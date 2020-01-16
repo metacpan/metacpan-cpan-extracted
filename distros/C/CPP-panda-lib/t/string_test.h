@@ -1906,18 +1906,6 @@ struct test_string {
             CHECK_ALLOCS();
             REQUIRE_STR(s, mstr("a",50)+mstr("b",10), 100);
         }
-        SECTION("use_cow_when_empty_without_reserve") {
-            String s;
-            String s2(cstr("a", 50));
-            String s3(cstr("b", 10));
-            get_allocs();
-            s.append(s2);
-            CHECK_ALLOCS();
-            REQUIRE(s2.use_count() == 2);
-            s.append(s3);
-            CHECK_ALLOCS(1, BUF_CHARS+60);
-            REQUIRE_STR(s, mstr("a",50)+mstr("b",10));
-        }
         SECTION("operator +=") {
             String s(cstr("abcd"));
             s += String(cstr("1234"));

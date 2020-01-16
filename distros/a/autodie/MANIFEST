@@ -62,7 +62,6 @@ t/import-into.t
 t/internal-backcompat.t
 t/internal.t
 t/kill.t
-t/kwalitee.t
 t/lethal.t
 t/lex58.t
 t/lib/Caller_helper.pm
@@ -109,6 +108,5 @@ t/utf8_open.t
 t/utime.t
 t/version.t
 t/version_tag.t
-xt/author/critic.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

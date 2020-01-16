@@ -16,4 +16,16 @@ subtest 'not match file' => sub {
     is_deeply \@matched, [];
 };
 
+subtest 'match whole dir without trailing slash' => sub {
+    my (@matched) = match_gitignore( ['bin'], 'bin/', 'bin/foo' );
+
+    is_deeply \@matched, ['bin/', 'bin/foo'];
+};
+
+subtest 'also match file without trailing slash' => sub {
+    my (@matched) = match_gitignore( ['bin'], 'bin' );
+
+    is_deeply \@matched, ['bin'];
+};
+
 done_testing;

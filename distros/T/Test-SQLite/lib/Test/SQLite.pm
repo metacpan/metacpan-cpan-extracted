@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0209';
 
 use Moo;
 use strictures 2;
@@ -62,7 +62,7 @@ has _database => (
 sub _build__database {
     my ($self) = @_;
 
-    my $filename = File::Temp->new( unlink => 1, suffix => '.db' );
+    my $filename = File::Temp->new( unlink => 1, suffix => '.db', EXLOCK => 0 );
 
     if ( $self->has_database ) {
         copy( $self->database, $filename )
@@ -72,16 +72,17 @@ sub _build__database {
         open my $schema, '<', $self->schema
             or die "Can't read " . $self->schema . ": $!";
 
-        my $dbh = DBI->connect( 'dbi:SQLite:dbname=' . $filename, '', '', { RaiseError => 1, AutoCommit => 0 } )
-            or die "Failed to open DB $filename: " . $DBI::errstr;
+        my $dbh = DBI->connect( "dbi:SQLite:dbname=$filename", '', '', { RaiseError => 1, AutoCommit => 0 } )
+            or die "Can't connect to $filename: " . $DBI::errstr;
 
         my $sql = '';
         while ( my $line = readline($schema) ) {
             next if $line =~ /^\s*--/;
+            next if $line =~ /^\s*$/;
 
             $sql .= $line;
 
-            if ( $line =~ /;/ ) {
+            if ( $line =~ /;\s*$/ ) {
                 $dbh->do($sql)
                     or die 'Error executing SQL for ' . $self->schema . ': ' . $dbh->errstr;
 
@@ -120,23 +121,27 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0200
+version 0.0209
 
 =head1 SYNOPSIS
 
   use DBI;
   use Test::SQLite;
 
-  my $sqlite = Test::SQLite->new(
-    database => '/some/where/production.db',
+  my $sqlite = Test::SQLite->new(database => '/some/where/production.db');
+  my $dbh = $sqlite->dbh;
+  # Fiddle with the test database...
+  $dbh->disconnect;
+
+  $sqlite = Test::SQLite->new(
+    schema   => '/some/where/schema.sql',
     db_attrs => { RaiseError => 1, AutoCommit => 0 },
   );
-
-  my $dbh = $sqlite->dbh;
-
-  $sqlite = Test::SQLite->new(schema => '/some/where/schema.sql');
-
+  # Explicitly use the dsn and db_attrs to connect:
   $dbh = DBI->connect($sqlite->dsn, '', '', $sqlite->db_attrs);
+  # Fiddle with the test database...
+  $dbh->commit;
+  $dbh->disconnect;
 
 =head1 DESCRIPTION
 
@@ -158,7 +163,9 @@ Boolean indicating that a database file was provided to the constructor.
 
 =head2 schema
 
-The SQL schema to create a test database.
+The SQL schema with which to create a test database.
+
+* The SQL parsing done by this module does not handle triggers.
 
 =head2 has_schema
 
@@ -182,18 +189,17 @@ A connected database handle based on the B<dsn> and B<db_attrs>.
 
   $sqlite = Test::SQLite->new(%arguments);
 
-Create a new C<Test::SQLite> object.
+Create a new C<Test::SQLite> object, which creates a temporary
+database given a B<database> or B<schema>.
 
 =head2 BUILD
 
 Ensure that we are given either a B<database> or a B<schema> and not
 both.
 
-=head1 THANK YOU
-
-Kaitlyn Parkhurst <symkat@symkat.com>
-
 =head1 SEE ALSO
+
+The F<t/01-methods.t> file in this distribution.
 
 L<DBI>
 
@@ -202,6 +208,10 @@ L<File::Copy>
 L<File::Temp>
 
 L<Moo>
+
+=head1 THANK YOU
+
+Kaitlyn Parkhurst <symkat@symkat.com>
 
 =head1 AUTHOR
 

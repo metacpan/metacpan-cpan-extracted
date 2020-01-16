@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tangence::Stream;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 
@@ -68,14 +68,18 @@ mixin.
 
 =cut
 
-=head2 $stream->tangence_write( $data )
+=head2 tangence_write
+
+   $stream->tangence_write( $data )
 
 Write bytes of data to the connected peer. C<$data> will be a plain perl
 string.
 
 =cut
 
-=head2 $stream->handle_request_$CODE( $token, $message )
+=head2 handle_request_$CODE
+
+   $stream->handle_request_$CODE( $token, $message )
 
 Invoked on receipt of a given message code. C<$token> will be some opaque perl
 scalar value, and C<$message> will be an instance of L<Tangence::Message>.
@@ -117,7 +121,9 @@ sub identity
    return $self->{identity};
 }
 
-=head2 $stream->tangence_closed
+=head2 tangence_closed
+
+   $stream->tangence_closed
 
 Informs the object that the underlying connection has now been closed, and any
 attachments to C<Tangence::Object> or C<Tangence::ObjectProxy> instances
@@ -135,7 +141,9 @@ sub tangence_closed
    }
 }
 
-=head2 $stream->tangence_readfrom( $buffer )
+=head2 tangence_readfrom
+
+   $stream->tangence_readfrom( $buffer )
 
 Informs the object that more data has been read from the underlying connection
 stream. Whole messages will be removed from the beginning of the C<$buffer>,
@@ -213,7 +221,9 @@ sub object_destroyed
    );
 }
 
-=head2 $stream->request( %args )
+=head2 request
+
+   $stream->request( %args )
 
 Serialises a message object to pass to the C<tangence_write> method, then
 enqueues a response handler to be invoked when a reply arrives. Takes the
@@ -234,7 +244,9 @@ received. It will be passed the response message:
 
 =back
 
-=head2 $response = $stream->request( request => $request )->get
+=head2 request (non-void)
+
+   $response = $stream->request( request => $request )->get
 
 When called in non-void context, this method returns a L<Future> that will
 yield the response instead. In this case it should not be given an
@@ -280,7 +292,9 @@ sub request
    return $f;
 }
 
-=head2 $stream->respond( $token, $message )
+=head2 respond
+
+   $stream->respond( $token, $message )
 
 Serialises a message object to be sent to the C<tangence_write> method. The
 C<$token> value that was passed to the C<handle_request_> method ensures that
@@ -313,7 +327,9 @@ sub respondERROR
    );
 }
 
-=head2 $ver = $stream->minor_version
+=head2 minor_version
+
+   $ver = $stream->minor_version
 
 Returns the minor version negotiated by the C<MSG_INIT> / C<MSG_INITED>
 initial message handshake.
@@ -328,12 +344,6 @@ sub minor_version
 }
 
 # Some (internal) methods that control new protocol features
-
-# wire protocol supports MSG_GETPROPELEM
-sub _ver_can_getpropelem { shift->minor_version >= 3 }
-
-# wire protocol supports MSG_WATCH_CUSR and cursors
-sub _ver_can_cursor { shift->minor_version >= 3 }
 
 # wire protocol uses typed smash data
 sub _ver_can_typed_smash { shift->minor_version >= 4 }

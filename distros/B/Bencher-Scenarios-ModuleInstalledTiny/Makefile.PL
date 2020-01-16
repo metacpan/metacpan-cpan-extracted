@@ -26,13 +26,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.046",
+    "Bencher::Backend" => "1.047",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.046",
+  "Bencher::Backend" => "1.047",
   "File::Path" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,

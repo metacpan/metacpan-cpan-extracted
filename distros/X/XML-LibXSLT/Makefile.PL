@@ -43,7 +43,7 @@ delete $config{NO_THREADS};
 my $HAVE_USER_DEFINED = (defined($config{LIBS}) or defined($config{INC}) );
 
 unless ( $::is_Win32 ) { # cannot get config in W32
-    my $xsltcfg = "xslt-config";
+    my $xsltcfg = "pkg-config libxslt";
     my $libprefix = $ENV{XSLTPREFIX} || $config{XSLTPREFIX};
 
     delete $config{XSLTPREFIX}; # delete if exists, otherwise MakeMaker gets confused
@@ -57,8 +57,8 @@ unless ( $::is_Win32 ) { # cannot get config in W32
     if ( ! $HAVE_USER_DEFINED ) {
         # get libs and inc from gnome-config
         eval {
-            print "running xslt-config... ";
-            my $ver = backtick("$xsltcfg --version");
+            print "running $xsltcfg... ";
+            my $ver = backtick("$xsltcfg --modversion");
             my ($major, $minor, $point) = $ver =~ /(\d+)\.(\d+)\.(\d+)/g;
             if (not
                 (

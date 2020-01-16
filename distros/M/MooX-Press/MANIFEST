@@ -23,3 +23,5 @@ t/10plusattr.t
 t/11plusclass.t
 t/12shortcuts.t
 t/13signatures.t
+t/14enum.t
+t/15requires.t

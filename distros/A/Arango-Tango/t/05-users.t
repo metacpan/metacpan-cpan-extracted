@@ -35,7 +35,7 @@ my $db = $arango->create_database('tmp_');
 
 ## 6. Ask about user access level to database
 
-my $perms = $arango->get_access_level('tmp_', 'tmp_user_');
+my $perms = $arango->get_access_level('tmp_user_', 'tmp_');
 ok !$perms->{error};
 is $perms->{result}, "none"; # no permission for the user
 
@@ -45,10 +45,10 @@ is $perms, $perms2, "Permissions are the same, getting them from different metho
 ## 7. Create Collection
 my $col = $db->create_collection('tmp_col');
 
-$perms = $arango->get_access_level('tmp_', 'tmp_col', 'tmp_user_');
+$perms = $arango->get_access_level('tmp_user_', 'tmp_', 'tmp_col');
 ok !$perms->{error};
 is $perms->{result}, "none"; # no permission for the user
-$perms2 = $db->get_access_level('tmp_col', 'tmp_user_');
+$perms2 = $db->get_access_level('tmp_user_', 'tmp_col');
 is $perms, $perms2, "Permissions are the same, getting them from different methods";
 
 $perms2 = $col->get_access_level('tmp_user_');
@@ -68,30 +68,30 @@ ok !exists($ans->{extra}{email});
 
 ## 9. Grant Permissions
 
-$ans = $arango->set_access_level('tmp_', 'tmp_user_', 'rw');
+$ans = $arango->set_access_level( 'tmp_user_', 'rw', 'tmp_');
 is ($ans->{code}, 200);
 
-$perms = $arango->get_access_level('tmp_', 'tmp_user_');
+$perms = $arango->get_access_level( 'tmp_user_', 'tmp_');
 is ($perms->{result}, "rw");
 
 $ans = $db->set_access_level('tmp_user_', 'ro');
 is ($ans->{code}, 200);
-$perms = $arango->get_access_level('tmp_', 'tmp_user_');
+$perms = $arango->get_access_level('tmp_user_', 'tmp_');
 is ($perms->{result}, "ro");
 
-$ans = $arango->set_access_level('tmp_', 'tmp_col', 'tmp_user_', 'rw');
+$ans = $arango->set_access_level( 'tmp_user_', 'rw', 'tmp_', 'tmp_col');
 is ($ans->{code}, 200);
-$perms = $arango->get_access_level('tmp_', 'tmp_col', 'tmp_user_');
+$perms = $arango->get_access_level( 'tmp_user_', 'tmp_', 'tmp_col');
 is ($perms->{result}, "rw");
 
-$ans = $db->set_access_level('tmp_col', 'tmp_user_', 'none');
+$ans = $db->set_access_level( 'tmp_user_', 'none', 'tmp_col');
 is ($ans->{code}, 200);
-$perms = $arango->get_access_level('tmp_', 'tmp_col', 'tmp_user_');
+$perms = $arango->get_access_level( 'tmp_user_', 'tmp_', 'tmp_col');
 is ($perms->{result}, "none");
 
 $ans = $col->set_access_level('tmp_user_', 'rw');
 is ($ans->{code}, 200);
-$perms = $arango->get_access_level('tmp_', 'tmp_col', 'tmp_user_');
+$perms = $arango->get_access_level( 'tmp_user_', 'tmp_', 'tmp_col');
 is ($perms->{result}, "rw");
 
 $ans = $col->clear_access_level('tmp_user_');
@@ -100,7 +100,7 @@ is ($ans->{code}, 202);
 {
     my $todo = todo "Need way to check default collection access level";
 
-    $perms = $arango->get_access_level('tmp_', 'tmp_col', 'tmp_user_');
+    $perms = $arango->get_access_level('tmp_user_', 'tmp_', 'tmp_col');
     is ($perms->{result}, "none");
 }
 
@@ -110,7 +110,7 @@ is ($ans->{code}, 202);
 {
     my $todo = todo "Need way to check default collection access level";
 
-    $perms = $arango->get_access_level('tmp_', 'tmp_user_');
+    $perms = $arango->get_access_level('tmp_user_', 'tmp_');
     is ($perms->{result}, "none");
 }
 

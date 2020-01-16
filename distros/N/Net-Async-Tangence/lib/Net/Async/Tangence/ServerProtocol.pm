@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package Net::Async::Tangence::ServerProtocol;
 
@@ -11,7 +11,7 @@ use warnings;
 use base qw( Net::Async::Tangence::Protocol Tangence::Server );
 use mro 'c3';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp;
 
@@ -55,6 +55,20 @@ sub configure
    }
 
    $self->SUPER::configure( %params );
+}
+
+sub rootobj
+{
+   my $self = shift;
+   my ( $identity ) = @_;
+
+   return $self->parent->conn_rootobj( $self, $identity );
+}
+
+sub permit_registry
+{
+   my $self = shift;
+   return $self->parent->conn_permits_registry( $self );
 }
 
 =head1 AUTHOR

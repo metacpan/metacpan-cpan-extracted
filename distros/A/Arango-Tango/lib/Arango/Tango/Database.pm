@@ -1,16 +1,77 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.010';
+$Arango::Tango::Database::VERSION = '0.011';
 use Arango::Tango::Cursor;
+use Arango::Tango::API;
 
 use warnings;
 use strict;
+
+BEGIN {
+    Arango::Tango::API::_install_methods "Arango::Tango::Database" => {
+
+        delete_collection => {
+            rest => [ delete => '{{database}}_api/collection/{colname}' ],
+            signature => [ 'colname' ],
+            inject_properties => [ { prop => 'name', as => 'database' } ],
+        },
+
+        create_collection => {
+            rest => [ post => '{{database}}_api/collection' ],
+            schema => {
+                keyOptions => { type => 'object', additionalProperties => 0, params => {
+                    allowUserKeys => { type => 'boolean' },
+                    type          => { type => 'string', default => 'traditional', enum => [qw'traditional autoincrement uuid padded'] },
+                    increment     => { type => 'integer' },
+                    offset        => { type => 'integer' },
+                }},
+                journalSize       => { type => 'integer' },
+                replicationFactor => { type => 'integer' },
+                waitForSync       => { type => 'boolean' },
+                doCompact         => { type => 'boolean' },
+                shardingStrategy  => {
+                    type    => 'string',
+                    default => 'community-compat',
+                    enum    => ['community-compat', 'enterprise-compat', 'enterprise-smart-edge-compat', 'hash', 'enterprise-hash-smart-edge']},
+                isVolatile        => { type => 'boolean' },
+                shardKeys         => { type => 'array', items => {type => 'string'} },
+                numberOfShards    => { type => 'integer' },
+                isSystem          => { type => 'booean' },
+                type              => { type => 'string', default => '2', enum => ['2', '3'] },
+                indexBuckets      => { type => 'integer' },
+                distributeShardsLike => { type => 'string' },
+                name              => { type => 'string' }
+            },
+            builder => sub {
+                my ($self, %params) = @_;
+                return Arango::Tango::Collection->_new(arango => $self, database => $params{database}, 'name' => $params{name});
+            },
+            signature => [ 'name' ],
+            inject_properties => [ { prop => 'name', as => 'database' } ]
+        }
+
+    };
+}
 
 sub _new {
     my ($class, %opts) = @_;
     return bless {%opts} => $class;
 }
+
+sub delete {
+    my $self = shift;
+    return $self->{arango}->delete_database($self->{name});
+}
+
+sub cursor {
+    my ($self, $aql, %opts) = @_;
+    return Arango::Tango::Cursor->_new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
+}
+
+
+
+
 
 sub collection {
    my ($self, $name) = @_;
@@ -23,46 +84,25 @@ sub collection {
    }
 }
 
-sub cursor {
-    my ($self, $aql, %opts) = @_;
-    return Arango::Tango::Cursor->_new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
-}
-
 sub list_collections {
     my ($self, %opts) = @_;
     return $self->{arango}->_api( list_collections => {  %opts, database => $self->{name} } )->{result};
 }
 
-sub create_collection {
-    my ($self, $name, %params) = @_;
-    die "Arango::Tango | Cannot create collection with empty collection or database name" unless length $name;
-    return $self->{arango}->_api('create_collection', { %params, database => $self->{name}, name => $name })
-}
-
-sub delete_collection {
-    my ($self, $name) = @_;
-    die "Arango::Tango | Cannot create collection with empty collection or database name" unless length $name;
-    return $self->{arango}->_api('delete_collection', { database => $self->{name}, name => $name })
-}
-
-sub delete {
-    my $self = shift;
-    return $self->{arango}->delete_database($self->{name});
-}
 
 sub get_access_level {
     my ($self, $username, $collection) = @_;
-    return $self->{arango}->get_access_level($self->{name}, $username, $collection);
+    return $self->{arango}->get_access_level( $username, $self->{name}, $collection);
 }
 
 sub clear_access_level {
     my ($self, $username, $collection) = @_;
-    return $self->{arango}->clear_access_level($self->{name}, $username, $collection);
+    return $self->{arango}->clear_access_level($username, $self->{name},  $collection);
 }
 
 sub set_access_level {
     my ($self, $username, $grant, $collection) = @_;
-    return $self->{arango}->set_access_level($self->{name}, $username, $grant, $collection);
+    return $self->{arango}->set_access_level($username, $grant, $self->{name},  $collection);
 }
 
 1;
@@ -79,7 +119,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 USAGE
 
@@ -129,21 +169,21 @@ Deletes the supplied database.
 =head2 C<get_access_level>
 
     $perms = $db->get_access_level($user)
-    $perms = $db->get_access_level($collection, $user)
+    $perms = $db->get_access_level($user, $collection)
 
 Fetch the database or collection access level for a specific user.
 
 =head2 C<set_access_level>
 
     $db->set_access_level($user, "rw")
-    $db->set_sccess_level($collection, $user, "ro")
+    $db->set_sccess_level($user, "ro", $collection)
 
 Set the database or collection access level for a specific user.
 
 =head2 C<clear_access_level>
 
     $db->clear_access_level($user)
-    $db->clear_sccess_level($collection, $user)
+    $db->clear_sccess_level($user, $collection)
 
 Clears the database or collection access level for a specific user.
 
@@ -153,7 +193,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alberto Simões.
+This software is copyright (c) 2019-2020 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

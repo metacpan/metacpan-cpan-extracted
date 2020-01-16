@@ -222,6 +222,17 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
   ->text_like('p', qr/fun/, 'with description')->text_unlike('p', qr/boring/)
   ->text_unlike('p', qr/boring/, 'with description');
 
+# Foo::joy (testing HTML attributes in template)
+$t->get_ok('/fun/joy')->status_is(200)
+  ->attr_is('p.joy', 'style', 'background-color: darkred;')
+  ->attr_is('p.joy', 'style', 'background-color: darkred;', 'with description')
+  ->attr_isnt('p.joy', 'style', 'float: left;')
+  ->attr_isnt('p.joy', 'style', 'float: left;', 'with description')
+  ->attr_like('p.joy', 'style', qr/color/)
+  ->attr_like('p.joy', 'style', qr/color/, 'with description')
+  ->attr_unlike('p.joy', 'style', qr/^float/)
+  ->attr_unlike('p.joy', 'style', qr/^float/, 'with description');
+
 # Foo::baz (missing action without template)
 $log = '';
 $cb  = $t->app->log->on(message => sub { $log .= pop });
@@ -260,7 +271,7 @@ like $log, qr/Missing right curly/,                       'right message';
 like $log, qr/Template "exception.development.html.ep" not found/,
   'right message';
 like $log, qr/Rendering template "exception.html.epl"/, 'right message';
-like $log, qr/500 Internal Server Error/, 'right message';
+like $log, qr/500 Internal Server Error/,               'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Exceptional::this_one_dies (action dies)
@@ -457,6 +468,11 @@ my $etag = $t->tx->res->headers->etag;
 $t->get_ok('/hello.txt' => {'If-None-Match' => $etag})->status_is(304)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('');
 
+# Check weak If-None-Match against strong ETag
+$t->get_ok('/hello.txt' => {'If-None-Match' => qq{W/"$etag"}})->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_like(qr/Hello Mojo from a development static file!/);
+
 # Check If-None-Match and If-Last-Modified
 $t->get_ok(
   '/hello.txt' => {'If-None-Match' => $etag, 'If-Last-Modified' => $mtime})
@@ -494,7 +510,7 @@ $t->get_ok('/just/some/template')->status_is(200)
 }
 
 # Make sure we can override attributes with constructor arguments
-is(MojoliciousTest->new(mode => 'test')->mode, 'test', 'right mode');
+is(MojoliciousTest->new(mode => 'test')->mode,   'test', 'right mode');
 is(MojoliciousTest->new({mode => 'test'})->mode, 'test', 'right mode');
 
 # Persistent error

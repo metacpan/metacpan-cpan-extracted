@@ -2,7 +2,9 @@ NAME
     Log::Any::Adapter::Callback - Send Log::Any logs to a subroutine
 
 VERSION
-    version 0.09
+    This document describes version 0.100 of Log::Any::Adapter::Callback
+    (from Perl distribution Log-Any-Adapter-Callback), released on
+    2020-01-14.
 
 SYNOPSIS
      # say, let's POST each log message to an HTTP API server
@@ -21,6 +23,10 @@ SYNOPSIS
      );
 
 DESCRIPTION
+    DEPRECATION NOTICE: Log::Any distribution since 1.708 comes with
+    Log::Any::Adapter::Capture which does the same thing. I'm deprecating
+    this adapter now.
+
     This adapter lets you specify callback subroutine to be called by
     Log::Any's logging methods (like $log->debug(), $log->error(), etc) and
     detection methods (like $log->is_warning(), $log->is_fatal(), etc.).
@@ -36,16 +42,13 @@ DESCRIPTION
     where $method is the name of method (like "debug") and ($self, $format,
     @params) are given by Log::Any.
 
-SEE ALSO
-    Log::Any
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Log-Any-Adapter-Callback>.
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Log-Any-Adapter-Callback>.
+    <https://github.com/perlancar/perl-Log-Any-Adapter-Callback>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -55,11 +58,17 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    Log::Any::Adapter::Capture
+
+    Log::Any
+
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
+    This software is copyright (c) 2020, 2014, 2013, 2012, 2011 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

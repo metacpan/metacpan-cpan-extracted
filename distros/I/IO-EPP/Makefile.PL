@@ -16,6 +16,9 @@ WriteMakefile(
 	'HTTP::Cookies'      => 0,
 	'Digest::MD5'        => 0,
 	'Time::HiRes'        => 0,
+	'parent'             => 0,
+	'strict'             => 0,
+	'warnings'           => 0,
     },
     BUILD_REQUIRES     => {
 	'Test::Spec' => 0,

@@ -259,7 +259,7 @@ describe 'IO::EPP::Verisign::' => sub {
 
         is $answ->{statuses}{linked}, undef;
 
-        is scalar( @{$answ->{addrs}} ), 2;
+        is scalar( @{$answ->{ips}} ), 2;
     };
 
     it 'update_ns' => sub {

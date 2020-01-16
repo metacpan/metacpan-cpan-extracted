@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser;
 # ABSTRACT: front-end class for Bio::Palantir::Parser module, wich handles the parsing of biosynML.xml and regions.js antiSMASH reports
-$Bio::Palantir::Parser::VERSION = '0.193230';
+$Bio::Palantir::Parser::VERSION = '0.200150';
 use Moose;
 use namespace::autoclean;
 
@@ -10,6 +10,7 @@ use Carp;
 use File::Basename 'fileparse';
 use File::Temp;
 use JSON::Parse 'json_file_to_perl';
+use POSIX 'ceil';
 use XML::Bare;
 use XML::Hash::XS;
 
@@ -126,7 +127,7 @@ sub _convert_js2biosynml {
             name  => $region_for->{$region}{anchor},
             rank  => $region_for->{$region}{idx},
             type  => $region_for->{$region}{type},
-            start => $region_for->{$region}{start},
+            start => $region_for->{$region}{start}, # DNA coordinates
             end   => $region_for->{$region}{end},
         );
         
@@ -142,12 +143,13 @@ sub _convert_js2biosynml {
                 = $def =~ m/PROGRAMS=blastp&amp;QUERY=([A-Z]+)\&amp/xms;
 
             my %orf_for = (
-                id   => $gene_id++,
-                name => $orf->{locus_tag},
-                start => $orf->{start},
-                end => $orf->{end},
-                type => $orf->{type},
+                id       => $gene_id++,
+                name     => $orf->{locus_tag},
+                start    => $orf->{start},  # DNA coordinates
+                end      => $orf->{end},
+                type     => $orf->{type},
                 sequence => $sequence,
+                strand   => $orf->{strand},
             );
 
             $json_for{ $cluster_for{name} }{genes}{ $orf_for{name} }{$_} 
@@ -157,7 +159,8 @@ sub _convert_js2biosynml {
 
     # parse the second part of the report
     my $domain_id = 1; 
-    $region_for = $root->{details_data};
+    my $module_id = 1;
+    $region_for = $root->{details_data}; # reassigning the region_for var
     for my $region (keys %{ $region_for }) {
 
         my $cluster_name = $region_for->{$region}{id};
@@ -179,17 +182,72 @@ sub _convert_js2biosynml {
                 
                 $json_for{$cluster_name}{genes}{$gene_name}{domains}{$domain_id}
                     = {
-                    id         => $domain_id++,
-                    gene_id    => $json_for{$cluster_name}{genes}{$gene_name}{id},
-                    prot_start => $domain->{start},
-                    prot_end   => $domain->{end},
-                    type       => $domain->{type},
-                    sequence   => $domain->{sequence},
-                    dna_start  => $domain->{start} * 3,
-                    dna_end    => $domain->{end} * 3,
+                    id           => $domain_id++,
+                    gene_id      => $json_for{$cluster_name}{genes}{$gene_name}{id},
+                    prot_start   => $domain->{start},
+                    prot_end     => $domain->{end},
+                    type         => $domain->{type},
+                    sequence     => $domain->{sequence},
+                    dna_start    => $domain->{start} == 1 
+                                        ? 1 : $domain->{start} * 3,
+                    dna_end      => $domain->{end} * 3,
+                    abbreviation => $domain->{abbreviation}, # = symbol
                 };
 
                 $prev_domain = $domain;
+            }
+
+            if ($orf->{modules}) {    # appeared in antiSMASH version 5.1
+                
+                for my $module (@{ $orf->{modules} }) {
+
+#                     my $domain_for = $json_for{$cluster_name}{genes}{
+#                         $gene_name}{domains};
+# 
+#                     my @module_domains =  
+#                         map { $domain_for->{$_}{abbreviation} } 
+#                         grep { $domain_for->{$_}{prot_start} < $module->{end}
+#                             && $domain_for->{$_}{prot_end} > $module->{start} }
+#                         keys %{ $domain_for }
+#                     ;
+                    
+                    my @gene_dna_coordinates = (
+                        $json_for{$cluster_name}{genes}{$gene_name}{start},
+                        $json_for{$cluster_name}{genes}{$gene_name}{end},
+                    );
+
+                    my $genomic_prot_start = ceil(($gene_dna_coordinates[0] / 3))
+                        + $module->{start} - 1;     # if module starting pos is 1, this souldn't be position 2 on the gene coords
+                    my $genomic_prot_end =   ceil(($gene_dna_coordinates[0] / 3))
+                        + $module->{end} - 1;
+
+                    my $dna_start = $module->{start} == 1   # if prot pos is 1, it should still be 1 in DNA
+                        ? 1 
+                        : $module->{start} * 3
+                    ;
+
+                    my $genomic_dna_start = $gene_dna_coordinates[0]
+                        + $dna_start - 1;
+                    my $genomic_dna_end   = $gene_dna_coordinates[0]
+                        + ($module->{end} * 3) - 1;
+                    
+                    $json_for{$cluster_name}{modules}{
+                        'module' . $module_id} = {
+                        id         => $module_id++,
+                        gene_id    => $gene_name,
+                        rel_start  => $module->{start}, # relative to gene coordinates
+                        rel_end    => $module->{end},
+                        prot_start => $genomic_prot_start,
+                        prot_end   => $genomic_prot_end,
+                        dna_start  => $genomic_dna_start,
+                        dna_end    => $genomic_dna_end,
+                        complete   => $module->{complete} == 1
+                            ? 'true' : 'false',
+                        iterative  => $module->{iterative},
+                        monomer    => $module->{monomer},
+#                         domains    => join ',', @module_domains // 'NULL',
+                    };
+                }
             }
         }
     }
@@ -207,7 +265,7 @@ sub _convert_js2biosynml {
 
         $biosynml_for{$model_id}{genecluster}{name} = $c_name; 
         $biosynml_for{$model_id}{genecluster}{type} = $c_type;
-        $biosynml_for{$model_id}{genecluster}{region}{begin} = $c_begin; 
+        $biosynml_for{$model_id}{genecluster}{region}{begin} = $c_begin;    # DNA coordinates
         $biosynml_for{$model_id}{genecluster}{region}{end}   = $c_end;
 
         GENE: 
@@ -223,48 +281,60 @@ sub _convert_js2biosynml {
             $biosynml_for{genelist}{$attr_gene_id}{gene_location}{begin} 
                 = $g_begin;
             
-            $biosynml_for{genelist}{$attr_gene_id}{gene_location}{end} = $g_end;
+            $biosynml_for{genelist}{$attr_gene_id}{gene_location}{end} 
+                = $g_end;
             
             $biosynml_for{genelist}{$attr_gene_id}{gene_qualifiers}{'qualifier' 
                 . ' name="translation" ori="auto-annotation" style="genbank"'} 
                 = $g_sequence
             ;
-                for my $domain (keys %{ $json_for{$cluster}{genes}{$gene}{domains}
-                    }) {
-                    
-                    my ($d_id, $dgene_id, $d_pbegin, $d_pend, $d_dbegin, 
-                        $d_dend,$d_type, $d_sequence)
-                        = map { $json_for{$cluster}{genes}{$gene}{domains}{
-                        $domain}{$_} } 
-                        qw(id gene_id prot_start prot_end 
-                            dna_begin dna_end type sequence)
-                    ;
 
-                    my $attr_domain_id = 'domain id="' . $d_id .'"';
-                    $biosynml_for{domainlist}{$attr_domain_id}{nodeid} 
-                        = $d_id;
+            for my $domain (keys %{ $json_for{$cluster}{genes}{$gene}{domains}
+                }) {
+                
+                my ($d_id, $dgene_id, $d_pbegin, $d_pend, $d_dbegin, 
+                    $d_dend,$d_type, $d_sequence)
+                    = map { $json_for{$cluster}{genes}{$gene}{domains}{
+                    $domain}{$_} } 
+                    qw(id gene_id prot_start prot_end 
+                        dna_begin dna_end type sequence)
+                ;
 
-                    $biosynml_for{domainlist}{$attr_domain_id}{function} 
-                        = $d_type;
+                my $attr_domain_id = 'domain id="' . $d_id .'"';
 
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'protein'}{sequence} = $d_sequence;
-                        
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'protein'}{position}{begin} = $d_pbegin;
+                $biosynml_for{domainlist}{$attr_domain_id} 
+                    = { 
+                    nodeid => $d_id,
+                    function => $d_type,
+                    location => {
+                        gene => {
+                            'geneid source ="genelist"' => $dgene_id,
+                            position => { begin => $d_dbegin, end => $d_dend, },
+                        },
+                        protein => {
+                            sequence => $d_sequence,
+                            position => { begin => $d_pbegin, end => $d_pend, },
+                        },
+                    },
+                };
+            }
+        }
+       
+       if ($json_for{$cluster}{modules}) {
 
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'protein'}{position}{end} = $d_pend;
+            my $module_for = $json_for{$cluster}{modules}; 
 
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'gene'}{'geneid source="genelist"'} = $dgene_id;
-                    
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'gene'}{position}{begin} = $d_dbegin;
-
-                    $biosynml_for{domainlist}{$attr_domain_id}{location}{
-                        'gene'}{position}{end} = $d_dend;
-                }
+            MODULE:
+            for my $module (keys %{ $module_for }) {
+            
+                my $attr_module_id = 'module id="' 
+                    . $module_for->{$module}{id} .'"';
+             
+                $biosynml_for{modulelist}{$attr_module_id}{$_} 
+                  = $module_for->{$module}{$_} 
+                  for keys %{ $module_for->{$module} }
+                ;
+            }
         }
     }
 
@@ -320,7 +390,7 @@ Bio::Palantir::Parser - front-end class for Bio::Palantir::Parser module, wich h
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 

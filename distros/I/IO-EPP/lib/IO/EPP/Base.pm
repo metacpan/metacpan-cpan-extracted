@@ -94,6 +94,9 @@ our $epp_host_urn =
 'xmlns:host="urn:ietf:params:xml:ns:host-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:host-1.0 host-1.0.xsd"';
 our $epp_dom_urn  =
 'xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd"';
+our $epp_dnssec =
+'xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:secDNS-1.1 secDNS-1.1.xsd"';
+
 
 our %id = ( crID => 'creater', clID => 'owner', upID => 'updater', reID => 'requestors_id', acID => 'senders_id' );
 our %dt = ( crDate => 'cre_date', upDate => 'upd_date', trDate => 'trans_date', exDate => 'exp_date', reDate => 'request_date', acDate => 'send_date'  );
@@ -103,20 +106,29 @@ our %dt = ( crDate => 'cre_date', upDate => 'upd_date', trDate => 'trans_date', 
 
 =head2 make_request
 
-See IO:EPP for description
+See L<IO:EPP> for description
 
 An example of working with functions is presented in the synopsis
 
 Work checked on CentralNic server
 
 INPUT:
+
 action name;
+
 parameters of query
 
 OUTPUT:
-full answer with code and message;
-string with code and message;
+
 io::epp object
+
+or, in list context:
+
+( full answer with code and message, string with code and message, io::epp object )
+
+An Example:
+
+    my ( $answer, $message, $conn_object ) = make_request( 'hello', \%login_params );
 
 =cut
 
@@ -166,6 +178,20 @@ END_MR:
 }
 
 
+=head2 gen_id
+
+Gereration ID for contacts
+
+INPUT:
+
+no params
+
+OUTPUT:
+
+new id
+
+=cut
+
 sub gen_id {
     my @chars = ( 'a'..'z', '0'..'9' );
 
@@ -178,9 +204,11 @@ sub gen_id {
 Authinfo Generation
 
 INPUT:
+
 length of authInfo, default 16 symbols
 
 OUTPUT:
+
 new authInfo
 
 =cut
@@ -282,18 +310,37 @@ Example of a call
 
     undef $o; # call logout() и DESTROY() of object
 
+INPUT:
+
+package name, parameters.
+
 Connection parameters:
-C<user>        -- login;
-C<pass>        -- password;
-C<tld>         -- zone for providers that have a binding in it, for example, verisign;
-C<server>      -- server name if the registry has different servers with different extensions, for example, pir/afilias for afilias;
-C<sock_params> -- hashref with L<IO::Socket::SSL> parameters;
-C<test_mode>   -- use a real connection or registry emulator.
+
+C<user>        – login;
+
+C<pass>        – password;
+
+C<tld>         – zone for providers that have a binding in it, for example, verisign;
+
+C<server>      – server name if the registry has different servers with different extensions, for example, pir/afilias for afilias;
+
+C<sock_params> – hashref with L<IO::Socket::SSL> parameters;
+
+C<test_mode>   – use a real connection or registry emulator.
 
 Parameters for logging:
-C<no_log>   -- do not write anything to the log;
-C<log_name> -- write log in this file, not in STDOUT;
-C<log_fn>   -- ref on functions to write to the log.
+
+C<no_log>   – do not write anything to the log;
+
+C<log_name> – write log in this file, not in STDOUT;
+
+C<log_fn>   – ref on functions to write to the log.
+
+OUTPUT:
+
+io::epp object or array ( object, login code, login message )
+
+If the connection or authorization failed, the response will contain zero instead of an object
 
 =cut
 
@@ -487,7 +534,7 @@ sub epp_log {
 
 =head2 req_test
 
-For replace req() in test mode
+For replace L</req> in test mode
 
 =cut
 
@@ -519,8 +566,10 @@ sub req_test {
 Request to registry
 
 INPUT:
-out_data -- body of request;
-info -- name of request for log.
+
+C<out_data> – body of request;
+
+C<info> – name of request for log.
 
 OUTPUT:
 answer from registry.
@@ -639,14 +688,42 @@ sub req {
 Universal handler for simple answer
 
 INPUT:
+
 request body;
+
 request name;
+
 check or not epp poll, default is 0
 
 OUTPUT:
-answer;
+
+answer, may contain the object's name, id, creation and/or expiration date, client-side transaction id, and registry id;
+
 answer code;
-answer message
+
+answer message, if there is an error in the response, an additional reason for the error may be passed along with the message.
+
+An Example:
+
+    # answer for create_contact:
+
+    {
+        'msg' => 'Command completed successfully.',
+        'cont_id' => 'sxsup8ehs000',
+        'cre_date' => '2020-01-01 01:01:01',
+        'cltrid' => 'd0a528a4816ea4e16c3f56e25bf11111',
+        'code' => 1000,
+        'svtrid' => 'CNIC-22E5B2CBBD6C04169AEC9228FB0677FA173D76487AF8BA8734AF3C11111'
+    };
+
+    # answer with error, "1.2.3.4 addr not found" is reason:
+
+    {
+        'msg' => 'Parameter value policy error; 1.2.3.4 addr not found',
+        'cltrid' => 'd0e2a9c2af427264847b0a6e59b60000',
+        'code' => 2306,
+        'svtrid' => '4586654601-1579115463111'
+    };
 
 =cut
 
@@ -726,9 +803,13 @@ The function is automatically called from new.
 A separate call is only needed to change the password.
 
 INPUT:
+
 password;
+
 addition standard parameters (<objURI>xxxxx-1.0</objURI>);
+
 extensions (<extURI>yyyyyy-1.0</extURI>);
+
 new password if need.
 
 OUTPUT: see L</simple_request>.
@@ -781,7 +862,43 @@ LOGIN
 
 Get greeting, ping analog.
 
-No parameters.
+No input parameters.
+
+Sample response:
+
+    {
+        'msg' => '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <epp xmlns="urn:ietf:params:xml:ns:epp-1.0"><greeting>
+            <svID>CentralNic EPP server EPP.CENTRALNIC.COM</svID>
+            <svDate>2020-20-20T20:20:20.0Z</svDate>
+            <svcMenu>
+            <version>1.0</version><lang>en</lang>
+            <objURI>urn:ietf:params:xml:ns:domain-1.0</objURI>
+            <objURI>urn:ietf:params:xml:ns:contact-1.0</objURI>
+            <objURI>urn:ietf:params:xml:ns:host-1.0</objURI>
+            <svcExtension>
+            <extURI>urn:ietf:params:xml:ns:rgp-1.0</extURI>
+            <extURI>urn:ietf:params:xml:ns:secDNS-1.1</extURI>
+            <extURI>urn:ietf:params:xml:ns:idn-1.0</extURI>
+            <extURI>urn:ietf:params:xml:ns:fee-0.4</extURI>
+            <extURI>urn:ietf:params:xml:ns:fee-0.5</extURI>
+            <extURI>urn:ietf:params:xml:ns:launch-1.0</extURI>
+            <extURI>urn:ietf:params:xml:ns:regtype-0.1</extURI>
+            <extURI>urn:ietf:params:xml:ns:auxcontact-0.1</extURI>
+            <extURI>urn:ietf:params:xml:ns:artRecord-0.2</extURI>
+            <extURI>http://www.nic.coop/contactCoopExt-1.0</extURI>
+            </svcExtension>
+            </svcMenu>
+            <dcp>
+            <access><all></all></access>
+            <statement>
+            <purpose><admin></admin><prov></prov></purpose>
+            <recipient><ours></ours><public></public></recipient>
+            <retention><stated></stated></retention>
+            </statement>
+            </dcp></greeting></epp>',
+        'code' => 1000
+    };
 
 =cut
 
@@ -895,7 +1012,13 @@ CHECKCONT
     return wantarray ? ( 0, 0, 'empty answer' ) : 0 ;
 }
 
-# Convert contact params to xml text
+=head2 cont_to_xml
+
+Covertor contact user date to epp xml
+
+for create/update_contact functions
+
+=cut
 
 sub cont_to_xml {
     my ( $self, $params ) = @_;
@@ -1025,9 +1148,12 @@ sub cont_to_xml {
     return $textcont;
 }
 
+=head2 create_contact_ext
 
-# create contact extensions,
-# for overwriting in child classes
+Create contact extensions,
+for overwriting in child classes
+
+=cut
 
 sub create_contact_ext {
     return '';
@@ -1037,7 +1163,89 @@ sub create_contact_ext {
 
 Register a contact
 
+INPUT:
+
+Hash with parameters:
+
+C<cont_id> – some providers create contact ID automatically;
+
+C<name> or C<first_name>, C<last_name>, C<patronymic>, C<family_name> – full name in one field or first, last, patronymic, family names separately;
+
+C<org> – organization if necessary, some registries require a zero-length string, while others require C<undef>;
+
+C<addr> – street, house, building, apartment;
+
+C<city> – city, town;
+
+C<state> – state, region, province, republic, optional field;
+
+C<postcode> – zip code;
+
+C<country_code> – two-character country code;
+
+C<phone> – the phone number in international format;
+
+C<fax> – usually only required for legal entities;
+
+C<email>;
+
+C<authinfo> – the key is to transfer your contacts, but usually the contacts are transferred automatically together with a domain.
+
+If only the C<int> type of contacts is passed, it can be omitted.
+
 OUTPUT: see L</simple_request>.
+
+An Example, one type (by default this is C<int>):
+
+    ( $answ, $code, $msg ) = $conn->create_contact(
+        {
+            cont_id => '123qwerty',
+            first_name => 'Test',
+            last_name => 'Testov',
+            org => 'Private Person',
+            addr => 'Vagnera 11-22',
+            city => 'Donetsk',
+            state => 'Donetskaya',
+            postcode => '83061',
+            country_code => 'DN',
+            phone => '+380.501234567',
+            fax => '',
+            email => 'reg1010@yandex.com',
+            authinfo => 'Q2+qqqqqqqqqqqqqqqqqqqqqqqqqq',
+        },
+    );
+
+Contact with two types
+
+    ( $answ, $code, $msg ) = $conn->create_contact(
+        {
+            cont_id => '123qwerty',
+            int => {
+                first_name => 'Test',
+                last_name => 'Testov',
+                org => 'Private Person',
+                addr => 'Vagnera 11-22',
+                city => 'Donetsk',
+                state => 'Donetskaya',
+                postcode => '83061',
+                country_code => 'DN',
+            },
+            loc => {
+                first_name => 'Тест',
+                last_name => 'Тестов',
+                org => 'Частное лицо',
+                addr => 'Вагнера 11/22',
+                city => 'Донецк',
+                state => 'Донецкая обл.',
+                postcode => '83061',
+                country_code => 'DN',
+            },
+            phone => '+380.501234567',
+            fax => '',
+            email => 'reg1010@yandex.com',
+            authinfo => 'Q2+qqqqqqqqqqqqqqqqqqqqqqqqqq',
+        }
+    );
 
 =cut
 
@@ -1078,6 +1286,14 @@ CRECONT
     return $self->simple_request( $body, 'create_contact' );
 }
 
+
+=head2 cont_from_xml
+
+Covertor contact epp xml data to hash
+
+for get_contact_info, overwritten in some child modules
+
+=cut
 
 sub cont_from_xml {
     my ( undef, $rdata ) = @_;
@@ -1139,8 +1355,9 @@ sub cont_from_xml {
         $cont{authinfo} = $1;
     }
 
-    my ( $visible ) = $rdata =~ /<contact:disclose flag=['"](\d)['"]>/;
-    $cont{pp_flag} = $visible ? 0 : 1;
+    if ( $rdata =~ /<contact:disclose flag=['"](\d)['"]>/ ) {
+        $cont{pp_flag} = $1 ? 0 : 1;
+    }
 
     # owner, ...
     foreach my $k ( keys %id ) {
@@ -1164,7 +1381,13 @@ sub cont_from_xml {
 }
 
 
-# Providers extension, replaced in provider modules
+=head2 get_contact_ext
+
+Providers extension, replaced in provider modules
+
+Returns an empty hashref here
+
+=cut
 
 sub get_contact_ext {
     return {};
@@ -1174,6 +1397,51 @@ sub get_contact_ext {
 =head2 get_contact_info
 
 Get information on the specified contact
+
+INPUT:
+
+C<cont_id> – contact id
+
+C<extension> – epp extensions in xml
+
+An Example:
+
+    my ( $answer, $code, $msg ) = $conn->get_contact_info( { cont_id => 'H12345' } );
+
+    # $answer:
+
+    {
+        'owner' => 'H2220222',
+        'int' => {
+            'city' => 'Moscow',
+            'org' => 'My Ltd',
+            'country_code' => 'RU',
+            'name' => 'Igor Igorev',
+            'postcode' => '123456',
+            'addr' => 'Igoreva str, 3',
+            'state' => 'Igorevskya obl.'
+        },
+        'roid' => 'C2222888-CNIC',
+        'cre_date' => '2012-12-12 12:12:12',
+        'phone' => [
+            '+7.4952334455'
+        ],
+        'pp_flag' => 1,
+        'email' => [
+            'mail@igor.ru'
+        ],
+        'upd_date' => '2012-12-12 12:12:12',
+        'cont_id' => 'H12345',
+        'fax' => [
+            '+7.4952334455'
+        ],
+        'creater' => 'H2220222',
+        'statuses' => {
+            'serverDeleteProhibited' => '+',
+            'serverTransferProhibited' => '+',
+            'linked' => '+'
+        }
+    };
 
 =cut
 
@@ -1247,6 +1515,12 @@ CONTINFO
     return wantarray ? ( 0, 0, 'empty answer' ) : 0 ;
 }
 
+=head2 update_statuses_add
+
+Part of update_* functions
+
+=cut
+
 sub update_statuses_add {
     my ( undef, $type, $statuses ) = @_;
 
@@ -1273,6 +1547,12 @@ sub update_statuses_add {
 }
 
 
+=head2 update_statuses_rem
+
+Part of update_* functions
+
+=cut
+
 sub update_statuses_rem {
     my ( undef, $type, $statuses ) = @_;
 
@@ -1295,7 +1575,39 @@ sub update_statuses_rem {
 
 To update contact information
 
+INPUT:
+
+params with keys:
+
+C<cont_id> – contact id
+
+C<add>, C<rem> – only contact statuses can be added or deleted, , such as clientUpdateProhibited
+
+C<chg> – modify data, see fields in L</create_contact>
+
 OUTPUT: see L</simple_request>.
+
+An Example, change data, one type (by default this is C<int>):
+
+    ( $answ, $code, $msg ) = $conn->update_contact(
+        {
+            cont_id => '123qwerty',
+            chg => {
+                first_name => 'Test',
+                last_name => 'Testov',
+                org => 'Private Person',
+                addr => 'Vagnera 11-22',
+                city => 'Donetsk',
+                state => 'Donetskaya',
+                postcode => '83061',
+                country_code => 'DN',
+                phone => '+380.501234567',
+                fax => '',
+                email => 'reg1010@yandex.com',
+                authinfo => 'Q2+qqqqqqqqqqqqqqqqqqqqqqqqqq',
+            }
+        },
+    );
 
 =cut
 
@@ -1357,10 +1669,22 @@ UPDCONT
 
 =head2 delete_contact
 
-Delete the specified contact
+Delete the specified contact.
+Usually this function is not needed because the registry itself deletes unused contacts.
 
-OUTPUT:
-see L</simple_request>.
+INPUT:
+
+params with keys:
+
+C<cont_id> – contact id.
+
+C<extension> – extensions for some providers, empty by default
+
+OUTPUT: see L</simple_request>.
+
+An Example:
+
+    my ( $answ, $msg ) = make_request( 'delete_contact', { cont_id => 'H12345', %conn_params } );
 
 =cut
 
@@ -1398,8 +1722,33 @@ DELCONT
 
 Check that the nameserver is registered
 
-OUTPUT:
-see L</simple_request>.
+INPUT:
+
+params with keys:
+
+C<nss> – list with nameservers
+
+C<extension> – extensions for some providers, empty by default
+
+OUTPUT: see L</simple_request>.
+
+An Example:
+
+    my ( $a, $m, $o ) = make_request( 'check_nss', { nss => [ 'ns99.cnic.com', 'ns1.godaddy.com' ] } );
+
+    # answer:
+
+    {
+        'msg' => 'Command completed successfully.',
+        'ns1.godaddy.com' => {
+            'reason' => 'in use',
+            'avail' => '0'
+        },
+        'ns99.cnic.com' => {
+            'avail' => '1'
+        },
+        'code' => '1000'
+    };
 
 =cut
 
@@ -1468,8 +1817,29 @@ CHECKNSS
 
 Registering a nameserver
 
+INPUT:
+
+params with keys:
+
+C<ns> – name server
+
+C<ips> – array with IP, IPv4 and IPv6,
+IP must be specified only we register nameserver based on the domain of the same registry
+
+C<extension> – extensions for some providers, empty by default
+
 OUTPUT:
-see L</simple_request>.
+see L</simple_request>
+
+An Example:
+
+    my ( $h, $m, $o ) = make_request( 'create_ns', { ns => 'ns111.sssllll.info', %conn_params } );
+
+    # check answer
+
+    ( $a, $m ) = make_request( 'create_ns', { ns => 'ns222.ssslll.com', ips => ['1.2.3.4', 'fe80::aa00:bb11' ], conn => $o } );
+
+    # check answer
 
 =cut
 
@@ -1513,6 +1883,14 @@ CREATENS
 }
 
 
+=head2 get_ns_info_rdata
+
+Covertor NS xml resData data to hash.
+
+Can be overwritten in a child module.
+
+=cut
+
 sub get_ns_info_rdata {
     my ( undef, $rdata ) = @_;
 
@@ -1538,7 +1916,7 @@ sub get_ns_info_rdata {
         $ns{statuses}{$_} = '+' for @ss;
     }
 
-    $ns{addrs} = [ $rdata =~ /<host:addr ip=['"]v\d['"]>([0-9A-Fa-f.:]+)<\/host:addr>/g ];
+    $ns{ips} = [ $rdata =~ /<host:addr ip=['"]v\d['"]>([0-9A-Fa-f.:]+)<\/host:addr>/g ];
 
     # owner, ...
     foreach my $k ( keys %id ) {
@@ -1565,6 +1943,53 @@ sub get_ns_info_rdata {
 =head2 get_ns_info
 
 Get information about the specified nameserver
+
+INPUT:
+
+params with keys:
+
+C<ns> – name server;
+
+C<extension> – extensions for some providers, empty by default.
+
+OUTPUT:
+
+hash with ns data: statuses, dates, ips and other
+
+C<owner> – the account where the name server is located;
+
+C<create> – the account where the name server was registered;
+
+C<cre_date> – name server registration date;
+
+C<roid> – name server id in the registry;
+
+C<ips> – list of IP addresses, IPv4 and IPv6;
+
+C<linked> – this status indicates that the name server is being used by some domain.
+
+An Example:
+
+    my ( $answer, $msg, $conn ) = make_request( 'get_ns_info', { ns => 'ns1.sss.ru.com', %conn_params  } );
+
+    # answer:
+
+    {
+        'msg' => 'Command completed successfully.',
+        'owner' => 'H2220222',
+        'roid' => 'H370000-CNIC',
+        'cre_date' => '2013-09-05 18:42:49',
+        'name' => 'ns1.sss.ru.com',
+        'ips' => [
+            '2A00:3B00:0:0:0:0:0:25'
+        ],
+        'creater' => 'H2220222',
+        'statuses' => {
+            'ok' => '+',
+            'linked' => '+'
+        },
+        'code' => '1000'
+    };
 
 =cut
 
@@ -1619,10 +2044,43 @@ NSINFO
 
 =head2 update_ns
 
-Change the data of the specified nameserver
+Change the data of the specified name server
+
+INPUT
+
+params with keys:
+
+C<ns> – name server
+
+C<add>, C<rem> – adding or removing the name server parameters listed below:
+
+C<ips> – IPv4 and IPv6 addresses;
+
+C<statuses> – clientUpdateProhibited and other client*;
+
+C<chg> – change the server name, this is used to move the name server to a different domain.
+
+C<no_empty_chg> – some registries prohibit  passing an empty chg parameter – C<< <host:chg/> >>
+
+C<extension> – extensions for some providers, empty by default
 
 OUTPUT:
 see L</simple_request>.
+
+An Example
+
+    my ( $answ, $msg, $conn ) = make_request( 'update_ns', {
+        ns => 'ns1.sss.ru.com',
+        rem => { ips => [ '2A00:3B00:0:0:0:0:0:25' ] },
+        add => { ips => [ '176.99.13.11' ] },
+        %conn_params,
+    } );
+
+    ( $answ, $msg ) = make_request( 'update_ns', {
+        ns => 'ns1.sss.ru.com',
+        chg => { new_name => 'ns1.sss.xyz' },
+        conn => $conn,
+    } );
 
 =cut
 
@@ -1728,8 +2186,22 @@ UPDATENS
 
 Remove nameserver from the registry.
 
+It is usually forbidden to delete a name server that has the C<linked> status.
+
+INPUT:
+
+params with keys:
+
+C<ns> – name server;
+
+C<extension> – extensions for some providers, empty by default.
+
 OUTPUT:
 see L</simple_request>.
+
+An Example:
+
+    my ( $answ, $msg ) = make_request( 'delete_ns', { ns => 'ns1.sss.ru.com', %conn_params } );
 
 =cut
 
@@ -1760,7 +2232,15 @@ DELNS
     return $self->simple_request( $body, 'delete_ns' );
 }
 
-# TODO: move
+
+=head2 check_domains_rdata
+
+Parses resData in the registry response
+
+Can be overwritten in a child module.
+
+=cut
+
 sub check_domains_rdata {
     my ( undef, $rdata ) = @_;
 
@@ -1805,6 +2285,45 @@ sub check_domains_rdata {
 =head2 check_domains
 
 Check that the domain is available for registration
+
+INPUT:
+
+params with keys:
+
+C<domains> – list of domains to check;
+
+C<extension> – extensions for some providers, empty by default.
+
+OUTPUT:
+
+hash with domains, each domain has an C<avail> parameter, if avail == 0, the C<reason> parameter is usually added
+
+An Example
+
+    my ( $answer, $code, $msg ) = $conn->check_domains( {
+        tld => 'com',
+        domains => [ 'qwerty.com', 'bjdwferbkre3jd0hf.net', 'xn--xx.com', 'hiebw.info' ],
+    } );
+
+    # answer:
+
+    {
+        'qwerty.com' => {
+            'reason' => 'Domain exists',
+            'avail' => '0'
+        },
+        'bjdwferbkre3jd0hf.net' => {
+            'avail' => '1'
+        },
+        'hiebw.info' => {
+            'reason' => 'Not an authoritative TLD',
+            'avail' => '0'
+        },
+        'xn--xx.com' => {
+            'reason' => 'Invalid punycode encoding',
+            'avail' => '0'
+        }
+    };
 
 =cut
 
@@ -1863,6 +2382,14 @@ CHECKDOMS
 }
 
 
+=head2 create_domain_nss
+
+Generating a list of ns-s for domain registration.
+
+Can be overwritten in a child module.
+
+=cut
+
 sub create_domain_nss {
     my ( $self, $params ) = @_;
 
@@ -1878,6 +2405,14 @@ sub create_domain_nss {
 }
 
 
+=head2 create_domain_authinfo
+
+authinfo block for domain registration.
+
+Can be overwritten in a child module.
+
+=cut
+
 sub create_domain_authinfo {
     my ( $self, $params ) = @_;
 
@@ -1889,7 +2424,14 @@ sub create_domain_authinfo {
     return "\n    <domain:authInfo>\n     <domain:pw/>\n    </domain:authInfo>";
 }
 
-# DNSSEC extension
+
+=head2 create_domain_ext
+
+Block with the DNSSEC extension for domain registration
+
+Can be overwritten in a child module.
+
+=cut
 
 sub create_domain_ext {
     my ( $self, $params ) = @_;
@@ -1908,7 +2450,7 @@ sub create_domain_ext {
             $dsdata .= "     <secDNS:dsData>\n$ds     </secDNS:dsData>\n" if $ds;
         }
 
-        $ext = qq|   <secDNS:create xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:secDNS-1.1 secDNS-1.1.xsd" >\n$dsdata    </secDNS:create>\n|
+        $ext = "   <secDNS:create $epp_dnssec >\n$dsdata    </secDNS:create>\n"
             if $dsdata;
     }
 
@@ -1920,8 +2462,43 @@ sub create_domain_ext {
 
 Domain registration.
 
+INPUT:
+
+params with keys:
+
+C<dname> – domain name;
+
+C<period> – domain registration period, usually the default value is 1 year,
+registration for several months is not implemented – this is a very rare case;
+
+C<reg_id>, C<admin_id>, C<tech_id>, C<billing_id> – id of registrant, administrator, technical and billing contacts,
+at least one contact is required, usually the registrant;
+
+C<dnssec> -- hash for DNSSEC params: C<keytag>, C<alg>, C<digtype>, C<digest>,
+for details see L<https://tools.ietf.org/html/rfc5910>;
+
+C<nss> – array with nameservers;
+
+C<extension> – extensions for some providers, empty by default.
+
 OUTPUT:
 see L</simple_request>.
+
+An Example:
+
+    my ( $answ, $msg ) = make_request(
+        'create_domain',
+        {
+            dname      => "sss.ru.com",
+            reg_id     => 'jp1g8fcv30fq',
+            admin_id   => 'jp1g8fcv31fq',
+            tech_id    => 'jp1g8fcv32fq',
+            billing_id => 'jp1g8fcv33fq',
+            authinfo   => 'jp1g8fcv30fq+jp1g8fcv31fq',
+            nss        => [ 'dns1.yandex.net','dns2.yandex.net' ],
+            period     => 1,
+        },
+    );
 
 =cut
 
@@ -1984,11 +2561,14 @@ CREATEDOM
     return $self->simple_request( $body, 'create_domain' );
 }
 
-# For replace in children class
-sub get_domain_spec_rdata {
-    return {};
-}
 
+=head2 get_domain_info_rdata
+
+Covertor domains xml resData data to hash.
+
+Can be overwritten in a child module.
+
+=cut
 
 sub get_domain_info_rdata {
     my ( $self, $rdata ) = @_;
@@ -2040,7 +2620,7 @@ sub get_domain_info_rdata {
     }
 
     unless ( $info->{nss}  or  $rdata !~ /<domain:ns>/  or  scalar @{$info->{nss}} ) {
-        # ещё 1 древний вариант, наверное самый старый
+        # 1 more ancient artifact, probably the oldest
         $info->{nss} = [ $rdata =~ /<domain:ns>([^<>]+)<\/domain:ns>/g ];
     }
 
@@ -2084,14 +2664,109 @@ sub get_domain_info_rdata {
     return $info;
 }
 
-# For replace in children
+
+=head2 get_domain_spec_rdata
+
+Parse special data in resData from provider.
+
+For overwritten in a child module.
+
+In this module, the function does nothing
+
+=cut
+
+sub get_domain_spec_rdata {
+    return {};
+}
+
+
+=head2 get_domain_spec_ext
+
+Parse special data in extension from provider.
+
+For overwritten in a child module.
+
+In this module, the function does nothing
+
+=cut
+
 sub get_domain_spec_ext {
     return {};
 }
 
+
 =head2 get_domain_info
 
 The main information on the domain
+
+INPUT:
+
+params with keys:
+
+C<dname> – domain name;
+
+C<extension> – extensions for some providers, empty by default.
+
+OUTPUT:
+
+C<dname>;
+
+C<roid> – domain id if registry;
+
+C<owner> – the account where the domain is located now;
+
+C<create> – the account where the domain was registered;
+
+C<cre_date> – domain registration date;
+
+C<trans_date> – domain last transfer date;
+
+C<upd_date> – domain last update date;
+
+C<exp_date> – domain expiration date;
+
+C<reg_id>, C<admin_id>, C<tech_id>, C<billing_id> – domain contact IDs;
+
+C<nss> – list of domain name servers;
+
+C<statuses> – hash where keys is status flags, values is status expiration date, if any, or other information;
+
+C<hosts> – list with name servers based on this domain.
+
+There can also be extension parameters.
+
+An Example:
+
+    my ( $answer, $msg, $conn ) = make_request( 'get_domain_info', { dname => 'sss.ru.com', %conn_params  } );
+
+    # answer:
+
+    {
+        'hosts' => [
+            'ns1.sss.ru.com',
+            'ns2.sss.ru.com'
+        ],
+        'roid' => 'D888888-CNIC',
+        'cre_date' => '1212-12-12 12:12:12',
+        'upd_date' => '2020-02-02 20:02:20',
+        'trans_date' => '2012-12-12 12:12:12',
+        'creater' => 'H12345',
+        'tech_id' => '1iuhajppwsjp',
+        'reg_id' => 'H12346',
+        'owner' => 'H2220222',
+        'exp_date' => '2022-12-12 23:59:59',
+        'billing_id' => 'H12347',
+        'nss' => [
+            'ns1.sss.ru.com'
+            'ns1.mmm.ru.com'
+        ],
+        'dname' => 'sss.ru.com',
+        'admin_id' => 'H12348',
+        'statuses' => {
+            'renewPeriod' => '+',
+            'clientTransferProhibited' => '+'
+        }
+    };
 
 =cut
 
@@ -2217,15 +2892,33 @@ DOMINFO
 
 Domain registration renewal for N years.
 
+INPUT:
+
+params with keys:
+
+C<dname> – domain name;
+
+C<period> – the domain renewal period in years, by default, will be prologed for 1 year;
+
+C<exp_date> – current expiration date, without specifying the time;
+
+C<extension> – extensions for some providers, empty by default.
+
 OUTPUT:
 see L</simple_request>.
+
+An Example:
+
+    my ( $a, $m ) = make_request( 'renew_domain', { dname => 'datada.net', period => 1, exp_date => '2022-22-22' } );
 
 =cut
 
 sub renew_domain {
     my ( $self, $params ) = @_;
 
-    return ( 0, 0, 'no params' ) unless $$params{dname} && $$params{period} && $$params{exp_date};
+    return ( 0, 0, 'no params' ) unless $$params{dname} && $$params{exp_date};
+
+    $params->{period} ||= 1;
 
     my $ext = $params->{extension} || '';
 
@@ -2251,7 +2944,15 @@ RENEWDOM
     return $self->simple_request( $body, 'renew_domain' );
 }
 
-# replaced in DrsUa
+
+=head2 update_domain_add_nss
+
+Part of the update_domain function.
+
+Can be overwritten in a child module, example, in L<IO::EPP::DrsUa>
+
+=cut
+
 sub update_domain_add_nss {
     my ( undef, $params ) = @_;
 
@@ -2267,6 +2968,14 @@ sub update_domain_add_nss {
 }
 
 
+=head2 update_domain_rem_nss
+
+Part of the update_domain function.
+
+Can be overwritten in a child module.
+
+=cut
+
 sub update_domain_rem_nss {
     my ( undef, $params ) = @_;
 
@@ -2281,6 +2990,16 @@ sub update_domain_rem_nss {
     return $rem;
 }
 
+
+=head2 update_domain_ext
+
+Part of the update_domain function.
+
+Can be overwritten in a child module.
+
+In this function this module contains the DNSSEC extension
+
+=cut
 
 sub update_domain_ext {
     my ( undef, $params ) = @_;
@@ -2318,8 +3037,7 @@ sub update_domain_ext {
     }
 
     if ( $rem_ds || $add_ds ) {
-        $ext .= qq|
-   <secDNS:update xmlns:secDNS="urn:ietf:params:xml:ns:secDNS-1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:secDNS-1.1 secDNS-1.1.xsd" >\n|;
+        $ext .= "\n   <secDNS:update $epp_dnssec >\n";
         $ext .= $rem_ds;
         $ext .= $add_ds;
         $ext .= "   </secDNS:update>\n";
@@ -2330,10 +3048,49 @@ sub update_domain_ext {
 
 =head2 update_domain
 
-To update domain data: contact ids, nss, hosts, statuses.
+To update domain data: contact ids, authinfo, nss, statuses.
+
+INPUT:
+
+params with keys:
+
+C<dname> – domain name
+
+C<add>, C<rem> – hashes for adding and deleting data:
+
+C<admin_id>, C<tech_id>, C<billing_id> – contact IDs;
+
+C<nss> – list with name servers;
+
+C<statuses> – various client* statuses;
+
+C<dnssec> – DNSSEC extension parameters.
+
+C<chg> – hash for changeable data:
+
+C<reg_id> – registrant contact id;
+
+C<authinfo> – new key for domain;
 
 OUTPUT:
 see L</simple_request>.
+
+Examples:
+
+    my ( $a, $m, $c ) = make_request( 'update_domain', {
+        dname => 'example.com',
+        chg => { authinfo => 'fnjkfrekrejkfrenkfrenjkfren' },
+        rem => { nss => [ 'ns1.qqfklnqq.com', 'ns2.qqfklnqq.com' ] },
+        add => { nss => [ 'ns1.web.name', 'ns2.web.name' ] },
+        %conn_params,
+    } );
+
+    ( $a, $m ) = make_request( 'update_domain', {
+        dname => 'example.com',
+        rem => { statuses => [ 'clientUpdateProhibited','clientDeleteProhibited' ] },
+        add => { statuses => [ 'clientHold'  ] },
+        conn => $c,
+    } );
 
 =cut
 
@@ -2472,6 +3229,50 @@ UPDDOM
 
 Domain transfers: to us, from us, reject transfers.
 
+INPUT:
+
+params with keys:
+
+C<op> – operation, possible variants: C<request>, C<query>, C<accept>, C<cancel>, C<reject>;
+
+C<authinfo> – key for alien domain;
+
+C<period> – if the transfer with renew, you can specify the extension period for some registries, undef and zero have different values;
+
+C<extension> – extensions for some registries in xml format;
+
+C<addition> – special parameters for very original providers.
+
+OUTPUT:
+
+It depends very much on the operation and on the registry
+
+Examples:
+
+    my ( $answ, $code, $msg ) = $conn->transfer( { op => 'request', dname => 'reclick.realty',  authinfo => '123qweRTY{*}', period => 1 } );
+
+    ( $answ, $code, $msg ) = $conn->transfer( { op => 'query', dname => 'reclick.realty',  authinfo => '123qweRTY{*}' } );
+
+    # answer from the CentralNic
+
+    {
+        'exp_date' => '2021-01-18 23:59:59',
+        'cltrid' => '9d7e6ec767ec7d9d9d40fc518a5',
+        'trstatus' => 'pending', # transfer status
+        'requestors_id' => 'H2220222', # this we
+        'dname' => 'reclick.realty',
+        'senders_id' => 'H3105376', # godaddy
+        'send_date' => '2020-01-15 21:14:26',
+        'svtrid' => 'CNIC-82A2E9B355020697D1B3EF6FDE9D822D4CCE1D1616412EF53',
+        'request_date' => '2020-01-10 21:14:26'
+    };
+
+    ( $answ, $code, $msg ) = $conn->transfer( { op => 'approve', dname => 'reclick.realty' } );
+
+    ( $answ, $code, $msg ) = $conn->transfer( { op => 'reject', dname => 'reclick.realty',  authinfo => '123qweRTY{*}' } );
+
+    ( $answ, $code, $msg ) = $conn->transfer( { op => 'cancel', dname => 'reclick.realty',  authinfo => '123qweRTY{*}' } );
+
 =cut
 
 sub transfer {
@@ -2576,8 +3377,18 @@ TRANS
 
 Deleting a domain.
 
+params with keys:
+
+C<dname> – domain name
+
+C<extension> – extensions for some registries in xml format
+
 OUTPUT:
 see L</simple_request>.
+
+An Example:
+
+    my ( $a, $m ) = make_request( 'delete_domain', { dname => 'ssslll.ru.com', %conn_params } );
 
 =cut
 
@@ -2609,7 +3420,13 @@ DELDOM
 }
 
 
-# Parse resData from req poll
+=head2 req_poll_rdata
+
+Parse resData from req poll
+
+Can be overwritten in a child module
+
+=cut
 
 sub req_poll_rdata {
     my ( $self, $rdata ) = @_;
@@ -2718,17 +3535,59 @@ sub req_poll_rdata {
 }
 
 
-# Parse req poll extension
+=head2 req_poll_ext
 
-# Empty, for replace in children modules
+Parse req poll extension
+
+Empty, for overwriting in children modules
+
+=cut
 
 sub req_poll_ext {
     return {};
 }
 
+
 =head2 req_poll
 
-Get and parse message from poll
+Get and parse top message from poll
+
+No input params.
+
+OUTPUT:
+
+Еach provider has a lot of different types of messages.
+Only domain transfer messages are similar.
+They have something like this format:
+
+    {
+        'code' => '1301',
+        'msg' => 'Command completed successfully; ack to dequeue',
+        'count' => '1',
+        'id' => '456789',
+        'date' => '2020-02-02 20:02:02',
+        'qmsg' => 'Transfer Requested.',
+        'transfer' => {
+            'dname' => 'example.com',
+            'status' => 'pending',
+            'senders_id' => '1111'.
+            'requestors_id' => '999',
+            'request_date' => '2001-01-01 01:01:01',
+            'send_date' => '2001-01-06 01:01:01'
+        },
+        'svtrid' => '4569552848-1578703988000',
+        'cltrid' => '1f80c34195a936dfb0d2bd0c414141414'
+    };
+
+C<requestors_id> – the registrar who made the transfer request;
+
+C<senders_id> – the registrar from which the domain is transferred;
+
+C<request_date> – the start date of the transfer
+
+C<send_date> – date when the transfer is completed, unless it is canceled or the domain is released;
+
+C<status> – the status of the transfer, the most common meaning: C<pending>, C<serverApproved>, C<clientRejected>, C<clientApproved>.
 
 =cut
 
@@ -2810,7 +3669,11 @@ RPOLL
 
 =head2 ask_poll
 
-Delete message from poll
+Delete message from poll by id
+
+INPUT:
+
+C<msg_id> – id of the message to be removed from the queue.
 
 =cut
 
@@ -2857,7 +3720,7 @@ APOLL
 
 Close session, disconnect
 
-No parameters.
+No input parameters.
 
 =cut
 

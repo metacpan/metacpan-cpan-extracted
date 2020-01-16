@@ -1,9 +1,42 @@
 ==================================================
-Changes from 2018-11-20 00:00:00 +0000 to present.
+Changes from 2019-01-10 00:00:00 +0000 to present.
 ==================================================
 
 --------------------------------------------
-version v0.0.18 at 2019-11-20 16:17:49 +0000
+version v0.0.19 at 2020-01-10 16:56:22 +0000
+--------------------------------------------
+
+  Change: 886ec6514388aa8099de957c23a4b1ce5ef41e9c
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-07 17:07:31 +0000
+
+    Update README 
+
+  Change: 363b67ea1bfb1d33cb1c3897b6ab07151bf75f96
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-07 17:06:12 +0000
+
+    Remove the Git::Contributors Plugin
+
+    Concern was expressed at putting these names and email addresses in
+    places that will be indexed easily by web scrapers. This will remove
+    it from the README.md that shows up on GitHub, the POD for the
+    module, and the meta.yml/meta.json that the MetaCPAN uses to show
+    those names in the sidebar. 
+
+  Change: 4ec1d2397f78cc78a2afd0ae25a831b64589f52d
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-07 17:06:12 +0000
+
+    Use TMPDIR for tempdir_root in test
+
+    Otherwise it may create the temp directory in the git repo and we're
+    testing that we don't have one and git will look up and find it.
+
+    There may be a better solution, but not sure what that might be. 
+
+--------------------------------------------
+version v0.0.18 at 2019-11-20 16:17:30 +0000
 --------------------------------------------
 
   Change: 2d9a317a4dab0beb15abf29b23e4acaeb2e5c59e

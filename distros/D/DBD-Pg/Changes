@@ -1,4 +1,17 @@
 
+Version 3.10.1  (released January 13, 2020)
+
+  - Prevent double-free memory errors
+    [Greg Sabino Mullane]
+    [RT #130681]
+
+  - Fix crash when pg_error_field is called
+    [Greg Sabino Mullane]
+    [RT #130721]
+
+  - Update the list of Postgres reserved words in quote.c
+
+
 Version 3.10.0  (released September 3, 2019)
 
   - Prevent memory leak related to pg_error_field
@@ -11,11 +24,13 @@ Version 3.10.0  (released September 3, 2019)
     [Github issue #57]
 
   - If a commit or rollback fails, do not set BegunWork
+    [Greg Sabino Mullane]
     [Github issue #40]
 
   - Treat partitioned tables same as regular tables for column_info, table_info, 
     and foreign_key_info (i.e. support pg_class.relkind = 'p')
     [Octavian R. Corlade]
+    [Github PR #55]
 
   - Allow last_insert_id() to work against inherited tables
     [Greg Sabino Mullane]
@@ -23,6 +38,7 @@ Version 3.10.0  (released September 3, 2019)
 
   - Add DBI SQL_BLOB, SQL_BINARY and SQL_LONGVARBINARY types as alias for PG_BYTEA
     [Pali]
+    [Github PR #58]
 
 
 Version 3.9.1  (released August 15, 2019)

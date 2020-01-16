@@ -97,11 +97,6 @@ constants.
 
 Return the parent of the checkpoint, if any
 
-=item $res = $domchkp->has_metadata()
-
-Returns a true value if this checkpoint has metadata associated with
-it.
-
 =item my @checkpoints = $domchkp->list_all_children($flags)
 
 Return a list of all domain checkpoints that are children of this

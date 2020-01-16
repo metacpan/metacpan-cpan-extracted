@@ -1,9 +1,9 @@
 package Bencher::Scenario::ModuleInstalledTiny::module_installed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-09'; # DATE
+our $DATE = '2020-01-14'; # DATE
 our $DIST = 'Bencher-Scenarios-ModuleInstalledTiny'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -67,7 +67,7 @@ Bencher::Scenario::ModuleInstalledTiny::module_installed - Benchmark module_inst
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::ModuleInstalledTiny::module_installed (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-09.
+This document describes version 0.004 of Bencher::Scenario::ModuleInstalledTiny::module_installed (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-14.
 
 =head1 SYNOPSIS
 
@@ -172,31 +172,31 @@ Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz 
 Benchmark with default options (C<< bencher -m ModuleInstalledTiny::module_installed >>):
 
  #table1#
- +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+------------+---------+---------+
- | participant                               | dataset                                                        | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+------------+---------+---------+
- | Module::Load::Conditional::check_install  | strict                                                         |      2400 |  420      |          1 | 6.9e-07 |      20 |
- | Module::Load::Conditional::check_install  | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     28000 |   36      |         12 | 3.1e-07 |      21 |
- | Module::Path::More::module_path           | strict                                                         |     44000 |   23      |         18 | 5.3e-08 |      20 |
- | Module::Path::More::module_path           | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     44000 |   23      |         18 | 1.4e-07 |      20 |
- | require                                   | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     50000 |   20      |         21 | 2.7e-08 |      20 |
- | Module::Installed::Tiny::module_installed | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     62300 |   16      |         26 | 6.7e-09 |      20 |
- | Module::Installed::Tiny::module_installed | strict                                                         |   1410000 |    0.708  |        590 | 2.1e-10 |      20 |
- | require                                   | strict                                                         |   3736000 |    0.2677 |       1561 | 1.2e-11 |      20 |
- +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+------------+---------+---------+
+ +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                               | dataset                                                        | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Module::Load::Conditional::check_install  | strict                                                         |      3300 |  300      |                 0.00% |            155352.19% | 1.2e-06 |      20 |
+ | Module::Load::Conditional::check_install  | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     40000 |   25      |              1112.29% |             12722.99% | 2.7e-08 |      20 |
+ | Module::Path::More::module_path           | strict                                                         |     60100 |   16.6    |              1711.19% |              8482.85% | 6.2e-09 |      23 |
+ | Module::Path::More::module_path           | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     61400 |   16.3    |              1749.98% |              8302.89% | 5.8e-09 |      26 |
+ | require                                   | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     70000 |   14      |              2023.32% |              7221.19% | 2.7e-08 |      20 |
+ | Module::Installed::Tiny::module_installed | Bencher::Scenario::ModuleInstalledTiny::module_installed::Test |     85000 |   12      |              2471.21% |              5945.88% | 1.3e-08 |      21 |
+ | Module::Installed::Tiny::module_installed | strict                                                         |   2032000 |    0.4922 |             61166.01% |               153.73% | 2.3e-11 |      20 |
+ | require                                   | strict                                                         |   5160000 |    0.194  |            155352.19% |                 0.00% | 8.7e-11 |      31 |
+ +-------------------------------------------+----------------------------------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m ModuleInstalledTiny::module_installed --module-startup >>):
 
  #table2#
- +---------------------------+-----------+------------------------+------------+---------+---------+
- | participant               | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------------+-----------+------------------------+------------+---------+---------+
- | Module::Load::Conditional |      40.1 |                   33.7 |       1    | 2.4e-05 |      20 |
- | Module::Path::More        |      10   |                    3.6 |       3.8  | 1.8e-05 |      20 |
- | Module::Installed::Tiny   |      10.2 |                    3.8 |       3.92 | 8.7e-06 |      23 |
- | perl -e1 (baseline)       |       6.4 |                    0   |       6.3  | 1.4e-05 |      21 |
- +---------------------------+-----------+------------------------+------------+---------+---------+
+ +---------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | participant               | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +---------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | Module::Load::Conditional |     31.1  |             24.2  |                 0.00% |               349.93% | 2.6e-05   |      20 |
+ | Module::Path::More        |     10    |              3.1  |               199.48% |                50.24% |   0.00015 |      20 |
+ | Module::Installed::Tiny   |      9.43 |              2.53 |               229.74% |                36.45% | 7.6e-06   |      20 |
+ | perl -e1 (baseline)       |      6.9  |              0    |               349.93% |                 0.00% | 3.2e-05   |      20 |
+ +---------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

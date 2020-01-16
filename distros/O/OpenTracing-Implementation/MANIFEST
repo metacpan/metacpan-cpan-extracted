@@ -1,3 +1,4 @@
+CHANGES
 cpanfile
 lib/OpenTracing/Implementation/Interface/Bootstrap.pm
 lib/OpenTracing/Implementation/Interface/Bootstrap.pod

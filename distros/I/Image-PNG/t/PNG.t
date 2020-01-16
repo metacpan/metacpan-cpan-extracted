@@ -4,7 +4,7 @@
 use warnings;
 use strict;
 use utf8;
-use FindBin;
+use FindBin '$Bin';
 use Test::More;
 
 # Set up outputs to not print wide character warnings (this is for
@@ -23,7 +23,7 @@ use Image::PNG;
 use Image::PNG::Libpng qw/libpng_supports/;
 
 my $png = Image::PNG->new ({verbosity => undef});
-my $file = "$FindBin::Bin/test.png";
+my $file = "$Bin/test.png";
 $png->read ($file);
 
 # Test the reading of the PNG file's header.
@@ -35,7 +35,7 @@ ok ($png->bit_depth () == 8, "oo bit depth");
 
 # Test writing out the file.
 
-my $out_file = "$FindBin::Bin/out.png";
+my $out_file = "$Bin/out.png";
 if (-f $out_file) {
     unlink $out_file or die $!;
 }

@@ -1,15 +1,19 @@
-# Copyrights 2011-2015 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution IOMux.  Meta-POD processed with OODoc
+# into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package IOMux;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Log::Report 'iomux';
+
+use warnings;
+use strict;
 
 use List::Util  'min';
 use POSIX       'errno_h';
@@ -21,7 +25,15 @@ use constant
   };
 
 
-sub new(@)  {my $class = shift; (bless {}, $class)->init( {@_} ) }
+sub new(@)
+{   my ($class, %args) = @_;
+
+    error __x"initiate an extension of {pkg}", pkg => __PACKAGE__
+        if $class eq __PACKAGE__;
+
+    (bless {}, $class)->init(\%args);
+}
+
 sub init($)
 {   my ($self, $args) = @_;
     $self->{IM_handlers} = {};

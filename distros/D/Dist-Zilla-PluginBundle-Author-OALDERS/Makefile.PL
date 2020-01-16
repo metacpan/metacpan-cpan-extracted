@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-OALDERS",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Dist::Zilla::PluginBundle::Author::OALDERS",
   "PREREQ_PM" => {
+    "Code::TidyAll::Config::INI::Reader" => "0.44",
     "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003",
     "Code::TidyAll::Plugin::UniqueLines" => "0.000003",
     "Dist::Zilla::Plugin::AutoPrereqs" => 0,
@@ -37,7 +38,6 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::GithubMeta" => 0,
     "Dist::Zilla::Plugin::InstallGuide" => 0,
     "Dist::Zilla::Plugin::License" => 0,
-    "Dist::Zilla::Plugin::MAXMIND::TidyAll" => 0,
     "Dist::Zilla::Plugin::MakeMaker" => 0,
     "Dist::Zilla::Plugin::Manifest" => 0,
     "Dist::Zilla::Plugin::ManifestSkip" => 0,
@@ -69,29 +69,38 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::TravisCI::StatusBadge" => 0,
     "Dist::Zilla::Plugin::UploadToCPAN" => 0,
     "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.002",
+    "Dist::Zilla::Role::BeforeBuild" => 0,
     "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Dist::Zilla::Role::PluginBundle::PluginRemover" => 0,
+    "Dist::Zilla::Role::TextTemplate" => 0,
     "List::AllUtils" => 0,
+    "List::Util" => "1.45",
     "Moose" => 0,
+    "Path::Iterator::Rule" => 0,
+    "Path::Tiny" => 0,
+    "Perl::Critic::Freenode" => "0.021",
+    "Perl::Critic::Moose" => "1.05",
     "Perl::Tidy" => 2018220,
     "Pod::Elemental::Transformer::List" => 0,
+    "Sort::ByExample" => 0,
     "Test::Code::TidyAll" => "0.70",
     "Types::Path::Tiny" => 0,
     "Types::Standard" => 0,
+    "autodie" => 0,
     "feature" => 0,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.000024",
+  "VERSION" => "0.000025",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -99,6 +108,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Code::TidyAll::Config::INI::Reader" => "0.44",
   "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003",
   "Code::TidyAll::Plugin::UniqueLines" => "0.000003",
   "Dist::Zilla::Plugin::AutoPrereqs" => 0,
@@ -119,7 +129,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::GithubMeta" => 0,
   "Dist::Zilla::Plugin::InstallGuide" => 0,
   "Dist::Zilla::Plugin::License" => 0,
-  "Dist::Zilla::Plugin::MAXMIND::TidyAll" => 0,
   "Dist::Zilla::Plugin::MakeMaker" => 0,
   "Dist::Zilla::Plugin::Manifest" => 0,
   "Dist::Zilla::Plugin::ManifestSkip" => 0,
@@ -151,21 +160,30 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::TravisCI::StatusBadge" => 0,
   "Dist::Zilla::Plugin::UploadToCPAN" => 0,
   "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.002",
+  "Dist::Zilla::Role::BeforeBuild" => 0,
   "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "Dist::Zilla::Role::PluginBundle::PluginRemover" => 0,
+  "Dist::Zilla::Role::TextTemplate" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::AllUtils" => 0,
+  "List::Util" => "1.45",
   "Moose" => 0,
+  "Path::Iterator::Rule" => 0,
+  "Path::Tiny" => 0,
+  "Perl::Critic::Freenode" => "0.021",
+  "Perl::Critic::Moose" => "1.05",
   "Perl::Tidy" => 2018220,
   "Pod::Elemental::Transformer::List" => 0,
+  "Sort::ByExample" => 0,
   "Test::Code::TidyAll" => "0.70",
   "Test::More" => 0,
   "Types::Path::Tiny" => 0,
   "Types::Standard" => 0,
+  "autodie" => 0,
   "feature" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,

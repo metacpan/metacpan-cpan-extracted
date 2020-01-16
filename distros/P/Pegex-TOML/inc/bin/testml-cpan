@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use lib 't', 'inc/lib';
+
+use TestML::Run::TAP;
+
+my $testml_file = $ARGV[-1];
+my $test_file = $testml_file;
+
+$test_file =~ s/(.*)\.t$/inc\/$1.tml.lingy/
+  or die "Error with '$testml_file'. testml-cpan only works with *.t files.";
+-e $test_file
+  or die "TestML file '$testml_file' not compiled as '$test_file'";
+
+TestML::Run::TAP->run($test_file);

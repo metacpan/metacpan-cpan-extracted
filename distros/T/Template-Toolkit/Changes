@@ -11,8 +11,21 @@
 #========================================================================
 
 #-----------------------------------------------------------------------
-# Unreleased
+# Version 3.005 - 15th January 2020
 #------------------------------------------------------------------------
+
+* Add encoding option to Datafile plugin
+* Add support for '%z' in Date plugin.
+* Fix for WHILE_MAX which was stopping one iteration earlier.
+* Refresh contributor list
+* Update Copyrights for year 2020
+
+#-----------------------------------------------------------------------
+# Version 3.004 - 13th January 2020
+#------------------------------------------------------------------------
+
+* Use three-args open - fixes CVE-2019-19781 reported by Mikhail Klyuchnikov
+from Positive Technologies.
 
 #-----------------------------------------------------------------------
 # Version 3.003 - 27th December 2019

@@ -52,6 +52,9 @@ use parent qw( IO::EPP::Base );
 use strict;
 use warnings;
 
+my $cont_ext =
+'xmlns:contact="http://www.tcinet.ru/epp/tci-contact-ext-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tcinet.ru/epp/tci-contact-ext-1.0 tci-contact-ext-1.0.xsd"';
+
 sub make_request {
     my ( $action, $params ) = @_;
 
@@ -287,7 +290,7 @@ sub create_contact {
     my $extension = $self->contact_ext( $params );
 
     if ( $extension ) {
-        $params->{extension} = qq|   <contact:create xmlns:contact="http://www.tcinet.ru/epp/tci-contact-ext-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tcinet.ru/epp/tci-contact-ext-1.0 tci-contact-ext-1.0.xsd">\n$extension   </contact:create>\n|;
+        $params->{extension} = "   <contact:create $cont_ext>\n$extension   </contact:create>\n";
     }
 
     return $self->SUPER::create_contact( $params );
@@ -346,6 +349,8 @@ sub get_contact_ext {
 
 Has an optional C<description> field.
 
+For .дети tld automatically adds the idn extension with lang C<ru-RU>.
+
 =cut
 
 sub create_domain {
@@ -367,6 +372,11 @@ sub create_domain {
     return $self->SUPER::create_domain( $params );
 }
 
+=head2 get_domain_spec_ext
+
+Processes the additional description field.
+
+=cut
 
 sub get_domain_spec_ext {
     my ( undef, $ext ) = @_;
@@ -383,18 +393,7 @@ sub get_domain_spec_ext {
 }
 
 
-sub DESTROY {
-    local ($!, $@, $^E, $?);
-
-    my $self = shift;
-
-    if ( $self->{sock} ) {
-        $self->logout();
-    }
-}
-
 1;
-
 
 __END__
 

@@ -1,0 +1,40 @@
+---
+abstract: 'Encryption of the FTN messages.'
+author:
+  - 'Petr Antonov'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Pod::Coverage: '0'
+  Test::CheckManifest: '0'
+  Test::Data: '1.24'
+  Test::LongString: '0.17'
+  Test::More: '0.94'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FTN-Crypt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FTN::Address: '1.04'
+  FTN::Nodelist: '1.08'
+  GnuPG::Interface: '0.52'
+  IO::Handle: '1.35'
+  PGP::Finger: '1.1'
+  Try::Tiny: '0.28'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/pietro-a/FTN-Crypt.git
+version: v0.5.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

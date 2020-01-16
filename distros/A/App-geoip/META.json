@@ -1,0 +1,82 @@
+{
+   "name" : "App-geoip",
+   "generated_by" : "Author",
+   "abstract" : "Show geological data based on hostname or IP address(es)",
+   "release_status" : "stable",
+   "provides" : {
+      "App::geoip" : {
+         "version" : "0.10",
+         "file" : "lib/App/geoip.pm"
+         }
+      },
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "repository" : {
+         "url" : "https://github.com/Tux/GeoIP2",
+         "type" : "git",
+         "web" : "https://github.com/Tux/GeoIP2"
+         },
+      "homepage" : "https://metacpan.org/pod/App::geoip",
+      "x_IRC" : "irc://irc.perl.org/#csv"
+      },
+   "dynamic_config" : 1,
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "version" : "0.10",
+   "license" : [
+      "perl_5"
+      ],
+   "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Getopt::Long" : "2.51",
+            "Pod::Usage" : "1.69",
+            "Math::Trig" : "1.23",
+            "Socket" : "2.029",
+            "Text::CSV_XS" : "1.40",
+            "Archive::Zip" : "1.66",
+            "Net::CIDR" : "0.20",
+            "JSON::PP" : "4.04",
+            "DBI" : "1.642",
+            "LWP::Simple" : "6.43",
+            "Data::Dumper" : "2.173"
+            },
+         "requires" : {
+            "perl" : "5.014",
+            "Pod::Usage" : "0",
+            "Getopt::Long" : "0",
+            "Math::Trig" : "0",
+            "Socket" : "0",
+            "Text::CSV_XS" : "1.39",
+            "Net::CIDR" : "0",
+            "JSON::PP" : "0",
+            "DBI" : "0",
+            "Archive::Zip" : "0",
+            "LWP::Simple" : "0",
+            "Data::Dumper" : "0"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "Config" : "0"
+            }
+         },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         }
+      },
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      }
+   }

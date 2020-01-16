@@ -1,0 +1,24 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*toml","*yaml"],
+      ["==",
+        [".",
+          ["*","toml"],
+          ["pegex-toml-load"],
+          ["yaml"]],
+        ["*","yaml"],
+        "+ - Load with Pegex::TOML"]],
+    ["%<>",["*toml","*yaml-t"],
+      ["==",
+        [".",
+          ["*","toml"],
+          ["toml-parse"],
+          ["yaml"]],
+        ["*","yaml-t"],
+        "+ - Load with TOML.pm"]]],
+  "data": [
+    { "label": "Test 1",
+      "point": {
+        "toml": "# This is a TOML document. Boom.\n\ntitle = \"TOML Example\"\n\n[owner]\nname = \"Tom Preston-Werner\"\norganization = \"GitHub\"\nbio = \"GitHub Cofounder & CEO\\nLikes tater tots and beer.\"\n\n[database]\nserver = \"192.168.1.1\"\nports = [ 8001, 8001, 8002 ]\nconnection_max = 5000\nenabled = true\n",
+        "yaml": "---\n- - - title: TOML Example\n- - - owner\n  - - name: Tom Preston-Werner\n    - organization: GitHub\n    - bio: GitHub Cofounder & CEO\\nLikes tater tots and beer.\n- - - database\n  - - server: 192.168.1.1\n    - ports:\n      - - '8001'\n        - '8001'\n        - '8002'\n    - connection_max: '5000'\n    - enabled: 'true'\n",
+        "yaml-t": "---\ndatabase:\n  connection_max: 5000\n  enabled: 'true'\n  ports:\n  - 8001\n  - 8001\n  - 8002\n  server: 192.168.1.1\nowner:\n  bio: |-\n    GitHub Cofounder & CEO\n    Likes tater tots and beer.\n  name: Tom Preston-Werner\n  organization: GitHub\ntitle: TOML Example\n"}}]}

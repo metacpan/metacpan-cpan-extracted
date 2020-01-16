@@ -36,10 +36,10 @@ no_index:
 provides:
   Path::Tiny:
     file: lib/Path/Tiny.pm
-    version: '0.108'
+    version: '0.110'
   Path::Tiny::Error:
     file: lib/Path/Tiny.pm
-    version: '0.108'
+    version: '0.110'
 recommends:
   Unicode::UTF8: '0.58'
 requires:
@@ -66,7 +66,7 @@ resources:
   bugtracker: https://github.com/dagolden/Path-Tiny/issues
   homepage: https://github.com/dagolden/Path-Tiny
   repository: https://github.com/dagolden/Path-Tiny.git
-version: '0.108'
+version: '0.110'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
@@ -100,5 +100,5 @@ x_contributors:
   - 'Toby Inkster <tobyink@cpan.org>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
   - '김도형 - Keedi Kim <keedi@cpan.org>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -122,7 +122,6 @@ subtest 'Build a basic dist' => sub {
         name           => 'OurExternal-Package',
         abstract       => 'ABSTRACT',
         author         => ['Grant Street Group <developers@grantstreet.com>'],
-        x_contributors => [$contributor],
 
         version => 'v0.0.1',
 

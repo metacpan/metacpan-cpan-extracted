@@ -1047,7 +1047,7 @@ sub domain_create {
     my ( $obj, $body ) = @_;
 
     my ( $subProduct ) = $body =~ m|<namestoreExt:subProduct>dot([A-Z]+)</namestoreExt:subProduct>|;
-    my ( $lang )       = $body =~ m|<idnLang:tag xmlns:idnLang="http://www\.verisign\.com/epp/idnLang-1\.0">([A-Z]{3})</idnLang:tag>|;
+    my ( $lang )       = $body =~ m|<idnLang:tag[^<>]+">([A-Z]{3})</idnLang:tag>|;
 
     my @chb = _check_body( \$body );
 
@@ -1751,11 +1751,11 @@ sub domain_update  {
 
     delete $dom->{statuses}{$_} foreach keys %{$rem{statuses}};
 
-    if ( $dom->{statuses}{ok}  and  scalar( %{$dom->{statuses}} ) > 1 ) {
+    if ( $dom->{statuses}{ok}  and  scalar( keys %{$dom->{statuses}} ) > 1 ) {
         delete $dom->{statuses}{ok};
     }
 
-    unless ( scalar( %{$dom->{statuses}} ) ) {
+    unless ( scalar( keys %{$dom->{statuses}} ) ) {
         $dom->{statuses}{ok} = '+';
     }
 

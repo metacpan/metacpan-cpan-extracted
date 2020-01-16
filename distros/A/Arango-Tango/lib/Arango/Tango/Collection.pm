@@ -1,84 +1,106 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.010';
+$Arango::Tango::Collection::VERSION = '0.011';
 use warnings;
 use strict;
+
+use Arango::Tango::API;
+
+BEGIN {
+    Arango::Tango::API::_install_methods "Arango::Tango::Collection" => {
+
+        load => {
+            rest   => [ put => '{{database}}_api/collection/{name}/load'],
+            schema => { count => { type => 'integer' }},
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        unload => {
+            rest   => [ put => '{{database}}_api/collection/{name}/unload'],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        load_indexes => {
+            rest => [ put => '{{database}}_api/collection/{name}/loadIndexesIntoMemory' ],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        rename => {
+            rest => [ put => '{{database}}_api/collection/{collection}/rename' ],
+            inject_properties => [ 'database', { prop => 'name', as => 'collection'  } ],
+            signature => [ 'name' ],
+            schema => { name => { type => 'string' }},
+        },
+
+        properties => {
+            rest => [ get => '{{database}}_api/collection/{name}/properties' ],
+            inject_properties => ['database', 'name' ],
+        },
+
+        truncate => {
+            rest => [ put => '{{database}}_api/collection/{name}/truncate' ],
+            inject_properties => [ 'database', 'name' ]
+        },
+
+        revision => {
+            rest => [ get => '{{database}}_api/collection/{name}/revision' ],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        info => {
+            rest => [ get => '{{database}}_api/collection/{name}' ],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        recalculate_count => {
+            rest => [ put => '{{database}}_api/collection/{name}/recalculateCount' ],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        rotate => {
+            rest => [ put => '{{database}}_api/collection/{name}/rotate' ],
+            inject_properties => [ 'database', 'name' ],
+        },
+
+
+        figures => {
+            rest => [ get => '{{database}}_api/collection/{name}/figures' ],
+            schema => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }},
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        count => {
+            rest => [ get => '{{database}}_api/collection/{name}/count' ],
+            schema => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }},
+            inject_properties => [ 'database', 'name' ],
+        },
+
+
+        checksum => {
+            rest => [ get => '{{database}}_api/collection/{name}/checksum' ],
+            schema => { withRevisions => { type => 'boolean' }, withData => {type=>'boolean' }},
+            inject_properties => [ 'database', 'name' ],
+        },
+
+        set_properties => {
+            rest => [ put => '{{database}}_api/collection/{name}/properties'],
+            schema => {  waitForSync => { type => 'boolean' }, journalSize => { type => 'integer' }},
+            inject_properties => [ 'database', 'name' ],
+        },
+
+    };
+}
+
+
 
 sub _new {
     my ($class, %opts) = @_;
     return bless {%opts} => $class;
 }
 
-sub load {
-    my ($self, %opts) = @_;
-    return $self->{arango}->_api( collection_load => { %opts, database => $self->{database}, name => $self->{name} });
-}
-
-
-sub load_indexes {
+sub document_paths {
     my ($self) = @_;
-    return $self->{arango}->_api( collection_load_indexes => { database => $self->{database}, name => $self->{name} });
-}
-
-
-sub unload {
-    my ($self) = @_;
-    return $self->{arango}->_api( collection_unload => { database => $self->{database}, name => $self->{name} });
-}
-
-sub rename {
-    my ($self, $newname) = @_;
-    return $self->{arango}->_api( collection_rename => { database => $self->{database}, collection => $self->{name}, name => $newname } );
-}
-
-sub properties {
-    my $self = shift;
-    return $self->{arango}->_api( collection_properties => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub truncate {
-    my $self = shift;
-    return $self->{arango}->_api( collection_truncate => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub set_properties {
-    my ($self, %opts) = @_;
-    return $self->{arango}->_api( collection_set_properties => { %opts, database => $self->{database}, name => $self->{name} } );
-}
-
-sub recalculate_count {
-    my ($self) = @_;
-    return $self->{arango}->_api( collection_recalculate_count => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub revision {
-    my $self = shift;
-    return $self->{arango}->_api( collection_revision => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub info {
-    my ($self) = @_;
-    return $self->{arango}->_api( collection_info => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub rotate {
-    my ($self) = @_;
-    return $self->{arango}->_api( collection_rotate => { database => $self->{database}, name => $self->{name} } );
-}
-
-sub checksum {
-    my ($self, %opts) = @_;
-    return $self->{arango}->_api( collection_checksum => { %opts, database => $self->{database}, name => $self->{name} } );
-}
-
-sub count {
-    my ($self, %opts) = @_;
-    return $self->{arango}->_api( collection_count => { %opts, database => $self->{database}, name => $self->{name} } );
-}
-
-sub figures {
-    my ($self) = @_;
-    return $self->{arango}->_api( collection_figures => { database => $self->{database}, name => $self->{name} } );
+    return $self->{arango}->_api( all_keys => { database => $self->{database}, collection => $self->{name}, type => "path"})->{result}
 }
 
 sub create_document {
@@ -87,24 +109,19 @@ sub create_document {
     return $self->{arango}->_api( create_document => { database => $self->{database}, collection => $self->{name}, body => $body})
 }
 
-sub document_paths {
-    my ($self) = @_;
-    return $self->{arango}->_api( all_keys => { database => $self->{database}, collection => $self->{name}, type => "path"})->{result}
-}
-
 sub get_access_level {
     my ($self, $username) = @_;
-    return $self->{arango}->get_access_level($self->{database}, $self->{name}, $username );
+    return $self->{arango}->get_access_level( $username, $self->{database}, $self->{name} );
 }
 
 sub clear_access_level {
     my ($self, $username) = @_;
-    return $self->{arango}->clear_access_level($self->{database}, $self->{name}, $username );
+    return $self->{arango}->clear_access_level( $username , $self->{database}, $self->{name} );
 }
 
 sub set_access_level {
     my ($self, $username, $grant) = @_;
-    return $self->{arango}->set_access_level($self->{database}, $self->{name}, $username, $grant);
+    return $self->{arango}->set_access_level($username, $grant, $self->{database}, $self->{name});
 }
 
 
@@ -122,7 +139,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 USAGE
 
@@ -271,7 +288,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alberto Simões.
+This software is copyright (c) 2019-2020 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

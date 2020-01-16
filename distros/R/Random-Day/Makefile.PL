@@ -25,13 +25,13 @@ requires 'DateTime::Event::Recurrence' => 0;
 requires 'Error::Pure' => 0.15;
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=Random-Day';
-resources 'homepage' => 'https://github.com/tupinek/Random-Day';
-resources 'repository' => 'git://github.com/tupinek/Random-Day';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Random-Day';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Random-Day';
 test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.08';
+version '0.09';
 
 # Run.
 WriteAll();

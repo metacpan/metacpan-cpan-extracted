@@ -17,6 +17,7 @@ my $genhdlist2 = 'genhdlist2 --xml-info';
 
 foreach my $dir (grep { -d $_ } glob("data/SPECS/*")) {
     my ($medium_name) = $dir =~ m!([^/]*)$!;
+    next if $medium_name eq 'suggests' && !are_weak_deps_supported();
     rpmbuild($_, $medium_name) foreach glob("$dir/*.spec");
     genhdlist_std($medium_name);
 }

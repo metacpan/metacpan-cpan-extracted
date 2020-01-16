@@ -1,10 +1,32 @@
 ==================================================
-Changes from 2019-01-11 00:00:00 +0000 to present.
+Changes from 2019-01-13 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.014 at 2020-01-11 11:33:52 +0000
+version 0.015 at 2020-01-13 20:30:16 +0000
 ------------------------------------------
+
+  Change: 58dc66c7c38886ea6ebd3b7238a6de050be0c3ee
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-13 21:29:33 +0000
+
+    fit_to_view: cope with undef children
+
+    The child summary logic inadvertently assumed that data structure
+    members were defined. This commit (and test) corrects that oversight.
+
+    Adding Test2::Plugin::NoWarnings as well, since the test output is
+    verbose enough that there's a risk of missing warnings. 
+
+------------------------------------------
+version 0.014 at 2020-01-11 11:34:03 +0000
+------------------------------------------
+
+  Change: c0ebd5d50693d6f5477fa936d8ea33fc72b34ed9
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-11 12:34:03 +0000
+
+    v0.014 
 
   Change: 37791ba740055882e00a466e307928b189acd3da
   Author: Ben Tyler <benjamin.tyler@booking.com>
@@ -21,34 +43,6 @@ version 0.014 at 2020-01-11 11:33:52 +0000
     Fix outdated comments and documentation
 
     These were leftovers from when `fit_to_view` might return a data
-    structure if it was small enough. Since the removal of Devel::Size in
-    f03d4e1d02, `fit_to_view` unconditionally summarizes. 
-
-------------------------------------------
-version 0.013 at 2020-01-11 11:08:24 +0000
-------------------------------------------
-
-  Change: 2335ead0562824c91cd477a4d83428ed1099addb
-  Author: Ben Tyler <benjamin.tyler@booking.com>
-  Date : 2020-01-11 12:08:24 +0000
-
-    v0.013 
-
-  Change: c08db2f997d6b3fdb3586d3907f10121cde30098
-  Author: Ben Tyler <benjamin.tyler@booking.com>
-  Date : 2020-01-11 12:04:22 +0000
-
-    interpreter: quote scalars in error messages
-
-    Improve readability of the error messages slightly. 
-
-  Change: b96c5b1e1a9bc59752c7afb4c1a7cfa34ce3bd55
-  Author: Ben Tyler <benjamin.tyler@booking.com>
-  Date : 2020-01-11 11:52:02 +0000
-
-    Fix outdated comments and documentation
-
-    This were leftovers from when `fit_to_view` might return a data
     structure if it was small enough. Since the removal of Devel::Size in
     f03d4e1d02, `fit_to_view` unconditionally summarizes. 
 

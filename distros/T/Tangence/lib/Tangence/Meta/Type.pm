@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Type;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -30,11 +30,13 @@ implemented as singletons.
 
 =cut
 
-=head2 $type = Tangence::Meta::Type->new( $primitive )
+=head2 new
+
+   $type = Tangence::Meta::Type->new( $primitive )
 
 Returns an instance to represent the given primitive type signature.
 
-=head2 $type = Tangence::Meta::Type->new( $aggregate => $member_type )
+   $type = Tangence::Meta::Type->new( $aggregate => $member_type )
 
 Returns an instance to represent the given aggregation of the given type
 instance.
@@ -65,7 +67,9 @@ sub new
    die "TODO: @_";
 }
 
-=head2 $type = Tangence::Meta::Type->new_from_sig( $sig )
+=head2 new_from_sig
+
+   $type = Tangence::Meta::Type->new_from_sig( $sig )
 
 Parses the given full Tangence type signature and returns an instance to
 represent it.
@@ -90,7 +94,9 @@ sub new_from_sig
 
 =cut
 
-=head2 $agg = $type->aggregate
+=head2 aggregate
+
+   $agg = $type->aggregate
 
 Returns C<"prim"> for primitive types, or the aggregation name for list and
 dict aggregate types.
@@ -103,7 +109,9 @@ sub aggregate
    return $self->[0];
 }
 
-=head2 $member_type = $type->member_type
+=head2 member_type
+
+   $member_type = $type->member_type
 
 Returns the member type for aggregation types. Throws an exception for
 primitive types.
@@ -117,7 +125,9 @@ sub member_type
    return $self->[1];
 }
 
-=head2 $sig = $type->sig
+=head2 sig
+
+   $sig = $type->sig
 
 Returns the Tangence type signature for the type.
 

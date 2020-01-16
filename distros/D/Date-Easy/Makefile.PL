@@ -41,9 +41,10 @@ my %WriteMakefileArgs = (
     "Time::DaysInMonth" => 0,
     "Time::JulianDay" => 0,
     "Time::Local" => "1.27",
+    "constant" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,6 +70,7 @@ my %FallbackPrereqs = (
   "Time::ParseDate" => "2015.0925",
   "Time::Piece" => "1.32",
   "autodie" => 0,
+  "constant" => 0,
   "lib" => 0,
   "overload" => 0,
   "parent" => 0,

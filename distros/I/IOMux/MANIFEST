@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/echo-daemon.pl
 lib/IOMux.pm
 lib/IOMux.pod

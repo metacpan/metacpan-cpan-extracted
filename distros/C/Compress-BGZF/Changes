@@ -1,5 +1,8 @@
 Revision history for Compress-BGZF
 
+0.006     2020-01-10
+          Fixed missing exception handling for failed buffered writes (thanks to Paul Kolano)
+          Fixed variable initialization in Reader causing problems with empty inputs
 0.005     2016-08-30
           Fixed serious bug causing duplicated filehandles between objects
 0.004     2016-05-16

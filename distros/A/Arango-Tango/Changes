@@ -1,3 +1,9 @@
+0.011  2020-01-14
+    
+    - Changed access_level API: new parameter order.
+    - Rewrote part of the method definition, making it easier to maintain.
+    - Use HTTP::Tiny methods in uppercase (fix 3.6.0 ArangoDB incompatibility).
+
 0.010  2019-05-01
     
    - Tango.pm:

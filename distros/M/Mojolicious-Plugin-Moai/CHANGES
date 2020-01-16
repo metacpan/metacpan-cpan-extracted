@@ -1,5 +1,23 @@
 Changelog for Mojolicious-Plugin-Moai
 
+0.008     2020-01-15 00:39:48-05:00 America/New_York
+
+    [Fixed]
+
+    - Fixed missing prereq on Test2::API. Thanks @manwar! [Github #1]
+
+0.007     2020-01-15 00:33:39-05:00 America/New_York
+
+    [Added]
+
+    - The UI library version can now be specified in the plugin
+      configuration. This makes it easier to switch just through
+      configuration.
+
+    [Fixed]
+
+    - Pager components now default to page 1
+
 0.006     2020-01-01 13:44:50-06:00 America/Chicago
 
     [Added]

@@ -246,17 +246,15 @@ subtest 'release for dist+version' => sub {
         },
     ];
 
-    local $api_data{ release_dist_version } = [
-        {
-            author => "PREACTION",
-            dist => "Yancy",
-            fail => 1,
-            na => 12,
-            pass => 59,
-            unknown => 3,
-            version => "1.032"
-        },
-    ];
+    local $api_data{ release_dist_version } = {
+        author => "PREACTION",
+        dist => "Yancy",
+        fail => 1,
+        na => 12,
+        pass => 59,
+        unknown => 3,
+        version => "1.032"
+    };
 
     my $schema = prepare_temp_schema();
     $schema->{_ua} = $mock_ua;
@@ -274,6 +272,83 @@ subtest 'release for dist+version' => sub {
     @got_rows = $schema->resultset( 'Release' )->search->all;
     is scalar @got_rows, 1, 'got one row of releases';
     is $got_rows[0]->dist, 'Yancy', 'dist is correct';
+};
+
+subtest 'report for dist+version' => sub {
+    local $api_data{ upload_dist } = [
+        {
+            dist => 'Yancy',
+            author => 'PREACTION',
+            version => '1.032',
+            filename => 'Yancy-1.032.tar.gz',
+            released => '2019-04-25T00:00:00Z',
+        },
+    ];
+
+    local $api_data{ summary_dist_version } = [
+        {
+            date => '2019-04-25',
+            dist => 'Yancy',
+            version => '1.032',
+            grade => 'pass',
+            guid => '5cdc73c8-30c9-11e9-92f6-ffec9e86782c',
+            osname => 'linux',
+            osvers => '4.9.0-3-amd64',
+            perl => '5.24.3',
+            platform => 'x86_64-linux',
+            reporter => 'Doug Bell <doug@preaction.me>',
+        },
+    ];
+
+    local $api_data{ report } = {
+        '5cdc73c8-30c9-11e9-92f6-ffec9e86782c' => {
+            id => '5cdc73c8-30c9-11e9-92f6-ffec9e86782c',
+            result => {
+                grade => 'pass',
+                output => {
+                    uncategorized => 'This distribution has been tested as part of the CPAN Testers project',
+                },
+            },
+            reporter => {
+                email => 'srezic@example.net (Slaven Rezic)',
+                name => 'Slaven Rezi&#263; (SREZIC)',
+            },
+            created => '2019-02-15T02:28:21Z',
+            environment => {
+                language => {
+                    archname => 'x86_64-linux',
+                    version => '5.24.3',
+                    name => 'Perl 5',
+                },
+                system => {
+                    osname => 'linux',
+                    osversion => '4.9.0-3-amd64',
+                },
+            },
+            distribution => {
+                version => '1.023',
+                name => 'Yancy',
+            },
+        },
+    };
+
+    my $schema = prepare_temp_schema();
+    $schema->{_ua} = $mock_ua;
+    $schema->{_url} = '/v3';
+    $schema->populate_from_api( { dist => 'Yancy', version => '1.032' }, qw( report ) );
+
+    my @got_rows = $schema->resultset( 'Upload' )->search->all;
+    is scalar @got_rows, 1, 'got one row of uploads';
+    is $got_rows[0]->dist, 'Yancy', 'dist is correct';
+
+    @got_rows = $schema->resultset( 'Stats' )->search->all;
+    is scalar @got_rows, 1, 'got one row of summaries';
+    is $got_rows[0]->dist, 'Yancy', 'dist is correct';
+
+    @got_rows = $schema->resultset( 'TestReport' )->search->all;
+    is scalar @got_rows, 1, 'got one row of test reports';
+    is $got_rows[0]->report->{distribution}{name}, 'Yancy', 'dist is correct'
+        or diag explain $got_rows[0]->report;
 };
 
 done_testing;

@@ -1,5 +1,22 @@
 Revision history for Perl extension XML::LibXSLT.
 
+1.99    2020-01-16
+    - Remove checks for libxslt versions
+        - https://rt.cpan.org/Ticket/Display.html?id=131155
+        - Thanks to SREZIC and others
+        - These checks were much maligned.
+
+1.98    2020-01-16
+    - Replace xslt-config with plkg-config
+        - The former is going away
+        - https://github.com/shlomif/perl-XML-LibXSLT/pull/3
+        - Thanks to Debian.
+
+1.97    2020-01-14
+    - Tests hot fix for https://rt.cpan.org/Public/Bug/Display.html?id=131457
+        - Tests failed with XML::LibXML v 2.0202
+        - Thanks to jplesnik from Red Hat.
+
 1.96    2018-02-21
     - Apply patch from RT#83028
         - $Config{libs} is not needed

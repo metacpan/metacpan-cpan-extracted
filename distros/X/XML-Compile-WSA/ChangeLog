@@ -1,6 +1,12 @@
 
 ===== version history of XML::Compile::WSA
 
+version 0.95: Wed 15 Jan 14:13:00 CET 2020
+
+	Improvements:
+	- convert to GitHub
+	- require perl 5.10
+
 version 0.94: Thu Jun 11 09:41:04 CEST 2015
 
 	Fixes:

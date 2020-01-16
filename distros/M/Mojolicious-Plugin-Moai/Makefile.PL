@@ -25,9 +25,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::API" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t t/menu/*.t t/test/role/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Mojolicious" => 8,
   "Role::Tiny" => "2.000001",
+  "Test2::API" => 0,
   "Test::More" => "1.001005"
 );
 

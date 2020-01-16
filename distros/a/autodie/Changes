@@ -1,5 +1,14 @@
 Revision history for autodie
 
+2.32      2020-01-16 11:40:52-06:00 America/Chicago
+
+        * Update automated tests to include soft dependencies.
+
+        * Remove Test::Perl::Critic as a testing requirement.
+
+        * Update README.md to show github actions status
+          not Travis.
+
 2.31      2020-01-08 00:37:45-06:00 America/Chicago
 
         * TEST BUGFIX: Correct diag explain in t/version.t

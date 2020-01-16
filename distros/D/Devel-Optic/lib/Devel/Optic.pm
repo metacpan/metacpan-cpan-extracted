@@ -1,5 +1,5 @@
 package Devel::Optic;
-$Devel::Optic::VERSION = '0.014';
+$Devel::Optic::VERSION = '0.015';
 # ABSTRACT: Production safe data inspector
 
 use strict;
@@ -115,6 +115,8 @@ sub fit_to_view {
             my $val_chunk;
             if (ref $val) {
                 $val_chunk = ref $val;
+            } elsif (!defined $val) {
+                $val_chunk = '(undef)';
             } else {
                 $val_chunk = substr($val, 0, $scalar_sample_size);
                 $val_chunk .= '...' if length($val_chunk) < length($val);
@@ -137,6 +139,8 @@ sub fit_to_view {
             my $val_chunk;
             if (ref $val) {
                 $val_chunk = ref $val;
+            } elsif (!defined $val) {
+                $val_chunk = '(undef)';
             } else {
                 $val_chunk = substr($val, 0, $scalar_sample_size);
                 $val_chunk .= '...' if length($val_chunk) < length($val);
@@ -176,7 +180,7 @@ Devel::Optic - Production safe data inspector
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

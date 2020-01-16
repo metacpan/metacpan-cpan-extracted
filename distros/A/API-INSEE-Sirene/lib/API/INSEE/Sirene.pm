@@ -9,13 +9,12 @@ use LWP::UserAgent;
 use POSIX 'strftime';
 
 use Exporter 'import';
-our @EXPORT = qw(&getLegalUnitBySIREN &getEstablishmentBySIRET &getEstablishmentsBySIREN &getEstablishmentsByName &getEstablishmentsByUsualName);
-our @EXPORT_OK = qw(&getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLegalUnitsByName &getLegalUnitsByUsualName &getUserAgentInitialized);
+our @EXPORT = qw/ &getLegalUnitBySIREN &getEstablishmentBySIRET &getEstablishmentsBySIREN &getEstablishmentsByName &getEstablishmentsByUsualName /;
+our @EXPORT_OK = qw/ &getEstablishmentsByCriteria &getLegalUnitsByCriteria &getLegalUnitsByName &getLegalUnitsByUsualName &getUserAgentInitialized /;
 
 my $API_VERSION = 3;
-my $API_REVISION = 5;
-my $PACKAGE_REVISION = '04';
-our $VERSION = 3.504;
+# API version . API revision + package revision
+our $VERSION = 3.505;
 
 my $EMPTY = q{};
 my $API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V$API_VERSION";
@@ -97,8 +96,8 @@ sub initUserAgent {
     $user_agent->timeout($timeout);
     $proxy ? $user_agent->proxy(['https', 'http'], $proxy) : $user_agent->env_proxy;
 
-    my ($token, $err) = getToken();
-    croak "Unable to get token.\n$err" if (!$token);
+    my ($err, $token) = getToken();
+    croak "Unable to get token.\n$token" if ($err);
 
     $user_agent->default_header('Authorization' => "Bearer $token");
     $user_agent->default_header('Accept' => 'application/json');
@@ -121,40 +120,52 @@ sub getToken {
     if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
 
         my $json_obj = decode_json($response->content);
-        return $json_obj->{'access_token'};
+        return (0, $json_obj->{'access_token'});
     }
 
-    return (0, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    return (1, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
 }
 
-sub checkResponse {
+sub _checkResponse {
 
-    my ($endpoint, $parameters) = @_;
+    my ($endpoint, $parameters, $flag) = @_;
 
     my $request = HTTP::Request->new('GET', "$API_BASE_URL/$endpoint?$parameters");
     my $response = $user_agent->request($request);
 
     if ($response->is_success && $response->header('Content-Type') =~ qr{application/json}i) {
 
-        return $response->content;
+        return (0, $response->content);
     }
 
-    return (0, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
+    # This is used when the token has expired
+    my $error_message = decode_json($response->content);
+    if (!$flag && ($error_message->{'fault'}->{'message'} =~ qr{Invalid Credentials})) {
+
+        # we can't call initUserAgent here because of getUserAgentInitialized
+        my ($err, $token) = getToken();
+        croak "Unable to get token.\n$token" if ($err);
+
+        $user_agent->default_header('Authorization' => "Bearer $token");
+        return _checkResponse($endpoint, $parameters, 1);
+    }
+
+    return (1, sprintf "Sent request:\n%s\nReceived response:\n%s\n", $request->as_string, $response->as_string);
 }
 
-sub buildParameters {
+sub _buildParameters {
 
     my ($usefull_fields, $use_historized_fields, $fields, $criteria) = @_;
 
     my $date = strftime('%Y-%m-%d', localtime);
-    $fields = buildFields($usefull_fields, $fields);
-    $criteria = $criteria ? buildQuery($criteria, $use_historized_fields) : $EMPTY;
+    $fields = _buildFields($usefull_fields, $fields);
+    $criteria = $criteria ? _buildQuery($criteria, $use_historized_fields) : $EMPTY;
 
     $default_max_results = $HARD_MAX_RESULTS if ($default_max_results > $HARD_MAX_RESULTS);
     return "q=($criteria)&champs=$fields&date=$date&nombre=$default_max_results";
 }
 
-sub buildQuery {
+sub _buildQuery {
 
     my ($criteria, $use_historized_fields) = @_;
     my @query;
@@ -174,7 +185,7 @@ sub buildQuery {
 
             $word =~ s/&/%26/ig;
             my $query = sprintf '(%s:"%s"~ OR %s:*%s*)', $field_name, $word, $field_name, $word;
-            $query = "periode$query" if ($use_historized_fields && isInArray($field_name, $historized_fields));
+            $query = "periode$query" if ($use_historized_fields && _isInArray($field_name, $historized_fields));
 
             push @query, $query;
         }
@@ -183,7 +194,7 @@ sub buildQuery {
     return join ' AND ', @query;
 }
 
-sub buildFields {
+sub _buildFields {
 
     my ($usefull_fields, $fields) = @_;
 
@@ -201,7 +212,9 @@ sub buildFields {
     }
 }
 
-sub isInArray {
+# use smartmatch instead of _isInArray ?
+# 1 = true, 0 = false
+sub _isInArray {
 
     my ($element, $array) = @_;
 
@@ -217,96 +230,96 @@ sub getLegalUnitBySIREN {
 
     my ($siren, $fields) = @_;
 
-    return (0, "Invalid SIREN $siren -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
+    return (1, "Invalid SIREN $siren -> Must be a 9 digits number") if ($siren !~ m/\d{9}/);
 
-    my $parameters = buildParameters($usefull_fields_unite_legale, 0, $fields);
+    my $parameters = _buildParameters($usefull_fields_unite_legale, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse("siren/$siren", $parameters);
+    return _checkResponse("siren/$siren", $parameters);
 }
 
 sub getEstablishmentBySIRET {
 
     my ($siret, $fields) = @_;
 
-    return (0, "Invalid SIRET $siret -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
+    return (1, "Invalid SIRET $siret -> Must be a 14 digits number") if ($siret !~ m/\d{14}/);
 
-    my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields);
+    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields);
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse("siret/$siret", $parameters);
+    return _checkResponse("siret/$siret", $parameters);
 }
 
 sub getEstablishmentsBySIREN {
 
     my ($siren, $fields) = @_;
 
-    return (0, "Invalid SIREN $siren -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
+    return (1, "Invalid SIREN $siren -> Must be a 9 digits number.") if ($siren !~ m/\d{9}/);
 
-    my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {siren => $siren});
+    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {siren => $siren});
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siret', $parameters);
+    return _checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByCriteria {
 
     my ($criteria, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, $criteria);
+    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siren', $parameters);
+    return _checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByCriteria {
 
     my ($criteria, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, $criteria);
+    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, $criteria);
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siret', $parameters);
+    return _checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
+    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siren', $parameters);
+    return _checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
+    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siret', $parameters);
+    return _checkResponse('siret', $parameters);
 }
 
 sub getLegalUnitsByUsualName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
+    my $parameters = _buildParameters($usefull_fields_unite_legale, 1, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siren', $parameters);
+    return _checkResponse('siren', $parameters);
 }
 
 sub getEstablishmentsByUsualName {
 
     my ($nom, $fields) = @_;
 
-    my $parameters = buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
+    my $parameters = _buildParameters($usefull_fields_etablissement, 0, $fields, {denominationUsuelle1UniteLegale => $nom});
     initUserAgent() if (not defined $user_agent);
 
-    return checkResponse('siret', $parameters);
+    return _checkResponse('siret', $parameters);
 }
 
 
@@ -324,7 +337,7 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 =head1 VERSION
 
-Version 3.504
+Version 3.505
 
 =head1 SYNOPSIS
 
@@ -389,15 +402,11 @@ L<< https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-i
 
 =back
 
-B<Please note that this API is french so all fields names used in function calls are in french.>
+B<Please note that this API is french so all fields names used in function calls are in french, including the aliases.>
 
 =head1 REQUIRED MODULES
 
 =over 4
-
-=item *
-
-L<< Carp|https://perldoc.perl.org/Carp.html >>
 
 =item *
 
@@ -421,15 +430,15 @@ These following functions are exported by default:
 
 =over 4
 
-=item * getLegalUnitBySIREN
+=item * L<< getLegalUnitBySIREN|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitBySIREN >>
 
-=item * getEstablishmentsBySIREN
+=item * L<< getEstablishmentsBySIREN|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsBySIREN >>
 
-=item * getEstablishmentBySIRET
+=item * L<< getEstablishmentBySIRET|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentBySIRET >>
 
-=item * getEstablishmentsByName
+=item * L<< getEstablishmentsByName|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByName >>
 
-=item * getEstablishmentsByUsualName
+=item * L<< getEstablishmentsByUsualName|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByUsualName >>
 
 =back
 
@@ -437,15 +446,15 @@ These folowing functions are available by manual import:
 
 =over 4
 
-=item * getEstablishmentsByCriteria
+=item * L<< getEstablishmentsByCriteria|https://metacpan.org/pod/API::INSEE::Sirene#getEstablishmentsByCriteria >>
 
-=item * getLegalUnitsByCriteria
+=item * L<< getLegalUnitsByCriteria|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByCriteria >>
 
-=item * getLegalUnitsByName
+=item * L<< getLegalUnitsByName|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByName >>
 
-=item * getLegalUnitsByUsualName
+=item * L<< getLegalUnitsByUsualName|https://metacpan.org/pod/API::INSEE::Sirene#getLegalUnitsByUsualName >>
 
-=item * getUserAgentInitialized
+=item * L<< getUserAgentInitialized|https://metacpan.org/pod/API::INSEE::Sirene#getUserAgentInitialized >>
 
 =back
 
@@ -459,10 +468,10 @@ This section describes all available features in this module.
 
 =item B<CLIENT_AUTH>
 
-Required variable so the module can connect to your INSEE account and obtain a token that allows him to send requests thereafter. The value must be your base64 encoded credentials.
+Required constant so the module can connect to your INSEE account and obtain a token that allows him to send requests thereafter. The value must be your base64 encoded credentials.
 
-The token has a limited lifetime (7 days by default but you can change it) and is automatically renewed by the API.
-The module gets the token only once at program launch so you need to relaunch the module to get the new token.
+The token has a limited lifetime (7 days by default but you can change it) and it is automatically renewed by the API.
+The module gets the new token automatically from the API.
 
 =item B<default_max_results>
 
@@ -472,7 +481,7 @@ This variable is set to 20 results by default.
 
 =item B<HARD_MAX_RESULTS>
 
-Constant that specifies the max results number you can get. This value can't be increased. If you try to send a request with a higher value, the C<nombre> parameter will be forced to HARD_MAX_RESULTS value.
+Constant that specifies the max results number you can get. This value can't be increased (restricted by API). If you try to send a request with a higher value, the C<nombre> parameter will be forced to HARD_MAX_RESULTS value.
 
 =item B<proxy>
 
@@ -540,7 +549,7 @@ B<Note:> All functions search and return values that are in the most recent lega
 
 =over 4
 
-=item B<siren and siret>
+=item B<siren> and B<siret>
 
 In the B<getEstablishmentBySIRET>, B<getEstablishmentsBySIREN> and B<getLegalUnitBySIREN> functions, you must give a SIREN or a SIRET number:
 
@@ -591,22 +600,24 @@ When you don't specify fields like this:
 
   my $response_json = getLegalUnitBySIREN(123456789);
 
-The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you.
+The module will not return to you all fields by default because there are too many. Instead, it returns a selection of fields that are most likely of interest to you. (see C<$usefull_fields_unite_legale> and C<$usefull_fields_etablissement> in code to find out which ones)
 
 If you want all fields, you have to specify it explicitly by passing the 'all' parameter.
 
 =back
 
-=head2 FUNCTION RETURN
+=head2 RETURN VALUES
 
-Each function listed above returns the JSON string of the response content in case of success. Else, they return a list, whose the first element is 0, and the second is the complete sent request and the response received with headers.
+Each function returns a list of two elements. The first is the return code, which is 0 in case of success, or something else in case of failure. The second is the result of the request (some json or an error message). In case of problem when call the API (malformed request for example), the complete sent request and the response received with headers will be returned in the error message.
 To handling the return of these function, you can do somethink like this:
 
-  my ($response_json, $err) = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
+  my ($err, $result) = getLegalUnitBySIREN(123456789, 'dateCreationUniteLegale');
+  print $result if ($err);
 
-  if (!$response_json) {
-      print $err;
-  }
+The getUserAgentInitialized function may launch a croak when the getToken internal function fails to get the token used to call the API, so to handle this error, you should use it in an eval.
+
+    eval { my $user_agent = getUserAgentInitialized() };
+    print $@ if ($@);
 
 =head2 ALIAS
 
@@ -641,7 +652,7 @@ Justin Fouquet <jfouquet at lncsa dot fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018 by Les Nouveaux Constructeurs
+Copyright 2018-2020 by Les Nouveaux Constructeurs
 
 This library is free software; You can redistribute it and/or modify it under the same terms as Perl itself.
 

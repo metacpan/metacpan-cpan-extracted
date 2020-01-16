@@ -1,0 +1,40 @@
+---
+abstract: 'Monte Carlo method for gambling.'
+author:
+  - 'nqounet <mail@nqou.net>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BettingStrategy-MonteCarlo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  BettingStrategy::MonteCarlo:
+    file: lib/BettingStrategy/MonteCarlo.pm
+    version: v0.1.0
+requires:
+  Moo: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/nqounet/p5-betting_strategy-monte_carlo/issues
+  homepage: https://github.com/nqounet/p5-betting_strategy-monte_carlo
+  repository: git://github.com/nqounet/p5-betting_strategy-monte_carlo.git
+version: v0.1.0
+x_authority: cpan:NQOUNET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

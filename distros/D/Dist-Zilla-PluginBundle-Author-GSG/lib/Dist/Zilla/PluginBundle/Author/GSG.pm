@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::GSG;
 
 # ABSTRACT: Grant Street Group CPAN dists
 use version;
-our $VERSION = 'v0.0.18'; # VERSION
+our $VERSION = 'v0.0.19'; # VERSION
 
 use Moose;
 with qw(
@@ -77,7 +77,6 @@ sub configure {
         'Git::Tag',
         'Git::Push',
 
-        'Git::Contributors',
         [ 'Git::GatherDir' => $self->config_slice( qw<
             exclude_filename
             exclude_match
@@ -155,7 +154,7 @@ Dist::Zilla::PluginBundle::Author::GSG - Grant Street Group CPAN dists
 
 =head1 VERSION
 
-version v0.0.18
+version v0.0.19
 
 =head1 SYNOPSIS
 
@@ -213,7 +212,6 @@ Some of which comes from L<Dist::Zilla::Plugin::Author::GSG>.
     [Git::Tag]
     [Git::Push]
 
-    [Git::Contributors]
     [Git::GatherDir]
     ; include_dotfiles
     ; exclude_filename
@@ -438,26 +436,10 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Grant Street Group.
+This software is Copyright (c) 2019 - 2020 by Grant Street Group.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
-=head1 CONTRIBUTORS
-
-=for stopwords Andrew Fresh Mark Flickinger
-
-=over 4
-
-=item *
-
-Andrew Fresh <andrew.fresh@grantstreet.com>
-
-=item *
-
-Mark Flickinger <mark.flickinger@grantstreet.com>
-
-=back
 
 =cut

@@ -85,9 +85,12 @@ subtest 'Dist with defaults' => sub {
 };
 
 subtest 'Dist with defaults, without git repo' => sub {
+    # Hope for no .git directories in TMPDIR
+    my $tmpdir = File::Temp->newdir( 'dzpag-XXXXXXXXX', TMPDIR => 1 );
     my $tzil = Builder->from_config(
         { dist_root => 'corpus/dist/defaults' },
-        {   add_files => {
+        {   tempdir_root => "$tmpdir",    # requires a string
+            add_files    => {
                 'source/dist.ini' => dist_ini(
                     {   name    => 'Defaults',
                         version => '1.2.3',

@@ -28,7 +28,7 @@ test(sub { urpmi('--auto-select --auto'); check_installed_fullnames("a-2-1"); ur
 sub test {
     my ($f) = @_;
     system_("rpm --root $::pwd/root -i media/$medium_name/a-1-*.rpm");
-    is(`rpm -qa --root $::pwd/root`, "a-1-1\n");
+    check_installed_fullnames("a-1-1");
 
     $f->();
     check_nothing_installed();

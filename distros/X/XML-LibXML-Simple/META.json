@@ -1,10 +1,10 @@
 {
-   "abstract" : "XML::LibXML based XML::Simple clone",
+   "abstract" : "XML::LibXML alternative to XML::Simple::XMLin()",
    "author" : [
-      "Mark Overmeer"
+      "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,5 +39,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.99"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-XML-LibXML-Simple.git",
+         "web" : "https://github.com/markov2/perl5-XML-LibXML-Simple"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

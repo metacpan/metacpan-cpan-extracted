@@ -62,7 +62,7 @@ sub test {
 
     urpmi($pkgs_v1);
     my @pkgs_v1 = split(' ', $pkgs_v1);   
-    is(`rpm -qa --root $::pwd/root | sort`, join('', map { "$_-1-1\n" } @pkgs_v1));
+    check_installed_fullnames(map { "$_-1-1" } @pkgs_v1);
 
     unlink "$::pwd/media/$name";
     symlink "$name-2", "$::pwd/media/$name";
@@ -77,10 +77,10 @@ sub test {
 
     my @pkgs_v2 = split(' ', $pkgs_v2);
     my @l = (
-	(map { "$_-2-1\n" } @pkgs_v2),
-	(map { "$_-1-1\n" } difference2(\@pkgs_v1, \@pkgs_v2)),
+	(map { "$_-2-1" } @pkgs_v2),
+	(map { "$_-1-1" } difference2(\@pkgs_v1, \@pkgs_v2)),
     );
-    is(`rpm -qa --root $::pwd/root | sort`, join('', sort @l));
+    check_installed_fullnames(sort @l);
 
     system_('rm -rf root');
 }

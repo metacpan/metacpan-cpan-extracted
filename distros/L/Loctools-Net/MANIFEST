@@ -1,0 +1,13 @@
+AUTHORS
+Build
+Build.PL
+lib/Loctools/Net.pm
+lib/Loctools/Net/HTTP/Client.pm
+lib/Loctools/Net/OAuth2/Session.pm
+lib/Loctools/Net/OAuth2/Session/Google.pm
+MANIFEST			This list of files
+MIT-LICENSE.txt
+README.md
+Makefile.PL
+META.yml
+META.json

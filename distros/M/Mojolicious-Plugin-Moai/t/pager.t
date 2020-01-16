@@ -32,7 +32,7 @@ subtest 'Bootstrap4 pager' => \&test_pager,
     template => 'moai/pager',
     %{ $common_selectors{ Bootstrap4 } },
     has_pages => 1,
-    first_elem => 'ul.pagination li:nth-child(2) a',
+    first_elem => 'ul.pagination li:nth-child(2) > :first-child',
     current_elem => 'ul.pagination li.active span',
     ;
 
@@ -127,4 +127,21 @@ sub test_pager {
       ->or( sub { diag shift->tx->res->dom->at( $attr{next_elem_disabled} ) } )
       ->text_like( $attr{next_elem_disabled}, qr{^\s*Next\s*$}, 'next link text correct' )
       ;
+
+    # Defaults to first page
+    $t->get_ok( $url, form => { total_pages => 5 } )
+      ->status_is( 200 )
+      ->or( sub { diag 'Error: ', shift->tx->res->dom->at( '#error,#routes' ) } )
+      ->element_exists(
+        $attr{prev_elem_disabled},
+        'previous link is disabled',
+      )
+      ->or( sub { diag shift->tx->res->dom->at( $attr{prev_elem_disabled} ) } )
+      ->text_like( $attr{prev_elem_disabled}, qr{^\s*Previous\s*$}, 'previous link text correct' )
+      ;
+    if ( $attr{has_pages} ) {
+        my $dom = $t->tx->res->dom;
+        is $dom->at( $attr{ first_elem } ), $dom->at( $attr{ current_elem } ),
+            'first page is current page by default';
+    }
 }

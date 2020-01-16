@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::LineLogger';
 
-our $VERSION = '0.019';    # VERSION
+our $VERSION = '0.020';    # VERSION
 
 has 'lines' => ( is      => 'ro',
                  isa     => ArrayRef,
@@ -35,7 +35,7 @@ Bat::Interpreter::Delegate::LineLogger::SilentSaveLines
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Pablo Rodríguez González.
+This software is Copyright (c) 2020 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Scattermapbox::Unselected::Marker;
 
-our $VERSION = '0.036';    # VERSION
+our $VERSION = '0.037';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattermapbox.
 
@@ -53,7 +53,7 @@ Chart::Plotly::Trace::Scattermapbox::Unselected - This attribute is one of the p
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

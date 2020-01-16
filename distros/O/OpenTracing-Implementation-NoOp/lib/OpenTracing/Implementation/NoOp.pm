@@ -3,7 +3,7 @@ package OpenTracing::Implementation::NoOp;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 
 
@@ -11,7 +11,7 @@ use aliased 'OpenTracing::Implementation::NoOp::Tracer';
 
 
 
-sub bootstrap {
+sub bootstrap_tracer {
     my $implementation_class = shift;
     
     my @implementation_args  = @_;

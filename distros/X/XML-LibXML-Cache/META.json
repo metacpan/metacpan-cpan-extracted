@@ -1,0 +1,57 @@
+{
+   "abstract" : "Document cache for XML::LibXML",
+   "author" : [
+      "Nick Wellnhofer <wellnhofer@aevum.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-LibXML-Cache",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "URI" : "0",
+            "XML::LibXML" : "1.59",
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "XML::LibXSLT" : "1.59"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Touch" : "0",
+            "Test::Deep" : "0",
+            "XML::LibXSLT" : "1.59"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/nwellnhof/XML-LibXML-Cache"
+      }
+   },
+   "version" : "0.14",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

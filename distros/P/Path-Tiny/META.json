@@ -112,11 +112,11 @@
    "provides" : {
       "Path::Tiny" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.108"
+         "version" : "0.110"
       },
       "Path::Tiny::Error" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.108"
+         "version" : "0.110"
       }
    },
    "release_status" : "stable",
@@ -131,7 +131,7 @@
          "web" : "https://github.com/dagolden/Path-Tiny"
       }
    },
-   "version" : "0.108",
+   "version" : "0.110",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
@@ -166,7 +166,7 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>",
       "\uae40\ub3c4\ud615 - Keedi Kim <keedi@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"
 }
 

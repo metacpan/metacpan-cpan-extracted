@@ -8,7 +8,7 @@ use Module::Find;
 use Chart::Plotly;
 use namespace::autoclean;
 
-our $VERSION = '0.036';    # VERSION
+our $VERSION = '0.037';    # VERSION
 
 # ABSTRACT: Inline display of plotly charts in Jupyter notebooks using L<Devel::IPerl> kernel
 
@@ -99,7 +99,7 @@ Devel::IPerl::Plugin::Chart::Plotly - Inline display of plotly charts in Jupyter
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000025  2020-01-14 15:54:42Z
+    - Copy Dist::Zilla::Plugin::MAXMIND::TidyAll into
+      Dist::Zilla::Plugin::OALDERS::TidyAll
+
 0.000024  2019-11-06 02:26:15Z
     - Add MojibakeTests, Test::EOL, Test::Portability and Test::Version
 

@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Tangence::Client 0.25; # ->get_registry
 use Net::Async::Tangence::Client;
 use Tangence::Constants;
 
@@ -57,31 +58,25 @@ my $conn = Net::Async::Tangence::Client->new(
 
 $loop->add( $conn );
 
-my $registry;
+$conn->connect_url( $URL )->get;
 
-$conn->connect_url( 
-   $URL,
-   on_registry => sub {
-      $registry = shift;
+my $registry = $conn->get_registry->get;
 
-      $registry->watch_property( 
-         property => "objects",
-         on_set => sub {
-            my ( $objects ) = @_;
-            new_object( $_ ) foreach keys %$objects;
-         },
-         on_add => sub {
-            my ( $id, $obj ) = @_;
-            new_object( $id );
-         },
-         on_del => sub {
-            my ( $id ) = @_;
-            print STDERR "deleted object $id\n";
-         },
-         want_initial => 1,
-      );
+$registry->watch_property_with_initial(
+   "objects",
+   on_set => sub {
+      my ( $objects ) = @_;
+      new_object( $_ ) foreach keys %$objects;
    },
-);
+   on_add => sub {
+      my ( $id, $obj ) = @_;
+      new_object( $id );
+   },
+   on_del => sub {
+      my ( $id ) = @_;
+      print STDERR "deleted object $id\n";
+   },
+)->get;
 
 $loop->loop_forever;
 
@@ -91,41 +86,38 @@ sub new_object
 
    print "Subscribing to events and properties on new object $objid\n";
 
-   $registry->call_method(
-      method => "get_by_id",
-      args   => [ $objid ],
+   my $obj = $registry->call_method( "get_by_id", $objid )->get;
+   unless( $obj ) {
+      warn "Registry did not give us an object at ID=$objid\n";
+      return;
+   }
 
-      on_result => sub {
-         my ( $obj ) = @_;
+   my $class = $obj->class;
 
-         my $introspection = $obj->introspect;
+   my @f;
 
-         my $events = $introspection->{events};
+   foreach my $event ( keys %{ $class->events } ) {
+      print "Subscribing to object $objid event $event\n";
+      push @f, object_event( $obj, $event );
+   }
 
-         foreach my $event ( keys %$events ) {
-            print "Subscribing to object $objid event $event\n";
-            object_event( $obj, $event );
-         }
+   foreach my $prop ( keys %{ $class->properties } ) {
+      # We're already watching 'objects' on the registry, so ignore that
+      next if $objid == 0 and $prop eq "objects";
+      print "Watching object $objid property $prop\n";
+      # Need to handle based on the property dimension
+      my $dim = $class->property( $prop )->dimension;
+      my $install = $dim == DIM_SCALAR ? \&object_prop_scalar :
+                    $dim == DIM_HASH   ? \&object_prop_hash :
+                    $dim == DIM_QUEUE  ? \&object_prop_queue :
+                    $dim == DIM_ARRAY  ? \&object_prop_array :
+                    $dim == DIM_OBJSET ? \&object_prop_objset :
+                    undef;
 
-         my $properties = $introspection->{properties};
+      push @f, $install->( $obj, $prop ) if defined $install;
+   }
 
-         foreach my $prop ( keys %$properties ) {
-            # We're already watching 'objects' on the registry, so ignore that
-            next if $objid == 0 and $prop eq "objects";
-            print "Watching object $objid property $prop\n";
-            # Need to handle based on the property dimension
-            my $dim = $properties->{$prop}->{dim};
-            my $install = $dim == DIM_SCALAR ? \&object_prop_scalar :
-                          $dim == DIM_HASH   ? \&object_prop_hash :
-                          $dim == DIM_QUEUE  ? \&object_prop_queue :
-                          $dim == DIM_ARRAY  ? \&object_prop_array :
-                          $dim == DIM_OBJSET ? \&object_prop_objset :
-                          undef;
-
-            $install->( $obj, $prop ) if defined $install;
-         }
-      },
-   );
+   Future->needs_all( @f )->get;
 }
 
 sub object_event
@@ -135,7 +127,7 @@ sub object_event
    my $id = $obj->id;
 
    $obj->subscribe_event(
-      event => $event,
+      $event,
       on_fire => sub {
          my ( @args ) = @_;
 
@@ -151,14 +143,13 @@ sub object_prop_scalar
 
    my $id = $obj->id;
 
-   $obj->watch_property(
-      property => $prop,
+   $obj->watch_property_with_initial(
+      $prop,
       on_set => sub {
          my ( $scalar ) = @_;
          print "PROP SET $id [$prop]\n";
          print "  " . Data::Dump::dump($scalar) . "\n";
       },
-      want_initial => 1,
    );
 }
 
@@ -168,8 +159,8 @@ sub object_prop_hash
 
    my $id = $obj->id;
 
-   $obj->watch_property(
-      property => $prop,
+   $obj->watch_property_with_initial(
+      $prop,
       on_set => sub {
          my ( $hash ) = @_;
          print "PROP SET $id [$prop]\n";
@@ -185,7 +176,6 @@ sub object_prop_hash
          print "PROP DEL $id [$prop]\n";
          print "  {$key}\n";
       },
-      want_initial => 1,
    );
 }
 
@@ -196,7 +186,7 @@ sub object_prop_array
    my $id = $obj->id;
 
    $obj->watch_property(
-      property => $prop,
+      $prop,
       on_set => sub {
          my ( $array ) = @_;
          print "PROP SET $id [$prop]\n";
@@ -223,7 +213,6 @@ sub object_prop_array
          print "PROP MOVE $id [$prop]\n";
          print "  [$index] by ".($delta>0?"+$delta":"$delta")."\n";
       },
-      want_initial => 1,
    );
 }
 
@@ -233,8 +222,8 @@ sub object_prop_queue
 
    my $id = $obj->id;
 
-   $obj->watch_property(
-      property => $prop,
+   $obj->watch_property_with_initial(
+      $prop,
       on_set => sub {
          my ( $queue ) = @_;
          print "PROP SET $id [$prop]\n";
@@ -250,7 +239,6 @@ sub object_prop_queue
          print "PROP SHIFT $id [$prop]\n";
          print "  shift x $count\n";
       },
-      want_initial => 1,
    );
 }
 
@@ -260,8 +248,8 @@ sub object_prop_objset
 
    my $id = $obj->id;
 
-   $obj->watch_property(
-      property => $prop,
+   $obj->watch_property_with_initial(
+      $prop,
       on_set => sub {
          my ( $objs ) = @_;
          print "PROP SET $id [$prop]\n";
@@ -277,6 +265,5 @@ sub object_prop_objset
          print "PROP DEL $id [$prop]\n";
          print "  $delid\n";
       },
-      want_initial => 1,
    );
 }

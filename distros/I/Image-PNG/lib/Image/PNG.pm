@@ -9,7 +9,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 
 sub error
@@ -42,7 +42,6 @@ my %IHDR_fields = (
 
 sub write_info_error
 {
-    my ($png) = @_;
     my @unset;
     for my $field (sort keys %IHDR_fields) {
         if (!$IHDR_fields{$field}{default}) {
@@ -111,7 +110,6 @@ sub Image::PNG::read
         my $ihdr = Image::PNG::Libpng::get_IHDR ($read->png ());
         printf ("The size of the image is %d X %d; its colour type is %s; its bit depth is %d\n", $ihdr->{width}, $ihdr->{height}, Image::PNG::Libpng::color_type_name ($ihdr->{color_type}), $ihdr->{bit_depth});
     }
-
     $png->{read} = $read;
     return 1;
 }
@@ -425,7 +423,7 @@ sub rowbytes
 
 sub text
 {
-    my ($png, $text) = @_;
+    my ($png) = @_;
     if (! $png->{text}) {
         my $text_ref =
             Image::PNG::Libpng::get_text ($png->{read}->png ());
@@ -484,6 +482,19 @@ sub display_text
     }
 }
 
+sub interlacing_method
+{
+    my ($png) = @_;
+    my $ihdr = Image::PNG::Libpng::get_IHDR ($png->{read}->png);
+    if ($ihdr->{interlace_method} == PNG_INTERLACE_NONE) {
+	return 'none';
+    }
+    if ($ihdr->{interlace_method} == PNG_INTERLACE_ADAM7) {
+	return 'adam7';
+    }
+    return undef;
+}
+
 1;
 
 =head1 NAME
@@ -495,25 +506,27 @@ Image::PNG - Read and write PNG files
 =head1 SYNOPSIS
 
     my $png = Image::PNG->new ();
-    $png->read_file ("crazy.png");
+    $png->read ("example.png");
     printf "Your PNG is %d x %d\n", $png->width, $png->height;
 
 =head1 VERSION
 
-This documents version 0.23 of Image::PNG corresponding
-to git commit L<dff4678b1deaa602af5b7a155989cead1afbe026|https://github.com/benkasminbullock/Image-PNG/commit/dff4678b1deaa602af5b7a155989cead1afbe026> made on Sun Dec 11 08:12:23 2016 +0900.
-
+This documents version 0.24 of Image::PNG corresponding
+to git commit L<ddd4a5ff61dc35830859846754cd091ba4491fc1|https://github.com/benkasminbullock/Image-PNG/commit/ddd4a5ff61dc35830859846754cd091ba4491fc1> made on Tue Jan 14 08:49:00 2020 +0900.
 
 =head1 DESCRIPTION
+
+This module is an attempt to make a simple interface for dealing with
+images in the PNG format. See L</About the PNG format> for details of
+the format.
 
 Image::PNG is a layer on top of L<Image::PNG::Libpng>. Whereas
 L<Image::PNG::Libpng> copies the interface of the C library C<libpng>,
 Image::PNG is intended to be a more intuitive way to handle PNG
 images. 
 
-Please note that this module is not completed yet and is still under
-development, so the interface may change. It's also open to
-suggestions for improvements.
+This module is not completed, so its interface is likely to
+change. It's also open to suggestions for improvements.
 
 =head1 General methods
 
@@ -617,7 +630,8 @@ Get the bit depth of the current PNG image.
 
     my $interlacing_method = $png->interlacing_method ();
 
-Get the name of the method of interlacing of the current PNG image.
+Get the name of the method of interlacing of the current PNG
+image. This may be either C<none> or C<adam7>.
 
 There is no method for dealing with the compression method
 field of the header, since this only has one possible value.
@@ -702,32 +716,63 @@ general-purpose routine.
 
 =head1 SEE ALSO
 
-=head2 In this distribution
+=head2 About the PNG format
 
-=head3 Image::PNG::Const
+=over
+
+=item Libpng.org website
+
+L<http://www.libpng.org/> is the website for PNG and for the libpng
+implementation. To download libpng, see
+L<http://www.libpng.org/pub/png/libpng.html>. See also L</Alien::PNG>.
+
+=item Wikipedia article
+
+There is L<an article on the format on Wikipedia|http://en.wikipedia.org/wiki/Portable_Network_Graphics>.
+
+=item The PNG specification
+
+L<The PNG specification|http://www.w3.org/TR/PNG/> (link to W3
+consortium) explains the details of the PNG format.
+
+
+=item PNG The Definitive Guide by Greg Roelofs
+
+The book "PNG - The Definitive Guide" by Greg Roelofs, published in
+1999 by O'Reilly is available online at
+L<http://www.faqs.org/docs/png/>. 
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+=back
+
+=head2 Other CPAN modules
+
+=over
+
+=item Image::PNG::Const
 
 L<Image::PNG::Const> contains the libpng constants taken from the libpng
 header file "png.h".
 
-=head3 Image::PNG::Libpng
+=item Image::PNG::Libpng
 
 L<Image::PNG::Libpng> provides a Perl mirror of the interface of the C
 PNG library "libpng". Image::PNG is built on top of this module.
 
-=head2 libpng download
-
-To download libpng, see
-L<http://www.libpng.org/pub/png/libpng.html>. See also L</Alien::PNG>.
-
-=head2 Other Perl modules on CPAN
-
-=head3 Image::ExifTool
+=item Image::ExifTool
 
 L<Image::ExifTool> is a pure Perl (doesn't require a C compiler)
 solution for accessing the text segments of images. It has extensive
 support for PNG text segments.
 
-=head3 Alien::PNG
+=item Alien::PNG
 
 L<Alien::PNG> claims to be a way of "building, finding and using PNG
 binaries". It may help in installing libpng. I didn't use it as a
@@ -735,7 +780,7 @@ dependency for this module because it seems not to work in batch mode,
 but stop and prompt the user. I'm interested in hearing feedback from
 users whether this works or not on various platforms.
 
-=head3 Image::PNG::Rewriter
+=item Image::PNG::Rewriter
 
 L<Image::PNG::Rewriter> is a utility for unpacking and recompressing
 the IDAT (image data) part of a PNG image. The main purpose seems to
@@ -743,13 +788,13 @@ be to recompress the image data with the module author's other module
 L<Compress::Deflate7>. Unfortunately that only works with Perl
 versions 5.12.
 
-=head3 Image::Pngslimmer
+=item Image::Pngslimmer
 
 L<Image::Pngslimmer> reduces the size of dynamically created PNG
 images. It's very, very slow at reading PNG data, but seems to work
 OK.
 
-=head3 Image::Info
+=item Image::Info
 
 L<Image::Info> is a module for getting information out of various
 types of images. It has good support for PNG and is written in pure
@@ -759,39 +804,27 @@ palette, gamma (gAMA chunk), resolution (pHYs chunk), and significant
 bits (sBIT chunk). At the time of writing (version 1.31) it doesn't
 support other chunks.
 
-=head3 Image::Size
+=item Image::Size
 
 If you only need to find the size of an image, L<Image::Size> can give
-you the size of PNG and various other image formats. This module is
-highly recommended on CPAN ratings.
+you the size of PNG and various other image formats.
 
-=head3 Image::PNGwriter
+=item Image::PNGwriter
 
 L<Image::PNGwriter> is an interface to a project called
 "PNGwriter". At the time of writing (2013-12-01), only one version has
 been released, in 2005. The most recent version of PNGwriter itself is
 from 2009.
 
+=item Image::PNG::Write::BW
+
+L<Image::PNG::Write::BW> is a pure-Perl module to write minimal black
+and white PNG images.
 
 
 
-=head2 About the PNG format
 
-=head3 Wikipedia article
-
-There is L<an article on the format on Wikipedia|http://en.wikipedia.org/wiki/Portable_Network_Graphics>.
-
-=head3 The PNG specification
-
-L<The PNG specification|http://www.w3.org/TR/PNG/> (link to W3
-consortium) explains the details of the PNG format.
-
-
-=head3 PNG The Definitive Guide by Greg Roelofs
-
-The book "PNG - The Definitive Guide" by Greg Roelofs, published in
-1999 by O'Reilly is available online at
-L<http://www.faqs.org/docs/png/>. 
+=back
 
 =head1 AUTHOR
 
@@ -800,7 +833,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 The Image::PNG package and associated files are copyright (C)
-2016 Ben Bullock.
+2020 Ben Bullock.
 
 You can use, copy, modify and redistribute Image::PNG and
 associated files under the Perl Artistic Licence or the GNU General

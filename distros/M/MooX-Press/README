@@ -305,7 +305,7 @@ DESCRIPTION
 
         For details of the hashrefs, see "Attribute Specifications".
 
-    `can` *(HashRef[CodeRef])*
+    `can` *(HashRef[CodeRef|HashRef])*
         A hashref of coderefs to install into the package.
 
           package MyApp;
@@ -448,8 +448,8 @@ DESCRIPTION
         pairs.
 
         The type may be either a blessed type constraint object (Type::Tiny,
-        etc) or it may be a class or role name that is being set up by
-        MooX::Press, in which case it will have the prefix added, etc.
+        etc) or it may be a string type name for something that your type
+        library knows about.
 
         The method is a string containing the method name to perform the
         coercion.
@@ -499,13 +499,15 @@ DESCRIPTION
             class => [
               'Foo::Bar' => {
                 coerce => [
-                  Str,        'from_string', sub { ... },
-                  ArrayRef,   'from_array',  sub { ... },
-                  HashRef,    'from_hash',   sub { ... },
-                  'Foo::Baz', 'from_foobaz', sub { ... },
+                  Str,      'from_string', sub { ... },
+                  ArrayRef, 'from_array',  sub { ... },
+                  HashRef,  'from_hash',   sub { ... },
+                  'FBaz',   'from_foobaz', sub { ... },
                 ],
               },
-              'Foo::Baz',
+              'Foo::Baz' => {
+                type_name => 'FBaz',
+               },
             ],
           );
 
@@ -669,10 +671,41 @@ DESCRIPTION
     Options for roles are largely the same as for classes with the following
     exceptions:
 
+    `requires` *(ArrayRef)*
+        A list of methods required by the role.
+
+          package MyApp;
+          use MooX::Press (
+            role => [
+              'Milkable' => {
+                requires => ['get_udder'],
+                ...,
+              },
+            ],
+          );
+
+        Each method can optionally be followed by a method-defining hashref
+        like in `can`:
+
+          package MyApp;
+          use MooX::Press (
+            role => [
+              'Milkable' => {
+                requires => [
+                  'get_udder', { signature => [...], named => 0 },
+                ],
+                ...,
+              },
+            ],
+          );
+
+        These hashrefs are currently ignored, but may be useful for people
+        reading your role declarations.
+
     `extends` *(Any)*
         This option is disallowed.
 
-    `can` *(HashRef[CodeRef])*
+    `can` *(HashRef[CodeRef|HashRef])*
         The alternative style for defining methods may cause problems with the
         order in which things happen. Because `use MooX::Press` happens at
         compile time, the following might not do what you expect:
@@ -856,6 +889,30 @@ DESCRIPTION
           enum => ['foo', 'bar'],
           type => Types::Standard::Enum['foo', 'bar'],
 
+        If the type constraint is set to an enum and `handles` is provided,
+        then MooX::Press will automatically load MooX::Enumeration or
+        MooseX::Enumeration as appropriate. (This is not supported for Mouse.)
+
+          use MooX::Press (
+            prefix  => 'Nature',
+            class   => [
+              'Leaf'  => {
+                has  => {
+                  'colour' => {
+                    enum    => ['green', 'red', 'brown'],
+                    handles => 2,
+                    default => 'green',
+                  },
+                },
+               },
+            ],
+          );
+  
+          my $leaf = Nature->new_leaf;
+          if ( $leaf->colour_is_green ) {
+            print "leaf is green!\n";
+          }
+
    Method Signatures
     Most places where a coderef is expected, MooX::Press will also accept a
     hashref of the form:
@@ -874,7 +931,14 @@ DESCRIPTION
     as strings, which will be looked up by name.
 
     This should work for `can`, `factory_can`, `type_library_can`, `factory`,
-    and `builder` methods, but will not work for method modifiers.
+    `builder` methods, and method modifiers. (Though if you are doing type
+    checks in both the methods and method modifiers, this may result in
+    unnecessary duplication of checks.)
+
+    The invocant ($self) is not included in the signature. (For `around`
+    method modifiers, the original coderef $orig is logically a second
+    invocant. For `factory` methods installed in the factory package, the
+    factory package name and class name are both considered invocants.)
 
     Example with named parameters:
 
@@ -934,6 +998,10 @@ DESCRIPTION
   
       my $carol  = Wedding->new_officiant(name => 'Carol');
       $carol->marry($alice, $bob);
+
+    Methods with a mixture of named and positional parameters are not
+    supported. If you really want such a method, don't provide a signature;
+    just provide a coderef and manually unpack @_.
 
   Optimization Features
     MooX::Press will automatically load MooX::TypeTiny if it's installed,

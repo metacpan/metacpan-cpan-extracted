@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.193230';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.200150';
 use Moose::Role;
 
 use autodie;
@@ -138,10 +138,10 @@ sub _elongate_coordinates {
         # begin at profile start even if does not match the profile, and adjust the coords depending of the domain nature
         my $start    = $domain->begin - $domain->hmm_from; # complete the domain if the phmm didnt match entirely the sequence
         my $end      = $domain->end   + ($domain->tlen - $domain->hmm_to); 
-
+ 
         if ($ADJUSTMENT_FOR{$domain->target_name}) {
-            $start -= $ADJUSTMENT_FOR{$domain->target_name}{start};
-            $end   += $ADJUSTMENT_FOR{$domain->target_name}{end};
+            $start -= $ADJUSTMENT_FOR{$domain->target_name}{start} // 0;
+            $end   += $ADJUSTMENT_FOR{$domain->target_name}{end} // 0;
         }
 
         # handle truncated domains
@@ -247,7 +247,10 @@ sub _refine_coordinates {                   ## no critic (RequireArgUnpacking)
         if ($sorted_domains[$i]->end >= $sorted_domains[$i + 1]->begin) {        # si le hit recouvre la fin du hit précént
 
             my $adjust_start 
-                = $ADJUSTMENT_FOR{ $sorted_domains[$i + 1]->target_name }{start};
+                = $ADJUSTMENT_FOR{ $sorted_domains[$i + 1]->target_name }{start}
+                // 0
+            ;
+
             if ($adjust_start > 0) { # si ajustement start domaine suivant
 
                 if ( ($sorted_domains[$i + 1]->begin + $adjust_start) 
@@ -268,7 +271,9 @@ sub _refine_coordinates {                   ## no critic (RequireArgUnpacking)
         if ($sorted_domains[$i]->end >= $sorted_domains[$i + 1]->begin) {  # si cela ne résoud pas le problème, on peut réduire la taille de la région ajoutée C-ter du domaine précédent (jusqu'au pHMM tout au plus
             
             my $adjust_end 
-                = $ADJUSTMENT_FOR{ $sorted_domains[$i]->target_name }{end};
+                = $ADJUSTMENT_FOR{ $sorted_domains[$i]->target_name }{end}
+                // 0
+            ;
 
             if ($adjust_end > 0) {  # si ajustement end
 
@@ -541,7 +546,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 

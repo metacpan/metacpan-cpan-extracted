@@ -4,7 +4,7 @@ use warnings;
 use base 'Exporter';
 
 our @EXPORT_OK = qw(match_gitignore build_gitignore_matcher);
-our $VERSION   = "0.02";
+our $VERSION   = "0.03";
 
 sub match_gitignore {
     my ( $patterns, @paths ) = @_;
@@ -50,7 +50,7 @@ sub build_gitignore_matcher {
               . ']'
         }eg;
 
-        $pattern .= '$' unless $pattern =~ m{\/$};
+        $pattern .= '(\/|$)' unless $pattern =~ m{\/$};
 
         return $pattern;
     };
@@ -166,6 +166,8 @@ it under the same terms as Perl itself.
 =head1 CREDITS
 
 Flavio Poletti
+
+Eric A. Zarko
 
 =head1 AUTHOR
 

@@ -91,3 +91,6 @@ Revision history for Perl module Term::Highlight and script hl.
 2018/11/13 - Version 2.0.4 - license update, explicitly licensed by the Perl 5
                 license.
 
+2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into hidden
+                directories by default. A new option '-a' was added to do so.
+

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # ABSTRACT: Install, upgrade and examine the CPAN Testers database schema
 # PODNAME: cpantesters-schema
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 #pod =head1 SYNOPSIS
 #pod
@@ -57,7 +57,7 @@ our $VERSION = '0.024';
 use v5.24;
 use warnings;
 use Pod::Usage;
-use Getopt::Long qw( GetOptionsFromArray );
+use Getopt::Long qw( GetOptionsFromArray :config pass_through );
 use CPAN::Testers::Schema;
 use File::Share qw( dist_dir );
 
@@ -71,9 +71,11 @@ my %tasks = (
     install => \&install,
     upgrade => \&upgrade,
     check => \&check,
+    fetch => \&fetch,
 );
 
-$tasks{ shift @ARGV }->( @ARGV );
+my $task = shift @ARGV;
+$tasks{ $task }->( @ARGV );
 
 sub prepare {
     my $schema = CPAN::Testers::Schema->connect_from_config;
@@ -106,16 +108,18 @@ sub install {
 sub upgrade {
     my $schema = CPAN::Testers::Schema->connect_from_config;
     if ( !$schema->get_db_version() ) {
-        $schema->install( '0.000' );
+        $schema->deploy;
     }
-    $schema->upgrade;
+    else {
+        $schema->upgrade;
+    }
 }
 
 sub fetch {
     my ( @args ) = @_;
     my $schema = CPAN::Testers::Schema->connect_from_config;
-    GetOptionsFromArray( \my %opt, \@args,
-        'dist|d=@s',
+    GetOptionsFromArray( \@args, \my %opt,
+        'dist|d=s@',
     );
     my @tables = @args;
     if ( !$opt{dist}->@* ) {
@@ -143,7 +147,7 @@ cpantesters-schema - Install, upgrade and examine the CPAN Testers database sche
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

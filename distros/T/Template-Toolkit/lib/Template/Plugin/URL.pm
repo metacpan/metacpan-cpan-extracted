@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base 'Template::Plugin';
 
-our $VERSION = '3.003';
+our $VERSION = '3.005';
 our $JOINT   = '&amp;';
 
 

@@ -7,6 +7,8 @@ META.yml
 Makefile.PL
 README.md
 dist.ini
+docker-compose.yml
+docker-compose.yml~
 lib/Arango/Tango.pm
 lib/Arango/Tango.pm~
 lib/Arango/Tango/API.pm

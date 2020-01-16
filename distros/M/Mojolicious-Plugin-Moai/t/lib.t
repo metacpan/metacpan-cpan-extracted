@@ -56,6 +56,30 @@ sub test_lib {
     if ( $attr{ js_min_name } ) {
         test_javascript( $t, %attr );
     }
+
+    # Dies without known library version
+    $t->get_ok( '/moai/lib' )
+      ->status_is( 500 )
+      ->content_like( qr/No Moai UI library version specified/ )
+      ;
+
+    # Test version config
+    $app = Mojolicious->new;
+    $app->plugin( Moai => [ $lib, { version => $attr{version} } ] );
+    $app->routes->get( '/*template' )->to( cb => sub {
+        my ( $c ) = @_;
+        $c->stash( map { $_ => $c->param( $_ ) } @{ $c->req->params->names } );
+        $c->render;
+    } );
+    $t = Test::Mojo->new( $app );
+    $t->get_ok( '/moai/lib' )
+      ->status_is( 200 )
+      ;
+    test_stylesheet( $t, %attr );
+    if ( $attr{ js_min_name } ) {
+        test_javascript( $t, %attr );
+    }
+
 }
 
 sub test_javascript {

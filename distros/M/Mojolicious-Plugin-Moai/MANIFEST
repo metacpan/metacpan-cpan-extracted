@@ -9,6 +9,9 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+eg/demo/myapp.bulma.conf
+eg/demo/myapp.conf
+eg/demo/myapp.pl
 lib/Mojolicious/Plugin/Moai.pm
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/lib.html.ep
 lib/Mojolicious/Plugin/Moai/resources/bootstrap4/templates/moai/lib/javascript.html.ep

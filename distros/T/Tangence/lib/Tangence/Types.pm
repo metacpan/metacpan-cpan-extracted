@@ -8,7 +8,7 @@ package Tangence::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Exporter 'import';
 our @EXPORT = qw(

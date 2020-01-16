@@ -41,16 +41,37 @@ static perl_mutex OP_SYSOPEN_replace_mutex;
 
 OP * (*real_pp_open)(pTHX);
 OP * (*real_pp_sysopen)(pTHX);
-
+SV * cached_hook_open = NULL;
+SV * cached_hook_sysopen = NULL;
+CV * cached_code_hook_open = NULL;
+CV * cached_code_hook_sysopen = NULL;
+bool overload_is_sysopen(char *opname) {
+    return strcmp(opname, "sysopen") == 0;
+}
+bool overload_is_open(char *opname) {
+    return strcmp(opname, "open") == 0;
+}
+void set_cached_hooks_for_op (char *opname, SV *hook, CV *code_hook) {
+    if (overload_is_open(opname)) {
+        cached_hook_open      = hook;
+        cached_code_hook_open = code_hook;
+    }
+    if (overload_is_sysopen(opname)) {
+        cached_hook_sysopen      = hook;
+        cached_code_hook_sysopen = code_hook;
+    }
+}
 OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     SV *hook = get_sv(global, 0);
     /* If the hook evaluates as false, we should just call the original
      * function ( AKA overload::open->prehook_open() has not been called yet ) */
     if ( !hook || !SvTRUE( hook ) ) {
+        set_cached_hooks_for_op(opname, NULL, NULL);
         return real_pp_func(aTHX);
     }
     /* Check to make sure we have a coderef */
     if ( !SvROK( hook ) || SvTYPE( SvRV(hook) ) != SVt_PVCV ) {
+        set_cached_hooks_for_op(opname, NULL, NULL);
         warn("override::open expected a code reference, but got something else");
         return real_pp_func(aTHX);
     }
@@ -61,8 +82,23 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
             die("overload::open error. Cowardly refusing to hook an XS sub into %s", opname);
         return real_pp_func(aTHX);
     }
+    /* Found suitable hook. We can cache in now */
+    set_cached_hooks_for_op(opname, hook, code_hook);
+
     /* CvDEPTH > 0 that means our hook is calling OP_OPEN. This is ok
      * just ensure we direct things to the original function */
+    /* calling on the cached allows us to check the depth for both of the code functions */
+    if (cached_code_hook_open) {
+        if ( 0 < CvDEPTH( cached_code_hook_open ) ) {
+            return real_pp_func(aTHX);
+        }
+    }
+    if (cached_code_hook_sysopen) {
+        if ( 0 < CvDEPTH( cached_code_hook_sysopen ) ) {
+            return real_pp_func(aTHX);
+        }
+    }
+    /* Once more for paranoia */
     if ( 0 < CvDEPTH( code_hook ) ) {
         return real_pp_func(aTHX);
     }
@@ -73,49 +109,41 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
             SV **sp = PL_stack_sp;
             /* Save the stack pointer location */
             SV **mysp = PL_stack_sp;
-            assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow");
+            //assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow");
             /* DON'T call dMARK... it has unintended side effects.
              * it actually calls POPMARK! sad! */
             /* Initialize mark ourselves instead. */
-            SV **mark = PL_stack_base + *PL_markstack_ptr;
+            //SV **mark = PL_stack_base + *PL_markstack_ptr;
             /* Save the number of items (number of arguments) */
-            ssize_t myitems = (ssize_t)(sp - PL_stack_base - *PL_markstack_ptr);
-            if (myitems < 0) {
-                SV *suppress_warnings = get_sv("overload::open::SUPPRESS_WARNINGS", 0);
-                if (SvTRUE(suppress_warnings)) {
+            ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
+            if (myitems < 0)
+                DIE(aTHX_ "panic: overload::open internal error. This should not happen.");
+
+            PUSHMARK(sp);
+                EXTEND(sp, myitems);
+                ssize_t c;
+                for ( c = 0; c < myitems; c++) {
+                    /* We are going from last to first */
+                    ssize_t i = myitems - 1 - c;
+                    mPUSHs( newSVsv(*(mysp - i)) );
                 }
-                else {
-                    warn("overload::open internal error. Unable to save arguments, unexpected behavior could also occur in your program.");
-                }
-            }
-            else {
-                PUSHMARK(sp);
-                    EXTEND(sp, myitems);
-                    ssize_t c;
-                    for ( c = 0; c < myitems; c++) {
-                        /* We are going from last to first */
-                        ssize_t i = myitems - 1 - c;
-                        mPUSHs( newSVsv(*(mysp - i)) );
-                    }
-                /*  PL_stack_sp = sp */
-                PUTBACK; /* Closing bracket for XSUB arguments */
-                I32 count = call_sv( (SV*)code_hook, G_VOID | G_DISCARD );
-                /* G_VOID and G_DISCARD should cause us to not ask for any return
-                * arguments from the call. */
-                if (count) warn("call_sv was not supposed to get any arguments");
-                /* The purpose of the macro "SPAGAIN" is to refresh the local copy of
-                * the stack pointer. This is necessary because it is possible that
-                * the memory allocated to the Perl stack has been reallocated during
-                * the *call_pv* call */
-                /*  sp = PL_stack_sp */
-                SPAGAIN;
-            }
+            /*  PL_stack_sp = sp */
+            PUTBACK; /* Closing bracket for XSUB arguments */
+            I32 count = call_sv( (SV*)code_hook, G_VOID | G_DISCARD|G_EVAL |G_KEEPERR);
+            /* G_VOID and G_DISCARD should cause us to not ask for any return
+            * arguments from the call. */
+            if (count) warn("call_sv was not supposed to get any arguments");
+            /* The purpose of the macro "SPAGAIN" is to refresh the local copy of
+            * the stack pointer. This is necessary because it is possible that
+            * the memory allocated to the Perl stack has been reallocated during
+            * the *call_pv* call */
+            /*  sp = PL_stack_sp */
+            SPAGAIN;
 
         /* FREETMPS cleans up all stuff on the temporaries stack added since SAVETMPS was called */
         FREETMPS;
     LEAVE;
-    OP *real_rtrn = real_pp_func(aTHX);
-    return real_rtrn;
+    return real_pp_func(aTHX);
 }
 
 PP(pp_overload_open) {
@@ -127,7 +155,7 @@ PP(pp_overload_sysopen) {
         real_pp_sysopen);
 }
 
-#line 131 "open.c"
+#line 159 "open.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -271,7 +299,7 @@ S_croak_xs_usage(const CV *const cv, const char *const params)
 #  define newXS_deffile(a,b) Perl_newXS_deffile(aTHX_ a,b)
 #endif
 
-#line 275 "open.c"
+#line 303 "open.c"
 
 XS_EUPXS(XS_overload__open__test_xs_function); /* prototype to pass -Wmissing-prototypes */
 XS_EUPXS(XS_overload__open__test_xs_function)
@@ -280,9 +308,9 @@ XS_EUPXS(XS_overload__open__test_xs_function)
     PERL_UNUSED_VAR(cv); /* -W */
     PERL_UNUSED_VAR(items); /* -W */
     {
-#line 128 "open.xs"
+#line 156 "open.xs"
         printf("running test xs function\n");
-#line 286 "open.c"
+#line 314 "open.c"
     }
     XSRETURN_EMPTY;
 }
@@ -295,9 +323,9 @@ XS_EUPXS(XS_overload__open__install_open)
     if (items != 0)
        croak_xs_usage(cv,  "");
     {
-#line 133 "open.xs"
+#line 161 "open.xs"
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_open, OP_OPEN, Perl_pp_overload_open, OP_OPEN_replace_mutex);
-#line 301 "open.c"
+#line 329 "open.c"
     }
     XSRETURN_EMPTY;
 }
@@ -310,9 +338,9 @@ XS_EUPXS(XS_overload__open__install_sysopen)
     if (items != 0)
        croak_xs_usage(cv,  "");
     {
-#line 138 "open.xs"
+#line 166 "open.xs"
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_sysopen, OP_SYSOPEN, Perl_pp_overload_sysopen, OP_SYSOPEN_replace_mutex);
-#line 316 "open.c"
+#line 344 "open.c"
     }
     XSRETURN_EMPTY;
 }

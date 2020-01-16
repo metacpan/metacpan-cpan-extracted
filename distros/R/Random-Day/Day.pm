@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -235,6 +235,7 @@ Random::Day - Class for random day generation.
 =head1 SYNOPSIS
 
  use Random::Day;
+
  my $obj = Random::Day->new(%params);
  my $dt = $obj->get;
  my $dt = $obj->random;
@@ -247,9 +248,9 @@ Random::Day - Class for random day generation.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Random::Day->new(%params);
 
 Constructor.
 
@@ -287,55 +288,69 @@ Default value is undef.
 
 =back
 
-=item C<get()>
+=head2 C<get>
+
+ my $dt = $obj->get;
 
 Get random date defined by constructor parameters.
 
 Returns DateTime object for date.
 
-=item C<random()>
+=head2 C<random>
+
+ my $dt = $obj->random;
 
 Get random date.
 
 Returns DateTime object for date.
 
-=item C<random_day($day)>
+=head2 C<random_day>
+
+ my $dt = $obj->random_day($day);
 
 Get random date defined by day.
 
 Returns DateTime object for date.
 
-=item C<random_day_month($day, $month)>
+=head2 C<random_day_month>
+
+ my $dt = $obj->random_day_month($day, $month);
 
 Get random date defined by day and month.
 
 Returns DateTime object for date.
 
-=item C<random_day_month_year($day, $month, $year)>
+=head2 C<random_day_month_year>
+
+ my $dt = $obj->random_day_month_year($day, $month, $year);
 
 Get date defined by day, month and year.
 
 Returns DateTime object for date.
 
-=item C<random_month($month)>
+=head2 C<random_month>
+
+ my $dt = $obj->random_month($month);
 
 Get random date defined by month.
 
 Returns DateTime object for date.
 
-=item C<random_month_year($month, $year)>
+=head2 C<random_month_year>
+
+ my $dt = $obj->random_month_year($month, $year);
 
 Get random date defined by month and year.
 
 Returns DateTime object for date.
 
-=item C<random_year($year)>
+=head2 C<random_year>
+
+ my $dt = $obj->random_year($year);
 
 Get random date defined by year.
 
 Returns DateTime object for date.
-
-=back
 
 =head1 ERRORS
 
@@ -406,7 +421,7 @@ Perl module to generate random data
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Random-Day>
+L<https://github.com/michal-josef-spacek/Random-Day>
 
 =head1 AUTHOR
 
@@ -416,12 +431,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2013-2018
+© Michal Josef Špaček 2013-2020
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

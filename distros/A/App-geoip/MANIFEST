@@ -1,0 +1,11 @@
+geoip
+ChangeLog
+CONTRIBUTING.md
+cpanfile
+lib/App/geoip.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README.md
+t/00-notests.t

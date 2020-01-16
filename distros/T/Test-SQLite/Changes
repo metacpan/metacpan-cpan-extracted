@@ -1,5 +1,38 @@
 Revision history for Test-SQLite
 
+0.0209 2020-01-16 09:28:23
+    - Improve documentation slightly.
+
+0.0208 2020-01-14 14:36:40
+    - Explicitly set the File::Temp EXLOCK to false - SREZIC RT #131472
+    - Require a minimum version of File::Temp.
+
+0.0207 2020-01-14 08:43:58
+    - Improve documentation again!
+
+0.0206 2020-01-13 21:40:36
+    - Clean up code slightly.
+    - Improve documentation.
+
+0.0205 2020-01-13 21:07:12
+    - Improve documentation.
+
+0.0204 2020-01-13 20:49:41
+    - Use constants in the test instead of repeated variables.
+    - Collect tests into subtest sections.
+    - Improve documentation.
+
+0.0203 2020-01-13 19:10:13
+    - Test that the temporary db is unlinked when out of scope.
+
+0.0202 2020-01-13 15:20:18
+    - Skip blank lines in the schema SQL.
+    - Test and use the db_attrs attribute.
+
+0.0201 2020-01-13 14:06:10
+    - Improve SQL schema line ending regular expression.
+    - Reorganize SYNOPSIS code.
+
 0.0200 2020-01-13 01:44:20
     - Remove unused code.
     - Add user specification of the DBI connection attributes.

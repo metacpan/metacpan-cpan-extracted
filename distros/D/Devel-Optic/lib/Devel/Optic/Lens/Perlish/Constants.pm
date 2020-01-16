@@ -1,5 +1,5 @@
 package Devel::Optic::Lens::Perlish::Constants;
-$Devel::Optic::Lens::Perlish::Constants::VERSION = '0.014';
+$Devel::Optic::Lens::Perlish::Constants::VERSION = '0.015';
 # ABSTRACT: Useful constants for the Perlish lens
 
 use strict;
@@ -52,7 +52,7 @@ Devel::Optic::Lens::Perlish::Constants - Useful constants for the Perlish lens
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

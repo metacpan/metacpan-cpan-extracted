@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie;
-$Net::Hadoop::Oozie::VERSION = '0.115';
+$Net::Hadoop::Oozie::VERSION = '0.116';
 use 5.010;
 use strict;
 use warnings;
@@ -1078,7 +1078,7 @@ Net::Hadoop::Oozie - Interface to various Oozie REST endpoints and utility metho
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 DESCRIPTION
 

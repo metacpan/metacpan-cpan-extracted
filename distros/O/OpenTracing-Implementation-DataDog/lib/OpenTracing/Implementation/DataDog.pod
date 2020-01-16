@@ -1,0 +1,98 @@
+=head1 NAME
+
+OpenTracing::Implementation::DataDog - Sending traces to DataDog using Agent
+
+
+
+=head1 SYNOPSIS
+
+    use alias "OpenTracing::Implementation::DataDog", 'Implementation';
+    
+    my $tracer = Implementation->bootstrap_tracer(
+        agent => {
+            host            => 'localhost',
+            port            => '8126',
+            path            => 'v0.3/traces',
+        },
+        default_context => {
+            service_name    => 'MyService',
+            service_type    => 'web',
+            resource_name   => 'my_cgi_endpoint,
+        },
+    );
+
+
+
+=head1 DESCRIPTION
+
+This `DataDog` implementation for 'OpenTracing' is fully compliant with the open
+source definition of L<OpenTracing::Interface>. 
+
+This implementation connects to the C<localhost> installed agent by default,
+that listens to port C<8126>. It recieves traces at the C</v0.3/traces>
+endpoint.
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 bootstrap_tracer
+
+    my $tracer = OpenTracing::Implementation::DataDog->bootstrap_tracer( );
+
+Returns a L<OpenTracing::Interface::Tracer> compliant tracer, using the
+L<OpenTracing::Implementation::NoOp::Tracer> implementation.
+
+=head3 named paramters
+
+=over
+
+=item agent
+
+A hasreference with instantiation options for
+L<OpenTracing::Implementation::DataDog::Agent>.
+
+=item default_context
+
+A hasreference with instantiation options for
+L<OpenTracing::Implementation::DataDog::SpanContext>. This will be used if no
+context can be found for C<<$tracer->extract_context>>.
+
+=back
+
+
+
+=head1 ENVIRONMENT VARIABLES
+
+
+
+=head2 OPENTRACING_INTERFACE
+
+If set to true, this will wrap all methods inside L<Type::Tiny> typechecks, for
+incomming parameters and return values. Beside that, it will add check for
+required methods according to the L<OpenTracing::Interface> API description.
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

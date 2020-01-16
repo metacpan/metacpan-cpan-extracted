@@ -1,3 +1,5 @@
+-- Example SQLite:
+
 DROP TABLE IF EXISTS account;
 CREATE TABLE account (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

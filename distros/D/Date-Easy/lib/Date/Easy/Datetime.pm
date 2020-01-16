@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 use Exporter;
 use parent 'Exporter';
@@ -384,7 +384,7 @@ Date::Easy::Datetime - easy datetime class
 
 =head1 VERSION
 
-This document describes version 0.09 of Date::Easy::Datetime.
+This document describes version 0.10 of Date::Easy::Datetime.
 
 =head1 SYNOPSIS
 
@@ -713,7 +713,7 @@ especially as regards what happens when you try to add months to dates at the en
 
 Calls L<Time::Piece>'s C<add_years> to add a given number of years and return a new datetime object.
 The original datetime is not modified.  See the L<Time::Piece> docs for full details.  (Though the
-Time::Piece documentation isn't clear on this point, adding a year to Feb 29th of a leap years acts
+Time::Piece documentation isn't clear on this point, adding a year to Feb 29th of a leap year acts
 correspondingly to adding a month to Jan 29th of a non-leap year.)
 
 =head3 subtract_seconds($num)
@@ -810,7 +810,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Buddy Burden.
+This software is Copyright (c) 2020 by Buddy Burden.
 
 This is free software, licensed under:
 

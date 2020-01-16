@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package Tangence::ObjectProxy;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 
@@ -427,7 +427,6 @@ sub get_property_element
       or croak "Class ".$self->classname." does not have a property $property";
 
    my $client = $self->{client};
-   $client->_ver_can_getpropelem or croak "Server is too old to support MSG_GETPROPELEM";
 
    my $request = Tangence::Message->new( $client, MSG_GETPROPELEM )
       ->pack_int( $self->id )
@@ -504,7 +503,7 @@ sub set_property
    my $request = Tangence::Message->new( $client, MSG_SETPROP )
          ->pack_int( $self->id )
          ->pack_str( $property );
-   $pdef->type->pack_value( $request, $value ),
+   $pdef->overall_type->pack_value( $request, $value );
 
    $client->request(
       request => $request,
@@ -708,7 +707,7 @@ sub watch_property_with_cursor
    my $smashed = $pdef->smashed;
 
    if( my $cbs = $self->{props}->{$property}->{cbs} ) {
-      die "TODO: need to synthesize a second cursor";
+      die "TODO: need to synthesize a second cursor for $self";
    }
 
    $self->{props}->{$property}->{cbs} = [ $callbacks ];
@@ -718,7 +717,6 @@ sub watch_property_with_cursor
    }
 
    my $client = $self->{client};
-   $client->_ver_can_cursor or croak "Server is too old to support MSG_WATCH_CUSR";
    $pdef->dimension == DIM_QUEUE or croak "Can only iterate on queue-dimension properties";
 
    $client->request(

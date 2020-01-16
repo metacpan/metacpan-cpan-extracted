@@ -29,6 +29,9 @@ my $client = TestClient->new();
 
    $client->send_message( $S2C{GETROOT} );
    $client->send_message( $S2C{GETREGISTRY} );
+
+   ok( defined $client->rootobj,  'client has rootobj' );
+   ok( defined $client->registry, 'client has registry' );
 }
 
 my $objproxy = $client->rootobj;

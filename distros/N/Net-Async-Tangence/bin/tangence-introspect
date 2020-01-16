@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Tangence::Client 0.25; # ->get_registry
 use Net::Async::Tangence::Client;
 
 use IO::Async::Loop 0.16;
@@ -59,8 +60,7 @@ $loop->add( $conn );
 
 $conn->connect_url( $URL )->get;
 
-my $registry;
-$loop->loop_once until $registry = $conn->registry;
+my $registry = $conn->get_registry->get;;
 
 if( !@ARGV ) {
    my $objshash = $registry->get_property( "objects" )->get;

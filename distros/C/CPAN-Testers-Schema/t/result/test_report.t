@@ -23,6 +23,40 @@ subtest 'column defaults' => sub {
     is $row->report->{created}, $row->created . 'Z', 'created field added to report';
 };
 
+subtest 'accessor methods' => sub {
+    my %report = (
+        distribution => {
+            name => 'Example',
+            version => '1.000002',
+        },
+        environment => {
+            language => {
+                name => 'Perl 5',
+                version => '5.30.1',
+                archname => 'x86_64-linux-thread-multi',
+            },
+        },
+        reporter => {
+            name => 'Andreas K&ouml;nig',
+        },
+        result => {
+            grade => 'pass',
+            output => {
+                uncategorized => 'Full text',
+            },
+        },
+    );
+    my $row = $schema->resultset( 'TestReport' )->create( { report => \%report } );
+
+    is $row->dist_name, 'Example', 'dist_name is correct';
+    is $row->dist_version, '1.000002', 'dist_version is correct';
+    is $row->lang_version, 'Perl 5 v5.30.1', 'lang_version is correct';
+    is $row->platform, 'x86_64-linux-thread-multi', 'platform is correct';
+    is $row->grade, 'pass', 'grade is correct';
+    is $row->text, 'Full text', 'text is correct';
+    is $row->tester_name, "Andreas K\x{00F6}nig", 'tester_name is correct';
+};
+
 subtest 'upload' => sub {
     my $expect_upload = $schema->resultset( 'Upload' )->create({
         type => 'cpan',

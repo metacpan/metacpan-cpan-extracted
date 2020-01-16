@@ -1,5 +1,5 @@
-=== README for XML-Compile-C14N version 0.94
-=   Generated on Tue Feb 18 11:05:30 2014 by OODoc 2.01
+=== README for XML-Compile-C14N version 0.95
+=   Generated on Wed Jan 15 11:21:40 2020 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-C14N-0.94.tar.gz
-       tar -xf XML-Compile-C14N-0.94.tar
-       cd XML-Compile-C14N-0.94
+       gzip -d XML-Compile-C14N-0.95.tar.gz
+       tar -xf XML-Compile-C14N-0.95.tar
+       cd XML-Compile-C14N-0.95
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-C14N-0.94/
+    http://search.cpan.org/dist/XML-Compile-C14N-0.95/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-C14N

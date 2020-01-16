@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -799,8 +799,19 @@ sub TO_JSON {
 	my %copy = %{$self};
 	delete $copy{arrival_wings};
 	delete $copy{departure_wings};
+	delete $copy{realtime_xml};
 	delete $copy{replaced_by};
 	delete $copy{replacement_for};
+	delete $copy{strptime_obj};
+	delete $copy{wing_of};
+
+	for my $datetime_key (
+		qw(arrival departure sched_arrival sched_departure start datetime))
+	{
+		if ( defined $copy{$datetime_key} ) {
+			$copy{$datetime_key} = $copy{$datetime_key}->epoch;
+		}
+	}
 
 	return {%copy};
 }
@@ -828,7 +839,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 DESCRIPTION
 
@@ -1472,7 +1483,7 @@ Travel::Status::DE::IRIS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

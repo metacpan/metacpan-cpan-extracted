@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Field;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -26,7 +26,9 @@ structure. Once constructed, such objects are immutable.
 
 =cut
 
-=head2 $field = Tangence::Meta::Field->new( %args )
+=head2 new
+
+   $field = Tangence::Meta::Field->new( %args )
 
 Returns a new instance initialised by the given fields.
 
@@ -55,7 +57,9 @@ sub new
 
 =cut
 
-=head2 $name = $field->name
+=head2 name
+
+   $name = $field->name
 
 Returns the name of the field
 
@@ -67,7 +71,9 @@ sub name
    return $self->{name};
 }
 
-=head2 $type = $field->type
+=head2 type
+
+   $type = $field->type
 
 Return the type as a L<Tangence::Meta::Type> reference.
 

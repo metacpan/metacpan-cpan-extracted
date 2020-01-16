@@ -1,6 +1,6 @@
 package IO::EPP
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 1;
 
@@ -17,21 +17,22 @@ IO::EPP - Object and procedure interface of the client-side for work with EPP AP
 =head1 SYNOPSIS
 
     use IO::EPP;
-    print "IO::EPP versiin is $IO::EPP::VERSION\n";
+    print "IO::EPP version is $IO::EPP::VERSION\n";
 
 =head1 DESCRIPTION
 
-IO::EPP is a very light and fast interface of the access to EPP API from the client's side with minimum dependances, such as libxml and other heavy libraries.
+IO::EPP is a very light and fast interface of the access to EPP API from the client's side with minimum dependences.
+It is independent of libxml and other heavy libraries.
 
-It works over IO::Socket::SSL without additional modules and demands only MD5 for generation of unique ID and Time::HiRes for the purpose of logging.
-LWP is necessary for two registries and one reseller (TCI/RIPN, Taeping и HosterKZ), because EPP of these providers works over HTTPS.
+It works over IO::Socket::SSL without additional modules and demands only L<Digest::MD5> for generation of unique ID and L<Time::HiRes> for the purpose of logging.
+L<LWP> is necessary for two registries and one reseller (TCI/RIPN, Taeping и HosterKZ), because EPP of these providers works over HTTPS.
 
 In test mode IO::EPP can emulate the job of some registries.
 Now the emulation of Verisign Core and CentralNic servers is supported at the level of 99% of answers.
-The test environment for IO::EPP::Base uses the emulation of CentralNic without extentions.
+The test environment for L<IO::EPP::Base> uses the emulation of CentralNic without extentions.
 
 The main difference of the emulation from a registry is that all the data are into the process which makes requests. That's why when the process comes to the end all the data will be lost.
-If you want to save the data between queries you need to replace the functions in the module IO::EPP::Test::Server.
+If you want to save the data between queries you need to replace the functions in the module L<IO::EPP::Test::Server>.
 
 The library IO::EPP has two ways of working - procedural or object one.
 The procedural method works over the object one and when called returns the object of connection.
@@ -40,7 +41,7 @@ The authorization occurs when an object is created.
 
 Logout is called automatically from the object destructor.
 
-The basic module is L<IO::EPP::Base>. It supports all the functions of EPP RFC and the extention DNSSEC.
+The basic module is L<IO::EPP::Base>. It supports all the functions of EPP RFC and the extension DNSSEC.
 But since many registries and resellers use a large number of their own extentions the special modules that work over L<IO::EPP::Base> are wrote for them.
 
 The description of definite functions see in L<IO::EPP::Base>.
@@ -61,7 +62,7 @@ The universal module for working with EPP API and the basic class for other modu
 
 =item L<IO::EPP::Verisign>
 
-https://www.verisign.com/en_US/domain-names/index.xhtml
+L<https://www.verisign.com/en_US/domain-names/index.xhtml>
 
 Registry for gtlds (Core Server), cctlds and new gtlds (NameStore Server)
 
@@ -69,7 +70,7 @@ Registry for gtlds (Core Server), cctlds and new gtlds (NameStore Server)
 
 L<https://afilias.info/global-registry-services>,
 
-.org, .ngo, .org, .орг, .संगठन, .机构 -- L<https://thenew.org/org-people/domain-products/>
+.org, .ngo, .org, .орг, .संगठन, .机构 – L<https://thenew.org/org-people/domain-products/>
 
 Registry for gltds and cctlds
 
@@ -91,7 +92,7 @@ L<https://cocca.org.nz/#five>
 
 Registry for cctlds and some new gtlds
 
-.рус -- L<http://rusnames.ru/en/index.pl>
+.рус – L<http://rusnames.ru/en/index.pl>
 
 =item L<IO::EPP::TCI>
 
@@ -126,14 +127,14 @@ L<https://faitid.org/>
 L<https://www.flexireg.net/>
 
 Registry for .moscow, .москва, .ru.net and 3lvl.ru/su tlds
-.
+
 =item L<IO::EPP::CoreNic>
 
 L<https://corenic.org/>
 
 Registry for new gtlds
 
-=item L<IO::EPP::DrsUA>
+=item L<IO::EPP::DrsUa>
 
 L<http://drs.ua/>
 
@@ -161,22 +162,22 @@ The list of emulation modules:
 
 =over 3
 
-=item IO::EPP::Test::Base
+=item L<IO::EPP::Test::Base>
 
 The module of emulation of server with standard EPP API, mostly repeats the behavior of CentralNic server.
 
-=item IO::EPP::Test::CNic
+=item L<IO::EPP::Test::CNic>
 
 The module of emulation of CentralNic server.
 
-=item IO::EPP::Test::VerisignCore
+=item L<IO::EPP::Test::VerisignCore>
 
 The module of emulation of Verisign Core Server. The real test Verisign server does not support the redemption of domains.
 The redemption of domains works in this module, but without checking of parametres.
 
 =back
 
-For working with emulation of registries it is necessary to set the parameter "test_mode = 1".
+For working with emulation of registries it is necessary to set the parameter C<test_mode = 1>.
 Error codes and messages have been checked on production server.
 
 The modules of emulation of other registries are still in construction.

@@ -34,11 +34,12 @@
          "requires" : {
             "JSON" : "2.9",
             "LWP::UserAgent" : "6.15",
-            "POSIX" : "1.65"
+            "POSIX" : "1.65",
+            "perl" : "5.024001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 3.504,
+   "version" : 3.505,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

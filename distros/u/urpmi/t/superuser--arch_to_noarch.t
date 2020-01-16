@@ -13,5 +13,5 @@ foreach my $nb (1 .. 4) {
     my $medium_name = "${name}_$nb";
     urpmi_addmedia("$medium_name $::pwd/media/$medium_name");
     urpmi("$name");
-    is(`rpm -qa --root $::pwd/root`, "$name-$nb-1\n");
+    check_installed_fullnames("$name-$nb-1");
 }

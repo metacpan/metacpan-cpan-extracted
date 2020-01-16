@@ -1,7 +1,8 @@
 package Business::ID::NOPPBB;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-11-21'; # DATE
+our $DIST = 'Business-ID-NOPPBB'; # DIST
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -9,9 +10,8 @@ use strict;
 
 use Locale::ID::Province qw(list_id_provinces);
 
-require Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(validate_nop_pbb);
+use Exporter 'import';
+our @EXPORT_OK = qw(validate_nop_pbb);
 
 our %SPEC;
 
@@ -111,7 +111,7 @@ Business::ID::NOPPBB - Validate (and parse) Indonesian property tax number (NOP 
 
 =head1 VERSION
 
-This document describes version 0.08 of Business::ID::NOPPBB (from Perl distribution Business-ID-NOPPBB), released on 2015-09-03.
+This document describes version 0.090 of Business::ID::NOPPBB (from Perl distribution Business-ID-NOPPBB), released on 2019-11-21.
 
 =head1 SYNOPSIS
 
@@ -145,7 +145,11 @@ This module has L<Rinci> metadata.
 =head1 FUNCTIONS
 
 
-=head2 validate_nop_pbb(%args) -> [status, msg, result, meta]
+=head2 validate_nop_pbb
+
+Usage:
+
+ validate_nop_pbb(%args) -> [status, msg, payload, meta]
 
 Validate (and parse) Indonesian property tax number (NOP PBB).
 
@@ -170,6 +174,8 @@ Currently the length and AA code is checked against valid province code. There
 is currently no way to check whether a specific NOP PBB actually exists, because
 you would need to query Dirjen Pajak's database for that.
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
@@ -185,7 +191,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -213,7 +219,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

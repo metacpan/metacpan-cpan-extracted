@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schema
+  targetNamespace="http://ws.apache.org/xmlrpc/namespaces/extensions"
+  xmlns:ex="http://ws.apache.org/xmlrpc/namespaces/extensions"
+
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementsFormDefault="qualified"
+  attributesFormDefault="unqualified"
+>
+
+<!-- I couldn't find an official schema for apache's xmlrpc extension
+     namespace, so created this by myself.  Some hools may be needed
+     to simplify access to the data.
+
+     https://ws.apache.org/xmlrpc/types.html
+  -->
+
+<element name="serializable" type="base64"     />
+
+<element name="i1"           type="byte"       />
+<element name="i2"           type="short"      />
+<element name="i8"           type="long"       />
+
+<element name="bigdecimal"   type="decimal"    />
+<element name="biginteger"   type="integer"    />
+<element name="float"        type="float"      />
+
+<element name="dateTime"     type="dateTime"   />
+<element name="dom"          type="string"     />
+
+<element name="nil"          type="ex:NilType" />
+<complexType name="NilType">
+  <sequence />
+</complexType>
+
+</schema>

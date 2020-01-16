@@ -45,10 +45,12 @@ http://flexireg.net/
 Documentaion:
 
 moscow, москва
+L<https://faitid.org/projects/moscow/documents>,
 L<https://faitid.org/sites/default/files/policy/tech/Tu-flexireg-EPP_1.2_ru.pdf>,
 L<https://faitid.org/sites/default/files/Tu-flexireg-Examples_1.3_ru.pdf>
 
 ru.net+
+L<https://faitid.org/projects/RU.NET/documents>,
 L<https://faitid.org/sites/default/files/Tu-flexireg-EPP_ext.pdf>
 
 
@@ -59,6 +61,11 @@ use parent qw( IO::EPP::Base );
 
 use strict;
 use warnings;
+
+my $cont_ext =
+'xmlns:contact="http://www.tcinet.ru/epp/tci-contact-ext-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tcinet.ru/epp/tci-contact-ext-1.0 tci-contact-ext-1.0.xsd"';
+my $rgp_ext =
+'xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd"';
 
 sub make_request {
     my ( $action, $params ) = @_;
@@ -134,7 +141,6 @@ sub login {
 
     return $self->SUPER::login( $pw, $svcs, $extension );
 }
-
 
 sub contact_ext {
     my ( undef, $params ) = @_;
@@ -295,7 +301,7 @@ sub create_contact {
     my $extension = $self->contact_ext( $params );
 
     if ( $extension ) {
-        $params->{extension} = qq|   <contact:create xmlns:contact="http://www.tcinet.ru/epp/tci-contact-ext-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tcinet.ru/epp/tci-contact-ext-1.0 tci-contact-ext-1.0.xsd">\n$extension   </contact:create>\n|;
+        $params->{extension} = "   <contact:create $cont_ext>\n$extension   </contact:create>\n";
     }
 
     return $self->SUPER::create_contact( $params );
@@ -428,7 +434,7 @@ first call for restore_domain
 sub restore_domain {
     my ( $self, $params ) = @_;
 
-    $params->{extension} = qq|<rgp:update xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd">
+    $params->{extension} = qq|<rgp:update $rgp_ext>
     <rgp:restore op=\"request\"/>
    </rgp:update>|;
 
@@ -480,7 +486,7 @@ sub confirmations_restore_domain {
     my ( $self, $params ) = @_;
 
     $params->{extension} = <<RGPEXT;
-    <rgp:update xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd">
+    <rgp:update $rgp_ext>
       <rgp:restore op="report">
         <rgp:report>
           <rgp:preData>$$params{pre_data}</rgp:preData>

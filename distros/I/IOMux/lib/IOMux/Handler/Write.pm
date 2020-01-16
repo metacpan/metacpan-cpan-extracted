@@ -1,20 +1,24 @@
-# Copyrights 2011-2015 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution IOMux.  Meta-POD processed with OODoc
+# into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package IOMux::Handler::Write;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use base 'IOMux::Handler';
+
+use warnings;
+use strict;
 
 use Log::Report 'iomux';
 use Fcntl;
 use POSIX            'errno_h';
-use File::Spec       ();;
+use File::Spec       ();
 use File::Basename   'basename';
 
 use constant PIPE_BUF_SIZE => 4096;

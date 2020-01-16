@@ -1,0 +1,163 @@
+=head1 NAME
+
+CGI::Application::Plugin::OpenTracing - Use OpenTracing in CGI Applications
+
+
+
+=head1 SYNOPSIS
+
+Inside your own CGI Application:
+
+    package MyCGI;
+    
+    use strict;
+    use warnings;
+    
+    use base qw/CGI::Application/;
+    
+    use CGI::Application::Plugin::OpenTracing;
+
+After Setup, before Run, initialize the Global Tracer with the following
+callback:
+
+    sub opentracing_implementation {
+        my $webapp = shift;
+        my $run_mode = $webapp->get_current_runmode();
+        my $run_method = { $webapp->run_modes }->{ $run_mode };
+        
+        
+        return ( 'SomeImplementation' =>
+            default_context => {
+                
+                # implentation specific settings
+                #
+                service_name    => __PACKAGE__,
+                service_type    => 'web',
+                resource_name   => 'test.cgi',
+                
+                # any key/values that will be carried over to child spans
+                #
+                baggage_items   => {
+                    run_mode        => $run_mode,
+                    run_method      => $run_method,
+                }
+                
+            },
+        );
+        
+    }
+
+
+
+=head1 DESCRIPTION
+
+This plugin will use the return value from the C<opentracing_implementation>
+callback to bootstrap a L<OpenTracing::GlobalTracer>, with
+L<OpenTracing::Implementation>. It uses all the parameters as mentioned in that
+C<set> method.
+
+It will automatically create a new tracer, with a total of four spans:
+
+=over
+
+=item cgi_application
+
+This is the root span, wich will have a start time at the beginning of the cgi
+request, and last till the entire request will be finished.
+
+=back
+
+On top of this rootspan, the following three child-spans will be created:
+
+=over
+
+=item setup
+
+A childspan, that will take the duration of the entire setup process.
+
+=item run
+
+After the tracer has been setup (using the information from the callback), this
+span will be started for the actual duration of the request handling
+
+=item teardown
+
+OOPS C<...> not implemented (yet)
+
+=back
+
+
+
+=head1 ADDING DEEPER INSTRUMENTATION
+
+This plugin only initiates the tracer, and three childspans. For more detail at
+deeper call levels, one would need the L<OpenTracing::GlobalTracer> and add
+manual instrumentation using C<start_active_span>:
+
+    use OpenTracing::GlobalTracer qw/$TRACER/;
+
+and later per subroutine:
+
+    sub foo {
+        my $opentracing_scope = $TRACER->start_active_span( foo => \%options );
+        
+        ...
+        
+        $opentracing_scope->close( )
+    }
+
+Alternatively, on can use L<OpenTracing::AutoScope>, which handles all the work
+in one go:
+
+    use OpenTracing::AutoScope;
+
+and later per subroutine:
+
+    sub foo {
+        OpenTracing::AutoScope->start_guarded_span;
+        
+        ...
+        
+    }
+
+Lastly, use L<OpenTracing::Wrap>, to automagically wrap scopes and traces around
+a list of mentioned (fully qualified) subroutine names.
+
+=head1 CAVEATS
+
+Probably a few...
+
+Originally, OpenTracing Implementations should extract any context and build new
+spans based on that. Sadly, no implementations are providing these features.
+
+Since the tracer is only initialised, right before 'run' phase, it is useless to
+even try to add deeper level of instrumentation during 'setup'. Those will use
+the default L<OpenTracing::Implementation::NoOp> which ... does nothing.
+
+Traces will get lost, when the rootspan is not closed properly.
+
+
+
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

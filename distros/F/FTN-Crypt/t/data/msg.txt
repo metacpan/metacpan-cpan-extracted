@@ -1,0 +1,1 @@
+INTL 99:8877/2 99:8877/1FMPT 1MSGID: 99:8877/1 ddde5031PID: No Editor/0.0.1TID: No MailerCHRS: CP866 2First lineSecond line--- No Editor/0.0.1 * Origin: Some origin (99:8877/1)Via 99:8877/1 No Mailer Mon, 01 Jan 1990 00:00:00 +0000

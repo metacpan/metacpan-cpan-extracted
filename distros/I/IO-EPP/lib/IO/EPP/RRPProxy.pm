@@ -59,6 +59,8 @@ use parent qw( IO::EPP::Base );
 use strict;
 use warnings;
 
+my $ks_ext = 'xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0"';
+
 sub make_request {
     my ( $action, $params ) = @_;
 
@@ -139,6 +141,8 @@ sub login {
 
 =head2 create_contact
 
+Contact id is generated automatically by the reseller
+
 =cut
 
 sub create_contact {
@@ -176,11 +180,11 @@ sub create_contact {
 
     # each contact is registered separately even if they are the same
     $params->{extension} =
-'   <keysys:create xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
-    <keysys:contact>'.$fields.'
+qq|   <keysys:create $ks_ext>
+    <keysys:contact>$fields
     </keysys:contact>
    </keysys:create>
-';
+|;
 
     return $self->SUPER::create_contact( $params );
 }
@@ -213,7 +217,9 @@ sub check_claims {
     return $self->SUPER::check_domains( $params );
 }
 
+
 # Compile trade, premium  and tlds extension
+
 sub _keysys_domain_ext {
     my ( $params ) = @_;
 
@@ -283,11 +289,11 @@ sub create_domain {
     # closing special domain extensions
     if ( $extension ) {
         $extension =
-'   <keysys:create xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
-    <keysys:domain>'.$extension.'
+qq|   <keysys:create $ks_ext>
+    <keysys:domain>$extension
     </keysys:domain>
    </keysys:create>
-';
+|;
     }
 
 
@@ -322,6 +328,18 @@ sub create_domain {
 }
 
 
+=head2 transfer
+
+INPUT
+
+For premium domains, you need to pass a special parameter is_premium
+
+You can also specify contact id for some tlds: C<reg_id>, C<admin_id>, C<tech_id>, C<billing_id>
+
+All other parameters such as L<IO::EPP::Base/transfer>.
+
+=cut
+
 sub transfer {
     my ( $self, $params ) = @_;
 
@@ -346,11 +364,11 @@ sub transfer {
 
     if ( $extension ) {
         $params->{extension} =
-'   <keysys:transfer xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
+qq|   <keysys:transfer $ks_ext>
     <keysys:domain>
-'.$extension.'    </keysys:domain>
+$extension    </keysys:domain>
    </keysys:transfer>
-';
+|;
     }
 
     return $self->SUPER::transfer( $params );
@@ -368,12 +386,12 @@ sub renew_domain {
     if ( $params->{is_premium}  ||  $params->{'X-ACCEPT-PREMIUMPRICE'}  ||  $params->{'x-accept-premiumprice'} ) {
         # https://wiki.rrpproxy.net/domains/premium-domains
         $params->{extension} =
-'   <keysys:renew xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
+qq|   <keysys:renew $ks_ext>
     <keysys:domain>
      <keysys:accept-premiumprice>1</keysys:accept-premiumprice>
     </keysys:domain>
    </keysys:renew>
-';
+|;
     }
 
     return $self->SUPER::renew_domain( $params );
@@ -382,7 +400,7 @@ sub renew_domain {
 
 =head2 update_domain
 
-C<trade> -- option for special change of domain owner -- paid or requires confirmation;
+C<trade> – option for special change of domain owner – paid or requires confirmation;
 
 =cut
 
@@ -395,43 +413,56 @@ sub update_domain {
 
     if ( $extension ) {
          $params->{extension} =
-'   <keysys:update xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
-    <keysys:domain>' . $extension . '
+qq|   <keysys:update $ks_ext>
+    <keysys:domain>$extension
     </keysys:domain>
    </keysys:update>
-';
+|;
     }
 
     return $self->SUPER::update_domain( $params );
 }
 
 
-=head2 update_renewalmode
+=head2 set_domain_renewal_mode
 
 Set renewal mode for domain.
 
-key of params:
+INPUT:
 
-C<renewalmode> -- variants: C<DEFAULT> | C<RENEWONCE> | C<AUTORENEW> | C<AUTOEXPIRE> | C<AUTODELETE> | ...
+params with key:
+
+C<renewal_mode> – valid values: C<DEFAULT>, C<RENEWONCE>, C<AUTORENEW>, C<AUTOEXPIRE>, C<AUTODELETE>
 
 For details see L<https://wiki.rrpproxy.net/domains/renewal-system>
 
+OUTPUT:
+see L<IO::EPP::Base/simple_request>
+
 =cut
 
-sub update_renewalmode {
+sub set_domain_renewal_mode {
     my ( $self, $params ) = @_;
 
+    $params->{renewal_mode} = uc $params->{renewal_mode};
+
     $params->{extension} =
-'   <keysys:update xmlns:keysys="http://www.key-systems.net/epp/keysys-1.0">
+qq|   <keysys:update $ks_ext>
     <keysys:domain>
-     <keysys:renewalmode>' . uc( $params->{renewalmode} ) . '</keysys:renewalmode>
+     <keysys:renewalmode>$$params{renewal_mode}</keysys:renewalmode>
     </keysys:domain>
    </keysys:update>
-';
+|;
 
     return $self->update_domain( $params );
 }
 
+
+=head2 req_poll_ext
+
+keysys extension for the req poll
+
+=cut
 
 sub req_poll_ext {
     my ( undef, $ext ) = @_;

@@ -11,8 +11,9 @@ L<CPAN::Testers::Schema>, L<DBIx::Class>
 
 use CPAN::Testers::Schema::Base 'Test';
 
-subtest 'upload relationship' => sub {
+subtest 'relationships' => sub {
     my $schema = prepare_temp_schema;
+
     my %upload = (
         type => 'cpan',
         dist => 'My-Dist',
@@ -23,29 +24,8 @@ subtest 'upload relationship' => sub {
     );
     my $upload = $schema->resultset( 'Upload' )->create( \%upload );
 
-    my %release = (
-        dist => 'My-Dist',
-        version => '1.000',
-        id => 1,
-        guid => '00000000-0000-0000-0000-000000000000',
-        oncpan => 1,
-        distmat => 1,
-        perlmat => 1,
-        patched => 1,
-        pass => 35,
-        fail => 1,
-        na => 0,
-        unknown => 0,
-        uploadid => $upload->uploadid,
-    );
-    my $release = $schema->resultset( 'Release' )->create( \%release );
+    my $version = $schema->resultset( 'PerlVersion' )->create( { version => '5.22.0' } );
 
-    ok $release->upload, 'upload relationship exists';
-    is $release->upload->uploadid, $upload->uploadid, 'correct upload is related';
-};
-
-subtest 'stats relationship' => sub {
-    my $schema = prepare_temp_schema;
     my %report = (
         dist => 'My-Dist',
         version => '1.000',
@@ -77,12 +57,15 @@ subtest 'stats relationship' => sub {
         fail => 1,
         na => 0,
         unknown => 0,
-        uploadid => 1,
+        uploadid => $upload->id,
     );
     my $release = $schema->resultset( 'Release' )->create( \%release );
 
     ok $release->report, 'report relationship exists';
     is $release->report->guid, $report->guid, 'correct report is related';
+
+    ok $release->upload, 'upload relationship exists';
+    is $release->upload->uploadid, $upload->uploadid, 'correct upload is related';
 };
 
 done_testing;

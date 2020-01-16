@@ -1,0 +1,23 @@
+Revision history for FTN::Crypt
+
+0.5.1   2020-01-16
+    [*] Tidied up MANIFEST.SKIP as suggested by CPANTS.
+
+0.5     2019-11-18
+    [*] Add pointlist processing.
+    [*] Multiple node- and pointlists.
+
+0.4     2019-11-17
+    [*] Rewrite message processing code.
+
+0.3.0   2019-11-15
+    [*] Add tests and prepare CPAN release.
+
+0.2.5   2019-11-01
+    [*] Switch to Gnupg::Interface, pure-perl OpenPGP implementation in
+        Crypt::OpenPGP seems to be broken.
+    [*] New error handling.
+
+0.1.0   2019-10-29
+    [*] Initial release.
+

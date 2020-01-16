@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Constants;
-$Net::Hadoop::Oozie::Constants::VERSION = '0.115';
+$Net::Hadoop::Oozie::Constants::VERSION = '0.116';
 use 5.010;
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use constant JOB_OPTIONS => qw(
 );
 
 use constant COORD_STATUS => qw(
-    DONWITHERROR
+    DONEWITHERROR
     FAILED
     KILLED
     PAUSED
@@ -171,7 +171,7 @@ Net::Hadoop::Oozie::Constants - Constants for Oozie
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 DESCRIPTION
 

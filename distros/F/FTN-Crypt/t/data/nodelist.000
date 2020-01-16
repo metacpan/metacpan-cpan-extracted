@@ -1,0 +1,11 @@
+;
+; Sample nodelist
+;
+Zone,99,No_station_99,No_city,Nobody_1,-Unpublished,300,CM
+;
+Region,88,No_station_88,No_city,Nobody_2,-Unpublished,300,CM
+;
+Host,8877,No_station_8877,No_city,Nobody_3,-Unpublished,300,CM
+,1,No_station_1,No_city,Nobody_4,-Unpublished,300,CM
+,2,No_station_2,No_city,Nobody_5,-Unpublished-,300,CM,MO,U,ENCRYPT:PGP5
+

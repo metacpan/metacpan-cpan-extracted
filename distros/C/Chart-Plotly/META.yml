@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.036'
+version: '0.037'
 x_contributors:
   - 'Roy Storey <kiwiroy@users.noreply.github.com>'
   - 'stphnlyd <stephanloyd9@gmail.com>'

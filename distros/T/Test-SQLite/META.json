@@ -36,7 +36,7 @@
          "requires" : {
             "DBI" : "0",
             "File::Copy" : "0",
-            "File::Temp" : "0",
+            "File::Temp" : "0.19",
             "Moo" : "2",
             "perl" : "5.006",
             "strictures" : "2"
@@ -46,11 +46,13 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0.19",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Moo" : "2",
             "Test::Exception" : "0",
             "Test::More" : "0.88",
+            "constant" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -66,7 +68,7 @@
          "web" : "https://github.com/ology/Test-SQLite"
       }
    },
-   "version" : "0.0200",
+   "version" : "0.0209",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

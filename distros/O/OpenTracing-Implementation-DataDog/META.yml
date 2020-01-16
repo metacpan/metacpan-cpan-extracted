@@ -1,0 +1,44 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenTracing-Implementation-DataDog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  HTTP::Request: '0'
+  JSON::MaybeXS: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Attribute::ENV: '0'
+  MooX::HandlesVia: '0'
+  OpenTracing::Implementation: '0.03'
+  OpenTracing::Role: '0.05'
+  PerlX::Maybe: '0'
+  Ref::Util: '0'
+  Sub::Trigger::Lock: '0'
+  Syntax::Feature::Maybe: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  Types::Interface: '0'
+  Types::Standard: '0'
+  aliased: '0'
+  syntax: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

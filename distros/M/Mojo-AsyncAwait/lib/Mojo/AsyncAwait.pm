@@ -4,7 +4,7 @@ use Carp ();
 use Mojo::Loader;
 use Import::Into;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 my $backend = $ENV{MOJO_ASYNCAWAIT_BACKEND} // '+Coro';
 $backend =~ s/^\+/Mojo::AsyncAwait::Backend::/;
@@ -52,9 +52,10 @@ This pattern simplies the use of both promises and nonblocking code in general
 and is therefore a very exciting development for writing asynchronous systems.
 
 If you are going to use this module to create async controllers actions in
-L<Mojolicious> applications (as seen in the L</SYNOPSIS>), you are highly
-encouraged to also use L<Mojolicious::Plugin::PromiseActions> in order to
-properly handle exceptions in your action.
+L<Mojolicious> applications (as seen in the L</SYNOPSIS>) before Mojolicious
+version 8.28, you are highly encouraged to also use
+L<Mojolicious::Plugin::PromiseActions> in order to properly handle exceptions
+in your action.
 
 =head1 GOALS
 
@@ -66,10 +67,9 @@ are considered.
 
 Secondarily, it is intended to be a testbed for early implementations of
 Async/Await in the Perl 5 language. It is for this reason that the
-implementation details are intended to be replaceable. This may manifest as a
-pluggable backend or rather as wholesale rewrites of the internals. The result
-should hopefully be backwards compatible, mostly because the interface is so
-simple, just two keywords.
+implementation details are intended to be replaceable. The result should
+hopefully still be backwards compatible, mostly because the interface is so
+simple. After all, it is just two keywords.
 
 Of course, I always intend as much as possible that Mojolicious-focused code is
 as useful as practically possible for the broader Perl 5 ecosystem. It is for
@@ -136,7 +136,7 @@ behavior and thus it should not be relied upon.
 
 Regardless of backend, L<Mojo::AsyncAwait> provides two keywords (i.e.
 functions), both exported by default. Depending on backend, their exact
-behavior might change slightly, however, implementer should attempt to follow
+behavior might change slightly, however, implementers should attempt to follow
 the api described here as closely as possible.
 
 Some backends may allow additional options to be passed to the keywords; those
@@ -180,7 +180,7 @@ are returned. For ease of use, in scalar context the first promise result is
 returned and the remainder are discarded.
 
 If the value passed to await is not a promise (defined as having a C<then>
-method>), it will be wrapped in a Mojo::Promise for consistency. This is mostly
+method), it will be wrapped in a Mojo::Promise for consistency. This is mostly
 inconsequential to the user.
 
 Note that await can only take one promise as an argument. If you wanted to

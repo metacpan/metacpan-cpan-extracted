@@ -1,3 +1,8 @@
+0.004   2020-01-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix participant name: 'require, cached' -> 'require, uncached'.
+
+
 0.003   2020-01-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename dist from Bencher-Scenario{,s}-ModuleInstalledTiny. Rename

@@ -145,6 +145,13 @@ sub create_contact {
     return $self->SUPER::create_contact( $params );
 }
 
+
+=head2 create_domain
+
+Additional tld parameters must be specified as described in the tld documentation
+
+=cut
+
 sub create_domain {
     my ( $self, $params ) = @_;
 
@@ -248,7 +255,6 @@ sub transfer {
     my ( $self, $params ) = @_;
 
     if ( defined $params->{authinfo} ) {
-        # не понимает передаваемые на прямую спецсимвол в authinfo
         $params->{authinfo} =~ s/&/&amp;/g;
         $params->{authinfo} =~ s/</&lt;/g;
         $params->{authinfo} =~ s/>/&gt;/g;
@@ -267,7 +273,7 @@ $$self{urn}{head}
 </epp>
 INTTR
 
-        my $answ = $self->req( $body, 'transfer' );
+        my $answ = $self->req( $body, 'query_transfer' );
 
 #         if ( ref $res && $res->{code} == 1000 ) {
 #             $res->{trstatus} = 'pending';
@@ -289,7 +295,7 @@ An Example, request:
 
     my ( $answ, $msg, $conn ) = make_request( 'get_transfer_list', \%conn_params );
 
-Answer:
+    # Answer:
 
     {
         'user1' => 'login',
@@ -371,7 +377,7 @@ An Example, request:
 
     my ( $answ, $msg, $conn ) = make_request( 'get_status_domain', { dname => '777.mx', %conn_params } );
 
-Answer:
+    # Answer:
 
     {
         'REGISTRATIONGRACEPERIOD' => '0',
@@ -466,6 +472,11 @@ sub get_status_domain {
     return wantarray ? ( 0, 0, 'no answer' ) : 0;
 }
 
+=head2 renew_domain
+
+Automatic adds an additional parameter for the .jp tld
+
+=cut
 
 sub renew_domain {
     my ( $self, $params ) = @_;
@@ -481,6 +492,53 @@ sub renew_domain {
     return $self->SUPER::renew_domain( $params );
 }
 
+
+=head2 set_domain_renewal_mode
+
+Update domain renewal mode
+
+L<https://wiki.hexonet.net/wiki/API:SetDomainRenewalMode>
+
+INPUT:
+
+params with key:
+
+C<renewal_mode> – valid values: C<AUTORENEW>, C<AUTODELETE>, C<AUTOEXPIRE>
+
+OUTPUT:
+see L<IO::EPP::Base/simple_request>
+
+=cut
+
+sub set_domain_renewal_mode {
+    my ( $self, $params ) = @_;
+
+    $params->{renewal_mode} = uc $params->{renewal_mode};
+
+    $params->{extension} = qq|
+  <extension>
+   <keyvalue:extension  $kv_ext>
+      <keyvalue:kv key='COMMAND' value='SetDomainRenewalMode' />
+      <keyvalue:kv key='RENEWALMODE' value='$$params{renewal_mode}' />
+  </extension>|;
+
+    return $self->SUPER::update_domain( $params );
+}
+
+
+=head2 update_domain
+
+Has additional parameters:
+
+C<trade> – Changing domain contacts requires confirmation or a fee, depending on the tld;
+
+C<confirm_old_registrant> – send confirmation of changing the owner's email address to the old address;
+
+C<confirm_new_registrant>– send confirmation of changing the owner's email address to the new address;
+
+Other additional parameters depend on the tld.
+
+=cut
 
 sub update_domain {
     my ( $self, $params ) = @_;
@@ -514,7 +572,7 @@ sub update_domain {
     }
 
     if ( $extension ) {
-        $params->{extension} = "   <keyvalue:extension  $kv_ext>\n$extension   </keyvalue:extension>\n";
+        $params->{extension} = "   <keyvalue:extension $kv_ext>\n$extension   </keyvalue:extension>\n";
     }
 
     return $self->SUPER::update_domain( $params );
@@ -648,6 +706,12 @@ QAL
 }
 
 
+=head2 req_poll_ext
+
+key-value extension for the req poll
+
+=cut
+
 sub req_poll_ext {
     my ( undef, $ext ) = @_;
 
@@ -689,7 +753,7 @@ __END__
 
 =head1 AUTHORS
 
-Vadim Likhota <vadiml@cpan.org>
+Vadim Likhota <vadiml@cpan.org>, renewal_mode function are written by Andrey Voyshko
 
 =head1 COPYRIGHT
 

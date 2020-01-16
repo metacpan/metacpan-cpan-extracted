@@ -8,7 +8,7 @@ OpenTracing::Implementation::Interface::Bootstrap - Ensure we do the right thing
 
     package My::OpenTracing::Implementation
     
-    sub bootstrap {
+    sub bootstrap_tracer {
         my $class = shift;
         
         my @args = @_; # whatever

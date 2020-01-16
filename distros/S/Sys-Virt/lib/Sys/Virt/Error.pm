@@ -418,6 +418,10 @@ The domain checkpoint
 
 The TPM subsystem
 
+=item Sys::Virt::Error::FROM_BPF
+
+The BPF subsystem
+
 =back
 
 =head2 ERROR CODE CONSTANTS

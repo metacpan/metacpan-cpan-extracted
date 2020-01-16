@@ -1,5 +1,31 @@
 Changelog for CPAN-Testers-Schema
 
+0.025     2020-01-13 21:13:16-05:00 America/New_York
+
+    [Added]
+
+    - Added full report fetching to the fetch command. Now you can
+      populate an entire local database using the API!
+    - Added a resultset method to get recent uploads to CPAN.
+    - Added a relationship from a CPAN release to its report metrics
+      (pass/fail/na/unknown counts) to make fetching those metrics easy.
+    - Added a method to total up all release metrics by dist/version. We
+      store metrics based on other criteria (stable/dev perl, for
+      example), so we need to be able to collate them.
+    - Added accessor methods for common parts of the test report to both
+      the TestReport and Stats objects. These two objects have the same
+      API now, so one can be substituted for the other with little
+      difference (except the Stats object lacks the full text of the
+      report).
+
+    [Fixed]
+
+    - Fixed cpantesters-schema command for the initial deploy. The
+      workaround for the primary database is no longer necessary.
+    - Fixed the "fetch" command script's options parsing and added
+      better error checking from the API.
+    - Fixed duplicate test summaries being created for the same report.
+
 0.024     2019-04-27 15:58:52+01:00 Europe/London
 
     [Added]

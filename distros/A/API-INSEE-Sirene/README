@@ -1,4 +1,4 @@
-API-INSEE-Sirene version 3.504
+API-INSEE-Sirene version 3.505
 =============================
 
 API::INSEE::Sirene - An interface for the Sirene API of INSEE
@@ -22,7 +22,7 @@ POSIX
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2019 by FOUQUET Justin
+Copyright (C) 2018-2020 by Les Nouveaux Constructeurs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

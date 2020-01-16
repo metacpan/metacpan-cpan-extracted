@@ -1,14 +1,21 @@
-SYNOPSIS
+NAME
+    Business::ID::NOPPBB - Validate (and parse) Indonesian property tax
+    number (NOP PBB)
 
+VERSION
+    This document describes version 0.090 of Business::ID::NOPPBB (from Perl
+    distribution Business-ID-NOPPBB), released on 2019-11-21.
+
+SYNOPSIS
      use Business::ID::NOPPBB qw(validate_nop_pbb);
-    
+
      my $res = validate_nop_pbb(str => '327311000109900990');
      $res->[0] == 200 or die "Invalid NOP PBB!";
-    
+
      # get structure
      use Data::Dumper;
      print Dumper $res->[2];
-    
+
      # will print something like
      {
          province => 32,
@@ -22,8 +29,81 @@ SYNOPSIS
      }
 
 DESCRIPTION
-
     This module provides one function: validate_nop_pbb.
 
     This module has Rinci metadata.
+
+FUNCTIONS
+  validate_nop_pbb
+    Usage:
+
+     validate_nop_pbb(%args) -> [status, msg, payload, meta]
+
+    Validate (and parse) Indonesian property tax number (NOP PBB).
+
+    Indonesian property tax object number, or Nomor Objek Pajak Pajak Bumi
+    dan Bangunan, is a number given to a tax object (a piece of land with
+    its house/building).
+
+    NOP PBB is composed of 18 digits as follow:
+
+     AA.BB.CCC.DDD.EEE-XXXX.Y
+
+    AA is the province code from BPS. BB is locality (city/regency a.k.a
+    kota/kabupaten) code from BPS. CCC is district (kecamatan) code from
+    BPS. DDD is village (desa/kelurahan) code from BPS. EEE is block code.
+    XXXX is the object number. Y is a special code (it is most likely not a
+    check digit, since it is almost always has the value of 0).
+
+    The function will return status 200 if syntax is valid and return the
+    parsed information hash. Otherwise it will return 400.
+
+    Currently the length and AA code is checked against valid province code.
+    There is currently no way to check whether a specific NOP PBB actually
+    exists, because you would need to query Dirjen Pajak's database for
+    that.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   str => *str*
+
+        The input string containing number to check.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (hash)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-NOPPBB>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-NOPPBB>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NOPPBB>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

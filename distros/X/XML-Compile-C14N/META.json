@@ -1,16 +1,16 @@
 {
-   "abstract" : "SOAP Web Service Addressing",
+   "abstract" : "XML Canonicalization",
    "author" : [
-      "Mark Overmeer"
+      "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-C14N",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Report" : "0.991",
+            "Log::Report" : "1.10",
             "Scalar::Util" : "0",
             "Test::More" : "0.98",
             "XML::Compile" : "1.30",
@@ -42,5 +42,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.94"
+   "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-XML-Compile-C14N.git",
+         "web" : "https://github.com/markov2/perl5-XML-Compile-C14N"
+      }
+   },
+   "version" : "0.95",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

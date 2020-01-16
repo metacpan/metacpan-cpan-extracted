@@ -55,7 +55,7 @@ use constant NEXT    => 4;   # link to next item in cache linked list
 use constant STAT    => 5;   # Time last stat()ed
 use constant MSWin32 => $^O eq 'MSWin32';
 
-our $VERSION = '3.003';
+our $VERSION = '3.005';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 
@@ -986,7 +986,7 @@ sub _template_content {
     if(-d $path) {
         $error = "$path: not a file";
     }
-    elsif (open(FH, "< $path")) {
+    elsif (open(FH, "<", $path)) {
         local $/;
         binmode(FH);
         $data = <FH>;

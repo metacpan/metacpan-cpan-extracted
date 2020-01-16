@@ -1,5 +1,5 @@
 <%
-    my $version = stash( 'version' ) // '0.8.0';
+    my $version = stash( 'version' ) // moai->config->{version} // die "No Moai UI library version specified";
     my @urls = (
         sprintf( '//cdn.jsdelivr.net/npm/bulma@%s/css/bulma.min.css', $version ),
     );

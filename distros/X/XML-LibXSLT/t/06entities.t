@@ -9,7 +9,7 @@ use XML::LibXSLT;
 my $parser = XML::LibXML->new();
 my $xslt = XML::LibXSLT->new();
 
-# $parser->expand_entities(1);
+$parser->expand_entities(1);
 
 my $source = $parser->parse_string(qq{<?xml version="1.0" encoding="UTF-8"?>
 <root>foo</root>});

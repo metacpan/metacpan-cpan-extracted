@@ -1,5 +1,5 @@
 package MARC::Moose::Formater::UnimarcToMarc21;
-$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.40';
+$MARC::Moose::Formater::UnimarcToMarc21::VERSION = '1.0.41';
 # ABSTRACT: Convert biblio record from UNIMARC to MARC21
 use Moose;
 
@@ -980,7 +980,7 @@ override 'format' => sub {
     }
 
     # 500 => 240 or 130
-    for my $field ( $unimarc->field('500') ) {
+    for my $field ( $unimarc->field('500|503|517|540|541') ) {
         my ($ind1, $ind2) = ($field->ind1, $field->ind2);
         my $tag = '240';
         if ( $ind2 eq '0' ) {
@@ -1272,7 +1272,7 @@ MARC::Moose::Formater::UnimarcToMarc21 - Convert biblio record from UNIMARC to M
 
 =head1 VERSION
 
-version 1.0.40
+version 1.0.41
 
 =head1 SYNOPSYS
 

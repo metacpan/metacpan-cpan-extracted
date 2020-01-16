@@ -1,5 +1,18 @@
 Revision history for Tangence
 
+0.25    2020-01-14
+        [CHANGES]
+         * Allow servers to disallow access to Registry
+         * Disallow clients from accessing objects that haven't already been
+           sent to them
+         * Customisable root object per connection
+         * Added $client->get_registry; discourage the ->registry method
+         * Use core's Sub::Util::set_subname()
+         * Removed support for protocol minor version 2
+
+        [BUGFIXES]
+         * Ensure MSG_SETPROP serialises correctly for non-scalar properties
+
 0.24    2017-11-14 17:48:45
         [BUGFIXES]
          * Avoid harmless warning about wide characters during SvIV test

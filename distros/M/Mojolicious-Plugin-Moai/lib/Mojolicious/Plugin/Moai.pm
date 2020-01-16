@@ -1,11 +1,11 @@
 package Mojolicious::Plugin::Moai;
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 # ABSTRACT: Mojolicious UI components using modern UI libraries
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
-#pod     plugin Moai => 'Bootstrap4'; # or 'Bulma'
+#pod     plugin Moai => 'Bootstrap4', { version => '4.4.1' };
 #pod     app->start;
 #pod     __DATA__
 #pod     @@ list.html.ep
@@ -39,6 +39,26 @@ our $VERSION = '0.006';
 #pod =head2 Bulma
 #pod
 #pod L<http://bulma.io>
+#pod
+#pod =head1 GETTING STARTED
+#pod
+#pod Add the Moai plugin to your Mojolicious application and specify which
+#pod UI library and version of that library you want to use.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     plugin Moai => 'Bootstrap4', {
+#pod         version => '4.4.1',
+#pod     };
+#pod
+#pod Now you can add widgets. You will likely first want to add the C<moai/lib>
+#pod widget to your layout template to get the UI library.
+#pod
+#pod     @@ layouts/default.html.ep
+#pod     <!DOCTYPE html>
+#pod     <head>
+#pod         %= include 'moai/lib'
+#pod     </head>
+#pod     <body><%= content %></body>
 #pod
 #pod =head1 WIDGETS
 #pod
@@ -225,7 +245,8 @@ our $VERSION = '0.006';
 #pod
 #pod =item version
 #pod
-#pod The specific version of the library to use. Required.
+#pod The specific version of the library to use. Defaults to the C<version>
+#pod specified in the plugin (if any). Required.
 #pod
 #pod =back
 #pod
@@ -347,10 +368,12 @@ our $VERSION = '0.006';
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::File qw( path );
 
+has config =>;
 sub register {
-    my ( $self, $app, $conf ) = @_;
-    my $library = $conf->[0];
-    $conf = $conf->[1] || {};
+    my ( $self, $app, $config ) = @_;
+    my $library = $config->[0];
+    $self->config( $config->[1] || {} );
+    $app->helper( moai => sub { $self } );
     my $libdir = path( __FILE__ )->sibling( 'Moai' )->child( 'resources', lc $library );
     push @{$app->renderer->paths}, $libdir->child( 'templates' );
     return;
@@ -368,12 +391,12 @@ Mojolicious::Plugin::Moai - Mojolicious UI components using modern UI libraries
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
-    plugin Moai => 'Bootstrap4'; # or 'Bulma'
+    plugin Moai => 'Bootstrap4', { version => '4.4.1' };
     app->start;
     __DATA__
     @@ list.html.ep
@@ -407,6 +430,26 @@ L<http://getbootstrap.com>
 =head2 Bulma
 
 L<http://bulma.io>
+
+=head1 GETTING STARTED
+
+Add the Moai plugin to your Mojolicious application and specify which
+UI library and version of that library you want to use.
+
+    use Mojolicious::Lite;
+    plugin Moai => 'Bootstrap4', {
+        version => '4.4.1',
+    };
+
+Now you can add widgets. You will likely first want to add the C<moai/lib>
+widget to your layout template to get the UI library.
+
+    @@ layouts/default.html.ep
+    <!DOCTYPE html>
+    <head>
+        %= include 'moai/lib'
+    </head>
+    <body><%= content %></body>
 
 =head1 WIDGETS
 
@@ -593,7 +636,8 @@ using C<moai/lib/stylesheet> and C<moai/lib/javascript> respectively.
 
 =item version
 
-The specific version of the library to use. Required.
+The specific version of the library to use. Defaults to the C<version>
+specified in the plugin (if any). Required.
 
 =back
 
@@ -713,6 +757,12 @@ L<Test::Mojo::Role::Moai>, L<Mojolicious::Guides::Rendering>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

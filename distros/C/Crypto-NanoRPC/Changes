@@ -1,0 +1,9 @@
+Revision history for Perl extension Crypto::NanoRPC.
+
+0.8   Thu Jan 16 2020
+    - First import of the code
+
+0.01  Mon Jan 13 07:23:15 2020
+	- original version; created by h2xs 1.23 with options
+		-AX -n Crypto::NanoRPC
+

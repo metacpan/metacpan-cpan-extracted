@@ -6,7 +6,7 @@ use Test2::Tools::Exception qw/dies lives/;
 do "./t/helper.pl";
 
 skip_all "No ArangoDB environment variables for testing. See README" unless valid_env_vars();
-skip_all "Can't reach ArangoDB Server" unless server_alive(); 
+skip_all "Can't reach ArangoDB Server" unless server_alive();
 
 my $arango = Arango::Tango->new( );
 clean_test_environment($arango);

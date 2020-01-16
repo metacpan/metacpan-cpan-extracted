@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2020-01-15'; # DATE
+our $VERSION = '0.20'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=cpanm
@@ -12,7 +12,7 @@ use warnings;
 use Log::ger;
 
 use Complete::File qw(complete_file);
-use Complete::Util qw(complete_array_elem);
+use Complete::Util qw(answer_has_entries complete_array_elem);
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 die "This script is for shell completion only\n"
@@ -71,8 +71,6 @@ my $comp_installed_mods = sub {
 
 # complete with installable stuff
 my $comp_installable = sub {
-    require Complete::Module;
-
     my %args = @_;
     my $word   = $args{word} // '';
 
@@ -106,7 +104,6 @@ my $comp_installable = sub {
             filter => sub { log_trace("  $_"); /\.(zip|tar\.gz|tar\.bz2)$/i || (-d $_) },
             word   => $word,
         );
-        return {words=>$answer, path_sep=>"/"} if @$answer;
     }
 
     # if that fails, and the word looks like the start of module name, try
@@ -251,7 +248,7 @@ _cpanm - Shell completer for cpanm
 
 =head1 VERSION
 
-This document describes version 0.19 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2017-07-10.
+This document describes version 0.20 of _cpanm (from Perl distribution App-ShellCompleter-cpanm), released on 2020-01-15.
 
 =head1 SYNOPSIS
 
@@ -300,7 +297,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

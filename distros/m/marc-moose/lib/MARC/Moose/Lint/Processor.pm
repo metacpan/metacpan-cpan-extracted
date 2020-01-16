@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Processor;
 # ABSTRACT: Processor to lint a biblio records file
-$MARC::Moose::Lint::Processor::VERSION = '1.0.40';
+$MARC::Moose::Lint::Processor::VERSION = '1.0.41';
 use Moose;
 use Modern::Perl;
 use MARC::Moose::Reader::File::Iso2709;
@@ -114,7 +114,7 @@ MARC::Moose::Lint::Processor - Processor to lint a biblio records file
 
 =head1 VERSION
 
-version 1.0.40
+version 1.0.41
 
 =head1 ATTRIBUTES
 

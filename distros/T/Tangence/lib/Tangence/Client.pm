@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package Tangence::Client;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use base qw( Tangence::Stream );
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 
@@ -22,7 +22,7 @@ use Future;
 
 use List::Util qw( max );
 
-use constant VERSION_MINOR_MIN => 2;
+use constant VERSION_MINOR_MIN => 3;
 
 =head1 NAME
 
@@ -110,7 +110,13 @@ sub rootobj
 
    $registry = $client->registry
 
-Returns a L<Tangence::ObjectProxy> to the server's object registry
+Returns a L<Tangence::ObjectProxy> to the server's object registry if one has
+been received, or C<undef> if not.
+
+This method is now deprecated in favour of L</get_registry>. Additionally note
+that currently the client will attempt to request the registry at connection
+time, but a later version of this module will stop doing that, so users who
+need access to it should call C<get_registry>.
 
 =cut
 
@@ -119,6 +125,35 @@ sub registry
    my $self = shift;
    $self->{registry} = shift if @_;
    return $self->{registry};
+}
+
+=head2 get_registry
+
+   $registry = $client->get_registry->get
+
+Returns a L<Future> that will yield a L<Tangence::ObjectProxy> to the server's
+registry object.
+
+Note that not all servers may permit access to the registry.
+
+=cut
+
+sub get_registry
+{
+   my $self = shift;
+
+   $self->request(
+      request => Tangence::Message->new( $self, MSG_GETREGISTRY ),
+   )->then( sub {
+      my ( $message ) = @_;
+      my $code = $message->code;
+
+      $code == MSG_RESULT or
+         return Future->fail( "Cannot get registry - code $code", tangence => $message );
+
+      $self->registry( TYPE_OBJ->unpack_value( $message ) );
+      return Future->done( $self->registry );
+   });
 }
 
 sub on_error
@@ -158,6 +193,11 @@ Optional callback to be invoked once the registry has been returned. It will
 be passed a L<Tangence::ObjectProxy> to the registry.
 
  $on_registry->( $registry )
+
+Note that in the case that the server does not permit access to the registry
+or an error occurs while requesting it, this is invoked with an empty list.
+
+ $on_registry->()
 
 =item version_minor_min => INT
 
@@ -233,26 +273,15 @@ sub tangence_initialised
       }
    );
 
-   $self->request(
-      request => Tangence::Message->new( $self, MSG_GETREGISTRY ),
-
-      on_response => sub {
-         my ( $message ) = @_;
-         my $code = $message->code;
-
-         if( $code == MSG_RESULT ) {
-            $self->registry( TYPE_OBJ->unpack_value( $message ) );
-            $args{on_registry}->( $self->registry ) if $args{on_registry};
-         }
-         elsif( $code == MSG_ERROR ) {
-            my $msg = $message->unpack_str();
-            print STDERR "Cannot get registry - error $msg";
-         }
-         else {
-            print STDERR "Cannot get registry - code $code\n";
-         }
+   $self->get_registry->then(
+      sub {
+         my ( $registry ) = @_;
+         $args{on_registry}->( $registry ) if $args{on_registry};
+      },
+      sub {
+         $args{on_registry}->() if $args{on_registry};
       }
-   );
+   )->retain;
 }
 
 sub handle_request_EVENT

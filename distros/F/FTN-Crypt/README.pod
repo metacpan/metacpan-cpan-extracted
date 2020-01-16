@@ -1,0 +1,192 @@
+=head1 NAME
+
+FTN::Crypt - Encryption of the FTN messages.
+
+=head2 VERSION
+
+0.5.1
+
+
+=cut
+
+=head1 SYNOPSIS
+
+    use FTN::Crypt;
+
+    my $obj = FTN::Crypt->new(
+        Nodelist => 'NODELIST.*',
+        Pointlist => [
+            'pointlist_1.*',
+            'pointlist_2',
+        ],
+    ) or die FTN::Crypt->error;
+
+    $obj->encrypt_message(
+        Address => $ftn_address,
+        Message => $msg,
+    ) or die $obj->error;
+
+=head1 DESCRIPTION
+
+The possibility of FTN netmail encryption may be sometimes a useful option.
+Corresponding nodelist flag was proposed in FSC-0073.
+
+Although current FidoNet Policy (version 4.07 dated June 9, 1989) clearly
+forbids routing of encrypted traffic without the express permission of
+all the links in the delivery system, it's still possible to deliver such
+messages directly. And, obviously, such routing may be allowed in FTN
+networks other than FidoNet.
+
+The proposed nodelist userflag is ENCRYPT:[TYPE], where [TYPE] is one of
+'PGP2', 'PGP5', 'GnuPG'. So encryption-capable node should have something
+like U,ENCRYPT:PGP5 in his nodelist record.
+
+
+=cut
+
+=head1 METHODS
+
+
+=cut
+
+=head2 new()
+
+Constructor.
+
+=head3 Parameters:
+
+=over 4
+
+=item * C<Nodelist>: Path to nodelist file(s), either scalar or arrayref. If contains wildcard, file with maximum number in digital extension will be selected.
+
+=item * B<Optional> C<Pointlist>: Path to pointlist file(s), either scalar or arrayref. If contains wildcard, file with maximum number in digital extension will be selected.
+
+=item * B<Optional> C<Keyserver> Keyserver (defaults to 'https://zimmermann.mayfirst.org/pks/lookup').
+
+=item * B<Optional> C<Pubring> Public keyring file.
+
+=item * B<Optional> C<Secring> Secret keyring file.
+
+=back
+
+=head3 Returns:
+
+Created object or error in C<FTN::Crypt-E<gt>error>.
+
+Sample:
+
+    my $obj = FTN::Crypt->new(
+        Nodelist => 'NODELIST.*',
+        Pointlist => [
+            'pointlist_1.*',
+            'pointlist_2',
+        ],
+    ) or die FTN::Crypt->error;
+
+
+=cut
+
+=head2 encrypt_message()
+
+Message encryption.
+
+=head3 Parameters:
+
+=over 4
+
+=item * C<Address>: Recipient's FTN address.
+
+=item * C<Message>: FTN message text with kludges.
+
+=back
+
+=head3 Returns:
+
+Encrypted message or error in C<$obj-E<gt>error>.
+
+Sample:
+
+    my $res = $obj->encrypt_message(
+        Address => $ftn_address,
+        Message => $msg,
+    ) or die $obj->error;
+
+
+=cut
+
+=head2 decrypt_message()
+
+Message decryption.
+
+=head3 Parameters:
+
+=over 4
+
+=item * C<Address>: Recipient's FTN address.
+
+=item * C<Message>: FTN message text with kludges.
+
+=item * C<Passphrase>: Key passphrase.
+
+=back
+
+=head3 Returns:
+
+Decrypted message or error in C<$obj-E<gt>error>.
+
+Sample:
+
+    my $res = $obj->decrypt_message(
+        Address => $ftn_address,
+        Message => $msg,
+        Passphrase => $pass,
+    ) or die $obj->error;
+
+
+=cut
+
+=head1 AUTHOR
+
+Petr Antonov, E<lt>pietro@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2019 by Petr Antonov
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses at L<https://opensource.org/licenses/Artistic-1.0>, and
+L<http://www.gnu.org/licenses/gpl-2.0.html>.
+
+This package is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantability and fitness for a particular purpose.
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan FTN::Crypt
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ make install
+
+=head1 REFERENCES
+
+=over 4
+
+=item 1 L<FidoNet Policy Document Version 4.07|https://www.fidonet.org/policy4.txt>
+
+=item 2 L<FTS-5001 - Nodelist flags and userflags|http://ftsc.org/docs/fts-5001.006>
+
+=item 3 L<FSC-0073 - Encrypted message identification for FidoNet *Draft I*|http://ftsc.org/docs/fsc-0073.001>
+
+=back
+
+
+=cut
+

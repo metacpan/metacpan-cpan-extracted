@@ -3,13 +3,14 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.0.4";
+$VERSION = "2.1.0";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
 $CTX_PTN = qr/^(\d+)?\.?(\d+)?$/;
 $SNIPPET_OPT_PTN = qr/(?:^-s)(\S*)/;
 $CTX_OPT_PTN = qr/(?:^-c)(\S*)/;
+$HIDDEN_FILE_PTN = qr/^\..+/;
 
 
 sub PrintUsage
@@ -28,6 +29,8 @@ Global options affect the behaviour of the program globally:
     -g (-grep) prints only lines that match specified patterns.
     -r greps recursively, implies '-g'.
        If the file list is empty then grep starts in the current directory.
+    -a greps inside hidden files and directories, implies '-r'.
+       Names of hidden files and directories start with a dot symbol.
     -f (-flist) builds the file list from the trailing arguments automatically
        when option '-' is not specified.
     -l prints the list of files where matches were found, implies '-g'.
@@ -186,6 +189,10 @@ while ( defined ( my $arg = shift ) )
         if ( $arg eq "-r" )
         {
             $Grep = 1; $GrepRecursively = 1; last SWITCH_ARGS;
+        }
+        if ( $arg eq "-a" )
+        {
+            $Grep = 1; $GrepRecursively = 1; $GrepAll = 1; last SWITCH_ARGS;
         }
         if ( $arg eq "-l" )
         {
@@ -392,6 +399,16 @@ if ( $GrepRecursively )
                 no warnings 'once';     #for $File::Find::name
                 my ( $FullFile, $File, $FileIsBinary ) =
                                             ( $File::Find::name, $_, -B $_ );
+                unless ( $GrepAll )
+                {
+                    if ( $_ =~ $HIDDEN_FILE_PTN &&
+                        ! grep { $FullFile eq $_ || $FullFile eq "./$_" }
+                                                                    @Files )
+                    {
+                        $File::Find::prune = 1;
+                        return;
+                    }
+                }
                 return unless -f $File;
                 return if $FileIsBinary && ! $BinarySupport;
                 unless ( open $FileHandle, "< $File" )
@@ -612,6 +629,11 @@ prints only lines that match specified patterns.
 greps recursively, implies '-g'.
 If the file list is empty then grep starts in the current directory.
 
+=item -a
+
+greps inside hidden files and directories, implies '-r'.
+Names of hidden files and directories start with a dot symbol.
+
 =item -f (-flist)
 
 builds the file list from the trailing arguments automatically when option '-'
@@ -803,7 +825,7 @@ Alexey Radkov <alexey.radkov@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by A. Radkov.
+Copyright (C) 2008-2020 by A. Radkov.
 
 This is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

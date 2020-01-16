@@ -1,5 +1,31 @@
 Revision history for overload::open
 
+1.8.0 Jan 16, 2020
+    - Actually add G_EVAL|G_KEEPERR. Add tests which test what happens if our hook
+      dies inside of it.
+
+1.7.0 Jan 16, 2020
+    - Revert base code to 1.4.0 since this had the cleanest cpan testers yet,
+      but keep the G_EVAL|G_KEEPERR flags to call_sv()
+    - Remove my warn() code which covered up a fatal panic condition and let Perl die if
+      this occurs.
+
+1.6.0 Jan 15, 2020
+    - Use G_EVAL|G_KEEPERR flags to call_sv()
+      These will ensure the hook does not change `$@' which can break
+      error handling in programs.
+
+1.5.0 Jan 14, 2020
+    - Use another alternative for saving the mark, allowing us to do a popmark before returning
+
+1.4.0 Jan 13, 2020
+    - Fix possible issue in pointing math
+
+1.03.0 Jan 13, 2020
+    - Add some extra paranoia for ensuring we don't run our hook inside another
+      hook. (check CvDEPTH for sysopen in open's hook and check CvDEPTH for
+      open in sysopen's hook).
+
 1.02.0 Jan 13, 2020
     - Add an option to suppress warnings. For now this is only
       applying to an internal error (so as long as you setup overload::open

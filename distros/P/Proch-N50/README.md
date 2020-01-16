@@ -1,4 +1,5 @@
-# Proch::N50 0.70
+# Proch::N50 0.90
+
 [![CPAN](https://img.shields.io/badge/CPAN-Proch::N50-1abc9c.svg)](https://metacpan.org/pod/Proch::N50)
 [![Kwalitee](https://cpants.cpanauthors.org/release/PROCH/Proch-N50-0.70.svg)](https://cpants.cpanauthors.org/release/PROCH/Proch-N50-0.70)
 [![Version](https://img.shields.io/cpan/v/Proch-N50.svg)](https://metacpan.org/pod/Proch::N50)
@@ -11,7 +12,7 @@ The updated documentation is in the *[Meta::CPAN page](https://metacpan.org/pod/
 
 The module ships the **n50** program to calculate the N50 of FASTA/FASTQ files ([documentation](https://metacpan.org/pod/distribution/Proch-N50/bin/n50)).
 
-### Installation
+### Installation - perl way
 
 Via CPANminus:
 ```
@@ -21,7 +22,9 @@ curl -L http://cpanmin.us | perl - App::cpanminus
 cpanm Proch::N50
 ```
 
-Via Miniconda:
+### Conda N50
+
+You can install 'n50' to calculate the N50 of a FASTA/FASTQ file with Miniconda, with the command:
 
 ```
 conda install -y -c bioconda n50
@@ -125,10 +128,10 @@ small_test.fa,6,130,65,4,65
 ```perl
 use Proch::N50 qw(getStats getN50);
 my $filepath = '/path/to/assembly.fasta';
- 
+
 # Get N50 only: getN50(file) will return an integer
 print "N50 only:\t", getN50($filepath), "\n";
- 
+
 # Full stats
 my $seq_stats = getStats($filepath);
 print Data::Dumper->Dump( [ $seq_stats ], [ qw(*FASTA_stats) ] );
@@ -141,7 +144,7 @@ print Data::Dumper->Dump( [ $seq_stats ], [ qw(*FASTA_stats) ] );
 #               'filename' => 'small_test.fa',
 #               'status' => 1
 #             );
- 
+
 # Get also a JSON object
 my $seq_stats_with_JSON = getStats($filepath, 'JSON');
 print $seq_stats_with_JSON->{json}, "\n";

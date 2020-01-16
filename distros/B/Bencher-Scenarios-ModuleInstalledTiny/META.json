@@ -41,7 +41,7 @@
       },
       "test" : {
          "requires" : {
-            "Bencher::Backend" : "1.046",
+            "Bencher::Backend" : "1.047",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenario-ModuleInstalledTiny"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Release;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: Query the per-release summary testers data
 
 #pod =head1 SYNOPSIS
@@ -86,6 +86,30 @@ sub maturity( $self, $maturity ) {
     return $self->search( { 'me.distmat' => $maturity } );
 }
 
+#pod =method total_by_release
+#pod
+#pod     $rs = $rs->total_by_release
+#pod
+#pod Sum the pass/fail/na/unknown counts by release distribution and version.
+#pod
+#pod =cut
+
+sub total_by_release( $self ) {
+    my @total_cols = qw( pass fail na unknown );
+    my $me = $self->current_source_alias;
+    return $self->search( {}, {
+        # The uploadid here is included to allow joins from the results
+        group_by => [ map "$me.$_", qw( dist version uploadid ) ],
+        select => [
+            qw( dist version uploadid ),
+            ( map { \"SUM($_) AS $_" } @total_cols ),
+            ( \sprintf 'SUM(%s) AS total', join ' + ', @total_cols )
+        ],
+        as => [ qw( dist version uploadid ), @total_cols, 'total' ],
+        order_by => undef,
+    } );
+}
+
 1;
 
 __END__
@@ -98,7 +122,7 @@ CPAN::Testers::Schema::ResultSet::Release - Query the per-release summary tester
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -144,6 +168,12 @@ ISO8601 date.
 
 Restrict results to only those dists that are stable. Also supported:
 'dev' to restrict to only development dists.
+
+=head2 total_by_release
+
+    $rs = $rs->total_by_release
+
+Sum the pass/fail/na/unknown counts by release distribution and version.
 
 =head1 SEE ALSO
 

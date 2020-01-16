@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-Oozie
 
+0.116 2020-01-14 BURAK
+    - Fix typo on status named DONEWITHERROR (brnrc)
+
 0.115 2018-12-17 BURAK
     - New method failed_workflows_last_n_hours_paged for paged error reporting.
 

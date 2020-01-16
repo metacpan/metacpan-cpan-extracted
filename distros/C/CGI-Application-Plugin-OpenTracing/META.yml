@@ -1,0 +1,26 @@
+---
+abstract: 'Use OpenTracing in CGI Applications'
+author:
+  - 'Theo van Hoesel <tvanhoesel@perceptyx.com'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Application-Plugin-OpenTracing
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  OpenTracing::GlobalTracer: '0'
+  OpenTracing::Implementation: '0'
+  Time::HiRes: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

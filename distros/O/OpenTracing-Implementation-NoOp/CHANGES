@@ -2,6 +2,21 @@ CHANGE LOG
 ==========
 
 
+2020-01-15 - v0.07
+------------------
+
+Quick fix, for dependency pin
+
+2020-01-15 - v0.06
+------------------
+
+Quick fix because of changes in OT::Implementation::Interface::Bootstrap
+
+### Changed
+
+    - internal method changed to `bootstrap_tracer` to match Interface requires
+
+
 2020-01-10 - v0.05
 ------------------
 

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Property;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Tangence::Constants;
 
@@ -29,7 +29,9 @@ property. Once constructed, such objects are immutable.
 
 =cut
 
-=head2 $property = Tangence::Meta::Property->new( %args )
+=head2 new
+
+   $property = Tangence::Meta::Property->new( %args )
 
 Returns a new instance initialised by the given arguments.
 
@@ -73,7 +75,9 @@ sub new
 
 =cut
 
-=head2 $class = $property->class
+=head2 class
+
+   $class = $property->class
 
 Returns the class the property is a member of
 
@@ -85,7 +89,9 @@ sub class
    return $self->{class};
 }
 
-=head2 $name = $property->name
+=head2 name
+
+   $name = $property->name
 
 Returns the name of the class
 
@@ -97,7 +103,9 @@ sub name
    return $self->{name};
 }
 
-=head2 $dimension = $property->dimension
+=head2 dimension
+
+   $dimension = $property->dimension
 
 Returns the dimension as one of the C<DIM_*> constants.
 
@@ -109,7 +117,9 @@ sub dimension
    return $self->{dimension};
 }
 
-=head2 $type = $property->type
+=head2 type
+
+   $type = $property->type
 
 Returns the element type as a L<Tangence::Meta::Type> reference.
 
@@ -121,7 +131,9 @@ sub type
    return $self->{type};
 }
 
-=head2 $type = $property->overall_type
+=head2 overall_type
+
+   $type = $property->overall_type
 
 Returns the type of the entire collection as a L<Tangence::Meta::Type>
 reference. For scalar types this will be the element type. For dict types this
@@ -151,7 +163,9 @@ sub overall_type
    }
 }
 
-=head2 $smashed = $property->smashed
+=head2 smashed
+
+   $smashed = $property->smashed
 
 Returns true if the property is smashed.
 

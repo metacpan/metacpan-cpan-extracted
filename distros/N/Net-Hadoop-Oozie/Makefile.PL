@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::CPAN::Meta" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.115",
+  "VERSION" => "0.116",
   "test" => {
     "TESTS" => "t/*.t"
   }

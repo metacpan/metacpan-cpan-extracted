@@ -1,5 +1,11 @@
 Revision history for Text-Hspell
 
+0.2.1       2020-01-15
+    - Documentation updates.
+
+0.2.0       2020-01-14
+    - Use Perl/XS instead of depending on Inline-Python and HspellPy.
+
 0.0.2       2019-12-10
     - Try to fix tests
     - Add DESCRIPTION to the POD.

@@ -8,7 +8,7 @@ OpenTracing::Implementation::NoOp - Stops Crashing, doing nothing else
 
     use OpenTracing::Implementation::NoOp;
     
-    my $tracer = OpenTracing::Implementation::NoOp->bootstrap( );
+    my $tracer = OpenTracing::Implementation::NoOp->bootstrap_tracer( );
 
 
 
@@ -33,12 +33,12 @@ purposes).
 
 =head2 bootstrap
 
-    my $tracer = OpenTracing::Implementation::NoOp->bootstrap( @extra_args );
+    my $tracer = OpenTracing::Implementation::NoOp->bootstrap_tracer( @args );
 
 Returns a L<OpenTracing::Interface::Tracer> compliant tracer, using the
 L<OpenTracing::Implementation::NoOp::Tracer> implementation.
 
-Any arguments passed in, and dutyfully passed, but are supposedly useless.
+Any arguments passed in, are dutyfully passed, but are supposedly useless.
 
 
 

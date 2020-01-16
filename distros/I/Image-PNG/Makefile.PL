@@ -5,9 +5,12 @@ use ExtUtils::Constant;
 
 use 5.008001;
 
+my $pm = 'lib/Image/PNG.pm';
+my $pod = 'lib/Image/PNG.pm';
+
 WriteMakefile (
     NAME         => 'Image::PNG',
-    VERSION      => '0.23',
+    VERSION      => '0.24',
     ABSTRACT     => 'Read and write PNG files',
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',

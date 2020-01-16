@@ -1,0 +1,40 @@
+---
+abstract: 'Otogiri plugin to search row-data that contains only specific columns from database'
+author:
+  - 'Satoshi Azuma <ytnobody@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Otogiri-Plugin-SelectWithColumns
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Otogiri::Plugin::SelectWithColumns:
+    file: lib/Otogiri/Plugin/SelectWithColumns.pm
+    version: '0.01'
+requires:
+  Otogiri: '0.18'
+  Otogiri::Plugin: '0.03'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ytnobody/Otogiri-Plugin-SelectWithColumns/issues
+  homepage: https://github.com/ytnobody/Otogiri-Plugin-SelectWithColumns
+  repository: git://github.com/ytnobody/Otogiri-Plugin-SelectWithColumns.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

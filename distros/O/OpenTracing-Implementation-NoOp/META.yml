@@ -19,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  OpenTracing::Implementation::Interface::Bootstrap: '0'
+  OpenTracing::Implementation: '0.03'
   OpenTracing::Interface: '0'
   aliased: '0'
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

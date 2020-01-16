@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.022	2020-01-16
+
+ - Added: Integration with MooX::Enumeration/MooseX::Enumeration.
+ - Added: Roles now have `requires`.
+
+0.021	2020-01-15
+
+ [ Bug Fixes ]
+ - Prevent global options from overriding per-package options.
+
+ [ Other ]
+ - Added: Method modifiers now support signatures.
+ - String 'from' types in coercions are now interpreted as type names
+   instead of class/role names. This is for consistency with signatures.
+
 0.020	2020-01-13
 
  - Added: Provide a `begin` option to run callback early in class/role

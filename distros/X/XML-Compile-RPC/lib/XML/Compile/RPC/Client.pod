@@ -4,6 +4,47 @@
 
 XML::Compile::RPC::Client - XML-RPC based on unofficial schema
 
+=head1 SYNOPSIS
+
+ my $rpc = XML::Compile::RPC::Client->new
+   ( destination => $service_uri
+   , xmlformat   => 1
+   , autoload_underscore_is => '-'
+   );
+
+ # Call the server
+ my ($rc, $answer) = $rpc->call($procedure, @param_pairs);
+ my ($rc, $answer) = $rpc->call($procedure, \%params);
+ $rc==0 or die "error: $answer ($rc)";
+
+ # explict and autoload examples of the same.
+ my ($rc, $answer) = $rpc->call('getQuote", string => 'IBM');
+ my ($rc, $answer) = $rpc->getQuote(string => 'IBM');
+
+ # when param is a structure:
+ my $data = struct_from_hash string => {symbol => 'IBM'};
+ my ($rc, $answer) = $rpc->call('getQuote", $data);
+ my ($rc, $answer) = $rpc->getQuote($data);
+
+ # Data::Dumper is your friend
+ use Data::Dumper;
+ $Data::Dumper::Indent = 1;
+ print Dumper $answer;
+
+ # Many useful functions in XML::Compile::RPC::Util
+ use XML::Compile::RPC::Util;
+ if($answer->{array})
+ {   my @a = rpcarray_values $answer->{array};
+ }
+
+ # Retreive detailed trace of last call
+ my $trace = $rpc->trace;
+ print $trace->{response}->as_string;
+ print "$trace->{total_elapse}\n";
+
+ # clean-up of connections depends on LWP
+ undef $rpc;
+
 =head1 DESCRIPTION
 
 Client XML-RPC implementation, based on an unofficial XML-RPC schema. The
@@ -30,7 +71,7 @@ syntax in the first. This simplifies your code.
 
 =over 4
 
-=item XML::Compile::RPC::Client-E<gt>B<new>(OPTIONS)
+=item XML::Compile::RPC::Client-E<gt>B<new>(%options)
 
  -Option                --Default
   autoload_underscore_is  '_'
@@ -99,28 +140,32 @@ decode the exchanged XML messages.
 
 =over 4
 
-=item $obj-E<gt>B<call>(METHOD, PARAM-(HASH|PAIR)S)
+=item $obj-E<gt>B<call>( $method, <$param|%param> )
+
+The call parameters are passed as PAIRS or HASH.
 
 example: 
 
- my ($rc, $response) = $rpc->call('getQuote', string => 'IBM');
- $rc == 0
-     or die "error: $response\n";
- my $trace = $rpc->trace;  # facts about the last call
+  my ($rc, $response, $trace) = $rpc->call('getQuote', string => 'IBM');
+  $rc == 0
+      or die "error: $response\n";
 
- # same call, via autoload. One simple parameter
- my ($rc, $response) = $rpc->getQuote(string => 'IBM');
+  # If you did not catch trace on time
+  my $trace = $rpc->trace;  # facts about the last call
 
- # function produces a HASH, one complex parameter
- my $struct = struct_from_hash string => symbol => 'IBM';
- my ($rc, $response) = $rpc->call('getQuote', $struct);
- my ($rc, $response) = $rpc->getQuote($struct);
+  # same call, via autoload of 'getQuote'. One simple parameter
+  my ($rc, $resp, $trace) = $rpc->getQuote(string => 'IBM');
 
- # or mixed simple and complex types
- # Three parameters, of which two are complex structures.
- my ($rc, $ans) = $rcp->someMethod($struct, int => 3, $struct2);
+  # function produces a HASH, example complex parameter
+  my $struct = struct_from_hash string => symbol => 'IBM';
+  my ($rc, $resp, $trace) = $rpc->call('getQuote', $struct);
+  my ($rc, $resp, $trace) = $rpc->getQuote($struct);
 
-=item $obj-E<gt>B<printTrace>([FILEHANDLE])
+  # or mixed simple and complex types
+  # Three parameters, of which two are complex structures.
+  my ($rc, $resp, $t) = $rcp->someMethod($struct, int => 3, $struct2);
+
+=item $obj-E<gt>B<printTrace>( [$fh] )
 
 Pretty print the trace, by default to STDERR.
 
@@ -146,11 +191,13 @@ Have a look at XML::eXistDB::Client for an extended example.
   sub getQuote($)
   {   my ($self, $symbol) = @_;
       my $params = struct_from_hash string => {symbol => $symbol};
-      my ($rc, $data) = $self->call(getQuote => $params);
+      my ($rc, $data, $trace) = $self->call(getQuote => $params);
       $rc==0 or die "error: $data ($rc)";
 
       # now simplify $data
-      $data;
+      ...
+
+      return $data;
   }
 
 Now, the main program runs like this:
@@ -158,19 +205,19 @@ Now, the main program runs like this:
   my $service = My::Service->new(destination => $uri);
   my $price   = $service->getQuote('IBM');
 
-=head2 Comparison
+=head2 Comparison to other XML-RPC CPAN modules
 
 The XML::RPC module uses the XML::TreePP XML parser and parameter type
 guessing, where XML::Compile::RPC uses strict typed and validated XML
 via XML::LibXML: smaller chance on unexpected behavior. For instance,
 the XML::Compile::RPC client application will not produce incorrect
 messages when a string contains only digits. Besides, XML::RPC does not
-support all data types.
+support all "standard" data types.
 
 XML::RPC::Fast is compatible with XML::RPC, but uses XML::LibXML
 which is faster and safer. It implements "manually" what L<XML::Compile|XML::Compile>
 offers for free in XML::Compile::RPC. Getting the types of the parameters
-right is difficult for other things than strings and numbers.
+right is not easy for other things than strings and numbers.
 
 Finally, RPC::XML makes you handle parameters as object: create a typed
 object for each passed value. It offers a standard method signatures to 
@@ -178,79 +225,16 @@ simplify that task. On the other hand, RPC::XML does offer more features.
 
 There are many ways to do it.
 
-=head1 SYNOPSYS
-
- my $rpc = XML::Compile::RPC::Client->new
-   ( destination => $service_uri
-   , xmlformat   => 1
-   , autoload_underscore_is => '-'
-   );
-
- # Call the server
- my ($rc, $answer) = $rpc->call($procedure, @param_pairs);
- my ($rc, $answer) = $rpc->call($procedure, \%params);
- $rc==0 or die "error: $answer ($rc)";
-
- # explict and autoload examples of the same.
- my ($rc, $answer) = $rpc->call('getQuote", string => 'IBM');
- my ($rc, $answer) = $rpc->getQuote(string => 'IBM');
-
- # when param is a structure:
- my $data = struct_from_hash string => {symbol => 'IBM'};
- my ($rc, $answer) = $rpc->call('getQuote", $data);
- my ($rc, $answer) = $rpc->getQuote($data);
-
- # Data::Dumper is your friend
- use Data::Dumper;
- $Data::Dumper::Indent = 1;
- print Dumper $answer;
-
- # Many useful functions in XML::Compile::RPC::Util
- use XML::Compile::RPC::Util;
- if($answer->{array})
- {   my @a = rpcarray_values $answer->{array};
- }
-
- # Retreive detailed trace of last call
- my $trace = $rpc->trace;
- print $trace->{response}->as_string;
- print "$trace->{total_elapse}\n";
-
- # clean-up of connections depends on LWP
- undef $rpc;
-
 =head1 SEE ALSO
 
-This module is part of XML-Compile-RPC distribution version 0.17,
-built on September 12, 2013. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Other distributions in this suite:
-L<XML::Compile>,
-L<XML::Compile::SOAP>,
-L<XML::Compile::SOAP12>,
-L<XML::Compile::SOAP::Daemon>,
-L<XML::Compile::SOAP::WSA>,
-L<XML::Compile::C14N>,
-L<XML::Compile::WSS>,
-L<XML::Compile::WSS::Signature>,
-L<XML::Compile::Tester>,
-L<XML::Compile::Cache>,
-L<XML::Compile::Dumper>,
-L<XML::Compile::RPC>,
-L<XML::Rewrite>
-and
-L<XML::LibXML::Simple>.
-
-Please post questions or ideas to the mailinglist at
-F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
-For live contact with other developers, visit the C<#xml-compile> channel
-on C<irc.perl.org>.
+This module is part of XML-Compile-RPC distribution version 0.20,
+built on January 15, 2020. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 
-Copyrights 2009-2013 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2009-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

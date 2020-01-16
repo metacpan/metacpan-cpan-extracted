@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/simulation.pl
+lib/BettingStrategy/MonteCarlo.pm
+minil.toml
+t/00_compile.t
+t/array.t
+t/basic.t
+t/magnification.t
+META.yml
+MANIFEST

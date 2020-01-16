@@ -1,4 +1,14 @@
 
+### 1.20200114
+
+- skip HTTP tests when optional deps not installed #171
+- update PSL
+- auto update PSL as part of release
+
+### 1.20200113
+
+- lazy load Net::SMTPS #168
+
 ### 1.20200108
 
 - NEW FEATURE: Postgres support #150
@@ -11,13 +21,11 @@
 - sqlite: add default current_timestamp
 - bin/install_deps.pl: apt improvements
 
-
 ### 1.20191004
 
 - updated PSL
 - update jQuery, jQuery grid
 - empty ENV FROM when missing #144
-
 
 ### 1.20190831
 

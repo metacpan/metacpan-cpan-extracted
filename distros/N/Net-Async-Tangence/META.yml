@@ -10,7 +10,7 @@ build_requires:
   Test::More: '0.88'
   Test::Refcount: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,19 +19,25 @@ name: Net-Async-Tangence
 provides:
   Net::Async::Tangence:
     file: lib/Net/Async/Tangence.pm
-    version: '0.14'
+    version: '0.15'
   Net::Async::Tangence::Client:
     file: lib/Net/Async/Tangence/Client.pm
-    version: '0.14'
+    version: '0.15'
+  Net::Async::Tangence::Client::via::sshexec:
+    file: lib/Net/Async/Tangence/Client/via/sshexec.pm
+    version: '0.15'
+  Net::Async::Tangence::Client::via::sshunix:
+    file: lib/Net/Async/Tangence/Client/via/sshunix.pm
+    version: '0.15'
   Net::Async::Tangence::Protocol:
     file: lib/Net/Async/Tangence/Protocol.pm
-    version: '0.14'
+    version: '0.15'
   Net::Async::Tangence::Server:
     file: lib/Net/Async/Tangence/Server.pm
-    version: '0.14'
+    version: '0.15'
   Net::Async::Tangence::ServerProtocol:
     file: lib/Net/Async/Tangence/ServerProtocol.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Encode: '0'
   Exporter: '5.57'
@@ -40,10 +46,10 @@ requires:
   IO::Async::Loop: '0.16'
   IO::Async::Stream: '0'
   IO::Async::Test: '0'
-  Tangence::Client: '0.21'
+  Tangence::Client: '0.25'
   Tangence::Server: '0.19'
-  URI::Split: '0'
+  URI: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

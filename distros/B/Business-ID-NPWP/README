@@ -1,11 +1,17 @@
-SYNOPSIS
+NAME
+    Business::ID::NPWP - Parse Indonesian taxpayer registration number
+    (NPWP)
 
+VERSION
+    This document describes version 0.090 of Business::ID::NPWP (from Perl
+    distribution Business-ID-NPWP), released on 2019-11-21.
+
+SYNOPSIS
      use Business::ID::NPWP qw(parse_npwp);
-    
+
      my $res = parse_npwp(npwp => "02.183.241.5-000.000");
 
 DESCRIPTION
-
     This module can be used to validate Indonesian taxpayer registration
     number, Nomor Pokok Wajib Pajak (NPWP).
 
@@ -13,25 +19,77 @@ DESCRIPTION
 
      ST.sss.sss.C-OOO.BBB
 
-    S is a serial number from 0-9 (so far haven't seen 7 and up, but it's
+    "S" is a serial number from 0-9 (so far haven't seen 7 and up, but it's
     probably possible).
 
-    T denotes taxpayer type code (0 = government treasury [bendahara
+    "T" denotes taxpayer type code (0 = government treasury [bendahara
     pemerintah], 1-3 = company/organization [badan], 4/6 = invidual
-    entrepreneur [pengusaha perorangan], 5 = civil servants [pegawai
-    negeri, PNS], 7-9 = individual employee [pegawai perorangan]).
+    entrepreneur [pengusaha perorangan], 5 = civil servants [pegawai negeri,
+    PNS], 7-9 = individual employee [pegawai perorangan]).
 
-    sss.sss is a 6-digit serial code for the taxpayer, probably starts from
-    1. It is distributed in blocks by the central tax office (kantor pusat
-    dirjen pajak, DJP) to the local tax offices (kantor pelayanan pajak,
-    KPP) throughout the country for allocation to taypayers.
+    "sss.sss" is a 6-digit serial code for the taxpayer, probably starts
+    from 1. It is distributed in blocks by the central tax office (kantor
+    pusat dirjen pajak, DJP) to the local tax offices (kantor pelayanan
+    pajak, KPP) throughout the country for allocation to taypayers.
 
-    C is a check digit. It is apparently using Luhn (modulus 10) algorithm
+    "C" is a check digit. It is apparently using Luhn (modulus 10) algorithm
     on the first 9 digits on the NPWP.
 
-    OOO is a 3-digit local tax office code (kode KPP).
+    "OOO" is a 3-digit local tax office code (kode KPP).
 
-    BBB is a 3-digit branch code. 000 means the taxpayer is the sole branch
-    (or, for individuals, the head of the family). 001, 002, and so on
-    denote each branch.
+    "BBB" is a 3-digit branch code. 000 means the taxpayer is the sole
+    branch (or, for individuals, the head of the family). 001, 002, and so
+    on denote each branch.
+
+FUNCTIONS
+  parse_npwp
+    Usage:
+
+     parse_npwp(%args) -> [status, msg, payload, meta]
+
+    Parse Indonesian taxpayer registration number (NPWP).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   npwp* => *str*
+
+        Input NPWP to be parsed.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-NPWP>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-NPWP>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NPWP>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

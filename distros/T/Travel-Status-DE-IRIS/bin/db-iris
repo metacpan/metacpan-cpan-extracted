@@ -6,12 +6,13 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 use DateTime;
 use DateTime::Format::Strptime;
 use Encode qw(decode);
 use Getopt::Long qw(:config no_ignore_case bundling);
+use JSON;
 use List::Util qw(first max);
 use List::MoreUtils qw(none);
 use Travel::Status::DE::IRIS;
@@ -23,9 +24,12 @@ my $developer_mode = 0;
 my $lookahead      = 2 * 60;
 my $realtime       = 0;
 my $with_related   = 1;
-my ( $filter_via, $track_via, $status_via );
-my ( @grep_class, @grep_type, @grep_platform );
-my ( %edata,      @edata_pre );
+my $json_output    = 0;
+my $use_cache      = 1;
+my ( $schedule_cache, $realtime_cache );
+my ( $filter_via,     $track_via, $status_via );
+my ( @grep_class,     @grep_type, @grep_platform );
+my ( %edata,          @edata_pre );
 
 my @output;
 
@@ -46,7 +50,9 @@ GetOptions(
 	'v|via=s'            => \$filter_via,
 	'V|track-via=s'      => \$track_via,
 	'x|exact|no-related' => sub { $with_related = 0 },
+	'cache!'             => \$use_cache,
 	'devmode'            => \$developer_mode,
+	'json'               => \$json_output,
 	'version'            => \&show_version,
 
 ) or show_help(1);
@@ -131,18 +137,45 @@ for my $efield (@edata_pre) {
 	}
 }
 
+if ($use_cache) {
+	my $cache_path          = $ENV{XDG_CACHE_HOME} // "$ENV{HOME}/.cache";
+	my $schedule_cache_path = "${cache_path}/db-iris-schedule";
+	my $realtime_cache_path = "${cache_path}/db-iris-realtime";
+	eval {
+		use Cache::File;
+		$schedule_cache = Cache::File->new(
+			cache_root     => $schedule_cache_path,
+			defaut_expires => '6 hours',
+			lock_level     => Cache::File::LOCK_LOCAL(),
+		);
+		$realtime_cache = Cache::File->new(
+			cache_root     => $realtime_cache_path,
+			defaut_expires => '180 seconds',
+			lock_level     => Cache::File::LOCK_LOCAL(),
+		);
+	};
+	if ($@) {
+		$schedule_cache = undef;
+		$realtime_cache = undef;
+	}
+}
+
 my $status = Travel::Status::DE::IRIS->new(
 	datetime       => $datetime,
 	developer_mode => $developer_mode,
 	lookahead      => $lookahead,
+	main_cache     => $schedule_cache,
+	realtime_cache => $realtime_cache,
 	station        => $station,
 	with_related   => $with_related,
 );
 if ($track_via) {
 	$status_via = Travel::Status::DE::IRIS->new(
-		datetime  => $datetime,
-		station   => $track_via,
-		lookahead => $lookahead + 3 * 60,
+		datetime       => $datetime,
+		lookahead      => $lookahead + 3 * 60,
+		main_cache     => $schedule_cache,
+		realtime_cache => $realtime_cache,
+		station        => $track_via,
 	);
 }
 
@@ -413,6 +446,11 @@ if ( $status_via and $status_via->warnstr ) {
 
 sanitize_options();
 
+if ($json_output) {
+	say JSON->new->convert_blessed->encode( [ $status->results ] );
+	exit 0;
+}
+
 for my $d ( $status->results() ) {
 
 	my @via;
@@ -533,7 +571,7 @@ B<db-iris> [B<-rx>] [B<-d> I<date>] [B<-o> I<output-flags>]
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 DESCRIPTION
 
@@ -575,6 +613,17 @@ or I<dd>.I<mm>.I<YYYY> format, or C<< tomorrow >>.  Note that typically only
 slight (a few hours max) deviations from the current time are supported by the
 IRIS backend, larger ones will not return data.
 
+=item B<--json>
+
+List results as JSON, see Travel::Status::DE::IRIS::Result(3pm) for a partial
+documentation of arrival/departure keys. The B<--output> option has no effect
+when using B<--json>.
+
+Note that JSON entries not mentioned in Travel::Status::DE::IRIS::Result(3pm)
+are NOT guaranteed to be compatible between releases. Their structure is not
+part of the db-iris / Travel::Status::DE::IRIS versioning scheme; it may change
+in backwards-incompatible ways anytime.
+
 =item B<-l>, B<--lookahead> I<int>
 
 Do not return results which are more than I<int> minutes in the future.
@@ -584,6 +633,14 @@ Note that this is only an upper limit, not a guarantee to get every train
 with a departure in less than I<int> minutes. This guarantee holds only for
 I<int> below 120. However, any non-negative number is accepted for this
 option.
+
+=item B<--no-cache>
+
+If the Cache::File module is available, server replies are cached in
+F<~/.cache/db-iris-schedule> and F<~/.cache/db-iris-realtime> (or paths
+relative to C<$XDG_CACHE_HOME>, if set). Use this option to disable caching
+altogether. Note that this will significantly decrease db-iris responsiveness,
+especially on mobile networks such as WifiOnICE.
 
 =item B<-o>, B<--output> I<outputtypes>
 
@@ -757,13 +814,21 @@ None.
 
 =back
 
+=head1 RECOMMENDS
+
+=over
+
+=item * Cache::File(3pm)
+
+=back
+
 =head1 BUGS AND LIMITATIONS
 
 There are no known bugs at the moment.
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 The station data used by this script is provided by DB
 Station&Service AG, Europaplatz 1, 10557 Berlin, Germany and available

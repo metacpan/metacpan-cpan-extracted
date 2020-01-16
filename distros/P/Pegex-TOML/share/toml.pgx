@@ -1,0 +1,88 @@
+# Adapted from https://github.com/jcoglan/toml/blob/master/lib/toml/grammar.peg
+
+%grammar toml
+%version 0.0.1
+%include pegex-atoms
+
+toml: document
+
+document: key-group+
+
+key-group: header-line? value-line+ ignore
+
+header-line: ignore '[' key-name ']' line-end
+
+key-name: /( key-segment (: '.' key-segment)* )/
+
+key-segment: / [^ '[' ']' '.']+ /
+
+value-line: ignore name - '=' - value line-end
+
+name: /( WORD+ )/
+
+value:
+  | string
+  | datetime
+  | float
+  | integer
+  | boolean
+  | array
+
+array:
+  | empty-array
+  | string-array
+  | datetime-array
+  | float-array
+  | integer-array
+  | boolean-array
+  | array-array
+
+string: /
+  '"' (
+    (: BACK escape-char | [^ '"' ])*
+  ) '"'
+/
+
+escape-char: / [ '0tnr' '"' BACK ] /
+
+digit: / [0-9] /
+
+number: /(: '-'? [1-9] digit* )/
+integer: /( number )/
+
+float: /( number '.' digit+ )/
+
+boolean: /( 'true' | 'false' )/
+
+datetime: /(
+    (: [1-9] digit digit digit) '-'
+    (digit digit) '-'
+    (digit digit) 'T'
+    (digit digit) ':'
+    (digit digit) ':'
+    (digit digit)
+    ('.' digit+)?
+    'Z'
+)/
+
+empty-array:    '[' - ']'
+
+string-array:   '[' - ( string+   % comma ) - ']'
+integer-array:  '[' - ( integer+  % comma ) - ']'
+float-array:    '[' - ( float+    % comma ) - ']'
+boolean-array:  '[' - ( boolean+  % comma ) - ']'
+datetime-array: '[' - ( datetime+ % comma ) - ']'
+array-array:    '[' - ( array+    % comma ) - ']'
+comma: /(: - ',' - )/
+
+line-end: /(: - comment? nl )/
+
+ignore: /(: (: comment | space | nl)* )/
+
+comment: /(: HASH ANY* )/
+
+ws: / space /
+
+space: / BLANK /
+
+nl: / EOL /

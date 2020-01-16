@@ -1,3 +1,7 @@
+0.136		2020-01-15	T. R. Wyant
+    Remove Celestrak supplemental Starlink 3 pre-launch TLE catalog.
+    Kelso took it down once the launch occurred.
+
 0.135		2020-01-06	T. R. Wyant
     Add Celestrak supplemental Starlink 3 pre-launch TLE catalog.
 

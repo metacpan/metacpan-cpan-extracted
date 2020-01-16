@@ -14,10 +14,6 @@ Tests for IO::EPP::Flexireg
 
 Vadim Likhota <vadiml@cpan.org>
 
-=encoding utf8
-
-ok
-
 =cut
 
 use Test::Spec;

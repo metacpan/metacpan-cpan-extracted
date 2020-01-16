@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Struct;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -28,7 +28,9 @@ Once constructed and defined, such objects are immutable.
 
 =cut
 
-=head2 $struct = Tangence::Meta::Struct->new( name => $name )
+=head2 new
+
+   $struct = Tangence::Meta::Struct->new( name => $name )
 
 Returns a new instance representing the given name.
 
@@ -42,7 +44,9 @@ sub new
    return $self;
 }
 
-=head2 $struct->define( %args )
+=head2 define
+
+   $struct->define( %args )
 
 Provides a definition for the structure.
 
@@ -71,7 +75,9 @@ sub define
 
 =cut
 
-=head2 $defined = $struct->defined
+=head2 defined
+
+   $defined = $struct->defined
 
 Returns true if a definition of the structure has been provided using
 C<define>.
@@ -84,7 +90,9 @@ sub defined
    return exists $self->{fields};
 }
 
-=head2 $name = $struct->name
+=head2 name
+
+   $name = $struct->name
 
 Returns the name of the structure
 
@@ -96,7 +104,9 @@ sub name
    return $self->{name};
 }
 
-=head2 @fields = $struct->fields
+=head2 fields
+
+   @fields = $struct->fields
 
 Returns a list of the fields defined on the structure, in their order of
 definition.

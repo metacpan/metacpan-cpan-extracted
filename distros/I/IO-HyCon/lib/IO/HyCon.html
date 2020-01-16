@@ -48,6 +48,9 @@
       <li><a href="#get_status">get_status()</a></li>
       <li><a href="#get_op_time">get_op_time()</a></li>
       <li><a href="#reset">reset()</a></li>
+      <li><a href="#"></a></li>
+      <li><a href="#1"></a></li>
+      <li><a href="#2"></a></li>
     </ul>
   </li>
   <li><a href="#Examples">Examples</a></li>
@@ -60,7 +63,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>This document refers to version 1.1 of HyCon</p>
+<p>This document refers to version 1.0 of HyCon</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -90,40 +93,107 @@
 
 <h2 id="new-filename">new($filename)</h2>
 
-<p>This function generates a HyCon-object. Currently there is only one hybrid controller supported, so this is, in fact, a singleton and every subsequent invocation will cause a fatal error. If no configuration file path is supplied as parameter, new() tries to open a YAML-file with the name of the currently running program but with the extension &#39;.yml&#39; instead of &#39;.pl&#39;. This file is assumed to have the following structure:</p>
+<p>This function generates a HyCon-object. Currently there is only one hybrid controller supported, so this is, in fact, a singleton and every subsequent invocation will cause a fatal error. If no configuration file path is supplied as parameter, new() tries to open a YAML-file with the name of the currently running program but with the extension &#39;.yml&#39; instead of &#39;.pl&#39;. This file is assumed to have the following structure (this example configures a van der Pol oscillator):</p>
 
-<pre><code>    config.yml:
-        serial:
-            port: /dev/tty.usbmodem621
-            bits: 8
-            baud: 250000
-            parity: none
-            stopbits: 1
-            poll_interval: 1000
-            poll_attempts: 200
-    types:
-        0: PS
-        1: SUM8
-        2: INT4
-        3: PT8
-        4: CU
-        5: MLT8
-        6: MDS2
-        7: CMP4
-        8: HC
-    elements: 
-        Y_DDOT: 0x0100
-        Y_DOT:  0x0101
-        PT_8-0: 0x0220
-        PT_8-1: 0x0221
-        PT_8-2: 0x0222
-        PT_8-3: 0x0223
-        PT_8-4: 0x0224
-        PT_8-5: 0x0225
-        PT_8-6: 0x0226
-        PT_8-7: 0x0227
-    manual_potentiometers:
-        PT_8-0,rT_8-1,PT_8-2,PT_8-3,PT_8-4,PT_8-5,PT_8-6,PT_8-7</code></pre>
+<p>serial: port: /dev/cu.usbserial-DN050L1O bits: 8 baud: 115200 parity: none stopbits: 1 poll_interval: 10 poll_attempts: 20000 types: 0: PS 1: SUM8 2: INT4 3: PT8 4: CU 5: MLT8 6: MDS2 7: CMP4 8: HC elements: INT0-: 0160 INT0+: 0123 INT0a: 0060/0 INT0b: 0060/1 INT0ic: 0080/0</p>
+
+<pre><code>    INT1-: 0161
+    INT1+: 0126
+    INT1a: 0060/2
+    INT1b: 0060/3
+    INT1ic: 0080/1
+
+    INT2-: 0162
+    INT2a: 0060/4
+    INT2b: 0060/5
+    INT2ic: 0080/2
+
+    MLT0+: 0100
+    MLT0-: 0127
+    MLT0a: 0060/6
+    MLT0b: 0060/7
+
+    MLT1+: 0101
+    MLT1a: 0060/8
+    MLT1b: 0060/9
+
+    SUM0-: 0120
+    SUM0+: 0124
+    SUM0a: 0060/a
+    SUM0b: 0060/b
+
+    SUM1-: 0121
+    SUM1+: 0125
+    SUM1a: 0060/c
+    SUM1b: 0060/d
+
+    SUM2-: 0122
+    SUM2a: 0060/e
+    SUM2b: 0060/f
+
+    XBAR16: 0040
+xbar:
+    input:
+        - +1
+        - -1
+        - SUM2-
+        - SUM1+
+        - SUM1-
+        - SUM0+
+        - SUM0-
+        - MLT1+
+        - MLT0+
+        - MLT0-
+        - INT2-
+        - INT1+
+        - INT1-
+        - INT0+
+        - INT0-
+    output:
+        - INT0a
+        - INT0b
+        - INT1a
+        - INT1b
+        - INT2a
+        - INT2b
+        - MLT0a
+        - MLT0b
+        - MLT1a
+        - MLT1b
+        - SUM0a
+        - SUM0b
+        - SUM1a
+        - SUM1b
+        - SUM2a
+        - SUM2b
+problem:
+    IC:
+        INT1ic: +.1 # Must start with + or -!
+    times:
+        ic: 20
+        op: 400
+    coefficients:
+        INT1a: .25
+        INT2a: .2
+        MLT0a: 1
+        MLT0b: 1
+        MLT1a: 1
+        MLT1b: 1
+        SUM0a: .02
+        SUM0b: .08
+        SUM1a: .1
+        SUM1b: .25
+    circuit:
+        INT1a: INT2-
+        INT2a: SUM0-
+        MLT0a: INT1-
+        MLT0b: INT1-
+        MLT1a: INT2-
+        MLT1b: SUM1-
+        SUM0a: INT1-
+        SUM0b: MLT1+
+        SUM1a: MLT0+
+        SUM1b: -1</code></pre>
 
 <p>The setup shown above will not fit your particular analog computer configuration; it just serves as an example. The remaining parameters nevertheless apply in general and are mostly self-explanatory. &#39;poll_interval&#39; and &#39;poll_attempts&#39; control how often this interface will poll the hybrid controller to get a response to a command issued before. The values shown above are overly pessimistic but this won&#39;t matter during normal operation.</p>
 
@@ -237,7 +307,15 @@
 
 <h2 id="set_xbar">set_xbar()</h2>
 
-<p>set_xbar sends a configuration bitstream to an XBAR-module specified by its name in the elements section of the configuration file. The routine expects two parameters: The name of the XBAR-module and a HEX-number, XBAR_CONFIG_BYTES * 2 nibbles in length.</p>
+<p>set_xbar creates and sends a configuration bitstream to an XBAR-module specified by its name in the elements section of the configuration file. The routine is called like this:</p>
+
+<pre><code>    xbar(name, config-string);</code></pre>
+
+<p>where name is the name of the XBAR-module to be configured and config-string is a string describing the mapping of output lines to input lines at the XBAR. This string consists of 16 single hex digits or &#39;-&#39;. Each digit/&#39;-&#39; denotes one output of the XBAR-module, starting with output 0. An output denoted by &#39;-&#39; is disabled.</p>
+
+<p>To connect output 0 to input B and output 2 to input E while all other outputs are disabled, the following call would be issued:</p>
+
+<p>xbar(name, &#39;B-E-------------&#39;);</p>
 
 <h2 id="read_mpts">read_mpts()</h2>
 
@@ -275,6 +353,28 @@
 <h2 id="reset">reset()</h2>
 
 <p>The reset() method resets the hybrid controller to its initial setup. This will also reset all digital potentiometer settings including their number! During normal operations it should not be necessary to call this method which was included primarily to aid debugging.</p>
+
+<h2 id=""></h2>
+
+<p>store_data() stores data gathered from an analog computer run into a file. If no arguments are supplied, the data is read from the current object where it has to have been stored by previously invoking get_data().</p>
+
+<p>If external data and/or an external filename should be used these are expected as optional named parameters as in this example:</p>
+
+<p>store_data(data =&gt; [...], filename =&gt; &#39;scratch.dat&#39;);</p>
+
+<h2 id="1"></h2>
+
+<p>plot() uses gnuplot (which must be installed and be found in PATH) to plot data gathered by get_data(). If no argument is given, it uses the data stored in the ac-object. Otherwise, data can be given as an optional named parameter which consists of a reference to an array which either contains data values or arrays of data tuples in case multiple variables were logged during an analog computer run:</p>
+
+<p>plot(data =&gt; [...]);</p>
+
+<p>If the data set to be plotted contains two element tuples, a phase space plot can be created by specifying the named parameter type:</p>
+
+<p>plot(type =&gt; phase);</p>
+
+<h2 id="2"></h2>
+
+<p>setup() prepares a problem based on the information contained in the problem section of the configuration YAML-file.</p>
 
 <h1 id="Examples">Examples</h1>
 

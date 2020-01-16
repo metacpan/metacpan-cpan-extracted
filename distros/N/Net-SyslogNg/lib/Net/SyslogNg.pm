@@ -9,7 +9,7 @@ use IO::Socket::INET;
 use Sys::Hostname;
 use DateTime;
 
-our $VERSION    = '0.02';
+our $VERSION    = '0.03';
 
 my %SYSLOG_PRIORITIES = (
     'emerg'         => 0,
@@ -122,7 +122,7 @@ B<Net::SyslogNg> - client module for writing to syslog server (rfc5424)
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSYS
 

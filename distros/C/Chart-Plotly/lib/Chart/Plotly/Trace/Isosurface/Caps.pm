@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Isosurface::Caps::X;
 use Chart::Plotly::Trace::Isosurface::Caps::Y;
 use Chart::Plotly::Trace::Isosurface::Caps::Z;
 
-our $VERSION = '0.036';    # VERSION
+our $VERSION = '0.037';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace isosurface.
 
@@ -61,7 +61,7 @@ Chart::Plotly::Trace::Isosurface::Caps - This attribute is one of the possible o
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,27 @@
+CHANGE LOG
+==========
+
+
+2020-01-15 - v0.03
+
+### Changed
+    - renamed internal required method to `bootstrap_tracer`
+    
+
+2020-01-08 - v0.02
+------------------
+
+Public Release
+
+### Changed
+    - package instantiation method to `bootstrap_global_tracer` renamed
+
+### Added
+    - OpenTracing::Implementation::Interface::Bootstrap
+    - LICENSE and COPYRIGHT
+
+
+2019-12-13 - v0.01
+------------------
+
+Iniitial Release

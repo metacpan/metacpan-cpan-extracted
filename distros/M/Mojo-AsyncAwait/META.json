@@ -12,7 +12,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-AsyncAwait",
    "prereqs" : {
@@ -43,7 +43,7 @@
    "provides" : {
       "Mojo::AsyncAwait" : {
          "file" : "lib/Mojo/AsyncAwait.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Mojo::AsyncAwait::Backend::Coro" : {
          "file" : "lib/Mojo/AsyncAwait/Backend/Coro.pm"
@@ -61,6 +61,6 @@
          "url" : "http://github.com/mojolicious/Mojo-AsyncAwait"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

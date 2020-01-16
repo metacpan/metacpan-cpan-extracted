@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -64,7 +64,7 @@ sub bootstrap_global_tracer {
     
     load $implementation_class;
     
-    my $tracer = $implementation_class->bootstrap( @implementation_args);
+    my $tracer = $implementation_class->bootstrap_tracer( @implementation_args);
     
     OpenTracing::GlobalTracer->set_global_tracer( $tracer );
     

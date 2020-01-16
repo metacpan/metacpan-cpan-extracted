@@ -29,7 +29,7 @@ IO::EPP::Taeping
     } );
 
     # Check domain
-    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'org.info' ] } );
+    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'my.pp.ru', 'my.org.ru' ] } );
 
     # Call logout() and destroy object
     undef $conn;
@@ -115,6 +115,8 @@ END_MR:
 
 
 =head1 METHODS
+
+All methods except the ones listed below are completely the same as L<IO::EPP::RIPN>
 
 =head2 new
 

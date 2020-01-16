@@ -1,5 +1,5 @@
 % my $page_param = stash( 'page_param' ) || 'page';
-% my $current_page = stash( 'current_page' ) || param( $page_param );
+% my $current_page = stash( 'current_page' ) || param( $page_param ) || 1;
 <nav class="pagination" id="<%= stash( 'id' ) %>" role="navigation" aria-label="pagination">
     <a class="pagination-previous"
         <%== $current_page <= 1

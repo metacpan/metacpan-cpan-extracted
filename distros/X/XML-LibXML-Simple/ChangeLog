@@ -1,6 +1,23 @@
 
 === version history for XML::LibXML::Simple
 
+version 1.01: Wed 15 Jan 2020 10:47:10 PM CET
+
+	Changes:
+	- Slaven needs 5.8 to be supported for his processed.  Reinstated.
+	  rt.cpan.org#131486 [Slaven Rezic]
+
+	Fixes:
+	- README.md contained info of other project.
+
+version 1.00: Wed 15 Jan 11:57:43 CET 2020
+
+	Changes:
+	- require perl 5.10
+
+	Improvements:
+	- converted to GitHUB
+
 version 0.99: Mon 11 Dec 12:53:14 CET 2017
 
 	Changes:

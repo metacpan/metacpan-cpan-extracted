@@ -9,7 +9,10 @@ $ENV{XML_CATALOG_FILES} = '';
 
 use_ok('XML::LibXML::Cache');
 
-my $parser = XML::LibXML->new(expand_xinclude => 1);
+my $parser = XML::LibXML->new(
+    expand_entities => 1,
+    expand_xinclude => 1,
+);
 my $cache = new_ok('XML::LibXML::Cache' => [ parser => $parser ]);
 my $filename = 't/xml/test01.xml';
 my $entity_filename = 't/xml/test01-entity.xml';

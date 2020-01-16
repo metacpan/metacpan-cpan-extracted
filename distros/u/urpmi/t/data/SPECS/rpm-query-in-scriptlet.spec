@@ -26,9 +26,9 @@ for i in sh rpm; do
 done
 
 %ifos linux
-%define cpio_opts --dereference
+%global cpio_opts --dereference
 %else
-%define cpio_opts
+%global cpio_opts
 %endif
 # Install the wanted tools and their deps:
 grep '/' list | (cd / ; cpio -pumd %cpio_opts %buildroot)

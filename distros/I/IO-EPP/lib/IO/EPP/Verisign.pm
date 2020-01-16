@@ -29,7 +29,7 @@ IO::EPP::Verisign
     } );
 
     # Check domain
-    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'org.info' ] } );
+    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'com.net', 'net.com' ] } );
 
     # Call logout() and destroy object
     undef $conn;
@@ -48,6 +48,8 @@ L<https://epptool-ctld.verisign-grs.com/epptool/> (need white IP)
 for .name:
 L<https://www.verisign.com/assets/email-forwarding-mapping.pdf>
 
+The behavior of C<Core> and C<NameStore> servers is markedly different.
+
 =cut
 
 use IO::EPP::Base;
@@ -63,6 +65,8 @@ our $sub_product_ext_begin =
 our $sub_product_ext_end =
 '</namestoreExt:subProduct>
    </namestoreExt:namestoreExt>';
+our $idn_ext =
+'xmlns:idnLang="http://www.verisign.com/epp/idnLang-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.verisign.com/epp/idnLang-1.0 idnLang-1.0.xsd"';
 our $rgp_ext =
 'xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd"';
 
@@ -171,11 +175,19 @@ sub req_test {
 }
 
 
+=head1 METHODS
+
+Here are the features that distinguish the registry from the EPP RFC.
+All basic information about functions is in L<IO::EPP::Base>
+
 =head2 new
 
 See description in L<IO::EPP::Base/new>
 
-Requires the C<server> field to be specified, which can have values: C<Core> for .com/.net/.edu, C<DotName> for .name, C<NameStore> for cctld and new gtlds.
+Requires the C<server> field to be specified, which can have values:
+C<Core> for .com/.net/.edu,
+C<DotName> for .name,
+C<NameStore> for cctld and new gtlds.
 
 =cut
 
@@ -244,20 +256,18 @@ sub new {
             $self->{dzone} = 'dot' . uc( $tld );
         }
 
-        $self->{namestore_ext} = $sub_product_ext_begin . $self->{dzone} . $sub_product_ext_end ."\n";
+        $self->{namestore_ext} = "   $sub_product_ext_begin" . $self->{dzone} . "$sub_product_ext_end\n";
     }
 
     return wantarray ? ( $self, $code, $msg ) : $self;
 }
 
 
-=head1 METHODS
-
-далее перекрываем те функции, где у провайдера есть особенности
-
 =head2 login
 
-залогиниться
+Ext params for login,
+
+INPUT: new password for change
 
 =cut
 
@@ -320,6 +330,33 @@ sub login {
     return $self->SUPER::login( $pw, $svcs, $extension );
 }
 
+=head2 check_contacts
+
+.com/.net/.edu zones are not currently supported
+
+For more information, see L<IO::EPP::Base/check_contacts>
+
+An Example
+
+    my ( $answ, $msg ) = make_request( 'check_contacts', { tld => 'name', contacts => [ 'PP-SP-001', 'GB789HBHKS' ] } );
+
+    # answer:
+
+    {
+        'msg' => 'Command completed successfully',
+        'PP-SP-001' => {
+            'avail' => '0'
+        },
+        'GB789HBHKS' => {
+            'avail' => '1'
+        },
+        'BHJVJH' => {
+            'avail' => '1'
+        },
+        'code' => '1000'
+    };
+
+=cut
 
 sub check_contacts {
     my ( $self, $params ) = @_;
@@ -331,10 +368,76 @@ sub check_contacts {
 
 =head2 create_contact
 
+You cannot register a contact that has two data types at once -- C<int> and C<loc>,
+a contact can have any type, but only one.
+
+.com/.net/.edu zones are not currently supported.
+
 For .jobs need additional parameters:
 C<jobs_title>, C<jobs_website>, C<jobs_industry_type>, C<is_admin>.
 
 About .jobs parameters see L<https://www.verisign.com/assets/epp-jobscontact-extension.pdf>.
+
+The C<pp_flag> / <disclose> flag is not supported, and the registry does not display contacts in whois
+
+For more information, see L<IO::EPP::Base/create_contact>.
+
+Example with C<int> data type
+
+    my %cont = (
+        name       => 'Protection of Private Person',
+        org        => 'Private Person',
+        addr       => 'PO box 01, Protection Service',
+        city       => 'Moscow',
+        state      => '',
+        postcode   => '125000',
+        country_code => 'RU',
+        phone      => '+7.4951111111',
+        fax        => '+7.4951111111',
+        email      => 'my@private.ru',
+    );
+
+    my ( $answ, $msg ) = make_request( 'create_contact', { tld => 'name', %cont } );
+
+    # answer
+    {
+        'msg' => 'Command completed successfully',
+        'cont_id' => '5555LECTU555',
+        'cre_date' => '2020-01-11 11:11:11',
+        'cltrid' => '5552d5cc9ab81c787eb9892eed888888',
+        'code' => 1000,
+        'svtrid' => '8888176177629-666916888'
+    };
+
+Example with C<loc> data type
+
+    my %cont = (
+        loc => {
+            name       => 'Защита персональных данных',
+            org        => 'Частное лицо',
+            addr       => 'А/Я 01, Сервис защиты персональных данных',
+            city       => 'Москва',
+            state      => '',
+            postcode   => '125000',
+            country_code => 'RU',
+        },
+        phone      => '+7.4951111111',
+        fax        => '+7.4951111111',
+        email      => 'my@private.ru',
+    );
+
+    my ( $answ, $msg ) = make_request( 'create_contact', { tld => 'name', %cont } );
+
+    # answer
+
+    {
+        'msg' => 'Command completed successfully',
+        'cont_id' => '5555EMELT555',
+        'cre_date' => '2020-01-11 11:11:11',
+        'cltrid' => '88807717dfcb0ea49d0106697e888888',
+        'code' => 1000,
+        'svtrid' => '8889175980353-666988888'
+    };
 
 =cut
 
@@ -362,6 +465,52 @@ sub create_contact {
     return $self->SUPER::create_contact( $params );
 }
 
+=head2 get_contact_info
+
+.com/.net/.edu zones are not currently supported.
+
+For more information, see L<IO::EPP::Base/get_contact_info>.
+
+An Example
+
+    my ( $answ, $msg ) = make_request( 'get_contact_info', { tld => 'name', cont_id => '5555LECTU555' } );
+
+    # answer
+
+    {
+        'int' => {
+            'city' => 'Moscow',
+            'country_code' => 'RU',
+            'name' => 'Protection of Private Person',
+            'postcode' => '125000',
+            'addr' => 'PO box 01, Protection Service',
+            'state' => undef
+        },
+        'roid' => '22222100_CONTACT_NAME-VRSN',
+        'cre_date' => '2020-01-11 11:11:11',
+        'email' => [
+            'my@private.ru'
+        ],
+        'upd_date' => '2020-01-11 11:11:11',
+        'fax' => [
+            '+7.4951111111'
+        ],
+        'creater' => 'login',
+        'authinfo' => 'HF+B5ON$,qUDkyYW',
+        'code' => '1000',
+        'owner' => 'LOGIN',
+        'msg' => 'Command completed successfully',
+        'phone' => [
+            '+7.4951111111'
+        ],
+        'updater' => 'login',
+        'cont_id' => '5555LECTU555',
+        'statuses' => {
+            'ok' => '+'
+        }
+    };
+
+=cut
 
 sub get_contact_info {
     my ( $self, $params ) = @_;
@@ -372,6 +521,14 @@ sub get_contact_info {
 }
 
 
+=head2 update_contact
+
+.com/.net/.edu zones are not currently supported.
+
+For more information, see L<IO::EPP::Base/update_contact>.
+
+=cut
+
 sub update_contact {
     my ( $self, $params ) = @_;
 
@@ -380,6 +537,14 @@ sub update_contact {
     return $self->SUPER::update_contact( $params );
 }
 
+
+=head2 delete_contact
+
+.com/.net/.edu zones are not currently supported.
+
+For more information, see L<IO::EPP::Base/delete_contact>.
+
+=cut
 
 sub delete_contact {
     my ( $self, $params ) = @_;
@@ -398,6 +563,14 @@ sub check_nss {
     return $self->SUPER::check_nss( $params );
 }
 
+=head2 create_ns
+
+Within a single server, all NS-s are shared, that is,
+if you register NS for the .com tld, it will be available for the .net tld as well.
+
+For details, see L<IO::EPP::Base/create_ns>.
+
+=cut
 
 sub create_ns {
     my ( $self, $params ) = @_;
@@ -436,6 +609,49 @@ sub delete_ns {
     return $self->SUPER::delete_ns( $params );
 }
 
+=head2 check_domains
+
+With a single request, you can check availability in all zones of this server at once,
+if they have accreditation
+
+In the example, accreditation is not available in the .edu tld.
+The .info tld belongs to a different registry.
+
+    my ( $answ, $msg ) = make_request( 'check_domains', {
+        tld => 'com',
+        domains => [ 'qwerty.com', 'bjdwferbkr-e3jd0hf.net', 'bjk8bj-kewew.edu', 'xn--xx.com', 'hiebw.info' ]
+    } );
+
+    # answer
+
+    {
+        'msg' => 'Command completed successfully',
+        'qwerty.com' => {
+            'reason' => 'Domain exists',
+            'avail' => '0'
+        },
+        'hiebw.info' => {
+            'reason' => 'Not an authoritative TLD',
+            'avail' => '0'
+        },
+        'bjk8bj-kewew.edu' => {
+            'reason' => 'Not authorized',
+            'avail' => '0'
+        },
+        'code' => '1000',
+        'xn--xx.com' => {
+            'reason' => 'Invalid punycode encoding',
+            'avail' => '0'
+        },
+        'bjdwferbkr-e3jd0hf.net' => {
+            'avail' => '1'
+            }
+        };
+
+For details, see L<IO::EPP::Base/check_domains>.
+
+=cut
+
 sub check_domains {
     my ( $self, $params ) = @_;
 
@@ -451,6 +667,27 @@ For IDN domains you need to specify the language code in the C<idn_lang> field
 See L<https://www.verisign.com/assets/idn-valid-language-tags.pdf>,
 and L<https://www.iana.org/domains/idn-tables> for .com, .net
 
+An Example of a domain with C<idn_lang>, without NSs
+
+    ( $answ, $code, $msg ) = $conn->create_domain( {
+        tld => 'com',
+        dname => 'xn----htbdjfuifot5a9e.com', # хитрый-домен.com
+        period => 1,
+        idn_lang => 'RUS'
+    } );
+
+    # answer
+
+    {
+        'dname' => 'xn----htbdjfuifot5a9e.com',
+        'exp_date' => '2021-01-01 01:01:01',
+        'cre_date' => '2020-01-01 01:01:01',
+        'cltrid' => '37777a45e43d0c691c65538aacd77777',
+        'svtrid' => '8888827708-7856526698888'
+    };
+
+For more information, see L<IO::EPP::Base/create_domain>.
+
 =cut
 
 sub create_domain {
@@ -462,10 +699,7 @@ sub create_domain {
     my $extension = $self->{namestore_ext};
 
     if ( $params->{idn_lang} ) {
-        $extension .=
-'   <idnLang:tag xmlns:idnLang="http://www.verisign.com/epp/idnLang-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.verisign.com/epp/idnLang-1.0 idnLang-1.0.xsd">' .
-        $params->{idn_lang} .
-        "</idnLang:tag>\n";
+        $extension .= "   <idnLang:tag $idn_ext>$$params{idn_lang}</idnLang:tag>\n";
     }
 
     $params->{extension} = $extension;
@@ -477,17 +711,53 @@ sub create_domain {
 sub transfer {
     my ( $self, $params ) = @_;
 
-    $params->{extension} = $self->{namestore_ext};
-
     if ( defined $params->{authinfo} ) {
         $params->{authinfo} =~ s/&/&amp;/g;
         $params->{authinfo} =~ s/</&lt;/g;
         $params->{authinfo} =~ s/>/&gt;/g;
     }
 
+    $params->{extension} = $self->{namestore_ext};
+
     return $self->SUPER::transfer( $params );
 }
 
+=head2 get_domain_info
+
+For details, see L<IO::EPP::Base/check_domains>.
+
+An Example
+
+    my ( $answ, $msg, $conn ) = make_request( 'get_domain_info', { dname => 'llll.com' } );
+
+    # answer
+
+    {
+        'msg' => 'Command completed successfully',
+        'owner' => '1000',
+        'hosts' => [
+            'ns2.llll.com',
+            'ns1.llll.com'
+        ],
+        'roid' => '2222489946_DOMAIN_COM-VRSN',
+        'exp_date' => '2020-01-01 01:01:01',
+        'cre_date' => '2018-01-01 01:01:01',
+        'nss' => [
+            'ns1.rrr.ru',
+            'ns2.rrr.ru'
+        ],
+        'dname' => 'llll.com',
+        'updater' => 'login',
+        'upd_date' => '2019-12-30 13:17:54',
+        'creater' => 'login',
+        'authinfo' => 'AAA:8k.o5*p"_pAA',
+        'statuses' => {
+            'clientTransferProhibited' => '+'
+        },
+        'code' => 1000
+    };
+
+=cut
 
 sub get_domain_info {
     my ( $self, $params ) = @_;
@@ -515,6 +785,15 @@ sub update_domain {
     return $self->SUPER::update_domain( $params );
 }
 
+=head2 delete_domain
+
+You can delete a domain only if it does not have NS-s that are used by other domains.
+If there are such NS-s, they should be renamed using the C<< update_ns( chg => { new_name => 'new.ns.xxxx.com' } ) >>,
+For details see L<IO::EPP::Base/update_ns>.
+
+For more information about C<delete>, see L<IO::EPP::Base/delete_domain>
+
+=cut
 
 sub delete_domain {
     my ( $self, $params ) = @_;
@@ -529,6 +808,15 @@ sub delete_domain {
 
 First call of restore — request
 
+INPUT:
+
+params with key:
+
+C<dname> — domain name
+
+OUTPUT:
+see L<IO::EPP::Base/simple_request>.
+
 =cut
 
 sub restore_domain {
@@ -537,8 +825,7 @@ sub restore_domain {
     $params->{extension} = $self->{namestore_ext} .
 "   <rgp:update $rgp_ext>
     <rgp:restore op=\"request\"/>
-   </rgp:update>
-";
+   </rgp:update>\n";
 
     return $self->SUPER::update_domain( $params );
 }
@@ -548,15 +835,32 @@ sub restore_domain {
 
 Secont call of restore — confirmation
 
+INPUT:
+
+params with keys:
+
+C<dname> — domain name
+
 C<pre_data>   — whois before delete, may be none;
+
 C<post_data>  — whois now, may be none;
+
 C<del_time>   — domain delete datetime in UTC;
+
 C<rest_time>  — restore request call datetime in UTC.
 
 The following fields already contain the required value, they do not need to be passed:
-C<resReason> — restore reason;
-C<statement> — need to write what it is for the client;
+
+C<resReason> — restore reason: "Customer forgot to renew.";
+
+C<statement> — need to write what it is for the client:
+"I agree that the Domain Name has not been restored in order to assume the rights to use or sell the name to myself or for any third party.
+I agree that the information provided in this Restore Report is true to the best of my knowledge, and acknowledge that intentionally supplying false information in the Restore Report shall constitute an incurable material breach of the Registry-Registrar Agreement.";
+
 C<other>     — additional information, may be empty.
+
+OUTPUT:
+see L<IO::EPP::Base/simple_request>.
 
 =cut
 
@@ -570,7 +874,7 @@ sub confirmations_restore_domain {
 
     $params->{extension} = <<RGPEXT;
 $extension
-    <rgp:update xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd">
+   <rgp:update $rgp_ext>
       <rgp:restore op="report">
         <rgp:report>
           <rgp:preData>$$params{pre_data}</rgp:preData>
@@ -583,12 +887,59 @@ $extension
           <rgp:other/>
         </rgp:report>
       </rgp:restore>
-    </rgp:update>
+   </rgp:update>
 RGPEXT
 
     return $self->SUPER::update_domain( $params );
 }
 
+
+=head2 req_poll_ext
+
+Processing a special messages from a poll.
+Now only processing the message about deleting NS.
+
+An Example
+
+    my ( $answ, $msg, $conn ) = make_request( 'req_poll', \%conn_params );
+
+    # answer:
+
+    {
+        'roid' => '77777866_HOST_NAME-VRSN',
+        'date' => '2020-01-10 10:10:10',
+        'cre_date' => '2010-01-10 10:15:05',
+        'ips' => [
+            '3.1.1.1'
+        ],
+        'upd_date' => '2013-01-01 10:00:01',
+        'qmsg' => 'Unused Objects Policy',
+        'creater' => 'direct',
+        'id' => '2222282',
+        'ext' => {
+            'change' => {
+                'who' => 'ctldbatch',
+                'row_msg' => '<changePoll:operation op="purge">delete</changePoll:operation>',
+                'date' => '2020-01-10 10:00:10.000',
+                'reason' => 'Unused objects policy',
+                'svtrid' => '416801225',
+                'state' => 'before'
+            }
+        },
+        'code' => 1301,
+        'msg' => 'Command completed successfully; ack to dequeue',
+        'owner' => 'LOGIN',
+        'count' => '13',
+        'cltrid' => '2222701245bb287334838a273fd22222',
+        'ns' => 'ns1.abuse.name',
+        'updater' => 'ctldbatch',
+        'statuses' => {
+            'ok' => '+'
+        },
+        'svtrid' => '7777770945650-666947777'
+    };
+
+=cut
 
 sub req_poll_ext {
     my ( $self, $ext ) = @_;

@@ -22,7 +22,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.036",
+  "dist_version" => "0.037",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recommends" => {

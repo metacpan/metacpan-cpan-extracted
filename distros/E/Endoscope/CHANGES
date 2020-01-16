@@ -1,9 +1,22 @@
 ==================================================
-Changes from 2018-06-19 00:00:00 +0000 to present.
+Changes from 2019-01-13 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2019-06-19 22:09:15 +0000
+version 0.002 at 2020-01-13 20:42:53 +0000
+------------------------------------------
+
+  Change: 93c69473252c10d1e059962c837bc325086493c9
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2020-01-13 21:33:29 +0000
+
+    Update to Devel::Optic 0.015
+
+    This version of Devel::Optic has a bugfix for summarizing undefined
+    data structure members. 
+
+------------------------------------------
+version 0.001 at 2019-06-19 21:57:44 +0000
 ------------------------------------------
 
   Change: c3c5b539912712c83c2ca2b6d2346747527ab688

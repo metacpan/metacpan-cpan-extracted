@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/LibXML/Simple.pm
 lib/XML/LibXML/Simple.pod
 t/01use.t

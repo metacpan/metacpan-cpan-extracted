@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Method;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Scalar::Util qw( weaken );
 
@@ -27,7 +27,9 @@ method. Once constructed, such objects are immutable.
 
 =cut
 
-=head2 $method = Tangence::Meta::Method->new( %args )
+=head2 new
+
+   $method = Tangence::Meta::Method->new( %args )
 
 Returns a new instance initialised by the given arguments.
 
@@ -69,7 +71,9 @@ sub new
 
 =cut
 
-=head2 $class = $method->class
+=head2 class
+
+   $class = $method->class
 
 Returns the class the method is a member of
 
@@ -81,7 +85,9 @@ sub class
    return $self->{class};
 }
 
-=head2 $name = $method->name
+=head2 name
+
+   $name = $method->name
 
 Returns the name of the class
 
@@ -93,7 +99,9 @@ sub name
    return $self->{name};
 }
 
-=head2 @arguments = $method->arguments
+=head2 arguments
+
+   @arguments = $method->arguments
 
 Return the arguments in a list of L<Tangence::Meta::Argument> references.
 
@@ -105,7 +113,9 @@ sub arguments
    return @{ $self->{arguments} };
 }
 
-=head2 @argtypes = $method->argtypes
+=head2 argtype
+
+   @argtypes = $method->argtypes
 
 Return the argument types in a list of L<Tangence::Meta::Type> references.
 
@@ -117,7 +127,9 @@ sub argtypes
    return map { $_->type } $self->arguments;
 }
 
-=head2 $ret = $method->ret
+=head2 ret
+
+   $ret = $method->ret
 
 Returns the return type as a L<Tangence::Meta::Type> reference or C<undef> if
 the method does not return a value.

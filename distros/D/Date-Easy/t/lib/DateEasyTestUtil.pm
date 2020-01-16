@@ -6,7 +6,7 @@ use warnings;
 use parent 'Exporter';
 our @EXPORT_OK =
 (
-	qw< is_32bit compare_times generate_times_and_compare >,
+	qw< is_32bit gmtime_sane localtime_sane compare_times generate_times_and_compare >,
 	qw< date_parse_test_cases date_parse_result >,
 	qw< is_true is_false >,
 );
@@ -25,6 +25,26 @@ sub is_32bit
 {
 	require Config;
 	return $Config::Config{ptrsize} == 4;
+}
+
+
+# These do the same thing as `gmtime` and `localtime`, except they return the actual year instead of
+# the year - 1900.  For a good explanation of why we need this, try reading this:
+# http://blogs.perl.org/users/grinnz/2019/07/the-timelocal-trap.html
+use constant YEAR => 5;								# as per `perldoc -f localtime`
+
+sub gmtime_sane
+{
+	my @t = gmtime @_;
+	$t[YEAR] += 1900;
+	@t;
+}
+
+sub localtime_sane
+{
+	my @t = localtime @_;
+	$t[YEAR] += 1900;
+	@t;
 }
 
 

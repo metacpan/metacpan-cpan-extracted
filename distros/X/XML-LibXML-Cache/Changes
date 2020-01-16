@@ -1,5 +1,15 @@
 Revision history for Perl module XML::LibXML::Cache 
 
+0.14
+        - Leave blank line after package statement
+        - Add META.json
+
+0.13  2020-01-15
+        - Fix tests for breaking change in XML::LibXML
+        - Suggest XML::LibXSLT as prereq
+        - Use warnings
+        - Fix documentation
+
 0.12  2012-08-24
         - Add cache_hits method
 

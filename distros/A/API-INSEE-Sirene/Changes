@@ -1,14 +1,21 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+3.505
+        - Updated documentation
+        - Fixed errors in documentation from the previous version
+        - Fixed regression about automatic token renewal
+        - Fixed some return values, now all the functions returns in first the error and in second the result
+
 3.504
+        - Added automatic token renewal
         - Updated documentation
 
-3.503  Mon Sep  23 10:59:44 2019
+3.503
         - Decreased $HARD_MAX_RESULTS value from 10000 to 1000 according to new the specifications applicable from 2019-10-01
         - Updated documentation
 
-3.502  Wed Jul  10 10:28:00 2019
-        - Documentation uniformisation
+3.502
+        - Documentation standardization
         - Minor code improvements
         - Errors handling improvement. The module will now display better errors
         - Added checkResponse() method

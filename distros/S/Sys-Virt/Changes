@@ -1,5 +1,28 @@
 Revision history for perl module Sys::Virt
 
+6.0.0 2020-01-16
+
+ - Add VIR_DOMAIN_JOB_SUCCESS and VIR_DOMAIN_JOB_STATS_KEEP_COMPLETED
+   constants
+ - Fix typo breaking migration postcopy bandwidth and
+   autoconvert increment parameter handling
+ - Add handling for VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS
+   constant when invoking migrate
+ - Add VIR_MIGRATE_PARAM_TLS_DESTINATION constant
+ - Add missing create_checkpoint method on Sys::Virt::Domain
+ - Remove docs for has_metadata method which doesn't exit
+ - Fix data type for VIR_CONNECT_IDENTITY_SASL_USER_NAME
+   parameter
+ - Add new domain job constants related to backups
+ - Add new domain backup APIs
+ - Add VIR_DOMAIN_STATS_MEMORY constant
+
+5.10.0 2019-12-03
+
+ - Add VIR_FROM_BPF constant
+ - Add virDomainAgentSetResponseTimeout API and
+   associated constants
+
 5.8.0 2019-10-07
 
  - Add virConnectSetIdentity API and constants

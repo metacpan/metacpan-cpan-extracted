@@ -23,7 +23,7 @@ sub test {
 
     urpmi_addmedia("$medium_name $url/media/$medium_name");
     urpmi($name);
-    is(`rpm -qa --root $::pwd/root`, "$name-1-1\n");
+    check_installed_fullnames("$name-1-1");
     urpme($name);
     urpmi_removemedia($medium_name);
 }
@@ -50,7 +50,7 @@ sub test_exotic_medium_name {
     is(run_urpm_cmd('urpmq --sourcerpm various'), "various: various-1-1.src.rpm\n");
 
     urpmi($name);
-    is(`rpm -qa --root $::pwd/root`, "$name-1-1\n");
+    check_installed_fullnames("$name-1-1");
     urpme($name);
 
     urpmi_removemedia("'$medium_name'");

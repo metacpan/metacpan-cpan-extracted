@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Event;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Scalar::Util qw( weaken );
 
@@ -27,7 +27,9 @@ event. Once constructed, such objects are immutable.
 
 =cut
 
-=head2 $event = Tangence::Meta::Event->new( %args )
+=head2 new
+
+   $event = Tangence::Meta::Event->new( %args )
 
 Returns a new instance initialised by the given arguments.
 
@@ -64,7 +66,9 @@ sub new
 
 =cut
 
-=head2 $class = $event->class
+=head2 class
+
+   $class = $event->class
 
 Returns the class the event is a member of
 
@@ -76,7 +80,9 @@ sub class
    return $self->{class};
 }
 
-=head2 $name = $event->name
+=head2 name
+
+   $name = $event->name
 
 Returns the name of the class
 
@@ -88,7 +94,9 @@ sub name
    return $self->{name};
 }
 
-=head2 @arguments = $event->arguments
+=head2 arguments
+
+   @arguments = $event->arguments
 
 Return the arguments in a list of L<Tangence::Meta::Argument> references.
 
@@ -100,7 +108,9 @@ sub arguments
    return @{ $self->{arguments} };
 }
 
-=head2 @argtypes = $event->argtypes
+=head2 argtypes
+
+   @argtypes = $event->argtypes
 
 Return the argument types in a list of strings.
 
@@ -119,4 +129,3 @@ Paul Evans <leonerd@leonerd.org.uk>
 =cut
 
 0x55AA;
-

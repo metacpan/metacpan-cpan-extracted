@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Tangence::Meta::Struct );
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 

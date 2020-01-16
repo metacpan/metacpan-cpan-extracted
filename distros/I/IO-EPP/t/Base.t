@@ -468,7 +468,7 @@ describe 'IO::EPP::Base::' => sub {
 
         is $answ->{name}, $ns;
 
-        is $answ->{addrs}[0], '11.22.33.44';
+        is $answ->{ips}[0], '11.22.33.44';
     };
 
     it 'host:update' => sub {

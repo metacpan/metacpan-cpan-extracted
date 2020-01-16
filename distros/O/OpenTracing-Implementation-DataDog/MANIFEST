@@ -1,0 +1,20 @@
+CHANGES
+cpanfile
+examples/create_tracer.pl
+examples/lib/MyTracer.pm
+lib/OpenTracing/Implementation/DataDog.pm
+lib/OpenTracing/Implementation/DataDog.pod
+lib/OpenTracing/Implementation/DataDog/Agent.pm
+lib/OpenTracing/Implementation/DataDog/Scope.pm
+lib/OpenTracing/Implementation/DataDog/ScopeManager.pm
+lib/OpenTracing/Implementation/DataDog/Span.pm
+lib/OpenTracing/Implementation/DataDog/SpanContext.pm
+lib/OpenTracing/Implementation/DataDog/Tracer.pm
+lib/OpenTracing/Implementation/DataDog/Utils.pm
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/00_use_ok.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

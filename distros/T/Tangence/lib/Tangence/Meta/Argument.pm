@@ -8,7 +8,7 @@ package Tangence::Meta::Argument;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -27,7 +27,9 @@ immutable.
 
 =cut
 
-=head2 $argument = Tangence::Meta::Argument->new( %args )
+=head2 new
+
+   $argument = Tangence::Meta::Argument->new( %args )
 
 Returns a new instance initialised by the given arguments.
 
@@ -56,7 +58,9 @@ sub new
 
 =cut
 
-=head2 $name = $argument->name
+=head2 name
+
+   $name = $argument->name
 
 Returns the name of the class
 
@@ -68,7 +72,9 @@ sub name
    return $self->{name};
 }
 
-=head2 $type = $argument->type
+=head2 type
+
+   $type = $argument->type
 
 Return the type as a L<Tangence::Meta::Type> reference.
 

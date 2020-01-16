@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/Compile/C14N.pm
 lib/XML/Compile/C14N.pod
 lib/XML/Compile/C14N/Util.pm

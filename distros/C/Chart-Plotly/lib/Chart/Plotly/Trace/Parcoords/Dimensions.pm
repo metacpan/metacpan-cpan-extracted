@@ -3,7 +3,7 @@ use Moose;
 use MooseX::ExtraArgs;
 use Moose::Util::TypeConstraints qw(enum union);
 
-our $VERSION = '0.036';    # VERSION
+our $VERSION = '0.037';    # VERSION
 
 sub TO_JSON {
     my $self       = shift;
@@ -45,7 +45,7 @@ Chart::Plotly::Trace::Parcoords::Dimensions
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

@@ -1,24 +1,29 @@
 ---
-abstract: 'event driven programming'
+abstract: 'Abstraction of event loop'
 author:
-  - 'Mark Overmeer'
+  - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IOMux
 no_index:
   directory:
     - t
     - inc
 requires:
-  IO::Socket: 1.18
-  Log::Report: 0.91
-  Test::More: 0.8
-version: 1.00
+  IO::Socket: '1.18'
+  Log::Report: '0.91'
+  Test::More: '0.8'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-IOMux.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

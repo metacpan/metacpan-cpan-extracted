@@ -39,6 +39,7 @@ Prepare and deploy a schema in memory for testing purposes.
 
 sub prepare_temp_schema {
     my $schema = CPAN::Testers::Schema->connect( 'dbi:SQLite:dbname=:memory:', undef, undef, { ignore_version => 1 } );
+    $schema->storage->dbh->do('PRAGMA foreign_keys = ON');
     $schema->deploy;
     return $schema;
 }

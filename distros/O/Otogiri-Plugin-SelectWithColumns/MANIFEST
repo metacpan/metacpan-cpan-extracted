@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Otogiri/Plugin/SelectWithColumns.pm
+minil.toml
+t/00_compile.t
+t/11_select_with_columns.t
+META.yml
+MANIFEST

@@ -1,36 +1,53 @@
-# Copyrights 2009-2013 by [Mark Overmeer].
+# Copyrights 2009-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-RPC.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::RPC;
 use vars '$VERSION';
-$VERSION = '0.17';
+$VERSION = '0.20';
 
 use base 'XML::Compile::Cache';
 
+use warnings;
+use strict;
+
 use Log::Report 'xml-compile-rpc', syntax => 'SHORT';
+use File::Glob     qw/bsd_glob/;
+use File::Basename qw/dirname/;
 
 
 sub init($)
 {   my ($self, $args) = @_;
 
-    push @{$args->{opts_rw}}, sloppy_floats => 1, sloppy_integers => 1
-      , mixed_elements => 'STRUCTURAL';
+    unshift @{$args->{opts_rw}}
+      , sloppy_floats   => 1    # no need for Big::
+      , sloppy_integers => 1
+      , mixed_elements  => 'STRUCTURAL';
 
-    push @{$args->{opts_readers}}
-      , hooks => [ {type => 'ValueType', replace => \&_rewrite_string}
-                 , {type => 'ISO8601', replace  => \&_reader_rewrite_date} ];
+    unshift @{$args->{opts_readers}}
+      , hooks =>
+         [ {type => 'ValueType', replace => \&_rewrite_string}
+         , {type => 'ISO8601',   replace => \&_reader_rewrite_date}
+         ];
 
-    push @{$args->{opts_writers}}
-      , hook  =>   {type => 'ISO8601', before  => \&_writer_rewrite_date};
+    unshift @{$args->{opts_writers}}
+      , hooks =>
+         [ {type => 'ISO8601', before => \&_writer_rewrite_date}
+         ];
 
     $self->SUPER::init($args);
 
-    (my $xsd = __FILE__) =~ s,\.pm$,/xml-rpc.xsd,;
-    $self->importDefinitions($xsd);
+    $self->addPrefixes
+      ( ex => 'http://ws.apache.org/xmlrpc/namespaces/extensions'
+      );
+
+    (my $xsddir = __FILE__) =~ s/\.pm$//i;
+    my @xsds = bsd_glob "$xsddir/*.xsd";
+    $self->importDefinitions(\@xsds);
 
     # only declared methods are accepted by the Cache
     $self->declare(WRITER => 'methodCall');
@@ -40,7 +57,6 @@ sub init($)
 
 sub _rewrite_string($$$$$)
 {   my ($element, $reader, $path, $type, $replaced) = @_;
-#   panic $element->childNodes;
 
       (grep $_->isa('XML::LibXML::Element'), $element->childNodes)
     ? $replaced->($element)

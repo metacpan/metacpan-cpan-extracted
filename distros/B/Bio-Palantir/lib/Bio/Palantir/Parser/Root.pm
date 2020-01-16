@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Root;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Root::VERSION = '0.193230';
+$Bio::Palantir::Parser::Root::VERSION = '0.200150';
 use Moose;
 use namespace::autoclean;
 
@@ -14,6 +14,7 @@ use aliased 'Bio::Palantir::Parser::Gene';
 use aliased 'Bio::Palantir::Parser::Domain';
 use aliased 'Bio::Palantir::Parser::Motif';
 
+use aliased 'Bio::Palantir::Roles::Modulable::Module';
 
 # private attributes
 has '_root' => (
@@ -186,7 +187,12 @@ sub BUILD {
     }
 
     $self->_set_genes( \@genes );
-
+    
+    my @modules;
+    if ($self->_root->{modulelist}) {
+        @modules = _extract_antismash_modules($self->_root, @genes);
+    }
+    
     my $cluster_rank = 1;
     
     # fix for antismash5: cluster order is not preserved during json2xml conversion
@@ -259,16 +265,45 @@ sub BUILD {
             $gene->_set_rank($gene_rank++);
         }
 
-        push @clusters, Cluster->new( 
-            module_delineation => $self->module_delineation,
-                          rank => $cluster_rank,
-                         _root => $cluster->{'genecluster'},
-                         genes => \@cluster_genes,
-             genomic_dna_begin => $begin,
-               genomic_dna_end => $end,
-            genomic_prot_begin => ceil($begin / 3),
-              genomic_prot_end => floor($end / 3),
-        );
+        # fix antiSMASH 5.1 and its module delineation
+        if ($self->_root->{modulelist}) {     # Add new module feature from version 5.1
+
+            # TODO see how synchronize domain rank in @genes and @modules
+            my @cluster_modules = 
+                sort {$a->genomic_prot_begin <=> $b->genomic_prot_begin } 
+                grep { $_->genomic_dna_begin < $end
+                    && $_->genomic_dna_end > $begin }
+                @modules;
+            ;
+            
+            my $mrank = 1;
+            $_->_set_rank($mrank++) for @cluster_modules;
+            
+            push @clusters, Cluster->new( 
+                module_delineation => $self->module_delineation,
+                              rank => $cluster_rank,
+                             _root => $cluster->{'genecluster'},
+                             genes => \@cluster_genes,
+                 genomic_dna_begin => $begin,
+                   genomic_dna_end => $end,
+                genomic_prot_begin => ceil($begin / 3),
+                genomic_prot_end   => floor($end / 3),
+                modules            => \@cluster_modules,
+            );
+        }
+
+        else { 
+            push @clusters, Cluster->new( 
+                module_delineation => $self->module_delineation,
+                              rank => $cluster_rank,
+                             _root => $cluster->{'genecluster'},
+                             genes => \@cluster_genes,
+                 genomic_dna_begin => $begin,
+                   genomic_dna_end => $end,
+                genomic_prot_begin => ceil($begin / 3),
+                  genomic_prot_end => floor($end / 3),
+            );
+        }
 
         $cluster_rank++;
     }
@@ -279,6 +314,63 @@ sub BUILD {
     $self->_set_clusters( \@clusters );
 
     return;
+}
+
+sub _extract_antismash_modules { 
+
+    my ($root, @report_genes) = @_;
+
+    my @report_modules;
+    for my $module ( @{ forcearray $root->{'modulelist'}{'module'} }) {
+
+        next
+            if $module->{complete}{value} eq 'false';
+
+        my @mgenes
+            = grep { $module->{prot_start}{value} < $_->genomic_prot_end
+                  && $module->{prot_end}{value}  >  $_->genomic_prot_begin }
+              sort { $a->genomic_prot_begin <=> $b->genomic_prot_end }
+            @report_genes
+        ;
+
+        my $gene_ids = [map { $_->uui } @mgenes];  # ArrayRef Module attribute
+        
+        my $mdomains;
+        for my $gene (@mgenes) { 
+
+            push @{ $mdomains }, 
+                sort { $a->begin <=> $b->begin }
+                grep { ($_->begin + $gene->genomic_prot_begin - 1)  # -1 for beginning domain pos 1 in gene pos 1
+                        < $module->{prot_end}{value}
+                    && ($_->end + $gene->genomic_prot_begin - 1)
+                        > $module->{prot_start}{value} }
+                $gene->all_domains
+            ;
+        }
+
+        my $module_sequence = join '', map { $_->protein_sequence }
+            @{ $mdomains };
+#             my $module_sequence = substr(
+#                 $module->{prot_begin} - 1,
+#                 $module->{prot_end} - $module->{prot_begin} + 1,
+#                 $mgene->protein_sequence
+#             );
+#
+        push @report_modules, Module->new(
+            rank => $module->{id}{value},
+            genomic_prot_begin => $module->{prot_start}{value},
+            genomic_prot_end   => $module->{prot_end}{value},
+            genomic_prot_coordinates => [
+                $module->{prot_start}{value},
+                $module->{prot_end}{value},
+            ],
+            protein_sequence => $module_sequence,
+            gene_uuis => $gene_ids,
+            domains => $mdomains,
+        );
+    }
+
+    return(@report_modules);
 }
 
 
@@ -295,7 +387,7 @@ Bio::Palantir::Parser::Root - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 

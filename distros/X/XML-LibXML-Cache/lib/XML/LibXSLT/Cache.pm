@@ -1,8 +1,7 @@
 package XML::LibXSLT::Cache;
-{
-  $XML::LibXSLT::Cache::VERSION = '0.12';
-}
+$XML::LibXSLT::Cache::VERSION = '0.14';
 use strict;
+use warnings;
 
 # ABSTRACT: Style sheet cache for XML::LibXSLT
 
@@ -40,9 +39,11 @@ sub parse_stylesheet_file {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -50,7 +51,7 @@ XML::LibXSLT::Cache - Style sheet cache for XML::LibXSLT
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -100,14 +101,9 @@ Nick Wellnhofer <wellnhofer@aevum.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Nick Wellnhofer.
+This software is copyright (c) 2020 by Nick Wellnhofer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-
-

@@ -3,10 +3,9 @@ abstract: 'wrapper for the hspell (= Hebrew speller) library'
 author:
   - 'Shlomi Fish <shlomif@cpan.org>'
 build_requires:
-  Module::Build: '0.28'
   Test::More: '0.88'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -17,16 +16,18 @@ name: Text-Hspell
 provides:
   Text::Hspell:
     file: lib/Text/Hspell.pm
-    version: v0.0.2
+    version: v0.2.1
 requires:
-  Inline: '0'
+  DynaLoader: '0'
+  Encode: '0'
   strict: '0'
+  vars: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/shlomif/Text-Hspell/issues
   homepage: http://metacpan.org/release/Text-Hspell
   repository: git://github.com/shlomif/Text-Hspell.git
-version: 0.0.2
+version: 0.2.1
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -127,20 +128,13 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuild
-      config:
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
-      name: '@Filter/ModuleBuild'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PkgVersion
@@ -275,7 +269,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'
@@ -302,6 +296,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker::Awesome
+      config:
+        Dist::Zilla::Plugin::MakeMaker:
+          make_path: make
+          version: '6.012'
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+          version: '6.012'
+      name: MakeMaker::Awesome
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: Test::TidyAll

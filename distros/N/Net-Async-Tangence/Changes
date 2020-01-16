@@ -1,5 +1,12 @@
 Revision history for Net-Async-Tangence
 
+0.15    2020-01-14
+        [CHANGES]
+         * More unit testing of connection methods
+         * Updated for Tangence 0.25
+         * Added server override hooks for per-connection registry permission
+           and rootobj
+
 0.14    2017/01/08 00:38:11
         [BUGFIXES]
          * Enable arrayification of Struct::Dumb instances while Devel::Cycle

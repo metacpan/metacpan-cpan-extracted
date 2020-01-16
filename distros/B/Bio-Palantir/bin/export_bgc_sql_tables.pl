@@ -5,6 +5,7 @@
 
 use Modern::Perl '2011';
 use autodie;
+use Smart::Comments;
 
 use Carp;
 use Const::Fast;
@@ -746,7 +747,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 NAME
 

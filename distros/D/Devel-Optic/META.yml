@@ -3,6 +3,7 @@ abstract: 'Production safe data inspector'
 author:
   - 'Ben Tyler <btyler@cpan.org>'
 build_requires:
+  Test2::Plugin::NoWarnings: '0.08'
   Test2::V0: '0.000100'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -16,19 +17,19 @@ name: Devel-Optic
 provides:
   Devel::Optic:
     file: lib/Devel/Optic.pm
-    version: '0.014'
+    version: '0.015'
   Devel::Optic::Lens::Perlish:
     file: lib/Devel/Optic/Lens/Perlish.pm
-    version: '0.014'
+    version: '0.015'
   Devel::Optic::Lens::Perlish::Constants:
     file: lib/Devel/Optic/Lens/Perlish/Constants.pm
-    version: '0.014'
+    version: '0.015'
   Devel::Optic::Lens::Perlish::Interpreter:
     file: lib/Devel/Optic/Lens/Perlish/Interpreter.pm
-    version: '0.014'
+    version: '0.015'
   Devel::Optic::Lens::Perlish::Parser:
     file: lib/Devel/Optic/Lens/Perlish/Parser.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   PadWalker: '2.3'
   Ref::Util: '0.204'
@@ -39,6 +40,6 @@ resources:
   bugtracker: https://github.com/kanatohodets/Devel-Optic/issues
   homepage: https://github.com/kanatohodets/Devel-Optic
   repository: https://github.com/kanatohodets/Devel-Optic.git
-version: '0.014'
+version: '0.015'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

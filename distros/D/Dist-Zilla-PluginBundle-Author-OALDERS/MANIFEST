@@ -11,6 +11,7 @@ Makefile.PL
 README.md
 cpanfile
 dist.ini
+lib/Dist/Zilla/Plugin/OALDERS/TidyAll.pm
 lib/Dist/Zilla/PluginBundle/Author/OALDERS.pm
 perlcriticrc
 perltidyrc

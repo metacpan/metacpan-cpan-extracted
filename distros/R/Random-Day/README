@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Random::Day;
+
      my $obj = Random::Day->new(%params);
      my $dt = $obj->get;
      my $dt = $obj->random;
@@ -14,77 +15,96 @@ SYNOPSIS
      my $dt = $obj->random_year($year);
 
 METHODS
-    "new(%params)"
-            Constructor.
+  "new"
+     my $obj = Random::Day->new(%params);
 
-            *       "day"
+    Constructor.
 
-                    Day.
+    *       "day"
 
-                    Default value is undef.
+            Day.
 
-            *       "dt_from"
+            Default value is undef.
 
-                    DateTime object from.
+    *       "dt_from"
 
-                    Default value is DateTime object for 1900 year.
+            DateTime object from.
 
-            *       "dt_to"
+            Default value is DateTime object for 1900 year.
 
-                    DateTime object to.
+    *       "dt_to"
 
-                    Default value is DateTime object for 2050 year.
+            DateTime object to.
 
-            *       "month"
+            Default value is DateTime object for 2050 year.
 
-                    Month.
+    *       "month"
 
-                    Default value is undef.
+            Month.
 
-            *       "year"
+            Default value is undef.
 
-                    Year.
+    *       "year"
 
-                    Default value is undef.
+            Year.
 
-    "get()" Get random date defined by constructor parameters.
+            Default value is undef.
 
-            Returns DateTime object for date.
+  "get"
+     my $dt = $obj->get;
 
-    "random()"
-            Get random date.
+    Get random date defined by constructor parameters.
 
-            Returns DateTime object for date.
+    Returns DateTime object for date.
 
-    "random_day($day)"
-            Get random date defined by day.
+  "random"
+     my $dt = $obj->random;
 
-            Returns DateTime object for date.
+    Get random date.
 
-    "random_day_month($day, $month)"
-            Get random date defined by day and month.
+    Returns DateTime object for date.
 
-            Returns DateTime object for date.
+  "random_day"
+     my $dt = $obj->random_day($day);
 
-    "random_day_month_year($day, $month, $year)"
-            Get date defined by day, month and year.
+    Get random date defined by day.
 
-            Returns DateTime object for date.
+    Returns DateTime object for date.
 
-    "random_month($month)"
-            Get random date defined by month.
+  "random_day_month"
+     my $dt = $obj->random_day_month($day, $month);
 
-            Returns DateTime object for date.
+    Get random date defined by day and month.
 
-    "random_month_year($month, $year)"
-            Get random date defined by month and year.
+    Returns DateTime object for date.
 
-            Returns DateTime object for date.
+  "random_day_month_year"
+     my $dt = $obj->random_day_month_year($day, $month, $year);
 
-    "random_year($year)"
-            Get random date defined by year.
+    Get date defined by day, month and year.
 
-            Returns DateTime object for date.
+    Returns DateTime object for date.
+
+  "random_month"
+     my $dt = $obj->random_month($month);
+
+    Get random date defined by month.
+
+    Returns DateTime object for date.
+
+  "random_month_year"
+     my $dt = $obj->random_month_year($month, $year);
+
+    Get random date defined by month and year.
+
+    Returns DateTime object for date.
+
+  "random_year"
+     my $dt = $obj->random_year($year);
+
+    Get random date defined by year.
+
+    Returns DateTime object for date.
 
 ERRORS
      new():
@@ -141,7 +161,7 @@ SEE ALSO
         Perl module to generate random data
 
 REPOSITORY
-    <https://github.com/tupinek/Random-Day>
+    <https://github.com/michal-josef-spacek/Random-Day>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -149,10 +169,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2013-2018
+    © Michal Josef Špaček 2013-2020
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

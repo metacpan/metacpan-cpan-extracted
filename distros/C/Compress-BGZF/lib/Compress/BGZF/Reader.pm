@@ -299,7 +299,7 @@ sub getline {
 
     my ($self) = @_;
 
-    my $data;
+    my $data = '';
 
     while (1) {
 
@@ -634,9 +634,9 @@ Compress::BGZF::Reader - Performs blocked GZIP (BGZF) decompression
 =head1 DESCRIPTION
 
 C<Compress::BGZF::Reader> is a module implementing random access to the BGZIP file
-format.  While it can do sequential/streaming reads, there is really no point
+format. While it can do sequential/streaming reads, there is really no point
 in using it for this purpose over standard GZIP tools/libraries, since BGZIP
-is GZIP-compatible. The
+is GZIP-compatible.
 
 There are two main modes of construction - as an object (using C<new()>) and
 as a filehandle glob (using C<new_filehandle>). The filehandle mode is

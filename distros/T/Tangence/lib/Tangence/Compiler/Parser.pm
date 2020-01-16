@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Compiler::Parser;
 
@@ -12,7 +12,7 @@ use base qw( Parser::MGC );
 use feature qw( switch ); # we like given/when
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use File::Basename qw( dirname );
 
@@ -391,7 +391,9 @@ in the syntax tree.
 
 =cut
 
-=head2 $class = $parser->make_class( name => $name )
+=head2 make_class
+
+   $class = $parser->make_class( name => $name )
 
 Return a new instance of L<Tangence::Meta::Class> to go in a package. The
 parser will call C<define> on it.
@@ -405,7 +407,9 @@ sub make_class
    return Tangence::Meta::Class->new( @_ );
 }
 
-=head2 $struct = $parser->make_struct( name => $name )
+=head2 make_struct
+
+   $struct = $parser->make_struct( name => $name )
 
 Return a new instance of L<Tangence::Meta::Struct> to go in a package. The
 parser will call C<define> on it.
@@ -419,11 +423,17 @@ sub make_struct
    return Tangence::Meta::Struct->new( @_ );
 }
 
-=head2 $method = $parser->make_method( %args )
+=head2 make_method
 
-=head2 $event = $parser->make_event( %args )
+   $method = $parser->make_method( %args )
 
-=head2 $property = $parser->make_property( %args )
+=head2 make_event
+
+   $event = $parser->make_event( %args )
+
+=head2 make_property
+
+   $property = $parser->make_property( %args )
 
 Return a new instance of L<Tangence::Meta::Method>, L<Tangence::Meta::Event>
 or L<Tangence::Meta::Property> to go in a class.
@@ -451,7 +461,9 @@ sub make_property
    return Tangence::Meta::Property->new( @_ );
 }
 
-=head2 $argument = $parser->make_argument( %args )
+=head2 make_argument
+
+   $argument = $parser->make_argument( %args )
 
 Return a new instance of L<Tangence::Meta::Argument> to use for a method
 or event argument.
@@ -465,7 +477,9 @@ sub make_argument
    return Tangence::Meta::Argument->new( @_ );
 }
 
-=head2 $field = $parser->make_field( %args )
+=head2 make_field
+
+   $field = $parser->make_field( %args )
 
 Return a new instance of L<Tangence::Meta::Field> to use for a structure type.
 
@@ -478,9 +492,11 @@ sub make_field
    return Tangence::Meta::Field->new( @_ );
 }
 
-=head2 $type = $parser->make_type( $primitive_name )
+=head2 make_type
 
-=head2 $type = $parser->make_type( $aggregate_name => $member_type )
+   $type = $parser->make_type( $primitive_name )
+
+   $type = $parser->make_type( $aggregate_name => $member_type )
 
 Return an instance of L<Tangence::Meta::Type> representing the given
 primitive or aggregate type name. An implementation is allowed to use

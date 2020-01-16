@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable;
 # ABSTRACT: Modulable Moose role for Module object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.193230';
+$Bio::Palantir::Roles::Modulable::VERSION = '0.200150';
 use Moose::Role;
 
 use autodie;
@@ -15,9 +15,10 @@ has 'modules' => (
     traits   => ['Array'],
     is       => 'ro',
     isa      => 'ArrayRef[Bio::Palantir::Roles::Modulable::Module]',
-    init_arg => undef,
-    lazy => 1,
-    builder   => '_build_modules',
+#     init_arg => undef,    # due to antiSMASH 5.1's new Module delineation method
+    lazy     => 1,
+#     builder  => '_build_modules', # error from perlcritic, likely due to parallel way to fill modules "Private subroutine/method '_build_modules' declared but not used at line 35, column 1.  Eliminate dead code.  (Severity: 3)"
+    default  => \&_build_modules, 
     handles  => {
          count_modules => 'count',
            all_modules => 'elements',
@@ -32,10 +33,7 @@ has 'cutting_mode' => (
     writer   => '_set_cutting_mode',
 );
 
-
-## no critic (ProhibitUnusedPrivateSubroutines)
-
-sub _build_modules {
+sub _build_modules { 
     my $self = shift;
  
     # process other cluster types
@@ -83,9 +81,9 @@ sub _build_modules {
                       - $genes[ $module_for{$module_n}{start} ]->rank) > 1)                
                 # avoid auxilliary domains in modules, for instance: if C-A-PCP-TE | AT | A | ACL | ECH assign a different module for last domains
                 || (@domains == 1
-                    && $domains[$i]->symbol !~ m/^A$ | ^AT | ^C$ | ^KS | ^PCP$ 
-                |      ^ACP$ | KR | DH | ER | cyc | ^TE$ | ^Red$ | ^NAD 
-                |       NRPS-COM/xms)
+                    && $domains[$i]->symbol !~ m/^A$ | ^AT | ^C$ | ^KS
+                        | ^PCP$ | ^ACP$ | KR | DH | ER | cyc | ^TE$ | ^Red$
+                        | ^NAD | NRPS-COM/xms)
                 ) {
                     $module_n++;
                     $module_for{$module_n}{start} = $gene_n;
@@ -145,7 +143,8 @@ sub _build_modules {
 
         my $module = Module->new( 
                            rank      => $module_n,
-                         domains     => $module_for{$module_n}{domains} // [],
+                         domains     => $module_for{$module_n}{domains}
+                                        // [],
                       gene_uuis      => \@gene_uuis, 
                   genomic_prot_begin => $genomic_prot_begin,
                     genomic_prot_end => $genomic_prot_end,
@@ -160,9 +159,6 @@ sub _build_modules {
     return \@modules;
 }
 
-## use critic
-
-
 no Moose::Role;
 1;
 
@@ -176,7 +172,7 @@ Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object constru
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tangence::Server;
 
@@ -10,11 +10,12 @@ use warnings;
 
 use base qw( Tangence::Stream );
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 
 use Scalar::Util qw( weaken );
+use Sub::Util 1.40 qw( set_subname );
 
 use Tangence::Constants;
 use Tangence::Types;
@@ -23,18 +24,8 @@ use Tangence::Server::Context;
 use Struct::Dumb;
 struct CursorObject => [qw( cursor obj )];
 
-# We will accept any version back to 2
-use constant VERSION_MINOR_MIN => 2;
-
-BEGIN {
-   if( eval { require Sub::Name } ) {
-      Sub::Name->import(qw( subname ));
-   }
-   else {
-      # Emulate it by just returning the CODEref and ignoring setting the name
-      *subname = sub { $_[1] };
-   }
-}
+# We will accept any version back to 3
+use constant VERSION_MINOR_MIN => 3;
 
 =head1 NAME
 
@@ -100,9 +91,11 @@ The following methods are provided by this mixin.
 sub subscriptions { shift->{subscriptions} ||= [] }
 sub watches       { shift->{watches} ||= [] }
 
-=head2 $server->registry( $registry )
+=head2 registry
 
-=head2 $registry = $server->registry
+   $server->registry( $registry )
+
+   $registry = $server->registry
 
 Accessor to set or obtain the L<Tangence::Registry> object for the server.
 
@@ -150,22 +143,31 @@ sub get_by_id
    my $self = shift;
    my ( $id ) = @_;
 
-   return $self->registry->get_by_id( $id );
+   # Only permit the client to interact with objects they've already been
+   # sent, so they cannot gain access by inventing object IDs
+   $self->peer_hasobj->{$id} or
+      die "Access not allowed to object with id $id\n";
+
+   my $obj = $self->registry->get_by_id( $id ) or
+      die "No such object with id $id\n";
+
+   return $obj;
 }
 
 sub handle_request_CALL
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
 
-   my $response = eval { $object->handle_request_CALL( $ctx, $message ) };
+      my $object = $self->get_by_id( $objid );
+
+      $object->handle_request_CALL( $ctx, $message )
+   };
    $@ and return $ctx->responderr( $@ );
 
    $ctx->respond( $response );
@@ -175,76 +177,85 @@ sub handle_request_SUBSCRIBE
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
-   my $event = $message->unpack_str();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
+      my $event = $message->unpack_str();
 
-   weaken( my $weakself = $self );
+      my $object = $self->get_by_id( $objid );
 
-   my $id = $object->subscribe_event( $event,
-      subname "__SUBSCRIBE($event)__" => sub {
-         $weakself or return;
-         my $object = shift;
+      weaken( my $weakself = $self );
 
-         my $message = $object->generate_message_EVENT( $weakself, $event, @_ );
-         $weakself->request(
-            request     => $message,
-            on_response => sub { "IGNORE" },
-         );
-      }
-   );
+      my $id = $object->subscribe_event( $event,
+         set_subname "__SUBSCRIBE($event)__" => sub {
+            $weakself or return;
+            my $object = shift;
 
-   push @{ $self->subscriptions }, [ $object, $event, $id ];
+            my $message = $object->generate_message_EVENT( $weakself, $event, @_ );
+            $weakself->request(
+               request     => $message,
+               on_response => sub { "IGNORE" },
+            );
+         }
+      );
 
-   $ctx->respond( Tangence::Message->new( $self, MSG_SUBSCRIBED ) );
+      push @{ $self->subscriptions }, [ $object, $event, $id ];
+
+      Tangence::Message->new( $self, MSG_SUBSCRIBED )
+   };
+   $@ and return $ctx->responderr( $@ );
+
+   $ctx->respond( $response );
 }
 
 sub handle_request_UNSUBSCRIBE
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
-   my $event = $message->unpack_str();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
+      my $event = $message->unpack_str();
 
-   my $edef = $object->can_event( $event ) or
-      return $ctx->responderr( "Object cannot respond to event $event" );
+      my $object = $self->get_by_id( $objid );
 
-   # Delete from subscriptions and obtain id
-   my $id;
-   @{ $self->subscriptions } = grep { $_->[0] == $object and $_->[1] eq $event and ( $id = $_->[2], 0 ) or 1 }
-                                 @{ $self->subscriptions };
-   defined $id or
-      return $ctx->responderr( "Not subscribed to $event" );
+      my $edef = $object->can_event( $event ) or
+         die "Object cannot respond to event $event\n";
 
-   $object->unsubscribe_event( $event, $id );
+      # Delete from subscriptions and obtain id
+      my $id;
+      @{ $self->subscriptions } = grep { $_->[0] == $object and $_->[1] eq $event and ( $id = $_->[2], 0 ) or 1 }
+                                     @{ $self->subscriptions };
+      defined $id or
+         die "Not subscribed to $event\n";
 
-   $ctx->respond( Tangence::Message->new( $self, MSG_OK ) );
+      $object->unsubscribe_event( $event, $id );
+
+      Tangence::Message->new( $self, MSG_OK )
+   };
+   $@ and return $ctx->responderr( $@ );
+
+   $ctx->respond( $response );
 }
 
 sub handle_request_GETPROP
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
 
-   my $response = eval { $object->handle_request_GETPROP( $ctx, $message ) };
+      my $object = $self->get_by_id( $objid );
+
+      $object->handle_request_GETPROP( $ctx, $message )
+   };
    $@ and return $ctx->responderr( $@ );
 
    $ctx->respond( $response );
@@ -255,14 +266,15 @@ sub handle_request_GETPROPELEM
    my $self = shift;
    my ( $token, $message ) = @_;
 
-   my $objid = $message->unpack_int();
-
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
 
-   my $response = eval { $object->handle_request_GETPROPELEM( $ctx, $message ) };
+      my $object = $self->get_by_id( $objid );
+
+      $object->handle_request_GETPROPELEM( $ctx, $message )
+   };
    $@ and return $ctx->responderr( $@ );
 
    $ctx->respond( $response );
@@ -272,15 +284,16 @@ sub handle_request_SETPROP
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
 
-   my $response = eval { $object->handle_request_SETPROP( $ctx, $message ) };
+      my $object = $self->get_by_id( $objid );
+
+      $object->handle_request_SETPROP( $ctx, $message )
+   };
    $@ and return $ctx->responderr( $@ );
 
    $ctx->respond( $response );
@@ -292,43 +305,46 @@ sub _handle_request_WATCHany
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
-   my $prop  = $message->unpack_str();
-   my $want_initial;
-   my $from;
-   if( $message->code == MSG_WATCH ) {
-      $want_initial = $message->unpack_bool();
-   }
-   elsif( $message->code == MSG_WATCH_CUSR ) {
-      $from = $message->unpack_int();
-   }
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my ( $want_initial, $object, $prop );
 
-   my $pdef = $object->can_property( $prop ) or
-      return $ctx->responderr( "Object does not have property $prop" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
+      $prop     = $message->unpack_str();
 
-   $self->_install_watch( $object, $prop );
+      $object = $self->get_by_id( $objid );
 
-   if( $message->code == MSG_WATCH ) {
-      $ctx->respond( Tangence::Message->new( $self, MSG_WATCHING ) );
-      $self->_send_initial( $object, $prop ) if $want_initial;
-   }
-   elsif( $message->code == MSG_WATCH_CUSR ) {
-      my $m = "cursor_prop_$prop";
-      my $cursor = $object->$m( $from );
-      my $id = $self->message_state->{next_cursorid}++;
-      $self->peer_hascursor->{$id} = CursorObject( $cursor, $object );
-      $ctx->respond( Tangence::Message->new( $self, MSG_WATCHING_CUSR )
-         ->pack_int( $id )
-         ->pack_int( 0 ) # first index
-         ->pack_int( $#{ $object->${\"get_prop_$prop"} } ) # last index
-      );
-   }
+      my $pdef = $object->can_property( $prop ) or
+         die "Object does not have property $prop\n";
+
+      $self->_install_watch( $object, $prop );
+
+      if( $message->code == MSG_WATCH ) {
+         $want_initial = $message->unpack_bool();
+
+         Tangence::Message->new( $self, MSG_WATCHING )
+      }
+      elsif( $message->code == MSG_WATCH_CUSR ) {
+         my $from = $message->unpack_int();
+
+         my $m = "cursor_prop_$prop";
+         my $cursor = $object->$m( $from );
+         my $id = $self->message_state->{next_cursorid}++;
+
+         $self->peer_hascursor->{$id} = CursorObject( $cursor, $object );
+         Tangence::Message->new( $self, MSG_WATCHING_CUSR )
+            ->pack_int( $id )
+            ->pack_int( 0 ) # first index
+            ->pack_int( $#{ $object->${\"get_prop_$prop"} } ) # last index
+      }
+   };
+   $@ and return $ctx->responderr( $@ );
+
+   $ctx->respond( $response );
+
+   $self->_send_initial( $object, $prop ) if $want_initial;
 }
 
 sub _send_initial
@@ -354,28 +370,32 @@ sub handle_request_UNWATCH
 {
    my $self = shift;
    my ( $token, $message ) = @_;
-   
-   my $objid = $message->unpack_int();
-   my $prop  = $message->unpack_str();
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $object = $self->registry->get_by_id( $objid ) or
-      return $ctx->responderr( "No such object with id $objid" );
+   my $response = eval {
+      my $objid = $message->unpack_int();
+      my $prop  = $message->unpack_str();
 
-   my $pdef = $object->can_property( $prop ) or
-      return $ctx->responderr( "Object does not have property $prop" );
+      my $object = $self->get_by_id( $objid );
 
-   # Delete from watches and obtain id
-   my $id;
-   @{ $self->watches } = grep { $_->[0] == $object and $_->[1] eq $prop and ( $id = $_->[2], 0 ) or 1 }
-                         @{ $self->watches };
-   defined $id or
-      return $ctx->responderr( "Not watching $prop" );
+      my $pdef = $object->can_property( $prop ) or
+         die "Object does not have property $prop\n";
 
-   $object->unwatch_property( $prop, $id );
+      # Delete from watches and obtain id
+      my $id;
+      @{ $self->watches } = grep { $_->[0] == $object and $_->[1] eq $prop and ( $id = $_->[2], 0 ) or 1 }
+                            @{ $self->watches };
+      defined $id or
+         die "Not watching $prop\n";
 
-   $ctx->respond( Tangence::Message->new( $self, MSG_OK ) );
+      $object->unwatch_property( $prop, $id );
+
+      Tangence::Message->new( $self, MSG_OK );
+   };
+   $@ and return $ctx->responderr( $@ );
+
+   $ctx->respond( $response );
 }
 
 sub handle_request_CUSR_NEXT
@@ -461,9 +481,9 @@ sub handle_request_GETROOT
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
 
-   my $root = $self->registry->get_by_id( 1 );
-
    $self->identity( $identity );
+
+   my $root = $self->rootobj( $identity );
 
    my $response = Tangence::Message->new( $self, MSG_RESULT );
    TYPE_OBJ->pack_value( $response, $root );
@@ -477,6 +497,9 @@ sub handle_request_GETREGISTRY
    my ( $token ) = @_;
 
    my $ctx = Tangence::Server::Context->new( $self, $token );
+
+   $self->permit_registry or
+      return $ctx->responderr( "This client is not permitted access to the registry" );
 
    my $response = Tangence::Message->new( $self, MSG_RESULT );
    TYPE_OBJ->pack_value( $response, $self->registry );
@@ -507,7 +530,7 @@ sub _install_watch
    my %callbacks;
    foreach my $name ( @{ CHANGETYPES->{$dim} } ) {
       my $how = $change_values{$name};
-      $callbacks{$name} = subname "__WATCH($prop:$name)__" => sub {
+      $callbacks{$name} = set_subname "__WATCH($prop:$name)__" => sub {
          $weakself or return;
          my $object = shift;
 
@@ -561,6 +584,50 @@ sub object_destroyed
 
    $self->SUPER::object_destroyed( @_ );
 }
+
+=head1 OVERRIDEABLE METHODS
+
+The following methods are provided but intended to be overridden if the
+implementing class wishes to provide different behaviour from the default.
+
+=cut
+
+=head2 rootobj
+
+   $rootobj = $server->rootobj( $identity )
+
+Invoked when a C<GETROOT> message is received from the client, this method
+should return a L<Tangence::Object> as root object for the connection.
+
+The default implementation will return the object with ID 1; i.e. the first
+object created in the registry.
+
+=cut
+
+sub rootobj
+{
+   my $self = shift;
+
+   return $self->registry->get_by_id( 1 );
+}
+
+=head2 permit_registry
+
+   $allow = $server->permit_registry
+
+Invoked when a C<GETREGISTRY> message is received from the client, this method
+should return a boolean to indicate whether the client is allowed to access
+the object registry.
+
+The default implementation always permits this, but an overridden method may
+decide to disallow it in some situations. When disabled, a client will not be
+able to gain access to any serverside objects other than the root object, and
+(recursively) any other objects returned by methods, events or properties on
+objects already known. This can be used as a security mechanism.
+
+=cut
+
+sub permit_registry { 1; }
 
 =head1 AUTHOR
 

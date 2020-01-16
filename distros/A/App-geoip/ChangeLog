@@ -1,0 +1,36 @@
+0.10	- 2020-01-16, H.Merijn Brand
+    * Support download using Maxmind license key
+    * Prepare for CPAN
+
+0.09	- 2019-08-12, H.Merijn Brand
+    * Support whois (-w / --whois)
+    * Support JSON (-j / --json, -J --json-pretty)
+    * Support fixed local location (-l / --local)
+    * Support alternate database (-D / --DB)
+    * Full manual
+    * Support configuration file(s)
+
+0.07	- 2019-03-09, H.Merijn Brand
+    * Use Data::Peek for diagnoses or Data::Dumper if not installed
+    * Use alternatives to determine own location
+
+0.06	- 2019-04-11, H.Merijn Brand
+    * Add -s/--short
+    * Use GIS::Distance if available
+    * Add alternative geolocation url
+
+0.05	- 2019-01-31, H.Merijn Brand
+    * Add ChangeLog
+    * Add --dist option
+    * Add support for SQLite
+
+0.04	- 2018-11-26, H.Merijn Brand
+    * Initial release to github
+    * README updates
+    * Progress on DB loading
+    * Error handling on bad queries
+    * Off-line use (no DNS)
+    * Usage
+    * Add --fetch and --no-update
+    * Add OpenStreetMap URL
+    * No warnings on first fetch

@@ -1,5 +1,10 @@
 Revision history for perl module Image::PNG
 
+0.24 2020-01-14
+
+* Add interlacing_method method
+* Correct documentation
+
 0.23 2016-12-11
 
 * Fix bug of crash on reading non-existent file name

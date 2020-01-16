@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: Schema for CPANTesters database processed from test reports
 
 #pod =head1 SYNOPSIS
@@ -140,15 +140,26 @@ sub ordered_schema_versions( $self ) {
 
 sub populate_from_api( $self, $search, @tables ) {
     my $ua = $self->{_ua} ||= Mojo::UserAgent->new;
+    $ua->inactivity_timeout( 120 );
     my $base_url = $self->{_url} ||= 'http://api.cpantesters.org/v3';
     my $dtf = DateTime::Format::ISO8601->new();
 
     # Establish dependencies
-    my %tables = map {; $_ => 1 } @tables;
     my @order = qw( upload summary release report );
+    my $match_tables = join '|', @order;
+    if ( my @unknown = grep { !/^(?:$match_tables)$/ } @tables ) {
+        die 'Unknown table(s): ', join ', ', @unknown;
+    }
+
+    my %tables = map {; $_ => 1 } @tables;
     # release depends on data in uploads and summary
     if ( $tables{ release } ) {
         @tables{qw( upload summary )} = ( 1, 1 );
+    }
+    # In order to link the report from the dist via the API, we need
+    # to get the summaries first
+    if ( $tables{ report } ) {
+        @tables{qw( summary )} = ( 1 );
     }
     # summary depends on data in uploads
     if ( $tables{ summary } ) {
@@ -170,12 +181,15 @@ sub populate_from_api( $self, $search, @tables ) {
                 $url .= '/author/' . $search->{author};
             }
             my $tx = $ua->get( $url );
+            if ( my $err = $tx->error ) {
+                die sprintf q{Error fetching table '%s': (%s) %s}, $table, $err->{code} // 'XXX', $err->{message};
+            }
             my @rows = map {
                 $_->{released} = $dtf->parse_datetime( $_->{released} )->epoch;
                 $_->{type} = 'cpan';
                 $_;
             } $tx->res->json->@*;
-            $self->resultset( 'Upload' )->populate( \@rows );
+            $self->resultset( 'Upload' )->update_or_create( $_ ) for @rows;
         }
 
         if ( $table eq 'summary' ) {
@@ -187,6 +201,9 @@ sub populate_from_api( $self, $search, @tables ) {
                 }
             }
             my $tx = $ua->get( $url );
+            if ( my $err = $tx->error ) {
+                die sprintf q{Error fetching table '%s': (%s) %s}, $table, $err->{code} // 'XXX', $err->{message};
+            }
             my @rows = map {
                 my $dt = $dtf->parse_datetime( delete $_->{date} );
                 $_->{postdate} = $dt->strftime( '%Y%m' );
@@ -201,7 +218,12 @@ sub populate_from_api( $self, $search, @tables ) {
             } $tx->res->json->@*;
             # ; use Data::Dumper;
             # ; say "Populate summary: " . Dumper \@rows;
-            $self->resultset( 'Stats' )->populate( \@rows );
+            for my $perl ( uniq map { $_->{perl} } @rows ) {
+                $self->resultset( 'PerlVersion' )->find_or_create({
+                    version => $perl,
+                });
+            }
+            $self->resultset( 'Stats' )->update_or_create( $_, { key => 'guid' } ) for @rows;
         }
 
         if ( $table eq 'release' ) {
@@ -216,6 +238,10 @@ sub populate_from_api( $self, $search, @tables ) {
                 $url .= '/author/' . $search->{author};
             }
             my $tx = $ua->get( $url );
+            if ( my $err = $tx->error ) {
+                die sprintf q{Error fetching table '%s': (%s) %s}, $table, $err->{code} // 'XXX', $err->{message};
+            }
+            my @results = $search->{version} ? ( $tx->res->json ) : $tx->res->json->@*;
             my @rows = map {
                 delete $_->{author}; # Author is from Upload
                 my $stats_rs = $self->resultset( 'Stats' )
@@ -232,10 +258,48 @@ sub populate_from_api( $self, $search, @tables ) {
                 $_->{perlmat} = 1;
                 $_->{patched} = 1;
                 $_;
-            } $tx->res->json->@*;
+            } @results;
             # ; use Data::Dumper;
             # ; say "Populate release: " . Dumper \@rows;
-            $self->resultset( 'Release' )->populate( \@rows );
+            $self->resultset( 'Release' )->update_or_create( $_ ) for @rows;
+        }
+
+        if ( $table eq 'report' ) {
+            $url .= '/report';
+
+            # There is no direct API to get reports by dist/version, BUT
+            # we already have summaries loaded in the database so we can
+            # get the GUIDs out of there.
+            Mojo::Promise->map(
+                { concurrency => 8 },
+                sub( $summary ) {
+                    my $report_url = join '/', $url, $summary->guid;
+                    #; say "Getting report $report_url";
+                    return $ua->get_p( $report_url )->then(
+                        # Success
+                        sub {
+                            my ( $tx ) = @_;
+                            if ( my $err = $tx->error ) {
+                                die sprintf q{Error fetching table '%s': (%s) %s}, $table, $err->{code} // 'XXX', $err->{message};
+                            }
+                            my $report = $tx->res->json;
+                            #; say "Writing $report->{id}";
+                            $self->resultset( 'TestReport' )->update_or_create({
+                                id => $report->{id},
+                                report => $report,
+                            });
+                        },
+                        # Failure
+                        sub {
+                            warn 'Problem fetching report: ' . join ' ', @_;
+                        },
+                    );
+                },
+                $self->resultset( 'Stats' )->search( $search )->all,
+            )->then(
+                undef,
+                sub { warn 'Problem fetching reports: ' . join ' ', @_ },
+            )->wait;
         }
     }
 }
@@ -252,7 +316,7 @@ CPAN::Testers::Schema - Schema for CPANTesters database processed from test repo
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 

@@ -20,9 +20,9 @@ no_index:
 provides:
   overload::open:
     file: lib/overload/open.pm
-    version: v1.2.0
+    version: v1.8.0
 requires: {}
 resources:
   repository: https://github.com/samcv/perl-overload-open.git
-version: v1.02.0
+version: v1.8.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

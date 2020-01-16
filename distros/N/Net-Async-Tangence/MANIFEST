@@ -4,6 +4,8 @@ Build.PL
 Changes
 lib/Net/Async/Tangence.pm
 lib/Net/Async/Tangence/Client.pm
+lib/Net/Async/Tangence/Client/via/sshexec.pm
+lib/Net/Async/Tangence/Client/via/sshunix.pm
 lib/Net/Async/Tangence/Protocol.pm
 lib/Net/Async/Tangence/Server.pm
 lib/Net/Async/Tangence/ServerProtocol.pm
@@ -19,6 +21,11 @@ t/02server.t
 t/03client.t
 t/04xlink.t
 t/05close.t
+t/20connect-exec.t
+t/20connect-sshexec.t
+t/20connect-sshunix.t
+t/20connect-tcp.t
+t/20connect-unix.t
 t/90close-leak.t
 t/99pod.t
 t/Ball.pm
@@ -26,5 +33,6 @@ t/Ball.tan
 t/Colourable.pm
 t/Colourable.tan
 t/Conversation.pm
+t/server.pl
 t/TestObj.pm
 t/TestObj.tan

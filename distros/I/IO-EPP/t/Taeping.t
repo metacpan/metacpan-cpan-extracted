@@ -17,7 +17,6 @@ Vadim Likhota <vadiml@cpan.org>
 =cut
 
 use Test::More;
-use Test::Deep;
 
 use strict;
 use warnings;

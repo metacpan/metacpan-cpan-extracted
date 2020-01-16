@@ -1,5 +1,5 @@
 <%
-    my $version = stash( 'version' ) // '4.4.1';
+    my $version = stash( 'version' ) // moai->config->{version} // die "No Moai UI library version specified";
     my @urls = (
         '//code.jquery.com/jquery-3.4.1.min.js',
         '//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',

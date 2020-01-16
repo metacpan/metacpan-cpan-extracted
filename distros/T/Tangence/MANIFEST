@@ -47,6 +47,8 @@ t/23close.t
 t/30props-cbs.t
 t/31props-cache.t
 t/32props-cursor.t
+t/33props-set.t
+t/40server-security.t
 t/90close-leak.t
 t/99pod.t
 t/Ball.pm

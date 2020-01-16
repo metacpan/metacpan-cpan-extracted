@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.010';
+$Arango::Tango::VERSION = '0.011';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -11,6 +11,121 @@ use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
+
+BEGIN {
+Arango::Tango::API::_install_methods "Arango::Tango" => {
+    engine                  => { rest => [ get => '_api/engine' ] },
+    cluster_endpoints       => { rest => [ get => '_api/cluster/endpoints' ] },
+    server_id               => { rest => [ get => '_admin/server/id' ] },
+    status                  => { rest => [ get => '_admin/status' ] },
+    time                    => { rest => [ get => '_admin/time' ] },
+    statistics              => { rest => [ get => '_admin/statistics' ] },
+    statistics_description  => { rest => [ get => '_admin/statistics-description' ] },
+    target_version          => { rest => [ get => '_admin/database/target-version' ] },
+    log_level               => { rest => [ get => '_admin/log/level' ] },
+    server_role             => { rest => [ get => '_admin/server/role' ] },
+    server_mode             => { rest => [ get => '_admin/server/mode' ] },
+    server_availability     => { rest => [ get => '_admin/server/availability' ] },
+    list_users              => { rest => [ get => '_api/user' ] },
+    current_database        => { rest => [ get => '_api/database/current' ] },
+
+    version                 => { rest => [ get => '_api/version' ], schema => {  details => { type => 'boolean' } }},
+
+    delete_database         => {
+        signature => [ 'name' ],
+        rest => [ delete => '_api/database/{name}' ]
+    },
+
+    delete_user             => {
+        signature => [ 'username' ],
+        rest => [ delete => '_api/user/{username}' ]
+    },
+
+    replace_user            => {
+        signature => [ 'username' ],
+        rest => [ put => '_api/user/{username}' ],
+        schema => { password => { type => 'string'  },
+                    active   => { type => 'boolean' },
+                    extra    => { type => 'object', additionalProperties => 1 }}},
+
+    user                    => {
+        signature => [ 'username' ],
+        rest => [ get => '_api/user/{username}' ] },
+
+    update_user             => {
+        signature => [ 'user' ],
+        rest => [ patch => '_api/user/{user}' ],
+        schema => { password => { type => 'string'  },
+                    active   => { type => 'boolean' },
+                    extra    => { type => 'object', additionalProperties => 1 }}},
+
+    user_databases  => {
+        signature => [ 'username' ],
+        rest      => [ get => '_api/user/{username}/database' ],
+        schema    => { full => {type => 'boolean' }}},
+
+    get_access_level => {
+        signature => ['username','database','?collection'],
+        rest      => [ get => '_api/user/{username}/database/{database}/{collection}' ],
+       },
+
+    clear_access_level => {
+        signature => ['username','database','?collection'],
+        rest      => [ delete => '_api/user/{username}/database/{database}/{collection}' ],
+       },
+
+    set_access_level => {
+        signature => ['username', 'grant', 'database', '?collection'],
+        rest      => [ put => '_api/user/{username}/database/{database}/{collection}' ],
+        schema    => { grant => { type => 'string', enum => [qw'rw ro none'], default => 'none' }},
+    },
+
+    create_database => {
+        signature => [ 'name' ],
+        rest => [ post => '_api/database' ],
+        schema  => { name  => { type => 'string' },
+                     users => {
+                         type => 'array',
+                         items => {
+                             type => 'object',
+                             additionalProperties => 0,
+                             properties => {
+                                 username => { type => 'string' },
+                                 passwd   => { type => 'string'},
+                                 active   => { type => 'boolean' },
+                                 extra    => { type => 'object', additionalProperties => 1 }
+                             }}}},
+        builder => sub {
+            my ($self, %params) = @_;
+            return Arango::Tango::Database->_new(arango => $self, 'name' => $params{name});
+        },
+    },
+
+    create_user => {
+        signature => [ 'user' ],
+        rest => [ post => '_api/user'],
+        schema => {
+            password => { type => 'string'  },
+            active   => { type => 'boolean' },
+            user     => { type => 'string'  },
+            extra    => { type => 'object', additionalProperties => 1 },
+        }
+    },
+
+    log => {
+        rest => [ get => '_admin/log' ],
+        schema => {
+            upto   => { type => 'string', default => 'info', enum => [qw'fatal error warning info debug 0 1 2 3 4'] },
+            level  => { type => 'string', default => 'info', enum => [qw'fatal error warning info debug'] },
+            size   => { type => 'integer', minimum => 0 },
+            offset => { type => 'integer', minimum => 0 },
+            search => { type => 'string' },
+            sort   => { type => 'string', default => 'asc', enum => [qw'asc desc'] }, # asc, desc
+        }
+    }
+};
+
+}
 
 sub new {
     my ($package, %opts) = @_;
@@ -23,29 +138,14 @@ sub new {
     $self->{password} ||= $ENV{ARANGO_DB_PASSWORD} || "";
 
     $self->{headers} = {
-        Authorization => $self->_auth
+        Authorization => $self->_auth,
+        Accept => 'application/json',
     };
     $self->{http} = HTTP::Tiny->new(default_headers => $self->{headers});
 
     return $self;
 }
 
-
-use Sub::Install qw(install_sub);
-use Sub::Name qw(subname);
-BEGIN {
-    my $package = __PACKAGE__;
-    for my $m (qw'engine cluster_endpoint server_id version status time statistics statistics_description target_version log log_level server_availability server_mode server_role list_users current_database') {
-        install_sub {
-            code => subname(
-                "${package}::$m",
-                sub { my ($self, %opts) = @_; return $self->_api($m, \%opts) }
-               ),
-                 into => $package,
-                 as => $m
-             };
-    }
-}
 
 sub _auth {
     my $self = shift;
@@ -67,100 +167,8 @@ sub list_databases {
     return  $self->_api('accessible_databases')->{result};
 }
 
-sub create_database {
-    my ($self, $name, %opts) = @_;
-    return $self->_api('create_database', { %opts, name => $name });
-}
 
-sub delete_database {
-    my ($self, $name) = @_;
-    return $self->_api('delete_database', { name => $name });
-}
 
-sub create_user {
-    my ($self, $username, %opts) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('create_user', { %opts, user => $username });
-}
-
-sub update_user {
-    my ($self, $username, %opts) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('update_user', { %opts, user => $username });
-}
-
-sub replace_user {
-    my ($self, $username, %opts) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('replace_user', { %opts, user => $username });
-}
-
-sub delete_user {
-    my ($self, $username) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('delete_user', { username => $username });
-}
-
-sub user {
-    my ($self, $username) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('get_user', { username => $username });
-}
-
-sub user_databases {
-    my ($self, $username) = @_;
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    return $self->_api('get_user_databases', { username => $username });
-}
-
-sub get_access_level {
-    my ($self, $database, $username, $collection) = @_;
-    if (defined $collection && length $collection) {
-        ($username, $collection) = ($collection, $username);
-    }
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    die "Arango::Tango | No database suplied" unless defined $database and length $database;
-    if ($collection) {
-        return $self->_api('get_access_level_c', { username => $username, database => $database, collection => $collection });
-    }
-    else {
-        return $self->_api('get_access_level', { username => $username, database => $database });
-    }
-}
-
-sub clear_access_level {
-    my ($self, $database, $username, $collection) = @_;
-    if (defined $collection && length $collection) {
-        ($username, $collection) = ($collection, $username);
-    }
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    die "Arango::Tango | No database suplied" unless defined $database and length $database;
-    if ($collection) {
-        return $self->_api('clear_access_level_c', { username => $username, database => $database, collection => $collection });
-    }
-    else {
-        return $self->_api('clear_access_level', { username => $username, database => $database });
-    }
-}
-
-sub set_access_level {
-    ### 3 PARAMETERS:   DB, USER, GRANT
-    ### 4 PARAETERS:  DB, COL, USER, GRANT
-    my ($self, $database, $username, $permissions, $collection ) = @_;
-
-    if (defined $collection && length $collection) {
-        ($username, $collection, $permissions) = ($permissions, $username, $collection);
-    }
-
-    die "Arango::Tango | No username suplied" unless defined $username and length $username;
-    die "Arango::Tango | No database suplied" unless defined $database and length $database;
-    if ($collection) {
-        return $self->_api('set_access_level_c', { username => $username, database => $database, collection => $collection, grant => $permissions });
-    }
-    else {
-        return $self->_api('set_access_level', { username => $username, database => $database, grant => $permissions  });
-    }
-}
 
 1;
 
@@ -176,7 +184,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSYS
 
@@ -347,22 +355,22 @@ call.
 
 =item C<get_access_level>
 
-    $perms = $db->get_access_level("myDatabase", "john");
-    $perms = $db->get_access_level("myDatabase", $collection, "john");
+    $perms = $db->get_access_level("john", "myDatabase");
+    $perms = $db->get_access_level("john", "myDatabase", $collection );
 
 Fetch the database or the collection access level for a specific user.
 
 =item C<set_access_level>
 
-    $perms = $db->set_access_level("myDatabase", "john", "rw");
-    $perms = $db->set_access_level("myDatabase", $collection, "john", "ro");
+    $perms = $db->set_access_level("john", "rw", "myDatabase");
+    $perms = $db->set_access_level("john", "ro", "myDatabase", $collection);
 
 Sets the database or the collection access level for a specific user.
 
 =item C<clear_access_level>
 
-    $db->clear_access_level("myDatabase", "john");
-    $db->clear_access_level("myDatabase", $collection, "john");
+    $db->clear_access_level("john", "myDatabase");
+    $db->clear_access_level("john", "myDatabase", $collection);
 
 Clears the database or the collection access level for a specific user.
 
@@ -489,7 +497,7 @@ Alberto Simões <ambs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alberto Simões.
+This software is copyright (c) 2019-2020 by Alberto Simões.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Shared network-related modules",
+   "author" : [
+      "Igor Afanasyev <igor.afanasyev@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Loctools-Net",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Loctools::Net" : {
+         "file" : "lib/Loctools/Net.pm",
+         "version" : "1.0"
+      },
+      "Loctools::Net::HTTP::Client" : {
+         "file" : "lib/Loctools/Net/HTTP/Client.pm"
+      },
+      "Loctools::Net::OAuth2::Session" : {
+         "file" : "lib/Loctools/Net/OAuth2/Session.pm"
+      },
+      "Loctools::Net::OAuth2::Session::Google" : {
+         "file" : "lib/Loctools/Net/OAuth2/Session/Google.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

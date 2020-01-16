@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Type;
 
@@ -27,13 +27,15 @@ implementations.
 
 =head1 CONSTRUCTOR
 
-=head2 $type = Tangence::Type->new( $primitive_sig )
+=head2 new
+
+   $type = Tangence::Type->new( $primitive_sig )
 
 Returns an instance to represent a primitive type of the given signature.
 
-=head2 $type = Tangence::Type->new( list => $member_type )
+   $type = Tangence::Type->new( list => $member_type )
 
-=head2 $type = Tangence::Type->new( dict => $member_type )
+   $type = Tangence::Type->new( dict => $member_type )
 
 Returns an instance to represent a list or dict aggregation containing members
 of the given type.
@@ -69,15 +71,21 @@ sub new
 
 =head1 METHODS
 
-=head2 $value = $type->default_value
+=head2 default_value
+
+   $value = $type->default_value
 
 Returns a value suitable to use as an initial value for object properties.
 
-=head2 $type->pack_value( $message, $value )
+=head2 pack_value
+
+   $type->pack_value( $message, $value )
 
 Appends a value of this type to the end of a L<Tangence::Message>.
 
-=head2 $value = $type->unpack_value( $message )
+=head2 unpack_value
+
+   $value = $type->unpack_value( $message )
 
 Removes a value of this type from the start of a L<Tangence::Message>.
 

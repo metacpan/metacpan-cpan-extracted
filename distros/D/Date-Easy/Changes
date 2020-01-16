@@ -1,5 +1,13 @@
 Revision history for Date-Easy
 
+0.10      2020-01-14 13:57:52-08:00 America/Los_Angeles
+
+    [Distro Fixes]
+    * Fix failing unit test caused by imperfect mirroring of `gmtime`/`timegm`
+      github #14 (thx Slaven Rezić (SREZIC))
+    [Docs]
+    * Fix a small typo
+
 0.09      2019-09-03 16:34:03-07:00 America/Los_Angeles
 
     [Docs]

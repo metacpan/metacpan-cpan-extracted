@@ -1,14 +1,18 @@
-# Copyrights 2009-2013 by [Mark Overmeer].
+# Copyrights 2009-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-RPC.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::RPC::Client;
 use vars '$VERSION';
-$VERSION = '0.17';
+$VERSION = '0.20';
 
+
+use warnings;
+use strict;
 
 use XML::Compile::RPC        ();
 use XML::Compile::RPC::Util  qw/fault_code/;
@@ -43,50 +47,53 @@ sub init($)
     $self;
 }
 
+#--------------
+
 
 sub headers() {shift->{headers}}
-
-
 sub schemas() {shift->{schemas}}
 
+#--------------
 
-my %trace;
-sub trace() {\%trace}
+my $trace;
+sub trace() {$trace}
 
 
 sub printTrace(;$)
-{   my $self = shift;
-    my $fh   = shift || \*STDERR;
-
-    $fh->print("response: ",$trace{response}->status_line, "\n");
-    $fh->print("elapse:   $trace{total_elapse}\n");
+{   my $self  = shift;
+    my $fh    = shift || \*STDERR;
+    my $trace = $self->trace;
+    $fh->print("response: ",$trace->{response}->status_line, "\n");
+    $fh->print("elapse:   $trace->{total_elapse}\n");
 }
 
 
 sub call($@)
 {   my $self    = shift;
     my $start   = [gettimeofday];
+
     my $request = $self->_request($self->_callmsg(@_));
     my $format  = [gettimeofday];
+
     my $response  = $self->{user_agent}->request($request);
     my $network = [gettimeofday];
     
-    %trace      =
-      ( request        => $request
+    $trace   =
+      { request        => $request
       , response       => $response
       , start_time     => ($start->[0] + $start->[1]*10e-6)
       , format_elapse  => tv_interval($start, $format)
       , network_elapse => tv_interval($format, $network)
-      );
+      };
 
    $response->is_success
-      or return ($response->code, $response->status_line);
+       or return ($response->code, $response->status_line, $trace);
 
    my ($rc, $decoded) = $self->_respmsg($response->decoded_content);
-   $trace{decode_elapse} = tv_interval $network;
-   $trace{total_elapse}  = tv_interval $start;
+   $trace->{decode_elapse} = tv_interval $network;
+   $trace->{total_elapse}  = tv_interval $start;
 
-   ($rc, $decoded);
+   ($rc, $decoded, $trace);
 }
 
 sub _callmsg($@)
@@ -118,6 +125,7 @@ sub _request($)
 sub _respmsg($)
 {   my ($self, $xml) = @_;
     length $xml or return (1, "no xml received");
+
     my $data = $self->{schemas}->reader('methodResponse')->($xml);
     return fault_code $data->{fault}
         if $data->{fault};
@@ -131,6 +139,7 @@ sub AUTOLOAD
     (my $proc = our $AUTOLOAD) =~ s/.*\:\://;
     $proc =~ s/_/$self->{auto_under}/g
         if defined $self->{auto_under};
+
     $self->call($proc, @_);
 }
 

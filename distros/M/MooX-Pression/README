@@ -1,0 +1,940 @@
+NAME
+    MooX::Pression - express yourself through moo
+
+SYNOPSIS
+    MyApp.pm
+
+      use v5.18;
+      use strict;
+      use warnings;
+  
+      package MyApp {
+        use MooX::Pression (
+          version    => 0.1,
+          authority  => 'cpan:MYPAUSEID',
+        );
+    
+        class Person {
+          has name   ( type => Str, required => true );
+          has gender ( type => Str );
+      
+          factory new_man (Str $name) {
+            return $class->new(name => $name, gender => 'male');
+          }
+      
+          factory new_woman (Str $name) {
+            return $class->new(name => $name, gender => 'female');
+          }
+      
+          method greet (Person *friend, Str *greeting = "Hello") {
+            printf("%s, %s!\n", $arg->greeting, $arg->friend->name);
+          }
+      
+          coerce from Str via from_string {
+            return $class->new(name => $_);
+          }
+        }
+      }
+
+    my_script.pl
+
+      use v5.18;
+      use strict;
+      use warnings;
+      use MyApp;
+      use MyApp::Types qw( is_Person );
+  
+      # Create a new MyApp::Person object.
+      #
+      my $alice  = MyApp->new_woman("Alice");
+      is_Person($alice) or die;
+  
+      # The string "Bob" will be coerced to a MyApp::Person.
+      #
+      $alice->greet(friend => "Bob", greeting => 'Hi');
+
+DESCRIPTION
+    MooX::Pression is kind of like Moops; a marrying together of Moo with
+    Type::Tiny and some keyword declaration magic. Instead of being built on
+    Kavorka, Parse::Keyword, Keyword::Simple and a whole heap of crack, it is
+    built on MooX::Press and Keyword::Declare. I'm not saying there isn't some
+    crazy stuff going on under the hood, but it ought to be a little more
+    maintainable.
+
+    Some of the insane features of Moops have been dialled back, and others
+    have been amped up.
+
+    It's more opinionated about API design and usage than Moops is, but in
+    most cases, it should be fairly easy to port Moops code to MooX::Pression.
+
+    MooX::Pression requires Perl 5.18.0 or above. It may work on Perl 5.14.x
+    and Perl 5.16.x partly, but there are likely to be issues.
+
+    MooX::Press is a less magic version of MooX::Pression and only requires
+    Perl 5.8.8 or above.
+
+  Important Concepts
+   The Factory Package and Prefix
+    MooX::Pression assumes that all the classes and roles you are building
+    with it will be defined under the same namespace prefix. For example
+    "MyApp::Person" and "MyApp::Company" are both defined under the common
+    prefix of "MyApp".
+
+    It also assumes there will be a factory package that can be used to build
+    new instances of your class. Rather than creating a new person object with
+    `MyApp::Person->new()`, you should create a new person object with
+    `MyApp->new_person()`. Calling `MyApp::Person->new()` directly is only
+    encouraged from within the "MyApp::Person" class itself, and from within
+    the factory. Everywhere else, you should call `MyApp->new_person()`
+    instead.
+
+    By default, the factory package and the prefix are the same: they are the
+    caller that you imported MooX::Pression into. But they can be set to
+    whatever:
+
+      use MooX::Pression (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+      );
+
+    MooX::Pression assumes that you are defining all the classes and roles
+    within this namespace prefix in a single Perl module file. This Perl
+    module file would normally be named based on the prefix, so in the example
+    above, it would be "MyApp/Objects.pm" and in the example from the
+    SYNOPSIS, it would be "MyApp.pm".
+
+    Of course, there is nothing to stop you from having multiple prefixes for
+    different logical parts of a larger codebase, but MooX::Pression assumes
+    that if it's been set up for a prefix, it owns that prefix and everything
+    under it, and it's all defined in the same Perl module.
+
+    Each object defined by MooX::Pression will have a `FACTORY` method, so you
+    can do:
+
+      $person_object->FACTORY
+
+    And it will return the string "MyApp". This allows for stuff like:
+
+      class Person {
+        method give_birth {
+          return $self->FACTORY->new_person();
+        }
+      }
+
+   The Type Library
+    While building your classes and objects, MooX::Pression will also build
+    type constraints for each of them. So for the "MyApp::Person" class above,
+    it also builds a Person type constraint. This can be used in Moo/Moose
+    attribute definitions like:
+
+      use MyApp;
+      use MyApp::Types qw( Person );
+  
+      use Moose;
+      has boss => (is => 'rw', isa => Person);
+
+    And just anywhere a type constraint may be used generally. You should know
+    this stuff by now.
+
+    Note that we had to `use MyApp` before we could `use MyApp::Types`. This
+    is because there isn't a physical "MyApp/Types.pm" file on disk; it is
+    defined entirely by "MyApp.pm".
+
+    Your type library will be the same as your namespace prefix, with
+    "::Types" added at the end. But you can change that:
+
+      use MooX::Pression (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+        type_library    => 'MyApp::TypeLibrary',
+      );
+
+    It can sometimes be helpful to pre-warn MooX::Pression about the types
+    you're going to define before you define them, just so it is able to allow
+    them as barewords in some places...
+
+      use MooX::Pression (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+        type_library    => 'MyApp::TypeLibrary',
+        declare         => [qw( Person Company )],
+      );
+
+    See also Type::Tiny::Manual.
+
+  Keywords
+   `class`
+    Define a very basic class:
+
+      class Person;
+
+    Define a more complicated class:
+
+      class Person {
+        ...;
+      }
+
+    Note that if the `class` keyword without a block, it does *not* act like
+    the `package` keyword by changing the "ambient" package. It just defines a
+    totally empty class with no methods or attributes.
+
+    The prefix will automatically be added to the class name, so if the prefix
+    is MyApp, the above will create a class called MyApp::Person. It will also
+    create a factory method `MyApp->new_person`. (The name is generated by
+    stripping the prefix from the class name, replacing any "::" with an
+    underscore, lowercasing, and prefixing it with "new_".) And it will create
+    a type called Person in the type library. (Same rules to generate the name
+    apart from lowercasing and adding "new_".)
+
+    Classes can be given more complex names:
+
+      class Person::Neanderthal {
+        ...;
+      }
+
+    Will create "MyApp::Person::Neanderthal" class, a factory method called
+    `MyApp->new_person_neanderthal`, and a Person_Neanderthal type.
+
+    It is possible to create a class without the prefix:
+
+      class ::Person {
+        ...;
+      }
+
+    The class name will now be "Person" instead of "MyApp::Person"!
+
+    `class` blocks can be nested. This establishes an inheritance heirarchy.
+
+      class Animal {
+        has name;
+        class Mammal {
+          class Primate {
+            class Monkey;
+            class Gorilla;
+            class Human {
+              class Superhuman;
+            }
+          }
+        }
+        class Bird;
+        class Fish {
+          class Shark;
+        }
+      }
+  
+      my $superman = MyApp->new_superhuman( name => 'Kal El' );
+
+    See also `extends` as an alternative way of declaring inheritance.
+
+   `role`
+    Define a very basic role:
+
+      role Person;
+
+    Define a more complicated role:
+
+      role Person {
+        ...;
+      }
+
+    This is just the same as `class` but defines a role instead of a class.
+
+    Roles cannot be nested within each other, nor can roles be nested in
+    classes, nor classes in roles.
+
+   `type_name`
+      class Homo::Sapiens {
+        type_name Human;
+      }
+
+    The class will still be called MyApp::Homo::Sapiens but the type in the
+    type library will be called Human instead of Homo_Sapiens.
+
+   `extends`
+    Defines a parent class. Only for use within `class` blocks.
+
+      class Person {
+        extends Animal;
+      }
+
+    This works:
+
+      class Person {
+        extends ::Animal;   # no prefix
+      }
+
+   `with`
+    Composes roles.
+
+      class Person {
+        with Employable, Consumer;
+      }
+  
+      role Consumer;
+  
+      role Worker;
+  
+      role Payable;
+  
+      role Employable {
+        with Worker, Payable;
+      }
+
+    Because roles are processed before classes, you can compose roles into
+    classes where the role is defined later in the file. But if you compose
+    one role into another, you must define them in a sensible order.
+
+    It is possible to compose a role that does not exist by adding a question
+    mark to the end of it:
+
+      class Person {
+        with Employable, Consumer?;
+      }
+  
+      role Employable {
+        with Worker?, Payable?;
+      }
+
+    This is equivalent to declaring an empty role.
+
+   `begin`
+    This code gets run early on in the definition of a class or role.
+
+      class Person {
+        begin {
+          say "Defining $package";
+        }
+      }
+
+    At the time the code gets run, none of the class's attributes or methods
+    will be defined yet.
+
+    The lexical variables $package and $kind are defined within the block.
+    $kind will be either 'class' or 'role'.
+
+    It is possible to define a global chunk of code to run too:
+
+      use MooX::Pression (
+        ...,
+        begin => sub {
+          my ($package, $kind) = @_;
+          ...;
+        },
+      );
+
+    Per-package `begin` overrides the global `begin`.
+
+    Unlike Perl's `BEGIN` keyword, a package can only have one `begin`.
+
+    If `class` definitions are nested, `begin` blocks will be inherited by
+    child classes. If a parent class is specified via `extends`, `begin`
+    blocks will not be inherited.
+
+   `end`
+    This code gets run late in the definition of a class or role.
+
+      class Person {
+        end {
+          say "Finished defining $package";
+        }
+      }
+
+    The lexical variables $package and $kind are defined within the block.
+    $kind will be either 'class' or 'role'.
+
+    It is possible to define a global chunk of code to run too:
+
+      use MooX::Pression (
+        ...,
+        end => sub {
+          my ($package, $kind) = @_;
+          ...;
+        },
+      );
+
+    Per-package `end` overrides the global `end`.
+
+    Unlike Perl's `END` keyword, a package can only have one `end`.
+
+    If `class` definitions are nested, `end` blocks will be inherited by child
+    classes. If a parent class is specified via `extends`, `end` blocks will
+    not be inherited.
+
+   `has`
+      class Person {
+        has name;
+        has age;
+      }
+  
+      my $bob = MyApp->new_person(name => "Bob", age => 21);
+
+    Moo-style attribute specifications may be given:
+
+      class Person {
+        has name ( is => rw, type => Str, required => true );
+        has age  ( is => rw, type => Int );
+      }
+
+    Note there is no fat comma after the attribute name! It is a bareword.
+
+    Use a plus sign before an attribute name to modify an attribute defined in
+    a parent class.
+
+      class Animal {
+        has name ( type => Str, required => false );
+    
+        class Person {
+          has +name ( required => true );
+        }
+      }
+
+    `rw`, `rwp`, `ro`, `lazy`, `true`, and `false` are allowed as barewords
+    for readability, but `is` is optional, and defaults to `rw`.
+
+    Note `type` instead of `isa`. Any type constraints from Types::Standard,
+    Types::Common::Numeric, and Types::Common::String will be avaiable as
+    barewords. Also, any pre-declared types can be used as barewords. It's
+    possible to quote types as strings, in which case you don't need to have
+    pre-declared them.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has age    ( type => Int );
+        has spouse ( type => 'Person' );
+        has kids   (
+          is      => lazy,
+          type    => 'ArrayRef[Person]',
+          builder => sub { [] },
+        );
+      }
+
+    Note that when `type` is a string, MooX::Pression will consult your type
+    library to figure out what it means.
+
+    It is also possible to use `isa => 'SomeClass'` or `does => 'SomeRole'` to
+    force strings to be treated as class names or role names instead of type
+    names.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has age    ( type => Int );
+        has spouse ( isa  => 'Person' );
+        has pet    ( isa  => '::Animal' );   # no prefix
+      }
+
+    For enumerations, you can define them like this:
+
+      class Person {
+        ...;
+        has status ( enum => ['alive', 'dead', 'undead'] );
+      }
+
+    It is possible to add hints to the name as a shortcut for common
+    specifications.
+
+      class Person {
+        has $name!;
+        has $age;
+        has @kids;
+      }
+
+    Using `$`, `@` and `%` sigils hints that the values should be a scalar, an
+    arrayref, or a hashref (and tries to be smart about overloading). It *does
+    not make the attribute available as a lexical*! You still access the value
+    as `$self->age` and not just $age.
+
+    The trailing `!` indicates a required attribute.
+
+    If you need to decide an attribute name on-the-fly, you can replace the
+    name with a block that returns the name as a string.
+
+      class Employee {
+        extends Person;
+        has {
+          $ENV{LOCALE} eq 'GB'
+            ? 'national_insurance_no'
+            : 'social_security_no'
+        } (type => Str)
+      }
+  
+      my $bob = Employee->new(
+        name               => 'Bob',
+        social_security_no => 1234,
+      );
+
+    This can be used to define a bunch of types from a list.
+
+      class Person {
+        my @attrs = qw( $name $age );
+        for my $attr (@attrs) {
+          has {$attr} ( required => true );
+        }
+      }
+
+    You can think of the syntax as being kind of like `print`.
+
+      print BAREWORD_FILEHANDLE @strings;
+      print { block_returning_filehandle(); } @strings;
+
+   `constant`
+      class Person {
+        extends Animal;
+        constant latin_name = 'Homo sapiens';
+      }
+
+    `MyApp::Person->latin_name`, `MyApp::Person::latin_name`, and
+    `$person_object->latin_name` will return 'Homo sapiens'.
+
+   `method`
+      class Person {
+        has $spouse;
+    
+        method marry {
+          my ($self, $partner) = @_;
+          $self->spouse($partner);
+          $partner->spouse($self);
+          return $self;
+        }
+      }
+
+    `sub { ... }` will not work as a way to define methods within the class.
+    Use `method { ... }` instead.
+
+    The variables $self and $class will be automatically defined within all
+    methods. $self is set to $_[0] (though the invocant is not shifted off
+    @_). $class is set to `ref($self)||$self`. If the method is called as a
+    class method, both $self and $class will be the same thing: the full class
+    name as a string. If the method is called as an object method, $self is
+    the object and $class is its class.
+
+    Like with `has`, you may use a block that returns a string instead of a
+    bareword name for the method.
+
+      method {"ma"."rry"} {
+        ...;
+      }
+
+    MooX::Pression supports method signatures for named arguments and
+    positional arguments. If you need a mixture of named and positional
+    arguments, this is not currently supported, so instead you should define
+    the method with no signature at all, and unpack @_ within the body of the
+    method.
+
+   Signatures for Named Arguments
+      class Person {
+        has $spouse;
+    
+        method marry ( Person *partner, Object *date = DateTime->now ) {
+          $self->spouse( $arg->partner );
+          $arg->partner->spouse( $self );
+          return $self;
+        }
+      }
+
+    The syntax for each named argument is:
+
+      Type *name = default
+
+    The type is a type name. It must start with a word character (but not a
+    digit) and continues until whitespace is seen. Whitespace is not currently
+    permitted in the type. (Parsing is a little naive right now.)
+
+    Alternatively, you can provide a block which returns a type name or
+    returns a blessed Type::Tiny object. (And the block can contain
+    whitespace!)
+
+    The asterisk indicates that the argument is named, not positional.
+
+    The name may be followed by a question mark to indicate an optional
+    argument.
+
+      method marry ( Person *partner, Object *date? ) {
+        ...;
+      }
+
+    Or it may be followed by an equals sign to set a default value.
+
+    As with signature-free methods, $self and $class wll be defined for you in
+    the body of the method. However, when a signature has been used $self *is*
+    shifted off @_.
+
+    Also within the body of the method, a variable called $arg is provided.
+    This is a hashref of the named arguments. So you can access the partner
+    argument in the above example like this:
+
+      $arg->{partner}
+
+    But because $arg is blessed, you can also do:
+
+      $arg->partner
+
+    The latter style is encouraged as it looks neater, plus it helps catch
+    typos. (`$ars->{pratner}` for example!) However, accessing it as a plain
+    hashref is supported and shouldn't be considered to be breaking
+    encapsulation.
+
+    For optional arguments you can check:
+
+      exists($arg->{date})
+
+    Or:
+
+      $arg->has_date
+
+    For types which have a coercion defined, the value will be automatically
+    coerced.
+
+    Methods with named arguments can be called with a hash or hashref.
+
+      $alice->marry(  partner => $bob  );      # okay
+      $alice->marry({ partner => $bob });      # also okay
+
+   Signatures for Positional Arguments
+      method marry ( Person $partner, Object $date? ) {
+        $self->spouse( $partner );
+        $partner->spouse( $self );
+        return $self;
+      }
+
+    The dollar sign is used instead of an asterisk to indicate a positional
+    argument.
+
+    As with named arguments, $self is automatically shifted off @_ and $class
+    exists. Unlike named arguments, there is no $arg variable, and instead a
+    scalar variable is defined for each named argument.
+
+    Allowing a slurpy hash or array at the end of the signature is currently
+    not supported, but is planned.
+
+    Optional arguments and default are supported in the same way as named
+    arguments.
+
+   Empty Signatures
+    There is a difference between the following two methods:
+
+      method foo {
+        ...;
+      }
+  
+      method foo () {
+        ...;
+      }
+
+    In the first, you have not provided a signature and are expected to deal
+    with @_ in the body of the method. In the second, there is a signature,
+    but it is a signature showing that the method expects no arguments (other
+    than the invocant of course).
+
+   `before`
+      before marry {
+        say "Speak now or forever hold your peace!";
+      }
+
+    As with `method`, $self and $class are defined.
+
+    As with `method`, you can provide a signature:
+
+      before marry ( Person $partner, Object $date? ) {
+        say "Speak now or forever hold your peace!";
+      }
+
+    Note that this will result in the argument types being checked/coerced
+    twice; once by the before method modifier and once by the method itself.
+    Sometimes this may be desirable, but at other times your before method
+    modifier might not care about the types of the arguments, so can omit
+    checking them.
+
+      before marry ( $partner, $date? ) {
+        say "Speak now or forever hold your peace!";
+      }
+
+   `after`
+    There's not much to say about `after`. It's just like `before`.
+
+      after marry {
+        say "You may kiss the bride!";
+      }
+  
+      after marry ( Person $partner, Object $date? ) {
+        say "You may kiss the bride!";
+      }
+  
+      after marry ( $partner, $date? ) {
+        say "You may kiss the bride!";
+      }
+
+   `around`
+    The `around` method modifier is somewhat more interesting.
+
+      around marry ( Person $partner, Object $date? ) {
+        say "Speak now or forever hold your peace!";
+        my $return = $self->$next(@_);
+        say "You may kiss the bride!";
+        return $return;
+      }
+
+    The $next variable holds a coderef pointing to the "original" method that
+    is being modified. This gives your method modifier the ability to munge
+    the arguments seen by the "original" method, and munge any return values.
+    (I say "original" in quote marks because it may not really be the original
+    method but another wrapper!)
+
+    $next and $self are both shifted off @_.
+
+    If you use the signature-free version then $next and C << $self >> are not
+    shifted off @_ for you, but the variables are still defined.
+
+      around marry {
+        say "Speak now or forever hold your peace!";
+        my $return = $self->$next($_[2], $_[3]);
+        say "You may kiss the bride!";
+        return $return;
+      }
+
+   `factory`
+    The `factory` keyword is used to define alternative constructors for your
+    class.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        factory new_man (Str $name) {
+          return $class->new(name => $name, gender => 'male');
+        }
+    
+        factory new_woman (Str $name) {
+          return $class->new(name => $name, gender => 'female');
+        }
+      }
+
+    But here's the twist. These methods are defined within the factory
+    package, not within the class.
+
+    So you can call:
+
+      MyApp->new_man("Bob")             # yes
+
+    But not:
+
+      MyApp::Person->new_man("Bob")     # no
+
+    Note that if your class defines *any* factory methods like this, then the
+    default factory method (in this case `MyApp->new_person` will no longer be
+    automatically created. But you can create the default one easily:
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        factory new_man (Str $name) { ... }
+        factory new_woman (Str $name) { ... }
+        factory new_person;   # no method signature or body!
+      }
+
+    Within a factory method body, the variable $class is defined, just like
+    normal methods, but $self is not defined. There is also a variable
+    $factory which is a string containing the factory package name. This is
+    because you sometimes need to create more than just one object in a
+    factory method.
+
+      class Wheel;
+  
+      class Car {
+        has @wheels;
+    
+        factory new_three_wheeler () {
+          return $class->new(
+            wheels => [
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+            ]
+          );
+        }
+    
+        factory new_four_wheeler () {
+          return $class->new(
+            wheels => [
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+            ]
+          );
+        }
+      }
+
+    As with `method` and the method modifiers, if you provide a signature,
+    $factory and $class will be shifted off @_. If you don't provide a
+    signature, the variables will be defined, but not shifted off @_.
+
+    An alternative way to provide additional constructors is with `method` and
+    then use `factory` to proxy them.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        method new_guy (Str $name) { ... }
+        method new_gal (Str $name) { ... }
+    
+        factory new_person;
+        factory new_man via new_guy;
+        factory new_woman via new_gal;
+      }
+
+    Now `MyApp->new_man` will call `MyApp::Person->new_guy`.
+
+    `factory new_person` with no `via` or method body is basically like saying
+    `via new`.
+
+   `coerce`
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        coerce from Str via from_string {
+          $class->new(name => $_);
+        }
+      }
+  
+      class Company {
+        has owner ( type => 'Person', required => true );
+      }
+  
+      my $acme = MyApp->new_company( owner => "Bob" );
+
+    Note that the company owner is supposed to be a person object, not a
+    string, but the Person class knows how create a person object from a
+    string.
+
+    Coercions are automatically enabled in a lot of places for types that have
+    a coercion. For example, types in signatures, and types in attribute
+    definitions.
+
+    Note that the coercion body doesn't allow signatures, and the value being
+    coerced will be found in $_. If you want to have signatures, you can
+    define a coercion as a normal method first:
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        method from_string ( Str $name ) {
+          $class->new(name => $name);
+        }
+    
+        coerce from Str via from_string;
+      }
+
+    In both cases, a `MyApp::Person->from_string` method is generated which
+    can be called to manually coerce a string into a person object.
+
+    They keyword `from` is technically optional, but does make the statement
+    more readable.
+
+      coerce Str via from_string {      # this works
+        $class->new(name => $_);
+      }
+
+   `version`
+      class Person {
+        version 1.0;
+      }
+
+    This just sets $MyApp::Person::VERSION.
+
+    You can set a default version for all packages like this:
+
+      use MooX::Pression (
+        ...,
+        version => 1.0,
+      );
+
+    If `class` definitions are nested, `version` will be inherited by child
+    classes. If a parent class is specified via `extends`, `version` will not
+    be inherited.
+
+   `authority`
+      class Person {
+        authority 'cpan:TOBYINK';
+      }
+
+    This just sets $MyApp::Person::AUTHORITY.
+
+    It is used to indicate who is the maintainer of the package.
+
+      use MooX::Pression (
+        ...,
+        version   => 1.0,
+        authority => 'cpan:TOBYINK',
+      );
+
+    If `class` definitions are nested, `authority` will be inherited by child
+    classes. If a parent class is specified via `extends`, `authority` will
+    not be inherited.
+
+  Utilities
+    MooX::Pression also exports constants `true` and `false` into your
+    namespace. These show clearer boolean intent in code than using 1 and 0.
+
+    MooX::Pression exports `rw`, `ro`, `rwp`, and `lazy` constants which make
+    your attribute specs a little cleaner looking.
+
+    MooX::Pression exports `blessed` from Scalar::Util because that can be
+    handy to habe, and `confess` from Carp. MooX::Pression's copy of `confess`
+    is super-powered and runs its arguments through `sprintf`.
+
+      before vote {
+        if ($self->age < 18) {
+          confess("Can't vote, only %d", $self->age);
+        }
+      }
+
+    And MooX::Pression exports everything from Try::Tiny because it's cool.
+    (This might be replaced with another `try` module in the future?)
+
+    And last but not least, it exports all the types, `is_*` functions, and
+    `assert_*` functions from Types::Standard, Types::Common::String, and
+    Types::Common::Numeric.
+
+  MooseX::Pression or MouseX::Pression?
+      use MooX::Pression (
+        ...,
+        toolkit => 'Moose',
+      );
+
+      use MooX::Pression (
+        ...,
+        toolkit => 'Mouse',
+      );
+
+    The ability to choose a toolkit on a package-by-package basis is not
+    currently supported. (Though it's implemented in MooX::Press.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>.
+
+SEE ALSO
+    Less magic version: MooX::Press, portable::loader.
+
+    Important underlying technologies: Moo, Type::Tiny::Manual.
+
+    Similar modules: Moops, Kavorka, Dios, MooseX::Declare.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

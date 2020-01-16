@@ -1,0 +1,36 @@
+=head1 NAME
+
+OpenTracing::Role - common attributes and methods for OpenTracing
+
+=head1 VERSION
+
+0.04
+
+=head1 DESCRIPTION
+
+This package and related roles provide a set off attributes methods that will be
+required by a OpenTracing compliant implementation. If these are missing, then
+it may cause issues being compatible with other modules and or frameworks that
+need the deeper voodoo magic inside Opentracing.
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing Roles' is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+
+=cut

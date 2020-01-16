@@ -1,0 +1,30 @@
+MooX-Pression
+=============
+
+Created:      2020-01-15
+Home page:    <https://metacpan.org/release/MooX-Pression>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2020-01-16
+
+ [ Documentation ]
+ - Document +attrname.
+ - Document that `begin` and `end` may only occur once per package.
+
+ [ Other ]
+ - `class` blocks may be nested.
+
+0.002	2020-01-16
+
+ [ Documentation ]
+ - Better SYNOPSIS showing coercion.
+ - Document `enum`.
+ - Document issues with Perl 5.14.x and Perl 5.16.x and officially only
+   support Perl 5.18.0 and above.
+ - Fix typo in `end` keyword documentation.
+
+ [ Other ]
+ - Allow (and encourage) `from` to follow `coerce`.
+
+0.001	2020-01-16	Initial release

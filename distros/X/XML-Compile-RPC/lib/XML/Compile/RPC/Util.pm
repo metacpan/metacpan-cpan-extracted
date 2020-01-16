@@ -1,15 +1,19 @@
-# Copyrights 2009-2013 by [Mark Overmeer].
+# Copyrights 2009-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-RPC.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::RPC::Util;
 use vars '$VERSION';
-$VERSION = '0.17';
+$VERSION = '0.20';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 our @EXPORT = qw/
    struct_to_hash
@@ -52,7 +56,7 @@ sub struct_to_rows($)
 
 
 sub struct_from_rows(@)
-{   my @members = map { +{name => $_->[0], value => {$_->[1] => $_->[2]}}} @_;
+{   my @members = map +{name => $_->[0], value => {$_->[1] => $_->[2]}}, @_;
    +{ struct => {member => \@members} };
 }
 

@@ -178,66 +178,66 @@ if ($do==1) {
          # smtp-mail-server-with-windows.html
          ($stdout,$stderr)=$handle->cmd(
             "chmod -v 755 /usr/bin/exim*",'__display__');
-         $handle->{_cmd_handle}->print('/bin/exim-config');
-         $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+         $handle->print('/bin/exim-config');
+         $prompt=$handle->prompt();
          while (1) {
             my $output.=Net::FullAuto::FA_Core::fetch($handle);
             last if $output=~/$prompt/;
             print $output;
             if (-1<index $output,'local postmaster') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                next;
             } elsif (-1<index $output,'Is it') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             } elsif (-1<index $output,'change that setting') {
-               $handle->{_cmd_handle}->print('no');
+               $handle->print('no');
                $output='';
                next;
             } elsif (-1<index $output,'standard values') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             } elsif (-1<index $output,'be links to') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             } elsif (-1<index $output,'some CPAN') {
-               $handle->{_cmd_handle}->print('no');
+               $handle->print('no');
                $output='';
                next;
             } elsif (-1<index $output,'install the exim') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             } elsif (-1<index $output,'in minutes') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                next;
             } elsif (-1<index $output,'CYGWIN for the daemon') {
-               $handle->{_cmd_handle}->print('default');
+               $handle->print('default');
                $output='';
                next;
             } elsif (-1<index $output,'the cygsla package') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             } elsif (-1<index $output,'another privileged account') {
-               $handle->{_cmd_handle}->print('no');
+               $handle->print('no');
                $output='';
                next;
             } elsif (-1<index $output,'enter the password') {
-               $handle->{_cmd_handle}->print($service_and_cert_password);
+               $handle->print($service_and_cert_password);
                $output='';
                next;
             } elsif (-1<index $output,'Reenter') {
-               $handle->{_cmd_handle}->print($service_and_cert_password);
+               $handle->print($service_and_cert_password);
                $output='';
                next;
             } elsif (-1<index $output,'start the exim') {
-               $handle->{_cmd_handle}->print('yes');
+               $handle->print('yes');
                $output='';
                next;
             }
@@ -399,38 +399,38 @@ if ($do==1) {
    #($stdout,$stderr)=$handle->cmd("tar zxvf $rmqtar",'__display__');
    #($stdout,$stderr)=$handle->cmd("rm -rvf $rmqtar",'__display__');
    #($stdout,$stderr)=$handle->cwd($rmqdir);
-   #$handle->{_cmd_handle}->print('sudo su');
-   #$prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   #$handle->print('sudo su');
+   #$prompt=$handle->prompt();
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
    #   print $output;
    #}
-   #$handle->{_cmd_handle}->print('export TARGET_DIR=/usr/local');
+   #$handle->print('export TARGET_DIR=/usr/local');
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
    #   print $output;
    #}
-   #$handle->{_cmd_handle}->print('export SBIN_DIR=/usr/local');
+   #$handle->print('export SBIN_DIR=/usr/local');
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
    #   print $output;
    #}
-   #$handle->{_cmd_handle}->print('export MAN_DIR=/usr/local');
+   #$handle->print('export MAN_DIR=/usr/local');
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
    #   print $output;
    #}
-   #$handle->{_cmd_handle}->print('make install');
+   #$handle->print('make install');
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
    #   print $output;
    #}
-   #$handle->{_cmd_handle}->print('exit');
+   #$handle->print('exit');
    #while (1) {
    #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
    #   last if $output=~/$prompt/;
@@ -711,10 +711,10 @@ if ($do==1) {
    my $zmq_branch='v4.0.1';
    ($stdout,$stderr)=$handle->cmd($sudo.
       "git checkout $zmq_branch",'__display__');
-   ($stdout,$stderr)=$handle->cmd("./autogen.sh",'__display__');
-   $handle->cmd_raw('export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig');
-   ($stdout,$stderr)=$handle->cmd('./configure','__display__');
    if ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cmd("./autogen.sh",'__display__');
+      $handle->cmd_raw('export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig');
+      ($stdout,$stderr)=$handle->cmd('./configure','__display__');
       my $ad="        -no-undefined \\%NL%".
              "        -avoid-version \\";
       ($stdout,$stderr)=$handle->cmd(
@@ -723,11 +723,17 @@ if ($do==1) {
          "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
          "./Makefile");
    } else {
+      # Following cmd shows default pkg-config locations
+      # pkg-config --variable pc_path pkg-config
+      $handle->cmd_raw('export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig');
+      my $e='PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ';
+      ($stdout,$stderr)=$handle->cmd($sudo.$e."./autogen.sh",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.$e.'./configure','__display__');
       my $ad="Defaults    env_keep += \"PKG_CONFIG_PATH\"";
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo sed -i \'/_XKB_CHARSET/a$ad\' /etc/sudoers")
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'/_XKB_CHARSET/a$ad\' /etc/sudoers")
    }
-   ($stdout,$stderr)=$handle->cmd('make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
 }
@@ -1282,21 +1288,21 @@ print "DOING NGINX\n";
       $sudo.'mkdir -vp /etc/nginx/ssl.crt');
    ($stdout,$stderr)=$handle->cmd(
       $sudo.'mkdir -vp /etc/nginx/ssl.csr');
-   $handle->{_cmd_handle}->print(
+   $handle->print(
       $sudo.'openssl genrsa -des3 -out '.
       "/etc/nginx/ssl.key/$public_ip.key 2048");
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=$handle->prompt();
    $prompt=~s/\$$//;
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      my $output.=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'pass phrase for') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $handle->print($service_and_cert_password);
          $output='';
          next;
       } elsif (-1<index $output,'Verifying - Enter') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $handle->print($service_and_cert_password);
          $output='';
          next;
       }
@@ -1306,7 +1312,7 @@ print "DOING NGINX\n";
       my $ereturn=eval {
          local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
          alarm 7;
-         $handle->{_cmd_handle}->print($sudo.
+         $handle->print($sudo.
             "openssl req -new -key /etc/nginx/ssl.key/$public_ip.key ".
             "-out /etc/nginx/ssl.csr/$public_ip.csr");
          my $test='';my $output='';
@@ -1318,80 +1324,80 @@ print "DOING NGINX\n";
             print $output;
             $test=~s/\n//gs;
             if ($test=~/Enter pass phrase.*key:/s) {
-               $handle->{_cmd_handle}->print($service_and_cert_password);
+               $handle->print($service_and_cert_password);
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'[AU]:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'[Some-State]:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'city) []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'Pty Ltd]:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'section) []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'YOUR name) []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'Address []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'challenge password []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'company name []:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'Country Name (2 letter code) [XX]') {
-               $handle->{_cmd_handle}->print('.');
+               $handle->print('.');
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,'State or Province Name (full name) []') {
-               $handle->{_cmd_handle}->print('.');
+               $handle->print('.');
                $output='';
                $test='';
                next;
             } elsif (
                   -1<index $test,'Locality Name (eg, city) [Default City]:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,
                  'Organization Name (eg, company) [Default Company Ltd]:') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
             } elsif (-1<index $test,
                  'Common Name (eg, your name or your server\'s hostname) []') {
-               $handle->{_cmd_handle}->print();
+               $handle->print();
                $output='';
                $test='';
                next;
@@ -1402,7 +1408,7 @@ print "DOING NGINX\n";
       alarm(0);
       last if $ereturn eq 'DONE' || $trys++>3;
    }
-   $handle->{_cmd_handle}->print($sudo.
+   $handle->print($sudo.
       'openssl x509 -req -days 365 -in '.
       "/etc/nginx/ssl.csr/$public_ip.csr -signkey ".
       "/etc/nginx/ssl.key/$public_ip.key -out ".
@@ -1412,7 +1418,7 @@ print "DOING NGINX\n";
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'Enter pass phrase') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
+         $handle->print($service_and_cert_password);
          $output='';
          next;
       } 
@@ -1472,8 +1478,8 @@ END
 use Net::FullAuto;
 \\x24Net::FullAuto::FA_Core::debug=1;
 my \\x24handle=connect_shell();
-\\x24handle->{_cmd_handle}->print('/usr/local/nginx/nginx -g \\x22daemon on;\\x22');
-\\x24prompt=substr(\\x24handle->{_cmd_handle}->prompt(),1,-1);
+\\x24handle->print('/usr/local/nginx/nginx -g \\x22daemon on;\\x22');
+\\x24prompt=\\x24handle->prompt();
 my \\x24output='';my \\x24password_not_submitted=1;
 while (1) {
    eval {
@@ -1484,12 +1490,12 @@ while (1) {
       print \\x24output;
       if ((-1<index \\x24output,'Enter PEM pass phrase:') &&
             \\x24password_not_submitted) {
-         \\x24handle->{_cmd_handle}->print(\\x24ARGV[0]);
+         \\x24handle->print(\\x24ARGV[0]);
          \\x24password_not_submitted=0;
       }
    };
    if (\\x24\@) {
-      \\x24handle->{_cmd_handle}->print();
+      \\x24handle->print();
       next;
    }
 }
@@ -1520,14 +1526,14 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd("touch script/first_time_start.flag");
    } else {
-      $handle->{_cmd_handle}->print($sudo."/usr/local/nginx/nginx");
-      $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      $handle->print($sudo."/usr/local/nginx/nginx");
+      $prompt=$handle->prompt();
       while (1) {
-         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         my $output.=fetch($handle);
          last if $output=~/$prompt/;
          print $output;
          if (-1<index $output,'PEM pass phrase') {
-            $handle->{_cmd_handle}->print($service_and_cert_password);
+            $handle->print($service_and_cert_password);
             $output='';
             next;
          }
@@ -1592,43 +1598,43 @@ exit;
 }
    unless (-e '/usr/bin/cpan') {
       if ($^O eq 'cygwin') {
-         $handle->{_cmd_handle}->print('cpan');
+         $handle->print('cpan');
       } else {
          ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install cpan',
             '__display__');
-         $handle->{_cmd_handle}->print($sudo.'cpan');
+         $handle->print($sudo.'cpan');
       } 
-      $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      $prompt=$handle->prompt();
       while (1) {
          my $output.=Net::FullAuto::FA_Core::fetch($handle);
          last if $output=~/$prompt/;
          print 'm'.$output;
          if (-1<index $output,'possible automatically') {
-            $handle->{_cmd_handle}->print('yes');
+            $handle->print('yes');
             $output='';
             next;
          } elsif (-1<index $output,'by bootstrapping') {
-            $handle->{_cmd_handle}->print('sudo');
+            $handle->print('sudo');
             $output='';
             next;
          } elsif (-1<index $output,'some CPAN') {
-            $handle->{_cmd_handle}->print('no');
+            $handle->print('no');
             $output='';
             next;
          } elsif (-1<index $output,'pick from') {
-            $handle->{_cmd_handle}->print('no');
+            $handle->print('no');
             $output='';
             next;
          } elsif (-1<index $output,'CPAN site') {
-            $handle->{_cmd_handle}->print('http://www.cpan.org');
+            $handle->print('http://www.cpan.org');
             $output='';
             next;
          } elsif (-1<index $output,'ENTER to quit') {
-            $handle->{_cmd_handle}->print();
+            $handle->print();
             $output='';
             next;
          } elsif ($output=~/cpan[[]\d+[]][>]/) {
-            $handle->{_cmd_handle}->print('bye');
+            $handle->print('bye');
             next;
          }
       }
@@ -1668,10 +1674,29 @@ END
 ########################################
 END
       print $show;
-      $handle->cmd_raw($sudo.
-         'perl -MCPAN -e \'CPAN::Shell->notest('.
+      $stdout=$handle->cmd_raw($sudo.
+         'perl -MCPAN -e \'CPAN::Shell->get('.
          '"install","autodie")\'',
          '__display__');
+      $stdout=~s/^.*Checksum for (.*autodie.*gz) ok.*$/$1/s;
+      my $gzfile=$stdout;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "cp -v $gzfile ~",'__display__');
+      $stdout=~/^(.*)\/(.*gz)$/;
+      my $modpath=$1;my $modfile=$2;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar zxvf $modfile",'__display__');
+      ($stdout,$stderr)=$handle->cwd("autodie*");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/\"Test::Perl/#\"Test::Perl/' Makefile.PL");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'perl Makefile.PL','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('..');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf autodie*','__display__');
+      ($stdout,$stderr)=$handle->cwd("~/FullAutoAPI/deps");
    $show=<<END;
 ########################################
 
@@ -1841,7 +1866,7 @@ END
    my $mirror='https://dl.fedoraproject.org/pub/fedora/linux/releases/';
    # "http://mirrors.maine.edu/Fedora/releases/";
    ($stdout,$stderr)=$handle->cmd($sudo."wget -qO- $mirror");
-   my @nums=();
+   my @num=();
    foreach my $line (split /\n/, $stdout) {
       next unless $line=~/DIR/;
       $line=~/^.*DIR.*href=["](\d+)\/["].*$/;
@@ -1910,7 +1935,7 @@ END
       if ($module eq 'Regexp::Assemble' ||
             $module eq 'ZMQ::LibZMQ4' ||
             $module eq 'CatalystX::OAuth2') {
-         $handle->{_cmd_handle}->print($sudo.
+         $handle->print($sudo.
             'perl -MCPAN -e \'CPAN::Shell->force('.
             "\"install\",\"$module\")\'"
          )
@@ -2011,24 +2036,24 @@ END
 END
    print $show;
    if ($^O eq 'cygwin') {
-      $handle->{_cmd_handle}->print($sudo.
+      $handle->print($sudo.
          'perl -MCPAN -e \'CPAN::Shell->notest('.
          '"install","Catalyst::Devel")\'');
    } else {
-      $handle->{_cmd_handle}->print($sudo.'cpan Catalyst::Devel');
+      $handle->print($sudo.'cpan Catalyst::Devel');
    }
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=$handle->prompt();
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      my $output.=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'XS Stash module?') {
-         $handle->{_cmd_handle}->print('Y');
+         $handle->print('Y');
          $output='';
          next;
       }
       if (-1<index $output,'XS Stash by default?') {
-         $handle->{_cmd_handle}->print('Y');
+         $handle->print('Y');
          $output='';
          next;
       }
@@ -2064,14 +2089,14 @@ END
 ########################################
 #END
 #   print $show;
-#   $handle->{_cmd_handle}->print($sudo.'cpan Net::RabbitFoot');
-#   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+#   $handle->print($sudo.'cpan Net::RabbitFoot');
+#   $prompt=$handle->prompt();
 #   while (1) {
-#      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+#      my $output.=fetch($handle);
 #      last if $output=~/$prompt/;
 #      print $output;
 #      if (-1<index $output,'Skip further questions and use') {
-#         $handle->{_cmd_handle}->print('y');
+#         $handle->print('y');
 #         $output='';
 #         next;
 #      }
@@ -2297,7 +2322,7 @@ END
 END
    print $show;
    sleep 1;
-   $handle->{_cmd_handle}->print($sudo.
+   $handle->print($sudo.
       'perl -MCPAN -e \'CPAN::Shell->notest('.
       '"install","Time::Warp")\'');
    $show=<<END;
@@ -2393,19 +2418,19 @@ END
 ########################################
 END
    print $show;
-   $handle->{_cmd_handle}->print("${sudo}cpan Finance::Quote");
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $handle->print("${sudo}cpan Finance::Quote");
+   $prompt=$handle->prompt();
    while (1) {
       my $output.=Net::FullAuto::FA_Core::fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'traffic to external sites') {
-         $handle->{_cmd_handle}->print('Y');
+         $handle->print('Y');
          $output='';
          next;
       }
       if (-1<index $output,'have network connectivity. [n]') {
-         $handle->{_cmd_handle}->print('y');
+         $handle->print('y');
          $output='';
          next;
       }

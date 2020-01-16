@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,44 +14,45 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 bc9d0374280c1f01232634238421ab1a64d3adea Changes
-SHA1 cdc7a934508940964c66f41dcf8bdd4c8163cc44 Day.pm
-SHA1 3dd4b78713ae27d0a5cff6b8aee83cb2a6ae6861 LICENSE
-SHA1 bca574011b48d5b35924344d463a3eb16e8f48a9 MANIFEST
-SHA1 daf50842bdbd0402e00983977e4fc24df92e416a META.yml
-SHA1 f434935e0276e6f8813ec35e462ac9a6c0d485f2 Makefile.PL
-SHA1 80d41d17f9d01470bdb42991e8eed0667b8a3b27 README
-SHA1 ae2e124e11cce32382494933cf61bf5d6c7e09d5 examples/ex1.pl
-SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
-SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
-SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
-SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
-SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
-SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
-SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
-SHA1 102f38134352a7c06de06cf6a3ae289ff061de32 t/Random-Day/01-use.t
-SHA1 e024bf8d67677bb6f3bf23c5a0341127d98192ab t/Random-Day/02-version.t
-SHA1 17cbde094fbe0a9826f2173f7e787ca0620a8295 t/Random-Day/03-new.t
-SHA1 71cc25e0f175ec4268bef274bb6d1d01d1d1d6c2 t/Random-Day/04-get.t
-SHA1 9f3a3fdea73a8c09d2404d0d95a96bc69ef06b93 t/Random-Day/05-random.t
-SHA1 7a4105e593bf5c87c2d3d3671061dadf563480e0 t/Random-Day/06-random_day.t
-SHA1 8603f1ebc03851eb1db1ad8cee8695f13e12715e t/Random-Day/07-random_day_month.t
-SHA1 a267618f6ff4340a6915625fe1a64ab25d9a9aea t/Random-Day/08-random_day_month_year.t
-SHA1 2915ee11a673be85262916059555d9d214720857 t/Random-Day/09-random_month.t
-SHA1 219d10245620b6c2dd0b8bcd89a860984c278b3c xt/Random-Day/01-pod_coverage.t
-SHA1 419a08dab22a629a3710c126ed5349b147ae1690 xt/Random-Day/02-pod.t
+SHA256 5370008dcc97323a03ccb2485a09f45978bb43abd5d8385324982ec6756888b8 Changes
+SHA256 847452d2466198299fad39b93413ced42567e5a3476bf7096f8904b332afe776 Day.pm
+SHA256 cf17aabcd594f257dd9369e1420c29e1ca80b5ed93dd5e967204f40e9e56d18b LICENSE
+SHA256 924571e8909db50f9c9885dc05f0f1cf37aff903b85b47727ebd13796bb54d7c MANIFEST
+SHA256 286f6e890c89cf546ed0340440e72ed648e950edc4b40cabab0d2abb67f19ae8 META.yml
+SHA256 d0eef23369a051e273b5d5aece892e7083453e4db613f65e621dd94d0de78479 Makefile.PL
+SHA256 788ced5681e6d55bf1f1afc024cffaa98963155c5dd1a45b0e6c4745952ad828 README
+SHA256 8516c201095187ce28f5160f0960301eb4f028513324cf7a4c76802d30287817 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 1024543fb751f7f1a5bc2a07451adf53d4f54ee1cef4f9138cca6c46560b5b00 t/Random-Day/01-use.t
+SHA256 04d51edc647e0721f35db08dc80b2ed321381fa6430605ce671c5a4d10c17155 t/Random-Day/02-version.t
+SHA256 ca6e0037f323bedf15b59c353e27e1f82daec3930aba2b2f123b82039e5832de t/Random-Day/03-new.t
+SHA256 ecc5f8f94a86efbb05b203ec0fc71ae363214fabe2b07d887f83f12cac8e3d23 t/Random-Day/04-get.t
+SHA256 e4d282b796e088d7b543f394bf5a6f9139c8e45ef5b1da9600d7d28293e7c91f t/Random-Day/05-random.t
+SHA256 c02369378005c16161b23b8d1a035f4adbe492f05e7a6ba3fc826d73f99547c6 t/Random-Day/06-random_day.t
+SHA256 7febde00f374eb3c6a7030ffc13711252d54120071e680b6ba388247ebc8e316 t/Random-Day/07-random_day_month.t
+SHA256 a6d0ec0aa98dff2db0f8082ac4150afdde4054de84dce8f43612b449c222837d t/Random-Day/08-random_day_month_year.t
+SHA256 f75ff6afcba792b719662abde1331a4871473b85aece0d9abba2f45db8939fcb t/Random-Day/09-random_month.t
+SHA256 f80384d7161cf05826ac9dc1c07e6125d02ae0297de35bcf664f1b01e27f5d14 t/Random-Day/10-random_year.t
+SHA256 9c80e00ecea4a1431c60195d5249f74df0da9b0d90726b7e64be10cc5bb66913 xt/Random-Day/01-pod_coverage.t
+SHA256 57d1e9be4be0ea0a92860bd958610cb225c645dac8460d2caa5a7ac5abb792f6 xt/Random-Day/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlu/ZAQACgkQKyiOZjWe
-rHZGfAf/X5qDZX2DtgFm26WqlDkVDRLc9Np/M91uHRAnUPPSj0RLJLx4CLAeeG4c
-uw6Y9ibXrM92Sj8y/xuoAdjQ84jyTvBqWW6/nqO6qIocWISMPpCMOtl/aO408f5c
-UsreZGSb+NM4M2dkLE3/uqxSSsz0x80jXVPOnzbBAKEP2+5tbT3DOpl6iIQI79V6
-VgtgfhrSZY0tSgMAASmLB5YVpXWKD2VEkeIVYjp0I0f74BHNqm635xFRlA5vkRfK
-RrurwkvRU5IGcYYmDe3fgxXlzP1sJ79n5ujek9g9jbOOtReYGEouTNcjYvNExJ02
-/ZHPaXfugBCfA/KOmrPBQblQ6Pm6og==
-=7oX2
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl4c/RkACgkQKyiOZjWe
+rHZc4gf/alP68vAwNAtan+eykckckbi521se+WQa3Y18EshQJvFKsXRbRvmEmUOW
+PTrFV+KdZE8zDN5S66rHejz5QGozhvNeVlRBJZGIxM+qnM4IyEys1ruqAq3TB773
+IoPgXJOJaYwFDjWSnmFHdq+qA85FmrS1Mt6tKqFqLrgRtKqVeaUkiZ0YoayDXyxo
+wd0VRYBLSOIgpU3HCMpA2j+DLNOUkQroGVbRPyB1qt0A9cIof9e25IWBRg5C2ZyB
+ghDjDqZNg0/Qauidzm4Dfk8N5qoY0+NqvRgNp3meiCgjjnI8ejUQytgFHLEFCFB2
+u18FPYJOBTWIOepP7hNKCf7l+9O+Ug==
+=gnG7
 -----END PGP SIGNATURE-----

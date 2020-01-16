@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020';
+our $VERSION   = '0.022';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -88,18 +88,19 @@ sub import {
 		for my $role (@roles) {
 			my ($pkg_name, $pkg_opts) = @$role;
 			$builder->munge_role_options($pkg_opts, \%opts);
-			$builder->make_type_for_role($pkg_name, $pkg_opts->$_handle_list, %opts);
+			$builder->make_type_for_role($pkg_name, %opts, $pkg_opts->$_handle_list);
 		}
 		for my $class (@classes) {
 			my ($pkg_name, $pkg_opts) = @$class;
 			$builder->munge_class_options($pkg_opts, \%opts);
-			$builder->make_type_for_class($pkg_name, $pkg_opts->$_handle_list, %opts);
+			$builder->make_type_for_class($pkg_name, %opts, $pkg_opts->$_handle_list);
 		}
 	}
 	
+	my $reg;
 	if ($opts{factory_package}) {
 		require Type::Registry;
-		my $reg = 'Type::Registry'->for_class($opts{factory_package});
+		$reg = 'Type::Registry'->for_class($opts{factory_package});
 		$reg->add_types($_) for (
 			$opts{type_library},
 			qw( Types::Standard Types::Common::Numeric Types::Common::String Types::TypeTiny ),
@@ -119,20 +120,20 @@ sub import {
 	
 	for my $role (@roles) {
 		my ($pkg_name, $pkg_opts) = @$role;
-		$builder->do_coercions_for_role($pkg_name, $pkg_opts->$_handle_list, %opts);
+		$builder->do_coercions_for_role($pkg_name, %opts, reg => $reg, $pkg_opts->$_handle_list);
 	}
 	for my $class (@classes) {
 		my ($pkg_name, $pkg_opts) = @$class;
-		$builder->do_coercions_for_class($pkg_name, $pkg_opts->$_handle_list, %opts);
+		$builder->do_coercions_for_class($pkg_name, %opts, reg => $reg, $pkg_opts->$_handle_list);
 	}
 	
 	for my $role (@roles) {
 		my ($pkg_name, $pkg_opts) = @$role;
-		$builder->make_role($pkg_name, $pkg_opts->$_handle_list, %opts);
+		$builder->make_role($pkg_name, %opts, $pkg_opts->$_handle_list);
 	}
 	for my $class (@classes) {
 		my ($pkg_name, $pkg_opts) = @$class;
-		$builder->make_class($pkg_name, $pkg_opts->$_handle_list, %opts);
+		$builder->make_class($pkg_name, %opts, $pkg_opts->$_handle_list);
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -350,15 +351,9 @@ sub _do_coercions {
 		
 		while (@coercions) {
 			my $type = shift @coercions;
-			if (!ref $type and $opts{type_library}) {
-				my $target = $builder->qualify_name($type, $opts{prefix});
-				my $tc = $opts{type_library}->get_type_for_package(class => $target)
-					|| $opts{type_library}->get_type_for_package(role => $target);
-				$type = $tc if $tc;
-			}
 			if (!ref $type) {
-				my $target = $builder->qualify_name($type, $opts{prefix});
-				$type = InstanceOf->of($target);
+				my $tc = $opts{reg}->lookup($type);
+				$type = $tc if $tc;
 			}
 			my $method_name = shift @coercions;
 			defined($method_name) && !ref($method_name)
@@ -523,7 +518,7 @@ sub _make_package {
 			my %spec =
 				is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
 				is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
-				$attrspec->$_handle_list_add_nulls;
+				$attrspec->$_handle_list_add_nulls; # ????? should not add nulls ?????
 			if (is_CodeRef $spec{builder}) {
 				my $code = delete $spec{builder};
 				$spec{builder} = $buildername;
@@ -572,7 +567,15 @@ sub _make_package {
 			$builder->$method($qname, $attrname, \%spec);
 		}
 	}
-	
+
+	if ($opts{is_role}) {
+		my $method   = $opts{toolkit_require_methods} || ("require_methods_".lc $toolkit);
+		my %requires = $opts{requires}->$_handle_list_add_nulls;
+		if (keys %requires) {
+			$builder->$method($qname, \%requires);
+		}
+	}
+
 	for my $modifier (qw(before after around)) {
 		my $method = $opts{toolkit_modify_methods} || ("modify_method_".lc $toolkit);
 		my @methods = $opts{$modifier}->$_handle_list;
@@ -580,7 +583,7 @@ sub _make_package {
 			my @method_names;
 			push(@method_names, shift @methods)
 				while (@methods and not ref $methods[0]);
-			my $coderef = shift @methods;
+			my $coderef = $builder->_prepare_method_modifier($qname, $modifier, \@method_names, shift(@methods));
 			$builder->$method($qname, $modifier, \@method_names, $coderef);
 		}
 	}
@@ -654,7 +657,7 @@ sub _get_moo_helper {
 	my ($package, $helpername) = @_;
 	return $_cached_moo_helper{"$package\::$helpername"}
 		if $_cached_moo_helper{"$package\::$helpername"};
-	die "lolwut?" unless $helpername =~ /^(has|with|extends|around|before|after)$/;
+	die "lolwut?" unless $helpername =~ /^(has|with|extends|around|before|after|requires)$/;
 	my $is_role = ($INC{'Moo/Role.pm'} && 'Moo::Role'->is_role($package));
 	my $tracker = $is_role ? $Moo::Role::INFO{$package}{exports} : $Moo::MAKERS{$package}{exports};
 	if (ref $tracker) {
@@ -676,21 +679,54 @@ sub make_attribute_moo {
 	my $builder = shift;
 	my ($class, $attribute, $spec) = @_;
 	my $helper = $builder->_get_moo_helper($class, 'has');
+	if (is_Object($spec->{isa}) and $spec->{isa}->isa('Type::Tiny::Enum') and $spec->{handles}) {
+		$builder->_process_enum_moo(@_);
+	}
 	$helper->($attribute, %$spec);
+}
+
+sub _process_enum_moo {
+	my $builder = shift;
+	my ($class, $attribute, $spec) = @_;
+	require MooX::Enumeration;
+	my %new_spec = 'MooX::Enumeration'->process_spec($class, $attribute, %$spec);
+	if (delete $new_spec{moox_enumeration_process_handles}) {
+		'MooX::Enumeration'->install_delegates($class, $attribute, \%new_spec);
+	}
+	%$spec = %new_spec;
 }
 
 sub make_attribute_moose {
 	my $builder = shift;
 	my ($class, $attribute, $spec) = @_;
+	if (is_Object($spec->{isa}) and $spec->{isa}->isa('Type::Tiny::Enum')||$spec->{isa}->isa('Moose::Meta::TypeConstraint::Enum') and $spec->{handles}) {
+		$builder->_process_enum_moose(@_);
+	}
 	require Moose::Util;
 	(Moose::Util::find_meta($class) or $class->meta)->add_attribute($attribute, $spec);
+}
+
+sub _process_enum_moose {
+	my $builder = shift;
+	my ($class, $attribute, $spec) = @_;
+	require MooseX::Enumeration;
+	push @{ $spec->{traits}||=[] }, 'Enumeration';
 }
 
 sub make_attribute_mouse {
 	my $builder = shift;
 	my ($class, $attribute, $spec) = @_;
+	use Data::Dumper;
+	print Dumper($spec);
+	if (is_Object($spec->{isa}) and $spec->{isa}->isa('Type::Tiny::Enum') and $spec->{handles}) {
+		$builder->_process_enum_mouse(@_);
+	}
 	require Mouse::Util;
 	(Mouse::Util::find_meta($class) or $class->meta)->add_attribute($attribute, $spec);
+}
+
+sub _process_enum_mouse {
+	die 'not implemented';
 }
 
 sub extend_class_moo {
@@ -749,6 +785,27 @@ sub extend_class_mouse {
 		# this can double-apply roles? :(
 		Mouse::Util::apply_all_roles($class, $roles->$_process_roles('Mouse'));
 	}
+}
+
+sub require_methods_moo {
+	my $builder = shift;
+	my ($role, $methods) = @_;
+	my $helper = $builder->_get_moo_helper($role, 'requires');
+	$helper->(sort keys %$methods);
+}
+
+sub require_methods_moose {
+	my $builder = shift;
+	my ($role, $methods) = @_;
+	require Moose::Util;
+	(Moose::Util::find_meta($role) or $role->meta)->add_required_methods(sort keys %$methods);
+}
+
+sub require_methods_mouse {
+	my $builder = shift;
+	my ($role, $methods) = @_;
+	require Mouse::Util;
+	(Mouse::Util::find_meta($role) or $role->meta)->add_required_methods(sort keys %$methods);
 }
 
 sub install_methods {
@@ -883,6 +940,32 @@ sub install_constants {
 				or $builder->croak("Could not create constant $name in package $class: $@");
 		}
 	}
+}
+
+sub _prepare_method_modifier {
+	my ($builder, $class, $kind, $names, $method) = @_;
+	return $method if is_CodeRef $method;
+	
+	my $coderef   = $method->{code};
+	my $signature = $method->{signature};
+	my @curry     = @{ $method->{curry} || [] };
+	my $signature_style = $method->{named} ? 'named' : 'positional';
+	
+	my $invocant_count = 1 + !!($kind eq 'around');
+	$invocant_count  = $method->{invocant_count} if exists $method->{invocant_count};
+	
+	my $name = join('|', @$names)."($kind)";
+
+	my $wrapped = eval qq{
+		my \$check;
+		sub {
+			my \@invocants = splice(\@_, 0, $invocant_count);
+			\$check ||= q($builder)->_build_method_signature_check(q($class), q($class\::$name), \$signature_style, \$signature, \\\@invocants);
+			\@_ = (\@invocants, \@curry, \&\$check);
+			goto \$coderef;
+		};
+	};
+	$wrapped or die("YIKES: $@");
 }
 
 sub modify_method_moo {
@@ -1260,7 +1343,7 @@ Builder coderefs are automatically installed as methods like
 
 For details of the hashrefs, see L</Attribute Specifications>.
 
-=item C<< can >> I<< (HashRef[CodeRef]) >>
+=item C<< can >> I<< (HashRef[CodeRef|HashRef]) >>
 
 A hashref of coderefs to install into the package.
 
@@ -1408,8 +1491,8 @@ Now that's out of the way, the exact structure for the arrayref of coercions
 can be explained. It is essentially a list of type-method pairs.
 
 The type may be either a blessed type constraint object (L<Type::Tiny>, etc)
-or it may be a class or role name that is being set up by MooX::Press, in
-which case it will have the prefix added, etc.
+or it may be a string type name for something that your type library knows
+about.
 
 The method is a string containing the method name to perform the coercion.
 
@@ -1457,13 +1540,15 @@ possible to have coercions from many different types.
     class => [
       'Foo::Bar' => {
         coerce => [
-          Str,        'from_string', sub { ... },
-          ArrayRef,   'from_array',  sub { ... },
-          HashRef,    'from_hash',   sub { ... },
-          'Foo::Baz', 'from_foobaz', sub { ... },
+          Str,      'from_string', sub { ... },
+          ArrayRef, 'from_array',  sub { ... },
+          HashRef,  'from_hash',   sub { ... },
+          'FBaz',   'from_foobaz', sub { ... },
         ],
       },
-      'Foo::Baz',
+      'Foo::Baz' => {
+        type_name => 'FBaz',
+       },
     ],
   );
 
@@ -1643,11 +1728,43 @@ exceptions:
 
 =over
 
+=item C<< requires >> I<< (ArrayRef) >>
+
+A list of methods required by the role.
+
+  package MyApp;
+  use MooX::Press (
+    role => [
+      'Milkable' => {
+        requires => ['get_udder'],
+        ...,
+      },
+    ],
+  );
+
+Each method can optionally be followed by a method-defining hashref like
+in C<can>:
+
+  package MyApp;
+  use MooX::Press (
+    role => [
+      'Milkable' => {
+        requires => [
+          'get_udder', { signature => [...], named => 0 },
+        ],
+        ...,
+      },
+    ],
+  );
+
+These hashrefs are currently ignored, but may be useful for people reading
+your role declarations.
+
 =item C<< extends >> I<< (Any) >>
 
 This option is disallowed.
 
-=item C<< can >> I<< (HashRef[CodeRef]) >>
+=item C<< can >> I<< (HashRef[CodeRef|HashRef]) >>
 
 The alternative style for defining methods may cause problems with the order
 in which things happen. Because C<< use MooX::Press >> happens at compile time,
@@ -1846,6 +1963,31 @@ This is a cute shortcut for an enum type constraint.
   enum => ['foo', 'bar'],
   type => Types::Standard::Enum['foo', 'bar'],
 
+If the type constraint is set to an enum and C<handles> is provided,
+then MooX::Press will automatically load L<MooX::Enumeration> or
+L<MooseX::Enumeration> as appropriate. (This is not supported for
+Mouse.)
+
+  use MooX::Press (
+    prefix  => 'Nature',
+    class   => [
+      'Leaf'  => {
+        has  => {
+          'colour' => {
+            enum    => ['green', 'red', 'brown'],
+            handles => 2,
+            default => 'green',
+          },
+        },
+       },
+    ],
+  );
+  
+  my $leaf = Nature->new_leaf;
+  if ( $leaf->colour_is_green ) {
+    print "leaf is green!\n";
+  }
+
 =back
 
 =head3 Method Signatures
@@ -1867,8 +2009,15 @@ Unlike L<Type::Params>, these signatures allow type constraints to be
 given as strings, which will be looked up by name.
 
 This should work for C<can>, C<factory_can>, C<type_library_can>,
-C<factory>, and C<builder> methods, but will not work for method
-modifiers.
+C<factory>, C<builder> methods, and method modifiers. (Though if you
+are doing type checks in both the methods and method modifiers, this
+may result in unnecessary duplication of checks.)
+
+The invocant (C<< $self >>) is not included in the signature.
+(For C<around> method modifiers, the original coderef C<< $orig >> is
+logically a second invocant. For C<factory> methods installed in the
+factory package, the factory package name and class name are both
+considered invocants.) 
 
 Example with named parameters:
 
@@ -1928,6 +2077,10 @@ Example with positional parameters:
   
   my $carol  = Wedding->new_officiant(name => 'Carol');
   $carol->marry($alice, $bob);
+
+Methods with a mixture of named and positional parameters are not supported.
+If you really want such a method, don't provide a signature; just provide a
+coderef and manually unpack C<< @_ >>.
 
 =head2 Optimization Features
 

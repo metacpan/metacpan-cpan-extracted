@@ -13,7 +13,7 @@ use warnings;
 # restriction could be listed.
 use 5.010; # pack endian formats
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 

@@ -17,13 +17,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Endoscope",
   "PREREQ_PM" => {
-    "Devel::Optic" => "0.012",
+    "Devel::Optic" => "0.015",
     "Devel::Probe" => "0.000005"
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000100"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => ""
   }
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Devel::Optic" => "0.012",
+  "Devel::Optic" => "0.015",
   "Devel::Probe" => "0.000005",
   "Test2::V0" => "0.000100"
 );

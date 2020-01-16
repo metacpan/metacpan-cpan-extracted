@@ -26,7 +26,7 @@ use base 'Template::Plugin';
 use Scalar::Util 'weaken', 'isweak';
 
 
-our $VERSION = '3.003';
+our $VERSION = '3.005';
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
 
@@ -386,7 +386,7 @@ Andy Wardley E<lt>abw@wardley.orgE<gt> L<http://wardley.org/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1996-2019 Andy Wardley.  All Rights Reserved.
+Copyright (C) 1996-2020 Andy Wardley.  All Rights Reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

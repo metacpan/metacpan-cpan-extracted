@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Location;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Location::VERSION = '0.193230';
+$Bio::Palantir::Parser::Location::VERSION = '0.200150';
 use Moose;
 use namespace::autoclean;
 
@@ -94,7 +94,9 @@ sub dna_size {
 
 
 sub prot_begin {
-    return ( ceil(shift->dna_begin / 3) )
+    my $self = shift;
+    my $prot_begin = $self->dna_begin == 1 ? 1 : $self->dna_begin / 3;
+    return ( ceil($prot_begin) );
 } 
 
 
@@ -136,7 +138,7 @@ Bio::Palantir::Parser::Location - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 

@@ -13,9 +13,9 @@ my $build = Module::Build->new(
       'IO::Async::Loop' => '0.16',
       'IO::Async::Stream' => 0,
       'IO::Async::Test' => 0,
-      'Tangence::Client' => '0.21',
+      'Tangence::Client' => '0.25', # ->get_registry
       'Tangence::Server' => '0.19',
-      'URI::Split' => 0,
+      'URI' => 0,
    },
    build_requires => {
       'Test::Fatal' => '0.006',

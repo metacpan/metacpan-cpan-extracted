@@ -780,7 +780,7 @@ from the L<XML::Simple> module, written by
 Grant McLean E<lt>grantm@cpan.orgE<gt>
 
 Copyrights of the perl code and the related documentation by
-2008-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+2008-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

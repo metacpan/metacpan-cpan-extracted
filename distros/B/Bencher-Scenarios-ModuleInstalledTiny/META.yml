@@ -3,7 +3,7 @@ abstract: 'Scenarios to benchmark Module::Installed::Tiny'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.046'
+  Bencher::Backend: '1.047'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-ModuleInstalledTiny
   homepage: https://metacpan.org/release/Bencher-Scenarios-ModuleInstalledTiny
   repository: git://github.com/perlancar/perl-Bencher-Scenario-ModuleInstalledTiny.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

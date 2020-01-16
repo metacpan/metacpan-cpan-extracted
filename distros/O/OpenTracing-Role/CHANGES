@@ -1,0 +1,43 @@
+CHANGE LOG
+==========
+
+
+2020-01-15 - v0.05
+
+### Changed
+    - use option `finish_span_on_close` instead of optional boolean
+
+
+2020-01-14 - v0.04
+
+### Added
+    - OpenTracing::Role.pm, to satisfy PAUSE indexer
+
+
+2020-01-14 - v0.03
+------------------
+
+Public Release for CPAN
+
+### Added
+    - use_ok test
+    - LICENSE
+
+
+2019-12-18 - v0.02
+------------------
+
+GitLab - CI Release
+
+### Added
+    - gitlab-ci
+
+
+2019-12-05 - v0.01
+------------------
+
+Initial Release
+
+### Added
+
+    - OpenTracing Roles

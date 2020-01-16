@@ -1,14 +1,19 @@
-# Copyrights 2011-2014 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-C14N.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::C14N::Util;
-our $VERSION = '0.94';
+use vars '$VERSION';
+$VERSION = '0.95';
 
 use base 'Exporter';
+
+use warnings;
+use strict;
 
 my @c14n = qw/
   C14N_v10_NO_COMM

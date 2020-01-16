@@ -3,9 +3,9 @@ NAME
     Module::Installed::Tiny
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     Bencher::Scenarios::ModuleInstalledTiny (from Perl distribution
-    Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-09.
+    Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-14.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:

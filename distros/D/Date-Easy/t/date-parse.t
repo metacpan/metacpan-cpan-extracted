@@ -2,7 +2,7 @@ use Test::Most 0.25;
 
 use Date::Easy;
 
-use Time::Local;
+use Time::Local qw< timelocal_modern >;
 use Date::Parse;
 use Time::ParseDate;
 
@@ -13,7 +13,7 @@ use File::Spec;
 use Cwd 'abs_path';
 use File::Basename;
 use lib File::Spec->catdir(dirname(abs_path($0)), 'lib');
-use DateEasyTestUtil qw< is_32bit compare_times date_parse_test_cases date_parse_result >;
+use DateEasyTestUtil qw< is_32bit gmtime_sane compare_times date_parse_test_cases date_parse_result >;
 use DateParseTests qw< %DATE_PARSE_TESTS _date_parse_remove_timezone >;
 use TimeParseDateTests qw< @TIME_PARSE_DATE_TESTS get_ymd_from_parsedate >;
 
@@ -112,7 +112,7 @@ foreach (pairs @TIME_PARSE_DATE_TESTS)
 
 
 # insure we properly handle a time of 0 (i.e. the exact day of the epoch)
-my $local_epoch = timelocal gmtime 0;				# for whatever timezone we happen to be in
+my $local_epoch = timelocal_modern gmtime_sane 0;	# for whatever timezone we happen to be in
 foreach (
 			$local_epoch,							# handled internally (epoch seconds)
 			'19700101',								# handled internally (compact datestring)

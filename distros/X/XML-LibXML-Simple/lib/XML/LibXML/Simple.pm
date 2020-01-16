@@ -1,10 +1,14 @@
-# Copyrights 2008-2017 by [Mark Overmeer].
+# Copyrights 2008-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-LibXML-Simple.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 package XML::LibXML::Simple;
 use vars '$VERSION';
-$VERSION = '0.99';
+$VERSION = '1.01';
 
 use base 'Exporter';
 

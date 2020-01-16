@@ -1,0 +1,102 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.021"^^doap-deps:CpanId ], [
+		doap-deps:on "Keyword::Declare 0.001014"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>;
+	doap:created         "2020-01-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooX-Pression>;
+	doap:homepage        <https://metacpan.org/release/MooX-Pression>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooX-Pression";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moox-pression>;
+	];
+	doap:shortdesc       "express yourself through moo".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-Pression-0.001"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.002"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document issues with Perl 5.14.x and Perl 5.16.x and officially only support Perl 5.18.0 and above.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix typo in `end` keyword documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow (and encourage) `from` to follow `coerce`.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better SYNOPSIS showing coercion.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document `enum`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.003"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "`class` blocks may be nested.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document +attrname.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that `begin` and `end` may only occur once per package.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

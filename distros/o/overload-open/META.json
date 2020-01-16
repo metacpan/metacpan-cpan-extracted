@@ -36,7 +36,7 @@
    "provides" : {
       "overload::open" : {
          "file" : "lib/overload/open.pm",
-         "version" : "v1.2.0"
+         "version" : "v1.8.0"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "web" : "https://github.com/samcv/perl-overload-open"
       }
    },
-   "version" : "v1.02.0",
+   "version" : "v1.8.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

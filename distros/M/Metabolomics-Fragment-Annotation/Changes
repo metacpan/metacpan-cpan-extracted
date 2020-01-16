@@ -1,0 +1,10 @@
+Revision history for Metabolomics-Fragment-Annotation
+
+0.2.0	2020-01-08
+	- Splitting 0.1 version in classes/methods for utils and ab initio fragment build process
+	- Adding news resources as BloodExposome and MaConDa
+	- Updating metabolomics::references
+
+0.1.0 2019-06-13
+	- First version of the package, allowing contaminants annotation, adducts/isotopes fragments annotation
+

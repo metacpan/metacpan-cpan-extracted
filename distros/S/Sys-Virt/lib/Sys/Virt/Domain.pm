@@ -1141,6 +1141,15 @@ progress is not made
 
 The number of connections used during parallel migration.
 
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_TLS_DESTINATION>
+
+Override the destination host name used for TLS verification.
+Normally the TLS certificate from the destination host must match
+the host's name for TLS verification to succeed. When the
+certificate does not match the destination hostname and the
+expected cetificate's hostname is known, this parameter can be
+used to pass this expected hostname when starting the migration.
+
 =back
 
 =item $ddom = $dom->migrate(destcon, flags=0, dname=undef, uri=undef, bandwidth=0)
@@ -1551,6 +1560,10 @@ the following constants.
 
 Return the stats of the most recently completed job.
 
+=item Sys::Virt::Domain::JOB_STATS_KEEP_COMPLETED
+
+Don't clear the completed stats after reading them.
+
 =back
 
 =item Sys::Virt::Domain::JOB_TIME_ELAPSED
@@ -1686,6 +1699,18 @@ The number of milliseconds of time doing setup of the job
 
 The type of operation associated with the job
 
+=item Sys::Virt::Domain::JOB_SUCCESS
+
+Whether the job was successfully completed.
+
+=item Sys::Virt::Domain::JOB_DISK_TEMP_TOTAL
+
+Possible total temporary disk space for the job in bytes
+
+=item Sys::Virt::Domain::JOB_DISK_TEMP_USED
+
+Current total temporary disk space for the job in bytes
+
 =back
 
 The values for the Sys::Virt::Domain::JOB_OPERATION field are
@@ -1727,6 +1752,10 @@ The guest is reverting to a snapshot
 =item Sys::Virt::Domain::JOB_OPERATION_DUMP
 
 The guest is saving a crash dump
+
+=item Sys::Virt::Domain::JOB_OPERATION_BACKUP
+
+The guest is performing a block backup
 
 =back
 
@@ -1948,7 +1977,47 @@ sub get_checkpoint_by_name {
     return Sys::Virt::DomainCheckpoint->_new(domain => $self, name => $name);
 }
 
+=item $checkpoint = $dom->create_checkpoint($xml[, $flags])
+
+Create a new checkpoint from the C<$xml>. The C<$flags> parameter accepts
+the B<CHECKPOINT CREATION> constants listed in C<Sys::Virt::DomainCheckpoints>.
+
+=cut
+
+sub create_checkpoint {
+    my $self = shift;
+    my $xml = shift;
+    my $flags = shift;
+
+    my $checkpoint = Sys::Virt::DomainCheckpoint->_new(domain => $self, xml => $xml, flags => $flags);
+
+    return $checkpoint;
+}
+
 1;
+
+=item $dom->backup_begin($backupxml, $checkpointxml=undef, $flags=0);
+
+Start a point-in-time backup job for the specified disks of a
+running domain. The C<$backupxml> parameter describes the
+backup operation, including which disks to use. The optional
+C<$checkpointxml> parameter can be used to create a checkpoint
+covering to the same point in time as the backup. The optional
+C<$flags> parameter can be one of the following constants:
+
+=over 4
+
+=item Sys::Virt::Domain::BACKUP_BEGIN_REUSE_EXTERNAL
+
+Assume that the output/temporary files for the backup have been
+precreated by the caller with the correct size and format.
+
+=back
+
+=item $xml = $dom->backup_get_xml_description($flags=0);
+
+Get the XML description of the currently executing backup
+job. If there is no backup job then an error is raised.
 
 =item $dom->fs_trim($mountPoint, $minimum, $flags=0);
 
@@ -2125,6 +2194,31 @@ Filesystem mount information
 =back
 
 C<$flags> is currently unused and defaults to zero.
+
+=item $dom->set_agent_response_timeout($timeout, $flags=0)
+
+Set the amount of time to wait for the agent to respond to a
+command. C<$timeout> is a positive integer representing the
+number of seconds to wait, or one of the constants:
+
+=over 4
+
+=item Sys::Virt::Domain::AGENT_RESPONSE_TIMEOUT_BLOCK
+
+Wait forever with no timeout
+
+=item Sys::Virt::Domain::AGENT_RESPONSE_TIMEOUT_NOWAIT
+
+Don't want at all, return immediately
+
+=item Sys::Virt::Domain::AGENT_RESPONSE_TIMEOUT_DEFAULT
+
+Use the hypervisor driver's default timeout
+
+=back
+
+The C<$flags> parameter is currently unused and defaults
+to zero.
 
 =back
 
@@ -3699,6 +3793,10 @@ The block commit job type
 
 The block active commit job type
 
+=item Sys::Virt::Domain::BLOCK_JOB_TYPE_BACKUP
+
+The block backup job type
+
 =back
 
 =head2 DOMAIN BLOCK JOB COMPLETION CONSTANTS
@@ -4327,6 +4425,10 @@ Performance event counter values
 =item Sys::Virt::Domain::STATS_IOTHREAD
 
 IOThread performance statistics values
+
+=item Sys::Virt::Domain::STATS_MEMORY
+
+Memory bandwidth statistics values
 
 =back
 

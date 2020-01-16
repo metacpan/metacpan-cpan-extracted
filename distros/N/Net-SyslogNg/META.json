@@ -34,7 +34,7 @@
          "requires" : {
             "DateTime" : "1.18",
             "IO::Socket::INET" : "1.31",
-            "Sys::HostName" : "1.16",
+            "Sys::Hostname" : "1.16",
             "perl" : "v5.14.2"
          }
       }
@@ -51,6 +51,6 @@
          "url" : "https://github.com/vrag86/perl-net-syslogng"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

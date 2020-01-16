@@ -14,14 +14,9 @@
    },
    "name" : "Text-Hspell",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -39,8 +34,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Inline" : "0",
+            "DynaLoader" : "0",
+            "Encode" : "0",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -53,7 +50,7 @@
    "provides" : {
       "Text::Hspell" : {
          "file" : "lib/Text/Hspell.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -68,7 +65,7 @@
          "web" : "https://github.com/shlomif/Text-Hspell"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.2.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -196,7 +193,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -206,16 +203,6 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Filter/MetaResources",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ModuleBuild",
-            "config" : {
-               "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
-               }
-            },
-            "name" : "@Filter/ModuleBuild",
             "version" : "6.012"
          },
          {
@@ -386,7 +373,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.010"
+                        "version" : "1.012"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
@@ -423,6 +410,21 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker::Awesome",
+            "config" : {
+               "Dist::Zilla::Plugin::MakeMaker" : {
+                  "make_path" : "make",
+                  "version" : "6.012"
+               },
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1,
+                  "version" : "6.012"
+               }
+            },
+            "name" : "MakeMaker::Awesome",
+            "version" : "0.48"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",
@@ -494,6 +496,6 @@
       }
    },
    "x_generated_by_perl" : "v5.30.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

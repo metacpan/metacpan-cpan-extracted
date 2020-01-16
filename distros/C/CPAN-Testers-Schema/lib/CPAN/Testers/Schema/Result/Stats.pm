@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::Result::Stats;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: The basic statistics information extracted from test reports
 
 #pod =head1 SYNOPSIS
@@ -51,6 +51,7 @@ our $VERSION = '0.024';
 #pod =cut
 
 use CPAN::Testers::Schema::Base 'Result';
+use Mojo::Util qw( html_unescape );
 table 'cpanstats';
 
 #pod =attr id
@@ -281,6 +282,75 @@ belongs_to upload => 'CPAN::Testers::Schema::Result::Upload' => 'uploadid';
 might_have perl_version => 'CPAN::Testers::Schema::Result::PerlVersion' =>
     { 'foreign.version' => 'self.perl' };
 
+#pod =method dist_name
+#pod
+#pod The name of the distribution that was tested.
+#pod
+#pod =cut
+
+sub dist_name( $self ) {
+    return $self->dist;
+}
+
+#pod =method dist_version
+#pod
+#pod The version of the distribution that was tested.
+#pod
+#pod =cut
+
+sub dist_version( $self ) {
+    return $self->version;
+}
+
+#pod =method lang_version
+#pod
+#pod The language and version the test was executed with
+#pod
+#pod =cut
+
+sub lang_version( $self ) {
+    return sprintf '%s v%s', 'Perl 5', $self->perl;
+}
+
+#pod =method platform
+#pod
+#pod The platform the test was run on
+#pod
+#pod =cut
+
+sub platform( $self ) {
+    return $self->get_inflated_column( 'platform' );
+}
+
+#pod =method grade
+#pod
+#pod The report grade. One of 'pass', 'fail', 'na', 'unknown'.
+#pod
+#pod =cut
+
+sub grade( $self ) {
+    return $self->state;
+}
+
+#pod =method tester_name
+#pod
+#pod The name of the tester who sent the report
+#pod
+#pod =cut
+
+sub tester_name( $self ) {
+    # The name could either be in quotes before the e-mail, or in
+    # parentheses after.
+    for my $re ( qr{"([^"]+)"}, qr{\(([^)]+)\)} ) {
+        if ( $self->tester =~ $re ) {
+            # And it may have high-byte characters HTML-escaped
+            return html_unescape $1;
+        }
+    }
+    # Can't find just the name, so send it all for now...
+    return html_unescape $self->tester;
+}
+
 1;
 
 __END__
@@ -293,7 +363,7 @@ CPAN::Testers::Schema::Result::Stats - The basic statistics information extracte
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -443,6 +513,30 @@ Get the related row in the `uploads` table. See L<CPAN::Testers::Schema::Result:
 
 Get the related metadata about the Perl version this report is for. See
 L<CPAN::Testers::Schema::Result::PerlVersion>.
+
+=head2 dist_name
+
+The name of the distribution that was tested.
+
+=head2 dist_version
+
+The version of the distribution that was tested.
+
+=head2 lang_version
+
+The language and version the test was executed with
+
+=head2 platform
+
+The platform the test was run on
+
+=head2 grade
+
+The report grade. One of 'pass', 'fail', 'na', 'unknown'.
+
+=head2 tester_name
+
+The name of the tester who sent the report
 
 =head1 SEE ALSO
 

@@ -1,15 +1,19 @@
-# Copyrights 2011-2015 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution IOMux.  Meta-POD processed with OODoc
+# into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package IOMux::Select;
 use vars '$VERSION';
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use base 'IOMux';
+
+use warnings;
+use strict;
 
 use Log::Report 'iomux';
 
@@ -67,23 +71,22 @@ sub fdset($$$$$)
     vec($self->{IMS_readers}, $fileno, 1) = $state if $r;
     vec($self->{IMS_writers}, $fileno, 1) = $state if $w;
     vec($self->{IMS_excepts}, $fileno, 1) = $state if $e;
-use Carp 'cluck';
-cluck 'set write bit' if $w;
     # trace "fdset(@_), now: " .$self->showFlags($self->waitFlags);
 }
 
 sub one_go($$)
 {   my ($self, $wait, $heartbeat) = @_;
 
-    trace "SELECT=\n".$self->showFlags($self->waitFlags);
+    #trace "SELECT=\n".$self->showFlags($self->waitFlags);
 
     my ($rdready, $wrready, $exready)
        = @$self{ qw/IMS_readers IMS_writers IMS_excepts/ };
 
     my ($numready, $timeleft)
        = select $rdready, $wrready, $exready, $wait;
+info "time left: $timeleft";
 
-    trace "READY=\n".$self->showFlags($rdready, $wrready, $exready);
+    #trace "READY=\n".$self->showFlags($rdready, $wrready, $exready);
 
     if($heartbeat)
     {   # can be collected from within heartbeat
@@ -102,6 +105,7 @@ sub one_go($$)
     $self->_ready(muxWriteFlagged  => $wrready) if $wrready =~ m/[^\x00]/;
     $self->_ready(muxExceptFlagged => $exready) if $exready =~ m/[^\x00]/;
 
+info "sleeping 1";
 sleep 1;
     1;  # success
 }
@@ -112,7 +116,7 @@ sub _ready($$)
     my $handlers = $self->_handlers;
     while(my ($fileno, $conn) = each %$handlers)
     {   $conn->$call($fileno) if (vec $flags, $fileno, 1)==1;
-warn "$conn $call($fileno)" if (vec $flags, $fileno, 1)==1;
+#warn "$conn $call($fileno)" if (vec $flags, $fileno, 1)==1;
     }
 }
 

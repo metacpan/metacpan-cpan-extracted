@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Upload;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: Query the CPAN uploads data
 
 #pod =head1 SYNOPSIS
@@ -67,6 +67,27 @@ sub since( $self, $date ) {
     return $self->search( { released => { '>=' => $dt->epoch } } );
 }
 
+#pod =method recent
+#pod
+#pod     # 20 most recent
+#pod     $rs = $rs->recent( 20 );
+#pod
+#pod     # Just the most recent
+#pod     $rs = $rs->recent( 1 );
+#pod
+#pod Return the most-recently released distributions sorted by their release
+#pod date/time, descending. Defaults to returning up to 20 results.
+#pod
+#pod =cut
+
+sub recent( $self, $count = 20 ) {
+    return $self->search( { }, {
+        order_by => { -desc => 'released' },
+        rows => $count,
+        page => 1,
+    } );
+}
+
 1;
 
 __END__
@@ -79,7 +100,7 @@ CPAN::Testers::Schema::ResultSet::Upload - Query the CPAN uploads data
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -117,6 +138,17 @@ constraints.
 
 Restrict results to only those that have been updated since the given
 ISO8601 date.
+
+=head2 recent
+
+    # 20 most recent
+    $rs = $rs->recent( 20 );
+
+    # Just the most recent
+    $rs = $rs->recent( 1 );
+
+Return the most-recently released distributions sorted by their release
+date/time, descending. Defaults to returning up to 20 results.
 
 =head1 SEE ALSO
 

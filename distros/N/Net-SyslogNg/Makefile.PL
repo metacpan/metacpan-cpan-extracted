@@ -13,7 +13,7 @@ WriteMakefile(
     PREREQ_PM         => {
         'IO::Socket::INET'          => '1.31',
         'DateTime'                  => '1.18',
-        'Sys::HostName'             => '1.16',
+        'Sys::Hostname'             => '1.16',
     },
     META_MERGE   => {
           requires  => { perl => '5.14.2' },

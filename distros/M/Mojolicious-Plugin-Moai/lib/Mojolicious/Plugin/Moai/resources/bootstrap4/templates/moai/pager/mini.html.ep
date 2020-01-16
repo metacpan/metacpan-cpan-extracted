@@ -1,3 +1,5 @@
+% my $page_param = stash( 'page_param' ) || 'page';
+% my $current_page = stash( 'current_page' ) || param( $page_param ) || 1;
 <ul class="pagination" id="<%= stash( 'id' ) %>">
     % if ( $current_page > 1 ) {
         <li class="page-item">

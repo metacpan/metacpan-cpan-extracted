@@ -1,9 +1,9 @@
 package Bencher::Scenario::ModuleInstalledTiny::module_source;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-09'; # DATE
+our $DATE = '2020-01-14'; # DATE
 our $DIST = 'Bencher-Scenarios-ModuleInstalledTiny'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -42,7 +42,7 @@ our $scenario = {
         #    tags => ['cached'],
         #},
         {
-            name => 'require, cached',
+            name => 'require, uncached',
             code_template => 'BEGIN {<begin_code:raw>} delete $INC{<module_pm>}; require <module_pm>;',
             tags => ['uncached'],
         },
@@ -72,7 +72,7 @@ Bencher::Scenario::ModuleInstalledTiny::module_source - Benchmark Module::Instal
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::ModuleInstalledTiny::module_source (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-09.
+This document describes version 0.004 of Bencher::Scenario::ModuleInstalledTiny::module_source (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-14.
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Code template:
 
 
 
-=item * require, cached (perl_code) [uncached]
+=item * require, uncached (perl_code) [uncached]
 
 Code template:
 
@@ -135,23 +135,23 @@ Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz 
 Benchmark with default options (C<< bencher -m ModuleInstalledTiny::module_source >>):
 
  #table1#
- +-----------------------------------+-----------+-----------+------------+---------+---------+
- | participant                       | rate (/s) | time (μs) | vs_slowest |  errors | samples |
- +-----------------------------------+-----------+-----------+------------+---------+---------+
- | Module::Installed::Tiny, uncached |     51000 |        20 |        1   | 3.3e-08 |      21 |
- | require, cached                   |     61000 |        16 |        1.2 | 2.7e-08 |      20 |
- +-----------------------------------+-----------+-----------+------------+---------+---------+
+ +-----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                       | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | Module::Installed::Tiny, uncached |     71000 |        14 |                 0.00% |                23.69% | 2.5e-08 |      22 |
+ | require, uncached                 |     87000 |        11 |                23.69% |                 0.00% | 1.2e-08 |      26 |
+ +-----------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m ModuleInstalledTiny::module_source --module-startup >>):
 
  #table2#
- +-------------------------+-----------+------------------------+------------+---------+---------+
- | participant             | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +-------------------------+-----------+------------------------+------------+---------+---------+
- | Module::Installed::Tiny |      10.3 |                    3.9 |        1   |   1e-05 |      20 |
- | perl -e1 (baseline)     |       6.4 |                    0   |        1.6 | 1.6e-05 |      20 |
- +-------------------------+-----------+------------------------+------------+---------+---------+
+ +-------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | participant             | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+ | Module::Installed::Tiny |      9.49 |              1.69 |                 0.00% |                21.74% | 5.6e-06 |      20 |
+ | perl -e1 (baseline)     |      7.8  |              0    |                21.74% |                 0.00% | 5.4e-05 |      20 |
+ +-------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

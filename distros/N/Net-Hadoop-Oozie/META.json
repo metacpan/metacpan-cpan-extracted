@@ -77,17 +77,13 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-Oozie/issues"
-      },
-      "homepage" : "http://metacpan.org/release/Net-Hadoop-Oozie",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/Perl-Hadoop/Net-Hadoop-Oozie.git",
          "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-Oozie"
       }
    },
-   "version" : "0.115",
+   "version" : "0.116",
    "x_contributors" : [
       "Canran Gou <canrangou@cpan.org>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
@@ -96,7 +92,7 @@
       "Eric Herman <eherman@cpan.org>",
       "Rafa\u00ebl Garcia-Suarez <rgarcia@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.26.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

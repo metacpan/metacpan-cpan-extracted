@@ -29,15 +29,15 @@ IO::EPP::RIPN
     } );
 
     # Check domain
-    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'org.info' ] } );
+    my ( $answ, $code, $msg ) = $conn->check_domains( { domains => [ 'my.ru', 'out.ru' ] } );
 
     # Call logout() and destroy object
     undef $conn;
 
 =head1 DESCRIPTION
 
-RIPN is the first organization the registry in the .ru tld
-Then it transferred functions of the registry into TCI (L<tcinet.ru>)
+RIPN is the first organization the registry in the .ru tld.
+Then it transferred functions of the registry into L<TCI|https://tcinet.ru>,
 but all special headings in epp remained
 
 Examlpe:
@@ -47,27 +47,27 @@ instead of
 C<xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
 
 Module overwrites IO::EPP::Base where there are differences from RFC
-and work with tcinet epp using http api
+and work with tcinet epp using http api.
 
 For details see:
 L<https://tcinet.ru/documents/RU-RF/TechRules.pdf>,
 L<https://tcinet.ru/documents/RU-RF/P2_RIPN-EPP.pdf>,
 L<https://tcinet.ru/documents/SU/SUTechRules.pdf>,
-L<https://tcinet.ru/documents/SU/SU_P2_RipnEPP.pdf>
+L<https://tcinet.ru/documents/SU/SU_P2_RipnEPP.pdf>.
 
-All documents -- L<https://tcinet.ru/documents/>
+All documents -- L<https://tcinet.ru/documents/>.
 
 IO::EPP::RIPN only works with .RU, .SU & .РФ cctlds.
 
-For work with the new gtlds .ДЕТИ, .TATAR need use IO::EPP::TCI
+For work with the new gtlds .ДЕТИ, .TATAR need use L<IO::EPP::TCI>.
 
 Features:
 
-Working over https
+Working over https;
 
-Completely other contacts
+Completely other contacts;
 
-Non-standard domain transfer in the .su zone
+Non-standard domain transfer in the .su zone;
 
 The domain:check function has an error: when checking the availability of a blocked domain, it responds that it is available.
 The list of blocked domains should be downloaded from the Registrar panel.
@@ -433,6 +433,12 @@ sub save_cookies {
 }
 
 
+=head2 hello
+
+For details, see L<IO::EPP::Base/hello>
+
+=cut
+
 sub hello {
     my ( $self ) = @_;
 
@@ -450,6 +456,12 @@ HELLO
 
     return wantarray ? ( $info, 1000, $content ) : $info;
 }
+
+=head2 cont_to_xml
+
+Overrides the base class converter, since the contacts are very different here.
+
+=cut
 
 sub cont_to_xml {
     my ( undef, $cont ) = @_;
@@ -486,7 +498,7 @@ sub cont_to_xml {
     }
 
     if ( $$cont{taxpayerNumbers} ) {
-	$txtcont .= "    <contact:taxpayerNumbers>$$cont{taxpayerNumbers}</contact:taxpayerNumbers>\n";
+	$txtcont .= "    <contact:taxpayerNumbers>$$cont{TIN}</contact:taxpayerNumbers>\n";
     }
     else {
 	$txtcont .= "    <contact:taxpayerNumbers/>\n";
@@ -500,9 +512,9 @@ sub cont_to_xml {
         $txtcont .= "    <contact:passport>$_</contact:passport>\n" foreach @{$$cont{passport}};
     }
 
-    $$cont{voice} = [ $$cont{voice} ] unless ref $$cont{voice};
+    $$cont{phone} = [ $$cont{phone} ] unless ref $$cont{phone};
 
-    $txtcont .= "    <contact:voice>$_</contact:voice>\n" foreach @{$$cont{voice}};
+    $txtcont .= "    <contact:voice>$_</contact:voice>\n" foreach @{$$cont{phone}};
 
     if ( $$cont{fax} ) {
         $$cont{fax} = [ $$cont{fax} ] unless ref $$cont{fax};
@@ -535,6 +547,222 @@ sub cont_to_xml {
 }
 
 
+=head2 create_contact
+
+Parameter names are maximally unified with other providers.
+
+INPUT:
+
+for individual:
+
+C<name> — full name, need for C<int> and C<loc> types;
+
+C<birthday> — date of birth;
+
+C<passport> — identification card number, place and date of issue;
+
+for legal entity:
+
+C<org> — organization name
+
+C<addr> — string or array with full legal address of the organization, need for C<legal> type data
+
+common fields:
+
+C<addr> — string or array with full address;
+
+C<TIN> - taxpayer numbers;
+
+C<phone> – string or array with phone numbers in international format,
+you can specify a list of multiple phones,
+the suffixes C<(sms)> and C<(transfer)> are used to mark phones for confirming transfers;
+
+C<fax> – string or array with faxes, usually only required for legal entities;
+
+C<email>;
+
+C<verified> – the full name or name of the organization was confirmed by documents.
+
+Examples:
+
+Create person contact
+
+    my %pers = (
+        cont_id => 'MY-123456',
+        'int' => {
+            name => 'Igor I Igover',
+            addr => 'UA, 12345, Igorevsk, Igoreva str, 13',
+        },
+        loc => {.
+            name => 'Игорь Игоревич Игорев',.
+            addr =>  [ 'UA', '85012', 'Игоревск', 'ул. Игорева, д.12, Игореву И.И.' ],
+        },
+        TIN => '',
+        birthday => '2001-01-01',
+        passport => [ 'II662244', 'выдан Игоревским МВД УДМС', '1.1.2017' ],
+        phone => '+380.501234567',
+        fax => '',
+        email => 'mail@igor.name',
+    );
+
+    my ( $answ, $code, $msg ) = $conn->create_contact( \%pers );
+
+    # answer
+
+    {
+        'cont_id' => 'my-123456',
+        'cre_date' => '2020-01-11 10:10:10',
+        'cltrid' => '1710de82a0e9249277ffd713f51c8888',
+        'svtrid' => '4997598888'
+    };
+
+Create legal entity contact
+
+    my %org = (
+        # cont_id - auto
+        'int' => {.
+            org => 'Igor Limited Liability Company',
+            addr => [ 'RU', '123456', 'Moscow', 'Igoreva str, 3', 'Igor LLC' ]
+        },
+        loc => {
+            org => 'ООО «Игорь»',
+            addr => [ 'RU, 123456, г. Москва, ул. Игорева, дом 3, ООО «Игорь»', 'охраннику' ],
+        },
+        legal => {.
+            addr => [ '125476, г.Москва, ул. Игорева, д.3' ],
+        },
+        TIN => '7777777777',
+        phone => [ '+7.4951111111', '+7.4951111111(transfer)' ],
+        fax => '+7.4951111111',
+        email => [ 'mail@igor.ru' ],
+    );
+
+    my ( $answ, $code, $msg ) = $conn->create_contact( \%org );
+
+    # answer
+
+    {
+        'cont_id' => 'e88c1fngsz1e',
+        'cre_date' => '2020-01-01 10:10:10',
+        'cltrid' => '6194b816dd3f5d3f417fd2cfe0c88888',
+        'svtrid' => '4997633333'
+    };
+
+=cut
+
+sub create_contact {
+    my ( $self, $params ) = @_;
+
+    $params->{cont_id} ||= IO::EPP::Base::gen_id( 16 );
+
+    return $self->SUPER::create_contact( $params );
+}
+
+
+=head2 cont_from_xml
+
+Overrides the base class contact parser.
+
+As a result, the get_contact_info function displays the request response in the registry as follows:
+
+Individual
+
+    my ( $a, $m, $o ) = make_request( 'get_contact_info', { cont_id => 'my-123456' } );
+
+    # answer
+
+    {
+        'msg' => 'Command completed successfully',
+        'owner' => 'XXX-RU',
+        'int' => {
+            'name' => 'Igor I Igover',
+            'addr' => [
+                'UA, 12345, Igorevsk, Igoreva str, 13'
+            ]
+        },
+        'cre_date' => '2020-01-10 10:10:10',
+        'phone' => [
+            '+380.501234567'
+        ],
+        'email' => [
+            'mail@igor.name'
+        ],
+        'loc' => {
+            'name' => 'Игорь Игоревич Игорев',
+            'addr' => [
+                'UA',
+                '85012',
+                'Игоревск',
+                'ул. Игорева, д.12, Игореву И.И.'
+            ]
+        },
+        'fax' => [],
+        'creater' => 'XXX-RU',
+        'verified' => 0,
+        'statuses' => {
+            'ok' => '+'
+        },
+        'birthday' => '2001-01-01',
+        'passport' => [
+            'II662244',
+            'выдан Игоревским МВД УДМС',
+            '1.1.2017'
+        ],
+        'code' => '1000'
+    };
+
+Legal entity
+
+    my ( $a, $m, $o ) = make_request( 'get_contact_info', { cont_id => 'e88c1fngsz1e' } );
+
+    # answer
+
+    {
+        'msg' => 'Command completed successfully',
+        'owner' => 'XXX-RU',
+        'int' => {
+            'org' => 'Igor Limited Liability Company',
+            'addr' => [
+                'RU',
+                '123456',
+                'Moscow',
+                'Igoreva str, 3',
+                'Igor LLC'
+            ]
+        },
+        'cre_date' => '2020-01-10 10:10:10',
+        'phone' => [
+            '+7.4951111111',
+            '+7.4951111111(transfer)'
+        ],
+        'email' => [
+            'mail@igor.ru'
+        ],
+        'loc' => {
+            'org' => 'ООО «Игорь»',
+            'addr' => [
+                'RU, 123456, г. Москва, ул. Игорева, дом 3, ООО «Игорь»',
+                'охраннику'
+            ]
+        },
+        'fax' => [
+            '+7.4951111111'
+        ],
+        'legal' => {
+            'addr' => [
+            '125476, г.Москва, ул. Игорева, д.3'
+            ]
+        },
+        'creater' => 'XXX-RU',
+        'verified' => 0,
+        'statuses' => {
+            'ok' => '+'
+        },
+        'code' => '1000'
+    };
+
+=cut
+
 sub cont_from_xml {
     my ( undef, $txtcont ) = @_;
 
@@ -562,7 +790,7 @@ sub cont_from_xml {
     }
 
     if ( $txtcont =~ /<contact:taxpayerNumbers>([^<>]+)<\/contact:taxpayerNumbers>/ ) {
-        $cont{taxpayerNumbers} = $1;
+        $cont{TIN} = $1;
     }
 
     if ( $is_person ) {
@@ -573,7 +801,7 @@ sub cont_from_xml {
         $cont{passport} = [ $txtcont =~ /<contact:passport>([^<>]+)<\/contact:passport>/g ];
     }
 
-    $cont{voice} = [ $txtcont =~ /<contact:voice>([^<>]+)<\/contact:voice>/g ];
+    $cont{phone} = [ $txtcont =~ /<contact:voice>([^<>]+)<\/contact:voice>/g ];
 
     $cont{fax} = [ $txtcont =~ /<contact:fax>([^<>]+)<\/contact:fax>/g ];
 
@@ -606,16 +834,6 @@ sub cont_from_xml {
     return \%cont;
 }
 
-
-sub create_domain_authinfo {
-    my ( $self, $params ) = @_;
-
-    return '' unless $params->{authinfo};
-
-    $params->{authinfo} =~ s/&/&amp;/g;
-
-    return "\n    <domain:authInfo>\n     <domain:pw>$$params{authinfo}</domain:pw>\n    </domain:authInfo>";
-}
 
 =head2 transfer
 
@@ -698,15 +916,15 @@ REGINFO
                         $info->{$types{$type}}{org} = $1;
                     }
 
-                    $info->{$types{$type}}{address} = join(', ', $pi =~ /<registrar:address>([^<>]+)<\/registrar:address>/g );
+                    $info->{$types{$type}}{addr} = join(', ', $pi =~ /<registrar:address>([^<>]+)<\/registrar:address>/g );
                 }
             }
 
             if ( $rdata =~ /<registrar:taxpayerNumbers>([^<>]+)<\/registrar:taxpayerNumbers>/ ) {
-                $info->{taxpayerNumbers} = $1;
+                $info->{TIN} = $1;
             }
 
-            $info->{voice} = [ $rdata =~ /<registrar:voice>([^<>]+)<\/registrar:voice>/g ];
+            $info->{phone} = [ $rdata =~ /<registrar:voice>([^<>]+)<\/registrar:voice>/g ];
 
             $info->{fax} = [ $rdata =~ /<registrar:fax>([^<>]+)<\/registrar:fax>/g ];
 
@@ -726,7 +944,7 @@ REGINFO
                 $info->{whois} = $1;
             }
 
-            $info->{addrs} = [ $rdata =~ /<registrar:addr ip="v\d">([0-9A-Fa-f.:]+)<\/registrar:addr>/g ];
+            $info->{ips} = [ $rdata =~ /<registrar:addr ip="v\d">([0-9A-Fa-f.:]+)<\/registrar:addr>/g ];
 
             my %dt = %IO::EPP::Base::dt;
             foreach my $k ( keys %dt ) {
@@ -763,6 +981,7 @@ C<emails> - hashref where keys - email type, values - email
 C<chg>:
 
 C<www> - new web url
+
 C<whois> - new whois url
 
 =cut
@@ -874,7 +1093,9 @@ INPUT:
 keys of params:
 
 C<date>,
+
 C<period>: in days,
+
 C<currency>: RUB.
 
 =cut

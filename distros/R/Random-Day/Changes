@@ -1,3 +1,10 @@
+0.09 2020-01-14T00:28:19+01:00
+ - Add test for random_year() method.
+ - Change =item to =head2 in METHODS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+ - Update my github user name.
+
 0.08 2018-10-11T16:53:50+02:00
  - Code optimalization - to simple quotes.
  - Remove verbatim from POD doc.

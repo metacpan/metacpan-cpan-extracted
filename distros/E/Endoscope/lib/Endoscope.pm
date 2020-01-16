@@ -1,5 +1,5 @@
 package Endoscope;
-$Endoscope::VERSION = '0.001';
+$Endoscope::VERSION = '0.002';
 # ABSTRACT: Dig into the guts of a live Perl program
 
 use strict;
@@ -125,7 +125,7 @@ Endoscope - Dig into the guts of a live Perl program
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

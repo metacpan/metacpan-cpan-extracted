@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Plugin::NoWarnings echo => 1;
 
 use Devel::Optic;
 
@@ -160,6 +161,34 @@ subtest 'sample count respects data structure size' => sub {
         'hashref with one key shows only one sample'
     );
 };
+
+subtest 'copes with undef keys' => sub {
+    my $o = Devel::Optic->new();
+
+    like(
+        $o->fit_to_view([undef]),
+        qr|ARRAY: \[\(undef\)\] \(len 1\)$|,
+        'arrayref with undef member samples (undef)'
+    );
+
+    like(
+        $o->fit_to_view({a => undef}),
+        qr|HASH: \{a => \(undef\)\} \(1 keys\)$|,
+        'hashref with undef value samples (undef)'
+    );
+
+    like(
+        $o->fit_to_view([undef, 'a', undef, 'b']),
+        qr|ARRAY: \[\(undef\), a, \(undef\), b\] \(len 4\)$|,
+        'arrayref with mixed undef and real member samples (undef)'
+    );
+
+    # not doing a mixed hash because the random ordering is annoying to test. The
+    # random shuffle is probably a reasonable way to get coverage over a range
+    # of possible hash keys, though, so until there's some other way to see
+    # them I'd rather not sort the summary output.
+};
+
 
 subtest 'weird ref types' => sub {
     my $o = Devel::Optic->new();

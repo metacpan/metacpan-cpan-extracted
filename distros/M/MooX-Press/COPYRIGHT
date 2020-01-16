@@ -18,6 +18,8 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
+ t/14enum.t
+ t/15requires.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

@@ -31,3 +31,6 @@ void __call_at_thread_create ();
 void __boot_module (const char* mod, void (*bootfunc)(pTHX_ CV*), const char* version, const char* file);
 
 }
+
+using xs::my_perl;
+

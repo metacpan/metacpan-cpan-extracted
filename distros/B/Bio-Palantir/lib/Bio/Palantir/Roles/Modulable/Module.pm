@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable::Module;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.193230';
+$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.200150';
 use Moose;
 use namespace::autoclean;
 
@@ -96,7 +96,16 @@ sub size {
     my $size = length $self->protein_sequence;
 
     return $size;
+}
 
+
+sub genomic_dna_begin {
+    return (shift->genomic_prot_begin * 3)
+}
+
+
+sub genomic_dna_end {
+    return (shift->genomic_prot_end * 3)
 }
 
 
@@ -121,7 +130,7 @@ Bio::Palantir::Roles::Modulable::Module - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.193230
+version 0.200150
 
 =head1 SYNOPSIS
 
@@ -198,6 +207,20 @@ Returns the size of the module.
 
     # $module is a Bio::FastParsers::Biosynml::Module
 	my $size = $module->size;
+
+=head2 genomic_dna_begin
+
+Returns the begin of the genomic DNA coordinate of the module.
+
+    # $module is a Bio::FastParsers::Biosynml::Module
+	my $genomic_dna_begin = $module->genomic_dna_begin;
+
+=head2 genomic_dna_end
+
+Returns the end of the genomic DNA coordinate of the module.
+
+    # $module is a Bio::FastParsers::Biosynml::Module
+	my $genomic_dna_end = $module->genomic_dna_end;
 
 =head2 get_domain_functions
 

@@ -98,5 +98,17 @@ subtest 'since' => sub {
         or diag explain [ $rs->all ];
 };
 
+subtest 'recent' => sub {
+    my $rs = $schema->resultset( 'Upload' )->recent(1);
+    $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+    is_deeply [ $rs->all ], [ $data{Upload}->@[2] ], 'get most recent item'
+        or diag explain [ $rs->all ];
+    $rs = $schema->resultset( 'Upload' )->recent;
+    $rs->result_class( 'DBIx::Class::ResultClass::HashRefInflator' );
+    is_deeply [ $rs->all ], [ $data{Upload}->@[2,1,0] ],
+        'get up to 20 most recent items sorted newest to oldest'
+        or diag explain [ $rs->all ];
+};
+
 done_testing;
 

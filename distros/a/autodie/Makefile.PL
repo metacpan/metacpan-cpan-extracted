@@ -37,13 +37,11 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "IO::Handle" => 0,
     "Socket" => 0,
-    "Test::Kwalitee" => 0,
     "Test::More" => 0,
-    "Test::Perl::Critic" => 0,
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.31",
+  "VERSION" => "2.32",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,9 +61,7 @@ my %FallbackPrereqs = (
   "POSIX" => 0,
   "Scalar::Util" => 0,
   "Socket" => 0,
-  "Test::Kwalitee" => 0,
   "Test::More" => 0,
-  "Test::Perl::Critic" => 0,
   "Tie::RefHash" => 0,
   "constant" => 0,
   "if" => 0,

@@ -4,7 +4,7 @@
       "Daniel Berrange <dan@berrange.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "gpl_1"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v5.8.0"
+         "version" : "v6.0.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -100,6 +100,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v5.8.0",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v6.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

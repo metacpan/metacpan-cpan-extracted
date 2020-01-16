@@ -7,8 +7,8 @@ IOMux::Pipe::Read - read from an external command
 =head1 INHERITANCE
 
  IOMux::Pipe::Read
-   is a IOMux::Handler::Read
-   is a IOMux::Handler
+   is an IOMux::Handler::Read
+   is an IOMux::Handler
 
 =head1 SYNOPSIS
 
@@ -178,20 +178,14 @@ Inherited, see L<IOMux::Handler/"Helpers">
 
 =head1 SEE ALSO
 
-This module is part of IOMux distribution version 1.00,
-built on November 11, 2015. Website: F<http://perl.overmeer.net/>
-All modules in this suite:
-L</Any::Daemon>,
-L</IOMux>, and
-L</IOMux::HTTP>.
-
-Please post questions or ideas to F<perl@overmeer.net>
+This module is part of IOMux distribution version 1.01,
+built on January 15, 2020. Website: F<http://perl.overmeer.net/CPAN>
 
 =head1 LICENSE
 
-Copyrights 2011-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

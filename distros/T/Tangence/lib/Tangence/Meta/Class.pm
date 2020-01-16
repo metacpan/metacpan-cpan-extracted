@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2017 -- leonerd@leonerd.org.uk
 
 package Tangence::Meta::Class;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -27,7 +27,9 @@ Once constructed and defined, such objects are immutable.
 
 =cut
 
-=head2 $class = Tangence::Meta::Class->new( name => $name )
+=head2 new
+
+   $class = Tangence::Meta::Class->new( name => $name )
 
 Returns a new instance representing the given name.
 
@@ -41,7 +43,9 @@ sub new
    return $self;
 }
 
-=head2 $class->define( %args )
+=head2 define
+
+   $class->define( %args )
 
 Provides a definition for the class.
 
@@ -84,7 +88,9 @@ sub define
 
 =cut
 
-=head2 $defined = $class->defined
+=head2 defined
+
+   $defined = $class->defined
 
 Returns true if a definintion for the class has been provided using C<define>.
 
@@ -96,7 +102,9 @@ sub defined
    return exists $self->{superclasses};
 }
 
-=head2 $name = $class->name
+=head2 name
+
+   $name = $class->name
 
 Returns the name of the class
 
@@ -108,7 +116,9 @@ sub name
    return $self->{name};
 }
 
-=head2 $perlname = $class->perlname
+=head2 perlname
+
+   $perlname = $class->perlname
 
 Returns the perl name of the class. This will be the Tangence name, with dots
 replaced by double colons (C<::>).
@@ -122,7 +132,9 @@ sub perlname
    return $perlname;
 }
 
-=head2 @superclasses = $class->direct_superclasses
+=head2 direct_superclasses
+
+   @superclasses = $class->direct_superclasses
 
 Return the direct superclasses in a list of C<Tangence::Meta::Class>
 references.
@@ -136,7 +148,9 @@ sub direct_superclasses
    return @{ $self->{superclasses} };
 }
 
-=head2 $methods = $class->direct_methods
+=head2 direct_methods
+
+   $methods = $class->direct_methods
 
 Return the methods that this class directly defines (rather than inheriting
 from superclasses) as a HASH reference mapping names to
@@ -151,7 +165,9 @@ sub direct_methods
    return $self->{methods};
 }
 
-=head2 $events = $class->direct_events
+=head2 direct_events
+
+   $events = $class->direct_events
 
 Return the events that this class directly defines (rather than inheriting
 from superclasses) as a HASH reference mapping names to
@@ -166,7 +182,9 @@ sub direct_events
    return $self->{events};
 }
 
-=head2 $properties = $class->direct_properties
+=head2 direct_properties
+
+   $properties = $class->direct_properties
 
 Return the properties that this class directly defines (rather than inheriting
 from superclasses) as a HASH reference mapping names to
@@ -188,7 +206,9 @@ all its superclasses
 
 =cut
 
-=head2 @superclasses = $class->superclasses
+=head2 superclasses
+
+   @superclasses = $class->superclasses
 
 Return all the superclasses in a list of unique C<Tangence::Meta::Class>
 references.
@@ -204,7 +224,9 @@ sub superclasses
    return grep { !$seen{$_}++ } map { $_, $_->superclasses } $self->direct_superclasses;
 }
 
-=head2 $methods = $class->methods
+=head2 methods
+
+   $methods = $class->methods
 
 Return all the methods available to this class as a HASH reference mapping
 names to L<Tangence::Meta::Method> instances.
@@ -222,7 +244,9 @@ sub methods
    return \%methods;
 }
 
-=head2 $method = $class->method( $name )
+=head2 method
+
+   $method = $class->method( $name )
 
 Return the named method as a L<Tangence::Meta::Method> instance, or C<undef>
 if no such method exists.
@@ -236,7 +260,9 @@ sub method
    return $self->methods->{$name};
 }
 
-=head2 $events = $class->events
+=head2 events
+
+   $events = $class->events
 
 Return all the events available to this class as a HASH reference mapping
 names to L<Tangence::Meta::Event> instances.
@@ -254,7 +280,9 @@ sub events
    return \%events;
 }
 
-=head2 $event = $class->event( $name )
+=head2 event
+
+   $event = $class->event( $name )
 
 Return the named event as a L<Tangence::Meta::Event> instance, or C<undef> if
 no such event exists.
@@ -268,7 +296,9 @@ sub event
    return $self->events->{$name};
 }
 
-=head2 $properties = $class->properties
+=head2 properties
+
+   $properties = $class->properties
 
 Return all the properties available to this class as a HASH reference mapping
 names to L<Tangence::Meta::Property> instances.
@@ -286,7 +316,9 @@ sub properties
    return \%properties;
 }
 
-=head2 $property = $class->property( $name )
+=head2 property
+
+   $property = $class->property( $name )
 
 Return the named property as a L<Tangence::Meta::Property> instance, or
 C<undef> if no such property exists.

@@ -1,12 +1,15 @@
 package Log::Any::Adapter::Callback;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-01-14'; # DATE
+our $DIST = 'Log-Any-Adapter-Callback'; # DIST
+our $VERSION = '0.100'; # VERSION
+
 use strict;
 use warnings;
 
 use Log::Any::Adapter::Util qw(make_method);
 use base qw(Log::Any::Adapter::Base);
-
-our $VERSION = '0.09'; # VERSION
 
 my @logging_methods = Log::Any->logging_methods;
 my %logging_levels;
@@ -71,7 +74,7 @@ Log::Any::Adapter::Callback - Send Log::Any logs to a subroutine
 
 =head1 VERSION
 
-version 0.09
+This document describes version 0.100 of Log::Any::Adapter::Callback (from Perl distribution Log-Any-Adapter-Callback), released on 2020-01-14.
 
 =head1 SYNOPSIS
 
@@ -92,7 +95,11 @@ version 0.09
 
 =head1 DESCRIPTION
 
-This adapter lets you specify callback subroutine to be called by Log::Any's
+DEPRECATION NOTICE: Log::Any distribution since 1.708 comes with
+L<Log::Any::Adapter::Capture> which does the same thing. I'm deprecating this
+adapter now.
+
+This adapter lets you specify callback subroutine to be called by L<Log::Any>'s
 logging methods (like $log->debug(), $log->error(), etc) and detection methods
 (like $log->is_warning(), $log->is_fatal(), etc.).
 
@@ -109,17 +116,13 @@ are given by Log::Any.
 
 =for Pod::Coverage init
 
-=head1 SEE ALSO
-
-L<Log::Any>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Log-Any-Adapter-Callback>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Log-Any-Adapter-Callback>.
+Source repository is at L<https://github.com/perlancar/perl-Log-Any-Adapter-Callback>.
 
 =head1 BUGS
 
@@ -129,13 +132,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Log::Any::Adapter::Capture>
+
+L<Log::Any>
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2020, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

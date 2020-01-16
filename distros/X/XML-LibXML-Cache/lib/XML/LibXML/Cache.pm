@@ -1,8 +1,7 @@
 package XML::LibXML::Cache;
-{
-  $XML::LibXML::Cache::VERSION = '0.12';
-}
+$XML::LibXML::Cache::VERSION = '0.14';
 use strict;
+use warnings;
 
 # ABSTRACT: Document cache for XML::LibXML
 
@@ -46,9 +45,11 @@ sub parse_html_file {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -56,7 +57,7 @@ XML::LibXML::Cache - Document cache for XML::LibXML
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -90,7 +91,7 @@ Creates a new cache. Valid options are:
 =item parser
 
 The L<XML::LibXML> parser object that should be used to load documents if you
-want to use certain parser options. If this options is missing a parser
+want to use certain parser options. If this option is missing a parser
 with default options will be used.
 
 =back
@@ -113,13 +114,9 @@ Nick Wellnhofer <wellnhofer@aevum.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Nick Wellnhofer.
+This software is copyright (c) 2020 by Nick Wellnhofer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

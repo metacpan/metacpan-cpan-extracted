@@ -1,5 +1,5 @@
 package CPAN::Testers::Schema::Result::TestReport;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 # ABSTRACT: Raw reports as JSON documents
 
 #pod =head1 SYNOPSIS
@@ -25,6 +25,7 @@ use CPAN::Testers::Schema::Base 'Result';
 use Data::UUID;
 use DateTime;
 use JSON::MaybeXS;
+use Mojo::Util qw( html_unescape );
 table 'test_report';
 
 __PACKAGE__->load_components('InflateColumn::DateTime', 'Core');
@@ -129,6 +130,80 @@ sub upload( $self ) {
         ->search({ dist => $dist, version => $vers })->single;
 }
 
+#pod =method dist_name
+#pod
+#pod The name of the distribution that was tested.
+#pod
+#pod =cut
+
+sub dist_name( $self ) {
+    return $self->report->{distribution}{name};
+}
+
+#pod =method dist_version
+#pod
+#pod The version of the distribution that was tested.
+#pod
+#pod =cut
+
+sub dist_version( $self ) {
+    return $self->report->{distribution}{version};
+}
+
+#pod =method lang_version
+#pod
+#pod The language and version the test was executed with
+#pod
+#pod =cut
+
+sub lang_version( $self ) {
+    return sprintf '%s v%s',
+        $self->report->{environment}{language}->@{qw( name version )};
+}
+
+#pod =method platform
+#pod
+#pod The platform the test was run on
+#pod
+#pod =cut
+
+sub platform( $self ) {
+    return join ' ', $self->report->{environment}{language}{archname};
+}
+
+#pod =method grade
+#pod
+#pod The report grade. One of 'pass', 'fail', 'na', 'unknown'.
+#pod
+#pod =cut
+
+sub grade( $self ) {
+    return $self->report->{result}{grade};
+}
+
+#pod =method text
+#pod
+#pod The full text of the report, either from the phased sections or the
+#pod "uncategorized" section.
+#pod
+#pod =cut
+
+my @output_phases = qw( configure build test install );
+sub text( $self ) {
+    return $self->report->{result}{output}{uncategorized}
+        || join "\n\n", grep defined, $self->report->{result}{output}->@{ @output_phases };
+}
+
+#pod =method tester_name
+#pod
+#pod The name of the tester who sent the report
+#pod
+#pod =cut
+
+sub tester_name( $self ) {
+    return html_unescape $self->report->{reporter}{name};
+}
+
 1;
 
 __END__
@@ -141,7 +216,7 @@ CPAN::Testers::Schema::Result::TestReport - Raw reports as JSON documents
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -201,6 +276,35 @@ many feeds, and may cause failures to not be reported to authors.
 
 Get the associated L<CPAN::Testers::Schema::Result::Upload> object for
 the distribution tested by this test report.
+
+=head2 dist_name
+
+The name of the distribution that was tested.
+
+=head2 dist_version
+
+The version of the distribution that was tested.
+
+=head2 lang_version
+
+The language and version the test was executed with
+
+=head2 platform
+
+The platform the test was run on
+
+=head2 grade
+
+The report grade. One of 'pass', 'fail', 'na', 'unknown'.
+
+=head2 text
+
+The full text of the report, either from the phased sections or the
+"uncategorized" section.
+
+=head2 tester_name
+
+The name of the tester who sent the report
 
 =head1 SEE ALSO
 

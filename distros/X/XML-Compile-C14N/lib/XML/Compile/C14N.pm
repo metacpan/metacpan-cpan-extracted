@@ -1,13 +1,18 @@
-# Copyrights 2011-2014 by [Mark Overmeer].
+# Copyrights 2011-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution XML-Compile-C14N.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package XML::Compile::C14N;
-our $VERSION = '0.94';
+use vars '$VERSION';
+$VERSION = '0.95';
 
+
+use warnings;
+use strict;
 
 use Log::Report 'xml-compile-c14n';
 
@@ -84,6 +89,10 @@ sub normalize($$%)
     my $canon     =
       eval { $node->$serialize($with_comments, $xpath, $context, $prefixes) };
 #warn "--> $canon#\n";
+
+    # The cannonicalization (XML::LibXML <2.0110) sets the utf8 flag.  Later,
+    # Digest::SHA >5.74 downgrades that string, changing some bytes...  So,
+    # enforce this output to be interpreted as bytes!
     _utf8_off $canon;
 
     if(my $err = $@)

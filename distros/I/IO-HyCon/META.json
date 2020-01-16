@@ -26,6 +26,7 @@
             "Device::SerialPort" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0",
             "YAML" : "0"
@@ -37,6 +38,7 @@
             "Device::SerialPort" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
+            "File::Temp" : "0",
             "Time::HiRes" : "0",
             "YAML" : "0"
          }
@@ -46,13 +48,14 @@
             "Carp" : "0",
             "Device::SerialPort" : "0",
             "File::Basename" : "0",
+            "File::Temp" : "0",
             "Time::HiRes" : "0",
             "YAML" : "0",
-            "perl" : "5.010"
+            "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

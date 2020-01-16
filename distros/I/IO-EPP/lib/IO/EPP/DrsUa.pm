@@ -38,8 +38,7 @@ Module for work with nic.ua/drs.ua domains
 
 Drs.ua is a registry for biz.ua, co.ua, pp.ua and reseller for other .ua tlds
 
-drs.ua uses deprecated epp version 0.5 --
-drs.ua использует устаревший epp версии 0.5 -- it uses hostAttr instead of hostObj
+drs.ua uses deprecated epp version 0.5 -- it uses hostAttr instead of hostObj
 
 Features:
 

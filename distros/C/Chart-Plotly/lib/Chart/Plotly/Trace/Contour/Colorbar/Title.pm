@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Contour::Colorbar::Title::Font;
 
-our $VERSION = '0.036';    # VERSION
+our $VERSION = '0.037';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contour.
 
@@ -67,7 +67,7 @@ Chart::Plotly::Trace::Contour::Colorbar::Title - This attribute is one of the po
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

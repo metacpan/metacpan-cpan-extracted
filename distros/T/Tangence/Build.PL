@@ -13,6 +13,7 @@ my $build = Module::Build->new(
       'perl' => 5.010,
       'Parser::MGC' => '0.04',
       'Struct::Dumb' => 0,
+      'Sub::Util' => '1.40',
    },
    test_requires => {
       'Struct::Dumb' => '0.09',

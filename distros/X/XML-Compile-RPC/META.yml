@@ -1,28 +1,35 @@
 ---
-abstract: 'XML-RPC client'
+abstract: 'XML-RPC client via XML::Compile'
 author:
-  - 'Mark Overmeer'
+  - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-Compile-RPC
 no_index:
   directory:
     - t
     - inc
 requires:
-  LWP::UserAgent: 0
-  Log::Report: 0.28
-  Test::More: 0.54
-  Time::HiRes: 0
-  XML::Compile: 1.08
-  XML::Compile::Cache: 0.92
-  XML::Compile::Tester: 0.05
-version: 0.17
+  File::Basename: '0'
+  File::Glob: '0'
+  LWP::UserAgent: '0'
+  Log::Report: '0.28'
+  Test::More: '0.54'
+  Time::HiRes: '0'
+  XML::Compile: '1.08'
+  XML::Compile::Cache: '0.92'
+  XML::Compile::Tester: '0.05'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markov2/perl5-XML-Compile-RPC.git
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::Common;
-$Net::Hadoop::Oozie::Role::Common::VERSION = '0.115';
+$Net::Hadoop::Oozie::Role::Common::VERSION = '0.116';
 use 5.010;
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ Net::Hadoop::Oozie::Role::Common - Common methods for Oozie
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 DESCRIPTION
 

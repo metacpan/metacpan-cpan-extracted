@@ -32,7 +32,6 @@ use Rex::Commands::Sync;
 group all => qw(
     cpantesters3.dh.bytemark.co.uk
     cpantesters4.dh.bytemark.co.uk
-    cpantesters1.barnyard.co.uk
 );
 
 #######################################################################

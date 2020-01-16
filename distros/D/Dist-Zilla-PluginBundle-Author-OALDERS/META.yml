@@ -8,12 +8,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.010'
-  strict: '0'
-  warnings: '0'
+  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: v5.10.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -26,7 +24,10 @@ no_index:
     - examples
     - t
     - xt
+  package:
+    - Dist::Zilla::Plugin::OALDERS::TidyAll
 requires:
+  Code::TidyAll::Config::INI::Reader: '0.44'
   Code::TidyAll::Plugin::SortLines::Naturally: '0.000003'
   Code::TidyAll::Plugin::UniqueLines: '0.000003'
   Dist::Zilla::Plugin::AutoPrereqs: '0'
@@ -47,7 +48,6 @@ requires:
   Dist::Zilla::Plugin::GithubMeta: '0'
   Dist::Zilla::Plugin::InstallGuide: '0'
   Dist::Zilla::Plugin::License: '0'
-  Dist::Zilla::Plugin::MAXMIND::TidyAll: '0'
   Dist::Zilla::Plugin::MakeMaker: '0'
   Dist::Zilla::Plugin::Manifest: '0'
   Dist::Zilla::Plugin::ManifestSkip: '0'
@@ -79,27 +79,38 @@ requires:
   Dist::Zilla::Plugin::TravisCI::StatusBadge: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0.002'
+  Dist::Zilla::Role::BeforeBuild: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
   List::AllUtils: '0'
+  List::Util: '1.45'
   Moose: '0'
+  Path::Iterator::Rule: '0'
+  Path::Tiny: '0'
+  Perl::Critic::Freenode: '0.021'
+  Perl::Critic::Moose: '1.05'
   Perl::Tidy: '2018220'
   Pod::Elemental::Transformer::List: '0'
+  Sort::ByExample: '0'
   Test::Code::TidyAll: '0.70'
   Types::Path::Tiny: '0'
   Types::Standard: '0'
+  autodie: '0'
   feature: '0'
   namespace::autoclean: '0'
-  perl: '5.010'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues
   homepage: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders
   repository: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git
-version: '0.000024'
+version: '0.000025'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::lib
@@ -137,7 +148,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -193,7 +204,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -220,8 +231,13 @@ x_Dist_Zilla:
           stopwords:
             - Alders
             - "Alders'"
+            - MaxMind
+            - Rolsky
             - bar
             - foo
+            - perlcriticrc
+            - perltidyrc
+            - tidyall
           wordlist: Pod::Wordlist
       name: '@Author::OALDERS/Test::PodSpelling'
       version: '2.007005'
@@ -428,7 +444,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -436,7 +452,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.23.0
+          git_version: 2.24.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -531,7 +547,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -544,11 +560,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000024
+          tag: v0.000025
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -585,7 +601,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -599,7 +615,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.24.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -628,6 +644,10 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: 'dzil plugin bundle (direct)'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
@@ -677,6 +697,6 @@ x_Dist_Zilla:
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

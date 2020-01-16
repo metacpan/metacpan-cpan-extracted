@@ -1,5 +1,5 @@
 <%
-    my $version = stash( 'version' ) // '4.4.1';
+    my $version = stash( 'version' ) // moai->config->{version} // die "No Moai UI library version specified";
     my @urls = (
         sprintf( '//maxcdn.bootstrapcdn.com/bootstrap/%s/css/bootstrap.min.css', $version ),
     );

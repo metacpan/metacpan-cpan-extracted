@@ -86,5 +86,61 @@ is($x, 3);
 is($fp, 'MyApp');
 isa_ok($obj, 'MyApp::OtherClass');
 
-done_testing;
+my ($xxx, $yyy);
+use MooX::Press (
+	prefix => 'MyApp2',
+	class  => [
+		'Base' => {
+			can => {
+				'my_method' => sub { ++$xxx },
+			},
+		},
+		'Derived' => {
+			extends => 'Base',
+			before => [
+				'my_method' => {
+					signature => ['Int'],
+					code      => sub { ++$yyy },
+				},
+			],
+		},
+		'Derived2' => {
+			extends => 'Base',
+			around => [
+				'my_method' => {
+					signature => ['Num'],
+					code      => sub {
+						return [ map { ref($_)||$_ } @_ ];
+					},
+				},
+			],
+		},
+	],
+);
 
+my $base     = MyApp2->new_base;
+my $derived  = MyApp2->new_derived;
+my $derived2 = MyApp2->new_derived2;
+
+$base->my_method(42);
+$derived->my_method(42);
+my $eee = exception {
+	$derived->my_method("foo");
+};
+
+is($xxx, 2);
+is($yyy, 1);
+like($eee, qr/did not pass type constraint "?Int"?/);
+
+my $rrr = $derived2->my_method(777);
+is_deeply(
+	$rrr,
+	[ 'CODE', 'MyApp2::Derived2', '777' ],
+);
+
+my $fff = exception {
+	$derived2->my_method([]);
+};
+like($fff, qr/did not pass type constraint "?Num"?/);
+
+done_testing;

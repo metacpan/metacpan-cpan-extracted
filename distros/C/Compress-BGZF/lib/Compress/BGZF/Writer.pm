@@ -49,7 +49,7 @@ sub new {
     # initialize
     if (defined $fn_out) {
         open $self->{fh}, '>', $fn_out
-            or croak "Error openingn file for writing";
+            or croak "Error opening file for writing";
     }
     else {
         $self->{fh} = \*STDOUT;
@@ -209,7 +209,10 @@ sub finalize {
             if ( length($unwritten) );
 
     }
-    close $self->{fh};
+    if (defined fileno($self->{fh}) ) {
+        close $self->{fh}
+            or croak "Error closing compressed file";
+    }
 
     return;
 
@@ -227,14 +230,20 @@ sub write_index {
 
     $self->finalize(); # always clear remaining buffer to fully populate index
     croak "missing index output filename" if (! defined $fn_out);
-    open my $fh_out, '>:raw', $fn_out;
+    open my $fh_out, '>:raw', $fn_out
+        or croak "Error opening index file for writing";
 
     my @offsets = @{ $self->{idx} };
     pop @offsets; # last offset is EOF
-    print {$fh_out} pack('Q<', scalar(@offsets));
-    print {$fh_out} pack('Q<Q<', @{$_}) for (@offsets);
+    print {$fh_out} pack('Q<', scalar(@offsets))
+        or croak "Error printing to index file";
+    for (@offsets) {
+        print {$fh_out} pack('Q<Q<', @{$_})
+            or croak "Error printing offset to index file";
+    }
 
-    close $fh_out;
+    close $fh_out
+        or croak "Error closing index file after writing";
     return;
 
 }

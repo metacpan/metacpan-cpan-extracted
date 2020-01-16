@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+<xsd:schema
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ex="http://ws.apache.org/xmlrpc/namespaces/extensions"
   elementsFormDefault="unqualified"
   attributesFormDefault="unqualified"
 >
@@ -51,7 +53,7 @@
     <xsd:element name="double"        type="xsd:decimal"/>
     <xsd:element name="i4"            type="LimitedIntType"/>
     <xsd:element name="int"           type="LimitedIntType"/>
-    <xsd:element name="nil"           type="NilType"/>
+    <xsd:element name="nil"           type="ex:NilType"/>
     <xsd:element name="string"        type="xsd:string"/>
     <xsd:element name="struct"        type="StructType"/>
   </xsd:choice>
@@ -89,10 +91,6 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:sequence>
-</xsd:complexType>
-
-<xsd:complexType name="NilType">
-  <xsd:sequence />
 </xsd:complexType>
 
 <xsd:simpleType name="methodNameType">

@@ -23,9 +23,10 @@ my %WriteMakefileArgs = (
     "Sub::Info" => "0.002"
   },
   "TEST_REQUIRES" => {
+    "Test2::Plugin::NoWarnings" => "0.08",
     "Test2::V0" => "0.000100"
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t t/lens-perlish/*.t"
   }
@@ -37,6 +38,7 @@ my %FallbackPrereqs = (
   "Ref::Util" => "0.204",
   "Scalar::Util" => 0,
   "Sub::Info" => "0.002",
+  "Test2::Plugin::NoWarnings" => "0.08",
   "Test2::V0" => "0.000100"
 );
 

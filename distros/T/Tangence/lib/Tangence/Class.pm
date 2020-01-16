@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package Tangence::Class;
 
@@ -19,17 +19,9 @@ use Tangence::Meta::Argument;
 
 use Carp;
 
-BEGIN {
-   if( eval { require Sub::Name } ) {
-      Sub::Name->import(qw( subname ));
-   }
-   else {
-      # Emulate it by just returning the CODEref and ignoring setting the name
-      *subname = sub { $_[1] };
-   }
-}
+use Sub::Util 1.40 qw( set_subname );
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 our %metas; # cache one per class, keyed by _Tangence_ class name
 
@@ -130,7 +122,7 @@ sub define
    no strict 'refs';
    foreach my $name ( keys %subs ) {
       next if defined &{"${class}::${name}"};
-      *{"${class}::${name}"} = subname "${class}::${name}" => $subs{$name};
+      *{"${class}::${name}"} = set_subname "${class}::${name}" => $subs{$name};
    }
 }
 

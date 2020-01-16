@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More;
 use Test::Memory::Cycle;
 
 use Tangence::Constants;

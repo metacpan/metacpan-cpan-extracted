@@ -485,6 +485,7 @@ urpmf
 urpmi
 urpmi.addmedia
 urpmi.bash-completion
+urpmi.pm
 urpmi.removemedia
 urpmi.schema
 urpmi.update

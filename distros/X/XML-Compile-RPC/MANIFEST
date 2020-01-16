@@ -2,12 +2,14 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/XML/Compile/RPC.pm
 lib/XML/Compile/RPC.pod
 lib/XML/Compile/RPC/Client.pm
 lib/XML/Compile/RPC/Client.pod
 lib/XML/Compile/RPC/Util.pm
 lib/XML/Compile/RPC/Util.pod
+lib/XML/Compile/RPC/apache.xsd
 lib/XML/Compile/RPC/xml-rpc.xsd
 t/01use.t
 t/10create.t

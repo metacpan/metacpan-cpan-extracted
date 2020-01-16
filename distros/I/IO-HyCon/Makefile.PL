@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/IO/HyCon.pm',
     ABSTRACT_FROM    => 'lib/IO/HyCon.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
         YAML                  => '0',
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
         'Device::SerialPort'  => '0',
         'Time::HiRes'         => '0',
         'File::Basename'      => '0',
+        'File::Temp'          => '0',
     },
     TEST_REQUIRES => {
         'Test::More'         => '0',
@@ -25,6 +26,7 @@ my %WriteMakefileArgs = (
         'Device::SerialPort' => '0',
         'Time::HiRes'        => '0',
         'File::Basename'     => '0',
+        'File::Temp'          => '0',
     },
     PREREQ_PM => {
         YAML                 => '0',
@@ -32,6 +34,7 @@ my %WriteMakefileArgs = (
         'Device::SerialPort' => '0',
         'Time::HiRes'        => '0',
         'File::Basename'     => '0',
+        'File::Temp'          => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'IO-HyCon-*' },

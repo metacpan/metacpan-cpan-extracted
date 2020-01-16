@@ -1,5 +1,14 @@
 ==== version history of XML::Compile::C14N
 
+version 0.95: Wed 15 Jan 11:21:06 CET 2020
+
+	Fixes:
+	- disable 'strip' test, because I cannot get it to work in a test-
+	  setup. rt.cpan.org#131477 [Slaven Rezic]
+
+	Improvements:
+	- convert to GitHub
+
 version 0.94: Tue Feb 18 11:10:19 CET 2014
 
 	Fixes:

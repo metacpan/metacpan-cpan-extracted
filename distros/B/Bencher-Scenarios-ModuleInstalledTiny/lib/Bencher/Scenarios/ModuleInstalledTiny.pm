@@ -1,9 +1,9 @@
 package Bencher::Scenarios::ModuleInstalledTiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-09'; # DATE
+our $DATE = '2020-01-14'; # DATE
 our $DIST = 'Bencher-Scenarios-ModuleInstalledTiny'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Scenarios to benchmark Module::Installed::Tiny
@@ -20,7 +20,7 @@ Bencher::Scenarios::ModuleInstalledTiny - Scenarios to benchmark Module::Install
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenarios::ModuleInstalledTiny (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-09.
+This document describes version 0.004 of Bencher::Scenarios::ModuleInstalledTiny (from Perl distribution Bencher-Scenarios-ModuleInstalledTiny), released on 2020-01-14.
 
 =head1 DESCRIPTION
 

@@ -20,12 +20,15 @@ no_index:
 requires:
   AnyEvent: '0'
   AnyEvent::AIO: '0'
+  Class::Refresh: '0'
   Compiler::Lexer: '0'
   Coro: '0'
   Data::Dump: '0'
   IO::AIO: '0'
   JSON: '0'
   Moose: '0'
+  PadWalker: '0'
+  Scalar::Util: '0'
   perl: '5.014'
-version: '2.0'
+version: v2.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

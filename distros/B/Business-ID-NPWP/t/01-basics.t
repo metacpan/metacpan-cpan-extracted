@@ -3,9 +3,9 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Business::ID::NPWP qw(parse_npwp);
-use Test::More 0.98;
 
 test_parse(
     npwp   => "02.183.241.5-000.000",

@@ -1,6 +1,11 @@
 Compress::BGZF
 ====
 
+[![Build Status](https://travis-ci.org/jvolkening/p5-Compress-BGZF.svg?branch=master)](https://travis-ci.org/jvolkening/p5-Compress-BGZF)
+[![Coverage Status](https://coveralls.io/repos/github/jvolkening/p5-Compress-BGZF/badge.svg?branch=master)](https://coveralls.io/github/jvolkening/p5-Compress-BGZF?branch=master)
+[![CPAN version](https://badge.fury.io/pl/Compress-BGZF.svg)](https://badge.fury.io/pl/Compress-BGZF)
+
+
 A pure-Perl implementation of blocked gzip (BGZF)
 
 INSTALLATION

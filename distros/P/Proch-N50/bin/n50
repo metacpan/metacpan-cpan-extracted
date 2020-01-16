@@ -8,11 +8,11 @@ use Pod::Usage;
 use Term::ANSIColor qw(:constants colorvalid colored);
 use Getopt::Long;
 use File::Basename;
-use FindBin qw($Bin);
-# The following placeholder is to be programmatically replaced with 'use lib "$Bin/../lib"' if needed
+use FindBin qw($RealBin);
+# The following placeholder is to be programmatically replaced with 'use lib "$RealBin/../lib"' if needed
 #~loclib~
-if (-e "$Bin/../lib/Proch/N50.pm" and -e "$Bin/../Changes" ) {
-	use lib "$Bin/../lib";
+if (-e "$RealBin/../lib/Proch/N50.pm" and -e "$RealBin/../Changes" ) {
+	use lib "$RealBin/../lib";
 }
 use Proch::N50;
 use Data::Dumper;
@@ -20,7 +20,7 @@ our %program = (
     'NAME'    => 'FASTX N50',
     'AUTHOR'  => 'Andrea Telatin',
     'MAIL'    => 'andrea@telatin.com',
-    'VERSION' => '2.07',
+    'VERSION' => '2.10',
 );
 my $hasJSON = undef;
 our $t;
@@ -95,7 +95,6 @@ pod2usage( { -exitval => 0, -verbose => 2 } ) if $opt_help;
 version() if defined $opt_version;
 
 our %output_object;
-our %output_print;
 # Added in v1.5: list accepted output formats programmatically
 # [-f list] or [--format list] will print a list of accepted formats
 
@@ -125,7 +124,7 @@ if ( $opt_format eq 'list' ) {
 
 unless (defined $ARGV[0] or      $opt_version) {
     say STDERR "\n Usage: n50 file.fa ... \n Type n50 --help for full manual";
-    
+
 }
 # Shot output formats
 die "Error: Please specify either -x (--screen) or -j (--json)\n"
@@ -228,7 +227,7 @@ foreach my $file (@ARGV) {
     elsif ( $file eq '-' ) {
 
         # Set file to <STDIN>
-        $file = '-';
+        $file = '<STDIN>';
     }
     else {
         # Open filehandle with $file
@@ -242,9 +241,6 @@ foreach my $file (@ARGV) {
     # Validate answer: check {status}==1
     if ( !$FileStats->{status} ) {
         print STDERR "[WARNING]\tError parsing \"$file\". Skipped.\n";
-	if ($opt_debug) {
-		print Dumper $FileStats;
-	}
         next;
     }
 
@@ -276,18 +272,12 @@ foreach my $file (@ARGV) {
         'max'  => $max,
     );
 
+
     if (defined $output_object{$file}) {
        print STDERR " WARNING: Overwriting '$file': multiple items with the same filename. Try not using -b/--basename.\n";
     }
     $output_object{$file} = \%metrics;
 
-    if ($opt_thousand_separator or $opt_format eq 'screen') {
-       for my $key (keys %metrics) {
-          $metrics{$key} = thousands($metrics{$key});
-       }  
-    }
-    $output_print{$file} = \%metrics;
-    
 }
 
 my $file_num = scalar keys %output_object;
@@ -299,21 +289,21 @@ if ( not $opt_format or $opt_format eq 'default' ) {
 
     # DEFAULT: format
     if ( $file_num == 1 ) {
+			# If only one file is supplied, just return N50 (to allow easy pipeline parsing)
 
-# If only one file is supplied, just return N50 (to allow easy pipeline parsing)
-        my @keys = keys %output_object;
+        my @keys =  keys %output_object;
         if ($opt_nonewline) {
-            print $output_print{ $keys[0] }{'N50'};
+            print $opt_thousand_separator ? thousands($output_object{ $keys[0] }{'N50'}) : $output_object{ $keys[0] }{'N50'};
         }
         else {
-            say $output_print{ $keys[0] }{'N50'};
+            say $opt_thousand_separator ? thousands($output_object{ $keys[0] }{'N50'}) : $output_object{ $keys[0] }{'N50'};
         }
 
     }
     else {
         # Print table
-        foreach my $r ( keys %output_object ) {
-            say $r, $opt_separator, $output_print{$r}{'N50'};
+        foreach my $r ( sort $sort_function keys %output_object ) {
+            say $r, $opt_separator, $opt_thousand_separator ? thousands($output_object{ $r }{'N50'}) : $output_object{ $r }{'N50'};;
         }
     }
 }
@@ -321,10 +311,10 @@ elsif ( $opt_format eq 'json' ) {
 
     # Print JSON object
     my $json           = JSON::PP->new->ascii->allow_nonref;;
-    my $json_printed   = $json->encode( \%output_print );
+    my $json_printed   = $json->encode( \%output_object );
 
     if ( $opt_pretty ) {
-       $json_printed = $json->pretty->encode( \%output_print ); 
+       $json_printed = $json->pretty->encode( \%output_object );
     }
     say $json_printed;
 
@@ -341,13 +331,15 @@ elsif ( $opt_format eq 'tsv' or $opt_format eq 'csv' ) {
         print $r, $opt_separator;
 
         for ( my $i = 1 ; $i <= $#fields ; $i++ ) {
-            if ( defined $output_print{$r}{ $fields[$i] } ) {
-		if ($i == 0 or ($opt_separator eq ',' and defined $opt_thousand_separator)) {
-		    print '"' , $output_print{$r}{ $fields[$i] } , '"';
-		} else {
-		    print $output_print{$r}{ $fields[$i] } ;
-		}
-	     }
+						if ($opt_thousand_separator) {
+							print '"' if ($opt_format eq 'csv' or $opt_separator eq ',');
+							print thousands($output_object{$r}{ $fields[$i] })
+								if ( defined $output_object{$r}{ $fields[$i] } );
+							print '"' if ($opt_format eq 'csv' or $opt_separator eq ',');
+						} else {
+	            print $output_object{$r}{ $fields[$i] }
+	              if ( defined $output_object{$r}{ $fields[$i] } );
+						}
             if ( ( $i == $#fields ) and ( not $opt_nonewline ) ) {
                 print "\n";
             }
@@ -370,7 +362,7 @@ elsif ( $opt_format eq 'custom' ) {
         $output_string =~ s/({tab}|{n}|\\t)/$tab/g if ( $output_string =~ /({tab}|{t}|\\t)/ );
         $output_string =~ s/{path}/$r/g  if ( $output_string =~ /{path}/ );
         foreach my $f (@fields) {
-            $output_string =~ s/{$f}/$output_print{$r}{$f}/g;
+            $output_string =~ s/{$f}/$output_object{$r}{$f}/g;
         }
         print $output_string;
     }
@@ -385,8 +377,13 @@ elsif ( $opt_format eq 'screen' ) {
         my @array;
         push( @array, $r );
         for ( my $i = 1 ; $i <= $#fields ; $i++ ) {
-            push( @array, $output_print{$r}{ $fields[$i] } )
-              if ( defined $output_print{$r}{ $fields[$i] } );
+						if ($opt_thousand_separator) {
+							push( @array, thousands($output_object{$r}{ $fields[$i] }) )
+	              if ( defined $output_object{$r}{ $fields[$i] } );
+						} else {
+	            push( @array, $output_object{$r}{ $fields[$i] } )
+	              if ( defined $output_object{$r}{ $fields[$i] } );
+						}
         }
         $t->addRow(@array);
     }
@@ -432,7 +429,7 @@ sub version {
         qq(
   $program{AUTHOR}
 
-  Program to calculate N50 from multiple FASTA/FASTQ files, 
+  Program to calculate N50 from multiple FASTA/FASTQ files,
   based on Proch::N50 $Proch::N50::VERSION
   https://metacpan.org/pod/distribution/Proch-N50/bin/n50
 ), '', 'blue', 'green'
@@ -524,7 +521,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 0.83
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -567,7 +564,7 @@ total size in bp, and finally N50.
 
 Instead of printing the path of each file, will only print
 the filename, stripping relative or absolute paths to it. See C<-a>.
-Warning: if you are reading multiple files with the same basename, only one will be printed. 
+Warning: if you are reading multiple files with the same basename, only one will be printed.
 This is the intended behaviour and you will only receive a warning.
 
 =item I<-a, --abspath>

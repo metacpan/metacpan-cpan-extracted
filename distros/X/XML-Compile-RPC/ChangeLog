@@ -1,6 +1,21 @@
 
 ======== version history for XML::Compile::RPC
 
+version 0.20: Wed 15 Jan 13:07:35 CET 2020
+
+	Changes:
+	- require perl 5.10
+
+	Improvements:
+	- add support for apache types
+	- convert GitHub
+
+version 0.18: Sat Jul 25 23:53:12 CEST 2015
+
+	Improvements:
+	- change documentation style
+	- return $trace for each call()
+
 version 0.17: Thu Sep 12 08:30:44 CEST 2013
 	- rpc "string" type, now from ASCIIstring to xsd:string
 	  [Caleb Cushing]

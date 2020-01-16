@@ -8,7 +8,7 @@ package Tangence::Server::Context;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Carp;
 
@@ -55,6 +55,8 @@ sub responderr
 {
    my $self = shift;
    my ( $msg ) = @_;
+
+   chomp $msg; # In case of simple  ->responderr( $@ );
 
    $self->respond( Tangence::Message->new( $self->stream, MSG_ERROR )
       ->pack_str( $msg )
