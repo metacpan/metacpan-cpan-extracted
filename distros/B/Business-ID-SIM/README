@@ -3,8 +3,8 @@ NAME
     SIM)
 
 VERSION
-    This document describes version 0.08 of Business::ID::SIM (from Perl
-    distribution Business-ID-SIM), released on 2019-10-15.
+    This document describes version 0.080 of Business::ID::SIM (from Perl
+    distribution Business-ID-SIM), released on 2019-11-21.
 
 SYNOPSIS
      use Business::ID::SIM qw(parse_sim);

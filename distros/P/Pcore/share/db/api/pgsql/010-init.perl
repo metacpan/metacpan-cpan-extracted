@@ -25,7 +25,6 @@ CREATE TABLE "user" (
     "enabled" BOOLEAN NOT NULL DEFAULT TRUE,
     "email" TEXT UNIQUE,
     "email_confirmed" BOOL NOT NULL DEFAULT FALSE,
-    "has_avatar" BOOL NOT NULL DEFAULT FALSE,
     "gravatar" TEXT,
     "locale" TEXT,
     "telegram_name" TEXT UNIQUE

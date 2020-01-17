@@ -9,7 +9,6 @@ use Test::More;
 
 sub temp_file_path {
     # older EUMMs turn this on. We don't want to emit warnings.
-    # also, some of our CORE function overrides emit warnings. Silence those.
     local $^W;
 
     my $file;

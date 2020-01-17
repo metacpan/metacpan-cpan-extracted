@@ -9,6 +9,7 @@ README
 t/00-load.t
 t/basic.t
 t/changes.t
+t/images.t
 t/manifest.t
 t/opensearch.t
 t/pod-coverage.t

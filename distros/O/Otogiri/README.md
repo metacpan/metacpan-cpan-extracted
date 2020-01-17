@@ -47,7 +47,7 @@ Otogiri is a thing that like as ORM. A slogan is "Schema-less, Fat-less".
 
 # ATTRIBUTES
 
-Please see ATTRIBUTES section of [DBIx::Otogiri](https://metacpan.org/pod/DBIx::Otogiri) documentation.
+Please see ATTRIBUTES section of [DBIx::Otogiri](https://metacpan.org/pod/DBIx%3A%3AOtogiri) documentation.
 
 # METHODS
 
@@ -55,13 +55,13 @@ Please see ATTRIBUTES section of [DBIx::Otogiri](https://metacpan.org/pod/DBIx::
 
     my $db = Otogiri->new( connect_info => [$dsn, $dbuser, $dbpass] );
 
-Instantiate and connect to db. Then, it returns [DBIx::Otogiri](https://metacpan.org/pod/DBIx::Otogiri) object.
+Instantiate and connect to db. Then, it returns [DBIx::Otogiri](https://metacpan.org/pod/DBIx%3A%3AOtogiri) object.
 
 # EXPORT FUNCTIONS
 
 Otogiri exports each SQL::QueryMaker::sql\_\* functions. (ex. sql\_ge(), sql\_like() and more...)
 
-For more information, please see FUNCTIONS section of [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)'s documentation.
+For more information, please see FUNCTIONS section of [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker)'s documentation.
 
 # INFORMATION ABOUT INCOMPATIBILITY
 
@@ -69,7 +69,7 @@ For more information, please see FUNCTIONS section of [SQL::QueryMaker](https://
 
 An insert() method is removed, and it was become a synonym of fast\_insert() method.
 
-If you want to use previous style insert() method, please try [Otogiri::Plugin::InsertAndFetch](https://metacpan.org/pod/Otogiri::Plugin::InsertAndFetch) .
+If you want to use previous style insert() method, please try [Otogiri::Plugin::InsertAndFetch](https://metacpan.org/pod/Otogiri%3A%3APlugin%3A%3AInsertAndFetch) .
 
 # LICENSE
 
@@ -84,10 +84,10 @@ ytnobody <ytnobody@gmail.com>
 
 # SEE ALSO
 
-[DBIx::Otogiri](https://metacpan.org/pod/DBIx::Otogiri)
+[DBIx::Otogiri](https://metacpan.org/pod/DBIx%3A%3AOtogiri)
 
-[DBIx::Sunny](https://metacpan.org/pod/DBIx::Sunny)
+[DBIx::Sunny](https://metacpan.org/pod/DBIx%3A%3ASunny)
 
-[SQL::Maker](https://metacpan.org/pod/SQL::Maker)
+[SQL::Maker](https://metacpan.org/pod/SQL%3A%3AMaker)
 
-[SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)
+[SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker)

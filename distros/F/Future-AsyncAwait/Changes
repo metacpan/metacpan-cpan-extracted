@@ -1,5 +1,13 @@
 Revision history for Future-AsyncAwait
 
+0.36    2020-01-16
+        [CHANGES]
+         * Add an optional 'force' callback to test_awaitable()
+
+        [BUGFIXES]
+         * Fix more segfault cases during compile failures
+           (RT129987, RT131487)
+
 0.35    2020-01-07
         [CHANGES]
          * Support lexical scopes declaring a different class of future

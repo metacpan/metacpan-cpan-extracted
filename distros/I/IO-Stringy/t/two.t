@@ -1,29 +1,8 @@
-#!/usr/bin/perl -w         #-*-Perl-*-
+use strict;
+use warnings;
 
-use lib "./t", "./lib"; 
 use IO::Scalar;
-use ExtUtils::TBone;
-use Common;
-
-
-#--------------------
-#
-# TEST...
-#
-#--------------------
-
-### Make a tester:
-my $T = typical ExtUtils::TBone;
-Common->test_init(TBone=>$T);
-$T->log_warnings;
-
-### Set the counter:
-my $ntests = (($] >= 5.004) ? 2 : 0);
-$T->begin($ntests);
-if ($ntests == 0) {
-    $T->end;
-    exit 0;
-}
+use Test::More tests => 3;
 
 ### Open handles on strings:
 my $str1 = "Tea for two";
@@ -41,13 +20,6 @@ print $S1 "for tea";
 print $S2 "4 me";
 
 ### Verify:
-$T->ok_eq($str1, 
-	  "Tea for two, and two for tea",
-	  "COHERENT STRING 1");
-$T->ok_eq($str2, 
-	  "Me 4 U, and U 4 me",
-	  "COHERENT STRING 2");
-
-### So we know everything went well...
-$T->end;
-
+is($str1, "Tea for two, and two for tea", "COHERENT STRING 1");
+is($str2, "Me 4 U, and U 4 me", "COHERENT STRING 2");
+is($str3, "hello, world", "COHERENT STRING 3");

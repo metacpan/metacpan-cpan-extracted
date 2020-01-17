@@ -80,6 +80,24 @@ DESCRIPTION
         This is the list of roles to create, structured almost the same as the
         optlist for classes, but see "Role Options".
 
+    `class_generator` *(OptList)*
+        Kind of like `class`, but:
+
+          [ "A", \&generator_for_A, "B", \&generator_for_B, ... ]
+
+        "A" and "B" are not classes, but when
+        `MyApp::A->generate_package(...)` is called, it will pass arguments to
+        &generator_for_A which is expected to return a hashref like
+        `\%opts_for_A`. Then a new pseudononymous class will be created with
+        those options.
+
+        See the FAQ for an example.
+
+    `role_generator` *(OptList)*
+        The same but for roles.
+
+        See the FAQ for an example.
+
     `toolkit` *(Str)*
         The strings "Moo", "Moose", or "Mouse" are accepted and instruct
         MooX::Press to use your favourite OO toolkit. "Moo" is the default.
@@ -1175,6 +1193,104 @@ FAQ
 
   The plural of "leaf" is "leaves", right?
     Yeah, but that sounds like something is leaving.
+
+  How do generators work?
+    A class generator is like a class of classes.
+
+    A role generator is like a class of roles.
+
+      use MooX::Press (
+        prefix => 'MyApp',
+        class  => [
+          'Animal' => {
+            has => ['$name'],
+          },
+        ],
+        class_generator => [
+          'Species' => sub {
+            my ($gen, $binomial) = @_;
+            return {
+              extends  => ['Animal'],
+              constant => { binomial => $binomial },
+            };
+          },
+        ],
+      );
+
+    This generates MyApp::Animal as a class, as you might expect, but also
+    creates a class generator called MyApp::Species.
+
+    MyApp::Species is not itself a class but it can make classes.
+
+      my $Human = MyApp::Species->generate_package('Homo sapiens');
+      my $Dog   = MyApp::Species->generate_package('Canis familiaris');
+  
+      my $alice = $Human->new(name => 'Alice');
+      say $alice->name;      # Alice
+      say $alice->binomial;  # Homo sapiens
+  
+      my $fido  = $Dog->new(name => 'Fido');
+      $fido->isa($Dog);               # true
+      $fido->isa($Human);             # false
+      $fido->isa('MyApp::Animal');    # true
+      $fido->isa('MyApp::Species');   # false!!!
+  
+      use Types::Standard -types;
+      use MyApp::Types -types;
+  
+      is_ClassName($fido)             # false
+      is_Object($fido)                # true
+      is_Animal($fido);               # true
+      is_SpeciesInstance($fido);      # true
+      is_SpeciesClass($fido);         # false
+      is_ClassName($Dog)              # true
+      is_Object($Dog)                 # false
+      is_Animal($Dog);                # false
+      is_SpeciesInstance($Dog);       # false
+      is_SpeciesClass($Dog);          # true
+
+    Note that there is no Species type created, but instead a pair of types is
+    created: `SpeciesClass` and `SpeciesInstance`.
+
+    It is also possible to inherit from generated classes.
+
+      use MooX::Press (
+        prefix => 'MyApp',
+        class  => [
+          'Animal' => {
+            has => ['$name'],
+          },
+          'Dog' => {
+            extends => [ 'Species' => ['Canis familiaris'] ]
+          },
+        ],
+        class_generator => [
+          'Species' => sub {
+            my ($gen, $binomial) = @_;
+            return {
+              extends  => ['Animal'],
+              constant => { binomial => $binomial },
+            };
+          },
+        ],
+      );
+  
+      my $fido = MyApp->new_dog(name => 'Fido');
+
+    The inheritance heirarchy for $fido is something like:
+
+      Moo::Object
+      ->  MyApp::Animal
+        ->  MyApp::Species::__GEN000001__
+          ->  MyApp::Dog
+
+    Note that MyApp::Species itself isn't in that heirarchy!
+
+    Generated roles work pretty much the same, but `role_generator` instead of
+    `class_generator`, `does` instead of `isa`, and `with` instead of
+    `extends`.
+
+    No type constraints are automatically created for generated roles.
 
   Are you insane?
     Quite possibly.

@@ -1,4 +1,9 @@
-Revision history IO::Stringy
+Revision history  IO-Stringy
+
+2.113     2020-01-16
+  - Get rid of use of Common and TBone in all tests
+  - Convert to Dist::Zilla for authoring
+  - Cleaned up some of the docs. Needs more.
 
 2.112    2019-12-13
   - Added the change log from any prior source that could be found. Formatted

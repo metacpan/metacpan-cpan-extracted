@@ -11,7 +11,6 @@ use ExtUtils::MakeMaker;
 # --install-po : compile .po files and install locale files
 #		 also, install localized man pages
 # --install-gui : install gurpmi
-my $with_rpm = 1; $with_rpm = 0 if grep $_ eq '--without-rpm', @ARGV;
 my $with_po  = 0; $with_po  = 1 if grep $_ eq '--install-po', @ARGV;
 my $with_polkit = 0; $with_polkit = 1 if grep $_ eq '--install-polkit', @ARGV;
 my $with_gui = 0; $with_gui = 1 if grep $_ eq '--install-gui', @ARGV;
@@ -161,7 +160,7 @@ WriteMakefile(
 	'Expect'		=> '0',
 	'File::Slurp'		=> '0',
 	'Net::Server'		=> '0',
-	'rpmtools'		=> '7.11',
+	'rpmtools'		=> '7.11.1',
 	'Test::More'		=> '1.302',
 	'Test::Pod'		=> '0',
 	'Test::Pod::Coverage'	=> '0',
@@ -195,6 +194,7 @@ WriteMakefile(
 		},
 		'urpmi' => {
 		    file => 'urpmi.pm',
+		    version => 'v8.120.11',
 		},
             },
             resources => {

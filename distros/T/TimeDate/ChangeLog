@@ -1,3 +1,13 @@
+2.31 -- Thu Jan 16 14:00:00 MT 2020
+
+  * Fix year 2020 bug from t/getdate.t [Prajith]
+  * Fix warnings from t/date.t
+  * Fix pod issue in lib/Date/Parse.pm
+  * Fix for French language using English day suffixes in %o [mitchjacksontech]
+  * RT#84075: Fix Date::Parse::str2time century issue. [perlpilot]
+  * Adds Occitan language. [Quenty31]
+  * Migrate GitHub repo and bugtracker to atoomic/perl-TimeDate
+
 2.30 -- Mon Feb 18 13:31:03 CST 2013
   * Syncing distribution version number with Date::Parse, not functional changes
 

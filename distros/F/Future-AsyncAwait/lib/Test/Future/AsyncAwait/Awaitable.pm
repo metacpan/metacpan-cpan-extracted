@@ -8,7 +8,7 @@ package Test::Future::AsyncAwait::Awaitable;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Test::More;
 
@@ -74,12 +74,28 @@ This argument is optional; if not provided the tests will simply try to invoke
 the regular C<new> constructor on the given class name. For most
 implementations this should be sufficient.
 
+   $f = $new->()
+
 =item cancel => CODE
 
 Optional. Gives a callback function to invoke to cancel a pending instance, if
 the implementation provides cancellation semantics. If this callback is
 provided then an extra subtest suite is run to check the API around
 cancellation.
+
+   $cancel->( $f )
+
+=item force => CODE
+
+Optional. Gives a callback function to invoke to wait for a promise to invoke
+its on-ready callbacks. Some future-like implementations will run these
+immediately when the future is marked as done or failed, and so this callback
+will not be required. Other implementations will defer these invocations,
+perhaps until the next tick of an event loop or similar. In the latter case,
+these implementations should provide a way for the test to wait for this to
+happen.
+
+   $force->( $f )
 
 =back
 
@@ -92,6 +108,7 @@ sub test_awaitable
    my $class  = $args{class};
    my $new    = $args{new}   || sub { return $class->new() };
    my $cancel = $args{cancel};
+   my $force  = $args{force};
 
    subtest "$title immediate done" => sub {
       ok( my $f = $class->AWAIT_NEW_DONE( "result" ), "AWAIT_NEW_DONE yields object" ); 
@@ -149,6 +166,7 @@ sub test_awaitable
       ok( !$called, 'AWAIT_ON_READY CB not yet invoked' );
 
       $f->AWAIT_DONE( "ping" );
+      $force->( $f ) if $force;
       ok( $called, 'AWAIT_ON_READY CB now invoked' );
    };
 

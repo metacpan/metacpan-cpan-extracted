@@ -1,5 +1,5 @@
 use Test::More;
-use t::Capture;
+use Capture::Tiny 'capture_stdout';
 use CGI::Compile;
 
 my $sub = CGI::Compile->compile("t/warnings.cgi");
@@ -7,7 +7,7 @@ my $sub = CGI::Compile->compile("t/warnings.cgi");
 my $stdout = do {
     local $^W = 0;
 
-    capture_out($sub);
+    capture_stdout { $sub->() };
 };
 
 like $stdout, qr/\s*1\z/, '-w switch preserved';

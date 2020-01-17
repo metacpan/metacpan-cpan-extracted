@@ -1,5 +1,9 @@
 Revision history for Perl extension Otogiri
 
+0.19 2020-01-17T11:11:53Z
+
+    - Added test prereq Test::Exception suggested by CPANTS. [manwar]
+
 0.18 2017-05-19T01:35:24Z
 
     - no ping before fetch mysql_insertid [tsucchi]

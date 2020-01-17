@@ -71,10 +71,9 @@ sub new {
             $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
         }
 
-        if ( UNIVERSAL::isa( $$value_sr, __PACKAGE__ ) ) {
-            _repromise( $value_sr, \@children, $value_sr );
-        }
-        elsif (@children) {
+        # We do not repromise rejections. Whatever is in $$value_sr
+        # is literally what rejection callbacks receive.
+        if (@children) {
             $_->_settle($value_sr) for splice @children;
         }
     };

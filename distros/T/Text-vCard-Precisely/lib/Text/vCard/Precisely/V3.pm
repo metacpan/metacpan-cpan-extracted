@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use 5.8.9;
 
@@ -14,6 +14,7 @@ use Data::UUID;
 use Encode;
 use Text::LineFold;
 use URI;
+use Path::Tiny;
 
 =encoding utf8
 
@@ -21,7 +22,7 @@ use URI;
 
 Text::vCard::Precisely::V3 - Read, Write and Edit B<just ONLY vCards 3.0> precisely
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
  my $vc = Text::vCard::Precisely->new( version => '3.0' );
  # Or you can write like below if you want to be expressly using 3.0:
@@ -86,7 +87,7 @@ And you can use X-SOCIALPROFILE type if you want like below:
 
  print $vc->as_string();
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 A vCard is a digital business card. vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> provide an API for parsing vCards.
 
@@ -136,9 +137,9 @@ use Text::vCard::Precisely::V3::Node::SocialProfile;
 has encoding_in  => ( is => 'rw', isa => 'Str', default => 'UTF-8', );
 has encoding_out => ( is => 'rw', isa => 'Str', default => 'UTF-8', );
 
-=head2 Constructors
+=head1 Constructors
 
-=head3 load_hashref($HashRef)
+=head2 load_hashref($HashRef)
 
 Accepts a HashRef that looks like below:
 
@@ -192,7 +193,7 @@ sub load_hashref {
     return $self;
 }
 
-=head3 load_file($file_name)
+=head2 load_file($file_name)
 
 Accepts a file name
 
@@ -209,7 +210,7 @@ sub load_file {
     $self->load_hashref($hashref);
 }
 
-=head3 load_string($vCard)
+=head2 load_string($vCard)
 
 Accepts a vCard string
 
@@ -263,9 +264,9 @@ sub _parse_param {
     return $ref;
 }
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 as_string()
+=head2 as_string()
 
 Returns the vCard as a string.
 You have to use Encode::encode_utf8() if your vCard is written in utf8
@@ -353,32 +354,39 @@ sub _footer {
     return $str;
 }
 
-=head3 as_file($filename)
+=head2 as_file($filename)
 
 Write data in vCard format to $filename.
 Dies if not successful.
 
 =cut
 
+sub _path {
+    my $self = shift;
+    return path($_[0]);
+}
+
 sub as_file {
     my ( $self, $filename ) = @_;
+    croak "No filename was set!" unless $filename;
+    
     my $file = $self->_path($filename);
-    $file->spew( $self->_iomode_out, $self->as_string );
+    $file->spew( {binmode => ":encoding(UTF-8)"}, $self->as_string );
     return $file;
 }
 
-=head2 SIMPLE GETTERS/SETTERS
+=head1 SIMPLE GETTERS/SETTERS
 
 These methods accept and return strings
 
-=head3 version()
+=head2 version()
 
 returns Version number of the vcard. Defaults to B<'3.0'> and this method is B<READONLY>
 =cut
 
 has version => ( is => 'ro', isa => 'Str', default => '3.0' );
 
-=head3 rev()
+=head2 rev()
 
 To specify revision information about the current vCard3.0
 
@@ -398,7 +406,7 @@ coerce 'TimeStamp',
     via { $_->[0]{content} };
 has rev => ( is => 'rw', isa => 'TimeStamp', coerce => 1 );
 
-=head3 name(), profile(), mailer(), agent(), class();
+=head2 name(), profile(), mailer(), agent(), class();
 
 These Types will be DEPRECATED in vCard 4.0 and it seems they are useless
 So just sapport as B<READONLY> methods
@@ -407,13 +415,13 @@ So just sapport as B<READONLY> methods
 
 has $will_be_deprecated => ( is => 'ro', isa => 'Str' );
 
-=head2 COMPLEX GETTERS/SETTERS
+=head1 COMPLEX GETTERS/SETTERS
 
 They are based on Moose with coercion.
 So, these methods accept not only ArrayRef[HashRef] but also ArrayRef[Str], single HashRef or single Str.
 Read source if you were confused.
 
-=head3 n()
+=head2 n()
 
 To specify the components of the name of the object the vCard represents.
 
@@ -443,7 +451,7 @@ coerce 'N',
     via { Text::vCard::Precisely::V3::Node::N->new({ content => [split /(?<!\\);/, $_] }) };
 has n => ( is => 'rw', isa => 'N', coerce => 1 );
 
-=head3 tel()
+=head2 tel()
 
  Accepts/returns an ArrayRef that looks like:
 
@@ -464,7 +472,7 @@ coerce 'Tels',
     via { [ map { Text::vCard::Precisely::V3::Node::Tel->new($_) } @$_ ] };
 has tel => ( is => 'rw', isa => 'Tels', coerce => 1 );
 
-=head3 adr(), address()
+=head2 adr(), address()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -492,7 +500,7 @@ coerce 'Address',
     via { [ map { Text::vCard::Precisely::V3::Node::Address->new($_) } @$_ ] };
 has adr => ( is => 'rw', isa => 'Address', coerce => 1 );
 
-=head3 email()
+=head2 email()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -517,7 +525,7 @@ coerce 'Email',
     via { [ map { Text::vCard::Precisely::V3::Node::Email->new($_) } @$_ ] };
 has email => ( is => 'rw', isa => 'Email', coerce => 1 );
 
-=head3 url()
+=head2 url()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -559,7 +567,7 @@ coerce 'URLs',
     via  { [ map{ Text::vCard::Precisely::V3::Node::URL->new($_) } @$_ ] };
 has url => ( is => 'rw', isa => 'URLs', coerce => 1 );
 
-=head3 photo(), logo()
+=head2 photo(), logo()
 
 Accepts/returns an ArrayRef of URLs or Images: Even if they are raw image binary or text encoded in Base64, it does not matter
 Attention! Mac OS X and iOS B<ignore> the description beeing URL
@@ -605,31 +613,31 @@ coerce 'Photos',
     via { [ Text::vCard::Precisely::V3::Node::Image->new( { content => $_->as_string } ) ] };
 has [qw| photo logo |] => ( is => 'rw', isa => 'Photos', coerce => 1 );
 
-=head3 note()
+=head2 note()
 
 To specify supplemental information or a comment that is associated with the vCard
 
-=head3 org(), title(), role(), categories()
+=head2 org(), title(), role(), categories()
 
 To specify additional information for your jobs
  
-=head3 fn(), full_name(), fullname()
+=head2 fn(), full_name(), fullname()
 
 A person's entire name as they would like to see it displayed
 
-=head3 nickname()
+=head2 nickname()
 
 To specify the text corresponding to the nickname of the object the vCard represents
 
-=head3 geo()
+=head2 geo()
 
 To specify information related to the global positioning of the object the vCard represents
 
-=head3 key()
+=head2 key()
 
 To specify a public key or authentication certificate associated with the object that the vCard represents
 
-=head3 label()
+=head2 label()
 ToDo: because B<It's DEPRECATED in 4.0>
 To specify the formatted text corresponding to delivery address of the object the vCard represents
 
@@ -663,7 +671,7 @@ coerce 'Node',
 has [qw|note org title role categories fn nickname geo key label|]
     => ( is => 'rw', isa => 'Node', coerce => 1 );
 
-=head3 sort_string()
+=head2 sort_string()
 
 To specify the family name, given name or organization text to be used for national-language-specific sorting of the FN, N and ORG
 B<This method will be DEPRECATED in vCard4.0> Use SORT-AS param instead of it. (L<Text::vCard::Precisely::V4|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V4.pm> supports it)
@@ -672,7 +680,7 @@ B<This method will be DEPRECATED in vCard4.0> Use SORT-AS param instead of it. (
 
 has sort_string => ( is => 'rw', isa => 'Node', coerce => 1 );
 
-=head3 uid()
+=head2 uid()
 
 To specify a value that represents a globally unique identifier corresponding to the individual or resource associated with the vCard
 
@@ -684,7 +692,7 @@ subtype 'UID'
     => message { "The UID you provided, $_, was not correct" };
 has uid => ( is => 'rw', isa => 'UID' );
 
-=head3 tz(), timezone()
+=head2 tz(), timezone()
 
 Both are same method with Alias
 To specify information related to the time zone of the object the vCard represents
@@ -702,7 +710,7 @@ coerce 'TimeZones',
     via {[ DateTime::TimeZone->new( name => $_ ) ]};
 has tz =>  ( is => 'rw', isa => 'TimeZones', coerce => 1 );
 
-=head3 bday(), birthday()
+=head2 bday(), birthday()
 
 Both are same method with Alias
 To specify the birth date of the object the vCard represents
@@ -711,7 +719,7 @@ To specify the birth date of the object the vCard represents
 
 has bday => ( is => 'rw', isa => 'Str' );
 
-=head3 prodid()
+=head2 prodid()
 
 To specify the identifier for the product that created the vCard object
 
@@ -719,11 +727,11 @@ To specify the identifier for the product that created the vCard object
 
 has prodid => ( is => 'rw', isa => 'Str' );
 
-=head3 source()
+=head2 source()
 
 To identify the source of directory information contained in the content type
 
-=head3 sound()
+=head2 sound()
 
 To specify a digital sound content information that annotates some aspect of the vCard
 This property is often used to specify the proper pronunciation of the name property value of the vCard
@@ -732,7 +740,7 @@ This property is often used to specify the proper pronunciation of the name prop
 
 has [qw|source sound|] => ( is => 'rw', isa => 'URLs', coerce => 1 );
 
-=head3 socialprofile()
+=head2 socialprofile()
  
 There is no documents about X-SOCIALPROFILE in RFC but it works!
 
@@ -782,18 +790,18 @@ sub timezone {
 
 1;
 
-=head2 aroud UTF-8
+=head1 aroud UTF-8
 
 if you want to send precisely the vCard3.0 with UTF-8 characters to the B<Android4.4.x or before>, you have to set Charset param for each values like below:
 
  ADR;CHARSET=UTF-8:201号室;マンション;通り;市;都道府県;郵便番号;日本
 
-=head2 for under perl-5.12.5
+=head1 for under perl-5.12.5
 
 This module uses C<\P{ascii}> in regexp so You have to use 5.12.5 and later
 And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't support them
 
-=head2 SEE ALOSO
+=head1 SEE ALSO
 
 =over
 
@@ -819,6 +827,11 @@ L<Text::vCard::Precisely::V4 on CPAN|http://search.cpan.org/~worthmine/Text-vCar
  
 =back
 
-=head2 AUTHOR
+=head1 AUTHOR
 
 L<Yuki Yoshida(worthmine)|https://github.com/worthmine>
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl.
+ 

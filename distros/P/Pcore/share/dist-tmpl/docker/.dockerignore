@@ -4,20 +4,3 @@
 # common
 data/
 wiki/
-
-# node
-dist/
-node_modules/
-
-# yarn
-.yarn/
-.pnp.*
-
-# vue
-.env.local
-.env.*.local
-
-# cordova
-hooks/
-platforms/
-plugins/

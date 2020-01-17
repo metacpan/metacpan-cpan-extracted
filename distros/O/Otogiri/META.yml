@@ -7,13 +7,14 @@ build_requires:
   File::Temp: '0'
   JSON: '0'
   Mock::Quick: '0'
+  Test::Exception: '0'
   Test::More: '0.98'
   Test::Requires: '0'
   Test::Time: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +37,7 @@ provides:
     file: lib/DBIx/Otogiri/Iterator.pm
   Otogiri:
     file: lib/Otogiri.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   Class::Accessor::Lite: '0'
   DBIx::Sunny: '0'
@@ -47,8 +48,11 @@ resources:
   bugtracker: https://github.com/ytnobody/Otogiri/issues
   homepage: https://github.com/ytnobody/Otogiri
   repository: git://github.com/ytnobody/Otogiri.git
-version: '0.18'
+version: '0.19'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Takuya Tsuchida <tsucchi@cpan.org>'
   - 'papix <mail@papix.net>'
   - 'ytnobody <ytnobody@ytnobody.net>'
-  - 'Takuya Tsuchida <tsucchi@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

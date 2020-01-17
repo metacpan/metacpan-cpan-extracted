@@ -4,7 +4,7 @@
       "ytnobody <ytnobody@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.1.8",
    "license" : [
       "perl_5"
    ],
@@ -28,14 +28,14 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::PostgreSQL" : "0",
             "Test::Spellunker" : "v0.2.7",
@@ -57,6 +57,7 @@
             "File::Temp" : "0",
             "JSON" : "0",
             "Mock::Quick" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.98",
             "Test::Requires" : "0",
             "Test::Time" : "0"
@@ -72,7 +73,7 @@
       },
       "Otogiri" : {
          "file" : "lib/Otogiri.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -86,10 +87,13 @@
          "web" : "https://github.com/ytnobody/Otogiri"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Takuya Tsuchida <tsucchi@cpan.org>",
       "papix <mail@papix.net>",
-      "ytnobody <ytnobody@ytnobody.net>",
-      "Takuya Tsuchida <tsucchi@cpan.org>"
-   ]
+      "ytnobody <ytnobody@ytnobody.net>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

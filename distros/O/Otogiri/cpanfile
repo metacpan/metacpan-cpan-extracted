@@ -6,6 +6,7 @@ requires 'DBIx::Sunny';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
+    requires 'Test::Exception', '0';
     requires 'Test::Time', '0';
     requires 'DBD::SQLite', '0';
     requires 'JSON', '0';

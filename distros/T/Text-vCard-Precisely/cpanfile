@@ -14,10 +14,11 @@ requires 'URI';
 requires 'overload';
 requires 'perl', 'v5.12.5';
 requires 'utf8';
+requires 'Path::Tiny';
 
 on build => sub {
+    requires 'File::Compare';
     requires 'Data::Section::Simple';
-    requires 'Path::Tiny';
     requires 'Test::More';
     requires 'lib';
     requires 'strict';

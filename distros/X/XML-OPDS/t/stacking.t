@@ -93,6 +93,9 @@ $feed->add_to_acquisitions(
                            href => '/second/title',
                            title => 'Second title',
                            files => [ '/second/title.epub' ],
+                           image => '/path/myimage.png',
+                           thumbnail => '/path/to/thumbnail.png',
+                           description => 'blablabla',
                           );
 
 
@@ -117,7 +120,12 @@ $feed->add_to_acquisitions(
     <id>http://amusewiki.org/second/title</id>
     <title>Second title</title>
     <updated>2016-03-01T00:00:00+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">blablabla</div>
+    </content>
     <link rel="http://opds-spec.org/acquisition" href="http://amusewiki.org/second/title.epub" type="application/epub+zip"/>
+    <link rel="http://opds-spec.org/image/thumbnail" href="http://amusewiki.org/path/to/thumbnail.png" type="image/png"/>
+    <link rel="http://opds-spec.org/image" href="http://amusewiki.org/path/myimage.png" type="image/png"/>
   </entry>
 </feed>
 FEED
@@ -153,7 +161,12 @@ FEED
     <id>http://amusewiki.org/second/title</id>
     <title>Second title</title>
     <updated>2016-03-01T00:00:00+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">blablabla</div>
+    </content>
     <link rel="http://opds-spec.org/acquisition" href="http://amusewiki.org/second/title.epub" type="application/epub+zip"/>
+    <link rel="http://opds-spec.org/image/thumbnail" href="http://amusewiki.org/path/to/thumbnail.png" type="image/png"/>
+    <link rel="http://opds-spec.org/image" href="http://amusewiki.org/path/myimage.png" type="image/png"/>
   </entry>
 </feed>
 FEED

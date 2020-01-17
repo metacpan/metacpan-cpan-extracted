@@ -11,32 +11,32 @@ XML::OPDS::OpenSearch::Query - OpenSearch query element for XML::OPDS
 
 =head1 DESCRIPTION
 
-This module is mostly an helper to provide validation to create
+This module is mostly a helper to provide validation to create
 C<Query> elements in an OPDS search result. Notably, this doesn't
-expand to XML.
+expand to XML. The serialization is left to L<XML::OPDS>.
 
 =head1 SYNOPSIS
 
-use XML::OPDS;
-use XML::OPDS::OpenSearch::Query;
-use Data::Page;
-my $feed = XML::OPDS->new;
-my $query = XML::OPDS::OpenSearch::Query->new(role => "example",
-                                              searchTerms => "my terms",
-                                              );
-my $pager = Data::Page->new;
-$pager->total_entries(50);
-$pager->entries_per_page(20);
-$pager->current_page(1);
-$feed->search_result_pager($pager);
-$feed->search_result_terms('my terms');
-
-# please note that if you set the search_result_pager and
-# search_result_terms a role:request query is added automatically, so
-# here we add only the example.
-
-$feed->search_result_queries([$query]);
-print $feed->render;
+  use XML::OPDS;
+  use XML::OPDS::OpenSearch::Query;
+  use Data::Page;
+  my $feed = XML::OPDS->new;
+  my $query = XML::OPDS::OpenSearch::Query->new(role => "example",
+                                                searchTerms => "my terms",
+                                                );
+  my $pager = Data::Page->new;
+  $pager->total_entries(50);
+  $pager->entries_per_page(20);
+  $pager->current_page(1);
+  $feed->search_result_pager($pager);
+  $feed->search_result_terms('my terms');
+  
+  # please note that if you set the search_result_pager and
+  # search_result_terms a role:request query is added automatically, so
+  # here we add only the example.
+  
+  $feed->search_result_queries([$query]);
+  print $feed->render;
 
 =head1 SETTERS/ACCESSORS
 
@@ -173,7 +173,7 @@ sub attributes_hashref {
         $out{title} = substr $self->title, 0, 256;
     }
     if (defined $self->searchTerms) {
-        $out{searchTerms} = URI::Escape::uri_escape($self->searchTerms);
+        $out{searchTerms} = URI::Escape::uri_escape_utf8($self->searchTerms);
     }
     foreach my $accessor (qw/totalResults
                              count

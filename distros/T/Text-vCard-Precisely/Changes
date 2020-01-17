@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.14 2020-01-17T08:58:25Z
+  - added the test and script for method as_file()
+
 0.13 2017-10-21T12:03:26Z
   - just fixed around POD
 

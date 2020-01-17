@@ -13,7 +13,7 @@ our %EXPORT_TAGS = ( 'all' => [] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = '0.8';
+our $VERSION = '0.9.1';
 
 my $rpc_actions = {
     # Node RPC's
@@ -283,149 +283,19 @@ set_ methods.
 
 =head1 METHODS
 
-=over 1
+See L<https://docs.nano.org/commands/rpc-protocol/> for a list of RPC calls. This module implements the following RPCs:
 
-account_balance
+=head2 Node RPCs
 
-account_block_count
+account_balance account_block_count account_get account_history account_info account_key account_representative account_weight accounts_balances accounts_frontiers accounts_pending active_difficulty available_supply block_account block_count block_count_type block_confirm block_create block_hash block_info blocks blocks_info bootstrap bootstrap_any bootstrap_lazy bootstrap_status chain confirmation_active confirmation_height_currently_processing confirmation_history confirmation_info confirmation_quorum database_txn_tracker delegators delegators_count deterministic_key frontier_count frontiers keepalive key_create key_expand ledger node_id node_id_delete peers pending pending_exists process representatives representatives_online republish sign stats stats_clear stop successors validate_account_number version unchecked unchecked_clear unchecked_get unchecked_keys unopened uptime work_cancel work_generate work_peer_add work_peers work_peers_clear work_validate
 
-account_get
+=head2 Wallet RPCs
 
-account_history
+account_create account_list account_move account_remove account_representative_set accounts_create password_change password_enter password_valid receive receive_minimum receive_minimum_set search_pending search_pending_all send wallet_add wallet_add_watch wallet_balances wallet_change_seed wallet_contains wallet_create wallet_destroy wallet_export wallet_frontiers wallet_history wallet_info wallet_ledger wallet_lock wallet_locked wallet_pending wallet_representative wallet_representative_set wallet_republish wallet_work_get work_get work_set
 
-account_info
+=head2 Unit Conversion RPCs
 
-account_key
-
-account_representative
-
-account_weight
-
-accounts_balances
-
-accounts_frontiers
-
-accounts_pending
-
-active_difficulty
-
-available_supply
-
-block_account
-
-block_count
-
-block_count_type
-
-block_confirm
-
-block_create
-
-block_hash
-
-block_info
-
-blocks
-
-blocks_info
-
-bootstrap
-
-bootstrap_any
-
-bootstrap_lazy
-
-bootstrap_status
-
-chain
-
-confirmation_active
-
-confirmation_height_currently_processing
-
-confirmation_history
-
-confirmation_info
-
-confirmation_quorum
-
-database_txn_tracker
-
-delegators
-
-delegators_count
-
-deterministic_key
-
-frontier_count
-
-frontiers
-
-keepalive
-
-key_create
-
-key_expand
-
-ledger
-
-node_id
-
-node_id_delete
-
-peers
-
-pending
-
-pending_exists
-
-process
-
-representatives
-
-representatives_online
-
-republish
-
-sign
-
-stats
-
-stats_clear
-
-stop
-
-successors
-
-validate_account_number
-
-version
-
-unchecked
-
-unchecked_clear
-
-unchecked_get
-
-unchecked_keys
-
-unopened
-
-uptime
-
-work_cancel
-
-work_generate
-
-work_peer_add
-
-work_peers
-
-work_peers_clear
-
-work_validate
-
-=back
+krai_from_raw krai_to_raw mrai_from_raw mrai_to_raw rai_from_raw rai_to_raw
 
 =head1 DEPENDENCIES
 
@@ -443,7 +313,9 @@ These modules are required:
 
 =head1 AUTHOR
 
-Ruben de Groot, E<lt>ruben@hacktor.com<gt>
+Ruben de Groot, ruben at hacktor.com
+
+Git Repository: L<https://github.com/hacktor/Crypto-NanoRPC>
 
 =head1 COPYRIGHT AND LICENSE
 

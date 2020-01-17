@@ -21,6 +21,7 @@ __PACKAGE__->run();
 
 sub _REQUIRE {
     require Mojo::IOLoop;
+    die "Mojo::IOLoop lacks next_tick()." if !Mojo::IOLoop->can('next_tick');
 }
 
 sub _RESOLVE {

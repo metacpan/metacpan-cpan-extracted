@@ -1,3 +1,12 @@
+v0.111.0 2020-01-16T21:59:11Z
+ - status reason fixed
+ - user avatar fixed
+ - api users
+ - api allow username email
+ - app tmpl fixed
+ - common roles applied to the api classes
+ - api roles
+
 v0.110.4 2020-01-13T13:36:20Z
  - env build updated
 

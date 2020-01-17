@@ -57,8 +57,11 @@ function’s resolve callback itself receives another promise, e.g.:
 
 # COMPATIBILITY
 
-Right now this doesn’t try for interoperability with other promise
-classes. If that’s something you want, make a feature request.
+Right now this doesn’t interoperate directly with other promise
+classes. If that’s something you want, make a feature request. For the
+time being, of course, you can wrap one of this module’s promises in an
+instance of whatever promise class you’re using, or vice-versa, to achieve
+interoperability.
 
 See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) if you need to interact with [Future](https://metacpan.org/pod/Future).
 
@@ -118,8 +121,9 @@ be some object or ID besides the promise that uniquely identifies the action
 to be canceled. See [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) for an example of this approach.
 
 You’ll need to decide if it makes more sense for your application to leave
-a canceled query in the “pending” state or to resolve or reject it.
-All things being equal, I feel the first approach is the most intuitive.
+a canceled query in the “pending” state or to “settle” (i.e., resolve or
+reject) it. All things being equal, I feel the first approach is the most
+intuitive.
 
 # MEMORY LEAKS
 
@@ -170,26 +174,23 @@ try manually deleting as many references/closures as possible. See
             # … etc.
         } );
 
-# TODO
-
-Currently rejections will defer until promises are resolved. This makes
-no real sense and ought to change. Do not build anything that depends on
-this behavior.
-
 # SEE ALSO
 
 If you’re not sure of what promises are, there are several good
 introductions to the topic. You might start with
 [this one](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
+[Promise::XS](https://metacpan.org/pod/Promise::XS) is a lot like this library but implemented mostly in XS for
+speed.
+
 Promise::ES6 serves much the same role as [Future](https://metacpan.org/pod/Future) but exposes
 a standard, minimal, cross-language API rather than a proprietary (large) one.
 
 CPAN contains a number of other modules that implement promises. I think
-mine is the nicest :), but YMMV. Enjoy!
+mine are the nicest :), but YMMV. Enjoy!
 
 # LICENSE & COPYRIGHT
 
-Copyright 2019 Gasper Software Consulting.
+Copyright 2019-2020 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.

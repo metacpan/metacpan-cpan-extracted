@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.022';
+our $VERSION   = '0.023';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -71,12 +71,40 @@ sub import {
 	
 	$builder->munge_options(\%opts);
 	
-	# Sucks that we need to go through the lists thrice, but we really need to
-	# pre-build the type library so it can be used in `isa` for classes/roles.
-	#
-	my @roles   = @{ mkopt $opts{role} };
-	my @classes = @{ mkopt $opts{class} };
+	my @role_generators  = @{ mkopt $opts{role_generator} };
+	my @class_generators = @{ mkopt $opts{class_generator} };
+	my @roles            = @{ mkopt $opts{role} };
+	my @classes          = @{ mkopt $opts{class} };
 	
+	# Canonicalize these now, saves repeatedly doing it later!
+	for my $pkg (@role_generators) {
+		if (is_CodeRef($pkg->[1])
+		or  is_HashRef($pkg->[1]) && is_CodeRef($pkg->[1]{code})) {
+			$pkg->[1] = { generator => $pkg->[1] };
+		}
+		$pkg->[1] = { $pkg->[1]->$_handle_list };
+		$builder->munge_role_generator_options($pkg->[1], \%opts);
+	}
+	for my $pkg (@class_generators) {
+		if (is_CodeRef($pkg->[1])
+		or  is_HashRef($pkg->[1]) && is_CodeRef($pkg->[1]{code})) {
+			$pkg->[1] = { generator => $pkg->[1] };
+		}
+		$pkg->[1] = { $pkg->[1]->$_handle_list };
+		$builder->munge_class_generator_options($pkg->[1], \%opts);
+	}
+	for my $pkg (@roles) {
+		$pkg->[1] = { $pkg->[1]->$_handle_list };
+		$builder->munge_role_options($pkg->[1], \%opts);
+	}
+	for my $pkg (@classes) {
+		$pkg->[1] = { $pkg->[1]->$_handle_list };
+		if (defined $pkg->[1]{extends} and not ref $pkg->[1]{extends}) {
+			$pkg->[1]{extends} = [$pkg->[1]{extends}];
+		}
+		$builder->munge_class_options($pkg->[1], \%opts);
+	}
+
 	unless (exists $opts{type_library}) {
 		$opts{type_library} = 'Types';
 		$opts{type_library} = $builder->qualify_name($opts{type_library}, $opts{prefix});
@@ -84,16 +112,15 @@ sub import {
 	
 	if ($opts{type_library}) {
 		$builder->prepare_type_library($opts{type_library}, %opts);
-		
-		for my $role (@roles) {
-			my ($pkg_name, $pkg_opts) = @$role;
-			$builder->munge_role_options($pkg_opts, \%opts);
-			$builder->make_type_for_role($pkg_name, %opts, $pkg_opts->$_handle_list);
+		# no type for role generators
+		for my $pkg (@class_generators) {
+			$builder->make_type_for_class_generator($pkg->[0], %opts, %{$pkg->[1]});
 		}
-		for my $class (@classes) {
-			my ($pkg_name, $pkg_opts) = @$class;
-			$builder->munge_class_options($pkg_opts, \%opts);
-			$builder->make_type_for_class($pkg_name, %opts, $pkg_opts->$_handle_list);
+		for my $pkg (@roles) {
+			$builder->make_type_for_role($pkg->[0], %opts, %{$pkg->[1]});
+		}
+		for my $pkg (@classes) {
+			$builder->make_type_for_class($pkg->[0], %opts, %{$pkg->[1]});
 		}
 	}
 	
@@ -118,22 +145,24 @@ sub import {
 		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
 	}
 	
-	for my $role (@roles) {
-		my ($pkg_name, $pkg_opts) = @$role;
-		$builder->do_coercions_for_role($pkg_name, %opts, reg => $reg, $pkg_opts->$_handle_list);
+	for my $pkg (@roles) {
+		$builder->do_coercions_for_role($pkg->[0], %opts, reg => $reg, %{$pkg->[1]});
 	}
-	for my $class (@classes) {
-		my ($pkg_name, $pkg_opts) = @$class;
-		$builder->do_coercions_for_class($pkg_name, %opts, reg => $reg, $pkg_opts->$_handle_list);
+	for my $pkg (@classes) {
+		$builder->do_coercions_for_class($pkg->[0], %opts, reg => $reg, %{$pkg->[1]});
 	}
 	
-	for my $role (@roles) {
-		my ($pkg_name, $pkg_opts) = @$role;
-		$builder->make_role($pkg_name, %opts, $pkg_opts->$_handle_list);
+	for my $pkg (@class_generators) {
+		$builder->make_class_generator($pkg->[0], %opts, %{$pkg->[1]});
 	}
-	for my $class (@classes) {
-		my ($pkg_name, $pkg_opts) = @$class;
-		$builder->make_class($pkg_name, %opts, $pkg_opts->$_handle_list);
+	for my $pkg (@role_generators) {
+		$builder->make_role_generator($pkg->[0], %opts, %{$pkg->[1]});
+	}
+	for my $pkg (@roles) {
+		$builder->make_role($pkg->[0], %opts, %{$pkg->[1]});
+	}
+	for my $pkg (@classes) {
+		$builder->make_class($pkg->[0], %opts, %{$pkg->[1]});
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -143,30 +172,17 @@ sub munge_options {
 	my $builder = shift;
 	my ($opts) = @_;
 	for my $key (sort keys %$opts) {
-		if ($key =~ /^class:([^:].*)$/) {
-			my $pkg = $1;
+		if ($key =~ /^(class|role|class_generator|role_generator):([^:].*)$/) {
+			my ($kind, $pkg) = ($1, $2);
 			my $val = delete $opts->{$key};
 			if (ref $val) {
-				push @{ $opts->{class} ||= [] }, $pkg, $val;
+				push @{ $opts->{$kind} ||= [] }, $pkg, $val;
 			}
 			elsif ($val eq 1 or not defined $val) {
-				push @{ $opts->{class} ||= [] }, $pkg;
+				push @{ $opts->{$kind} ||= [] }, $pkg;
 			}
 			else {
-				$builder->croak("class:$pkg shortcut should be '1' or reference");
-			}
-		}
-		elsif ($key =~ /^role:([^:].*)$/) {
-			my $pkg = $1;
-			my $val = delete $opts->{$key};
-			if (ref $val) {
-				push @{ $opts->{role} ||= [] }, $pkg, $val;
-			}
-			elsif ($val eq 1 or not defined $val) {
-				push @{ $opts->{role} ||= [] }, $pkg;
-			}
-			else {
-				$builder->croak("role:$pkg shortcut should be '1' or reference");
+				$builder->croak("$kind\:$pkg shortcut should be '1' or reference");
 			}
 		}
 	}
@@ -185,6 +201,18 @@ sub munge_class_options {
 	return;
 }
 
+sub munge_class_generator_options {
+	shift;
+	my ($cgenopts, $opts) = @_;
+	return;
+}
+
+sub munge_role_generator_options {
+	shift;
+	my ($rgenopts, $opts) = @_;
+	return;
+}
+
 sub qualify_name {
 	shift;
 	my ($name, $prefix, $parent) = @_;
@@ -193,7 +221,7 @@ sub qualify_name {
 		$sigil = substr $name, 0, 1;
 		$name  = substr $name, 1;
 	}
-	return $sigil.join("::", $parent, $1) if (defined $parent and $name =~ /^\+(.+)/);
+	return $sigil.join("::", $parent->$_handle_list, $1) if (defined $parent and $name =~ /^\+(.+)/);
 	return $sigil.$1 if $name =~ /^::(.+)$/;
 	$prefix ? $sigil.join("::", $prefix, $name) : $sigil.$name;
 }
@@ -299,11 +327,39 @@ sub make_type_for_class {
 	$builder->_make_type($name, %opts, is_role => 0);
 }
 
+sub make_type_for_class_generator {
+	my $builder = shift;
+	my ($name, %opts) = @_;
+	my $qname = $builder->qualify_name($name, $opts{prefix});
+
+	if ($opts{'type_library'}) {
+		my $class_type_name = $opts{'class_type_name'}
+			|| sprintf('%sClass', $builder->type_name($qname, $opts{'prefix'}));
+		my $class_type = $opts{'type_library'}->add_type({
+			name        => $class_type_name,
+			parent      => ClassName,
+			constraint  => sprintf('$_->can("GENERATOR") && ($_->GENERATOR eq %s)', B::perlstring($qname)),
+		});
+		
+		my $instance_type_name = $opts{'instance_type_name'}
+			|| sprintf('%sInstance', $builder->type_name($qname, $opts{'prefix'}));
+		my $instance_type = $opts{'type_library'}->add_type({
+			name        => $instance_type_name,
+			parent      => Object,
+			constraint  => sprintf('$_->can("GENERATOR") && ($_->GENERATOR eq %s)', B::perlstring($qname)),
+		});
+		
+		if ($opts{'factory_package'}) {
+			my $reg = Type::Registry->for_class($opts{'factory_package'});
+			$reg->add_type($_) for $class_type, $instance_type;
+		}
+	}
+}
+
 sub _make_type {
 	my $builder = shift;
 	my ($name, %opts) = @_;
-	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
-	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
+	my $qname = $builder->qualify_name($name, $opts{prefix}, $opts{extends});
 	
 	my $type_name = $opts{'type_name'} || $builder->type_name($qname, $opts{'prefix'});
 	if ($opts{'type_library'}->can('_mooxpress_add_type')) {
@@ -342,8 +398,7 @@ sub _do_coercions {
 	my $builder = shift;
 	my ($name, %opts) = @_;
 	
-	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
-	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
+	my $qname = $builder->qualify_name($name, $opts{prefix}, $opts{extends});
 	
 	if ($opts{coerce}) {
 		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
@@ -401,12 +456,44 @@ sub make_class {
 	$builder->_make_package($name, %opts, is_role => 0);
 }
 
+sub make_role_generator {
+	my $builder = shift;
+	my ($name, %opts) = @_;
+	$builder->_make_package_generator($name, %opts, is_role => 1);
+}
+
+sub make_class_generator {
+	my $builder = shift;
+	my ($name, %opts) = @_;
+	$builder->_make_package_generator($name, %opts, is_role => 0);
+}
+
+sub _expand_isa {
+	my ($builder, $pfx, $ext) = @_;
+	my @raw = $ext->$_handle_list;
+	my @isa;
+	my $changed;
+	while (@raw) {
+		if (@raw > 1 and ref($raw[1])) {
+			my $gen  = $builder->qualify_name(shift(@raw), $pfx);
+			my @args = shift(@raw)->$_handle_list;
+			push @isa, sprintf('::%s', $gen->generate_package(@args));
+			$changed++;
+		}
+		else {
+			push @isa, shift(@raw);
+		}
+	}
+	@$ext = @isa if $changed;;
+	map $builder->qualify_name($_, $pfx), @isa;
+}
+
 my $nondeep;
 sub _make_package {
 	my $builder = shift;
 	my ($name, %opts) = @_;
 	
-	my @isa = map $builder->qualify_name($_, $opts{prefix}), $opts{extends}->$_handle_list;
+	my @isa = $opts{extends} ? $builder->_expand_isa($opts{prefix}, $opts{extends}) : ();
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	my $tn = $builder->type_name($qname, $opts{prefix});
 	
@@ -464,9 +551,20 @@ sub _make_package {
 	
 	{
 		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
-		my @roles = map $builder->qualify_name($_, $opts{prefix}), $opts{with}->$_handle_list;
+		my @roles = $opts{with}->$_handle_list;
 		if (@roles) {
-			$builder->$method($qname, \@roles);
+			my @processed;
+			while (@roles) {
+				if (@roles > 1 and ref($roles[1])) {
+					my $gen  = $builder->qualify_name(shift(@roles), $opts{prefix});
+					my @args = shift(@roles)->$_handle_list;
+					push @processed, $gen->generate_package(@args);
+				}
+				else {
+					push @processed, $builder->qualify_name(shift(@roles), $opts{prefix});
+				}
+			}
+			$builder->$method($qname, \@processed);
 		}
 	}
 	
@@ -482,7 +580,7 @@ sub _make_package {
 	}
 	
 	{
-		my $method = $opts{toolkit_install_methods} || ("install_constants");
+		my $method = $opts{toolkit_install_constants} || ("install_constants");
 		my %methods = $opts{constant}->$_handle_list_add_nulls;
 		if (keys %methods) {
 			$builder->$method($qname, \%methods);
@@ -650,6 +748,80 @@ sub _make_package {
 	}
 	
 	return $qname;
+}
+
+sub _make_package_generator {
+	my $builder = shift;
+	my ($name, %opts) = @_;
+	my $gen = $opts{generator} or die 'no generator code given!';
+	
+	my $kind = $opts{is_role} ? 'role' : 'class';
+	
+	my $qname = $builder->qualify_name($name, $opts{prefix});
+	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
+	
+	$builder->$method_installer(
+		$qname,
+		{
+			'_generate_package_spec' => $gen,
+			'generate_package' => sub {
+				my ($generator_package, @args) = @_;
+				$builder->generate_package(
+					$kind,
+					$generator_package,
+					\%opts,
+					$generator_package->_generate_package_spec(@args),
+				);
+			},
+		},
+	);
+}
+
+my %_generate_counter;
+sub generate_package {
+	my $builder           = shift;
+	my $kind              = shift;
+	my $generator_package = shift;
+	my $global_opts       = shift;
+	my %local_opts        = ( @_ == 1 ? $_[0] : \@_ )->$_handle_list;
+	
+	my %opts;
+	for my $key (qw/ extends with has can constant around before after
+		toolkit version authority mutable begin end requires /) {
+		if (exists $local_opts{$key}) {
+			$opts{$key} = delete $local_opts{$key};
+		}
+	}
+	
+	if (keys %local_opts) {
+		die "bad keys from generator: ".join(", ", sort keys %local_opts);
+	}
+	
+	# must not generate types or factory methods
+	$opts{factory}   = undef;
+	$opts{type_name} = undef;
+	
+	$_generate_counter{$generator_package} = 0 unless exists $_generate_counter{$generator_package};
+	my $qname = sprintf('%s::__GEN%06d__', $generator_package, ++$_generate_counter{$generator_package});
+	
+	if ($global_opts->{factory_package}) {
+		require Type::Registry;
+		'Type::Registry'->for_class($qname)->set_parent(
+			'Type::Registry'->for_class($global_opts->{factory_package})
+		);
+	}
+	
+	if ($kind eq 'class') {
+		my $method = $opts{toolkit_install_constants} || ("install_constants");
+		$builder->$method($qname, { GENERATOR => $generator_package });
+	}
+	
+	if ($kind eq 'role') {
+		return $builder->make_role("::$qname", %$global_opts, %opts);
+	}
+	else {
+		return $builder->make_class("::$qname", %$global_opts, %opts);
+	}
 }
 
 sub _get_moo_helper {
@@ -1093,6 +1265,25 @@ also accepted.
 
 This is the list of roles to create, structured almost the same as the optlist
 for classes, but see L</Role Options>.
+
+=item C<< class_generator >> I<< (OptList) >>
+
+Kind of like C<class>, but:
+
+  [ "A", \&generator_for_A, "B", \&generator_for_B, ... ]
+
+"A" and "B" are not classes, but when C<< MyApp::A->generate_package(...) >>
+is called, it will pass arguments to C<< &generator_for_A >> which is expected
+to return a hashref like C<< \%opts_for_A >>. Then a new pseudononymous class
+will be created with those options.
+
+See the FAQ for an example.
+
+=item C<< role_generator >> I<< (OptList) >>
+
+The same but for roles.
+
+See the FAQ for an example.
 
 =item C<< toolkit >> I<< (Str) >>
 
@@ -2273,6 +2464,105 @@ is a Good Thing, design-wise.
 =head2 The plural of "leaf" is "leaves", right?
 
 Yeah, but that sounds like something is leaving.
+
+=head2 How do generators work?
+
+A class generator is like a class of classes.
+
+A role generator is like a class of roles.
+
+  use MooX::Press (
+    prefix => 'MyApp',
+    class  => [
+      'Animal' => {
+        has => ['$name'],
+      },
+    ],
+    class_generator => [
+      'Species' => sub {
+        my ($gen, $binomial) = @_;
+        return {
+          extends  => ['Animal'],
+          constant => { binomial => $binomial },
+        };
+      },
+    ],
+  );
+
+This generates MyApp::Animal as a class, as you might expect, but also
+creates a class generator called MyApp::Species.
+
+MyApp::Species is not itself a class but it can make classes.
+
+  my $Human = MyApp::Species->generate_package('Homo sapiens');
+  my $Dog   = MyApp::Species->generate_package('Canis familiaris');
+  
+  my $alice = $Human->new(name => 'Alice');
+  say $alice->name;      # Alice
+  say $alice->binomial;  # Homo sapiens
+  
+  my $fido  = $Dog->new(name => 'Fido');
+  $fido->isa($Dog);               # true
+  $fido->isa($Human);             # false
+  $fido->isa('MyApp::Animal');    # true
+  $fido->isa('MyApp::Species');   # false!!!
+  
+  use Types::Standard -types;
+  use MyApp::Types -types;
+  
+  is_ClassName($fido)             # false
+  is_Object($fido)                # true
+  is_Animal($fido);               # true
+  is_SpeciesInstance($fido);      # true
+  is_SpeciesClass($fido);         # false
+  is_ClassName($Dog)              # true
+  is_Object($Dog)                 # false
+  is_Animal($Dog);                # false
+  is_SpeciesInstance($Dog);       # false
+  is_SpeciesClass($Dog);          # true
+
+Note that there is no B<Species> type created, but instead a pair of types
+is created: C<SpeciesClass> and C<SpeciesInstance>.
+
+It is also possible to inherit from generated classes.
+
+  use MooX::Press (
+    prefix => 'MyApp',
+    class  => [
+      'Animal' => {
+        has => ['$name'],
+      },
+      'Dog' => {
+        extends => [ 'Species' => ['Canis familiaris'] ]
+      },
+    ],
+    class_generator => [
+      'Species' => sub {
+        my ($gen, $binomial) = @_;
+        return {
+          extends  => ['Animal'],
+          constant => { binomial => $binomial },
+        };
+      },
+    ],
+  );
+  
+  my $fido = MyApp->new_dog(name => 'Fido');
+
+The inheritance heirarchy for C<< $fido >> is something like:
+
+  Moo::Object
+  ->  MyApp::Animal
+    ->  MyApp::Species::__GEN000001__
+      ->  MyApp::Dog
+
+Note that MyApp::Species itself isn't in that heirarchy!
+
+Generated roles work pretty much the same, but C<role_generator> instead
+of C<class_generator>, C<does> instead of C<isa>, and C<with> instead of
+C<extends>.
+
+No type constraints are automatically created for generated roles.
 
 =head2 Are you insane?
 

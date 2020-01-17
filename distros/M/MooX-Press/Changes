@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.023	2020-01-17
+
+ - Added: class_generator and role_generator.
+
 0.022	2020-01-16
 
  - Added: Integration with MooX::Enumeration/MooseX::Enumeration.

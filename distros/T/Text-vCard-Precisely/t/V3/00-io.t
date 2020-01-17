@@ -1,19 +1,16 @@
 use strict;
 use warnings;
-use Path::Tiny;
-
-use Test::More tests => 6;
+use Path::Tiny qw(path);
+use Test::More tests => 7;
 use Data::Section::Simple qw(get_data_section);
+use File::Compare;
 
 use lib qw(./lib);
 
 BEGIN { use_ok ('Text::vCard::Precisely::V3') };        #1
 
-my $vc = Text::vCard::Precisely::V3->new();
-is 'Text::vCard::Precisely::V3', ref($vc), 'new()';     #2
-
-$vc = Text::vCard::Precisely::V3->new({});
-is 'Text::vCard::Precisely::V3', ref($vc), 'new({})';   #3
+my $vc = new_ok( 'Text::vCard::Precisely::V3', [] );     #2
+$vc = new_ok( 'Text::vCard::Precisely::V3', [{}] );      #3
 
 my $hashref = {
     N   => [ 'Gump', 'Forrest', '', 'Mr.', '' ],
@@ -55,15 +52,19 @@ $data =~ s/\n/\r\n/g;
 my $string = $vc->load_hashref($hashref)->as_string();
 is $string, $data, 'as_string()';                       #4
 
+is compare( $vc->as_file('got.vcf'), path( 't', 'V3', 'expected.vcf' ) ), 0, 'as_file()';  #5
+
 my $in_file = path( 't', 'V3', 'expected.vcf' );
 $string = $vc->load_file($in_file)->as_string();
 my $expected_content = $in_file->slurp_utf8;
-is $string, $expected_content, 'load_file()';           #5
+is $string, $expected_content, 'load_file()';           #6
 
 my $load_s = $vc->load_string($data);
-is $load_s->as_string(), $data, 'load_string()';        #6
+is $load_s->as_string(), $data, 'load_string()';        #7
 
 done_testing;
+
+`rm got.vcf`;
 
 __DATA__
 

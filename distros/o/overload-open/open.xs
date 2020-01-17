@@ -58,20 +58,20 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
      * function ( AKA overload::open->prehook_open() has not been called yet ) */
     if ( !hook || !SvTRUE( hook ) ) {
         set_cached_hooks_for_op(opname, NULL, NULL);
-        return real_pp_func(aTHX);
+        return real_pp_func(aTHXR);
     }
     /* Check to make sure we have a coderef */
     if ( !SvROK( hook ) || SvTYPE( SvRV(hook) ) != SVt_PVCV ) {
         set_cached_hooks_for_op(opname, NULL, NULL);
         warn("override::open expected a code reference, but got something else");
-        return real_pp_func(aTHX);
+        return real_pp_func(aTHXR);
     }
     /* Get the CV* that the reference refers to */
     CV* code_hook = (CV*) SvRV(hook);
     if ( CvISXSUB( code_hook ) ) {
         if ( overload_open_die_with_xs_sub )
             die("overload::open error. Cowardly refusing to hook an XS sub into %s", opname);
-        return real_pp_func(aTHX);
+        return real_pp_func(aTHXR);
     }
     /* Found suitable hook. We can cache in now */
     set_cached_hooks_for_op(opname, hook, code_hook);
@@ -81,17 +81,17 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     /* calling on the cached allows us to check the depth for both of the code functions */
     if (cached_code_hook_open) {
         if ( 0 < CvDEPTH( cached_code_hook_open ) ) {
-            return real_pp_func(aTHX);
+            return real_pp_func(aTHXR);
         }
     }
     if (cached_code_hook_sysopen) {
         if ( 0 < CvDEPTH( cached_code_hook_sysopen ) ) {
-            return real_pp_func(aTHX);
+            return real_pp_func(aTHXR);
         }
     }
     /* Once more for paranoia */
     if ( 0 < CvDEPTH( code_hook ) ) {
-        return real_pp_func(aTHX);
+        return real_pp_func(aTHXR);
     }
     ENTER;
         /* Save the temporaries stack */
@@ -100,15 +100,15 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
             SV **sp = PL_stack_sp;
             /* Save the stack pointer location */
             SV **mysp = PL_stack_sp;
-            //assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow");
+            /*assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow"); */
             /* DON'T call dMARK... it has unintended side effects.
              * it actually calls POPMARK! sad! */
             /* Initialize mark ourselves instead. */
-            //SV **mark = PL_stack_base + *PL_markstack_ptr;
+            /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
             /* Save the number of items (number of arguments) */
             ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
             if (myitems < 0)
-                DIE(aTHX_ "panic: overload::open internal error. This should not happen.");
+                DIE(aTHXR_ "panic: overload::open internal error. This should not happen.");
 
             PUSHMARK(sp);
                 EXTEND(sp, myitems);
@@ -134,7 +134,7 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
         /* FREETMPS cleans up all stuff on the temporaries stack added since SAVETMPS was called */
         FREETMPS;
     LEAVE;
-    return real_pp_func(aTHX);
+    return real_pp_func(aTHXR);
 }
 
 PP(pp_overload_open) {

@@ -3,6 +3,7 @@
 (our $VERSION) = q(Id: gendistrib 20724 2006-11-30 13:13:27Z rafael ) =~ /(\d+)/;
 
 use strict;
+use Cwd;
 use MDV::Distribconf::Build;
 use Getopt::Long;
 
@@ -184,11 +185,18 @@ if (grep { !$_->{noneedrebuild} } @hdlists) {
 	# this MD5SUM is mostly obsolete, but is still needed up to 2007.1
 	# (and even on cooker for existing urpmi.cfg)
 	require File::Glob;
-	my $md5sum1 = `cd $destinfodir ; /usr/bin/md5sum hdlist_*`   if glob("$destinfodir/hdlist_*");
-	my $md5sum2 = `cd $destinfodir ; /usr/bin/md5sum synthesis*` if glob("$destinfodir/synthesis*");
+	require Digest::MD5;
+	my $md5sum;
+	my $cwd = getcwd();
+	chdir($destinfodir);
+	foreach my $fn (glob("hdlist_*"), glob("synthesis*")) {
+            open(my $fh, '<', $fn) or die "Can't open '$fn': $!";
+            binmode($fh);
+            $md5sum .= Digest::MD5->new->addfile($fh)->hexdigest . "  $fn\n";
+	}
+	chdir($cwd);
 	open my $md5sumfh, '>', "$destinfodir/MD5SUM" or die "Can't create $destinfodir/MD5SUM: $!\n";
-	print $md5sumfh $md5sum1 if $md5sum1;
-	print $md5sumfh $md5sum2 if $md5sum2;
+	print $md5sumfh $md5sum if $md5sum;
     }
 
     print STDERR "Calculating size of medias\n" unless $nooutput;

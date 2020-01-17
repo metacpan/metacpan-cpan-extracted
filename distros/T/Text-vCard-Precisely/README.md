@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/worthmine/Text-vCard-Precisely.svg?branch=master)](https://travis-ci.com/worthmine/Text-vCard-Precisely) [![MetaCPAN Release](https://badge.fury.io/pl/Text-vCard-Precisely.svg)](https://metacpan.org/release/Text-vCard-Precisely)
 # NAME
 
 Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisely

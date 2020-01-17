@@ -1,5 +1,10 @@
 Revision history for XML-OPDS
 
+0.06 2020-01-17
+
+ - Fix long standing bug which was crashing the requests with search
+   strings with chars higher than codepoint 255.
+
 0.05 2016-03-10
 
  - Added opensearch support for the results

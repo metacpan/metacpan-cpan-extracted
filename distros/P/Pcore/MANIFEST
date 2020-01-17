@@ -46,6 +46,12 @@ lib/Pcore/App/API/Backend/NoAuth.pm
 lib/Pcore/App/API/Backend/Remote.pm
 lib/Pcore/App/API/Base.pm
 lib/Pcore/App/API/Node.pm
+lib/Pcore/App/API/Role/Admin/Settings.pm
+lib/Pcore/App/API/Role/Admin/SystemLog.pm
+lib/Pcore/App/API/Role/Admin/Users.pm
+lib/Pcore/App/API/Role/Auth.pm
+lib/Pcore/App/API/Role/Profile.pm
+lib/Pcore/App/API/Role/Profile/Tokens.pm
 lib/Pcore/App/API/Role/Read.pm
 lib/Pcore/App/API/Role/Upload.pm
 lib/Pcore/App/Controller.pm
@@ -306,13 +312,6 @@ share/dist-tmpl/tmpl-dist/xt/README.md
 share/dist-tmpl/tmpl-dist/xt/author/README.md
 share/dist-tmpl/tmpl-dist/xt/release/README.md
 share/dist-tmpl/tmpl-dist/xt/smoke/README.md
-share/dist-tmpl/tmpl-phonegap/config.xml
-share/dist-tmpl/tmpl-phonegap/www/css/index.css
-share/dist-tmpl/tmpl-phonegap/www/img/.exists
-share/dist-tmpl/tmpl-phonegap/www/index.html
-share/dist-tmpl/tmpl-phonegap/www/js/app.js
-share/dist-tmpl/tmpl-phonegap/www/js/index.js
-share/dist-tmpl/tmpl-phonegap/www/js/overrides.js
 share/dist.yaml
 share/docker.yaml
 share/include/Pcore/Lib/Path.c

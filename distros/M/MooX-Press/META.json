@@ -62,11 +62,11 @@
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "MooX::Press::Keywords" : {
          "file" : "lib/MooX/Press/Keywords.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

@@ -1,7 +1,8 @@
 package Business::ID::SIM;
 
-our $DATE = '2019-10-15'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-11-21'; # DATE
+our $DIST = 'Business-ID-SIM'; # DIST
+our $VERSION = '0.080'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -9,8 +10,7 @@ use strict;
 
 use DateTime;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
 our @EXPORT_OK = qw(parse_sim);
 
 # legend: S = lack of samples
@@ -96,7 +96,7 @@ Business::ID::SIM - Validate Indonesian driving license number (nomor SIM)
 
 =head1 VERSION
 
-This document describes version 0.08 of Business::ID::SIM (from Perl distribution Business-ID-SIM), released on 2019-10-15.
+This document describes version 0.080 of Business::ID::SIM (from Perl distribution Business-ID-SIM), released on 2019-11-21.
 
 =head1 SYNOPSIS
 

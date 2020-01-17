@@ -1,5 +1,13 @@
 Revision history for Perl module Promise::ES6
 
+0.18
+- Rejected promises no longer “repromise” their rejection values. Previously
+  this module would attempt to settle a value given to a rejector callback
+  in the same way as with a value given to a resolver callback; however,
+  this behavior deviated from ES6 behavior. Since it was undocumented anyway,
+  it’s removed here.
+- Fix t/mojo.t to abort if given an unworkable Mojolicious version.
+
 0.17 Sun 5 Jan 2020
 - Optimization: remove extra call to isa(), and use $self rather than $_[0].
   (Thank you, bdraco!)

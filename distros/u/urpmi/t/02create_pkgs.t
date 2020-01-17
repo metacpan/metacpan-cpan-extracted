@@ -6,6 +6,9 @@ use helper;
 use Test::More 'no_plan';
 use Cwd;
 
+# help CPAN testers who installed genhdlist2 using cpan but do not have /usr/local/bin in their PATH:
+$ENV{PATH} .= ":/usr/local/bin";
+
 chdir 't' if -d 't';
 system('rm -rf tmp media');
 foreach (qw(media tmp tmp/BUILD tmp/RPMS tmp/RPMS/noarch tmp/SRPMS)) {

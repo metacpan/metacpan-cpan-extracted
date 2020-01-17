@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,9 @@ no_index:
 provides:
   rpmtools:
     file: packdrake.pm
-    version: '7.11'
+    version: '7.12'
 requires:
+  Digest::MD5: '0'
   ExtUtils::MakeMaker: '0'
   Getopt::Long: '0'
   List::Util: '1.33'
@@ -35,5 +36,5 @@ requires:
   URPM: '5.16'
 resources:
   repository: git://git.mageia.org/software/rpm/rpmtools/
-version: '7.11'
+version: '7.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

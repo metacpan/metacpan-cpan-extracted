@@ -4,7 +4,7 @@ use warnings;
 use 5.009_004;
 use feature ':5.10';
 use XSLoader;
-our $VERSION = '1.8.0';
+our $VERSION = '1.9.0';
 our $GLOBAL_OPEN;
 our $GLOBAL_SYSOPEN;
 our $SUPPRESS_WARNINGS;

@@ -1,16 +1,16 @@
 use Test::More;
 use CGI::Compile;
-use t::Capture;
+use Capture::Tiny 'capture_stdout';
 
 {
     my $sub = CGI::Compile->compile("t/data.cgi");
-    my $out = capture_out($sub);
+    my $out = capture_stdout { $sub->() };
     like $out, qr/Hello\nWorld/;
 }
 
 {
     my $sub = CGI::Compile->compile("t/data_crlf.cgi");
-    my $out = capture_out($sub);
+    my $out = capture_stdout { $sub->() };
     like $out, qr/Hello\r?\nWorld/;
 }
 
@@ -38,10 +38,10 @@ line 3
 line 4
 EOF
 
-    my $out = capture_out($sub);
+    my $out = capture_stdout { $sub->() };
     like $out, qr/line 1\r?\nline 4/;
 
-    $out = capture_out($sub);
+    $out = capture_stdout { $sub->() };
     like $out, qr/line 1\r?\nline 4/;
 
     is $main::FLNO, -1;

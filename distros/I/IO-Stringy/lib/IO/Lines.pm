@@ -5,7 +5,7 @@ use Carp;
 use IO::ScalarArray;
 
 # The package version, both in 1.23 style *and* usable by MakeMaker:
-our $VERSION = "2.112";
+our $VERSION = '2.113';
 
 # Inheritance:
 our @ISA = qw(IO::ScalarArray);     ### also gets us new_tie  :-)
@@ -27,7 +27,7 @@ IO::Lines - IO:: interface for reading/writing an array of lines
 
 This class implements objects which behave just like FileHandle
 (or IO::Handle) objects, except that you may use them to write to
-(or read from) an array of lines.  They can be tiehandle'd as well.
+(or read from) an array of lines.  C<tiehandle> capable as well.
 
 This is a subclass of L<IO::ScalarArray|IO::ScalarArray>
 in which the underlying
@@ -155,28 +155,20 @@ __END__
 $Id: Lines.pm,v 1.3 2005/02/10 21:21:53 dfs Exp $
 
 
-=head1 AUTHORS
-
-
-=head2 Primary Maintainer
-
-Dianne Skoll (F<dfs@roaringpenguin.com>).
-
-=head2 Principal author
+=head1 AUTHOR
 
 Eryq (F<eryq@zeegee.com>).
 President, ZeeGee Software Inc (F<http://www.zeegee.com>).
 
+=head1 CONTRIBUTORS
 
-=head2 Other contributors
+Dianne Skoll (F<dfs@roaringpenguin.com>).
 
-Thanks to the following individuals for their invaluable contributions
-(if I've forgotten or misspelled your name, please email me!):
+=head1 COPYRIGHT & LICENSE
 
-I<Morris M. Siegel,>
-for his $/ patch and the new C<getlines()>.
+Copyright (c) 1997 Erik (Eryq) Dorfman, ZeeGee Software, Inc. All rights reserved.
 
-I<Doug Wilson,>
-for the IO::Handle inheritance and automatic tie-ing.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

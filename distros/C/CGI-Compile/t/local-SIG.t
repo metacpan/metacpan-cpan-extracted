@@ -1,6 +1,6 @@
 #!perl
 
-use t::Capture;
+use Capture::Tiny 'capture_stdout';
 use CGI::Compile;
 use POSIX qw(:signal_h);
 
@@ -20,4 +20,4 @@ kill QUIT => $$;
 print "END\n";
 EOF
 
-is capture_out($sub), "QUIT\nEND\n", 'caught signal';
+is capture_stdout { $sub->() }, "QUIT\nEND\n", 'caught signal';

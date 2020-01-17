@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-BEGIN { require 5.9.4; }
+#BEGIN { require 5.9.4; }
 
 use ExtUtils::MakeMaker 7.34;
 use Module::Metadata;

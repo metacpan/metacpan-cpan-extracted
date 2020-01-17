@@ -2,6 +2,7 @@
 
 our ($VERSION) = q(Id: genhdlist2 20460 2006-11-23 13:19:11Z pixel ) =~ /(\d+\.\d+)/;
 
+use Cwd;
 use URPM;
 use List::Util 'any';
 use MDV::Packdrakeng;
@@ -427,8 +428,17 @@ sub generate_versioned_media_info {
 
 sub generate_md5sum {
     my ($media_info_dir, $media_info_files) = @_;
+    require Digest::MD5;
     print "updating $media_info_dir/MD5SUM\n" if $verbose >= 0;
-    my $m = `cd '$media_info_dir' ; /usr/bin/md5sum @$media_info_files`;
+    my $cwd = getcwd();
+    chdir($media_info_dir);
+    my $m;
+    foreach my $fn (@$media_info_files) {
+	open(my $fh, '<', $fn) or die "Can't open '$fn': $!";
+	binmode($fh);
+	$m .= Digest::MD5->new->addfile($fh)->hexdigest . "  $fn\n";
+    }
+    chdir($cwd);
     unlink "$media_info_dir/MD5SUM"; # ensure no hard link is used
     open(my $f, '>', "$media_info_dir/MD5SUM") or die "Can't write MD5SUM: $!\n";
     print $f $m;

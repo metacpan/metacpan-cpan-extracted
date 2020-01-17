@@ -1,32 +1,20 @@
 package <: $module_name ~ "::API::v1::Admin::Settings" :>;
 
-use Pcore -const, -class, -sql, -res;
+use Pcore -const, -class, -sql;
 use <: $module_name ~ "::Const qw[:PERMS]" :>;
-use Pcore::API::SMTP;
 
 extends qw[Pcore::App::API::Base];
 
+with qw[Pcore::App::API::Role::Admin::Settings];
+
 const our $API_NAMESPACE_PERMS => [$PERMS_ADMIN];
 
-sub API_read ( $self, $auth, @ ) {
-    return 200, $self->{api}->{settings};
-}
+around API_update => sub ( $orig, $self, $auth, $args ) {
 
-sub API_update ( $self, $auth, $args ) {
-    return $self->{api}->settings_update($args);
-}
+    # $args->{use_proxy} = SQL_BOOL $args->{use_proxy} if defined $args->{use_proxy};
 
-sub API_test_smtp ( $self, $auth, $args ) {
-    my $smtp = Pcore::API::SMTP->new( {
-        host     => $args->{smtp_host},
-        port     => $args->{smtp_port},
-        username => $args->{smtp_username},
-        password => $args->{smtp_password},
-        tls      => $args->{smtp_tls},
-    } );
-
-    return $smtp->test;
-}
+    return $self->$orig($args);
+};
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -37,7 +25,7 @@ sub API_test_smtp ( $self, $auth, $args ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 4                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 33                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 37 does not match the package declaration       |
+## |    1 | 21                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 25 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

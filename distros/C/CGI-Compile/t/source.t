@@ -1,6 +1,6 @@
 use Test::More;
 use CGI::Compile;
-use t::Capture;
+use Capture::Tiny 'capture_stdout';
 
 {
     my $str =<<EOL;
@@ -14,7 +14,7 @@ World
 EOL
 
     my $sub = CGI::Compile->compile(\$str);
-    my $out = capture_out($sub);
+    my $out = capture_stdout { $sub->() };
     like $out, qr/Hello\nWorld/;
 }
 

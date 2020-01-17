@@ -4,7 +4,6 @@ lib/Crypto/NanoRPC.pm
 LICENSE
 Makefile.PL
 MANIFEST
-README
 README.md
 t/Crypto-NanoRPC.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

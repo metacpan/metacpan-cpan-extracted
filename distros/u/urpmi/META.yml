@@ -10,7 +10,7 @@ build_requires:
   Test::More: '1.302'
   Test::Pod: '0'
   Test::Pod::Coverage: '0'
-  rpmtools: '7.11'
+  rpmtools: v7.11.1
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
@@ -30,6 +30,7 @@ provides:
     version: '0'
   urpmi:
     file: urpmi.pm
+    version: v8.120.11
 requires:
   Filesys::Df: '0'
   Getopt::Long: '0'
@@ -43,5 +44,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.120.10
+version: v8.120.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

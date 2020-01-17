@@ -140,11 +140,12 @@ sub user_set_password ( $self, $user_id, $password, $dbh = undef ) {
 }
 
 sub user_set_enabled ( $self, $user_id, $enabled ) {
-    return res [ 400, qw[Can't modify root user] ] if $self->user_is_root($user_id);
+
+    # root can't be disabled
+    return res [ 400, q[Can't modify root user] ] if $self->user_is_root($user_id);
 
     my $dbh = $self->{dbh};
 
-    # root can't be disabled
     state $q1 = $dbh->prepare(q[UPDATE "user" SET "enabled" = ? WHERE "id" = ? AND "enabled" = ?]);
 
     $enabled = 0+ !!$enabled;
@@ -210,7 +211,7 @@ SQL
 sub user_set_permissions ( $self, $user_id, $permissions, $dbh = undef ) {
     return res 204 if !$permissions || !$permissions->%*;    # not modified
 
-    return res [ 400, qw[Can't modify root user] ] if $self->user_is_root($user_id);
+    return res [ 400, q[Can't modify root user] ] if $self->user_is_root($user_id);
 
     my $on_finish;
 
@@ -315,6 +316,33 @@ SQL
     }
     else {
         return $on_finish->( $dbh, res 204 );
+    }
+}
+
+sub user_delete ( $self, $user_id ) {
+
+    # root can't be deleted
+    return res [ 400, q[Can not delete root user] ] if $self->user_is_root($user_id);
+
+    my $dbh = $self->{dbh};
+
+    state $q1 = $dbh->prepare(q[DELETE FROM "user" WHERE "id" = ?]);
+
+    my $res = $dbh->do( $q1, [$user_id] );
+
+    # dbh error
+    return $res if !$res;
+
+    # deleted
+    if ( $res->{rows} ) {
+        P->fire_event( 'app.api.auth.invalidate', { type => $INVALIDATE_USER, id => $user_id } );
+
+        return res 200;
+    }
+
+    # not deleted
+    else {
+        return res [ 404, 'User not found' ];
     }
 }
 

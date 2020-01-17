@@ -8,5 +8,6 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 example/example.pl
+example/ip_locate.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

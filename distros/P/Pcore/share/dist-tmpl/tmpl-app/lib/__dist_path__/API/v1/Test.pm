@@ -11,7 +11,7 @@ sub API_test ( $self, $auth, @ ) {
     return 200;
 }
 
-sub API_test1 : Perms('$PERMS_ANY_AUTHENTICATED_USER') ( $self, $auth, @ ) {
+sub API_test1 : Perms($PERMS_ANY_AUTHENTICATED_USER) ( $self, $auth, @ ) {
     return 200;
 }
 

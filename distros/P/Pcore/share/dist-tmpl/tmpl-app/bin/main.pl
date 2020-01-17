@@ -59,49 +59,6 @@ my $app = <: $module_name :>->new(
                     },
                 },
             },
-
-            # CDN
-            cdn => {
-                native_cdn => 0,
-                resources  => [    #
-                    '<: $module_name :>',
-                ],
-                buckets => {
-                    local => {
-                        type      => 'local',
-                        locations => [          #
-                            "$ENV->{DATA_DIR}/cdn",
-                            '<: $module_name :>',
-                        ],
-                    },
-
-                    # s3 => {
-                    #     type       => 'digitalocean',
-                    #     bucket     => '',
-                    #     region     => 'nyc3',
-                    #     key        => '',
-                    #     secret     => '',
-                    #     edge_links => 0,
-                    # },
-                },
-                locations => {
-                    static => {
-                        bucket        => 'local',
-                        path          => 'static',
-                        cache_control => 'public, max-age=30672000',
-                    },
-                    user => {
-                        bucket        => 'local',
-                        path          => 'user',
-                        cache_control => 'public, max-age=30672000',
-                    },
-                    app => {
-                        bucket        => 'local',
-                        path          => 'app',
-                        cache_control => 'public, private, must-revalidate, proxy-revalidate',
-                    },
-                },
-            },
             devel => $ENV->{cli}->{opt}->{devel},
         },
     },
@@ -124,7 +81,7 @@ $cv->recv;
 ## |======+======================+================================================================================================================|
 ## |    3 | 7                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 32, 67, 74           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 32                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

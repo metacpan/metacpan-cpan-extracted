@@ -1,0 +1,61 @@
+{
+   "abstract" : "Decode the redmine cookie _redmine_session",
+   "author" : [
+      "Tomohiro Hosaka <bokutin@bokut.in>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Authentication-RedmineCookie",
+   "optional_features" : {
+      "Using_Schema" : {
+         "description" : "Using bundle schema Catalyst::Authentication::RedmineCookie::Schema",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBIx::Class" : "1",
+                  "aliased" : "1"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::Cmd" : "1",
+            "Catalyst::Model::DBIC::Schema" : "1",
+            "Catalyst::Runtime" : "1",
+            "DBIx::Class" : "1",
+            "DBIx::Class::Schema::Loader" : "1",
+            "aliased" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "1",
+            "Moose" : "1"
+         },
+         "suggests" : {
+            "DBIx::Class" : "1",
+            "aliased" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+}
+

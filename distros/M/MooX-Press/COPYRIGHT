@@ -20,6 +20,8 @@ Files: Changes
  doap.ttl
  t/14enum.t
  t/15requires.t
+ t/16classgenerators.t
+ t/17rolegenerators.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -41,12 +43,12 @@ Files: README
 Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2019 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/MooX/Press/Keywords.pm

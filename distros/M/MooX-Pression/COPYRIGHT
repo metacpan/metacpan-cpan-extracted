@@ -10,6 +10,7 @@ Files: Changes
  doap.ttl
  t/02synopsis.t
  t/03subclass.t
+ t/04requires.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

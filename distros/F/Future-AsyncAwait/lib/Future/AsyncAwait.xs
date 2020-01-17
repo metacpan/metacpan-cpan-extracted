@@ -2069,6 +2069,9 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   SV *name = lex_scan_ident();
   lex_read_space(0);
 
+  ENTER_with_name("parse_block");
+  /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
+
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
@@ -2087,8 +2090,10 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     sigop = parse_subsignature(0);
     lex_read_space(0);
 
-    if(PL_parser->error_count)
+    if(PL_parser->error_count) {
+      LEAVE_with_name("parse_block");
       return 0;
+    }
 
     if(lex_peek_unichar(0) != ')')
       croak("Expected ')'");
@@ -2135,8 +2140,16 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     if(sigop)
       op_free(sigop);
 #endif
-    *op_ptr = NULL;
-    return name ? KEYWORD_PLUGIN_STMT : KEYWORD_PLUGIN_EXPR;
+    *op_ptr = newOP(OP_NULL, 0);
+    if(name) {
+      SvREFCNT_dec(name);
+      LEAVE_with_name("parse_block");
+      return KEYWORD_PLUGIN_STMT;
+    }
+    else {
+      LEAVE_with_name("parse_block");
+      return KEYWORD_PLUGIN_EXPR;
+    }
   }
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
@@ -2165,6 +2178,8 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 
   if(CvLVALUE(cv))
     warn("Pointless use of :lvalue on async sub");
+
+  LEAVE_with_name("parse_block");
 
   if(name) {
     *op_ptr = newOP(OP_NULL, 0);

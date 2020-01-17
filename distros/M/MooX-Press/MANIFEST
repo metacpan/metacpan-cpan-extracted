@@ -25,3 +25,5 @@ t/12shortcuts.t
 t/13signatures.t
 t/14enum.t
 t/15requires.t
+t/16classgenerators.t
+t/17rolegenerators.t

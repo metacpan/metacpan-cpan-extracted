@@ -1,7 +1,7 @@
 use Date::Format qw(time2str strftime);
 use Date::Parse qw(strptime str2time);
 
-print "1..8\n";
+print "1..9\n";
 
 my $i = 1;
 
@@ -22,7 +22,7 @@ my $i = 1;
     my @t = strptime($str);
     my $t = join ":", map { defined($_) ? $_ : "-" } @t;
     print "# $str => $t\n";
-    print "not " unless $t eq "-:35:22:30:10:108:3600";
+    print "not " unless $t eq "-:35:22:30:10:108:3600:20";
     print "ok ", $i++, "\n";
   }
 }
@@ -51,5 +51,15 @@ my $i = 1;
 
 {   # [rt.cpan.org #51664]  Change in str2time behaviour between 1.16 and 1.19
   print "not " if str2time('16 Oct 09') < 0;
+  print "ok ", $i++, "\n";
+}
+
+{   # RT#84075: Date::Parse::str2time maps date in 1963 to 2063
+  my $this_year = 1900 + (gmtime(time))[5];
+  my $target_year = $this_year - 50;
+  my $date = "$target_year-01-01 00:00:00 UTC";
+  my $time = str2time($date);
+  my $year_parsed_as = 1900 + (gmtime($time))[5];
+  print "not " unless $year_parsed_as == $target_year;
   print "ok ", $i++, "\n";
 }

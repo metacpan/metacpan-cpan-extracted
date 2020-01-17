@@ -177,7 +177,7 @@ foreach (@data)
 
    $x = time2str("%a %b %e %T %Y %Z",$time,'GMT');
 
-   printf "%-40s\t%s\n", $_,$x,"\n";
+   printf "%-40s\t%s\n", $_, $x;
 
    $y = str2time($x);
 

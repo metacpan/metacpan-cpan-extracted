@@ -14,10 +14,15 @@ WriteMakefile(
   (eval { ExtUtils::MakeMaker->VERSION(6.21) } ? (LICENSE => 'perl') : ()),
   ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
       META_MERGE => {
-        resources => {    ##
-          repository => 'http://github.com/gbarr/perl-TimeDate',
+      resources => {
+        bugtracker => {web => 'https://github.com/atoomic/perl-TimeDate/issues'},
+        repository => {
+          type => 'git',
+          url  => 'https://github.com/atoomic/perl-TimeDate.git',
+          web  => 'https://github.com/atoomic/perl-TimeDate',
         },
       }
+    }
       )
     : ()
   ),

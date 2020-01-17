@@ -5,7 +5,7 @@ use Carp;
 use IO::Handle;
 
 # The package version, both in 1.23 style *and* usable by MakeMaker:
-our $VERSION = "2.112";
+our $VERSION = '2.113';
 
 # Inheritance:
 our @ISA = qw(IO::Handle);
@@ -121,7 +121,7 @@ IO::Handle (or FileHandle) objects, except that you may use them
 to write to (or read from) arrays of scalars.  Logically, an
 array of scalars defines an in-core "file" whose contents are
 the concatenation of the scalars in the array.  The handles created by
-this class are automatically tiehandle'd (though please see L<"WARNINGS">
+this class are automatically C<tiehandle>d (though please see L<"WARNINGS">
 for information relevant to your Perl version).
 
 For writing large amounts of data with individual print() statements,
@@ -732,64 +732,20 @@ __END__
 #
 #     * Inital pos is [0,0].  After print("Hello"), it is [1,0].
 
-
-
-=head1 WARNINGS
-
-Perl's TIEHANDLE spec was incomplete prior to 5.005_57;
-it was missing support for C<seek()>, C<tell()>, and C<eof()>.
-Attempting to use these functions with an IO::ScalarArray will not work
-prior to 5.005_57. IO::ScalarArray will not have the relevant methods
-invoked; and even worse, this kind of bug can lie dormant for a while.
-If you turn warnings on (via C<$^W> or C<perl -w>),
-and you see something like this...
-
-    attempt to seek on unopened filehandle
-
-...then you are probably trying to use one of these functions
-on an IO::ScalarArray with an old Perl.  The remedy is to simply
-use the OO version; e.g.:
-
-    $AH->seek(0,0);    ### GOOD: will work on any 5.005
-    seek($AH,0,0);     ### WARNING: will only work on 5.005_57 and beyond
-
-
-
-=head1 VERSION
-
-$Id: ScalarArray.pm,v 1.7 2005/02/10 21:21:53 dfs Exp $
-
-
 =head1 AUTHOR
-
-=head2 Primary Maintainer
-
-Dianne Skoll (F<dfs@roaringpenguin.com>).
-
-=head2 Principal author
 
 Eryq (F<eryq@zeegee.com>).
 President, ZeeGee Software Inc (F<http://www.zeegee.com>).
 
+=head1 CONTRIBUTORS
 
-=head2 Other contributors
+Dianne Skoll (F<dfs@roaringpenguin.com>).
 
-Thanks to the following individuals for their invaluable contributions
-(if I've forgotten or misspelled your name, please email me!):
+=head1 COPYRIGHT & LICENSE
 
-I<Andy Glew,>
-for suggesting C<getc()>.
+Copyright (c) 1997 Erik (Eryq) Dorfman, ZeeGee Software, Inc. All rights reserved.
 
-I<Brandon Browning,>
-for suggesting C<opened()>.
-
-I<Eric L. Brine,>
-for his offset-using read() and write() implementations.
-
-I<Doug Wilson,>
-for the IO::Handle inheritance and automatic tie-ing.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
-
-#------------------------------
-1;

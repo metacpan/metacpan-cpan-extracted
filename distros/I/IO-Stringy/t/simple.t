@@ -1,63 +1,36 @@
-#!/usr/bin/perl -w         #-*-Perl-*-
+use strict;
+use warnings;
 
-use lib "./t", "./lib"; 
 use IO::Scalar;
 use IO::ScalarArray;
 use IO::Lines;
-use ExtUtils::TBone;
-use Common;
+use Test::More tests => 6;
 
-
-#--------------------
-#
-# TEST...
-#
-#--------------------
-
-### Make a tester:
-my $T = typical ExtUtils::TBone;
-Common->test_init(TBone=>$T);
-$T->log_warnings;
-
-### Set the counter:
-my $ntests = 6;
-$T->begin($ntests);
-
-#------------------------------
-
-my $SH = new IO::Scalar;
+my $SH = IO::Scalar->new();
 print $SH "Hi there!\n";
 print $SH "Tres cool, no?\n";
-$T->ok_eq(${$SH->sref}, "Hi there!\nTres cool, no?\n");    
+is(${$SH->sref}, "Hi there!\nTres cool, no?\n", 'sref: Got the correct string');
 
 $SH->seek(0, 0);
 my $line = <$SH>;
-$T->ok_eq($line, "Hi there!\n");
+is($line, "Hi there!\n", 'readline: got the right first line');
 
-#------------------------------
-
-my $AH = new IO::ScalarArray;
+my $AH = IO::ScalarArray->new;
 print $AH "Hi there!\n";
 print $AH "Tres cool, no?\n";
-$T->ok_eq(join('', @{$AH->aref}), "Hi there!\nTres cool, no?\n");    
+is(join('', @{$AH->aref}), "Hi there!\nTres cool, no?\n", 'array aref: got the right contents');
 
 $AH->seek(0, 0);
 $line = <$AH>;
-$T->ok_eq($line, "Hi there!\n");
+is($line, "Hi there!\n", 'array readline: got the right first line');
 
 #------------------------------
 
-my $LH = new IO::Lines;
+my $LH = IO::Lines->new;
 print $LH "Hi there!\n";
 print $LH "Tres cool, no?\n";
-$T->ok_eq(join('', @{$LH->aref}), "Hi there!\nTres cool, no?\n");    
+is(join('', @{$LH->aref}), "Hi there!\nTres cool, no?\n", 'lines aref: got the right content');
 
 $LH->seek(0, 0);
 $line = <$LH>;
-$T->ok_eq($line, "Hi there!\n");
-
-
-
-### So we know everything went well...
-$T->end;
-
+is($line, "Hi there!\n", 'lines readline: got the right first line');
