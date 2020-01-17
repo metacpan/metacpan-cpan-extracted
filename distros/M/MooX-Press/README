@@ -85,11 +85,10 @@ DESCRIPTION
 
           [ "A", \&generator_for_A, "B", \&generator_for_B, ... ]
 
-        "A" and "B" are not classes, but when
-        `MyApp::A->generate_package(...)` is called, it will pass arguments to
-        &generator_for_A which is expected to return a hashref like
-        `\%opts_for_A`. Then a new pseudononymous class will be created with
-        those options.
+        "A" and "B" are not classes, but when `MyApp->generate_a(...)` is
+        called, it will pass arguments to &generator_for_A which is expected
+        to return a hashref like `\%opts_for_A`. Then a new pseudononymous
+        class will be created with those options.
 
         See the FAQ for an example.
 
@@ -1220,10 +1219,12 @@ FAQ
     This generates MyApp::Animal as a class, as you might expect, but also
     creates a class generator called MyApp::Species.
 
-    MyApp::Species is not itself a class but it can make classes.
+    MyApp::Species is not itself a class but it can make classes. Calling
+    either `MyApp::Species->generate_package` or `MyApp->generate_species`
+    will compile a new class and return the class name as a string.
 
-      my $Human = MyApp::Species->generate_package('Homo sapiens');
-      my $Dog   = MyApp::Species->generate_package('Canis familiaris');
+      my $Human = MyApp->generate_species('Homo sapiens');
+      my $Dog   = MyApp->generate_species('Canis familiaris');
   
       my $alice = $Human->new(name => 'Alice');
       say $alice->name;      # Alice

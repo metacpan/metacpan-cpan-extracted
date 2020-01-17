@@ -9,6 +9,7 @@
 use strict;
 use lib '.', 't';
 use helper;
+use urpm::select;
 use urpm::util;
 use urpm::cfg;
 use Test::More 'no_plan';
@@ -30,11 +31,12 @@ sub test1 {
     check_installed_names('a');
 
     my $arch = urpm::cfg::get_arch();
-    test_urpmi("b c", sprintf(<<'EOF', $arch, $arch));
+    my $rm_msg = urpm::select::_rpm_version() gt 4.13.0 ? " a-1-1.$arch" : "";
+    test_urpmi("b c", sprintf(<<'EOF', $rm_msg || ' ', $rm_msg));
       1/2: c
       2/2: b
-removing package a-1-1.%s
-      1/1: removing a-1-1.%s
+removing package%s
+      1/1: removing%s
 EOF
     check_installed_and_remove('b', 'c');
 }

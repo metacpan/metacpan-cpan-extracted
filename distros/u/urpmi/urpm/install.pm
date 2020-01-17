@@ -120,6 +120,8 @@ sub install_logger {
 		++$urpm->{logger_count} if $pname;
 		$cnt = $pname ? $urpm->{logger_count} : '-';
 	    }
+	    require urpm::select;
+	    $index++ if urpm::select::_rpm_version() lt 4.13.0;
 	    my $s = sprintf("%9s: %-22s", $cnt . "/" . $total_pkg, $pname);
 	    print $s;
 	    $s =~ / $/ or printf "\n%9s  %-22s", '', '';

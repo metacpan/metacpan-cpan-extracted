@@ -1,6 +1,14 @@
+Version 5.24.1 - 17 January 2020
+
+- make test pass on most distros
+
+Version 5.24 - 17 January 2020
+
 - fix support for hdlist compressed with !gzip
 - CPAN testers:
   o display rpm version in flags
+  o fix indexation (RT#127881)
+  o fix a test on Fedora where perl main package is perl-interpreter
   o workaround CPAN testers that run FreeBSD (RT#131162)
   o Workaround CPAN testers that run CentOS 7 (RT#131163)
 

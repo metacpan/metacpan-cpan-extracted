@@ -1,3 +1,5 @@
+1.2.2  17.01.2020
+           - fix compilation warnings
 1.2.1  15.01.2020
            - bug: my_perl alias at global scope was forgotten
 1.2.0  30.12.2019

@@ -24,7 +24,7 @@ sub configure_hook {
 
   $self->{server}->{port}     = "*:$PORT";   # port and addr to bind
   $self->{server}->{user}     = 'nobody'; # user to run as
-  $self->{server}->{group}    = 'nogroup'; # group to run as
+  $self->{server}->{group}    = 'nogroup' if -e '/etc/mageia-release'; # group to run as
   $self->{server}->{setsid}   = 1;        # daemonize
   $self->{server}->{log_file} = "$root/server.log";
 

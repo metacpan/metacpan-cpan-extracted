@@ -12,7 +12,7 @@ namespace panda {
     }
 
     template<> private_tags::ErrorCodeXsIn ErrorCode::private_access<private_tags::ErrorCodeXsIn, const xs::Sv&>(const xs::Sv& arg);
-    template<> xs::Sv ErrorCode::private_access<xs::Sv, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const;
+    template<> xs::Simple ErrorCode::private_access<xs::Simple, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const;
 }
 
 namespace xs {
@@ -51,7 +51,7 @@ template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
     static Sv out (const panda::ErrorCode& var, const Sv& = {}) {
         if (!var) return Sv::undef;
 
-        Sv ret = var.private_access<Sv>(panda::private_tags::ErrorCodeXsOut{});
+        auto ret = var.private_access<Simple>(panda::private_tags::ErrorCodeXsOut{});
 
         thread_local Stash stash("XS::ErrorCode");
         return stash.bless(ret).ref();
@@ -74,10 +74,10 @@ template<> inline private_tags::ErrorCodeXsIn ErrorCode::private_access<private_
     return {};
 }
 
-template<> inline xs::Sv ErrorCode::private_access<xs::Sv, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const {
+template<> inline xs::Simple ErrorCode::private_access<xs::Simple, private_tags::ErrorCodeXsOut>(private_tags::ErrorCodeXsOut) const {
     static const size_t CAT_SIZE = sizeof(const error::NestedCategory*);
     size_t size = CAT_SIZE + codes.storage.size();
-    xs::Simple base = xs::Simple::create(size);
+    auto base = xs::Simple::create(size);
 
     char* data = SvPVX(base);
 

@@ -20,5 +20,5 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc
+install -d $RPM_BUILD_ROOT/etc
 %foobar

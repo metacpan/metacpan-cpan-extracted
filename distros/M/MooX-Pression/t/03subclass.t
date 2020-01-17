@@ -19,6 +19,9 @@ package MyApp {
 				class ::Human {
 					has +name ( required => 1 );
 					class Superhuman;
+					class +Employee {
+						has job_title;
+					}
 				}
 			}
 		}
@@ -45,12 +48,24 @@ package MyApp {
 
 my $superman = MyApp->new_superhuman(name => 'Kal El');
 
-isa_ok($superman, $_) for qw(
+isa_ok($superman, $_, "\$superman isa $_") for qw(
 	MyApp::Animal
 	MyApp::Mammal
 	MyApp::Primate
 	Human
 	MyApp::Superhuman
+);
+
+my $worker = MyApp->new_human_employee(name => 'Bob', job_title => 'Uncle');
+
+is($worker->job_title, 'Uncle');
+
+isa_ok($worker, $_, "\$superman isa $_") for qw(
+	MyApp::Animal
+	MyApp::Mammal
+	MyApp::Primate
+	Human
+	Human::Employee
 );
 
 done_testing;

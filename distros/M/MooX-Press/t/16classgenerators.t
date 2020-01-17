@@ -29,7 +29,7 @@ use MooX::Press (
 use Types::Standard -types;
 use MyApp::Types -types;
 
-my $Human = MyApp::Species->generate_package('human', 'Homo sapiens');
+my $Human = MyApp->generate_species('human', 'Homo sapiens');
 
 ok(
 	ClassName->check($Human) && $Human->can('new'),

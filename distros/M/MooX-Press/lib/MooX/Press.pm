@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.023';
+our $VERSION   = '0.024';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -775,6 +775,24 @@ sub _make_package_generator {
 			},
 		},
 	);
+	
+	if ($opts{factory_package}) {
+		my $tn = $builder->type_name($qname, $opts{prefix});
+		if (!exists $opts{factory}) {
+			$opts{factory} = 'generate_' . lc $tn;
+		}
+		my $fp = $opts{factory_package};
+		my $f  = $opts{factory};
+		eval qq{
+			package $fp;
+			sub $f :method {
+				shift;
+				q($qname)->generate_package(\@_);
+			}
+		};
+	}
+	
+	return $qname;
 }
 
 my %_generate_counter;
@@ -1272,7 +1290,7 @@ Kind of like C<class>, but:
 
   [ "A", \&generator_for_A, "B", \&generator_for_B, ... ]
 
-"A" and "B" are not classes, but when C<< MyApp::A->generate_package(...) >>
+"A" and "B" are not classes, but when C<< MyApp->generate_a(...) >>
 is called, it will pass arguments to C<< &generator_for_A >> which is expected
 to return a hashref like C<< \%opts_for_A >>. Then a new pseudononymous class
 will be created with those options.
@@ -2492,10 +2510,13 @@ A role generator is like a class of roles.
 This generates MyApp::Animal as a class, as you might expect, but also
 creates a class generator called MyApp::Species.
 
-MyApp::Species is not itself a class but it can make classes.
+MyApp::Species is not itself a class but it can make classes. Calling
+either C<< MyApp::Species->generate_package >> or
+C<< MyApp->generate_species >> will compile a new class
+and return the class name as a string.
 
-  my $Human = MyApp::Species->generate_package('Homo sapiens');
-  my $Dog   = MyApp::Species->generate_package('Canis familiaris');
+  my $Human = MyApp->generate_species('Homo sapiens');
+  my $Dog   = MyApp->generate_species('Canis familiaris');
   
   my $alice = $Human->new(name => 'Alice');
   say $alice->name;      # Alice

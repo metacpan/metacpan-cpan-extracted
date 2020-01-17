@@ -1291,7 +1291,13 @@ private:
         switch (_state) {
             case State::INTERNAL:
             case State::EXTERNAL:
+                // suppress false-positive uninitialized warning for "_storage.any" for GCC
+                #pragma GCC diagnostic push
+                #pragma GCC diagnostic ignored "-Wpragmas"
+                #pragma GCC diagnostic ignored "-Wunknown-warning-option"
+                #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
                 if (_storage.any->refcnt > 1) _detach_cow(_length);
+                #pragma GCC diagnostic pop
                 break;
             case State::LITERAL:
                 _detach_str(_length);

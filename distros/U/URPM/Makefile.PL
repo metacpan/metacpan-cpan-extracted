@@ -80,7 +80,7 @@ WriteMakefile(
 	provides => {
 	    'URPM' => {
 		file => 'URPM.pm',
-		version => 'v5.23.2.5',
+		version => 'v5.24.1',
 	    },
 	    'URPM::Resolve' => {
 		file => 'URPM/Resolve.pm',

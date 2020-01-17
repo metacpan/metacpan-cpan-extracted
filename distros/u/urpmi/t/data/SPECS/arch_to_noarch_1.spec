@@ -10,7 +10,7 @@ License: x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/usr/lib/test-%{name}
+install -d $RPM_BUILD_ROOT/usr/lib/test-%{name}
 cp /sbin/ldconfig $RPM_BUILD_ROOT/usr/lib/test-%{name}
 
 %clean

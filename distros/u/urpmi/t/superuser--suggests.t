@@ -16,8 +16,12 @@ use strict;
 use lib '.', 't';
 use helper;
 use urpm::util;
-use Test::More 'no_plan';
-plan skip_all => "Weak dependencies support is needed for those tests" if !are_weak_deps_supported();
+use Test::More;
+if (are_weak_deps_supported()) {
+    plan 'no_plan';
+} else {
+    plan skip_all => "Weak dependencies support is needed for those tests" ;
+}
 
 
 need_root_and_prepare();

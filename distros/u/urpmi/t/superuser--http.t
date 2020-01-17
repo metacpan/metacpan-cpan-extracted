@@ -58,7 +58,7 @@ sub test_exotic_medium_name {
 
 sub run_urpm_cmd_as_user {
     my ($cmd) = @_;
-    my $full_cmd = "su nobody -c '" . urpm_cmd($cmd). "'";
+    my $full_cmd = "su nobody -s /bin/sh -c '" . urpm_cmd($cmd). "'";
     warn "# $full_cmd\n";
     `$full_cmd`;
 }

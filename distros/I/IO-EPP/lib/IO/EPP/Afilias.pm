@@ -94,7 +94,7 @@ END_MR:
 
     $msg .= '; ' . $self->{critical_error} if $self->{critical_error};
 
-    $code //= '';
+    $code ||= '';
 
     my $full_answ = "code: $code\nmsg: $msg";
 

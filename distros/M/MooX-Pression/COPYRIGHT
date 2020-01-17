@@ -11,7 +11,16 @@ Files: Changes
  t/02synopsis.t
  t/03subclass.t
  t/04requires.t
+ t/16classgenerators.t
+ t/17rolegenerators.t
+ t/18classgenerators-nesting.t
 Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/MooX/Pression.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -19,12 +28,6 @@ Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
-
-Files: README
- lib/MooX/Pression.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
  LICENSE

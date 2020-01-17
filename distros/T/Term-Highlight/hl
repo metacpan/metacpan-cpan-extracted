@@ -3,13 +3,14 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.1.0";
+$VERSION = "2.1.1";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
 $CTX_PTN = qr/^(\d+)?\.?(\d+)?$/;
 $SNIPPET_OPT_PTN = qr/(?:^-s)(\S*)/;
 $CTX_OPT_PTN = qr/(?:^-c)(\S*)/;
+$STRIP_EOL_PTN = qr/(?=\R)/;
 $HIDDEN_FILE_PTN = qr/^\..+/;
 
 
@@ -319,7 +320,7 @@ if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
 }
 
 my $Location = '';
-my $print_ctx = 0;
+my $PrintCtx = 0;
 
 
 sub InitCtx
@@ -332,11 +333,11 @@ sub InitCtx
 
 sub ProcessCtx
 {
-    my ( $matches, $print_ctx, $file ) = @_;
+    my ( $matches, $file ) = @_;
     if ( $matches )
     {
         my $n = $#CtxPre;
-        print "$CtxDelim\n" if $$print_ctx++ && $. > $LastLine + $n + 2;
+        print "$CtxDelim\n" if $PrintCtx++ && $. > $LastLine + $n + 2;
         for my $i ( 0 .. $n )
         {
             my $line = $. - ( $n + 1 - $i );
@@ -375,6 +376,137 @@ sub ProcessCtx
 }
 
 
+my ( $FileHandle, $FileIsBinary );
+my ( $FullFile, $CurFile );
+
+
+sub ProcessFile
+{
+    my ( $as_node ) = @_;
+    if ( $FileIsBinary )
+    {
+        binmode( $FileHandle );
+    }
+    elsif ( $UTF8Support )
+    {
+        binmode( $FileHandle, ':utf8' );
+        binmode( STDOUT, ':utf8' ) unless $GrepList;
+    }
+    InitCtx if $CheckCtx;
+    while ( <$FileHandle> )
+    {
+        #pre-check that line matches: it is cheaper than calling Process()!
+        #Notice that newline characters get removed from the current line
+        #before the check
+        my $matches = $AlwaysMatches;
+        my ( $line, $end, $check, $len, $len_check ) = ( $_, '', '', 2, 0 );
+        my $was_split = 0;
+        if ( ! $matches && @$Patterns )
+        {
+            #search for line endings only within 2 last characters of the line
+            $check = substr( $_, -$len );
+            $len_check = length $check;
+            $len = $len_check if $len > $len_check;
+            $len -= pos( $check ) if $check =~ /$STRIP_EOL_PTN/g;
+            ( $line, $end ) = ( substr( $_, 0, -$len ),
+                                substr( $_, -$len ) ) if $len;
+            $was_split = 1;
+            for my $ptn ( @$Patterns )
+            {
+                if ( $line =~ @$ptn[ 0 ] )
+                {
+                    $matches = 1;
+                    last;
+                }
+            }
+        }
+        my $print_once = $GrepList || $FileIsBinary;
+        if ( $matches )
+        {
+            print "$FullFile\n" if $GrepList && ! $FileIsBinary;
+            print "Binary file $FullFile matches\n" if $FileIsBinary;
+            last if $print_once;
+        }
+        next if $print_once;
+        if ( $as_node )
+        {
+            next if $CheckCtx &&
+                ! ProcessCtx( $matches, $FullFile ) ||
+                ! $CheckCtx && ! $matches;
+            $Location = $LineNumbers ? $FullFile . ':' . $. : $FullFile;
+            $hl_loc->Process( \$Location ) if defined $hl_loc;
+        }
+        else
+        {
+            next if $Grep &&
+                ( $CheckCtx &&
+                    ! ProcessCtx( $matches, $FullFile ) ||
+                    ! $CheckCtx && ! $matches );
+            if ( $ManyFiles || $LineNumbers )
+            {
+                $Location = $ManyFiles ?
+                    ( $LineNumbers ? $FullFile . ':' . $. : $FullFile ) : $.;
+                $hl_loc->Process( \$Location ) if defined $hl_loc;
+                $Location .= ': ';
+            }
+        }
+        #call Process() only when the line matches and is not empty
+        if ( $matches )
+        {
+            unless ( $was_split )
+            {
+                $check = substr( $_, -$len );
+                $len_check = length $check;
+                $len = $len_check if $len > $len_check;
+                $len -= pos( $check ) if $check =~ /$STRIP_EOL_PTN/g;
+                ( $line, $end ) = ( substr( $_, 0, -$len ),
+                                    substr( $_, -$len ) ) if $len;
+            }
+            $hl->Process( \$line ) if $line ne '';
+        }
+        #debug purpose
+        #print "$_->[ 0 ], $_->[ 1 ], $_->[ 2 ], $_->[ 3 ], ",
+        #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$line );
+        if ( $as_node )
+        {
+            print "$Location: $line$end";
+        }
+        else
+        {
+            print $Location, "$line$end";
+        }
+        $LastLine = $.;
+    }
+    close $FileHandle;
+}
+
+
+sub VisitNode
+{
+    no warnings 'once';     #for $File::Find::name
+    ( $FullFile, $CurFile ) = ( $File::Find::name, $_ );
+    unless ( $GrepAll )
+    {
+        if ( $_ =~ $HIDDEN_FILE_PTN &&
+            ! grep { $FullFile eq $_ || $FullFile eq "./$_" } @Files )
+        {
+            $File::Find::prune = 1;
+            return;
+        }
+    }
+    return unless -f $CurFile;
+    $FileIsBinary = -B $CurFile;
+    return if $FileIsBinary && ! $BinarySupport;
+    unless ( open $FileHandle, "< $CurFile" )
+    {
+        Flush( *STDOUT );
+        warn( "WARNING: Unable to open $CurFile: $!" );
+        return;
+    }
+    ProcessFile 1;
+}
+
+
 #process file list or STDIN line by line
 if ( $GrepRecursively )
 {
@@ -392,91 +524,7 @@ if ( $GrepRecursively )
         require File::Find;
         File::Find->import( qw( find ) );
         @Files || push @Files, './';
-        find
-        (
-            sub
-            {
-                no warnings 'once';     #for $File::Find::name
-                my ( $FullFile, $File, $FileIsBinary ) =
-                                            ( $File::Find::name, $_, -B $_ );
-                unless ( $GrepAll )
-                {
-                    if ( $_ =~ $HIDDEN_FILE_PTN &&
-                        ! grep { $FullFile eq $_ || $FullFile eq "./$_" }
-                                                                    @Files )
-                    {
-                        $File::Find::prune = 1;
-                        return;
-                    }
-                }
-                return unless -f $File;
-                return if $FileIsBinary && ! $BinarySupport;
-                unless ( open $FileHandle, "< $File" )
-                {
-                    Flush( *STDOUT );
-                    warn( "WARNING: Unable to open $File: $!" );
-                    return;
-                }
-                if ( $FileIsBinary )
-                {
-                    binmode( $FileHandle );
-                }
-                elsif ( $UTF8Support )
-                {
-                    binmode( $FileHandle, ':utf8' );
-                    binmode( STDOUT, ':utf8' ) unless $GrepList;
-                }
-                InitCtx if $CheckCtx;
-                while ( <$FileHandle> )
-                {
-                    my $matches = $AlwaysMatches;
-                    my ( $line, $end ) = ( $_, '' );
-                    my $was_split = 0;
-                    if ( ! $matches && @$Patterns )
-                    {
-                        ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
-                        substr( $line, 0, 1 ) = '';
-                        $was_split = 1;
-                        for my $ptn ( @$Patterns )
-                        {
-                            if ( $line =~ @$ptn[ 0 ] )
-                            {
-                                $matches = 1;
-                                last;
-                            }
-                        }
-                    }
-                    my $print_once = $GrepList || $FileIsBinary;
-                    if ( $matches )
-                    {
-                        print "$FullFile\n" if $GrepList && ! $FileIsBinary;
-                        print "Binary file $FullFile matches\n"
-                                                            if $FileIsBinary;
-                        last if $print_once;
-                    }
-                    next if $print_once;
-                    next if $CheckCtx &&
-                        ! ProcessCtx( $matches, \$print_ctx, $FullFile ) ||
-                        ! $CheckCtx && ! $matches;
-                    $Location = $LineNumbers ? $FullFile . ':' . $. : $FullFile;
-                    $hl_loc->Process( \$Location ) if defined $hl_loc;
-                    if ( $matches )
-                    {
-                        unless ( $was_split )
-                        {
-                            ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
-                            substr( $line, 0, 1 ) = '';
-                        }
-                        $hl->Process( \$line ) if $line ne '';
-                    }
-                    $end //= '';
-                    print "$Location: $line$end";
-                    $LastLine = $.;
-                }
-                close $FileHandle;
-            },
-            @Files
-        );
+        find ( \&VisitNode, @Files );
     }
 }
 else
@@ -484,7 +532,6 @@ else
     @Files || push @Files, *STDIN;
     for my $File ( @Files )
     {
-        my ( $FileHandle, $FileIsBinary );
         if ( $File eq *STDIN )
         {
             $FileHandle = *STDIN;
@@ -511,75 +558,8 @@ else
                 next;
             }
         }
-        if ( $FileIsBinary )
-        {
-            binmode( $FileHandle );
-        }
-        elsif ( $UTF8Support )
-        {
-            binmode( $FileHandle, ':utf8' );
-            binmode( STDOUT, ':utf8' ) unless $GrepList;
-        }
-        InitCtx if $CheckCtx;
-        while ( <$FileHandle> )
-        {
-            #pre-check that line matches: it is cheaper than calling Process()!
-            #Notice that newline characters get removed from the current line
-            #before the check
-            my $matches = $AlwaysMatches;
-            my ( $line, $end ) = ( $_, '' );
-            my $was_split = 0;
-            if ( ! $matches && @$Patterns )
-            {
-                ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
-                substr( $line, 0, 1 ) = '';
-                $was_split = 1;
-                for my $ptn ( @$Patterns )
-                {
-                    if ( $line =~ @$ptn[ 0 ] )
-                    {
-                        $matches = 1;
-                        last;
-                    }
-                }
-            }
-            my $print_once = $GrepList || $FileIsBinary;
-            if ( $matches )
-            {
-                print "$File\n" if $GrepList && ! $FileIsBinary;
-                print "Binary file $File matches\n" if $FileIsBinary;
-                last if $print_once;
-            }
-            next if $print_once;
-            next if $Grep && ( $CheckCtx &&
-                ! ProcessCtx( $matches, \$print_ctx, $File ) ||
-                ! $CheckCtx && ! $matches );
-            #print current line
-            if ( $ManyFiles || $LineNumbers )
-            {
-                $Location = $ManyFiles ?
-                            ( $LineNumbers ? $File . ':' . $. : $File ) : $.;
-                $hl_loc->Process( \$Location ) if defined $hl_loc;
-                $Location .= ': ';
-            }
-            #call Process() only when line matches and is not empty
-            if ( $matches )
-            {
-                unless ( $was_split )
-                {
-                    ( $line, $end ) = split( /(?=\R$)/, "x$_", 2 );
-                    substr( $line, 0, 1 ) = '';
-                }
-                $hl->Process( \$line ) if $line ne '';
-            }
-            #debug purpose
-            #print "$_->[ 0 ], $_->[ 1 ], $_->[ 2 ], $_->[ 3 ], ",
-            #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$line );
-            $end //= '';
-            print $Location, "$line$end";
-            $LastLine = $.;
-        }
-        close $FileHandle;
+        $FullFile = $File;
+        ProcessFile 0;
     }
 }
 

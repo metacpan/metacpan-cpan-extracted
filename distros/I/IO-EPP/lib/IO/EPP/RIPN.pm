@@ -906,7 +906,7 @@ REGINFO
         my $info = {};
 
         if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
-            my $rdata = $1 // '';
+            my $rdata = $1;
 
             my %types = ( intPostalInfo => 'int', locPostalInfo => 'loc', legalInfo => 'legal' );
             foreach my $type ( keys %types ) {
@@ -1146,7 +1146,7 @@ BILINFO
         my $info = {};
 
         if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
-            my $rdata = $1 // '';
+            my $rdata = $1;
 
             my @billing = $rdata =~ /(<billing:[^<>]+>[^<>]+<\/billing:[^<>]+>)/g;
 
@@ -1211,7 +1211,7 @@ LIMINFO
         my $info = {};
 
         if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
-            my $rdata = $1 // '';
+            my $rdata = $1;
 
             my @limits = $rdata =~ /(<limits:[^<>]+>[^<>]+<\/limits:[^<>]+>)/g;
 

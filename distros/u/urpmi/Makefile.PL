@@ -5,6 +5,9 @@
 use strict;
 use ExtUtils::MakeMaker;
 
+use Config;
+die "OS unsupported" if $Config{osname} ne 'linux';
+
 # Command-line parsing.
 # --without-rpm : don't use rpm to find some paths, and generate make targets
 #   to produce an rpm of this
@@ -160,7 +163,7 @@ WriteMakefile(
 	'Expect'		=> '0',
 	'File::Slurp'		=> '0',
 	'Net::Server'		=> '0',
-	'rpmtools'		=> '7.11.1',
+	'rpmtools'		=> '7.12',
 	'Test::More'		=> '1.302',
 	'Test::Pod'		=> '0',
 	'Test::Pod::Coverage'	=> '0',
@@ -194,7 +197,7 @@ WriteMakefile(
 		},
 		'urpmi' => {
 		    file => 'urpmi.pm',
-		    version => 'v8.120.11',
+		    version => 'v8.120.12',
 		},
             },
             resources => {

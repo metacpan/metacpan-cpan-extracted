@@ -70,6 +70,16 @@ our $idn_ext =
 our $rgp_ext =
 'xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd"';
 
+=head1 FUNCTIONS
+
+=head2 make_request
+
+Make a single request to the registry
+
+A complete example is found in L<IO::EPP>
+
+=cut
+
 sub make_request {
     my ( $action, $params ) = @_;
 
@@ -137,6 +147,13 @@ END_MR:
 }
 
 
+=head1 METHODS
+
+Here are the features that distinguish the registry from the EPP RFC.
+All basic information about functions is in L<IO::EPP::Base>
+
+=cut
+
 sub req_test {
     my ( $self, $out_data, $info ) = @_;
 
@@ -174,11 +191,6 @@ sub req_test {
     return $answ;
 }
 
-
-=head1 METHODS
-
-Here are the features that distinguish the registry from the EPP RFC.
-All basic information about functions is in L<IO::EPP::Base>
 
 =head2 new
 

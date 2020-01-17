@@ -71,7 +71,7 @@ Revision history for Perl module Term::Highlight and script hl.
 2016/07/21 - Version 1.9.2 - version bump after Highlight.pm update.
                 Highlight.pm version 1.7 - fixes in default color mode.
 
-2016/07/22 - Version 1.9.3 - expensive Process() calls otimized.
+2016/07/22 - Version 1.9.3 - expensive Process() calls optimized.
 
 2016/07/22 - Version 1.9.4 - optimization: always pre-check that line matches.
                 Highlight.pm version 1.8 - minor cleanup.
@@ -93,4 +93,6 @@ Revision history for Perl module Term::Highlight and script hl.
 
 2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into hidden
                 directories by default. A new option '-a' was added to do so.
+
+2020/01/15 - Version 2.1.1 - corrected and faster line endings split.
 

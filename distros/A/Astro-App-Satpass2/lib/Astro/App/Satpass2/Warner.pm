@@ -8,7 +8,7 @@ use warnings;
 use Astro::App::Satpass2::Locale qw{ __message };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 sub new {
     my ( $class, @arg ) = @_;
@@ -94,7 +94,7 @@ reserves the right to modify or revoke it without notice. The
 documentation is purely for the benefit of the author.
 
 This class manages the reporting of error messages, generating them by
-either C<warn> and c<die>, or C<carp> and C<croak> as the user desires.
+either C<warn> and C<die>, or C<carp> and C<croak> as the user desires.
 If the C<warn> attribute is true, you get C<warn> or C<die>. If false,
 you get C<carp> or C<croak>.
 
@@ -146,7 +146,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2019 by Thomas R. Wyant, III
+Copyright (C) 2011-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

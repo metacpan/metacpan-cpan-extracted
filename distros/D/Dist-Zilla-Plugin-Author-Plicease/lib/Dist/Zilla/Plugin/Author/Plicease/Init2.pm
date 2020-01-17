@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.40 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.41 {
   
   use 5.014;
   use Moose;
@@ -562,7 +562,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 DESCRIPTION
 

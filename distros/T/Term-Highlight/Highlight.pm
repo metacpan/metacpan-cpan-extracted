@@ -9,7 +9,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw( LoadArgs LoadPatterns ClearPatterns GetPatterns Process );
 
-our $VERSION = "2.1.0";
+our $VERSION = "2.1.1";
 
 
 sub new
@@ -140,14 +140,14 @@ sub FindPositionsOfTags
                 next if $length == 0;
                 my $offset = 0;
                 #trailing new lines cause problems: put color tags before them
-                #BEWARE: in classis Mac OS "\r" was used as the line terminator,
+                #BEWARE: in older Mac OS "\r" was used as the line terminator,
                 #which is not supported here
-                if ( substr( $$string_ref, $+[0] - 1, 1 ) eq "\n" )
+                if ( substr( $$string_ref, $+[ 0 ] - 1, 1 ) eq "\n" )
                 {
                     --$length;
                     ++$offset;
                     next if $length == 0;
-                    if ( substr( $$string_ref, $+[0] - 2, 1 ) eq "\r" )
+                    if ( substr( $$string_ref, $+[ 0 ] - 2, 1 ) eq "\r" )
                     {
                         --$length;
                         ++$offset;
@@ -309,11 +309,13 @@ sub Process
 
     #populate @Positions
     my $found_matches = FindPositionsOfTags( \@Positions,
-                        \@{ $self->{ Patterns } }, $String_ref ) or return 0;
+                                    \@{ $self->{ Patterns } }, $String_ref );
 
     #do not change original string and return found positions if an array is
     #expected
     return @Positions if wantarray;
+
+    return 0 unless $found_matches;
 
     #replace all but the last ending tags from @Positions by one-before-the-last
     #starting tag (crucial for terminal color escape sequences algorithm)

@@ -25,6 +25,7 @@ static std::string get_type_name (const std::type_info& ti) {
     return ret;
 }
 
+/*
 static panda::string get_reduced_backtrace (const panda::backtrace& bt) {
     auto full_backtrace = bt.get_trace_string();
     auto perl_backtrace = panda::backtrace().get_trace_string();
@@ -39,6 +40,7 @@ static panda::string get_reduced_backtrace (const panda::backtrace& bt) {
     full_backtrace.resize(size);
     return full_backtrace;
 }
+*/
 
 static Sv _exc2sv_default (const Sub&) {
     try { throw; }

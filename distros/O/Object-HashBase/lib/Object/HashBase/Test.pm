@@ -2,7 +2,7 @@ package Object::HashBase::Test;
 use strict;
 use warnings;
 
-use vars qw/$NO_RUN/;
+use vars qw/$NO_RUN $TODO/;
 
 BEGIN {
     if ($NO_RUN) {
@@ -20,7 +20,7 @@ BEGIN {
 
 return 1 if $NO_RUN;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # <-- START -->
 
 sub warnings(&) {
@@ -102,7 +102,10 @@ is($pkg->do_it, 'const', "worked as expected");
     *Object::HashBase::Test::Const::Test::FOO = sub { 0 };
 }
 ok(!$pkg->FOO, "overrode const sub");
+{
+local $TODO = "known to fail on $]" if $] le "5.006002";
 is($pkg->do_it, 'const', "worked as expected, const was constant");
+}
 
 BEGIN {
     $INC{'Object/HashBase/Test/HBase/Wrapped.pm'} = __FILE__;

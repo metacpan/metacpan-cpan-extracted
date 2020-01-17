@@ -1,6 +1,6 @@
 package IO::EPP
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 1;
 
@@ -24,12 +24,12 @@ IO::EPP - Object and procedure interface of the client-side for work with EPP AP
 IO::EPP is a very light and fast interface of the access to EPP API from the client's side with minimum dependences.
 It is independent of libxml and other heavy libraries.
 
-It works over IO::Socket::SSL without additional modules and demands only L<Digest::MD5> for generation of unique ID and L<Time::HiRes> for the purpose of logging.
+It works over L<IO::Socket::SSL> without additional modules and demands only L<Digest::MD5> for generation of unique ID and L<Time::HiRes> for the purpose of logging.
 L<LWP> is necessary for two registries and one reseller (TCI/RIPN, Taeping и HosterKZ), because EPP of these providers works over HTTPS.
 
 In test mode IO::EPP can emulate the job of some registries.
 Now the emulation of Verisign Core and CentralNic servers is supported at the level of 99% of answers.
-The test environment for L<IO::EPP::Base> uses the emulation of CentralNic without extentions.
+The test environment for L<IO::EPP::Base> uses the emulation of CentralNic without extensions.
 
 The main difference of the emulation from a registry is that all the data are into the process which makes requests. That's why when the process comes to the end all the data will be lost.
 If you want to save the data between queries you need to replace the functions in the module L<IO::EPP::Test::Server>.
@@ -42,7 +42,7 @@ The authorization occurs when an object is created.
 Logout is called automatically from the object destructor.
 
 The basic module is L<IO::EPP::Base>. It supports all the functions of EPP RFC and the extension DNSSEC.
-But since many registries and resellers use a large number of their own extentions the special modules that work over L<IO::EPP::Base> are wrote for them.
+But since many registries and resellers use a large number of their own extensions the special modules that work over L<IO::EPP::Base> are wrote for them.
 
 The description of definite functions see in L<IO::EPP::Base>.
 
@@ -191,7 +191,7 @@ An example of registration of a new nameserver
     use IO::EPP::CNic;
     use Data::Dumper;
 
-    # Parameters for L<IO::Socket::SSL>
+    # Parameters for IO::Socket::SSL
     my %sock_params = (
         PeerHost        => 'epp.centralnic.com',
         PeerPort        => 700,
@@ -279,7 +279,7 @@ An example of cheking of two domains access
                 $sock_params{PeerHost} = $config->{core_url}; # epp.verisign-grs.com
             }
             elsif ( $params->{tld} eq 'name' ) {
-                # For .name need set special epp extentions
+                # For .name need set special epp extensions
                 # earlier this tld was located on the dedicated server
                 $params->{server}      = 'DotName';
                 $params->{user}        = $config->{name_username};

@@ -298,9 +298,7 @@ sub create_contact {
 
 
 sub get_contact_ext {
-    my ( undef, $ext ) = @_;
-
-    my %cont;
+    my ( undef, $cont, $ext ) = @_;
 
     if ( $ext =~ m|<contact:infData[^<>]+tci-contact-ext-1[^<>]+>(.+?)</contact:infData>|s ) {
         my $data = $1;
@@ -312,7 +310,7 @@ sub get_contact_ext {
 
             foreach my $row ( @rows ) {
                 if ( $row =~ m|<contact:([A-Za-z]+)>([^<>]+)| ) {
-                    $cont{$1} = $2;
+                    $cont->{$1} = $2;
                 }
             }
         }
@@ -320,7 +318,7 @@ sub get_contact_ext {
         if ( $data =~ m|<contact:organization>(.+)</contact:organization>|s ) {
             my $org_data = $1;
 
-            ( $cont{TIN} ) = $org_data =~ /<contact:TIN>([^<>]+)<\/contact:TIN>/;
+            ( $cont->{TIN} ) = $org_data =~ /<contact:TIN>([^<>]+)<\/contact:TIN>/;
 
             my @atypes = ( 'int', 'loc' );
             foreach my $atype ( @atypes ) {
@@ -328,20 +326,18 @@ sub get_contact_ext {
 
                 next unless $postal;
 
-                $cont{legal}{$atype}{addr} = join(' ', $postal =~ /<contact:street>([^<>]*)<\/contact:street>/ );
+                $cont->{legal}{$atype}{addr} = join(' ', $postal =~ /<contact:street>([^<>]*)<\/contact:street>/ );
 
-                ( $cont{legal}{$atype}{city} ) = $postal =~ /<contact:city>([^<>]*)<\/contact:city>/;
+                ( $cont->{legal}{$atype}{city} ) = $postal =~ /<contact:city>([^<>]*)<\/contact:city>/;
 
-                ( $cont{legal}{$atype}{'state'} ) = $postal =~ /<contact:sp>([^<>]*)<\/contact:sp>/;
+                ( $cont->{legal}{$atype}{'state'} ) = $postal =~ /<contact:sp>([^<>]*)<\/contact:sp>/;
 
-                ( $cont{legal}{$atype}{postcode} ) = $postal =~ /<contact:pc>([^<>]*)<\/contact:pc>/;
+                ( $cont->{legal}{$atype}{postcode} ) = $postal =~ /<contact:pc>([^<>]*)<\/contact:pc>/;
 
-                ( $cont{legal}{$atype}{country_code} ) = $postal =~ /<contact:cc>([A-Z]+)<\/contact:cc>/;
+                ( $cont->{legal}{$atype}{country_code} ) = $postal =~ /<contact:cc>([A-Z]+)<\/contact:cc>/;
             }
         }
     }
-
-    return \%cont;
 }
 
 

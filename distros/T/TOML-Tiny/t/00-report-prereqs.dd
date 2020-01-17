@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Types::Serialiser' => '0'
+                                      },
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::Dumper' => '0',
+                                      'DateTime::Format::RFC3339' => '0',
+                                      'Exporter' => '0',
+                                      'Math::BigInt' => '1.999718',
+                                      'Scalar::Util' => '1.14',
+                                      'perl' => '5.018'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'DateTime::Format::RFC3339' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'TOML::Parser' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -397,7 +397,7 @@ __END__
 
 =head1 AUTHORS
 
-Vadim Likhota <vadiml@cpan.org>
+Vadim Likhota <vadiml@cpan.org>, claims functions are written by Andrey Voyshko
 
 =head1 COPYRIGHT
 

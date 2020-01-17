@@ -10,7 +10,7 @@ x
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc/dir
+install -d $RPM_BUILD_ROOT/etc/dir
 echo a > $RPM_BUILD_ROOT/etc/foo
 echo bar > $RPM_BUILD_ROOT/etc/bar
 echo a > $RPM_BUILD_ROOT/etc/dir/a

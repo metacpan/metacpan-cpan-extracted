@@ -3,8 +3,16 @@
 use strict;
 use lib '.', 't';
 use helper;
-use Test::More 'no_plan';
-plan skip_all => "Needs a Mageia specific patch that introduces Time::ZoneInfo->current_zone()" if !-e '/etc/mageia-release';
+use Test::More;
+# Must be done before 'use urpm::cfg' else we got:
+# '1..0 # SKIP Needs a Mageia specific patch that introduces Time::ZoneInfo->current_zone()'
+BEGIN {
+    if (-e '/etc/mageia-release') {
+	plan 'no_plan';
+    } else {
+	plan skip_all => "Needs a Mageia specific patch that introduces Time::ZoneInfo->current_zone()";
+    }
+}
 
 BEGIN { use_ok 'urpm::cfg' }
 

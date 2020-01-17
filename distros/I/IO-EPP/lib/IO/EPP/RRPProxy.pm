@@ -189,6 +189,63 @@ qq|   <keysys:create $ks_ext>
     return $self->SUPER::create_contact( $params );
 }
 
+=head2 get_contact_ext
+
+Parsing the keysys extension for get_contact_info:
+
+Additional contact statuses in extension: C<validated>, C<verified>, C<verification-requested>
+
+An Examples:
+
+    {
+        'msg' => 'Command completed successfully',
+        'owner' => 'login',
+        'roid' => '333376460_CONTACT-KEYSYS',
+        'cre_date' => '2017-12-11 07:20:17',
+        'phone' => [
+            '+7.9066329999'
+        ],
+        'email' => [
+            'aleks@gmail.com'
+        ],
+        'cont_id' => 'P-JDA6666',
+        'loc' => {
+            'city' => 'Tyumen',
+            'org' => 'Aleks Aleksandra',
+            'country_code' => 'RU',
+            'name' => 'Alesk Aleksandra',
+            'postcode' => '123456',
+            'addr' => 'ul Aleksa d 16 kv 16',
+            'state' => undef
+        },
+        'fax' => [
+            '+7.9066329999'
+        ],
+        'creater' => 'login',
+        'statuses' => {
+            'ok' => '+',
+            'linked' => '+',
+            'validated' => '+'
+        },
+          'authinfo' => ':1ADE:ZEh:',
+        'code' => '1000'
+    };
+
+=cut
+
+sub get_contact_ext {
+    my ( undef, $cont, $ext ) = @_;
+
+    if ( $ext =~ /<keysys:resData[^<>]*>(.+)<\/keysys:resData>/s ) {
+        # key-system extension TODO: move
+        my $krdata = $1;
+
+        $cont->{statuses}{'validated'} = '+' if $krdata =~ /<keysys:validated>1<\/keysys:validated>/;
+        $cont->{statuses}{'verified'}  = '+'  if $krdata =~ /<keysys:verified>1<\/keysys:verified>/;
+        $cont->{statuses}{'verification-requested'} = '+'
+            if $krdata =~ /<keysys:verification-requested>1<\/keysys:verification-requested>/;
+    }
+}
 
 =head2 check_claims
 
@@ -199,7 +256,12 @@ For details see L<https://tools.ietf.org/html/draft-tan-epp-launchphase-12>
 INPUT:
 
 key of params:
+
 C<dname> -- domain name
+
+OUTPUT:
+
+see L<IO::EPP::Base/check_domains>
 
 =cut
 

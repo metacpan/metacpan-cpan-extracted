@@ -10,7 +10,7 @@ use MooX::Press::Keywords ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.006';
 
 use Keyword::Declare;
 use B::Hooks::EndOfScope;
@@ -25,7 +25,7 @@ BEGIN {
 		if ($action eq -gather) {
 			while (@_) {
 				my ($k, $v) = splice @_, 0, 2;
-				if (my ($kind,$pkg) = ($k =~ /^(class|role):(.+)$/)) {
+				if (my ($kind,$pkg) = ($k =~ /^(class|role|class_generator|role_generator):(.+)$/)) {
 					if ( my @stack = @{ $stack{$me}{$caller}||[] } ) {
 						pop @stack if $stack[-1] eq $pkg;
 						if (@stack) {
@@ -44,12 +44,22 @@ BEGIN {
 			if ($gather{$me}{$caller}{'_defer_role'}) {
 				die 'nested roles not currently supported';
 			}
+			if ($gather{$me}{$caller}{'_defer_role_generator'}) {
+				die 'nested role generators not currently supported';
+			}
+			if ($gather{$me}{$caller}{'_defer_class_generator'}) {
+				die 'nested class generators not currently supported';
+			}
 			if ($gather{$me}{$caller}{'_defer_class'}) {
 				$me->_undefer_classes($gather{$me}{$caller}{'class'}, delete $gather{$me}{$caller}{'_defer_class'});
 			}
+			
+			if ($gather{$me}{$caller}{debug}) {
+				require Data::Dumper;
+				warn Data::Dumper::Dumper($gather{$me}{$caller});
+			}
+			
 			@_ = ('MooX::Press' => $gather{$me}{$caller});
-			#use Data::Dumper;
-			#warn Dumper \@_;
 			goto \&MooX::Press::import;
 		}
 		elsif ($action eq -parent) {
@@ -123,9 +133,9 @@ keytype SignatureList is /
 			\? | (\s*=\s*(?&PerlTerm))
 		)?
 	)*
-/xs  # fix for highlighting /
+/xs;  # fix for highlighting /
 
-my $handle_signature = sub {
+my $handle_signature_list = sub {
 	my $sig = $_[0];
 	my $seen_named = 0;
 	my $seen_pos   = 0;
@@ -137,7 +147,7 @@ my $handle_signature = sub {
 		
 		push @parsed, {};
 		
-		if ($sig =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xs) {
+		if ($sig =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xso) {
 			my $type = $1;
 			$parsed[-1]{type}          = $type;
 			$parsed[-1]{type_is_block} = 1;
@@ -156,14 +166,14 @@ my $handle_signature = sub {
 			$parsed[-1]{type_is_block} = 0;
 		}
 		
-		if ($sig =~ /^\*((?&PerlIdentifier)) $PPR::GRAMMAR/xs) {
+		if ($sig =~ /^\*((?&PerlIdentifier)) $PPR::GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name} = $name;
 			++$seen_named;
 			$sig =~ s/^\*\Q$name//xs;
 			$sig =~ s/^\s+//xs;
 		}
-		elsif ($sig =~ /^((?&PerlVariable)) $PPR::GRAMMAR/xs) {
+		elsif ($sig =~ /^((?&PerlVariable)) $PPR::GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name} = $name;
 			++$seen_pos;
@@ -175,7 +185,7 @@ my $handle_signature = sub {
 			$parsed[-1]{optional} = 1;
 			$sig =~ s/^\?\s*//xs;
 		}
-		elsif ($sig =~ /^=\s*((?&PerlTerm)) $PPR::GRAMMAR/xs) {
+		elsif ($sig =~ /^=\s*((?&PerlTerm)) $PPR::GRAMMAR/xso) {
 			my $default = $1;
 			$parsed[-1]{default} = $default;
 			$sig =~ s/^=\s*\Q$default//xs;
@@ -226,6 +236,93 @@ my $handle_signature = sub {
 	);
 };
 
+keytype RoleList is /
+	\+?\s*
+	(
+		(?&PerlBlock) | (?&PerlQualifiedIdentifier)
+	)
+	(
+		(?:\s*\?) | (?&PerlList)
+	)?
+	(
+		\s*
+		,
+		\s*
+		\+?\s*
+		(
+			(?&PerlBlock) | (?&PerlQualifiedIdentifier)
+		)
+		(
+			(?:\s*\?) | (?&PerlList)
+		)?
+	)*
+/xs;  #/*
+
+my $handle_rolelist = sub {
+	my ($rolelist, $kind) = @_;
+	my @return;
+	
+	while (length $rolelist) {
+		$rolelist =~ s/^\s+//xs;
+		
+		my $prefix = '';
+		my $role = undef;
+		my $role_is_block = 0;
+		my $suffix = '';
+		my $role_params   = undef;
+		
+		if ($rolelist =~ /^\+/xs) {
+			die 'unexpected plus sign' if $kind eq 'role';
+			$prefix = '+';
+			$rolelist =~ s/^\+\s*//xs;
+		}
+		
+		if ($rolelist =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xso) {
+			$role = $1;
+			$role_is_block = 1;
+			$rolelist =~ s/^\Q$role//xs;
+			$rolelist =~ s/^\s+//xs;
+		}
+		elsif ($rolelist =~ /^((?&PerlQualifiedIdentifier)) $PPR::GRAMMAR/xso) {
+			$role = $1;
+			$rolelist =~ s/^\Q$role//xs;
+			$rolelist =~ s/^\s+//xs;
+		}
+		else {
+			die "expected role name, got $rolelist";
+		}
+		
+		if ($rolelist =~ /^\?/xs) {
+			die 'unexpected question mark' if $kind eq 'class';
+			$suffix = '?';
+			$rolelist =~ s/^\?\s*//xs;
+		}
+		elsif ($rolelist =~ /^((?&PerlList)) $PPR::GRAMMAR/xso) {
+			$role_params = $1;
+			$rolelist =~ s/^\Q$role_params//xs;
+			$rolelist =~ s/^\s+//xs;
+		}
+		
+		if ($role_is_block) {
+			push @return, sprintf('sprintf(q(%s%%s%s), scalar(do %s))', $prefix, $suffix, $role);
+		}
+		else {
+			push @return, B::perlstring("$prefix$role$suffix");
+		}
+		if ($role_params) {
+			push @return, sprintf('[%s]', $role_params);
+		}
+		
+		$rolelist =~ s/^\s+//xs;
+		if (length $rolelist) {
+			$rolelist =~ /^,/ or die "expected comma, got $rolelist";
+			$rolelist =~ s/^\,\s*//;
+		}
+	}
+	
+	return join(",", @return);
+};
+
 sub _handle_factory_keyword {
 	my ($me, $name, $via, $code, $sig) = @_;
 	if ($via) {
@@ -244,7 +341,7 @@ sub _handle_factory_keyword {
 			$code,
 		);
 	}
-	my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature->($sig);
+	my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
 	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); do %s }', $signature_var_list, $code);
 	sprintf(
 		'q[%s]->_factory(%s, { code => %s, named => %d, signature => %s });',
@@ -260,7 +357,7 @@ sub _handle_modifier_keyword {
 	my ($me, $kind, $name, $code, $sig) = @_;
 	
 	if ($sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
 		my $munged_code;
 		if ($kind eq 'around') {
 			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); my $class = ref($self)||$self; do %s }', $signature_var_list, $code);
@@ -338,25 +435,45 @@ sub import {
 	
 	# `class` keyword
 	#
-	keyword class (Bareword $classname, Block $classdfn) {
+	keyword class ('+'? $plus, QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { my($generator,%s)=(shift,@_); q(%s)->_package_callback(sub %s) }', $signature_var_list, $me, $classdfn);
+		sprintf(
+			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => %s; use MooX::Pression::_Gather -unparent;',
+			B::perlstring("$plus$classname"),
+			B::perlstring("class_generator:$plus$classname"),
+			$munged_code,
+		);
+	}
+	keyword class ('+'? $plus, QualifiedIdentifier $classname, Block $classdfn) {
 		sprintf(
 			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use MooX::Pression::_Gather -unparent;',
-			B::perlstring($classname),
-			B::perlstring('class:'.$classname),
+			B::perlstring("$plus$classname"),
+			B::perlstring("class:$plus$classname"),
 			$me,
 			$classdfn,
 		);
 	}
-	keyword class (Bareword $classname, ';') {
+	keyword class ('+'? $plus, QualifiedIdentifier $classname, ';') {
 		sprintf(
 			'use MooX::Pression::_Gather -gather, %s => {};',
-			B::perlstring('class:'.$classname),
+			B::perlstring("class:$plus$classname"),
 		);
 	}
 	
 	# `role` keyword
 	#
-	keyword role (Bareword $classname, Block $classdfn) {
+	keyword role (QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { my($generator,%s)=(shift,@_); q(%s)->_package_callback(sub %s) }', $signature_var_list, $me, $classdfn);
+		sprintf(
+			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => %s; use MooX::Pression::_Gather -unparent;',
+			B::perlstring($classname),
+			B::perlstring('role_generator:'.$classname),
+			$munged_code,
+		);
+	}
+	keyword role (QualifiedIdentifier $classname, Block $classdfn) {
 		sprintf(
 			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use MooX::Pression::_Gather -unparent;',
 			B::perlstring($classname),
@@ -365,7 +482,7 @@ sub import {
 			$classdfn,
 		);
 	}
-	keyword role (Bareword $classname, OWS, ';') {
+	keyword role (QualifiedIdentifier $classname, OWS, ';') {
 		sprintf(
 			'use MooX::Pression::_Gather -gather, %s => {};',
 			B::perlstring('role:'.$classname),
@@ -389,14 +506,14 @@ sub import {
 	
 	# `extends` keyword
 	#
-	keyword extends (Bareword $parent) {
-		sprintf('q[%s]->_extends(%s);', $me, B::perlstring($parent));
+	keyword extends (RoleList $parent) {
+		sprintf('q[%s]->_extends(%s);', $me, $parent->$handle_rolelist('class'));
 	}
 	
 	# `with` keyword
 	#
-	keyword with (/(?&PerlIdentifier)\??(\s*,\s*(?&PerlIdentifier)\??)*/ $roles) {
-		sprintf('q[%s]->_with(%s);', $me, join q[,], map B::perlstring($_), split /\s*,\s*/, $roles);
+	keyword with (RoleList $roles) {
+		sprintf('q[%s]->_with(%s);', $me, $roles->$handle_rolelist('role'));
 	}
 	
 	# `requires` keyword
@@ -439,7 +556,7 @@ sub import {
 	# `method` keyword
 	#
 	keyword method (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
 		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); my $class = ref($self)||$self; do %s }', $signature_var_list, $code);
 		sprintf(
 			'q[%s]->_can(%s, { code => %s, named => %d, signature => %s });',
@@ -497,7 +614,7 @@ sub import {
 	
 	# `coerce` keyword
 	#
-	keyword coerce ('from'?, Block|Identifier|String $from, 'via', Block|Identifier|String $via, Block? $code) {
+	keyword coerce ('from'?, Block|QualifiedIdentifier|String $from, 'via', Block|Identifier|String $via, Block? $code) {
 		if ($from =~ /^\{/) {
 			$from = "scalar(do $from)"
 		}
@@ -545,7 +662,6 @@ sub authority {
 #
 # CALLBACKS
 #
-our @STACK;
 sub _package_callback {
 	shift;
 	my $cb = shift;
@@ -560,7 +676,7 @@ sub _has {
 }
 sub _extends {
 	shift;
-	$OPTS{extends} = shift;
+	@{ $OPTS{extends}||=[] } = @_;
 }
 sub _type_name {
 	shift;
@@ -798,7 +914,7 @@ Define a more complicated class:
     ...;
   }
 
-Note that if the C<class> keyword without a block, it does I<not> act like
+Note that for the C<class> keyword without a block, it does I<not> act like
 the C<package> keyword by changing the "ambient" package. It just defines a
 totally empty class with no methods or attributes.
 
@@ -827,6 +943,8 @@ It is possible to create a class without the prefix:
 
 The class name will now be "Person" instead of "MyApp::Person"!
 
+=head4 Nested classes
+
 C<class> blocks can be nested. This establishes an inheritance heirarchy.
 
   class Animal {
@@ -850,6 +968,72 @@ C<class> blocks can be nested. This establishes an inheritance heirarchy.
 
 See also C<extends> as an alternative way of declaring inheritance.
 
+It is possible to prefix a class name with a plus sign:
+
+  package MyApp {
+    use MooX::Pression;
+    class Person {
+      has name;
+      class +Employee {
+        has job_title;
+      }
+    }
+  }
+
+Now the employee class will be named C<MyApp::Person::Employee> instead of
+the usual C<MyApp::Employee>.
+
+=head4 Parameterizable classes
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Animal {
+      has name;
+    }
+    
+    class Species ( Str $common_name, Str $binomial ) {
+      extends Animal;
+      constant common_name  = $common_name;
+      constant binomial     = $binomial;
+    }
+    
+    class Dog {
+      extends Species('dog', 'Canis familiaris');
+      method bark () {
+        say "woof!";
+      }
+    }
+  }
+
+Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
+instances of it. It's like a template for generating classes. Then 
+"MyApp::Dog" generates a class from the template and inherits from that.
+
+  my $Cat = MyApp->generate_species('cat', 'Felis catus');
+  my $mog = $Cat->new(name => 'Mog');
+  
+  $mog->isa('MyApp::Animal');         # true
+  $mog->isa('MyApp::Species');        # false!!!
+  $mog->isa($Cat);                    # true
+
+Because there are never any instances of "MyApp::Species", it doesn't
+make sense to have a B<Species> type constraint. Instead there are
+B<SpeciesClass> and B<SpeciesInstance> type constraints.
+
+  use MyApp::Types -is;
+  
+  my $lassie = MyApp->new_dog;
+  
+  is_Animal( $lassie );               # true
+  is_Dog( $lassie );                  # true
+  is_SpeciesInstance( $lassie );      # true
+  is_SpeciesClass( ref($lassie) );    # true
+
+Subclasses cannot be nested inside parameterizable classes.
+It should theoretically be possible to nest parameterizable classes
+within regular classes, but this isn't implemented yet.
+
 =head3 C<< role >>
 
 Define a very basic role:
@@ -866,6 +1050,31 @@ This is just the same as C<class> but defines a role instead of a class.
 
 Roles cannot be nested within each other, nor can roles be nested in classes,
 nor classes in roles.
+
+=head4 Parameterizable roles
+
+Often it makes more sense to parameterize roles than classes.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Animal {
+      has name;
+    }
+    
+    role Species ( Str $common_name, Str $binomial ) {
+      extends Animal;
+      constant common_name  = $common_name;
+      constant binomial     = $binomial;
+    }
+    
+    class Dog {
+      with Species('dog', 'Canis familiaris'), GoodBoi?;
+      method bark () {
+        say "woof!";
+      }
+    }
+  }
 
 =head3 C<< type_name >>
 
@@ -1366,7 +1575,7 @@ method but another wrapper!)
 
 C<< $next >> and C<< $self >> are both shifted off C<< @_ >>.
 
-If you use the signature-free version then C<< $next >> and C << $self >>
+If you use the signature-free version then C<< $next >> and C<< $self >>
 are not shifted off C<< @_ >> for you, but the variables are still defined.
 
   around marry {
@@ -1573,7 +1782,7 @@ MooX::Pression exports C<rw>, C<ro>, C<rwp>, and C<lazy> constants
 which make your attribute specs a little cleaner looking.
 
 MooX::Pression exports C<blessed> from L<Scalar::Util> because that can
-be handy to habe, and C<confess> from L<Carp>. MooX::Pression's copy
+be handy to have, and C<confess> from L<Carp>. MooX::Pression's copy
 of C<confess> is super-powered and runs its arguments through C<sprintf>.
 
   before vote {
@@ -1833,9 +2042,6 @@ MooX::Pression:
   }
 
 =head2 Future Directions
-
-I'd like to consider adding Package::Variant support if that isn't too
-tricky.
 
 Slurpy parameters for methods need to be integrated.
 

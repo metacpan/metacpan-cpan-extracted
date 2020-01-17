@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.40 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.41 {
 
   use 5.014;
   use Moose;
@@ -169,7 +169,7 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.40 {
             $self->zilla->register_prereqs({
               type => 'recommends',
               phase => $phase,
-            }, "Cpanel::JSON::XS");
+            }, "Cpanel::JSON::XS" => 0);
           }
           my($first) = split /::/, $module;
           if($first =~ /^(AnyEvent|Mojo|Mojolicious)$/)
@@ -236,7 +236,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.40
+version 2.41
 
 =head1 SYNOPSIS
 

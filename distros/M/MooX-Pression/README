@@ -174,7 +174,7 @@ DESCRIPTION
         ...;
       }
 
-    Note that if the `class` keyword without a block, it does *not* act like
+    Note that for the `class` keyword without a block, it does *not* act like
     the `package` keyword by changing the "ambient" package. It just defines a
     totally empty class with no methods or attributes.
 
@@ -203,6 +203,7 @@ DESCRIPTION
 
     The class name will now be "Person" instead of "MyApp::Person"!
 
+   Nested classes
     `class` blocks can be nested. This establishes an inheritance heirarchy.
 
       class Animal {
@@ -226,6 +227,71 @@ DESCRIPTION
 
     See also `extends` as an alternative way of declaring inheritance.
 
+    It is possible to prefix a class name with a plus sign:
+
+      package MyApp {
+        use MooX::Pression;
+        class Person {
+          has name;
+          class +Employee {
+            has job_title;
+          }
+        }
+      }
+
+    Now the employee class will be named `MyApp::Person::Employee` instead of
+    the usual `MyApp::Employee`.
+
+   Parameterizable classes
+      package MyApp {
+        use MooX::Pression;
+    
+        class Animal {
+          has name;
+        }
+    
+        class Species ( Str $common_name, Str $binomial ) {
+          extends Animal;
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          extends Species('dog', 'Canis familiaris');
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
+    instances of it. It's like a template for generating classes. Then
+    "MyApp::Dog" generates a class from the template and inherits from that.
+
+      my $Cat = MyApp->generate_species('cat', 'Felis catus');
+      my $mog = $Cat->new(name => 'Mog');
+  
+      $mog->isa('MyApp::Animal');         # true
+      $mog->isa('MyApp::Species');        # false!!!
+      $mog->isa($Cat);                    # true
+
+    Because there are never any instances of "MyApp::Species", it doesn't make
+    sense to have a Species type constraint. Instead there are SpeciesClass
+    and SpeciesInstance type constraints.
+
+      use MyApp::Types -is;
+  
+      my $lassie = MyApp->new_dog;
+  
+      is_Animal( $lassie );               # true
+      is_Dog( $lassie );                  # true
+      is_SpeciesInstance( $lassie );      # true
+      is_SpeciesClass( ref($lassie) );    # true
+
+    Subclasses cannot be nested inside parameterizable classes. It should
+    theoretically be possible to nest parameterizable classes within regular
+    classes, but this isn't implemented yet.
+
    `role`
     Define a very basic role:
 
@@ -241,6 +307,30 @@ DESCRIPTION
 
     Roles cannot be nested within each other, nor can roles be nested in
     classes, nor classes in roles.
+
+   Parameterizable roles
+    Often it makes more sense to parameterize roles than classes.
+
+      package MyApp {
+        use MooX::Pression;
+    
+        class Animal {
+          has name;
+        }
+    
+        role Species ( Str $common_name, Str $binomial ) {
+          extends Animal;
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          with Species('dog', 'Canis familiaris'), GoodBoi?;
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
 
    `type_name`
       class Homo::Sapiens {
@@ -726,8 +816,8 @@ DESCRIPTION
 
     $next and $self are both shifted off @_.
 
-    If you use the signature-free version then $next and C << $self >> are not
-    shifted off @_ for you, but the variables are still defined.
+    If you use the signature-free version then $next and $self are not shifted
+    off @_ for you, but the variables are still defined.
 
       around marry {
         say "Speak now or forever hold your peace!";
@@ -928,7 +1018,7 @@ DESCRIPTION
     your attribute specs a little cleaner looking.
 
     MooX::Pression exports `blessed` from Scalar::Util because that can be
-    handy to habe, and `confess` from Carp. MooX::Pression's copy of `confess`
+    handy to have, and `confess` from Carp. MooX::Pression's copy of `confess`
     is super-powered and runs its arguments through `sprintf`.
 
       before vote {
@@ -1177,9 +1267,6 @@ DESCRIPTION
       }
 
   Future Directions
-    I'd like to consider adding Package::Variant support if that isn't too
-    tricky.
-
     Slurpy parameters for methods need to be integrated.
 
     Something like MooX::HandlesVia or Moose native traits would be good.

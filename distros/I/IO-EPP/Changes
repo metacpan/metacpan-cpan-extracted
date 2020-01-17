@@ -1,3 +1,6 @@
+0.004   2020-02-02
+        Replace // on || for old versions
+
 0.003   2020-02-02
         Added more documentation
         Small fixes

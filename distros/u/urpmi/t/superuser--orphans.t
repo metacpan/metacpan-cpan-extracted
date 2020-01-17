@@ -25,6 +25,7 @@
 use strict;
 use lib '.', 't';
 use helper;
+use urpm::select;
 use urpm::util;
 use urpm::orphans;
 use Test::More 'no_plan';
@@ -40,7 +41,11 @@ set_urpmi_cfg_global_options({ 'nb-of-new-unrequested-pkgs-between-auto-select-o
 
 
 test_urpme_v1(['h'], 'h', '');
-test_urpme_v1(['hh', 'h'], 'h', 'hh');
+if (urpm::select::_rpm_version() gt 4.13.0) {
+    test_urpme_v1(['hh', 'h'], 'h', 'hh');
+} else {
+    test_urpme_v1(['h'], 'h');
+}
 
 test_urpme_v1(['u1 u2'], 'u1', 'u2');
 test_urpme_v1(['u3 u4'], 'u4', 'u3');
@@ -52,7 +57,11 @@ test_auto_select_both('d', 'dd',  'd-2', 'dd-1');
 test_auto_select_both('e', 'ee1', 'e-2 ee2-2', 'ee1-1');
 test_auto_select_both('f', 'ff1', 'f-2 ff2-2');
 test_auto_select_both('g', 'gg',  'g-2 gg-2');
-test_auto_select_both('h', 'hh',  'h-2', 'hh-1');
+if (urpm::select::_rpm_version() gt 4.13.0) {
+    test_auto_select_both('h', 'hh',  'h-2', 'hh-1');
+} else {
+    test_auto_select_both('h', '',  'h-2', '');
+}
 test_auto_select_both('l', 'll',  'l-2 ll-1');
 test_auto_select_both('m', 'mm',  'm-2 mm-2');
 test_auto_select_both('n', 'nn',  'n-2 nn-2');

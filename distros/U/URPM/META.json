@@ -47,7 +47,7 @@
    "provides" : {
       "URPM" : {
          "file" : "URPM.pm",
-         "version" : "v5.23.2.5"
+         "version" : "v5.24.1"
       },
       "URPM::Resolve" : {
          "file" : "URPM/Resolve.pm"
@@ -61,6 +61,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/perl-URPM/"
       }
    },
-   "version" : "v5.23.2.5",
+   "version" : "v5.24.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

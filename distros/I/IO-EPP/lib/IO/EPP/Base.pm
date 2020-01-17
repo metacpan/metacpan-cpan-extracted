@@ -130,6 +130,8 @@ An Example:
 
     my ( $answer, $message, $conn_object ) = make_request( 'hello', \%login_params );
 
+A more complete example is found in L<IO::EPP>
+
 =cut
 
 sub make_request {
@@ -288,7 +290,7 @@ Create new IO::EPP object, аutomatically connects to the provider and logins.
 
 Example of a call
 
-    # Parameters for L<IO::Socket::SSL>
+    # Parameters for IO::Socket::SSL
     my %sock_params = (
         PeerHost => 'epp.example.com',
         PeerPort => 700,
@@ -534,7 +536,7 @@ sub epp_log {
 
 =head2 req_test
 
-For replace L</req> in test mode
+Used instead of L</req> in test mode
 
 =cut
 
@@ -572,6 +574,7 @@ C<out_data> – body of request;
 C<info> – name of request for log.
 
 OUTPUT:
+
 answer from registry.
 
 =cut
@@ -623,7 +626,7 @@ sub req {
             die "closed connection\n";
         }
 
-        my $data_size = ( unpack( 'N', $hdr ) // 0 ) - 4;
+        my $data_size = ( unpack( 'N', $hdr ) || 0 ) - 4;
 
         die "closed connection\n" if $data_size < 0;
 
@@ -1494,19 +1497,7 @@ CONTINFO
         if ( $content =~ /<extension>(.+)<\/extension>/s ) {
             my $ext = $1;
 
-            my $spec_ext = $self->get_contact_ext( $ext );
-
-            $cont->{$_} = $spec_ext->{$_} for keys %$spec_ext;
-
-            if ( $content =~ /<keysys:resData[^<>]*>(.+)<\/keysys:resData>/s ) {
-                # key-system extension TODO: move
-                my $krdata = $1;
-
-                push @{$cont->{statuses}}, 'validated' if $krdata =~ /<keysys:validated>1<\/keysys:validated>/;
-                push @{$cont->{statuses}}, 'verified'  if $krdata =~ /<keysys:verified>1<\/keysys:verified>/;
-                push @{$cont->{statuses}}, 'verification-requested'
-                    if $krdata =~ /<keysys:verification-requested>1<\/keysys:verification-requested>/;
-            }
+            my $spec_ext = $self->get_contact_ext( $cont, $ext );
         }
 
         return wantarray ? ( $cont, $rcode, $msg ) : $cont;
@@ -2357,25 +2348,22 @@ $$self{urn}{head}
 </epp>
 CHECKDOMS
 
-    my $answ = $self->req( $body, 'check_domains' ) // '';
+    my $answ = $self->req( $body, 'check_domains' );
 
-    my $rcode = '';
-    my $msg = '';
+    my ( $rcode, $msg ) = ( 0, '' );
 
-    if ( $answ =~ /<result code=['"](\d+)['"]/ ) {
+    if ( $answ  and  $answ =~ /<result code=['"](\d+)['"]/ ) {
         $rcode = $1 + 0;
-    }
 
-    if ( $answ =~ /<msg[^<>]*>([^<>]+)<\/msg>/ ) {
-        $msg = $1;
-    }
+        if ( $answ =~ /<msg[^<>]*>([^<>]+)<\/msg>/ ) {
+            $msg = $1;
+        }
 
-    if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
-        my $rdata = $1 // '';
+        if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
+            my $domlist = $self->check_domains_rdata( $1 );
 
-        my $domlist = $self->check_domains_rdata( $rdata );
-
-        return wantarray ? ( $domlist, $rcode, $msg ) : $domlist;
+            return wantarray ? ( $domlist, $rcode, $msg ) : $domlist;
+        }
     }
 
     return wantarray ? ( 0, $rcode, $msg ) : 0;
@@ -2828,7 +2816,7 @@ DOMINFO
 
         # pull out the main part and parse
         if ( $answ =~ /<resData>(.+)<\/resData>/s ) {
-            my $rdata = $1 // '';
+            my $rdata = $1;
 
             $info = $self->get_domain_info_rdata( $rdata );
         }
@@ -3295,7 +3283,7 @@ sub transfer {
     }
 
     # special parameters for very original registries
-    my $spec = $$params{addition} // '';
+    my $spec = $$params{addition} || '';
 
     my $ext = $$params{extension} || '';
 

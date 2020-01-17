@@ -307,11 +307,74 @@ sub create_contact {
     return $self->SUPER::create_contact( $params );
 }
 
+=head2 get_contact_ext
+
+Parsing the tcinet extension for get_contact_info:
+
+C<birthday> and C<passport> for individuals;
+
+C<legal> address for legal entities.
+
+An Example
+
+    {
+        'int' => {
+            'city' => 'Kaluga',
+            'country_code' => 'RU',
+            'name' => 'Igor Igorevich Igover',
+            'postcode' => '248000',
+            'addr' => 'Barrikadnaya 1',
+            'state' => 'Kaluzhskaya obl.'
+        },
+        'roid' => '22222217183841759329_aed2a25748687035b9ad8dcbcf839171_contact-FIR',
+        'cre_date' => '2020-01-01 10:10:10',
+        'TIN' => 'FICTION-01',
+        'email' => [
+            'i@go.ru'
+        ],
+        'fax' => [],
+        'legal' => {
+            'int' => {
+                'city' => 'Moscow',
+                'country_code' => 'RU',
+                'postcode' => '123456',
+                'addr' => 'ul. Vasi Petushkova, dom 3',
+                'state' => 'Moscow'
+            },
+            'loc' => {
+                'city' => 'Москва',
+                'country_code' => 'RU',
+                'postcode' => '123456',
+                'addr' => 'Васи Петушкова стриит., хаус 3',
+                'state' => 'Москва'
+            }
+        },
+        'creater' => 'login-msk-fir',
+        'authinfo' => 'khylMUWPjpqU=%9Y',
+        'code' => '1000',
+        'owner' => 'login-msk-fir',
+        'msg' => 'Command completed successfully',
+        'phone' => [
+            '+7.9166337777'
+        ],
+        'cont_id' => 'jsybsvtjjjjj',
+        'loc' => {
+            'city' => 'Калуга',
+            'country_code' => 'RU',
+            'name' => 'Игорь Игоревич Игорев',
+            'postcode' => '248000',
+            'addr' => 'Баррикадная 1',
+            'state' => 'Калужская обл.'
+        },
+        'statuses' => {
+            'ok' => '+'
+        }
+    };
+
+=cut
 
 sub get_contact_ext {
-    my ( undef, $ext ) = @_;
-
-    my %cont;
+    my ( undef, $cont, $ext ) = @_;
 
     if ( $ext =~ m|<contact:infData[^<>]+tci-contact-ext-1[^<>]+>(.+?)</contact:infData>|s ) {
         my $data = $1;
@@ -323,7 +386,7 @@ sub get_contact_ext {
 
             foreach my $row ( @rows ) {
                 if ( $row =~ m|<contact:([A-Za-z]+)>([^<>]+)| ) {
-                    $cont{$1} = $2;
+                    $cont->{$1} = $2;
                 }
             }
         }
@@ -331,7 +394,7 @@ sub get_contact_ext {
         if ( $data =~ m|<contact:organization>(.+)</contact:organization>|s ) {
             my $org_data = $1;
 
-            ( $cont{TIN} ) = $org_data =~ /<contact:TIN>([^<>]+)<\/contact:TIN>/;
+            ( $cont->{TIN} ) = $org_data =~ /<contact:TIN>([^<>]+)<\/contact:TIN>/;
 
             my @atypes = ( 'int', 'loc' );
             foreach my $atype ( @atypes ) {
@@ -339,20 +402,18 @@ sub get_contact_ext {
 
                 next unless $postal;
 
-                $cont{legal}{$atype}{addr} = join(' ', $postal =~ /<contact:street>([^<>]*)<\/contact:street>/ );
+                $cont->{legal}{$atype}{addr} = join(' ', $postal =~ /<contact:street>([^<>]*)<\/contact:street>/ );
 
-                ( $cont{legal}{$atype}{city} ) = $postal =~ /<contact:city>([^<>]*)<\/contact:city>/;
+                ( $cont->{legal}{$atype}{city} ) = $postal =~ /<contact:city>([^<>]*)<\/contact:city>/;
 
-                ( $cont{legal}{$atype}{'state'} ) = $postal =~ /<contact:sp>([^<>]*)<\/contact:sp>/;
+                ( $cont->{legal}{$atype}{'state'} ) = $postal =~ /<contact:sp>([^<>]*)<\/contact:sp>/;
 
-                ( $cont{legal}{$atype}{postcode} ) = $postal =~ /<contact:pc>([^<>]*)<\/contact:pc>/;
+                ( $cont->{legal}{$atype}{postcode} ) = $postal =~ /<contact:pc>([^<>]*)<\/contact:pc>/;
 
-                ( $cont{legal}{$atype}{country_code} ) = $postal =~ /<contact:cc>([A-Z]+)<\/contact:cc>/;
+                ( $cont->{legal}{$atype}{country_code} ) = $postal =~ /<contact:cc>([A-Z]+)<\/contact:cc>/;
             }
         }
     }
-
-    return \%cont;
 }
 
 =head2 create_domain
