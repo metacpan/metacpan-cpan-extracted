@@ -1,3 +1,16 @@
+2020-01-18 Todd Rinaldo <toddr@cpan.org> 1.14
+    * Add strict/warnings to Tty.pm
+	* Fix pod errors
+	* Typo: s/dependend/dependent/
+	* Prevent spurious warning from get_winsize()
+	* Fix usage of setsid
+	* Github actions testing. Windows is off of course.
+	* Make README.md
+
+2014-12-14 Todd Rinaldo <toddr@cpan.org> 1.13_01
+	* RT 91590 - Remove MAP_TARGET from Makefile.PL
+	* RT 88271 - Fix for Solaris setuid when root running as other user
+	
 2014-09-12 Todd Rinaldo <toddr@cpan.org> 1.12
 	* Merge pull request from Chris Williams (bingos) to fix "redefinition of typedef" errors with v5.19.4 and above
 

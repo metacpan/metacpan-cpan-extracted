@@ -18,7 +18,7 @@ meta-spec:
 name: App-lcpan-CmdBundle-weaver
 requires:
   App::lcpan: '1.039'
-  Hash::Subset: '0'
+  Hash::Subset: '0.005'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-weaver
   homepage: https://metacpan.org/release/App-lcpan-CmdBundle-weaver
   repository: git://github.com/perlancar/perl-App-lcpan-CmdBundle-weaver.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -145,7 +145,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -285,7 +285,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
             -
               class: Pod::Weaver::Plugin::App::lcpan
               name: -App::lcpan
@@ -303,7 +303,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

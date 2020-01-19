@@ -16,10 +16,8 @@ WriteMakefile(
     META_MERGE  => {
         resources => {
             license => 'http://dev.perl.org/licenses/',
-#            homepage => '',
-#            bugtracker => 'http://rt.perl.org/perlbug/',
+            bugtracker => 'https://github.com/toddr/Tie-File/issues',
             repository => 'https://github.com/toddr/Tie-File',
-            MailingList => 'http://lists.perl.org/list/perl5-porters.html',
         },
     },
 );

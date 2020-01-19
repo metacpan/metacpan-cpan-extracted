@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2019-01-09 00:00:00 +0000 to present.
+Changes from 2019-01-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.022 at 2020-01-09 15:05:56 +0000
+version 0.023 at 2020-01-17 21:56:05 +0000
+------------------------------------------
+
+  Change: 116f9fe923de47eed528841848b063e68e2e1d67
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-17 15:55:37 +0000
+
+    added which method to Util-Medley/lib/Util/Medley/File.pm 
+
+  Change: 86b74ab5833e8aa78422a783f9c4044dc74cc548
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-10 10:12:03 +0000
+
+    updated pod in lib/Util/Medley/File.pm 
+
+------------------------------------------
+version 0.022 at 2020-01-09 15:05:17 +0000
 ------------------------------------------
 
   Change: 4673cb91f26daccfb9449f854b36a2095363076e

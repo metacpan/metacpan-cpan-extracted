@@ -16,7 +16,6 @@ lib/Quiq/ClassConfig.pm
 lib/Quiq/ClassLoader.pm
 lib/Quiq/Color.pm
 lib/Quiq/CommandLine.pm
-lib/Quiq/Concat.pm
 lib/Quiq/Config.pm
 lib/Quiq/Confluence/Client.pm
 lib/Quiq/Confluence/Markup.pm
@@ -77,6 +76,7 @@ lib/Quiq/Gnuplot/Plot.pm
 lib/Quiq/Gnuplot/Process.pm
 lib/Quiq/Hash.pm
 lib/Quiq/Hash/Db.pm
+lib/Quiq/Hash/Ordered.pm
 lib/Quiq/Hash/Persistent.pm
 lib/Quiq/Html/Base.pm
 lib/Quiq/Html/Construct.pm
@@ -111,6 +111,7 @@ lib/Quiq/Http/Client.pm
 lib/Quiq/Http/Client/Lwp.pm
 lib/Quiq/Http/Cookie.pm
 lib/Quiq/Http/Message.pm
+lib/Quiq/If.pm
 lib/Quiq/Image.pm
 lib/Quiq/ImageMagick.pm
 lib/Quiq/ImagePool.pm
@@ -119,6 +120,7 @@ lib/Quiq/ImagePool/Sequence.pm
 lib/Quiq/Ipc.pm
 lib/Quiq/JavaScript.pm
 lib/Quiq/JQuery/Accordion.pm
+lib/Quiq/JQuery/ContextMenu/Ajax.pm
 lib/Quiq/JQuery/DataTable.pm
 lib/Quiq/JQuery/Form/ViewEdit.pm
 lib/Quiq/JQuery/Function.pm
@@ -138,7 +140,6 @@ lib/Quiq/ModelCache.pm
 lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm
 lib/Quiq/Object.pm
 lib/Quiq/Option.pm
-lib/Quiq/OrderedHash.pm
 lib/Quiq/Parallel.pm
 lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
@@ -220,7 +221,6 @@ t/bin/Quiq/ClassConfig.t
 t/bin/Quiq/ClassLoader.t
 t/bin/Quiq/Color.t
 t/bin/Quiq/CommandLine.t
-t/bin/Quiq/Concat.t
 t/bin/Quiq/Config.t
 t/bin/Quiq/Confluence/Client.t
 t/bin/Quiq/Confluence/Markup.t
@@ -281,6 +281,7 @@ t/bin/Quiq/Gnuplot/Plot.t
 t/bin/Quiq/Gnuplot/Process.t
 t/bin/Quiq/Hash.t
 t/bin/Quiq/Hash/Db.t
+t/bin/Quiq/Hash/Ordered.t
 t/bin/Quiq/Hash/Persistent.t
 t/bin/Quiq/Html/Base.t
 t/bin/Quiq/Html/Construct.t
@@ -315,6 +316,7 @@ t/bin/Quiq/Http/Client.t
 t/bin/Quiq/Http/Client/Lwp.t
 t/bin/Quiq/Http/Cookie.t
 t/bin/Quiq/Http/Message.t
+t/bin/Quiq/If.t
 t/bin/Quiq/Image.t
 t/bin/Quiq/ImageMagick.t
 t/bin/Quiq/ImagePool.t
@@ -323,6 +325,7 @@ t/bin/Quiq/ImagePool/Sequence.t
 t/bin/Quiq/Ipc.t
 t/bin/Quiq/JavaScript.t
 t/bin/Quiq/JQuery/Accordion.t
+t/bin/Quiq/JQuery/ContextMenu/Ajax.t
 t/bin/Quiq/JQuery/DataTable.t
 t/bin/Quiq/JQuery/Form/ViewEdit.t
 t/bin/Quiq/JQuery/Function.t
@@ -342,7 +345,6 @@ t/bin/Quiq/ModelCache.t
 t/bin/Quiq/Mojolicious/Plugin/Log/Parameters.t
 t/bin/Quiq/Object.t
 t/bin/Quiq/Option.t
-t/bin/Quiq/OrderedHash.t
 t/bin/Quiq/Parallel.t
 t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t

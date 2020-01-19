@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Map::Tube::KualaLumpur;
 use Test::More tests => 5;

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,44 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 fea8a0f5d569844f8d51b7006c2b5fcddd5a9303 Barf.pm
-SHA1 d8e0b0084483d042250bd77dae46dd6976295e9f Changes
-SHA1 d6dfac2c0a485769f4b9e92c8c8806b16888278c LICENSE
-SHA1 7002fbda81e9ba59827cd6379e9db090ad46ea2a MANIFEST
-SHA1 fd789370246893164ba7ef88fe2520be6bf4deb8 META.yml
-SHA1 48681ebec136d5bb265f1b56a3705040c47b3ca7 Makefile.PL
-SHA1 ba872d8d2b33242589d8b26e87b8b2b9b3638abd README
-SHA1 47c343353bddadf67d59db4b53e297c0c52238aa doc/BENCHMARK
-SHA1 1596c198f42e61cebb331cab827db419465bfaf8 examples/ex1.pl
-SHA1 4fcc11a9f381b9e631c862a16102db4c9a8228ca examples/ex2.pl
-SHA1 ce3940fde86b2c379fcdf5222625db9d4345bfa7 examples/ex3.pl
-SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
-SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
-SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
-SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
-SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
-SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
-SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
-SHA1 63fd6f04e801c823a7d0a11a9bdcea23b432d8d8 t/IO-Barf/00-use.t
-SHA1 bfe4367f7615249b861bb4a033941a60fe63cc0d t/IO-Barf/01-version.t
-SHA1 845e1c92e64123be49ab6453b1087fac2a952cee t/IO-Barf/02-pod_coverage.t
-SHA1 ffceb4685ba9df0350a6404ceb425a5f278bffba t/IO-Barf/03-pod.t
-SHA1 518d0cbeb44f08005ba5e71c4eb85720af9920ba t/IO-Barf/04-barf.t
-SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/data/ex1.txt
-SHA1 61e4e81a10b34be2e1d7039b98f1a59ae1c111a0 t/data/ex2.txt
-SHA1 8d5a411b7fce70c67de3316b40e9c282a87c090d t/data/ex3.txt
+SHA256 d177d9a3e3c6fb79fe1303b3f04566717182d649611a1350a89797564589520e Barf.pm
+SHA256 9034af4dd86a2ff9e68b9f6c07d3c498abc95a810555f6a462ccd23b0a3fe922 Changes
+SHA256 30d744ab8a487b17da2f28ebb119f396a36bccf8d4c9f867f4d593ea841afaa6 LICENSE
+SHA256 33f44f39731036dd724b26e7c2a1d882a8297cc7e83f8c9ebebde58983cd4adf MANIFEST
+SHA256 e8da788bc436a5ef3dc8e5eefface40bd26d8316c69ec39a4e0876debd53ce84 META.yml
+SHA256 b02b38313bb3f827d5370f62b8d73237d6c2e3f10d3efe497eaf7c07316f6412 Makefile.PL
+SHA256 fc0809c5728f81f9c3d9575e55d74db3a37b32fdbd6fa62cb2648460ea5948c7 README
+SHA256 8cfcf12756c9ed1ea667542f75f15c353ce66202ffefc32d6ae5ddfcc688fe33 doc/BENCHMARK
+SHA256 ff85a14ee7bdbd95ac203da96cb527f3aaad4b82dd3d6e23152c8bcc24f1c608 examples/ex1.pl
+SHA256 190a2a54db3415ef636da2dfe1f3b8a1e40ae5a4ef8a015f3e5efee75d133e25 examples/ex2.pl
+SHA256 939411e269585f0ff4351b2a4a8a5bb366840f7844dfb437a9b49ce23a7fc2a1 examples/ex3.pl
+SHA256 8acca19d1a566c10b213c56c279239c1a597e27c8097a3bb99656a7d1f63b7ac examples/ex4.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 bff9dcbc6890fe7cbf33582536975a4b2e72cc793c7b6986364bdbb2207a76b2 t/IO-Barf/01-use.t
+SHA256 95b9cf4715b06cbed21285f79d24a0122161a0a51d46c017435afd6edd58c17c t/IO-Barf/02-version.t
+SHA256 d8baafdeaf4f7ce19963367cf66647cb703493f9f0bbc8648f5d4c535131cfd3 t/IO-Barf/03-barf.t
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 t/data/ex1.txt
+SHA256 77780847fc2619037e9961d81a1f8f424a801c43e8f1038388047d14ddc11c5d t/data/ex2.txt
+SHA256 6d27c734aae199045738de8c1122a45e78f806be39530b39098e6db7af6c5a29 t/data/ex3.txt
+SHA256 408e54c571d9b8ca35f7174c53d94ef6f920b7b1c999db7356be36c539415882 t/data/ex4.bin
+SHA256 58432fcf58dcb42bd98db9089f3a5b53bb8b56aa3d7aa42730bb454b3983fc06 xt/IO-Barf/01-pod_coverage.t
+SHA256 2d0191d71ee8040dd19de5476de31e9e524929ddd6301d954973cb09178f216d xt/IO-Barf/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJTjrk4AAoJEAwa+cf4dLBaeycH/R/5+xWeZxWVPhsupaYVX6Y8
-7bbt2nEcwbPQignQo2ZmiW602JVWoU/Fa4aDUAvMcngQMDoM7LXqcOSghSjo6xDF
-pxgxN6lVGAdgbl7riQZMb1/RpfOUS4lU7cAJumNMsj7HNXQmBZpBfbSfgU411a+I
-GRZ3Dumer/gy4RuxCG1OFKfeMVtyTfjgOM6s5+NRB43MWnTp85sFH5EPD047RY9n
-Q+1GA+uI1feuqzFIdCVslvlxJQuhkw7KFv5y9PxdWnAlC0fUrEshXE5ptVLslCRz
-tZxKssbeBn78tQSK1/pHTLieZytpCg0dNHsMvHiGNeNXgj1gLRBCzqQxhew2LJw=
-=Zbhj
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl4jFo8ACgkQKyiOZjWe
+rHZWlAgAvLigkPX82lvNSn+7ZeB0Mb+fwDkGafGLdMjZUBf/R3Rs+/VNoxqnBrwu
+nYiOFHzIByZfNG64yyd/eglTJjeIa90+jb800CTvH1TeO1nIrzX9ja70ekAXRT20
+i8/Fhq6gjgeR6qPRiIBrFxaJbiICgqrOhP1Ys1JCCgj60fLSlQbI/WspfHSoIGzZ
+GF3l66L0H1Yy3yNMfIL461AAnrZ5QOAZyE/WH01YBaCM72Qyu0eZ5JoE5yjoo1M7
+JnTBW2lpvgbXDxBVPM+mC0diokp3bfjCNR08yDGlgddT0/Z0K4KkJAygTXaNxF0E
+g3y6XptJASMufNpGqAQqv6b5GvMIuA==
+=AOm8
 -----END PGP SIGNATURE-----

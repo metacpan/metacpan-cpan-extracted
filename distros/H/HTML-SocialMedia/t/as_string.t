@@ -22,9 +22,9 @@ unless(-e 't/online.enabled') {
 	ok(!defined($sm->as_string()));
 	ok(defined($sm->as_string(twitter_follow_button => 1)));
 	ok($sm->as_string(twitter_tweet_button => 1) !~ /data-related/);
-	ok($sm->as_string(twitter_tweet_button => 1) =~ /https:..twitter.com/);
+	ok($sm->as_string(twitter_tweet_button => 1) =~ /\/\/twitter.com/);
 	ok($sm->as_string(twitter_follow_button => 1) !~ /data-lang="/);
-	ok($sm->as_string(twitter_follow_button => 1) =~ /http:..twitter.com/);
+	ok($sm->as_string(twitter_follow_button => 1) =~ /\/\/twitter.com/);
 	ok($sm->as_string(twitter_follow_button => 1) !~ /facebook/);
 
 	$ENV{'REQUEST_METHOD'} = 'GET';
@@ -32,7 +32,7 @@ unless(-e 't/online.enabled') {
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; fr-FR; rv:1.9.2.19) Gecko/20110707 Firefox/3.6.19';
 	$sm = new_ok('HTML::SocialMedia' => []);
 	ok(defined($sm->as_string(facebook_like_button => 1)));
-	ok($sm->as_string(facebook_like_button => 1) =~ /fr_FR/);
+	like($sm->as_string(facebook_like_button => 1), qr/fr_FR/, 'Facebook button is in French');
 	# No twitter account given, so we can't get a tweet button
 	ok(!defined($sm->as_string(twitter_tweet_button => 1)));
 	ok($sm->as_string(facebook_like_button => 1) !~ /http:..twitter.com/);
@@ -78,7 +78,7 @@ unless(-e 't/online.enabled') {
 	ok($sm->as_string(twitter_follow_button => 1) !~ /data-lang="/);
 	ok($sm->as_string(linkedin_share_button => 1) =~ /linkedin/);
 	ok($sm->as_string(twitter_tweet_button => 1) !~ /linkedin/);
-	ok($sm->as_string(twitter_follow_button => 1) eq $sm->render(twitter_follow_button => 1));
+	is($sm->as_string(twitter_follow_button => 1), $sm->render(twitter_follow_button => 1));
 
 	$sm = $sm->new();
 	ok(defined($sm->as_string(facebook_like_button => 1)));
@@ -104,8 +104,8 @@ unless(-e 't/online.enabled') {
 	};
 
 	if($@) {
-		diag("CHI not installed");
 		$cache = undef;
+		diag('CHI not installed');
 	} else {
 		diag("Using CHI $CHI::VERSION");
 		my $hash = {};

@@ -1,0 +1,7 @@
+^.github/
+^.git/.*
+^MYMETA.*
+^MANIFEST.bak
+^.gitignore
+^.perltidyrc
+^Makefile$

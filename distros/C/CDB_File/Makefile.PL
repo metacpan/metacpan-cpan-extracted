@@ -24,12 +24,8 @@ WriteMakefile(
         },
         resources => {
             license  => 'http://dev.perl.org/licenses/',
-            homepage => 'http://wiki.github.com/toddr/CDB_File',
-
-            #            bugtracker => 'https://rt.cpan.org/Dist/Display.html?Queue=CDB_File',
+            bugtracker => 'https://github.com/toddr/CDB_File/issues',
             repository => 'https://github.com/toddr/CDB_File',
-
-            #            MailingList => '',
         },
     },
 );

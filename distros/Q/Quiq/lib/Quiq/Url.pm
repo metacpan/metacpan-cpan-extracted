@@ -5,8 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
+use Encode ();
 use Quiq::Array;
 use Quiq::Option;
 
@@ -31,6 +32,25 @@ L<Quiq::Object>
 =head4 Synopsis
 
   $encStr = $class->encode($str);
+  $encStr = $class->encode($str,$encoding);
+
+=head4 Arguments
+
+=over 4
+
+=item $str
+
+Die Zeichenkette, die kodiert wird.
+
+=item $encoding (Default: 'utf-8')
+
+Das Encoding, in dem die Zeichenkette encodiert werden soll.
+
+=back
+
+=head4 Returns
+
+String
 
 =head4 Description
 
@@ -42,23 +62,25 @@ In der Zeichenkette werden alle Zeichen außer
 
   * - . _ 0-9 A-Z a-z
 
-durch
+durch eine Folge von
 
   %xx
 
-ersetzt, wobei xx dem Hexadezimalwert des Zeichens entspricht.
+ersetzt, wobei die xx dem Hexadezimalwert des betreffenden
+Bytes im Encoding des Zeichens entspricht.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub encode {
-    my ($class,$str) = @_;
+    my ($class,$str) = splice @_,0,2;
+    my $encoding = shift // 'utf-8';
 
-    # FIXME: byte-orientiert encoden! D.h. utf8 geflaggte Strings
-    # werden als mehrere Bytes kodiert.
-
-    return '' unless defined $str;
+    if (!defined $str) {
+        return '';
+    }
+    $str = Encode::encode($encoding,$str);
     $str =~ s|([^-*._0-9A-Za-z])|sprintf('%%%02X',ord $1)|eg;
     # $str =~ s|%20|+|g;
 
@@ -72,6 +94,25 @@ sub encode {
 =head4 Synopsis
 
   $str = $class->decode($encStr);
+  $str = $class->decode($encStr,$encoding);
+
+=head4 Arguments
+
+=over 4
+
+=item $str
+
+Die Zeichenkette, die dekodiert wird.
+
+=item $encoding (Default: 'utf-8')
+
+Das Encoding, in dem die Zeichenkette encodiert ist.
+
+=back
+
+=head4 Returns
+
+String
 
 =head4 Description
 
@@ -84,16 +125,17 @@ zurück.
 # -----------------------------------------------------------------------------
 
 sub decode {
-    my ($class,$str) = @_;
+    my ($class,$str) = splice @_,0,2;
+    my $encoding = shift // 'utf-8';
 
-    # FIXME: byte-orientiert decoden und nach UTF-8 wandeln, wenn
-    # nichts anderes gewüncht ist.
+    if (!defined $str) {
+        return '';
+    }
 
-    return '' unless defined $str;
     # $str =~ tr/+/ /;
     $str =~ s/%([\dA-F]{2})/chr hex $1/egi;
 
-    return $str;
+    return Encode::decode($encoding,$str);
 }
 
 # -----------------------------------------------------------------------------
@@ -105,21 +147,44 @@ sub decode {
   $queryStr = $class->queryEncode(@opt,@keyVal);
   $queryStr = $class->queryEncode($initialChar,@opt,@keyVal);
 
+=head4 Arguments
+
+=over 4
+
+=item @keyVal
+
+Liste der Schlüssel/Wert-Paare, die URL-kodiert werden sollen.
+
+=item $initialChar
+
+Zeichen, das der URL-Kodierten Zeichenkette vorangestellt werden
+soll. Dies ist, wenn bentigt, typischweise ein Fragezeichen (?).
+
+=back
+
 =head4 Options
 
 =over 4
+
+=item -encoding => $encoding (Default: 'utf-8')
+
+Das Encoding, in dem die Zeichenkette encodiert werden soll.
 
 =item -null => $bool (Default: 0)
 
 Kodiere auch Schlüssel/Wert-Paare mit leerem Wert (undef oder '').
 Per Default werden diese weggelassen.
 
-=item -separator => $char (Default: ';')
+=item -separator => $char (Default: '&')
 
 Verwende $char als Trennzeichen zwischen den Schlüssel/Wert-Paaren.
-Mögliche Werte sind ';' und '&'.
+Mögliche Werte sind '&' und ';'.
 
 =back
+
+=head4 Returns
+
+String
 
 =head4 Description
 
@@ -129,38 +194,38 @@ zusammen.
 
 =head4 Examples
 
+Querystring mit Kaufmanns-Und als Trennzeichen:
+
+  $url = Quiq::Url->queryEncode(a=>1,b=>2,c=>3);
+  =>
+  a=1&b=2&c=3
+
 Querystring mit Semikolon als Trennzeichen:
 
-  $str = Quiq::Url->queryEncode(a=>1,b=>2,c=>3);
+  $url = Quiq::Url->queryEncode(-separator=>';',d=>4,e=>5);
   =>
-  a=1;b=2;c=3
-
-Querystring mit Kaufmannsund als Trennzeichen:
-
-  $url .= Quiq::Url->queryEncode(-separator=>'&',d=>4,e=>5);
-  =>
-  ?a=1&b=2&c=3&d=4,e=5
+  d=4;e=5
 
 Querystring mit einleitendem Fragezeichen:
 
   $url = Quiq::Url->queryEncode('?',a=>1,b=>2,c=>3);
   =>
-  ?a=1;b=2;c=3
+  ?a=1&b=2&c=3
 
 =head4 Details
 
 Als Trennzeichen zwischen den Paaren wird per Default ein
-Semikolon (;) verwendet:
+Kaufmanns-Und (&) verwendet:
 
-  key1=val1;key2=val2;...;keyN=valN
+  key1=val1&key2=val2&...&keyN=valN
 
-Ist der erste Parameter ein Fragezeichen (?), Semikolon (;) oder
-Kaufmannsund (&), wird dieses dem Query String vorangestellt:
+Ist der erste Parameter ein Fragezeichen (?), wird dieses dem
+Query String vorangestellt:
 
-  ?key1=val1;key2=val2;...;keyN=valN
+  ?key1=val1&key2=val2&...&keyN=valN
 
 Das Fragezeichen ist für die URL-Generierung nützlich, das Semikolon
-und das Kaufmannsund für die Konkatenation von Querystrings.
+und das Kaufmanns-Und für die Konkatenation von Querystrings.
 
 Ist der Wert eines Schlüssels eine Arrayreferenz, wird für
 jedes Arrayelement ein eigenes Schlüssel/Wert-Paar erzeugt:
@@ -169,7 +234,7 @@ jedes Arrayelement ein eigenes Schlüssel/Wert-Paar erzeugt:
 
 wird zu
 
-  a=1;a=2;a=3
+  a=1&a=2&a=3
 
 =cut
 
@@ -188,8 +253,9 @@ sub queryEncode {
 
     # Direktiven
 
+    my $encoding = 'utf-8',
     my $null = 0;
-    my $separator = ';';
+    my $separator = '&';
 
     # Query-String generieren
 
@@ -199,7 +265,11 @@ sub queryEncode {
         if (substr($key,0,1) eq '-') {
             # Optionen
 
-            if ($key eq '-null') {
+            if ($key eq '-encoding') {
+                $encoding = shift;
+                next;
+            }
+            elsif ($key eq '-null') {
                 $null = shift;
                 next;
             }
@@ -218,9 +288,9 @@ sub queryEncode {
             if ($i++) {
                 $str .= $separator;
             }
-            $str .= $class->encode($key);
+            $str .= $class->encode($key,$encoding);
             $str .= '=';
-            $str .= $class->encode($val);
+            $str .= $class->encode($val,$encoding);
         }
     }
 
@@ -234,6 +304,26 @@ sub queryEncode {
 =head4 Synopsis
 
   @arr | $arr = $class->queryDecode($queryStr);
+  @arr | $arr = $class->queryDecode($queryStr,$encoding);
+
+=head4 Arguments
+
+=over 4
+
+=item $queryStr
+
+Querystring, der dekodiert werden soll.
+
+=item $encoding (Default: 'utf-8')
+
+Das Encoding, in dem der Querystring encodiert ist.
+
+=back
+
+=head4 Returns
+
+Liste der dekodierten Schüssel/Wert-Paare. Im Skalarkontext
+eine Referenz auf die Liste.
 
 =head4 Description
 
@@ -248,17 +338,16 @@ Die Schlüssel/Wert-Paare können per & oder ; getrennt sein.
 # -----------------------------------------------------------------------------
 
 sub queryDecode {
-    my $class = shift;
-    my $str = shift;
+    my ($class,$str) = splice @_,0,2;
+    my $encoding = shift // 'utf-8';
 
     my $arr = Quiq::Array->new;
     for (split /[&;]/,$str) {
         next if !$_;
         my ($key,$val) = split /=/;
 
-        $key = $class->decode($key);
-        $val = $class->decode($val);
-        # $val =~ s/&quot;/"/g; # &quot;-Rueckwandlung
+        $key = $class->decode($key,$encoding);
+        $val = $class->decode($val,$encoding);
 
         push @$arr,$key,$val;
     }
@@ -298,9 +387,9 @@ Leerstring ('') geliefert.
 
 Ein vollständiger URL hat die Form:
 
-  schema://[user[:passw]@]host[:port]/[path][?query][#fragment]
-  ------    ----  -----   ----  ----   ----   -----   --------
-     1       2      3      4     5      6       7        8
+  schema://[user[:password]@]host[:port]/[path][?query][#fragment]
+  ------    ----  --------   ----  ----   ----   -----   --------
+  1         2     3          4     5      6      7       8
   
   1 = Schema (http, ftp, ...)
   2 = Benutzername
@@ -327,8 +416,8 @@ Die Funktion akzeptiert auch unvollständige HTTP URLs:
   
   ?arg1=val1&arg2=val2&arg3=val3
 
-Der Querystring ist alles zwischen '?' und '#', der konkrete Aufbau,
-wie Trennzeichen usw., spielt keine Rolle.
+Der Querystring ist alles nach '?' und ggf. bis '#', falls angegeben.
+Der konkrete Aufbau, wie Trennzeichen usw., spielt keine Rolle.
 
 =cut
 
@@ -397,7 +486,7 @@ sub split {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -405,7 +494,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

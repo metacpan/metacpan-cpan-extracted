@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::similar_authors;
 
-our $DATE = '2019-11-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-11-21'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to finding similar authors
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::similar_authors - More lcpan subcommands related to findi
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::similar_authors (from Perl distribution App-lcpan-CmdBundle-similar_authors), released on 2019-11-20.
+This document describes version 0.002 of App::lcpan::CmdBundle::similar_authors (from Perl distribution App-lcpan-CmdBundle-similar_authors), released on 2019-11-21.
 
 =head1 SYNOPSIS
 

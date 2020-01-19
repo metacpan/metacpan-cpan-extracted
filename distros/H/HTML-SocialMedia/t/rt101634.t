@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 3;
+use lib 't/lib';
+use MyLogger;
 
 # Test for "Use of uninitialized value in lc at /home/nigelhorne/perlmods/share/perl/5.14.2/HTML/SocialMedia.pm line 190"
 
@@ -24,52 +26,5 @@ RT101634: {
 	$ENV{'REMOTE_ADDR'} = '77.106.148.148';
 
 	my $sm = new_ok('HTML::SocialMedia' => [ logger => MyLogger->new() ]);
-	ok(defined($sm->as_string(facebook_like_button => 1)));
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub info {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		::diag($message);
-	}
+	ok(defined($sm->as_string({ facebook_like_button => 1 })));
 }

@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Ident.
 
+1.25 Sat Jan 18 2020
+    - Enable github actions testing
+    - Switch to README.md and point to testing status
+    - Fix spelling typo provided by Debian project
+    - Switch primary tracker to github issues
+    - Remove META.yml from source control
+
 1.24 Sun Dec 14 2014
     - RT 79165 - Fix for Strawberry Perl
     - Tidy code base for conformity of future patches

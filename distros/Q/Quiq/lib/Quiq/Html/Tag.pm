@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -2178,7 +2178,7 @@ sub import {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 

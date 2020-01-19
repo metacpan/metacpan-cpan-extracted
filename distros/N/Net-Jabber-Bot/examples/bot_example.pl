@@ -33,15 +33,15 @@ foreach my $forum (@forums) {
     $forums_and_responses{$forum} = \@response_array;
 }
 
-my $bot = Net::Jabber::Bot->new({
+my $bot = Net::Jabber::Bot->new(
                                  server => $ARGV{'-server'}
                                 , conference_server => $ARGV{'-conference_server'}
                                 , port => $ARGV{'-port'}
                                 , username => $ARGV{'-user'}
                                 , password => $ARGV{'-pass'}
                                 , alias => $alias
-                                , message_callback => \&new_bot_message   # Called if new messages arrive.
-                                , background_activity => \&background_checks # What the bot does outside jabber.
+                                , message_function => \&new_bot_message   # Called if new messages arrive.
+                                , background_function => \&background_checks # What the bot does outside jabber.
                                 , loop_sleep_time => 20 # Minimum time before doing background function.
                                 , process_timeout => 5 # Time to wait for new jabber messages before timing out
                                 , forums_and_responses => \%forums_and_responses
@@ -49,8 +49,8 @@ my $bot = Net::Jabber::Bot->new({
                                 , ignore_self_messages => 1 # Usually you don't want to see your own messages
                                 , out_messages_per_second => 5 # Maximum messages allowed per second (server flood throttling)
                                 , max_message_size => 1000 # Maximum byte size of the message before we chop it into pieces
-                                , max_messages_per_hour => 1000 # Keep the bot from going out of control with noisy messages 
-                            });
+                                , max_messages_per_hour => 1000 # Keep the bot from going out of control with noisy messages
+                            );
 
 
 foreach my $forum (@forums) {

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::scripts_for;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-01-19'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -98,7 +98,7 @@ App::lcpan::Cmd::scripts_for - Try to find whether there are scripts (CLIs) for 
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::scripts_for (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2019-09-19.
+This document describes version 0.002 of App::lcpan::Cmd::scripts_for (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-01-19.
 
 =head1 DESCRIPTION
 
@@ -196,7 +196,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -111,7 +111,7 @@ sub test_unitTest: Test(2) {
     if ($p->exists('Blob/doc-content') && $p->compareData($blobFile,$html)) {
         $p->write($blobFile,$html);
     }
-    my $pod =  "=begin html\n\n$html\n\n=end html\n";
+    my $pod =  "=begin html\n\n$html\n=end html\n";
     $blobFile = 'Blob/doc-content/quiq-chartjs-timeseries.pod';
     if ($p->exists('Blob/doc-content') && $p->compareData($blobFile,$pod)) {
         $p->write($blobFile,$pod);

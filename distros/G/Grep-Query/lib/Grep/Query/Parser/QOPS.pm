@@ -3,6 +3,9 @@ package Grep::Query::Parser::QOPS;
 use strict;
 use warnings;
 
+our $VERSION = '1.009';
+$VERSION = eval $VERSION;
+
 sub __union
 {
 	my $l = shift;

@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.15 2020-01-18T14:59:11Z
+  - devided the test for as_file() with Windows or not  
+
 0.14 2020-01-17T08:58:25Z
   - added the test and script for method as_file()
 

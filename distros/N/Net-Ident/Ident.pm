@@ -1,6 +1,8 @@
 package Net::Ident;
 
 use strict;
+use warnings;
+
 use Socket;
 use Fcntl;
 use FileHandle;
@@ -9,15 +11,14 @@ use Config;
 use Errno;
 require Exporter;
 
-use vars qw(@ISA @EXPORT_OK $DEBUG $VERSION %EXPORT_TAGS @EXPORT_FAIL
-  %EXPORT_HOOKS @EXPORT);
-
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(ident_lookup lookup lookupFromInAddr);
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw(ident_lookup lookup lookupFromInAddr);
+our @EXPORT_FAIL;
+our %EXPORT_TAGS;
 
 # EXPORT_HOOKS is a sortof Exporter extension. Whenever one of the keys
 # of this hash is imported as a "tag", the corresponding function is called
-%EXPORT_HOOKS = (
+our %EXPORT_HOOKS = (
     'fh'     => \&_add_fh_method,
     'apache' => \&_add_apache_method,
     'debug'  => \&_set_debug,
@@ -40,9 +41,9 @@ _export_hooks();
 # for compatibility mode, uncomment the next line @@ s/^#\s*// @@
 # @EXPORT = qw(_export_hook_fh);
 
-$VERSION = "1.24";
+our $VERSION = "1.25";
 
-$DEBUG ||= 0;
+our $DEBUG = 0;
 *STDDBG = *STDERR;
 
 sub _set_debug {
@@ -860,7 +861,7 @@ this case, all methods will return C<undef> except for the C<geterror>
 method, wich will return the error message.
 
 The timeout is I<not> implemented using C<alarm()>. In fact you can
-use C<alarm()> completely independant of this library, they do not
+use C<alarm()> completely independent of this library, they do not
 interfere.
 
 =item C<newFromInAddr $localaddr, $remoteaddr, $timeout>
@@ -870,7 +871,7 @@ behaves identical to the C<new> constructor above.
 
 =item C<query $obj>
 
-This object method queries the remote rfc931 deamon, and blocks until
+This object method queries the remote rfc931 daemon, and blocks until
 the connection to the ident daemon is writable, if necessary (but you
 are supposed to make sure it is, of course). Returns true on success
 (or rather it returns the I<$obj> itself), or undef on error.

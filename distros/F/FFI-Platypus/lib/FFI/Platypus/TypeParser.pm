@@ -6,7 +6,7 @@ use List::Util 1.45 qw( uniqstr );
 use Carp qw( croak );
 
 # ABSTRACT: FFI Type Parser
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 
 # The TypeParser and Type classes are used internally ONLY and
@@ -40,9 +40,13 @@ sub create_type_custom
 {
   my($self, $basic_type_name, @rest) = @_;
 
-  my $basic = $self->global_types->{basic}->{
-    $self->type_map->{$basic_type_name||'opaque'}
-  } || croak "not basic type $basic_type_name";
+  my $tm = $self->type_map->{$basic_type_name||'opaque'};
+
+  croak "$basic_type_name is not a legal native type for a custom type"
+    unless $tm;
+
+  my $basic = $self->global_types->{basic}->{$tm}
+  || croak "$basic_type_name is not a legal native type for a custom type";
 
   $self->_create_type_custom($basic->type_code, @rest);
 }
@@ -108,7 +112,7 @@ FFI::Platypus::TypeParser - FFI Type Parser
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 DESCRIPTION
 

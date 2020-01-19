@@ -14,7 +14,7 @@ WriteMakefile(
     },
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     'DISTNAME' => 'Tie-DBI',
-    'linkext'  => { LINKTYPE => '' },                       # no link needed
+    'MIN_PERL_VERSION' => 5.006,
     'dist'     => {
         'COMPRESS' => 'gzip -9f',     'SUFFIX'   => 'gz',
         'ZIP'      => '/usr/bin/zip', 'ZIPFLAGS' => '-rl'
@@ -28,11 +28,8 @@ WriteMakefile(
         resources => {
             license  => 'http://dev.perl.org/licenses/',
             homepage => 'http://wiki.github.com/toddr/Tie-DBI/',
-
-            #            bugtracker => 'http://code.google.com/p/Tie-DBI/issues/list',
+            bugtracker => 'http://github.com/toddr/Tie-DBI/issues',
             repository => 'http://github.com/toddr/Tie-DBI',
-
-            #            MailingList => 'http://groups.google.com/group/Tie-DBI',
         },
     },
   )

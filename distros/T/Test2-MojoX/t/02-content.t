@@ -23,9 +23,9 @@ ok $assert_facets->[3]->pass;
 
 $assert_facets = facets assert => intercept {
   $t->get_ok('/')->content_is('Oops!')
-    ->content_is(match qr/^o[^o]/i, 'only one "o"')->content_is(U());;
+    ->content_is(match qr/^o[^o]/i, 'only one "o"')->content_is(U());
 };
-is @$assert_facets, 4, 'exactly two events and two diag messages';
+is @$assert_facets, 4, 'exactly four tests';
 is $assert_facets->[1]->details, 'exact match for content';
 ok !$assert_facets->[1]->pass;
 is $assert_facets->[2]->details, 'only one "o"';

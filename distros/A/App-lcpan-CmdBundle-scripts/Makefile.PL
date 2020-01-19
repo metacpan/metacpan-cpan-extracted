@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "App::lcpan" => "1.039",
     "Clone::Util" => "0.03",
-    "Hash::Subset" => 0,
+    "Hash::Subset" => "0.005",
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "App::lcpan" => "1.039",
   "Clone::Util" => "0.03",
   "File::Spec" => 0,
-  "Hash::Subset" => 0,
+  "Hash::Subset" => "0.005",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,

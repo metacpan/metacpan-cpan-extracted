@@ -34,7 +34,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.12';  # keep this consistent with Tty.pm
+my $Package_Version = '1.14';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
@@ -359,6 +359,8 @@ print POD <<"_EOT_";
 
 package IO::Tty::Constant;
 
+our \$VERSION = '$Package_Version';
+
 use vars qw(\@ISA \@EXPORT_OK);
 require Exporter;
 
@@ -386,6 +388,8 @@ problems ('o').  Undefined or problematic constants are set to 'undef'.
 
 =head1 DEFINED CONSTANTS
 
+=over 4
+
 _EOT_
 
 foreach my $s (@ttsyms) {
@@ -400,6 +404,8 @@ foreach my $s (@ttsyms) {
 }
 
 print POD <<_EOT_;
+
+=back
 
 =head1 FOR MORE INFO SEE
 
@@ -428,7 +434,6 @@ WriteMakefile1(
     'LIBS'           => join(" ", @libs),
     'clean'	     => {'FILES' => 'xssubs.c conf Tty.exp_old log'},
     'realclean'	     => {'FILES' => 'Tty IO-Tty.ppd'},
-    'MAP_TARGET'     => 'perltty',
     'AUTHOR'         => 'Roland Giersig <RGiersig@cpan.org>',
     'ABSTRACT'       => 'Pseudo ttys and constants',
     'LICENSE'        => 'perl',

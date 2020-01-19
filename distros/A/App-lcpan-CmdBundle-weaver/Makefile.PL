@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::lcpan::CmdBundle::weaver",
   "PREREQ_PM" => {
     "App::lcpan" => "1.039",
-    "Hash::Subset" => 0,
+    "Hash::Subset" => "0.005",
     "strict" => 0,
     "warnings" => 0
   },
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.031",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "App::lcpan" => "1.039",
   "File::Spec" => 0,
-  "Hash::Subset" => 0,
+  "Hash::Subset" => "0.005",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,

@@ -37,7 +37,7 @@ has is_null => (
 );
 
 has is_autoinc => (
-	is => 'ro',
+	is => 'rw',
 	isa => 'Bool',
 	default => 0,
 );
@@ -65,6 +65,37 @@ method get_moose_type {
 	}
 
 	return $str;
+}
+
+method get_ddl {
+    my $sql = "`" . $self->name . "` " . $self->type . ' ';
+    
+    if( $self->is_null ){
+        $sql .= " NULL ";
+    }
+    else{
+        $sql .= " NOT NULL ";   
+    }
+    
+    my $default = $self->default;
+    if( defined $default && $self->type =~ /varchar/i ){
+        $default = "\"$default\"";  # Surround default in quotes
+    }
+    
+    if( $self->is_null ){
+        if( defined $self->default){
+            $sql .= " DEFAULT $default" if defined $self->default;
+        }
+        else{
+            $sql .= " DEFAULT NULL ";
+        }
+    }
+    else{
+        $sql .= "DEFAULT $default" if defined $self->default;
+    }
+    $sql .= "AUTO_INCREMENT " if $self->is_autoinc;
+    
+    return $sql;
 }
 
 1;

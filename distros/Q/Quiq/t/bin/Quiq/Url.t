@@ -16,90 +16,119 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_encode : Test(3) {
+sub test_encode : Test(5) {
     my $self = shift;
 
     my $val = Quiq::Url->encode('-*._1ABCabc');
     $self->is($val,'-*._1ABCabc','encode: Nicht-kodierte Zeichen (ASCII)');
 
-    $val = Quiq::Url->encode('!"§$%&/()=?');
+    # iso-8859-1
+
+    $val = Quiq::Url->encode('!"§$%&/()=?','iso-8859-1');
     $self->is($val,'%21%22%A7%24%25%26%2F%28%29%3D%3F',
         'encode: Einige kodierte Zeichen (ASCII)');
 
-    $val = Quiq::Url->encode('ÄÖÜäöüß');
+    $val = Quiq::Url->encode('ÄÖÜäöüß','iso-8859-1');
     $self->is($val,'%C4%D6%DC%E4%F6%FC%DF','encode: Umlaute (ISO-8859-1)');
+
+    # utf-8 (Default)
+
+    $val = Quiq::Url->encode('!"§$%&/()=?');
+    $self->is($val,'%21%22%C2%A7%24%25%26%2F%28%29%3D%3F',
+        'encode: Einige kodierte Zeichen (ASCII)');
+
+    $val = Quiq::Url->encode('ÄÖÜäöüß');
+    $self->is($val,'%C3%84%C3%96%C3%9C%C3%A4%C3%B6%C3%BC%C3%9F',
+        'encode: Umlaute (UTF-8)');
+
 }
 
 # -----------------------------------------------------------------------------
 
-sub test_decode : Test(3) {
+sub test_decode : Test(5) {
     my $self = shift;
 
     my $val = Quiq::Url->decode('-*._1ABCabc');
     $self->is($val,'-*._1ABCabc','decode: Nicht-kodierte Zeichen (ASCII)');
 
-    $val = Quiq::Url->decode('%21%22%A7%24%25%26%2F%28%29%3D%3F');
+    # iso-8859-1
+
+    $val = Quiq::Url->decode('%21%22%A7%24%25%26%2F%28%29%3D%3F','iso-8859-1');
     $self->is($val,'!"§$%&/()=?','decode: Einige kodierte Zeichen (ASCII)');
 
-    $val = Quiq::Url->decode('%C4%D6%DC%E4%F6%FC%DF');
+    $val = Quiq::Url->decode('%C4%D6%DC%E4%F6%FC%DF','iso-8859-1');
     $self->is($val,'ÄÖÜäöüß','decode: Umlaute (ISO-8859-1)');
+
+    # utf-8
+
+    $val = Quiq::Url->decode('%21%22%C2%A7%24%25%26%2F%28%29%3D%3F');
+    $self->is($val,'!"§$%&/()=?','decode: Einige kodierte Zeichen (ASCII)');
+
+    $val = Quiq::Url->decode('%C3%84%C3%96%C3%9C%C3%A4%C3%B6%C3%BC%C3%9F');
+    $self->is($val,'ÄÖÜäöüß','decode: Umlaute (UTF-8)');
+
 }
 
 # -----------------------------------------------------------------------------
 
-sub test_queryEncode : Test(9) {
+sub test_queryEncode : Test(10) {
     my $self = shift;
 
     # Einfacher Query-String
 
     my $val = Quiq::Url->queryEncode(a=>1,b=>2,c=>3);
-    $self->is($val,'a=1;b=2;c=3');
+    $self->is($val,'a=1&b=2&c=3');
 
     # Query-String mit Fragezeichen
 
     $val = Quiq::Url->queryEncode('?',a=>1,b=>2,c=>3);
-    $self->is($val,'?a=1;b=2;c=3');
+    $self->is($val,'?a=1&b=2&c=3');
 
     # Query-String ohne leere Werte
 
     $val = Quiq::Url->queryEncode('?',a=>1,b=>2,c=>'',d=>4,e=>undef);
-    $self->is($val,'?a=1;b=2;d=4');
+    $self->is($val,'?a=1&b=2&d=4');
 
     # Query-String ohne leere Werte
 
     $val = Quiq::Url->queryEncode(a=>1,b=>[2,'',3,undef],c=>'',d=>4,e=>undef);
-    $self->is($val,'a=1;b=2;b=3;d=4');
+    $self->is($val,'a=1&b=2&b=3&d=4');
 
     # Query-String mit leeren Werten
 
     $val = Quiq::Url->queryEncode('?',-null=>1,a=>1,b=>2,c=>'',d=>4,e=>undef);
-    $self->is($val,'?a=1;b=2;c=;d=4;e=');
+    $self->is($val,'?a=1&b=2&c=&d=4&e=');
 
     # Query-String mit leeren Werten
 
     $val = Quiq::Url->queryEncode(-null=>1,a=>1,b=>[2,'',3,undef],c=>'',
         d=>4,e=>undef);
-    $self->is($val,'a=1;b=2;b=;b=3;b=;c=;d=4;e=');
+    $self->is($val,'a=1&b=2&b=&b=3&b=&c=&d=4&e=');
 
-    # Umlaute
+    # Umlaute iso-8859-1
+
+    $val = Quiq::Url->queryEncode(-encoding=>'iso-8859-1',a=>1,'für'=>'Möller');
+    $self->is($val,'a=1&f%FCr=M%F6ller');
+
+    # Umlaute utf-8
 
     $val = Quiq::Url->queryEncode(a=>1,'für'=>'Möller');
-    $self->is($val,'a=1;f%FCr=M%F6ller');
+    $self->is($val,'a=1&f%C3%BCr=M%C3%B6ller');
 
     # Array-Referenz als Wert
 
     $val = Quiq::Url->queryEncode(a=>1,b=>[1,2,3],c=>3);
-    $self->is($val,'a=1;b=1;b=2;b=3;c=3');
-
-    # & als Trennzeichen
-
-    $val = Quiq::Url->queryEncode(-separator=>'&',a=>1,b=>[1,2,3],c=>3);
     $self->is($val,'a=1&b=1&b=2&b=3&c=3');
+
+    # ; als Trennzeichen
+
+    $val = Quiq::Url->queryEncode(-separator=>';',a=>1,b=>[1,2,3],c=>3);
+    $self->is($val,'a=1;b=1;b=2;b=3;c=3');
 }
 
 # -----------------------------------------------------------------------------
 
-sub test_queryDecode : Test(3) {
+sub test_queryDecode : Test(5) {
     my $self = shift;
 
     my $arr = Quiq::Url->queryDecode('');
@@ -110,6 +139,16 @@ sub test_queryDecode : Test(3) {
 
     $arr = Quiq::Url->queryDecode('a=1;b=2');
     $self->isDeeply($arr,[qw/a 1 b 2/]);
+
+    # Umlaute iso-8859-1
+
+    $arr = Quiq::Url->queryDecode('a=1;f%FCr=M%F6ller','iso-8859-1');
+    $self->isDeeply($arr,[a=>1,'für'=>'Möller']);
+
+    # Umlaute utf-8
+
+    $arr = Quiq::Url->queryDecode('a=1;f%C3%BCr=M%C3%B6ller');
+    $self->isDeeply($arr,[a=>1,'für'=>'Möller']);
 }
 
 # -----------------------------------------------------------------------------

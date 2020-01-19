@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::cwalitees_of_scripts_abstracts;
 
-our $DATE = '2019-07-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-01-19'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -80,7 +80,7 @@ App::lcpan::Cmd::cwalitees_of_scripts_abstracts - Calculate the cwalitees of scr
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::cwalitees_of_scripts_abstracts (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2019-07-11.
+This document describes version 0.003 of App::lcpan::Cmd::cwalitees_of_scripts_abstracts (from Perl distribution App-lcpan-CmdBundle-cwalitee), released on 2020-01-19.
 
 =head1 DESCRIPTION
 
@@ -146,7 +146,7 @@ using the C<index_name>.
 
 Minimum indicator severity.
 
-=item * B<scripts>* => I<array[str]>
+=item * B<scripts>* => I<array[filename::unix]>
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 
@@ -190,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

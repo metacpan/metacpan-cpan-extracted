@@ -1,18 +1,15 @@
 package Image::Checkerboard;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Imager;
 use Imager::Fill;
 use List::MoreUtils qw(none);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -225,11 +222,9 @@ Image::Checkerboard - Image generator for checkboards.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Temp qw(tempfile);
  use Image::Checkerboard;
 
@@ -253,8 +248,8 @@ Image::Checkerboard - Image generator for checkboards.
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Image-Checkerboard/master/images/ex1.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Image-Checkerboard/master/images/ex1.png" alt="Generated image" width="533px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Image-Checkerboard/master/images/ex1.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Image-Checkerboard/master/images/ex1.png" alt="Generated image" width="533px" height="300px" />
 </a>
 
 =end html
@@ -282,21 +277,21 @@ Perl class for creating random image.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Image-Checkerboard>.
+L<https://github.com/michal-josef-spacek/Image-Checkerboard>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
+ © 2012-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

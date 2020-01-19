@@ -2,6 +2,10 @@
 
 ansifold - fold command handling ANSI terminal sequences
 
+# VERSION
+
+Version 1.02
+
 # SYNOPSIS
 
 ansifold \[ options \]

@@ -5,7 +5,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 $VERSION = eval $VERSION;
 
 use Grep::Query::Parser;
@@ -13,6 +13,7 @@ use Grep::Query::FieldAccessor;
 
 use Scalar::Util qw(blessed);
 use Carp;
+use Digest::MD5;
 
 # allow importing the qgrep function/method
 # to enable non-OO use
@@ -82,7 +83,7 @@ sub __qgrep
 	my $fieldAccessor;
 	if (@{$self->{_fieldrefs}})
 	{
-		# the query uses fields, so there must be field accessor first 
+		# the query uses fields, so there must be a field accessor first 
 		#
 		$fieldAccessor = shift(@_);
 		
@@ -90,7 +91,7 @@ sub __qgrep
 		{
 			# verify that the field accessor is of the right sort and has the known fields
 			#
-			croak("field names used in query; first argument must be a field accessor") unless ref($fieldAccessor) eq 'Grep::Query::FieldAccessor';
+			croak("field names used in query; the argument before the list must be a field accessor") unless ref($fieldAccessor) eq 'Grep::Query::FieldAccessor';
 			$fieldAccessor->assertField($_) foreach (@{$self->{_fieldrefs}});
 		}
 		else
@@ -98,21 +99,34 @@ sub __qgrep
 			# for laziness, the caller passed undef and so we can assume the objects to be queried
 			# are in fact plain hashes so we manufacture a field accessor for that
 			#
-			$fieldAccessor = Grep::Query::FieldAccessor->new();
-			foreach my $field (@{$self->{_fieldrefs}})
-			{
-				$fieldAccessor->add($field, sub { $_[0]->{$field} } );
-			}
+			$fieldAccessor = Grep::Query::FieldAccessor->newDefault(@{$self->{_fieldrefs}});
 		}
 	}
 	else
 	{
 		# it's weird if a field accessor is present, but the query uses no fields - flag that mistake
 		#
-		croak("no fields used in query, yet the first argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
+		croak("no fields used in query, yet the first list argument is a field accessor?") if ref($_[0]) eq 'Grep::Query::FieldAccessor';
 	}
 
-	my $list = \@_;
+	# trim away undef values
+	#
+	my @list = map { defined($_) ? $_ : () } @_;
+	
+	# nothing to see here
+	#
+	return(wantarray() ? () : 0) unless @list;
+	
+	# try to make sure all items in the list have the same structure...
+	#
+	if (@list > 1)
+	{
+		my $fp = __fingerprint(Digest::MD5->new(), $list[0])->hexdigest();
+		foreach my $entry (@list)
+		{
+			croak("layout of datastructures in query list are not the same") unless $fp eq __fingerprint(Digest::MD5->new(), $entry)->hexdigest();
+		}
+	}
 	
 	# a special case:
 	# if there is only one argument AND it is a hash ref, we can let loose a query on it
@@ -121,15 +135,15 @@ sub __qgrep
 	# for this, we must have a fieldaccessor 
 	#
 	my $lonehash = 0;
-	if (scalar(@$list) == 1 && ref($list->[0]) eq 'HASH')
+	if (scalar(@list) == 1 && ref($list[0]) eq 'HASH')
 	{
 		croak("a lone hash used in query; first argument must be a field accessor") unless $fieldAccessor;
 		my @eachList;
-		while (my @kv = each %{$list->[0]})
+		while (my @kv = each %{$list[0]})
 		{
 			push(@eachList, \@kv);
 		}
-		$list = \@eachList;
+		@list = @eachList;
 		$lonehash = 1;
 	} 
 	
@@ -142,7 +156,7 @@ sub __qgrep
 	# keys are simply a number, and values are refs to the individual scalars/objects to avoid copying them
 	#
 	my $id = 0;
-	my %data = map { $id++ => \$_ } @$list;
+	my %data = map { $id++ => \$_ } @list;
 	
 	# kick off the query 
 	#
@@ -179,6 +193,20 @@ sub __qgrep
 	return @matched;
 }
 
+sub __fingerprint
+{
+	my $digest = shift;
+	my $obj = shift;
+
+	my $type = ref($obj);
+	$digest->add($type);
+	if 		($type eq 'ARRAY')	{ __fingerprint($digest, $_) foreach (@$obj) }
+	elsif 	($type eq 'HASH')	{ __fingerprint($digest, $obj->{$_}) foreach (sort(keys(%$obj))) }
+	else						{ $digest->add($digest->digest()) }
+	
+	return $digest;	
+}
+
 1;
 
 =head1 NAME
@@ -187,7 +215,7 @@ Grep::Query - Query logic for lists of scalars/objects
 
 =head1 VERSION
 
-Version 1.008
+Version 1.009
 
 =head1 SYNOPSIS
 
@@ -379,7 +407,10 @@ to provide the query engine with the mapping between a field name and the data.
 
 A special case occurs when the list consists of hashes with keys being exactly
 the field names - if so, the query engine can transparently create the
-necessary field accessor if one is not passed in. 
+necessary field accessor if one is not passed in.
+
+The default field accessor also understands 'navigation paths', i.e. handling
+a deep structure with lists-in-lists/hashes etc. This will work to any depth.
 
 =back
 
@@ -584,7 +615,12 @@ names used in the query, the query engine can autogenerate a field accessor.
 
 This is only a convenience, a manually constructed field accessor will be used
 if given. To take advantage of the convenience, simply pass C<undef> as the
-C<$fieldAccessor> argument. 
+C<$fieldAccessor> argument.
+
+If you have a deep structure, you may use 'field' names connected by '->' linkages,
+where raw text are used as regular hash keys and array indexes are denoted using
+[<index>]. When the end of the navigation path has been reached the object at that
+location is returned.
 
 =head3 EXAMPLES
 
@@ -636,6 +672,18 @@ C<$fieldAccessor> argument.
   $matches = qgrep('fieldX.>(20) AND fieldY.>(40)', $fieldAccessor, @hashData);
   #
   # $matches again 2
+  
+  # a hash with depth
+  #
+  my @hashData = 
+  	(
+  		{ x => { fee => 1, fie => 2, foo => 3 }, y => [ 2, 4, 6 ]  },
+  		{ x => { fee => 10, fie => 20, foo => 30 }, y => [ 12, 14, 16 ]  },
+  		{ x => { fee => 100, fie => 200, foo => 300 }, y => [ 22, 24, 26 ]  },
+  	);
+  $matches = qgrep('x->fie.>(30) AND y->[2].>(20)', undef, @hashData);
+  #
+  # $matches is now 1 (matching last entry)
   
 =head1 AUTHOR
 

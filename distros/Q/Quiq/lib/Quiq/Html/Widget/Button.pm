@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 # -----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ CSS-Id.
 
 Name, unter dem der Button kommuniziert wird.
 
-=item onClick => \@arr (Default: [])
+=item onClick => $js (Default: undef)
 
 OnClick-Handler.
 
@@ -156,7 +156,7 @@ sub html {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 

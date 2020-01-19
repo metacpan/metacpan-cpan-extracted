@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Time::HiRes ();
 
@@ -37,7 +37,40 @@ Baumstruktur operieren zu können.
 
 =head4 Synopsis
 
-  $tree = $class->new($tab,$pkColumn,$fkColumn);
+  $tree = $class->new($tab,$pkColumn,$fkColumn,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -whenNoParentRow => 'removeRow'|'removeReference'|'throwException' \
+
+(Default: 'throwException')
+Was getan werden soll, wenn der Parent eines Child-Datensatzes in
+der Ergebnismenge nicht enthalten ist:
+
+=over 4
+
+=item 'removeRow'
+
+Entferne den Datensatz aus der Ergebnismenge.
+
+=item 'removeReference'
+
+Setze die Referenz auf NULL (Leerstring). Der Child-Datensatz
+wird damit logisch zu einem Parent-Datensatz.
+
+=item 'throwException'
+
+Wirf eine Exception.
+
+=back
+
+Die Varianten 'removeRow' und 'removeReference' sind nützlich, wenn
+die Ergebnismenge nicht alle Sätze enthält, sondern nur eine Teilmenge,
+z.B. aufgrund einer Selektion mit -limit.
+
+=back
 
 =head4 Description
 
@@ -79,7 +112,17 @@ Aufruf:
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$tab,$pkColumn,$fkColumn) = @_;
+    my ($class,$tab,$pkColumn,$fkColumn) = splice @_,0,4;
+
+    # Optionen
+
+    my $whenNoParentRow = 'throwException';
+
+    $class->parameters(\@_,
+        -whenNoParentRow => \$whenNoParentRow,
+    );
+
+    # Operation ausführen
 
     # Typbezeichner für Baumverknüpfung erzeugen
     my $type = sprintf 'Tree%s',scalar Time::HiRes::gettimeofday;
@@ -92,9 +135,25 @@ sub new {
 
     # Datensätze miteinander verknüpfen
 
-    for my $row (@{$tab->rows}) {
+    my $rowA = $tab->rows;
+    for (my $i = 0; $i < @$rowA; $i++) {
+        my $row = $rowA->[$i];
         if (my $pk = $row->$fkColumn) {
-            my $par = $h->get($pk);
+            my $par = $h->try($pk);
+            if (!$par) {
+                if ($whenNoParentRow eq 'removeRow') {
+                    splice @$rowA,$i--,1;
+                    next;
+                }
+                elsif ($whenNoParentRow eq 'removeReference') {
+                    $row->$fkColumn('');
+                    next;
+                }
+                $class->throw(
+                    'TREE-00099: Parent row not found',
+                    $pkColumn => $pk,
+                );
+            }
             $row->addParent($type,$par);
             $par->addChild($type,$row);
         }
@@ -102,6 +161,7 @@ sub new {
 
     return $class->SUPER::new(
         table => $tab,
+        fkColumn => $fkColumn,
         type => $type,
         pkIndex => $h,
     );
@@ -242,7 +302,7 @@ sub descendants {
 =head4 Description
 
 Füge zu allen Datensätzen das Attribut $key hinzu und setze
-es auf den Pfad gemß Datensatz-Attribut $valColumn mit
+es auf den Pfad gemäß Datensatz-Attribut $valColumn mit
 der Trenn-Zeichenkette $sep. Die Methode liefert keinen Wert zurück.
 
 =head4 Example
@@ -272,6 +332,120 @@ sub generatePathAttribute {
     }
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 hierarchy() - Datensätze als Hierarchie
+
+=head4 Synopsis
+
+  @rows|$rowA = $tree->hierarchy(@opt);
+
+=head4 Options
+
+=over 4
+
+=item -childSort => $sub (Default: sub {0})
+
+Sortierfunktion für die Kind-Datensätze (die Wurzel-Datensätze bleiben
+in ihrer gegebenen Reihenfolge).
+
+ACHTUNG: Die Sortierfunktion muss mit Prototype ($$) vereinbart werden,
+damit die Elemente per Parameter und nicht mittels der globalen Variablen
+$a und $b übergeben werden. Denn die globalen Variablen befinden sich
+in einem anderen Package als dem, in dem die Sortierfunktion aufgerufen
+wird. Beispiel:
+
+  -childSort => sub ($$) {
+      $_[0]->id <=> $_[1]->id;
+  }
+
+=item -setTable => $bool (Default: 0)
+
+Setze die hierarchische Reihenfolge auf der zugrunde liegenden Tabelle.
+D.h. $tree->table->rows() liefert die Datensätze fortan in dieser
+Reihenfolge.
+
+=back
+
+=head4 Description
+
+Liefere die Datensätze der Ergebnismenge in hierarchischer Reihenfolge,
+also die Kind-Sätze in der Reihenfolge einer Tiefensuche.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub hierarchy {
+    my $self = shift;
+
+    # Optionen
+
+    my $childSort = sub {0};
+    my $setTable = 0;
+
+    $self->parameters(\@_,
+        -childSort => \$childSort,
+        -setTable => \$setTable,
+    );
+
+    # Eingebettete rekursive Funktion
+
+    my $treeSub; # Vorab-Deklaration wg. Rekursion
+    $treeSub = sub {
+        my $row = shift;
+
+        my @rows = ($row);
+        for my $row (sort $childSort $self->childs($row)) {
+            push @rows,$treeSub->($row);
+        }
+
+        return @rows;
+    };
+
+    # Wurzelknoten in ihrer gegebenen Reihenfolge
+
+    my @rows;
+    for my $row (@{$self->roots}) {
+        push @rows,$treeSub->($row);
+    }
+
+    if ($setTable) {
+        # Setze die Reihenfolge der Datensätze auf der
+        # zugrunde liegenden Tabelle
+        $self->table->set(rows=>\@rows);
+    }
+
+    return wantarray? @rows: \@rows;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 level() - Anzahl der übergeordneten Knoten
+
+=head4 Synopsis
+
+  $level = $tree->level($pk);
+  $level = $tree->level($row);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub level {
+    my ($self,$arg) = @_;
+
+    my $row = ref $arg? $arg: $self->pkIndex->get($arg);
+    my $type = $self->type;
+
+    my $i = 0;
+    while ($row = $row->getParent($type)) {
+        $i++;
+    }
+
+    return $i;
 }
 
 # -----------------------------------------------------------------------------
@@ -469,6 +643,30 @@ sub rows {
 
 # -----------------------------------------------------------------------------
 
+=head3 roots() - Alle Wurzel-Datensätze
+
+=head4 Synopsis
+
+  @rows|$rowA = $tree->roots;
+
+=head4 Description
+
+Liefere die Liste der Wurzel-Datensätze, also alle Datensätze, die
+keinen Parent haben. Die Reihenfolge entspricht der Reihenfolge der
+zugrundeliegenden Tabelle $tab (s. Konstruktor).
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub roots {
+    my $self = shift;
+    my @rows = grep {!$self->parent($_)} $self->rows;
+    return wantarray? @rows: \@rows;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 siblings() - Geschwister-Datensätze
 
 =head4 Synopsis
@@ -509,7 +707,7 @@ sub siblings {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -517,7 +715,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

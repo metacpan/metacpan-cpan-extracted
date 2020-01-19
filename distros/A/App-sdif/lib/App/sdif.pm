@@ -8,7 +8,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.13.2";
+our $VERSION = "4.13.3";
 
 use Pod::Usage;
 
@@ -33,9 +33,9 @@ App::sdif - sdif and family tools, cdif and watchdiff
 
 sdif f1 f2
 
-diff f1 f2 | cdif
+diff -c f1 f2 | cdif
 
-git diff | sdif --cdif -n
+git diff | sdif -n
 
 watchdiff df
 
@@ -62,9 +62,34 @@ See individual manual of each command for detail.
     or
     $ curl -sL http://cpanmin.us | perl - App::sdif
 
+=head2 GIT
+
+Those are sample configurations using B<sdif> family in git
+environment.  You need install B<mecab> command to use B<--mecab>
+option.
+
+	~/.gitconfig
+		[pager]
+		        log  = sdif | less
+		        show = sdif | less
+		        diff = sdif | less
+
+	~/.sdifrc
+		option default -n --margin=4
+
+	~/.cdifrc
+		option default --mecab
+
+	~/.profile
+		export LESS="-cR"
+		export LESSANSIENDCHARS="mK"
+
+
 =head1 SEE ALSO
 
 L<sdif>, L<cdif>, L<watchdiff>
+
+L<Getopt::EX>
 
 =head1 LICENSE
 

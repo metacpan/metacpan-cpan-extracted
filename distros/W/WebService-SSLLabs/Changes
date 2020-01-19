@@ -1,5 +1,11 @@
 Revision history for WebService-SSLLabs
 
+0.32   Sat Jan 19 19:52:00 2020
+        Corrected changelog
+
+0.31   Fri Jan 18 20:42:00 2020
+        Updating the test suite to cope with a change in the case of protocol field
+
 0.30   Fri Jan 26 15:31:00 2017
         Updating the test suite to cope with a change in the return value of attempts
 

@@ -1,17 +1,14 @@
 package Map::Tube::Budapest;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Get XML.
 has xml => (
@@ -81,7 +78,7 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
 =item C<get_lines()>
 
  Get lines in metro map.
- Returns reference to array with Map::Tube::Line objects.
+ Returns reference to unsorted array with Map::Tube::Line objects.
 
 =item C<get_node_by_id($station_id)>
 
@@ -117,11 +114,9 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Budapest;
 
@@ -139,11 +134,9 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Budapest;
 
  # Object.
@@ -160,11 +153,9 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Budapest;
@@ -190,19 +181,17 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Budapest/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Budapest/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Budapest/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Budapest/master/images/ex3.png" alt="Budapest metro" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Budapest;
 
@@ -220,6 +209,48 @@ For more information about Budapest Map, click L<here|https://en.wikipedia.org/w
  # Linia M2
  # Linia M3
  # Linia M4
+
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Encode qw(encode_utf8);
+ use Map::Tube::Budapest;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = $ARGV[0];
+
+ # Object.
+ my $obj = Map::Tube::Budapest->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Linia M4' argument.
+ # Kelenföld vasútállomás
+ # Bikás park
+ # Újbuda-központ
+ # Móricz Zsigmond körtér
+ # Szent Gellért tér
+ # Fővám tér
+ # Kálvin tér
+ # Rákóczi tér
+ # II. János Pál pápa tér
+ # Keleti pályaudvar
 
 =head1 DEPENDENCIES
 
@@ -256,22 +287,22 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Budapest>
+L<https://github.com/michal-josef-spacek/Map-Tube-Budapest>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2020 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

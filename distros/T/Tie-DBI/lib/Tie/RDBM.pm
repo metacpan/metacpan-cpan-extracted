@@ -1,14 +1,15 @@
 package Tie::RDBM;
 
 use strict;
-use vars qw($VERSION %Types);
+use warnings;
+use 5.006;
 use Carp;
 use DBI;
-$VERSION = '0.73';
+our $VERSION = '0.74';
 
 # %Types is used for creating the data table if it doesn't exist already.
 # You may want to edit this.
-%Types = (    # key          value          frozen    freeze  keyless
+our %Types = (    # key          value          frozen    freeze  keyless
     'mysql'    => [qw/ varchar(127)  longblob       tinyint   1          0 /],
     'mSQL'     => [qw/ char(255)     char(255)      int       0          0 /],
     'Pg'       => [qw/ varchar(127)  varchar(2000)  int       0          0 /],
@@ -558,7 +559,7 @@ strings types will work as well.
 
 In a future version of this module, the "frozen" field may be turned
 into a general "datatype" field in order to minimize storage.  For
-future compatability, please use an integer for the frozen field.
+future compatibility, please use an integer for the frozen field.
 
 If you use the "create" and/or "drop" options, the module will
 automatically attempt to create a table for its own use in the
@@ -623,7 +624,8 @@ B<Process #1:>
 
 B<Process #2:>
    tie %i,'Tie::RDBM','mysql:Employees:host.somewhere.com',
-                   {table=>'employee',user=>'george',password=>'kumquat2'};
+                   {table=>'employee',user=>'george',
+                    password=>'kumquat2'};
    foreach (keys %i) {
       $info = $i{$_};
       if ($info->{age} > 30) {

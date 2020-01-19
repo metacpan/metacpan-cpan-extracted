@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.151     2020-01-18 05:41:38Z
+          - update $TODO in xt/author/changes_has_content.t to also give a bye
+            to the 'devel' branch
+
 0.150     2019-08-30 19:12:01Z
           - fix parsing of .pause file (sorry, oalders!)
 

@@ -75,11 +75,9 @@ ERRORS
              Image type '%s' doesn't supported.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Spec::Functions qw(catfile);
      use File::Temp qw(tempfile tempdir);
      use Image::Random;
@@ -115,11 +113,9 @@ EXAMPLE1
      # bmp
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Spec::Functions qw(catfile);
      use File::Temp qw(tempfile tempdir);
      use Image::Random;
@@ -171,18 +167,21 @@ SEE ALSO
     Image::Select::Array
         Selecting image from list with checking.
 
+    Image::Select::Date
+        Selecting image from images directory by date.
+
 REPOSITORY
-    <https://github.com/tupinek/Image-Select>
+    <https://github.com/michal-josef-spacek/Image-Select>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -1,5 +1,27 @@
 Revision history for Net-Jabber-Bot
 
+XXX
+
+2.1.6
+Fix examples for new moose code
+Spelling errors in documentation
+Display server error message when we think there was a disconnect event.
+Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter.
+Move jabber object creation to lazy moose
+Add ignore file to repo
+Clean up POD so new() documentation lays out correctly
+Remove DD from code. Moose has a helper sub already for this anyways
+Explicitly set priority of users - Adam Malone
+Allow the user to specify the path to the CA cert bundle via the 'ssl_ca_path' parameter - Jan Schaumann
+Don't bail if the IQ message doesn't contain a query - Jan Schaumann
+Allow user to disable server certificate validity check - eleksir
+Use Mozilla::CA for default path for ssl_ca_path - eleksir
+Fix undefined warnings due to insufficient Moose Laziness
+Misc distro file cleanup.
+Automated testing with github actions
+Remove author tests from user installs.
+Point support to github now.
+
 2.1.5
 resource now unique per instance of bot based on alias_hostname_pid
 new dependency from core modules - Sys::Hostname

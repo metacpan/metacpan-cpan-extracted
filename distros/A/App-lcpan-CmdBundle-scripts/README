@@ -3,9 +3,9 @@ NAME
     scripts
 
 VERSION
-    This document describes version 0.001 of App::lcpan::CmdBundle::scripts
+    This document describes version 0.002 of App::lcpan::CmdBundle::scripts
     (from Perl distribution App-lcpan-CmdBundle-scripts), released on
-    2019-09-19.
+    2020-01-19.
 
 SYNOPSIS
 DESCRIPTION
@@ -36,7 +36,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

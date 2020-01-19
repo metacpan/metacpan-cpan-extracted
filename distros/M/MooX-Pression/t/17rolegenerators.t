@@ -30,4 +30,21 @@ ok(
 	'$lassie->does("MyApp::GoodBoi")'
 );
 
+package MyApp2 {
+	use MooX::Pression;
+	role SimpleAttributes ( ArrayRef[Str] @attrs ) {
+		for my $attr (@attrs) {
+			has {$attr} ( is => ro );
+		}
+	}
+	class Foo {
+		with SimpleAttributes(qw( foo bar baz ));
+	}
+}
+
+my $obj = MyApp2->new_foo( foo => 1, bar => 2, baz => 3 );
+is($obj->foo, 1);
+is($obj->bar, 2);
+is($obj->baz, 3);
+
 done_testing;

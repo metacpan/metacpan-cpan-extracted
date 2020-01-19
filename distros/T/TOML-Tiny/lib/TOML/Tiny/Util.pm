@@ -1,6 +1,6 @@
 package TOML::Tiny::Util;
 # ABSTRACT: utility functions used by TOML::Tiny
-$TOML::Tiny::Util::VERSION = '0.01';
+$TOML::Tiny::Util::VERSION = '0.03';
 use strict;
 use warnings;
 no warnings 'experimental';
@@ -22,18 +22,20 @@ sub is_strict_array {
     my $type;
 
     for (ref $value) {
-      $type = 'array'   when /ARRAY/;
-      $type = 'table'   when /HASH/;
-      $type = 'float'   when /Math::BigFloat/;
-      $type = 'integer' when /Math::BigInt/;
-      $type = 'bool'    when /JSON::PP::Boolean/;
+      $type = 'array'   when 'ARRAY';
+      $type = 'table'   when 'HASH';
+
+      # Do a little heuristic guess-work
+      $type = 'float'   when /Float/;
+      $type = 'integer' when /Int/;
+      $type = 'bool'    when /Boolean/;
 
       when ('') {
         for ($value) {
-          $type = 'bool'      when /$Boolean/;
-          $type = 'float'     when /$Float/;
-          $type = 'integer'   when /$Integer/;
-          $type = 'datetime'  when /$DateTime/;
+          $type = 'bool'     when /$Boolean/;
+          $type = 'float'    when /$Float/;
+          $type = 'integer'  when /$Integer/;
+          $type = 'datetime' when /$DateTime/;
           default{ $type = 'string' };
         }
       }
@@ -70,7 +72,7 @@ TOML::Tiny::Util - utility functions used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

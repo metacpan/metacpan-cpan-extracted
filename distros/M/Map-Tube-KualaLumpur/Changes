@@ -1,3 +1,19 @@
+0.06 2020-01-18T12:04:54+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add new stations to Sri Petaling Line.
+ - Add test for ok_map_functions().
+ - Fix "Ampang Line" stations.
+ - Fix "Masjid Jamek" station links.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Rewrite XML map to new version with line IDs.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+ - Update to Map::Tube 3.62.
+
 0.05 2015-10-16T12:04:29+02:00
  - Improve description for get_lines() in doc.
  - Update to Map::Tube 3.06.

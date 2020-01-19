@@ -3,13 +3,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/HTML-SocialMedia/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/HTML-SocialMedia?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/HTML-SocialMedia/badge)](https://dependencyci.com/github/nigelhorne/HTML-SocialMedia)
 
-# HTML::SocialMedia
+# NAME
 
-Put social media links onto your website
+HTML::SocialMedia - Put social media links onto your website
 
 # VERSION
 
-Version 0.27
+Version 0.28
 
 # SYNOPSIS
 
@@ -26,14 +26,14 @@ HTML::SocialMedia ideal for running on multilingual sites.
 Takes optional parameter logger, an object which is used for warnings and
 traces.
 This logger object is an object that understands warn() and trace() messages,
-such as a [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) object.
+such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) object.
 
 Takes optional parameter cache, an object which is used to cache country
 lookups.
 This cache object is an object that understands get() and set() messages,
 such as an [CHI](https://metacpan.org/pod/CHI) object.
 
-Takes optional parameter lingua, which is a [CGI::Lingua](https://metacpan.org/pod/CGI::Lingua) object.
+Takes optional parameter lingua, which is a [CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua) object.
 
 # SUBROUTINES/METHODS
 
@@ -51,12 +51,12 @@ twitter: twitter account name
 twitter\_related: array of 2 elements - the name and description of a related account
 cache: This object will be an instantiation of a class that understands get and
 set, such as [CHI](https://metacpan.org/pod/CHI).
-info: Object which understands host\_name messages, such as [CGI::Info](https://metacpan.org/pod/CGI::Info).
+info: Object which understands host\_name messages, such as [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo).
 
 ## as\_string
 
 Returns the HTML to be added to your website.
-HTML::SocialMedia uses [CGI::Lingua](https://metacpan.org/pod/CGI::Lingua) to try to ensure that the text printed is
+HTML::SocialMedia uses [CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua) to try to ensure that the text printed is
 in the language of the user.
 
     use HTML::SocialMedia;
@@ -113,10 +113,11 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 # BUGS
 
 When adding a FaceBook like button, you may find performance improves a lot if
-you use [HTTP::Cache::Transparent](https://metacpan.org/pod/HTTP::Cache::Transparent).
+you use [HTTP::Cache::Transparent](https://metacpan.org/pod/HTTP%3A%3ACache%3A%3ATransparent).
 
 Please report any bugs or feature requests to `bug-html-socialmedia at rt.cpan.org`, or through
-the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia).  I will be notified, and then you'll
+the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia).
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 Would be good to have
@@ -136,10 +137,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-SocialMedia](http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-SocialMedia)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/HTML-SocialMedia](http://annocpan.org/dist/HTML-SocialMedia)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/HTML-SocialMedia](http://cpanratings.perl.org/d/HTML-SocialMedia)
@@ -152,6 +149,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2011-2016 Nigel Horne.
+Copyright 2011-2020 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

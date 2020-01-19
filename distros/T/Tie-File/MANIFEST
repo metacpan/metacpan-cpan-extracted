@@ -1,6 +1,9 @@
-MANIFEST
+ChangeLog
+COPYING
 lib/Tie/File.pm
 Makefile.PL
+MANIFEST
+README
 t/00_version.t
 t/01_gen.t
 t/02_fetchsize.t
@@ -39,8 +42,5 @@ t/33_defer_vs.t
 t/40_abs_cache.t
 t/41_heap.t
 t/42_offset.t
-README
-ChangeLog
-COPYING
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

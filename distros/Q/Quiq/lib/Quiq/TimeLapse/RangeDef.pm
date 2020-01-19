@@ -5,9 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
-use Quiq::OrderedHash;
+use Quiq::Hash::Ordered;
 use Quiq::Path;
 use Quiq::FileHandle;
 use Quiq::Hash;
@@ -221,9 +221,9 @@ sub new {
     # Wir speichern die Range- und Clip-Definitionen in geordneten Hashes
     # und die ausgeklammerten Ranges in einem Array.
     
-    my $clipH = Quiq::OrderedHash->new;
-    my $clipPropertyH = Quiq::OrderedHash->new;
-    my $rangeH = Quiq::OrderedHash->new;
+    my $clipH = Quiq::Hash::Ordered->new;
+    my $clipPropertyH = Quiq::Hash::Ordered->new;
+    my $rangeH = Quiq::Hash::Ordered->new;
     my $junkExpr;
    
     # Range-Definitionsdateien einlesen.
@@ -525,7 +525,7 @@ sub expression {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -533,7 +533,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

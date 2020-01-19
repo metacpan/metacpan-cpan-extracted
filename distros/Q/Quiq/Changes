@@ -1,3 +1,54 @@
+1.170 2020-01-18
+================
+
+[Quiq::ChartJs::TimeSeries]
+* Einbettung HTML auf Body beschränkt
+
+[Quiq::Database::Tree]
+* hierarchy() - hinzugefügt
+* roots() - hinzugefügt
+* Behandlung von fehlenden Parent-Datenstzen erweitert
+
+[Quiq::Hash::Ordered]
+* von Quiq::OrderedHash umbenannt
+
+[Quiq::Html::Widget::Button]
+* Doku korrigiert
+
+[Quiq::Html::Widget::Textfield]
+* Entfernung von umbegebendem Whitespace hinzugefügt
+
+[Quiq::Html::Page]
+* Attribut bodyOnly hinzugefügt
+
+[Quiq::JQuery::ContextMenu::Ajax]
+* Klasse hinzugefügt
+
+[Quiq::PlotlyJs::Reference]
+* HTML-Doku ausgelagert
+
+[Quiq::PlotlyJs::TimeSeries]
+* Attribut height hinzugefügt
+* Attribute marginBottom, marginLeft, marginRight, marginTop hinzugefgt
+* Attribut xSpikeFormat hinzugefügt
+* Attribut ySide hinzugefügt
+
+[Quiq::If]
+* von Quiq::Concat umbenannt
+
+[Quiq::JavaScript]
+* line() - Kommentare werden entfernt
+
+[Quiq::Json]
+* Objektattribute mit Wert undef werden weggelassen
+
+[Quiq::Ssh]
+* Per SSH ausgeführte Kommandozeile wird encodiert (sonst keine Ausführung)
+
+[Quiq::Url]
+* encode(), decode(), queryEncode(), queryDecode() - um Encoding erweitert
+* queryEncode() - & statt ; als Default-Trenner
+
 1.169 2020-01-05
 ================
 

@@ -1,6 +1,8 @@
 # $Id: apache.t,v 1.28 1999/08/26 23:39:52 john Exp $
 
 use strict;
+use warnings;
+
 use Cwd;
 use IO::Socket;
 use Net::Ident;
@@ -33,7 +35,7 @@ HTTP
     };
 }
 
-use vars qw($apache_bin $apache_addr $apache_root $username $ourpid);
+my ($apache_bin, $apache_addr, $apache_root, $username, $ourpid);
 
 END {
     # make sure apache dies when we exit, but only if we exit ourselves

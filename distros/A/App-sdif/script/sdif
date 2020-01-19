@@ -314,8 +314,9 @@ if ($opt_colortable) {
 ## Column order
 ##
 my @column = !$opt_column ? () : do {
-    my %column = (O => 0, N => 1, M => 2);
-    map { $column{$_} } $opt_column =~ /[ONM]/g;
+    map { $_ - 1 }
+    map { { O=>1, N=>2, M=>3 }->{$_} // $_ }
+    $opt_column =~ /[0-9ONM]/g;
 };
 
 ##
@@ -1076,15 +1077,21 @@ I<center>, I<side> or I<no>.  Default is I<center>.
 
 =item B<--column>=I<order>
 
-Specify the order of each column by B<O> (old), B<N> (new) and B<M>
-(merge).  Default order is B<ONM>.  If you want to show new file on
-left side and old file in right side, use like:
+Specify the order of each column by B<O> (1: old), B<N> (2: new) and
+B<M> (3: merge).  Default order is "ONM" or "123".  If you want to
+show new file on left side and old file in right side, use like:
 
     $ sdif --column NO
 
 Next example show merged file on left-most column for diff3 data.
 
     $ sdif --column MON
+
+Next two commands produce same output.
+
+    $ git diff v1 v2 v3 | sdif --column 312
+
+    $ git diff v3 v1 v2 | sdif
 
 =item B<-->[B<no>]B<color>
 

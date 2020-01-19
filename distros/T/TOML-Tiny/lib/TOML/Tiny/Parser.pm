@@ -1,6 +1,6 @@
 package TOML::Tiny::Parser;
 # ABSTRACT: parser used by TOML::Tiny
-$TOML::Tiny::Parser::VERSION = '0.01';
+$TOML::Tiny::Parser::VERSION = '0.03';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -24,6 +24,9 @@ eval{
 sub new {
   my ($class, %param) = @_;
   bless{
+    inflate_integer  => $param{inflate_integer}  || sub{ shift },
+    inflate_float    => $param{inflate_float}    || sub{ shift },
+    inflate_number   => $param{inflate_number}   || sub{ shift },
     inflate_datetime => $param{inflate_datetime} || sub{ shift },
     inflate_boolean  => $param{inflate_boolean}  || sub{ shift eq 'true' ? $TRUE : $FALSE },
     strict_arrays    => $param{strict_arrays},
@@ -260,35 +263,9 @@ sub parse_value {
   my $token = shift // $self->next_token;
 
   for ($token->{type}) {
-    when ('float') {
-      use bignum;
-      return $token->{value} + 0;
-    }
-
-    when ('integer') {
-      for (my $n = $token->{value}) {
-        use bigint;
-
-        when ($Oct) {
-          $n =~ s/^0o/0/; # convert to perl's octal format
-          return oct $n;
-        }
-
-        when ($Bin) {
-          return oct $n;
-        }
-
-        when ($Hex) {
-          return hex $n;
-        }
-
-        default{
-          return $n + 0;
-        }
-      }
-    }
-
     return $token->{value} when 'string';
+    return $self->{inflate_float}->($token->{value}) when 'float';
+    return $self->{inflate_integer}->($token->{value}) when 'integer';
     return $self->{inflate_boolean}->($token->{value}) when 'bool';
     return $self->{inflate_datetime}->($token->{value}) when 'datetime';
     return $self->parse_inline_table when 'inline_table';
@@ -363,7 +340,7 @@ TOML::Tiny::Parser - parser used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

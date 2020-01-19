@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,40 +12,43 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 7203e213910af0a8c1b2fb57740b9f4625c9bc1e Changes
-SHA1 9daf712acd38e68d1a09b342aa476eae8b879f16 Form.pm
-SHA1 8c3dc421056515d6b3fc4e0e59d281288cec9c7e MANIFEST
-SHA1 75d305677c18cfbe5fbada6174e92dbcf923e82a META.yml
-SHA1 9ed1e3f2c994abfab38b69187ca98d850fa1c943 Makefile.PL
-SHA1 edcfc8db1f84188d8104b2f8ca0879ecfe48181a README
-SHA1 812c9eebf216452993668b2816ee426987e12894 examples/ex1.pl
-SHA1 5c3445fbda20a2c3ea1b45c00a4009626d7b7909 examples/ex2.pl
-SHA1 e85274b116da70a84eccc84ac27c11b1a6e474a1 examples/ex3.pl
-SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
-SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
-SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
-SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
-SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
-SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
-SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
-SHA1 799d40cbf99470bc322c2340b780d70df8b97a17 t/Indent-Form/00-use.t
-SHA1 db63a8f1c2823c36adf64c90b9126cc1804d1281 t/Indent-Form/01-version.t
-SHA1 13e314175b1ab9c98904356881cd7f4a525b7f1a t/Indent-Form/02-pod_coverage.t
-SHA1 7f8ef816da4fa68e22fed334a75368c957e889aa t/Indent-Form/03-pod.t
-SHA1 ae73e152b78d0756510657689934e6c6811a2d72 t/Indent-Form/04-new.t
-SHA1 69bd832f05e2fd8a45671d9346d26744a3c7a004 t/Indent-Form/05-indent.t
+SHA256 aa98517c6b3d4c42288d88fd4c392b318b6d71632d1ec00ea55c91ea8b526bb9 Changes
+SHA256 19a098178c45d4d3d9421cd138788bc6fcbb056edd44e63d60eb13756a3bc327 Form.pm
+SHA256 0ed14285b9b297d9a1db9f6515c0ad85608e60cc12362323475c8c10d8606d15 LICENSE
+SHA256 a7c8461f5c6968f94b0404926dea4cf7819ee91cb8dbba8c3cbeedb71da7ffbf MANIFEST
+SHA256 2756a2dd13d4ece17070ab6599983ba3617c4e8459baa74c75521a7ea96d1228 META.yml
+SHA256 6269eb3794ddaf33aa24cee8633721e160db54e283366a7ee5f8fa45fb23f05a Makefile.PL
+SHA256 9acd6640d6786cf0b5527c9fd3f8a0021f7aead438e397bd170849614fe689a2 README
+SHA256 6378d025faf227c97504b02ad5dc1a5d06a3bcee98cd02cf5d51a319783d55e8 examples/ex1.pl
+SHA256 29be39ae94204c6af150597abf4ec5bd3750483ff994c81d3fe5db0ca8fb3912 examples/ex2.pl
+SHA256 460b29711832ebce5f9880909ac031485661b7582d7d0c5cdce16d573e9634c9 examples/ex3.pl
+SHA256 2f140f4ba53cc20c4a36054a25bb7fb65745a511e2d3d04c87b227838572b02f examples/ex4.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 51fc46960910f1b015327b5273412c433d4eff991b6f964815afb483f581c2dc t/Indent-Form/01-use.t
+SHA256 36d853b0a94edfa34ddf429ef80a006da74629ab9a9abcde2178a803d0c517bd t/Indent-Form/02-version.t
+SHA256 0e9dd1f1bd8900827fa517cf51372d788cfffa72d5747697abe1e07059529d53 t/Indent-Form/03-new.t
+SHA256 617afdb4640747190d948e86c87a5b8e3679cf9e6407588480a9bea5d6d39fd3 t/Indent-Form/04-indent.t
+SHA256 a53d24e9c0a571911f417eb3d2c385504d5628b14286010e42406382bfe44c09 xt/Indent-Form/01-pod_coverage.t
+SHA256 76a6257893a760e336f379599150b7aef5ea1668646884adaef506d8f33e980b xt/Indent-Form/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAEBAgAGBQJTO/+oAAoJEAwa+cf4dLBao2YIAMHducHAlcue2KRRd/Ee4GkF
-dhrpvJRpDwLef9iKdvV4xv8JVOfjQuXT4rGvIMA/SkTm8M69y9DGMQuJLtuxuv2Q
-4YIInha/lBqrbqMxvewQYcfWaNqNLUlp2PSjfBDyJc6b8hsuIv6ALnT9LWX+Dl6K
-e8i7Xt3/xWjR4KTOCmlb2UJ9CjgCIEcc7Rmadfv9AuJtVopJujQw2WLaOnRNQwB0
-NCVimncsRI88lj7DPLHRP65MxpbGktYhbkQ4r8k9TQW190HtDii7nprks9CPKneK
-l5WuEka7ffRrRbSnnpP+U2TYI+oAN2N1NybMc9riggm5s9wXhLhp4Avs4NVWdeA=
-=HLE5
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl4jgrsACgkQKyiOZjWe
+rHZCNQf7BP3XLNQy+6WTYW9Xxl7Sm8TBnpG5OBRRKYZ4+OUM6samGS/qtyVbyOKh
+4ydxnCV9UaLekCPBcWIc1JV/1BOp2qE9IvSr62GMBV7KMaROo+EhsDswu8u/28pe
+dkis9HknB8prL7JClUzPlujqrOUU+NnnXY9pbmUVcyGYe29YkOZX+A61EImQeSs8
+y9a+/zmQIFbz3Aw3uB/VB+ue0oyiUpk9NnNXVx9PpvWGv4zSqt8a8M681jG7jhUj
+/r9dI+xzOhtwOrMRSThSQ7rBIwDFX293vzCWIX/unc+3nTa/UkMLbHODx3lgOuWk
+B66rcAkgxrrPnQA65TGhFYFDSNTpaQ==
+=Vq8W
 -----END PGP SIGNATURE-----

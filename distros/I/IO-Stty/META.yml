@@ -1,26 +1,29 @@
 ---
-abstract: lib/IO/Stty.pm
+abstract: 'Change and print terminal line settings'
 author:
-  - 'Austin Schutz <auschutz@cpan.org> (Initial version and maintenance)'
-  - 'Todd Rinaldo <toddr@cpan.org> (Maintenance)'
+  - 'Austin Schutz <auschutz@cpan.org>'
 build_requires:
-  Module::Build: 0.35
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: IO-Stty
-provides:
-  IO::Stty:
-    file: lib/IO/Stty.pm
-    version: 0.03
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
 resources:
-  MailingList: mailto:toddr@cpan.org
-  homepage: http://github.com/toddr/IO-Stty
+  bugtracker: http://github.com/toddr/IO-Stty/issues
+  homepage: http://wiki.github.com/toddr/IO-Stty
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/toddr/IO-Stty.git
-version: 0.03
+  repository: http://github.com/toddr/IO-Stty
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

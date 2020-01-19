@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.024';
+our $VERSION   = '0.026';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -777,6 +777,11 @@ sub _make_package_generator {
 	);
 	
 	if ($opts{factory_package}) {
+		require Type::Registry;
+		'Type::Registry'->for_class($qname)->set_parent(
+			'Type::Registry'->for_class($opts{factory_package})
+		);
+
 		my $tn = $builder->type_name($qname, $opts{prefix});
 		if (!exists $opts{factory}) {
 			$opts{factory} = 'generate_' . lc $tn;
@@ -822,12 +827,10 @@ sub generate_package {
 	$_generate_counter{$generator_package} = 0 unless exists $_generate_counter{$generator_package};
 	my $qname = sprintf('%s::__GEN%06d__', $generator_package, ++$_generate_counter{$generator_package});
 	
-	if ($global_opts->{factory_package}) {
-		require Type::Registry;
-		'Type::Registry'->for_class($qname)->set_parent(
-			'Type::Registry'->for_class($global_opts->{factory_package})
-		);
-	}
+	require Type::Registry;
+	'Type::Registry'->for_class($qname)->set_parent(
+		'Type::Registry'->for_class($generator_package)
+	);
 	
 	if ($kind eq 'class') {
 		my $method = $opts{toolkit_install_constants} || ("install_constants");
@@ -893,7 +896,7 @@ sub make_attribute_moose {
 		$builder->_process_enum_moose(@_);
 	}
 	require Moose::Util;
-	(Moose::Util::find_meta($class) or $class->meta)->add_attribute($attribute, $spec);
+	(Moose::Util::find_meta($class) or $class->meta)->add_attribute($attribute, %$spec);
 }
 
 sub _process_enum_moose {
@@ -912,7 +915,7 @@ sub make_attribute_mouse {
 		$builder->_process_enum_mouse(@_);
 	}
 	require Mouse::Util;
-	(Mouse::Util::find_meta($class) or $class->meta)->add_attribute($attribute, $spec);
+	(Mouse::Util::find_meta($class) or $class->meta)->add_attribute($attribute, %$spec);
 }
 
 sub _process_enum_mouse {
@@ -1079,7 +1082,7 @@ sub _build_method_signature_check {
 		else {
 			$type = shift(@sig);
 		}
-		if (is_HashRef($sig[0]) && !$sig[0]{slurpy}) {
+		if (is_HashRef($sig[0]) && !ref($sig[0]{slurpy})) {
 			$opts = shift(@sig);
 		}
 		
@@ -1105,7 +1108,19 @@ sub _build_method_signature_check {
 			}
 		}
 		
-		push @params, $is_named ? ($name, $type, $opts) : ($type, $opts);
+		my $hide_opts = 0;
+		if ($opts->{slurpy} && !ref($opts->{slurpy})) {
+			delete $opts->{slurpy};
+			$type = { slurpy => $type };
+			$hide_opts = 1;
+		}
+		
+		push(
+			@params,
+			$is_named
+				? ($name, $type, $hide_opts?():($opts))
+				: (       $type, $hide_opts?():($opts))
+		);
 	}
 	
 	my $next = $is_named ? \&Type::Params::compile_named_oo : \&Type::Params::compile;
@@ -2543,7 +2558,7 @@ and return the class name as a string.
   is_SpeciesClass($Dog);          # true
 
 Note that there is no B<Species> type created, but instead a pair of types
-is created: C<SpeciesClass> and C<SpeciesInstance>.
+is created: B<SpeciesClass> and B<SpeciesInstance>.
 
 It is also possible to inherit from generated classes.
 

@@ -2,11 +2,9 @@ package <: $module_name ~ "::Index" :>;
 
 use Pcore -class;
 
-with qw[Pcore::App::Controller];
+with qw[Pcore::App::Controller::Webpack];
 
-sub run ( $self, $req ) {
-    return 200, [ 'Content-Type' => 'text/html' ], $self->{app}->{util}->{tmpl}->render('index.html');
-}
+has app_dist => ( "@{[ $ENV->dist->{root} ]}/app/www", init_arg => undef );
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -17,7 +15,7 @@ sub run ( $self, $req ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 13                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 17 does not match the package declaration       |
+## |    1 | 11                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 15 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

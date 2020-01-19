@@ -236,6 +236,73 @@ my $data =
 			{
 				# FIXUP
 			},
+			
+		nested =>
+			{
+				a =>
+					{
+						fee => 1,
+						fie =>
+							[
+								1,
+								2,
+								3
+							],
+						foo =>
+							{
+								a => 10,
+								b => 12,
+								c => 14,
+							},
+						text =>
+							[
+								'abc',
+								'xyz',
+							],
+					},
+				b =>
+					{
+						fee => 2,
+						fie =>
+							[
+								4,
+								5,
+								6
+							],
+						foo =>
+							{
+								a => 20,
+								b => 22,
+								c => 24,
+							},
+						text =>
+							[
+								'plugh!',
+								'xyzzy',
+							],
+					},
+				c =>
+					{
+						fee => 3,
+						fie =>
+							[
+								7,
+								8,
+								9
+							],
+						foo =>
+							{
+								a => 30,
+								b => 32,
+								c => 34,
+							},
+						text =>
+							[
+								'Tilo',
+								'Santino',
+							],
+					},
+			},
 	};
 
 $data->{objects}->{$_} = TestObject->new($_, $data->{records}->{$_}) foreach (keys(%{$data->{records}}));
@@ -736,7 +803,31 @@ QRY
 QRY
 					e => [ qw(a f m p s) ],
 				},
-			]
+			],
+			
+		nested =>
+			[
+				{
+					q => 'fee.==(2)',
+					e => [ $data->{nested}->{b} ],
+				},
+				{
+					q => 'fie->[2].<(5) or foo->a.>=(21)',
+					e => [ map { $data->{nested}->{$_} } split('', 'ac') ],
+				},
+				{
+					q => 'text->[0].eq(plugh!)',
+					e => [ $data->{nested}->{b} ],
+				},
+				{
+					q => 'text->[1].regexp(xyz)',
+					e => [ map { $data->{nested}->{$_} } split('', 'ab') ],
+				},
+				{
+					q => 'text->[1].regexp(xyz) and !foo->b.==(22)',
+					e => [ $data->{nested}->{a} ],
+				},
+			],
 	};
 
 my @recordValues;
@@ -796,7 +887,12 @@ my $fieldAccessors =
 							sex => sub { $_[0]->[1]->{sex} },
 						}
 					),
-			],	
+			],
+			
+		nested =>
+			[
+				undef
+			]
 	};
 	
 my $recordFieldAccessor = Grep::Query::FieldAccessor->new();
@@ -820,6 +916,7 @@ my $matchAdjustors =
 		records => sub { $_[0] },
 		objects => sub { [ map { $_->get_id() } @{$_[0]} ] },
 		lonehash => sub { [ sort(keys(%{$_[0]->[0]})) ] },
+		nested => sub { $_[0] },
 	};
 
 sub getData

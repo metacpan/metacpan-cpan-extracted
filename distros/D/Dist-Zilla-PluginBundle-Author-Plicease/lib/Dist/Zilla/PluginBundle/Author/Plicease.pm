@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.42 {
 
   use 5.014;
   use Moose;
@@ -16,7 +16,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
 
   with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-  sub mvp_multivalue_args { qw( 
+  sub mvp_multivalue_args { qw(
     alien_build_command
     alien_install_command
     alien_auto_include
@@ -25,29 +25,10 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
     upgrade
     preamble
     diag_preamble
-  
+
     diag
     allow_dirty ) }
 
-  my %plugin_versions = qw(
-    Alien                0.023
-    Author::Plicease.*   2.41
-    OurPkgVersion        0.21
-    MinimumPerl          1.006
-    InstallGuide         1.200006
-    Run::.*              0.035
-    PodWeaver            4.006
-    ReadmeAnyFromPod     0.150250
-    AutoMetaResources    1.20
-    CopyFilesFromBuild   0.150250
-  );
-
-  require Dist::Zilla::Plugin::Author::Plicease;
-  unless(Dist::Zilla::Plugin::Author::Plicease->VERSION)
-  {
-    delete $plugin_versions{'Author::Plicease.*'};
-  }
-    
   sub _my_add_plugin {
     my($self, @specs) = @_;
 
@@ -55,14 +36,6 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
     {
       my $plugin = $spec->[0];
       my %args = ref $spec->[-1] ? %{ pop @$spec } : ();
-    
-      foreach my $key (keys %plugin_versions)
-      {
-        if($plugin =~ /^$key$/)
-        {
-          $args{':version'} = $plugin_versions{$key};
-        }
-      }
       $self->add_plugins([@$spec, \%args]);
     }
   };
@@ -76,12 +49,21 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
     # right).
     if($self->payload->{non_native_release})
     {
-      eval q{
-        no warnings 'redefine';
-        use Dist::Zilla::Role::BuildPL;
-        sub Dist::Zilla::Role::BuildPL::build {};
-        sub Dist::Zilla::Role::BuildPL::test {};
-      };
+      no warnings 'redefine';
+      require Dist::Zilla::Role::BuildPL;
+      *Dist::Zilla::Role::BuildPL::build = sub {};
+      *Dist::Zilla::Role::BuildPL::test  = sub {};
+    }
+
+    foreach my $script (qw( before_build.pl before_release.pl release.pl test.pl after_build.pl after_release.pl ))
+    {
+      if(-r "inc/run/$script")
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "please rename inc/run/$script to maint/run-$script";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
     }
 
     foreach my $prefix (qw( inc/run/ maint/run- ))
@@ -115,20 +97,35 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
       my %mb = map { $_ => $self->payload->{$_} } grep /^mb_/, keys %{ $self->payload };
       if(-e "inc/My/ModuleBuild.pm")
       {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "please migrate off of Module::Build";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+
         $installer ||= 'ModuleBuild';
         $mb{mb_class} = 'My::ModuleBuild'
           unless defined $mb{mb_class};
       }
       if(defined $installer && $installer eq 'Alien')
       {
-        my %args = 
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "please do not use the Alien plugin anymore";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+
+        my %args =
           map { $_ => $self->payload->{"alien_$_"} }
-          map { s/^alien_//; $_ } 
+          map { s/^alien_//r }
           grep /^alien_/, keys %{ $self->payload };
         $self->_my_add_plugin([ Alien => { %args, %mb } ]);
       }
       elsif(defined $installer && $installer eq 'ModuleBuild')
       {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "please migrate off of Module::Build";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+
         $self->_my_add_plugin([ ModuleBuild => \%mb ]);
       }
       else
@@ -137,15 +134,15 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         $self->_my_add_plugin([$installer]);
       }
     };
-  
+
     $self->_my_add_plugin(map { [$_] } qw(
       Manifest
       TestRelease
       PodWeaver
     ));
-  
+
     $self->_my_add_plugin([ NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss Z}d' }]);
-      
+
     $self->_my_add_plugin(['AutoPrereqs']);
     $self->_my_add_plugin([$self->payload->{version_plugin} || (
       'OurPkgVersion', {
@@ -165,12 +162,12 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         $self->_my_add_plugin([$plugin, \%args])
       }
     }
-  
+
     do {
       my $name = path(".")->absolute->basename;
       my $user = $self->payload->{github_user} || 'plicease';
       my $repo = $self->payload->{github_repo} || $name;
-    
+
       $self->_my_add_plugin([
         'MetaResources' => {
           'homepage' => $self->payload->{homepage}                 || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
@@ -182,7 +179,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         },
       ]);
     };
-  
+
     if($self->payload->{release_tests})
     {
       $self->_my_add_plugin([
@@ -194,14 +191,14 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         }
       ]);
     }
-    
+
     $self->_my_add_plugin(map { [$_] } qw(
 
       InstallGuide
       ConfirmRelease
 
     ));
-  
+
     $self->_my_add_plugin([
       MinimumPerl => {
         maybe perl => $self->payload->{perl},
@@ -214,11 +211,11 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         'ReadmeAnyFromPod' => {
                 type            => 'text',
                 filename        => 'README',
-                location        => 'build', 
+                location        => 'build',
           maybe source_filename => $self->payload->{readme_from},
         },
       ]);
-    
+
       $self->_my_add_plugin([
         'ReadmeAnyFromPod' => ReadMePodInRoot => {
           type                  => 'gfm',
@@ -228,7 +225,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
        },
      ]);
     }
-  
+
     $self->_my_add_plugin([
       'Author::Plicease::MarkDownCleanup' => {
               travis_status => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
@@ -263,13 +260,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
         },
       ]);
     }
-  
-    unless('bakeini' eq (Dist::Zilla::Util::CurrentCmd::current_cmd() ||'') )
-    {
-      if(eval { require Dist::Zilla::Plugin::ACPS::RPM })
-      { $self->_my_add_plugin(['ACPS::RPM']) }
-    }
-    
+
     foreach my $test (map { path($_) } bsd_glob ('t/*.t'))
     {
       my @lines = grep !/-no_srand => 1/, grep /use Test2::V0/, $test->lines_utf8;
@@ -277,19 +268,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.41 {
       print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
       print STDERR "$test has Test2::V0 without -no_srand";
       print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-      print STDERR "\n";    
-    }
-  
-    foreach my $name (qw( t/00_diag.txt t/00_diag.pre.txt ), 
-                        map { "xt/release/$_.t" } qw( build_environment unused eol no_tabs pod strict fixme changes pod_coverage pod_spelling_common pod_spelling_system version ))
-    {  
-      if(-e $name)
-      {
-        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-        print STDERR "You have a lingering deprecated test: $name";
-        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
-        print STDERR "\n";
-      }
+      print STDERR "\n";
     }
 
     $self->_my_add_plugin(
@@ -325,7 +304,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.41
+version 2.42
 
 =head1 SYNOPSIS
 
@@ -354,12 +333,12 @@ unbundled version.
 
 =item Want to submit a patch for one of my modules?
 
-Consider using C<prove -l> on the test suite or adding the lib directory 
-to C<PERL5LIB>.  Save yourself the hassle of dealing with L<Dist::Zilla> 
-at all.  If there is something wrong with one of the generated files 
-(such as C<Makefile.PL> or C<Build.PL>) consider opening a support 
-ticket instead.  Most other activities relating to the use of 
-L<Dist::Zilla> have to do with release testing and uploading to CPAN 
+Consider using C<prove -l> on the test suite or adding the lib directory
+to C<PERL5LIB>.  Save yourself the hassle of dealing with L<Dist::Zilla>
+at all.  If there is something wrong with one of the generated files
+(such as C<Makefile.PL> or C<Build.PL>) consider opening a support
+ticket instead.  Most other activities relating to the use of
+L<Dist::Zilla> have to do with release testing and uploading to CPAN
 which is more my responsibility than yours.
 
 =item Really need to fix some aspect of the build process?
@@ -368,7 +347,7 @@ Or perhaps the module in question is using XS (hint: convert it to FFI
 instead!).  If you really do need to fix some aspect of the build process
 then you probably do need to install L<Dist::Zilla> and this bundle.
 If you are having trouble figuring out how it works, then try extracting
-the bundle using the C<example/unbundle.pl> script or 
+the bundle using the C<example/unbundle.pl> script or
 L<dzil bakeini technique|Dist::Zilla::App::Command::bakeini>
 mentioned above.
 
@@ -471,7 +450,7 @@ Specify an alternative to L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>
 L<[ModuleBuildTiny]|Dist::Zilla::Plugin::ModuleBuildTiny>, or
 L<[ModuleBuildDatabase]|Dist::Zilla::Plugin::ModuleBuildDatabase> for example).
 
-If installer is L<Alien|Dist::Zilla::Plugin::Alien>, then any options 
+If installer is L<Alien|Dist::Zilla::Plugin::Alien>, then any options
 with the alien_ prefix will be passed to L<Alien|Dist::Zilla::Plugin::Alien>
 (minus the alien_ prefix).
 
@@ -484,7 +463,7 @@ will assume C<installer> is C<ModuleBuild> and C<mb_class> = C<My::ModuleBuild>.
 
 =head2 readme_from
 
-Which file to pull from for the Readme (must be POD format).  If not 
+Which file to pull from for the Readme (must be POD format).  If not
 specified, then the main module will be used.
 
 =head2 release_tests
@@ -582,7 +561,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018 by Graham Ollis.
+This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

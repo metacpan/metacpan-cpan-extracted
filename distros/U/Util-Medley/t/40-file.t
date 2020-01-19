@@ -162,3 +162,9 @@ sub test_touch {
 	$File->unlink('foobar.txt');
 }
 
+sub test_which {
+	
+	my $path =$File->which('echo');
+	ok($path);
+}
+

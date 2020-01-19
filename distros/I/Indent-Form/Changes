@@ -1,2 +1,36 @@
+0.05 2020-01-18T23:12:09+01:00
+ - Fix adding of separator to situation when second columns is undef.
+
+0.04 2020-01-18T19:37:45+01:00
+ - Add test comments.
+ - Add test for bad align.
+ - Add test for left align and remove non-sense code.
+ - Add test for line size.
+ - Add test for negative line size and remove non-sense code.
+ - Add test for returning of string.
+ - Add tests for non-indent-flag.
+ - Add tests with undef in different situations.
+ - Fix cleanup in tests after error.
+ - Fix non-indent-flag usage with undef values.
+
+0.03 2020-01-18T17:24:27+01:00
+ - Add example to doc with explicit indent.
+ - Add test for indent with explicit indent for all.
+ - Fix dependency to Indent::Work 0.04 with ansi support.
+
+0.02 2020-01-18T13:35:05+01:00
+ - Add REPOSITORY section to doc.
+ - Add LICENSE file.
+ - Fix strings with ANSI sequences via Indent::Word object.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Remove diacritics from author name in Makefile.PL.
+ - Rewrite tests to author tests and rest.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.19 version.
+ - Update author github username to reality.
+ - Update author name.
+ - Update copyright years.
+
 0.01 2014-04-02T14:16:38+02:00
  - First version.

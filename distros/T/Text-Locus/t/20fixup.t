@@ -10,7 +10,6 @@ BEGIN {
 
 my $loc = new Text::Locus;
 
-my $loc = new Text::Locus;
 $loc->add('foo', 10, 11, 12, 13);
 $loc->add('foo', 24, 28);
 $loc->add('bar', 1, 5);

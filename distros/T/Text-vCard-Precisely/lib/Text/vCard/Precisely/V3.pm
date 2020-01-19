@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use 5.8.9;
 
@@ -361,16 +361,11 @@ Dies if not successful.
 
 =cut
 
-sub _path {
-    my $self = shift;
-    return path($_[0]);
-}
-
 sub as_file {
     my ( $self, $filename ) = @_;
     croak "No filename was set!" unless $filename;
     
-    my $file = $self->_path($filename);
+    my $file = path($filename);
     $file->spew( {binmode => ":encoding(UTF-8)"}, $self->as_string );
     return $file;
 }

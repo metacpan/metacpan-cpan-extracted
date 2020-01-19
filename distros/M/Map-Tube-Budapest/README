@@ -40,7 +40,7 @@ METHODS
 
     "get_lines()"
              Get lines in metro map.
-             Returns reference to array with Map::Tube::Line objects.
+             Returns reference to unsorted array with Map::Tube::Line objects.
 
     "get_node_by_id($station_id)"
              Get station node by id.
@@ -67,11 +67,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Budapest;
 
@@ -88,11 +86,9 @@ EXAMPLE1
      # Route: Fővám tér (Linia M4), Kálvin tér (Linia M3,Linia M4), Ferenciek tere (Linia M3), Deák Ferenc tér (Linia M1,Linia M2,Linia M3), Bajcsy-Zsilinszky út (Linia M1), Opera (Linia M1)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::Budapest;
 
      # Object.
@@ -108,11 +104,9 @@ EXAMPLE2
      # XML file: .*/budapest-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Budapest;
@@ -137,11 +131,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 164520 Mar  4 22:32 Budapest.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Budapest;
 
@@ -159,6 +151,47 @@ EXAMPLE4
      # Linia M2
      # Linia M3
      # Linia M4
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Encode qw(encode_utf8);
+     use Map::Tube::Budapest;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = $ARGV[0];
+
+     # Object.
+     my $obj = Map::Tube::Budapest->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Linia M4' argument.
+     # Kelenföld vasútállomás
+     # Bikás park
+     # Újbuda-központ
+     # Móricz Zsigmond körtér
+     # Szent Gellért tér
+     # Fővám tér
+     # Kálvin tér
+     # Rákóczi tér
+     # II. János Pál pápa tér
+     # Keleti pályaudvar
 
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
@@ -180,18 +213,18 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Budapest>
+    <https://github.com/michal-josef-spacek/Map-Tube-Budapest>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2020 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -23,8 +23,8 @@ my $bot = Net::Jabber::Bot->new({
                                 , username => $username
                                 , password => $password
                                 , alias => $username
-                                , message_callback => \&new_bot_message
-                                , background_activity => \&background_checks
+                                , message_function => \&new_bot_message
+                                , background_function => \&background_checks
                                 , loop_sleep_time => 15
                                 , process_timeout => 5
                                 , ignore_server_messages => 0
@@ -56,7 +56,7 @@ sub new_bot_message {
 sub background_checks {
     my ($title, $link) = checa();
 
-    return if ($last_title eq $title)
+    return if ($last_title eq $title);
     foreach my $tosend (@users) {
           
         my $status = $bot->GetStatus($tosend);
@@ -87,10 +87,3 @@ sub checa {
 
     return($title, $link)
 }
-
-
-
-
-
-
-

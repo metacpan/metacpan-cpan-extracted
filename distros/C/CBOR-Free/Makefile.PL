@@ -50,6 +50,10 @@ WriteMakefile1(
         'Text::Control' => 0,
         'Types::Serialiser' => 0,
         'XSLoader' => 0.24,
+
+        # Perl 5.10.1 ships 1.82, which mishandles
+        # abstract-namespace Linux sockets. (But why did I care?)
+        # 'Socket' => 1.87,
     },
 
     TEST_REQUIRES => {

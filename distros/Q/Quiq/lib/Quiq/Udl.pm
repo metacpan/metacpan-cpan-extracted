@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Quiq::Hash;
 use Quiq::Database::Config;
@@ -165,7 +165,7 @@ sub new {
         password => '',
         host => '',
         port => '',
-        # FIXME: auf Quiq::OrderedHash umstellen
+        # FIXME: auf Quiq::Hash::Ordered umstellen
         options => Quiq::Hash->new->unlockKeys,
     );
     if (@_ == 1 && $_[0] !~ /^[a-z]+#/) {
@@ -770,7 +770,7 @@ sub udl {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -778,7 +778,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

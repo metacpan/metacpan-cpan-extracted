@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.149-4-gac9c10b
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.150-2-g816cee2
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.150';
+our $VERSION = '0.151';
 
 use Moose;
 with
@@ -641,7 +641,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.150
+version 0.151
 
 =head1 SYNOPSIS
 
@@ -1303,9 +1303,13 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Edward Betts Graham Knop Dave Rolsky Randy Stauner Roy Ivy III Сергей Романов
+=for stopwords Dave Rolsky Edward Betts Graham Knop Randy Stauner Roy Ivy III Сергей Романов
 
 =over 4
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
 
 =item *
 
@@ -1314,10 +1318,6 @@ Edward Betts <edward@4angle.com>
 =item *
 
 Graham Knop <haarg@haarg.org>
-
-=item *
-
-Dave Rolsky <autarch@urth.org>
 
 =item *
 

@@ -174,7 +174,6 @@ diag("Checking basic functionality and how your ptys handle large strings...
     # parent sends down some strings and expects to get them back inverted
     my $maxlen = 0;
     foreach my $len ( 1 .. length($randstring) ) {
-        print STDERR "$len\r";
         my $s = substr( $randstring, 0, $len );
         my $buf;
         my $ret = "";

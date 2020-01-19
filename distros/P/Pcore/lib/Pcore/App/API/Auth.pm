@@ -36,51 +36,15 @@ sub TO_DUMP ( $self, $dumper, %args ) {
 }
 
 sub api_can_call ( $self, $method_id ) {
-    if ( $self->{is_authenticated} ) {
-        my $auth = $self->{api}->authenticate_private( $self->{private_token} );
+    $method_id =~ tr /-/_/;
 
-        return $auth->_check_permissions($method_id);
-    }
-    else {
-        return $self->_check_permissions($method_id);
-    }
-}
-
-sub _check_permissions ( $self, $method_id ) {
-
-    # find method
-    my $method_cfg = $self->{api}->{_method}->{$method_id};
-
-    # method wasn't found
-    return res [ 404, qq[Method "$method_id" was not found] ] if !$method_cfg;
-
-    # method was found
-    my $method_permissions = $method_cfg->{permissions};
-
-    # method has no permissions, authorization is not required
-    return res 200 if !$method_permissions;
-
-    if ( is_plain_arrayref $method_permissions) {
-
-        # compare permissions for authenticated session only
-        if ( $self->{is_authenticated} ) {
-            my $auth_permissions = $self->{permissions};
-
-            # compare permissions
-            for my $permission ( $method_permissions->@* ) {
-                return res 200 if $auth_permissions->{$permission};
-            }
-        }
-    }
-    else {
-        return res 200 if $method_permissions eq $PERMS_ANY_AUTHENTICATED_USER && $self->{is_authenticated};
-    }
-
-    return res [ 403, qq[Insufficient permissions for method "$method_id"] ];
+    return $self->_api_can_call($method_id);
 }
 
 sub api_call ( $self, $method_id, @args ) {
-    my $can_call = $self->api_can_call($method_id);
+    $method_id =~ tr /-/_/;
+
+    my $can_call = $self->_api_can_call($method_id);
 
     return $can_call if !$can_call;
 
@@ -109,6 +73,50 @@ sub api_call ( $self, $method_id, @args ) {
     else {
         return is_res $res[0] ? $res[0] : res @res;
     }
+}
+
+sub _api_can_call ( $self, $method_id ) {
+    if ( $self->{is_authenticated} ) {
+        my $auth = $self->{api}->authenticate_private( $self->{private_token} );
+
+        return $auth->_check_permissions($method_id);
+    }
+    else {
+        return $self->_check_permissions($method_id);
+    }
+}
+
+sub _check_permissions ( $self, $method_id ) {
+
+    # find method
+    my $method_cfg = $self->{api}->{_method}->{$method_id};
+
+    # method wasn't found
+    return res [ 404, 'Method was not found' ] if !$method_cfg;
+
+    # method was found
+    my $method_permissions = $method_cfg->{permissions};
+
+    # method has no permissions, authorization is not required
+    return res 200 if !$method_permissions;
+
+    if ( is_plain_arrayref $method_permissions) {
+
+        # compare permissions for authenticated session only
+        if ( $self->{is_authenticated} ) {
+            my $auth_permissions = $self->{permissions};
+
+            # compare permissions
+            for my $permission ( $method_permissions->@* ) {
+                return res 200 if $auth_permissions->{$permission};
+            }
+        }
+    }
+    else {
+        return res 200 if $method_permissions eq $PERMS_AUTHENTICATED && $self->{is_authenticated};
+    }
+
+    return res [ 403, 'Insufficient permissions' ];
 }
 
 1;

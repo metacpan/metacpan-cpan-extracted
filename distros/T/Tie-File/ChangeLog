@@ -1,3 +1,7 @@
+What's new in version 1.01:
+ - Change documentation for line numbering.
+ - Switch to github for issue tracking.
+
 What's new in version 1.00:
  - typo fixes for Tie::File
 

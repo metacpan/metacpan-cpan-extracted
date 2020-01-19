@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.01';
+$TOML::Tiny::Writer::VERSION = '0.03';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -7,7 +7,6 @@ use v5.18;
 
 use Data::Dumper;
 use DateTime::Format::RFC3339;
-use Math::BigFloat;
 use Scalar::Util qw(looks_like_number);
 use TOML::Tiny::Grammar;
 use TOML::Tiny::Util qw(is_strict_array);
@@ -192,7 +191,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

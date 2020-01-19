@@ -1,16 +1,13 @@
 package Image::Select::Array;
 
-# Pragmas.
 use base qw(Image::Select);
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ($class, @params) = @_;
@@ -173,11 +170,9 @@ Image::Select::Array - Selecting image from list with checking.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Spec::Functions qw(catfile);
  use File::Temp qw(tempfile tempdir);
  use Image::Random;
@@ -217,11 +212,9 @@ Image::Select::Array - Selecting image from list with checking.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Spec::Functions qw(catfile);
  use File::Temp qw(tempfile tempdir);
  use Image::Random;
@@ -283,25 +276,29 @@ Perl class for creating random image.
 
 Selecting image from images directory.
 
+=item L<Image::Select::Date>
+
+Selecting image from images directory by date.
+
 =back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Image-Select>
+L<https://github.com/michal-josef-spacek/Image-Select>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
+ © 2015-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

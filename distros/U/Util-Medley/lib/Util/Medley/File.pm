@@ -1,5 +1,5 @@
 package Util::Medley::File;
-$Util::Medley::File::VERSION = '0.022';
+$Util::Medley::File::VERSION = '0.023';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -9,9 +9,10 @@ use Carp;
 use File::LibMagic;
 use File::Path qw(make_path remove_tree);
 use File::Touch;
+use File::Slurp;
+use File::Which;
 use Try::Tiny;
 use Path::Iterator::Rule;
-use File::Slurp;
 
 with 'Util::Medley::Roles::Attributes::Logger';
 with 'Util::Medley::Roles::Attributes::String';
@@ -23,7 +24,7 @@ Util::Medley::File - utility file methods
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =cut
 
@@ -733,9 +734,11 @@ Just a pass-through to File::Slurp::read_file().
 
 =item usage:
 
- $util->slurp($file);
-
- $util->slurp(path => $file);
+ $contents = $util->slurp($file, [0|1]);
+ @contents = $util->slurp($file, [0|1]);
+ 
+ $contents = $util->slurp(path => $file, trim => [0|1]);
+ @contents = $util->slurp(path => $file, trim => [0|1]);
 
 =item args:
 
@@ -894,6 +897,44 @@ multi method unlink (Str $path) {
 		$self->Logger->debug("unlink $path");
 		unlink($path) or confess "failed to unlink $path: $!";
 	}
+}
+
+=head2 which
+
+Wrapper around File::Which::which()
+
+=over
+
+=item usage:
+
+ $path = $util->which($exe);
+ @path = $util->which($exe);
+ 
+ $path = $util->which(exe => $exe);
+ @path = $util->which(exe => $exe);
+  
+=item args:
+
+=over
+
+=item exe [Str]
+
+Name of the executable you are searching for.
+
+=back
+
+=back
+
+=cut
+
+multi method which (Str :$exe) {
+
+	return File::Which::which($exe);	
+}
+
+multi method which (Str $exe) {
+
+	return $self->which(exe => $exe);	
 }
 
 ######################################################################

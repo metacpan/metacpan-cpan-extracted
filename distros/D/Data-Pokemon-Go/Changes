@@ -1,5 +1,8 @@
 Revision history for Perl extension Data-Pokemon-Go
 
+0.13 2020-01-18T09:48:51Z
+    - now we can calcurate about Unoba's available Pokemons    
+
 0.12 2020-01-10T12:35:30Z
     - strat to suport Galar region and Multiformed Pokemons
 

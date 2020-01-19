@@ -1,0 +1,69 @@
+{
+   "abstract" : "Automated Bot creation with safeties",
+   "author" : [
+      "Todd E Rinaldo <toddr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Jabber-Bot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0.82",
+            "MooseX::Types" : "0.12",
+            "Mozilla::CA" : "0",
+            "Net::Jabber" : "2",
+            "Sys::Hostname" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Time::HiRes" : "0",
+            "lib" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/toddr/perl-net-jabber-bot/issues"
+      },
+      "homepage" : "http://wiki.github.com/toddr/perl-net-jabber-bot",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/toddr/perl-net-jabber-bot/tree/master"
+      }
+   },
+   "version" : "v2.1.6",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

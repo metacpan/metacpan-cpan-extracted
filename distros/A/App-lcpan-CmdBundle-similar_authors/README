@@ -3,9 +3,9 @@ NAME
     to finding similar authors
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     App::lcpan::CmdBundle::similar_authors (from Perl distribution
-    App-lcpan-CmdBundle-similar_authors), released on 2019-11-20.
+    App-lcpan-CmdBundle-similar_authors), released on 2019-11-21.
 
 SYNOPSIS
 DESCRIPTION

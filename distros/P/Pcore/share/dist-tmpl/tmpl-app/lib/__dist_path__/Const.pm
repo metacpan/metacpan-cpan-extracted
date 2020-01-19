@@ -4,7 +4,7 @@ use Pcore -const, -export;
 use Pcore::App::API qw[:PERMS];
 
 our $EXPORT = {
-    PERMS  => [qw[$PERMS_ANY_AUTHENTICATED_USER $PERMS_ADMIN $PERMS_USER]],
+    PERMS  => [qw[$PERMS_ANY $PERMS_AUTHENTICATED $PERMS_ADMIN $PERMS_USER]],
     AVATAR => [qw[$DEFAULT_GRAVATAR_IMAGE $DEFAULT_AVATAR]],
 };
 

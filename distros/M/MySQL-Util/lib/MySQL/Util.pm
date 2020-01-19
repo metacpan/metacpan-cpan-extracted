@@ -17,11 +17,11 @@ MySQL::Util - Utility functions for working with MySQL.
 
 =head1 VERSION
 
-Version 0.29
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 

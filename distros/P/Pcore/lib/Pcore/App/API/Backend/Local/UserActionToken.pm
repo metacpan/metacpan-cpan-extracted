@@ -78,7 +78,7 @@ sub user_action_token_verify ( $self, $token, $token_type ) {
 
     state $q1 = $self->{dbh}->prepare('SELECT "user_action_token".*, "auth_hash"."hash" FROM "user_action_token", "auth_hash" WHERE "user_action_token"."id" = "auth_hash"."id" AND "user_action_token"."id" = ? AND "user_action_token"."type" = ?');
 
-    my $res = $self->{dbh}->selectrow( $q1, [ $private_token->[$PRIVATE_TOKEN_ID], $token_type ] );
+    my $res = $self->{dbh}->selectrow( $q1, [ SQL_UUID $private_token->[$PRIVATE_TOKEN_ID], $token_type ] );
 
     return $res if !$res;
 

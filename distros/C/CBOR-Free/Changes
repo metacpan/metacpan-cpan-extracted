@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.17 17 Jan 2020
+- Make documentation more accurate regarding Perl strings.
+
 0.16 19 Nov 2019
 - Make tests accommodate floating-point bug in pre-5.24 Windows perls.
 

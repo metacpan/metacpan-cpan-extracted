@@ -6,9 +6,9 @@ App::sdif - sdif and family tools, cdif and watchdiff
 
 sdif f1 f2
 
-diff f1 f2 | cdif
+diff -c f1 f2 | cdif
 
-git diff | sdif --cdif -n
+git diff | sdif -n
 
 watchdiff df
 
@@ -35,9 +35,33 @@ See individual manual of each command for detail.
     or
     $ curl -sL http://cpanmin.us | perl - App::sdif
 
+## GIT
+
+Those are sample configurations using **sdif** family in git
+environment.  You need install **mecab** command to use **--mecab**
+option.
+
+        ~/.gitconfig
+                [pager]
+                        log  = sdif | less
+                        show = sdif | less
+                        diff = sdif | less
+
+        ~/.sdifrc
+                option default -n --margin=4
+
+        ~/.cdifrc
+                option default --mecab
+
+        ~/.profile
+                export LESS="-cR"
+                export LESSANSIENDCHARS="mK"
+
 # SEE ALSO
 
 [sdif](https://metacpan.org/pod/sdif), [cdif](https://metacpan.org/pod/cdif), [watchdiff](https://metacpan.org/pod/watchdiff)
+
+[Getopt::EX](https://metacpan.org/pod/Getopt::EX)
 
 # LICENSE
 

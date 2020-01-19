@@ -4,7 +4,7 @@ BEGIN {
     use Test::More;
 
     # Author tests - requires Config::Std
-    plan skip_all => "\$ENV{AUTHOR} required for these tests" if(!defined $ENV{AUTHOR});
+    plan skip_all => "\$ENV{AUTHOR_TESTING} required for these tests" if(!$ENV{AUTHOR_TESTING});
     eval "use Config::Std";
     plan skip_all => "Optional Module Config::Std Required for these tests" if($@);
 }

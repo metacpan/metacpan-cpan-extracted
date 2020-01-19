@@ -60,19 +60,6 @@ sub API_set_locale ( $self, $auth, $locale ) {
     return $res;
 }
 
-sub API_signout ( $self, $auth ) {
-
-    # request is authenticated from the session token
-    if ( $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] && $auth->{private_token}->[$PRIVATE_TOKEN_TYPE] == $TOKEN_TYPE_SESSION ) {
-
-        # remove user session
-        return $self->{api}->user_session_remove( $auth->{private_token}->[$PRIVATE_TOKEN_ID] );
-    }
-
-    # not a session token
-    return 400;
-}
-
 1;
 __END__
 =pod

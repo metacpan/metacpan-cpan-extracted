@@ -2,7 +2,9 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 4;
+use Test::Most tests => 3;
+use lib 't/lib';
+use MyLogger;
 
 # Test for https://rt.cpan.org/Ticket/Display.html?id=100242
 
@@ -25,54 +27,4 @@ RT100242: {
 
 	my $sm = new_ok('HTML::SocialMedia' => [ logger => MyLogger->new() ]);
 	ok(defined($sm->as_string(facebook_like_button => 1)));
-}
-
-# On some platforms it's failing - find out why
-package MyLogger;
-
-sub new {
-	my ($proto, %args) = @_;
-
-	my $class = ref($proto) || $proto;
-
-	return bless { }, $class;
-}
-
-sub warn {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
-	::ok($message =~ /Can't determine language from IP 195.29.95.225, country hr/);
-}
-
-sub debug {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
-}
-
-sub trace {
-	my $self = shift;
-	my $message = shift;
-
-	# Enable this for debugging
-	# ::diag($message);
-}
-
-sub info {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
-}
-
-sub error {
-	my $self = shift;
-	my $message = shift;
-
-	::diag($message);
 }

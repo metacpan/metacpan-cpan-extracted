@@ -10,7 +10,7 @@ use Pcore::Util::UUID qw[uuid_from_bin];
 
 our $EXPORT = {
     ROOT_USER       => [qw[$ROOT_USER_NAME $ROOT_USER_ID]],
-    PERMS           => [qw[$PERMS_ANY_AUTHENTICATED_USER]],
+    PERMS           => [qw[$PERMS_ANY $PERMS_AUTHENTICATED]],
     TOKEN_TYPE      => [qw[$TOKEN_TYPE_PASSWORD $TOKEN_TYPE_TOKEN $TOKEN_TYPE_SESSION $TOKEN_TYPE_EMAIL_CONFIRM $TOKEN_TYPE_PASSWORD_RECOVERY]],
     INVALIDATE_TYPE => [qw[$INVALIDATE_USER $INVALIDATE_TOKEN $INVALIDATE_ALL]],
     PRIVATE_TOKEN   => [qw[$PRIVATE_TOKEN_ID $PRIVATE_TOKEN_HASH $PRIVATE_TOKEN_TYPE]],
@@ -28,7 +28,8 @@ has _auth_cache_cleanup_timer => ( init_arg             => undef );    # Instanc
 const our $ROOT_USER_NAME => 'root';
 const our $ROOT_USER_ID   => 1;
 
-const our $PERMS_ANY_AUTHENTICATED_USER => '*';
+const our $PERMS_ANY           => undef;
+const our $PERMS_AUTHENTICATED => '*';
 
 const our $TOKEN_TYPE_PASSWORD          => 1;
 const our $TOKEN_TYPE_TOKEN             => 2;
@@ -190,6 +191,8 @@ sub _unpack_token ( $self, $token ) {
         # unpack token id
         $token_id = uuid_from_bin( substr $token_bin, 0, 16 )->str;
 
+        die if length $token_bin < 16;
+
         $token_type = unpack 'C', substr $token_bin, 16, 1;
 
         $private_token_hash = sha3_512_bin substr $token_bin, 17;
@@ -328,7 +331,7 @@ sub _auth_cache_cleanup ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 187                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 188                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

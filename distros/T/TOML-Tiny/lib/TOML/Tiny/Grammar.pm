@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
 # ABSTRACT: exports regex definition of TOML grammar
-$TOML::Tiny::Grammar::VERSION = '0.01';
+$TOML::Tiny::Grammar::VERSION = '0.03';
 use strict;
 use warnings;
 use v5.18;
@@ -145,7 +145,7 @@ TOML::Tiny::Grammar - exports regex definition of TOML grammar
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

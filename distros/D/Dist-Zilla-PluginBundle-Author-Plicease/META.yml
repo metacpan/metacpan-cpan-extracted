@@ -3,11 +3,13 @@ abstract: 'Dist::Zilla plugin bundle used by Plicease'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
+  Test2::V0: '0.000060'
   Test::More: '0.98'
   Test::Script: '1.10'
   perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0.06'
   perl: '5.014'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -16,13 +18,20 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-Plicease
+no_index:
+  directory:
+    - corpus
+    - lib/Dist/Zilla/MintingProfile
+    - profiles
+  file:
+    - lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm
 recommends:
   PerlX::Maybe::XS: '0'
 requires:
+  Data::Section: '0'
   Dist::Zilla: '6.00'
   Dist::Zilla::App::Command::aliendeps: '0.01'
   Dist::Zilla::Plugin::Alien: '0.023'
-  Dist::Zilla::Plugin::Author::Plicease: '2.41'
   Dist::Zilla::Plugin::AutoMetaResources: '1.20'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0.150250'
   Dist::Zilla::Plugin::InsertExample: '0.04'
@@ -32,24 +41,31 @@ requires:
   Dist::Zilla::Plugin::PodWeaver: '4.006'
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.150250'
   Dist::Zilla::Plugin::Run::BeforeBuild: '0.035'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
   Dist::Zilla::Util::CurrentCmd: '0'
+  File::ShareDir::Dist: '0'
+  File::chdir: '0'
   IPC::System::Simple: '1.25'
   Moose: '0'
   Path::Tiny: '0'
+  Perl::Tidy: '0'
   PerlX::Maybe: '0.003'
   Pod::Markdown: '1.400'
+  Sub::Exporter::ForMethods: '0'
   Test::Fixme: '0.14'
   Test::Pod: '1.48'
   Test::Pod::Coverage: '1.10'
   Test::Script: '1.10'
   Test::Version: '2.00'
   YAML: '1.15'
+  namespace::autoclean: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.41'
+version: '2.42'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

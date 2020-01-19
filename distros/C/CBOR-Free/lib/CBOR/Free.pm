@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.16';
+    $VERSION = '0.17';
     XSLoader::load();
 }
 
@@ -87,8 +87,32 @@ Notes on mapping Perl to CBOR:
 =over
 
 =item * The internal state of a defined Perl scalar (e.g., whether it’s an
-integer, float, byte string, or character string) determines its CBOR
-encoding.
+integer, float, string, etc.) determines its CBOR encoding.
+
+=item * Perl doesn’t currently provide reliable binary/character string types.
+CBOR::Free tries to distinguish anyway by look at a string’s UTF8 flag: if
+set, then the string becomes CBOR text; otherwise, it’ll be CBOR binary.
+That’s not always going to work, though. A trivial example:
+
+    perl -MCBOR::Free -e'my $str = "abc"; utf8::decode($str); print CBOR::Free::encode($str)'
+
+Since C<utf8::decode()> doesn’t set the UTF8 flag unless it “has to”
+(see L<utf8>), that function is a no-op in the above.
+
+The above I<will> work if you use L<Unicode::UTF8> instead:
+
+    perl -MUnicode::UTF8 -MCBOR::Free -e'print CBOR::Free::encode(Unicode::UTF8::decode_utf8("abc"))'
+
+… but even then, this merely I<happens> to work. Perl itself does not, and
+cannot, reliably distinguish a text string from a binary string via
+introspection.
+
+B<IMPORTANT:> Whatever consumes your Perl-sourced CBOR B<MUST> account
+for the prospect of an incorrectly-typed string.
+
+=item * The above applies also to strings vs. numbers: whatever consumes
+your Perl-sourced CBOR B<MUST> account for the prospect of numbers that
+are in CBOR as strings, or vice-versa.
 
 =item * Perl hash keys become CBOR binary strings.
 
@@ -120,8 +144,10 @@ Notes on mapping CBOR to Perl:
 
 =over
 
-=item * CBOR text strings become Perl character strings. CBOR binary strings
-become Perl byte strings. (This may become configurable later.)
+=item * CBOR text strings become Perl strings with the internal UTF8 flag set.
+CBOR binary strings become Perl strings I<without> that flag set. This is
+a mostly-internal distinction in Perl that doesn’t actually constitute
+separate byte/character string types, but it’s at least something similar.
 
 Note that invalid UTF-8 in a CBOR text string is considered
 invalid input and will thus prompt a thrown exception.

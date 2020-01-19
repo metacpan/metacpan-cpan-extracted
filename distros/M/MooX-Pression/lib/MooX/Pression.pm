@@ -4,13 +4,13 @@ use warnings;
 use B ();
 use Carp ();
 use Import::Into ();
-use MooX::Press ();
+use MooX::Press 0.025 ();
 use MooX::Press::Keywords ();
 
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.008';
 
 use Keyword::Declare;
 use B::Hooks::EndOfScope;
@@ -204,27 +204,41 @@ my $handle_signature_list = sub {
 	require B;
 	die "cannot mix named and positional (yet?)" if $seen_pos && $seen_named;
 
+	my $extra = '';
+	my $count = @parsed;
 	while (my $p = shift @parsed) {
-		push @signature_var_list, $p->{name};
 		$type_params_stuff .= B::perlstring($p->{name}) . ',' if $seen_named;
-		if (@parsed and $p->{name} =~ /^[\@\%]/) {
-			die "Cannot have slurpy in non-final position";
+		if ($p->{name} =~ /^[\@\%]/) {
+			die "Cannot have slurpy in non-final position" if @parsed;
+			$extra .= sprintf(
+				'my (%s) = (@_==%d ? %s{$_[-1]} : ());',
+				$p->{name},
+				$count,
+				substr($p->{name}, 0, 1),
+			);
+			$p->{slurpy} = 1;
+			if ($p->{type} eq 'Any') {
+				$p->{type} = substr($p->{name}, 0, 1) eq '%' ? 'HashRef' : 'ArrayRef';
+			}
 		}
+		else {
+			push @signature_var_list, $p->{name};
+		}
+		
 		if ($p->{type_is_block}) {
 			$type_params_stuff .= sprintf('scalar(do %s)', $p->{type}) . ',';
 		}
 		else {
 			$type_params_stuff .= B::perlstring($p->{type}) . ',';
 		}
-		if (exists $p->{optional} or exists $p->{default}) {
+		if (exists $p->{optional} or exists $p->{default} or $p->{slurpy}) {
 			$type_params_stuff .= '{';
 			$type_params_stuff .= sprintf('optional=>%d,', !!$p->{optional}) if exists $p->{optional};
-			$type_params_stuff .= sprintf('default=>scalar(%s),', $p->{default}) if exists $p->{default};
+			$type_params_stuff .= sprintf('default=>sub{scalar(%s)},', $p->{default}) if exists $p->{default};
+			$type_params_stuff .= sprintf('slurpy=>%d,', !!$p->{slurpy}) if exists $p->{slurpy};
 			$type_params_stuff .= '},';
 		}
 	}
-	
-	# TODO: slurpy still needs thought!
 	
 	@signature_var_list = '$arg' if $seen_named;
 	$type_params_stuff .= ']';
@@ -233,6 +247,7 @@ my $handle_signature_list = sub {
 		$seen_named,
 		join(',', @signature_var_list),
 		$type_params_stuff,
+		$extra,
 	);
 };
 
@@ -258,7 +273,7 @@ keytype RoleList is /
 	)*
 /xs;  #/*
 
-my $handle_rolelist = sub {
+my $handle_role_list = sub {
 	my ($rolelist, $kind) = @_;
 	my @return;
 	
@@ -341,8 +356,8 @@ sub _handle_factory_keyword {
 			$code,
 		);
 	}
-	my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
-	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); do %s }', $signature_var_list, $code);
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); %s; do %s }', $signature_var_list, $extra, $code);
 	sprintf(
 		'q[%s]->_factory(%s, { code => %s, named => %d, signature => %s });',
 		$me,
@@ -357,13 +372,13 @@ sub _handle_modifier_keyword {
 	my ($me, $kind, $name, $code, $sig) = @_;
 	
 	if ($sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 		my $munged_code;
 		if ($kind eq 'around') {
-			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); my $class = ref($self)||$self; do %s }', $signature_var_list, $code);
+			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		}
 		else {
-			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); my $class = ref($self)||$self; do %s }', $signature_var_list, $code);
+			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		}
 		sprintf(
 			'q[%s]->_modifier(q(%s), %s, { code => %s, named => %d, signature => %s });',
@@ -436,13 +451,15 @@ sub import {
 	# `class` keyword
 	#
 	keyword class ('+'? $plus, QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { my($generator,%s)=(shift,@_); q(%s)->_package_callback(sub %s) }', $signature_var_list, $me, $classdfn);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
 		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => %s; use MooX::Pression::_Gather -unparent;',
+			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
 			B::perlstring("$plus$classname"),
 			B::perlstring("class_generator:$plus$classname"),
 			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
 		);
 	}
 	keyword class ('+'? $plus, QualifiedIdentifier $classname, Block $classdfn) {
@@ -464,13 +481,15 @@ sub import {
 	# `role` keyword
 	#
 	keyword role (QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { my($generator,%s)=(shift,@_); q(%s)->_package_callback(sub %s) }', $signature_var_list, $me, $classdfn);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
 		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => %s; use MooX::Pression::_Gather -unparent;',
+			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
 			B::perlstring($classname),
 			B::perlstring('role_generator:'.$classname),
 			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
 		);
 	}
 	keyword role (QualifiedIdentifier $classname, Block $classdfn) {
@@ -507,13 +526,13 @@ sub import {
 	# `extends` keyword
 	#
 	keyword extends (RoleList $parent) {
-		sprintf('q[%s]->_extends(%s);', $me, $parent->$handle_rolelist('class'));
+		sprintf('q[%s]->_extends(%s);', $me, $parent->$handle_role_list('class'));
 	}
 	
 	# `with` keyword
 	#
 	keyword with (RoleList $roles) {
-		sprintf('q[%s]->_with(%s);', $me, $roles->$handle_rolelist('role'));
+		sprintf('q[%s]->_with(%s);', $me, $roles->$handle_role_list('role'));
 	}
 	
 	# `requires` keyword
@@ -556,8 +575,8 @@ sub import {
 	# `method` keyword
 	#
 	keyword method (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); my $class = ref($self)||$self; do %s }', $signature_var_list, $code);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		sprintf(
 			'q[%s]->_can(%s, { code => %s, named => %d, signature => %s });',
 			$me,
@@ -666,7 +685,7 @@ sub _package_callback {
 	shift;
 	my $cb = shift;
 	local %OPTS = ();
-	$cb->();
+	&$cb;
 	return +{ %OPTS };
 }
 sub _has {
@@ -1063,12 +1082,12 @@ Often it makes more sense to parameterize roles than classes.
     }
     
     role Species ( Str $common_name, Str $binomial ) {
-      extends Animal;
       constant common_name  = $common_name;
       constant binomial     = $binomial;
     }
     
     class Dog {
+      extends Animal;
       with Species('dog', 'Canis familiaris'), GoodBoi?;
       method bark () {
         say "woof!";
@@ -1473,11 +1492,22 @@ As with named arguments, C<< $self >> is automatically shifted off C<< @_ >>
 and C<< $class >> exists. Unlike named arguments, there is no C<< $arg >>
 variable, and instead a scalar variable is defined for each named argument.
 
-Allowing a slurpy hash or array at the end of the signature is currently not
-supported, but is planned.
-
-Optional arguments and default are supported in the same way as named
+Optional arguments and defaults are supported in the same way as named
 arguments.
+
+It is possible to include a slurpy hash or array at the end of the list
+of positional arguments.
+
+  method marry ( $partner, $date, @vows ) {
+    ...;
+  }
+
+If you need to perform a type check on the slurpy parameter, you should
+pretend it is a hashref or arrayref.
+
+  method marry ( $partner, $date, ArrayRef[Str] @vows ) {
+    ...;
+  }
 
 =head4 Empty Signatures
 
@@ -2042,8 +2072,6 @@ MooX::Pression:
   }
 
 =head2 Future Directions
-
-Slurpy parameters for methods need to be integrated.
 
 Something like MooX::HandlesVia or Moose native traits would be good.
 MooX::HandlesVia doesn't work well for non-reference values though.

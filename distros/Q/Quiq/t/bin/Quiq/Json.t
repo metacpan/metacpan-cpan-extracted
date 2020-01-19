@@ -78,7 +78,7 @@ sub test_encode : Test(13) {
         },
         min => undef,
     });
-    $self->is($json,"{bool:true,min:undefined,obj:{id:4711,name:'Wall',".
+    $self->is($json,"{bool:true,obj:{id:4711,name:'Wall',".
         "numbers:[1,2,3,4,5]},pi:3.14159,str:'Hello world!'}");
 }
 
@@ -144,6 +144,19 @@ sub test_object : Test(6) {
         ),
         min => undef,
     );
+    #$self->isText("$json\n",q~
+    #    {
+    #        pi: 3.14159,
+    #        str: 'Hello world!',
+    #        bool: true,
+    #        obj: {
+    #            id: 4711,
+    #            name: 'Wall',
+    #            numbers: [1,2,3,4,5],
+    #        },
+    #        min: undefined,
+    #    }
+    #~);
     $self->isText("$json\n",q~
         {
             pi: 3.14159,
@@ -154,7 +167,6 @@ sub test_object : Test(6) {
                 name: 'Wall',
                 numbers: [1,2,3,4,5],
             },
-            min: undefined,
         }
     ~);
 
@@ -279,8 +291,6 @@ sub test_object : Test(6) {
                             maxRotation: 60,
                         },
                         time: {
-                            min: undefined,
-                            max: undefined,
                             minUnit: 'second',
                             displayFormats: {
                                 second: 'YYYY-MM-DD HH:mm:ss',
@@ -298,7 +308,6 @@ sub test_object : Test(6) {
                     yAxes: [{
                         ticks: {
                             min: 0,
-                            max: undefined,
                         },
                         scaleLabel: {
                             display: true,

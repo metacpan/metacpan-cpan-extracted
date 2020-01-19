@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 # -----------------------------------------------------------------------------
 
@@ -221,7 +221,7 @@ sub html {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 

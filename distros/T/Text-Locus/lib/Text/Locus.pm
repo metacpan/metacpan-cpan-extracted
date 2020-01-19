@@ -8,7 +8,7 @@ use Carp;
 use Clone;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 NAME
 
@@ -101,6 +101,48 @@ sub add {
     return $self;
 }
 
+=head2 has_file
+
+    if ($locus->has_file($file)) ...
+
+Returns true if the filename B<$file> is present in the locus.
+
+=cut
+
+sub has_file {
+    my ($self, $file) = @_;
+    return exists($self->{_table}{$file});
+}
+
+=head2 filenames
+
+    @list = $locus->filenames
+
+Returns a list of file names from the locus.  The list preserves the
+order in which filenames were added to the locus.
+
+=cut
+
+sub filenames {
+    my ($self) = @_;
+    sort { $self->{_table}{$a}{_order} <=> $self->{_table}{$b}{_order} }
+    keys %{$self->{_table}};
+}
+
+=head2 filelines
+
+    @list = $locus->filelines($file)
+
+Returns the list of lines in <$file> which are part of this locus.
+
+=cut
+
+sub filelines {
+    my ($self, $file) = @_;
+    return unless $self->has_file($file);
+    return @{$self->{_table}{$file}{_lines}}
+}
+
 =head2 union
 
     $locus->union($locus2);
@@ -152,10 +194,7 @@ sub format {
     my $self = shift;
     unless (exists($self->{_string})) {
 	$self->{_string} = '';
-	foreach my $file (sort {
-	                    $self->{_table}{$a}{_order} <=> $self->{_table}{$b}{_order}
-			  }
-			  keys %{$self->{_table}}) {
+	foreach my $file ($self->filenames) {
 	    $self->{_string} .= ';' if $self->{_string};
 	    $self->{_string} .= "$file";
 	    if (my @lines = @{$self->{_table}{$file}{_lines}}) {
@@ -195,6 +234,20 @@ sub format {
     return $self->{_string};
 }
 
+=head2 equals
+
+    $bool = $locus->equals($other);
+
+Returns true if $locus and $other are equal (i.e. refer to the same
+source file location).
+
+=cut
+
+sub equals {
+    my ($self, $other) = @_;
+    return $self->format eq $other->format;
+}
+
 =head1 OVERLOADED OPERATIONS
 
 When used in a string, the locus object formats itself. E.g. to print
@@ -218,7 +271,9 @@ Moreover, a term can also be a string in the form C<I<file>:I<line>>:
 or
 
     "file:10" + $loc    
-    
+
+Two locus objects can be compared for equality using B<==> or B<eq> operators.
+
 =cut
 
 use overload
@@ -236,7 +291,9 @@ use overload
 	} else {
 	    croak "bad argument type in locus addition";
 	}
-    };
+    },
+    'eq' => \&equals,
+    '==' => \&equals;
 
 =head1 FIXUPS
 

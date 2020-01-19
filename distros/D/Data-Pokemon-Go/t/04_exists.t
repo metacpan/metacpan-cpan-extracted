@@ -14,12 +14,12 @@ my $pg = new_ok 'Data::Pokemon::Go::Pokemon';                           # 2
 my @list = @Data::Pokemon::Go::Pokemon::List;
 my @types = @Data::Pokemon::Go::Pokemon::Types;
 
-subtest 'Exists' => sub {                                            # 3
+subtest 'Recommend' => sub {                                            # 3
     plan tests => scalar @list;
     foreach my $name (@list) {
         is $pg->exists($name), 1, "$name exists in data";
         $pg->name($name);
-        note $pg->name() . '[' . $pg->id() . ']は' . join( '／', @{$pg->types()} ) . "タイプ";
+        note $pg->name() . "\[${\$pg->id}\]は" . join( '／', @{$pg->types()} ) . "タイプ";
     }
 };
 

@@ -1,10 +1,8 @@
 package Indent::Form;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
@@ -17,8 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -56,7 +53,7 @@ sub new {
 	}
 
 	# 'line_size' check.
-	if ($self->{'line_size'} !~ /^\d*$/ms || $self->{'line_size'} < 0) {
+	if ($self->{'line_size'} !~ /^\d*$/ms) {
 		err '\'line_size\' parameter must be a number.', 
 			'line_size', $self->{'line_size'};
 	}
@@ -94,8 +91,8 @@ sub indent {
 
 		# Non-indent.
 		if ($non_indent_flag) {
-			push @data, $dat->[0].$self->{'form_separator'}.
-				$dat->[1];
+			push @data, $self->_value($dat->[0]).$self->{'form_separator'}.
+				$self->_value($dat->[1]);
 		}
 	}
 
@@ -110,6 +107,7 @@ sub indent {
 	my $next_indent = $self->{'next_indent'} ? $self->{'next_indent'}
 		: $SPACE x ($max + $self->_length($self->{'form_separator'}));
 	my $word = Indent::Word->new(
+		'ansi' => $self->{'ansi'},
 		'line_size' => $self->{'line_size'} - $max
 			- $self->_length($self->{'form_separator'}),
 		'next_indent' => $next_indent,
@@ -118,28 +116,26 @@ sub indent {
 	foreach my $dat_ar (@{$data_ar}) {
 		my $output = $actual_indent;
 
-		# Left side.
+		# Left side, left align.
 		if ($self->{'align'} eq 'left') {
-			$output .= $dat_ar->[0];
+			$output .= $self->_value($dat_ar->[0]);
 			$output .= $self->{'fill_character'}
 				x ($max - $self->_length($dat_ar->[0]));
-		} elsif ($self->{'align'} eq 'right') {
+
+		# Left side, right align.
+		} else {
 			$output .= $self->{'fill_character'}
 				x ($max - $self->_length($dat_ar->[0]));
-			$output .= $dat_ar->[0];
+			$output .= $self->_value($dat_ar->[0]);
 		}
 
 		# Right side.
-		if ($dat_ar->[1]) {
-			$output .= $self->{'form_separator'};
-			my @tmp = $word->indent($dat_ar->[1]);
-			$output .= shift @tmp;
-			push @data, $output;
-			while (@tmp) {
-				push @data, $actual_indent.shift @tmp;
-			}
-		} else {
-			push @data, $output;
+		$output .= $self->{'form_separator'};
+		my @tmp = $word->indent($self->_value($dat_ar->[1]));
+		$output .= shift @tmp if @tmp;
+		push @data, $output;
+		while (@tmp) {
+			push @data, $actual_indent.shift @tmp;
 		}
 	}
 
@@ -150,11 +146,26 @@ sub indent {
 # Get length.
 sub _length {
 	my ($self, $string) = @_;
+
+	if (! defined $string) {
+		return 0;
+	}
+
 	if ($self->{'ansi'}) {
 		return length Text::ANSI::Util::ta_strip($string);
 	} else {
 		return length $string;
 	}
+}
+
+sub _value {
+	my ($self, $string) = @_;
+
+	if (! defined $string) {
+		return $EMPTY_STR;
+	}
+
+	return $string;
 }
 
 1;
@@ -172,6 +183,7 @@ __END__
 =head1 SYNOPSIS
 
  use Indent::Form;
+
  my $indent = Indent::Form->new(%parametes);
  $indent->indent($data_ar, $actual_indent, $non_indent_flag);
 
@@ -244,11 +256,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Form;
 
  # Indent object.
@@ -273,11 +283,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Form;
 
  # Indent object.
@@ -304,11 +312,9 @@ __END__
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Form;
 
  # Indent object.
@@ -334,6 +340,34 @@ __END__
  # Description: File
  # Author.....: skim.cz
 
+=head1 EXAMPLE4
+
+ use strict;
+ use warnings;
+
+ use Encode qw(decode_utf8 encode_utf8);
+ use Indent::Form;
+
+ # Indent object.
+ my $indent = Indent::Form->new;
+
+ # Input data.
+ my $input_ar = [
+         ['Filename', 'foo.bar'],
+         ['Size', '1456kB'],
+         ['Description', 'File'],
+         ['Author', 'skim.cz'],
+ ];
+
+ # Indent.
+ print encode_utf8($indent->indent($input_ar, decode_utf8('|↔| ')))."\n";
+
+ # Output:
+ # |↔|    Filename: foo.bar
+ # |↔|        Size: 1456kB
+ # |↔| Description: File
+ # |↔|      Author: skim.cz
+
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
@@ -347,25 +381,52 @@ L<Text::ANSI::Util> for situation with 'ansi' => 1.
 
 =head1 SEE ALSO
 
-L<Indent>,
-L<Indent::Block>,
-L<Indent::Data>,
-L<Indent::String>,
-L<Indent::Utils>,
-L<Indent::Word>.
+=over 8
+
+=item L<Indent>
+
+ Class for indent handling.
+
+=item L<Indent::Block>
+
+ Class for block indenting.
+
+=item L<Indent::Data>
+
+ Class for data indenting.
+
+=item L<Indent::String>
+
+ Class for text indenting.
+
+=item L<Indent::Utils>
+
+ Utilities for Indent classes.
+
+=item L<Indent::Word>
+
+ Class for word indenting.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/Indent-Form>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2011-2020 Michal Josef Špaček
+ Artistic License
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.05
 
 =cut

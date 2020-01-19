@@ -45,13 +45,15 @@ sub run ( $type, $args ) {
         on_rpc => sub ( $self, $tx ) {
             my $method_name = "API_$tx->{method}";
 
+            $method_name =~ tr/-/_/;
+
             if ( my $sub = $node->can($method_name) ) {
 
                 # call method
                 return $node->$sub( $tx->{args} ? $tx->{args}->@* : () );
             }
             else {
-                return [ 400, q[Method not implemented] ];
+                return [ 400, 'Method not implemented' ];
             }
         },
     );

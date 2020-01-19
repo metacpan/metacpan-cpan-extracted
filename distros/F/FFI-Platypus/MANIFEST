@@ -264,6 +264,7 @@ t/memory.t
 t/threads.t
 t/type_complex_double.t
 t/type_complex_float.t
+t/type_custom.t
 t/type_double.t
 t/type_float.t
 t/type_longdouble.t

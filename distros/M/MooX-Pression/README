@@ -319,12 +319,12 @@ DESCRIPTION
         }
     
         role Species ( Str $common_name, Str $binomial ) {
-          extends Animal;
           constant common_name  = $common_name;
           constant binomial     = $binomial;
         }
     
         class Dog {
+          extends Animal;
           with Species('dog', 'Canis familiaris'), GoodBoi?;
           method bark () {
             say "woof!";
@@ -718,11 +718,22 @@ DESCRIPTION
     exists. Unlike named arguments, there is no $arg variable, and instead a
     scalar variable is defined for each named argument.
 
-    Allowing a slurpy hash or array at the end of the signature is currently
-    not supported, but is planned.
-
-    Optional arguments and default are supported in the same way as named
+    Optional arguments and defaults are supported in the same way as named
     arguments.
+
+    It is possible to include a slurpy hash or array at the end of the list of
+    positional arguments.
+
+      method marry ( $partner, $date, @vows ) {
+        ...;
+      }
+
+    If you need to perform a type check on the slurpy parameter, you should
+    pretend it is a hashref or arrayref.
+
+      method marry ( $partner, $date, ArrayRef[Str] @vows ) {
+        ...;
+      }
 
    Empty Signatures
     There is a difference between the following two methods:
@@ -1267,8 +1278,6 @@ DESCRIPTION
       }
 
   Future Directions
-    Slurpy parameters for methods need to be integrated.
-
     Something like MooX::HandlesVia or Moose native traits would be good.
     MooX::HandlesVia doesn't work well for non-reference values though.
     MooX::Enumeration proves that it's possible to do!

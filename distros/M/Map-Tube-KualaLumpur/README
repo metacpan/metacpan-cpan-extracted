@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::KualaLumpur;
+
      my $obj = Map::Tube::KualaLumpur->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -69,11 +70,9 @@ METHODS
              Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::KualaLumpur;
 
@@ -90,11 +89,9 @@ EXAMPLE1
      # Route: Kuang (Seremban Line), Sungai Buloh (Seremban Line), Kepong Sentral (Seremban Line), Kepong (Seremban Line), Segambut (Seremban Line), Putra (Port Klang Line, Walking), Bank Negara (Port Klang Line, Walking), Kuala Lumpur (Port Klang Line), KL Sentral (Port Klang Line, Terminal1, Terminal5, Walking, Terminal6), Angkasapuri (Port Klang Line), Pantai Dalam (Port Klang Line), Petaling (Port Klang Line), Jalan Templer (Port Klang Line), Kampung Dato Harun (Port Klang Line), Seri Setia (Port Klang Line), Setia Jaya (Port Klang Line), Subang Jaya (Port Klang Line)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::KualaLumpur;
 
      # Object.
@@ -110,11 +107,9 @@ EXAMPLE2
      # XML file: .*/kuala_lumpur-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::KualaLumpur;
@@ -138,11 +133,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 379962 Sep 28 12:11 KualaLumpur.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::KualaLumpur;
 
@@ -165,6 +158,55 @@ EXAMPLE4
      # Seremban Line
      # Sri Petaling Line
 
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Encode qw(encode_utf8);
+     use Map::Tube::KualaLumpur;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = $ARGV[0];
+
+     # Object.
+     my $obj = Map::Tube::KualaLumpur->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Ampang Line' argument.
+     # Sentul Timur
+     # Sentul
+     # Titiwangsa
+     # PWTC
+     # Sultan Ismail
+     # Bandaraya
+     # Masjid Jamek
+     # Plaza Rakyat
+     # Hang Tuah
+     # Pudu
+     # Chan Sow Lin
+     # Miharja
+     # Maluri
+     # Pandan Jaya
+     # Pandan Indah
+     # Cempaka
+     # Cahaya
+     # Ampang
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -179,18 +221,18 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-KualaLumpur>
+    <https://github.com/michal-josef-spacek/Map-Tube-KualaLumpur>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2020 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

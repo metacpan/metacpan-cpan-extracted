@@ -3,6 +3,8 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec();
 
+delete $ENV{HOME};
+
 sub last_desperate_search {
     if ( ( $^O eq 'MSWin32' ) ) {
         print "Checking in Path:" . `"firefox.exe" -version` . "\n";

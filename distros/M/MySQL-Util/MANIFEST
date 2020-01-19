@@ -3,6 +3,7 @@ bin/myutil_dump_columns.pl
 bin/myutil_dump_table_constraints.pl
 bin/myutil_dump_table_fks.pl
 bin/myutil_dump_tables.pl
+bin/myutil_gen_hist_tables.pl
 Changes
 CONF
 eg/myutil_drop_test_db.pl

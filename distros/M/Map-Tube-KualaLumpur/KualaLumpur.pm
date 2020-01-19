@@ -1,17 +1,14 @@
 package Map::Tube::KualaLumpur;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Get XML.
 has xml => (
@@ -36,6 +33,7 @@ Map::Tube::KualaLumpur - Interface to the KualaLumpur urban monorail system map.
 =head1 SYNOPSIS
 
  use Map::Tube::KualaLumpur;
+
  my $obj = Map::Tube::KualaLumpur->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -117,11 +115,9 @@ For more information about KualaLumpur Map, click L<here|https://https://en.wiki
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::KualaLumpur;
 
@@ -139,11 +135,9 @@ For more information about KualaLumpur Map, click L<here|https://https://en.wiki
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::KualaLumpur;
 
  # Object.
@@ -160,11 +154,9 @@ For more information about KualaLumpur Map, click L<here|https://https://en.wiki
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::KualaLumpur;
@@ -189,19 +181,17 @@ For more information about KualaLumpur Map, click L<here|https://https://en.wiki
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-KualaLumpur/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-KualaLumpur/master/images/ex3.png" alt="Rapid Rail" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-KualaLumpur/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-KualaLumpur/master/images/ex3.png" alt="Rapid Rail" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::KualaLumpur;
 
@@ -223,6 +213,56 @@ For more information about KualaLumpur Map, click L<here|https://https://en.wiki
  # Port Klang Line
  # Seremban Line
  # Sri Petaling Line
+
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Encode qw(encode_utf8);
+ use Map::Tube::KualaLumpur;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = $ARGV[0];
+
+ # Object.
+ my $obj = Map::Tube::KualaLumpur->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Ampang Line' argument.
+ # Sentul Timur
+ # Sentul
+ # Titiwangsa
+ # PWTC
+ # Sultan Ismail
+ # Bandaraya
+ # Masjid Jamek
+ # Plaza Rakyat
+ # Hang Tuah
+ # Pudu
+ # Chan Sow Lin
+ # Miharja
+ # Maluri
+ # Pandan Jaya
+ # Pandan Indah
+ # Cempaka
+ # Cahaya
+ # Ampang
 
 =head1 DEPENDENCIES
 
@@ -251,22 +291,22 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-KualaLumpur>
+L<https://github.com/michal-josef-spacek/Map-Tube-KualaLumpur>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2020 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

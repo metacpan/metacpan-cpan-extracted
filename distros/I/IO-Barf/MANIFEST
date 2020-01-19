@@ -4,7 +4,10 @@ doc/BENCHMARK
 examples/ex1.pl
 examples/ex2.pl
 examples/ex3.pl
+examples/ex4.pl
 inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
+inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -15,15 +18,16 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
 t/data/ex1.txt
 t/data/ex2.txt
 t/data/ex3.txt
-t/IO-Barf/00-use.t
-t/IO-Barf/01-version.t
-t/IO-Barf/02-pod_coverage.t
-t/IO-Barf/03-pod.t
-t/IO-Barf/04-barf.t
+t/data/ex4.bin
+t/IO-Barf/01-use.t
+t/IO-Barf/02-version.t
+t/IO-Barf/03-barf.t
+xt/IO-Barf/01-pod_coverage.t
+xt/IO-Barf/02-pod.t

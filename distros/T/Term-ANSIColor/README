@@ -1,4 +1,4 @@
-                           Term::ANSIColor 5.00
+                           Term::ANSIColor 5.01
                (simple ANSI text attribute control module)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -14,7 +14,8 @@ BLURB
   text attributes, most notably colors.  It can be used to set the current
   text attributes or to apply a set of attributes to a string and reset
   the current text attributes at the end of that string.  Eight-color,
-  sixteen-color, and 256-color escape sequences are all supported.
+  sixteen-color, 256-color, and true color (24-bit color) escape sequences
+  are all supported.
 
 DESCRIPTION
 

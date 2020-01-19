@@ -18,3 +18,8 @@
 ^foo
 ^pm_to_blib
 /#.+#$
+^.github/
+^.git/.*
+^MYMETA.*
+^MANIFEST.bak
+^.gitignore

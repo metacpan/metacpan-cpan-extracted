@@ -8,5 +8,6 @@ t/00format.t
 t/10add.t
 t/20fixup.t
 t/30ovr.t
+t/40inspect.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

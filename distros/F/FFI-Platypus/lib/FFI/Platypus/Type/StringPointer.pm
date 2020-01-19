@@ -4,14 +4,13 @@ use strict;
 use warnings;
 use FFI::Platypus;
 use Scalar::Util qw( readonly );
-use Config ();
 
 # ABSTRACT: Convert a pointer to a string and back
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 
 use constant _incantation =>
-  $^O eq 'MSWin32' && $Config::Config{archname} =~ /MSWin32-x64/
+  $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
   ? 'Q'
   : 'L!';
 use constant _pointer_buffer => "P" . FFI::Platypus->new( api => 1 )->sizeof('opaque');
@@ -76,7 +75,7 @@ FFI::Platypus::Type::StringPointer - Convert a pointer to a string and back
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 

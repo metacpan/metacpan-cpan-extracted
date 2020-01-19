@@ -1,8 +1,8 @@
 package App::lcpan::Cmd::similar_authors_from_related_mods;
 
-our $DATE = '2019-11-20'; # DATE
+our $DATE = '2019-11-21'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-similar_authors'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,6 +25,8 @@ There are several ways one can regard an author as similar to another. This
 subcommand offers one such way: by looking at how much their modules are related
 to one another. Related modules are defined as modules that tend to be mentioned
 together in POD documentation.
+
+Experimental.
 
 _
     args => {
@@ -97,7 +99,7 @@ App::lcpan::Cmd::similar_authors_from_related_mods - List authors similar to the
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::similar_authors_from_related_mods (from Perl distribution App-lcpan-CmdBundle-similar_authors), released on 2019-11-20.
+This document describes version 0.002 of App::lcpan::Cmd::similar_authors_from_related_mods (from Perl distribution App-lcpan-CmdBundle-similar_authors), released on 2019-11-21.
 
 =head1 DESCRIPTION
 
@@ -118,6 +120,8 @@ There are several ways one can regard an author as similar to another. This
 subcommand offers one such way: by looking at how much their modules are related
 to one another. Related modules are defined as modules that tend to be mentioned
 together in POD documentation.
+
+Experimental.
 
 This function is not exported.
 

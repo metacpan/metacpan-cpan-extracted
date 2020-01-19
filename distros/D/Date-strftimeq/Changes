@@ -1,0 +1,5 @@
+0.001   2019-11-20  Released-By: PERLANCAR
+
+        - First release, refactored from DateTimeX-strftimeq. Fixed regex which
+          had exponential backtracking problem. Also, now compile code in the
+          caller's package and without strict/warnings for more convenience.

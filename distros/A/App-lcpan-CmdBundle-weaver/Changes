@@ -1,3 +1,8 @@
+0.031   2020-01-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump Hash::Subset dependency version [RT#131407].
+
+
 0.030   2019-11-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add subcommands: weaver-{bundle,plugin,role,section}.

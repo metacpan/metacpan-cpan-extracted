@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.01';
+$TOML::Tiny::VERSION = '0.03';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -76,7 +76,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -197,6 +197,32 @@ If you wish to override this, you can provide your own routine to generate value
         return 'A Lie';
       }
     },
+  );
+
+=item inflate_integer
+
+TOML integers are 64 bit and may not match the size of the compiled perl's
+internal integer type. By default, integers are left as-is as perl strings
+which may be upgraded as needed by the caller.
+
+  my $parser = TOML::Tiny->new(
+    inflate_integer => sub{
+      use bignum;
+      return 0 + shift;
+    }
+  );
+
+=item inflate_float
+
+TOML floats are 64 bit and may not match the size of the compiled perl's
+internal float type. By default, integers are left as-is as perl strings which
+may be upgraded as needed by the caller.
+
+  my $parser = TOML::Tiny->new(
+    inflate_float => sub{
+      use bignum;
+      return 0 + shift;
+    }
   );
 
 =item strict_arrays

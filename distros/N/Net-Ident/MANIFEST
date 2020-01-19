@@ -3,7 +3,7 @@ INSTALL		installation instructions
 Ident.pm	the module itself, contains pod
 MANIFEST	this file
 Makefile.PL	feed to perl to get a makefile
-README		extract of the manpage, gives a brief overview
+README.md	extract of the manpage, gives a brief overview
 t/0use.t	script to test "use Net::Ident"
 t/Ident.t	test script that actually makes ident lookups
 t/apache.t	script to test Net::Ident within apache and mod_perl
@@ -18,5 +18,5 @@ t/apache/html/testapache.txt	simple .txt file to test basic apache ops
 t/apache/perl/testmodperl	script to test mod_perl operates OK
 t/apache/perl/testident		script to actually test ident within mod_perl
 t/apache/logs/.exists		Directory for the logfiles
-META.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

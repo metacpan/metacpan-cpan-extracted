@@ -1,0 +1,12 @@
+Changes
+lib/IO/Stty.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+scripts/stty.pl
+t/00-load.t
+t/99-pod-coverage.t
+t/99-pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

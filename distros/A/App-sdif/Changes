@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.3 2020-01-18T02:45:49Z
+
+    - Require Getopt-EX v1.15.2 to not produce Erase Line sequence.
+    - Accept number in --column option.
+
 4.13.2 2019-12-03T11:51:58Z
 
     - Flush STDOUT after processing each chunk.

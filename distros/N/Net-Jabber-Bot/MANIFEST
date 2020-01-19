@@ -1,16 +1,18 @@
 Changes
-MANIFEST
-META.yml
-Makefile.PL
-README
-examples/gtalk_RSSbot.pl
 examples/bot_example.pl
+examples/gtalk_RSSbot.pl
 lib/Net/Jabber/Bot.pm
-t/lib/MockJabberClient.pm
-t/03-test_connectivity.t
-t/99-pod.t
-t/test_config.sample
-t/06-test_safeties.t
-t/05-helper_functions.t
-t/99-pod-coverage.t
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
 t/00-load.t
+t/03-test_connectivity.t
+t/05-helper_functions.t
+t/06-test_safeties.t
+t/99-pod-coverage.t
+t/99-pod.t
+t/lib/MockJabberClient.pm
+t/test_config.sample
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

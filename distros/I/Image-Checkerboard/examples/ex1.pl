@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Temp qw(tempfile);
 use Image::Checkerboard;
 

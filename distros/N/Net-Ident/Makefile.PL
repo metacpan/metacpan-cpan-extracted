@@ -4,6 +4,8 @@
 # $Id: Makefile.PL,v 1.57 1999/08/27 00:00:09 john Exp $
 
 use strict;
+use warnings;
+
 use ExtUtils::MakeMaker qw(:DEFAULT prompt);
 use Getopt::Long;
 use Pod::Text;
@@ -20,7 +22,7 @@ You can specify the following options:
 
 HELP
 
-use vars qw($opt_help $opt_force_compat $opt_test_apache);
+our ($opt_help, $opt_force_compat, $opt_test_apache);
 my %options = (
     'help|h'         => "Produce this helptext",
     'force-compat|c' => q{
@@ -645,9 +647,7 @@ WriteMakefile(
         },
         resources => {
             license  => 'http://dev.perl.org/licenses/',
-            homepage => 'http://wiki.github.com/toddr/Net-Ident/',
-
-            #            bugtracker => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-Ident',
+            bugtracker => 'http://github.com/toddr/Net-Ident/issues',
             repository => 'http://github.com/toddr/Net-Ident',
         },
     },

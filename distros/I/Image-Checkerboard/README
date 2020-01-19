@@ -72,11 +72,9 @@ ERRORS
              Image type '%s' doesn't supported.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Temp qw(tempfile);
      use Image::Checkerboard;
 
@@ -109,17 +107,17 @@ SEE ALSO
         Perl class for creating random image.
 
 REPOSITORY
-    <https://github.com/tupinek/Image-Checkerboard>.
+    <https://github.com/michal-josef-spacek/Image-Checkerboard>.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2015 Michal Špaček
+     © 2012-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

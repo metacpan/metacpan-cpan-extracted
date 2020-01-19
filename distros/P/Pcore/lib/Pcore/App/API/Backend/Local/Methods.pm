@@ -152,8 +152,8 @@ around init => sub ( $orig, $self ) {
                         }
 
                         # any authenticated user
-                        if ( $permission eq $PERMS_ANY_AUTHENTICATED_USER ) {
-                            $method->{$method_id}->{permissions} = $PERMS_ANY_AUTHENTICATED_USER;
+                        if ( $permission eq $PERMS_AUTHENTICATED ) {
+                            $method->{$method_id}->{permissions} = $PERMS_AUTHENTICATED;
 
                             last;
                         }

@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.003
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/App/lcpan/Cmd/cwalitee_of_module_abstract.pm','lib/App/lcpan/Cmd/cwalitee_of_release_changes.pm','lib/App/lcpan/Cmd/cwalitee_of_script_abstract.pm','lib/App/lcpan/Cmd/cwalitees_of_modules_abstracts.pm','lib/App/lcpan/Cmd/cwalitees_of_scripts_abstracts.pm','lib/App/lcpan/CmdBundle/cwalitee.pm'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

@@ -13,6 +13,10 @@ use App::ansifold qw($VERSION);
 
 ansifold - fold command handling ANSI terminal sequences
 
+=head1 VERSION
+
+Version 1.02
+
 =head1 SYNOPSIS
 
 ansifold [ options ]
@@ -173,7 +177,7 @@ my @optargs = (
     "runin=i"  => \$opt{runin},
     "runout=i" => \$opt{runout},
     "n" => sub { $opt{separate} = "" },
-    "compose|s!" => sub {
+    "smart|s!" => sub {
 	($opt{boundary}, $opt{linebreak}) = do {
 	    if ($_[1]) {
 		('word', LINEBREAK_ALL);

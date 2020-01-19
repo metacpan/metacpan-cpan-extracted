@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::scripts;
 
-our $DATE = '2019-09-19'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-01-19'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to scripts
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::scripts - More lcpan subcommands related to scripts
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::scripts (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2019-09-19.
+This document describes version 0.002 of App::lcpan::CmdBundle::scripts (from Perl distribution App-lcpan-CmdBundle-scripts), released on 2020-01-19.
 
 =head1 SYNOPSIS
 
@@ -58,7 +58,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

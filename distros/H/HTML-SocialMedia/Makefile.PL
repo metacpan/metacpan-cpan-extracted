@@ -40,6 +40,7 @@ WriteMakefile(
 	'Test::NoWarnings' => 0,
 	# 'Test::Kwalitee' => 0,
 	'CGI::Info' => 0.10,	# Needs protocol()
+	'Carp' => 0,
     },
     PREREQ_PM => {
 	'CGI::Lingua' => 0.26,	# Need subcountry_code_alpha2()

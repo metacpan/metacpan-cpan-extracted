@@ -31,10 +31,10 @@ no_index:
 provides:
   Text::vCard::Precisely:
     file: lib/Text/vCard/Precisely.pm
-    version: '0.14'
+    version: '0.15'
   Text::vCard::Precisely::V3:
     file: lib/Text/vCard/Precisely/V3.pm
-    version: '0.14'
+    version: '0.15'
   Text::vCard::Precisely::V3::Node:
     file: lib/Text/vCard/Precisely/V3/Node.pm
   Text::vCard::Precisely::V3::Node::Address:
@@ -53,7 +53,7 @@ provides:
     file: lib/Text/vCard/Precisely/V3/Node/URL.pm
   Text::vCard::Precisely::V4:
     file: lib/Text/vCard/Precisely/V4.pm
-    version: '0.14'
+    version: '0.15'
   Text::vCard::Precisely::V4::Node:
     file: lib/Text/vCard/Precisely/V4/Node.pm
   Text::vCard::Precisely::V4::Node::Address:
@@ -90,7 +90,7 @@ resources:
   bugtracker: https://github.com/worthmine/Text-vCard-Precisely/issues
   homepage: https://github.com/worthmine/Text-vCard-Precisely
   repository: git://github.com/worthmine/Text-vCard-Precisely.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Yuki Yoshida <worthmine@gmail.com>'

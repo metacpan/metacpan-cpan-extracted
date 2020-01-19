@@ -1,4 +1,4 @@
-# Term::ANSIColor 5.00
+# Term::ANSIColor 5.01
 
 [![Build
 status](https://travis-ci.org/rra/ansicolor.svg?branch=master)](https://travis-ci.org/rra/ansicolor)
@@ -17,7 +17,8 @@ Term::ANSIColor provides constants and simple functions for setting ANSI
 text attributes, most notably colors.  It can be used to set the current
 text attributes or to apply a set of attributes to a string and reset the
 current text attributes at the end of that string.  Eight-color,
-sixteen-color, and 256-color escape sequences are all supported.
+sixteen-color, 256-color, and true color (24-bit color) escape sequences
+are all supported.
 
 ## Description
 

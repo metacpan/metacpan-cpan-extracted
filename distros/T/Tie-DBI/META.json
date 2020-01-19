@@ -4,13 +4,13 @@
       "Lincoln D. Stein <lds@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tie-DBI",
    "no_index" : {
@@ -36,12 +36,16 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "DBI" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/toddr/Tie-DBI/issues"
+      },
       "homepage" : "http://wiki.github.com/toddr/Tie-DBI/",
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -50,5 +54,6 @@
          "url" : "http://github.com/toddr/Tie-DBI"
       }
    },
-   "version" : "1.06"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

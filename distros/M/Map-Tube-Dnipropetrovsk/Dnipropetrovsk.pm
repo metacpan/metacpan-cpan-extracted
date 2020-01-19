@@ -1,17 +1,14 @@
 package Map::Tube::Dnipropetrovsk;
 
-# Pragmas.
 use strict;
 use warnings;
 use 5.006;
 
-# Modules.
 use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Get XML.
 has xml => (
@@ -36,6 +33,7 @@ Map::Tube::Dnipropetrovsk - Interface to the Dnipropetrovsk Metro Map.
 =head1 SYNOPSIS
 
  use Map::Tube::Dnipropetrovsk;
+
  my $obj = Map::Tube::Dnipropetrovsk->new;
  my $routes_ar = $obj->get_all_routes($from, $to);
  my $line = $obj->get_line_by_id($line_id);
@@ -81,7 +79,7 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 =item C<get_lines()>
 
  Get lines in metro map.
- Returns reference to array with Map::Tube::Line objects.
+ Returns reference to unsorted array with Map::Tube::Line objects.
 
 =item C<get_node_by_id($station_id)>
 
@@ -117,11 +115,9 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(decode_utf8 encode_utf8);
  use Map::Tube::Dnipropetrovsk;
 
@@ -139,11 +135,9 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::Dnipropetrovsk;
 
  # Object.
@@ -160,11 +154,9 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Map::Tube::GraphViz;
  use Map::Tube::GraphViz::Utils qw(node_color_without_label);
  use Map::Tube::Dnipropetrovsk;
@@ -189,19 +181,17 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/tupinek/Map-Tube-Dnipropetrovsk/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/tupinek/Map-Tube-Dnipropetrovsk/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/ex3.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Map::Tube::Dnipropetrovsk;
 
@@ -216,6 +206,44 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
  # Output:
  # Центрально-Заводська лінія
+
+=head1 EXAMPLE5
+
+ use strict;
+ use warnings;
+
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::Dnipropetrovsk;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::Dnipropetrovsk->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Центрально-Заводська лінія' argument.
+ # Комунарівська
+ # Проспект Свободи
+ # Заводська
+ # Металургів
+ # Метробудівників
+ # Вокзальна
 
 =head1 DEPENDENCIES
 
@@ -244,22 +272,22 @@ Install the Map::Tube concrete metro modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Dnipropetrovsk>
+L<https://github.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2020 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

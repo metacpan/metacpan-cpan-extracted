@@ -3,6 +3,7 @@
 
 package IO::Tty;
 
+use strict; use warnings;
 use IO::Handle;
 use IO::File;
 use IO::Tty::Constant;
@@ -13,8 +14,8 @@ require DynaLoader;
 
 use vars qw(@ISA $VERSION $XS_VERSION $CONFIG $DEBUG);
 
-$VERSION = '1.12';
-$XS_VERSION = "1.12";
+$VERSION = '1.14';
+$XS_VERSION = "1.14";
 @ISA = qw(IO::Handle);
 
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
@@ -68,7 +69,7 @@ my $SIZEOF_WINSIZE = length IO::Tty::pack_winsize(0,0,0,0);
 
 sub get_winsize {
   my $self = shift;
-  ioctl($self, IO::Tty::Constant::TIOCGWINSZ(), my $winsize)
+  ioctl($self, IO::Tty::Constant::TIOCGWINSZ(), my $winsize = q<>)
     or croak "Cannot TIOCGWINSZ - $!";
   substr($winsize, $SIZEOF_WINSIZE) = "";
   return IO::Tty::unpack_winsize($winsize);
@@ -118,7 +119,7 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 =head1 VERSION
 
-1.12
+1.14
 
 =head1 SYNOPSIS
 

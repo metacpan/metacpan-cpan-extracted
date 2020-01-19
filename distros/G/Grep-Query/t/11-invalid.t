@@ -36,7 +36,7 @@ throws_ok
 			{
 				my $hits = $gqWithField->qgrep(1, 2, 3);
 			},
-		qr/field names used in query; first argument must be a field accessor/,
+		qr/field names used in query; the argument before the list must be a field accessor/,
 		'not passing a fieldaccessor when needed'
 	);
 
@@ -55,7 +55,7 @@ throws_ok
 			{
 				my $hits = $gqWithoutField->qgrep($fieldAccessor, 1, 2, 3);
 			},
-		qr/no fields used in query, yet the first argument is a field accessor\?/,
+		qr/no fields used in query, yet the first list argument is a field accessor\?/,
 		'pass a fieldaccessor when not needed'
 	);
 

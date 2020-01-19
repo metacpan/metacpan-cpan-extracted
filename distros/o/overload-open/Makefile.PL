@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-#BEGIN { require 5.9.4; }
+BEGIN { require 5.004; }
 
 use ExtUtils::MakeMaker 7.34;
 use Module::Metadata;
@@ -38,10 +38,10 @@ my %WriteMakefileArgs = (
 );
 
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
-  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+if ( !eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUxLD_REQUIRES};
   my $pp = $WriteMakefileArgs{PREREQ_PM};
-  for my $mod ( keys %$br ) {
+  for my $mod ( keys %{$br} ) {
     if ( exists $pp->{$mod} ) {
       $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
     }
@@ -52,6 +52,6 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+  if !eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);

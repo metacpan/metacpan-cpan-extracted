@@ -12,7 +12,7 @@ sub myWriteMakefile
     if $^O ne 'MSWin32' && !$ENV{PLICEASE_DZIL_NO_GIT};
   $args{PREREQ_PM}->{'Dist::Zilla::Plugin::PkgVersion::Block'} = 0
     if $] >= 5.014;
-  
+
   WriteMakefile(%args);
 }
 

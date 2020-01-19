@@ -1,20 +1,20 @@
 ---
 abstract: 'A perl module for form indenting.'
 author:
-  - 'Michal Špaček <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Encode: 0
   English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
   File::Object: 0.08
   Test::More: 0
   Test::NoWarnings: 0
-  Test::Pod: 0
-  Test::Pod::Coverage: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.08'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,17 +25,18 @@ no_index:
     - examples
     - inc
     - t
+    - xt
 requires:
   Class::Utils: 0.05
   English: 0
   Error::Pure: 0.16
-  Indent::Word: 0.03
+  Indent::Word: 0.04
   List::MoreUtils: 0
   Readonly: 0
   perl: 5.6.2
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Indent-Form
-  homepage: https://github.com/tupinek/Indent-Form
+  homepage: https://github.com/michal-josef-spacek/Indent-Form
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Indent-Form
-version: 0.01
+  repository: git://github.com/michal-josef-spacek/Indent-Form
+version: '0.05'

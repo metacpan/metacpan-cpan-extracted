@@ -43,7 +43,8 @@ WriteMakefile(
 		"bin/myutil_create_data.pl",
 		"bin/myutil_dump_table_constraints.pl",
 		"bin/myutil_dump_table_fks.pl",
-		"bin/myutil_dump_tables.pl"
+		"bin/myutil_dump_tables.pl",
+		"bin/myutil_gen_hist_tables.pl"
 	],
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'MySQL-Util-*' },

@@ -264,6 +264,7 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 	    if (PL_dowarn)
 		warn("IO::Tty::pty_allocate(nonfatal): grantpt(): %.100s", strerror(errno));
 	}
+
 #endif /* HAVE_GRANTPT */
 #if defined(HAVE_UNLOCKPT)
 #if PTY_DEBUG
@@ -319,6 +320,38 @@ open_slave(int *ptyfd, int *ttyfd, char *namebuf, int namebuflen)
 
     if (namebuf[0] == 0)
 	return 0;		/* we failed to get the slave name */
+
+#if defined (__SVR4) && defined (__sun)
+       #include <sys/types.h>
+       #include <unistd.h>
+       {
+           uid_t euid = geteuid();
+           uid_t uid  = getuid();
+
+           /* root running as another user
+            * grantpt() has done the wrong thing
+             */
+           if (euid != uid && uid == 0) {
+#if PTY_DEBUG
+		if (print_debug)
+	  	    fprintf(stderr, "trying seteuid() from %d to %d...\n",
+			euid, uid);
+#endif
+		if (setuid(uid)) {
+		    warn("ERROR: IO::Tty::open_slave: couldn't seteuid to root: %d", errno);
+		    return 0;
+		}
+		if (chown(namebuf, euid, -1)) {
+		    warn("ERROR: IO::Tty::open_slave: couldn't fchown the pty: %d", errno);
+		    return 0;
+		}
+		if (seteuid(euid)) {
+		    warn("ERROR: IO::Tty::open_slave: couldn't seteuid back: %d", errno);
+		    return 0;
+		}
+           }
+       }
+#endif
 
     if (*ttyfd >= 0) {
       make_safe_fd(ptyfd);

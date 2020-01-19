@@ -1,3 +1,12 @@
+0.05 2020-01-18T18:42:18+01:00
+ - Add Image::Select::Date to SEE ALSO section in doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-11-19T11:59:09+01:00
  - Add Image::Select::Array module.
  - Fix and improve ABSTRACT.

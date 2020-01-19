@@ -5,11 +5,11 @@ use warnings;
 
 use POSIX;
 
-our $VERSION='0.03';
+our $VERSION='0.04';
 
 =head1 NAME
 
-Change and print terminal line settings
+IO::Stty - Change and print terminal line settings
 
 =head1 SYNOPSIS
 
@@ -363,69 +363,6 @@ sub stty {
 
   @_ or die("No parameters passed to stty");
 
-  # Version info
-  if ($_[0] eq '-v' || $_[0] =~ /version/ ) {
-    return $IO::Stty::VERSION."\n";
-  }
-  
-  
-
-  my @parameters;
-  my $parameter;
-  # Build the 'this really means this' cases.
-  foreach $parameter (@_) {
-    if($parameter eq 'ek') {
-      push (@parameters,'erase',8,'kill',21);
-      next;
-    }
-    if($parameter eq 'sane') {
-      push (@parameters,'cread','-ignbrk','brkint','-inlcr','-igncr','icrnl',
-        '-ixoff','opost','isig','icanon','iexten','echo','echoe','echok',
-        '-echonl','-noflsh','-tostop','echok','intr',3,'quit',28,'erase',
-        8,'kill',21,'eof',4,'eol',0,'stop',19,'start',17,'susp',26,
-        'time',0,'min',0 );
-      next;
-    # Ugh.
-    }
-    if($parameter eq 'cooked' || $parameter eq '-raw') {
-    # Is this right?
-      push (@parameters,'brkint','ignpar','istrip','icrnl','ixon','opost',
-        'isig','icanon');
-      push (@parameters,'intr',3,'quit',28,'erase',8,'kill',21,'eof',
-        4,'eol',0,'stop',19,'start',17,'susp',26,'time',0,'min',0);
-      next; 
-    }
-    if($parameter eq 'raw' || $parameter eq '-cooked') {
-      push (@parameters,'-ignbrk','-brkint','-ignpar','-parmrk','-inpck',
-        '-istrip','-inlcr','-igncr','-icrnl','-ixon','-ixoff',
-        '-opost','-isig','-icanon','min',1,'time',0 );
-      next;
-    }
-    if($parameter eq 'pass8') {
-      push (@parameters,'-parenb','-istrip','cs8');
-      next;
-    }
-    if($parameter eq '-pass8') {
-      push (@parameters,'parenb','istrip','cs7');
-      next;
-    }
-    if($parameter eq 'crt') {
-      push (@parameters,'echoe','echok');
-      next;
-    }
-    if($parameter eq 'dec') {
-      # 127 == delete, no?
-      push (@parameters,'echoe','echok','intr',3,'erase', 127,'kill',21);
-      next; 
-    }
-    if($parameter =~ /^\d+$/) {
-      push (@parameters,'ispeed',$parameter,'ospeed',$parameter);
-      next;
-    }  
-    push (@parameters,$parameter);
-  }
-    
-    
   # Notice fileno() instead of handle->fileno(). I want it to work with 
   # normal fhs.
   my ($file_num) = fileno($tty_handle);
@@ -454,13 +391,26 @@ sub stty {
   $control_chars{'SUSP'}=$termios->getcc(VSUSP);
   $control_chars{'EOL'}=$termios->getcc(VEOL);
   # OK.. we have our crap.
+
+  my @parameters;
+  my $parameter_with_value_rx = qr/^()$/;
+
+  if(@_ == 1) {
+    # handle the one-arg cases specifically
+    # Version info
+    if ($_[0] =~ /^(-v|version)$/ ) {
+      return $IO::Stty::VERSION."\n";
+    }
+    elsif($_[0] =~ /^\d+$/) {
+      push (@parameters,'ispeed',$_[0],'ospeed',$_[0]);
+    }
   # Do we want to know what the crap is?
-  if($parameters[0] eq '-a') {
+    elsif($_[0] eq '-a') {
     return show_me_the_crap ($c_cflag,$c_iflag,$ispeed,$c_lflag,$c_oflag,
       $ospeed,\%control_chars);
     }
   # did we get the '-g' flag?
-  if($parameters[0] eq '-g') {
+    if($_[0] eq '-g') {
     return "$c_cflag:$c_iflag:$ispeed:$c_lflag:$c_oflag:$ospeed:".
       $control_chars{'INTR'}.":".
       $control_chars{'QUIT'}.":".
@@ -473,101 +423,154 @@ sub stty {
       $control_chars{'STOP'}.":".
       $control_chars{'SUSP'}.":".
       $control_chars{'EOL'};
-  }
+    } else {
   # Or the converse.. -g used before and we're getting the return.
   # Note that this uses the functionality of stty -g, not any specific
   # method. Don't take the output here and feed it to the OS stty.
 
   # This will make  perl -w happy.
-  my(@useless_var) = split(':',$parameters[0]);
-  if (@useless_var == 17) {
+      my(@g_params) = split(':',$_[0]);
+      if (@g_params == 17) {
 #   print "Feeding back...\n";
-   @parameters = split(':',$parameters[0]);
-   ($c_cflag,$c_iflag,$ispeed,$c_lflag,$c_oflag,$ospeed)=(@parameters);
-      $control_chars{'INTR'}=$parameters[6];
-      $control_chars{'QUIT'}=$parameters[7];
-      $control_chars{'ERASE'}=$parameters[8];
-      $control_chars{'KILL'}=$parameters[9];
-      $control_chars{'EOF'}=$parameters[10];
-      $control_chars{'TIME'}=$parameters[11];
-      $control_chars{'MIN'}=$parameters[12];
-      $control_chars{'START'}=$parameters[13];
-      $control_chars{'STOP'}=$parameters[14];
-      $control_chars{'SUSP'}=$parameters[15];
-      $control_chars{'EOL'}=$parameters[16];
-      @parameters=(); # Unset so while loop is passed.
+        ($c_cflag,$c_iflag,$ispeed,$c_lflag,$c_oflag,$ospeed)=(@g_params);
+        $control_chars{'INTR'}=$g_params[6];
+        $control_chars{'QUIT'}=$g_params[7];
+        $control_chars{'ERASE'}=$g_params[8];
+        $control_chars{'KILL'}=$g_params[9];
+        $control_chars{'EOF'}=$g_params[10];
+        $control_chars{'TIME'}=$g_params[11];
+        $control_chars{'MIN'}=$g_params[12];
+        $control_chars{'START'}=$g_params[13];
+        $control_chars{'STOP'}=$g_params[14];
+        $control_chars{'SUSP'}=$g_params[15];
+        $control_chars{'EOL'}=$g_params[16];
+        # leave parameters empty
+      } else {
+        # a simple single option
+        @parameters = @_;
+      }
+    }
+  } else {
+    @parameters = @_;
   }
+
   # So.. what shall we set?
   my($set_value);
-  while ($parameter = shift(@parameters)) {
-#    print "Param:$parameter:\n";
+  local($_);
+  while (defined ($_ = shift(@parameters))) {
+#    print "Param:$_:\n";
+    # Build the 'this really means this' cases.
+    if($_ eq 'ek') {
+      unshift(@parameters,'erase',8,'kill',21);
+      next;
+    }
+    if($_ eq 'sane') {
+      unshift(@parameters,'cread','-ignbrk','brkint','-inlcr','-igncr','icrnl',
+        '-ixoff','opost','isig','icanon','iexten','echo','echoe','echok',
+        '-echonl','-noflsh','-tostop','echok','intr',3,'quit',28,'erase',
+        8,'kill',21,'eof',4,'eol',0,'stop',19,'start',17,'susp',26,
+        'time',0,'min',0 );
+      next;
+    # Ugh.
+    }
+    if($_ eq 'cooked' || $_ eq '-raw') {
+      # Is this right?
+      unshift(@parameters,'brkint','ignpar','istrip','icrnl','ixon','opost',
+        'isig','icanon',
+        'intr',3,'quit',28,'erase',8,'kill',21,'eof',
+        4,'eol',0,'stop',19,'start',17,'susp',26,'time',0,'min',0);
+      next; 
+    }
+    if($_ eq 'raw' || $_ eq '-cooked') {
+      unshift(@parameters,'-ignbrk','-brkint','-ignpar','-parmrk','-inpck',
+        '-istrip','-inlcr','-igncr','-icrnl','-ixon','-ixoff',
+        '-opost','-isig','-icanon','min',1,'time',0 );
+      next;
+    }
+    if($_ eq 'pass8') {
+      unshift(@parameters,'-parenb','-istrip','cs8');
+      next;
+    }
+    if($_ eq '-pass8') {
+      unshift(@parameters,'parenb','istrip','cs7');
+      next;
+    }
+    if($_ eq 'crt') {
+      unshift(@parameters,'echoe','echok');
+      next;
+    }
+    if($_ eq 'dec') {
+      # 127 == delete, no?
+      unshift(@parameters,'echoe','echok','intr',3,'erase', 127,'kill',21);
+      next; 
+    }
     $set_value = 1; # On by default...
     # unset if starts w/ -, as in  -crtscts
-    $set_value = 0 if $parameter=~ s/^\-//;
+    $set_value = 0 if s/^\-//;
     # Now the fun part.
     
     # c_cc field crap.
-    if ($parameter eq 'intr') { $control_chars{'INTR'} = shift @parameters; next;}
-    if ($parameter eq 'quit') { $control_chars{'QUIT'} = shift @parameters; next;}
-    if ($parameter eq 'erase') { $control_chars{'ERASE'} = shift @parameters; next;}
-    if ($parameter eq 'kill') { $control_chars{'KILL'} = shift @parameters; next;}
-    if ($parameter eq 'eof') { $control_chars{'EOF'} = shift @parameters; next;}
-    if ($parameter eq 'eol') { $control_chars{'EOL'} = shift @parameters; next;}
-    if ($parameter eq 'start') { $control_chars{'START'} = shift @parameters; next;}
-    if ($parameter eq 'stop') { $control_chars{'STOP'} = shift @parameters; next;}
-    if ($parameter eq 'susp') { $control_chars{'SUSP'} = shift @parameters; next;}
-    if ($parameter eq 'min') { $control_chars{'MIN'} = shift @parameters; next;}
-    if ($parameter eq 'time') { $control_chars{'TIME'} = shift @parameters; next;}
+    if ($_ eq 'intr') { $control_chars{'INTR'} = shift @parameters; next;}
+    if ($_ eq 'quit') { $control_chars{'QUIT'} = shift @parameters; next;}
+    if ($_ eq 'erase') { $control_chars{'ERASE'} = shift @parameters; next;}
+    if ($_ eq 'kill') { $control_chars{'KILL'} = shift @parameters; next;}
+    if ($_ eq 'eof') { $control_chars{'EOF'} = shift @parameters; next;}
+    if ($_ eq 'eol') { $control_chars{'EOL'} = shift @parameters; next;}
+    if ($_ eq 'start') { $control_chars{'START'} = shift @parameters; next;}
+    if ($_ eq 'stop') { $control_chars{'STOP'} = shift @parameters; next;}
+    if ($_ eq 'susp') { $control_chars{'SUSP'} = shift @parameters; next;}
+    if ($_ eq 'min') { $control_chars{'MIN'} = shift @parameters; next;}
+    if ($_ eq 'time') { $control_chars{'TIME'} = shift @parameters; next;}
 
     # c_cflag crap
-    if ($parameter eq 'clocal') { $c_cflag = ($set_value ? ($c_cflag | CLOCAL) : ($c_cflag & (~CLOCAL))); next; } 
-    if ($parameter eq 'cread') { $c_cflag = ($set_value ? ($c_cflag | CREAD) : ($c_cflag & (~CREAD))); next; } 
+    if ($_ eq 'clocal') { $c_cflag = ($set_value ? ($c_cflag | CLOCAL) : ($c_cflag & (~CLOCAL))); next; } 
+    if ($_ eq 'cread') { $c_cflag = ($set_value ? ($c_cflag | CREAD) : ($c_cflag & (~CREAD))); next; } 
     # As best I can tell, doing |~CS8 will clear the bits.. under solaris
     # anyway, where CS5 = 0, CS6 = 0x20, CS7= 0x40, CS8=0x60
-    if ($parameter eq 'cs5') { $c_cflag = (($c_cflag & ~CS8 )| CS5); next; } 
-    if ($parameter eq 'cs6') { $c_cflag = (($c_cflag & ~CS8 )| CS6); next; } 
-    if ($parameter eq 'cs7') { $c_cflag = (($c_cflag & ~CS8 )| CS7); next; } 
-    if ($parameter eq 'cs8') { $c_cflag = ($c_cflag | CS8); next; } 
-    if ($parameter eq 'cstopb') { $c_cflag = ($set_value ? ($c_cflag | CSTOPB) : ($c_cflag & (~CSTOPB))); next; } 
-    if ($parameter eq 'hupcl' || $parameter eq 'hup') { $c_cflag = ($set_value ? ($c_cflag | HUPCL) : ($c_cflag & (~HUPCL))); next; } 
-    if ($parameter eq 'parenb') { $c_cflag = ($set_value ? ($c_cflag | PARENB) : ($c_cflag & (~PARENB))); next; } 
-    if ($parameter eq 'parodd') { $c_cflag = ($set_value ? ($c_cflag | PARODD) : ($c_cflag & (~PARODD))); next; } 
+    if ($_ eq 'cs5') { $c_cflag = (($c_cflag & ~CS8 )| CS5); next; } 
+    if ($_ eq 'cs6') { $c_cflag = (($c_cflag & ~CS8 )| CS6); next; } 
+    if ($_ eq 'cs7') { $c_cflag = (($c_cflag & ~CS8 )| CS7); next; } 
+    if ($_ eq 'cs8') { $c_cflag = ($c_cflag | CS8); next; } 
+    if ($_ eq 'cstopb') { $c_cflag = ($set_value ? ($c_cflag | CSTOPB) : ($c_cflag & (~CSTOPB))); next; } 
+    if ($_ eq 'hupcl' || $_ eq 'hup') { $c_cflag = ($set_value ? ($c_cflag | HUPCL) : ($c_cflag & (~HUPCL))); next; } 
+    if ($_ eq 'parenb') { $c_cflag = ($set_value ? ($c_cflag | PARENB) : ($c_cflag & (~PARENB))); next; } 
+    if ($_ eq 'parodd') { $c_cflag = ($set_value ? ($c_cflag | PARODD) : ($c_cflag & (~PARODD))); next; } 
 
     # That was fun. Still awake? c_iflag time.
-    if ($parameter eq 'brkint') { $c_iflag = (($set_value ? ($c_iflag | BRKINT) : ($c_iflag & (~BRKINT)))); next; }
-    if ($parameter eq 'icrnl') { $c_iflag = (($set_value ? ($c_iflag | ICRNL) : ($c_iflag & (~ICRNL)))); next; }
-    if ($parameter eq 'ignbrk') { $c_iflag = (($set_value ? ($c_iflag | IGNBRK) : ($c_iflag & (~IGNBRK)))); next; }
-    if ($parameter eq 'igncr') { $c_iflag = (($set_value ? ($c_iflag | IGNCR) : ($c_iflag & (~IGNCR)))); next; }
-    if ($parameter eq 'ignpar') { $c_iflag = (($set_value ? ($c_iflag | IGNPAR) : ($c_iflag & (~IGNPAR)))); next; }
-    if ($parameter eq 'inlcr') { $c_iflag = (($set_value ? ($c_iflag | INLCR) : ($c_iflag & (~INLCR)))); next; }
-    if ($parameter eq 'inpck') { $c_iflag = (($set_value ? ($c_iflag | INPCK) : ($c_iflag & (~INPCK)))); next; }
-    if ($parameter eq 'istrip') { $c_iflag = (($set_value ? ($c_iflag | ISTRIP) : ($c_iflag & (~ISTRIP)))); next; }
-    if ($parameter eq 'ixoff') { $c_iflag = (($set_value ? ($c_iflag | IXOFF) : ($c_iflag & (~IXOFF)))); next; }
-    if ($parameter eq 'ixon') { $c_iflag = (($set_value ? ($c_iflag | IXON) : ($c_iflag & (~IXON)))); next; }
-    if ($parameter eq 'parmrk') { $c_iflag = (($set_value ? ($c_iflag | PARMRK) : ($c_iflag & (~PARMRK)))); next; }
+    if ($_ eq 'brkint') { $c_iflag = (($set_value ? ($c_iflag | BRKINT) : ($c_iflag & (~BRKINT)))); next; }
+    if ($_ eq 'icrnl') { $c_iflag = (($set_value ? ($c_iflag | ICRNL) : ($c_iflag & (~ICRNL)))); next; }
+    if ($_ eq 'ignbrk') { $c_iflag = (($set_value ? ($c_iflag | IGNBRK) : ($c_iflag & (~IGNBRK)))); next; }
+    if ($_ eq 'igncr') { $c_iflag = (($set_value ? ($c_iflag | IGNCR) : ($c_iflag & (~IGNCR)))); next; }
+    if ($_ eq 'ignpar') { $c_iflag = (($set_value ? ($c_iflag | IGNPAR) : ($c_iflag & (~IGNPAR)))); next; }
+    if ($_ eq 'inlcr') { $c_iflag = (($set_value ? ($c_iflag | INLCR) : ($c_iflag & (~INLCR)))); next; }
+    if ($_ eq 'inpck') { $c_iflag = (($set_value ? ($c_iflag | INPCK) : ($c_iflag & (~INPCK)))); next; }
+    if ($_ eq 'istrip') { $c_iflag = (($set_value ? ($c_iflag | ISTRIP) : ($c_iflag & (~ISTRIP)))); next; }
+    if ($_ eq 'ixoff') { $c_iflag = (($set_value ? ($c_iflag | IXOFF) : ($c_iflag & (~IXOFF)))); next; }
+    if ($_ eq 'ixon') { $c_iflag = (($set_value ? ($c_iflag | IXON) : ($c_iflag & (~IXON)))); next; }
+    if ($_ eq 'parmrk') { $c_iflag = (($set_value ? ($c_iflag | PARMRK) : ($c_iflag & (~PARMRK)))); next; }
     
     # Are we there yet? No. Are we there yet? No. Are we there yet...
 #    print "Values: $c_lflag,".($c_lflag | ECHO)." ".($c_lflag & (~ECHO))."\n";
-    if ($parameter eq 'echo') { $c_lflag = (($set_value ? ($c_lflag | ECHO) : ($c_lflag & (~ECHO)))); next; }
-    if ($parameter eq 'echoe') { $c_lflag = (($set_value ? ($c_lflag | ECHOE) : ($c_lflag & (~ECHOE)))); next; }
-    if ($parameter eq 'echok') { $c_lflag = (($set_value ? ($c_lflag | ECHOK) : ($c_lflag & (~ECHOK)))); next; }
-    if ($parameter eq 'echonl') { $c_lflag = (($set_value ? ($c_lflag | ECHONL) : ($c_lflag & (~ECHONL)))); next; }
-    if ($parameter eq 'icanon') { $c_lflag = (($set_value ? ($c_lflag | ICANON) : ($c_lflag & (~ICANON)))); next; }
-    if ($parameter eq 'iexten') { $c_lflag = (($set_value ? ($c_lflag | IEXTEN) : ($c_lflag & (~IEXTEN)))); next; }
-    if ($parameter eq 'isig') { $c_lflag = (($set_value ? ($c_lflag | ISIG) : ($c_lflag & (~ISIG)))); next; }
-    if ($parameter eq 'noflsh') { $c_lflag = (($set_value ? ($c_lflag | NOFLSH) : ($c_lflag & (~NOFLSH)))); next; }
-    if ($parameter eq 'tostop') { $c_lflag = (($set_value ? ($c_lflag | TOSTOP) : ($c_lflag & (~TOSTOP)))); next; }
+    if ($_ eq 'echo') { $c_lflag = (($set_value ? ($c_lflag | ECHO) : ($c_lflag & (~ECHO)))); next; }
+    if ($_ eq 'echoe') { $c_lflag = (($set_value ? ($c_lflag | ECHOE) : ($c_lflag & (~ECHOE)))); next; }
+    if ($_ eq 'echok') { $c_lflag = (($set_value ? ($c_lflag | ECHOK) : ($c_lflag & (~ECHOK)))); next; }
+    if ($_ eq 'echonl') { $c_lflag = (($set_value ? ($c_lflag | ECHONL) : ($c_lflag & (~ECHONL)))); next; }
+    if ($_ eq 'icanon') { $c_lflag = (($set_value ? ($c_lflag | ICANON) : ($c_lflag & (~ICANON)))); next; }
+    if ($_ eq 'iexten') { $c_lflag = (($set_value ? ($c_lflag | IEXTEN) : ($c_lflag & (~IEXTEN)))); next; }
+    if ($_ eq 'isig') { $c_lflag = (($set_value ? ($c_lflag | ISIG) : ($c_lflag & (~ISIG)))); next; }
+    if ($_ eq 'noflsh') { $c_lflag = (($set_value ? ($c_lflag | NOFLSH) : ($c_lflag & (~NOFLSH)))); next; }
+    if ($_ eq 'tostop') { $c_lflag = (($set_value ? ($c_lflag | TOSTOP) : ($c_lflag & (~TOSTOP)))); next; }
 
     # Make it stop! Make it stop!
     # c_oflag crap.
-    if ($parameter eq 'opost') { $c_oflag = (($set_value ? ($c_oflag | OPOST) : ($c_oflag & (~OPOST)))); next; }
+    if ($_ eq 'opost') { $c_oflag = (($set_value ? ($c_oflag | OPOST) : ($c_oflag & (~OPOST)))); next; }
   
     # Speed?
-    if ($parameter eq 'ospeed') { $ospeed = &{"POSIX::B".shift(@parameters)}; next; }
-    if ($parameter eq 'ispeed') { $ispeed = &{"POSIX::B".shift(@parameters)}; next; }
+    if ($_ eq 'ospeed') { $ospeed = &{"POSIX::B".shift(@parameters)}; next; }
+    if ($_ eq 'ispeed') { $ispeed = &{"POSIX::B".shift(@parameters)}; next; }
   # Default.. parameter hasn't matched anything
-#    print "char:".sprintf("%lo",ord($parameter))."\n";
-    warn "IO::Stty::stty passed invalid parameter '$parameter'\n";
+#    print "char:".sprintf("%lo",ord($_))."\n";
+    warn "IO::Stty::stty passed invalid parameter '$_'\n";
   }
 
   # What a pain in the ass! Ok.. let's write the crap back.

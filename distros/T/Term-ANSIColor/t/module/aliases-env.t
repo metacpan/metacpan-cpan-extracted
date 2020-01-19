@@ -25,6 +25,7 @@ plan tests => 22;
 
 # Ensure we don't pick up a setting from the user's environment.
 delete $ENV{ANSI_COLORS_DISABLED};
+delete $ENV{NO_COLOR};
 
 # Set up some custom color configuration.  Some will produce warnings on
 # module load.

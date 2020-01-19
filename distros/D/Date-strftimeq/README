@@ -1,0 +1,56 @@
+NAME
+    Date::strftimeq - POSIX::strftime() with support for embedded perl code
+    in %(...)q
+
+VERSION
+    This document describes version 0.001 of Date::strftimeq (from Perl
+    distribution Date-strftimeq), released on 2019-11-20.
+
+SYNOPSIS
+     use Date::strftimeq; # by default exports strftimeq()
+
+     my @time = localtime();
+     print strftimeq '<%Y-%m-%d>', @time; # <2019-11-19>
+     print strftimeq '<%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 0 ? "sun":"" )q>', @time; # <2019-11-19>
+     print strftimeq '<%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 2 ? "tue":"" )q>', @time; # <2019-11-19tue>
+
+DESCRIPTION
+    This module provides "strftimeq()" which extends POSIX's "strftime()"
+    with a conversion: "%(...)q". Inside the parenthesis, you can specify
+    Perl code. The Perl code will receive the arguments passed to
+    strftimeq() except for the first). The Perl code will be eval-ed in the
+    caller's package, without strict and without warnings.
+
+FUNCTIONS
+  strftimeq
+    Usage:
+
+     $str = strftimeq $fmt, $sec, $min, $hour, $mday, $mon, $year;
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Date-strftimeq>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Date-strftimeq>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Date-strftimeq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    POSIX's "strftime()"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

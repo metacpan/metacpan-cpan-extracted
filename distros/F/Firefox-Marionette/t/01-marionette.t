@@ -19,6 +19,8 @@ my $terminated;
 
 my $test_time_limit = 90;
 
+delete $ENV{HOME};
+
 $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
 
@@ -888,13 +890,15 @@ SKIP: {
 		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 3);
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
-	ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
-	SKIP: {
+        if ($tls_tests_ok) {
+		ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
 		if ($major_version < 61) {
 			skip("HAR support not available in Firefox before version 61", 1);
 		}
 		my $har = $firefox->har();
 		ok($har->{log}->{creator}->{name} eq 'Firefox', "\$firefox->har() gives a data structure with the correct creator name");
+	} else {
+		skip("TLS test infrastructure seems compromised", 2);
 	}
 }
 
@@ -1597,7 +1601,7 @@ SKIP: {
 					||
 					(($major_version > $min_major)))
 			{
-				my $max_version = '71.0.0'; # known bad version
+				my $max_version = '72.0.1'; # known bad version
 				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
 				if ((($major_version == $max_major)
 						&& (defined $minor_version)

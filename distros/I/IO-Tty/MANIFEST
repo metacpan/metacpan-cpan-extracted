@@ -1,11 +1,13 @@
 ChangeLog
-MANIFEST
 Makefile.PL
+MANIFEST
+MANIFEST.SKIP
 Pty.pm
-README
+README.md
+t/pty_get_winsize.t
+t/test.t
+try
 Tty.pm
 Tty.xs
-try
-t/test.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

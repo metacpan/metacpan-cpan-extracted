@@ -1,5 +1,19 @@
 Revision history for Perl extension Tie::DBI.
 
+1.08 Sat Jan 18 2020 Todd Rinaldo
+    Switch testing to github actions
+	update MANIFEST and .gitignorew
+	Switch to github issues
+
+1.07 Tue Apr 12 2016 Todd Rinaldo
+    Stop using vars in favor of ours
+    Add Travis support
+    Debian QA tool tidy fix
+    Apply Perl::Tidy 20150815 and track .perltidyrc
+    Fixes RT 104338 - prepare fails when a question mark appears in a text field
+    Add an explicit minimum version of perl supported
+    Add warnings.
+
 1.06 Fri Apr 5 2013 Todd Rinaldo
      Bump to production release now tests all pass on cpan testers
 

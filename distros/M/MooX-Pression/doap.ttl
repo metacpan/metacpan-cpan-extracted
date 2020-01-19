@@ -14,7 +14,7 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.018000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.024"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.026"^^doap-deps:CpanId ], [
 		doap-deps:on "Keyword::Declare 0.001014"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
@@ -31,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Pression";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-pression>;
@@ -155,6 +155,40 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.007"^^xsd:string;
+	dc:issued            "2020-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Slurpy positional parameters in signatures.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Handle parameters passed to class/role generators properly.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix example that showed `extends` within a `role` block.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.008"^^xsd:string;
+	dc:issued            "2020-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.026.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

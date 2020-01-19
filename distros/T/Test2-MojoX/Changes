@@ -1,5 +1,9 @@
 Revision history for Test2-MojoX
 
+0.05    2020-01-18
+        - Added attr_is, attr_isnt, attr_like and attr_unlike methods from Test::Mojo
+          shipped with Mojolicious 8.31
+
 0.04    2019-09-11
         - Improve documentation
 

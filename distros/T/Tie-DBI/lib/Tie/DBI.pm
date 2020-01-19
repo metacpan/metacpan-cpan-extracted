@@ -1,10 +1,11 @@
 package Tie::DBI;
 
 use strict;
-use vars qw($VERSION);
+use warnings;
+use 5.006;
 use Carp;
 use DBI;
-$VERSION = '1.06';
+our $VERSION = '1.08';
 
 BEGIN {
     eval {
@@ -390,9 +391,15 @@ sub _run_query {
     }
     local ($^W) = 0;    # kill uninitialized variable warning
                         # if we get here, then we can't bind, so we replace ? with escaped parameters
-    while ( ( my $pos = index( $query, '?' ) ) >= 0 ) {
+    my $pos = 0;
+    while ( ( $pos = index( $query, '?', $pos ) ) >= 0 ) {
         my $value = shift(@bind_variables);
-        substr( $query, $pos, 1 ) = ( defined($value) ? ( $self->{CanBind} ? $self->{'dbh'}->quote($value) : $value ) : 'null' );
+        $value =
+          defined($value)
+          ? ( $self->{CanBind} ? $self->{'dbh'}->quote($value) : $value )
+          : 'null';
+        substr( $query, $pos, 1 ) = $value;
+        $pos += length($value);
     }
     my $sth = $self->{'dbh'}->prepare($query);
     return unless $sth && $sth->execute;
@@ -594,10 +601,9 @@ sub _decode {
 
 package Tie::DBI::Record;
 use strict;
-use vars qw($VERSION);
 use Carp;
 use DBI;
-$VERSION = '0.50';
+our $VERSION = '0.51';
 
 # TIEHASH interface
 # tie %h,Tie::DBI::Record,dbh,table,record

@@ -8,11 +8,11 @@ our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 our @EXPORT_OK = qw ( scalar_to_pointer );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 
 use constant _incantation =>
-  $^O eq 'MSWin32' && $Config::Config{archname} =~ /MSWin32-x64/
+  $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
   ? 'Q'
   : 'L!';
 
@@ -48,7 +48,7 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 

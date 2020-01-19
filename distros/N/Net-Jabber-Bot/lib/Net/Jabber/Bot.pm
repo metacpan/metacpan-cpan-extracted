@@ -1,7 +1,7 @@
 package Net::Jabber::Bot;
 
 use Moose;
-use MooseX::Types 
+use MooseX::Types
     -declare => [qw( JabberClientObject PosInt PosNum HundredInt )];
 
 # import builtin types
@@ -12,10 +12,9 @@ use Net::Jabber;
 use Time::HiRes;
 use Sys::Hostname;
 use Log::Log4perl qw(:easy);
-#use Data::Dumper; #For testing only.
+use Mozilla::CA;
 
-
-coerce Bool, from Str, 
+coerce Bool, from Str,
     via {($_ =~ m/(^on$)|(^true$)/i) + 0}; # True if it's on or true. Otherwise false.
 
 subtype JabberClientObject, as Object, where { $_->isa('Net::Jabber::Client') };
@@ -36,25 +35,25 @@ has 'server_host'         => (isa => Str, is => 'rw', lazy => 1, default => sub{
 has 'server'              => (isa => Str, is => 'rw');
 has 'port'                => (isa => PosInt, is => 'rw', default => 5222);
 has 'tls'                 => (isa => Bool, is => 'rw', default => '0');
+has 'ssl_ca_path'         => (isa => Str, is => 'rw', default => Mozilla::CA::SSL_ca_file());
+has 'ssl_verify'          => (isa => Bool, is => 'rw', default => '1');
 has 'connection_type'     => (isa => Str, is => 'rw', default => 'tcpip');
 has 'conference_server'   => (isa => Str, is => 'rw');
 has 'username'            => (isa => Str, is => 'rw');
 has 'password'            => (isa => Str, is => 'rw');
-has 'alias'               => (isa => Str, is => 'rw', default => sub{'net_jabber_bot'});
+has 'alias'               => (isa => Str, lazy => 1, is => 'rw', default => 'net_jabber_bot');
 # Resource defaults to alias_hostname_pid
 has 'resource'            => (isa => Str, lazy => 1, is => 'rw', default => sub{shift->alias . "_" . hostname . "_" . $$});
-#has 'resource'            => (isa => Str, lazy => 1, is => 'rw', default => sub{shift->alias});
 has 'message_function'    => (isa => Maybe[CodeRef], is => 'rw', default => sub{undef});
 has 'background_function' => (isa => Maybe[CodeRef], is => 'rw', default => sub{undef});
 has 'loop_sleep_time'     => (isa => PosNum, is => 'rw', default => 5);
 has 'process_timeout'     => (isa => PosNum, is => 'rw', default => 5);
-has 'from_full'           => (isa => Str, is => 'rw', default => sub{my $self = shift;
-                                                                       $self->username .
+has 'from_full'           => (isa => Str, lazy => 1, is => 'rw', default => sub{my $self = shift;
+                                                                       $self->username || ''  .
                                                                        '@' .
-                                                                       $self->server .
+                                                                       $self->server || '' .
                                                                        '/' .
-                                                                       $self->alias});
-                                                                       
+                                                                       $self->alias || '' });
 
 has 'safety_mode'            => (isa => Bool, is => 'rw', default => 1, coerce => 1);
 has 'ignore_server_messages' => (isa => Bool, is => 'rw', default => 1, coerce => 1);
@@ -92,11 +91,11 @@ Net::Jabber::Bot - Automated Bot creation with safeties
 
 =head1 VERSION
 
-Version 2.1.5
+Version 2.1.6
 
 =cut
 
-our $VERSION = '2.1.5';
+our $VERSION = '2.1.6';
 
 =head1 SYNOPSIS
 
@@ -143,46 +142,48 @@ The object at present has the following enforced safeties as long as you do not 
 
 =item B<new>
 
-Minimal: 
+Minimal:
+
     my $bot = Net::Jabber::Bot->new(
-                                  server => 'host.domain.com' # Name of server when sending messages internally.
-                                , conference_server => 'conference.host.domain.com'
-                                , port => 522
-                                , username => 'username'
-                                , password => 'pasword'
-                                , safety_mode => 1
-                                , message_function => \&new_bot_message
-                                , background_function => \&background_checks
-                                , forums_and_responses => \%forum_list
-                            );
-    
+        server               => 'host.domain.com', # Name of server when sending messages internally.
+        conference_server    => 'conference.host.domain.com',
+        port                 => 522,
+        username             => 'username',
+        password             => 'pasword',
+        safety_mode          => 1,
+        message_function     => \&new_bot_message,
+        background_function  => \&background_checks,
+        forums_and_responses => \%forum_list
+    );
+
 All options:
+
     my $bot = Net::Jabber::Bot->new(
-                                  server => 'host.domain.com' # Name of server when sending messages internally.
-                                , conference_server => 'conference.host.domain.com'
-                                , server_host => 'talk.domain.com' # used to specify what jabber server to connect to on connect?
-                                , tls => 0 # set to 1 for google 
-                                , connection_type => 'tcpip'
-                                , port => 522
-                                , username => 'username'
-                                , password => 'pasword'
-                                , alias => 'cpan_bot'
-                                , message_function => \&new_bot_message
-                                , background_function => \&background_checks
-                                , loop_sleep_time => 15
-                                , process_timeout => 5
-                                , forums_and_responses => \%forum_list
-                                , ignore_server_messages => 1
-                                , ignore_self_messages => 1
-                                , out_messages_per_second => 4
-                                , max_message_size => 1000
-                                , max_messages_per_hour => 100
-                            );
+        server                  => 'host.domain.com', # Name of server when sending messages internally.
+        conference_server       => 'conference.host.domain.com',
+        server_host             => 'talk.domain.com', # used to specify what jabber server to connect to on connect?
+        tls                     => 0,                    # set to 1 for google
+        ssl_ca_path             => '',  # path to your CA cert bundle
+        ssl_verify              => 0,   # for testing and for self-signed certificates
+        connection_type         => 'tcpip',
+        port                    => 522,
+        username                => 'username',
+        password                => 'pasword',
+        alias                   => 'cpan_bot',
+        message_function        => \&new_bot_message,
+        background_function     => \&background_checks,
+        loop_sleep_time         => 15,
+        process_timeout         => 5,
+        forums_and_responses    => \%forum_list,
+        ignore_server_messages  => 1,
+        ignore_self_messages    => 1,
+        out_messages_per_second => 4,
+        max_message_size        => 1000,
+        max_messages_per_hour   => 100
+    );
 
 
-
-
-Setup the object and connect to the server. Hash values are passed to new as a hash.
+Set up the object and connect to the server. Hash values are passed to new as a hash.
 
 The following initialization variables can be passed. Only marked variables are required (TODO)
 
@@ -201,7 +202,7 @@ Jabber server name
 =item B<server_host>
 
 Defaults to the same value set for 'server' above.
-This is where the bot initially connects. For google for instance, you should set this to 'gmail.com' 
+This is where the bot initially connects. For google for instance, you should set this to 'gmail.com'
 
 =item B<conference_server>
 
@@ -212,10 +213,20 @@ conferencee server (usually conference.$server_name)
 Defaults to 5222
 
 =item B<tls>
-Boolean value. defaults to 0. for google, it is know that this value must be 1 to work.  
+
+Boolean value. defaults to 0. for google, it is know that this value must be 1 to work.
+
+=item B<ssl_ca_path>
+
+The path to your CA cert bundle. This is passed on to XML::Stream eventually.
+
+=item B<ssl_verify>
+
+Enable or disable server certificate validity check when connecting to server. This is passed on to XML::Stream eventually.
 
 =item B<connection_type>
-defaults to 'tcpip' also takes 'http' 
+
+defaults to 'tcpip' also takes 'http'
 
 =item B<username>
 
@@ -236,9 +247,9 @@ The array is order sensitive and an empty string means it is going to respond to
 
 The found 'response string' is assumed to be at the beginning of the message. The message_funtion function will be called with the modified string.
 
-alias = jbot:, attention:
+    alias = jbot:, attention:
 
-    example1:
+example1:
 
     message: 'jbot: help'
 
@@ -284,7 +295,7 @@ Specify maximimum size a message can be before it's split and sent in pieces.
 
 default: 1,000,000
 
-safetey: 1,000
+safety: 1,000
 
 =item B<max_messages_per_hour>
 
@@ -292,7 +303,7 @@ Limits the number of messages per hour before we refuse to send them
 
 default: 125
 
-safetey: 166
+safety: 166
 
 =back
 
@@ -357,11 +368,7 @@ sub _callback_maker {
 sub _init_jabber {
     my $self = shift;
 
-    # Determine if the object already exists and if not, create it.
-    DEBUG("new client object.");
-    if(!$self->jabber_client) {
-        $self->jabber_client(Net::Jabber::Client->new);
-    }
+    # Autocreate the jabber object (see has jabber_client)
     my $connection = $self->jabber_client;
 
     DEBUG("Set the call backs.");
@@ -377,6 +384,8 @@ sub _init_jabber {
         hostname => $self->server,
         port => $self->port,
         tls => $self->tls,
+        ssl_ca_path => $self->ssl_ca_path,
+        ssl_verify => $self->ssl_verify,
         connectiontype => $self->connection_type,
         componentname  => $self->server_host,
     );
@@ -479,10 +488,18 @@ sub Process { # Call connection process.
 =item B<Start>
 
 Primary subroutine save new called by the program. Does an endless loop of:
-1. Process
-2. If Process failed, Reconnect to server over larger and larger timeout
-3. run background process fed from new, telling it who I am and how many loops we have been through.
-4. Enforce a sleep to prevent server floods.
+
+=over
+
+=item 1. Process
+
+=item 2. If Process failed, Reconnect to server over larger and larger timeout
+
+=item 3. run background process fed from new, telling it who I am and how many loops we have been through.
+
+=item 4. Enforce a sleep to prevent server floods.
+
+=back
 
 =cut
 
@@ -503,8 +520,10 @@ sub Start {
         eval {$self->Process($process_timeout)};
 
         if($@) { #Assume the connection is down...
+            ERROR("Server error: $@");
             my $message = "Disconnected from " . $self->server . ":" . $self->port
                         . " as " . $self->username;
+
             ERROR("$message Reconnecting...");
             sleep 5; # TODO: Make re-connect time flexible somehow
             $self->ReconnectToServer();
@@ -523,9 +542,10 @@ sub Start {
 
 You should not ever need to use this. the Start() kernel usually figures this out and calls it.
 
-Internal process
-1. Disconnects
-3. Re-initializes
+Internal process:
+
+    1. Disconnects
+    3. Re-initializes
 
 =cut
 
@@ -586,7 +606,7 @@ sub IsConnected {
 # TODO: ***NEED VERY GOOD DOCUMENTATION HERE*****
 =item B<_process_jabber_message> - DO NOT CALL
 
-Handles incoming messages.   
+Handles incoming messages.
 
 =cut
 
@@ -616,7 +636,7 @@ sub _process_jabber_message {
     #    my $message_date_text = $message->GetTimeStamp(); # Since we're not using the data, we'll turn this off since it crashes gtalk clients aparently?
     #    my $message_date = UnixDate($message_date_text, "%s") - 1*60*60; # Convert to EST from CST;
 
-    # Ignore any messages within 10 seconds of start or join of that forum
+    # Ignore any messages within 'forum_join_grace' seconds of start or join of that forum
     my $grace_period = $self->forum_join_grace;
     my $time_now = time;
     if($self->connect_time > $time_now - $grace_period
@@ -725,6 +745,12 @@ sub _jabber_in_iq_message {
     my $from = $iq->GetFrom();
 #    my $type = $iq->GetType();DEBUG("Type=$type");
     my $query = $iq->GetQuery();#DEBUG("query=" . Dumper($query));
+
+    if (!$query) {
+        DEBUG("iq->GetQuery() returned undef.");
+        return;
+    }
+
     my $xmlns = $query->GetXMLNS();DEBUG("xmlns=$xmlns");
     my $iqReply;
 
@@ -780,6 +806,10 @@ sub _jabber_presence_message {
         INFO("Processed unsubscribe request from $from");
         return;
     }
+    
+    # Without explicitly setting a priority, XMPP::Protocol will store all JIDs with an empty
+    # priority under the same key rather than in an array. 
+    $presence->SetPriority(0) unless $presence->GetPriority();
 
     $self->jabber_client->PresenceDBParse($presence); # Since we are always an object just throw it into the db.
 
@@ -820,7 +850,6 @@ sub respond_to_self_messages {
 replys with number of messages sent so far this hour.
 
 =cut
-
 
 sub get_messages_this_hour {
     my $self = shift;
@@ -1166,17 +1195,13 @@ L<http://annocpan.org/dist/Net-Jabber-Bot>
 
 L<http://cpanratings.perl.org/d/Net-Jabber-Bot>
 
-=item * Search CPAN
+=item * Metacpan
 
-L<http://search.cpan.org/dist/Net-Jabber-Bot>
+L<https://metacpan.org/pod/Net::Jabber::Bot>
 
-=item * Project homepage
+=item * Github
 
-L<http://code.google.com/p/perl-net-jabber-bot/>
-
-=item * Google Issue Tracker (reporting bugs)
-
-L<http://code.google.com/p/perl-net-jabber-bot/issues/entry>
+L<https://github.com/toddr/perl-net-jabber-bot>
 
 =back
 

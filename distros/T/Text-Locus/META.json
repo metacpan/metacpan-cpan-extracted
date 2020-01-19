@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Text-Locus",
    "no_index" : {
@@ -19,30 +19,10 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "Clone" : "0",
-            "Scalar::Util" : "0",
-            "perl" : "5.006"
-         }
-      }
-   },
    "provides" : {
       "Text::Locus" : {
          "file" : "lib/Text/Locus.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -53,5 +33,5 @@
          "web" : "http://git.gnu.org.ua/cgit/text-locus.git/"
       }
    },
-   "version" : "1.01"
+   "version" : "1.03"
 }

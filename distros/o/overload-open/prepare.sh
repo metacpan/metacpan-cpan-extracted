@@ -30,4 +30,4 @@ if [ "$meta_version" != "$yml_version" ]; then
     echo "mismatching versions meto $meta_version and $yml_version"
     fail
 fi
-perl pport.h
+perl ppport.h

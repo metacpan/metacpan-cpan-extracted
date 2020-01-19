@@ -3,6 +3,7 @@ package HTML::SocialMedia;
 use warnings;
 use strict;
 use CGI::Lingua;
+use Carp;
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ HTML::SocialMedia - Put social media links onto your website
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =head1 SYNOPSIS
 
@@ -74,7 +75,7 @@ sub new {
 		if($params{twitter}) {
 			# Languages supported by Twitter according to
 			# https://twitter.com/about/resources/tweetbutton
-			$args{supported} = ['en', 'nl', 'fr', 'fr-fr', 'de', 'id', 'il', 'ja', 'ko', 'pt', 'ru', 'es', 'tr'],
+			$args{supported} = ['en', 'nl', 'fr', 'fr-fr', 'de', 'id', 'il', 'ja', 'ko', 'pt', 'ru', 'es', 'tr'];
 		} else {
 			# TODO: Google plus only supports the languages listed at
 			# http://www.google.com/webmasters/+1/button/index.html
@@ -168,6 +169,14 @@ sub as_string {
 	my $self = shift;
 
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: as_string($options)');
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	}
 
 	if($self->{_logger}) {
 		$self->{_logger}->trace('Entering as_string');
@@ -310,22 +319,14 @@ END
 		$paragraph = '<p>';
 	}
 
-	my $protocol;
-	if($self->{_info}) {
-		$protocol = $self->{_info}->protocol() || 'http';
-	} else {
-		require CGI::Info;
-		$protocol = CGI::Info->protocol() || 'http';
-	}
-
 	if($self->{_twitter}) {
 		if($params{twitter_follow_button}) {
 			my $language = $lingua->language();
 			if(($language eq 'English') || ($language eq 'Unknown')) {
-				$rc .= '<a href="' . $protocol . '://twitter.com/' . $self->{_twitter} . '" class="twitter-follow-button">Follow @' . $self->{_twitter} . '</a>';
+				$rc .= '<a href="//twitter.com/' . $self->{_twitter} . '" class="twitter-follow-button">Follow @' . $self->{_twitter} . '</a>';
 			} else {
 				my $langcode = substr($self->{_alpha2}, 0, 2);
-				$rc .= '<a href="' . $protocol . '://twitter.com/' . $self->{_twitter} . "\" class=\"twitter-follow-button\" data-lang=\"$langcode\">Follow \@" . $self->{_twitter} . '</a>';
+				$rc .= '<a href="//twitter.com/' . $self->{_twitter} . "\" class=\"twitter-follow-button\" data-lang=\"$langcode\">Follow \@" . $self->{_twitter} . '</a>';
 			}
 			if($params{twitter_tweet_button}) {
 				$rc .= $paragraph;
@@ -351,7 +352,7 @@ END
 						return t;
 					}(document, "script", "twitter-wjs"));
 				</script>
-				<a href="https://twitter.com/intent/tweet" class="twitter-share-button" data-count="horizontal" data-via="
+				<a href="//twitter.com/intent/tweet" class="twitter-share-button" data-count="horizontal" data-via="
 END
 			$rc =~ s/\n$//;
 			$rc .= $self->{_twitter} . '"';
@@ -359,7 +360,7 @@ END
 				my @related = @{$self->{_twitter_related}};
 				$rc .= ' data-related="' . $related[0] . ':' . $related[1] . '"';
 			}
-			$rc .= '>Tweet</a><script type="text/javascript" src="' . $protocol . '://platform.twitter.com/widgets.js"></script>';
+			$rc .= '>Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>';
 		}
 	}
 
@@ -376,7 +377,7 @@ END
 		}
 		$host_name = $self->{info}->host_name();
 
-		$rc .= "<div class=\"fb-like\" data-href=\"$protocol://$host_name\" data-layout=\"standard\" data-action=\"like\" data-size=\"small\" data-show-faces=\"false\" data-share=\"false\"></div>";
+		$rc .= "<div class=\"fb-like\" data-href=\"//$host_name\" data-layout=\"standard\" data-action=\"like\" data-size=\"small\" data-show-faces=\"false\" data-share=\"false\"></div>";
 
 		if($params{google_plusone} || $params{linkedin_share_button} || $params{reddit_button} || $params{'facebook_share_button'}) {
 			$rc .= $paragraph;
@@ -395,7 +396,7 @@ END
 		}
 		$host_name = $self->{info}->host_name();
 
-		$rc .= "<div class=\"fb-share-button\" data-href=\"$protocol://$host_name\" data-layout=\"button_count\" data-size=\"small\" data-mobile-iframe=\"false\"><a class=\"fb-xfbml-parse-ignore\" target=\"_blank\" href=\"https://www.facebook.com/sharer/sharer.php?u=$protocol%3A%2F%2F$host_name&amp;src=sdkpreparse\">Share</a></div>";
+		$rc .= "<div class=\"fb-share-button\" data-href=\"//$host_name\" data-layout=\"button_count\" data-size=\"small\" data-mobile-iframe=\"false\"><a class=\"fb-xfbml-parse-ignore\" target=\"_blank\" href=\"//www.facebook.com/sharer/sharer.php?u=%2F%2F$host_name&amp;src=sdkpreparse\">Share</a></div>";
 
 		if($params{google_plusone} || $params{linkedin_share_button} || $params{reddit_button}) {
 			$rc .= $paragraph;
@@ -404,7 +405,7 @@ END
 
 	if($params{linkedin_share_button}) {
 		$rc .= << 'END';
-<script src="http://platform.linkedin.com/in.js" type="text/javascript"></script>
+<script src="//platform.linkedin.com/in.js" type="text/javascript"></script>
 <script type="IN/Share" data-counter="right"></script>
 END
 		if($params{google_plusone} || $params{reddit_button}) {
@@ -432,6 +433,14 @@ END
 			$rc .= "window.___gcfg = {lang: '$alpha2'};\n";
 		}
 
+		my $protocol;
+		if($self->{_info}) {
+			$protocol = $self->{_info}->protocol() || 'http';
+		} else {
+			require CGI::Info;
+			$protocol = CGI::Info->protocol() || 'http';
+		}
+
 		$rc .= << "END";
 			  (function() {
 			    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
@@ -445,7 +454,7 @@ END
 		}
 	}
 	if($params{reddit_button}) {
-		$rc .= '<script type="text/javascript" src="' . $protocol . '://www.reddit.com/static/button/button1.js"></script>';
+		$rc .= '<script type="text/javascript" src="//www.reddit.com/static/button/button1.js"></script>';
 	}
 
 	return $rc;
@@ -473,7 +482,8 @@ When adding a FaceBook like button, you may find performance improves a lot if
 you use L<HTTP::Cache::Transparent>.
 
 Please report any bugs or feature requests to C<bug-html-socialmedia at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-SocialMedia>.
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 Would be good to have
@@ -496,10 +506,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-SocialMedia>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/HTML-SocialMedia>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/HTML-SocialMedia>
@@ -516,9 +522,9 @@ L<http://search.cpan.org/dist/HTML-SocialMedia/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2016 Nigel Horne.
+Copyright 2011-2020 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

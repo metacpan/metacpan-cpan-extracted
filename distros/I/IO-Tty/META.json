@@ -4,13 +4,13 @@
       "Roland Giersig <RGiersig@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Tty",
    "no_index" : {
@@ -29,9 +29,6 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -40,5 +37,6 @@
          "url" : "https://github.com/toddr/IO-Tty"
       }
    },
-   "version" : "1.12"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

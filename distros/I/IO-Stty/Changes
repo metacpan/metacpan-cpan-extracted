@@ -1,5 +1,15 @@
 Revision history for Perl extension IO::Stty
 
+0.04 Sat Jan 18 2020
+   - Switch to EU::MM
+   - Address a few deficiencies in the way how the stty() sub processes its arguments
+   - Enable testing on Github actions.
+
+0.03 Thu May 6 2010
+   - Re-vamp IO::Stty to modern layout
+   - stty.txt moved into POD for module
+   - stty.pl in docs. Die if no params passed to stty
+
 0.02_01 Tue Mar 23 2010
   - Re-vamp module to Module::Build
   - stty.txt merged into POD so it shows up on CPAN

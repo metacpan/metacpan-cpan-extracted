@@ -1,3 +1,15 @@
+0.08 2020-01-18T15:30:37+01:00
+ - Add test for binary file.
+ - Add another usage to benchamrk.
+ - Fix Makefile.PL which fails with no '.' in @INC.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update author name.
+ - Update copyright years.
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+
 0.07 2014-06-04T08:14:12+02:00
  - Add 'readme_from' directive to Makefile.PL.
  - Add test dependency to Digest::SHA, which is not in perl 5.8.9 base.

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Quiq::Unindent;
 use Scalar::Util ();
@@ -464,7 +464,8 @@ Die Übersetzung erfolgt (rekursiv) nach folgenden Regeln:
 
 =item undef
 
-Wird abgebildet auf: C<undefined> (nicht auf C<null>)
+Wird abgebildet auf: C<undefined>. In einem Objekt wird das
+betreffende Attribut weggelassen.
 
 =item \1 oder \'true'
 
@@ -495,7 +496,8 @@ Wird abgebildet auf: [ELEMENT1,ELEMENT2,...]
 
 =item HASH_REF
 
-Wird abgebildet auf: {KEY1:VALUE1,KEY2:VALUE2,...}
+Wird abgebildet auf: {KEY1:VALUE1,KEY2:VALUE2,...}. Im Falle des
+Werts undef, wird das betreffende Schlüssel/Wert-Paar weggelassen.
 
 =back
 
@@ -542,11 +544,12 @@ sub encode {
     }
     elsif ($refType eq 'HASH') {
         for my $key (sort keys %$arg) {
+            my $val = $arg->{$key} // next; # Attribut streichen, wenn undef
             if ($json) {
                 $json .= ',';
             }
             $json .= $self->key($key);
-            $json .= ':'.$self->encode($arg->{$key});
+            $json .= ':'.$self->encode($val);
         }
         $json = "{$json}";
     }
@@ -640,10 +643,12 @@ sub object {
     my $json = '';
     if ($indent) {
         while (@_) {
+            my $key = shift;
+            my $val = shift // next;
             if ($json) {
                 $json .= "\n";
             }
-            $json .= sprintf '%s: %s,',$self->key(shift),$self->encode(shift);
+            $json .= sprintf '%s: %s,',$self->key($key),$self->encode($val);
         }
         if ($json) {
             my $indent = ' ' x $self->{'indent'};
@@ -656,10 +661,12 @@ sub object {
     }
     else {
         while (@_) {
+            my $key = shift;
+            my $val = shift // next;
             if ($json) {
                 $json .= ',';
             }
-            $json .= $self->key(shift).':'.$self->encode(shift);
+            $json .= $self->key($key).':'.$self->encode($val);
         }
         $json = "{$json}";
     }
@@ -730,7 +737,7 @@ sub key {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -738,7 +745,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

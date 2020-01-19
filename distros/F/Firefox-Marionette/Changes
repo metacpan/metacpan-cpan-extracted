@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.90  Sat Jan 18 15:26:00 2020
+       clear HOME environment variable for tests in an attempt to fix RT#131304.
+
 0.89  Wed Dec 25 07:01:00 2019
        Fixing test suite for Perl 5.8.
 
@@ -16,7 +19,7 @@ Revision history for Firefox-Marionette
        Fixing session cookie support.  Thanks to BOKUTIN in RT#130955.
 
 0.84  Tue Nov  5 not sure 2019
-       Allowing esr in version string b/c of debian breakage.  Thanks to QUATTRO in RT#130889.
+       Allowing esr in version string b/c of debian breakage.  Thanks to QUATTRO in RT#130.90.
        Removed mention of highlight parameter in selfie after Firefox 70 dropped support for it.
 
 0.83  Tue Oct 10 21:48:00 2019

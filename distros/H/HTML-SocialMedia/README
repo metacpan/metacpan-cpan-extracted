@@ -1,4 +1,4 @@
-HTML-SocialMedia Version 0.27
+HTML-SocialMedia Version 0.28
 
 INSTALLATION
 
@@ -21,18 +21,14 @@ You can also look for information at:
     RT, CPAN's request tracker
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-SocialMedia
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/HTML-SocialMedia
-
     CPAN Ratings
         http://cpanratings.perl.org/d/HTML-SocialMedia
 
     Search CPAN
         http://search.cpan.org/dist/HTML-SocialMedia/
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2011-2016 Nigel Horne
+Copyright (C) 2011-2020 Nigel Horne
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

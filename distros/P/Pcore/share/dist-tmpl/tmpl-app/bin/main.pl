@@ -59,8 +59,8 @@ my $app = <: $module_name :>->new(
                     },
                 },
             },
-            devel => $ENV->{cli}->{opt}->{devel},
         },
+        devel => $ENV->{cli}->{opt}->{devel},
     },
 );
 

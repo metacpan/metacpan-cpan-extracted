@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Quiq::Css;
 use Quiq::JQuery::Function;
@@ -43,6 +43,11 @@ L<Quiq::Html::Base>
 =item body => $str (Default: '')
 
 Rumpf der Seite.
+
+=item bodyOnly => $bool (Default: 0)
+
+Liefere als Returnwert von asHtml() nur den Body anstelle der
+Gesamtseite.
 
 =item comment => $str (Default: undef)
 
@@ -101,7 +106,7 @@ den Head der HTML-Seite.
 =item ready => $jsCode (Default: [])
 
 Führe JavaScript-Code $jsCode aus, wenn das DOM geladen ist.
-Dies ist so implementiert, dass der Code wird in einen jQuery
+Dies ist so implementiert, dass der Code in einen jQuery
 ready-Handler eingebettet wird:
 
   $(function() {
@@ -147,6 +152,7 @@ sub new {
 
     my $self = $class->SUPER::new(
         body => '',
+        bodyOnly => 0,
         comment => undef,
         encoding => 'utf-8',
         head => '',
@@ -199,11 +205,12 @@ sub html {
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($body,$comment,$encoding,$head,$loadA,$noNewline,$placeholders,
-        $title,$javaScript,$javaScriptToHead,$readyA,$styleSheet,
-        $topIndentation) =
-        $self->get(qw/body comment encoding head load noNewline placeholders
-        title javaScript javaScriptToHead ready styleSheet topIndentation/);
+    my ($body,$bodyOnly,$comment,$encoding,$head,$loadA,$noNewline,
+        $placeholders,$title,$javaScript,$javaScriptToHead,$readyA,
+        $styleSheet,$topIndentation) =
+        $self->get(qw/body bodyOnly comment encoding head load noNewline
+        placeholders title javaScript javaScriptToHead ready
+        styleSheet topIndentation/);
 
     # CSS- und JavaScript-Dateien laden (Test auf @$loadA wg. der
     # neuen Klasse Quiq::Html::Construct - bei Feher $h auf
@@ -219,7 +226,7 @@ sub html {
 
     my $readyHandlers = '';
     for (@$readyA) {
-        $readyHandlers .= Quiq::JQuery::Function->ready($_);
+        $readyHandlers .= Quiq::JQuery::Function->ready($_)."\n";
     }
     if ($readyHandlers) {
         push @$javaScript,$readyHandlers;
@@ -230,7 +237,7 @@ sub html {
 
     # Wenn $body keinen body-Tag enthält, fügen wir ihn hinzu.
 
-    $body = $h->cat($body);
+    # $body = $h->cat($body);
     if ($body !~ /^<body/i) {
         $body = $h->tag('body',
             -ind => $topIndentation,
@@ -240,7 +247,7 @@ sub html {
         );
     }
 
-    my $html = $h->cat(
+    my $html = $bodyOnly? $body: $h->cat(
         $h->doctype,
         $h->comment(-nl=>2,$comment),
         $h->tag('html',
@@ -285,7 +292,7 @@ sub html {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -293,7 +300,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

@@ -1251,7 +1251,7 @@ FAQ
       is_SpeciesClass($Dog);          # true
 
     Note that there is no Species type created, but instead a pair of types is
-    created: `SpeciesClass` and `SpeciesInstance`.
+    created: SpeciesClass and SpeciesInstance.
 
     It is also possible to inherit from generated classes.
 

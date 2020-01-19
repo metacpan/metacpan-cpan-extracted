@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 use Quiq::Json;
 use Quiq::Template;
@@ -40,7 +40,7 @@ Windgeschwindigkeits-Messung)
 <div id="plot"></div>
 <script type="text/javascript">
   $(function() {
-    Plotly.newPlot('plot',[{
+    var plot = Plotly.newPlot('plot',[{
       type: 'scatter',
       mode: 'lines',
       fill: 'tonexty',
@@ -58,18 +58,15 @@ Windgeschwindigkeits-Messung)
       },
       spikedistance: -1,
       margin: {
-        l: 90,
-        r: 90,
-        t: 60,
-        b: 10,
+        autoexpand: false,
       },
       xaxis: {
         type: 'date',
         autorange: true,
         gridcolor: 'rgb(232,232,232,1)',
+        hoverformat: '%Y-%m-%d %H:%M:%S',
         tickformat: '%Y-%m-%d %H:%M',
         tickangle: 30,
-        ticklen: 4,
         tickcolor: 'rgb(64,64,64,1)',
         showspikes: true,
         spikethickness: 1,
@@ -83,7 +80,6 @@ Windgeschwindigkeits-Messung)
       yaxis: {
         type: 'linear',
         autorange: true,
-        ticklen: 4,
         tickcolor: 'rgb(64,64,64,1)',
         gridcolor: 'rgb(232,232,232,1)',
         showspikes: true,
@@ -121,6 +117,26 @@ Windgeschwindigkeits-Messung)
 
 Farbe der Kurve.
 
+=item height (Default: 450 I<Default von plotly.js>)
+
+Höhe des Plot in Pixeln.
+
+=item marginBottom => $n (Default: 10)
+
+Unterer Rand in Pixeln.
+
+=item marginLeft => $n (Default: 90)
+
+Linker Rand in Pixeln.
+
+=item marginRight => $n (Default: 90)
+
+Rechter Rand in Pixeln.
+
+=item marginTop => $n (Default: 60)
+
+Oberer Rand in Pixeln.
+
 =item name => $name (Default: 'plot')
 
 Name des Plot. Der Name wird als CSS-Id für den Div-Container
@@ -139,6 +155,11 @@ der Name des gemessenen Parameters.
 
 Referenz auf Array der Zeit-Werte (bevorzugt in JavaScript-Epoch).
 
+=item xSpikeFormat => $timeFormat ('%Y-%m-%d %H:%M:%S')
+
+Format der Spike-Beschriftung für die X-Koordinate.
+Siehe: L<https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format>.
+
 =item xTickFormat => $timeFormat ('%Y-%m-%d %H:%M')
 
 Format der Zeitachsen-Beschriftung. Siehe: L<https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md#format>.
@@ -156,6 +177,8 @@ dass der Wert aus den Daten ermittelt wird.
 
 Größter Wert auf der Y-Achse. Der Default 'undefined' bedeutet,
 dass der Wert aus den Daten ermittelt wird.
+
+=item ySide => 'left'|'right' (Default: 'left' I<Default von plotly.js>)
 
 =item yTitle => $str
 
@@ -183,14 +206,21 @@ sub new {
 
     my $self = $class->SUPER::new(
         color => 'rgb(255,0,0,1)',
+        height => undef,
+        marginBottom => undef,
+        marginLeft => undef,
+        marginRight => undef,
+        marginTop => undef,
         name => 'plot',
         shape => 'spline',
         title => undef,
         x => [],
         xTickFormat => '%Y-%m-%d %H:%M',
+        xSpikeFormat => '%Y-%m-%d %H:%M:%S',
         y => [],
         yMin => undef,
         yMax => undef,
+        ySide => undef,
         yTitle => undef,
     );
     $self->set(@_);
@@ -284,9 +314,12 @@ sub js {
 
     # Objektattribute
 
-    my ($color,$name,$shape,$title,$xA,$xTickFormat,$yA,$yMin,$yMax,
-        $yTitle) = $self->get(qw/color name shape title x xTickFormat
-        y yMin yMax yTitle/);
+    my ($color,$height,$marginBottom,$marginLeft,$marginRight,
+        $marginTop,$name,$shape,$title,$xA,$xSpikeFormat,$xTickFormat,
+        $yA,$yMin,$yMax,$ySide,$yTitle) =
+        $self->get(qw/color height marginBottom marginLeft marginRight
+        marginTop name shape title x xSpikeFormat xTickFormat
+        y yMin yMax ySide yTitle/);
 
     # Erzeuge JSON-Code
 
@@ -319,19 +352,22 @@ sub js {
             text => $title,
         ),
         spikedistance => -1,
+        height => $height,
         margin => $j->o(
-            l => 90,
-            r => 90,
-            t => 60,
-            b => 10,
+            l => $marginLeft,
+            r => $marginRight,
+            t => $marginTop,
+            b => $marginBottom,
+            autoexpand => \'false',
         ),
         xaxis => $j->o(
             type => 'date',
             autorange => \'true',
             gridcolor => 'rgb(232,232,232,1)',
+            hoverformat => $xSpikeFormat,
             tickformat => $xTickFormat,
             tickangle => 30,
-            ticklen => 4,
+            # ticklen => 4,
             tickcolor => 'rgb(64,64,64,1)',
             showspikes => \'true',
             spikethickness => 1,
@@ -346,10 +382,11 @@ sub js {
             type => 'linear',
             defined($yMin) && defined($yMax)? (range => [$yMin,$yMax]):
                 (autorange => \'true'),
-            ticklen => 4,
+            # ticklen => 4,
             tickcolor => 'rgb(64,64,64,1)',
             gridcolor => 'rgb(232,232,232,1)',
             showspikes => \'true',
+            side => $ySide,
             spikethickness => 1,
             spikesnap => 'data',
             spikecolor => 'rgb(0,0,0,1)',
@@ -364,6 +401,7 @@ sub js {
 
     my $extra = $j->o(
         displayModeBar => \'false',
+        # doubleClick => \'false', # http://codepen.io/etpinard/pen/XNXKaM
     );
 
     # Erzeuge JavaScript-Code
@@ -385,7 +423,7 @@ sub js {
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -393,7 +431,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

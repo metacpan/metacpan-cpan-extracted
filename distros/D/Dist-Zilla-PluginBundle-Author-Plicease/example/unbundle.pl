@@ -48,7 +48,7 @@ sub add_plugins
     {
       my %config = ref $item->[-1] eq 'HASH' ? %{ pop @$item } : ();
       my($moniker, $name) = @$item;
-      
+
       print "\n" if $nl && %config;
       if(defined $name)
       {
@@ -65,7 +65,7 @@ sub add_plugins
         $v = [ $v ] unless ref $v;
         print "$k = $_\n" for @$v;
       }
-      
+
       if(%config)
       {
         print "\n";

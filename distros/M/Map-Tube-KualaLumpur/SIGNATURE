@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,52 +12,53 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 4bd775f8c550b747fdcf3ca009cdde255832abb6 Changes
-SHA1 0080eea62084cb4e44ca9ad19654196f17f0c138 KualaLumpur.pm
-SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 efd89aea8dd2ac116b90bfee79e074d93ddf53f0 MANIFEST
-SHA1 cf4d8bb4d49cfd89e9f2514fe3ea2a2dfe4795b5 META.yml
-SHA1 a7afe552dce73edec1ecb617da5f645a8ef4e6a9 Makefile.PL
-SHA1 646c16496c5769ec219f30d09f80f4672055e6ef README
-SHA1 702b082eb2df671ed57edf62a835645b0d5874af examples/ex1.pl
-SHA1 61510dfde0846b6fb22df367b99d2d894a4761c4 examples/ex2.pl
-SHA1 b99966e9c8569790b8ddd68113ecfa82fa387cdd examples/ex3.pl
-SHA1 bf66b6b3a5226ffa23f2926b08a058b5dbe6f7ad examples/ex4.pl
-SHA1 5a55ed154c83459fec28f902cc0a0b822600a3cb images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 0806681376bdc150b38ae68f991ad1feae24c00b share/kuala_lumpur-map.xml
-SHA1 c0b0206356c7312f49493ccede5279125d000866 t/Map-Tube-KualaLumpur/01-use.t
-SHA1 5b2f3be1521d6a64fc92155a8236cba170c5d270 t/Map-Tube-KualaLumpur/02-version.t
-SHA1 73e57d9696f9cca4ca16b1f0005212d71986c3cd t/Map-Tube-KualaLumpur/03-map.t
-SHA1 9bc7245e92a5519c9f9ab9ba6aa687b206b0a974 t/Map-Tube-KualaLumpur/04-get_node_by_id.t
-SHA1 49796f0cd580918f29d81e021988b1a902b8781b t/Map-Tube-KualaLumpur/05-get_node_by_name.t
-SHA1 2b92a664b5085c2ea01f5aeed7db3a631854469a t/Map-Tube-KualaLumpur/06-get_shortest_route.t
-SHA1 f0d1f37a5ba6df2536b627b7414134d958a80659 t/Map-Tube-KualaLumpur/07-name.t
-SHA1 782551e954624c8d57183eeb04b410d6bac3a134 t/Map-Tube-KualaLumpur/08-xml.t
-SHA1 1d47e9b0925d8ca6ccb88ab376ac651b494a4da3 xt/Map-Tube-KualaLumpur/01-pod_coverage.t
-SHA1 fdfa506ee56f92a67d886d8e280ce9d4288a603b xt/Map-Tube-KualaLumpur/02-pod.t
+SHA256 2983fc89bb3b1c0549e3b8cd46f0d1078bcc400d52a873c63d47636f1c5d1913 Changes
+SHA256 45d27fa5d9e106fdb9e6bc1273a7048354394a44ef59aa54ecf3d73e8edaff8d KualaLumpur.pm
+SHA256 4fd520fd3174c7bc1875a90a588fe12fbd2268830d6275df890f9acb6b76ec7b LICENSE.artistic_2
+SHA256 73c54c20df0c1eb887cbbc99b6dea34fcb6714e5cebc0bbbcd3a571560f1ec80 LICENSE.bsd
+SHA256 0fb70ef3a021498ab2589080f1d44f4d2d3dc1f4e19fcf18e1bd9ac55d65b8d7 MANIFEST
+SHA256 e62999eb339c11b5966bc547f48451e11be65f4082d0a9f190675c73805c5ce1 META.yml
+SHA256 f16fc9e1b11239fa3369e11597f56f2ca154fa6201567d165c6df3225d5095a8 Makefile.PL
+SHA256 1749c4119b995cdebc4fd8dafaea3ffe9b041ad3d89a3e1143c0e7ca9b3c38ea README
+SHA256 9c54134e2d6a4fa5691c9264fea7367c49b2479521ffa4fedb5cac8ff391d21a examples/ex1.pl
+SHA256 59c60eb9e39aea01d433d07fa83a1e3e0ebaed90599f7bfa5c2ec0073d8df5a6 examples/ex2.pl
+SHA256 3c7f596284ef9e3dccec30be71849a81e419ce266186aed0bfaafeac5da6bfef examples/ex3.pl
+SHA256 50c3104b3dd3cac1f4f70d6678020eaf9b4ed00248901d0e1b0839da46db08b0 examples/ex4.pl
+SHA256 bc6745256d23bfa071a5dbce3e497f367d9224df4afd9c13ff2c6a73956dab42 examples/ex5.pl
+SHA256 9d679f198030c67b7d8851b9ffb1cdc7cc4ca671f8fa858f0c0d4643075f82ff images/ex3.png
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b0d80f32f3ac7d93202dc831046c55cff967832806ef2b76936aab54352a52ea inc/Module/Install/Share.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 38a8ee822e973adf1d1bfea22c6e2cd21edea67db326f441d4d050976dafb752 share/kuala_lumpur-map.xml
+SHA256 97c2a0b7ebb371b0f770390568a1c3c78bec07382d390e1ec82b5aaddd0f997f t/Map-Tube-KualaLumpur/01-use.t
+SHA256 2f458a786069eb60509b2281663965040c30c068eec3efe8b5ef8a23a1a33ec8 t/Map-Tube-KualaLumpur/02-version.t
+SHA256 6d3fb799c149e7538195c0aea22c4a7be84bc845b78da3015be339859fd2b322 t/Map-Tube-KualaLumpur/03-map.t
+SHA256 7d9e92f7e4dbf7d4863400e6dd7ea1d61ff012d00dca6c9de375068108cbfd1b t/Map-Tube-KualaLumpur/04-get_node_by_id.t
+SHA256 b01b8722556bde22c023fabee2c8bcf73c28f470b84972f2f686d4cfa8520a43 t/Map-Tube-KualaLumpur/05-get_node_by_name.t
+SHA256 0c38de3af24145abbcbd7d6d35e8776c3cb4220383b805c3b67b64201d2714e3 t/Map-Tube-KualaLumpur/06-get_shortest_route.t
+SHA256 ab6832142c35b7b17a3f057087cd399e59dbce8f9e5568c0072ef65c8a9cc9d0 t/Map-Tube-KualaLumpur/07-name.t
+SHA256 1f532c4d46c334e5931edb76e9cc9a5d312141d448596b0a755f129d211f2a5d t/Map-Tube-KualaLumpur/08-xml.t
+SHA256 29537b1966ddb87a0bc31eebb2f57fd9b0d9b803bf6a410c881c2fd5e95d0b5d xt/Map-Tube-KualaLumpur/01-pod_coverage.t
+SHA256 d94d013d8398e527587e2f228645cbadac7cf813a0e233c5309466b0fb2d134a xt/Map-Tube-KualaLumpur/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIMuyAAoJEJe+XXKaIuTlCJwIALmT1HZmgvHRJr9+zp/bMWMT
-Hk0eNqGPeFMq3mMUe9mnDj6u724vJCvuYKbfrJg7yEFhCoV3ylJYUqa2pQ8/Jva/
-1Max8QPvMJkIYe26UZpgWiOdKlUkKNy5bfg4QKhhZMcNvuQxMx3SsdGkgp0zJZKJ
-fyQSGV28MidXbSfwHpxFxwvgVIbD5ZnpeBxcPoIc80hJsUs+nIUFDEtRmvw2DgLT
-OIz9H/uLo8RMFm+8zVHlowhuPOofe0Lzs+gmNsSFK76JZA5PTn/12fYtdSZ+ayrL
-NNX8VYVJsPNbh2xjqLmhztpYfIJDH13+XCBYxNSMJaXKyZPmqvFVUmqrE4ub0DU=
-=3lBI
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl4i5lcACgkQKyiOZjWe
+rHYJbggAsaeoXPWUsG3XyPoqllRpn/h8Td51cio+XGAJUvGEQEpXoqLlHvd+paWd
+/3MPiwM/NNaTJ1yMexznIlRG8fRA/WfW+dG+MNPVwvk3JugVuNmHYJLe9W3Aqrnc
+xTn0PI6fCMIEBL3w+GfTl7vWdd5NG4onKn0RLqutVMC6h/4wQvDCGQiBC0yIW/x2
+nsxnjvNc+p50LYrTX0tcmE7zVX7xOcJ4RTHeqjtUQu6J0k+YmGDFcQd9zwdSryNG
+kEl1yK/OFly/esyc+yqMmI5/7iPC92/WczcyQl42MUdEl3XDzofFUm4CiiDu2Nam
+QAh3lbpYH5KJ2jZ9XGYYKKZ2/SaeVw==
+=LcQT
 -----END PGP SIGNATURE-----

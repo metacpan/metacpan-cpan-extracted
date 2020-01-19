@@ -1,3 +1,18 @@
+0.05 2020-01-18T11:36:15+01:00
+ - Add EXAMPLE5 section to doc.
+ - Fix bad alt in doc HTML output.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Implement station order.
+ - Improve description for get_lines() in doc.
+ - Remove simple comments.
+ - Rewrite XML map to new version with line IDs.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+ - Update to Map::Tube 3.62.
+
 0.04 2015-10-15T23:27:06+02:00
  - Update to Map::Tube 3.06.
 

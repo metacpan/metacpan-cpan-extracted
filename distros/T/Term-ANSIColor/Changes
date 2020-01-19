@@ -1,5 +1,17 @@
                    User-Visible Term::ANSIColor Changes
 
+Term::ANSIColor 5.01 (2020-01-17)
+
+    Add support for NO_COLOR <https://no-color.org/> to suppress all
+    formatting sequences.  Thanks, Andrea Telatin.
+
+    Document that aliases are expanded during alias definition, and thus
+    an alias defined in terms of another alias will not change if the
+    other alias is redefined.
+
+    Fix SYNOPSIS example of uncolor.  The function returns a list, not a
+    reference to a list.  Thanks, Joe Smith.  (#131414)
+
 Term::ANSIColor 5.00 (2020-01-05)
 
     Drop support for Perl 5.6.  The minimum supported version is now Perl

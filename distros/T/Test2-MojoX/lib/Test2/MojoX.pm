@@ -1,7 +1,7 @@
 package Test2::MojoX;
 use Mojo::Base -base;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 ## "Amy: He knows when you are sleeping.
 ##  Professor: He knows when you're on the can.
@@ -44,6 +44,46 @@ sub app {
   return $self->ua->server->app unless $app;
   $self->ua->server->app($app);
   return $self;
+}
+
+sub attr_is {
+  my ($self, $selector, $attr, $value, $desc) = @_;
+  my $ctx = context;
+  $desc = _desc($desc,
+    qq{exact match for attribute "$attr" at selector "$selector"});
+  my $out = is($self->_attr($selector, $attr), $value, $desc);
+  $ctx->release;
+  return $self->success($out);
+}
+
+sub attr_isnt {
+  my ($self, $selector, $attr, $value, $desc) = @_;
+  my $ctx = context;
+  $desc
+    = _desc($desc, qq{no match for attribute "$attr" at selector "$selector"});
+  my $out = isnt($self->_attr($selector, $attr), $value, $desc);
+  $ctx->release;
+  return $self->success($out);
+}
+
+sub attr_like {
+  my ($self, $selector, $attr, $regex, $desc) = @_;
+  my $ctx = context;
+  $desc = _desc($desc,
+    qq{similar match for attribute "$attr" at selector "$selector"});
+  my $out = like($self->_attr($selector, $attr), $regex, $desc);
+  $ctx->release;
+  return $self->success($out);
+}
+
+sub attr_unlike {
+  my ($self, $selector, $attr, $regex, $desc) = @_;
+  my $ctx = context;
+  $desc = _desc($desc,
+    qq{no similar match for attribute "$attr" at selector "$selector"});
+  my $out = unlike($self->_attr($selector, $attr), $regex, $desc);
+  $ctx->release;
+  return $self->success($out);
 }
 
 sub content_is {
@@ -484,6 +524,12 @@ sub websocket_ok {
   return $self;
 }
 
+sub _attr {
+  my ($self, $selector, $attr) = @_;
+  return '' unless my $e = $self->tx->res->dom->at($selector);
+  return $e->attr($attr) || '';
+}
+
 sub _desc { encode 'UTF-8', shift || shift }
 
 sub _json {
@@ -735,6 +781,36 @@ Access application with L<Mojo::UserAgent::Server/"app">.
   $t->app->hook(after_dispatch => sub { $stash = shift->stash });
   $t->get_ok('/hello')->status_is(200);
   is $stash->{foo}, 'bar', 'right value';
+
+=head2 attr_is
+
+  $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat');
+  $t = $t->attr_is('img.cat', 'alt', 'Grumpy cat', 'right alt text');
+
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
+first matching HTML/XML element for exact match with L<Mojo::DOM/"at">.
+
+=head2 attr_isnt
+
+  $t = $t->attr_isnt('img.cat', 'alt', 'Calm cat');
+  $t = $t->attr_isnt('img.cat', 'alt', 'Calm cat', 'different alt text');
+
+Opposite of L</"attr_is">.
+
+=head2 attr_like
+
+  $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/);
+  $t = $t->attr_like('img.cat', 'alt', qr/Grumpy/, 'right alt text');
+
+Checks text content of attribute with L<Mojo::DOM/"attr"> at the CSS selectors
+first matching HTML/XML element for similar match with L<Mojo::DOM/"at">.
+
+=head2 attr_unlike
+
+  $t = $t->attr_unlike('img.cat', 'alt', qr/Calm/);
+  $t = $t->attr_unlike('img.cat', 'alt', qr/Calm/, 'different alt text');
+
+Opposite of L</"attr_like">.
 
 =head2 content_is
 

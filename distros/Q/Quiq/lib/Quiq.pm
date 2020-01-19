@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.169';
+our $VERSION = '1.170';
 
 =encoding utf8
 
@@ -85,10 +85,6 @@ L<Quiq::Color> - Eine Farbe des RGB-Farbraums
 =item *
 
 L<Quiq::CommandLine> - Erstelle eine Unix-Kommandozeile
-
-=item *
-
-L<Quiq::Concat> - Konkateniere Zeichenketten
 
 =item *
 
@@ -332,6 +328,10 @@ L<Quiq::Hash::Db> - Persistenter Hash
 
 =item *
 
+L<Quiq::Hash::Ordered> - Hash mit geordneten Elementen
+
+=item *
+
 L<Quiq::Hash::Persistent> - Persistente Hash-Datenstruktur
 
 =item *
@@ -468,6 +468,10 @@ L<Quiq::Http::Message> - HTTP-Nachricht
 
 =item *
 
+L<Quiq::If> - Liefere Werte unter einer Bedingung
+
+=item *
+
 L<Quiq::Image> - Operationen im Zusammenhang mit Bildern/Bilddateien
 
 =item *
@@ -493,6 +497,10 @@ L<Quiq::Ipc> - Interprozesskommunikation
 =item *
 
 L<Quiq::JQuery::Accordion> - Erzeuge HTML einer jQuery UI Accodion Reiterleiste
+
+=item *
+
+L<Quiq::JQuery::ContextMenu::Ajax> - Erzeuge Code für ein jQuery Kontext-Menü
 
 =item *
 
@@ -573,10 +581,6 @@ L<Quiq::Object> - Basisklasse für alle Klassen der Klassenbibliothek
 =item *
 
 L<Quiq::Option> - Verarbeitung von Programm- und Methoden-Optionen
-
-=item *
-
-L<Quiq::OrderedHash> - Hash mit geordneten Elementen
 
 =item *
 
@@ -830,7 +834,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.169
+1.170
 
 =head1 AUTHOR
 
@@ -838,7 +842,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019 Frank Seitz
+Copyright (C) 2020 Frank Seitz
 
 =head1 LICENSE
 

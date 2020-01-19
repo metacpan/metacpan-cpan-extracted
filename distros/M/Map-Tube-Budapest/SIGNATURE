@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,52 +12,53 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 38e3483a93cd3523011ba9342ab083cf58a9bdab Budapest.pm
-SHA1 13f5493fcbfb946f31346f5ab47bdcefeb88df7c Changes
-SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 cc4d8aa2b8022021e5390986539d0873bcd1a279 MANIFEST
-SHA1 c2e9b096f7a9c1618ecec5c874a0ff7ba08e0294 META.yml
-SHA1 c82ca60c74f56ffc2aeebac7397971a5d9483cb9 Makefile.PL
-SHA1 3411d34022b105080998e6d3dea73ffea2b2265b README
-SHA1 7c4e5b6657a0008ac5bcce4b8156f47292f2365c examples/ex1.pl
-SHA1 03a3b518b9e66366a0444a8ec3b82ee75b318f71 examples/ex2.pl
-SHA1 25474b84ea57a9597f9117889e51443f1121ecf0 examples/ex3.pl
-SHA1 8ef8cdf0e37a42ff431dbbd797cc408a1d443d19 examples/ex4.pl
-SHA1 a8d3c8b53c30b26b21c6a6cf13530bc2116d2e17 images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 008eda9e674b5802c27026e98157a634ffd56e43 share/budapest-map.xml
-SHA1 905447068279c43efe69fe6b0ba2d428691c7fe1 t/Map-Tube-Budapest/01-use.t
-SHA1 e04811d1fccaf3dcd605107aeaac6074adb4ebe1 t/Map-Tube-Budapest/02-version.t
-SHA1 09b9129c2b2f489cfe81d06d44782c640b9dc455 t/Map-Tube-Budapest/03-map.t
-SHA1 1b63dd5a94afb5a53d94d0232d59e214aefec02d t/Map-Tube-Budapest/04-get_node_by_id.t
-SHA1 92e31e610671c6b66681bc518a13a0f19804b1d6 t/Map-Tube-Budapest/05-get_node_by_name.t
-SHA1 97045d83028b5edadf44bf952858d92297a61e6a t/Map-Tube-Budapest/06-get_shortest_route.t
-SHA1 b07d81c363798bb2d21e7022f6159927bd815ec4 t/Map-Tube-Budapest/07-name.t
-SHA1 d13d17595ee821444c6e96eabc124e9701fd94f2 t/Map-Tube-Budapest/08-xml.t
-SHA1 9d60035115c5f1b4f4a32c7ae58083c1cedd8099 xt/Map-Tube-Budapest/01-pod_coverage.t
-SHA1 4201b71f20703842cff4a5e377b717a7d63619cd xt/Map-Tube-Budapest/02-pod.t
+SHA256 095035613b11da98d676274955afc3ec8c60c662ec88ff80d25ed4eefaa2127a Budapest.pm
+SHA256 106ba1982f075c22d85988d4e765f7f1ce839d08046c9b44a296da8c8b61a6a9 Changes
+SHA256 4fd520fd3174c7bc1875a90a588fe12fbd2268830d6275df890f9acb6b76ec7b LICENSE.artistic_2
+SHA256 73c54c20df0c1eb887cbbc99b6dea34fcb6714e5cebc0bbbcd3a571560f1ec80 LICENSE.bsd
+SHA256 b4eb1a18fe0bc60f386381a4b2e54138da48544f43ba8b1c7a0dcc0fac359fe6 MANIFEST
+SHA256 c252cc09e29557d865c2bb46630312c9bd79cefcfbd3fcba44a071db895717d5 META.yml
+SHA256 f002e0a0a6bcef790d6b7b0bd2d474d6f49e09879c0d5a26a187ded51402e451 Makefile.PL
+SHA256 5cbc0cedee15fd837b83d139b45d9d5f362ada0b6c5c59672472d1f1b015d8a3 README
+SHA256 311c06bf84baf78827d916528e08161a0e44f7a71f65383f43ac97cc9eae31eb examples/ex1.pl
+SHA256 fced672760b7ea15557e32460387dcd779e327a3aab844318f2dad9a331c7348 examples/ex2.pl
+SHA256 3c4cde30fa815f26d62238eba8296d57d5cbe9214d52ca7f84e01a2a9857081e examples/ex3.pl
+SHA256 bd2b53b228d3124cbbae6a597687c8107c1bd0d207879882ffc869e877fe7974 examples/ex4.pl
+SHA256 2794f233ba1e094ee595f4a3c5b7685dd517529d3f589a0c9f036092636fd144 examples/ex5.pl
+SHA256 936eb4e79611e14b8f1464b574d666bab4066139edc6078d2d367c7daf7d7c50 images/ex3.png
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 b0d80f32f3ac7d93202dc831046c55cff967832806ef2b76936aab54352a52ea inc/Module/Install/Share.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 7cefb07f9ebb643bcf54cf9fb71fdf96d68a2e2f9e83f045ccce1d9e87811cbd share/budapest-map.xml
+SHA256 896e6c532bcf849b13ed0b673cb313e15eaee8385b58110f8aa5ee65bcbdff8d t/Map-Tube-Budapest/01-use.t
+SHA256 879a597ed276d4e617ab8e08fed26fe1797b4c8dfb253cb0df018213f682ef41 t/Map-Tube-Budapest/02-version.t
+SHA256 7d0923a2877e3f26212fb1ab10f4847c91a235c39a824d5a08f4ecf2260bba13 t/Map-Tube-Budapest/03-map.t
+SHA256 228523a85ff5f60bb34880b9e2315da779787a00e6315447dd4c7ac60412033f t/Map-Tube-Budapest/04-get_node_by_id.t
+SHA256 e2eb101f02c483e5ee92d4b3371d16874d9d385b3629393ad93b7821facc11ca t/Map-Tube-Budapest/05-get_node_by_name.t
+SHA256 3a7bcac9ba7c0dc978434bb6809338149943a94547fb8f50a79129e18e49b5b1 t/Map-Tube-Budapest/06-get_shortest_route.t
+SHA256 f23efad4a839accf37a5ca3288f9cb10b3cf3ed55c030ef7f71b7d609b36eacd t/Map-Tube-Budapest/07-name.t
+SHA256 81d89bbda79e0dbe01d4eb736ab51115f8a2e72764fdd4b0701093326ee3db2d t/Map-Tube-Budapest/08-xml.t
+SHA256 d0b45dcf0457779fe6edfb026d205c2d2a72b45df2f50969a3eeee893ed9312c xt/Map-Tube-Budapest/01-pod_coverage.t
+SHA256 6dbb01f9db0a56d7b07e3d055ed81c75768e6532296b74e9fc3d4341d27e0c23 xt/Map-Tube-Budapest/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIBotAAoJEJe+XXKaIuTlviIH/0scV3IPbusUyPO1sjKTy6ev
-bOXrKV++rKVvUEmo0Vufqh3gEFrV+T57HMYKrr9GB+TfYoymwn6hM42bBx/9QNIy
-yqecXFKYFuXhor6QRHgjeybRqepPOiQ/VTPx0yDPWWaBgi+0+hblyZJ5Xu3vShPi
-eLDz6+HFl00a32fNonAJo3yXrrA8cE6zKJyKoYgmC0WldyJm8C5TyG1kvPVIaSy3
-4r9EnZY2PzclF80WkKsWIJCeO6RrEb/Nduwldgcx4ETgGn7o3h/aQZZg7ynEB/rY
-qqFBoq5cmECn8YK0Zw4DZIF3zZq0ji1toZ9saWzVTGHwm58T5ipkQFYnGTMUTZc=
-=YsAv
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl4i36gACgkQKyiOZjWe
+rHZfDgf+MiCN/SuYaMJ9nXssG5Paa400PRAJTavDIbT7TE2L48ShGdM9rXzs6WtV
+JMD+DRnKzaEd0qH7ZlB+xPvrDnZ5/XhYFEIXTYY2nepZ1hL0w2dAU9BCYZGhnypr
+ikG8tdg2ou3yrw0YkAGv0UeWUiMQVQf4CI9Z1pqEJERBFpfloKFZ+khBiA+IIQXM
+4foAnU1sfMLDwTJGgTcC7IJQrMPmyOkQ2unJ5bVcStujXSj6MlbAjM4YYo455zrP
+C1pv8MVdA2d5gwIv5ZwehSRwKhrgw/XhzM8oUvWslrcOk1ZmWaeaQ/Mm51P6oIS9
+9ft9ZAw8IhzQfchqQutEWTcT7Q1cug==
+=Q608
 -----END PGP SIGNATURE-----

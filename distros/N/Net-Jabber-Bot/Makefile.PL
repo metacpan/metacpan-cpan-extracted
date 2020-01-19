@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Net::Jabber::Bot',
-    AUTHOR              => 'Todd E Rinaldo <perl-net-jabber-bot@googlegroups.com>',
+    AUTHOR              => 'Todd E Rinaldo <toddr@cpan.org>',
     VERSION_FROM        => 'lib/Net/Jabber/Bot.pm',
     ABSTRACT_FROM       => 'lib/Net/Jabber/Bot.pm',
     PL_FILES            => {},
@@ -12,6 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moose' => 0.82,  # Object Base
         'MooseX::Types' => 0.12, # New variable types
+        'Mozilla::CA' => 0, # SSL Cert support.
         'Time::HiRes' => 0, # Partial second sleeping
         'Net::Jabber' => 2.0,  # The whole thing is based on Net::Jabber. 
         'Log::Log4perl' => 0,  # We use log4perl. not sure how bad this'll screw people over... should consider removal later or make it optional
@@ -25,10 +26,6 @@ WriteMakefile(
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Net-Jabber-Bot-*' },
     META_MERGE  => {
-        recommends => {
-            'Test::Pod::Coverage' => 1.04,
-            'Test::Pod' => 1.14,
-        },
         build_requires => {
             'Test::More' => 0,  # For testing
             'Test::NoWarnings' => 0,  # For testing
@@ -38,9 +35,9 @@ WriteMakefile(
         resources => {
             license => 'http://dev.perl.org/licenses/',
             homepage => 'http://wiki.github.com/toddr/perl-net-jabber-bot',
-            bugtracker => 'http://code.google.com/p/perl-net-jabber-bot/issues/list',
+            bugtracker => 'https://github.com/toddr/perl-net-jabber-bot/issues',
             repository => 'http://github.com/toddr/perl-net-jabber-bot/tree/master',
-            MailingList => 'http://groups.google.com/group/perl-net-jabber-bot',
+#            MailingList => 'http://groups.google.com/group/perl-net-jabber-bot',
         },
     },
 );

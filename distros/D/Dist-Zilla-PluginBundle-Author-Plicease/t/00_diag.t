@@ -1,7 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0 -no_srand => 1;
 use Config;
-use Test::More tests => 1;
+
+eval { require 'Test/More.pm' };
 
 # This .t file is generated.
 # make changes instead to dist.ini
@@ -10,12 +10,13 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Data::Section
   Dist::Zilla
   Dist::Zilla::App::Command::aliendeps
   Dist::Zilla::Plugin::Alien
-  Dist::Zilla::Plugin::Author::Plicease
   Dist::Zilla::Plugin::AutoMetaResources
   Dist::Zilla::Plugin::CopyFilesFromBuild
+  Dist::Zilla::Plugin::Git
   Dist::Zilla::Plugin::InsertExample
   Dist::Zilla::Plugin::InstallGuide
   Dist::Zilla::Plugin::MinimumPerl
@@ -24,14 +25,24 @@ $modules{$_} = $_ for qw(
   Dist::Zilla::Plugin::PodWeaver
   Dist::Zilla::Plugin::ReadmeAnyFromPod
   Dist::Zilla::Plugin::Run::BeforeBuild
+  Dist::Zilla::Role::PluginBundle::Easy
+  Dist::Zilla::Role::TextTemplate
   Dist::Zilla::Util::CurrentCmd
   ExtUtils::MakeMaker
+  File::ShareDir::Dist
+  File::ShareDir::Install
+  File::chdir
   IPC::System::Simple
   Moose
   Path::Tiny
+  Perl::PrereqScanner
+  Perl::Tidy
   PerlX::Maybe
   PerlX::Maybe::XS
   Pod::Markdown
+  Sub::Exporter::ForMethods
+  Term::Encoding
+  Test2::V0
   Test::Fixme
   Test::More
   Test::Pod
@@ -39,13 +50,13 @@ $modules{$_} = $_ for qw(
   Test::Script
   Test::Version
   YAML
+  namespace::autoclean
 );
 
-$modules{$_} = $_ for qw(
-  Dist::Zilla::Plugin::Git
-  Perl::PrereqScanner
-  Term::Encoding
-);
+$post_diag = sub {
+  use Dist::Zilla::Plugin::Author::Plicease;
+  diag 'share dir = ', Dist::Zilla::Plugin::Author::Plicease->dist_dir;
+};
 
 my @modules = sort keys %modules;
 
@@ -89,7 +100,7 @@ if(@keys > 0)
 
 diag sprintf $format, 'perl ', $];
 
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   my $pm = "$module.pm";
   $pm =~ s{::}{/}g;
@@ -112,4 +123,6 @@ if($post_diag)
 }
 
 spacer;
+
+done_testing;
 

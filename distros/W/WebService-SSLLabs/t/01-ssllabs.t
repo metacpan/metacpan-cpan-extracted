@@ -72,7 +72,7 @@ SKIP: {
 	if (defined $host->status_message()) {
 		ok($host->status_message() =~ /\w/, "\$host->status_message() is text");
 	}
-	ok($host->protocol() eq 'HTTP', "\$host->protocol() is 'HTTP'");
+	ok(uc $host->protocol() eq 'HTTP', "\$host->protocol() is 'HTTP'");
 	ok($host->test_time() =~ /^\d+/smx, "\$host->test_time() is a number");
 	foreach my $endpoint ($host->endpoints()) {
 		next unless ($endpoint->ready());

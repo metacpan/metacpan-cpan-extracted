@@ -1,3 +1,12 @@
+v0.112.0 2020-01-18T15:25:20Z
+ - sql qurey fixed
+ - app tmpl fixed
+ - components updated
+ - unpack token length check
+ - perms const renamed
+ - api session signout
+ - api methods renamed
+
 v0.111.0 2020-01-16T21:59:11Z
  - status reason fixed
  - user avatar fixed

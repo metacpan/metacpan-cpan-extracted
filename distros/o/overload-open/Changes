@@ -1,5 +1,8 @@
 Revision history for overload::open
 
+1.9.1 Jan 17, 2020
+    - Reduce needed version to 5.4 (though I have not tested it on 5.4)
+
 1.9.0 Jan 17, 2020
     - Make sure not to use // comments in the .xs file
     - Remove the minimum version requirement

@@ -23,6 +23,7 @@ sub test_line : Test(1) {
     my $js1 = "
         var s = this.form.mea_id;
         for (var i = 0; i < s.options.length; i++)
+            // ein Kommentar
             s.options[i].selected = this.checked;
     ";
 

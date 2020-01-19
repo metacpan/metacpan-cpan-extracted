@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/MooX-Pression>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2020-01-18
+
+ [ Packaging ]
+ - Require MooX::Press 0.026.
+
+0.007	2020-01-18
+
+ [ Bug Fixes ]
+ - Handle parameters passed to class/role generators properly.
+
+ [ Documentation ]
+ - Fix example that showed `extends` within a `role` block.
+
+ [ Other ]
+ - Added: Slurpy positional parameters in signatures.
+
 0.006	2020-01-17
 
  [ Documentation ]

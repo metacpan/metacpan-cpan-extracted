@@ -25,7 +25,7 @@ Array constants_list (const Stash& stash) {
     if (!clists) clists = Hash::create();
     auto clist = clists[stash.name()];
     if (!clist.defined()) clist = Ref::create(Array::create());
-    return clist;
+    return Array(clist);
 }
 
 static void register_export_impl (const Stash& stash, string_view name, Array clist) {

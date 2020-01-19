@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
     "File::ShareDir" => 0,
     "File::Slurp" => 0,
     "File::Touch" => 0,
+    "File::Which" => 0,
     "FileHandle" => 0,
     "Getopt::Long" => 0,
     "IPC::Run3" => 0,
@@ -69,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +94,7 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Slurp" => 0,
   "File::Touch" => 0,
+  "File::Which" => 0,
   "FileHandle" => 0,
   "Getopt::Long" => 0,
   "IPC::Run3" => 0,

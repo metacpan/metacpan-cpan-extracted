@@ -5,11 +5,11 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 
 use constant _incantation =>
-  $^O eq 'MSWin32' && $Config::Config{archname} =~ /MSWin32-x64/
+  $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
   ? 'Q'
   : 'L!';
 use constant _size_of_pointer => FFI::Platypus->new( api => 1 )->sizeof('opaque');
@@ -124,7 +124,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 

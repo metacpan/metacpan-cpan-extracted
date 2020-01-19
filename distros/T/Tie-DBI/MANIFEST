@@ -2,10 +2,10 @@ Changes
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
-README
+README.md
 lib/Tie/DBI.pm
 lib/Tie/RDBM.pm
 t/DBI.t
 t/RDBM.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

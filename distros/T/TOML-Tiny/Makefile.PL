@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "DateTime::Format::RFC3339" => 0,
     "Exporter" => 0,
-    "Math::BigInt" => "1.999718",
     "Scalar::Util" => "1.14"
   },
   "TEST_REQUIRES" => {
@@ -29,12 +28,13 @@ my %WriteMakefileArgs = (
     "DateTime::Format::RFC3339" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Math::BigInt" => "1.999718",
     "TOML::Parser" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t t/toml-test/invalid/*.t t/toml-test/valid/*.t"
   }
