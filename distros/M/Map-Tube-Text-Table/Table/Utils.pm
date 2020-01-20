@@ -1,11 +1,9 @@
 package Map::Tube::Text::Table::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use List::Util qw(sum);
 use Readonly;
 use Text::UnicodeBox;
@@ -17,8 +15,7 @@ Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
 Readonly::Scalar our $SPACE_ON_END_COUNT => 1;
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Print table.
 sub table {
@@ -101,6 +98,7 @@ Map::Tube::Text::Table::Utils - Utilities for Map::Tube::Text::Table.
 =head1 SYNOPSIS
 
  use Map::Tube::Text::Table::Utils qw(table);
+
  my $table = table($title, $data_len_ar, $header_ar, $data_ar);
 
 =head1 SUBROUTINES
@@ -116,11 +114,9 @@ Map::Tube::Text::Table::Utils - Utilities for Map::Tube::Text::Table.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Module.
  use Encode qw(encode_utf8);
  use Map::Tube::Text::Table::Utils qw(table);
 
@@ -153,28 +149,40 @@ L<Text::UnicodeBox::Control>.
 
 =head1 SEE ALSO
 
-L<Map::Tube>,
-L<Map::Tube::Text::Table>,
-L<Task::Map::Tube>.
+=over 8
+
+=item L<Map::Tube>
+
+Lightweight Routing Framework
+
+=item L<Map::Tube::Text::Table>
+
+Table output for Map::Tube
+
+=item L<Task::Map::Tube>
+
+Install the Map::Tube modules.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Text-Table>
+L<https://github.com/michal-josef-spacek/Map-Tube-Text-Table>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2020 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

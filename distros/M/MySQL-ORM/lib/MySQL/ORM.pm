@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -320,12 +320,28 @@ method _fq_table(Str $table){
     return $self->schema_name . "." . $table;
 }
 
-method _is_pk_autoinc (Str $table) {
+method _has_pk (Str $table) {
 
 	my $t  = $self->_schema->get_table($table);
 	my $pk = $t->get_primary_key;
+	if ($pk) {
+		return 1;	
+	}	
+	
+	return 0;
+}
 
-	return $pk->is_autoinc;
+method _is_pk_autoinc (Str $table) {
+
+	if ($self->_has_pk($table)) {
+		
+		my $t  = $self->_schema->get_table($table);
+		my $pk = $t->get_primary_key;
+
+		return $pk->is_autoinc;
+	}
+
+	return 0;	
 }
 
 method _get_autoinc_col (Str $table) {

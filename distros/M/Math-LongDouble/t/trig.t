@@ -109,9 +109,9 @@ else {
 tanh_LD($check1, $ldr);
 tanh_LD($check2, $ldr * -1);
 
-if($check1 == $check2 * -1) {print "ok 12\n"}
+if(approx($check1, $check2 * -1)) {print "ok 12\n"}
 else {
-  warn "\nExpected -$check2\nGot $check1\n";
+  warn "\nExpected ", -$check2, "\nGot $check1\n";
   print "not ok 12\n";
 }
 

@@ -1,10 +1,8 @@
 package Map::Tube::Text::Table;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Map::Tube::Text::Table::Utils qw(table);
@@ -20,8 +18,7 @@ Readonly::Scalar our $LINE => q{Line};
 Readonly::Scalar our $LINES => q{Lines};
 Readonly::Scalar our $STATION => q{Station};
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -167,6 +164,7 @@ Map::Tube::Text::Table - Table output for Map::Tube.
 =head1 SYNOPSIS
 
  use Map::Tube::Text::Table;
+
  my $obj = Map::Tube::Text::Table->new(%params);
  my $text = $obj->junctions;
  my $text = $obj->line($line);
@@ -231,11 +229,9 @@ Map::Tube::Text::Table - Table output for Map::Tube.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use English;
  use Error::Pure qw(err);
@@ -331,30 +327,36 @@ L<Scalar::Util>.
 
 =head1 SEE ALSO
 
-L<Map::Tube>,
-L<Map::Tube::Graph>,
-L<Map::Tube::GraphViz>,
-L<Map::Tube::Plugin::Graph>,
-L<Task::Map::Tube>.
+=over
+
+=item L<Task::Map::Tube>
+
+Install the Map::Tube modules.
+
+=item L<Task::Map::Tube::Metro>
+
+Install the Map::Tube concrete metro modules.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Text-Table>
+L<https://github.com/michal-josef-spacek/Map-Tube-Text-Table>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2020 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

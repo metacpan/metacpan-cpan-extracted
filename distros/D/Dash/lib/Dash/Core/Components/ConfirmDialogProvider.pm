@@ -2,18 +2,22 @@
 
 package Dash::Core::Components::ConfirmDialogProvider;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'message';
-has 'submit_n_clicks';
-has 'submit_n_clicks_timestamp';
-has 'cancel_n_clicks';
-has 'cancel_n_clicks_timestamp';
-has 'displayed';
-has 'children';
-has 'loading_state';
+extends 'Dash::BaseComponent';
+
+has 'id'                        => ( is => 'rw' );
+has 'message'                   => ( is => 'rw' );
+has 'submit_n_clicks'           => ( is => 'rw' );
+has 'submit_n_clicks_timestamp' => ( is => 'rw' );
+has 'cancel_n_clicks'           => ( is => 'rw' );
+has 'cancel_n_clicks_timestamp' => ( is => 'rw' );
+has 'displayed'                 => ( is => 'rw' );
+has 'children'                  => ( is => 'rw' );
+has 'loading_state'             => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -21,7 +25,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -38,7 +42,7 @@ Dash::Core::Components::ConfirmDialogProvider
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

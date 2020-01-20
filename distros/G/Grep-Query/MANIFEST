@@ -4,6 +4,7 @@ lib/Grep/Query.pm
 lib/Grep/Query/Parser.pm
 lib/Grep/Query/Parser/QOPS.pm
 lib/Grep/Query/FieldAccessor.pm
+.travis.yml
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -17,6 +18,7 @@ t/22-regexps.t
 t/30-records.t
 t/31-objects.t
 t/40-lonehash.t
+t/50-nested.t
 t/lib/TestInfo.pm
 t/lib/TestUtils.pm
 t/lib/TestObject.pm

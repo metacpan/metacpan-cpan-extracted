@@ -54,6 +54,6 @@
          "web" : "https://github.com/kenneth-olwing/Grep-Query"
       }
    },
-   "version" : "1.009",
+   "version" : "1.010",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

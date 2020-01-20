@@ -1,12 +1,13 @@
-Apache-Config-Preproc-1.02/META.json
-Apache-Config-Preproc-1.02/META.yml
 Changes
 lib/Apache/Config/Preproc.pm
 lib/Apache/Config/Preproc/compact.pm
+lib/Apache/Config/Preproc/Expand.pm
 lib/Apache/Config/Preproc/ifdefine.pm
 lib/Apache/Config/Preproc/ifmodule.pm
 lib/Apache/Config/Preproc/include.pm
+lib/Apache/Config/Preproc/locus.pm
 lib/Apache/Config/Preproc/macro.pm
+lib/Apache/Config/Preproc/Server/Probe.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -27,6 +28,13 @@ t/04macro02.t
 t/05ifdefine00.t
 t/05ifdefine01.t
 t/05ifdefine02.t
+t/06locus00.t
+t/06locus01.t
+t/06locus02.t
+t/06locus03.t
+t/06locus04.t
+t/06locus05.t
+t/06locus06.t
 t/99all00.t
 t/TestPreproc.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

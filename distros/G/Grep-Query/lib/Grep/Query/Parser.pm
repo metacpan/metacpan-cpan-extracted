@@ -3,7 +3,7 @@ package Grep::Query::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -120,11 +120,44 @@ sub __preprocessParsedQuery
 					my $op = $parsedQuery->{$k}->{op};
 					if ($op eq 'true')
 					{
-						$parsedQuery->{$k}->{op} = eval "sub { 1 }";						
+						$parsedQuery->{$k}->{op} = sub { 1 };						
 					}
 					elsif ($op eq 'false')
 					{
-						$parsedQuery->{$k}->{op} = eval "sub { 0 }";						
+						$parsedQuery->{$k}->{op} = sub { 0 };						
+					}
+					elsif ($op eq 'defined')
+					{
+						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? 1 : 0 };						
+					}
+					elsif ($op eq 'exists')
+					{
+						my $key = $parsedQuery->{$k}->{value};
+						$parsedQuery->{$k}->{op} = sub { ( defined($_[0]) && ref($_[0]) eq 'HASH' ) ? exists($_[0]->{$key}) : 0 };						
+					}
+					elsif ($op eq 'type')
+					{
+						my $v = $parsedQuery->{$k}->{value};
+						croak("Bad value for '$op' => '$v', must be one of: 'scalar', 'array' or 'hash'") unless $v =~ /^(?:scalar|array|hash)$/i;
+						$parsedQuery->{$k}->{op} = sub { defined($_[0]) ? (lc($v) eq (lc(ref($_[0])) || 'scalar') ) : 0 };						
+					}
+					elsif ($op =~ /^size(.+)/)
+					{
+						my $compop = $1;
+						my $possibleNumber = $parsedQuery->{$k}->{value};
+						croak("Not a number for '$op': '$possibleNumber'") unless looks_like_number($possibleNumber);
+						my $comparator = __getAnonWithOp($compop);
+						$parsedQuery->{$k}->{op} =
+							sub
+								{
+									my $reftype = ref($_[0]);
+									my $sz = ($reftype eq 'ARRAY')
+												? scalar(@{$_[0]})
+												: ($reftype eq 'HASH')
+													? scalar(keys(%{$_[0]}))
+													: length($_[0]);
+									$comparator->($sz, $possibleNumber);
+								};						
 					}
 					elsif ($op =~ /^(?:regexp|=~)$/)
 					{
@@ -209,12 +242,17 @@ unary:
 
 field_op_value_test:
 		/
-				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false)
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)								# allow paired '()' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
+				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false|defined)
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\((?<value>[^)]*)\)															# allow paired '()' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\{(?<value>[^)]*)\}															# allow paired '{}' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))\[(?<value>[^)]*)\]															# allow paired '[]' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))<(?<value>[^)]*)>																# allow paired '<>' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)size(?:[=!<>]=|<|>))(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}								# allow arbitrary delimiter
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)								# allow paired '()' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)exists|type|regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
 		/ix { bless( { field => $+{field}, op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
 
 or:

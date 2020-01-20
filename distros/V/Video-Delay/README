@@ -12,15 +12,15 @@ SEE ALSO
         Video::Delay class for delays defined by math function.
 
 REPOSITORY
-    <https://github.com/tupinek/Video-Delay>
+    <https://github.com/michal-josef-spacek/Video-Delay>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2015 Michal Špaček
+     © 2012-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION

@@ -4,46 +4,23 @@ package DateTimeX::strftimeq;
 
 our $DATE = '2019-11-20'; # DATE
 our $DIST = 'DateTimeX-strftimeq'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use Date::strftimeq ();
 use POSIX ();
 use Scalar::Util 'blessed';
 
 use Exporter 'import';
 our @EXPORT = qw(strftimeq);
 
-our $regex = qr{
-                   (?(DEFINE)
-                       (?<def_not_close_paren> [^)]+)
-                       (?<def_code> ((?&def_not_close_paren) | \((?&def_code)\))*)
-                   )
-                   (?<all>
-
-                       (?<convspec>
-                           %
-                           (?<flags> [_0^#-]+)?
-                           (?<width> [0-9]+)?
-                           (?<alt>[EO])?
-                           (?<convletter> [%aAbBcCdDeEFgGhHIjklmMnOpPrRsStTuUVwWxXyYZz+])
-                       )|
-                       (?<qconvspec>
-                           %\(
-                           (?<code> (?&def_code))
-                           \)q)
-                   )
-           }x;
-
-# faster version, without using named capture
-if (0) {
-}
-
 sub strftimeq {
     my ($format, @time) = @_;
 
+    my ($caller_pkg) = caller();
     my ($dt, %compiled_code);
 
     if (@time == 1 && blessed $time[0] && $time[0]->isa('DateTime')) {
@@ -58,12 +35,11 @@ sub strftimeq {
         );
     }
 
-    $format =~ s{$regex}{
+    $format =~ s{$Date::strftimeq::regex}{
         # for faster acccess
         my %m = %+;
 
-        # DEBUG
-        #use DD; dd \%m;
+        #use DD; dd \%m; # DEBUG
 
         if (exists $m{code}) {
             require DateTime;
@@ -76,7 +52,8 @@ sub strftimeq {
                 year   => $time[5]+1900,
             );
             unless (defined $compiled_code{$m{code}}) {
-                $compiled_code{$m{code}} = eval "sub { $m{code} }";
+                #say "D: compiling $m{code}"; # DEBUG
+                $compiled_code{$m{code}} = eval "package $caller_pkg; no strict; no warnings; sub { $m{code} }";
                 die "Can't compile code in $m{all}: $@" if $@;
             }
             local $_ = $dt;
@@ -110,7 +87,7 @@ DateTimeX::strftimeq - POSIX::strftime() with support for embedded perl code in 
 
 =head1 VERSION
 
-This document describes version 0.003 of DateTimeX::strftimeq (from Perl distribution DateTimeX-strftimeq), released on 2019-11-20.
+This document describes version 0.004 of DateTimeX::strftimeq (from Perl distribution DateTimeX-strftimeq), released on 2019-11-20.
 
 =head1 SYNOPSIS
 
@@ -129,11 +106,13 @@ $month, $year):
 =head1 DESCRIPTION
 
 This module provides C<strftimeq()> which extends L<POSIX>'s C<strftime()> with
-a conversion: C<%(...)q>. Inside the parenthesis, you can specify Perl code. The
-Perl code will receive a hash argument (C<%args>) with the following keys:
+a conversion: C<%(...)q>. Inside the parenthesis, you can specify Perl code.
+
+The Perl code will receive a hash argument (C<%args>) with the following keys:
 C<time> (arrayref, the arguments passed to strftimeq() except for the first),
 C<dt> (L<DateTime> object). For convenience, C<$_> will also be locally set to
-the DateTime object.
+the DateTime object. The Perl code will be eval-ed in the caller's package,
+without L<strict> and without L<warnings>.
 
 =head1 FUNCTIONS
 

@@ -1,14 +1,17 @@
 package Apache::Config::Preproc::macro;
+use parent 'Apache::Config::Preproc::Expand';
 use strict;
 use warnings;
 use Text::ParseWords;
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new {
-    my $self = bless { keep => {} }, shift;
-    shift; # Skip the ref to tree root
+    my $class = shift;
+    my $conf = shift;
+    my $self = bless $class->SUPER::new($conf), $class;
+    $self->{keep} = {};
     croak "bad number of arguments: @_" if @_ % 2;
     local %_ = @_;
     my $v;
@@ -144,4 +147,9 @@ convenient when a single macro name is to be retained.
 
 =back
     
+=head1 SEE ALSO
+
+L<Apache::Config::Preproc>
+
 =cut
+

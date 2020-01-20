@@ -1,3 +1,11 @@
+0.07 2020-01-19T14:56:23+01:00
+ [Common]
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.06 2015-09-16T20:02:25+02:00
  [Common]
  - Move author tests to xt/ directory.

@@ -579,9 +579,14 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
                 // to invoke utf8::decode() via call_pv(), which is ugly,
                 // or just to assume the UTF-8 is valid, which is wrong.
                 //
-                if ( !sv_utf8_decode(ret) ) {
+                if ( !decstate->naive_utf8 && !sv_utf8_decode(ret) ) {
                     _croak_invalid_utf8( aTHX_ decstate, SvPV_nolen(ret) );
                 }
+
+                // Always set the UTF8 flag, even if it’s not needed.
+                // This helps ensure that text strings will round-trip
+                // through Perl.
+                SvUTF8_on(ret);
             }
 
             break;
@@ -721,22 +726,23 @@ SV *_decode( pTHX_ decode_ctx* decstate ) {
     return ret;
 }
 
-decode_ctx _create_decode_state( pTHX_ SV *cbor, HV *tag_handler, bool preserve_refs ) {
+decode_ctx _create_decode_state( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
     STRLEN cborlen;
 
     char *cborstr = SvPV(cbor, cborlen);
 
     decode_ctx decode_state = {
-        cborstr,
-        cborlen,
-        cborstr,
-        cborstr + cborlen,
+        cborstr,                            // start
+        cborlen,                            // size
+        cborstr,                            // curbyte
+        cborstr + cborlen,                  // end
         tag_handler,
-        NULL,
-        0,
+        NULL,                               // reflist
+        0,                                  // reflistlen
+        !!(flags & CBF_FLAG_NAIVE_UTF8),
     };
 
-    if (preserve_refs) {
+    if (flags & CBF_FLAG_PRESERVE_REFERENCES) {
         Newx( decode_state.reflist, 0, void * );
     }
 
@@ -749,9 +755,9 @@ void _free_decode_state(decode_ctx* decode_state) {
     }
 }
 
-SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, bool preserve_refs ) {
+SV *cbf_decode( pTHX_ SV *cbor, HV *tag_handler, UV flags ) {
 
-    decode_ctx decode_state = _create_decode_state( aTHX_ cbor, tag_handler, preserve_refs);
+    decode_ctx decode_state = _create_decode_state( aTHX_ cbor, tag_handler, flags);
 
     SV *RETVAL = _decode( aTHX_ &decode_state );
 

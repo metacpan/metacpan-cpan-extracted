@@ -21,6 +21,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Dist::Zilla::PluginBundle::SHLOMIF",
   "PREREQ_PM" => {
+    "Code::TidyAll::Plugin::PerlCritic" => 0,
+    "Code::TidyAll::Plugin::PerlTidy" => 0,
+    "Code::TidyAll::Plugin::TestCount" => 0,
     "Dist::Zilla" => 0,
     "Dist::Zilla::Plugin::Authority" => 0,
     "Dist::Zilla::Plugin::AutoPrereqs" => 0,
@@ -57,7 +60,11 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::UploadToCPAN" => 0,
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "List::MoreUtils" => 0,
-    "Moose" => 0
+    "Moose" => 0,
+    "Perl::Critic" => 0,
+    "Pod::Markdown" => 0,
+    "Pod::Weaver::PluginBundle::SHLOMIF" => 0,
+    "Pod::Weaver::Section::Support" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -67,7 +74,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.000009",
+  "VERSION" => "0.000010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +82,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Code::TidyAll::Plugin::PerlCritic" => 0,
+  "Code::TidyAll::Plugin::PerlTidy" => 0,
+  "Code::TidyAll::Plugin::TestCount" => 0,
   "Dist::Zilla" => 0,
   "Dist::Zilla::Plugin::Authority" => 0,
   "Dist::Zilla::Plugin::AutoPrereqs" => 0,
@@ -116,6 +126,10 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => 0,
   "Module::Build" => "0.28",
   "Moose" => 0,
+  "Perl::Critic" => 0,
+  "Pod::Markdown" => 0,
+  "Pod::Weaver::PluginBundle::SHLOMIF" => 0,
+  "Pod::Weaver::Section::Support" => 0,
   "Test::More" => "0.88",
   "strict" => 0,
   "warnings" => 0

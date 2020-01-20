@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Temp qw(tempdir);
 use File::Path qw(rmtree);
 use Video::Pattern;

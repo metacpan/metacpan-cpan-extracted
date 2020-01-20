@@ -11,7 +11,7 @@ our ($VERSION);
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.17';
+    $VERSION = '0.18';
     XSLoader::load();
 }
 
@@ -64,6 +64,17 @@ The encoder currently does not handle any other blessed references.
 =item * C<canonical> - A boolean that makes the encoder output
 CBOR in L<canonical form|https://tools.ietf.org/html/rfc7049#section-3.9>.
 
+=item * C<text_keys> - EXPERIMENTAL. Encodes all Perl hash keys as CBOR text.
+If you use this mode then your strings B<must> be properly decoded, or else
+the output CBOR may mangle your string.
+
+For example, this:
+
+    CBOR::Free::encode( { "\xc3\xa9" => 1 }, text_keys => 1 )
+
+… will create a CBOR map with key C<"\xc3\x83\xc2\xa9"> because the key
+in the hash that was sent to C<encode()> was not properly decoded.
+
 =item * C<preserve_references> - A boolean that makes the encoder encode
 multi-referenced values via L<CBOR’s “shared references” tags|https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml>. This allows encoding of shared
 and circular references. It also incurs a performance penalty.
@@ -90,7 +101,7 @@ Notes on mapping Perl to CBOR:
 integer, float, string, etc.) determines its CBOR encoding.
 
 =item * Perl doesn’t currently provide reliable binary/character string types.
-CBOR::Free tries to distinguish anyway by look at a string’s UTF8 flag: if
+CBOR::Free tries to distinguish anyway by looking at a string’s UTF8 flag: if
 set, then the string becomes CBOR text; otherwise, it’ll be CBOR binary.
 That’s not always going to work, though. A trivial example:
 
@@ -99,13 +110,14 @@ That’s not always going to work, though. A trivial example:
 Since C<utf8::decode()> doesn’t set the UTF8 flag unless it “has to”
 (see L<utf8>), that function is a no-op in the above.
 
-The above I<will> work if you use L<Unicode::UTF8> instead:
+The above I<will> produce a CBOR text string, though, if you use
+L<Unicode::UTF8> instead of L<utf8>:
 
     perl -MUnicode::UTF8 -MCBOR::Free -e'print CBOR::Free::encode(Unicode::UTF8::decode_utf8("abc"))'
 
-… but even then, this merely I<happens> to work. Perl itself does not, and
-cannot, reliably distinguish a text string from a binary string via
-introspection.
+The crucial point, though, is that, because Perl itself doesn’t guarantee
+the reliable string types that CBOR recognizes, any heuristics we apply
+to distinguish one from the other are a “best-guess” merely.
 
 B<IMPORTANT:> Whatever consumes your Perl-sourced CBOR B<MUST> account
 for the prospect of an incorrectly-typed string.
@@ -114,7 +126,8 @@ for the prospect of an incorrectly-typed string.
 your Perl-sourced CBOR B<MUST> account for the prospect of numbers that
 are in CBOR as strings, or vice-versa.
 
-=item * Perl hash keys become CBOR binary strings.
+=item * Perl hash keys are serialized as strings, either binary or text
+(following the algorithm described above).
 
 =item * L<Types::Serialiser> booleans are encoded as CBOR booleans.
 Perl undef is encoded as CBOR null. (NB: No Perl value encodes as CBOR
@@ -154,6 +167,9 @@ invalid input and will thus prompt a thrown exception.
 
 =item * The only map keys that C<decode()> accepts are integers and strings.
 An exception is thrown if the decoder finds anything else as a map key.
+Note that, because Perl does not distinguish between binary and text strings,
+if two keys of the same map contain the same bytes, Perl will consider these
+a duplicate key and prefer the latter.
 
 =item * CBOR booleans become the corresponding L<Types::Serialiser> values.
 Both CBOR null and undefined become Perl undef.

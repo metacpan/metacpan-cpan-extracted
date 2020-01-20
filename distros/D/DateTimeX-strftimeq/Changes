@@ -1,3 +1,12 @@
+0.004   2019-11-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Extract regex to Date-strftimeq, also fix exponential
+	  backtracking problem in the regex.
+
+        - Now eval code in the caller's package and without strict/warnings for
+	  more convenience.
+
+
 0.003   2019-11-20  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

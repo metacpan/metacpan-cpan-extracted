@@ -3,7 +3,7 @@ package Grep::Query::Parser::QOPS;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 $VERSION = eval $VERSION;
 
 sub __union

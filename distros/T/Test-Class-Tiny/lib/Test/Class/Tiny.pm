@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 =encoding utf-8
 
@@ -24,7 +24,7 @@ Test::Class::Tiny - xUnit in Perl, simplified
         # Runs at the start of the test run.
     }
 
-    sub T_setup_something {
+    sub something_T_setup {
         # Runs before each normal test function
     }
 
@@ -82,7 +82,9 @@ xUnit provides standard hooks for:
 
 To write functions that execute at these points in the workflow,
 name those functions with the prefixes C<T_startup_>, C<T_setup_>,
-C<T_teardown_>, or C<T_shutdown_>.
+C<T_teardown_>, or C<T_shutdown_>. B<Alternatively>, name such functions
+with the I<suffixes> C<_T_startup>, C<_T_setup>, C<_T_teardown>, or
+C<_T_shutdown>.
 
 To write a test function—i.e., a function that actually runs some
 assertions—prefix the function name with C<T>, the number of test assertions
@@ -90,8 +92,11 @@ in the function, then an underscore. For example, a function that contains
 9 assertions might be named C<T9_check_validation()>. If that function
 doesn’t run exactly 9 assertions, a test failure is produced.
 
-(To forgo counting test assertions, use 0 as the test count, e.g.,
-C<T0_check_validation()>.)
+To forgo counting test assertions, use 0 as the test count, e.g.,
+C<T0_check_validation()>.
+
+You may alternatively use suffix-style naming for test functions well,
+e.g., C<check_validation_T9()>, C<check_validation_T0()>.
 
 The above convention is a significant departure from L<Test::Class>,
 which uses Perl subroutine attributes to indicate this information.
@@ -156,6 +161,52 @@ See F<t/> in the distribution for an example of this.
 
 =back
 
+=head1 COMMON PITFALLS
+
+Avoid the following:
+
+=over
+
+=item * Writing startup logic outside of the module class, e.g.:
+
+    if (!caller) {
+        my $mock = Test::MockModule->new('Some::Module');
+        $mock->redefine('somefunc', sub { .. } );
+
+        __PACKAGE__->runtests();
+    }
+
+The above works I<only> if the test module runs in its own process; if you try
+to run this module with anything else it’ll fail because C<caller()> will be
+truthy, which will prevent the mocking from being set up, which your test
+probably depends on.
+
+Instead of the above, write a wrapper around C<runtests()>, thus:
+
+    sub runtests {
+        my $self = shift;
+
+        my $mock = Test::MockModule->new('Some::Module');
+        $mock->redefine('somefunc', sub { .. } );
+
+        $self->SUPER::runtests();
+    }
+
+This ensures your test module will always run with the intended mocking.
+
+=item * REDUX: Writing startup logic outside of the module class, e.g.:
+
+    my $mock = Test::MockModule->new('Some::Module');
+    $mock->redefine('somefunc', sub { .. } );
+
+    __PACKAGE__->runtests() if !caller;
+
+This is even worse than before because the mock will be global, which
+will quietly apply it where we don’t intend. This produces
+action-at-a-distance bugs, which can be notoriously hard to find.
+
+=back
+
 =head1 SEE ALSO
 
 Besides L<Test::Class>, you might also look at the following:
@@ -185,6 +236,8 @@ This code is licensed under the same license as Perl itself.
 use mro ();
 
 use Test2::API ();
+
+our ($a, $b);
 
 #----------------------------------------------------------------------
 
@@ -272,7 +325,12 @@ sub runtests {
 
             $hub->filter($filter_cr);
 
-            for my $fn (sort keys %$tests_hr) {
+            my @sorted_fns = sort {
+                ( $tests_hr->{$a}{'simple_name'} cmp $tests_hr->{$b}{'simple_name'} )
+                || ( $a cmp $b )
+            } keys %$tests_hr;
+
+            for my $fn (@sorted_fns) {
                 $filter_fn = $fn;
 
                 if (my $ptn = $ENV{'TEST_METHOD'}) {
@@ -325,6 +383,10 @@ sub _analyze {
     if (!$self->{'_analyzed'}) {
         my @isa = @{ mro::get_linear_isa(ref $self) };
 
+        my $t_regexp = q<T(_setup|_teardown|_startup|_shutdown|[0-9]+)>;
+        my $prefix_regexp = qr<\A${t_regexp}_(.+)>;
+        my $suffix_regexp = qr<(.+)_$t_regexp\z>;
+
         for my $ns (@isa) {
             my $ptbl_hr = do {
                 no strict 'refs';
@@ -333,12 +395,22 @@ sub _analyze {
 
             for my $name (keys %$ptbl_hr) {
                 next if !$self->can($name);
-                next if $name !~ m<\AT(_setup|_teardown|_startup|_shutdown|[0-9]+)_(.+)>;
 
-                my $whatsit = $1;
-                my $simple_name = $2;
+                my ($whatsit, $simple_name);
 
-                if ( $whatsit =~ s<\A_><>) {
+                if ($name =~ $prefix_regexp) {
+                    $whatsit = $1;
+                    $simple_name = $2;
+                }
+                elsif ($name =~ $suffix_regexp) {
+                    $simple_name = $1;
+                    $whatsit = $2;
+                }
+                else {
+                    next;
+                }
+
+                if ( $whatsit =~ s<_><> ) {
                     $self->{$whatsit}{$name} = undef;
                 }
                 else {
@@ -360,7 +432,12 @@ sub _run_funcs {
     my ($self, $funcs_hr) = @_;
 
     for my $fn (sort keys %$funcs_hr) {
-        $funcs_hr->{$fn}->($self);
+        if ( $funcs_hr->{$fn} ) {
+            $funcs_hr->{$fn}->($self);
+        }
+        else {
+            $self->$fn();
+        }
     }
 
     return;

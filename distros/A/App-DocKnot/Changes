@@ -1,5 +1,27 @@
                        User-Visible DocKnot Changes
 
+DocKnot 3.03 (2020-01-19)
+
+    For CPAN packages pushed to GitHub, add a Shields.io license badge to
+    the Markdown README file.
+
+    For packages with a Debian package, add a Shields.io badge for the
+    version in Debian.
+
+    docknot dist now uses IO::Uncompress::Gunzip and IO::Compress::Xz to
+    generate a missing xz tarball rather than running external gzip and xz
+    programs, which avoids test failures when those programs aren't
+    available or don't support the expected options.  Thanks to Slaven
+    Rezić for the testing and report.  (#131406)
+
+    docknot dist now supports a distribution/ignore metadata setting,
+    which contains a list of regular expressions of files to ignore when
+    checking a distribution tarball for completeness.
+
+    Stop leaking exceptions via $@ to the caller of App::DocKnot::Config.
+    Configuration parsing catches and ignores a variety of errors, which
+    previously were polluting the caller's $@.
+
 DocKnot 3.02 (2020-01-08)
 
     Add support for the No Maintenance Intended badge in the Markdown
@@ -38,7 +60,7 @@ DocKnot 3.01 (2019-07-14)
     Allow the path to Perl to be configured in App::DocKnot::Dist.  This
     is used primarily for testing so that we can try building a
     distribution using Module::Build with the same Perl used to run the
-    test suite.  This is exposed by the module API but (intentially) not
+    test suite.  This is exposed by the module API but (intentionally) not
     exposed on the docknot command line.  Thanks, Slaven Rezic.  (#129958)
 
     Set user.name and user.email for Git in dist/basic.t test.

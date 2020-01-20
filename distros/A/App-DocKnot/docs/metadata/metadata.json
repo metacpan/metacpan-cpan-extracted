@@ -1,6 +1,6 @@
 {
     "name": "DocKnot",
-    "version": "3.02",
+    "version": "3.03",
     "synopsis": "package documentation generator",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
@@ -41,9 +41,27 @@
                 "name": "docknot",
                 "title": "docknot manual page",
             },
+        ],
+        "api": [
             {
                 "name": "api/app-docknot",
-                "title": "App::DocKnot manual page",
+                "title": "App::DocKnot",
+            },
+            {
+                "name": "api/app-docknot-command",
+                "title": "App::DocKnot::Command",
+            },
+            {
+                "name": "api/app-docknot-config",
+                "title": "App::DocKnot::Config",
+            },
+            {
+                "name": "api/app-docknot-dist",
+                "title": "App::DocKnot::Dist",
+            },
+            {
+                "name": "api/app-docknot-generate",
+                "title": "App::DocKnot::Generate",
             },
         ],
     },

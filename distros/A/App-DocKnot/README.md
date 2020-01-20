@@ -1,9 +1,10 @@
-# DocKnot 3.02
+# DocKnot 3.03
 
 [![Build
 status](https://travis-ci.org/rra/docknot.svg?branch=master)](https://travis-ci.org/rra/docknot)
 [![CPAN
-version](https://img.shields.io/cpan/v/App-DocKnot.svg)](https://metacpan.org/release/App-DocKnot)
+version](https://img.shields.io/cpan/v/App-DocKnot)](https://metacpan.org/release/App-DocKnot)
+[![License](https://img.shields.io/cpan/l/App-DocKnot)](https://github.com/rra/docknot/blob/master/LICENSE)
 
 Copyright 2013-2020 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section
@@ -58,6 +59,7 @@ The following additional Perl modules are required to use it:
 
 * File::BaseDir
 * File::ShareDir
+* IO::Compress::Xz (part of IO-Compress-LZMA)
 * IPC::Run
 * IPC::System::Simple
 * JSON

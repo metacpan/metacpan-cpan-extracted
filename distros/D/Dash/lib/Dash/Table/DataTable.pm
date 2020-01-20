@@ -2,82 +2,86 @@
 
 package Dash::Table::DataTable;
 
-use Dash::Table;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::TableAssets;
+use namespace::clean;
 
-has 'active_cell';
-has 'columns';
-has 'include_headers_on_copy_paste';
-has 'locale_format';
-has 'css';
-has 'data';
-has 'data_previous';
-has 'data_timestamp';
-has 'editable';
-has 'end_cell';
-has 'export_columns';
-has 'export_format';
-has 'export_headers';
-has 'fill_width';
-has 'hidden_columns';
-has 'id';
-has 'is_focused';
-has 'merge_duplicate_headers';
-has 'fixed_columns';
-has 'fixed_rows';
-has 'column_selectable';
-has 'row_deletable';
-has 'row_selectable';
-has 'selected_cells';
-has 'selected_rows';
-has 'selected_columns';
-has 'selected_row_ids';
-has 'start_cell';
-has 'style_as_list_view';
-has 'page_action';
-has 'page_current';
-has 'page_count';
-has 'page_size';
-has 'dropdown';
-has 'dropdown_conditional';
-has 'dropdown_data';
-has 'tooltip';
-has 'tooltip_conditional';
-has 'tooltip_data';
-has 'tooltip_delay';
-has 'tooltip_duration';
-has 'filter_query';
-has 'filter_action';
-has 'sort_action';
-has 'sort_mode';
-has 'sort_by';
-has 'sort_as_null';
-has 'style_table';
-has 'style_cell';
-has 'style_data';
-has 'style_filter';
-has 'style_header';
-has 'style_cell_conditional';
-has 'style_data_conditional';
-has 'style_filter_conditional';
-has 'style_header_conditional';
-has 'virtualization';
-has 'derived_filter_query_structure';
-has 'derived_viewport_data';
-has 'derived_viewport_indices';
-has 'derived_viewport_row_ids';
-has 'derived_viewport_selected_columns';
-has 'derived_viewport_selected_rows';
-has 'derived_viewport_selected_row_ids';
-has 'derived_virtual_data';
-has 'derived_virtual_indices';
-has 'derived_virtual_row_ids';
-has 'derived_virtual_selected_rows';
-has 'derived_virtual_selected_row_ids';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'active_cell'                       => ( is => 'rw' );
+has 'columns'                           => ( is => 'rw' );
+has 'include_headers_on_copy_paste'     => ( is => 'rw' );
+has 'locale_format'                     => ( is => 'rw' );
+has 'css'                               => ( is => 'rw' );
+has 'data'                              => ( is => 'rw' );
+has 'data_previous'                     => ( is => 'rw' );
+has 'data_timestamp'                    => ( is => 'rw' );
+has 'editable'                          => ( is => 'rw' );
+has 'end_cell'                          => ( is => 'rw' );
+has 'export_columns'                    => ( is => 'rw' );
+has 'export_format'                     => ( is => 'rw' );
+has 'export_headers'                    => ( is => 'rw' );
+has 'fill_width'                        => ( is => 'rw' );
+has 'hidden_columns'                    => ( is => 'rw' );
+has 'id'                                => ( is => 'rw' );
+has 'is_focused'                        => ( is => 'rw' );
+has 'merge_duplicate_headers'           => ( is => 'rw' );
+has 'fixed_columns'                     => ( is => 'rw' );
+has 'fixed_rows'                        => ( is => 'rw' );
+has 'column_selectable'                 => ( is => 'rw' );
+has 'row_deletable'                     => ( is => 'rw' );
+has 'row_selectable'                    => ( is => 'rw' );
+has 'selected_cells'                    => ( is => 'rw' );
+has 'selected_rows'                     => ( is => 'rw' );
+has 'selected_columns'                  => ( is => 'rw' );
+has 'selected_row_ids'                  => ( is => 'rw' );
+has 'start_cell'                        => ( is => 'rw' );
+has 'style_as_list_view'                => ( is => 'rw' );
+has 'page_action'                       => ( is => 'rw' );
+has 'page_current'                      => ( is => 'rw' );
+has 'page_count'                        => ( is => 'rw' );
+has 'page_size'                         => ( is => 'rw' );
+has 'dropdown'                          => ( is => 'rw' );
+has 'dropdown_conditional'              => ( is => 'rw' );
+has 'dropdown_data'                     => ( is => 'rw' );
+has 'tooltip'                           => ( is => 'rw' );
+has 'tooltip_conditional'               => ( is => 'rw' );
+has 'tooltip_data'                      => ( is => 'rw' );
+has 'tooltip_delay'                     => ( is => 'rw' );
+has 'tooltip_duration'                  => ( is => 'rw' );
+has 'filter_query'                      => ( is => 'rw' );
+has 'filter_action'                     => ( is => 'rw' );
+has 'sort_action'                       => ( is => 'rw' );
+has 'sort_mode'                         => ( is => 'rw' );
+has 'sort_by'                           => ( is => 'rw' );
+has 'sort_as_null'                      => ( is => 'rw' );
+has 'style_table'                       => ( is => 'rw' );
+has 'style_cell'                        => ( is => 'rw' );
+has 'style_data'                        => ( is => 'rw' );
+has 'style_filter'                      => ( is => 'rw' );
+has 'style_header'                      => ( is => 'rw' );
+has 'style_cell_conditional'            => ( is => 'rw' );
+has 'style_data_conditional'            => ( is => 'rw' );
+has 'style_filter_conditional'          => ( is => 'rw' );
+has 'style_header_conditional'          => ( is => 'rw' );
+has 'virtualization'                    => ( is => 'rw' );
+has 'derived_filter_query_structure'    => ( is => 'rw' );
+has 'derived_viewport_data'             => ( is => 'rw' );
+has 'derived_viewport_indices'          => ( is => 'rw' );
+has 'derived_viewport_row_ids'          => ( is => 'rw' );
+has 'derived_viewport_selected_columns' => ( is => 'rw' );
+has 'derived_viewport_selected_rows'    => ( is => 'rw' );
+has 'derived_viewport_selected_row_ids' => ( is => 'rw' );
+has 'derived_virtual_data'              => ( is => 'rw' );
+has 'derived_virtual_indices'           => ( is => 'rw' );
+has 'derived_virtual_row_ids'           => ( is => 'rw' );
+has 'derived_virtual_selected_rows'     => ( is => 'rw' );
+has 'derived_virtual_selected_row_ids'  => ( is => 'rw' );
+has 'loading_state'                     => ( is => 'rw' );
+has 'persistence'                       => ( is => 'rw' );
+has 'persisted_props'                   => ( is => 'rw' );
+has 'persistence_type'                  => ( is => 'rw' );
 my $dash_namespace = 'dash_table';
 
 sub DashNamespace {
@@ -85,7 +89,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Table::_js_dist;
+    return Dash::TableAssets::_js_dist;
 }
 
 1;
@@ -102,7 +106,7 @@ Dash::Table::DataTable
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

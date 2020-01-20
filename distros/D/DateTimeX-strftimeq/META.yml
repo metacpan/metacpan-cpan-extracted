@@ -18,6 +18,7 @@ meta-spec:
   version: '1.4'
 name: DateTimeX-strftimeq
 requires:
+  Date::strftimeq: '0'
   DateTime: '0'
   Exporter: '5.57'
   POSIX: '0'
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTimeX-strftimeq
   homepage: https://metacpan.org/release/DateTimeX-strftimeq
   repository: git://github.com/perlancar/perl-DateTimeX-strftimeq.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

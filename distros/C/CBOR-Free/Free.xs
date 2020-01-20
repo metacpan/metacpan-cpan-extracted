@@ -6,7 +6,6 @@
 
 #include "ppport.h"
 
-//#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +26,9 @@
 
 #define SCALAR_REFS_OPT "scalar_references"
 #define SCALAR_REFS_OPT_LEN (sizeof(SCALAR_REFS_OPT) - 1)
+
+#define TEXT_KEYS_OPT "text_keys"
+#define TEXT_KEYS_OPT_LEN (sizeof(TEXT_KEYS_OPT) - 1)
 
 HV *cbf_stash = NULL;
 
@@ -54,6 +56,13 @@ encode( SV * value, ... )
                 ++i;
                 if (i<items && SvTRUE(ST(i))) {
                     encode_state_flags |= ENCODE_FLAG_CANONICAL;
+                }
+            }
+
+            else if ((SvCUR(ST(i)) == TEXT_KEYS_OPT_LEN) && memEQ( SvPV_nolen(ST(i)), TEXT_KEYS_OPT, TEXT_KEYS_OPT_LEN)) {
+                ++i;
+                if (i<items && SvTRUE(ST(i))) {
+                    encode_state_flags |= ENCODE_FLAG_TEXT_KEYS;
                 }
             }
 
@@ -108,6 +117,11 @@ MODULE = CBOR::Free     PACKAGE = CBOR::Free::Decoder
 
 PROTOTYPES: DISABLE
 
+BOOT:
+    HV *stash = gv_stashpvn("CBOR::Free::Decoder", 19, FALSE);
+    newCONSTSUB(stash, "_FLAG_PRESERVE_REFERENCES", newSVuv(CBF_FLAG_PRESERVE_REFERENCES));
+    newCONSTSUB(stash, "_FLAG_NAIVE_UTF8", newSVuv(CBF_FLAG_NAIVE_UTF8));
+
 SV *
 decode( SV *selfref, SV *cbor )
     CODE:
@@ -115,18 +129,27 @@ decode( SV *selfref, SV *cbor )
 
         HV *tag_handler = NULL;
 
+        UV flags_uv;
+
         SV **tag_handler_hr = hv_fetchs(self, "_tag_decode_callback", 0);
 
         if (tag_handler_hr && *tag_handler_hr && SvOK(*tag_handler_hr)) {
             tag_handler = (HV *)SvRV(*tag_handler_hr);
         }
 
-        SV **preserve_refs = hv_fetchs(self, "_preserve_references", 0);
+        SV **flags = hv_fetchs(self, "_flags", 0);
+
+        if (flags && *flags) {
+            flags_uv = SvUV(*flags);
+        }
+        else {
+            flags_uv = 0;
+        }
 
         RETVAL = cbf_decode( aTHX_
             cbor,
             tag_handler,
-            preserve_refs && *preserve_refs && SvTRUE(*preserve_refs)
+            flags_uv
         );
 
     OUTPUT:

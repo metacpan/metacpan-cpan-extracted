@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Video::Pattern;
+
      my $pattern = Video::Pattern->new(%parameters);
      $pattern->create($output_dir);
 
@@ -53,11 +54,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Temp qw(tempdir);
      use File::Path qw(rmtree);
      use Video::Pattern;
@@ -121,17 +120,17 @@ SEE ALSO
         Video::Delay class for delays defined by math function.
 
 REPOSITORY
-    <https://github.com/tupinek/Video-Pattern>
+    <https://github.com/michal-josef-spacek/Video-Pattern>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2015 Michal Špaček
+     © 2012-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

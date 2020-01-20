@@ -56,6 +56,7 @@ t/scalar/has.t
 t/scalar/intersection.t
 t/scalar/member.t
 t/scalar/misc.t
+t/scalar/rt131354.t
 t/scalar/set_set.t
 t/scalar/storable.t
 t/scalar/symmdiff.t

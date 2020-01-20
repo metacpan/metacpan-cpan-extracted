@@ -2,26 +2,30 @@
 
 package Dash::Core::Components::Graph;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'responsive';
-has 'clickData';
-has 'clickAnnotationData';
-has 'hoverData';
-has 'clear_on_unhover';
-has 'selectedData';
-has 'relayoutData';
-has 'extendData';
-has 'restyleData';
-has 'figure';
-has 'style';
-has 'className';
-has 'animate';
-has 'animation_options';
-has 'config';
-has 'loading_state';
+extends 'Dash::BaseComponent';
+
+has 'id'                  => ( is => 'rw' );
+has 'responsive'          => ( is => 'rw' );
+has 'clickData'           => ( is => 'rw' );
+has 'clickAnnotationData' => ( is => 'rw' );
+has 'hoverData'           => ( is => 'rw' );
+has 'clear_on_unhover'    => ( is => 'rw' );
+has 'selectedData'        => ( is => 'rw' );
+has 'relayoutData'        => ( is => 'rw' );
+has 'extendData'          => ( is => 'rw' );
+has 'restyleData'         => ( is => 'rw' );
+has 'figure'              => ( is => 'rw' );
+has 'style'               => ( is => 'rw' );
+has 'className'           => ( is => 'rw' );
+has 'animate'             => ( is => 'rw' );
+has 'animation_options'   => ( is => 'rw' );
+has 'config'              => ( is => 'rw' );
+has 'loading_state'       => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -29,7 +33,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -46,7 +50,7 @@ Dash::Core::Components::Graph
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

@@ -4,3 +4,7 @@
 # common
 data/
 wiki/
+
+# app
+app/*
+!app/www/

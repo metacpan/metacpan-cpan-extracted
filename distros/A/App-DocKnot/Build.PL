@@ -65,6 +65,7 @@ my $build = Module::Build->new(
     requires           => {
         'File::BaseDir'       => 0,
         'File::ShareDir'      => 0,
+        'IO::Compress::Xz'    => 0,
         'IPC::Run'            => 0,
         'IPC::System::Simple' => 0,
         'JSON'                => 0,

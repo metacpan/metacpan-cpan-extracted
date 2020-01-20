@@ -34,8 +34,7 @@
 
     \link[readme.html][General overview] \break
     \link[news.html][Change summary] \break
-    \link[docknot.html][docknot manual page] \break
-    \link[api/app-docknot.html][App::DocKnot manual page]
+    \link[docknot.html][docknot manual page]
 
     \h2[Development]
 
@@ -101,6 +100,7 @@ The following additional Perl modules are required to use it:
 
 \bullet(packed)[File::BaseDir]
 \bullet(packed)[File::ShareDir]
+\bullet(packed)[IO::Compress::Xz (part of IO-Compress-LZMA)]
 \bullet(packed)[IPC::Run]
 \bullet(packed)[IPC::System::Simple]
 \bullet(packed)[JSON]
@@ -139,25 +139,37 @@ development source].
 
 \h2[Documentation]
 
-User documentation:
+\div(left)[
+    \class(first)[User documentation:]
 
-\doc[readme.html][README]
-\doc[news.html][Change summary]
-\doc[docknot.html][docknot manual page]
-\doc[api/app-docknot.html][App::DocKnot manual page]
-\doc[license.html][License and copyright]
+    \doc[readme.html][README]
+    \doc[news.html][Change summary]
+    \doc[docknot.html][docknot manual page]
+    \doc[license.html][License and copyright]
 
-Developer documentation:
+    Developer documentation:
 
-\doc[todo.html][To-do list]
-\doc[https://github.com/rra/docknot]
-    [GitHub]
-\doc[https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot]
-    [Bug tracker]
-\doc[https://travis-ci.org/rra/docknot]
-    [Travis-CI]
+    \doc[todo.html][To-do list]
+    \doc[https://github.com/rra/docknot]
+        [GitHub]
+    \doc[https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot]
+        [Bug tracker]
+    \doc[https://travis-ci.org/rra/docknot]
+        [Travis-CI]
 
-\h2[License]
+]
+
+\div(right)[
+    \class(first)[API documentation:]
+
+    \doc[api/app-docknot.html][App::DocKnot]
+    \doc[api/app-docknot-command.html][App::DocKnot::Command]
+    \doc[api/app-docknot-config.html][App::DocKnot::Config]
+    \doc[api/app-docknot-dist.html][App::DocKnot::Dist]
+    \doc[api/app-docknot-generate.html][App::DocKnot::Generate]
+]
+
+\h2(after)[License]
 
 The DocKnot package as a whole is covered by the following copyright and
 license:

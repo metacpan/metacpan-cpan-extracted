@@ -8,8 +8,6 @@ lib/Locale/Maketext/TPJ13.pod
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.json
-META.yml			Module meta-data (added by MakeMaker)
 perlcriticrc
 README
 t/00_load.t
@@ -28,3 +26,5 @@ t/91_backslash.t
 t/92_blacklist.t
 t/93_whitelist.t
 t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

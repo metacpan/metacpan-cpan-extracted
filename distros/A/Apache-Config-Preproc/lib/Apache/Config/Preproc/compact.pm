@@ -1,18 +1,14 @@
 package Apache::Config::Preproc::compact;
+use parent 'Apache::Config::Preproc::Expand';
 use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.02';
-
-sub new {
-    croak "too many arguments" unless @_ == 2;
-    bless {}, shift
-}
+our $VERSION = '1.03';
 
 sub expand {
-    my ($self, $d, $repl) = @_;
-    return $d->type eq 'blank' || $d->type eq 'comment';
+    my ($self, $d) = @_;
+    $d->type eq 'blank' || $d->type eq 'comment';
 }
 
 1;
@@ -32,5 +28,9 @@ Apache::Config::Preproc::compact - remove empty lines and comments
 
 Removes empty and comment lines from the Apache configuration parse
 tree.
+
+=head1 SEE ALSO
+
+L<Apache::Config::Preproc>
 
 =cut    

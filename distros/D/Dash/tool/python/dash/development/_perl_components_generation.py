@@ -54,25 +54,28 @@ def generate_class_string(typename, props, description, namespace):
     for p in prop_keys:
         # TODO support wildcard attributes
         if  p[-1] != "*":
-            string_attributes += "has '{}';\n".format(p)
-    perl_package_name = _perl_package_name_from_shortname(namespace)
-    common = "my $dash_namespace = '" + namespace + "';\n\nsub DashNamespace {\nreturn $dash_namespace;\n}\nsub _js_dist {\nreturn " + perl_package_name + "::_js_dist;\n}\n"
+            string_attributes += "has '{}' => (\n  is => 'rw'\n);\n".format(p)
+    perl_assets_package_name = _perl_assets_package_name_from_shortname(namespace)
+    common = "my $dash_namespace = '" + namespace + "';\n\nsub DashNamespace {\n    return $dash_namespace;\n}\nsub _js_dist {\n    return " + perl_assets_package_name + "::_js_dist;\n}\n"
     return string_attributes + common
 
 # TODO Refactor this methods to a class
 
-def _perl_package_name_from_shortname(shortname):
+def _perl_package_name_from_shortname(shortname, suffix=''):
     namespace_components = shortname.split("_")
     package_name = ""
     for namespace_component in namespace_components:
         if (len(package_name) > 0):
             package_name += "::"
         package_name += namespace_component.title()
-    return package_name
+    return package_name + suffix
 
-def _perl_file_name_from_shortname(shortname):
+def _perl_file_name_from_shortname(shortname, suffix=''):
     namespace_components = shortname.split("_")
-    return namespace_components[-1].title() + ".pm"
+    return namespace_components[-1].title() + suffix + ".pm"
+
+def _perl_assets_package_name_from_shortname(shortname):
+    return _perl_package_name_from_shortname(shortname, "Assets")
 
 def generate_perl_package_file(typename, props, description, namespace):
     """Generate a python class file (.py) given a class string.
@@ -89,12 +92,16 @@ def generate_perl_package_file(typename, props, description, namespace):
     """
     perl_base_package = _perl_package_name_from_shortname(namespace)
     package_name = perl_base_package + "::" + typename
+    perl_assets_package = _perl_assets_package_name_from_shortname(namespace)
 
     import_string =\
         "# AUTO GENERATED FILE - DO NOT EDIT\n\n" + \
         "package " + package_name + ";\n\n" + \
-        "use " + perl_base_package + ";\n" + \
-        "use Mojo::Base 'Dash::BaseComponent';\n\n"
+        "use Moo;\n" + \
+        "use strictures 2;\n" + \
+        "use " + perl_assets_package + ";\n" + \
+        "use namespace::clean;\n\n" + \
+        "extends 'Dash::BaseComponent';\n\n"
 
     class_string = generate_class_string(
         typename,
@@ -167,16 +174,53 @@ def write_js_metadata(pkg_data, project_shortname, has_wildcards):
     for sourcemap in glob.glob("{}/*.map".format(project_shortname)):
         shutil.copy(sourcemap, deps_output_path)
 
-def generate_imports(project_shortname, components):
-    with open(os.path.join(project_shortname, '_imports_.py'), 'w') as f:
-        imports_string = '{}\n\n{}'.format(
-            '\n'.join(
-                'from .{0} import {0}'.format(x) for x in components),
-            '__all__ = [\n{}\n]'.format(
-                ',\n'.join('    "{}"'.format(x) for x in components))
-        )
+def generate_perl_imports(project_shortname, components):
+    # the Perl source directory for the package won't exist on first call
+    # create the Perl directory if it is missing
+    if not os.path.exists("Perl"):
+        os.makedirs("Perl")
+    file_path = os.path.join("Perl", _perl_file_name_from_shortname(project_shortname))
+    with open(file_path, 'w') as f:
+        base_package_name = _perl_package_name_from_shortname(project_shortname)
+        header_string = 'package ' + base_package_name + ';\nuse strict;\nuse warnings;\nuse Module::Load;\n\n'
+        f.write(header_string)
+        imports_string = '\n'.join(
+            'sub {} {{\n    shift @_;\n    load {};\n    return {}->new(@_);\n}}\n'.format(
+                    x,
+                    base_package_name + "::" + x,
+                    base_package_name + "::" + x
+                ) for x in components)
 
         f.write(imports_string)
+        f.write("1;\n");
+
+    functions_suffix = 'Functions'
+    file_path = os.path.join("Perl", _perl_file_name_from_shortname(project_shortname, functions_suffix))
+    with open(file_path, 'w') as f:
+        base_package_name = _perl_package_name_from_shortname(project_shortname)
+        functions_package_name = _perl_package_name_from_shortname(project_shortname, functions_suffix)
+        header_string = 'package ' + functions_package_name + ';\nuse strict;\nuse warnings;\nuse Module::Load;\nuse Exporter::Auto;\n\n'
+        f.write(header_string)
+        imports_string = '\n'.join(
+            'sub {} {{\n    load {};\n    return {}->new(@_);\n}}\n'.format(
+                    x,
+                    base_package_name + "::" + x,
+                    base_package_name + "::" + x
+                ) for x in components)
+
+        f.write(imports_string)
+        f.write("1;\n");
+
+    file_path = os.path.join("Perl", _perl_file_name_from_shortname(project_shortname, 'Assets'))
+    with open(file_path, 'w') as f:
+        content = 'package ' + _perl_assets_package_name_from_shortname(project_shortname) + ';\n\nuse strict;\nuse warnings;\nuse JSON;\nuse File::ShareDir;\nuse Path::Tiny;\n\n' + \
+            'my $_deps;\nsub _deps {\n    my $kind = shift;\n    if (!defined $_deps) {\n        $_deps = from_json(Path::Tiny::path(File::ShareDir::dist_file("Dash", Path::Tiny::path("assets", "' + project_shortname + '", "js_deps.json" )->canonpath ))->slurp_utf8);\n    }\n' + \
+            '    if (defined $kind) {\n        return $_deps->{$kind};\n    }\n    return $_deps;\n}\n\n' + \
+            'sub _js_dist {\n    return _deps("_js_dist");\n}\nsub _css_dist {\n    return _deps("_css_dist");\n}\n\n' + \
+            '1;\n'
+
+        f.write(content);
+
 
 
 def required_props(props):

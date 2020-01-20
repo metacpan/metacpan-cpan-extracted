@@ -41,6 +41,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Code::TidyAll::Plugin::PerlCritic" : "0",
+            "Code::TidyAll::Plugin::PerlTidy" : "0",
+            "Code::TidyAll::Plugin::TestCount" : "0",
             "Dist::Zilla" : "0",
             "Dist::Zilla::Plugin::Authority" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
@@ -78,6 +81,10 @@
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "List::MoreUtils" : "0",
             "Moose" : "0",
+            "Perl::Critic" : "0",
+            "Pod::Markdown" : "0",
+            "Pod::Weaver::PluginBundle::SHLOMIF" : "0",
+            "Pod::Weaver::Section::Support" : "0",
             "perl" : "5.014"
          }
       },
@@ -95,7 +102,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::SHLOMIF" : {
          "file" : "lib/Dist/Zilla/PluginBundle/SHLOMIF.pm",
-         "version" : "0.000009"
+         "version" : "0.000010"
       }
    },
    "release_status" : "stable",
@@ -110,10 +117,10 @@
          "web" : "https://github.com/shlomif/Dist-Zilla-PluginBundle-SHLOMIF"
       }
    },
-   "version" : "0.000009",
+   "version" : "0.000010",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030001"
       },
       "plugins" : [
          {
@@ -248,7 +255,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -283,11 +290,6 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::PodVersion",
-            "name" : "@Filter/PodVersion",
             "version" : "6.012"
          },
          {
@@ -544,7 +546,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

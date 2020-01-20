@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 3.02;
+package App::DocKnot::Generate 3.03;
 
 use 5.024;
 use autodie;
@@ -139,7 +139,7 @@ sub _code_for_indent {
 # $self - The App::DocKnot::Generate object
 #
 # Returns: Code reference to a closure that takes a block of text and returns
-#          the coverted text
+#          the converted text
 sub _code_for_to_text {
     my ($self) = @_;
     my $to_text = sub {
@@ -212,7 +212,7 @@ sub _code_for_to_text {
 # $self - The App::DocKnot::Generate object
 #
 # Returns: Code reference to a closure that takes a block of text and returns
-#          the coverted thread
+#          the converted thread
 sub _code_for_to_thread {
     my ($self) = @_;
     my $to_thread = sub {
@@ -328,7 +328,7 @@ sub _wrap_paragraph {
         return $paragraph;
     }
 
-    # If this starts with a bullet, strip the bullet off, wrap the paragaraph,
+    # If this starts with a bullet, strip the bullet off, wrap the paragraph,
     # and then add it back in.
     if ($paragraph =~ s{ \A (\s*) [*] (\s+) }{$1 $2}xms) {
         my $offset = length($1);
@@ -651,7 +651,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2019 Russ Allbery <rra@cpan.org>
+Copyright 2013-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

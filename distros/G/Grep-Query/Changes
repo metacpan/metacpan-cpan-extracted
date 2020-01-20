@@ -1,5 +1,14 @@
 Revision history for Grep-Query
 
+1.010	2020-01-19
+
+	Added several operators
+	
+	defined (check for defined-ness of values)
+	size (check for size of values, i.e. length or size of arrays/hashes)
+	type (check for type of the value, i.e. scalar/array/hash)
+	exists (check for existence of a key in a hash)
+
 1.009	2020-01-18
 
 

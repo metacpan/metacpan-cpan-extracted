@@ -611,6 +611,7 @@ IV
 y_trans (func, transid, ...)
         SV *func
         char *transid
+        PROTOTYPE: &$;@
 PREINIT:
         int rc;
         int i;
@@ -628,7 +629,6 @@ CODE:
                 vars[i].len_used = vars[i].len_alloc = len;
                 vars[i].buf_addr = ptr;
         }
-
         rc = ydb_tp_s (my_transaction, (void *) func, transid, items - 2, vars);
         MYDEBUG("ydb_tp_s", rc);
         if (rc != YDB_TP_ROLLBACK

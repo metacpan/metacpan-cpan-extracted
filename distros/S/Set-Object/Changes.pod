@@ -5,6 +5,25 @@
 
 REVISION HISTORY - Set::Object
 
+=head1 1.40, 2020-01-19
+
+=over
+
+=item *
+
+Fixed perl5.28 regressions (not cperl), for @$set args to other set functions.
+(RT #131345). Fixed by adding missing SvGETMAGIC expansions to all args.
+
+=item *
+
+Bumped minimal required perl version to 5.8 for arrayref @$set behavior.
+
+=item *
+
+Fixed the smokers and some author tests.
+
+=back
+
 =head1 1.39, 2018-01-08
 
 =over

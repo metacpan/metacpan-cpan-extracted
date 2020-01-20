@@ -5,22 +5,21 @@ use warnings;
 use utf8;
 
 use Dash;
-use aliased 'Dash::Core::Components::Graph';
-use aliased 'Dash::Html::Components::Div';
-use aliased 'Dash::Html::Components::H1';
+use aliased 'Dash::Core::Components' => 'dcc';
+use aliased 'Dash::Html::Components' => 'html';
 
 my $external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'];
 
 my $app = Dash->new(app_name => 'Dash Tutorial - 2 Layout', external_stylesheets=>$external_stylesheets);
 
-$app->layout( Div->new(children=>[
-    H1->new(children=>'Hello Dash'),
+$app->layout( html->Div(children=>[
+    html->H1(children=>'Hello Dash'),
 
-    Div->new(children=>'
+    html->Div(children=>'
         Dash: A web application framework for Python, R & Perl!.
     '),
 
-    Graph->new(
+    dcc->Graph(
         id=>'example-graph',
         figure=>{
             data=> [

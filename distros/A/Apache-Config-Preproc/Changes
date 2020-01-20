@@ -1,3 +1,8 @@
+1.04 2020-01-20
+
+* New preprocessing module "locus" adds file location information to
+each node in the parse tree.
+
 1.03 2019-04-30
 
 * Handle include statements with directory as argument

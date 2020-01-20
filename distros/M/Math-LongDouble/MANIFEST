@@ -1,6 +1,7 @@
 MANIFEST
 Makefile.PL
 LongDouble.pm
+LongDouble.pod
 LongDouble.xs
 README
 Changes
@@ -19,6 +20,7 @@ t/constants.t
 t/cmp.t
 t/inc_dec.t
 t/int.t
+t/ld_bytes.t
 t/log_exp.t
 t/new.t
 t/nan_pow.t

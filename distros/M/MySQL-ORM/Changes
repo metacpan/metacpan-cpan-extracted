@@ -1,5 +1,8 @@
 Revision history for MySQL-ORM
 
+0.12	- added an additional primary key check to avoid errors when primary 
+		  key does not exist.
+	 	  
 0.11	- improved selectx to handle order by ASC vs DESC
 
 0.10    - improved MySQL::ORM::Generate::Class::ResultClassX::generate() to better handle null columns in selectx 

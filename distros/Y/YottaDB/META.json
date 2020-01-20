@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::PkgConfig" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.31",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

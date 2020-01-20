@@ -2,43 +2,47 @@
 
 package Dash::Core::Components::Textarea;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'value';
-has 'autoFocus';
-has 'cols';
-has 'disabled';
-has 'form';
-has 'maxLength';
-has 'minLength';
-has 'name';
-has 'placeholder';
-has 'readOnly';
-has 'required';
-has 'rows';
-has 'wrap';
-has 'accessKey';
-has 'className';
-has 'contentEditable';
-has 'contextMenu';
-has 'dir';
-has 'draggable';
-has 'hidden';
-has 'lang';
-has 'spellCheck';
-has 'style';
-has 'tabIndex';
-has 'title';
-has 'n_blur';
-has 'n_blur_timestamp';
-has 'n_clicks';
-has 'n_clicks_timestamp';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'id'                 => ( is => 'rw' );
+has 'value'              => ( is => 'rw' );
+has 'autoFocus'          => ( is => 'rw' );
+has 'cols'               => ( is => 'rw' );
+has 'disabled'           => ( is => 'rw' );
+has 'form'               => ( is => 'rw' );
+has 'maxLength'          => ( is => 'rw' );
+has 'minLength'          => ( is => 'rw' );
+has 'name'               => ( is => 'rw' );
+has 'placeholder'        => ( is => 'rw' );
+has 'readOnly'           => ( is => 'rw' );
+has 'required'           => ( is => 'rw' );
+has 'rows'               => ( is => 'rw' );
+has 'wrap'               => ( is => 'rw' );
+has 'accessKey'          => ( is => 'rw' );
+has 'className'          => ( is => 'rw' );
+has 'contentEditable'    => ( is => 'rw' );
+has 'contextMenu'        => ( is => 'rw' );
+has 'dir'                => ( is => 'rw' );
+has 'draggable'          => ( is => 'rw' );
+has 'hidden'             => ( is => 'rw' );
+has 'lang'               => ( is => 'rw' );
+has 'spellCheck'         => ( is => 'rw' );
+has 'style'              => ( is => 'rw' );
+has 'tabIndex'           => ( is => 'rw' );
+has 'title'              => ( is => 'rw' );
+has 'n_blur'             => ( is => 'rw' );
+has 'n_blur_timestamp'   => ( is => 'rw' );
+has 'n_clicks'           => ( is => 'rw' );
+has 'n_clicks_timestamp' => ( is => 'rw' );
+has 'loading_state'      => ( is => 'rw' );
+has 'persistence'        => ( is => 'rw' );
+has 'persisted_props'    => ( is => 'rw' );
+has 'persistence_type'   => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -46,7 +50,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -63,7 +67,7 @@ Dash::Core::Components::Textarea
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

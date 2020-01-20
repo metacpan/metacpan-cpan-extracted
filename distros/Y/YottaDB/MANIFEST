@@ -6,7 +6,8 @@ ppport.h
 README
 YottaDB.xs
 YottaDB.pm
-Tie.pm
+YottaDB/Tie.pm
+YottaDB/Lock.pm
 
 bin/ydb_json_import
 
@@ -30,6 +31,7 @@ t/016_transactions.t
 t/017_fork.t
 t/018_lock.t
 t/019_tie.t
+t/020_locked.t
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

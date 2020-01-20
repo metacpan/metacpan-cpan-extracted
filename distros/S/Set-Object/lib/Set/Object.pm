@@ -504,6 +504,7 @@ module is free software. It may be used, redistributed and/or modified
 under the terms of the Perl Artistic License
 
 Portions Copyright (c) 2013, cPanel.  Same license.
+Portions Copyright (c) 2020, Reini Urban.  Same license.
 
 =head1 SEE ALSO
 
@@ -528,7 +529,7 @@ require AutoLoader;
 
 @EXPORT_OK = qw( ish_int is_int is_string is_double blessed reftype
 		 refaddr is_overloaded is_object is_key set weak_set );
-$VERSION = '1.39';
+$VERSION = '1.40';
 
 bootstrap Set::Object $VERSION;
 

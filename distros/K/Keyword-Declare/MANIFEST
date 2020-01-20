@@ -38,5 +38,6 @@ t/postfix_deref.t
 t/unkeyword.t
 t/DATA.t
 t/underscore.t
+t/sep_attr.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

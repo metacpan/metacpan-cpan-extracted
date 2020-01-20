@@ -1,69 +1,114 @@
 use strict;
 use warnings;
+use Test::More tests => 37;
 use Math::LongDouble qw(:all);
 
-print "1..10\n";
+# The relationship between ld_inter_prec() and ld_max_orig_len() that
+# is present in the first 24 tests, does not always hold true. See tests
+# 25..36 for example.
+# However, that relationship should always hold true if $in[0] >= $in[2]
+# (ie if old base >= new base), as tested in test 37.
 
-eval{my $p = LD_DBL_DIG;};
 
-if(!$@) {print "ok 1\n"}
-else {
-  warn "\$\@: $@";
-  print "not ok 1\n";
+my @in = (2, 53, 10, 17);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 1');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 2');
+
+@in = (10, 15, 2, 51);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 3');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 4');
+
+@in = (10, 16, 2, 55);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 5');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 6');
+
+@in = (2, 56, 16, 14);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 7');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 8');
+
+@in = (32, 1, 16, 2);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 9');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 10');
+
+@in = (32, 2, 16, 3);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 11');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 12');
+
+
+@in = (32, 4, 16, 5);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 13');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 14');
+
+@in = (32, 5, 16, 7);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 15');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 16');
+
+@in = (8, 15, 10, 15);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 17');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 18');
+
+@in = (8, 16, 10, 16);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 19');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 20');
+
+@in = (10, 15, 2, 51);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 21');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 22');
+
+@in = (8, 21, 10, 20);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 23');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', $in[1], 'test 24');
+
+@in = (2, 80, 10, 26);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 25');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '!=', $in[1], 'test 26'); # $in[1] == 80
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', 83,     'test 27');
+
+@in = (8, 20, 10, 20);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 28');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '!=', $in[1], 'test 29'); # $in[1] == 20
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', 21,     'test 30');
+
+@in = (8, 14, 32, 9);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 31');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '!=', $in[1], 'test 32'); # $in[1] == 14
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', 15,     'test 33');
+
+@in = (2, 19, 16, 5);
+
+cmp_ok(ld_min_inter_prec($in[0], $in[1], $in[2]), '==', $in[3], 'test 34');
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '!=', $in[1], 'test 35'); # $in[1] == 19
+cmp_ok(ld_max_orig_len  ($in[0], $in[2], $in[3]), '==', 20,     'test 36');
+
+my $ok = 1;
+
+for(1 .. 1000) {
+  @in = (2 + int(rand(63)), 1 + int(rand(1000)), 2  + int(rand(63)));
+  $in[3] = ld_min_inter_prec($in[0], $in[1], $in[2]);
+  my $x = ld_max_orig_len($in[0], $in[2], $in[3]);
+  if($x != $in[1] && $in[0] >= $in[2]) {
+    warn "$x: @in\n";
+    $ok = 0;
+  }
 }
 
-eval{my $lp = LD_LDBL_DIG;};
+cmp_ok($ok, '==', 1, 'test 37');
 
-if(!$@) {print "ok 2\n"}
-else {
-  warn "\$\@: $@";
-  print "not ok 2\n";
-}
 
-if(ld_max_orig_len(10, 2, 55) == 16){print "ok 3\n"}
-else {
-  warn "\n3: Got ", ld_max_orig_len(10, 2, 55), "\nExpected 16\n";
-  print "not ok 3\n";
-}
 
-if(ld_max_orig_len(2, 10, 17) == 53){print "ok 4\n"}
-else {
-  warn "\n4: Got ", ld_max_orig_len(2, 10, 17), "\nExpected 53\n";
-  print "not ok 4\n";
-}
 
-if(ld_min_inter_prec(2, 53, 10) == 17) {print "ok 5\n"}
-else {
-  warn "\n5: Got ", ld_min_inter_prec(2, 53, 10), "\nExpected 17\n";
-  print "not ok 5\n";
-}
-
-if(ld_min_inter_prec(10, 16, 2) == 55) {print "ok 6\n"}
-else {
-  warn "\n6: Got ", ld_min_inter_prec(10, 16, 2), "\nExpected 55\n";
-  print "not ok 6\n";
-}
-
-if(ld_max_orig_base(53, 10, 17) == 2) {print "ok 7\n"}
-else {
-  warn "\n7: Got ", ld_max_orig_base(53, 10, 17), "\nExpected 2\n";
-  print "not ok 7\n";
-}
-
-if(ld_max_orig_base(16, 2, 55) == 10) {print "ok 8\n"}
-else {
-  warn "\n8: Got ", ld_max_orig_base(16, 2, 55), "\nExpected 10\n";
-  print "not ok 8\n";
-}
-
-if(ld_min_inter_base(10, 16, 55) ==2) {print "ok 9\n"}
-else {
-  warn "\n9: Got ", ld_min_inter_base(10, 16, 55), "\nExpected 2\n";
-  print "not ok 9\n";
-}
-
-if(ld_min_inter_base(2, 53, 17) ==10) {print "ok 10\n"}
-else {
-  warn "\n10: Got ", ld_min_inter_base(2, 53, 17), "\nExpected 10\n";
-  print "not ok 10\n";
-}

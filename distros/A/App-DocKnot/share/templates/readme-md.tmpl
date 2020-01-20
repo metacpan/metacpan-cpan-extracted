@@ -1,8 +1,9 @@
 # [% name %] [% version %]
-[% IF vcs.travis || distribution.cpan || orphaned %]
+[% IF vcs.travis || distribution.cpan || orphaned || packaging.debian %]
 [% IF orphaned %][![No maintenance intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) [% END -%]
 [% IF vcs.travis %][![Build status](https://travis-ci.org/[% vcs.travis %].svg?branch=master)](https://travis-ci.org/[% vcs.travis %]) [% END -%]
-[% IF distribution.cpan %][![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %].svg)](https://metacpan.org/release/[% distribution.cpan %])[% END -%]
+[% IF distribution.cpan %][![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %])](https://metacpan.org/release/[% distribution.cpan %])[% IF vcs.github %] [![License](https://img.shields.io/cpan/l/[% distribution.cpan %])](https://github.com/[% vcs.github %]/blob/master/LICENSE)[% END %] [% END -%]
+[% IF packaging.debian %][![Debian package](https://img.shields.io/debian/v/[% packaging.debian %])](https://tracker.debian.org/pkg/[% packaging.debian %])[% END -%]
 
 [% END %]
 [% FOREACH copr IN copyrights %]Copyright [% copr.years %]

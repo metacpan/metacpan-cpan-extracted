@@ -37,7 +37,9 @@ WriteMakefile1(
     ],
 
     CONFIGURE_REQUIRES => {
-        # 'ExtUtils::MakeMaker' => 7.12,
+
+        # In order to specify OBJECT as an array.
+        'ExtUtils::MakeMaker' => 6.84,
         'Devel::PPPort' => 0,
     },
 
@@ -65,6 +67,7 @@ WriteMakefile1(
         'Test::FailWarnings' => 0,
         'Test::Deep'      => 0,
         'Test::Differences' => 0,
+        'Test::Class::Tiny' => 0,
     },
 
     # SIGN => 1,

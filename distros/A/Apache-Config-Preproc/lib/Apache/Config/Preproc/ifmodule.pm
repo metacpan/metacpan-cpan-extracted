@@ -1,15 +1,16 @@
 package Apache::Config::Preproc::ifmodule;
+use parent 'Apache::Config::Preproc::Expand';
 use strict;
 use warnings;
 use Carp;
 use IPC::Open3;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new {
     my $class = shift;
     my $conf = shift;
-    my $self = bless { conf => $conf }, $class;
+    my $self = bless $class->SUPER::new($conf), $class;
     local %_ = @_;
     my $v;
     if ($v = delete $_{preloaded}) {
@@ -25,8 +26,6 @@ sub new {
     }
     return $self;
 }
-
-sub conf { shift->{conf} }
 
 sub preloaded {
     my $self = shift;
@@ -266,6 +265,10 @@ is a shorthand for
     probe => [qw(/usr/sbin/httpd /usr/sbin/apache2)]
         
 =back
+
+=head1 SEE ALSO
+
+L<Apache::Config::Preproc>
 
 =cut
 

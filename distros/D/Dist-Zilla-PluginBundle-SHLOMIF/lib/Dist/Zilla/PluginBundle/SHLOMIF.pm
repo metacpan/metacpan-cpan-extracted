@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::SHLOMIF;
-$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000009';
+$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000010';
 use 5.014;
 
 use Moose;
@@ -297,7 +297,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - Dist::Zilla plugins for me
 
 =head1 VERSION
 
-version 0.000009
+version 0.000010
 
 =head1 SYNOPSIS
 
@@ -374,10 +374,6 @@ equivalent to (FILL IN/update).
 
 Dist::Zilla::PluginBundle::SHLOMIF - dzil plugins for SHLOMIF (Shlomi Fish)
 
-=head1 VERSION
-
-version 0.000009
-
 =head1 SEE ALSO
 
 L<Dist::Zilla>
@@ -394,7 +390,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Jesse Luehrs.
+This software is Copyright (c) 2020 by Jesse Luehrs.
 
 This is free software, licensed under:
 

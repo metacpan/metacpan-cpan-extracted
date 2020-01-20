@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,30 +25,41 @@ no_index:
 provides:
   Apache::Config::Preproc:
     file: lib/Apache/Config/Preproc.pm
-    version: '1.03'
+    version: '1.04'
+  Apache::Config::Preproc::Expand:
+    file: lib/Apache/Config/Preproc/Expand.pm
+  Apache::Config::Preproc::Server::Probe:
+    file: lib/Apache/Config/Preproc/Server/Probe.pm
   Apache::Config::Preproc::compact:
     file: lib/Apache/Config/Preproc/compact.pm
-    version: '1.02'
+    version: '1.03'
   Apache::Config::Preproc::ifdefine:
     file: lib/Apache/Config/Preproc/ifdefine.pm
-    version: '1.02'
+    version: '1.03'
   Apache::Config::Preproc::ifmodule:
     file: lib/Apache/Config/Preproc/ifmodule.pm
-    version: '1.02'
+    version: '1.03'
   Apache::Config::Preproc::include:
     file: lib/Apache/Config/Preproc/include.pm
-    version: '1.02'
+    version: '1.03'
+  Apache::Config::Preproc::locus:
+    file: lib/Apache/Config/Preproc/locus.pm
+    version: '1.03'
+  Apache::Config::Preproc::locus::node:
+    file: lib/Apache/Config/Preproc/locus.pm
   Apache::Config::Preproc::macro:
     file: lib/Apache/Config/Preproc/macro.pm
-    version: '1.02'
+    version: '1.03'
   Apache::Config::Preproc::macro::defn:
     file: lib/Apache/Config/Preproc/macro.pm
 requires:
   Apache::Admin::Config: '0.95'
   File::Spec: '0'
   IPC::Open3: '0'
+  Text::Locus: '1.03'
   Text::ParseWords: '3.27'
   perl: '5.014002'
 resources:
   repository: git://git.gnu.org.ua/acpp.git
-version: '1.03'
+version: '1.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

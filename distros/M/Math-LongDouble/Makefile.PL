@@ -189,6 +189,9 @@ $defines .= " -DNO_INF_CAST_TO_NV"
 $defines .= ' -DMATH_LONGDOUBLE_DEBUG'
   if "@ARGV" =~ /DEBUG/;
 
+$defines .= " -DCFG_LONGDBLKIND=$Config{longdblkind}" if( defined $Config{longdblkind} &&
+                                                                  $Config{longdblkind} >= 0 );
+
 my %options = %{
 {
   NAME => 'Math::LongDouble',

@@ -1,0 +1,46 @@
+---
+abstract: 'Perl interface to the Pornhub.com API.'
+author:
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Pornhub
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::Pornhub:
+    file: lib/WebService/Pornhub.pm
+    version: '0.02'
+requires:
+  Function::Parameters: '0'
+  HTML::Entities: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  URI: '0'
+  WebService::Client: '0.0601'
+  namespace::clean: '0'
+  perl: '5.014001'
+resources:
+  bugtracker: https://github.com/yusukebe/p5-WebService-Pornhub/issues
+  homepage: https://github.com/yusukebe/p5-WebService-Pornhub
+  repository: git://github.com/yusukebe/p5-WebService-Pornhub.git
+version: '0.02'
+x_authority: cpan:YUSUKEBE
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

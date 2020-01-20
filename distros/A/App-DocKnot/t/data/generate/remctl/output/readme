@@ -295,7 +295,7 @@ TESTING
   Do this instead of running the test program directly since it will
   ensure that necessary environment variables are set up.
 
-  On particularly slow or loaded systems, you may see intermittant
+  On particularly slow or loaded systems, you may see intermittent
   failures from the server/streaming test because it's timing-sensitive.
 
   The test suite will also need to be able to bind to 127.0.0.1 on port

@@ -142,3 +142,24 @@ Revision history for Keyword-Declare
 
     * Further improved auto-insertion of __DATA__ keyword (thanks, Jeroen!)
 
+
+
+0.001015  Mon Jan 20 05:07:54 2020
+
+    * Added :sep attribute to allow repeated params to be separated
+      by something other than whitespace
+      (Thanks, Toby!)
+
+    * Now supports named captures within a type-regex.
+      If type-regex includes named captures, the corresponding
+      arg will be an hash-based object of type Keyword::Declare::Arg,
+      which stringifies to the match, but whose other keys are the
+      named captures.
+      (Thanks, Toby!)
+
+    * Fixed bug that ignored postfix flags on keytype regexes
+
+    * Fixed extraction of keyword array parameters whose type-regexes
+      include sub-captures (no longer inserts extra sub-capture values
+      into the array)
+

@@ -15,8 +15,6 @@ lib/IO/Socket/UNIX.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json
-META.yml
 poll.c
 poll.h
 ppport.h
@@ -30,6 +28,7 @@ t/io_dir.t
 t/io_dup.t
 t/io_file.t
 t/io_file_export.t
+t/io_getline.t
 t/io_leak.t
 t/io_linenum.t
 t/io_multihomed.t
@@ -45,3 +44,5 @@ t/io_utf8.t
 t/io_utf8argv.t
 t/io_xs.t
 t/test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,18 @@
+0.05 2020-01-19T13:27:16+01:00
+ [Common]
+ - Add author tests.
+ - Add .travis.yml file.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years to 2020.
+
+ [Map::Tube::Text::Table::Utils]
+ - Add tests.
+ - Improve SEE ALSO section in doc.
+
 0.04 2015-01-24T18:42:18+01:00
  [Map::Tube::Text::Table]
  - Add Map::Tube::Graph to SEE ALSO section in doc.

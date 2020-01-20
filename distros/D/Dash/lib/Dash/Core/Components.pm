@@ -1,41 +1,139 @@
 package Dash::Core::Components;
-
 use strict;
 use warnings;
+use Module::Load;
 
-use JSON;
-use File::ShareDir;
-use Path::Tiny;
-
-my $_deps;
-
-sub _deps {
-    my $kind = shift;
-    if ( !defined $_deps ) {
-
-        # TODO recover from __PACKAGE__ variable
-        $_deps = from_json(
-                         Path::Tiny::path(
-                             File::ShareDir::dist_file(
-                                 'Dash', Path::Tiny::path( 'assets', 'dash_core_components', 'js_deps.json' )->canonpath
-                             )
-                         )->slurp_utf8
-        );
-    }
-    if ( defined $kind ) {
-        return $_deps->{$kind};
-    }
-    return $_deps;
+sub Checklist {
+    shift @_;
+    load Dash::Core::Components::Checklist;
+    return Dash::Core::Components::Checklist->new(@_);
 }
 
-sub _js_dist {
-    return _deps('_js_dist');
+sub ConfirmDialog {
+    shift @_;
+    load Dash::Core::Components::ConfirmDialog;
+    return Dash::Core::Components::ConfirmDialog->new(@_);
 }
 
-sub _css_dist {
-    return _deps('_css_dist');
+sub ConfirmDialogProvider {
+    shift @_;
+    load Dash::Core::Components::ConfirmDialogProvider;
+    return Dash::Core::Components::ConfirmDialogProvider->new(@_);
 }
 
+sub DatePickerRange {
+    shift @_;
+    load Dash::Core::Components::DatePickerRange;
+    return Dash::Core::Components::DatePickerRange->new(@_);
+}
+
+sub DatePickerSingle {
+    shift @_;
+    load Dash::Core::Components::DatePickerSingle;
+    return Dash::Core::Components::DatePickerSingle->new(@_);
+}
+
+sub Dropdown {
+    shift @_;
+    load Dash::Core::Components::Dropdown;
+    return Dash::Core::Components::Dropdown->new(@_);
+}
+
+sub Graph {
+    shift @_;
+    load Dash::Core::Components::Graph;
+    return Dash::Core::Components::Graph->new(@_);
+}
+
+sub Input {
+    shift @_;
+    load Dash::Core::Components::Input;
+    return Dash::Core::Components::Input->new(@_);
+}
+
+sub Interval {
+    shift @_;
+    load Dash::Core::Components::Interval;
+    return Dash::Core::Components::Interval->new(@_);
+}
+
+sub Link {
+    shift @_;
+    load Dash::Core::Components::Link;
+    return Dash::Core::Components::Link->new(@_);
+}
+
+sub Loading {
+    shift @_;
+    load Dash::Core::Components::Loading;
+    return Dash::Core::Components::Loading->new(@_);
+}
+
+sub Location {
+    shift @_;
+    load Dash::Core::Components::Location;
+    return Dash::Core::Components::Location->new(@_);
+}
+
+sub LogoutButton {
+    shift @_;
+    load Dash::Core::Components::LogoutButton;
+    return Dash::Core::Components::LogoutButton->new(@_);
+}
+
+sub Markdown {
+    shift @_;
+    load Dash::Core::Components::Markdown;
+    return Dash::Core::Components::Markdown->new(@_);
+}
+
+sub RadioItems {
+    shift @_;
+    load Dash::Core::Components::RadioItems;
+    return Dash::Core::Components::RadioItems->new(@_);
+}
+
+sub RangeSlider {
+    shift @_;
+    load Dash::Core::Components::RangeSlider;
+    return Dash::Core::Components::RangeSlider->new(@_);
+}
+
+sub Slider {
+    shift @_;
+    load Dash::Core::Components::Slider;
+    return Dash::Core::Components::Slider->new(@_);
+}
+
+sub Store {
+    shift @_;
+    load Dash::Core::Components::Store;
+    return Dash::Core::Components::Store->new(@_);
+}
+
+sub Tab {
+    shift @_;
+    load Dash::Core::Components::Tab;
+    return Dash::Core::Components::Tab->new(@_);
+}
+
+sub Tabs {
+    shift @_;
+    load Dash::Core::Components::Tabs;
+    return Dash::Core::Components::Tabs->new(@_);
+}
+
+sub Textarea {
+    shift @_;
+    load Dash::Core::Components::Textarea;
+    return Dash::Core::Components::Textarea->new(@_);
+}
+
+sub Upload {
+    shift @_;
+    load Dash::Core::Components::Upload;
+    return Dash::Core::Components::Upload->new(@_);
+}
 1;
 
 __END__
@@ -50,7 +148,7 @@ Dash::Core::Components
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

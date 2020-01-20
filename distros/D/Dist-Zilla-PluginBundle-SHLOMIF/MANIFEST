@@ -12,7 +12,6 @@ README
 dist.ini
 dist.ini~
 lib/Dist/Zilla/PluginBundle/SHLOMIF.pm
-lib/Dist/Zilla/PluginBundle/SHLOMIF.pm~
 t/00-compile.t
 xt/author/eol.t
 xt/author/no-tabs.t

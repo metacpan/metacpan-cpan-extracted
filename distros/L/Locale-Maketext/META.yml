@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,9 +21,11 @@ requires:
   I18N::LangTags: '0.31'
   I18N::LangTags::Detect: '0'
   Test::More: '0'
+  parent: '0'
 resources:
   MailingList: http://lists.perl.org/list/perl5-porters.html
-  bugtracker: http://rt.perl.org/perlbug/
+  bugtracker: https://github.com/perl/perl5/issues
   license: http://dev.perl.org/licenses/
-  repository: http://perl5.git.perl.org/perl.git/tree/HEAD:/dist/Locale-Maketext
-version: '1.28'
+  repository: https://github.com/Perl/perl5/tree/blead/dist/Locale-Maketext
+version: '1.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,8 @@
 package Video::Pattern;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use English;
@@ -20,8 +18,7 @@ Readonly::Scalar our $MILISECONDS_IN_SECOND => 1000;
 Readonly::Scalar our $MINUTS_IN_HOUR => 60;
 Readonly::Scalar our $SECONDS_IN_MINUTE => 60;
 
-# Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -178,6 +175,7 @@ Video::Pattern - Video class for frame generation.
 =head1 SYNOPSIS
 
  use Video::Pattern;
+
  my $pattern = Video::Pattern->new(%parameters);
  $pattern->create($output_dir);
 
@@ -241,11 +239,9 @@ Video::Pattern - Video class for frame generation.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Temp qw(tempdir);
  use File::Path qw(rmtree);
  use Video::Pattern;
@@ -324,21 +320,21 @@ Video::Delay class for delays defined by math function.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Video-Pattern>
+L<https://github.com/michal-josef-spacek/Video-Pattern>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
+ © 2012-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

@@ -19,11 +19,14 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Dist-Zilla-PluginBundle-SHLOMIF",
-  "dist_version" => "0.000009",
+  "dist_version" => "0.000010",
   "license" => "mit",
   "module_name" => "Dist::Zilla::PluginBundle::SHLOMIF",
   "recursive_test_files" => 1,
   "requires" => {
+    "Code::TidyAll::Plugin::PerlCritic" => 0,
+    "Code::TidyAll::Plugin::PerlTidy" => 0,
+    "Code::TidyAll::Plugin::TestCount" => 0,
     "Dist::Zilla" => 0,
     "Dist::Zilla::Plugin::Authority" => 0,
     "Dist::Zilla::Plugin::AutoPrereqs" => 0,
@@ -61,6 +64,10 @@ my %module_build_args = (
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "List::MoreUtils" => 0,
     "Moose" => 0,
+    "Perl::Critic" => 0,
+    "Pod::Markdown" => 0,
+    "Pod::Weaver::PluginBundle::SHLOMIF" => 0,
+    "Pod::Weaver::Section::Support" => 0,
     "perl" => "5.014"
   },
   "test_requires" => {

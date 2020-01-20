@@ -171,7 +171,7 @@ an example:
   Test programs must be executable.
 
   For any test programs that need to be compiled, add build rules for them
-  in `Makefile.am`, simliar to:
+  in `Makefile.am`, similar to:
 
   ```make
       tests_libtap_c_basic_LDADD = tests/tap/libtap.a

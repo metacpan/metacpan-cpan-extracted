@@ -9,10 +9,10 @@ use TestPreproc;
 my $obj = new TestPreproc -expand => ['ifdefine'];
 ok($obj->dump_raw, $obj->dump_expect);
 
-my $obj = new TestPreproc -expand => [ { ifdefine => [qw(VAR)] } ];
+$obj = new TestPreproc -expand => [ { ifdefine => [qw(VAR)] } ];
 ok($obj->dump_raw, $obj->dump_expect);
 
-my $obj = new TestPreproc -expand => ['ifdefine'];
+$obj = new TestPreproc -expand => ['ifdefine'];
 ok($obj->dump_raw, $obj->dump_expect);
 
 __DATA__

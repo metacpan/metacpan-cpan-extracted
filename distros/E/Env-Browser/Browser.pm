@@ -1,19 +1,16 @@
 package Env::Browser;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(run);
 Readonly::Scalar our $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Run browser.
 sub run {
@@ -58,6 +55,7 @@ Env::Browser - Process environment variable $BROWSER and run web browser.
 =head1 SYNOPSIS
 
  use Env::Browser qw(run);
+
  run($uri);
 
 =head1 SUBROUTINES
@@ -76,11 +74,9 @@ Env::Browser - Process environment variable $BROWSER and run web browser.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Env::Browser qw(run);
 
  # Set $BROWSER variable.
@@ -94,11 +90,9 @@ Env::Browser - Process environment variable $BROWSER and run web browser.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Env::Browser qw(run);
 
  # Set $BROWSER variable.
@@ -112,11 +106,9 @@ Env::Browser - Process environment variable $BROWSER and run web browser.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Env::Browser qw(run);
 
  # Set $BROWSER variable.
@@ -144,21 +136,21 @@ URL extractor/launcher
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Env-Browser>
+L<https://github.com/michal-josef-spacek/Env-Browser>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
+ © 2013-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

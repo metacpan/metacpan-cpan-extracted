@@ -87,7 +87,7 @@ resources:
   homepage: http://dev.catalyst.perl.org/
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git
-version: '5.90125'
+version: '5.90126'
 x_authority: cpan:MSTROUT
 x_breaks:
   Catalyst::Action::REST: '<= 0.67'

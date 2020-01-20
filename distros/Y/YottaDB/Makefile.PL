@@ -1,14 +1,24 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::PkgConfig;
 
 # We require PkgConfig available from YottaDB r1.24 on
 
-my $cflags = cflags ExtUtils::PkgConfig ("yottadb");
-my $libs = libs ExtUtils::PkgConfig ("yottadb");
-my $ver  = modversion ExtUtils::PkgConfig ("yottadb");
+sub pkgconfig ($)
+{
+  my $v = shift;
+  my $cmd = "pkg-config --$v yottadb";
+  my $r = `$cmd`;
+  chomp $r;
+  $r = undef if $r eq "";
+  die "pkg-config error running: `$cmd`: $!" unless defined $r;
+  $r;
+}
+
+my $libs = pkgconfig "libs";
+my $cflags = pkgconfig "cflags";
+my $ver = pkgconfig "modversion";
 
 $ver =~ s/^r//;
-$cflags = "$cflags -DNO_CHILD_INIT" if $ver >= 1.24;
+$cflags .= " -DNO_CHILD_INIT" if $ver >= 1.24;
 
 
 open my $out, ">", "gen-switch.h" or die "opening gen-switch.h: $!";
@@ -30,7 +40,6 @@ WriteMakefile(
                     },
     NAME              => 'YottaDB',
     VERSION_FROM      => 'YottaDB.pm',
-    CONFIGURE_REQUIRES => { 'ExtUtils::PkgConfig' => 0 },
     PREREQ_PM         => {JSON => 2.90},
     ABSTRACT_FROM     => 'YottaDB.pm',
     AUTHOR            => 'Stefan Traby <stefan@hello-penguin.com>',
@@ -39,6 +48,7 @@ WriteMakefile(
     INC               => "$cflags",
     EXE_FILES         => [ "bin/ydb_json_import" ],
     PM                => { 'YottaDB.pm' => '$(INST_LIBDIR)/YottaDB.pm',
-                           'Tie.pm'     => '$(INST_LIBDIR)/YottaDB/Tie.pm',
+                           'YottaDB/Tie.pm'     => '$(INST_LIBDIR)/YottaDB/Tie.pm',
+                           'YottaDB/Lock.pm'     => '$(INST_LIBDIR)/YottaDB/Lock.pm',
                          },
 );

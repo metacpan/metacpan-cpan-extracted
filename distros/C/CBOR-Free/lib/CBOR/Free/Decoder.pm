@@ -36,7 +36,7 @@ Creates a new CBOR decoder object.
 
 =cut
 
-sub new { bless {} }    # TODO: implement in XS, and store a context.
+sub new { bless { _flags => 0 } }    # TODO: implement in XS, and store a context.
 
 #----------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ otherwise ignored.
 =head2 $enabled_yn = I<OBJ>->preserve_references( [$ENABLE] )
 
 Enables/disables recognition of CBOR’s shared references. (If no
-argument is given, shared references wil be enabled.)
+argument is given, shared references will be enabled.)
 
 B<HANDLE WITH CARE.> This option can cause CBOR::Free to create circular
 references, which can cause memory leaks if not handled properly.
@@ -63,7 +63,35 @@ references, which can cause memory leaks if not handled properly.
 =cut
 
 sub preserve_references {
-    return $_[0]{'_preserve_references'} = (@_ > 1 ? !!$_[1] : 1);
+    if (@_ < 2 || !!$_[1]) {
+        $_[0]{'_flags'} |= _FLAG_PRESERVE_REFERENCES();
+    }
+
+    return !!($_[0]{'_flags'} & _FLAG_PRESERVE_REFERENCES());
+}
+
+#----------------------------------------------------------------------
+
+=head2 $enabled_yn = I<OBJ>->naive_utf8( [$ENABLE] )
+
+Same interface as C<preserve_references()>, but this option tells I<OBJ>
+to forgo UTF-8 validation of CBOR text strings when enabled. This speeds up
+decoding of text strings but may confuse Perl if invalid UTF-8 is given in
+a CBOR text string. That may or may not break your application.
+
+This I<should> be safe in contexts—such as IPC—where you control the CBOR
+serialization and can thus ensure validity of the encoded text.
+
+If in doubt, leave this off.
+
+=cut
+
+sub naive_utf8 {
+    if (@_ < 2 || !!$_[1]) {
+        $_[0]{'_flags'} |= _FLAG_NAIVE_UTF8();
+    }
+
+    return !!($_[0]{'_flags'} & _FLAG_NAIVE_UTF8());
 }
 
 #----------------------------------------------------------------------

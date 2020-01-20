@@ -55,12 +55,11 @@ unless (exists $ENV{TEST_DB}) {
 	#
 	my $glb = '^tmp001';
 	y_set $glb, 1, 2, 3 => 42;
-	my $rc = y_trans (sub {
-			y_kill_tree $glb;
-			ok (0 == y_data $glb);
-			y_tp_rollback;
-		 }, "BATCH"
-	);
+	my $rc = y_trans {
+			    y_kill_tree $glb;
+			    ok (0 == y_data $glb);
+			    y_tp_rollback;
+		 } "BATCH";
 	ok (10 == y_data $glb);
 	ok (42 == y_get $glb, 1, 2, 3);		
 	y_kill_tree $glb;

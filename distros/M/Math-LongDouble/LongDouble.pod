@@ -1,0 +1,638 @@
+=pod
+
+=head1 NAME
+
+Math::LongDouble - perl interface to C's long double operations
+
+
+=head1 DESCRIPTION
+
+   use Math::LongDouble qw(:all);
+
+   $arg = ~0; # largest UV
+   $d1 = Math::LongDouble->new($arg); # Assign the UV ~0 to $d2.
+   $d2 = UVtoLD($arg);                # Assign the UV ~0 to $d2.
+
+   $arg = -21;
+   $d1 = Math::LongDouble->new($arg); # Assign the IV -21 to $d2.
+   $d2 = IVtoLD($arg);                # Assign the IV -21 to $d2.
+
+   $arg = 32.1;
+   $d1 = Math::LongDouble->new($arg); # Assign the NV 32.1 to $d2.
+   $d2 = NVtoLD($arg);                # Assign the NV 32.1 to $d2.
+
+   $arg = "32.1";
+   $d1 = Math::LongDouble->new($arg); # Assign strtold("32.1") to $d2.
+   $d2 = STRtoLD($arg);               # Assign strtold("32.1") to $d2.
+
+   $d3 = Math::LongDouble->new($d1); # Assign the value of $d1 to $d3.
+   $d4 = LDtoLD($d1);                # Assign the value of $d1 to $d4.
+   $d5 = $d1;                        # Assign the value of $d1 to $d5.
+
+   This behaviour has changed from 0.06 and earlier.
+
+   A number of the functions below accept string arguments. These arguments
+   having been handed to strtold() will be checked for the presence of
+   non-numeric characters. If any such non-numeric characters are detected,
+   then the global non-numeric flag (which is initially set to 0) will be
+   incremented.
+   Neither leading nor trailing whitespace is deemed non-numeric, but any
+   other (ie internal) whitespace *is* regarded as non-numeric.
+   You can query the value held by the global non-numeric flag by running
+   Math::Float128::nnumflag() and you can manually alter the value of this
+   global using Math::Float128::set_nnum and Math::Float128::clear_nnum.
+   These functions are documented below.
+
+   NOTE:
+    Math::LongDouble->new(32.1) != Math::LongDouble->new('32.1')
+    unless $Config{nvtype} reports 'long double'. The same holds
+    for many (but not all) numeric values. In general, it's not
+    always true (and is often untrue) that
+    Math::LongDouble->new($n) == Math::LongDouble->new("$n")
+
+
+=head1 OVERLOADING
+
+   The following operations are overloaded:
+    + - * / **
+    += -= *= /= **=
+    != == <= >= <=> < >
+    ++ --
+    =
+    abs bool ! int print
+    sqrt log exp
+    sin cos atan2
+
+    In those situations where the overload subroutine operates on 2
+    perl variables, then obviously one of those perl variables is
+    a Math::LongDouble object. To determine the value of the other
+    variable the subroutine works through the following steps (in
+    order), using the first value it finds, or croaking if it gets
+    to step 6:
+
+    1. If the variable is a UV (unsigned integer value) then that
+       value is used. The variable is considered to be a UV if
+       (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV()
+       returns true.
+
+    2. If the variable is an IV (signed integer value) then that
+       value is used. The variable is considered to be an IV if the
+       IOK flag is set.
+
+    3. If the variable is an NV (floating point value) then that
+       value is used. The variable is considered to be an NV if the
+       NOK flag is set.
+
+    4. If the variable is a string (ie the POK flag is set) then the
+       value of that string is used.
+
+    5. If the variable is a Math::LongDouble object then the value
+       encapsulated in that object is used.
+
+    6. If none of the above is true, then the second variable is
+       deemed to be of an invalid type. The subroutine croaks with
+       an appropriate error message.
+
+
+=head1 ASSIGNMENT FUNCTIONS
+
+   The following create and assign a new Math::LongDouble.
+
+    $ld = Math::LongDouble->new($arg);
+     Returns a Math::LongDouble object to which the numeric value of $arg
+     has been assigned.
+     If $arg is not provided then the value of $ld will be NaN.
+
+    $ld = UVtoLD($arg);
+     Returns a Math::LongDouble object to which the numeric (unsigned
+     integer) value of $arg has been assigned.
+
+    $ld = IVtoLD($arg);
+     Returns a Math::LongDouble object to which the numeric (signed
+     integer) value of $arg has been assigned.
+
+    $ld = NVtoLD($arg);
+     Returns a Math::LongDouble object to which the numeric (floating
+     point) value of $arg has been assigned.
+
+    $ld2 = LDtoLD($ld1);
+     Returns a Math::LongDouble object that is a copy of the
+     Math::LongDouble object provided as the argument.
+     Courtesy of overloading, this is in effect no different to doing:
+     $ld2 = $ld1;
+
+    $ld = STRtoLD($str);
+     Returns a Math::LongDouble object that has the value of the string
+     $str.
+
+
+=head1 ASSIGNMENT OF INF, NAN, UNITY and ZERO
+
+   $ld = InfLD($sign);
+    If $sign < 0, returns a Math::LongDouble object set to
+    negative infinity; else returns a Math::LongDouble object set
+    to positive infinity.
+
+   $ld = NaNLD();
+    If $sign < 0, returns a Math::longDouble object set to NaN.
+
+   $ld = ZeroLD($sign);
+    If $sign < 0, returns a Math::LongDouble object set to
+    negative zero; else returns a Math::LongDouble object set to
+    zero.
+
+   $ld = UnityLD($sign);
+    If $sign < 0, returns a Math::LongDouble object set to
+    negative one; else returns a Math::LongDouble object set to
+    one.
+
+   ld_set_prec($precision);
+    Sets the precision of stringified values to $precision decimal
+    digits. Default precision is set in the XS global _DIGITS to
+        1 + ceil(MANT_PREC * log(2) / log(10)
+    where MANT_PREC is LDBL_MANT_DIG if float.h defines that symbol.
+    Else MANT_PREC is DBL_MANT_DIG if float.h defines that symbol.
+    Else MANT_PREC is 21 (which is the correct value for a 64-bit
+    precision mantissa).
+
+
+   $precision = ld_get_prec();
+    Returns the precision (in decimal digits) that will be used
+    when stringifying values (by printing them, or calling
+    LDtoSTR).
+
+
+=head1 ASSIGNMENT OF FLOAT.H & MATH.H CONSTANTS
+
+   The following functions return their values as either normal
+   perl scalar integer values ($iv) or Math::LongDouble objects
+   ($ld), as appropriate.
+   Those LD_DBL_* functions that return 'double' values could have been
+   structured to return an NV, but they *do* return Math::LongDouble
+   objects - mainly for consistency with their LD_LDBL_* counterparts.
+
+    $iv = LD_DBL_DIG;
+    $iv = LD_LDBL_DIG;
+     Returns DBL_DIG/LDBL_DIG or croaks if DBL_DIG/LDBL_DIG is not
+     defined.
+
+    $ld = LD_DBL_MAX;
+    $ld = LD_LDBL_MAX;
+     Returns DBL_MAX/LDBL_MAX or croaks if DBL_MAX/LDBL_MAX is not defined.
+
+    $ld = LD_DBL_MIN;
+    $ld = LD_LDBL_MIN;
+     Returns DBL_MIN/LDBL_MIN or croaks if DBL_MIN/LDBL_MIN is not defined.
+
+    $ld = LD_DBL_EPSILON;
+    $ld = LD_LDBL_EPSILON;
+     Returns DBL_EPSILON/LDBL_EPSILON or croaks if
+     DBL_EPSILON/LDBL_EPSILON is not defined.
+
+    $ld = LD_DBL_DENORM_MIN;
+    $ld = LD_LDBL_DENORM_MIN;
+     Returns DBL_DENORM_MIN/LDBL_DENORM_MIN or croaks if
+     DBL_DENORM_MIN/LDBL_DENORM_MIN is not defined.
+
+    $iv = LD_DBL_MANT_DIG;
+    $iv = LD_LDBL_MANT_DIG;
+     Returns DBL_MANT_DIG/LDBL_MANT_DIG or croaks if
+     DBL_MANT_DIG/LDBL_MANT_DIG is not defined.
+
+    $iv = LD_DBL_MIN_EXP;
+    $iv = LD_LDBL_MIN_EXP;
+     Returns DBL_MIN_EXP/LDBL_MIN_EXP or croaks if
+     DBL_MIN_EXP/LDBL_MIN_EXP is not defined.
+
+    $iv = LD_DBL_MAX_EXP;
+    $iv = LD_LDBL_MAX_EXP;
+     Returns DBL_MAX_EXP/LDBL_MAX_EXP or croaks if
+     DBL_MAX_EXP/LDBL_MAX_EXP is not defined.
+
+    $iv = LD_DBL_MIN_10_EXP;
+    $iv = LD_LDBL_MIN_10_EXP;
+     Returns DBL_MIN_10_EXP/LDBL_MIN_10_EXP or croaks if
+     DBL_MIN_10_EXP/LDBL_MIN_10_EXP is not defined.
+
+    $iv = LD_DBL_MAX_10_EXP;
+    $iv = LD_LDBL_MAX_10_EXP;
+     Returns DBL_MAX_10_EXP/LDBL_MAX_10_EXP or croaks if
+     DBL_MAX_10_EXP/LDBL_MAX_10_EXP is not defined.
+
+    $ld = M_El;
+     Returns M_El (e) or expl(1.0) if M_El is not defined.
+
+    $ld = M_LOG2El;
+     Returns M_LOG2El or log2l(expl(1.0)) if M_LOG2El is not
+     defined.
+
+    $ld = M_LOG10El;
+     Returns M_LOG10El or log10l(expl(1.0)) if M_LOG10El is not
+     defined.
+
+    $ld = M_LN2l;
+     Returns M_LN2l or logl(2) if M_LN2l is not defined.
+
+    $ld = M_LN10l;
+     Returns M_LN10l or logl(10) if M_LN10l is not defined.
+
+    $ld = M_PIl;
+     Returns M_PIl (pi) or 2 * asinl(1) if M_PIl is not defined.
+
+    $ld = M_PI_2l;
+     Returns M_PI_2l (pi/2) or asinl(1) if M_PI_2l is not defined.
+
+    $ld = M_PI_4l;
+     Returns M_PI_4l (pi/4) or asinl(1)/2 if M_PI_4l is not defined.
+
+    $ld = M_1_PIl;
+     Returns M_1_PIl (1/pi) or 0.5/asinl(1) if M_1_PIl is not
+     defined.
+
+    $ld = M_2_PIl;
+     Returns M_2_PIl (2/pi) or 1/asinl(1) if M_2_PIl is not defined.
+
+    $ld = M_2_SQRTPIl;
+     Returns M_2_SQRTPIl (2/sqrt(pi)) or 2/sqrtl(pi) if M_2_SQRTPIl
+     is not defined.
+
+    $ld = M_SQRT2l;
+     Returns M_SQRT2l or sqrtl(2)) if M_SQRT2l is not defined.
+
+    $ld = M_SQRT1_2l;
+     Returns M_SQRT1_2l or 1/sqrtl(2)) if M_SQRT1_2l is not defined.
+
+
+
+=head1 RETRIEVAL FUNCTIONS
+
+   The following functions provide ways of seeing the value of
+   Math::LongDouble objects.
+
+   $nv = LDtoNV($ld);
+    This function returns the value of the Math::LongDouble object to
+    a perl scalar (NV). It may not translate the value accurately.
+
+   $string = LDtoSTR($ld);
+    Returns the value of the Math::LongDouble object as a string.
+    The returned string will contain the same as is displayed by
+    "print $ld", except that print() will strip the trailing zeroes
+    in the mantissa (significand) whereas LDtoSTR won't.
+    By default, provides 21 decimal digits of precision for the
+    typical 80-bit long double or 17 decimal digits if the long double
+    is a double. The number of digits dispalayed can be altered by
+    specifying the desired precision (in decimal digits) in a call to
+    ld_set_prec.
+
+   $string = LDtoSTRP($ld, $precision);
+    Same as LDtoSTR, but takes an additional arg that specifies the
+    precision (in decimal digits) of the stringified return value.
+
+=head1 MATH LIBRARY FUNCTIONS
+
+   With the following functions, "$rop" and "$op" are Math::LongDouble
+   objects, and "$iv" is just a normal perl scalar that either
+   holds a signed integer value, or to which a signed integer value
+   will be returned.
+   These are just interfaces to the standard math library functions.
+   I'm assuming you already have access to their documentation.
+   These functions do not check their argument types - if you get
+   a segfault, check that you've supplied the correct argument type(s).
+
+   acos_LD($rop, $op);
+    acosl($op) is assigned to $rop.
+
+   acosh_LD($rop, $op);
+    acoshl($op) is assigned to $rop.
+
+   asin_LD($rop, $op);
+    asinl($op) is assigned to $rop.
+
+   asinh_LD($rop, $op);
+    asinhl($op) is assigned to $rop.
+
+   atan_LD($rop, $op);
+    atanl($op) is assigned to $rop.
+
+   atanh_LD($rop, $op);
+    atanhl($op) is assigned to $rop.
+
+   atan2_LD($rop, $op1, $op2);
+    atan2l($op1, $op2) is assigned to $rop.
+
+   cbrt_LD($rop, $op);
+    cbrtl($op) is assigned to $rop.
+
+   ceil_LD($rop, $op);
+    ceill($op) is assigned to $rop.
+
+   copysign_LD($rop, $op1, $op2);
+    copysignl($op1, $op2) is assigned to $rop.
+
+   cosh_LD($rop, $op);
+    coshl($op) is assigned to $rop.
+
+   cos_LD($rop, $op);
+    cosl($op) is assigned to $rop.
+
+   erf_LD($rop, $op);
+    erfl($op) is assigned to $rop.
+
+   erfc_LD($rop, $op);
+    erfcl($op) is assigned to $rop.
+
+   exp_LD($rop, $op);
+    expl($op) is assigned to $rop.
+
+   expm1_LD($rop, $op);
+    expm1l($op) is assigned to $rop.
+
+   fabs_LD($rop, $op);
+    fabsl($op) is assigned to $rop.
+
+   fdim_LD($rop, $op1, $op2);
+    fdiml($op1, $op2) is assigned to $rop.
+
+   $iv = finite_LD($op);
+    finite($op) is assigned to $iv.
+
+   floor_LD($rop, $op);
+    floorl($op) is assigned to $rop.
+
+   fma_LD($rop, $op1, $op2, $op3);
+    fmal($op1, $op2, $op3) is assigned to $rop.
+    On mingw-w64 compilers, fmaq() crashes, so for those compilers
+    we assign ($op1 * $op2)+$op3 to $rop.
+
+   fmax_LD($rop, $op1, $op2);
+    fmaxl($op1, $op2) is assigned to $rop.
+
+   fmin_LD($rop, $op1, $op2);
+    fmin($op1, $op2) is assigned to $rop.
+
+   fmod_LD($rop, $op1, $op2);
+    fmodl($op1, $op2) is assigned to $rop.
+
+   frexp_LD($rop, $iv, $op);
+    frexpl($op) is assigned to ($rop, $iv)
+
+   hypot_LD($rop, $op1, $op2);
+    hypotl($op1, $op2) is assigned to $rop.
+
+   $iv = isinf_LD($op);
+    isinf($op) is assigned to $iv.
+
+   $iv = ilogb_LD($op);
+    ilogbl($op) is assigned to $iv.
+
+   $iv = isnan_LD($op);
+    isnanl($op) is assigned to $iv.
+    If Math::LOngDouble::_have_isnanl returns false, uses custom
+    (_is_nan) XSub instead.
+
+   ldexp_LD($rop, $op, $iv);
+    ldexpl($op, $iv) is assigned to $rop.
+    $iv should not contain a value that won't fit into a signed int
+
+   lgamma_LD($rop, $op);
+    lgammal($op) is assigned to $rop.
+
+   $iv = llrint_LD($op);
+    llrintl($op) is assigned to $iv.
+    This requires that perl's IV is large enough to hold a longlong
+    int. Otherwise attempts to use this function will result in a fatal
+    error, accompanied by a message stating that the function is
+    unimplemented.
+
+   $iv = llround_LD($op);
+    llroundl($op) is assigned to $rop.
+    This requires that perl's IV is large enough to hold a longlong
+    int. Otherwise attempts to use this function will result in a fatal
+    error, accompanied by a message stating that the function is
+    unimplemented.
+
+   log_LD($rop, $op);
+    logl($op) is assigned to $rop. # base e
+
+   log10_LD($rop, $op);
+    log10l($op) is assigned to $rop. # base 10
+
+   log2_LD($rop, $op);
+    log2l($op) is assigned to $rop. # base 2
+
+   log1p_LD($rop, $op);
+    log1pl($op) is assigned to $rop. # base e
+
+   $iv = lrint_LD($op);
+    lrintl($op) is assigned to $iv.
+    This requires that perl's IV is large enough to hold a long int.
+    Otherwise attempts to use this function will result in a fatal
+    error, accompanied by a message stating that the function is
+    unimplemented.
+
+   $iv = lround_LD($op);
+    lroundl($op) is assigned to $iv
+    This requires that perl's IV is large enough to hold a long int.
+    Otherwise attempts to use this function will result in a fatal
+    error, accompanied by a message stating that the function is
+    unimplemented.
+
+   modf_LD($rop1, $rop2, $op);
+    modfl($op) is assigned to ($rop1, $rop2).
+
+   nan_LD($rop, $op);
+    nanl($op) is assigned to $rop.
+    If Math::LongDouble::_have_nanl returns false, uses custom
+    (_get_nan) XSub instead.
+
+   nearbyint_LD($rop, $op);
+    nearbyintl($op) is assigned to $rop.
+
+   nextafter_LD($rop, $op1, $op2);
+    nextafterl($op1, $op2) is assigned to $rop.
+
+   pow_LD($rop, $op1, $op2);
+    pow($op1, $op2) is assigned to $rop.
+
+   remainder_LD($rop, $op1, $op2);
+    remainderl($op1, $op2) is assigned to $rop.
+
+   remquo_LD($rop1, $rop2, $op1, $op2);
+    remquol($op1, $op2) is assigned to ($rop1, $rop2).
+    I find this function can return unexpected results with some
+    compilers. Therefore, this function is not tested in the test suite.
+    Use it at your own risk.
+
+   $iv = rint_LD($op);
+    rintl($op) is assigned to $rop.
+
+   $iv = round_LD($op);
+    roundl($op) is assigned to $iv.
+
+   scalbln_LD($rop, $op, $iv);
+    scalblnl($op, $iv) is assigned to $rop.
+    $iv should not contain a value that won't fit into a signed
+    long int.
+
+   scalbn_LD($rop, $op, $iv);
+    scalbnl($op, $iv) is assigned to $rop.
+    $iv should not contain a value that won't fir into a signed int.
+
+   $iv = signbit_LD($op);
+    signbitl($op) is assigned to $iv.
+    If Math::LongDouble::_have_signbitl returns false signbit() is
+    used instead.
+
+   sincos_LD($rop1, $rop2, $op);
+    sinl($op) is assigned to $rop1.
+    cosl($op) is assigned to $rop2.
+
+   sinh_LD($rop, $op);
+    sinhl($op) is assigned to $rop.
+
+   sin_LD($rop, $op);
+    sin($op) is assigned to $rop.
+
+   sqrt_LD($rop, $op);
+    sqrtl($op) is assigned to $rop.
+
+   tan_LD($rop, $op);
+    tanl($op) is assigned to $rop.
+
+   tanh_LD($rop, $op);
+    tanhl($op) is assigned to $rop.
+
+   tgamma_LD($rop, $op);
+    gammal($op) is assigned to $rop.
+
+   trunc_LD($rop, $op);
+    truncl($op) is assigned to $rop.
+
+
+=head1 OTHER FUNCTIONS
+
+   $iv = Math::LongDouble::nnumflag(); # not exported
+    Returns the value of the non-numeric flag. This flag is
+    initialized to zero, but incemented by 1 whenever a function
+    is handed a string containing non-numeric characters. The
+    value of the flag therefore tells us how many times functions
+    have been handed such a string. The flag can be reset to 0 by
+    running Math::LongDouble::clear_nnum().
+
+   Math::LongDouble::set_nnum($iv); # not exported
+    Resets the global non-numeric flag to the value specified by
+    $iv.
+
+   Math::LongDouble::clear_nnum(); # not exported
+    Resets the global non-numeric flag to 0.(Essentially the same
+    as running Math::LongDouble::set_nnum(0).)
+
+   $bool = is_NaNLD($ld);
+    Returns 1 if $ld is a Math::LongDouble NaN.
+    Else returns 0
+
+   $int = is_InfLD($ld)
+    If the Math::LongDouble object $ld is -inf, returns -1.
+    If it is +inf, returns 1.
+    Otherwise returns 0.
+
+   $int = is_ZeroLD($ld);
+    If the Math::LongDouble object $ld is -0, returns -1.
+    If it is zero, returns 1.
+    Otherwise returns 0.
+
+   $int = cmp_NV($ld, $nv);
+    $nv can be any perl number - ie NV, UV or IV.
+    If the Math::LongDouble object $ld < $nv returns -1.
+    If it is > $nv, returns 1.
+    Otherwise returns 0.
+
+   $hex = ld_bytes($ld);
+    Returns the  hex representation (in big-endian order) of the
+    byte structure of $ld.
+
+=head1 BASE CONVERSIONS
+
+   $min_prec = ld_min_inter_prec($orig_base, $orig_prec, $to_base);
+
+    NOTE: $min_prec can be (very rarely) off by one if $orig_prec is in
+          the millions, or if either $orig_base or $to_base are
+          outside of the range 2..64.
+
+    Example 1:
+    Let's say we have some base 10 integers comprising 16 base 10
+    digits, and we want to represent those numbers in base 2 (binary).
+    What is the minimum required number of bits, such that it can be
+    guaranteed that converting the base 2 representations back to base
+    10 will result in the original 16 digit representations ?
+
+    We can calculate that minimum required precision with:
+      $min_prec = ld_min_inter_prec($orig_base, $orig_prec, $to_base);
+
+    In this example case that becomes:
+    $min_prec = mpfr_min_inter_prec(10, 16, 2);
+    which will set $min_prec to 55.
+
+    That is, so long as our base 2 representations provide at least 55
+    bits, we can pass 16-digit, base 10, integer values to them,
+    and be assured of retrieving the original base 10 representation when
+    we convert the base 2 representations back to base 10.
+    Sure ... not all 16-digit values require 55 bits, but there are some
+    that do ... and there are none that require more than  55 bits.
+
+    Example 2:
+    $min_prec = ld_min_inter_prec(2, 53, 10);
+    $min_prec is set to 17.
+    This tells us that a base 10 representation of a 53-bit integer needs
+    to comprise at least 17 digits if we are to be assured that assigning
+    that base 10 representation to a 53-bit integer will result in a
+    53-bit integer that is identical to the first.
+    Otherwise, there is no such assurance.
+
+
+   $max_prec = ld_max_orig_prec ($orig_base, $to_base, $to_prec);
+
+    NOTE: $max_prec can be (very rarely) off by one if $to_prec is in
+          the millions, or if either $orig_base or $to_base are
+          outside of the range 2..64.
+
+    For example:
+    To determine the maximum significant number of base 10 digits that
+    can be specified, when assigning to a 53-bit double. We have:
+
+    $max_len = ld_max_orig_len($orig_base, $to_base, $to_prec);
+
+    For this example that becomes:
+
+    $max_len = mpfr_max_orig_len(10, 2, 53);
+
+    which will set $max_len to 15.
+    That is, so long as our base 10 integer consists of no more than
+    15 significant digits, we can assign it to a 53-bit double and be
+    assured of retrieving the original value upon converting that
+    double back to a 15-digit base 10 representation.
+    Otherwise, there is no such assurance.
+
+    It is to be expected that
+     mpfr_max_orig_len(10, 2, 53) == DBL_DIG
+     and
+     mpfr_max_orig_len(10, 2, 113) == FLT128_DIG
+     and
+     mpfr_max_orig_len(10, 2, $long_double_prec) == LDBL_DIG
+
+    (where $long_double_prec is the precision, in bits, of the
+    the C 'long double' type - usually either 53 or 64 or 113.)
+
+
+=head1 LICENSE
+
+   This program is free software; you may redistribute it and/or modify
+   it under the same terms as Perl itself.
+   Copyright 2012-16, 2020 Sisyphus
+
+=head1 AUTHOR
+
+   Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut
+

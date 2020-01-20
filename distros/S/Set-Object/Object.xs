@@ -19,10 +19,10 @@ extern "C" {
 
 #ifdef SET_DEBUG
 /* for debugging object-related functions */
-#define IF_DEBUG(e)
+#define IF_DEBUG(e) e
 /* for debugging scalar-related functions */
 #define IF_REMOVE_DEBUG(e) e
-#define IF_INSERT_DEBUG(e)
+#define IF_INSERT_DEBUG(e) e
 /* for debugging weakref-related functions */
 #define IF_SPELL_DEBUG(e) e
 #else
@@ -643,8 +643,9 @@ new(pkg, ...)
      sv_bless(self, gv_stashsv(pkg, FALSE));
 
      for (item = 1; item < items; ++item) {
-       SvGETMAGIC(ST(item));
-       ISET_INSERT(s, ST(item));
+       SV* el = ST(item);
+       SvGETMAGIC(el);
+       ISET_INSERT(s, el);
      }
 
      IF_DEBUG(_warn("set!"));
@@ -664,12 +665,14 @@ insert(self, ...)
 
       for (item = 1; item < items; ++item)
       {
-	if ((SV*)s == ST(item)) {
+        SV* el = ST(item);
+	if ((SV*)s == el) {
 	  _warn("INSERTING SET UP OWN ARSE");
 	}
-	if ISET_INSERT(s, ST(item))
-	inserted++;
-	IF_DEBUG(_warn("inserting %p %p size = %d", ST(item), SvRV(ST(item)), s->elems));
+        SvGETMAGIC(el);
+	if ISET_INSERT(s, el)
+          inserted++;
+	IF_DEBUG(_warn("inserting %p %p size = %d", el, SvRV(el), s->elems));
       }
 
       XSRETURN_IV(inserted);
@@ -689,6 +692,7 @@ remove(self, ...)
       for (item = 1; item < items; ++item)
       {
          SV* el = ST(item);
+         SvGETMAGIC(el);
 	 removed += iset_remove_one(s, el, 0);
       }
       XSRETURN_IV(removed);
@@ -762,6 +766,7 @@ includes(self, ...)
 	 if (!SvOK(el))
 	   XSRETURN_NO;
 
+         SvGETMAGIC(el);
 	 if (!SvROK(el)) {
 	   IF_DEBUG(_warn("includes! el = %s", SvPV_nolen(el)));
 	   if (!iset_includes_scalar(s, el))
@@ -822,14 +827,15 @@ members(self)
          el_last = el_iter + bucket_iter->n;
 
          for (; el_iter != el_last; ++el_iter)
-            if (*el_iter)
-			{
-				SV* el = newRV(*el_iter);
-				if (SvOBJECT(*el_iter)) {
-				  sv_bless(el, SvSTASH(*el_iter));
-				}
-				PUSHs(sv_2mortal(el));
-			}
+         {
+            if (*el_iter) {
+               SV* el = newRV(*el_iter);
+               if (SvOBJECT(*el_iter)) {
+                  sv_bless(el, SvSTASH(*el_iter));
+               }
+               PUSHs(sv_2mortal(el));
+            }
+         }
       }
 
       if (s->flat) {
@@ -863,7 +869,7 @@ DESTROY(self)
       ISET* s = INT2PTR(ISET*, SvIV(SvRV(self)));
       if ( s ) {
 	sv_setiv(SvRV(self), 0);
-	IF_DEBUG(_warn("aargh!"));
+	IF_DEBUG(_warn("DESTROY s"));
 	iset_clear(s);
 	if (s->flat) {
 	  hv_undef(s->flat);
@@ -1182,7 +1188,9 @@ _STORABLE_thaw(obj, cloning, serialized, ...)
 
 	   for (item = 3; item < items; ++item)
 	   {
-		  ISET_INSERT(s, ST(item));
+              SV* el = ST(item);
+              SvGETMAGIC(el);
+              ISET_INSERT(s, el);
 	   }
 
       IF_DEBUG(_warn("set!"));

@@ -140,7 +140,7 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "5.90125",
+   "version" : "5.90126",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "Catalyst::Action::REST" : "<= 0.67",

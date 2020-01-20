@@ -11,6 +11,7 @@ WriteMakefile(NAME         => 'Apache::Config::Preproc',
 		  'Apache::Admin::Config' => '0.95',
 		  'File::Spec' => '3.39_02',
 		  'Text::ParseWords' => '3.27',
+		  'Text::Locus' => '1.03',
 		  'File::Spec' => 0,
 		  'IPC::Open3' => 0
       	      },

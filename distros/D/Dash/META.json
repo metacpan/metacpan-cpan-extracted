@@ -42,19 +42,30 @@
       "runtime" : {
          "requires" : {
             "Browser::Open" : "0",
+            "Exporter::Auto" : "0",
             "File::ShareDir" : "0",
             "JSON" : "0",
+            "Module::Load" : "0",
             "Mojo::Base" : "0",
+            "Moo" : "0",
             "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Throwable" : "0",
+            "Try::Tiny" : "0",
+            "aliased" : "0",
+            "namespace::clean" : "0",
             "perl" : "5.020",
             "strict" : "0",
+            "strictures" : "2",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Mojo" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
+            "aliased" : "0",
             "utf8" : "0"
          }
       }
@@ -71,7 +82,7 @@
          "web" : "https://github.com/pablrod/perl-Dash"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }

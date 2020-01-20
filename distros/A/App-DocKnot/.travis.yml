@@ -22,6 +22,7 @@ env: AUTHOR_TESTING=1
 before_install:
   - cpanm File::BaseDir
   - cpanm File::ShareDir
+  - cpanm IO::Compress::Xz
   - cpanm IPC::Run
   - cpanm IPC::System::Simple
   - cpanm JSON

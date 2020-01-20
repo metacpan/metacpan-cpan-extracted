@@ -1,35 +1,65 @@
 #!/usr/bin/env perl
 
+package t::string;
+
 use strict;
 use warnings;
+
+use parent qw( Test::Class::Tiny );
 
 use Test::More;
 use Test::FailWarnings;
 
 use Data::Dumper;
 
-use_ok('CBOR::Free');
+use CBOR::Free;
+use CBOR::Free::Decoder;
 
-my @tests = (
-    [ q<> => "\x40" ],
-    [ "\xff" => "\x41\xff" ],
-    [ 'abc' => "\x43\x61\x62\x63" ],
-    [ ('a' x 23) => "\x57" . ('a' x 23) ],
-    [ ('a' x 24) => "\x58\x18" . ('a' x 24) ],
+__PACKAGE__->runtests() if !caller;
 
-    [ 'épée' => "\x46\xc3\xa9p\xc3\xa9e" ],
+sub T7_basic {
+    my @tests = (
+        [ q<> => "\x40" ],
+        [ "\xff" => "\x41\xff" ],
+        [ 'abc' => "\x43\x61\x62\x63" ],
+        [ ('a' x 23) => "\x57" . ('a' x 23) ],
+        [ ('a' x 24) => "\x58\x18" . ('a' x 24) ],
 
-    [ do { utf8::decode(my $v = 'épée'); $v } => "\x66\xc3\xa9p\xc3\xa9e" ],
-);
+        [ 'épée' => "\x46\xc3\xa9p\xc3\xa9e" ],
 
-for my $t (@tests) {
-    my ($in, $enc) = @$t;
+        [ do { utf8::decode(my $v = 'épée'); $v } => "\x66\xc3\xa9p\xc3\xa9e" ],
+    );
 
-    local $Data::Dumper::Terse = 1;
-    local $Data::Dumper::Useqq = 1;
-    local $Data::Dumper::Indent = 0;
+    for my $t (@tests) {
+        my ($in, $enc) = @$t;
 
-    _cmpbin( CBOR::Free::encode($in), $enc, "Encode: " . Dumper($in) );
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Useqq = 1;
+        local $Data::Dumper::Indent = 0;
+
+        _cmpbin( CBOR::Free::encode($in), $enc, "Encode: " . Dumper($in) );
+    }
+}
+
+sub T1_ascii_text_string_roundtrip {
+    my $cbor_text = "cabc";
+
+    my $dec = CBOR::Free::decode($cbor_text);
+    my $cbor2 = CBOR::Free::encode($dec);
+
+    is( $cbor2, $cbor_text, 'text string round-trips, even if all code points are ASCII' );
+}
+
+sub T2_decode_naive_utf8 {
+    my $bad_utf8 = "c\xff\xff\xff";
+
+    my $decoder = CBOR::Free::Decoder->new();
+    $decoder->naive_utf8();
+
+    my $got = $decoder->decode($bad_utf8);
+
+    ok( utf8::is_utf8($got), 'UTF8 flag is set' );
+    ok( !utf8::valid($got), '… but the actual value is invalid UTF-8' );
 }
 
 sub _cmpbin {
@@ -40,4 +70,4 @@ sub _cmpbin {
     return is( $got, $expect, $label );
 }
 
-done_testing;
+1;

@@ -1,3 +1,11 @@
+0.09 2020-01-19T15:48:09+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update .travis.yml to reality.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.08 2015-09-18T14:49:39+02:00
  - Add support for min (minute) and h (hour) duration.
  - Fix author and test requires.

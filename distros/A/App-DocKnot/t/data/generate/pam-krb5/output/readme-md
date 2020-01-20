@@ -1,5 +1,8 @@
 # pam-krb5 4.8
 
+[![Debian
+package](https://img.shields.io/debian/v/libpam-krb5)](https://tracker.debian.org/pkg/libpam-krb5)
+
 Copyright 2005-2010, 2014-2015, 2017 Russ Allbery <eagle@eyrie.org>.
 Copyright 2009-2011 The Board of Trustees of the Leland Stanford Junior
 University.  Copyright 2005 Andres Salomon <dilinger@debian.org>.

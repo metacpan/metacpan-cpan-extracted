@@ -1,0 +1,9 @@
+Revision history for Perl extension WebService-Pornhub
+
+0.02 2020-01-20T06:30:03Z
+
+    - Remove 'use XXX' for not used modules.
+
+0.01 2020-01-19T22:23:08Z
+
+    - original version

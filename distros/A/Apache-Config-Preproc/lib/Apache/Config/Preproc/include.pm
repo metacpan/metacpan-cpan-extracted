@@ -1,4 +1,5 @@
 package Apache::Config::Preproc::include;
+use parent 'Apache::Config::Preproc::Expand';
 use strict;
 use warnings;
 use Apache::Admin::Config;
@@ -8,12 +9,13 @@ use Cwd 'abs_path';
 use IPC::Open3;
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new {
     my $class = shift;
     my $conf = shift;
-    my $self = bless { context => [], conf => $conf }, $class;
+    my $self = bless $class->SUPER::new($conf), $class;
+    $self->{context} = [];
     local %_ = @_;
     $self->{server_root} = delete $_{server_root};
     if (my $v = delete $_{probe}) {
@@ -30,8 +32,6 @@ sub new {
     return $self;
 }
 
-sub conf { shift->{conf} }
-    
 sub server_root {
     my $self = shift;
     if (my $v = shift) {
@@ -81,7 +81,7 @@ sub expand {
 			croak "file $file already included";
 		    }
 		    if (my $inc = new Apache::Admin::Config($file,
-							    @{$self->conf->options})) {
+							    $self->conf->options)) {
 			$inc->add('directive',
 				  '$PUSH$' => $self->context_string($file),
 				  '-ontop');
@@ -212,6 +212,11 @@ is a shorthand for
 When the B<ServerRoot> statement is seen, its value overwrites any
 previously set server root directory.
     
+=head1 SEE ALSO
+
+L<Apache::Config::Preproc>
+
 =cut
+
 
     

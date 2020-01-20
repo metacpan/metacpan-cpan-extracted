@@ -1,0 +1,15 @@
+Changes
+lib/File/BackupCopy.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00simple.t
+t/01numbered.t
+t/02auto.t
+t/03backup.t
+t/04envar.t
+t/TestBackup.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

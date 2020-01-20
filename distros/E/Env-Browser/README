@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
      use Env::Browser qw(run);
+
      run($uri);
 
 SUBROUTINES
@@ -14,11 +15,9 @@ ENVIRONMENT
      $BROWSER variable is defined by L<The BROWSER project|http://www.catb.org/~esr/BROWSER/index.html>.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Env::Browser qw(run);
 
      # Set $BROWSER variable.
@@ -31,11 +30,9 @@ EXAMPLE1
      # http://example.com
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Env::Browser qw(run);
 
      # Set $BROWSER variable.
@@ -48,11 +45,9 @@ EXAMPLE2
      # http://example.com
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Env::Browser qw(run);
 
      # Set $BROWSER variable.
@@ -72,17 +67,17 @@ SEE ALSO
         URL extractor/launcher
 
 REPOSITORY
-    <https://github.com/tupinek/Env-Browser>
+    <https://github.com/michal-josef-spacek/Env-Browser>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2015 Michal Špaček
+     © 2013-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

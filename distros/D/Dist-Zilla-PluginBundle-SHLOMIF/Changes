@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-SHLOMIF
 
+0.000010    2020-01-19
+        - Add some dependencies / deps / prerequisites / prereqs
+        which were specified as "; authordep" in many "dist.ini"s.
+        (Thanks to Grinnz for the tip.)
+
 0.000009    2019-06-21
         - Remove PodVersion to avoid duplicate VERSION.
 

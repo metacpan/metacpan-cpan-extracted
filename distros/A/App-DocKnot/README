@@ -1,4 +1,4 @@
-                               DocKnot 3.02
+                               DocKnot 3.03
                     (package documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -55,6 +55,7 @@ REQUIREMENTS
 
   * File::BaseDir
   * File::ShareDir
+  * IO::Compress::Xz (part of IO-Compress-LZMA)
   * IPC::Run
   * IPC::System::Simple
   * JSON

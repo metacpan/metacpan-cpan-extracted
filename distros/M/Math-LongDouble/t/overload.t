@@ -17,6 +17,9 @@ my $one = UnityLD(1);
 my $div;
 my $ok = '';
 
+my $bizarre_perl = 0;
+if(17.1 + 0 != 17.1) { $bizarre_perl = 1 }
+
 # +
 
 if($zero + $uv == $uv) {$ok .= 'a'}
@@ -25,16 +28,20 @@ else {warn "\n1a: ", $zero + $uv, "\n"}
 if($zero + $iv == $iv) {$ok .= 'b'}
 else {warn "\n1b: ", $zero + $iv, "\n"}
 
-if($zero + $nv == $nv) {$ok .= 'c'}
-else {warn "\n1c: ", $zero + $nv, "\n"}
+unless($bizarre_perl) {
+  if($zero + $nv == $nv) {$ok .= 'c'}
+  else {warn "\n1c: ", $zero + $nv, "\n"}
 
-if($zero + "$str" == "$str") {$ok .= 'd'}
-else {warn "\n1d: ", $zero + "$str", "\n"}
+  if($zero + "$str" == "$str") {$ok .= 'd'}
+  else {warn "\n1d: ", $zero + "$str", "\n"}
+}
 
 if($zero + $obj == $obj) {$ok .= 'e'}
 else {warn "\n1e: ", $zero + $obj, "\n"}
 
-if($ok eq 'abcde') {print "ok 1\n"}
+my $pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 1\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 1\n";
@@ -52,16 +59,20 @@ else {warn "\n2a: ", $one * $uv, "\n"}
 if($one * $iv == $iv) {$ok .= 'b'}
 else {warn "\n2b: ", $one * $iv, "\n"}
 
-if($one * $nv == $nv) {$ok .= 'c'}
-else {warn "\n2c: ", $one * $nv, "\n"}
+unless($bizarre_perl) {
+  if($one * $nv == $nv) {$ok .= 'c'}
+  else {warn "\n2c: ", $one * $nv, "\n"}
 
-if($one * "$str" == "$str") {$ok .= 'd'}
-else {warn "\n2d: ", $one * "$str", "\n"}
+  if($one * "$str" == "$str") {$ok .= 'd'}
+  else {warn "\n2d: ", $one * "$str", "\n"}
+}
 
 if($one * $obj == $obj) {$ok .= 'e'}
 else {warn "\n2e: ", $one * $obj, "\n"}
 
-if($ok eq 'abcde') {print "ok 2\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 2\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 2\n";
@@ -79,16 +90,20 @@ else {warn "\n3a: ", $zero - $uv, "\n"}
 if($zero - $iv == -$iv) {$ok .= 'b'}
 else {warn "\n3b: ", $zero - $iv, "\n"}
 
-if($zero - $nv == -$nv) {$ok .= 'c'}
-else {warn "\n3c: ", $zero - $nv, "\n"}
+unless($bizarre_perl) {
+  if($zero - $nv == -$nv) {$ok .= 'c'}
+  else {warn "\n3c: ", $zero - $nv, "\n"}
 
-if($zero - "$str" == "$strp") {$ok .= 'd'}
-else {warn "\n3d: ", $zero - "$str", "\n"}
+  if($zero - "$str" == "$strp") {$ok .= 'd'}
+  else {warn "\n3d: ", $zero - "$str", "\n"}
+}
 
 if($zero - $obj == -$obj) {$ok .= 'e'}
 else {warn "\n3e: ", $zero - $obj, "\n"}
 
-if($ok eq 'abcde') {print "ok 3\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 3\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 3\n";
@@ -106,16 +121,20 @@ else {warn "\n4a: ", $uv - $zero, "\n"}
 if($iv - $zero == $iv) {$ok .= 'b'}
 else {warn "\n4b: ", $iv - $zero, "\n"}
 
-if($nv - $zero == $nv) {$ok .= 'c'}
-else {warn "\n4c: ", $nv - $zero, "\n"}
+unless($bizarre_perl) {
+  if($nv - $zero == $nv) {$ok .= 'c'}
+  else {warn "\n4c: ", $nv - $zero, "\n"}
 
-if("$str" - $zero == "$str") {$ok .= 'd'}
-else {warn "\n4d: ", "$str" - $zero, "\n"}
+  if("$str" - $zero == "$str") {$ok .= 'd'}
+  else {warn "\n4d: ", "$str" - $zero, "\n"}
+}
 
 if($obj - $zero == $obj) {$ok .= 'e'}
 else {warn "\n4e: ", $obj - $zero, "\n"}
 
-if($ok eq 'abcde') {print "ok 4\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 4\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 4\n";
@@ -133,16 +152,20 @@ else {warn "\n5a: ", $uv / $one, "\n"}
 if($iv / $one == $iv) {$ok .= 'b'}
 else {warn "\n5b: ", $iv / $one, "\n"}
 
-if($nv / $one == $nv) {$ok .= 'c'}
-else {warn "\n5c: ", $nv / $one, "\n"}
+unless($bizarre_perl) {
+  if($nv / $one == $nv) {$ok .= 'c'}
+  else {warn "\n5c: ", $nv / $one, "\n"}
 
-if("$str" / $one == "$str") {$ok .= 'd'}
-else {warn "\n5d: ", "$str" / $one, "\n"}
+  if("$str" / $one == "$str") {$ok .= 'd'}
+  else {warn "\n5d: ", "$str" / $one, "\n"}
+}
 
 if($obj / $one == $obj) {$ok .= 'e'}
 else {warn "\n5e: ", $obj / $one, "\n"}
 
-if($ok eq 'abcde') {print "ok 5\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 5\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 5\n";
@@ -191,22 +214,26 @@ if($zero == $iv) {$ok .= 'b'}
 else {warn "\n7b: ", $zero + $iv, "\n"}
 $zero = ZeroLD(-1);
 
-$zero += $nv;
-if($zero == $nv) {$ok .= 'c'}
-else {warn "\n7c: ", $zero + $nv, "\n"}
-$zero = ZeroLD(-1);
+unless($bizarre_perl) {
+  $zero += $nv;
+  if($zero == $nv) {$ok .= 'c'}
+  else {warn "\n7c: ", $zero + $nv, "\n"}
+  $zero = ZeroLD(-1);
 
-$zero += "$str";
-if($zero == "$str") {$ok .= 'd'}
-else {warn "\n7d: ", $zero + "$str", "\n"}
-$zero = ZeroLD(-1);
+  $zero += "$str";
+  if($zero == "$str") {$ok .= 'd'}
+  else {warn "\n7d: ", $zero + "$str", "\n"}
+  $zero = ZeroLD(-1);
+}
 
 $zero += $obj;
 if($zero == $obj) {$ok .= 'e'}
 else {warn "\n7e: ", $zero + $obj, "\n"}
 $zero = ZeroLD(-1);
 
-if($ok eq 'abcde') {print "ok 7\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 7\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 7\n";
@@ -228,22 +255,26 @@ if($one == $iv) {$ok .= 'b'}
 else {warn "\n8b: ", $one, "\n"}
 $one = UnityLD(1);
 
-$one *= $nv;
-if($one == $nv) {$ok .= 'c'}
-else {warn "\n8c: ", $one, "\n"}
-$one = UnityLD(1);
+unless($bizarre_perl) {
+  $one *= $nv;
+  if($one == $nv) {$ok .= 'c'}
+  else {warn "\n8c: ", $one, "\n"}
+  $one = UnityLD(1);
 
-$one *= "$str";
-if($one == "$str") {$ok .= 'd'}
-else {warn "\n8d: ", $one, "\n"}
-$one = UnityLD(1);
+  $one *= "$str";
+  if($one == "$str") {$ok .= 'd'}
+  else {warn "\n8d: ", $one, "\n"}
+  $one = UnityLD(1);
+}
 
 $one *= $obj;
 if($one == $obj) {$ok .= 'e'}
 else {warn "\n8e: ", $one, "\n"}
 $one = UnityLD(1);
 
-if($ok eq 'abcde') {print "ok 8\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 8\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 8\n";
@@ -265,22 +296,26 @@ if($zero == -$iv) {$ok .= 'b'}
 else {warn "\n9b: ", $zero, "\n"}
 $zero = ZeroLD(-1);
 
-$zero -= $nv;
-if($zero == -$nv) {$ok .= 'c'}
-else {warn "\n9c: ", $zero, "\n"}
-$zero = ZeroLD(-1);
+unless($bizarre_perl) {
+  $zero -= $nv;
+  if($zero == -$nv) {$ok .= 'c'}
+  else {warn "\n9c: ", $zero, "\n"}
+  $zero = ZeroLD(-1);
 
-$zero -= "$str";
-if($zero == "$strp") {$ok .= 'd'}
-else {warn "\n9d: ", $zero, "\n"}
-$zero = ZeroLD(-1);
+  $zero -= "$str";
+  if($zero == "$strp") {$ok .= 'd'}
+  else {warn "\n9d: ", $zero, "\n"}
+  $zero = ZeroLD(-1);
+}
 
 $zero -= $obj;
 if($zero == -$obj) {$ok .= 'e'}
 else {warn "\n9e: ", $zero, "\n"}
 $zero = ZeroLD(-1);
 
-if($ok eq 'abcde') {print "ok 9\n"}
+$pass = $bizarre_perl ? 'abe' : 'abcde';
+
+if($ok eq $pass) {print "ok 9\n"}
 else {
   warn "\n\$ok: $ok\n";
   print "not ok 9\n";
@@ -702,10 +737,16 @@ else {
   print "not ok 22\n";
 }
 
-if($nan ** ZeroLD(1) == 1) {print "ok 23\n"}
+if(Math::LongDouble::_nan_pow_bug()) {
+  warn "\n Skip test 23 - nan**0 is miscalculated by this compiler/libc\n";
+  print "ok 23\n";
+}
 else {
-  warn "\n23: $nan ** ZeroLD(1) is ", $nan ** ZeroLD(1), "\n";
-  print "not ok 23\n";
+  if($nan ** ZeroLD(1) == 1) {print "ok 23\n"}
+  else {
+    warn "\n23: ", $nan ** ZeroLD(1), "\n";
+    print "not ok 23\n";
+  }
 }
 
 #############

@@ -43,16 +43,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.perl.org/perlbug/"
+         "web" : "https://github.com/Perl/perl5/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://perl5.git.perl.org/perl.git/tree/HEAD:/lib"
+         "url" : "https://github.com/Perl/perl5/tree/blead/dist/Exporter"
       },
       "x_MailingList" : "http://lists.perl.org/list/perl5-porters.html"
    },
-   "version" : "5.73",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "5.74",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

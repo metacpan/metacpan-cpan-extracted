@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Test::More 'tests' => 7;
 use Test::NoWarnings;
 use Video::Delay::Array;

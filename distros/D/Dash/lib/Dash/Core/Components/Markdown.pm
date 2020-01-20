@@ -2,17 +2,21 @@
 
 package Dash::Core::Components::Markdown;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'className';
-has 'dangerously_allow_html';
-has 'children';
-has 'dedent';
-has 'highlight_config';
-has 'loading_state';
-has 'style';
+extends 'Dash::BaseComponent';
+
+has 'id'                     => ( is => 'rw' );
+has 'className'              => ( is => 'rw' );
+has 'dangerously_allow_html' => ( is => 'rw' );
+has 'children'               => ( is => 'rw' );
+has 'dedent'                 => ( is => 'rw' );
+has 'highlight_config'       => ( is => 'rw' );
+has 'loading_state'          => ( is => 'rw' );
+has 'style'                  => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -20,7 +24,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -37,7 +41,7 @@ Dash::Core::Components::Markdown
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

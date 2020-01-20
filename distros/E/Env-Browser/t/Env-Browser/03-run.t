@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Env::Browser qw(run);
 use Test::More 'tests' => 6;
 use Test::Output;

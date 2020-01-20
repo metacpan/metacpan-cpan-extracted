@@ -1,14 +1,11 @@
 package Video::Delay::Const;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -48,6 +45,7 @@ Video::Delay::Const - Video::Delay class for constant delay.
 =head1 SYNOPSIS
 
  use Video::Delay::Const;
+
  my $obj = Video::Delay::Const->new(%parameters);
  my $delay = $obj->delay;
 
@@ -82,11 +80,9 @@ Video::Delay::Const - Video::Delay class for constant delay.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Video::Delay::Const;
 
  # Object.
@@ -120,21 +116,21 @@ Perl classes for delays between frames generation.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Video-Delay>
+L<https://github.com/michal-josef-spacek/Video-Delay>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
+ © 2012-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

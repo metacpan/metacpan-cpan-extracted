@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 3.02;
+package App::DocKnot::Dist 3.03;
 
 use 5.024;
 use autodie;
@@ -23,6 +23,8 @@ use Cwd qw(getcwd);
 use File::Copy qw(move);
 use File::Find qw(find);
 use File::Path qw(remove_tree);
+use IO::Compress::Xz       ();
+use IO::Uncompress::Gunzip ();
 use IPC::Run qw(run);
 use IPC::System::Simple qw(systemx);
 use List::MoreUtils qw(any lastval);
@@ -100,13 +102,20 @@ sub _expected_dist_files {
     my ($self, $path) = @_;
     my @files;
 
+    # Supplemental ignore rules from the package configuration.
+    my @ignore;
+    if ($self->{config}{distribution}{ignore}) {
+        @ignore = map { qr{$_}xms } $self->{config}{distribution}{ignore}->@*;
+    }
+
     # Find all files in the source directory, stripping its path from the file
-    # name and excluding (and pruning) anything matching @DIST_IGNORE.
+    # name and excluding (and pruning) anything matching @DIST_IGNORE or in
+    # the distribution/ignore key of the package configuration.
     my $wanted = sub {
         my $name = $File::Find::name;
         $name =~ s{ \A \Q$path\E / }{}xms;
         return if !$name;
-        if (any { $name =~ $_ } @DIST_IGNORE) {
+        if (any { $name =~ $_ } @DIST_IGNORE, @ignore) {
             $File::Find::prune = 1;
             return;
         }
@@ -160,15 +169,29 @@ sub _find_matching_tarballs {
 # $self   - The App::DocKnot::Dist object
 # $path   - The directory path
 # $prefix - The tarball file prefix
+#
+# Throws: Text exception on failure to read or write compressed files.
 sub _generate_compression_formats {
     my ($self, $path, $prefix) = @_;
     my @files = $self->_find_matching_tarballs($path, $prefix);
     if (!any { m{ [.]tar [.]xz \z }xms } @files) {
         my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
-        systemx('gzip', '-dk', File::Spec->catfile($path, $gzip_file));
-        my $tar_file = $gzip_file;
-        $tar_file =~ s{ [.]gz \z }{}xms;
-        systemx('xz', File::Spec->catfile($path, $tar_file));
+        my $xz_file   = $gzip_file;
+        $xz_file =~ s{ [.]gz \z }{.xz}xms;
+        my $gzip_path = File::Spec->catfile($path, $gzip_file);
+        my $xz_path   = File::Spec->catfile($path, $xz_file);
+
+        # Open the input and output files.
+        my $gzip_fh = IO::Uncompress::Gunzip->new($gzip_path);
+        my $xz_fh   = IO::Compress::Xz->new($xz_path);
+
+        # Read from the gzip file and write to the xz-compressed file.
+        my $buffer;
+        while (my $bytes = read($gzip_fh, $buffer, 1024 * 1024)) {
+            syswrite($xz_fh, $buffer);
+        }
+        close($xz_fh);
+        close($gzip_fh);
     }
     return;
 }
@@ -222,7 +245,7 @@ sub _replace_perl_path {
 # Create a new App::DocKnot::Dist object, which will be used for subsequent
 # calls.
 #
-# $class - Class of object ot create
+# $class - Class of object to create
 # $args  - Anonymous hash of arguments with the following keys:
 #   distdir  - Path to the directory for distribution tarball
 #   metadata - Path to the directory containing package metadata

@@ -7,7 +7,13 @@ use File::Basename;
 use File::Temp;
 use File::Spec;
 use File::Path qw /make_path/;
+use Cwd;
 use autodie;
+
+sub import {
+    my $class = shift;
+    $class->SUPER::import($ENV{APACHE_CONFIG_PREPROC});
+}
 
 sub new {
     my $class = shift;
@@ -49,6 +55,7 @@ sub new {
     my $self = $class->SUPER::new($confname, @_);
     if ($self) {
 	$self->{_expect} = $text;
+	$self->{_cwd} = getcwd;
     } elsif (!$expect_fail) {
 	croak $Apache::Admin::Config::ERROR;
     }
@@ -61,6 +68,38 @@ sub dump_test {
     my $self = shift;
     $self->dump_raw eq $self->{_expect};
 }
+
+sub dump_reformat_synclines {
+    my $self = shift;
+    dump_reformat_synclines_worker($self, qr{$self->{_cwd}});
+}
+
+
+sub dump_reformat_synclines_worker {
+    my ($tree, $dir) = @_;
+    join('', map {
+	(my $l = $_->locus->format) =~ s{$dir/}{}g;
+	"# $l\n" .
+	do {
+	    if ($_->type eq 'section') {
+		$tree->write_section($_->name, $_->value) .
+	        dump_reformat_synclines_worker($_, $dir) .
+		$tree->write_section_closing($_->name)
+	    } else {
+		my $method = "write_".$_->type;
+		my $name;
+		if ($_->type eq 'directive') {
+		    $name = $_->name;
+		} elsif ($_->type eq 'comment') {
+                    $name = $_->value;
+                } elsif ($_->type eq 'blank') {
+                    $name = $_->{length};
+                }	
+	        $tree->$method($name||'',$_->value//'');
+            }
+	};
+    } $tree->select());
+}	
 
 1;
 

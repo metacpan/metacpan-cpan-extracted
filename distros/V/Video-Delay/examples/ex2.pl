@@ -1,15 +1,16 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Video::Delay::Func;
 
 # Object.
 my $obj = Video::Delay::Func->new(
-        'func' => '1000 * sin(t)',
+        'func' => sub {
+                my $t = shift;
+                return 1000 * sin($t);
+        },
         'incr' => 0.1,
 );
 

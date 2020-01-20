@@ -3,7 +3,7 @@ NAME
     code in %(...)q
 
 VERSION
-    This document describes version 0.003 of DateTimeX::strftimeq (from Perl
+    This document describes version 0.004 of DateTimeX::strftimeq (from Perl
     distribution DateTimeX-strftimeq), released on 2019-11-20.
 
 SYNOPSIS
@@ -22,10 +22,13 @@ SYNOPSIS
 DESCRIPTION
     This module provides "strftimeq()" which extends POSIX's "strftime()"
     with a conversion: "%(...)q". Inside the parenthesis, you can specify
-    Perl code. The Perl code will receive a hash argument (%args) with the
-    following keys: "time" (arrayref, the arguments passed to strftimeq()
-    except for the first), "dt" (DateTime object). For convenience, $_ will
-    also be locally set to the DateTime object.
+    Perl code.
+
+    The Perl code will receive a hash argument (%args) with the following
+    keys: "time" (arrayref, the arguments passed to strftimeq() except for
+    the first), "dt" (DateTime object). For convenience, $_ will also be
+    locally set to the DateTime object. The Perl code will be eval-ed in the
+    caller's package, without strict and without warnings.
 
 FUNCTIONS
   strftimeq

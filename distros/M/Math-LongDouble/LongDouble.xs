@@ -24,28 +24,50 @@
 #endif
 
 #if defined(LDBL_MANT_DIG)
-#if LDBL_MANT_DIG == 53
-#define MATH_LONGDOUBLE_DIGITS 17
-#endif
-#if LDBL_MANT_DIG == 64
-#define MATH_LONGDOUBLE_DIGITS 21
-#endif
-#if LDBL_MANT_DIG == 106
-#define MATH_LONGDOUBLE_DIGITS 33
-#endif
-#if LDBL_MANT_DIG == 113
-#define MATH_LONGDOUBLE_DIGITS 36
-#endif
-#elif defined(DBL_MANT_DIG)
-#if DBL_MANT_DIG == 53
-#define MATH_LONGDOUBLE_DIGITS 17
-#endif
-#else
-#define MATH_LONGDOUBLE_DIGITS 21
-#endif
+#  if LDBL_MANT_DIG == 53
+#    define MATH_LONGDOUBLE_DIGITS 17
+#    define MATH_LONGDOUBLE_NVSIZE 8
+#  endif
+#  if LDBL_MANT_DIG == 64
+#    define MATH_LONGDOUBLE_DIGITS 21
+#    define MATH_LONGDOUBLE_NVSIZE 10
+#  endif
+#  if LDBL_MANT_DIG == 106
+#    define MATH_LONGDOUBLE_DIGITS 33
+#    define MATH_LONGDOUBLE_NVSIZE 16
+#  endif
+#  if LDBL_MANT_DIG == 113
+#    define MATH_LONGDOUBLE_DIGITS 36
+#    define MATH_LONGDOUBLE_NVSIZE 16
+#  endif
 
-#ifndef MATH_LONGDOUBLE_DIGITS
-#define MATH_LONGDOUBLE_DIGITS 21
+#elif defined CFG_LONGDBLKIND
+#  if CFG_LONGDBLKIND == 0
+#    define MATH_LONGDOUBLE_DIGITS 17
+#    define MATH_LONGDOUBLE_NVSIZE 8
+#  endif
+#  if CFG_LONGDBLKIND == 1 || CFG_LONGDBLKIND == 2 || CFG_LONGDBLKIND == 9
+#    define MATH_LONGDOUBLE_DIGITS 36
+#    define MATH_LONGDOUBLE_NVSIZE 16
+#  endif
+#  if CFG_LONGDBLKIND == 3 || CFG_LONGDBLKIND == 4
+#    define MATH_LONGDOUBLE_DIGITS 21
+#    define MATH_LONGDOUBLE_NVSIZE 10
+#  endif
+#  if CFG_LONGDBLKIND >= 5 && CFG_LONGDBLKIND <= 8
+#    define MATH_LONGDOUBLE_DIGITS 33
+#    define MATH_LONGDOUBLE_NVSIZE 16
+#  endif
+
+#elif defined(DBL_MANT_DIG)
+#  if DBL_MANT_DIG == 53
+#    define MATH_LONGDOUBLE_DIGITS 17
+#    define MATH_LONGDOUBLE_NVSIZE 8
+#  endif
+
+#else
+#  define MATH_LONGDOUBLE_DIGITS 21
+#  define MATH_LONGDOUBLE_NVSIZE 10
 #endif
 
 int _DIGITS = MATH_LONGDOUBLE_DIGITS;
@@ -1624,30 +1646,22 @@ SV * _get_xs_version(pTHX) {
      return newSVpv(XS_VERSION, 0);
 }
 
-void _ld_bytes(pTHX_ SV * sv) {
-  dXSARGS;
-  long double ld = *(INT2PTR(ldbl *, SvIVX(SvRV(sv))));
-  int i, n = sizeof(long double);
-  char * buff;
-  void * p = &ld;
+SV * _ld_bytes(pTHX_ SV * arg) {
 
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in _ld_bytes function");
+  long double ld;
+  int i;
+  SV * ret = NEWSV(0, MATH_LONGDOUBLE_NVSIZE);
 
-  sp = mark;
-
-#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
-  for (i = 0; i < n; i++) {
-#else
-  for (i = n - 1; i >= 0; i--) {
-#endif
-
-    sprintf(buff, "%02X", ((unsigned char*)p)[i]);
-    XPUSHs(sv_2mortal(newSVpv(buff, 0)));
+  if(sv_isobject(arg)) {
+    const char *h = HvNAME(SvSTASH(SvRV(arg)));
+    if(!strEQ(h, "Math::LongDouble")) croak("Argument provided to ld_bytes is not a Math::LongDouble object");
   }
-  PUTBACK;
-  Safefree(buff);
-  XSRETURN(n);
+  else croak("Argument provided to ld_bytes is not an object. (It needs to be a Math::LongDouble object.)");
+
+  ld = *(INT2PTR(ldbl *, SvIVX(SvRV(arg))));
+
+  sv_setpvn(ret, (char *) &ld, MATH_LONGDOUBLE_NVSIZE);
+  return ret;
 }
 
 void acos_LD(ldbl * rop, ldbl * op) {
@@ -1832,7 +1846,8 @@ void log1p_LD(ldbl * rop, ldbl * op) {
 
 void modf_LD(ldbl * integer, ldbl * frac, ldbl * op) {
 #if defined(__MINGW64__) && (__MINGW64_VERSION_MAJOR == 4 || __MINGW64_VERSION_MAJOR == 5) \
-                         && __MINGW64_VERSION_MINOR == 0 /* http://sourceforge.net/p/mingw-w64/bugs/478/ */
+                         && __MINGW64_VERSION_MINOR == 0 /* http://sourceforge.net/p/mingw-w64/bugs/478/ *
+                                                          * fixed in runtime version 5.0.3               */
   *integer = truncl(*op);
   *frac = *op - *integer;
 #else
@@ -2556,6 +2571,10 @@ int _lln(pTHX_ SV * x) {
   return 0;
 }
 
+int _get_math_longdouble_nvsize(void) {
+  return MATH_LONGDOUBLE_NVSIZE;
+}
+
 MODULE = Math::LongDouble  PACKAGE = Math::LongDouble
 
 PROTOTYPES: DISABLE
@@ -3092,21 +3111,12 @@ CODE:
 OUTPUT:  RETVAL
 
 
-void
-_ld_bytes (sv)
-	SV *	sv
-        PREINIT:
-        I32* temp;
-        PPCODE:
-        temp = PL_markstack_ptr++;
-        _ld_bytes(aTHX_ sv);
-        if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
-          PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
-        }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+SV *
+_ld_bytes (arg)
+	SV *	arg
+CODE:
+  RETVAL = _ld_bytes (aTHX_ arg);
+OUTPUT:  RETVAL
 
 void
 acos_LD (rop, op)
@@ -4306,4 +4316,8 @@ _lln (x)
 CODE:
   RETVAL = _lln (aTHX_ x);
 OUTPUT:  RETVAL
+
+int
+_get_math_longdouble_nvsize ()
+
 

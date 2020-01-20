@@ -24,8 +24,8 @@ requires:
   Carp: '1.05'
 resources:
   MailingList: http://lists.perl.org/list/perl5-porters.html
-  bugtracker: http://rt.perl.org/perlbug/
+  bugtracker: https://github.com/Perl/perl5/issues
   license: http://dev.perl.org/licenses/
-  repository: http://perl5.git.perl.org/perl.git/tree/HEAD:/lib
-version: '5.73'
+  repository: https://github.com/Perl/perl5/tree/blead/dist/Exporter
+version: '5.74'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

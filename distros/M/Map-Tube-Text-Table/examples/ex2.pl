@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Module.
 use Encode qw(encode_utf8);
 use Map::Tube::Text::Table::Utils qw(table);
 

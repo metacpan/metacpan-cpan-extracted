@@ -17,22 +17,23 @@ name: App-DocKnot
 provides:
   App::DocKnot:
     file: lib/App/DocKnot.pm
-    version: '3.02'
+    version: '3.03'
   App::DocKnot::Command:
     file: lib/App/DocKnot/Command.pm
-    version: '3.02'
+    version: '3.03'
   App::DocKnot::Config:
     file: lib/App/DocKnot/Config.pm
-    version: '3.02'
+    version: '3.03'
   App::DocKnot::Dist:
     file: lib/App/DocKnot/Dist.pm
-    version: '3.02'
+    version: '3.03'
   App::DocKnot::Generate:
     file: lib/App/DocKnot/Generate.pm
-    version: '3.02'
+    version: '3.03'
 requires:
   File::BaseDir: '0'
   File::ShareDir: '1.00'
+  IO::Compress::Xz: '0'
   IPC::Run: '0'
   IPC::System::Simple: '0'
   JSON: '0'
@@ -45,5 +46,5 @@ resources:
   homepage: https://www.eyrie.org/~eagle/software/docknot
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/rra/docknot.git
-version: '3.02'
+version: '3.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

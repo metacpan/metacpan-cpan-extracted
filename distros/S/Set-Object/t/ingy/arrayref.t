@@ -1,5 +1,5 @@
 #  -*- perl -*-
-
+use 5.008;
 use Set::Object qw(set);
 use Test::More tests => 15;
 

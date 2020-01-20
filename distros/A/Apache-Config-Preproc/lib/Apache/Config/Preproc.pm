@@ -3,8 +3,26 @@ use parent 'Apache::Admin::Config';
 use strict;
 use warnings;
 use Carp;
+use version 0.77;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
+
+sub import {
+    my $class = shift;
+    if (defined(my $kw = shift)) {
+	if ($kw eq ':default') {
+	    install_preproc_default()
+	} elsif ($kw eq ':optimized') {
+	    install_preproc_optimized()
+	} else {
+	    croak "Unrecognized import parameter: $kw"
+	}
+    }
+    if (@_) {
+	croak "Too many import parameters";
+    }
+    $class->SUPER::import();
+}
 
 sub new {
     my $class = shift;
@@ -14,10 +32,11 @@ sub new {
 
     my $self = $class->SUPER::new($file, @_) or return;
     bless $self, $class;
+    $self->{_filename} = $file;
     $self->{_options} = \@_;
 
     eval {
-	return unless $self->_preproc($explist);
+	$self->_preproc($explist);
     };
     if ($@) {
 	$Apache::Admin::Config::ERROR = $@;
@@ -27,6 +46,8 @@ sub new {
     return $self;
 }
 
+sub filename { shift->{_filename} }
+
 sub dequote {
     my ($self, $str) = @_;
     if ($str =~ s/^"(.*)"$/$1/) {
@@ -35,14 +56,12 @@ sub dequote {
     return $str;
 }
 
-sub options { shift->{_options} }
+sub options { @{shift->{_options}} }
 
 sub _preproc {
     my ($self, $explist) = @_;
 
-    return 1 unless @$explist;
-    
-    return $self->_preproc_section($self,
+    $self->_preproc_section($self,
 			  [ map {
 			      my ($mod,@arg);
 			      if (ref($_) eq 'HASH') {
@@ -61,14 +80,46 @@ sub _preproc {
 			    } @$explist ]);
 }
 
-sub _preproc_section {
+# As of version 0.95, the Apache::Admin::Config package provides no
+# methods for iterating over all configuration file statements, excepting
+# the select method with the -which => N argument, which returns Nth
+# statement or undef if N is out of range.  This method has two drawbacks:
+#
+#   1. It iterates over entire statement tree no matter what arguments are
+#      given (see Apache/Admin/Config.pm, lines 417-439)
+#   2. It makes unnecessary memory allocations (ibid., line 437).
+#   3. When N is out of range, the following warning is emitted
+#      in -w mode:
+#         Use of uninitialized value $_[0] in string at
+#         /usr/share/perl5/overload.pm line 119
+#      That's because it unreferences the undefined value and passes it
+#      to the overload::StrVal method (ibid., line 443).
+#
+# This means that time complexity of the code below is O(N**2).  This is
+# further aggravated by the fact that no method is provided for inline
+# modification of the source tree, except for the 'add' method, which again
+# iterates over entire tree in order to locate the element, after which
+# the new one should be inserted.
+#
+# Thus, the following default implementation of the _preproc_section function
+# is highly inefficient:
+
+sub _preproc_section_default {
     my ($self, $section, $modlist) = @_;
 
+    return unless @$modlist;
+
+    $_->begin_section($section) foreach (@$modlist);
   OUTER:
-    for (my $i = 0; defined(my $d = $section->select(-which => $i)); ) {
+    for (my $i = 0;
+	 defined(my $d = do {
+	     local $SIG{__WARN__} = sub {
+		 my $msg = shift;
+		 warn "$msg" unless $msg =~ /uninitialized/;
+	     };
+	     $section->select(-which => $i) }); ) {
 	foreach my $mod (@$modlist) {
-	    my @repl;
-	    if ($mod->expand($d, \@repl)) {
+	    if ($mod->expand($d, \my @repl)) {
 		my $prev = $d;
 		foreach my $r (@repl) {
 		    $prev = $section->add($r, -after => $prev);
@@ -77,14 +128,93 @@ sub _preproc_section {
 		next OUTER;
 	    }
 	    if ($d->type eq 'section') {
-		$self->_preproc_section($d, $modlist);
+		$self->_preproc_section_default($d, $modlist);
 	    }
 	}
 	$i++;
     }
-    return 1;
+    $_->end_section($section) foreach (@$modlist);
 }
 
+# In an attempt to fix the above problems I resort to a kludgy solution,
+# which directly modifies the Apache::Admin::Config::Tree namespace
+# and defines two missing functions in it: get_nth(N), which returns
+# the Nth statement or undef if N is greater than the source tree
+# length, and replace_inplace(N, A), which replaces the Nth statement
+# with statements from the array A.  With these two methods at hand,
+# the following implementation is used:
+sub _preproc_section_optimized {
+    my ($self, $section, $modlist) = @_;
+
+    return unless @$modlist;
+
+    $_->begin_section($section) foreach (@$modlist);
+  OUTER:
+    for (my $i = 0; defined(my $d = $section->get_nth($i)); ) {
+	foreach my $mod (@$modlist) {
+	    if ($mod->expand($d, \my @repl)) {
+		$section->replace_inplace($i, @repl);
+		next OUTER;
+	    }
+	    if ($d->type eq 'section') {
+		$self->_preproc_section_optimized($d, $modlist);
+	    }
+	}
+	$i++;
+    }
+    $_->end_section($section) foreach (@$modlist);
+}
+
+# The _preproc_section method upon its first invocation selects the
+# right implementation to use.  If the version of the Apache::Admin::Config
+# module is 0.95 or if the object has attribute {tree}{children} and it is
+# a list reference, the function installs the two new methods in the
+# Apache::Admin::Config::Tree namespace and selects the optimized
+# implementation.  Otherwise, the default implementation is used.
+#
+# The decision can be forced when requiring the module.  To select the
+# default implementation, do
+#
+#   use Apache::Config::Preproc qw(:default);
+#
+# To select the optimized implementation:
+#
+#   use Apache::Config::Preproc qw(:optimized);
+#
+sub _preproc_section {
+    my $self = shift;
+    unless ($self->can('_preproc_section_internal')) {
+	if ((version->parse($Apache::Admin::Config::VERSION) == version->parse('0.95')
+	    || (exists($self->{children}) && ref($self->{tree}{children}) eq 'ARRAY'))) {
+	    install_preproc_optimized()
+	} else {
+	    install_preproc_default()
+	}
+    }
+    $self->_preproc_section_internal(@_);
+}
+
+sub install_preproc_optimized {
+    no warnings 'once';
+    *{Apache::Admin::Config::Tree::get_nth} = sub {
+	my ($self, $n) = @_;
+	if ($n < @{$self->{children}}) {
+	    return $self->{children}[$n];
+	}
+	return undef
+    };
+    *{Apache::Admin::Config::Tree::replace_inplace} = sub {
+	my ($self, $n, @items) = @_;
+	splice @{$self->{children}}, $n, 1,
+	       map { $_->{parent} = $self; $_ } @items;
+    };
+
+    *{_preproc_section_internal} = \&_preproc_section_optimized;
+}
+
+sub install_preproc_default {
+    *{_preproc_section_internal} = \&_preproc_section_default;
+}
 
 1;
 __END__
@@ -130,6 +260,10 @@ Expands the B<E<lt>IfModuleE<gt>> statements.
 =item B<ifdefine>
     
 Expands the B<E<lt>IfDefineE<gt>> statements.
+
+=item B<locus>
+
+Attaches file location information to each node in the parse tree.    
     
 =item B<macro>
 
@@ -148,6 +282,26 @@ used:
     [ 'include' ]
     
 The rest of methods is inherited from B<Apache::Admin::Config>.
+
+=head1 IMPORT
+
+The package provides two implementations of the main preprocessing
+method.  The default implementation uses only the documented methods
+of the base B<Apache::Admin::Config> class and due to its deficiences
+shows the O(N**2) time complexity.  The optimized implementations does
+some introspection into the internals of the base class, which allow it
+to reduce the time complexity to O(N).  Whenever possible, the optimized
+implementation is selected.  You can, however, force using the particular
+implementation by supplying keywords to the C<use> statement.  To
+select the default implementation:
+
+    use Apache::Config::Preproc qw(:default);
+
+To select the optimized implementation:
+
+    use Apache::Config::Preproc qw(:optimized);
+
+See the source code for details.
 
 =head1 CONSTRUCTOR
 
@@ -220,6 +374,17 @@ Useless if the B<compact> expansion is enabled.
 =head1 METHODS
 
 All methods are inherited from B<Apache::Admin::Config>.
+
+Additional methods:
+
+=head2 filename
+
+Returns the name of the configuration file.
+
+=head2 options
+
+Returns the list of options passed to the constructor when creating
+the object.    
     
 =head1 MODULES
 
@@ -317,7 +482,24 @@ tree. Optional arguments to the constructor are treated as the names
 of symbols to define (similar to the B<httpd> B<-D> options). Example:   
 
     -expand => [ { ifdefine => [ qw(SSL FOREGROUND) ] } ]
+
+=head2 locus
+
+Attaches to each node in the parse tree a L<Text::Locus> object
+which describes the location of the corresponding statement in the source
+file.  The location for each node can be accessed via the B<locus> method.
+E.g. the following prints location and type of each statement:
+
+    $x = new Apache::Config::Preproc '/etc/httpd.conf',
+                                     -expand => [ qw(locus) ];
+
+    foreach ($x->select) {
+        print $_->locus
+    }
     
+See L<Text::Locus> for a detailed discussion of the locus object and its
+methods.
+
 =head2 macro
 
 Processes B<Macro> and B<Use> statements (see B<mod_macro>).  B<Macro>
@@ -342,52 +524,10 @@ convenient when a single macro name is to be retained.
 =head1 MODULE INTERNALS 
 
 Each keyword I<phase> listed in the B<-expand> array causes loading of the
-module B<Apache::Config::Preproc::I<phase>>. This module must provide the
-following methods:
-
-=head2 new($conf, ...)
-
-Class constructor. The B<$conf> argument is the configuration file object
-(B<Apache::Config::Preproc>). Rest are constructor arguments provided with
-the module name in the B<-expand> list.    
-
-=head2 expand
-
-This method must perform actual expansion of a subtree of the parse tree.
-It is called as:
-
-    $phase->expand($subtree, $repl)
-
-Its arguments are:
-
-=over 4
-
-=item $subtree
-
-The subtree to be processed.
-
-=item $repl
-
-A reference to array of items (of the same type as I<$subtree>,
-i.e. B<Apache::Admin::Config> or B<Apache::Admin::Config::Tree>) where
-expansion is to be stored.
-
-=back
-
-The function returns true if it did process the I<$subtree>. In this case,
-the subtree will be removed from the parse tree and the items from B<@$repl>
-will be inserted in its place. Thus, to simply remove the I<$subtree> the
-B<expand> method must return true and not touch I<$repl>. For example, the
-following is the B<expand> method definition from the
-B<Apache::Config::Preproc::compact> module:
-
-    sub expand {
-	my ($self, $d, $repl) = @_;
-	return $d->type eq 'blank' || $d->type eq 'comment';
-    }
-
-Notice, that B<expand> does not need to recurse into section objects. This
-is taken care of by the caller.
+package B<Apache::Config::Preproc::I<phase>>.  This package must inherit
+from B<Apache::Config::Preproc::Expand> and overload at least the
+B<expand> method.  See the description of B<Apache::Config::Preproc::Expand>
+for a detailed description.
 
 =head1 EXAMPLE
 
@@ -403,8 +543,20 @@ level of nesting.
 
 =head1 SEE ALSO
 
-B<Apache::Admin::Config>(3).    
-    
+L<Apache::Admin::Config>
+
+L<Apache::Config::Preproc::compact>
+
+L<Apache::Config::Preproc::ifdefine>
+
+L<Apache::Config::Preproc::ifmodule>
+
+L<Apache::Config::Preproc::include>
+
+L<Apache::Config::Preproc::locus>
+
+L<Apache::Config::Preproc::macro>
+
 =cut
     
     

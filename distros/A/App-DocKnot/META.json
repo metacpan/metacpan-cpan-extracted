@@ -23,6 +23,7 @@
          "requires" : {
             "File::BaseDir" : "0",
             "File::ShareDir" : "1.00",
+            "IO::Compress::Xz" : "0",
             "IPC::Run" : "0",
             "IPC::System::Simple" : "0",
             "JSON" : "0",
@@ -42,23 +43,23 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       },
       "App::DocKnot::Command" : {
          "file" : "lib/App/DocKnot/Command.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       },
       "App::DocKnot::Config" : {
          "file" : "lib/App/DocKnot/Config.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       },
       "App::DocKnot::Dist" : {
          "file" : "lib/App/DocKnot/Dist.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "3.02"
+         "version" : "3.03"
       }
    },
    "release_status" : "stable",
@@ -77,6 +78,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "3.02",
+   "version" : "3.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.05';    # VERSION
+our $VERSION = '0.06';    # VERSION
 
 # ABSTRACT: Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
@@ -12,13 +12,13 @@ our $VERSION = '0.05';    # VERSION
 
 use Mojo::Base 'Mojolicious';
 use JSON;
+use Scalar::Util;
 use Browser::Open;
 use File::ShareDir;
-
-# TODO Use Mojo::File (Mojo::Path) instead of Path::Tiny
-# # TODO Use Mojo::File (Mojo::Path) instead of Path::Tiny
 use Path::Tiny;
+use Try::Tiny;
 use Dash::Renderer;
+use Dash::Exceptions::NoLayoutException;
 
 # TODO Add ci badges
 
@@ -26,21 +26,53 @@ has app_name => __PACKAGE__;
 
 has external_stylesheets => sub { [] };
 
-has layout => sub { {} };
+has _layout => sub { {} };
 
-has callbacks => sub { [] };
+has _callbacks => sub { {} };
 
-has '_rendered_scripts';
+has '_rendered_scripts' => "";
 
-has '_rendered_external_stylesheets';
+has '_rendered_external_stylesheets' => "";
+
+sub layout {
+    my $self   = shift;
+    my $layout = shift;
+    if ( defined $layout ) {
+        my $type = ref $layout;
+        if ( $type eq 'CODE' || ( Scalar::Util::blessed($layout) && $layout->isa('Dash::BaseComponent') ) ) {
+            $self->_layout($layout);
+        } else {
+            Dash::Exceptions::NoLayoutException->throw(
+                                         'Layout must be a dash component or a function that returns a dash component');
+        }
+    } else {
+        $layout = $self->_layout;
+    }
+    return $layout;
+}
 
 sub callback {
     my $self     = shift;
     my %callback = @_;
 
     # TODO check_callback
-    push @{ $self->callbacks }, \%callback;
+    # TODO Callback map
+    my $output      = $callback{Output};
+    my $callback_id = $self->_create_callback_id($output);
+    my $callbacks   = $self->_callbacks;
+    $callbacks->{$callback_id} = \%callback;
     return $self;
+}
+
+sub _create_callback_id {
+    my $self   = shift;
+    my $output = shift;
+
+    if ( ref $output eq 'ARRAY' ) {
+        return ".." . join( "...", map { $_->{component_id} . "." . $_->{component_property} } @$output ) . "..";
+    }
+
+    return $output->{component_id} . "." . $output->{component_property};
 }
 
 sub startup {
@@ -95,29 +127,7 @@ sub startup {
     $r->get(
         '/_dash-dependencies' => sub {
             my $c            = shift;
-            my $dependencies = [];
-            for my $callback ( @{ $self->callbacks } ) {
-                my $rendered_callback = { clientside_function => JSON::null };
-                my $states            = [];
-                for my $state ( @{ $callback->{State} } ) {
-                    my $rendered_state = { id       => $state->{component_id},
-                                           property => $state->{component_property}
-                    };
-                    push @$states, $rendered_state;
-                }
-                $rendered_callback->{state} = $states;
-                my $inputs = [];
-                for my $input ( @{ $callback->{Inputs} } ) {
-                    my $rendered_input = { id       => $input->{component_id},
-                                           property => $input->{component_property}
-                    };
-                    push @$inputs, $rendered_input;
-                }
-                $rendered_callback->{inputs} = $inputs;
-                $rendered_callback->{'output'} =
-                  join( '.', $callback->{'Output'}{component_id}, $callback->{'Output'}{component_property} );
-                push @$dependencies, $rendered_callback;
-            }
+            my $dependencies = $self->_dependencies();
             $c->render( json => $dependencies );
         }
     );
@@ -127,39 +137,16 @@ sub startup {
             my $c = shift;
 
             my $request = $c->req->json;
-
-            # Searching callbacks by 'changePropdIds'
-            my $callbacks = $self->_search_callback( $request->{'changedPropIds'} );
-            if ( scalar @$callbacks > 1 ) {
-                die 'Not implemented multiple callbacks';
-            } elsif ( scalar @$callbacks == 1 ) {
-                my $callback           = $callbacks->[0];
-                my @callback_arguments = ();
-                for my $callback_input ( @{ $callback->{Inputs} } ) {
-                    my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
-                    for my $change_input ( @{ $request->{inputs} } ) {
-                        my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
-                        if ( $component_id eq $id && $component_property eq $property ) {
-                            push @callback_arguments, $value;
-                            last;
-                        }
-                    }
+            try {
+                my $content = $self->_update_component($request);
+                $c->render( json => $content );
+            } catch {
+                if ( Scalar::Util::blessed $_ && $_->isa('Dash::Exceptions::PreventUpdate') ) {
+                    $c->render( status => 204, json => '' );
+                } else {
+                    die $_;
                 }
-                for my $callback_input ( @{ $callback->{State} } ) {
-                    my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
-                    for my $change_input ( @{ $request->{state} } ) {
-                        my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
-                        if ( $component_id eq $id && $component_property eq $property ) {
-                            push @callback_arguments, $value;
-                            last;
-                        }
-                    }
-                }
-                my $updated_value    = $callback->{callback}(@callback_arguments);
-                my $updated_property = ( split( /\./, $request->{output} ) )[-1];
-                my $props_updated    = { $updated_property => $updated_value };
-                $c->render( json => { response => { props => $props_updated } } );
-            }
+            };
         }
     );
 
@@ -175,28 +162,118 @@ sub run_server {
     # Opening the browser before starting the daemon works because
     #  open_browser returns inmediately
     # TODO Open browser optional
-    Browser::Open::open_browser('http://127.0.0.1:8080');
-    $self->start( 'daemon', '-l', 'http://*:8080' );
+    if ( not caller(1) ) {
+        Browser::Open::open_browser('http://127.0.0.1:8080');
+        $self->start( 'daemon', '-l', 'http://*:8080' );
+    }
+    return $self;
+}
+
+sub _dependencies {
+    my $self         = shift;
+    my $dependencies = [];
+    for my $callback ( values %{ $self->_callbacks } ) {
+        my $rendered_callback = { clientside_function => JSON::null };
+        my $states            = [];
+        for my $state ( @{ $callback->{State} } ) {
+            my $rendered_state = { id       => $state->{component_id},
+                                   property => $state->{component_property}
+            };
+            push @$states, $rendered_state;
+        }
+        $rendered_callback->{state} = $states;
+        my $inputs = [];
+        for my $input ( @{ $callback->{Inputs} } ) {
+            my $rendered_input = { id       => $input->{component_id},
+                                   property => $input->{component_property}
+            };
+            push @$inputs, $rendered_input;
+        }
+        $rendered_callback->{inputs} = $inputs;
+        my $output_type = ref $callback->{Output};
+        if ( $output_type eq 'ARRAY' ) {
+            $rendered_callback->{'output'} .= '.';
+            for my $output ( @{ $callback->{'Output'} } ) {
+                $rendered_callback->{'output'} .=
+                  '.' . join( '.', $output->{component_id}, $output->{component_property} ) . '..';
+            }
+        } elsif ( $output_type eq 'HASH' ) {
+            $rendered_callback->{'output'} =
+              join( '.', $callback->{'Output'}{component_id}, $callback->{'Output'}{component_property} );
+        } else {
+            die 'Dependecy type for callback not implemented';
+        }
+        push @$dependencies, $rendered_callback;
+    }
+    return $dependencies;
+}
+
+sub _update_component {
+    my $self    = shift;
+    my $request = shift;
+
+    if ( scalar( values %{ $self->_callbacks } ) > 0 ) {
+        my $callbacks = $self->_search_callback( $request->{'output'} );
+        if ( scalar @$callbacks > 1 ) {
+            die 'Not implemented multiple callbacks';
+        } elsif ( scalar @$callbacks == 1 ) {
+            my $callback           = $callbacks->[0];
+            my @callback_arguments = ();
+            for my $callback_input ( @{ $callback->{Inputs} } ) {
+                my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
+                for my $change_input ( @{ $request->{inputs} } ) {
+                    my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
+                    if ( $component_id eq $id && $component_property eq $property ) {
+                        push @callback_arguments, $value;
+                        last;
+                    }
+                }
+            }
+            for my $callback_input ( @{ $callback->{State} } ) {
+                my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
+                for my $change_input ( @{ $request->{state} } ) {
+                    my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
+                    if ( $component_id eq $id && $component_property eq $property ) {
+                        push @callback_arguments, $value;
+                        last;
+                    }
+                }
+            }
+            my $output_type = ref $callback->{Output};
+            if ( $output_type eq 'ARRAY' ) {
+                my @return_value  = $callback->{callback}(@callback_arguments);
+                my $props_updated = {};
+                my $index_output  = 0;
+                for my $output ( @{ $callback->{'Output'} } ) {
+                    $props_updated->{ $output->{component_id} } =
+                      { $output->{component_property} => $return_value[$index_output] };
+                    $index_output++;
+                }
+                return { response => $props_updated, multi => JSON::true };
+            } elsif ( $output_type eq 'HASH' ) {
+                my $updated_value    = $callback->{callback}(@callback_arguments);
+                my $updated_property = ( split( /\./, $request->{output} ) )[-1];
+                my $props_updated    = { $updated_property => $updated_value };
+                return { response => { props => $props_updated } };
+            } else {
+                die 'Callback not supported';
+            }
+        } else {
+            return { response => "There is no matching callback" };
+        }
+
+    } else {
+        return { response => "There is no registered callbacks" };
+    }
+    return { response => "Internal error" };
 }
 
 sub _search_callback {
-    my $self             = shift;
-    my $changed_prop_ids = shift;
+    my $self   = shift;
+    my $output = shift;
 
-    my $callbacks          = $self->callbacks;
-    my @matching_callbacks = ();
-    for my $changed_prop_id (@$changed_prop_ids) {
-        for my $callback (@$callbacks) {
-            my $inputs = $callback->{Inputs};
-            for my $input (@$inputs) {
-                if ( $changed_prop_id eq join( '.', @{$input}{qw(component_id component_property)} ) ) {
-                    push @matching_callbacks, $callback;
-                    last;
-                }
-            }
-        }
-    }
-
+    my $callbacks          = $self->_callbacks;
+    my @matching_callbacks = ( $callbacks->{$output} );
     return \@matching_callbacks;
 }
 
@@ -303,16 +380,17 @@ sub _render_scripts {
     my $rendered_scripts = "";
     $rendered_scripts .= $self->_render_dash_config();
     push @$scripts_dependencies, @{ $self->_dash_renderer_js_deps() };
-
-    # TODO Avoid duplicates (Order?)
     my $filtered_resources = $self->_filter_resources($scripts_dependencies);
+    my %rendered           = ();
     for my $dep (@$filtered_resources) {
         my $dynamic = $dep->{dynamic} // 0;
         if ( !$dynamic ) {
-            $rendered_scripts .=
-                '<script src="/'
-              . join( "/", '_dash-component-suites', $dep->{namespace}, $dep->{relative_package_path} )
-              . '"></script>' . "\n";
+            my $resource_path_part = join( "/", $dep->{namespace}, $dep->{relative_package_path} );
+            if ( !$rendered{$resource_path_part} ) {
+                $rendered_scripts .=
+                  '<script src="/' . join( "/", '_dash-component-suites', $resource_path_part ) . '"></script>' . "\n";
+                $rendered{$resource_path_part} = 1;
+            }
         }
     }
     $rendered_scripts .= $self->_render_dash_renderer_script();
@@ -338,7 +416,7 @@ sub _filter_resources {
         my $async = $resource->{async};
         if ( defined $async ) {
             if ( defined $dynamic ) {
-                die 'A resource can have both dynamic and async: ' + to_json($resource);
+                die "A resource can't have both dynamic and async: " + to_json($resource);
             }
             my $dynamic = 1;
             if ( $async eq 'lazy' ) {
@@ -430,14 +508,13 @@ Dash - Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
  use Dash;
- use aliased 'Dash::Html::Components::Div';
- use aliased 'Dash::Html::Components::H1';
- use aliased 'Dash::Core::Components::Input';
+ use aliased 'Dash::Html::Components' => 'html';
+ use aliased 'Dash::Core::Components' => 'dcc';
  
  my $external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'];
  
@@ -447,10 +524,9 @@ version 0.05
  );
  
  $app->layout(
-     Div->new(children => [
-         H1->new(children => 'Titulo'),
-         Input->new(id => 'my-id', value => 'initial value', type => 'text'),
-         Div->new(id => 'my-div')
+     html->Div(children => [
+         dcc->Input(id => 'my-id', value => 'initial value', type => 'text'),
+         html->Div(id => 'my-div')
      ])
  );
  
@@ -459,29 +535,28 @@ version 0.05
      Inputs => [{component_id=>'my-id', component_property=> 'value'}],
      callback => sub {
          my $input_value = shift;
-         return "You've entered \"$input_value\"";
+         return "You've entered '$input_value'";
      }
  );
  
  $app->run_server();
 
  use Dash;
- use aliased 'Dash::Html::Components::Div';
- use aliased 'Dash::Core::Components::Input';
- use aliased 'Dash::Core::Components::Graph';
+ use aliased 'Dash::Html::Components' => 'html';
+ use aliased 'Dash::Core::Components' => 'dcc';
  
  my $external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'];
  
  my $app = Dash->new(
-     app_name             => 'Basic Callbacks',
+     app_name             => 'Random chart',
      external_stylesheets => $external_stylesheets
  );
  
  my $initial_number_of_values = 20;
  $app->layout(
-     Div->new(children => [
-         Input->new(id => 'my-id', value => $initial_number_of_values, type => 'number'),
-         Graph->new(id => 'my-graph')
+     html->Div(children => [
+         dcc->Input(id => 'my-id', value => $initial_number_of_values, type => 'number'),
+         dcc->Graph(id => 'my-graph')
      ])
  );
  
@@ -519,19 +594,19 @@ minor changes:
 
 =over 4
 
-=item Use of -> (arrow operator) instead of .
+=item * Use of -> (arrow operator) instead of .
 
-=item Main package and class for apps is Dash
+=item * Main package and class for apps is Dash
 
-=item Component suites will use Perl package convention, I mean: dash_html_components will be Dash::Html::Components, although for new component suites you could use whatever package name you like
+=item * Component suites will use Perl package convention, I mean: dash_html_components will be Dash::Html::Components, although for new component suites you could use whatever package name you like
 
-=item Instead of decorators we'll use plain old callbacks
+=item * Instead of decorators we'll use plain old callbacks
 
-=item Instead of Flask we'll be using L<Mojolicious> (Maybe in the future L<Dancer2>)
+=item * Instead of Flask we'll be using L<Mojolicious> (Maybe in the future L<Dancer2>)
 
 =back
 
-In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash> or directly in L<repository|https://github.com/pablrod/perl-Dash/tree/master/examples>
+In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash> or directly in L<repository|https://github.com/pablrod/perl-Dash/tree/master/examples>. The full Dash tutorial is ported to Perl in those examples folder.
 
 =head2 Components
 
@@ -539,15 +614,110 @@ This package ships the following component suites and are ready to use:
 
 =over 4
 
-=item L<Dash Core Components|https://dash.plot.ly/dash-core-components> as Dash::Core::Components
+=item * L<Dash Core Components|https://dash.plot.ly/dash-core-components> as Dash::Core::Components
 
-=item L<Dash Html Components|https://dash.plot.ly/dash-html-components> as Dash::Html::Components
+=item * L<Dash Html Components|https://dash.plot.ly/dash-html-components> as Dash::Html::Components
 
-=item L<Dash DataTable|https://dash.plot.ly/datatable> as Dash::Table
+=item * L<Dash DataTable|https://dash.plot.ly/datatable> as Dash::Table
 
 =back
 
 The plan is to make the packages also for L<Dash-Bio|https://dash.plot.ly/dash-bio>, L<Dash-DAQ|https://dash.plot.ly/dash-daq>, L<Dash-Canvas|https://dash.plot.ly/canvas> and L<Dash-Cytoscape|https://dash.plot.ly/cytoscape>.
+
+=head3 Using the components
+
+Every component has a class of its own. For example dash-html-component Div has the class: L<Dash::Html::Components::Div> and you can use it the perl standard way:
+
+    use Dash::Html::Components::Div;
+    ...
+    $app->layout(Dash::Html::Components::Div->new(id => 'my-div', children => 'This is a simple div'));
+
+But with every component suite could be a lot of components. So to ease the task of importing them (one by one is a little bit tedious) we could use two ways:
+
+=head4 Factory methods
+
+Every component suite has a factory method for every component. For example L<Dash::Html::Components> has the factory method Div to load and build a L<Dash::Html::Components::Div> component:
+
+    use Dash::Html::Components;
+    ...
+    $app->layout(Dash::Html::Components->Div(id => 'my-div', children => 'This is a simple div'));
+
+But this factory methods are meant to be aliased so this gets less verbose:
+
+    use aliased 'Dash::Html::Components' => 'html';
+    ...
+    $app->layout(html->Div(id => 'my-div', children => 'This is a simple div'));
+
+=head4 Functions
+
+Many modules use the L<Exporter> & friends to reduce typing. If you like that way every component suite gets a Functions package to import all this functions
+to your namespace.
+
+So for example for L<Dash::Html::Components> there is a package L<Dash::Html::ComponentsFunctions> with one factory function to load and build the component with the same name:
+
+    use Dash::Html::ComponentsFunctions;
+    ...
+    $app->layout(Div(id => 'my-div', children => 'This is a simple div'));
+
+=head3 I want more components
+
+There are L<a lot of components... for Python|https://github.com/ucg8j/awesome-dash#component-libraries>. So if you want to contribute I'll be glad to help.
+
+Meanwhile you can build your own component. I'll make a better guide and an automated builder but right now you should use L<https://github.com/plotly/dash-component-boilerplate> for all the javascript part (It's L<React|https://github.com/facebook/react> based) and after that the Perl part is very easy (the components are mostly javascript, or typescript):
+
+=over 4
+
+=item * For every component must be a Perl class inheriting from L<Dash::BaseComponent>, overloaded the hash dereferencing %{} with the props that the React component has, and with this methods:
+
+=over 4
+
+=item DashNamespace
+
+Namespace of the component
+
+=item _js_dist
+
+Javascript dependencies for the component
+
+=item _css_dist
+
+Css dependencies for the component
+
+=back
+
+=back
+
+Optionally the component suite will have the Functions package and the factory methods for ease of using.
+
+As mentioned early, I'll make an automated builder but contributions are more than welcome!!
+
+Making a component for Dash that is not React based is a little bit difficult so please first get the javascript part React based and integrating it with Perl, R or Python will be easy.
+
+=head1 Missing parts
+
+Right now there are a lot of parts missing:
+
+=over 4
+
+=item * Callback context
+
+=item * Prefix mount
+
+=item * Debug mode & hot reloading
+
+=item * Dash configuration (supporting environment variables)
+
+=item * Callback dependency checking
+
+=item * Clientside functions
+
+=item * Support for component properties data-* and aria-*
+
+=item * Dynamic layout generation
+
+=back
+
+And many more, but you could use it right now to make great apps! (If you need some inspiration... just check L<https://dash-gallery.plotly.host/Portal/>)
 
 =head1 STATUS
 
@@ -555,6 +725,8 @@ At this moment this library is experimental and still under active
 development and the API is going to change!
 
 The intent of this release is to try, test and learn how to improve it.
+
+Security warning: this module is not tested for security so test yourself if you are going to run the app server in a public facing server.
 
 If you want to help, just get in contact! Every contribution is welcome!
 
@@ -567,11 +739,21 @@ If you like Dash please consider supporting them purchasing professional service
 
 =head1 SEE ALSO
 
-L<Dash|https://dash.plot.ly/>
-L<Dash Repository|https://github.com/plotly/dash>
-L<Chart::Plotly>
-L<Chart::GGPlot>
-L<Alt::Data::Frame::ButMore>
+=over 4
+
+=item L<Dash|https://dash.plot.ly/>
+
+=item L<Dash Repository|https://github.com/plotly/dash>
+
+=item L<Chart::Plotly>
+
+=item L<Chart::GGPlot>
+
+=item L<Alt::Data::Frame::ButMore>
+
+=item L<AI::MXNet>
+
+=back
 
 =head1 AUTHOR
 

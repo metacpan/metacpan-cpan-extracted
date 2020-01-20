@@ -4,6 +4,9 @@ Makefile(\.old)?$
 CVS
 blib
 ~
-.git
 .gitignore$
 Makefile$
+^.github/
+^.git/.*
+^MYMETA.*
+^MANIFEST.bak

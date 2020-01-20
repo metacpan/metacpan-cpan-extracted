@@ -1,41 +1,13 @@
 package Dash::Table;
-
 use strict;
 use warnings;
+use Module::Load;
 
-use JSON;
-use File::ShareDir;
-use Path::Tiny;
-
-my $_deps;
-
-sub _deps {
-    my $kind = shift;
-    if ( !defined $_deps ) {
-
-        # TODO recover from __PACKAGE__ variable
-        $_deps = from_json(
-                            Path::Tiny::path(
-                                       File::ShareDir::dist_file(
-                                           'Dash', Path::Tiny::path( 'assets', 'dash_table', 'js_deps.json' )->canonpath
-                                       )
-                            )->slurp_utf8
-        );
-    }
-    if ( defined $kind ) {
-        return $_deps->{$kind};
-    }
-    return $_deps;
+sub DataTable {
+    shift @_;
+    load Dash::Table::DataTable;
+    return Dash::Table::DataTable->new(@_);
 }
-
-sub _js_dist {
-    return _deps('_js_dist');
-}
-
-sub _css_dist {
-    return _deps('_css_dist');
-}
-
 1;
 
 __END__
@@ -50,7 +22,7 @@ Dash::Table
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

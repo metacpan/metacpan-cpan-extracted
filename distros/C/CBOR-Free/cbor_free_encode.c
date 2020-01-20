@@ -74,11 +74,24 @@ void _croak_unrecognized(pTHX_ encode_ctx *encode_state, SV *value) {
 // keys are only byte-sorted if their lengths are identical. Thus,
 // “z” sorts EARLIER than “aa”. (cf. section 3.9 of the RFC)
 
-int _sort_string_and_length( const void* a, const void* b ) {
+#define _SORT(x) ((struct sortable_hash_entry *)x)
+
+int _sort_map_keys( const void* a, const void* b ) {
+
+    // The CBOR RFC defines canonical sorting such that the
+    // *encoded* keys are what gets sorted; however, it’s easier to
+    // anticipate the sort order algorithmically rather than to
+    // create the encoded keys *then* sort those. Since Perl hash keys
+    // are always strings (either with or without the UTF8 flag), we
+    // only have 2 CBOR types to deal with (text & binary strings) and
+    // can sort accordingly.
+
     return (
-        ((struct string_and_length *)a)->length < ((struct string_and_length *)b)->length ? -1
-        : ((struct string_and_length *)a)->length > ((struct string_and_length *)b)->length ? 1
-        : memcmp( ((struct string_and_length *)a)->buffer, ((struct string_and_length *)b)->buffer, ((struct string_and_length *)a)->length )
+        _SORT(a)->is_utf8 < _SORT(b)->is_utf8 ? -1
+        : _SORT(a)->is_utf8 > _SORT(b)->is_utf8 ? 1
+        : _SORT(a)->length < _SORT(b)->length ? -1
+        : _SORT(a)->length > _SORT(b)->length ? 1
+        : memcmp( _SORT(a)->buffer, _SORT(b)->buffer, _SORT(a)->length )
     );
 }
 
@@ -105,21 +118,17 @@ static inline void _COPY_INTO_ENCODE( encode_ctx *encode_state, const unsigned c
 
 // TODO? This could be a macro … it’d just be kind of unwieldy as such.
 static inline void _init_length_buffer( pTHX_ UV num, enum CBOR_TYPE major_type, encode_ctx *encode_state ) {
-//fprintf(stderr, "_init_length_buffer(%llu)\n", num);
     union control_byte *scratch0 = (void *) encode_state->scratch;
     scratch0->pieces.major_type = major_type;
 
     if ( num < CBOR_LENGTH_SMALL ) {
-//fprintf(stderr, "size tiny\n");
         scratch0->pieces.length_type = (uint8_t) num;
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 1);
     }
     else if ( num <= 0xff ) {
-//fprintf(stderr, "size small\n");
         scratch0->pieces.length_type = CBOR_LENGTH_SMALL;
         encode_state->scratch[1] = (uint8_t) num;
-//fprintf(stderr, "uint8: %02x,%02x\n", encode_state->scratch[0], encode_state->scratch[1]);
 
         _COPY_INTO_ENCODE(encode_state, encode_state->scratch, 2);
     }
@@ -316,60 +325,78 @@ void _encode( pTHX_ SV *value, encode_ctx *encode_state ) {
         if (!encode_state->reftracker || _check_reference( aTHX_ (SV *)hash, encode_state)) {
             SV *cur_sv;
             char *key;
-            I32 key_length;
+            STRLEN key_length;
+
+            HE* h_entry;
+            SV* svkey;
 
             I32 keyscount = hv_iterinit(hash);
 
             _init_length_buffer( aTHX_ keyscount, CBOR_TYPE_MAP, encode_state );
 
             if (encode_state->is_canonical) {
-
-                // The CBOR RFC defines canonical sorting such that the
-                // *encoded* keys are what gets sorted; however, since Perl hash
-                // keys are always (binary) strings, and since a lexicographical
-                // sort of encoded CBOR uints yields the same order as encoding
-                // that same list of uints pre-sorted, we can sort the keys
-                // prior to insertion into the output buffer.
-                //
-                // It may be faster to sort encoded keys (as the RFC envisions),
-                // but this works for now.
-
-                struct string_and_length cur;
-                struct string_and_length strings[keyscount];
-
                 I32 curkey = 0;
 
-                while (hv_iternextsv(hash, &key, &key_length)) {
-                    strings[curkey].buffer = key;
-                    strings[curkey].length = key_length;
-                    ++curkey;
+                struct sortable_hash_entry sortables[keyscount];
+
+                while ( (h_entry = hv_iternext(hash)) ) {
+                    if (HeUTF8(h_entry) || (!encode_state->text_keys && !CBF_HeUTF8(h_entry))) {
+                        key = HePV(h_entry, key_length);
+                        sortables[curkey].is_utf8 = !!HeUTF8(h_entry);
+                        sortables[curkey].buffer = key;
+                        sortables[curkey].length = key_length;
+                    }
+                    else {
+                        SV* key_sv = HeSVKEY_force(h_entry);
+                        sv_utf8_upgrade(key_sv);
+                        sortables[curkey].is_utf8 = true;
+
+                        sortables[curkey].buffer = SvPV(key_sv, sortables[curkey].length);
+                    }
+
+                    sortables[curkey].value = HeVAL(h_entry);
+
+                    curkey++;
                 }
 
-                qsort(strings, keyscount, sizeof(struct string_and_length), _sort_string_and_length);
+                qsort(sortables, keyscount, sizeof(struct sortable_hash_entry), _sort_map_keys);
 
                 for (curkey=0; curkey < keyscount; ++curkey) {
-                    cur = strings[curkey];
-                    key = cur.buffer;
-                    key_length = cur.length;
+                    _init_length_buffer( aTHX_ sortables[curkey].length, sortables[curkey].is_utf8 ? CBOR_TYPE_UTF8 : CBOR_TYPE_BINARY, encode_state );
+                    _COPY_INTO_ENCODE( encode_state, (unsigned char *) sortables[curkey].buffer, sortables[curkey].length );
 
-                    // Store the key.
-                    _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
-                    _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
-
-                    cur_sv = *( hv_fetch(hash, key, key_length, 0) );
-
-                    _encode( aTHX_ cur_sv, encode_state );
+                    _encode( aTHX_ sortables[curkey].value, encode_state );
                 }
             }
             else {
-                while ((cur_sv = hv_iternextsv(hash, &key, &key_length))) {
+                while ( (h_entry = hv_iternext(hash)) ) {
 
-                    // Store the key.
-                    _init_length_buffer( aTHX_ key_length, CBOR_TYPE_BINARY, encode_state );
+                    // If the key is HeUTF8, then we can use it as-is.
+                    // (This will yield a CBOR text key.)
+                    //
+                    // If the key is !CBF_HeUTF8 and we aren’t in text-keys
+                    // mode, then use the key as-is.
+                    // (This will yield a CBOR binary key.)
+                    //
+                    // If the key is !HeUTF8 but IS CBF_HeUTF8, then we
+                    // force an SV conversion and upgrade to UTF-8.
+                    //
+                    // Likewise, if the key is !HeUTF8 but we are in text-keys
+                    // mode, we need the same conversion.
 
-                    _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
+                    if (HeUTF8(h_entry) || (!encode_state->text_keys && !CBF_HeUTF8(h_entry))) {
+                        key = HePV(h_entry, key_length);
 
-                    _encode( aTHX_ cur_sv, encode_state );
+                        _init_length_buffer( aTHX_ key_length, HeUTF8(h_entry) ? CBOR_TYPE_UTF8 : CBOR_TYPE_BINARY, encode_state );
+                        _COPY_INTO_ENCODE( encode_state, (unsigned char *) key, key_length );
+                    }
+                    else {
+                        SV* key_sv = HeSVKEY_force(h_entry);
+                        sv_utf8_upgrade(key_sv);
+                        _encode( aTHX_ key_sv, encode_state );
+                    }
+
+                    _encode( aTHX_ HeVAL(h_entry), encode_state );
                 }
             }
         }
@@ -406,6 +433,8 @@ encode_ctx cbf_encode_ctx_create(uint8_t flags) {
     encode_state.recurse_count = 0;
 
     encode_state.is_canonical = !!(flags & ENCODE_FLAG_CANONICAL);
+
+    encode_state.text_keys = !!(flags & ENCODE_FLAG_TEXT_KEYS);
 
     encode_state.encode_scalar_refs = !!(flags & ENCODE_FLAG_SCALAR_REFS);
 

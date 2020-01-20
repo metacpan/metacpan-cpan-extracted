@@ -1,3 +1,10 @@
+0.06 2020-01-19T17:11:24+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-09-22T11:18:27+02:00
  - Add 'readme_from' directive to Makefile.PL.
  - Fix LICENSE file.

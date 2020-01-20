@@ -381,8 +381,11 @@ use NEXT;
       $self->{data}->type;
     }
     else {
-      join "", $self->{how}, ($self->{neg} ? '^' : ''),
-               $self->{type}, $self->{how};
+      my $how = ref $self->{how} eq 'SCALAR' ?
+	  ${ $self->{how} } :
+	  $self->{how};
+      join "", $how, ($self->{neg} ? '^' : ''),
+               $self->{type}, $how;
     }
   }
 
@@ -404,8 +407,11 @@ use NEXT;
       $self->{data}->visual;
     }
     else {
-      join "", "[", $self->{how}, ($self->{neg} ? '^' : ''),
-           $self->{type}, $self->{how}, "]";
+      my $how = ref $self->{how} eq 'SCALAR' ?
+	  ${ $self->{how} } :
+	  $self->{how};
+      join "", "[", $how, ($self->{neg} ? '^' : ''),
+           $self->{type}, $how, "]";
     }
   }
 }

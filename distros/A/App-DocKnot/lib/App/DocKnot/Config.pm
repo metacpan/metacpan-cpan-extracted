@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 3.02;
+package App::DocKnot::Config 3.03;
 
 use 5.024;
 use autodie;
@@ -124,6 +124,10 @@ sub new {
 #          Text exception on inconsistencies in the package data
 sub config {
     my ($self) = @_;
+
+    # Localize $@ since we catch and ignore a lot of exceptions and don't want
+    # to leak changes to $@ to the caller.
+    local $@ = q{};
 
     # Load the package metadata from JSON.
     my $data_ref = $self->_load_metadata_json('metadata.json');
@@ -290,7 +294,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2019 Russ Allbery <rra@cpan.org>
+Copyright 2013-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

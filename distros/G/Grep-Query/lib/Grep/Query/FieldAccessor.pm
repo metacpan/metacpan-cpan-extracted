@@ -5,7 +5,7 @@ package Grep::Query::FieldAccessor;
 use strict;
 use warnings;
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -97,7 +97,7 @@ sub __fetchvalue
 	
 	# do we have a hash key or an array index?
 	#
-	if ($point =~ /^\[(\d+)\]$/)
+	if ($point =~ /^\[(-?\d+)\]$/)
 	{
 		($arridx, $exptype) = ($1, 'ARRAY');
 	}

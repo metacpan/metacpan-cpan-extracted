@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001014';
+our $VERSION = '0.001015';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -86,7 +86,10 @@ sub import {
             my $var = qq{$keytype_info{typesigil}$keytype_info{newtype}};
             if ($keytype_info{oldtyperegex}) {
                 $keytype_info{oldtyperegex} =~ s{^m}{};
-                $sigil_decl = qq{my $var; BEGIN { $var = qr$keytype_info{oldtyperegex}; }};
+                if ($keytype_info{oldtyperegex} =~ /\(\?\&Perl[A-Z]/) {
+                    $keytype_info{oldtyperegex} =~ s{^\s*(\S)}{$1\$PPR::GRAMMAR};
+                }
+                $sigil_decl = qq{my $var; BEGIN { $var = qr$keytype_info{oldtyperegex} }}
             }
             elsif ($keytype_info{oldtypestring}) {
                 $sigil_decl = qq{my $var; BEGIN { $var = $keytype_info{oldtypestring} }}
@@ -170,7 +173,7 @@ sub import {
 
                 (?<____K_D___Param>
                     (?{ $expected = 'keyword parameter type'; $failed_at = pos() })
-                                     (?<____K_D___type> (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
+                        (?<____K_D___type> (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
 
                     (?{ $expected = 'keyword parameter quantifier or variable'; $failed_at = pos() })
                         (?: (?&PerlOWS)  (?<____K_D___quantifier> [?*+][?+]?+      )  )?+
@@ -178,6 +181,12 @@ sub import {
                     (?{ $expected = 'keyword parameter variable'; $failed_at = pos() })
                         (?: (?&PerlOWS)  (?<____K_D___sigil>    [\$\@]             )
                                          (?<____K_D___name>     (?&PerlIdentifier) )  )?+
+
+                    (?: (?&PerlOWS)  :sep \(
+                    (?{ $expected = 'keyword parameter separator :sep'; $failed_at = pos() })
+                        (?&PerlOWS)  (?<____K_D___sep>  (?&PerlMatch) | (?&PerlString) | $TYPE_JUNCTION )
+                        (?&PerlOWS) \)
+                    )?+
 
                     (?: (?&PerlOWS)  =
                     (?{ $expected = 'keyword parameter default string after ='; $failed_at = pos() })
@@ -671,9 +680,10 @@ sub _resolve_type {
     }
     elsif ($type =~ $REGEX_TYPE ) {
         $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
-        my $pat = $+{pattern};
+        my $pat  = $+{pattern};
+        my $mods = $+{modifiers};
         $pat =~ s{(?<!\\)/}{\\/}g;
-        return $pat;
+        return "(?$mods:$pat)";
     }
     elsif ($type =~ $TYPE_JUNCTION) {
         return join '|', map { _resolve_type($_, $user_defined_type_for) } split /[|]/, $type;
@@ -684,6 +694,87 @@ sub _resolve_type {
 
 }
 
+# Convert named types and explicit regexes or strings to matcher regex...
+sub _convert_type_to_matcher {
+    my ($param) = @_;
+
+    my $matcher;
+
+    # Convert type specification to PPR subrule invocations and build a description...
+    # ...for named types...
+    my $type = $param->{type};
+    if ($type =~ m{\A \w++ (?: [|] \w++ )* \Z}x) {
+        # Extract component types...
+        my @types = split /[|]/, $type;
+
+        # First set up pseudo-inheritance...
+        for my $component_type (@types) {
+            $isa{$component_type, $type} = 1;
+        }
+
+        # Convert component types to regexes...
+        $param->{desc} //= do {
+            my $desc = $param->{name} ? "<$param->{name}>" : '<'.join(' or ', @types).'>';
+            $desc =~ tr/_/ /;
+            $desc;
+        };
+        $type = '/' . join('|', map { _resolve_type( $_ ) } @types) . '/';
+
+    }
+
+    # ...for literal string types...
+    if ($type =~ m{\A (?: q\s*\S | ' ) (.*) \S \z }x) {
+        $param->{desc}
+            //= ($param->{name}
+                    ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
+                    : $1
+                );
+        $matcher = '(?:' . quotemeta($1) . ')';
+    }
+
+    # ...for regex types...
+    elsif ($type =~ $REGEX_TYPE ) {
+        $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
+        my %match = %+;
+        $match{pattern} =~ s{(?<!\\)/}{\\/}g;
+        $param->{desc}
+            //= ($param->{name}
+                    ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
+                    : "/$match{pattern}/$match{modifiers}"
+                );
+        $matcher = "(?$match{modifiers}:$match{pattern})";
+    }
+
+    # Incomprehensible types...
+    else {
+        die "Keyword::Declare internal error: incomprehensible type: [$type]"
+    }
+
+    return $matcher;
+}
+
+# This class allows captures from type-regexes to be preserved and accessed...
+{
+    package Keyword::Declare::Arg;
+    use overload
+        '""'     => sub { $_[0]{""} },
+        fallback => 1
+}
+
+# Extract a string or a Keyword::Declare::Arg object from the most recent match...
+sub _objectify {
+    my ($match_str, $captures_ref) = @_;
+
+    # Trim any leading Perlish whitespace from the match...
+    $match_str =~ s{^(?: \s*+ (?: [#].*\n \s*+)*+)}{}x;
+
+    # Just return the match if there were no captures...
+    return $match_str if !keys %{$captures_ref};
+
+    my $obj = { q{}=>$match_str, %{$captures_ref} };
+    $obj->{':sep'} = delete( $obj->{____KD___sep} ) // q{};
+    return bless $obj, 'Keyword::Declare::Arg';
+}
 
 # Convert the keyword's parameter list to various useful representations...
 sub _unpack_signature {
@@ -707,61 +798,14 @@ sub _unpack_signature {
             next;
         }
 
-        my $matcher;    # Accumulates a regex to match this parameter
+        # Generate a regex to match this parameter (note: modifies $param!)...
+        my $matcher = _convert_type_to_matcher($param);
 
-        # Convert type specification to PPR subrule invocations and build a description...
-        # ...for named types...
-        my $type = $param->{type};
-        if ($type =~ m{\A \w++ (?: [|] \w++ )* \Z}x) {
-            # Extract component types...
-            my @types = split /[|]/, $type;
-
-            # First set up pseudo-inheritance...
-            for my $component_type (@types) {
-                $isa{$component_type, $type} = 1;
-            }
-
-            # Convert component types to regexes...
-            $param->{desc} //= do {
-                my $desc = $param->{name} ? "<$param->{name}>" : '<'.join(' or ', @types).'>';
-                $desc =~ tr/_/ /;
-                $desc;
-            };
-            $type = '/' . join('|', map { _resolve_type( $_ ) } @types) . '/';
-
+        # Generate a regex to match the separator (if any)...
+        my $sep;
+        if ($param->{sep}) {
+            $sep = _convert_type_to_matcher({name=>':sep', type=>$param->{sep}});
         }
-
-        # ...for literal string types...
-        if ($type =~ m{\A (?: q\s*\S | ' ) (.*) \S \z }x) {
-            $param->{desc}
-                //= ($param->{name}
-                        ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
-                        : $1
-                    );
-            $matcher = '(?:' . quotemeta($1) . ')';
-        }
-
-        # ...for regex types...
-        elsif ($type =~ $REGEX_TYPE ) {
-            $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
-            my %match = %+;
-            $match{pattern} =~ s{(?<!\\)/}{\\/}g;
-            $param->{desc}
-                //= ($param->{name}
-                        ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
-                        : "/$match{pattern}/$match{modifiers}"
-                    );
-            $matcher = "(?$match{modifiers}:$match{pattern})";
-        }
-
-        # Incomprehensible types...
-        else {
-            die "Keyword::Declare internal error: incomprehensible type: [$type]"
-        }
-
-        # Matchers also handle leading whitespace (unless they ARE whitespace)...
-        $matcher = "(?:(?&PerlOWS)$matcher)"
-            if $type !~ m{^/\(\?\&Perl[ON]WS\)/$};
 
         # Resolve implicit quantification (and any default value)...
         if (exists $param->{default}) {
@@ -774,11 +818,25 @@ sub _unpack_signature {
             $param->{quantifier} //= $param->{sigil} && $param->{sigil} eq '@' ? '+' : '';
         }
 
-        # Array parameters are minimally repeatable...
+        # Matchers handle leading whitespace (unless they ARE whitespace)...
+        $matcher = "(?:(?&PerlOWS)$matcher)"
+            if $param->{type} !~ m{^/\(\?\&Perl[ON]WS\)/$};
+
+        # Quantified parameters are repeatable...
         my $single_matcher = $matcher;
         if ($param->{quantifier}) {
-            $matcher      = "(?:$matcher$param->{quantifier})";
+            # Unseparated parameters are easy...
+            if (!$sep) {
+                $matcher = "(?:$matcher$param->{quantifier})";
+            }
+            # Separated parameters are more complex...
+            else {
+                $matcher = "(?:$matcher(?:(?&PerlOWS)$sep(?&PerlOWS)$matcher)*)";
+                $matcher .= '?' if $param->{quantifier} eq '*';
+                $single_matcher .= "(?=(?<____KD___sep>$sep))?";
+            }
         }
+
 
         # Named parameters have to be named captured...
         my $skip_matcher = $matcher;
@@ -798,17 +856,35 @@ sub _unpack_signature {
 
         # Accumulate variable list into which parameters will be unpacked...
         if ($param->{name}) {
+            my $match_once = $param->{sigil} ne '$' || $single_matcher =~ /\(\?</
+                                ? "m{$single_matcher\$PPR::GRAMMAR}"
+                                : "m{}";
+
             $sig_vars                            .= "$param->{sigil}$param->{name},";
             $keyword_info_ref->{sig_vars_unpack} .= "$param->{sigil}$param->{name} = "
                                                   . ( $param->{sigil} eq '$'
-                                                        ? 'shift();'
-                                                        : "map { s{^(?: \\s*+ (?: [#].*\\n \\s*+ )*+)}{}x; \$_ } grep {defined && /\\S/} split m{($single_matcher \$PPR::GRAMMAR)}x, shift();"
+                                                        ? qq{do { my \$arg = shift();
+                                                                  \$arg =~ $match_once;
+                                                                  Keyword::Declare::_objectify(\$arg,{%+});
+                                                                };
+                                                            }
+                                                        : qq{do { my \@data;
+                                                                  my \$arg = shift();
+                                                                  while (\$arg =~ ${match_once}g) {
+                                                                      push \@data,
+                                                                           Keyword::Declare::_objectify(\$&,{%+});
+                                                                  }
+                                                                  \@data;
+                                                                };
+                                                            }
                                                     )
         }
         else {
             $keyword_info_ref->{sig_vars_unpack} .= 'shift();';
         }
     }
+
+#    use Data::Show; show $keyword_info_ref->{sig_vars_unpack};
 
     # Build a human readable version of the signature...
     $keyword_info_ref->{sig_desc} = '(' . join(',', @{$keyword_info_ref->{sig_quantified}}) . ')';
@@ -1074,14 +1150,14 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001014
+This document describes Keyword::Declare version 0.001015
 
 
 =head1 STATUS
 
 This module is an alpha release.
 Aspects of its behaviour may still change in future releases.
-They already have in past releases.
+They have already done so in past releases.
 
 
 =head1 SYNOPSIS
@@ -1217,15 +1293,16 @@ to declare a new keyword named C<keyword>, as that way lies madness.
 The parameters of the keyword tell it how to parse the source code that
 follows it. The general syntax for each parameter is:
 
-                            TYPE  [?*+][?+]  [$@]NAME  = 'DEFAULT'
+                         TYPE  [?*+][?+]  [$@]NAME  :sep(TYPE)  = 'DEFAULT'
 
-                            \__/  \_______/  \______/  \_________/
-    Parameter type............:       :          :          :
-    Repetition specifier..............:          :          :
-    Parameter variable...........................:          :
-    Default source code (if argument is missing)............:
+                         \__/  \_______/  \______/  \________/  \_________/
+    Parameter type.........:       :          :          :           :
+    Repetition specifier...........:          :          :           :
+    Parameter variable........................:          :           :
+    Separator specifier..................................:           :
+    Default source code (if argument is missing).....................:
 
-The type specifier is required, but the other three components
+The type specifier is required, but the other four components
 are optional. Each component is described in the following sections.
 
 
@@ -1498,6 +1575,107 @@ convert a non-named type to a named type using C<keytype>:
     list /rex/ from dogs();
 
 
+=head2 Capturing parameter components
+
+Normally, when a keyword parameter matches part of the source code,
+the text of that source code fragment becomes the string value of
+the corresponding parameter variable. For example:
+
+    keytype Mode     is / first | last | any | all /x;
+    keytype NumBlock is / \d+ (?&PerlOWS) (?&PerlBlock) /;
+
+    keyword choose (Mode $choosemode, NumBlock @numblocks) {...}
+
+    # And later...
+
+    choose any
+        1 {x==1}
+        2 {sqrt 4}
+        3 {"Many"}
+
+    # Parameter $choosemode gets: 'any'
+    # Parameter @numblocks  gets: ( '1 {x==1}', '2 {sqrt 4}', '3 {"Many"}' )
+
+However, if a parameter's type regex includes one or more named captures
+(i.e. via the C<(?<name> ... )> syntax), then the corresponding
+parameter variable is no longer bound to a simple string.
+
+Instead, it is bound to a hash-based object of the class
+C<Keyword::Declare::Arg>.
+
+This object still stringifies to the original source code fragment,
+so the parameter can still be interpolated into a replacement source
+code string.
+
+However, the object can also be treated as a hash...whose keys are the
+names of the named captures in the type regex, and whose values are the
+substrings those named captures matched.
+
+In addition, the C<Keyword::Declare::Arg> object always has an extra key
+(namely: the empty string), whose value stores the entire original source
+code fragment.
+
+So, for example, if the two parameter types from the previous example,
+had included named captures:
+
+    keytype Mode     is / (?<one> first | last | any ) | (?<many> all ) /x;
+
+    keytype NumBlock is / (?<num> \d+ ) (?&PerlOWS) (?<block> (?&PerlBlock) ) /;
+
+    keyword choose (Mode $choosemode, NumBlock @numblocks) {...}
+
+    # And later...
+
+    choose any
+        1 {x==1}
+        2 {sqrt 4}
+        3 {"Many"}
+
+    # $choosemode stringifies to:     'any'
+    # $choosemode->{''}     returns:  'any'
+    # $choosemode->{'one'}  returns:  'any'
+    # $choosemode->{'many'} returns:  undef
+
+    # $numblocks[0] stringifies to:    '1 {x==1}'
+    # $numblocks[0]{''}      returns:  '1 {x==1}'
+    # $numblocks[0]{'num'}   returns:  '1'
+    # $numblocks[0]{'block'} returns:  '{x==1}'
+
+    # et cetera...
+
+This feature is most often used to defined keywords whose arguments
+consist of a repeated sequence of components, especially when those
+components are either inherently complex (as in the previous example)
+or they are unavoidably heterogeneous in nature (as below).
+
+For example, to declare an C<assert> keyword that can take and test
+a series of blocks and/or expressions:
+
+    keytype BlockOrExpr is / (?<block> (?&PerlBlock) )
+                           | (?<expr>  (?&PerlExpression)  )
+                           /x;
+
+    keyword assert (BlockOrExpr @test_sequence) {
+
+        # Accumulate transformed tests in this variable
+        my @assertions;
+
+        # Build assertion code from sequence of test components
+        for my $test (@test_sequence) {
+
+            # Is the next component a block?
+            push @assertions, "do $test" if $test->{block};
+
+            # Is the next component a raw expression?
+            push @assertions, "($test)"  if $test->{expr};
+        }
+
+        # Generate replacement code...
+        return "die 'Assertion failed' unless "
+             . join ' && ', @assertions;
+    }
+
+
 =head2 Scalar vs array keyword parameters
 
 Declaring a keyword's parameter as a scalar (the usual approach) causes
@@ -1510,7 +1688,7 @@ exactly once in the trailing source. For example:
 Declaring a keyword's parameter as an array causes the source code
 parser to match the corresponding type of component as many times as it
 appears (but at least once) in the trailing source, with each matching
-occurence becoming one element of the array.
+occurrence becoming one element of the array.
 
     # tryall takes one or more trailing blocks
     keyword tryall (Block @blocks) {...}
@@ -1583,12 +1761,80 @@ For example:
         return "{ $statements }";
     }
 
-Note that any repetition quantifier is appended to the parameter's type, not after
+Note that any repetition quantifier is appended to the parameter's type, B<not> after
 its variable. As the previous example indicates, any quantifier may be applied to
 either a scalar or an array parameter: the quantifier tells the type how often to
 match; the kind of parameter determines how that match is made available inside
-the keyword body: as a single string (for scalar parameters), or as a list of
-individual matches (for array parameters).
+the keyword body: as a single string or object for scalar parameters, or as a list of
+individual strings or objects for array parameters.
+
+
+=head3 Separated repetitions
+
+Parameters can be marked as repeating either by being declared as arrays
+or by being declared with a type quantifier such as C<*>, C<+>, etc.)
+Any repeating parameter may match multiple repetitions of the same
+component. For example:
+
+    # tryall takes zero or more trailing blocks
+    keyword tryall (Block* @blocks) {...}
+
+...will match zero-or-more code blocks after the keyword.
+
+You can also specify that such parameters should match repeated
+components that are explicitly B<separated> by some other interstitial
+syntactic element: such as a comma or a colon or a newline or a special
+string like '+' or '&&' or 'then'.
+
+Such separators are specified by adding a C<:sep(...)> attribute after
+the variable name (but before any default value).
+
+For example, if the C<tryall> blocks should be separated by
+commas, you could specify that like so:
+
+    # tryall takes zero or more trailing comma-separated blocks
+    keyword tryall (Block* @blocks :sep(',')) {...}
+                                 # ^^^^^^^^^
+
+Separators can be specified using any valid parameter type:
+string, regex, named type, or junctive. For example:
+
+    # tryall takes zero or more trailing (fat-)comma-separated blocks
+    keyword tryall (Block* @blocks :sep( /,|=>/ )) {...}
+                                 #       ^^^^^^
+
+    # tryall takes zero or more trailing Comma-separated blocks
+    keyword tryall (Block* @blocks :sep( Comma )) {...}
+                                 #       ^^^^^
+
+    # tryall takes zero or more trailing Comma-or-colon-separated blocks
+    keytype Colon is ':';
+    keyword tryall (Block* @blocks :sep( Comma|Colon )) {...}
+                                 #       ^^^^^^^^^^^
+
+
+=head4 Accessing separators
+
+Whenever an array parameter is specified with a C<:sep> attribute, the
+actual separators found between instances of a repeated component can be
+retrieved via the Keyword::Declare::Arg objects that are returned in the
+array.
+
+Each such object stores the separator that occurred immediately I<after>
+the corresponding component, and each such trailing separator can be
+accessed via the object's special C<':sep'> key. For example:
+
+    # tryall takes zero or more trailing Comma-separated blocks
+    keyword tryall (Block* @blocks :sep(Comma)) {
+        warn "Separators are: ",
+             map { $_->{':sep'} } @blocks;
+        ...
+    }
+
+    # and later...
+
+    tryall {say 1} , {say 2} => {say 3} , {say 4};
+    # Warns: Separators are: ,=>,
 
 
 =head3 Providing a default for optional parameters
@@ -1928,9 +2174,9 @@ and less specific than its children or deeper descendants):
     HashIndexer
 
     OWS
-     \..NWS or Whitespace 
-       |...Pod 
-        \..Comment 
+     \..NWS or Whitespace
+       |...Pod
+        \..Comment
 
     PostfixUnaryOperator
 
@@ -1941,75 +2187,75 @@ and less specific than its children or deeper descendants):
     PrefixUnaryOperator
 
     Document
-     \..Statement 
-       |...Block 
-       |...PackageDeclaration 
-       |...Label 
-       |...UseStatement 
-       |...Format 
-       |...Expression or Expr 
-       |    \..LowPrecedenceNotExpression 
-       |       \..List 
-       |          \..CommaList 
-       |             \..Assignment 
-       |                \..ConditionalExpression or Ternary or ListElem 
-       |                   \..BinaryExpression 
-       |                      \..PrefixPostfixTerm 
-       |                         \..Term 
-       |                           |...AnonymousHash or AnonHash 
-       |                           |...VariableDeclaration or VarDecl 
-       |                           |...Literal 
-       |                           |   |...Number or Num 
-       |                           |   |   |...Integer or Int 
-       |                           |   |   |    \..PositiveInteger or PosInt 
-       |                           |   |    \..VersionNumber 
-       |                           |   |       \..VString 
-       |                           |   |...Bareword 
-       |                           |   |    \..OldQualifiedIdentifier 
-       |                           |   |       \..QualifiedIdentifier or QualIdent 
-       |                           |   |          \..Identifier or Ident 
-       |                           |    \..String or Str 
-       |                           |      |...VString 
-       |                           |      |...QuotelikeQ 
-       |                           |      |...QuotelikeQQ 
-       |                           |       \..Heredoc 
-       |                           |...Lvalue 
-       |                           |...AnonymousSubroutine 
-       |                           |...AnonymousArray or AnonArray 
-       |                           |...DoBlock 
-       |                           |...DiamondOperator 
-       |                           |...Variable or Var 
-       |                           |   |...ScalarAccess 
-       |                           |   |    \..VariableScalar or VarScalar or ScalarVar 
-       |                           |   |...ArrayAccess 
-       |                           |   |    \..VariableArray or VarArray or ArrayVar 
-       |                           |    \..HashAccess 
-       |                           |       \..VariableHash or VarHash or HashVar 
-       |                           |...Typeglob 
-       |                           |...Call 
-       |                           |    \..BuiltinFunction 
-       |                           |       \..NullaryBuiltinFunction 
-       |                           |...ParenthesesList or ParensList 
-       |                           |...ReturnStatement 
-       |                           |...EvalBlock 
-       |                            \..Quotelike 
-       |                              |...Regex or Regexp 
-       |                              |   |...QuotelikeQR 
-       |                              |   |...ContextualRegex 
-       |                              |   |   |...ContextualMatch or ContextualQuotelikeM 
-       |                              |   |    \..QuotelikeQR 
-       |                              |    \..Match or QuotelikeM 
-       |                              |       \..ContextualMatch or ContextualQuotelikeM 
-       |                              |...QuotelikeQW 
-       |                              |...QuotelikeQX 
-       |                              |...Substitution or QuotelikeS 
-       |                              |...Transliteration or QuotelikeTR 
-       |                               \..String or Str 
-       |                                 |...QuotelikeQQ 
-       |                                  \..QuotelikeQ 
-       |...SubroutineDeclaration 
-       |...Keyword 
-        \..ControlBlock 
+     \..Statement
+       |...Block
+       |...PackageDeclaration
+       |...Label
+       |...UseStatement
+       |...Format
+       |...Expression or Expr
+       |    \..LowPrecedenceNotExpression
+       |       \..List
+       |          \..CommaList
+       |             \..Assignment
+       |                \..ConditionalExpression or Ternary or ListElem
+       |                   \..BinaryExpression
+       |                      \..PrefixPostfixTerm
+       |                         \..Term
+       |                           |...AnonymousHash or AnonHash
+       |                           |...VariableDeclaration or VarDecl
+       |                           |...Literal
+       |                           |   |...Number or Num
+       |                           |   |   |...Integer or Int
+       |                           |   |   |    \..PositiveInteger or PosInt
+       |                           |   |    \..VersionNumber
+       |                           |   |       \..VString
+       |                           |   |...Bareword
+       |                           |   |    \..OldQualifiedIdentifier
+       |                           |   |       \..QualifiedIdentifier or QualIdent
+       |                           |   |          \..Identifier or Ident
+       |                           |    \..String or Str
+       |                           |      |...VString
+       |                           |      |...QuotelikeQ
+       |                           |      |...QuotelikeQQ
+       |                           |       \..Heredoc
+       |                           |...Lvalue
+       |                           |...AnonymousSubroutine
+       |                           |...AnonymousArray or AnonArray
+       |                           |...DoBlock
+       |                           |...DiamondOperator
+       |                           |...Variable or Var
+       |                           |   |...ScalarAccess
+       |                           |   |    \..VariableScalar or VarScalar or ScalarVar
+       |                           |   |...ArrayAccess
+       |                           |   |    \..VariableArray or VarArray or ArrayVar
+       |                           |    \..HashAccess
+       |                           |       \..VariableHash or VarHash or HashVar
+       |                           |...Typeglob
+       |                           |...Call
+       |                           |    \..BuiltinFunction
+       |                           |       \..NullaryBuiltinFunction
+       |                           |...ParenthesesList or ParensList
+       |                           |...ReturnStatement
+       |                           |...EvalBlock
+       |                            \..Quotelike
+       |                              |...Regex or Regexp
+       |                              |   |...QuotelikeQR
+       |                              |   |...ContextualRegex
+       |                              |   |   |...ContextualMatch or ContextualQuotelikeM
+       |                              |   |    \..QuotelikeQR
+       |                              |    \..Match or QuotelikeM
+       |                              |       \..ContextualMatch or ContextualQuotelikeM
+       |                              |...QuotelikeQW
+       |                              |...QuotelikeQX
+       |                              |...Substitution or QuotelikeS
+       |                              |...Transliteration or QuotelikeTR
+       |                               \..String or Str
+       |                                 |...QuotelikeQQ
+       |                                  \..QuotelikeQ
+       |...SubroutineDeclaration
+       |...Keyword
+        \..ControlBlock
 
     Comma
 
@@ -2176,6 +2422,7 @@ handle (or possibly misspelled one of the valid attribute names).
 
 
 =item C<< Missing » on interpolation «%s... >>
+
 =item C<< Missing }> on interpolation <{%s... >>
 
 You created a C<keyword> definition with a C<{{{...}}}> interpolator,

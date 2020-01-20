@@ -2,16 +2,20 @@
 
 package Dash::Core::Components::Link;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'href';
-has 'refresh';
-has 'className';
-has 'style';
-has 'children';
-has 'loading_state';
+extends 'Dash::BaseComponent';
+
+has 'id'            => ( is => 'rw' );
+has 'href'          => ( is => 'rw' );
+has 'refresh'       => ( is => 'rw' );
+has 'className'     => ( is => 'rw' );
+has 'style'         => ( is => 'rw' );
+has 'children'      => ( is => 'rw' );
+has 'loading_state' => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -19,7 +23,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -36,7 +40,7 @@ Dash::Core::Components::Link
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

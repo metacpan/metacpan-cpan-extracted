@@ -1,14 +1,14 @@
 package Apache::Config::Preproc::ifdefine;
+use parent 'Apache::Config::Preproc::Expand';
 use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub new {
-    my $class = shift;
-    my $conf = shift;
-    my $self = bless {}, $class;
+    my ($class, $conf) = @_;
+    my $self = bless $class->SUPER::new($conf), $class;
     @{$self->{D}}{@_} = (1) x @_;
     return $self;
 }
@@ -136,4 +136,9 @@ B<E<lt>IfDefineE<gt>> statements in the Apache configuration parse
 tree. Optional arguments to the constructor are treated as the names
 of symbols to define (similar to the B<httpd> B<-D> options).    
     
-    
+=head1 SEE ALSO
+
+L<Apache::Config::Preproc>
+
+=cut
+

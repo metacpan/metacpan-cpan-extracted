@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 3.02;
+package App::DocKnot 3.03;
 
 use 5.024;
 use autodie;

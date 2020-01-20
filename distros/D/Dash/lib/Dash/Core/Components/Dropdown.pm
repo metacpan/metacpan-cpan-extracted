@@ -2,25 +2,29 @@
 
 package Dash::Core::Components::Dropdown;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'options';
-has 'value';
-has 'optionHeight';
-has 'className';
-has 'clearable';
-has 'disabled';
-has 'multi';
-has 'placeholder';
-has 'searchable';
-has 'search_value';
-has 'style';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'id'               => ( is => 'rw' );
+has 'options'          => ( is => 'rw' );
+has 'value'            => ( is => 'rw' );
+has 'optionHeight'     => ( is => 'rw' );
+has 'className'        => ( is => 'rw' );
+has 'clearable'        => ( is => 'rw' );
+has 'disabled'         => ( is => 'rw' );
+has 'multi'            => ( is => 'rw' );
+has 'placeholder'      => ( is => 'rw' );
+has 'searchable'       => ( is => 'rw' );
+has 'search_value'     => ( is => 'rw' );
+has 'style'            => ( is => 'rw' );
+has 'loading_state'    => ( is => 'rw' );
+has 'persistence'      => ( is => 'rw' );
+has 'persisted_props'  => ( is => 'rw' );
+has 'persistence_type' => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -28,7 +32,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -45,7 +49,7 @@ Dash::Core::Components::Dropdown
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

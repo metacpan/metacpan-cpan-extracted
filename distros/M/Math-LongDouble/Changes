@@ -1,3 +1,9 @@
+ 0.21
+  - Fix error in t/trig.t (in test 12 diagnostic message).
+  - Prototype subroutines listed in 'use subs()'.
+  - Remove ld_min_inter_base() and ld_max_orig_base() as they are of no use
+  - Rewrite ld_bytes.
+
  0.19
   - Revert to previous version of _is_zero() XSub. (More reliable.)
   - Alter Overload_abs() to work correctly with -0 when the compiler/libc

@@ -2,41 +2,45 @@
 
 package Dash::Core::Components::DatePickerRange;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'start_date';
-has 'start_date_id';
-has 'end_date_id';
-has 'end_date';
-has 'min_date_allowed';
-has 'max_date_allowed';
-has 'initial_visible_month';
-has 'start_date_placeholder_text';
-has 'end_date_placeholder_text';
-has 'day_size';
-has 'calendar_orientation';
-has 'is_RTL';
-has 'reopen_calendar_on_clear';
-has 'number_of_months_shown';
-has 'with_portal';
-has 'with_full_screen_portal';
-has 'first_day_of_week';
-has 'minimum_nights';
-has 'stay_open_on_select';
-has 'show_outside_days';
-has 'month_format';
-has 'display_format';
-has 'disabled';
-has 'clearable';
-has 'style';
-has 'className';
-has 'updatemode';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'id'                          => ( is => 'rw' );
+has 'start_date'                  => ( is => 'rw' );
+has 'start_date_id'               => ( is => 'rw' );
+has 'end_date_id'                 => ( is => 'rw' );
+has 'end_date'                    => ( is => 'rw' );
+has 'min_date_allowed'            => ( is => 'rw' );
+has 'max_date_allowed'            => ( is => 'rw' );
+has 'initial_visible_month'       => ( is => 'rw' );
+has 'start_date_placeholder_text' => ( is => 'rw' );
+has 'end_date_placeholder_text'   => ( is => 'rw' );
+has 'day_size'                    => ( is => 'rw' );
+has 'calendar_orientation'        => ( is => 'rw' );
+has 'is_RTL'                      => ( is => 'rw' );
+has 'reopen_calendar_on_clear'    => ( is => 'rw' );
+has 'number_of_months_shown'      => ( is => 'rw' );
+has 'with_portal'                 => ( is => 'rw' );
+has 'with_full_screen_portal'     => ( is => 'rw' );
+has 'first_day_of_week'           => ( is => 'rw' );
+has 'minimum_nights'              => ( is => 'rw' );
+has 'stay_open_on_select'         => ( is => 'rw' );
+has 'show_outside_days'           => ( is => 'rw' );
+has 'month_format'                => ( is => 'rw' );
+has 'display_format'              => ( is => 'rw' );
+has 'disabled'                    => ( is => 'rw' );
+has 'clearable'                   => ( is => 'rw' );
+has 'style'                       => ( is => 'rw' );
+has 'className'                   => ( is => 'rw' );
+has 'updatemode'                  => ( is => 'rw' );
+has 'loading_state'               => ( is => 'rw' );
+has 'persistence'                 => ( is => 'rw' );
+has 'persisted_props'             => ( is => 'rw' );
+has 'persistence_type'            => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -44,7 +48,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -61,7 +65,7 @@ Dash::Core::Components::DatePickerRange
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

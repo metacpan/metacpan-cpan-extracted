@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Text::Table;
+
      my $obj = Map::Tube::Text::Table->new(%params);
      my $text = $obj->junctions;
      my $text = $obj->line($line);
@@ -51,11 +52,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use English;
      use Error::Pure qw(err);
@@ -145,22 +144,25 @@ DEPENDENCIES
     List::MoreUtils, Readonly, Scalar::Util.
 
 SEE ALSO
-    Map::Tube, Map::Tube::Graph, Map::Tube::GraphViz,
-    Map::Tube::Plugin::Graph, Task::Map::Tube.
+    Task::Map::Tube
+        Install the Map::Tube modules.
+
+    Task::Map::Tube::Metro
+        Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Text-Table>
+    <https://github.com/michal-josef-spacek/Map-Tube-Text-Table>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2020 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

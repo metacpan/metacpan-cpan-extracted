@@ -1,0 +1,48 @@
+NAME
+    unicode-block - Script to print Unicode blocks.
+
+SYNOPSIS
+     unicode-block [-h] [-l] [--version] [unicode_block]
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "-l"
+
+             Print list of Unicode blocks.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "unicode_block"
+
+             Name of Unicode block to print.
+             If this name present, only print block and exit.
+
+EXAMPLE1
+     unicode-block -h
+
+EXAMPLE2
+     unicode-block -l
+
+EXAMPLE3
+     unicode-block Thai
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Unicode-Block>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2013-2020 Michal Josef Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

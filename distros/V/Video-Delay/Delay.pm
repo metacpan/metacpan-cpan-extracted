@@ -1,11 +1,9 @@
 package Video::Delay;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 1;
 
@@ -39,17 +37,17 @@ Video::Delay class for delays defined by math function.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Video-Delay>
+L<https://github.com/michal-josef-spacek/Video-Delay>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
+ © 2012-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION 

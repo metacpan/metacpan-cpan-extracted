@@ -1,6 +1,8 @@
 package Dash::BaseComponent;
 
-use Mojo::Base -base;
+use Moo;
+use strictures 2;
+use namespace::clean;
 
 sub DashNamespace {
     return 'no_namespace';
@@ -11,6 +13,9 @@ sub TO_JSON {
     my @components = split( /::/, ref($self) );
     my $type       = $components[-1];
     my %hash       = %$self;
+    if ( !exists $hash{children} ) {
+        $hash{children} = undef;
+    }
     return { type      => $type,
              namespace => $self->DashNamespace,
              props     => \%hash
@@ -31,7 +36,7 @@ Dash::BaseComponent
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

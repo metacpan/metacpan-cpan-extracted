@@ -17,7 +17,7 @@ chdir($toplevel) or die("Failed to chdir to $toplevel: $!\n");
 my %files = 
 	(
 		'README.md' => [1],
-		'lib/Grep/Query.pm' => [8, 218],
+		'lib/Grep/Query.pm' => [8, 217],
 		'lib/Grep/Query/Parser.pm' => [6],
 		'lib/Grep/Query/FieldAccessor.pm' => [8],
 		'lib/Grep/Query/Parser/QOPS.pm' => [6],

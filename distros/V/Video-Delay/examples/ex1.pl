@@ -1,19 +1,13 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Video::Delay::Func;
+use Video::Delay::Const;
 
 # Object.
-my $obj = Video::Delay::Func->new(
-        'func' => sub {
-                my $t = shift;
-                return 1000 * sin($t);
-        },
-        'incr' => 0.1,
+my $obj = Video::Delay::Const->new(
+        'const' => 1000,
 );
 
 # Print delay.
@@ -22,6 +16,6 @@ print $obj->delay."\n";
 print $obj->delay."\n";
 
 # Output:
-# 99.8334166468282
-# 198.669330795061
-# 295.52020666134
+# 1000
+# 1000
+# 1000

@@ -1,0 +1,31 @@
+---
+abstract: 'create a backup copy of the file.'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Cmp: '1.07'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-BackupCopy
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  File::BackupCopy:
+    file: lib/File/BackupCopy.pm
+    version: '1.00'
+requires:
+  File::Temp: '0.23'
+  perl: '5.006'
+resources:
+  repository: git://git.gnu.org.ua/file-backup.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

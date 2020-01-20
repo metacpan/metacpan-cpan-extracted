@@ -449,8 +449,8 @@ sub _build_dockerignore ( $self, $path ) {
             $pattern =~ s[\\[*]][[^/]*]smg;
 
             # if pattern started with "!" - this is "including" pattern
-            if ( substr( $line, 0, 2 ) eq '\!' ) {
-                substr $line, 0, 2, $EMPTY;
+            if ( substr( $pattern, 0, 2 ) eq '\!' ) {
+                substr $pattern, 0, 2, $EMPTY;
 
                 push @include, $pattern;
             }

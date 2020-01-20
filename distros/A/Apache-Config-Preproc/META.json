@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Apache-Config-Preproc",
    "no_index" : {
@@ -35,6 +35,7 @@
             "Apache::Admin::Config" : "0.95",
             "File::Spec" : "0",
             "IPC::Open3" : "0",
+            "Text::Locus" : "1.03",
             "Text::ParseWords" : "3.27",
             "perl" : "5.014002"
          }
@@ -52,27 +53,40 @@
    "provides" : {
       "Apache::Config::Preproc" : {
          "file" : "lib/Apache/Config/Preproc.pm",
-         "version" : "1.03"
+         "version" : "1.04"
+      },
+      "Apache::Config::Preproc::Expand" : {
+         "file" : "lib/Apache/Config/Preproc/Expand.pm"
+      },
+      "Apache::Config::Preproc::Server::Probe" : {
+         "file" : "lib/Apache/Config/Preproc/Server/Probe.pm"
       },
       "Apache::Config::Preproc::compact" : {
          "file" : "lib/Apache/Config/Preproc/compact.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Apache::Config::Preproc::ifdefine" : {
          "file" : "lib/Apache/Config/Preproc/ifdefine.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Apache::Config::Preproc::ifmodule" : {
          "file" : "lib/Apache/Config/Preproc/ifmodule.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Apache::Config::Preproc::include" : {
          "file" : "lib/Apache/Config/Preproc/include.pm",
-         "version" : "1.02"
+         "version" : "1.03"
+      },
+      "Apache::Config::Preproc::locus" : {
+         "file" : "lib/Apache/Config/Preproc/locus.pm",
+         "version" : "1.03"
+      },
+      "Apache::Config::Preproc::locus::node" : {
+         "file" : "lib/Apache/Config/Preproc/locus.pm"
       },
       "Apache::Config::Preproc::macro" : {
          "file" : "lib/Apache/Config/Preproc/macro.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Apache::Config::Preproc::macro::defn" : {
          "file" : "lib/Apache/Config/Preproc/macro.pm"
@@ -86,5 +100,6 @@
          "web" : "http://git.gnu.org.ua/cgit/acpp.git/"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

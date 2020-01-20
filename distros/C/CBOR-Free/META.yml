@@ -6,6 +6,7 @@ build_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
+  Test::Class::Tiny: '0'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::Exception: '0'
@@ -14,6 +15,7 @@ build_requires:
   autodie: '0'
 configure_requires:
   Devel::PPPort: '0'
+  ExtUtils::MakeMaker: '6.84'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -35,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-CBOR-Free/issues
   repository: git://github.com/FGasper/p5-CBOR-Free.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

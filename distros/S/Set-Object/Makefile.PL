@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 unless (eval { require Test::More; 1 }) {
 	print STDERR "*** Test::More is not installed, you will not be able to run the tests\n";
 }
-unless ($] >= 5.006001) {
+unless ($] >= 5.008) {
 	print STDERR "*** This Perl version ($]) is not supported\n";
 }
 

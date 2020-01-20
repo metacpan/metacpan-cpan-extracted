@@ -2,22 +2,26 @@
 
 package Dash::Core::Components::RadioItems;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'options';
-has 'value';
-has 'style';
-has 'className';
-has 'inputStyle';
-has 'inputClassName';
-has 'labelStyle';
-has 'labelClassName';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'id'               => ( is => 'rw' );
+has 'options'          => ( is => 'rw' );
+has 'value'            => ( is => 'rw' );
+has 'style'            => ( is => 'rw' );
+has 'className'        => ( is => 'rw' );
+has 'inputStyle'       => ( is => 'rw' );
+has 'inputClassName'   => ( is => 'rw' );
+has 'labelStyle'       => ( is => 'rw' );
+has 'labelClassName'   => ( is => 'rw' );
+has 'loading_state'    => ( is => 'rw' );
+has 'persistence'      => ( is => 'rw' );
+has 'persisted_props'  => ( is => 'rw' );
+has 'persistence_type' => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -25,7 +29,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -42,7 +46,7 @@ Dash::Core::Components::RadioItems
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

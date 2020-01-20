@@ -22,7 +22,9 @@ const my $dash_component_packages => [ qw(
 # TODO pull repo to find tag version
 
 
-my $dash_path = path('..', 'dash');
+my $base_dash_python_path = path('..');
+
+my $dash_path = $base_dash_python_path->child('dash');
 my $dist_share_js = path('share/assets');
 
 # Generate componentes
@@ -50,12 +52,35 @@ $dash_renderer_assets->visit(sub {
 
 system("source $dash_venv_path; cd $dash_renderer_path; renderer build");
 
+my $node_modules_renderer = $dash_renderer_path->child('node_modules');
 my $dist_share_js_renderer = $dist_share_js->child('dash_renderer');
 $dist_share_js_renderer->remove_tree();
 $dist_share_js_renderer->mkpath();
-# TODO LICENSE files and source maps
 for my $js_file ($dash_renderer_assets->children(qr/\.js$/)) {
     $js_file->copy($dist_share_js_renderer);
+    my $package_name = $js_file->basename;
+    $package_name =~ s/([^@]+)@.+/$1/;
+    my $package_dist = $node_modules_renderer->child($package_name);
+    if ($package_dist->exists) {
+        my $license_destination_file = $dist_share_js_renderer->child($js_file->basename . '.LICENSE');
+        say 'Copying LICENSE to ' . $license_destination_file;
+        $package_dist->child('LICENSE')->copy($license_destination_file);
+    } elsif ($package_name eq 'polyfill') {
+        $package_name = '@babel';
+        $package_dist = $node_modules_renderer->child($package_name)->child('polyfill');
+        if ($package_dist->exists) {
+            my $license_destination_file = $dist_share_js_renderer->child($js_file->basename . '.LICENSE');
+            say 'Copying LICENSE to ' . $license_destination_file;
+            $package_dist->child('LICENSE')->copy($license_destination_file);
+        } else {
+            say 'LICENSE not found for ' . $js_file->basename;
+        }
+    }
+}
+
+# Dash renderer LICENSE
+for my $js_renderer_file ($dist_share_js_renderer->children(qr/dash_renderer/)) {
+    $dash_path->child('LICENSE')->copy($dist_share_js_renderer->child($js_renderer_file->basename . '.LICENSE'));
 }
 
 my $python_script_extract_renderer_js_deps = path('tool', 'python', 'aux_dash_renderer.py');
@@ -68,7 +93,7 @@ for my $component_suite (@$dash_component_packages) {
     print "Building $component_suite <============================================================>\n";
     # TODO pull repo
 
-    my $component_suite_path = path('..', $component_suite);
+    my $component_suite_path = $base_dash_python_path->child($component_suite);
     # Install js deps
     system("cd $component_suite_path; npm ci");
     #system("cd $component_suite_path; npm update");
@@ -85,9 +110,43 @@ for my $component_suite (@$dash_component_packages) {
 
     $perl_base_path->child('js_deps.json')->copy($component_suite_assets_path);
 
-    # TODO LICENSE files
+    # TODO source map files
+    my $node_modules_component_suite = $component_suite_path->child('node_modules');
     for my $js_file ($perl_base_path->child('deps')->children()) {
         $js_file->copy($component_suite_assets_path);
+        if ($js_file =~ /\.js$/) {
+            my $package_name = $js_file->basename;
+            print 'Searching LICENSE for ' . $package_name;
+            if ($package_name =~ /@/) {
+                $package_name =~ s/([^@]+)@.+/$1/;
+                my $package_dist = $node_modules_component_suite->child($package_name);
+                say ' in ' . $package_dist;
+                if ($package_dist->exists) {
+                    my $license_destination_file = $component_suite_assets_path->child($js_file->basename . '.LICENSE');
+                    say 'Copying LICENSE file from ' . $package_dist . ' to ' . $license_destination_file;
+                    $package_dist->child('LICENSE')->copy($license_destination_file);
+                }
+            } elsif ($package_name =~ /$component_suite_assets_directory_name/) {
+                my $package_dist = $component_suite_path;
+                say ' in ' . $package_dist;
+                my $license_destination_file = $component_suite_assets_path->child($js_file->basename . '.LICENSE');
+                say 'Copying LICENSE file from ' . $package_dist . ' to ' . $license_destination_file;
+                $package_dist->child('LICENSE')->copy($license_destination_file);
+            } elsif ($package_name =~ /async~/) {
+                $package_name =~ s/async~(.+)/$1/;
+                my $package_dist = $node_modules_component_suite->child($package_name);
+                say ' in ' . $package_dist;
+                if ($package_dist->exists) {
+                    my $license_destination_file = $component_suite_assets_path->child($js_file->basename . '.LICENSE');
+                    say 'Copying LICENSE file from ' . $package_dist . ' to ' . $license_destination_file;
+                    $package_dist->child('LICENSE')->copy($license_destination_file);
+                } else {
+                    say 'Assuming there is not LICENSE file for ' . $js_file . ' because is part of the main component suite';
+                }
+            } else {
+                say 'Assuming there is not LICENSE file for ' . $js_file . ' because is part of the main component suite';
+            }
+        }
     }
 
     my $component_suite_package_files_directory = path('lib', map {ucfirst } split(/-/, $component_suite));
@@ -95,6 +154,9 @@ for my $component_suite (@$dash_component_packages) {
     $component_suite_package_files_directory->mkpath();
     for my $pm_file ($perl_base_path->child($component_suite_assets_directory_name)->children(qr/\.pm$/)) {
         $pm_file->copy($component_suite_package_files_directory);
+    }
+    for my $pm_file ($perl_base_path->children(qr/\.pm$/)) {
+        $pm_file->copy($component_suite_package_files_directory->parent);
     }
 }
 

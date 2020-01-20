@@ -2,30 +2,34 @@
 
 package Dash::Core::Components::RangeSlider;
 
-use Dash::Core::Components;
-use Mojo::Base 'Dash::BaseComponent';
+use Moo;
+use strictures 2;
+use Dash::Core::ComponentsAssets;
+use namespace::clean;
 
-has 'id';
-has 'marks';
-has 'value';
-has 'allowCross';
-has 'className';
-has 'count';
-has 'disabled';
-has 'dots';
-has 'included';
-has 'min';
-has 'max';
-has 'pushable';
-has 'tooltip';
-has 'step';
-has 'vertical';
-has 'verticalHeight';
-has 'updatemode';
-has 'loading_state';
-has 'persistence';
-has 'persisted_props';
-has 'persistence_type';
+extends 'Dash::BaseComponent';
+
+has 'id'               => ( is => 'rw' );
+has 'marks'            => ( is => 'rw' );
+has 'value'            => ( is => 'rw' );
+has 'allowCross'       => ( is => 'rw' );
+has 'className'        => ( is => 'rw' );
+has 'count'            => ( is => 'rw' );
+has 'disabled'         => ( is => 'rw' );
+has 'dots'             => ( is => 'rw' );
+has 'included'         => ( is => 'rw' );
+has 'min'              => ( is => 'rw' );
+has 'max'              => ( is => 'rw' );
+has 'pushable'         => ( is => 'rw' );
+has 'tooltip'          => ( is => 'rw' );
+has 'step'             => ( is => 'rw' );
+has 'vertical'         => ( is => 'rw' );
+has 'verticalHeight'   => ( is => 'rw' );
+has 'updatemode'       => ( is => 'rw' );
+has 'loading_state'    => ( is => 'rw' );
+has 'persistence'      => ( is => 'rw' );
+has 'persisted_props'  => ( is => 'rw' );
+has 'persistence_type' => ( is => 'rw' );
 my $dash_namespace = 'dash_core_components';
 
 sub DashNamespace {
@@ -33,7 +37,7 @@ sub DashNamespace {
 }
 
 sub _js_dist {
-    return Dash::Core::Components::_js_dist;
+    return Dash::Core::ComponentsAssets::_js_dist;
 }
 
 1;
@@ -50,7 +54,7 @@ Dash::Core::Components::RangeSlider
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

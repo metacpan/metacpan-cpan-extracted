@@ -20,6 +20,7 @@ from ._py_components_generation import generate_imports
 from ._py_components_generation import generate_classes_files
 from ._perl_components_generation import generate_perl_package_file
 from ._perl_components_generation import write_js_metadata
+from ._perl_components_generation import generate_perl_imports
 
 
 reserved_words = [
@@ -120,6 +121,7 @@ def generate_components(
         json.dump(metadata, f, indent=2)
 
     generate_imports(project_shortname, components)
+    generate_perl_imports(project_shortname, components)
 
 
     if rprefix is not None:

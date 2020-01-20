@@ -1,0 +1,41 @@
+File::BackupCopy
+================
+
+The File::BackupCopy module provides functions for creating backup copies of
+files.  Two backup schemes are supported: simple and numbered backups.  In
+simple (or single) backup scheme, only one backup copy is maintained for the
+given file.  Its name is created by appending a single tilde character to the
+original file name.  In numbered backup scheme, arbitrary number of backup
+copies can be created.  The name of each backup copy is created by suffixing
+the original file name with '.~N~', where N is a decimal number starting with
+1.  Additionally, the automatic backup name scheme is implemented.  In this
+naming scheme, numbered backups are created if at least one numbered backup
+copy already exists and simple backups are created otherwise.
+
+INSTALLATION
+------------
+
+The usual way:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2020 by Sergey Poznyakoff
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+It is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this library. If not, see <http://www.gnu.org/licenses/>.
