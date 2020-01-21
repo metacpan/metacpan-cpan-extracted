@@ -6,7 +6,7 @@ use Date::Format;
 use Class::Std::Fast::Storable constructor => 'none', cache => 1;
 use base qw(SOAP::WSDL::XSD::Typelib::Builtin::anySimpleType);
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 sub set_value {
     # use set_value from base class if we have a XML-Time format

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Build Curio classes around GitLab::API::v4.",
+   "abstract" : "Build Curio classes around GitLab::API::v4. (DEPRECATED)",
    "author" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Curio::Role::GitLab::API::v4" : {
          "file" : "lib/Curio/Role/GitLab/API/v4.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -77,8 +77,9 @@
          "web" : "https://github.com/bluefeet/Curio-Role-GitLab-API-v4"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:BLUEFEET",
+   "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

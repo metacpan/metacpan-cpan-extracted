@@ -2,19 +2,23 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
+               'oneline' => 'This string has a \' quote character.',
                'multiline' => 'This string
 has \' a quote character
 and more than
 one newline
 in it.',
-               'firstnl' => 'This string has a \' quote character.',
-               'oneline' => 'This string has a \' quote character.'
+               'firstnl' => 'This string has a \' quote character.'
              };
 
 

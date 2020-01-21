@@ -1,5 +1,5 @@
 ---
-abstract: 'Curio Model for Catalyst.'
+abstract: 'Curio Model for Catalyst. (DEPRECATED)'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
@@ -28,10 +28,10 @@ no_index:
 provides:
   Catalyst::Helper::Model::Curio:
     file: lib/Catalyst/Helper/Model/Curio.pm
-    version: '0.03'
+    version: '0.04'
   Catalyst::Model::Curio:
     file: lib/Catalyst/Model/Curio.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Catalyst: '5.80001'
   Catalyst::Model: '0'
@@ -47,7 +47,10 @@ resources:
   bugtracker: https://github.com/bluefeet/Catalyst-Model-Curio/issues
   homepage: https://github.com/bluefeet/Catalyst-Model-Curio
   repository: git://github.com/bluefeet/Catalyst-Model-Curio.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

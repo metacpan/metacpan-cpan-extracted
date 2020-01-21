@@ -5,11 +5,7 @@ META.json
 README.md
 cpanfile
 eg/chart.pl
-eg/double_click.pl
-eg/drag_and_drop.pl
-eg/html_view.pl
 eg/input_choice.pl
-eg/progress.pl
 eg/scrollbar.pl
 eg/synopsis.pl
 eg/tabs.pl

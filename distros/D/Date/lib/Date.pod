@@ -1,46 +1,41 @@
 =head1 NAME
 
-Date - fast Date framework with timezone and microseconds support, with Perl and C++ interface.
+Date - extremely fast Date framework with timezones, microseconds, relative dates and intervals support.
 
 =head1 DESCRIPTION
 
-L<Date> is almost fully compatible with L<Class::Date>, but has several more features and much greater perfomance.
-It is written fully in C++.
+Date is a port of C++ C<panda::date> framework which is complete feature-rich date framework, supporting timezones (not just offsets), microseconds,
+relative dates and intervals. Timezones with leap seconds (right/*) are also supported.
 
 L<Date> supports dates between -2147483648/01/01 00:00:00 and 2147483647/12/31 23:59:59 (on 64bit perls).
 
-With L<Date> you can perform some operations even faster than in plain C program using stdlibc functions.
-See L<Time::XS> why.
+With L<Date> you can perform some operations even faster than in plain C program using stdlibc functions because it has its own efficient 
+low-level time functions implementation.
 
 =head1 SYNOPSIS
 
-    use Time::XS qw/tzset/;
-    use Date qw/now now_hires date today rdate idate :const/;
+    use Date qw/date date_ymd rdate rdate_ymd tzset/;
     
     my $date = Date->new($epoch); # using server's local timezone
-    $date = Date->new([$y,$m,$d,$h,$m,$s]);
-    $date = Date->new({year => $y, month => $m, day => $d, hour => $h, min => $m, sec => $s, mksec => $mks});
-    $date = Date->new("2013-03-05 23:45:56");
     $date = Date->new("2013-03-05 23:45:56.345");
-    $date = now(); # same as Date->new(time()) but faster
-    $date = today(); # same as Date->new(time())->truncate but faster
-    $date = now_hires(); # current time with microseconds
+    $date = Date->new_ymd($y,$m,$d,$h,$m,$s);
+    $date = Date->new_ymd(year => $y, month => $m, day => $d, hour => $h, min => $m, sec => $s, mksec => $mks);
+    $date = Date::now(); # same as Date->new(time()) but faster
+    $date = Date::today(); # same as Date->new(time())->truncate but faster
+    $date = Date::now_hires(); # current time with microseconds
     
     # create using function 'date'
     tzset('Europe/Moscow'); # using 'Europe/Moscow' as server's local timezone
-    $date = date [$year,$month,$day,$hour,$min,$sec]; 
-    $date = date { year => $year, month => $month, day => $day, hour => $hour, min => $min, sec => $sec };
-    $date = date "2001/11/12 07:13:12";
-    $date = date 123456789;
+    $date = date(123456789);
     $date = date("2001/11/12 07:13:12", 'America/New_York'); # $date operates in custom time zone
     
     # creating relative date object
     # (normally you don't need to create this object explicitly)
-    $reldate = new Date::Rel "3Y 1M 3D 6h 2m 4s";
-    $reldate = new Date::Rel "6Y";
-    $reldate = new Date::Rel $secs;  # secs
-    $reldate = new Date::Rel [$year,$month,$day,$hour,$min,$sec];
-    $reldate = new Date::Rel { year => $year, month => $month, day => $day, hour => $hour, min => $min, sec => $sec };
+    $reldate = Date::Rel->new("3Y 1M 3D 6h 2m 4s");
+    $reldate = Date::Rel->new("6Y");
+    $reldate = Date::Rel->new($secs);
+    $reldate = Date::Rel->new_ymd($year,$month,$day,$hour,$min,$sec);
+    $reldate = Date::Rel->new_ymd(year => $year, month => $month, day => $day, hour => $hour, min => $min, sec => $sec);
     $reldate = rdate "-1M -3D 6h";
     $reldate = 3*MONTH; # "3M"
     $reldate = 2*YEAR + MONTH - 30*DAY; # "2Y 1M -30D"
@@ -50,12 +45,11 @@ See L<Time::XS> why.
     $date;              # prints the date in default output format (ISO/SQL format)
     $date->epoch;       # unix timestamp
     $date->year;        # year, e.g: 2001
-    $date->_year;       # year - 1900, e.g. 101
+    $date->c_year;      # year - 1900, e.g. 101
     $date->yr;          # 2-digit year 0-99, e.g 1
-    $date->mon;         # month 1..12
-    $date->month;       # same as prev.
-    $date->_mon;        # month 0..11
-    $date->_month;      # same as prev.
+    $date->month;       # month 1..12
+    $date->mon;         # same as prev.
+    $date->c_month;     # month 0..11
     $date->day;         # day of month
     $date->mday;        # day of month
     $date->day_of_month;# same as prev.
@@ -65,73 +59,49 @@ See L<Time::XS> why.
     $date->sec;
     $date->second;      # same as prev.
     $date->mksec;
-    $date->wday;        # 1 = Sunday
+    $date->wday;        # 1-7, Sunday-Saturday
     $date->day_of_week; # same as prev.
-    $date->_wday;       # 0 = Sunday
-    $date->ewday;       # 1 = Monday, 7 = Sunday
-    $date->yday;        # [1-366]
+    $date->c_wday;      # 0-6, Sunday-Saturday
+    $date->ewday;       # 1-7, Monday-Sunday
+    $date->yday;        # day of year [1-366]
     $date->day_of_year; # same as prev.
-    $date->_yday;       # [0-365]
+    $date->c_yday;      # [0-365]
     $date->isdst;       # DST?
     $date->daylight_savings; # same as prev.
     $date->strftime($format);
-    $date->monname;     # name of month, eg: March
-    $date->monthname;   # same as prev.
-    $date->wdayname;    # Thursday
-    $date->day_of_weekname # same as prev.
-    $date->hms          # 01:23:45
-    $date->ymd          # 2000/02/29
-    $date->mdy          # 02/29/2000
-    $date->dmy          # 29/02/2000
-    $date->meridiam     # 01:23 AM
-    $date->ampm         # AM/PM
-    $date->string       # 2000-02-29 12:21:11 (format can be changed)
+    $date->month_name;  # March
+    $date->month_sname; # Mar
+    $date->wday_name;   # Thursday
+    $date->wday_sname;  # Thu
+    $date->to_string    # 2000-02-29 12:21:11
     "$date"             # same as prev.
-    $date->iso          # 2000-02-29 12:21:11
+    $date->to_string(Date::Format::iso8601); # 2000-02-29T12:21:11+03:00
     $date->gmtoff       # current offset from UTC (in seconds)
     $date->tzname       # returns the timezone name (EST, EET, etc)
     $date->tzlocal      # true if $date is in local time zone
-    $date->tz           # returns timezone info
-    $date->tz('GMT+5')  # changes $date's timezone (saving YMDhms)
-    $date->to_tz('UTC') # changes $date's timezone (saving epoch)
+    $date->timezone     # returns timezone object
+    $date->timezone('GMT+5')  # changes $date's timezone (saving YMDhms)
+    $date->to_timezone('UTC') # changes $date's timezone (saving epoch)
     
-    ($year,$month,$day,$hour,$min,$sec)=$date->array;
-    ($year,$month,$day,$hour,$min,$sec)=@{ $date->aref };
-    # !! $year: 1900-, $month: 1-12
-    
-    ($sec,$min,$hour,$day,$mon,$year,$wday,$yday,$isdst)=$date->struct;
-    ($sec,$min,$hour,$day,$mon,$year,$wday,$yday,$isdst)=@{ $date->sref };
-    # !! $year: 0-, $month: 0-11
-    
-    %hash=$date->hash;
-    # !! $hash{year}: 1900-, $hash{month}: 1-12
-    $hash=$date->href; # $hash can be reused as a constructor
-    print $hash->{year}."-".$hash->{month}. ... $hash->{sec} ... ;
+    ($year,$month,$day,$hour,$min,$sec) = $date->array;
+    ($sec,$min,$hour,$day,$mon,$year,$wday,$yday,$isdst) = $date->struct;
     
     # constructing new date based on an existing one:
     $new_date = $date->clone;
-    $new_date = $date->clone({year => 1977, sec => 14, tz => 'Australia/Melbourne'});
-    # valid keys: year, _year, month, _month, day, hour, min, sec, tz
+    $new_date = $date->clone(year => 1977, sec => 14, tz => 'Australia/Melbourne');
+    # valid keys: year, month, day, hour, min, sec, tz
     
-    $date->month_begin  # First day of the month (date object)
-    $date->month_end    # Last day of the month
+    $date->month_begin   # First day of the month (date object)
+    $date->month_end     # Last day of the month
     $date->days_in_month # 28..31
-    
-    # changing date stringify format globally
-    Date::string_format("%Y%m%d%H%M%S");
-    print $date       # result: 20011222000000
-    Date::string_format(undef);
-    print $date       # result: 2000-02-29 12:21:11
-    Date::string_format("%Y/%m/%d");
-    print $date       # result: 1994/10/13
     
     # error handling
     $a = date($date_string);
     if ($a) { # valid date
       ...
     } else { # invalid date
-      if ($a->error == E_UNPARSABLE) { ... }
-      print $a->errstr;
+      if ($a->error == Date::errc::parser_error) { ... }
+      print $a->error->message;
     }
     
     # date range check
@@ -141,49 +111,36 @@ See L<Time::XS> why.
     print date("2001-02-31"); # will print nothing
     
     # getting values of a relative date object
-    int($reldate);         # reldate in seconds (assumed 1 month = 2_629_744 secs)
-    "$reldate";            # reldate in "1Y 2M 3D 4h 5m 6s" format
     $reldate->year;
-    $reldate->mon;
-    $reldate->month;       # same as prev.
+    $reldate->month;
     $reldate->day;
     $reldate->hour;
     $reldate->min;
-    $reldate->minute;      # same as prev.
-    $reldate->sec;         # same as $reldate
-    $reldate->second;      # same as prev.
-    $reldate->to_sec;      # relative date in seconds
-    $reldate->to_min;      # relative date in minutes
-    $reldate->to_hour;     # relative date in hours
-    $reldate->to_day;      # relative date in days
-    $reldate->to_month;    # relative date in months
-    $reldate->to_year;     # relative date in years
+    $reldate->sec;
+    "$reldate";             # reldate in "1Y 2M 3D 4h 5m 6s" format
+    $reldate->duration;     # duration in seconds
+    int $reldate;           # same as prev
+    $reldate->to_secs;      # same as prev
+    $reldate->to_mins;      # relative date in minutes
+    $reldate->to_hours;     # relative date in hours
+    $reldate->to_days;      # relative date in days
+    $reldate->to_months;    # relative date in months
+    $reldate->to_years;     # relative date in years
      
     # arithmetic with dates:
-    print date([2001,12,11,4,5,6])->truncate; # will print "2001-12-11"
+    print date_ymd(2001,12,11,4,5,6)->truncate; # "2001-12-11"
     
-    $new_date = $date+$reldate;
-    $date2    = $date+'3Y 2D';   # 3 Years and 2 days
-    $date3    = $date+[1,2,3];   # $date plus 1 year, 2 months, 3 days
+    $new_date = $date + $reldate;
+    $date2    = $date - '3Y 2D';   # 3 Years and 2 days
+    $date3    = $date + rdate_ymd(1,2,3);   # $date plus 1 year, 2 months, 3 days
     
-    $new_date = $date-$reldate;
-    $date2    = $date-'3Y';      # 3 Yearss
-    $date3    = $date-[1,2,3];   # $date minus 1 year, 2 months, 3 days
+    # accurate relative dates
+    $rel = $date1 - $date2;
+    $rel->duration;              # accurate number of seconds in interval
+    $rel->to_months;             # accurate number of months in interval
+    $rel->includes("2013-01-01") # returns -1, 0, or 1
     
-    $intdate  = $date1-$date2;
-    $intdate2 = date('2000-11-12')-'2000-11-10';
-    $intdate3 = $date3-'1977-11-10';
-    
-    $intdate = date("2013-10-25") - "2012-03-10";
-    $intdate->from;                  # lower date in interval (2012-03-10)
-    $intdate->till;                  # upper date in interval (2013-10-25)
-    $reldate = $intdate->relative;   # relative date ("1Y 7M 15D")
-    $intdate->sec;                   # accurate number of seconds in interval
-    $intdate->month;                 # accurate number of months in interval
-    $reldate->to_sec;                # number of seconds in relative date (inaccurate)
-    $intdate->includes("2013-01-01") # returns -1, 0, or 1
-    
-    $days_between = (Class::Date->new('2001-11-12')-'2001-07-04')->day;
+    $days_between = ($date1 - $date2)->to_days;
     
     # comparison between absolute dates
     print $date1 > $date2 ? "I am older" : "I am younger";
@@ -194,255 +151,339 @@ See L<Time::XS> why.
     # Adding / Subtracting months and years are sometimes tricky:
     print date("2001-01-29") + '1M' - '1M'; # gives "2001-02-01"
     print date("2000-02-29") + '1Y' - '1Y'; # gives "2000-03-01"
-    
-    # Named interface ($date2 does not necessary to be a Class::Date object)
-    $date1->string;               # same as $date1 in scalar context
-    $date1->subtract($date2);     # same as $date1 -= $date2
-    $date1->subtract_new($date2); # same as $date1 - $date2
-    $date1->add($date2);          # same as $date1 += $date2
-    $date1->add_new($date2);      # same as $date1 + $date2
-    $date1->compare($date2);      # same as $date1 <=> $date2
-    
-    $reldate1->sec;               # same as $reldate1 in numeric or scalar context
-    $reldate1->compare($reldate2);# same as $reldate1 <=> $reldate2
-    $reldate1->add($reldate2);    # same as $reldate1 + $reldate2
-    $reldate1->neg                # used for subtraction
+
 
 
 =head1 CLASS METHODS
 
-=head4 new($epoch | \@ymdhms | \%ymdhms | $iso_fmt | $date, [$timezone])
+=head4 new([$epoch = 0], [$timezone = local])
 
-Creates a date object.
+Creates date from UNIX timestamp (number of seconds since 1970). C<$epoch> may be non-integer value in which case microseconds is set.
+
+
+=head4 new($string, [$timezone = local], [$format = INPUT_FORMAT_ALL])
+
+Creates date from string in one of the following formats:
+
+=over
+
+=item Default iso date format
+
+    YYYY-MM-DD[ HH:MM[:SS[.ss]][±hh[:mm]|Z]]
+    YYYY/MM/DD[ HH:MM[:SS[.ss]][±hh[:mm]|Z]]
+
+    2019-12-11
+    2019-12-11 14:56:23
+    2019-12-11 14:56:23.123
+    2019-12-11 14:56:23Z
+    2019/12/11 14:56+03:00
+    2019/12/11 14:56:23.123+03
+
+C<.ss> is a microseconds part 1-6 digits long.
+
+=item ISO 8601 most popular subset
+
+    YYYY-MM[-DD[THH[:MM[:SS[.ss]]][±hh[:mm]|Z]]]]
+    YYYYMMDD[THH[MM[SS[.ss]]][±hh[mm]|Z]]]
+    YYYY-Wnn[-n]
+
+    2019-12
+    2019-12-11T14:56:23
+    20191211T145623.123Z
+    20191211T145623.123+0300
+    2019-12-11T14:56:23.123-03:30
+    2019-W35
+    2019-W35-2
+
+=item RFC 822/1123
+
+    Tue, 10 Dec 2019 00:00:00 GMT
+    10 Dec 2019 00:00 Z
+
+Only C locale supported.
+
+=item RFC 850
+
+    Tuesday, 01-Jan-19 03:04:00 GMT
+
+Only C locale supported.
+
+=item ANSI C
+
+    Sun Sep  1 03:04:00 2019
+
+Only C locale supported.
+
+=item Dotted format
+
+    DD.MM.YYYY
+
+=back
+
+If timezone offset designator is present inside string, the date is created in unnamed timezone with constant offset from GMT (no transition rules).
+C<$timezone> parameter is ignored in this case.
+
+You can limit the number of allowed formats by passing C<$format> argument, which is the bitmask of the following constants:
+INPUT_FORMAT_ALL(the default), INPUT_FORMAT_ISO, INPUT_FORMAT_ISO8601, INPUT_FORMAT_RFC1123, INPUT_FORMAT_RFC850, INPUT_FORMAT_ANSI_C, INPUT_FORMAT_DOT.
+
+If C<$string> is an invalid date or a valid date but in format other than specified, then C<error()> is set to C<Date::errc::parser_error>
+
+
+=head4 new_ymd(%ymdhms)
+
+Creates date from named YMDHMS arguments.
+
+    Date->new(
+        year  => 2019
+        month => 12,
+        day   => 31,
+        hour  => 23,
+        min   => 59,
+        sec   => 59,
+        mksec => 123456,
+        tz    => 'Europe/Moscow',
+    );
+
+    
+the default values for year is 1970, month&day - 1, others - 0, timezone - local.
+
+If the date represented by YMDHMS is ambigious (falls into DST->STD timezone transition, i.e. when clock goes 1 hour back and certain HMS appears twice),
+the greater epoch is preferred. This behaviour can be altered with additional C<isdst> hash parameter. The default value is C<-1> (auto).
+C<0> means 'prefer standart time', C<1> means 'prefer daylight savings time'. If specified date is not ambigious, C<isdst> parameter is completely ignored.
+
+    
+=head4 new_ymd($year, [$month = 1], [$day = 1], [$hour = 0], [$min = 0], [$sec = 0], [$mksec = 0], [$timezone = local])
+
+Created date from unnamed YMDHMS arguments.
+
+
+=head4 new($date_object)
+
+If C<$date_object> is a Date object, then returns copy of the date as C<clone()>.
+Otherwise stringifies C<$date_object> and create date as C<new($string)>.
+If this object does not have stringification overload, the result is date with parsing error.
+
+
+=head4 new* [all variants]
+
+Common behaviour for any of constructor variants.
 
 If $timezone is present, created object will operate as if C<tzset($timezone)> was called, but without calling C<tzset()>.
 
-If $timezone is absent (or undef or ""), $date uses local timezone.
+If $timezone is absent (or undef or ""), local timezone will be used.
 Further changes of local timezone via C<tzset()> won't affect constructed object.
 
-=over
-
-=item 123456 or "123456" or 123456.789
-
-Treated as UNIX timestamp (64-bit int or double with mksecs). To define a date below 1970 year, use negative timestamp.
-
-=item [$year, $month, $day, $hour, $min, $sec, $mksec]
-
-If some args are missing, will use defaults [2000,1,1,0,0,0,0]
-    
-=item {year => x, month => x, day => x, hour => x, min => x, sec => x, mksec => x}
-
-If some args are missing, will use defaults defined in previous section.
-
-=item ISO 8601 and some additional formats
-
-=over
-
-=item YYYY-
-
-=item YYYY/
-
-=item YYYY-MM
-
-=item YYYY/MM
-
-=item YYYY-MM-DD
-
-=item YYYY/MM/DD
-
-=item YYYYMMDD
-
-=item YYYY-MM-DD hh
-
-=item YYYY/MM/DD hh
-
-=item YYYY-MM-DD hh:mm[:ss][.mks][±hh[:]mm]
-
-=item YYYY/MM/DD hh:mm[:ss][.mks][±hh[:]mm]
-
-=item YYYYMMDDThhmmss[.mks][±hh[:]mm]
-
-=item YYYY-MM-DDThh:mm:ss[.mks][±hh[:]mm]
-
-=back
-
-If timezone offset designator is present, the date is created in unnamed timezone with constant offset from GMT (no transition rules). If you pass your
-own timezone (second parameter to constructor or set()) in this case, it will be ignored (your parameter).
-
-=item Another date object
-
-Clones another object.
-
-If $timezone parameter is absent (or undef or ""), newly created date will use $date's timezone.
-Otherwise constructed date is converted to timezone $timezone preserving YMDhms information.
-
-=back
-
-If there is any error while creating an object, properties error() and errstr() will be set and the date is set to epoch=0.
+If there is any errors while creating an object, C<error()> will be set and the date is set to epoch=0.
 The object itself will return false in boolean context, empty string in string context and so on.
-
-=head1 FUNCTIONS
-
-=head4 now()
-
-Same as Date->new(time()) but runs faster.
-
-=head4 now_hires()
-
-Same as Date->new(Time::HiRes::time()) but runs faster.
-
-=head4 today()
-
-Same as Date->new(time())->truncate but runs faster.
-
-=head4 today_epoch()
-
-Same as today()->epoch but runs faster.
-
-=head4 string_format([$format])
-
-strftime-compatible format that is used to stringify the date with '.', "", to_string(), string() or as_string().
-If it's false (the default) then iso() is used.
-
-=head4 range_check([$true_false])
-
-If parts of the date are invalid or the whole date is not valid, e.g. 2001-02-31 then:
-
-when range_check is not set (the default), then these date values are automatically converted to a valid date (normalized): 2001-03-03
-
-when range_check is set, then a date "2001-02-31" became invalid date and error() is set to E_RANGE.
-
-=head4 date($epoch | \@ymdhms | \%ymdhms | $iso_fmt | $date, [$timezone])
-
-Same as Date->new($arg, [$timezone])
-
-=head4 rdate($rel_string | $seconds | \@rel_array | \%rel_hash | $reldate)
-
-Same as Date::Rel->new($arg)
-    
-=head4 rdate($from, $till)
-
-Same as Date::Rel->new($from, $till)
-    
-=head4 idate($epoch | \@ymdhms | \%ymdhms | $iso_fmt | $date, $epoch | \@ymdhms | \%ymdhms | $iso_fmt | $date)
-
-Same as Date::Int->new($arg1, $arg2)
 
 
 =head1 OBJECT METHODS
 
-=head4 set($epoch | \@ymdhms | \%ymdhms | $iso_fmt | $date)
+=head4 set(...)
 
-Set date from argument or another date. This is much faster than creating new object.
+=head4 set_ymd(%ymdhms | @ymdhms)
+
+Set another date for object. This is faster than creating new object. See C<new()> and C<new_ymd()> for arguments details.
+
 
 =head4 epoch([$epoch])
 
 Get or set UNIX timestamp (integer or double with mksecs)
 
+
 =head4 epoch_sec ()
 
-Get UNIX timestamp without microseconds as integer.
+Get UNIX timestamp as integer (without microseconds even if they are present).
+
 
 =head4 year([$year])
 
-Get or set Year [-2**31, 2**31-1]
+Get or set year [-2**31, 2**31-1]
 
-=head4 _year([$year])
 
-Get or set Year (year() - 1900)
+=head4 c_year([$year])
+
+Get or set year counted from 1900 (C-style)
+
 
 =head4 yr([$yr])
 
-Get or set last 2 digits of the year [0-99]
+Get or set 2-digits-style-year [0-99]
+
 
 =head4 month([$mon]), mon
 
 Get or set month [1-12]
 
-=head4 _month([$mon]), _mon
 
-Get or set month [0-11]
+=head4 c_month([$mon])
+
+Get or set month [0-11] (C-style)
+
 
 =head4 day([$day]), mday, day_of_month
 
 Get or set day of month [1-31]
 
+
 =head4 hour([$hour])
 
 Get or set hours [0-23]
+
 
 =head4 min([$min]), minute
 
 Get or set minutes [0-59]
 
+
 =head4 sec([$sec]), second
 
 Get or set seconds [0-60]
+
 
 =head4 mksec([$mksec])
 
 Get or set microseconds [0-999999]
 
+
 =head4 wday([$wday]), day_of_week
 
-Day of week. 1 = Sunday, 2 = Monday, ... , 7 = Saturday.
+Day of week. 1 = Sunday, ... , 7 = Saturday.
+
 If you pass an argument then another day of the same week will be set.
 
-=head4 _wday([$_wday])
 
-Day of week. 0 = Sunday, 1 = Monday, ... , 6 = Saturday.
+=head4 c_wday([$wday])
+
+C-style day of week. 0 = Sunday, ... , 6 = Saturday.
+
 If you pass an argument then another day of the same week will be set.
 
-=head4 ewday([$ewday])
 
-Day of week (Europe-friendly). 1 = Monday, ..., 7 = Sunday.
+=head4 ewday([$wday])
+
+Europe-friendly day of week. 1 = Monday, ..., 7 = Sunday.
+
 If you pass an argument then another day of the same week will be set.
+
 
 =head4 yday([$yday]), day_of_year
 
 Day of the year [1-366].
+
 If you pass an argument then another day of the same year will be set.
 
-=head4 _yday([$_yday])
 
-Day of the year [0-365].
+=head4 c_yday([$yday])
+
+C-style day of the year [0-365].
+
 If you pass an argument then another day of the same year will be set.
+
 
 =head4 isdst(), daylight_savings()
 
 Is daylight savings time in effect now (true/false).
 
+
+=head4 month_name()
+
+Full name of the month
+
+
+=head4 month_sname()
+
+Short name of the month
+
+
+=head4 wday_name()
+
+Full name of the day
+
+
+=head4 wday_sname()
+
+Short name of the day
+
+
+=head4 ""
+
+Same as C<to_string()>.
+
+
+=head4 to_string($format = Date::Format::iso)
+
+Stringifies date using C<$format>.
+
+Available formats:
+
+=over
+
+=item Date::Format::iso
+
+Default format
+
+    2019-12-31 23:59:59.123
+
+Microseconds part will be absent if mksec == 0.
+
+=item Date::Format::iso_tz
+
+C<iso> with timezone offset
+
+    2019-12-31 23:59:59.123+03:00
+
+=item Date::Format::iso_date
+
+Only date
+
+    2019-12-31
+
+=item Date::Format::iso8601
+
+    2019-12-31T23:59:59.123+03:00
+
+=item Date::Format::iso8601_notz
+
+Same as C<iso8601> but omits printing timezone offset
+
+    2019-12-31T23:59:59.123
+
+=item Date::Format::rfc1123
+
+    Tue, 10 Dec 2019 00:00:00 GMT
+    
+=item Date::Format::cookie
+
+same as rfc1123
+
+=item Date::Format::rfc850
+
+    Tuesday, 01-Jan-19 03:04:00 GMT
+
+=item Date::Format::ansi_c
+
+    Sun Sep  1 03:04:00 2019
+
+=item Date::Format::ymd
+
+    2019/12/31
+
+=item Date::Format::dot
+
+    31.12.2019
+
+=item Date::Format::hms
+
+    23:59:59
+
+=back
+
+
 =head4 strftime($format)
 
-Works like strftime from C POSIX
+Works like C<Date::strftime()> with current date's fields passed as arguments.
 
-=head4 monthname(), monname()
-
-Full name of the month in the genitive
-
-=head4 wdayname(), day_of_weekname()
-
-Full name of the day in the nominative case.
-
-=head4 hms()
-
-Same as C<strftime('%H:%M:%S')> but much faster
-
-=head4 ymd()
-
-Same as C<strftime('%Y/%m/%d')> but much faster
-
-=head4 mdy()
-
-Same as C<strftime('%m/%d/%Y')> but much faster
-
-=head4 dmy()
-
-Same as C<strftime('%d/%m/%Y')> but much faster
-
-=head4 "", to_string(), string(), as_string()
-
-By default returns C<iso()>. String format can be changed via C<string_format()>
 
 =head4 'bool', to_bool()
 
@@ -454,172 +495,348 @@ Called implicitly in boolean context
     
 Returns TRUE if date has no errors (i.e. has no parsing or out of range errors, etc), otherwise FALSE
 
+
 =head4 '0+', to_number()
 
 Returns C<epoch()> in numeric context
 
-=head4 iso(), sql()
-
-Return date in format YYYY-MM-DD HH:MM:SS[.MKS]. Microseconds part will be absent if mksec == 0.
-
-=head4 iso_sec()
-
-Same as iso() but ignores microseconds part.
-
-=head4 mysql()
-
-Same as C<strftime('%Y%m%d%H%M%S')> but much faster
-
-=head4 ampm()
-
-Returns string 'AM' or 'PM'
-
-=head4 meridiam()
-
-Returns time in "11:35 AM" format (american 12h style)
 
 =head4 gmtoff()
 
-Returns current timezone offset from UTC in seconds
+Returns current timezone offset from UTC in seconds - may change when the date changes isdst/nodst.
+
 
 =head4 tzname()
 
 Returns the name of the object's timezone (Europe/Moscow, America/New_York, etc).
 
+
 =head4 tzabbr()
 
 Returns timezone abbreviation (EST, EET, etc) - may change when the date changes isdst/nodst.
+
 
 =head4 tzlocal()
 
 Returns TRUE if this object's timezone is set as local.
 
+
 =head4 tz([$newzone])
 
-With no arguments returns information about object's timezone. See L<Time::XS/tzget([$zone])>.
+With no arguments returns L<Date::Timezone> object associated with the date.
 
 With argument changes the timezone of current object to $newzone preserving YMDhms information (epoch may change) and 
-returns nothing.
+returns nothing. C<$newzone> may be timezone object, name or rule.
+
 
 =head4 to_tz($newzone)
 
 Changes the timezone of current object to $newzone in a way that changed date still points to the same time moment (same epoch).
-YMDhms info may change. Returns nothing.
+YMDhms info may change. Returns nothing. C<$newzone> may be timezone object, name or rule.
+
 
 =head4 array()
 
 Returns elements list - $year,$month,$day,$hour,$min,$sec,[$mksec].
+
 $year is year() [2013=2013]
+
 $month is month() [1-12]
+
 If $mksec == 0 it will not be on the list
 
-=head4 aref()
-
-Same as [array()] (array reference)
 
 =head4 struct()
 
 Returns elements list - $sec,$min,$hour,$day,$mon,$year,$wday,$yday,$isdst
-$year is _year()  [113 = 2013]
-$month is _month() [0-11]
-$wday is _wday() [0-6]
-$yday is _yday() [0-365]
 
-=head4 sref()
+$year is c_year()  [113 = 2013]
 
-Same as [struct()] (array reference)
+$month is c_month() [0-11]
 
-=head4 hash()
+$wday is c_wday() [0-6]
 
-Returns key-value list. Keys are 'year', 'month', 'day', 'hour', 'min', 'sec' and optionally 'mksec'
-year, month are human-friendly (2013 year, month [1-12])
+$yday is c_yday() [0-365]
 
-=head4 href()
 
-Same as {href()} (hash reference)
-
-=head4 clone([\@diff | \%diff, [$timezone]])
+=head4 clone(%diff | @diff)
 
 Returns copy of the date.
 
-If you pass a hash or array ref then date is cloned with changes described in the hash/array.
-Hash keys: 'year' (YYYY), 'month' [1-12], 'day', 'hour', 'min', 'sec', 'mksec'.
-Array: [$year (YYYY), $month [1-12], $day, $hour, $min, $sec, $mksec]
+If you pass a hash-list or array then date is cloned with changes described in the hash/array.
 
-If any values in hash or array are absent (or = undef or = -1) the appropriate field of date is not changed.
+Hash keys: year (YYYY), month [1-12], day, hour, min, sec, mksec, tz
 
-If $timezone parameter is absent (or undef or ""), newly created date will use $date's timezone.
-Otherwise constructed date is converted to timezone $timezone preserving YMDhms information.
+Array: [$year (YYYY), $month [1-12], $day, $hour, $min, $sec, $mksec, $tz]
+
+If any values in hash or array are absent (or = undef or = -1) the appropriate field of source date is not changed.
+
+If C<tz> parameter is absent (or undef or ""), newly created date will use current date's timezone.
+Otherwise constructed date is converted to specified timezone preserving YMDhms information.
+
 
 =head4 month_begin_new()
 
 Returns the beggining of month. Only day of month is changed, HMS are preserved.
 
+
 =head4 month_begin()
 
 Same as C<month_begin_new()> but changes current object instead of cloning.
+
 
 =head4 month_end_new()
 
 Returns the end of month. Only day of month is changed, HMS are preserved.
 
+
 =head4 month_end()
 
 Same as C<month_end_new()> but changes current object instead of cloning.
+
 
 =head4 days_in_month()
 
 Returns the number of days in month
 
+
 =head4 error()
 
-Returns error code occured during creating or cloning object (if any). If no errors returns E_OK.
+Returns error occured during creating or cloning object (if any) as XS::STL::ErrorCode object.
 
-=head4 errstr()
 
-Returns error string if any, otherwise undef.
+=head4 truncated()
 
-=head4 truncate_new()
+Return copy of the current date with HMS set to 0. Same as C<clone(hour => 0, min => 0, sec => 0)>, but runs faster.
 
-Return copy of the current date with HMS set to 0. Same as C<clone({hour => 0, min => 0, sec => 0})>, but much faster.
 
 =head4 truncate()
 
-Same as C<truncate_new()> but changes current object instead of cloning. It's extremely faster.
+Same as C<truncated()> but changes current object instead of cloning.
 
-=head4 '<=>', 'cmp', compare($date | $iso_string | $epoch | \@array | \%hash)
 
-Compares 2 dates and returns -1, 0 or 1. Second operand may be anything that one-argument constructor supports.
+=head4 '<=>', 'cmp', compare($arg)
 
-=head4 '+', add_new($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
+Converts C<$arg> to date, compares 2 dates and returns -1, 0 or 1.
 
-Adds a relative date to date object. If second operand is not an object then it's created (L<Date::Rel>).
+    $date <=> $arg
+    $arg  <=> $date
+    
+    $date <=> "2001-01-01 01:01:01"
+    $date <=> 123456789; # epoch
+    "01.02.2019" <=> $date
+    $date1 <=> $date2
 
-=head4 '+=', add($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
 
-Same as C<add_new()> but changes current object instead of creating new one.
+=head4 '+', sum($arg)
 
-=head4 '-', subtract_new($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash | $date | $iso_string)
+Converts C<$arg> to relative date, adds it to the date and returns new date as a result.
 
-Subtracts a relative date or another date from the date object. In case of relative date the result is a L<Date> object.
-Otherwise the result is L<Date::Int>.
-If second operand is not an object then it's created (L<Date::Rel> or L<Date>).
+    $date + $arg
+    $arg + $date
+    
+    $date + "1Y 2M";
+    86400 + $date;
+    $date + DAY;
 
-=head4 '-=', subtract($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
 
-Same as C<subtract()> but changes current object instead of creating new one. Operand can only be a L<Date::Rel> object.
+=head4 '+=', add($arg)
+
+Converts C<$arg> to relative date and adds it to existing date object.
+
+    $date += $arg
+    
+    $date += 10;
+    $date += YEAR;
+    $date += "1h 2m 3s";
+
+
+=head4 '-', difference($arg)
+
+If second operand is a date object, then returns L<Date::Rel> object representing exact interval from left operand till right operand.
+
+    $date - $date
+    
+    (date("2019-02-01") - date("2019-01-01"))->to_days == 31;
+
+Otherwise converts right operand to relative date, subtracts it from the date object and returns new date as a result. Reverse is not allowed.
+
+    $date - "1Y";
+    $date - 86400;
+    86400 - $date; # !not allowed!
+
+=head4 '-=', subtract($arg)
+
+Converts C<$arg> to relative date and subtracts it from existing date object. Reverse is not allowed.
+
+
+=head1 FUNCTIONS
+
+=head4 now()
+
+Same as Date->new(time()) but runs faster.
+
+
+=head4 now_hires()
+
+Same as Date->new(Time::HiRes::time()) but runs faster.
+
+
+=head4 today()
+
+Same as Date->new(time())->truncate but runs faster.
+
+
+=head4 today_epoch()
+
+Same as today()->epoch but runs faster.
+
+
+=head4 range_check([$true_false])
+
+If parts of the date are invalid or the whole date is not valid, e.g. 2001-02-31 then:
+
+when range_check is not set (the default), then these date values are automatically converted to a valid date (normalized): 2001-03-03
+
+when range_check is set, then a date "2001-02-31" became invalid date and error() is set to C<Date::errc::out_of_range>.
+
+One exception from this rule is when format has a weekday name (rfc1123, etc) and it doesn't match represented date, C<Date::errc::out_of_range> will be always set.
+
+
+=head4 date(...)
+
+Same as Date->new(...). See C<new()> for arguments details.
+
+=head4 date_ymd(...)
+
+Same as Date->new_ymd(...). See C<new_ymd()> for arguments details.
+
+
+=head4 rdate(...)
+
+Same as Date::Rel->new(...), see L<Date::Rel>
+
+=head4 rdate_ymd(...)
+
+Same as Date::Rel->new_ymd(...), see L<Date::Rel>
+
+    
+=head4 tzget([$zone])
+
+Returns timezone object for timezone name C<$zone> (or local zone if $zone is not provided). The object can later be used for creating dates in this zone
+without setting this zone as local via C<tzset()>.
+
+
+=head4 tzset([$zone])
+
+Sets $zone as localzone. If you don't provide $zone, default timezone will be set ($ENV{TZ}, /etc/localtime, or whatever your OS considers to be localzone).
+
+Does NOT affect POSIX:tzset(). Only this module's functions and objects will follow this timezone.
+
+    # change local zone to 'America/New_York'
+    tzset('America/New_York');
+    # or
+    my $tz = tzget('America/New_York');
+    tzset($tz);
+    
+    # the same (doesnt work in Windows)
+    local $ENV{TZ} = 'America/New_York';
+    tzset();
+    
+    # change localzone back to the default localzone (in case you didn't change $ENV{TZ})
+    tzset(); # or tzset(undef) or tzset('')
+
+If you don't want to change localzone, you don't have to call this function directly as it's called implicitly on-demand.
+
+If you provide $zone and no such zone found in zones directory (or timezone file is corrupted), 'UTC0' is used.
+
+$zone may be L<Date::Timezone> object.
+
+
+=head4 tzname()
+
+The name of localzone. Note that in some cases the real name of localzone is not known
+(for example when localzone is retrieved from /etc/localtime file, tzname() will return ':/etc/localtime')
+
+
+=head4 use_system_zones()
+
+Use your OS's timezones dir. This is default behaviour if your OS has /usr/share/zoneinfo DB. Otherwise embedded zones
+are used by default (for example, on MS Windows).
+
+If your OS doesn't have /usr/share/zoneinfo DB, this function warns and does nothing.
+
+
+=head4 use_embed_zones()
+
+Use timezone files which come with this module (they may be newer or older than system ones).
+
+
+=head4 tzdir([$newdir])
+
+Sets or returns current timezones directory.
+If there was an error (!exists, !readable, etc) returns false and leaves tzdir unchanged.
+
+    say tzdir(); # prints /usr/share/zoneinfo (on UNIX)
+    tzdir('/home/frank/myzones'); # use /home/frank/myzones as timezones DB
+    say tzdir(); # prints /home/frank/myzones
+    tzset('Europe/Moscow'); # set /home/frank/myzones/Europe/Moscow as localzone
+
+
+=head4 available_zones()
+
+Returns list of all available timezones in tzdir().
+
+
+=head4 strftime($format, $sec, $min, $hour, $mday, $mon, $year, [$isdst], [$timezone])
+
+Works like POSIX's C<strftime()>, but runs much faster. Additionaly, supports timezone argument in which case it will interpret passed YMDHSD as date
+in timezone C<$timezone> instead of local zone.
+
+NOTE: C<$year> must be in natural form (2019, not 119). Month as in original C<strftime()>, 0-11.
+
+=head4 strftime($format, $epoch, [$timezone])
+
+Same as above, but receives UNIX timestamp instead of YMDHMS arguments.
+
+
+=head4 gmtime($epoch)
+
+The returned year is in human-readable form (not year-1900). Month is [0-11]. The same applies for all further time functions.
+
+=head4 localtime($epoch)
+
+=head4 anytime($epoch, $timezone)
+
+Like C<localtime()> but runs calculations in timezone C<$timezone> instead of local zone
+
+=head4 timegm($sec, $min, $hour, $day, $mon, $year, [$isdst])
+
+=head4 timegmn($sec, $min, $hour, $day, $mon, $year)
+
+Same as timegm() except for the arguments which have to be non-constant values because they are normalized during calculations.
+
+=head4 timelocal($sec, $min, $hour, $day, $mon, $year, [$isdst])
+
+=head4 timelocaln($sec, $min, $hour, $day, $mon, $year, [$isdst])
+
+Same as timelocal() except for the arguments which have to be non-constant values because they are normalized during calculations.
+
+=head4 timeany($sec, $min, $hour, $day, $mon, $year, [$isdst], [$timezone])
+
+Like C<timelocal()> but runs calculations in timezone C<$timezone> instead of local zone
+
+=head4 timeanyn($sec, $min, $hour, $day, $mon, $year, [$isdst], [$timezone])
+
+
 
 =head1 CONSTANTS
 
-=head4 E_OK
-
-No errors
-
-=head4 E_UNPARSABLE
+=head4 Date::errc::parser_error
 
 Wrong date string format
 
-=head4 E_RANGE
+=head4 Date::errc::out_of_range
 
 Invalid date (or date part) supplied when range_check() is in effect
 
@@ -649,9 +866,7 @@ Constant for rdate("1m").
 
 Constant for rdate("1s").
 
-=head1 OPERATOR OVERLOAD RULES
 
-See screenshot L<http://crazypanda.ru/v/clip2net/a/v/ri93sO22KI.png>
 
 =head1 CLONING/SERIALIZATION
 
@@ -682,11 +897,13 @@ For example:
 
 =item L<Data::Recursive>'s C<clone>
 
-=item L<JSON::XS> serialization with convert_blessed
+=item L<JSON> serialization with convert_blessed
 
 Serializes to C<epoch()>
 
 =back
+
+
 
 =head1 DATE RANGES
 
@@ -702,99 +919,200 @@ from -2147483648/01/01 00:00:00 till 2147483647/12/31 23:59:59
 
 from -285424812/02/20 18:53:48 till 285428751/11/12 11:36:32 
 
-=head1 PERFOMANCE
 
-L<Date> operates 40-70x faster than Class::Date, tests were performed on Core i7 3.2Ghz, MacOSX Lion, perl 5.12.4
+Please note, that these ranges means that Date object can make calculations and its API works correctly while date is in these ranges.
 
-    my $cdate = new Class::Date("2013-06-05 23:45:56");
-    my $date  = new Date("2013-06-05 23:45:56");
-    my $crel = Class::Date::Rel->new("1M");
-    my $rel  = rdate("1M");
+However, it won't be able to parse and to stringify such dates because no ISO/RFC standarts exist for those ranges.
+
+The maximum range for parsing and stringification is 0000/01/01 00:00:00 - 9999/12/31 23:59:59
+
+
+=head1 SUPPORTED OS
+
+Tested on FreeBSD, Linux, MacOSX, Windows 2003-10.
+
+I believe all of UNIX-like and Windows-like systems are supported.
+
+Timezones are supported in Olson DB format (V1,2,3).
+
+
+
+=head1 CAVEATS
+
+Setting C<$ENV{TZ}> doesn't work in Windows. To set $zone as localzone, you should write
+
+    Date::tzset($zone);
+
+to produce platform-independent code.
+
+Also please note that in some extremely rare cases the result of date calculations of this module and POSIX functions may not match
+(this module's results are correct in this case, POSIX's - are not).
+
+That's because POSIX's timegm/timelocal/etc functions have bugs on some certain time moments. For detailed info see L<Date::TimeImpl>.
+
+
+
+=head1 PERFORMANCE
+
+L<Date> runs 1.5 - 50x faster than Time::Moment. Tests were performed on Xeon-v3 3.0Ghz, Debian 10, perl 5.30.0
+
+    new empty
+                      Rate Time::Moment         Date
+    Time::Moment 3619344/s           --         -34%
+    Date         5450519/s          51%           --
     
-    timethese(-1, {
-        cdate_new_str    => sub { new Class::Date("2013-01-25 21:26:43"); },
-        date_new_str   => sub { new Date("2013-01-25 21:26:43"); },
-        cdate_new_epoch  => sub { new Class::Date(1000000000); },
-        date_new_epoch => sub { new Date(1000000000); },
-        date_new_reuse => sub { state $date = new Date(0); $date->set(1000000000); },
+    new with current time
+                      Rate Time::Moment   Date_hires         Date
+    Time::Moment  420102/s           --         -91%         -92%
+    Date_hires   4812084/s        1045%           --         -13%
+    Date         5519512/s        1214%          15%           --
+    
+    new from epoch
+                      Rate Time::Moment         Date
+    Time::Moment 3849666/s           --         -25%
+    Date         5164206/s          34%           --
+
+    new from string
+                      Rate Time::Moment         Date
+    Time::Moment 2682760/s           --         -29%
+    Date         3780922/s          41%           --
+
+    new from named YMDHMS
+                      Rate Time::Moment         Date
+    Time::Moment 2372854/s           --         -13%
+    Date         2737056/s          15%           --
+    
+    today (now+truncate)
+                      Rate Time::Moment         Date
+    Time::Moment  430970/s           --         -91%
+    Date         4721290/s         996%           --
+
+    adding 1 relative
+                      Rate Time::Moment         Date
+    Time::Moment 3780922/s           --         -53%
+    Date         7989875/s         111%           --
+
+    adding many relatives
+                      Rate Time::Moment         Date
+    Time::Moment 1341380/s           --         -72%
+    Date         4733156/s         253%           --    
+    
+    converting epoch<->YMDHMS with date operations
+                      Rate Time::Moment         Date
+    Time::Moment 1102769/s           --         -49%
+    Date         2143658/s          94%           --
+
+    using timezones
+                      Rate Time::Moment         Date
+    Time::Moment   71087/s           --         -98%
+    Date         3674915/s        5070%           --
         
-        cdate_now  => sub { Class::Date->now; },
-        date_now => sub { now(); },
-        
-        cdate_truncate      => sub { $cdate->truncate },
-        date_truncate_new => sub { $date->truncate_new },
-        date_truncate     => sub { $date->truncate },
-        cdate_today         => sub { Class::Date->now->truncate; },
-        date_today1       => sub { now()->truncate; },
-        date_today2       => sub { today(); },
-        cdate_stringify     => sub { $cdate->string },
-        date_stringify    => sub { $date->to_string },
-        cdate_strftime      => sub { $cdate->strftime("%H:%M:%S") },
-        date_strftime     => sub { $date->strftime("%H:%M:%S") },
-        cdate_clone_simple  => sub { $cdate->clone },
-        date_clone_simple => sub { $date->clone },
-        cdate_clone_change  => sub { $cdate->clone(year => 2008, month => 12) },
-        date_clone_change => sub { $date->clone({year => 2008, month => 12}) },
-        cdate_rel_new_sec   => sub { new Class::Date::Rel 1000 },
-        pdate_rel_new_sec   => sub { new Date::Rel 1000 },
-        cdate_rel_new_str   => sub { new Class::Date::Rel "1Y 2M 3D 4h 5m 6s" },
-        date_rel_new_str  => sub { new Date::Rel "1Y 2M 3D 4h 5m 6s" },
-        cdate_add           => sub { $cdate = $cdate + '1M' },
-        date_add_new      => sub { $date = $date + '1M' },
-        date_add          => sub { $date += '1M' },
-        date_add2         => sub { $date += MONTH },
-        date_add3         => sub { $date->month($date->month+1) },
-        cdate_compare       => sub { $cdate == $cdate },
-        date_compare      => sub { $date == $date },
+Benchmark code:
+
+    my $time = -1;
+    
+    say "new empty";
+    cmpthese($time, {
+        Date           => sub { Date::date() },
+        "Time::Moment" => sub { Time::Moment->new },
     });
+    say;
     
-    #RESULTS
+    say "new with current time";
+    cmpthese($time, {
+        Date           => sub { Date::now() },
+        Date_hires     => sub { Date::now_hires() },
+        "Time::Moment" => sub { Time::Moment->now },
+    });
+    say;
     
-    #cdate_new_epoch:  2 wallclock secs ( 1.11 usr +  0.00 sys =  1.11 CPU) @ 59609.01/s (n=66166)
-    #date_new_epoch:  1 wallclock secs ( 1.08 usr +  0.01 sys =  1.09 CPU) @ 1485434.86/s (n=1619124)
-    #cdate_new_str:  1 wallclock secs ( 1.09 usr +  0.01 sys =  1.10 CPU) @ 19549.09/s (n=21504)
-    #date_new_str:  1 wallclock secs ( 1.01 usr +  0.00 sys =  1.01 CPU) @ 1238753.47/s (n=1251141)
-    #date_new_reuse:  1 wallclock secs ( 1.05 usr +  0.00 sys =  1.05 CPU) @ 5242879.05/s (n=5505023)
+    say "new from epoch";
+    cmpthese($time, {
+        Date           => sub { Date::date(1000000000) },
+        "Time::Moment" => sub { Time::Moment->from_epoch(1000000000) },
+    });
+    say;
     
-    #cdate_now:  1 wallclock secs ( 1.11 usr +  0.00 sys =  1.11 CPU) @ 55350.45/s (n=61439)
-    #date_now:  1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 1341379.63/s (n=1448690)
+    say "new from string";
+    cmpthese($time, {
+        Date           => sub { Date::date("2019-01-01T23:59:59Z") },
+        "Time::Moment" => sub { Time::Moment->from_epoch("2019-01-01T23:59:59Z") },
+    });
+    say;
     
-    #cdate_truncate:  1 wallclock secs ( 1.07 usr +  0.00 sys =  1.07 CPU) @ 25120.56/s (n=26879)
-    #date_truncate:  1 wallclock secs ( 1.02 usr +  0.00 sys =  1.02 CPU) @ 7710116.67/s (n=7864319)
-    #date_truncate_new:  1 wallclock secs ( 1.00 usr +  0.00 sys =  1.00 CPU) @ 1376255.00/s (n=1376255)
+    say "new from named YMDHMS";
+    cmpthese($time, {
+        Date           => sub { Date::date_ymd(year => 2019, month => 1, day => 1, hour => 23, min => 59, sec => 59, mksec => 123456) },
+        "Time::Moment" => sub { Time::Moment->new(year => 2019, month => 1, day => 1, hour => 23, minute => 59, second => 59, nanosecond => 123456000) },
+    });
+    say;
     
-    #cdate_today:  1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 16591.67/s (n=17919)
-    #date_today1:  1 wallclock secs ( 1.03 usr +  0.00 sys =  1.03 CPU) @ 1027823.30/s (n=1058658)
-    #date_today2:  1 wallclock secs ( 1.03 usr +  0.01 sys =  1.04 CPU) @ 1323322.12/s (n=1376255)
+    say "today (now+truncate)";
+    {
+        my $d = Date::now();
+        my $tm = Time::Moment->now();
+        cmpthese($time, {
+            Date           => sub { Date::today() },
+            "Time::Moment" => sub { Time::Moment->now->at_midnight },
+        });
+    }
+    say;
     
-    #cdate_stringify:  1 wallclock secs ( 1.09 usr +  0.00 sys =  1.09 CPU) @ 92839.45/s (n=101195)
-    #date_stringify:  2 wallclock secs ( 1.09 usr +  0.00 sys =  1.09 CPU) @ 5072344.04/s (n=5528855)
+    say "adding 1 relative";
+    {
+        my $d = Date::now();
+        my $tm = Time::Moment->now();
+        cmpthese($time, {
+            Date           => sub { $d += HOUR },
+            "Time::Moment" => sub { $tm = $tm->plus_hours(1) },
+        });
+    }
+    say;
     
-    #cdate_strftime:  1 wallclock secs ( 1.06 usr +  0.00 sys =  1.06 CPU) @ 101433.02/s (n=107519)
-    #date_strftime:  2 wallclock secs ( 1.06 usr +  0.01 sys =  1.07 CPU) @ 1513200.00/s (n=1619124)
+    say "adding many relatives";
+    {
+        my $d = Date::now();
+        my $tm = Time::Moment->now();
+        cmpthese($time, {
+            Date           => sub { $d += "1D 1h 1m 1s" },
+            "Time::Moment" => sub { $tm = $tm->plus_days(1)->plus_hours(1)->plus_minutes(1)->plus_seconds(1) },
+        });
+    }
+    say;
     
-    #cdate_clone_simple:  1 wallclock secs ( 1.07 usr +  0.00 sys =  1.07 CPU) @ 26796.26/s (n=28672)
-    #date_clone_simple:  2 wallclock secs ( 1.03 usr +  0.00 sys =  1.03 CPU) @ 1670213.59/s (n=1720320)
-    #cdate_clone_change:  2 wallclock secs ( 1.11 usr +  0.00 sys =  1.11 CPU) @ 25830.63/s (n=28672)
-    #date_clone_change:  1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 637154.63/s (n=688127)
+    say "converting epoch<->YMDHMS with date operations";
+    {
+        my $d = Date::now();
+        my $tm = Time::Moment->now();
+        cmpthese($time, {
+            Date           => sub { $d += 1; $d->year; $d += DAY; $d->epoch },
+            "Time::Moment" => sub { $tm = $tm->plus_seconds(1); $tm->year; $tm = $tm->plus_days(1); $tm->epoch },
+        });
+    }
+    say;
     
-    #cdate_rel_new_sec:  1 wallclock secs ( 1.08 usr +  0.00 sys =  1.08 CPU) @ 245059.26/s (n=264664)
-    #cdate_rel_new_str:  1 wallclock secs ( 1.05 usr +  0.00 sys =  1.05 CPU) @ 68265.71/s (n=71679)
-    #pdate_rel_new_sec:  2 wallclock secs ( 1.02 usr +  0.00 sys =  1.02 CPU) @ 1420284.31/s (n=1448690)
-    #date_rel_new_str:  1 wallclock secs ( 1.01 usr +  0.00 sys =  1.01 CPU) @ 1238753.47/s (n=1251141)
-    
-    #cdate_add:  1 wallclock secs ( 1.09 usr +  0.00 sys =  1.09 CPU) @ 17934.86/s (n=19549)
-    #date_add:  0 wallclock secs ( 1.01 usr +  0.00 sys =  1.01 CPU) @ 4542099.01/s (n=4587520)
-    #date_add2:  1 wallclock secs ( 1.03 usr +  0.00 sys =  1.03 CPU) @ 4858802.91/s (n=5004567)
-    #date_add3:  1 wallclock secs ( 1.05 usr +  0.00 sys =  1.05 CPU) @ 2759410.48/s (n=2897381)
-    #date_add_new:  2 wallclock secs ( 1.06 usr +  0.00 sys =  1.06 CPU) @ 1180321.70/s (n=1251141)
-    
-    #cdate_compare:  1 wallclock secs ( 1.10 usr +  0.00 sys =  1.10 CPU) @ 71087.27/s (n=78196)
-    #date_compare:  2 wallclock secs ( 1.07 usr +  0.00 sys =  1.07 CPU) @ 3674914.95/s (n=3932159)
+    say "using timezones";
+    cmpthese($time, {
+        Date           => sub { Date::date_ymd(2012, 12, 24, 15, 0, 0, 0, 'America/New_York') },
+        "Time::Moment" => sub {
+            my $tm = Time::Moment->new(
+                year   => 2012,
+                month  => 12,
+                day    => 24,
+                hour   => 15
+            );
+            my $zone   = DateTime::TimeZone->new(name => 'America/New_York');
+            my $offset = $zone->offset_for_datetime($tm) / 60;
+            $tm->with_offset_same_instant($offset);
+        },
+    });
+    say;
+
+
 
 =head1 AUTHOR
 
-Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+Pronin Oleg <syber@cpan.org>, Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda LTD
 
 =head1 LICENSE
 

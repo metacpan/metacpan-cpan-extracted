@@ -11,7 +11,7 @@ use SOAP::WSDL::Factory::Serializer;
 use SOAP::WSDL::Factory::Transport;
 use SOAP::WSDL::Expat::MessageParser;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %class_resolver_of   :ATTR(:name<class_resolver> :default<()>);
 my %no_dispatch_of      :ATTR(:name<no_dispatch>    :default<()>);

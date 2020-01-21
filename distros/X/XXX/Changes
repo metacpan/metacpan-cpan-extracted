@@ -1,3 +1,9 @@
+0.35 Mon Jan 20 15:08:01 PST 2020
+ - Add Perl schema to YAML::PP dumping
+
+0.34 Mon Jan 20 12:38:24 PST 2020
+ - Use YAML::PP as default dumper
+
 0.33 Thu 13 Jun 2019 10:17:10 PM CEST
  - Make 5.8 compatible again (TINITA)
 

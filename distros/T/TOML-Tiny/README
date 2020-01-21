@@ -1,5 +1,5 @@
 This archive contains the distribution TOML-Tiny,
-version 0.03:
+version 0.05:
 
   a minimal, pure perl TOML parser and serializer
 

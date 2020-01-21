@@ -1,0 +1,78 @@
+MODE: INLINE
+
+static inline Hash export_transition (const Timezone::Transition& trans, bool is_past) {
+    auto hash = Hash::create();
+    hash.store("offset", Simple(trans.offset));
+    hash.store("abbrev", Simple(trans.abbrev));
+    if (!is_past) {
+        hash.store("start",      Simple(trans.start));
+        hash.store("isdst",      Simple(trans.isdst));
+        hash.store("gmt_offset", Simple(trans.gmt_offset));
+        hash.store("leap_corr",  Simple(trans.leap_corr));
+        hash.store("leap_delta", Simple(trans.leap_delta));
+    }
+    return hash;
+}
+
+MODULE = Date                PACKAGE = Date::Timezone
+PROTOTYPES: DISABLE
+
+string Timezone::name () : const {
+    RETVAL = THIS->name;
+}
+
+bool Timezone::is_local () : const {
+    RETVAL = THIS->is_local;
+}
+
+Hash Timezone::export () : const {
+    RETVAL = Hash::create();
+    
+    RETVAL.store("name", Simple(string_view(THIS->name.data(), THIS->name.length())));
+    RETVAL.store("is_local", Simple(THIS->is_local ? 1 : 0));
+    
+    auto future = Hash::create();
+    future.store("hasdst", Simple(THIS->future.hasdst ? 1 : 0));
+    
+    auto outer = Hash::create();
+    outer.store("abbrev",     Simple(string_view(THIS->future.outer.abbrev, strlen(THIS->future.outer.abbrev))));
+    outer.store("offset",     Simple(THIS->future.outer.offset));
+    outer.store("gmt_offset", Simple(THIS->future.outer.gmt_offset));
+    outer.store("isdst",      Simple(THIS->future.outer.isdst));
+    future.store("outer", Ref::create(outer));
+    
+    if (THIS->future.hasdst) {
+        auto outer_end = Hash::create();
+        outer_end.store("mon",  Simple(THIS->future.outer.end.mon));
+        outer_end.store("week", Simple(THIS->future.outer.end.yday));
+        outer_end.store("day",  Simple(THIS->future.outer.end.wday));
+        outer_end.store("hour", Simple(THIS->future.outer.end.hour));
+        outer_end.store("min",  Simple(THIS->future.outer.end.min));
+        outer_end.store("sec",  Simple(THIS->future.outer.end.sec));
+        outer.store("end", Ref::create(outer_end));        
+        
+        auto inner = Hash::create();
+        inner.store("abbrev",     Simple(string_view(THIS->future.inner.abbrev, strlen(THIS->future.inner.abbrev))));
+        inner.store("offset",     Simple(THIS->future.inner.offset));
+        inner.store("gmt_offset", Simple(THIS->future.inner.gmt_offset));
+        inner.store("isdst",      Simple(THIS->future.inner.isdst));
+        
+        auto inner_end = Hash::create();
+        inner_end.store("mon",  Simple(THIS->future.inner.end.mon));
+        inner_end.store("week", Simple(THIS->future.inner.end.yday));
+        inner_end.store("day",  Simple(THIS->future.inner.end.wday));
+        inner_end.store("hour", Simple(THIS->future.inner.end.hour));
+        inner_end.store("min",  Simple(THIS->future.inner.end.min));
+        inner_end.store("sec",  Simple(THIS->future.inner.end.sec));
+        inner.store("end", Ref::create(inner_end));
+        
+        future.store("inner", Ref::create(inner));
+    }
+    RETVAL.store("future", Ref::create(future));
+    
+    auto trans = Array::create();
+    for (uint32_t i = 0; i < THIS->trans_cnt; ++i) trans.push(Ref::create(export_transition(THIS->trans[i], false)));
+    RETVAL.store("transitions", Ref::create(trans));
+    
+    RETVAL.store("past", Ref::create(export_transition(THIS->trans[0], true)));
+}

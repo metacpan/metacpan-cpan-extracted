@@ -1206,12 +1206,17 @@ Redo:
     _exit(0);
 }
 
+static int (*rsa_finish)(RSA *rsa);
+
 static int priv_rsa_finish(RSA *rsa)
 {
     struct st_neverbleed_rsa_exdata_t *exdata;
     struct st_neverbleed_thread_data_t *thdata;
 
     get_privsep_data(rsa, &exdata, &thdata);
+
+    rsa_finish(rsa);
+
     if (exdata == NULL)
         return 1;
 
@@ -1406,6 +1411,8 @@ int neverbleed_init(neverbleed_t *nb, char *errbuf)
     const EC_KEY_METHOD *ecdsa_default_method;
     RSA_METHOD *rsa_method = RSA_meth_dup(RSA_PKCS1_OpenSSL());
 
+    rsa_finish = RSA_meth_get_finish(rsa_method);
+
     RSA_meth_set1_name(rsa_method, "privsep RSA method");
     RSA_meth_set_priv_enc(rsa_method, priv_enc_proxy);
     RSA_meth_set_priv_dec(rsa_method, priv_dec_proxy);
@@ -1422,6 +1429,8 @@ int neverbleed_init(neverbleed_t *nb, char *errbuf)
 #else
     const RSA_METHOD *default_method = RSA_PKCS1_SSLeay();
     RSA_METHOD *rsa_method = &static_rsa_method;
+
+    rsa_finish = default_method->finish;
 
     rsa_method->rsa_pub_enc = default_method->rsa_pub_enc;
     rsa_method->rsa_pub_dec = default_method->rsa_pub_dec;

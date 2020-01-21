@@ -1,140 +1,167 @@
 package Config::Registry;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use strictures 2;
 
 use Carp qw( croak );
-use Hash::Merge qw();
 use MRO::Compat;
 
 use Moo;
 use namespace::clean;
 
 around BUILDARGS => sub{
-  my $orig = shift;
-  my $class = shift;
+    my $orig = shift;
+    my $class = shift;
 
-  my $args = $class->$orig( @_ );
-  $args = $class->merge( $class->document(), $args );
-  $args = $class->render( $args );
+    my $args = $class->$orig( @_ );
+    $args = $class->merge_documents( $class->document(), $args );
+    $args = $class->render_document( $args );
 
-  return $args;
+    return $args;
 };
 
 sub BUILD {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  my $class = ref $self;
-  croak "$class must be published before an instance may be built"
-    if !$class->_get_class_data('is_published');
+    my $class = ref $self;
+    croak "$class must be published before an instance may be built"
+        if !$class->_get_class_data('is_published');
 
-  return;
+    return;
 }
 
 my %DATA;
 
 sub _set_class_data {
-  my ($class, $key, $value) = @_;
-  my $data = $DATA{$class} ||= {};
-  $data->{$key} = $value;
-  return;
+    my ($class, $key, $value) = @_;
+    my $data = $DATA{$class} ||= {};
+    $data->{$key} = $value;
+    return;
 }
 
 sub _get_class_data {
-  my ($class, $key) = @_;
+    my ($class, $key) = @_;
 
-  my $isas = mro::get_linear_isa( $class );
+    my $isas = mro::get_linear_isa( $class );
 
-  foreach my $isa (@$isas) {
-    my $data = $DATA{ $isa };
-    next if !$data;
-    next if !exists $data->{$key};
-    return $data->{$key};
-  }
+    foreach my $isa (@$isas) {
+        my $data = $DATA{ $isa };
+        next if !$data;
+        next if !exists $data->{$key};
+        return $data->{$key};
+    }
 
-  return undef;
+    return undef;
 }
 
-my $MERGER;
+sub merge_schemas {
+        my $class = shift;
+        return $class->merge( @_ );
+}
+
+sub merge_documents {
+        my $class = shift;
+        return $class->merge( @_ );
+}
 
 sub merge {
-  $MERGER ||= Hash::Merge->new( 'RIGHT_PRECEDENT' );
-  shift;
-  return $MERGER->merge( @_ );
+        my ($class, $l, $r) = @_;
+
+        return $r if ref($l) ne 'HASH';
+        return $r if ref($r) ne 'HASH';
+
+        $r = { %$r };
+
+        foreach my $key (keys %$l) {
+                next if !exists $r->{$key};
+                $r->{$key} = $class->merge( $l->{$key}, $r->{$key} );
+        }
+
+        return { %$l, %$r };
+}
+
+sub render_schema {
+        my $class = shift;
+        return $class->render( @_ );
+}
+
+sub render_document {
+        my $class = shift;
+        return $class->render( @_ );
 }
 
 sub render {
-  shift;
-  return shift;
+    shift;
+    return shift;
 }
 
 my %REGISTRIES;
 
 sub fetch {
-  my ($class) = @_;
-  return $REGISTRIES{ $class } ||= $class->new();
+    my ($class) = @_;
+    return $REGISTRIES{ $class } ||= $class->new();
 }
 
 sub schema {
-  my ($class, $extra) = @_;
+    my ($class, $extra) = @_;
 
-  my $schema = $class->_get_class_data('schema') || {};
-  return $schema if !$extra;
+    my $schema = $class->_get_class_data('schema') || {};
+    return $schema if !$extra;
 
-  croak "Cannot change the registry schema after publishing $class"
-    if $class->_get_class_data('is_published');
+    croak "Cannot change the registry schema after publishing $class"
+        if $class->_get_class_data('is_published');
 
-  $schema = $class->merge( $schema, $extra );
-  $class->_set_class_data( schema => $schema );
+    $schema = $class->merge_schemas( $schema, $extra );
+    $class->_set_class_data( schema => $schema );
 
-  return $schema;
+    return $schema;
 }
 
 sub document {
-  my ($class, $extra) = @_;
+    my ($class, $extra) = @_;
 
-  my $document = $class->_get_class_data('document') || {};
-  return $document if !$extra;
+    my $document = $class->_get_class_data('document') || {};
+    return $document if !$extra;
 
-  croak "Cannot change the registry document after publishing $class"
-    if $class->_get_class_data('is_published');
+    croak "Cannot change the registry document after publishing $class"
+        if $class->_get_class_data('is_published');
 
-  $document = $class->merge( $document, $extra );
-  $class->_set_class_data( document => $document );
+    $document = $class->merge_documents( $document, $extra );
+    $class->_set_class_data( document => $document );
 
-  return $document;
+    return $document;
 }
 
 sub publish {
-  my ($class) = @_;
+    my ($class) = @_;
 
-  croak "$class, or an ancestor class of, has already been published"
-    if $class->_get_class_data('is_published');
+    croak "$class, or an ancestor class of, has already been published"
+        if $class->_get_class_data('is_published');
 
-  my $schema = $class->_get_class_data('schema') || {};
+    my $schema = $class->_get_class_data('schema') || {};
 
-  $schema = $class->render( $schema );
+    $schema = $class->render_schema( $schema );
 
-  foreach my $key (keys %$schema) {
-    my $spec = $schema->{$key};
-    $spec = { isa=>$spec } if !ref $spec;
+    foreach my $key (keys %$schema) {
+        my $spec = $schema->{$key};
+        $spec = { isa=>$spec } if ref($spec) ne 'HASH';
 
-    $spec = {
-      is       => 'ro',
-      required => 1,
-      %$spec,
-    };
+        $spec = {
+            is             => 'ro',
+            required => 1,
+            %$spec,
+        };
 
-    # This is what the has() function does in Moo.pm.
-    Moo->_constructor_maker_for( $class )
-      ->register_attribute_specs( $key, $spec );
-    Moo->_accessor_maker_for( $class )
-      ->generate_method( $class, $key, $spec );
-    Moo->_maybe_reset_handlemoose( $class );
-  }
+        # This is what the has() function does in Moo.pm.
+        Moo->_constructor_maker_for( $class )
+            ->register_attribute_specs( $key, $spec );
+        Moo->_accessor_maker_for( $class )
+            ->generate_method( $class, $key, $spec );
+        Moo->_maybe_reset_handlemoose( $class );
+    }
 
-  $class->_set_class_data( is_published => 1 );
+    $class->_set_class_data( is_published => 1 );
 
-  return;
+    return;
 }
 
 1;
@@ -150,47 +177,47 @@ Config::Registry - Settings bundler.
 
 =head2 Create a Schema Class
 
-  package Org::Style;
-  use strictures 2;
-  
-  use Types::Standard qw( Str );
-  
-  use Moo;
-  use namespace::clean;
-  
-  extends 'Config::Registry';
-  
-  __PACKAGE__->schema({
-    border_color => Str,
-  });
-  
-  1;
+    package Org::Style;
+    use strictures 2;
+    
+    use Types::Standard qw( Str );
+    
+    use Moo;
+    use namespace::clean;
+    
+    extends 'Config::Registry';
+    
+    __PACKAGE__->schema({
+        border_color => Str,
+    });
+    
+    1;
 
 =head2 Create a Document Class
 
-  package MyApp::Style;
-  use strictures 2;
-  
-  use Moo;
-  use namespace::clean;
-  
-  extends 'Org::Style';
-  
-  __PACKAGE__->document({
-    border_color => '#333',
-  });
-  
-  __PACKAGE__->publish();
-  
-  1;
+    package MyApp::Style;
+    use strictures 2;
+    
+    use Moo;
+    use namespace::clean;
+    
+    extends 'Org::Style';
+    
+    __PACKAGE__->document({
+        border_color => '#333',
+    });
+    
+    __PACKAGE__->publish();
+    
+    1;
 
 =head2 Use a Document Class
 
-  use MyApp::Style;
-  
-  my $style = MyApp::Style->fetch();
-  
-  print '<table style="border-color:' . $style->border_color() . '">';
+    use MyApp::Style;
+    
+    my $style = MyApp::Style->fetch();
+    
+    print '<table style="border-color:' . $style->border_color() . '">';
 
 =head1 SYNOPSIS
 
@@ -198,58 +225,58 @@ This module provides a framework for a pattern we've seen emerge in
 ZipRecruiter code as we've been working to separate our monolithic
 application into smaller and more manageable code bases.
 
-The concept is pretty straightforward.  A registry consists of a
-schema class and one or more document classes.  The schema is used to
+The concept is pretty straightforward. A registry consists of a
+schema class and one or more document classes. The schema is used to
 validate the documents, and the documents are used to configure the
 features of an application.
 
 =head1 SCHEMAS
 
-  __PACKAGE__->schema({
-    border_color => Str,
-  });
+    __PACKAGE__->schema({
+        border_color => Str,
+    });
 
 The schema is a hash ref of attribute name and L<Type::Tiny> pairs.
 These pairs get turned into required L<Moo> attributes when
 L</publish> is called.
 
 Top-level schema keys may have a hash ref, rather than a type, as
-their value.  This hash ref will be used directly to construct the
-L<Moo> attribute.  The C<required> option defaults on, and the C<is>
-option default to C<ro>.  You can of course override these in the
+their value. This hash ref will be used directly to construct the
+L<Moo> attribute. The C<required> option defaults on, and the C<is>
+option default to C<ro>. You can of course override these in the
 hash ref.
 
 For example, the above code could be written as:
 
-  __PACKAGE__->schema({
-    border_color => { isa => Str },
-  });
+    __PACKAGE__->schema({
+        border_color => { isa => Str },
+    });
 
 The attribute can be made optional by passing an options hash ref:
 
-  __PACKAGE__->schema({
-    border_color => { isa => Str, required => 0 },
-  });
+    __PACKAGE__->schema({
+        border_color => { isa => Str, required => 0 },
+    });
 
 Non-top level keys can be made optional using L<Type::Standard>'s
 C<Optional> type modifier:
 
-  __PACKAGE__->schema({
-    border_colors => Dict[
-      top    => Optional[ Str ],
-      right  => Optional[ Str ],
-      bottom => Optional[ Str ],
-      left   => Optional[ Str ],
-    ],
-  });
+    __PACKAGE__->schema({
+        border_colors => Dict[
+            top    => Optional[ Str ],
+            right  => Optional[ Str ],
+            bottom => Optional[ Str ],
+            left   => Optional[ Str ],
+        ],
+    });
 
 See L</Create a Schema Role> for a complete example.
 
 =head1 DOCUMENTS
 
-  __PACKAGE__->document({
-    border_color => '#333',
-  });
+    __PACKAGE__->document({
+        border_color => '#333',
+    });
 
 A document is a hash ref of attribute name value pairs.
 
@@ -258,13 +285,21 @@ on the registry class.
 
 See L</Create a Document Class> for a complete example.
 
+=head1 CLASS METHODS
+
+=head2 fetch
+
+    my $registry = $class->fetch();
+
+Returns the singleton instance of the registry class.
+
 =head1 PACKAGE METHODS
 
 =head2 schema
 
-  __PACKAGE__->schema( \%schema );
+    __PACKAGE__->schema( \%schema );
 
-Sets the schema hash ref.  If a schema hash ref has already been
+Sets the schema hash ref. If a schema hash ref has already been
 set then L</merge> will be used to combine the passed in schema with
 the existing schema.
 
@@ -273,9 +308,9 @@ itself.
 
 =head2 document
 
-  __PACKAGE__->document( \%doc );
+    __PACKAGE__->document( \%doc );
 
-Sets the document hash ref.  If a document hash ref has already been
+Sets the document hash ref. If a document hash ref has already been
 set then L</merge> will be used to combine the passed in document with
 the existing document.
 
@@ -284,27 +319,10 @@ itself.
 
 =head2 publish
 
-  __PACKAGE__->publish();
+    __PACKAGE__->publish();
 
 Turns the L</schema> hash ref into L<Moo> attributes and enables the
 registry class to be instantiated.
-
-=head2 merge
-
-  my $new_schema = $class->merge( $schema, $extra_schema );
-
-This utility method does a C<RIGHT_PRECEDENT> L<Hash::Merge> and is
-made available for those jobs that require a bit more customization
-when building the schema and/or documents.
-
-=head2 render
-
-  my $document = $class->render( $raw_document );
-
-Like L</merge>, this method is made available as a spot for subclasses
-to customize behavior.  The default render method just returns what is
-passed to it.  As an example, this method could be customized to pass
-the schema and document data structures through L<Data::Xslate>.
 
 =head1 SUPPORT
 
@@ -317,7 +335,7 @@ L<https://github.com/bluefeet/Config-Registry/issues>
 
 Thanks to L<ZipRecruiter|https://www.ziprecruiter.com/> for
 encouraging their employees to contribute back to the open source
-ecosystem.  Without their dedication to quality software development
+ecosystem. Without their dedication to quality software development
 this distribution would not exist.
 
 =head1 AUTHOR
@@ -335,11 +353,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+along with this program. If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 

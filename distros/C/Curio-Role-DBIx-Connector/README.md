@@ -1,6 +1,6 @@
 # NAME
 
-Curio::Role::DBIx::Connector - Build Curio classes around DBIx::Connector.
+Curio::Role::DBIx::Connector - Build Curio classes around DBIx::Connector. (DEPRECATED)
 
 # SYNOPSIS
 

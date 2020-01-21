@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "XXX",
   "PREREQ_PM" => {
-    "YAML" => 0
+    "YAML::PP" => "0.018"
   },
-  "VERSION" => "0.33",
+  "VERSION" => "0.35",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "YAML" => 0
+  "YAML::PP" => "0.018"
 );
 
 

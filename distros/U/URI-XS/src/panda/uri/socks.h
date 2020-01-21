@@ -3,11 +3,10 @@
 
 namespace panda { namespace uri {
 
-class URI::socks : public UserPass {
-public:
-    socks () : Strict() {}
-    socks (const string& source, int flags = 0) : Strict(source, flags) { strict_scheme(); }
-    socks (const URI& source)                   : Strict(source)        { strict_scheme(); }
+struct URI::socks : Strict<URI::socks> {
+    using Strict<URI::socks>::Strict;
+
+    static string default_scheme () { return "socks5"; }
 };
 
 }}

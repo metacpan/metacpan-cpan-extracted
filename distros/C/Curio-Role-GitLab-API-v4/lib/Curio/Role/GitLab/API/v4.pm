@@ -1,5 +1,5 @@
 package Curio::Role::GitLab::API::v4;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use GitLab::API::v4;
 use Scalar::Util qw( blessed );
@@ -64,7 +64,7 @@ __END__
 
 =head1 NAME
 
-Curio::Role::GitLab::API::v4 - Build Curio classes around GitLab::API::v4.
+Curio::Role::GitLab::API::v4 - Build Curio classes around GitLab::API::v4. (DEPRECATED)
 
 =head1 SYNOPSIS
 

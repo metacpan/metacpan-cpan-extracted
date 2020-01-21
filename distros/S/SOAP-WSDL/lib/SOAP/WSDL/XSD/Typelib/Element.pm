@@ -2,7 +2,7 @@ package SOAP::WSDL::XSD::Typelib::Element;
 use strict; use warnings;
 use Class::Std::Fast::Storable constructor => 'none';
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %NAME;
 my %NILLABLE;
@@ -159,7 +159,7 @@ The prefix for 'http://www.w3.org/2001/XMLSchema-instance (used as namespace
 for the {http://www.w3.org/2001/XMLSchema-instance}nil="true" attribute
 is hardcoded as 'xsi'.
 
-You should definitly provide your XML envelope generator with the same prefix
+You should definitely provide your XML envelope generator with the same prefix
 namespace combination (Default for SOAP::WSDL::Envelope).
 
 =back

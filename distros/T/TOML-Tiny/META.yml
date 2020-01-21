@@ -26,7 +26,6 @@ recommends:
 requires:
   Carp: '0'
   Data::Dumper: '0'
-  DateTime::Format::RFC3339: '0'
   Exporter: '0'
   Scalar::Util: '1.14'
   perl: '5.018'
@@ -34,6 +33,6 @@ resources:
   bugtracker: https://github.com/sysread/TOML-Tiny/issues
   homepage: https://github.com/sysread/TOML-Tiny
   repository: https://github.com/sysread/TOML-Tiny.git
-version: '0.03'
+version: '0.05'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

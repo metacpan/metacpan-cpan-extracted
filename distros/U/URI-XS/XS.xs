@@ -1,4 +1,5 @@
 #include <xs/uri.h>
+#include <xs/export.h>
 #include <unordered_map>
 #include <panda/uri/all.h>
 #include <panda/string_view.h>
@@ -9,28 +10,8 @@ using namespace panda::uri;
 using panda::string;
 using panda::string_view;
 
-static char unsafe_query_component_plus[256];
 static std::unordered_map<string, Stash> uri_class_map;
 static Sv::payload_marker_t data_marker;
-
-// We use make_backref for URI, URI::http, URI::https,
-// but we can't use it for URI::ftp/socks because of virtual inheritance of UserPass from Strict with non-empty constructor
-
-class XSURIftp : public URI::ftp, public Backref {
-public:
-    XSURIftp () : URI::ftp() {}
-    XSURIftp (const string& source, int flags = 0) : URI::Strict(source, flags), URI::ftp(source, flags) {}
-    XSURIftp (const URI& source)                   : URI::Strict(source),        URI::ftp(source)        {}
-    ~XSURIftp() { Backref::dtor(); }
-};
-
-class XSURIsocks : public URI::socks, public Backref {
-public:
-    XSURIsocks () : URI::socks() {}
-    XSURIsocks (const string& source, int flags = 0) : URI::Strict(source, flags), URI::socks(source, flags) {}
-    XSURIsocks (const URI& source)                   : URI::Strict(source),        URI::socks(source)        {}
-    ~XSURIsocks() { Backref::dtor(); }
-};
 
 struct XsUriData {
     XsUriData () : query_cache_rev(0) {}
@@ -148,9 +129,11 @@ MODULE = URI::XS                PACKAGE = URI::XS
 PROTOTYPES: DISABLE
 
 BOOT {
-    unsafe_generate(unsafe_query_component_plus, UNSAFE_UNRESERVED);
-    unsafe_query_component_plus[(unsigned char)' '] = '+';
     data_marker.svt_free = data_free;
+    
+    xs::at_perl_destroy([]{
+        uri_class_map.clear();
+    });
 }
 
 URIx uri (string url = string(), int flags = 0) {
@@ -159,6 +142,49 @@ URIx uri (string url = string(), int flags = 0) {
 
 void register_scheme (string scheme, string_view perl_class) {
     register_perl_scheme(scheme, perl_class);
+}
+
+uint64_t bench_parse (string str) {
+    RETVAL = 0;
+    for (int i = 0; i < 1000; ++i) {
+        URI u(str);
+        RETVAL += u.path().length();
+    }
+}
+
+void test_parse (string str) {
+    auto uri = URI(str);
+    printf("scheme=%s\n", uri.scheme().c_str());
+    printf("userinfo=%s\n", uri.user_info().c_str());
+    printf("host=%s\n", uri.host().c_str());
+    printf("port=%d\n", uri.port());
+    printf("path=%s\n", uri.path().c_str());
+    printf("query=%s\n", uri.raw_query().c_str());
+    printf("fragment=%s\n", uri.fragment().c_str());
+}
+
+void bench_parse_query (string str) {
+    URI u;
+    for (int i = 0; i < 1000; ++i) {
+        u.query_string(str);
+        u.query();
+    }
+}
+
+uint64_t bench_encode_uri_component (string_view str) {
+    RETVAL = 0;
+    char dest[str.length() * 3];
+    for (int i = 0; i < 1000; ++i) {
+        encode_uri_component(str, dest);
+    }
+}
+
+uint64_t bench_decode_uri_component (string_view str) {
+    RETVAL = 0;
+    char dest[str.length()];
+    for (int i = 0; i < 1000; ++i) {
+        decode_uri_component(str, dest);
+    }
 }
 
 INCLUDE: encode.xsi

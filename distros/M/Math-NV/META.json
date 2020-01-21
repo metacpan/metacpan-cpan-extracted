@@ -44,6 +44,6 @@
          "web" : "https://github.com/sisyphus/math-nv"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

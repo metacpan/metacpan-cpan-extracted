@@ -1,11 +1,11 @@
 package Catalyst::Model::Curio;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =encoding utf8
 
 =head1 NAME
 
-Catalyst::Model::Curio - Curio Model for Catalyst.
+Catalyst::Model::Curio - Curio Model for Catalyst. (DEPRECATED)
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ sub _install_key_models {
 The Curio class that this model wraps around.
 
 This is required to be set, otherwise Catalyst will throw
-and exception when trying to load your model.
+an exception when trying to load your model.
 
 =cut
 
@@ -149,7 +149,7 @@ If you'd like, you can change this to call a different
 method, returning something else of your choice.
 
 You could, for example, have a method in your Curio class
-which returns the the resource that your Curio object makes:
+which returns the resource that your Curio object makes:
 
     sub connect {
         my $class = shift;
@@ -213,6 +213,7 @@ development this distribution would not exist.
 =head1 AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

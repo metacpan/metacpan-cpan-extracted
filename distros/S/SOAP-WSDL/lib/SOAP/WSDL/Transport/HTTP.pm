@@ -2,7 +2,7 @@ package SOAP::WSDL::Transport::HTTP;
 use strict; use warnings;
 use base qw(LWP::UserAgent);
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 # create methods normally inherited from SOAP::Client
 SUBFACTORY: {
@@ -28,6 +28,9 @@ sub send_receive {
     $encoding = defined($encoding)
         ? lc($encoding)
         : 'utf-8';
+
+    $endpoint = ""
+        if not defined($endpoint);
 
     $content_type = "text/xml; charset=$encoding"
         if not defined($content_type);

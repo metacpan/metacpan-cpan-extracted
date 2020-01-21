@@ -17,13 +17,13 @@ name: Apache-Session-Browseable
 provides:
   Apache::Session::Browseable:
     file: lib/Apache/Session/Browseable.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::DBI:
     file: lib/Apache/Session/Browseable/DBI.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::File:
     file: lib/Apache/Session/Browseable/File.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::Informix:
     file: lib/Apache/Session/Browseable/Informix.pm
     version: v1.2.2
@@ -35,22 +35,22 @@ provides:
     version: v1.2.5
   Apache::Session::Browseable::MySQLJSON:
     file: lib/Apache/Session/Browseable/MySQLJSON.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::Oracle:
     file: lib/Apache/Session/Browseable/Oracle.pm
     version: v1.2.2
   Apache::Session::Browseable::PgHstore:
     file: lib/Apache/Session/Browseable/PgHstore.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::PgJSON:
     file: lib/Apache/Session/Browseable/PgJSON.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::Postgres:
     file: lib/Apache/Session/Browseable/Postgres.pm
     version: v1.3.1
   Apache::Session::Browseable::Redis:
     file: lib/Apache/Session/Browseable/Redis.pm
-    version: v1.3.4
+    version: v1.3.5
   Apache::Session::Browseable::SQLite:
     file: lib/Apache/Session/Browseable/SQLite.pm
     version: v1.2.2
@@ -105,5 +105,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/LemonLDAPNG/Apache-Session-Browseable
-version: v1.3.4
+version: v1.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

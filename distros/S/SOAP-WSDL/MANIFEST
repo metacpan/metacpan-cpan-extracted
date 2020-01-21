@@ -1,3 +1,5 @@
+MYMETA.json
+MYMETA.yml
 benchmark/01_expat.t
 benchmark/hello.pl
 benchmark/MEMORY_FOOTPRINT
@@ -11,7 +13,6 @@ benchmark/XSD/02_anySimpleType.t
 benchmark/XSD/03_string.t
 benchmark/XSD/strftime.pl
 bin/wsdl2perl.pl
-Build.PL
 Changes
 example/cgi-bin/helloworld.pl
 example/cgi-bin/person.pl

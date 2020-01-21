@@ -1,0 +1,14 @@
+requires                "Font::Fontconfig";
+
+requires                "Exporter";
+requires                "List::Util";
+
+on 'develop' => sub {
+    requires    "ExtUtils::MakeMaker::CPANfile";
+};
+
+on 'test' => sub {
+    requires            "Test::Most";
+    requires            "Test::MockModule";
+    requires            "Test::MockObject";
+};

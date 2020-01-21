@@ -1,5 +1,10 @@
 Revision history for Perl extension Fl
 
+0.99.15 2020-01-21T03:43:34Z
+
+	- Force update to align with new Alien::FLTK dist
+	- Fl::HtmlView is broken!
+
 0.99.14 2016-07-01T13:04:26Z
 
     - Fix crash when args are set with $widget->callback(...)

@@ -1,5 +1,5 @@
 package Curio;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Curio::Declare qw();
 use Curio::Role qw();
@@ -40,7 +40,7 @@ __END__
 
 =head1 NAME
 
-Curio - Procurer of fine resources and services.
+Curio - Procurer of fine resources and services. (DEPRECATED)
 
 =head1 SYNOPSIS
 
@@ -86,6 +86,10 @@ Then use your new Curio class elsewhere:
     use MyApp::Service::Cache;
     
     my $chi = myapp_cache('geo_ip');
+
+=head1 DEPRECATED
+
+This distribution is deprecated in favor of L<Object::Depot>.
 
 =head1 DESCRIPTION
 

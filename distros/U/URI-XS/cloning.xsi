@@ -3,13 +3,13 @@ PROTOTYPES: DISABLE
 
 URI* URI::HOOK_CLONE () {
     PROTO = Object(ST(0)).stash();
-    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL = URI::create(*THIS);
-    else                                  RETVAL = make_backref<URI>(*THIS);
+    if (dynamic_cast<URIStrict*>(THIS)) RETVAL = URI::create(*THIS);
+    else                                RETVAL = make_backref<URI>(*THIS);
 }
 
 string URI::STORABLE_freeze (bool) {
     RETVAL = THIS->to_string();
-    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL += '1';
+    if (dynamic_cast<URIStrict*>(THIS)) RETVAL += '1';
     else RETVAL += '0';
 }
 

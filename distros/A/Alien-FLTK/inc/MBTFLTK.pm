@@ -14,7 +14,7 @@ use File::Find ();
 use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catfile catdir rel2abs abs2rel splitdir/;
 use Getopt::Long qw/GetOptions/;
-use JSON::PP 2 qw/encode_json decode_json/;
+use JSON::Tiny qw/encode_json decode_json/;
 use HTTP::Tiny;
 use Archive::Extract;
 use File::pushd;
@@ -90,28 +90,26 @@ sub process_xs {
 sub get_lib {
     my ($meta) = @_;
     my $location;
-    my $index = 'http://fltk.org/pub/fltk/snapshots/';
-    my $snaps = qr[fltk-1.3.x-r([\d\.]+)\.tar\.gz];
+    my $index = 'https://api.github.com/repos/fltk/fltk/tags';
     {
         print "Finding most recent version...";
         my $response = HTTP::Tiny->new->get($index);
-        if (0 && $response->{success}) {
+        if ($response->{success}) {
 
             # Snapshots don't contain fltk-config script
-            my ($version)
-                = sort { $b <=> $a } ($response->{content} =~ /$snaps/g);
-            $location = $index . 'fltk-1.3.x-r' . $version . '.tar.gz';
-            print " r$version\n";
+			my $tags = decode_json $response->{content};
+			printf "\nGrabbing %s snapshot (%s)\n", $tags->[0]{name}, $tags->[0]{commit}{sha};
+			$location = $tags->[0]{tarball_url};
         }
         else {
-            print " Hrm. Grabbing latest stable release\n";
+            print " Hrm. Grabbing latest known release\n";
             $location
-                = 'http://fltk.org/pub/fltk/1.3.3/fltk-1.3.3-source.tar.gz';
+                = 'https://github.com/fltk/fltk/archive/release-1.3.4-2.tar.gz';
         }
     }
-    my $file = basename($location);
+    my $file = basename($location) . '.tar.gz';
     {
-        print "Downloading $file...";
+        print "Downloading $location...";
         my $response = HTTP::Tiny->new->mirror($location, $file);
         if ($response->{success}) {
             print " Done\n";
@@ -133,10 +131,14 @@ sub build_lib {
         $dir = tempd();
         $libinfo{archive} = get_lib($meta->custom('x_alien'));
         print "Extracting...";
+
         my $ae = Archive::Extract->new(archive => $libinfo{archive});
+
         exit print " Fail! " . $ae->error if !$ae->extract();
         print " Done\nConfigure...\n";
         chdir($ae->extract_path);
+
+        system q[NOCONFIGURE=1 ./autogen.sh];
         system q[sh ./configure --enable-shared];
         $libinfo{cflags}     = `sh ./fltk-config --cflags --optim`;
         $libinfo{cxxflags}   = `sh ./fltk-config --cxxflags --optim`;

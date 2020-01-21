@@ -3,7 +3,7 @@ use 5.012;
 use Date;
 
 use overload
-    '""'     => \&to_string,
+    '""'     => \&_op_str,
     'bool'   => \&to_bool,
     '0+'     => \&to_number,
     'neg'    => \&negated,

@@ -1,6 +1,6 @@
 # NAME
 
-Curio - Procurer of fine resources and services.
+Curio - Procurer of fine resources and services. (DEPRECATED)
 
 # SYNOPSIS
 
@@ -50,6 +50,10 @@ use MyApp::Service::Cache;
 
 my $chi = myapp_cache('geo_ip');
 ```
+
+# DEPRECATED
+
+This distribution is deprecated in favor of [Object::Depot](https://metacpan.org/pod/Object::Depot).
 
 # DESCRIPTION
 

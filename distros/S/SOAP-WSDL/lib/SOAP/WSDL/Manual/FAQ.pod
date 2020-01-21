@@ -64,7 +64,7 @@ and emits SOAP messages with namespace information.
 Its SOAP message parser however, is not namespace sensitive but uses the
 pre-shared information from the WSDL for looking up what each XML node means.
 
-SOAP::WSDL can parse SOAP messages including namespace informations up to the
+SOAP::WSDL can parse SOAP messages including namespace information up to the
 point where equally named elements from different namespaces may appear at
 the same position.
 

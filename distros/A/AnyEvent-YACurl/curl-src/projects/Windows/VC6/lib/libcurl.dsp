@@ -1086,6 +1086,10 @@ SOURCE=..\..\..\..\lib\smtp.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\socketpair.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\socks.c
 # End Source File
 # Begin Source File
@@ -1215,6 +1219,26 @@ SOURCE=..\..\..\..\lib\vauth\spnego_sspi.c
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\vauth\vauth.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vquic\ngtcp2.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vquic\quiche.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vssh\libssh2.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vssh\libssh.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vtls\bearssl.c
 # End Source File
 # Begin Source File
 
@@ -1638,6 +1662,10 @@ SOURCE=..\..\..\..\lib\sockaddr.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\lib\socketpair.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\lib\socks.h
 # End Source File
 # Begin Source File
@@ -1647,10 +1675,6 @@ SOURCE=..\..\..\..\lib\speedcheck.h
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\splay.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\..\lib\ssh.h
 # End Source File
 # Begin Source File
 
@@ -1727,6 +1751,22 @@ SOURCE=..\..\..\..\lib\vauth\ntlm.h
 # Begin Source File
 
 SOURCE=..\..\..\..\lib\vauth\vauth.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vquic\ngtcp2.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vquic\quiche.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vssh\ssh.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\lib\vtls\bearssl.h
 # End Source File
 # Begin Source File
 

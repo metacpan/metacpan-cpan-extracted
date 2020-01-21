@@ -6,7 +6,7 @@ use DBI;
 use Apache::Session;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.4';
+our $VERSION = '1.3.5';
 our @ISA     = qw(Apache::Session Apache::Session::Browseable::_common);
 
 sub searchOn {
@@ -100,13 +100,17 @@ sub deleteIfLowerThan {
       ? $args->{Index}
       : [ split /\s+/, $args->{Index} ];
     if ( $rule->{or} ) {
-        $query = join ' OR ',
-          map { $fields{$_}++; "cast($_ as integer) < $rule->{or}->{$_}" }
+        $query = join ' OR ', map {
+            $fields{$_}++;
+            $class->_buildLowerThanExpression( $_, $rule->{or}->{$_} )
+          }
           keys %{ $rule->{or} };
     }
     elsif ( $rule->{and} ) {
-        $query = join ' AND ',
-          map { $fields{$_}++; "cast($_ as integer) < $rule->{or}->{$_}" }
+        $query = join ' AND ', map {
+            $fields{$_}++;
+            $class->_buildLowerThanExpression( $_, $rule->{or}->{$_} )
+          }
           keys %{ $rule->{or} };
     }
     if ( $rule->{not} ) {
@@ -122,6 +126,12 @@ sub deleteIfLowerThan {
       || $Apache::Session::Store::DBI::TableName;
     my $sth = $dbh->do("DELETE FROM $table_name WHERE $query");
     return 1;
+}
+
+# Let specialized modules override this syntax if they need to
+sub _buildLowerThanExpression {
+    my ( $class, $field, $value ) = @_;
+    return "cast($field as integer) < $value";
 }
 
 sub get_key_from_all_sessions {

@@ -75,4 +75,14 @@ WriteMakefile(
     INC               => '-I. -I' . $extdir,
     MYEXTLIB          => $myextlib,
     clean             => { FILES => $clean_files },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/sekimura/text-markdown-discount.git',
+                web  => 'https://github.com/sekimura/text-markdown-discount',
+            },
+        },
+    },
 );

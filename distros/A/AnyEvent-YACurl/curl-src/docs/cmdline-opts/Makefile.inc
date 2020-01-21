@@ -38,6 +38,8 @@ DPAGES =					\
   dump-header.d					\
   egd-file.d					\
   engine.d					\
+  etag-save.d                   \
+  etag-compare.d                \
   expect100-timeout.d				\
   fail-early.d					\
   fail.d					\
@@ -97,14 +99,16 @@ DPAGES =					\
   no-buffer.d					\
   no-keepalive.d				\
   no-npn.d					\
+  no-progress-meter.d                           \
   no-sessionid.d				\
   noproxy.d					\
   ntlm.d ntlm-wb.d				\
   oauth2-bearer.d				\
   output.d                                      \
-  pass.d                			\
-  parallel.d                                    \
+  parallel-immediate.d                          \
   parallel-max.d                                \
+  parallel.d                                    \
+  pass.d                			\
   path-as-is.d					\
   pinnedpubkey.d				\
   post301.d					\

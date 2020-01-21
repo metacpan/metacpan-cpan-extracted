@@ -1,5 +1,5 @@
 {
-   "abstract" : "Build Curio classes around DBIx::Connector.",
+   "abstract" : "Build Curio classes around DBIx::Connector. (DEPRECATED)",
    "author" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Curio::Role::DBIx::Connector" : {
          "file" : "lib/Curio/Role/DBIx/Connector.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -77,8 +77,9 @@
          "web" : "https://github.com/bluefeet/Curio-Role-DBIx-Connector"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:BLUEFEET",
+   "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

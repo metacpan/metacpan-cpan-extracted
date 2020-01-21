@@ -94,6 +94,30 @@ subtest 'parse errors', sub {
     like($@, qr/^Parse error on line 1/, 'parse error');
 };
 
+subtest 'handling projects', sub {
+    my $file = File::Codeowners->parse("$Bin/samples/kitchensink.CODEOWNERS");
+    my $r;
+
+    is_deeply($r = $file->projects, [
+        'Transportation',
+    ], 'projects listed') or diag explain $r;
+
+    $file->rename_project('Transportation', 'Getting Around');
+    is_deeply($r = $file->projects, [
+        'Getting Around',
+    ], 'project renamed') or diag explain $r;
+
+    is_deeply($r = [@{$file->_lines}[-3 .. -1]], [
+        {comment => ' Project: Getting Around', project => 'Getting Around'},
+        {},
+        {pattern => '/vehicles/**/batmobile.cad', 'owners' => ['@"Lucius Fox"'], project => 'Getting Around'},
+    ], 'renaming project properly modifies lines') or diag explain $r;
+
+    $file->update_owners_by_project('Getting Around', '@twoface');
+    ok( scalar grep { $_ eq '@twoface' }      @{$file->owners}, 'updating owner adds new owner');
+    ok(!scalar grep { $_ eq '@"Lucius Fox"' } @{$file->owners}, 'updating owner removes old owner');
+};
+
 subtest 'editing and writing files', sub {
     my $file = File::Codeowners->parse("$Bin/samples/basic.CODEOWNERS");
     my $r;

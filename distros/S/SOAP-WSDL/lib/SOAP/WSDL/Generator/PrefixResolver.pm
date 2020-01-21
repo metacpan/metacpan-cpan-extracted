@@ -3,7 +3,7 @@ use strict; use warnings;
 
 use Class::Std::Fast::Storable;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %namespace_prefix_map_of :ATTR(:name<namespace_prefix_map>   :default<{}>);
 my %namespace_map_of        :ATTR(:name<namespace_map>          :default<{}>);

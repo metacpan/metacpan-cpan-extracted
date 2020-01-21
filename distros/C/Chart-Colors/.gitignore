@@ -1,0 +1,8 @@
+# CPAN temp files
+
+MYMETA.json
+MYMETA.yml
+Makefile
+Makefile.old
+blib/*
+blib

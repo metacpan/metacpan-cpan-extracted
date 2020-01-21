@@ -46,10 +46,10 @@ use PPIx::Regexp::Token::Recursion		();
 use PPIx::Regexp::Token::Structure		();
 use PPIx::Regexp::Token::Unknown		();
 use PPIx::Regexp::Token::Whitespace		();
-use PPIx::Regexp::Util qw{ __is_ppi_regexp_element __instance };
+use PPIx::Regexp::Util qw{ is_ppi_regexp_element __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.067';
+our $VERSION = '0.068';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -157,7 +157,7 @@ defined $DEFAULT_POSTDEREF
 	};
 
 	if ( __instance( $re, 'PPI::Element' ) ) {
-	    __is_ppi_regexp_element( $re )
+	    is_ppi_regexp_element( $re )
 		or return __set_errstr( ref $re, 'not supported by', $class );
 	    # TODO conditionalizstion on PPI class does not really
 	    # belong here, but at the moment I have no other idea of
@@ -1623,7 +1623,7 @@ troubleshoot funny output from the tokenizer.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -1631,7 +1631,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Thomas R. Wyant, III
+Copyright (C) 2009-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -1,39 +1,40 @@
 #pragma once
 #include <xs.h>
 #include <panda/date.h>
+#include <panda/time.h>
 
 namespace xs { namespace date {
 
 using namespace panda::date;
+using namespace panda::time;
 
-inline Date invalid_date () { return Date(-2000000000, 0, 1); }
-
-inline TimezoneSP tzget_required (SV* zone) {
-    return tzget(zone && SvOK(zone) ? xs::in<panda::string_view>(zone) : panda::string_view());
-}
-
-inline TimezoneSP tzget_optional (SV* zone) {
-    return zone ? tzget(SvOK(zone) ? xs::in<panda::string_view>(zone) : panda::string_view()) : TimezoneSP();
-}
-
-void hash2vals  (const Hash& hash, ptime_t vals[8], TimezoneSP* zoneref);
-void array2vals (const Array& array, ptime_t vals[8]);
-
-Date    sv2date    (const Sv& arg, const TimezoneSP& zone = TimezoneSP(), bool keep_object_zone = false, bool no_throw = false);
-DateRel sv2daterel (const Sv& arg, const Sv& arg2 = Sv());
-DateInt sv2dateint (const Sv& arg, const Sv& arg2 = Sv());
+Date    sv2date    (const Sv& arg, const Timezone* zone = nullptr, int fmt = Date::InputFormat::all);
+DateRel sv2daterel (const Sv& arg);
 
 }}
 
 namespace xs {
+
+template <> struct Typemap<const panda::time::Timezone*> : TypemapObject<const panda::time::Timezone*, const panda::time::Timezone*, ObjectTypeForeignPtr, ObjectStorageMG> {
+    using Super = TypemapObject<const panda::time::Timezone*, const panda::time::Timezone*, ObjectTypeForeignPtr, ObjectStorageMG>;
+
+    static inline const panda::time::Timezone* in (const Sv& arg) {
+        if (arg.is_object_ref()) return Super::in(arg);
+        if (!arg) return {};
+        if (!arg.is_true()) return panda::time::tzlocal();
+        return panda::time::tzget(xs::in<panda::string_view>(arg));
+    }
+
+    static std::string package () { return "Date::Timezone"; }
+};
 
 template <class TYPE> struct Typemap<panda::date::Date*, TYPE> : TypemapObject<panda::date::Date*, TYPE, ObjectTypePtr, ObjectStorageMG> {
     static std::string package () { return "Date"; }
 };
 
 template <> struct Typemap<panda::date::Date> : TypemapBase<panda::date::Date> {
-    panda::date::Date in (const Sv& arg) { return xs::date::sv2date(arg); }
-    Sv out (const panda::date::Date& v, const Sv& proto = Sv()) { return xs::out(new panda::date::Date(v), proto); }
+    static inline panda::date::Date in (const Sv& arg) { return xs::date::sv2date(arg); }
+    static inline Sv out (const panda::date::Date& v, const Sv& proto = Sv()) { return xs::out(new panda::date::Date(v), proto); }
 };
 
 template <class TYPE> struct Typemap<panda::date::DateRel*, TYPE*> : TypemapObject<panda::date::DateRel*, TYPE*, ObjectTypePtr, ObjectStorageMG> {
@@ -41,17 +42,8 @@ template <class TYPE> struct Typemap<panda::date::DateRel*, TYPE*> : TypemapObje
 };
 
 template <> struct Typemap<panda::date::DateRel> : TypemapBase<panda::date::DateRel> {
-    panda::date::DateRel in (const Sv& arg) { return xs::date::sv2daterel(arg); }
-    Sv out (const panda::date::DateRel& v, const Sv& proto = Sv()) { return xs::out(new panda::date::DateRel(v), proto); }
-};
-
-template <class TYPE> struct Typemap<panda::date::DateInt*, TYPE> : TypemapObject<panda::date::DateInt*, TYPE, ObjectTypePtr, ObjectStorageMG> {
-    static std::string package () { return "Date::Int"; }
-};
-
-template <> struct Typemap<panda::date::DateInt> : TypemapBase<panda::date::DateInt> {
-    panda::date::DateInt in (const Sv& arg) { return xs::date::sv2dateint(arg); }
-    Sv out (const panda::date::DateInt& v, const Sv& proto = Sv()) { return xs::out(new panda::date::DateInt(v), proto); }
+    static inline panda::date::DateRel in (const Sv& arg) { return xs::date::sv2daterel(arg); }
+    static inline Sv out (const panda::date::DateRel& v, const Sv& proto = Sv()) { return xs::out(new panda::date::DateRel(v), proto); }
 };
 
 }

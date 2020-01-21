@@ -9,7 +9,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw( LoadArgs LoadPatterns ClearPatterns GetPatterns Process );
 
-our $VERSION = "2.1.1";
+our $VERSION = "2.1.2";
 
 
 sub new
@@ -128,7 +128,7 @@ sub GetPatterns
 
 sub FindPositionsOfTags
 {
-    my ( $positions, $patterns, $string_ref ) = @_;
+    my ( $positions, $patterns, $skip_nl_check, $string_ref ) = @_;
     my $result = 0;
     for ( my $i = 0; $i < @$patterns; ++$i )
     {
@@ -139,21 +139,25 @@ sub FindPositionsOfTags
                 my $length = $+[ 0 ] - $-[ 0 ];
                 next if $length == 0;
                 my $offset = 0;
-                #trailing new lines cause problems: put color tags before them
-                #BEWARE: in older Mac OS "\r" was used as the line terminator,
-                #which is not supported here
-                if ( substr( $$string_ref, $+[ 0 ] - 1, 1 ) eq "\n" )
+                unless ( $skip_nl_check )
                 {
-                    --$length;
-                    ++$offset;
-                    next if $length == 0;
-                    if ( substr( $$string_ref, $+[ 0 ] - 2, 1 ) eq "\r" )
+                    #trailing newlines cause problems: put color tags before
+                    #them
+                    #BEWARE: in older Mac OS "\r" was used as the line
+                    #terminator, which is not supported here
+                    if ( substr( $$string_ref, $+[ 0 ] - 1, 1 ) eq "\n" )
                     {
                         --$length;
                         ++$offset;
+                        next if $length == 0;
+                        if ( substr( $$string_ref, $+[ 0 ] - 2, 1 ) eq "\r" )
+                        {
+                            --$length;
+                            ++$offset;
+                        }
                     }
+                    next if $length == 0;
                 }
-                next if $length == 0;
                 push @$positions, ( [ $-[ 0 ], $length, 1, $i,
                                                         \$$patterns[ $i ] ],
                                     [ $+[ 0 ] - $offset, $length, 0, $i,
@@ -167,11 +171,14 @@ sub FindPositionsOfTags
             ++$result;
             my $length = length $$string_ref;
             next if $length == 0;
-            if ( substr( $$string_ref, -1 ) eq "\n" )
+            unless ( $skip_nl_check )
             {
-                --$length;
-                next if $length == 0;
-                --$length if substr( $$string_ref, -2, 1 ) eq "\r";
+                if ( substr( $$string_ref, -1 ) eq "\n" )
+                {
+                    --$length;
+                    next if $length == 0;
+                    --$length if substr( $$string_ref, -2, 1 ) eq "\r";
+                }
             }
             next if $length == 0;
             push @$positions, ( [ 0, $length, 1, $i,
@@ -309,7 +316,7 @@ sub Process
 
     #populate @Positions
     my $found_matches = FindPositionsOfTags( \@Positions,
-                                    \@{ $self->{ Patterns } }, $String_ref );
+            \@{ $self->{ Patterns } }, $$self{ skip_nl_check }, $String_ref );
 
     #do not change original string and return found positions if an array is
     #expected
@@ -319,9 +326,10 @@ sub Process
 
     #replace all but the last ending tags from @Positions by one-before-the-last
     #starting tag (crucial for terminal color escape sequences algorithm)
-    RearrangePositionsOfTags( \@Positions, \@{ $self->{ Patterns } } );
+    RearrangePositionsOfTags( \@Positions, \@{ $self->{ Patterns } } )
+                                                        if $found_matches > 1;
 
-    #insert tags into current line
+    #insert tags into the current line
     InsertTags( \@Positions, $String_ref, $$self{ tagtype } );
 
     $found_matches;
@@ -338,7 +346,7 @@ Term::Highlight - Perl module to highlight regexp patterns on terminals
 
 =item use Term::Highlight;
 
-=item $obj = Term::Highlight->new( tagtype => $TAGTYPE );
+=item $obj = Term::Highlight->new( tagtype => $TAGTYPE, skip_nl_check => 0 );
 
 =item $obj->LoadPatterns( \@ptns );
 
@@ -352,16 +360,32 @@ Term::Highlight - Perl module to highlight regexp patterns on terminals
 
 =back
 
-Currently C<term> and C<term-debug> tagtypes are supported.
-If tagtype is C<term> then boundaries of found patterns will be enclosed in
-ANSI terminal color escape sequence tags, if tagtype is C<term-debug> then they
-will be marked by special symbolic sequences.
-
 =head1 DESCRIPTION
 
 Term::Highlight is a Perl module aimed to support highlighting of regexp
-patterns on color terminals.
+patterns in color terminals.
 It supports 256 color terminals a well as older 8 color terminals.
+
+=head1 OPTIONS
+
+=over
+
+=item B<tagtype>
+
+sets type of color tags.
+Only C<term> and C<term-debug> tag types are currently supported.
+If tagtype is C<term> then boundaries of found patterns will be enclosed in
+ANSI terminal color escape sequence tags.
+If tagtype is C<term-debug> then they will be marked by special symbolic
+sequences: this is supposed to use for debug purposes.
+
+=item B<skip_nl_check>
+
+defines how to treat newlines in input lines.
+Set this to non-zero value if input lines do not contain newlines: this will
+gain a bit of speed.
+
+=back
 
 =head1 EXPORTS
 

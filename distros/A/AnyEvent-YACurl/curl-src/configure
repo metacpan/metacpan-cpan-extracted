@@ -902,7 +902,6 @@ USE_MANUAL_TRUE
 MANOPT
 NROFF
 PERL
-IPV6_ENABLED
 FISH_FUNCTIONS_DIR
 ZSH_FUNCTIONS_DIR
 USE_QUICHE
@@ -927,6 +926,7 @@ CURL_WITH_MULTI_SSL
 SSL_ENABLED
 NSS_LIBS
 USE_NSS
+USE_BEARSSL
 USE_MESALINK
 USE_WOLFSSL
 USE_MBEDTLS
@@ -942,6 +942,7 @@ USE_SCHANNEL
 DEFAULT_SSL_BACKEND
 BUILD_STUB_GSS_FALSE
 BUILD_STUB_GSS_TRUE
+IPV6_ENABLED
 USE_OPENLDAP
 HAVE_BROTLI
 ZLIB_LIBS
@@ -1127,6 +1128,7 @@ enable_symbol_hiding
 enable_hidden_symbols
 enable_ares
 enable_rt
+enable_esni
 enable_code_coverage
 enable_dependency_tracking
 enable_largefile
@@ -1176,9 +1178,9 @@ with_random
 enable_openssl_auto_load_config
 with_gnutls
 with_mbedtls
-with_cyassl
 with_wolfssl
 with_mesalink
+with_bearssl
 with_nss
 with_ca_bundle
 with_ca_path
@@ -1877,6 +1879,8 @@ Optional Features:
   --enable-ares[=PATH]    Enable c-ares for DNS lookups
   --disable-ares          Disable c-ares for DNS lookups
   --disable-rt            disable dependency on -lrt
+  --enable-esni           Enable ESNI support
+  --disable-esni          Disable ESNI support
   --enable-code-coverage  Provide code coverage
   --enable-dependency-tracking
                           do not reject slow dependency extractors
@@ -1971,7 +1975,7 @@ Optional Features:
   --disable-progress-meter
                           Disable progress-meter
   --enable-dnsshuffle     Enable DNS shuffling
-  --disable-dnsshuffle    Disable DNS shufflinf
+  --disable-dnsshuffle    Disable DNS shuffling
   --enable-alt-svc        Enable alt-svc support
   --disable-alt-svc       Disable alt-svc support
 
@@ -2026,15 +2030,15 @@ Optional Packages:
   --with-mbedtls=PATH     where to look for mbedTLS, PATH points to the
                           installation root
   --without-mbedtls       disable mbedTLS detection
-  --with-cyassl=PATH      where to look for CyaSSL, PATH points to the
-                          installation root (default: system lib default)
-  --without-cyassl        disable CyaSSL detection
   --with-wolfssl=PATH     where to look for WolfSSL, PATH points to the
                           installation root (default: system lib default)
   --without-wolfssl       disable WolfSSL detection
   --with-mesalink=PATH    where to look for MesaLink, PATH points to the
                           installation root
   --without-mesalink      disable MesaLink detection
+  --with-bearssl=PATH     where to look for BearSSL, PATH points to the
+                          installation root
+  --without-bearssl       disable BearSSL detection
   --with-nss=PATH         where to look for NSS, PATH points to the
                           installation root
   --without-nss           disable NSS detection
@@ -3327,6 +3331,37 @@ $as_echo "(assumed no)" >&6; }
             dontwant_rt="no"
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+      ;;
+  esac
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable ESNI support" >&5
+$as_echo_n "checking whether to enable ESNI support... " >&6; }
+  OPT_ESNI="default"
+  # Check whether --enable-esni was given.
+if test "${enable_esni+set}" = set; then :
+  enableval=$enable_esni; OPT_ESNI=$enableval
+fi
+
+  case "$OPT_ESNI" in
+    no)
+            want_esni="no"
+      curl_esni_msg="no      (--enable-esni)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      ;;
+    default)
+            want_esni="no"
+      curl_esni_msg="no      (--enable-esni)"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      ;;
+    *)
+            want_esni="yes"
+      curl_esni_msg="enabled (--disable-esni)"
+      experimental="esni"
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
       ;;
   esac
 
@@ -5827,8 +5862,8 @@ PKGADD_VENDOR="curl.haxx.se"
 
 
 
-    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl} )"
-    curl_ssh_msg="no      (--with-libssh2)"
+    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl,bearssl} )"
+    curl_ssh_msg="no      (--with-{libssh,libssh2})"
    curl_zlib_msg="no      (--with-zlib)"
  curl_brotli_msg="no      (--with-brotli)"
     curl_gss_msg="no      (--with-gssapi)"
@@ -21782,16 +21817,23 @@ $as_echo "yes" >&6; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
- /* is AF_INET6 available? */
+ /* are AF_INET6 and sockaddr_in6 available? */
 #include <sys/types.h>
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <sys/socket.h>
+#include <netinet/in.h>
+#if defined (__TANDEM)
+# include <netinet/in6.h>
+#endif
 #endif
 #include <stdlib.h> /* for exit() */
 main()
 {
+ struct sockaddr_in6 s;
+ (void)s;
  if (socket(AF_INET6, SOCK_STREAM, 0) < 0)
    exit(1);
  else
@@ -21815,12 +21857,14 @@ fi
 fi
 
 
-if test "$ipv6" = "yes"; then
-  curl_ipv6_msg="enabled"
-fi
-
-# Check if struct sockaddr_in6 have sin6_scope_id member
 if test "$ipv6" = yes; then
+  curl_ipv6_msg="enabled"
+
+$as_echo "#define ENABLE_IPV6 1" >>confdefs.h
+
+  IPV6_ENABLED=1
+
+
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if struct sockaddr_in6 has sin6_scope_id member" >&5
 $as_echo_n "checking if struct sockaddr_in6 has sin6_scope_id member... " >&6; }
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -24453,12 +24497,6 @@ OPT_WOLFSSL=no
 _cppflags=$CPPFLAGS
 _ldflags=$LDFLAGS
 
-# Check whether --with-cyassl was given.
-if test "${with_cyassl+set}" = set; then :
-  withval=$with_cyassl; OPT_WOLFSSL=$withval
-fi
-
-
 
 # Check whether --with-wolfssl was given.
 if test "${with_wolfssl+set}" = set; then :
@@ -24475,150 +24513,25 @@ if test -z "$ssl_backends" -o "x$OPT_WOLFSSL" != xno; then
       OPT_WOLFSSL=""
     fi
 
-
-    cyassllibname=cyassl
-
-    if test -z "$OPT_WOLFSSL" ; then
-
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CyaSSL_Init in -lcyassl" >&5
-$as_echo_n "checking for CyaSSL_Init in -lcyassl... " >&6; }
-if ${ac_cv_lib_cyassl_CyaSSL_Init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcyassl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-#ifdef __cplusplus
-extern "C"
-#endif
-char CyaSSL_Init ();
-int main (void)
-{
-return CyaSSL_Init ();
- ;
- return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cyassl_CyaSSL_Init=yes
-else
-  ac_cv_lib_cyassl_CyaSSL_Init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cyassl_CyaSSL_Init" >&5
-$as_echo "$ac_cv_lib_cyassl_CyaSSL_Init" >&6; }
-if test "x$ac_cv_lib_cyassl_CyaSSL_Init" = xyes; then :
-
-
-$as_echo "#define USE_WOLFSSL 1" >>confdefs.h
-
-         USE_WOLFSSL=1
-
-         WOLFSSL_ENABLED=1
-         USE_WOLFSSL="yes"
-         ssl_msg="CyaSSL"
-	 test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
-
-fi
-
-    fi
-
     addld=""
     addlib=""
     addcflags=""
-    cyassllib=""
 
     if test "x$USE_WOLFSSL" != "xyes"; then
-            addld=-L$OPT_WOLFSSL/lib$libsuff
+      addld=-L$OPT_WOLFSSL/lib$libsuff
       addcflags=-I$OPT_WOLFSSL/include
-      cyassllib=$OPT_WOLFSSL/lib$libsuff
+      wolfssllibpath=$OPT_WOLFSSL/lib$libsuff
 
       LDFLAGS="$LDFLAGS $addld"
       if test "$addcflags" != "-I/usr/include"; then
          CPPFLAGS="$CPPFLAGS $addcflags"
       fi
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CyaSSL_Init in -lcyassl" >&5
-$as_echo_n "checking for CyaSSL_Init in -lcyassl... " >&6; }
-if ${ac_cv_lib_cyassl_CyaSSL_Init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcyassl  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-#ifdef __cplusplus
-extern "C"
-#endif
-char CyaSSL_Init ();
-int main (void)
-{
-return CyaSSL_Init ();
- ;
- return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cyassl_CyaSSL_Init=yes
-else
-  ac_cv_lib_cyassl_CyaSSL_Init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cyassl_CyaSSL_Init" >&5
-$as_echo "$ac_cv_lib_cyassl_CyaSSL_Init" >&6; }
-if test "x$ac_cv_lib_cyassl_CyaSSL_Init" = xyes; then :
-
-
-$as_echo "#define USE_WOLFSSL 1" >>confdefs.h
-
-       USE_WOLFSSL=1
-
-       WOLFSSL_ENABLED=1
-       USE_WOLFSSL="yes"
-       ssl_msg="CyaSSL"
-       test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
-
-else
-
-         CPPFLAGS=$_cppflags
-         LDFLAGS=$_ldflags
-         cyassllib=""
-
-fi
-
-    fi
-
-    addld=""
-    addlib=""
-    addcflags=""
-
-    if test "x$USE_WOLFSSL" != "xyes"; then
-            addld=-L$OPT_WOLFSSL/lib$libsuff
-      addcflags=-I$OPT_WOLFSSL/include
-      cyassllib=$OPT_WOLFSSL/lib$libsuff
-
-      LDFLAGS="$LDFLAGS $addld"
-      if test "$addcflags" != "-I/usr/include"; then
-         CPPFLAGS="$CPPFLAGS $addcflags"
-      fi
-
-      cyassllibname=wolfssl
       my_ac_save_LIBS="$LIBS"
-      LIBS="-l$cyassllibname -lm $LIBS"
+      LIBS="-lwolfssl -lm $LIBS"
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for CyaSSL_Init in -lwolfssl" >&5
-$as_echo_n "checking for CyaSSL_Init in -lwolfssl... " >&6; }
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for wolfSSL_Init in -lwolfssl" >&5
+$as_echo_n "checking for wolfSSL_Init in -lwolfssl... " >&6; }
       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -24627,12 +24540,12 @@ $as_echo_n "checking for CyaSSL_Init in -lwolfssl... " >&6; }
    They are set up properly later if it is detected.  */
 #undef SIZEOF_LONG
 #undef SIZEOF_LONG_LONG
-#include <cyassl/ssl.h>
+#include <wolfssl/ssl.h>
 
 int main (void)
 {
 
-	  return CyaSSL_Init();
+	  return wolfSSL_Init();
 
  ;
  return 0;
@@ -24651,7 +24564,7 @@ $as_echo "#define USE_WOLFSSL 1" >>confdefs.h
          WOLFSSL_ENABLED=1
          USE_WOLFSSL="yes"
          ssl_msg="WolfSSL"
-	 test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+	 test wolfssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
 
 else
 
@@ -24659,7 +24572,7 @@ else
 $as_echo "no" >&6; }
          CPPFLAGS=$_cppflags
          LDFLAGS=$_ldflags
-         cyassllib=""
+         wolfssllibpath=""
 
 fi
 rm -f core conftest.err conftest.$ac_objext \
@@ -24668,8 +24581,8 @@ rm -f core conftest.err conftest.$ac_objext \
     fi
 
     if test "x$USE_WOLFSSL" = "xyes"; then
-      { $as_echo "$as_me:${as_lineno-$LINENO}: detected $cyassllibname" >&5
-$as_echo "$as_me: detected $cyassllibname" >&6;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: detected wolfSSL" >&5
+$as_echo "$as_me: detected wolfSSL" >&6;}
       check_for_ca_bundle=1
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long long" >&5
@@ -24712,7 +24625,7 @@ _ACEOF
 
 
 
-      LIBS="-l$cyassllibname -lm $LIBS"
+      LIBS="-lwolfssl -lm $LIBS"
 
                   for ac_func in wolfSSLv3_client_method \
                      wolfSSL_get_peer_certificate \
@@ -24729,12 +24642,12 @@ fi
 done
 
 
-      if test -n "$cyassllib"; then
+      if test -n "$wolfssllibpath"; then
                                         if test "x$cross_compiling" != "xyes"; then
-          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$cyassllib"
+          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$wolfssllibpath"
           export CURL_LIBRARY_PATH
-          { $as_echo "$as_me:${as_lineno-$LINENO}: Added $cyassllib to CURL_LIBRARY_PATH" >&5
-$as_echo "$as_me: Added $cyassllib to CURL_LIBRARY_PATH" >&6;}
+          { $as_echo "$as_me:${as_lineno-$LINENO}: Added $wolfssllibpath to CURL_LIBRARY_PATH" >&5
+$as_echo "$as_me: Added $wolfssllibpath to CURL_LIBRARY_PATH" >&6;}
         fi
       fi
 
@@ -24897,6 +24810,168 @@ $as_echo "$as_me: detected MesaLink" >&6;}
           export LD_LIBRARY_PATH
           { $as_echo "$as_me:${as_lineno-$LINENO}: Added $mesalinklib to LD_LIBRARY_PATH" >&5
 $as_echo "$as_me: Added $mesalinklib to LD_LIBRARY_PATH" >&6;}
+        fi
+      fi
+    fi
+
+  fi
+  test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
+fi
+
+
+OPT_BEARSSL=no
+
+_cppflags=$CPPFLAGS
+_ldflags=$LDFLAGS
+
+# Check whether --with-bearssl was given.
+if test "${with_bearssl+set}" = set; then :
+  withval=$with_bearssl; OPT_BEARSSL=$withval
+fi
+
+
+if test -z "$ssl_backends" -o "x$OPT_BEARSSL" != xno; then
+  ssl_msg=
+
+  if test X"$OPT_BEARSSL" != Xno; then
+
+    if test "$OPT_BEARSSL" = "yes"; then
+      OPT_BEARSSL=""
+    fi
+
+    if test -z "$OPT_BEARSSL" ; then
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for br_ssl_client_init_full in -lbearssl" >&5
+$as_echo_n "checking for br_ssl_client_init_full in -lbearssl... " >&6; }
+if ${ac_cv_lib_bearssl_br_ssl_client_init_full+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lbearssl -lbearssl $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#ifdef __cplusplus
+extern "C"
+#endif
+char br_ssl_client_init_full ();
+int main (void)
+{
+return br_ssl_client_init_full ();
+ ;
+ return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_bearssl_br_ssl_client_init_full=yes
+else
+  ac_cv_lib_bearssl_br_ssl_client_init_full=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bearssl_br_ssl_client_init_full" >&5
+$as_echo "$ac_cv_lib_bearssl_br_ssl_client_init_full" >&6; }
+if test "x$ac_cv_lib_bearssl_br_ssl_client_init_full" = xyes; then :
+
+
+$as_echo "#define USE_BEARSSL 1" >>confdefs.h
+
+         USE_BEARSSL=1
+
+         BEARSSL_ENABLED=1
+         USE_BEARSSL="yes"
+         ssl_msg="BearSSL"
+	 test bearssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+
+fi
+
+    fi
+
+    addld=""
+    addlib=""
+    addcflags=""
+    bearssllib=""
+
+    if test "x$USE_BEARSSL" != "xyes"; then
+            addld=-L$OPT_BEARSSL/lib$libsuff
+      addcflags=-I$OPT_BEARSSL/include
+      bearssllib=$OPT_BEARSSL/lib$libsuff
+
+      LDFLAGS="$LDFLAGS $addld"
+      if test "$addcflags" != "-I/usr/include"; then
+         CPPFLAGS="$CPPFLAGS $addcflags"
+      fi
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for br_ssl_client_init_full in -lbearssl" >&5
+$as_echo_n "checking for br_ssl_client_init_full in -lbearssl... " >&6; }
+if ${ac_cv_lib_bearssl_br_ssl_client_init_full+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lbearssl -lbearssl $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+#ifdef __cplusplus
+extern "C"
+#endif
+char br_ssl_client_init_full ();
+int main (void)
+{
+return br_ssl_client_init_full ();
+ ;
+ return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_bearssl_br_ssl_client_init_full=yes
+else
+  ac_cv_lib_bearssl_br_ssl_client_init_full=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_bearssl_br_ssl_client_init_full" >&5
+$as_echo "$ac_cv_lib_bearssl_br_ssl_client_init_full" >&6; }
+if test "x$ac_cv_lib_bearssl_br_ssl_client_init_full" = xyes; then :
+
+
+$as_echo "#define USE_BEARSSL 1" >>confdefs.h
+
+       USE_BEARSSL=1
+
+       BEARSSL_ENABLED=1
+       USE_BEARSSL="yes"
+       ssl_msg="BearSSL"
+       test bearssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+
+else
+
+         CPPFLAGS=$_cppflags
+         LDFLAGS=$_ldflags
+
+fi
+
+    fi
+
+    if test "x$USE_BEARSSL" = "xyes"; then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: detected BearSSL" >&5
+$as_echo "$as_me: detected BearSSL" >&6;}
+      check_for_ca_bundle=1
+
+      LIBS="-lbearssl $LIBS"
+
+      if test -n "$bearssllib"; then
+                                        if test "x$cross_compiling" != "xyes"; then
+          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$bearssllib"
+          export CURL_LIBRARY_PATH
+          { $as_echo "$as_me:${as_lineno-$LINENO}: Added $bearssllib to CURL_LIBRARY_PATH" >&5
+$as_echo "$as_me: Added $bearssllib to CURL_LIBRARY_PATH" >&6;}
         fi
       fi
     fi
@@ -25342,12 +25417,12 @@ $as_echo "$as_me: Added $nssprefix/lib$libsuff to CURL_LIBRARY_PATH" >&6;}
   test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
 fi
 
-case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$WINSSL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$AMISSL_ENABLED" in
+case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$WINSSL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$BEARSSL_ENABLED$AMISSL_ENABLED" in
 x)
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SSL disabled, you will not be able to use HTTPS, FTPS, NTLM and more." >&5
 $as_echo "$as_me: WARNING: SSL disabled, you will not be able to use HTTPS, FTPS, NTLM and more." >&2;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink or --with-amissl to address this." >&5
-$as_echo "$as_me: WARNING: Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink or --with-amissl to address this." >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink, --with-amissl or --with-bearssl to address this." >&5
+$as_echo "$as_me: WARNING: Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink, --with-amissl or --with-bearssl to address this." >&2;}
   ;;
 x1)
   # one SSL backend is enabled
@@ -41442,16 +41517,6 @@ fi
 done
 
 
-if test "$ipv6" = "yes"; then
-  if test "$curl_cv_func_getaddrinfo" = "yes"; then
-
-$as_echo "#define ENABLE_IPV6 1" >>confdefs.h
-
-    IPV6_ENABLED=1
-
-  fi
-fi
-
 
             #
   tst_method="unknown"
@@ -42621,6 +42686,41 @@ $as_echo "#define USE_ALTSVC 1" >>confdefs.h
   experimental="$experimental alt-svc"
 fi
 
+if test "x$want_esni" != "xno"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ESNI support is available" >&5
+$as_echo_n "checking whether ESNI support is available... " >&6; }
+
+    ESNI_ENABLED=0
+  ESNI_SUPPORT=''
+
+      if test "x$OPENSSL_ENABLED" = "x1"; then
+    for ac_func in SSL_get_esni_status
+do :
+  ac_fn_c_check_func "$LINENO" "SSL_get_esni_status" "ac_cv_func_SSL_get_esni_status"
+if test "x$ac_cv_func_SSL_get_esni_status" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SSL_GET_ESNI_STATUS 1
+_ACEOF
+ ESNI_SUPPORT="ESNI support available (OpenSSL with SSL_get_esni_status)"
+      ESNI_ENABLED=1
+fi
+done
+
+
+    fi
+
+    if test "x$ESNI_ENABLED" = "x1"; then
+
+$as_echo "#define USE_ESNI 1" >>confdefs.h
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ESNI_SUPPORT" >&5
+$as_echo "$ESNI_SUPPORT" >&6; }
+    experimental="$experimental ESNI"
+  else
+    as_fn_error $? "--enable-esni ignored: No ESNI support found" "$LINENO" 5
+  fi
+fi
+
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether hiding of library internal symbols will actually happen" >&5
 $as_echo_n "checking whether hiding of library internal symbols will actually happen... " >&6; }
@@ -42761,6 +42861,10 @@ fi
 if test "x$OPENSSL_ENABLED" = "x1" -o "x$GNUTLS_ENABLED" = "x1" \
     -o "x$NSS_ENABLED" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES HTTPS-proxy"
+fi
+
+if test "x$ESNI_ENABLED" = "x1"; then
+  SUPPORT_FEATURES="$SUPPORT_FEATURES ESNI"
 fi
 
 
@@ -45734,6 +45838,7 @@ done
   Alt-svc:          ${curl_altsvc_msg}
   HTTP2:            ${curl_h2_msg}
   HTTP3:            ${curl_h3_msg}
+  ESNI:             ${curl_esni_msg}
   Protocols:        ${SUPPORT_PROTOCOLS}
   Features:         ${SUPPORT_FEATURES}
 " >&5
@@ -45776,6 +45881,7 @@ $as_echo "$as_me: Configured to build curl/libcurl:
   Alt-svc:          ${curl_altsvc_msg}
   HTTP2:            ${curl_h2_msg}
   HTTP3:            ${curl_h3_msg}
+  ESNI:             ${curl_esni_msg}
   Protocols:        ${SUPPORT_PROTOCOLS}
   Features:         ${SUPPORT_FEATURES}
 " >&6;}

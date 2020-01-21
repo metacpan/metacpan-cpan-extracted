@@ -5,7 +5,7 @@ use Class::Std::Fast::Storable;
 use SOAP::WSDL::SOAP::Typelib::Fault11;
 use SOAP::WSDL::Expat::MessageParser;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %class_resolver_of   :ATTR(:name<class_resolver> :default<()>);
 my %strict_of           :ATTR(:get<strict> :init_arg<strict> :default<1>);

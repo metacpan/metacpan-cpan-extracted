@@ -1,0 +1,21 @@
+CHANGES
+cpanfile
+lib/Font/Fontconfig.pm
+lib/Font/Fontconfig.pod
+lib/Font/Fontconfig/Pattern.pm
+lib/Font/Fontconfig/Pattern.pod
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/00_use_ok.t
+t/01_can_methods.t
+t/11_list.t
+t/Pattern/00_use_ok.t
+t/Pattern/01_can_methods.t
+t/Pattern/09_parse_fc_line.t
+t/Pattern/10_constructors.t
+t/Pattern/21_contains_codepoint.t
+xt/integration.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

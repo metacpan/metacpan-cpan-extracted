@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
+BEGIN { push @INC, '.' }
 use inc::MBFlExt;
 use File::Basename;
 use File::Spec;
@@ -35,8 +36,8 @@ my %args = (
     },
 
     test_requires => {
-        'Test::NeedsDisplay' => '0',
         'Test::More' => '0.98',
+        'Test::NeedsDisplay' => '0',
     },
 
     name            => 'Fl',

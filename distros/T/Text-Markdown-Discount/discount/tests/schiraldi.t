@@ -6,7 +6,7 @@ rc=0
 MARKDOWN_FLAGS=
 
 try -fnohtml 'breaks with -fnohtml' 'foo  
-bar' '<p>foo<br/>
+bar' '<p>foo<br />
 bar</p>'
 
 try 'links with trailing \)' \

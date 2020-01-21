@@ -48,6 +48,8 @@ sub new {
 	    $fd = undef;
 	} elsif ($fd) {
 	    s/\$server_root/$dir/;
+	    s/{{(.+)}}
+             /File::Spec->catfile(split m{\/}, $1)/gex;
 	    print $fd $_;
 	}
     }

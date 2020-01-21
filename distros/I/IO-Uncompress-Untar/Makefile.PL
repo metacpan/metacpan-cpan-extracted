@@ -5,7 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'IO::Uncompress::Untar',
     VERSION_FROM      => 'lib/IO/Uncompress/Untar.pm', # finds $VERSION
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => { IO::File => 0,
+			   Archive::Tar::Stream => 0,
+			   IO::Uncompress::AnyUncompress => 0,
+			}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/IO/Uncompress/Untar.pm', # retrieve abstract from module
        AUTHOR         => 'Chris Drake<cdrake@cpan.org>') : ()),

@@ -25,11 +25,6 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "runtime" : {
          "requires" : {
             "AnyEvent" : "7.0"
@@ -37,6 +32,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/TvdW/perl-AnyEvent-YACurl.git",
+         "web" : "https://github.com/TvdW/perl-AnyEvent-YACurl"
+      }
+   },
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -6,10 +6,10 @@ use warnings;
 
 use AnyEvent;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require XSLoader;
-XSLoader::load('AnyEvent::YACurl', '0.13');
+XSLoader::load('AnyEvent::YACurl', '0.14');
 
 require constant;
 my %constants= %{_get_known_constants()};

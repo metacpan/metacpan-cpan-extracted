@@ -1,4 +1,28 @@
 
+Release notes for SOAP::WSDL 3.004
+
+o. Bug #131509  FTBFS: test failures with libtimedate-perl 2.3100
+   TimeDate 1.21 strptime() began returning an additional argument,
+   breaking t/SOAP/WSDL/XSD/Typelib/Builtin/dateTime.t.  Corrected
+   test.  Reported by gregoa@cpan.org.  Thanks, gregoa.
+o. Bug #103762: missing Build.PL in MANIFEST, bug in CGI.t
+   Added IO::Scalar as a testing dep, removed Build.PL from MANIFEST and 
+   install instructions.  Thanks SREZIC and ZOFFIX.
+o. Bug #103762: missing Build.PL in MANIFEST, bug in CGI.t
+   Correct CGI.t that preserves the path so Windows can find the XML
+   parser binary.  Thanks, arfreitas.
+o. Bug #103762: missing Build.PL in MANIFEST, bug in CGI.t
+   Removed additional references to Build.PL.
+   Thanks KENTNL
+o. Bug #123191  Tests fail if Class::Load not installed
+   Added Class::Load as a dep.  Thanks dhorne.
+o. Bug #114805: [PATCH] spelling fixes and two related tickets.
+   Corrects doc spelling fixing.  Thanks, gregor herrmann.
+o. Bug #114807  [PATCH] resurrect installation of bin/wsdl2perl.pl
+   Install bin/wsdl2perl.pl again via MakeMaker.  Thanks, gregor herrmann.
+o. Bug #120112: [PATCH] Fix HTTP.pm to allow an undefined endpoint
+   Allow empty endpoints.  Thanks, Andrew Bauer.
+
 Release notes for SOAP::WSDL 3.003
 -------
 

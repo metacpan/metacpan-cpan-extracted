@@ -2,6 +2,10 @@ NAME
 
     XXX - See Your Data in the Nude
 
+VERSION
+
+    This document describes XXX version 0.35.
+
 SYNOPSIS
 
         use XXX;
@@ -59,12 +63,13 @@ FUNCTIONS
 
 CONFIGURATION
 
-    By default, XXX uses YAML.pm to dump your data. You can change this
+    By default, XXX uses YAML::PP to dump your data. You can change this
     like so:
 
         use XXX -with => 'Data::Dumper';
         use XXX -with => 'Data::Dump';
         use XXX -with => 'Data::Dump::Color';
+        use XXX -with => 'YAML';
         use XXX -with => 'YAML::XS';
         use XXX -with => 'YAML::SomeOtherYamlModule';
         use XXX -with => 'JSON::Color';
@@ -109,7 +114,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2006-2014. Ingy döt Net.
+    Copyright 2006-2020. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

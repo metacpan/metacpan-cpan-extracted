@@ -2,15 +2,36 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
+               'bestdayever' => bless( {
+                                         'code' => sub {
+                                                       BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
+                                                       use strict;
+                                                       no feature ':all';
+                                                       use feature ':5.16';
+                                                       my $exp = 'DateTime::Format::RFC3339'->parse_datetime('1987-07-05T17:45:00Z');
+                                                       my $got = 'DateTime::Format::RFC3339'->parse_datetime($_);
+                                                       $exp->set_time_zone('UTC');
+                                                       $got->set_time_zone('UTC');
+                                                       return 'DateTime'->compare($got, $exp) == 0;
+                                                   },
+                                         '_file' => '(eval 369)',
+                                         'name' => '<Custom Code>',
+                                         'operator' => 'CODE(...)',
+                                         '_lines' => [
+                                                       11
+                                                     ]
+                                       }, 'Test2::Compare::Custom' ),
                'milliseconds' => bless( {
-                                          'operator' => 'CODE(...)',
-                                          'name' => '<Custom Code>',
                                           '_lines' => [
                                                         11
                                                       ],
@@ -25,15 +46,11 @@ my $expected1 = {
                                                         $got->set_time_zone('UTC');
                                                         return 'DateTime'->compare($got, $exp) == 0;
                                                     },
-                                          '_file' => '(eval 369)'
+                                          '_file' => '(eval 371)',
+                                          'name' => '<Custom Code>',
+                                          'operator' => 'CODE(...)'
                                         }, 'Test2::Compare::Custom' ),
                'numoffset' => bless( {
-                                       '_file' => '(eval 370)',
-                                       'name' => '<Custom Code>',
-                                       'operator' => 'CODE(...)',
-                                       '_lines' => [
-                                                     11
-                                                   ],
                                        'code' => sub {
                                                      BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                      use strict;
@@ -44,27 +61,14 @@ my $expected1 = {
                                                      $exp->set_time_zone('UTC');
                                                      $got->set_time_zone('UTC');
                                                      return 'DateTime'->compare($got, $exp) == 0;
-                                                 }
-                                     }, 'Test2::Compare::Custom' ),
-               'bestdayever' => bless( {
-                                         'name' => '<Custom Code>',
-                                         'operator' => 'CODE(...)',
-                                         '_lines' => [
-                                                       11
-                                                     ],
-                                         'code' => sub {
-                                                       BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
-                                                       use strict;
-                                                       no feature ':all';
-                                                       use feature ':5.16';
-                                                       my $exp = 'DateTime::Format::RFC3339'->parse_datetime('1987-07-05T17:45:00Z');
-                                                       my $got = 'DateTime::Format::RFC3339'->parse_datetime($_);
-                                                       $exp->set_time_zone('UTC');
-                                                       $got->set_time_zone('UTC');
-                                                       return 'DateTime'->compare($got, $exp) == 0;
-                                                   },
-                                         '_file' => '(eval 371)'
-                                       }, 'Test2::Compare::Custom' )
+                                                 },
+                                       '_file' => '(eval 370)',
+                                       'name' => '<Custom Code>',
+                                       'operator' => 'CODE(...)',
+                                       '_lines' => [
+                                                     11
+                                                   ]
+                                     }, 'Test2::Compare::Custom' )
              };
 
 

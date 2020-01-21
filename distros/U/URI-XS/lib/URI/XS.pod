@@ -6,6 +6,8 @@ URI::XS - fast URI framework, compatible with classic URI.pm, with C++ interface
 
 URI::XS has similar functionality as L<URI>, but is much faster (sometimes 100x).
 
+URI::XS conforms to RFC 3986.
+
 =head1 SYNOPSIS
 
     use URI::XS;
@@ -47,7 +49,7 @@ $flags is a bitmask of one or more of these:
 
 =over
 
-=item ALLOW_LEADING_AUTHORITY
+=item ALLOW_SUFFIX_REFERENCE
 
 By default, RFC doesn't allow urls to begin with authority (i.e. host,port). For example
 
@@ -63,11 +65,13 @@ Enabling this flag makes URI::XS detect such urls:
     
 However, URI::XS never produces RFC-uncompliant urls on output, so
 
-    say uri("www.google.com/hello", ALLOW_LEADING_AUTHORITY);
+    say uri("www.google.com/hello", ALLOW_SUFFIX_REFERENCE);
     
 prints "//www.google.com/hello" (scheme-relative format), making it valid
+
+See https://tools.ietf.org/html/rfc3986#section-4.5
     
-=item PARAM_DELIM_SEMICOLON
+=item QUERY_PARAM_SEMICOLON
 
 If true, URI::XS will use ';' as delimiter between query string params instead of a default '&'. Both for input and output.
 
@@ -307,40 +311,43 @@ Sets/returns path segments as list.
     say join(", ", $u->path_segments); # abc, def, jopa
     $u->path_segments('my', 'folder');
     say $u; # http://ya.ru/my/folder
+
+=head4 user([$new_user])
+
+Sets/returns user part of user_info in uri.
+
+=head4 password([$new_pass])
+
+Sets/returns password part of user_info in uri.
+
     
 =head1 STRICT CLASSES
 
+
 =head2 URI::XS::http
-
-=head4 new($url, [\%query | %query | $query_string])
-
-If provided, adds query params to $url after creating object.
 
 =head2 URI::XS::https
 
+=head2 URI::XS::ws
+
+=head2 URI::XS::wss
+
 =head4 new($url, [\%query | %query | $query_string])
 
 If provided, adds query params to $url after creating object.
 
+
 =head2 URI::XS::ftp
-
-=head4 user([$new_user])
-
-Sets/returns user part of user_info in uri.
-
-=head4 password([$new_pass])
-
-Sets/returns password part of user_info in uri.
 
 =head2 URI::XS::socks
 
-=head4 user([$new_user])
+=head2 URI::XS::ssh
 
-Sets/returns user part of user_info in uri.
+=head2 URI::XS::telnet
 
-=head4 password([$new_pass])
+=head2 URI::XS::sftp
 
-Sets/returns password part of user_info in uri.
+
 
 =head1 CLONING/SERIALIZING
 
@@ -358,223 +365,28 @@ URI::XS supports:
 
 =back
 
-=head1 C++ INTERFACE
 
-Here and below only short details are explained. For full docs see perl interface docs above.
-All functions and classes are in panda::uri:: namespace.
-
-C<string> is not an std::string, it's a panda::string, which has the same API, but is more effective and supports Copy-On-Write
-regardless of your compiler version. See L<CPP::panda::lib> for details.
-
-=head2 panda::uri::URI
-
-=head4 static URI* create (const string& source, int flags = 0)
-
-Creates uri object in strict mode. Returns object of customized class (panda::uri::URI::http, ...). If no scheme specified or
-scheme is not supported, returns object of a default class panda::uri::URI.
-
-=head4 static URI* create (const URI& source)
-
-Creates strict uri object from another uri object.
-
-=head4 URI ()
-
-Creates empty non-strict uri object.
-
-=head4 URI (const string& source, int flags = 0)
-
-Creates non-strict uri object from string.
-
-=head4 URI (const URI& source)
-
-Creates non-strict uri object from another object (cloning).
-
-=head4 URI& operator= (const URI& source)
-
-=head4 URI& operator= (const string& source)
-
-Sets data from another uri object or url string.
-
-=head4 const string& scheme () const
-
-=head4 const string& user_info () const
-
-=head4 const string& host () const
-
-=head4 const string& path () const
-
-=head4 const string& fragment () const
-
-=head4 uint16_t explicit_port () const
-
-=head4 uint16_t default_port () const
-
-=head4 uint16_t port () const
-
-=head4 bool secure () const
-
-Returns properties of uri.
-
-=head4 virtual void assign (const URI& source)
-
-Assign data from another uri. Same as C<URI& operator= (const URI& source)>.
-
-=head4 void assign (const string& uristr, int flags = 0)
-
-Assign data from url string.
-
-=head4 const string& query_string () const
-
-Returns unencoded query string
-
-=head4 const string raw_query () const
-
-Returns encoded query string
-
-=head4 Query& query ()
-
-Returns query params as object of class Query (std::multimap<string,string>). Unlike for perl's method, you can change this
-multimap object and changes will take effect for uri object.
-
-=head4 const Query& query () const
-
-Same as previous method but only for reading.
-
-=head4 virtual void scheme (const string& scheme)
-
-Changes object's scheme. May throw an exception of class WrongScheme if object in strict mode and schemes differ.
-
-=head4 void user_info (const string& user_info)
-
-=head4 void host (const string& host)
-
-=head4 void fragment (const string& fragment)
-
-=head4 void port (uint16_t port)
-
-=head4 void path (const string& path)
-
-Changes properties of uri.
-
-=head4 void query_string (const string& qstr)
-
-Sets unencoded query string
-
-=head4 void raw_query (const string& rq)
-
-Sets encoded query string
-
-=head4 void query (const string& qstr)
-
-Same as query_string(qstr).
-
-=head4 void query (const Query& query)
-
-Replaces current query with new one supplied as multimap.
-
-=head4 void add_query (const string& addstr)
-
-Adds query params from addstr to current query.
-
-=head4 void add_query (const Query& addquery)
-
-Adds query params from addquery to current query.
-
-=head4 const string& param (const string& key) const
-
-Returns value for param with key 'key'. If it's a multiparam, returns first of its values.
-
-=head4 void param (const string& key, const string& val)
-
-Sets param value replacing existing one. If it's a multiparam, replaces just first of its values.
-
-=head4 string explicit_location () const
-
-=head4 string location () const
-
-=head4 void location (const string& newloc)
-
-=head4 const std::vector<string> path_segments () const
-
-=head4 template <class It> void path_segments (It begin, It end)
-
-C<It> is an iterator for string or string_view
-
-=head4 string to_string (bool relative = false) const
-
-=head4 string relative () const
-
-=head4 bool equals (const URI& uri) const
-
-See perl interface docs for methods above.
-
-=head4 void swap (URI& uri)
-
-Swaps content of two uri objects.
-
-=head4 typedef URI* (*uricreator) (const URI& uri)
-
-Creator function type for custom scheme objects.
-
-=head4 static void register_scheme (const string& scheme, const std::type_info* ti, uricreator, uint16_t default_port, bool secure = false)
-
-Registers new scheme. "ti" is a typeinfo for your scheme's class. It's required for URI framework to automatically convert
-scheme names to classes and vice-versa.
-
-See C<REGISTERING SCHEMAS> for how to.
-
-=head2 panda::uri::URI::http
-
-=head4 http (const string& source, const Query& query, int flags = 0)
-
-=head2 panda::uri::URI::https
-
-=head4 https (const string& source, const Query& query, int flags = 0)
-
-=head2 panda::uri::URI::ftp
-
-=head4 const string user () const
-
-=head4 void user (const string& user)
-
-=head4 const string password () const
-
-=head4 void password (const string& password)
-
-=head2 panda::uri functions
-
-=head4 size_t encode_uri_component (const string_view src, char* dest, const char* unsafe = unsafe_query_component)
-
-Does what JavaScript's encodeURIComponent does.
-
-'dest' must have enough space to hold the result (in worst case = srclen*3 + 1)).
-Returns the actual resulting string length.
-
-'unsafe' is an array char[256] where index is char code to be replaced and value is either 0 or the same char code.
-If value is 0 then this char should be replaced with %XX. If value isn't 0, then it is replaced with value code.
-By default the alphabet for query param names and values is used. You can use one of these predefined arrays (in panda::uri::):
-unsafe_scheme, unsafe_uinfo, unsafe_host, unsafe_path, unsafe_path_segment, unsafe_query, unsafe_query_component, unsafe_fragment.
-
-=head4 void encode_uri_component (const string_view src, panda::string& dest, const char* unsafe = unsafe_query_component)
-
-=head4 panda::string encode_uri_component (const string_view src, const char* unsafe = unsafe_query_component)
-
-String versions.
-
-=head4 size_t decode_uri_component (const string_view src, char* dest)
-
-Does what JavaScript's decodeURIComponent does.
-
-'dest' must have enough space to hold the result (in worst case = srclen)).
-Returns the actual resulting string length.
-
-=head4 void decode_uri_component (string_view, panda::string& dest)
-
-=head4 panda::string decode_uri_component (string_view)
-
-String versions.
 
 =head1 REGISTERING SCHEMAS
+
+=head2 PURE PERL IMPLEMENTATION
+
+You will not be able to change core features of URI via pure perl implementation
+
+    package URI::myproto;
+    use parent 'URI::XS';
+
+    URI::XS::register_scheme("myproto", "MyURI::myproto");
+    
+    sub some_data_from_user_info {}
+
+    # run-time
+    my $u = uri("myproto://info@google.com");
+    say ref $u; # URI::myproto
+    say $u->some_data_from_user_info;
+
+
+=head2 NATIVE IMPLEMENTATION
 
 Let's create our custom scheme "myproto" which like FTP uses some info from "user_info". Our protocol won't be secure and default
 port is for example 12345.
@@ -584,15 +396,10 @@ Firstly we need to create our own C++ class. It must inherit from panda::uri::UR
     #include <panda/uri.h>
     using panda::uri::URI;
 
-    class URI::myproto : public Strict {
-    public:
-        myproto () : Strict() {}
-        myproto (const string& source, int flags = 0) : Strict(source, flags) { strict_scheme(); }
-        myproto (const URI& source)                   : Strict(source)        { strict_scheme(); }
+    struct URImyproto : URI::Strict<URImyproto> {
+        using URI::Strict<URImyproto>::Strict;
 
-        using Strict::operator=;
-
-        const string some_data_from_user_info () const {
+        string some_data_from_user_info () const {
             // parse user_info
             // return result
         }
@@ -600,60 +407,49 @@ Firstly we need to create our own C++ class. It must inherit from panda::uri::UR
         void some_data_from_user_info (const string& new_data) {
             // change user_info
         }
-        
-Notice the strict_scheme() call in constructor. It is required because it will throw an exception if scheme is wrong. In all other
-methods it is done automatically, but unfortunately while in panda::uri::URI::Strict class constructor,
-object is not yet ready for type_info manipulations.
-
-Secondly, create a function that creates URI::myproto object from default URI object.
-
-    static URI* new_myproto (const URI& source) {
-        return new URI::myproto(source);
     }
-
-Now, register your new scheme somewhere in program's initialization:
+        
+Register your new scheme somewhere in program's initialization:
 
     void init () {
         ...
-        URI::register_scheme("myproto", &typeid(URI::myproto), new_myproto, 12345, false);
+        URI::register_scheme("myproto", &typeid(URImyproto), [](const URI& u) -> URI* { return new URImyproto(u); }, 12345, false);
     }
 
 That's it. Now use your custom scheme:
 
     URI* uri = URI::create("myproto://myinfo@google.com");
-    URI::myproto myuri = dynamic_cast<URI::myproto*>(uri); // will return not-null
+    URImyproto myuri = dynamic_cast<URImyproto*>(uri); // will return not-null
     cout << myuri->some_data_from_user_info();
-};
 
 Finally, create an XS and register a perl class
 
     #include <xs/uri.h>
 
     // TYPEMAP
-    template <> struct Typemap<URI::myproto*> : Typemap<panda::uri::URI*, URI::myproto*> {}
+    template <> struct Typemap<URImyproto*> : Typemap<panda::uri::URI*, URImyproto*> {}
 
-    MODULE = MyURI                PACKAGE = MyURI::myproto
+    MODULE = URI::myproto                PACKAGE = URI::myproto
     PROTOTYPES: DISABLE
     
-    string URI::myproto::some_data_from_user_info (SV* newval = NULL) {
+    URImyproto* URImyproto::new (string url = string(), int flags = 0)
+    
+    string URImyproto::some_data_from_user_info (SV* newval = NULL) {
         if (newval) {
-            THIS->some_data_from_user_info(sv2string(newval));
+            THIS->some_data_from_user_info(xs::in<string>(newval));
             XSRETURN_UNDEF;
         }
         RETVAL = THIS->some_data_from_user_info();
     }
     
-    ...
-    
-    # Somewhere in perl
+
+    # perl package
+    package URI::myproto;
+    use parent 'URI::XS';
     
     URI::XS::register_scheme("myproto", "MyURI::myproto");
     
-Usage from perl:
 
-    my $u = uri("myproto://info@google.com");
-    say ref $u; # MyURI::myproto
-    say $u->some_data_from_user_info;
 
 =head1 EXPORTED TYPEMAPS
 
@@ -663,7 +459,7 @@ Usage from perl:
 
 Typemap for input/output any URI objects.
 
-=head4 panda::uri::URI::http*, panda::uri::URI::https*, panda::uri::URI::ftp*, panda::uri::URI::socks*
+=head4 panda::uri::URI::http*, panda::uri::URI::https*, panda::uri::URI::ftp*, panda::uri::URI::socks*, ... other protocols
 
 Typemaps for input/output strict uris.
 
@@ -681,11 +477,8 @@ Output-only typemap for autodetecting strict uri type and setting right perl cla
     }
     
     # Perl
-    
     say ref my_cool_uri_create1("http://ya.ru"); # URI::XS
-    say ref my_cool_uri_create1("ftp://ya.ru"); # URI::XS
     say ref my_cool_uri_create2("http://ya.ru"); # URI::XS::http
-    say ref my_cool_uri_create2("ftp://ya.ru"); # URI::XS::ftp
 
 =head1 AUTHOR
 

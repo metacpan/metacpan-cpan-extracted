@@ -6,6 +6,7 @@ package HandlerClass;
 sub bar {
     return "Verdammte Axt";
 }
+
 package main;
 use Test::More;
 eval "require IO::Scalar"
@@ -32,12 +33,16 @@ my $fh = IO::Scalar->new(\$output);
 my $stdout = *STDOUT;
 my $stdin = *STDIN;
 
-# don't try to print() anything from here on - it gehts caught in $output,
+# don't try to print() anything from here on - it gets caught in $output,
 #and does not make it to STDOUT...
+
+my $path = $ENV{PATH};
 
 *STDOUT = $fh;
 {
     local %ENV;
+    $ENV{PATH} = $path;
+    
     $server->handle();
 
     like $output, qr{ \A Status: \s 411 \s Length \s Required}x;
@@ -86,9 +91,6 @@ my $stdin = *STDIN;
     $ih->seek(0);
     *STDIN = $ih;
 
-#    my $buffer;
-#    read(*STDIN, $buffer, 6);
-#    die $buffer;
     $ENV{HTTP_SOAPAction} = 'bar';
     $ENV{CONTENT_LENGTH} = 6;
     $server->handle();
@@ -101,7 +103,6 @@ my $stdin = *STDIN;
     $ENV{HTTP_SOAPAction} = 'bar';
     $ENV{CONTENT_LENGTH} = length $input;
     $server->handle();
-#    die $output;
     like $output, qr{ Not \s found:}xms;
     $output = q{};
     $ih->seek(0);
@@ -142,4 +143,3 @@ my $stdin = *STDIN;
 # restore handles
 *STDOUT = $stdout;
 *STDIN = $stdin;
-# print $output;

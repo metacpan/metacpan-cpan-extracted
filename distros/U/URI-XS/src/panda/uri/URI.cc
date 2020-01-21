@@ -1,50 +1,22 @@
 #include <ostream>
 #include <stdexcept>
+#include <unordered_map>
 #include <panda/uri/all.h>
 
 namespace panda { namespace uri {
 
-typedef unsigned char uchar;
-
-enum state_t {
-    STATE_NONE   = -1,
-    STATE_SCHEME = 0,
-    STATE_UINFO,
-    STATE_HOST,
-    STATE_HOST_IPV6,
-    STATE_PORT,
-    STATE_PATH,
-    STATE_QUERY,
-    STATE_FRAGMENT,
-    STATE_END
-};
-
-enum token_flags_t {
-    TF_CROP     = 1,
-    TF_SUBSTATE = 2
-};
-
-struct token_t {
-    state_t seen_state;
-    state_t next_state;
-    int     flags;
-    token_t () : seen_state(STATE_NONE), next_state(STATE_NONE), flags(0) {}
-    token_t (state_t ss, state_t ns, int flags = 0) : seen_state(ss), next_state(ns), flags(flags) {}
-};
-
-struct mark_t {
-    ssize_t start;
-    ssize_t end;
-};
-
-static token_t parseinfo[STATE_END][256];
-static char unsafe_port[256];
-
-static std::map<const string, URI::SchemeInfo> scheme_map;
+static std::unordered_map<const string, URI::SchemeInfo> scheme_map;
 static std::map<const std::type_info*, URI::SchemeInfo*> scheme_ti_map;
 static std::vector<URI::SchemeInfo*> schemas;
 
+static URI::SchemeInfo* http_si;
+static URI::SchemeInfo* https_si;
+
 const string URI::_empty;
+
+void URI::register_scheme (const string& scheme, uint16_t default_port, bool secure) {
+    register_scheme(scheme, &typeid(URI), [](const URI& u)->URI*{ return new URI(u);  }, default_port, secure);
+}
 
 void URI::register_scheme (const string& scheme, const std::type_info* ti, uricreator creator, uint16_t default_port, bool secure) {
     if (scheme_map.find(scheme) != scheme_map.end())
@@ -60,60 +32,26 @@ void URI::register_scheme (const string& scheme, const std::type_info* ti, uricr
     schemas.push_back(&inf);
 }
 
-static URI* new_http  (const URI& source) { return new URI::http(source); }
-static URI* new_https (const URI& source) { return new URI::https(source); }
-static URI* new_ftp   (const URI& source) { return new URI::ftp(source); }
-static URI* new_socks (const URI& source) { return new URI::socks(source); }
 
 static int init () {
-    parseinfo[STATE_SCHEME][0]          = token_t(STATE_PATH,  STATE_END);
-    parseinfo[STATE_SCHEME][(uchar)':'] = token_t(STATE_END,   STATE_END); // custom handling
-    parseinfo[STATE_SCHEME][(uchar)'/'] = token_t(STATE_PATH,  STATE_PATH,     TF_SUBSTATE);
-    parseinfo[STATE_SCHEME][(uchar)'?'] = token_t(STATE_PATH,  STATE_QUERY,    TF_CROP);
-    parseinfo[STATE_SCHEME][(uchar)'#'] = token_t(STATE_PATH,  STATE_FRAGMENT, TF_CROP);
+    URI::register_scheme("http",   &typeid(URI::http),   [](const URI& u)->URI*{ return new URI::http(u);   },   80      );
+    URI::register_scheme("https",  &typeid(URI::https),  [](const URI& u)->URI*{ return new URI::https(u);  },  443, true);
+    URI::register_scheme("ws",     &typeid(URI::ws),     [](const URI& u)->URI*{ return new URI::ws(u);     },   80      );
+    URI::register_scheme("wss",    &typeid(URI::wss),    [](const URI& u)->URI*{ return new URI::wss(u);    },  443, true);
+    URI::register_scheme("ftp",    &typeid(URI::ftp),    [](const URI& u)->URI*{ return new URI::ftp(u);    },   21      );
+    URI::register_scheme("socks5", &typeid(URI::socks),  [](const URI& u)->URI*{ return new URI::socks(u);  }, 1080      );
+    URI::register_scheme("ssh",    &typeid(URI::ssh),    [](const URI& u)->URI*{ return new URI::ssh(u);    },   22, true);
+    URI::register_scheme("telnet", &typeid(URI::telnet), [](const URI& u)->URI*{ return new URI::telnet(u); },   23      );
+    URI::register_scheme("sftp",   &typeid(URI::sftp),   [](const URI& u)->URI*{ return new URI::sftp(u);   },   22, true);
 
-    parseinfo[STATE_HOST][0]          = token_t(STATE_HOST,  STATE_END);
-    parseinfo[STATE_HOST][(uchar)'/'] = token_t(STATE_HOST,  STATE_PATH);
-    parseinfo[STATE_HOST][(uchar)'?'] = token_t(STATE_HOST,  STATE_QUERY,    TF_CROP);
-    parseinfo[STATE_HOST][(uchar)'#'] = token_t(STATE_HOST,  STATE_FRAGMENT, TF_CROP);
-    parseinfo[STATE_HOST][(uchar)'@'] = token_t(STATE_UINFO, STATE_HOST,     TF_CROP);
-    parseinfo[STATE_HOST][(uchar)':'] = token_t(STATE_HOST,  STATE_PORT,     TF_CROP);
-    parseinfo[STATE_HOST][(uchar)'['] = token_t(STATE_HOST,  STATE_HOST_IPV6);
-
-    parseinfo[STATE_HOST_IPV6][0]          = token_t(STATE_HOST,  STATE_END);
-    parseinfo[STATE_HOST_IPV6][(uchar)']'] = token_t(STATE_HOST,  STATE_HOST,     TF_SUBSTATE);
-    parseinfo[STATE_HOST_IPV6][(uchar)'@'] = token_t(STATE_UINFO, STATE_HOST,     TF_CROP);
-    parseinfo[STATE_HOST_IPV6][(uchar)'/'] = token_t(STATE_HOST,  STATE_PATH);
-    parseinfo[STATE_HOST_IPV6][(uchar)'?'] = token_t(STATE_HOST,  STATE_QUERY,    TF_CROP);
-    parseinfo[STATE_HOST_IPV6][(uchar)'#'] = token_t(STATE_HOST,  STATE_FRAGMENT, TF_CROP);
-
-    parseinfo[STATE_PORT][0]          = token_t(STATE_PORT,  STATE_END);
-    parseinfo[STATE_PORT][(uchar)'@'] = token_t(STATE_UINFO, STATE_HOST,     TF_CROP);
-    parseinfo[STATE_PORT][(uchar)'/'] = token_t(STATE_PORT,  STATE_PATH);
-    parseinfo[STATE_PORT][(uchar)'?'] = token_t(STATE_PORT,  STATE_QUERY,    TF_CROP);
-    parseinfo[STATE_PORT][(uchar)'#'] = token_t(STATE_PORT,  STATE_FRAGMENT, TF_CROP);
-
-    parseinfo[STATE_PATH][0]          = token_t(STATE_PATH,  STATE_END);
-    parseinfo[STATE_PATH][(uchar)'?'] = token_t(STATE_PATH,  STATE_QUERY,    TF_CROP);
-    parseinfo[STATE_PATH][(uchar)'#'] = token_t(STATE_PATH,  STATE_FRAGMENT, TF_CROP);
-
-    parseinfo[STATE_QUERY][0]          = token_t(STATE_QUERY,  STATE_END);
-    parseinfo[STATE_QUERY][(uchar)'#'] = token_t(STATE_QUERY,  STATE_FRAGMENT, TF_CROP);
-
-    parseinfo[STATE_FRAGMENT][0] = token_t(STATE_FRAGMENT,  STATE_END);
-
-    unsafe_generate(unsafe_port, UNSAFE_DIGIT);
-
-    URI::register_scheme("http",   &typeid(URI::http),  new_http,    80);
-    URI::register_scheme("https",  &typeid(URI::https), new_https,  443, true);
-    URI::register_scheme("ftp",    &typeid(URI::ftp),   new_ftp,     21);
-    URI::register_scheme("socks5", &typeid(URI::socks), new_socks, 1080);
+    http_si  = &scheme_map.find("http")->second;
+    https_si = &scheme_map.find("https")->second;
 
     return 0;
 }
 static const int __init = init();
 
-inline void URI::guess_leading_authority () {
+void URI::guess_suffix_reference () {
     // try to find out if it was an url with leading authority ('ya.ru', 'ya.ru:80/a/b/c', 'user@mysite.com/a/b/c')
     // in either case host is always empty and there are 2 cases
     // 1) if no scheme -> host is first path part, port is absent
@@ -123,7 +61,7 @@ inline void URI::guess_leading_authority () {
         size_t delim = _path.find('/');
         if (delim == string::npos) {
             _host = _path;
-            _path = _empty;
+            _path.clear();
         } else {
             _host.assign(_path, 0, delim);
             _path.erase(0, delim);
@@ -136,12 +74,13 @@ inline void URI::guess_leading_authority () {
     const char* p = _path.data();
     size_t i = 0;
     for (; i < plen; ++i) {
-        if (unsafe_port[(uchar)p[i]]) {
-            _port = _port * 10 + (p[i] - '0');
+        char c = p[i];
+        if (c >= '0' && c <= '9') {
+            _port = _port * 10 + c - '0';
             ok = true;
             continue;
         }
-        if (p[i] != '/') { _port = 0; return; }
+        if (c != '/') { _port = 0; return; }
         break;
     }
 
@@ -149,78 +88,6 @@ inline void URI::guess_leading_authority () {
     _host = _scheme;
     _scheme.clear();
     _path.erase(0, i);
-}
-
-void URI::parse (const string& uristr) {
-    const char* p = uristr.data();
-    size_t len = uristr.length();
-    size_t i = 0;
-
-    mark_t marks[STATE_END] = {{0,-1}, {0,-1}, {0,-1}, {0,-1}, {0,-1}, {0,-1}, {0,-1}};
-    state_t state;
-
-    if (len >= 2 and *p == '/' and p[1] == '/') {
-        state = STATE_HOST;
-        i = 2;
-        marks[STATE_HOST].start = marks[STATE_UINFO].start = i;
-    }
-    else
-        state = STATE_SCHEME;
-
-    for (; i < len; ++i) {
-        if (parseinfo[state][(uchar)p[i]].seen_state == STATE_NONE) continue;
-        if (p[i] == 0) break; // null-byte in uri should be treaten as the end of uri
-
-        if (state == STATE_SCHEME && p[i] == ':') {                     // custom processing
-            if (len > i + 2 && p[i+1] == '/' && p[i+2] == '/') {        // 'scheme://netloc' case
-                state = STATE_HOST;
-                _scheme = uristr.substr(0, i);
-                i += 2;
-                marks[STATE_HOST].start = marks[STATE_UINFO].start = i + 1;
-            } else {                                                    // 'scheme:path' case
-                state = STATE_PATH;
-                _scheme = uristr.substr(0, i);
-                marks[STATE_PATH].start = i + 1;
-            }
-            continue;
-        }
-
-        // default case
-        token_t token = parseinfo[state][(uchar)p[i]];
-        marks[token.seen_state].end = i;
-        state = token.next_state;
-        if (state != STATE_END && !(token.flags & TF_SUBSTATE)) marks[state].start = i + (token.flags & TF_CROP ? 1 : 0);
-    }
-    marks[parseinfo[state][0].seen_state].end = i;
-
-    if (marks[STATE_UINFO].end > 0)
-        decode_uri_component(string_view(p + marks[STATE_UINFO].start, marks[STATE_UINFO].end - marks[STATE_UINFO].start), _user_info);
-
-    if (marks[STATE_HOST].end > 0) {
-        decode_uri_component(string_view(p + marks[STATE_HOST].start, marks[STATE_HOST].end - marks[STATE_HOST].start), _host);
-        if (marks[STATE_PORT].end > 0) {
-            const char* portp = p + marks[STATE_PORT].start;
-            size_t len = marks[STATE_PORT].end - marks[STATE_PORT].start;
-            for (size_t n = 0; n < len; ++n) {
-                char c = portp[n];
-                if (!unsafe_port[(uchar)c]) break;
-                _port = _port*10 + c - '0';
-            }
-        }
-    }
-
-    if (marks[STATE_PATH].end > 0)
-        _path = uristr.substr(marks[STATE_PATH].start, marks[STATE_PATH].end - marks[STATE_PATH].start);
-    if (marks[STATE_QUERY].end > 0) { // assign as is, raw_query getter or parse_query will actually decode
-        _qstr = uristr.substr(marks[STATE_QUERY].start, marks[STATE_QUERY].end - marks[STATE_QUERY].start);
-        ok_qstr();
-    }
-    if (marks[STATE_FRAGMENT].end > 0)
-        _fragment = uristr.substr(marks[STATE_FRAGMENT].start, marks[STATE_FRAGMENT].end - marks[STATE_FRAGMENT].start);
-
-    if (_flags & ALLOW_LEADING_AUTHORITY && !_host.length()) guess_leading_authority();
-
-    sync_scheme_info();
 }
 
 string URI::to_string (bool relative) const {
@@ -239,13 +106,13 @@ string URI::to_string (bool relative) const {
 
         if (_host.length()) {
             if (_user_info.length()) {
-                _encode_uri_component_append(_user_info, str, unsafe_uinfo);
+                _encode_uri_component_append(_user_info, str, URIComponent::user_info);
                 str += '@';
             }
 
             const auto& chost = _host;
             if (chost.front() == '[' && chost.back() == ']') str += _host;
-            else _encode_uri_component_append(_host, str, unsafe_host);
+            else _encode_uri_component_append(_host, str, URIComponent::host);
 
             if (_port) {
                 str += ':';
@@ -275,7 +142,8 @@ void URI::parse_query () const {
     int key_start = 0;
     int key_end   = 0;
     int val_start = 0;
-    const char delim = _flags & PARAM_DELIM_SEMICOLON ? ';' : '&';
+    bool has_pct = false;
+    const char delim = _flags & Flags::query_param_semicolon ? ';' : '&';
     const char* str = _qstr.data();
     int len = _qstr.length();
     _query.clear();
@@ -287,21 +155,28 @@ void URI::parse_query () const {
             mode = PARSE_MODE_VAL;
             val_start = i+1;
         }
+        else if (c == '%') {
+            has_pct = true;
+        }
         else if (c == delim) {
             if (mode == PARSE_MODE_KEY) {
                 key_end = i;
                 val_start = i;
             }
 
-            string key;
-            size_t klen = key_end - key_start;
-            if (klen > 0) decode_uri_component(string_view(str+key_start, klen), key);
+            if (has_pct) {
+                string key, value;
+                size_t klen = key_end - key_start;
+                if (klen > 0) decode_uri_component(string_view(str+key_start, klen), key);
 
-            string value;
-            size_t vlen = i - val_start;
-            if (vlen > 0) decode_uri_component(string_view(str+val_start, vlen), value);
+                size_t vlen = i - val_start;
+                if (vlen > 0) decode_uri_component(string_view(str+val_start, vlen), value);
 
-            _query.emplace(key, value);
+                has_pct = false;
+                _query.emplace(key, value);
+            } else {
+                _query.emplace(_qstr.substr(key_start, key_end - key_start), _qstr.substr(val_start, i - val_start));
+            }
 
             mode = PARSE_MODE_KEY;
             key_start = i+1;
@@ -313,7 +188,7 @@ void URI::parse_query () const {
 
 void URI::compile_query () const {
     _qstr.clear();
-    const char delim = _flags & PARAM_DELIM_SEMICOLON ? ';' : '&';
+    const char delim = _flags & Flags::query_param_semicolon ? ';' : '&';
     auto begin = _query.cbegin();
     auto end   = _query.cend();
 
@@ -380,6 +255,20 @@ void URI::sync_scheme_info () {
         return;
     }
 
+    auto len = _scheme.length();
+    if (len >= 4 && (_scheme[0]|0x20) == 'h' && (_scheme[1]|0x20) == 't' && (_scheme[2]|0x20) == 't' && (_scheme[3]|0x20) == 'p') {
+        if (len == 4) {
+            scheme_info = http_si;
+            _scheme = "http";
+        }
+        else if (len == 5 && (_scheme[4]|0x20) == 's') {
+            scheme_info = https_si;
+            _scheme = "https";
+            return;
+        }
+        return;
+    }
+
     // lowercase the scheme
     char* p   = _scheme.buf();
     char* end = p + _scheme.length();
@@ -393,6 +282,33 @@ void URI::sync_scheme_info () {
 URI::SchemeInfo* URI::get_scheme_info (const std::type_info* ti) {
     auto it = scheme_ti_map.find(ti);
     return it == scheme_ti_map.end() ? nullptr : it->second;
+}
+
+string URI::user () const {
+    size_t delim = _user_info.find(':');
+    if (delim == string::npos) return _user_info;
+    return _user_info.substr(0, delim);
+}
+
+void URI::user (const string& user) {
+    size_t delim = _user_info.find(':');
+    if (delim == string::npos) _user_info = user;
+    else _user_info.replace(0, delim, user);
+}
+
+string URI::password () const {
+    size_t delim = _user_info.find(':');
+    if (delim == string::npos) return string();
+    return _user_info.substr(delim+1);
+}
+
+void URI::password (const string& password) {
+    size_t delim = _user_info.find(':');
+    if (delim == string::npos) {
+        _user_info += ':';
+        _user_info += password;
+    }
+    else _user_info.replace(delim+1, string::npos, password);
 }
 
 std::ostream& operator<< (std::ostream& os, const URI& uri) {

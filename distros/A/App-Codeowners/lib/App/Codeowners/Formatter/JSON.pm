@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::JSON;
 use warnings;
 use strict;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -42,7 +42,7 @@ App::Codeowners::Formatter::JSON - Format codeowners output as JSON
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 DESCRIPTION
 

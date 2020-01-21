@@ -1,3 +1,21 @@
+4.13
+ - Fix bug in t/rndna.t and t/rndna2.t (exposed by:
+   http://www.cpantesters.org/cpan/report/90030d18-8f4f-11e9-a14c-c69b77725194 )
+ - Change stringification of 'inf' & 'nan' from '@Inf@' & '@NaN@'to 'Inf' & 'NaN,
+   except for Rmpfr_deref2(), which will still retain the actual inf or nan
+   string returned by mpfr - ie '@Inf@' & '@NaN@'.
+ - Remove definition of MAXIMUM_ALLOWABLE_BASE as it is always 62 now that we
+   no longer support versions of MPFR older than 3.0.0.
+ - Accommodate extended range of allowable bases for mpfr_out_str with MPFR-4.1.0
+   and later.
+ - Cleanup of some code called by nvtoa().
+ - Fix bug in _get_exp_and_bits() for DoubleDoubles. Integer values > 2 ** 105
+   were being misrepresented by nvtoa().
+ - Improve the private functions _d_bytes, _ld_bytes, _dd_bytes, _f128_bytes
+ - Replace the private functions _d_bytes_fr, _ld_bytes_fr, _dd_bytes_fr,
+   _f128_bytes_fr with the single function _bytes_fr.
+ - Remove mpfr_min_inter_base() and mpfr_max_orig_base() as both are of no value.
+
 4.12
  - Fix bug in nvtoa() that had values with negative single digit significands &&
    exponents less than -4 appearing as "-x.e-EXP" instead of "-xe-EXP"

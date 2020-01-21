@@ -102,20 +102,28 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     if ( 0 < CvDEPTH( code_hook ) ) {
         return real_pp_func(aTHXR);
     }
+    SV **sp = PL_stack_sp;
+    /* DON'T call dMARK... it has unintended side effects.
+     * it actually calls POPMARK! sad! This causes total breakage everywhere */
+
+    /* This is copied from pp_ctl.c It fixes things on freebsd 13, and also
+     * under certain circumstances under Linux. I don't know why it's actually
+     * needed. But apparently you need to POPMARK but only in certain cases */
+    if (PL_markstack_ptr[-1] > TOPMARK) {
+        POPMARK;
+    }
+    /* Initialize mark ourselves. (removed for now, but in case we need mark again
+     * I am leaving this part in */
+    /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
+    ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
     ENTER;
         /* Save the temporaries stack */
         SAVETMPS;
             /* sp (stack pointer) is used by some macros we call below. mysp is *ours* */
-            SV **sp = PL_stack_sp;
             /* Save the stack pointer location */
             SV **mysp = PL_stack_sp;
             /*assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow"); */
-            /* DON'T call dMARK... it has unintended side effects.
-             * it actually calls POPMARK! sad! */
-            /* Initialize mark ourselves instead. */
-            /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
             /* Save the number of items (number of arguments) */
-            ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
             if (myitems < 0)
                 DIE(aTHXR_ "panic: overload::open internal error. This should not happen.");
 
@@ -155,7 +163,7 @@ PP(pp_overload_sysopen) {
         real_pp_sysopen);
 }
 
-#line 159 "open.c"
+#line 167 "open.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -299,7 +307,7 @@ S_croak_xs_usage(const CV *const cv, const char *const params)
 #  define newXS_deffile(a,b) Perl_newXS_deffile(aTHX_ a,b)
 #endif
 
-#line 303 "open.c"
+#line 311 "open.c"
 
 XS_EUPXS(XS_overload__open__test_xs_function); /* prototype to pass -Wmissing-prototypes */
 XS_EUPXS(XS_overload__open__test_xs_function)
@@ -308,9 +316,9 @@ XS_EUPXS(XS_overload__open__test_xs_function)
     PERL_UNUSED_VAR(cv); /* -W */
     PERL_UNUSED_VAR(items); /* -W */
     {
-#line 156 "open.xs"
+#line 164 "open.xs"
         printf("running test xs function\n");
-#line 314 "open.c"
+#line 322 "open.c"
     }
     XSRETURN_EMPTY;
 }
@@ -323,9 +331,9 @@ XS_EUPXS(XS_overload__open__install_open)
     if (items != 0)
        croak_xs_usage(cv,  "");
     {
-#line 161 "open.xs"
+#line 169 "open.xs"
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_open, OP_OPEN, Perl_pp_overload_open, OP_OPEN_replace_mutex);
-#line 329 "open.c"
+#line 337 "open.c"
     }
     XSRETURN_EMPTY;
 }
@@ -338,9 +346,9 @@ XS_EUPXS(XS_overload__open__install_sysopen)
     if (items != 0)
        croak_xs_usage(cv,  "");
     {
-#line 166 "open.xs"
+#line 174 "open.xs"
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_sysopen, OP_SYSOPEN, Perl_pp_overload_sysopen, OP_SYSOPEN_replace_mutex);
-#line 344 "open.c"
+#line 352 "open.c"
     }
     XSRETURN_EMPTY;
 }

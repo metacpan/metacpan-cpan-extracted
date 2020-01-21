@@ -39,6 +39,8 @@ typedef struct {
 
 START_MY_CXT
 
+struct curl_slist *slist_from_av(pTHX_ struct curl_slist *list, AV *input);
+
 void maybe_warn_eval(pTHX)
 {
     SV *error = ERRSV;
@@ -218,6 +220,45 @@ int mcurl_debug_callback(CURL *handle,
     return 0;
 }
 
+int mcurl_trailer_callback(struct curl_slist **output, void *userdata)
+{
+    dTHX;
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+
+    call_sv((SV*)userdata, G_EVAL | G_SCALAR);
+
+    SPAGAIN;
+    int return_result;
+    SV *returned = POPs;
+    if (SvTRUE(ERRSV)) {
+        /* This codepath: something did a die() */
+        maybe_warn_eval(aTHX);
+        return_result = CURL_TRAILERFUNC_ABORT;
+    } else if (!SvTRUE(returned)) {
+        /* This codepath: return undef; */
+        return_result = CURL_TRAILERFUNC_ABORT;
+    } else if (!SvROK(returned) || SvTYPE(SvRV(returned)) != SVt_PVAV) {
+        /* This codepath: return "something"; */
+        warn("Cannot convert %s to ARRAY reference", SvPV_nolen(returned));
+        return_result = CURL_TRAILERFUNC_ABORT;
+    } else {
+        /* This codepath: return [..trailers..]; */
+        *output = slist_from_av(aTHX_ *output, (AV*)SvRV(returned));
+        return_result = CURL_TRAILERFUNC_OK;
+    }
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return return_result;
+}
+
 int finish_request(pTHX_ AnyEvent__YACurl* client, CURL* easy, CURLcode code)
 {
     AnyEvent__YACurl__Response *response;
@@ -331,10 +372,9 @@ int fill_hv_with_constants(pTHX_ HV* the_hv)
     return 0;
 }
 
-struct curl_slist *slist_from_av(pTHX_ AV *input)
+struct curl_slist *slist_from_av(pTHX_ struct curl_slist *list, AV *input)
 {
     SSize_t i;
-    struct curl_slist *list = NULL;
     for (i = 0; i <= av_len(input); i++) {
         char *pv_ptr, *new_ptr;
         STRLEN pv_len;
@@ -424,7 +464,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
                 croak("Cannot convert %s to ARRAY reference", SvPV_nolen(parameter));
 
             } else {
-                struct curl_slist *list = slist_from_av(aTHX_ (AV*)SvRV(parameter));
+                struct curl_slist *list = slist_from_av(aTHX_ NULL, (AV*)SvRV(parameter));
                 result = curl_easy_setopt(request->easy, option, list);
 
                 Renew(request->slists, request->slists_count+1, struct curl_slist*);
@@ -454,6 +494,7 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
         case CURLOPT_HEADERFUNCTION:
         case CURLOPT_READFUNCTION:
         case CURLOPT_DEBUGFUNCTION:
+        case CURLOPT_TRAILERFUNCTION:
         {
             SV* fn_copy = newSVsv(parameter);
             av_push(request->held_references, fn_copy);
@@ -477,6 +518,11 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
                 case CURLOPT_DEBUGFUNCTION: {
                     result = curl_easy_setopt(request->easy, CURLOPT_DEBUGFUNCTION, mcurl_debug_callback);
                     result = curl_easy_setopt(request->easy, CURLOPT_DEBUGDATA, fn_copy);
+                    break;
+                }
+                case CURLOPT_TRAILERFUNCTION: {
+                    result = curl_easy_setopt(request->easy, CURLOPT_TRAILERFUNCTION, mcurl_trailer_callback);
+                    result = curl_easy_setopt(request->easy, CURLOPT_TRAILERDATA, fn_copy);
                     break;
                 }
                 default: { result = CURLE_OK; } /* To keep compilers quiet */

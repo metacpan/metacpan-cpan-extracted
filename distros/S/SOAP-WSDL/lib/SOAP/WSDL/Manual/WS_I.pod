@@ -129,7 +129,7 @@ Other deserializers may not comply to this rule.
 
 A fault is generated when an error occurs processing the message.
 SOAP::WSDL::Deserializer::SOAP11 does not perform any additional processing
-after an error occured.
+after an error occurred.
 
 =head2 R1029
 
@@ -429,7 +429,7 @@ TODO support rpc-literal bindings.
 
 The wsdl:import element imports the referenced WSDL definition.
 
-This is rather hard-wired and does not allow to specify a wsdl:import without
+This is rather hard-wired and does not allow one to specify a wsdl:import without
 a resolvable location in SOAP::WSDL.
 
 =head2 R4002
@@ -492,7 +492,7 @@ TODO check and implement.
 
  A DESCRIPTION MAY use any construct from XML Schema 1.0.
 
-SOAP::WSDL's WSDL parser doen not allow all contructs from XML Schema 1.0 to
+SOAP::WSDL's WSDL parser doen not allow all constructs from XML Schema 1.0 to
 be used.
 
 TODO become "minimal conformant".

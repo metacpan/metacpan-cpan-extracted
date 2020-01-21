@@ -1,0 +1,52 @@
+---
+abstract: 'Decouple object instantiation from usage.'
+author:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Object-Depot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Object::Depot:
+    file: lib/Object/Depot.pm
+    version: '0.01'
+  Object::Depot::Singleton:
+    file: lib/Object/Depot/Singleton.pm
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Guard: '0'
+  List::MoreUtils: '0'
+  Moo: '0'
+  Role::Tiny: '0'
+  Scalar::Util: '0'
+  Sub::Name: '0'
+  Types::Common::String: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/bluefeet/Object-Depot/issues
+  homepage: https://github.com/bluefeet/Object-Depot
+  repository: git://github.com/bluefeet/Object-Depot.git
+version: '0.01'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

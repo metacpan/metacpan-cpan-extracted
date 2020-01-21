@@ -1,5 +1,8 @@
 Revision history for Catmandu-Template
 
+0.13  2020-01-20 12:53:37 CET
+    - handle template_before, template_after correctly
+
 0.12  2017-08-18 12:25:22 CEST
     - better pod formatting
 

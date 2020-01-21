@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -18,8 +22,8 @@ my $expected1 = {
                                'first_name' => 'Eric'
                              },
                              {
-                               'last_name' => 'Seger',
-                               'first_name' => 'Bob'
+                               'first_name' => 'Bob',
+                               'last_name' => 'Seger'
                              }
                            ]
              };

@@ -1,6 +1,6 @@
 package TOML::Tiny;
 # ABSTRACT: a minimal, pure perl TOML parser and serializer
-$TOML::Tiny::VERSION = '0.03';
+$TOML::Tiny::VERSION = '0.05';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -76,7 +76,7 @@ TOML::Tiny - a minimal, pure perl TOML parser and serializer
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -263,6 +263,9 @@ the exception of permitting heterogenous arrays (illegal in v4 and v5, but
 permissible in the upcoming v6); optional enforcement of homogenous arrays is
 supported with C<strict_arrays>.
 
+C<TOML::Tiny> supports a number of options which do not exist in L<TOML>:
+L</inflate_integer>, L</inflate_float>, and L</strict_arrays>.
+
 C<TOML::Tiny> ignores invalid surrogate pairs within basic and multiline
 strings (L<TOML> may attempt to decode an invalid pair). Additionally, only
 those character escapes officially supported by TOML are interpreted as such by
@@ -286,6 +289,16 @@ terminating with a backslash correctly in multilne strings:
 
 C<TOML::Tiny> includes support for integers specified in binary, octal or hex
 as well as the special float values C<inf> and C<nan>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<TOML::Tiny::Grammar>
+
+Regexp scraps used by C<TOML::Tiny> to parse TOML source.
+
+=back
 
 =head1 ACKNOWLEDGEMENTS
 

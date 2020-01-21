@@ -5,7 +5,7 @@ use List::Util qw(first);
 use Class::Std::Fast::Storable;
 use base qw(SOAP::WSDL::Base);
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %types_of        :ATTR(:name<types>      :default<[]>);
 my %message_of      :ATTR(:name<message>    :default<[]>);

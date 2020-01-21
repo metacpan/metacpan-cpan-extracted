@@ -1,3 +1,9 @@
+2.0.0    20.01.2020
+           - fix crash at global destroy phase on windows
+           - add URISP typemap which allows for autoconstruction from ctor arguments
+           - operator 'eq' now correctly handles any data types
+           - change parser to ragel
+           - add more types for protocols with port/secure info
 1.1.7    20.08.2019
            - remove _aTHX _pTHX junk from API (will slow down threaded perl, but who gives a fuck)
 1.1.6    05.08.2019

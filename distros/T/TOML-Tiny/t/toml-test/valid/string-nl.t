@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -9,12 +13,12 @@ binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
                'lit_nl_end' => 'value\\n',
-               'lit_nl_uni' => 'val\\ue',
-               'lit_nl_mid' => 'val\\nue',
                'nl_mid' => 'val
 ue',
+               'lit_nl_mid' => 'val\\nue',
                'nl_end' => 'value
-'
+',
+               'lit_nl_uni' => 'val\\ue'
              };
 
 

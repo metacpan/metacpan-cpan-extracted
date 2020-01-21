@@ -1,5 +1,5 @@
 package Catalyst::Helper::Model::Curio;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strictures 2;
 
@@ -22,7 +22,7 @@ sub mk_compclass {
 
 =head1 NAME
 
-Catalyst::Helper::Model::Curio - Helper for creating new Curio Catalyst models.
+Catalyst::Helper::Model::Curio - Helper for creating new Curio Catalyst models. (DEPRECATED)
 
 =head1 SYNOPSIS
 

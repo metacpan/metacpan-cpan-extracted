@@ -20,6 +20,20 @@
 #######################################################################
 
 
+2020-01-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000518 released
+
+        * Updated Instruction Set FullAutoAPI_is.pm.
+
+
+2020-01-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000518 released
+
+        * Replaced die() with handle_error() in FA_Core.pm.
+
+
 2020-01-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000517 released

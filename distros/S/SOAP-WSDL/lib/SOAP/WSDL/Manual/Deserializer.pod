@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-SOAP::WSDL::Manual::Deserializer
+SOAP::WSDL::Manual::Deserializer - Deserializer classes
 
 =head1 DESERIALIZER CLASSES
 
@@ -46,4 +46,4 @@ terms as perl itself
 Martin Kutter E<lt>martin.kutter fen-net.deE<gt>
 
 =cut
- 
+

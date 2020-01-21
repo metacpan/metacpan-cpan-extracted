@@ -1,33 +1,33 @@
 #pragma once
-#include <math.h>
-#include <stdexcept>
-#include <panda/date/Date.h>
+#include "Date.h"
+#include <panda/optional.h>
 
 namespace panda { namespace date {
 
-using panda::time::datetime;
+struct DateRel {
+    enum class Format { simple, iso8601d, iso8601i };
 
-class DateRel {
-public:
-    explicit DateRel (ptime_t year=0, ptime_t mon=0, ptime_t day=0, ptime_t hour=0, ptime_t min=0, ptime_t sec=0)
+    struct InputFormat {
+        static const int simple   = 1;
+        static const int iso8601d = 2;
+        static const int iso8601i = 4;
+        static const int iso8601  = iso8601d + iso8601i;
+        static const int all      = ~0;
+    };
+
+    DateRel () : _sec(0), _min(0), _hour(0), _day(0), _month(0), _year(0) {}
+
+    explicit DateRel (ptime_t year, ptime_t mon=0, ptime_t day=0, ptime_t hour=0, ptime_t min=0, ptime_t sec=0)
                      : _sec(sec), _min(min), _hour(hour), _day(day), _month(mon), _year(year) {}
-    explicit DateRel (string_view str)           { operator=(str); }
+
+    explicit DateRel (string_view str, int fmt = InputFormat::all) { parse(str, fmt); }
+
     DateRel (const Date& from, const Date& till) { set(from, till); }
     DateRel (const DateRel& source)              { operator=(source); }
 
     void set (const Date&, const Date&);
 
-    DateRel& operator= (string_view str) {
-        datetime date;
-        parse_relative(str, date);
-        _year  = date.year;
-        _month = date.mon;
-        _day   = date.mday;
-        _hour  = date.hour;
-        _min   = date.min;
-        _sec   = date.sec;
-        return *this;
-    }
+    DateRel& operator= (string_view str) { parse(str, InputFormat::all); return *this; }
 
     DateRel& operator= (const DateRel& source) {
         _sec   = source._sec;
@@ -36,32 +36,61 @@ public:
         _day   = source._day;
         _month = source._month;
         _year  = source._year;
+        _from  = source._from;
         return *this;
     }
 
-    ptime_t sec   () const      { return _sec; }
-    void    sec   (ptime_t val) { _sec = val; }
-    ptime_t min   () const      { return _min; }
-    void    min   (ptime_t val) { _min = val; }
-    ptime_t hour  () const      { return _hour; }
-    void    hour  (ptime_t val) { _hour = val; }
-    ptime_t day   () const      { return _day; }
-    void    day   (ptime_t val) { _day = val; }
-    ptime_t month () const      { return _month; }
-    void    month (ptime_t val) { _month = val; }
-    ptime_t year  () const      { return _year; }
-    void    year  (ptime_t val) { _year = val; }
-    bool    empty () const      { return _sec == 0 && _min == 0 && _hour == 0 && _day == 0 && _month == 0 && _year == 0; }
+    ptime_t sec   () const { return _sec; }
+    ptime_t min   () const { return _min; }
+    ptime_t hour  () const { return _hour; }
+    ptime_t day   () const { return _day; }
+    ptime_t month () const { return _month; }
+    ptime_t year  () const { return _year; }
 
-    ptime_t to_sec   () const { return _sec + _min*60 + _hour*3600 + _day * 86400 + (_month + 12*_year) * 2629744; }
-    double  to_min   () const { return (double) to_sec() / 60; }
-    double  to_hour  () const { return (double) to_sec() / 3600; }
-    double  to_day   () const { return (double) to_sec() / 86400; }
-    double  to_month () const { return (double) to_sec() / 2629744; }
-    double  to_year  () const { return to_month() / 12; }
-    ptime_t duration () const { return to_sec(); }
+    const optional<Date>& from  () const { return _from; }
+          optional<Date>& from  ()       { return _from; }
+          optional<Date>  till  () const { return _from ? (*_from + *this) : optional<Date>(); }
 
-    string to_string () const;
+    DateRel& sec   (ptime_t val)   { _sec = val; return *this; }
+    DateRel& min   (ptime_t val)   { _min = val; return *this; }
+    DateRel& hour  (ptime_t val)   { _hour = val; return *this; }
+    DateRel& day   (ptime_t val)   { _day = val; return *this; }
+    DateRel& month (ptime_t val)   { _month = val; return *this; }
+    DateRel& year  (ptime_t val)   { _year = val; return *this; }
+    DateRel& from  (const Date& v) { _from = v; return *this; }
+
+    bool empty () const { return (_sec | _min | _hour | _day | _month | _year) == 0; }
+
+    ptime_t duration () const {
+        if (_from) return (*_from + *this).epoch() - _from->epoch();
+        else       return _sec + _min*60 + _hour*3600 + _day * 86400 + (_month + 12*_year) * 2629744;
+    }
+
+    ptime_t to_secs  () const { return duration(); }
+    double  to_mins  () const { return double(duration()) / 60; }
+    double  to_hours () const { return double(duration()) / 3600; }
+
+    double to_days () const {
+        if (_from) {
+            auto till = *_from + *this;
+            return panda::time::christ_days(till.year()) - panda::time::christ_days(_from->year()) +
+                   till.yday()  - _from->yday() + double(hms_diff(till)) / 86400;
+        }
+        else return double(duration()) / 86400;
+    }
+
+    double to_months () const {
+        if (_from) {
+            auto till = *_from + *this;
+            return (till.year() - _from->year())*12 + till.month() - _from->month() +
+                   double(till.day() - _from->day() + double(hms_diff(till)) / 86400) / _from->days_in_month();
+        }
+        else return double(duration()) / 2629744;
+    }
+
+    double to_years () const { return to_months() / 12; }
+
+    string to_string (Format fmt = Format::simple) const;
 
     DateRel& operator+= (const DateRel&);
     DateRel& operator-= (const DateRel&);
@@ -71,11 +100,18 @@ public:
 
     DateRel negated () const { return DateRel(*this).negate(); }
 
-    ptime_t compare (const DateRel& operand) const { return to_sec() - operand.to_sec(); }
+    ptime_t compare (const DateRel& operand) const { return duration() - operand.duration(); }
 
     bool is_same (const DateRel& operand) const {
         return _sec == operand._sec && _min == operand._min && _hour == operand._hour &&
-               _day == operand._day && _month == operand._month && _year == operand._year;
+               _day == operand._day && _month == operand._month && _year == operand._year && _from == operand._from;
+    }
+
+    int includes (const Date& date) const {
+        if (!_from) return 0;
+        if (*_from > date) return 1;
+        if ((*_from + *this) < date) return -1;
+        return 0;
     }
 
 private:
@@ -85,6 +121,14 @@ private:
     ptime_t _day;
     ptime_t _month;
     ptime_t _year;
+
+    optional<Date> _from;
+
+    errc parse (string_view, int);
+
+    ptime_t hms_diff (const Date& till) const {
+        return (till.hour() - _from->hour())*3600 + (till.min() - _from->min())*60 + till.sec() - _from->sec();
+    }
 };
 
 extern const DateRel YEAR;

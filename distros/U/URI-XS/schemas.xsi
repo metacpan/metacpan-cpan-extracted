@@ -1,26 +1,3 @@
-MODULE = URI::XS                PACKAGE = URI::XS::UserPass
-PROTOTYPES: DISABLE
-
-BOOT {
-    Stash(__PACKAGE__, GV_ADD).inherit(__MODULE__);
-}
-
-string URI::UserPass::user (SV* newval = NULL) {
-    if (newval) {
-        THIS->user(xs::in<string>(newval));
-        XSRETURN_UNDEF;
-    }
-    RETVAL = THIS->user();
-}
-
-string URI::UserPass::password (SV* newval = NULL) {
-    if (newval) {
-        THIS->password(xs::in<string>(newval));
-        XSRETURN_UNDEF;
-    }
-    RETVAL = THIS->password();
-}
-
 MODULE = URI::XS                PACKAGE = URI::XS::http
 PROTOTYPES: DISABLE
 
@@ -30,11 +7,12 @@ BOOT {
     register_perl_scheme("http", s.name());
 }
 
-URI::http* new (SV* CLASS, string url = string(), ...) {
+URI::http* URI::http::new (string url = string(), ...) {
     RETVAL = make_backref<URI::http>(url);
     add_query_args(RETVAL, MARK+3, items-2);
-    PROTO = CLASS;
-}    
+}
+
+
 
 MODULE = URI::XS                PACKAGE = URI::XS::https
 PROTOTYPES: DISABLE
@@ -45,36 +23,114 @@ BOOT {
     register_perl_scheme("https", s.name());
 }
 
-URI::https* new (SV* CLASS, string url = string(), ...) {
+URI::https* URI::https::new (string url = string(), ...) {
     RETVAL = make_backref<URI::https>(url);
     add_query_args(RETVAL, MARK+3, items-2);
-    PROTO = CLASS;
-}    
+}
+
+
+
+MODULE = URI::XS                PACKAGE = URI::XS::ws
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit(__MODULE__);
+    register_perl_scheme("ws", s.name());
+}
+
+URI::ws* URI::ws::new (string url = string(), ...) {
+    RETVAL = make_backref<URI::ws>(url);
+    add_query_args(RETVAL, MARK+3, items-2);
+}
+
+
+
+MODULE = URI::XS                PACKAGE = URI::XS::wss
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS::ws");
+    register_perl_scheme("wss", s.name());
+}
+
+URI::wss* URI::wss::new (string url = string(), ...) {
+    RETVAL = make_backref<URI::wss>(url);
+    add_query_args(RETVAL, MARK+3, items-2);
+}
+
+
 
 MODULE = URI::XS                PACKAGE = URI::XS::ftp
 PROTOTYPES: DISABLE
 
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
-    s.inherit("URI::XS::UserPass");
+    s.inherit("URI::XS");
     register_perl_scheme("ftp", s.name());
 }
 
-URI::ftp* new (SV* CLASS, string url = string(), int flags = 0) {
-    RETVAL = new XSURIftp(url, flags);
-    PROTO = CLASS;
+URI::ftp* URI::ftp::new (string url = string(), int flags = 0) {
+    RETVAL = make_backref<URI::ftp>(url, flags);
 }
+
+
 
 MODULE = URI::XS                PACKAGE = URI::XS::socks
 PROTOTYPES: DISABLE
 
 BOOT {
     Stash s(__PACKAGE__, GV_ADD);
-    s.inherit("URI::XS::UserPass");
-    register_perl_scheme("socks", s.name());
+    s.inherit("URI::XS");
+    register_perl_scheme("socks5", s.name());
 }
 
-URI::socks* new (SV* CLASS, string url = string(), int flags = 0) {
-    RETVAL = new XSURIsocks(url, flags);
-    PROTO = CLASS;
+URI::socks* URI::socks::new (string url = string(), int flags = 0) {
+    RETVAL = make_backref<URI::socks>(url, flags);
+}
+
+
+
+MODULE = URI::XS                PACKAGE = URI::XS::ssh
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS");
+    register_perl_scheme("ssh", s.name());
+}
+
+URI::ssh* URI::ssh::new (string url = string(), int flags = 0) {
+    RETVAL = make_backref<URI::ssh>(url, flags);
+}
+
+
+
+MODULE = URI::XS                PACKAGE = URI::XS::telnet
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS");
+    register_perl_scheme("telnet", s.name());
+}
+
+URI::telnet* URI::telnet::new (string url = string(), int flags = 0) {
+    RETVAL = make_backref<URI::telnet>(url, flags);
+}
+
+
+
+MODULE = URI::XS                PACKAGE = URI::XS::sftp
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("URI::XS::ssh");
+    register_perl_scheme("sftp", s.name());
+}
+
+URI::sftp* URI::sftp::new (string url = string(), int flags = 0) {
+    RETVAL = make_backref<URI::sftp>(url, flags);
 }

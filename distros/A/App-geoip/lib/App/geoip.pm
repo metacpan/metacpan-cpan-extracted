@@ -3,7 +3,7 @@
 use 5.14.0;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {

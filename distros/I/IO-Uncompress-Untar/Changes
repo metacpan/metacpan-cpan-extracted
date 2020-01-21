@@ -4,3 +4,6 @@ Revision history for Perl extension IO::Uncompress::Untar.
 	- original version; created by h2xs 1.23 with options
 		-AX -n IO::Uncompress::Untar
 
+0.02  Mon, 20 Jan 2020 09:59:05 GMT
+	- bugfixes
+	- add dependencies

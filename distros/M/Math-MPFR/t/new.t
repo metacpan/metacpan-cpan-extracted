@@ -166,9 +166,20 @@ eval{my $f35 = Math::MPFR::new($bi);};
 if($@ =~ /Inappropriate argument/) {$ok .= 'f'}
 
 eval{my $f36 = Math::MPFR->new("17", 42);};
-if($@ =~ /Invalid value for base/) {$ok .= 'g'}
+if($@) { warn "\$\@: $@\n" }
+else {$ok .= 'g'}
 
-if($ok eq 'abcdefg') {print "ok 4\n"}
+eval{my $f37 = Math::MPFR->new("17", 1);};
+if($@ =~ /2nd argument supplied to Rmpfr_init_set str/) {$ok .= 'h' }
+
+eval{my $f38 = Math::MPFR->new("17", 0);};
+if($@) { warn "\$\@: $@\n" }
+else {$ok .= 'i' }
+
+eval{my $f39 = Math::MPFR->new("17", -4);};
+if($@ =~ /2nd argument supplied to Rmpfr_init_set str/) {$ok .= 'j' }
+
+if($ok eq 'abcdefghij') {print "ok 4\n"}
 else {
   warn "\$ok: $ok\n";
   print "not ok 4\n";

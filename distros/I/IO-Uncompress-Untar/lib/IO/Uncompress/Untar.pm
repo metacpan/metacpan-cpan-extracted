@@ -10,7 +10,7 @@ use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our($VERSION)='1.01';
+our($VERSION)='1.02';
 our($UntarError) = '';
 
 our %EXPORT_TAGS = ( 'all' => [ qw( $UntarError ) ] );
@@ -24,8 +24,10 @@ sub new {
   my $class = shift;
   my $this={};
   $this->{handle}=shift;
-  $this->{z} = new IO::Uncompress::AnyUncompress $this->{handle};
-  $this->{ts} = Archive::Tar::Stream->new(infh => $this->{z}); $this->{ts}->SafeCopy(0);
+  if(!defined $this->{handle}){warn "undef handle"; return undef;}
+  $this->{z} = new IO::Uncompress::AnyUncompress $this->{handle} or return undef;
+  $this->{ts} = Archive::Tar::Stream->new(infh => $this->{z}) or return undef;
+  $this->{ts}->SafeCopy(0);
   $this->{opt}=shift;
   $this->{raw}='';
   $this->{header}={};

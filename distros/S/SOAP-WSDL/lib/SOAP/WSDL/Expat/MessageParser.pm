@@ -9,7 +9,7 @@ use base qw(SOAP::WSDL::Expat::Base);
 
 BEGIN { require Class::Std::Fast };
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 # GLOBALS
 my $OBJECT_CACHE_REF = Class::Std::Fast::OBJECT_CACHE_REF();
@@ -297,7 +297,7 @@ See L<SOAP::WSDL::Manual::Parser> for details.
 
 =head2 Skipping unwanted items
 
-Sometimes there's unneccessary information transported in SOAP messages.
+Sometimes there's unnecessary information transported in SOAP messages.
 
 To skip XML nodes (including all child nodes), just edit the type map for
 the message, set the type map entry to '__SKIP__', and comment out all

@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.12 Tue Jan 21 00:34:46 UTC 2020
+	- 686fab5 Added cpan repository metadata @dsteinbrunner
+	- 4074458 Removed unnecessary comment in POD @anirvan
+	- 090a032 Use <br /> instead of <br/> @utgwkk
+
 0.11 Fri Nov 15 10:26:19 PST 2013
 	- upgraded Discount to 2.1.7, which fixed an issue generating <em> tags
 	  from _<nonascii>_ and *<nonascii>*

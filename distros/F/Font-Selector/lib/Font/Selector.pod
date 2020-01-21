@@ -1,0 +1,57 @@
+=head1 NAME
+
+Font::Selector - select the right font for rendering
+
+
+
+=head1 SYNOPSIS
+
+    use Font::Selector;
+    
+    my @suitable = Font::Selector-> grep_from_fontnames( $string =>
+        'Courier New',
+        'Noto Sans'
+    );
+
+
+
+=head1 DESCRIPTION
+
+This Perl module gives tools to select the most applicable font when used in
+rendering situations.
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 grep_from_fontnames
+
+    my @suitable = Font::Selector->grep_from_fontnames( $string, @font_names );
+
+For a given string, this will grep all the fonts from the given font-names list,
+that are suitable for rendereing the string, that is, contains all the glyphs.
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Font::Selector' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

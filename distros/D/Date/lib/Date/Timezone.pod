@@ -1,0 +1,89 @@
+=head1 NAME
+
+Date::Timezone - Timezone information object.
+
+=head1 DESCRIPTION
+
+Date::Timezone contains some specific timezone information. Read-only.
+
+=head1 SYNOPSIS
+
+    my $tz = tzget($name);
+    my $tz = $date->timezone;
+    
+    tzset($tz);
+    $date->timezone($tz);
+    $date->to_timezone($Tz);
+    
+=head1 OBJECT METHODS
+
+=head4 name()
+
+timezone name, i.e. 'America/New_York'
+
+=head4 is_local()
+
+returns true if this zone is a local timezone
+
+=head4 export()
+
+Returns timezone detailed information as a hash reference.
+
+Example of data returned:
+
+    {
+        future => {
+            hasdst => 1,
+            outer => {
+                end => {sec => 0, mon => 2, week => 2, hour => 2, day => 0, min => 0 },
+                offset => -18000,
+                isdst => 0,
+                gmt_offset => -18000,
+                abbrev => 'EST'
+            },
+            inner => {
+                end => {week => 1, mon => 10, min => 0, hour => 2, day => 0, sec => 0},
+                offset => -14400,
+                abbrev => 'EDT',
+                gmt_offset => -14400,
+                isdst => 1
+            }
+        },
+        name => 'America/New_York',
+        is_local => 0,
+        past => {
+            abbrev => 'LMT',
+            offset => -17762
+        },
+        transitions => [
+            {
+                offset => -17762,
+                leap_delta => 0,
+                abbrev => 'LMT',
+                start => '-9223372036854775808',
+                leap_corr => 0,
+                gmt_offset => -17762,
+                isdst => 0
+            },
+            {
+                offset => -18000,
+                leap_delta => 0,
+                gmt_offset => -18000,
+                isdst => 0,
+                start => '-2717650800',
+                abbrev => 'EST',
+                leap_corr => 0
+            },
+            ...
+        ]
+    }
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

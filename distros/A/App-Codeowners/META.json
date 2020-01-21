@@ -114,55 +114,55 @@
    "provides" : {
       "App::Codeowners" : {
          "file" : "lib/App/Codeowners.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter" : {
          "file" : "lib/App/Codeowners/Formatter.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::CSV" : {
          "file" : "lib/App/Codeowners/Formatter/CSV.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::JSON" : {
          "file" : "lib/App/Codeowners/Formatter/JSON.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::String" : {
          "file" : "lib/App/Codeowners/Formatter/String.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::TSV" : {
          "file" : "lib/App/Codeowners/Formatter/TSV.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::Table" : {
          "file" : "lib/App/Codeowners/Formatter/Table.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Formatter::YAML" : {
          "file" : "lib/App/Codeowners/Formatter/YAML.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Options" : {
          "file" : "lib/App/Codeowners/Options.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Util" : {
          "file" : "lib/App/Codeowners/Util.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "App::Codeowners::Util::Process" : {
          "file" : "lib/App/Codeowners/Util.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "File::Codeowners" : {
          "file" : "lib/File/Codeowners.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "Test::File::Codeowners" : {
          "file" : "lib/Test/File/Codeowners.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       }
    },
    "release_status" : "stable",
@@ -177,7 +177,7 @@
          "web" : "https://github.com/chazmcgarvey/git-codeowners"
       }
    },
-   "version" : "0.47",
+   "version" : "0.48",
    "x_authority" : "cpan:CCM",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.15"

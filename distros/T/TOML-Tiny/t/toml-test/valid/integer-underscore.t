@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -19,10 +23,10 @@ my $expected1 = {
                                                 require Math::BigInt;
                                                 'Math::BigInt'->new('1000')->beq($_);
                                             },
+                                  '_file' => '(eval 409)',
                                   '_lines' => [
                                                 6
-                                              ],
-                                  '_file' => '(eval 409)'
+                                              ]
                                 }, 'Test2::Compare::Custom' )
              };
 

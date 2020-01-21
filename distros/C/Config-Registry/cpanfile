@@ -1,5 +1,4 @@
 requires 'Carp';
-requires 'Hash::Merge';
 requires 'MRO::Compat';
 requires 'Moo';
 requires 'namespace::clean';

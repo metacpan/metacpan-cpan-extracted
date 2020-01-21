@@ -1,5 +1,5 @@
 package NewsExtractor;
-our $VERSION = v0.0.7;
+our $VERSION = v0.0.8;
 use Moo;
 
 use Mojo::UserAgent;

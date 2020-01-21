@@ -1,6 +1,6 @@
 # NAME
 
-Catalyst::Model::Curio - Curio Model for Catalyst.
+Catalyst::Model::Curio - Curio Model for Catalyst. (DEPRECATED)
 
 # SYNOPSIS
 
@@ -50,7 +50,7 @@ class => 'MyApp::Service::Cache',
 The Curio class that this model wraps around.
 
 This is required to be set, otherwise Catalyst will throw
-and exception when trying to load your model.
+an exception when trying to load your model.
 
 ## key
 
@@ -73,7 +73,7 @@ If you'd like, you can change this to call a different
 method, returning something else of your choice.
 
 You could, for example, have a method in your Curio class
-which returns the the resource that your Curio object makes:
+which returns the resource that your Curio object makes:
 
 ```perl
 sub connect {
@@ -129,6 +129,7 @@ development this distribution would not exist.
 
 ```
 Aran Clary Deltac <bluefeet@gmail.com>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 ```
 
 # COPYRIGHT AND LICENSE

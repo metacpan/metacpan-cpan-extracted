@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -9,9 +13,6 @@ binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
                'electron_mass' => bless( {
-                                           '_file' => '(eval 427)',
-                                           'operator' => 'CODE(...)',
-                                           'name' => '<Custom Code>',
                                            '_lines' => [
                                                          6
                                                        ],
@@ -22,7 +23,10 @@ my $expected1 = {
                                                          use feature ':5.16';
                                                          require Math::BigFloat;
                                                          'Math::BigFloat'->new('9.109109383e-31')->beq($_);
-                                                     }
+                                                     },
+                                           '_file' => '(eval 427)',
+                                           'operator' => 'CODE(...)',
+                                           'name' => '<Custom Code>'
                                          }, 'Test2::Compare::Custom' )
              };
 

@@ -2,84 +2,125 @@
 
 Date::Rel - Relative date object.
 
+
+
 =head1 DESCRIPTION
 
-Relative date is a period of time not bound to any particular point in time and is used for date calculations.
-Reldate consists of 6 units - seconds, minutes, hours, days, months and years. Some units convert to another inaccurate.
+Relative date is a period of time and is used for date calculations.
+
+Reldate consists of 6 units - seconds, minutes, hours, days, months and years.
+
+Relative date may be interval (bound to a certain date) or duration (not bound). These two are almost identical in operations and API.
+The main difference is that duration may convert one unit to another inaccurate while interval always returns accurate numbers.
+
+
 
 =head1 CLASS METHODS
 
-=head4 new([$rel_string | $seconds | \@rel_array | \%rel_hash | $reldate])
+=head4 new([$seconds])
 
-Creates a date object using one of these source data types:
+Creates duration C<$seconds> seconds long
+
+=head4 new($string)
+
+Creates relative date from string in the following formats:
 
 =over
 
-=item 123456 or "123456"
+=item Simple format [duration]
 
-Treated as a number of seconds
+    1Y 2M 3D 4h 5m 6s
 
-=item [$year, $month, $day, $hour, $min, $sec]
+=item ISO8601 time period format [duration]
 
-Missing elements are considered = 0.
+    P1Y2M3DT4H5M6S
+    
+=item ISO8601 time interval format [interval]
 
-=item {year => x, month => x, day => x, hour => x, min => x, sec => x}
-
-Missing elements are considered = 0.
-
-=item string "1Y 2M 3D 4h 5m 6s"
+    2019-12-31T00:00:00/P1Y2M3DT4H5M6S
+    
+=back
 
 Any part can be absent or negative.
 
-=item Another relative date object
-
-Clones another object
-
-=back
 
 =head4 new($from, $till)
 
-Creates relative date $rel so that $from + $rel == $till.
+Creates interval from two dates so that $from + $rel == $till.
 
-$from and $till can be L<Date> objects or any data supported by L<Date> constructor.
+$from and $till can be L<Date> objects or any type that one-argument L<Date> constructor supports.
+
+
+=head4 new($reldate_object)
+
+Clones another object
+
+
+=head4 new_ymd($year, [$month], [$day], [$hour], [$min], [$sec])
+
+=head4 new_ymd(%ymdhms)
+
+Creates duration.
+Valid keys are C<year>, C<month>, C<day>, C<hour>, C<min>, C<sec>
+
+
 
 =head1 OBJECT METHODS
 
-=head4 set($rel_string | $seconds | \@rel_array | \%rel_hash | $reldate)
+=head4 set(...)
 
-=head4 set($from, $till)
+Set relative date from arguments (can be anything that C<new()> supports).
 
-Set relative date from data (data can be anything that constructor supports). This is much faster than creating new object.
 
-=head4 year([$years]), years
+=head4 set_ymd(...)
 
-Number of years in relative date
+Set relative date from arguments (can be anything that C<new_ymd()> supports).
 
-=head4 month([$months]), months, mon, mons
 
-Number of month in relative date
+=head4 year([$years])
 
-=head4 day([$days]), days
+Get/set number of years in relative date
 
-Number of days in relative date
 
-=head4 hour([$hours]), hours
+=head4 month([$months])
 
-Number of hours in relative date
+Get/set number of month in relative date
 
-=head4 min([$mins]), mins, minute, minutes
 
-Number of minutes in relative date
+=head4 day([$days])
 
-=head4 sec([$secs]), secs, second, seconds
+Get/set number of days in relative date
 
-Number of seconds in relative date
 
-=head4 to_sec(), to_second, to_secs, to_seconds, duration
+=head4 hour([$hours])
 
-Converts relative date to number of seconds.
-If any of day/month/year are non-zero then this value can be inaccurate because one need to know exact dates
-to calculate exact number of seconds.
+Get/set number of hours in relative date
+
+
+=head4 min([$mins])
+
+Get/set number of minutes in relative date
+
+
+=head4 sec([$secs])
+
+Get/set number of seconds in relative date
+
+
+=head4 from([$from])
+
+Get/set date that object is bound to. Also changes the behaviour of object (duration/interval).
+
+=head4 till()
+
+For interval returns the end of the interval as date, for duration returns undef.
+
+=head4 to_secs(), duration()
+
+For interval, returns accurate number of seconds in interval. This applies for other duration getters as well (C<to_mins()>, ...etc).
+
+Otherwise, converts duration to number of seconds.
+If any of day/month/year are non-zero, then this value can be inaccurate because one need to know exact dates to calculate exact number of seconds.
 
 For such calculations the following assumptions are made:
 
@@ -93,40 +134,115 @@ For such calculations the following assumptions are made:
 
 =back
 
-=head4 to_min(), to_minute, to_mins, to_minutes
 
-Converts relative date to number of minutes. If any of day/month/year are non-zero then this value can be inaccurate, see to_sec().
+=head4 to_mins()
 
-=head4 to_hour(), to_hours
+Converts relative date to number of minutes. See to_secs() for accuracy info (if has day/month/year).
 
-Converts relative date to number of hours. If any of day/month/year are non-zero then this value can be inaccurate, see to_sec().
 
-=head4 to_day(), to_days
+=head4 to_hours()
 
-Converts relative date to number of days. If any of sec/min/hour/month/year are non-zero then this value can be inaccurate, see to_sec().
+Converts relative date to number of hours. See to_secs() for accuracy info (if has day/month/year).
 
-=head4 to_month(), to_months, to_mon, to_mons
 
-Converts relative date to number of months. If any of sec/min/hour/day are non-zero then this value can be inaccurate, see to_sec().
+=head4 to_days()
 
-=head4 to_year(), to_years
+Converts relative date to number of days. See to_secs() for accuracy info (if has sec/min/hour/month/year).
 
-Converts relative date to number of years. If any of sec/min/hour/day are non-zero then this value can be inaccurate, see to_sec().
 
-=head4 "", to_string(), string(), as_string()
+=head4 to_months()
 
-Returns string in "4M 15D 123s" format, any of YMDhms can be absent or negative. If all the parts YMDhms are 0, then "" is returned.
+Converts relative date to number of months. See to_secs() for accuracy info (if has sec/min/hour/day).
+
+
+=head4 to_years()
+
+Converts relative date to number of years. See to_secs() for accuracy info (if has sec/min/hour/day).
+
+
+=head4 to_string([$format = Date::Rel::Format::simple])
+
+Returns string in one of the following formats:
+
+=over
+
+=item Date::Rel::FORMAT_SIMPLE
+
+    4M 15D 123s
+    
+=item Date::Rel::FORMAT_ISO8601D
+
+ISO 8601 duration format
+
+    P4M15DT123S
+
+=item Date::Rel::FORMAT_ISO8601I (for intervals only)
+
+ISO 8601 interval format
+
+    2019-01-01T00:00:00+03/P4M15DT123S
+
+If current object is a duration, fallbacks to FORMAT_ISO8601D
+
+=back
+
+Any of YMDhms can be absent or negative. If all the parts YMDhms are 0, then "" is returned.
+
+
+=head4 ""
+
+Same as C<to_string()>
+
 
 =head4 'bool', to_bool()
 
 Called implicitly in boolean context.
 Returns FALSE, if sec = 0 and min = 0 and .... year = 0, i.e. duration = 0. Otherwise TRUE.
 
+
 =head4 '0+', to_number()
 
-Returns to_sec().
+Returns duration().
 
-=head4 '*', multiply_new($num)
+
+=head4 '+', sum($arg)
+
+If C<$arg> is a date object, the result is the same as C<$date + $rel>, i.e. date.
+
+Otherwise, converts C<$arg> to relative date, adds it to the current object and returns new relative date.
+
+    my $rel = 2*MONTH;
+    say $rel + MONTH; # 3M
+    say $rel + '30D'; # 2M 30D
+    say $rel + rdate(1,2,3); # 1Y 4M 3D
+
+   
+=head4 '+=', add($arg)
+
+Converts C<$arg> to relative date and adds it to the current object
+
+    my $rel = 2*MONTH;
+    $rel += '16h'; # 2M 16h
+    $rel += rdate(sec => 10, min => 20); # 2M 16h 20m 10s
+    $rel += $rel; # 4M 32h 40m 20s
+
+    
+=head4 '-', difference($arg)
+
+Converts C<$arg> to relative date, subtracts it from the current object and returns new relative date.
+
+    my $rel = 2*MONTH;
+    say $rel - MONTH; # 1M
+    say '30D' - $rel; # -2M 30D
+    say $rel - rdate(1,2,3); # -1Y -3D
+
+    
+=head4 '-=', subtract($arg)
+
+Converts C<$arg> to relative date and subtracts it from the current object.
+
+
+=head4 '*', product($num)
 
 Multiplies relative date by $num. $num can be fractional but the result is always integer.
 
@@ -136,22 +252,22 @@ Examples
     print $rel * 2; # 2M 2D
     print rdate("10h")->multiply(10); # 100h
 
-Relative date can only be multiplied by number (scalar).
-
 No normalization are made, i.e. 12h*2 = 24h is not normalized to 1D because that would be inaccurate (on DST border day for example, 1D is 25 or 23h)
+
 
 =head4 '*=', multiply($num)
 
-Same as C<multiply_new()>, but changes current object instead of creating new one.
+Same as C<product()>, but changes current object instead of creating new one.
 
-=head4 '/', divide_new($num)
+
+=head4 '/', quotient($num)
 
 Divides relative date by $num. $num can be fractional but the result is always integer.
 
 System will denormalize values if in another way (rounding) precision loses are bigger,
 for example "1Y" / 2 = "6M" (without denormalization it would be 0).
 
-This applies even if units are not converted accurate. In this case assumptions mentioned in to_sec() are made.
+This applies even if units are not converted accurate. In this case assumptions mentioned in to_secs() are made.
 
 Examples
 
@@ -164,60 +280,27 @@ Examples
 
 P.S. Keep in mind that ($rel / N) * N is not always equals $rel, as well as ($rel * N) / N
 
+
 =head4 '/=', divide($num)
 
-Same as C<divide_new()>, but changes current object instead of creating new one.
+Same as C<quotient()>, but changes current object instead of creating new one.
 
-=head4 '+', add_new($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
 
-Adds another rel date to current. Another reldate can be L<Date::Rel> object or any data valid for its constructor.
-
-Examples
-
-    my $rel = 2*MONTH;
-    print $rel+MONTH; # 3M
-    print $rel+'30D'; # 2M 30D
-    print $rel+[1,2,3]; # 1Y 4M 3D
-    
-=head4 '+=', add($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
-
-Same as C<add_new()>, but changes current object instead of creating new one.
-
-Examples
-
-    my $rel = 2*MONTH;
-    $rel += '16h'; # 2M 16h
-    $rel += {sec => 10, min => 20}; # 2M 16h 20m 10s
-    $rel += $rel; # 4M 32h 40m 20s
-    
-=head4 '-', subtract_new($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
-
-Subtracts another reldate from current. Another reldate can be L<Date::Rel> object or any data valid for its constructor.
-
-Examples
-
-    my $rel = 2*MONTH;
-    print $rel-MONTH; # 1M
-    print $rel-'30D'; # 2M -30D
-    print $rel-[1,2,3]; # -1Y -3D
-    
-=head4 '-=', subtract($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
-
-Same as C<subtract_new()>, but changes current object instead of creating new one.
- 
-=head4 'neg', negative_new() (unary '-')
+=head4 'neg', negated() (unary '-')
 
 Changes sign of YMDhms
 
-=head4 negative()
 
-Same as C<negative_new()>, but changes current object instead of creating new one.
+=head4 negate()
 
-=head4 '<=>', compare($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
+Same as C<negated()>, but changes current object instead of creating new one.
 
-Compares 2 relative dates and returns -1, 0 or 1. Another reldate can be L<Date::Rel> object or any data valid for its constructor.
 
-Dates are compared using C<to_sec()>, therefore 2 dates can be equal even if they consist of different components.
+=head4 '<=>', compare($arg)
+
+Converts C<$arg> to relative date, compares 2 relative dates and returns -1, 0 or 1.
+
+Relative dates are compared using C<duration()>, therefore 2 dates can be equal even if they consist of different components.
 If you want full equality test, use 'eq'.
 
 Examples
@@ -226,24 +309,46 @@ Examples
     rdate("1Y 1M") > YEAR; #true
     12*MONTH == YEAR; #true
     12*MONTH eq YEAR; #false
-    
-=head4 'eq', equals($reldate | $rel_string | $seconds | \@rel_array | \%rel_hash)
 
-Same as '==' but returns TRUE only if 2 reldates are fully identical.
+    
+=head4 'eq', is_same($arg)
+
+Returns TRUE only if 2 reldates are fully identical.
 
     $reldate = rdate("1Y 2M");
     $reldate == "1Y 2M"; # true
     $reldate == "14M";   # true
     $reldate eq "1Y 2M"; # true
     $reldate eq "14M";   # false
-    
+
+If one of the arguments is an interval, then the other has to be interval too, otherwise returns FALSE.
+
+
+=head4 includes($date_arg)
+
+If reldate is a duration, returns 0.
+
+Otherwise, converts C<$arg> to date and:
+
+Returns -1 if date is greater than the end of the interval.
+
+Returns 0 if date is between the interval (including the edges).
+
+Returns 1 otherwise.
+
+    my $rel = rdate("2019-01-10", "2019-01-11");
+    $rel->includes("2019-01-09");          # 1
+    $rel->includes("2019-01-11 00:00:01"); # -1
+    $rel->includes("2019-01-10");          # 0
+    $rel->includes("2019-01-10 10:00:00"); # 0
+    $rel->includes("2019-01-11");          # 0
+
+
 =head4 clone()
 
 Clones object.
 
-=head1 OPERATOR OVERLOAD RULES
 
-See screenshot L<http://crazypanda.ru/v/clip2net/g/0/KfYbuNhu0b.png>
 
 =head1 CLONING/SERIALIZATION
 
@@ -256,6 +361,8 @@ L<Date::Rel> supports:
 =item L<Data::Recursive>'s C<clone>
 
 =back
+
+
 
 =head1 AUTHOR
 

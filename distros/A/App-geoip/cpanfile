@@ -10,7 +10,7 @@ requires   "Pod::Usage";
 requires   "Socket";
 requires   "Text::CSV_XS"             => "1.39";
 
-recommends "Archive::Zip"             => "1.66";
+recommends "Archive::Zip"             => "1.67";
 recommends "DBI"                      => "1.642";
 recommends "Data::Dumper"             => "2.173";
 recommends "Getopt::Long"             => "2.51";

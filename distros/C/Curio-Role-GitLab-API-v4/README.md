@@ -1,6 +1,6 @@
 # NAME
 
-Curio::Role::GitLab::API::v4 - Build Curio classes around GitLab::API::v4.
+Curio::Role::GitLab::API::v4 - Build Curio classes around GitLab::API::v4. (DEPRECATED)
 
 # SYNOPSIS
 

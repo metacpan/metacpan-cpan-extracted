@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-print "1..18\n";
+print "1..21\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -79,3 +79,51 @@ else {print "not ok 17\n"}
 
 if(Math::MPFR::GMP_NAIL_BITS < Math::MPFR::GMP_NAIL_BITS + $arb) {print "ok 18\n"}
 else {print "not ok 18\n"}
+
+eval{my $p = MPFR_DBL_DIG;};
+
+if(!$@) {
+  if(defined(MPFR_DBL_DIG)) {
+    warn "\nFYI:\n DBL_DIG = ", MPFR_DBL_DIG, "\n";
+  }
+  else {
+    warn "\nFYI:\n DBL_DIG not defined\n";
+  }
+  print "ok 19\n";
+}
+else {
+  warn "\$\@: $@";
+  print "not ok 19\n";
+}
+
+eval{my $lp = MPFR_LDBL_DIG;};
+
+if(!$@) {
+  if(defined(MPFR_LDBL_DIG)) {
+    warn  "\nFYI:\n LDBL_DIG = ", MPFR_LDBL_DIG, "\n";
+  }
+  else {
+    warn "\nFYI:\n LDBL_DIG not defined\n";
+  }
+  print "ok 20\n";
+}
+else {
+  warn "\$\@: $@";
+  print "not ok 20\n";
+}
+
+eval{my $f128p = MPFR_FLT128_DIG;};
+
+if(!$@) {
+  if(defined(MPFR_FLT128_DIG)) {
+    warn  "\nFYI:\n FLT128_DIG = ", MPFR_FLT128_DIG, "\n";
+  }
+  else {
+    warn "\nFYI:\n FLT128_DIG not defined\n";
+  }
+  print "ok 21\n";
+}
+else {
+  warn "\$\@: $@";
+  print "not ok 21\n";
+}

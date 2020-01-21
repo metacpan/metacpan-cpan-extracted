@@ -1,5 +1,5 @@
 ---
-abstract: 'Build Curio classes around CHI.'
+abstract: 'Build Curio classes around CHI. (DEPRECATED)'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
@@ -27,7 +27,7 @@ no_index:
 provides:
   Curio::Role::CHI:
     file: lib/Curio/Role/CHI.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   CHI: '0.60'
   Curio::Role: '0.04'
@@ -41,7 +41,8 @@ resources:
   bugtracker: https://github.com/bluefeet/Curio-Role-CHI/issues
   homepage: https://github.com/bluefeet/Curio-Role-CHI
   repository: git://github.com/bluefeet/Curio-Role-CHI.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:BLUEFEET
+x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

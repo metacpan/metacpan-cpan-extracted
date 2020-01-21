@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use 5.8.9;
 

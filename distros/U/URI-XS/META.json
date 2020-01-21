@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,30 +25,32 @@
       },
       "configure" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.2.10",
-            "XS::Framework" : "v1.1.9",
-            "XS::Install" : "v1.2.10",
+            "CPP::panda::lib" : "v1.3.4",
+            "Export::XS" : "v3.0.1",
+            "XS::Framework" : "v1.2.2",
+            "XS::Install" : "v1.2.12",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "CPP::panda::lib" : "v1.2.10",
-            "Export::XS" : "0",
-            "XS::Framework" : "v1.1.9",
-            "XS::Install" : "v1.2.10",
+            "CPP::panda::lib" : "v1.3.4",
+            "Export::XS" : "v3.0.1",
+            "XS::Framework" : "v1.2.2",
+            "XS::Install" : "v1.2.12",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.7",
+   "version" : "v2.0.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

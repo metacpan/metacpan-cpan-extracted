@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -12,12 +16,12 @@ my $expected1 = {
                         'b' => {
                                  'c' => {
                                           'answer' => bless( {
-                                                               '_file' => '(eval 398)',
-                                                               'operator' => 'CODE(...)',
-                                                               'name' => '<Custom Code>',
                                                                '_lines' => [
                                                                              6
                                                                            ],
+                                                               'operator' => 'CODE(...)',
+                                                               'name' => '<Custom Code>',
+                                                               '_file' => '(eval 398)',
                                                                'code' => sub {
                                                                              BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                                              use strict;

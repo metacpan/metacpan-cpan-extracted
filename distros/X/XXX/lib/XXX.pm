@@ -1,11 +1,11 @@
 use strict; use warnings;
 package XXX;
-our $VERSION = '0.33';
+our $VERSION = '0.35';
 use base 'Exporter';
 
 our @EXPORT = qw( WWW XXX YYY ZZZ );
 
-our $DumpModule = 'YAML';
+our $DumpModule = 'YAML::PP';
 
 if ($ENV{PERL_XXX_DUMPER}) {
     _set_dump_module($ENV{PERL_XXX_DUMPER});
@@ -19,16 +19,6 @@ sub import {
             die "-with requires another argument"
               unless $i++ < @args;
             _set_dump_module($args[ $i ]);
-        }
-        # TODO Deprecation. These options are now undocumented. Next releases:
-        # die, then remove.
-        elsif ($arg =~ /^-dumper$/i) {
-            warn "Option '-dumper' is deprecated";
-            $DumpModule = 'Data::Dumper';
-        }
-        elsif ($arg =~ /^-yaml$/i) {
-            warn "Option '-yaml' is deprecated";
-            $DumpModule = 'YAML';
         }
         else {
             next;
@@ -53,7 +43,7 @@ sub _set_dump_module {
 sub _xxx_dump {
     no strict 'refs';
     no warnings;
-    $DumpModule ||= 'YAML';
+    $DumpModule ||= 'YAML::PP';
     my $dump_type =
         (substr($DumpModule, 0, 4) eq 'YAML') ? 'yaml' :
         (substr($DumpModule, 0, 4) eq 'JSON') ? 'json' :
@@ -64,26 +54,27 @@ sub _xxx_dump {
     if (not defined ${"$DumpModule\::VERSION"}) {
         eval "require $DumpModule; 1" or die $@;
     }
+    if ($DumpModule eq 'YAML::PP') {
+        return YAML::PP->new(schema => ['Core', 'Perl'])->dump_string(@_) . "...\n";
+    }
     if ($dump_type eq 'yaml') {
         return &{"$DumpModule\::Dump"}(@_) . "...\n";
     }
-    elsif ($dump_type eq 'json') {
+    if ($dump_type eq 'json') {
         return &{"$DumpModule\::encode_json"}(@_);
     }
-    elsif ($dump_type eq 'dumper') {
+    if ($dump_type eq 'dumper') {
         local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Indent = 2;
         return Data::Dumper::Dumper(@_);
     }
-    elsif ($dump_type eq 'dump') {
+    if ($dump_type eq 'dump') {
         return Data::Dump::dump(@_) . "\n";
     }
-    elsif ($dump_type eq 'dumpcolor') {
+    if ($dump_type eq 'dumpcolor') {
         return Data::Dump::Color::dump(@_) . "\n";
     }
-    else {
-        die "XXX had an internal error";
-    }
+    die "XXX had an internal error";
 }
 
 sub _at_line_number {

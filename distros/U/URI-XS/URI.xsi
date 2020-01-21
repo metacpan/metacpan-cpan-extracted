@@ -1,5 +1,24 @@
+MODE: INLINE
+
+static U32 uxs_hashval;
+
 MODULE = URI::XS                PACKAGE = URI::XS
 PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__);
+    PERL_HASH(uxs_hashval, "URI::XS", 7);
+    
+    xs::exp::create_constants(stash, {
+        {"ALLOW_SUFFIX_REFERENCE", URI::Flags::allow_suffix_reference},
+        {"QUERY_PARAM_SEMICOLON",  URI::Flags::query_param_semicolon},
+        
+        // deprecated names
+        {"ALLOW_LEADING_AUTHORITY", URI::Flags::allow_suffix_reference},
+        {"PARAM_DELIM_SEMICOLON",   URI::Flags::query_param_semicolon},
+    });
+    xs::exp::autoexport(stash);
+}
 
 URI* new (SV* CLASS, string url = string(), int flags = 0) {
     PROTO = CLASS;
@@ -154,20 +173,25 @@ string URI::to_string (...) : ALIAS(as_string=1) {
 
 bool URI::secure ()
 
-void URI::set (URI* source) {
-    THIS->assign(*source);
+void URI::set (Sv source, int flags = 0) : ALIAS(assign=1) {
+    PERL_UNUSED_VAR(ix);
+    if (source.is_string()) THIS->assign(xs::in<string>(source), flags);
+    else                    THIS->assign(*xs::in<xs::nn<const URI*>>(source));
 }    
     
-void URI::assign (string url, int flags = 0)
-    
-bool URI::equals (URI* other) {
-    RETVAL = THIS->equals(*other);
-}    
-    
+bool URI::equals (Sv other, ...) {
+    if (other.is_string()) RETVAL = THIS->to_string() == xs::in<string_view>(other);
+    else {
+        Object obj = other;
+        if (obj && obj.stash().isa("URI::XS")) RETVAL = THIS->equals(*xs::in<URI*>(obj));
+        else                                   RETVAL = false;
+    }
+}
+
 URI* URI::clone () {
     PROTO = Object(ST(0)).stash();
-    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL = URI::create(*THIS);
-    else                                  RETVAL = new URI(*THIS);
+    if (dynamic_cast<URIStrict*>(THIS)) RETVAL = URI::create(*THIS);
+    else                                RETVAL = new URI(*THIS);
 }
     
 void URI::path_segments (...) {
@@ -186,4 +210,20 @@ void URI::path_segments (...) {
 bool URI::to_bool (...) {
     RETVAL = THIS->scheme().length() || THIS->host().length() || THIS->path().length() || THIS->query_string().length() ||
              THIS->fragment().length();
+}
+
+string URI::user (SV* newval = NULL) {
+    if (newval) {
+        THIS->user(xs::in<string>(newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->user();
+}
+
+string URI::password (SV* newval = NULL) {
+    if (newval) {
+        THIS->password(xs::in<string>(newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->password();
 }

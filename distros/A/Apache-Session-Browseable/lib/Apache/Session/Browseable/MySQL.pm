@@ -25,6 +25,12 @@ sub populate {
     return $self;
 }
 
+# Override default CAST syntax from DBI.pm
+sub _buildLowerThanExpression {
+    my ( $class, $field, $value ) = @_;
+    return "CAST($field AS SIGNED INTEGER) < $value";
+}
+
 1;
 __END__
 

@@ -13,50 +13,132 @@ BEGIN {
 }
 require_ok $pkg;
 
-my $file     = "";
-my $template = <<EOF;
+#only template_before, no records
+{
+    my $file     = "";
+    my $template = <<EOF;
 Author: [% author %]
-Title: "[% title %]"
+EOF
+    my $template_before = <<EOF;
+---
 EOF
 
-dies_ok {my $exp = $pkg->new(file => \$file, xml => 1)};
+    my $exporter = $pkg->new(
+        file            => \$file,
+        template        => \$template,
+        template_before => \$template_before
+    );
+    $exporter->commit;
 
-dies_ok {my $exp = $pkg->new(template_before => $template)};
+    is($file, $template_before,
+        "no records added, only template_before rendered");
+}
 
-lives_ok {$pkg->new(template => $template)};
-
-my $exporter = $pkg->new(file => \$file, template => \$template);
-my $data = {author => "brian d foy", title => "Mastering Perl",};
-
-can_ok $exporter, "add";
-can_ok $exporter, "commit";
-
-$exporter->add($data);
-$exporter->commit;
-my $result = <<EOF;
-Author: brian d foy
-Title: "Mastering Perl"
+#only template_before, one record added
+{
+    my $file     = "";
+    my $template = <<EOF;
+Author: "[% author %]"
+EOF
+    my $template_before = <<EOF;
+---
 EOF
 
-is($file, $result, "Exported Format");
+    my $exporter = $pkg->new(
+        file            => \$file,
+        template        => \$template,
+        template_before => \$template_before
+    );
+    $exporter->add({author => "Nicolas Franck"});
+    $exporter->commit;
 
-is($exporter->count, 1, "Count");
-
-my $template_before = <<EOF;
-Book
-
-EOF
-$file = "";
-$exporter = $pkg->new(file => \$file, template => \$template, template_before => \$template_before);
-$exporter->add($data);
-$exporter->commit;
-$result = <<EOF;
-Book
-
-Author: brian d foy
-Title: "Mastering Perl"
+    my $expected_result = <<EOF;
+---
+Author: "Nicolas Franck"
 EOF
 
-is($file, $result, "Preamble added once");
+    is($file, $expected_result,
+        "one record added, template_before prepended");
+}
+
+#only template_after, no records
+{
+    my $file     = "";
+    my $template = <<EOF;
+Author: [% author %]
+EOF
+    my $template_after = <<EOF;
+...
+EOF
+
+    my $exporter = $pkg->new(
+        file           => \$file,
+        template       => \$template,
+        template_after => \$template_after
+    );
+    $exporter->commit;
+
+    is($file, $template_after,
+        "no records added, only template_after rendered");
+}
+
+#only template_after, one record added
+{
+    my $file     = "";
+    my $template = <<EOF;
+Author: "[% author %]"
+EOF
+    my $template_after = <<EOF;
+...
+EOF
+
+    my $exporter = $pkg->new(
+        file           => \$file,
+        template       => \$template,
+        template_after => \$template_after
+    );
+    $exporter->add({author => "Nicolas Franck"});
+    $exporter->commit;
+
+    my $expected_result = <<EOF;
+Author: "Nicolas Franck"
+...
+EOF
+
+    is($file, $expected_result, "one record added, template_after appended");
+}
+
+#both template_before and template_after, one record added
+{
+    my $file     = "";
+    my $template = <<EOF;
+Author: "[% author %]"
+EOF
+
+    my $template_before = <<EOF;
+---
+EOF
+
+    my $template_after = <<EOF;
+...
+EOF
+
+    my $exporter = $pkg->new(
+        file            => \$file,
+        template        => \$template,
+        template_before => \$template_before,
+        template_after  => \$template_after
+    );
+    $exporter->add({author => "Nicolas Franck"});
+    $exporter->commit;
+
+    my $expected_result = <<EOF;
+---
+Author: "Nicolas Franck"
+...
+EOF
+
+    is($file, $expected_result, "one record added, template_after appended");
+}
 
 done_testing;

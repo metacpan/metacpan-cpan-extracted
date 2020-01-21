@@ -131,6 +131,10 @@ static const struct helptxt helptext[] = {
    "EGD socket path for random data"},
   {"    --engine <name>",
    "Crypto engine to use"},
+  {"    --etag-save <file>",
+   "Get an ETag from response header and save it to a FILE"},
+  {"    --etag-compare <file>",
+   "Get an ETag from a file and send a conditional request"},
   {"    --expect100-timeout <seconds>",
    "How long to wait for 100-continue"},
   {"-f, --fail",
@@ -263,6 +267,8 @@ static const struct helptxt helptext[] = {
    "Disable TCP keepalive on the connection"},
   {"    --no-npn",
    "Disable the NPN TLS extension"},
+  {"    --no-progress-meter",
+   "Do not show the progress meter"},
   {"    --no-sessionid",
    "Disable SSL session-ID reusing"},
   {"    --noproxy <no-proxy-list>",
@@ -277,6 +283,8 @@ static const struct helptxt helptext[] = {
    "Write to file instead of stdout"},
   {"-Z, --parallel",
    "Perform transfers in parallel"},
+  {"    --parallel-immediate",
+   "Do not wait for multiplexing (with --parallel)"},
   {"    --parallel-max",
    "Maximum concurrency for parallel transfers"},
   {"    --pass <phrase>",
@@ -540,6 +548,7 @@ static const struct feat feats[] = {
   {"MultiSSL",       CURL_VERSION_MULTI_SSL},
   {"PSL",            CURL_VERSION_PSL},
   {"alt-svc",        CURL_VERSION_ALTSVC},
+  {"ESNI",           CURL_VERSION_ESNI},
 };
 
 void tool_help(void)

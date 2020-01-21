@@ -65,6 +65,27 @@ $exporter2 = Catmandu::Exporter::Template->new(
 );
 
 ok $exporter->_tt != $exporter2->_tt,
+    'tt engines with equal arguments get reused';
+
+$exporter = Catmandu::Exporter::Template->new(
+    template     => \$template,
+    INCLUDE_PATH => '/tmp/a',
+);
+
+$exporter2 = Catmandu::Exporter::Template->new(
+    template     => \$template,
+    INCLUDE_PATH => '/tmp/a',
+);
+
+ok $exporter->_tt == $exporter2->_tt,
+    'tt engines wirth equal arguments get reused';
+
+$exporter2 = Catmandu::Exporter::Template->new(
+    template     => \$template,
+    INCLUDE_PATH => '/tmp/b',
+);
+
+ok $exporter->_tt != $exporter2->_tt,
     'tt engines wirth equal arguments get reused';
 
 done_testing;

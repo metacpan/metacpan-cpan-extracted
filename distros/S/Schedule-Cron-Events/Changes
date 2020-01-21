@@ -1,0 +1,12 @@
+Revision history for Check-GlobalPhase
+
+1.96      2020-01-20 15:38:38-07:00 America/Denver
+
+- Remove 'use var'
+- Migrate bugtracker to GitHub
+- Remove './lib' from @INC for cron_event_predict.pl
+
+
+1.95     2016-04-10 16:34:54-06:00 America/Denver
+
+Release 1.95

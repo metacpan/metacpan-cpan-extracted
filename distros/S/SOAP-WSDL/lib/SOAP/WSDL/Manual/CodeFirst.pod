@@ -1,6 +1,8 @@
 =pod
 
-=head1 Writing Code-First Web Services with SOAP::WSDL
+=head1 NAME
+
+CodeFirst - Writing Code-First Web Services with SOAP::WSDL
 
 B<Note: This document is just a collection of thought. There's no implementation yet>.
 
@@ -69,7 +71,7 @@ This would result in the following XML Schema (inside a schema with the namespac
 Perl does not have the concept of interfaces. However, Moose provides Roles, which can be used for defining
 interfaces.
 
-However, it's not really necessary to define a interface Interface (in the sense of a Jave interface) -
+However, it's not really necessary to define a interface Interface (in the sense of a Java interface) -
 a interface class is sufficient.
 
 Subroutine attributes could be used for providing additional information - attributes in perl are much like

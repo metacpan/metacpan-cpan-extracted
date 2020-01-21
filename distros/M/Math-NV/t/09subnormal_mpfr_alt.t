@@ -8,6 +8,11 @@
 # Smallest normal double is:
 # 2.2250738585072014e-308
 
+# '0.00132e-308' is a double value that needs to be subnormalized before calling Rmpfr_get_NV
+# '0.00024e-4932' is a long double value that needs to be subnormalized before calling Rmpfr_get_NV.
+# '0.00001e-4932' is a __float128 value that needs to be subnormalized before calling Rmpfr_get_NV.
+# Failure to subnormalize first will result in Rmpfr_get_NV returning a slightly incorrect NV.
+
 use strict;
 use warnings;
 use Math::NV qw(:all);
@@ -22,6 +27,14 @@ if($have_atonv) {
 }
 else {  warn "\n Math::MPFR::atonv() tests disabled\n"}
 
+my $ld_type;
+if   (Math::MPFR::LDBL_MANT_DIG == 53)  {$ld_type = 'double'; }
+elsif(Math::MPFR::LDBL_MANT_DIG == 64)  {$ld_type = 'long double'}
+elsif(Math::MPFR::LDBL_MANT_DIG == 106) {$ld_type = 'double double'}
+elsif(Math::MPFR::LDBL_MANT_DIG == 113) {$ld_type = 'ieee long double'}
+else { die "Unknown long double type" }
+
+my $ld_bits = Math::MPFR::LDBL_MANT_DIG == 106 ? 2098 : Math::MPFR::LDBL_MANT_DIG;
 
 my $t = 9;
 
@@ -30,13 +43,13 @@ print "1..$t\n";
 my $ok = 1;
 my $exponent;
 
-if($Math::NV::mpfr_strtofr_bug == 1) {
+if(MPFR_STRTOFR_BUG == 1) {
   warn "Skipping tests - already run  in 08subnormal_mpfr.t\n";
   print "ok $_\n" for 1..$t;
   exit 0;
 }
 
-$Math::NV::mpfr_strtofr_bug = 1; # Force use of workaround routine.
+# MPFR_STRTOFR_BUG == 0
 
 warn "\nThese tests can take a few moments to complete\n";
 
@@ -46,14 +59,27 @@ my($have_ld_bytes, $no_ld_bytes) = (0, '');
 # warning on double-double builds, before setting $@ to "2nd arg to
 # Math::MPFR::_ld_bytes must be 64 or 113".
 
-eval{Math::MPFR::_ld_bytes('1e-2', Math::MPFR::LDBL_MANT_DIG)};
+if(Math::NV::OLD_MATH_MPFR) {
+  eval{Math::MPFR::_ld_bytes('1e-2', $ld_bits);};
+}
+else {
+  eval{Math::MPFR::_ld_bytes('1e-2');};
+}
+
 unless($@) {
   $have_ld_bytes = 1;
 }
 else {$no_ld_bytes = $@}
 
 my($have_f128_bytes, $no_f128_bytes) = (0, '');
-eval{Math::MPFR::_f128_bytes('1e-2', 113)};
+
+if(Math::NV::OLD_MATH_MPFR) {
+  eval{Math::MPFR::_f128_bytes('1e-2', 113);};
+}
+else {
+  eval{Math::MPFR::_f128_bytes('1e-2');};
+}
+
 unless($@) {
   $have_f128_bytes = 1;
 }
@@ -74,7 +100,7 @@ $exponent = $Config{nvtype} eq 'double' ? '-308' : '-4932';
 # Check also that that the hex dump of $nv
 # matches the hex dump returned by nv_mpfr($str)
 
-unless($Math::NV::_ld_subnormal_bug && $Config{nvtype} eq 'long double') {
+unless(LD_SUBNORMAL_BUG && $Config{nvtype} eq 'long double') {
   for my $count(1 .. 10000, 200000 .. 340000) {
 
     my $str = sprintf "%06d", $count;
@@ -156,7 +182,7 @@ $ok = 1;
 # confident that is_eq_mpfr($str) assigns the
 # same value as nv_mpfr($str)
 
-unless($Math::NV::_ld_subnormal_bug && $Config{nvtype} eq 'long double') {
+unless(LD_SUBNORMAL_BUG && $Config{nvtype} eq 'long double') {
   for my $count(1 .. 10000, 200000 .. 340000) {
 
     my $str = sprintf "%06d", $count;
@@ -265,7 +291,13 @@ for my $count(1 .. 10000, 200000 .. 340000) {
   $str .= "e-308";
 
   my $out_a = nv_mpfr($str, 106);
-  my $out_b = join '', Math::MPFR::_dd_bytes($str, 106);
+  my $out_b;
+  if(Math::NV::OLD_MATH_MPFR) {
+    $out_b = Math::MPFR::bytes($str, 'double-double');
+  }
+  else {
+    $out_b = Math::MPFR::bytes($str, 2098);
+  }
 
   my @out1 = @$out_a;
   my @out2 = (substr($out_b, 0, 16), substr($out_b, 16, 16));
@@ -366,7 +398,7 @@ elsif(mant_dig() == 64) {
   my $len = scalar(@str1);
   die "size mismatch" if @str1 != @str2;
 
-  if(!$Math::NV::_ld_subnormal_bug) {
+  unless(LD_SUBNORMAL_BUG) {
     for(my $i = 0; $i < $len; $i++) {
       if(set_mpfr($str1[$i]) != set_mpfr($str2[$i])) {
         warn "\nIn set_mpfr(): ", Math::NV::get_relevant_prec(Math::MPFR->new($str1[$i], 2)), ": $str1[$i] != $str2[$i]\n";
@@ -519,7 +551,13 @@ for my $count(1 .. 10000, 200000 .. 340000) {
   $str .= "e-308";
 
   my $out1 = nv_mpfr($str, 53);
-  my $out2 = join '', Math::MPFR::_d_bytes($str, 53);
+  my $out2;
+  if(Math::NV::OLD_MATH_MPFR) {
+    $out2 = Math::MPFR::bytes($str, 'double');
+  }
+  else {
+    $out2 = Math::MPFR::bytes($str, 53);
+  }
 
   if($out1 ne $out2) {
     warn "$out1 ne $out2\n";
@@ -544,7 +582,7 @@ $ok = 1;
 # in _ld_bytes().
 
 if($have_ld_bytes) {
-  if(!$Math::NV::_ld_subnormal_bug) {
+  unless(LD_SUBNORMAL_BUG) {
     for my $count(1 .. 10000, 200000 .. 340000) {
 
       my $str = sprintf "%06d", $count;
@@ -558,7 +596,14 @@ if($have_ld_bytes) {
         $out1 = substr($out1, -20, 20);
       }
 
-      my $out2 = join '', Math::MPFR::_ld_bytes($str, Math::MPFR::LDBL_MANT_DIG);
+
+      my $out2;
+      if(Math::NV::OLD_MATH_MPFR) {
+        $out2 = Math::MPFR::bytes($str, $ld_type);
+      }
+      else {
+        $out2 = Math::MPFR::bytes($str, $ld_bits);
+      }
 
       if($out1 ne $out2 && $out1 ne ('0000'. $out2) && $out1 ne ('000000000000'. $out2)) {
         warn "\nIn _ld_bytes: $out1 ne $out2 for $str\n";
@@ -601,7 +646,13 @@ if($have_f128_bytes) {
     $str .= "e-4932";
 
     my $out1 = nv_mpfr($str, 113);
-    my $out2 = join '', Math::MPFR::_f128_bytes($str, 113);
+    my $out2;
+    if(Math::NV::OLD_MATH_MPFR) {
+      $out2 = Math::MPFR::bytes($str, '__float128');
+    }
+    else {
+      $out2 = Math::MPFR::bytes($str, 113);
+    }
 
     if($out1 ne $out2) {
       warn "$out1 ne $out2\n";
@@ -772,7 +823,7 @@ elsif(mant_dig() == 53) {
   my $len = scalar(@str1);
   die "size mismatch" if @str1 != @str2;
 
-  if(!$Math::NV::_ld_subnormal_bug) {
+  unless(LD_SUBNORMAL_BUG) {
     if($have_ld_bytes) {
       for(my $i = 0; $i < $len; $i++) {
         my $x = nv_mpfr($str1[$i], 64);

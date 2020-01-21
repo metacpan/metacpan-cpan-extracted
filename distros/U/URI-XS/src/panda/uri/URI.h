@@ -14,34 +14,22 @@
 
 namespace panda { namespace uri {
 
-extern char unsafe_query[256];
-
-class URIError : public std::logic_error {
-public:
+struct URIError : std::logic_error {
   explicit URIError (const std::string& what_arg) : logic_error(what_arg) {}
 };
 
-class WrongScheme : public URIError {
-public:
+struct WrongScheme : URIError {
   explicit WrongScheme (const std::string& what_arg) : URIError(what_arg) {}
 };
 
-class URI : public virtual panda::Refcnt {
-
-public:
-    enum flags_t {
-        ALLOW_LEADING_AUTHORITY = 1, // allow urls to begin with authority (i.e. 'google.com', 'login@mysite.com:8080/mypath', etc (but NOT with IPV6 [xx:xx:...])
-        PARAM_DELIM_SEMICOLON   = 2, // allow query string param to be delimiter by ';' rather than '&'
+struct URI : Refcnt {
+    struct Flags {
+        static constexpr const int allow_suffix_reference = 1; // https://tools.ietf.org/html/rfc3986#section-4.5 uri may omit leading "SCHEME://"
+        static constexpr const int query_param_semicolon  = 2; // query params are delimited by ';' instead of '&'
     };
 
-    class Strict;
-    class httpX;
-    class UserPass;
-
-    class http;
-    class https;
-    class ftp;
-    class socks;
+    template <class TYPE1, class TYPE2 = void> struct Strict;
+    struct http; struct https; struct ftp; struct socks; struct ws; struct wss; struct ssh; struct telnet; struct sftp;
 
     using uricreator = URI*(*)(const URI& uri);
 
@@ -54,6 +42,7 @@ public:
         const std::type_info* type_info;
     };
 
+    static void register_scheme (const string& scheme, uint16_t default_port, bool secure = false);
     static void register_scheme (const string& scheme, const std::type_info*, uricreator, uint16_t default_port, bool secure = false);
 
     static URI* create (const string& source, int flags = 0) {
@@ -67,9 +56,10 @@ public:
         else                    return new URI(source);
     }
 
-    URI ()                                    : scheme_info(NULL), _port(0), _qrev(1), _flags(0)     {}
-    URI (const string& source, int flags = 0) : scheme_info(NULL), _port(0), _qrev(1), _flags(flags) { parse(source); }
-    URI (const URI& source)                                                                          { assign(source); }
+    URI ()                                               : scheme_info(NULL), _port(0), _qrev(1), _flags(0)     {}
+    URI (const string& s, int flags = 0)                 : scheme_info(NULL), _port(0), _qrev(1), _flags(flags) { parse(s); }
+    URI (const string& s, const Query& q, int flags = 0) : URI(s, flags)                                        { add_query(q); }
+    URI (const URI& s)                                                                                          { assign(s); }
 
     URI& operator= (const URI& source)    { if (this != &source) assign(source); return *this; }
     URI& operator= (const string& source) { assign(source); return *this; }
@@ -99,10 +89,10 @@ public:
         _flags      = source._flags;
     }
 
-    void assign (const string& uristr, int flags = 0) {
+    void assign (const string& s, int flags = 0) {
         clear();
         _flags = flags;
-        parse(uristr);
+        parse(s);
     }
 
     const string& query_string () const {
@@ -150,7 +140,7 @@ public:
 
     void raw_query (const string& rq) {
         _qstr.clear();
-        encode_uri_component(rq, _qstr, unsafe_query);
+        encode_uri_component(rq, _qstr, URIComponent::query);
         ok_qstr();
     }
 
@@ -198,10 +188,11 @@ public:
         if (_host) ret += _host;
         ret += ':';
         char* buf = ret.buf(); // has exactly 5 bytes left
-        auto ptr_start = buf + ret.length();
+        auto len = ret.length();
+        auto ptr_start = buf + len;
         auto res = to_chars(ptr_start, buf + ret.capacity(), port());
         assert(!res.ec); // because buf is always enough
-        ret.length(ret.length() + (res.ptr - ptr_start));
+        ret.length(len + (res.ptr - ptr_start));
         return ret;
     }
 
@@ -233,7 +224,7 @@ public:
         for (auto it = begin; it != end; ++it) {
             if (!it->length()) continue;
             _path += '/';
-            _encode_uri_component_append(*it, _path, unsafe_path_segment);
+            _encode_uri_component_append(*it, _path, URIComponent::path_segment);
         }
     }
 
@@ -249,6 +240,12 @@ public:
     }
 
     void swap (URI& uri);
+
+    string user () const;
+    void   user (const string& user);
+
+    string password () const;
+    void   password (const string& password);
 
     virtual ~URI () {}
 
@@ -293,7 +290,7 @@ private:
         _flags = 0;
     }
 
-    inline void guess_leading_authority ();
+    void guess_suffix_reference ();
 
     void compile_query () const;
     void parse_query   () const;

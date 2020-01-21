@@ -25,7 +25,7 @@ void _cache(const char * ptr, const char * cls) {
     if (Fl_cache == NULL)
         Fl_cache =
 #if FLTK_DEBUG
-                gv_stashpv( "Fl::Cache::ref", GV_ADD | GV_ADDMULTI );
+                gv_stashpv( "Fl::DEBUG::ClassCache", GV_ADD | GV_ADDMULTI );
 #else
                 newHV();
 #endif
@@ -273,6 +273,7 @@ croak(const char *const params) {
 
 {%for class in xsubs%}
 /* package {{class.package}}; */
+#define PKG_{{ class.package | replace: "::", "_" | upcase }}
 // #include <FL/{%if class.widget_type%}{{class.widget_type}}{%else%}{{class.package | replace:'::','_'}}{%endif%}.H>
 {%for method in class.methods %}
     {%assign function = method.name%}
@@ -544,6 +545,7 @@ XS_EUPXS({{cpp.function.name}}) {
         croak("TODO: Improve usage info! {%if is_method%}{%if function == 'new'%}{{ class.package }}{%else%}${{class.package | split:'::' | last | downcase }}{%endif%}->{%endif%}{{ function }}( ... );");
 }
 {% endfor %}
+#undef PKG_{{ class.package | replace: "::", "_" | upcase }}
 /* /package {{class.package}};  */
 {%endfor%}
 

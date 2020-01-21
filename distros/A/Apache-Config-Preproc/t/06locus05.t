@@ -22,7 +22,7 @@ ServerAdmin foo
   ServerName localhost
 </IfDefine>
 !=
-# $server_root/httpd.conf:1
+# {{$server_root/httpd.conf}}:1
 ServerAdmin foo
 !$
 __END__
@@ -32,9 +32,9 @@ ServerAdmin foo
   ServerName localhost
 </IfDefine>
 !=
-# $server_root/httpd.conf:1
+# {{$server_root/httpd.conf}}:1
 ServerAdmin foo
-# $server_root/httpd.conf:3
+# {{$server_root/httpd.conf}}:3
 ServerName localhost
 !$
 __END__
@@ -44,8 +44,8 @@ ServerAdmin foo
   ServerName localhost
 </IfDefine>
 !=
-# $server_root/httpd.conf:1
+# {{$server_root/httpd.conf}}:1
 ServerAdmin foo
-# $server_root/httpd.conf:3
+# {{$server_root/httpd.conf}}:3
 ServerName localhost
 !$

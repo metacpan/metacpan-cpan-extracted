@@ -481,7 +481,7 @@ int htp_hdrs_completecb(llhttp_t *htp) {
 #ifdef HAVE_MRUBY
   const auto &group = dconn_ptr->get_downstream_addr_group();
   if (group) {
-    const auto &dmruby_ctx = group->mruby_ctx;
+    const auto &dmruby_ctx = group->shared_addr->mruby_ctx;
 
     if (dmruby_ctx->run_on_request_proc(downstream) != 0) {
       resp.http_status = 500;
@@ -505,9 +505,7 @@ int htp_hdrs_completecb(llhttp_t *htp) {
     // and let them decide whether responds with 100 Continue or not.
     // For alternative mode, we have no backend, so just send 100
     // Continue here to make the client happy.
-    auto expect = req.fs.header(http2::HD_EXPECT);
-    if (expect &&
-        util::strieq(expect->value, StringRef::from_lit("100-continue"))) {
+    if (downstream->get_expect_100_continue()) {
       auto output = downstream->get_response_buf();
       constexpr auto res = StringRef::from_lit("HTTP/1.1 100 Continue\r\n\r\n");
       output->append(res);
@@ -790,7 +788,10 @@ int HttpsUpstream::downstream_read(DownstreamConnection *dconn) {
   rv = downstream->on_read();
 
   if (rv == SHRPX_ERR_EOF) {
-    return downstream_eof(dconn);
+    if (downstream->get_request_header_sent()) {
+      return downstream_eof(dconn);
+    }
+    return SHRPX_ERR_RETRY;
   }
 
   if (rv == SHRPX_ERR_DCONN_CANCELED) {
@@ -895,7 +896,11 @@ int HttpsUpstream::downstream_error(DownstreamConnection *dconn, int events) {
 
   unsigned int status;
   if (events & Downstream::EVENT_TIMEOUT) {
-    status = 504;
+    if (downstream->get_request_header_sent()) {
+      status = 504;
+    } else {
+      status = 408;
+    }
   } else {
     status = 502;
   }
@@ -1082,7 +1087,7 @@ int HttpsUpstream::on_downstream_header_complete(Downstream *downstream) {
     assert(dconn);
     const auto &group = dconn->get_downstream_addr_group();
     if (group) {
-      const auto &dmruby_ctx = group->mruby_ctx;
+      const auto &dmruby_ctx = group->shared_addr->mruby_ctx;
 
       if (dmruby_ctx->run_on_response_proc(downstream) != 0) {
         error_reply(500);

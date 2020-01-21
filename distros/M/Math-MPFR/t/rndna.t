@@ -1652,7 +1652,7 @@ else {
    print "ok 125\n";
 }
 
-if($Config{nvtype} eq 'long double' || $Config{nvtype} eq '__float128') {
+if($Config{nvsize} > 8) { # Rmpfr_set_ld is unavailable when nvsize <= 8 (even if nvtype is 'long double').
 
   $inex = rndna(\&Rmpfr_set_ld, $prop, 45.0);
 

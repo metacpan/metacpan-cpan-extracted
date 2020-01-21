@@ -451,18 +451,19 @@ if ($do==1) {
    #             'http://169.254.169.254/latest/dynamic/instance-identity/');
    #$public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
 
-   my $z=1;
-   while ($z==1) {
-      ($stdout,$stderr)=$handle->cmd("ps -ef",'__display__');
-      if ($stdout=~/nginx/) {
-         my @psinfo=();
-         foreach my $line (split /\n/, $stdout) {
-            next unless -1<index $line, 'nginx';
-            @psinfo=split /\s+/, $line;
-            ($stdout,$stderr)=$handle->cmd($sudo."kill -9 $psinfo[2]");
-         }
-      } else { last }
-   }
+   #my $z=1;
+   #while ($z==1) {
+   #   ($stdout,$stderr)=$handle->cmd("ps -ef",'__display__');
+   #   if ($stdout=~/nginx/) {
+   #      my @psinfo=();
+   #      foreach my $line (split /\n/, $stdout) {
+   #         next unless -1<index $line, 'nginx';
+   #         @psinfo=split /\s+/, $line;
+   #         ($stdout,$stderr)=$handle->cmd($sudo."kill -9 $psinfo[2]");
+   #      } last
+   #   } else { last }
+   #}
+   ($stdout,$stderr)=$handle->cmd($sudo."pkill nginx");
    ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf /usr/local/nginx",'__display__');
    ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
    $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
@@ -755,6 +756,24 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
    # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
+   ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
+   ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
+   $handle->print($sudo.'passwd www-data');
+   my $prompt=$handle->prompt();
+   while (1) {
+      my $output.=fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'New password:') {
+         $handle->print($service_and_cert_password);
+         $output='';
+         next;
+      } elsif (-1<index $output,'Retype new password:') {
+         $handle->print($service_and_cert_password);
+         $output='';
+         next;
+      }
+   }
    my $nginx_path='/etc';
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/deps');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1674,6 +1693,7 @@ END
 ########################################
 END
       print $show;
+      ($stdout,$stderr)=$handle->cwd("~/FullAutoAPI/deps");
       $stdout=$handle->cmd_raw($sudo.
          'perl -MCPAN -e \'CPAN::Shell->get('.
          '"install","autodie")\'',
@@ -1681,10 +1701,10 @@ END
       $stdout=~s/^.*Checksum for (.*autodie.*gz) ok.*$/$1/s;
       my $gzfile=$stdout;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "cp -v $gzfile ~",'__display__');
+         "cp -v $gzfile ~/FullAutoAPI/deps",'__display__');
       $stdout=~/^(.*)\/(.*gz)$/;
       my $modpath=$1;my $modfile=$2;
-      ($stdout,$stderr)=$handle->cmd($sudo.
+      ($stdout,$stderr)=$handle->cmd(
          "tar zxvf $modfile",'__display__');
       ($stdout,$stderr)=$handle->cwd("autodie*");
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1843,9 +1863,6 @@ END
       Math::Random::ISAAC::XS
       HTML::FormHandler
       Crypt::PassGen
-      #EXODIST/Test-Simple-1.001014.tar.gz
-      #Test::Aggregate
-      #Test::Aggregate::Nested
       Catalyst::Controller::HTML::FormFu
       HTML::FormHandler::Model::DBIC
       CatalystX::OAuth2
@@ -1854,6 +1871,11 @@ END
       Catalyst::Model::Adaptor
 
    );
+
+      #EXODIST/Test-Simple-1.001014.tar.gz
+      #Test::Aggregate
+      #Test::Aggregate::Nested
+
 # https://metacpan.org/pod/DBIx::Class::Manual::Cookbook#Predefined-searches
 # # http://ajct.info/2015/08/16/oauth-and-catalyst.html
 # # http://stackoverflow.com/questions/23652166/how-to-generate-oauth-2-client-id-and-secret
@@ -1948,6 +1970,8 @@ END
          my $done=eval {
             local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
             alarm 120;
+            select(undef,undef,undef,0.02);
+            # sleep for 1/50th second;
             my $output=fetch($handle);
             $allout.=$output;
             if ($output=~/$prompt/) {

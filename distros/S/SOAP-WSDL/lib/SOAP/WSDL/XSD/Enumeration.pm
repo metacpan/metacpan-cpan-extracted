@@ -4,7 +4,7 @@ use warnings;
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::Base);
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 #<enumeration value="">
 

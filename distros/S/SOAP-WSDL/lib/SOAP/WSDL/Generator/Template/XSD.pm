@@ -5,7 +5,7 @@ use Class::Std::Fast::Storable;
 use File::Basename;
 use File::Spec;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 use SOAP::WSDL::Generator::Visitor::Typemap;
 use SOAP::WSDL::Generator::Template::Plugin::XSD;

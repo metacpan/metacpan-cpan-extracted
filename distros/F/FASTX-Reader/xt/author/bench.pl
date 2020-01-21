@@ -9,7 +9,7 @@ use FASTX::Reader;
 my $s = "$Bin/../../data/";
 my @files = ("$s/comments.fastq",  "$s/test2.fastq", "$s/test.fastq");
 unshift(@files, @ARGV);
-my $c = 1500;
+my $c = 12000;
 $c /= 100 if ($ARGV[3]);
 foreach my $file (@files) {
 	if (! -e "$file") { say STDERR "Skipping $file"; next; }

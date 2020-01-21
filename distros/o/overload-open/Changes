@@ -1,5 +1,12 @@
 Revision history for overload::open
 
+1.9.3 Jan 21, 2020
+    - Conditionally POPMARK. This fixes FreeBSD 13 running out of memory
+      in t/04
+
+1.9.2 Jan 21, 2020
+    - Remove usage of feature say and // to support older Perl5's
+
 1.9.1 Jan 17, 2020
     - Reduce needed version to 5.4 (though I have not tested it on 5.4)
 

@@ -27,26 +27,26 @@ PidFile logs/httpd.pid
    DocumentRoot b
 </VirtualHost>
 !=
-# $server_root/httpd.conf:1
+# {{$server_root/httpd.conf}}:1
 # Start of file
-# $server_root/httpd.conf:2
+# {{$server_root/httpd.conf}}:2
 ServerRoot "$server_root"
-# $server_root/httpd.conf:3
+# {{$server_root/httpd.conf}}:3
 ServerAdmin foo@example.net
-# $server_root/vhost1.conf:1-4
+# {{$server_root/vhost1.conf}}:1-4
 <VirtualHost *:80>
-# $server_root/vhost1.conf:2
+# {{$server_root/vhost1.conf}}:2
 ServerName foo
-# $server_root/vhost1.conf:3
+# {{$server_root/vhost1.conf}}:3
 DocumentRoot a
 </VirtualHost>
-# $server_root/vhost2.conf:1-4
+# {{$server_root/vhost2.conf}}:1-4
 <VirtualHost *:80>
-# $server_root/vhost2.conf:2
+# {{$server_root/vhost2.conf}}:2
 ServerName bar
-# $server_root/vhost2.conf:3
+# {{$server_root/vhost2.conf}}:3
 DocumentRoot b
 </VirtualHost>
-# $server_root/httpd.conf:6
+# {{$server_root/httpd.conf}}:6
 PidFile logs/httpd.pid
 !$    

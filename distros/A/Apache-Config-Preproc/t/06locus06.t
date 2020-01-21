@@ -61,26 +61,26 @@ LoadModule unixd_module lib/httpd/modules/mod_unixd.so
     MaxRequestsPerChild    0
 </IfModule>
 !=
-# $server_root/httpd.conf:1
+# {{$server_root/httpd.conf}}:1
 LoadModule mpm_prefork_module lib/httpd/modules/mod_mpm_prefork.so
-# $server_root/httpd.conf:2
+# {{$server_root/httpd.conf}}:2
 LoadModule unixd_module lib/httpd/modules/mod_unixd.so
-# $server_root/httpd.conf:3
+# {{$server_root/httpd.conf}}:3
 
-# $server_root/httpd.conf:5
+# {{$server_root/httpd.conf}}:5
 PidFile "/var/run/httpd.pid"
-# $server_root/httpd.conf:8
+# {{$server_root/httpd.conf}}:8
 StartServers 1
-# $server_root/httpd.conf:9
+# {{$server_root/httpd.conf}}:9
 MinSpareServers 1
-# $server_root/httpd.conf:10
+# {{$server_root/httpd.conf}}:10
 MaxSpareServers 1
-# $server_root/httpd.conf:11
+# {{$server_root/httpd.conf}}:11
 MaxClients 10
-# $server_root/httpd.conf:12
+# {{$server_root/httpd.conf}}:12
 MaxRequestsPerChild 0
-# $server_root/httpd.conf:43
+# {{$server_root/httpd.conf}}:43
 User apache
-# $server_root/httpd.conf:44
+# {{$server_root/httpd.conf}}:44
 Group apache
 !$

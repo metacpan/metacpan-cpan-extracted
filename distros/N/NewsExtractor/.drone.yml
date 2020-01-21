@@ -34,6 +34,7 @@ steps:
       - git tag 0.103013
       - dzil install
       - cd ..
+      - rm -rf Software-License-improve-cc0-detection
       - git clean -xdf
       - mbtiny dist
       - ls -l

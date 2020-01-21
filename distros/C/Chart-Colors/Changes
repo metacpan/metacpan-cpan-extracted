@@ -1,0 +1,8 @@
+Revision history for Perl extension Chart::Colors
+
+0.01  Mon, 20 Jan 2020 09:40:08 GMT
+	- original version; created by h2xs 1.23 with options
+		-AX -n Chart::Colors
+
+0.02  Mon, 20 Jan 2020 11:00:15 GMT
+	- fix hex output

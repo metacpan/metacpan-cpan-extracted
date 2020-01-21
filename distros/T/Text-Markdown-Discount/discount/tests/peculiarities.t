@@ -64,13 +64,13 @@ That goes over multiple lines</p>
 
 <h2>AND THEN A HEADER</h2>'
 
-try 'forcing a <br/>' 'this  
-is' '<p>this<br/>
+try 'forcing a <br />' 'this  
+is' '<p>this<br />
 is</p>'
 
 try 'trimming single spaces' 'this ' '<p>this</p>'
-try -fnohtml 'markdown <br/> with -fnohtml' 'foo  
-is'  '<p>foo<br/>
+try -fnohtml 'markdown <br /> with -fnohtml' 'foo  
+is'  '<p>foo<br />
 is</p>'
 
 summary $0

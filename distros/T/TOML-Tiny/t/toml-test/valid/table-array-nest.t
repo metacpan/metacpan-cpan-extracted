@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -10,7 +14,6 @@ binmode STDOUT, ':encoding(UTF-8)';
 my $expected1 = {
                'albums' => [
                              {
-                               'name' => 'Born to Run',
                                'songs' => [
                                             {
                                               'name' => 'Jungleland'
@@ -18,9 +21,11 @@ my $expected1 = {
                                             {
                                               'name' => 'Meeting Across the River'
                                             }
-                                          ]
+                                          ],
+                               'name' => 'Born to Run'
                              },
                              {
+                               'name' => 'Born in the USA',
                                'songs' => [
                                             {
                                               'name' => 'Glory Days'
@@ -28,8 +33,7 @@ my $expected1 = {
                                             {
                                               'name' => 'Dancing in the Dark'
                                             }
-                                          ],
-                               'name' => 'Born in the USA'
+                                          ]
                              }
                            ]
              };

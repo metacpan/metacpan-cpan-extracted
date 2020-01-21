@@ -2,8 +2,8 @@ package FASTX::Reader;
 use 5.014;
 use warnings;
 use Carp qw(confess);
-
-$FASTX::Reader::VERSION = '0.61';
+use Data::Dumper;
+$FASTX::Reader::VERSION = '0.70';
 #ABSTRACT: A lightweight module to parse FASTA and FASTQ files, based on Heng Li's readfq() method, packaged in an object oriented parser.
 
 use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
@@ -13,9 +13,20 @@ sub new {
     # Instantiate object
     my ($class, $args) = @_;
 
+    if (defined $args->{loadseqs}) {
+      if ($args->{loadseqs} eq 'name' or $args->{loadseqs} eq 'names' ) {
+        $args->{loadseqs} = 'name';
+      } elsif ($args->{loadseqs} eq 'seq' or $args->{loadseqs} eq 'seqs' or $args->{loadseqs} == 1) {
+        $args->{loadseqs} = 'seq';
+      } else {
+        confess("attribute <loadseqs> should be 'name' or 'seq' to specify the key of the hash.");
+      }
+    }
     my $self = {
         filename  => $args->{filename},
+        loadseqs  => $args->{loadseqs},
     };
+
 
     my $object = bless $self, $class;
 
@@ -55,6 +66,14 @@ sub new {
       $object->{fh} = $fh;
     } else {
       $self->{fh} = \*STDIN;
+      if ($self->{load}) {
+        confess("Load sequences not supported for STDIN");
+      }
+    }
+
+    if ($self->{loadseqs}) {
+      _load_seqs($self);
+
     }
 
     return $object;
@@ -92,7 +111,7 @@ sub getRead {
   # Comments can have more spaces:    xx
   my ($name, $comm) = /^.(\S+)(?:\s+)(.+)/ ? ($1, $2) :
 	                    /^.(\S+)/ ? ($1, '') : ('', '');
-  
+
   my $seq = '';
   my $c;
   $aux->[0] = undef;
@@ -138,20 +157,20 @@ sub getFastqRead {
   my $seq_object = undef;
 
   return undef if (defined $self->{status} and $self->{status} == 0);
- 
+
   $self->{status} = 1;
   my $header = readline($self->{fh});
   my $seq    = readline($self->{fh});
   my $check  = readline($self->{fh});
   my $qual   = readline($self->{fh});
-  
+
 
   # Check 4 lines were found (FASTQ)
 
   unless (defined $qual) {
     if (defined $header) {
       $self->{message} = "Unknown format: FASTQ truncated at " . $header . "?";
-      $self->{status} = 0;   
+      $self->{status} = 0;
     }
     return undef;
   }
@@ -214,7 +233,22 @@ sub getFileFormat {
     return undef;
   }
 }
+sub _load_seqs {
+  my ($self) = @_;
+  return 0 unless (defined $self->{loadseqs});
 
+  my $seqs = undef;
+  while (my $s = $self->getRead() ) {
+      my ($name, $seq) = ($s->{name}, $s->{seq});
+      if ($self->{loadseqs} eq 'name') {
+        $seqs->{$name} = $seq;
+      } else {
+        $seqs->{$seq} = $name;
+      }
+
+  }
+  $self->{seqs} = $seqs;
+}
 sub _which {
 	return undef if ($^O eq 'MSWin32');
 	my $has_which = eval { require File::Which; File::Which->import(); 1};
@@ -224,7 +258,7 @@ sub _which {
 		}
 	} else {
 		foreach my $cmd (@_) {
-			`which $cmd 2> /dev/null`;
+			`which $cmd  2> /dev/null`;
 			return $cmd if (not $?);
 		}
 	}
@@ -244,7 +278,7 @@ FASTX::Reader - A lightweight module to parse FASTA and FASTQ files, based on He
 
 =head1 VERSION
 
-version 0.61
+version 0.70
 
 =head1 SYNOPSIS
 
@@ -277,6 +311,14 @@ stored as $object->{fh}.
 To read from STDIN either pass C<{{STDIN}}> as filename, or don't pass a filename at all:
 
   my $seq_from_stdin = FASTX::Reader->();
+
+The parameter C<loadseqs> will preload all sequences in a hash having the sequence
+name as key and its sequence as value.
+
+  my $seq_from_file = FASTX::Reader->({
+    filename => "$file",
+    loadseqs => 1,
+  });
 
 =head2 getRead()
 

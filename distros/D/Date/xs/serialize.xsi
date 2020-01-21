@@ -1,4 +1,5 @@
 MODE: INLINE
+#include <cstring>
 
 static inline size_t date_freeze_len (const Date& date) {
     if (date.timezone()->is_local) return sizeof(ptime_t);
@@ -72,45 +73,10 @@ DateRel* DateRel::HOOK_CLONE () {
 }
 
 string DateRel::STORABLE_freeze (bool) {
-    RETVAL = THIS->to_string();
+    RETVAL = THIS->from() ? THIS->to_string(DateRel::Format::iso8601i) : THIS->to_string();
 }
 
 DateRel* STORABLE_attach (SV* CLASS, bool, string_view serialized) {
     RETVAL = new DateRel(serialized);
-    PROTO = CLASS;
-}
-
-MODULE = Date                PACKAGE = Date::Int
-PROTOTYPES: DISABLE
-
-DateInt* DateInt::HOOK_CLONE () {
-    RETVAL = new DateInt(*THIS);
-    PROTO = Object(ST(0)).stash();    
-}
-
-SV* DateInt::STORABLE_freeze (bool) {
-    size_t from_len  = date_freeze_len(THIS->from());
-    size_t total_len = from_len + date_freeze_len(THIS->till()) + 1; // +1 for extra \0 between dates
-    RETVAL = newSV(total_len);
-    SvPOK_on(RETVAL);
-    char* buf = SvPVX(RETVAL);
-    date_freeze(THIS->from(), buf);
-    date_freeze(THIS->till(), buf + from_len + 1);
-    SvCUR_set(RETVAL, total_len);
-}
-
-DateInt* STORABLE_attach (SV* CLASS, bool, SV* serialized) {
-    STRLEN len;
-    const char* str = SvPV(serialized, len);
-    const char* strend = str + len;
-    ptime_t epoch_from, epoch_till;
-    const Timezone* zone_from;
-    const Timezone* zone_till;
-    str = date_thaw(&epoch_from, &zone_from, str, len) + 1;
-    if ((str-1) == strend || str == strend) throw "Date: cannot 'thaw' - corrupted data";
-    date_thaw(&epoch_till, &zone_till, str, strend - str);
-    RETVAL = new DateInt();
-    RETVAL->from().set(epoch_from, zone_from);
-    RETVAL->till().set(epoch_till, zone_till);
     PROTO = CLASS;
 }

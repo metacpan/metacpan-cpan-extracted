@@ -3,9 +3,10 @@ use warnings;
 use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
+use Date;
 
 subtest 'from zero epoch' => sub {
-    my $date = new Date(0);
+    my $date = Date->new(0);
     is $date->epoch, 0;
     is $date->year, 1970;
     is $date->_year, 70;
@@ -26,59 +27,62 @@ subtest 'from zero epoch' => sub {
 };
 
 subtest 'from epoch' => sub {
-    my $date = new Date(1000000000);
+    my $date = Date->new(1000000000);
     is $date->to_string, "2001-09-09 05:46:40";
     is $date, "2001-09-09 05:46:40";
     is "$date", "2001-09-09 05:46:40";
     is $date->_year, 101;
     is $date->yr, 1;
     is $date, $date->to_string;
-    is $date, $date->string;
-    is $date, $date->as_string;
     is $date->to_number, 1000000000;
     is int($date), $date->to_number;
 };
 
 subtest 'from date' => sub {
-    my $date = new Date(new Date(1000000000));
-    is($date->epoch, 1000000000);
+    my $date = Date->new(Date->new(1000000000));
+    is $date->epoch, 1000000000;
 };
 
-subtest 'from aref' => sub {
-    my $date = new Date([2012,02,20,15,16,17]);
+subtest 'from foreign object with stringification' => sub {
+    {
+        package MyDate;
+        use overload '""' => sub { "2666-02-03 04:05:06" };
+    }
+    my $fd = bless {}, 'MyDate';
+    my $date = Date->new($fd);
+    is_deeply [$date->array], [2666, 2, 3, 4, 5, 6];
+};
+
+subtest 'from list' => sub {
+    my $date = Date->new_ymd(2012,02,20,15,16,17);
     is $date, "2012-02-20 15:16:17";
-    $date = new Date([2012,02,20,15,16]);
+    $date = Date->new_ymd(2012,02,20,15,16);
     is $date, "2012-02-20 15:16:00";
-    $date = new Date([2012,02,20,15]);
+    $date = Date->new_ymd(2012,02,20,15);
     is $date, "2012-02-20 15:00:00";
-    $date = new Date([2012,02,20]);
+    $date = Date->new_ymd(2012,02,20);
     is $date, "2012-02-20 00:00:00";
-    $date = new Date([2012,02]);
+    $date = Date->new_ymd(2012,02);
     is $date, "2012-02-01 00:00:00";
-    $date = new Date([2012]);
+    $date = Date->new_ymd(2012);
     is $date, "2012-01-01 00:00:00";
-    $date = new Date([]);
-    is $date, "2000-01-01 00:00:00";
+    $date = Date->new_ymd();
+    is $date, "1970-01-01 00:00:00";
 };
 
-subtest 'from href' => sub {
-    my $date = new Date({year => 2013, month => 06, day => 28, hour => 6, min => 6, sec => 6});
+subtest 'from hash-list' => sub {
+    my $date = Date->new_ymd(year => 2013, month => 06, day => 28, hour => 6, min => 6, sec => 6);
     is $date, "2013-06-28 06:06:06";
-    $date = new Date({month => 06, day => 28, hour => 6, min => 6, sec => 6});
-    is $date, "2000-06-28 06:06:06";
-    $date = new Date({month => 06, hour => 6, min => 6, sec => 6});
-    is $date, "2000-06-01 06:06:06";
-    $date = new Date({month => 06, sec => 6});
-    is $date, "2000-06-01 00:00:06";
-    $date = new Date({});
-    is $date, "2000-01-01 00:00:00";
+    $date = Date->new_ymd(month => 06, day => 28, hour => 6, min => 6, sec => 6);
+    is $date, "1970-06-28 06:06:06";
+    $date = Date->new_ymd(month => 06, hour => 6, min => 6, sec => 6);
+    is $date, "1970-06-01 06:06:06";
+    $date = Date->new_ymd(month => 06, sec => 6);
+    is $date, "1970-06-01 00:00:06";
 };
 
 subtest 'from string' => sub {
-    my $date = Date->new("2006-01-02 15:04");
-    is $date, "2006-01-02 15:04:00";
-
-    $date = Date->new("2013-03-05 23:45:56");
+    my $date = Date->new("2013-03-05 23:45:56");
     is $date->wday, 3;
     is $date->_wday, 2;
     is $date->day_of_week, 3;
@@ -106,23 +110,33 @@ subtest 'from string' => sub {
     ok !$date->isdst;
     ok !$date->daylight_savings;
     is $date->tzabbr, 'EET';
+    
+    subtest 'limit formats' => sub {
+        ok !date("2013-03-05 23:45:56", undef, INPUT_FORMAT_ALL)->error;
+        ok !date("2013-03-05 23:45:56", undef, INPUT_FORMAT_ISO)->error;
+        ok !date("2013-03-05 23:45:56", undef, INPUT_FORMAT_ISO | INPUT_FORMAT_ISO8601)->error;
+        ok date("2013-03-05 23:45:56", undef, INPUT_FORMAT_ISO8601)->error;
+        ok !date("2013-03-05", undef, INPUT_FORMAT_ISO8601)->error;
+        ok !date("2013-03-05", undef, INPUT_FORMAT_ISO)->error;
+    };
 };
 
 subtest 'error' => sub {
-    is(Date->new(+67767976233446399 + 1)->error, E_RANGE);
+    is(Date->new(+67767976233446399 + 1)->error, Date::errc::out_of_range);
+   ok(Date->new(undef)->error); 
 };
 
-subtest "MEIACORE-728 bugfix" => sub {
-    is(Date->new("-567815678-12-27 02:52:56")->iso, "-567815678-12-27 02:52:56");
-    is(Date->new("567815678-12-27 02:52:56")->iso, "+567815678-12-27 02:52:56");
-    is(Date->new("+999999999-12-31 23:59:59")->iso, "+999999999-12-31 23:59:59");
-    like(Date->new("1234567890-12-27 02:52:56")->iso, qr/1970-01-01/);
-    is(Date->new("1234567890-12-27 02:52:56")->error, E_UNPARSABLE);
-    like(Date->new("-1234567890-12-27 02:52:56")->iso, qr/1970-01-01/);
-    is(Date->new("-1234567890-12-27 02:52:56")->error, E_UNPARSABLE);
-    is(Date->new(-1977603371737344898)->error, E_RANGE);
-    is(Date->new(-67768100567884800 - 1)->error, E_RANGE);
-    is(Date->new(+67767976233446399 + 1)->error, E_RANGE);
+subtest64 "MEIACORE-728 bugfix" => sub {
+    is(Date->new("-567815678-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new("567815678-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new("+999999999-12-31 23:59:59")->error, Date::errc::parser_error);
+    is(Date->new("1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new("1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::errc::parser_error);
+    is(Date->new(-1977603371737344898)->error, Date::errc::out_of_range);
+    is(Date->new(-67768100567884800 - 1)->error, Date::errc::out_of_range);
+    is(Date->new(+67767976233446399 + 1)->error, Date::errc::out_of_range);
 };
 
 done_testing();

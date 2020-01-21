@@ -129,7 +129,11 @@ if a signal happens).
 xs {name        => 'Fl::wait',
     definitions => [{
         optional => [['double', 'time']],
-        returns => 'double'}],
+        returns => 'double'
+	},
+	{	required => [['double', 'time']],
+        returns => 'double'},
+	],
     export      => [qw[event]]
 };
 

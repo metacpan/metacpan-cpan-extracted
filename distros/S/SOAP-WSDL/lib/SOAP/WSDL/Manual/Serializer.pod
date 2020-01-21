@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-SOAP::WSDL::Manual::Serializer
+SOAP::WSDL::Manual::Serializer - Serializer classes
 
 =head1 SERIALIZER CLASSES
 
@@ -27,4 +27,4 @@ the same terms as perl itself
 Martin Kutter E<lt>martin.kutter fen-net.deE<gt>
 
 =cut
- 
+

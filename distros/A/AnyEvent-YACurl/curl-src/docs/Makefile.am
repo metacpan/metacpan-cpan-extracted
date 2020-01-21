@@ -52,7 +52,9 @@ EXTRA_DIST =                                    \
  CODE_OF_CONDUCT.md                             \
  CODE_STYLE.md                                  \
  CONTRIBUTE.md                                  \
+ CURL-DISABLE.md                                \
  DEPRECATE.md                                   \
+ ESNI.md                                        \
  EXPERIMENTAL.md                                \
  FAQ                                            \
  FEATURES                                       \

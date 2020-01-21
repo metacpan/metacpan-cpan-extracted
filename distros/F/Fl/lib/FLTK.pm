@@ -2,7 +2,7 @@ package FLTK;
 use strict;
 use warnings;
 use Fl qw[:all];
-our $VERSION = '0.99.14';
+our $VERSION = '0.99.15';
 BEGIN {*FLTK:: = *Fl::}
 1;
 __END__

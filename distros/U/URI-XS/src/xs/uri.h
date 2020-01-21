@@ -31,6 +31,16 @@ namespace xs {
         }
     };
 
+    template <class TYPE>
+    struct Typemap<panda::uri::URISP, panda::iptr<TYPE>> : Typemap<TYPE*> {
+        using Super = Typemap<TYPE*>;
+        static panda::iptr<TYPE> in (const Sv& arg) {
+            if (!arg.defined()) return {};
+            if (!arg.is_object_ref()) return new TYPE(xs::in<panda::string>(arg));
+            return Super::in(arg);
+        }
+    };
+
     template <> struct Typemap<xs::uri::URIx> : Typemap<panda::uri::URI*> {
         static Sv out (xs::uri::URIx var, const Sv& = Sv()) {
             return Typemap<panda::uri::URI*>::out(var, xs::uri::get_perl_class(var));
@@ -45,13 +55,31 @@ namespace xs {
         static panda::string_view package () { return "URI::XS::https"; }
     };
 
-    template <class TYPE> struct Typemap<panda::uri::URI::UserPass*, TYPE> : Typemap<panda::uri::URI*, TYPE> {};
+    template <class TYPE> struct Typemap<panda::uri::URI::ws*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
+        static panda::string_view package () { return "URI::XS::ws"; }
+    };
 
-    template <class TYPE> struct Typemap<panda::uri::URI::ftp*, TYPE> : Typemap<panda::uri::URI::UserPass*, TYPE> {
+    template <class TYPE> struct Typemap<panda::uri::URI::wss*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
+        static panda::string_view package () { return "URI::XS::wss"; }
+    };
+
+    template <class TYPE> struct Typemap<panda::uri::URI::ftp*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
         static panda::string_view package () { return "URI::XS::ftp"; }
     };
 
-    template <class TYPE> struct Typemap<panda::uri::URI::socks*, TYPE> : Typemap<panda::uri::URI::UserPass*, TYPE> {
+    template <class TYPE> struct Typemap<panda::uri::URI::socks*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
         static panda::string_view package () { return "URI::XS::socks"; }
+    };
+
+    template <class TYPE> struct Typemap<panda::uri::URI::ssh*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
+        static panda::string_view package () { return "URI::XS::ssh"; }
+    };
+
+    template <class TYPE> struct Typemap<panda::uri::URI::telnet*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
+        static panda::string_view package () { return "URI::XS::telnet"; }
+    };
+
+    template <class TYPE> struct Typemap<panda::uri::URI::sftp*, TYPE> : Typemap<panda::uri::URI*, TYPE> {
+        static panda::string_view package () { return "URI::XS::sftp"; }
     };
 }

@@ -10,27 +10,27 @@
 /**
  * Create a form. The argument to the form
  * widget defines the structure of the form.
- *     
+ *
  *     [
  *         {
  *           key: 'xyc',             // unique name
- *           label: 'label',    
+ *           label: 'label',
  *           widget: 'text',
  *           cfg: {},                // widget specific configuration
  *           set: {}                 // normal qx porperties to apply
  *          },
  *          ....
  *     ]
- * 
+ *
  * The following widgets are supported: date, text, selectbox
- * 
+ *
  *     text: { },
  *     selectBox: { cfg { structure: [ {key: x, title: y}, ...] } },
  *     date: { },                    // following unix tradition, dates are represented in epoc seconds
  *
  * Populate the new form using the setDate method, providing a map
  * with the required data.
- * 
+ *
  */
 qx.Class.define("callbackery.ui.form.Auto", {
     extend : qx.ui.core.Widget,
@@ -49,11 +49,17 @@ qx.Class.define("callbackery.ui.form.Auto", {
         var formCtrl = new qx.data.controller.Form(null, form);
         this._boxCtrl = {};
         var tm = this._typeMap = {};
-        
+        var that = this;
         structure.forEach(function(s){
-            var note = s.note ? { note: this['tr'](s.note) } : null;
+            var options = {};
+            ['note','copyOnTap'].forEach(function(prop){
+                if (s[prop]){
+                    options[prop] = qx.lang.Type.isString(s[prop]) ?
+                        that['tr'](s[prop]) : s[prop];
+                }
+            });
             if (s.widget == 'header') {
-                form.addGroupHeader(s.label != null ? this['tr'](s.label) : null,note);
+                form.addGroupHeader(s.label != null ? this['tr'](s.label) : null,options);
                 return;
             }
 
@@ -164,9 +170,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 }
                 control.set(s.set);
             }
- 
+
             this._ctrl[s.key] = control;
-            form.add(control, s.label != null ? this['tr'](s.label) : null, null, s.key,null,note);
+            form.add(control, s.label != null ? this['tr'](s.label) : null, null, s.key,null,options);
 
             if (s.widget == 'date') {
                 formCtrl.addBindingOptions(s.key, {
@@ -185,7 +191,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 },
                 {
                     converter : function(data) {
-                        if (qx.lang.Type.isDate(data)) {                        
+                        if (qx.lang.Type.isDate(data)) {
                             var d = new Date(Date.UTC(data.getFullYear(),data.getMonth(),data.getDate(),0,0,0,0));
                             return Math.round(d.getTime()/1000);
                         }
@@ -210,7 +216,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 },
                 {
                     converter : function(data) {
-                        if (qx.lang.Type.isDate(data)) {                        
+                        if (qx.lang.Type.isDate(data)) {
                             return Math.round(data.getTime()/1000);
                         }
 

@@ -1243,7 +1243,7 @@ text(MMIOT *f)
 	switch (c) {
 	case 0:     break;
 
-	case 3:     Qstring(tag_text(f) ? "  " : "<br/>", f);
+	case 3:     Qstring(tag_text(f) ? "  " : "<br />", f);
 		    break;
 
 	case '>':   if ( tag_text(f) )

@@ -9,7 +9,7 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.4';
+our $VERSION = '1.3.5';
 our @ISA     = qw(Apache::Session);
 
 our $redis = $Apache::Session::Browseable::Store::Redis::redis;
@@ -159,6 +159,9 @@ Apache::Session::Redis
   my $args = {
        server => '127.0.0.1:6379',
 
+       # Select database (optional)
+       #database => 0,
+
        # Choose your browseable fileds
        Index          => 'uid mail',
   };
@@ -181,14 +184,15 @@ Apache::Session::Redis
 
   # 2) Parse all sessions
   # a. get all sessions
-  my $hash = Apache::Session::Browseable::Redis->get_key_from_all_sessions();
+  my $hash = Apache::Session::Browseable::Redis->get_key_from_all_sessions($args);
 
   # b. get some fields from all sessions
-  my $hash = Apache::Session::Browseable::Redis->get_key_from_all_sessions('uid', 'mail')
+  my $hash = Apache::Session::Browseable::Redis->get_key_from_all_sessions($args, 'uid', 'mail')
 
   # c. execute something with datas from each session :
   #    Example : get uid and mail if mail domain is
   my $hash = Apache::Session::Browseable::Redis->get_key_from_all_sessions(
+              $args,
               sub {
                  my ( $session, $id ) = @_;
                  if ( $session->{mail} =~ /mydomain.com$/ ) {

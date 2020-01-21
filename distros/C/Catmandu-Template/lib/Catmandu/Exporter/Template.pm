@@ -8,7 +8,7 @@ use Storable qw(freeze);
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 with 'Catmandu::Exporter';
 
@@ -39,10 +39,10 @@ my $OWN_OPTS = {
 has xml             => (is => 'ro');
 has template_before => (is => 'ro', coerce => $ADD_TT_EXT);
 has template        => (is => 'ro', coerce => $ADD_TT_EXT, required => 1);
-has template_after => (is => 'ro',   coerce   => $ADD_TT_EXT);
-has _tt_opts       => (is => 'lazy', init_arg => undef);
-has _tt            => (is => 'lazy', init_arg => undef);
-has _before_done   => (is => 'rw', init_arg => undef);
+has template_after  => (is => 'ro', coerce => $ADD_TT_EXT);
+has _tt_opts        => (is => 'lazy', init_arg => undef);
+has _tt             => (is => 'lazy', init_arg => undef);
+has _before_done    => (is => 'rw', init_arg => undef);
 
 sub BUILD {
     my ($self, $opts) = @_;
@@ -78,7 +78,7 @@ sub _build__tt {
     $vars->{_root}   = Catmandu->root;
     $vars->{_config} = Catmandu->config;
     local $Template::Stash::PRIVATE = 0;
-    $TT_INSTANCES->{$instance_key} = Template->new(%$opts);
+    $TT_INSTANCES->{$instance_key} = Template->new({%$opts});
 }
 
 sub _process {
@@ -102,6 +102,11 @@ sub add {
 
 sub commit {
     my ($self) = @_;
+    unless ($self->_before_done) {
+        $self->fh->print($XML_DECLARATION) if $self->xml;
+        $self->_process($self->template_before) if $self->template_before;
+        $self->_before_done(1);
+    }
     $self->_process($self->template_after) if $self->template_after;
 }
 

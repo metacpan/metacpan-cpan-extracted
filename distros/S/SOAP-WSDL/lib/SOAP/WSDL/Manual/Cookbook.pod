@@ -101,7 +101,7 @@ you should see at least two lines containing something like
 If you're talking to a Server using NTLMv2 exclusively, you will only the first line 
 in the debug output, and then an error.
 
-To explicitely enable NTLMv2, do the following in your client:
+To explicitly enable NTLMv2, do the following in your client:
 
  use Authen::NTLM;
  ntlmv2(1);
@@ -117,7 +117,7 @@ need to set up GSSAPI to perform the Kerberos authentication, though. How to do
 this is implementation specific (MIT or Heimdahl). See your Kerberos/GSSAPI 
 documentation for details.
 
-(Newer) Windows Web Services usually allow to use both the Negotiate (Kerberos) 
+(Newer) Windows Web Services usually allow one to use both the Negotiate (Kerberos)
 and NTLM authentication scheme. 
 
 =head3 Accessing HTTPS webservices protected by certificate authentication
@@ -156,7 +156,7 @@ Instead, it requires this:
 
 How do I do this using SOAP::WSDL?
 
-A: The following steps are neccessary to achieve this result:
+A: The following steps are necessary to achieve this result:
 
 First, you would need to write a new serializer, which is quite easy, as it
 just creates the envelope and calls ->serialize_qualified() on $header and
@@ -214,7 +214,7 @@ Example: The generated SOAP client is assumed to be "MyInterface::Test".
 
 =head2 Disabling strict XML processing in a CGI based server
 
-You have to set the deserializer in the transport class explicitely to
+You have to set the deserializer in the transport class explicitly to
 a L<SOAP::WSDL::Deserializer|SOAP::WSDL::Deserializer> object with the
 C<strict> option set to 0.
 

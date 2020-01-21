@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -13,9 +17,6 @@ my $expected1 = {
                               bless( {
                                        'name' => '<Custom Code>',
                                        'operator' => 'CODE(...)',
-                                       '_lines' => [
-                                                     6
-                                                   ],
                                        'code' => sub {
                                                      BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                      use strict;
@@ -24,14 +25,14 @@ my $expected1 = {
                                                      require Math::BigInt;
                                                      'Math::BigInt'->new('1')->beq($_);
                                                  },
-                                       '_file' => '(eval 362)'
+                                       '_file' => '(eval 362)',
+                                       '_lines' => [
+                                                     6
+                                                   ]
                                      }, 'Test2::Compare::Custom' ),
                               bless( {
                                        'name' => '<Custom Code>',
                                        'operator' => 'CODE(...)',
-                                       '_lines' => [
-                                                     6
-                                                   ],
                                        'code' => sub {
                                                      BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                      use strict;
@@ -40,7 +41,10 @@ my $expected1 = {
                                                      require Math::BigInt;
                                                      'Math::BigInt'->new('2')->beq($_);
                                                  },
-                                       '_file' => '(eval 363)'
+                                       '_file' => '(eval 363)',
+                                       '_lines' => [
+                                                     6
+                                                   ]
                                      }, 'Test2::Compare::Custom' )
                             ],
                             [
@@ -49,12 +53,8 @@ my $expected1 = {
                             ],
                             [
                               bless( {
-                                       '_file' => '(eval 364)',
                                        'name' => '<Custom Code>',
                                        'operator' => 'CODE(...)',
-                                       '_lines' => [
-                                                     6
-                                                   ],
                                        'code' => sub {
                                                      BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                      use strict;
@@ -62,9 +62,17 @@ my $expected1 = {
                                                      use feature ':5.16';
                                                      require Math::BigFloat;
                                                      'Math::BigFloat'->new('1.1')->beq($_);
-                                                 }
+                                                 },
+                                       '_file' => '(eval 364)',
+                                       '_lines' => [
+                                                     6
+                                                   ]
                                      }, 'Test2::Compare::Custom' ),
                               bless( {
+                                       '_lines' => [
+                                                     6
+                                                   ],
+                                       '_file' => '(eval 365)',
                                        'code' => sub {
                                                      BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                      use strict;
@@ -73,12 +81,8 @@ my $expected1 = {
                                                      require Math::BigFloat;
                                                      'Math::BigFloat'->new('2.1')->beq($_);
                                                  },
-                                       '_lines' => [
-                                                     6
-                                                   ],
-                                       'operator' => 'CODE(...)',
                                        'name' => '<Custom Code>',
-                                       '_file' => '(eval 365)'
+                                       'operator' => 'CODE(...)'
                                      }, 'Test2::Compare::Custom' )
                             ]
                           ]

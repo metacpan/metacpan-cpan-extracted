@@ -1,0 +1,83 @@
+=head1 NAME
+
+Font::Fontconfig - An Object Oriented interface to fontconfig
+
+
+
+=head1 SYNOPSIS
+
+    use Font::Fontconfig;
+    
+    # list all 'Avinir Next' patterns and print their styles
+    #
+    my @patterns = Font::Fontconfig->list('Avenir Next');
+    
+    say $_->{style} foreach @patterns;
+    #
+    # Regular
+    # Demi Bold,Regular
+    # Heavy Italic,Italic
+    # Heavy,Regular
+    # ...
+    
+    
+    # look for "CURVED STEM PARAGRAPH SIGN ORNAMENT"
+    #
+    my $unicode_pattern = last {
+        $_->contains_codepoint( hex '2761' )
+    } @patterns;
+    
+    say $unicode_pattern->{family}
+    #
+    # 'Zapf Dingbats'
+
+
+
+=head1 DESCRIPTION
+
+Font::Fontconfig is a wrapper around C<fontconfig> routines, like C<fc-list> and
+... .
+
+
+
+=head1 CLASS METHODS
+
+
+
+=head2 list
+
+    my @patterns = Font::Fontconfig->list( $Family );
+
+Returns a list of L<Font::Fontconfig::Pattern>s that match the search criteria,
+or all installed ones if no criteria are given
+
+
+
+=head2 match
+
+B<NOT IMPLEMENTED>
+
+The usefulness of C<fc-match> is not clear
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Font::Fontconfig' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

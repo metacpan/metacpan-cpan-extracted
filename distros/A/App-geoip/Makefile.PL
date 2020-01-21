@@ -3,6 +3,8 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+-f "lib/App/geoip.pm" or system $^X, "./2lib";
+
 my %wmf = (
     NAME               => "App::geoip",
     DISTNAME           => "App-geoip",
@@ -10,7 +12,7 @@ my %wmf = (
     AUTHOR             => "H.Merijn Brand",
     EXE_FILES          => [ "geoip" ],
     VERSION_FROM       => "lib/App/geoip.pm",
-    MIN_PERL_VERSION   => "5.014000",
+    MIN_PERL_VERSION   => "5.14",
     PREREQ_PM          => {
 	"DBI"			=> 0,
 	"Socket"		=> 0,

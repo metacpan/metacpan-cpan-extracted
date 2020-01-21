@@ -14,7 +14,7 @@ use Encode qw(encode);
 use File::Codeowners;
 use Path::Tiny;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 sub main {
@@ -177,7 +177,7 @@ sub _command_update {
         my $template = <<'END';
  This file shows mappings between subdirs/files and the individuals and
  teams who own them. You can read this file yourself or use tools to query it,
- so you can quickly determine who to speak with or send pull requests to. ❤️
+ so you can quickly determine who to speak with or send pull requests to.
 
  Simply write a gitignore pattern followed by one or more names/emails/groups.
  Examples:
@@ -218,7 +218,7 @@ App::Codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 DESCRIPTION
 

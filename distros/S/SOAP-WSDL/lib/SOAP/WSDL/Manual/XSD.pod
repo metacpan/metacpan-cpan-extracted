@@ -316,7 +316,7 @@ element or type name in XML schemas - the XML standard bans the use of names
 starting with "xml" (case-insensitive).
 
 All XML attributes for a XML element are set- and retrievable via the method
-C<attr>. The name is chosen to allow mimicing SOAP::Lite's behaviour, which
+C<attr>. The name is chosen to allow mimicking SOAP::Lite's behaviour, which
 allows setting a SOAP::Data object's attributes via C<attr>.
 
  my $attrSet = $obj->attr();
@@ -424,7 +424,7 @@ effect yet.
 
 =item * fractionDigits
 
-=item * lenght
+=item * length
 
 =item * maxExclusive
 

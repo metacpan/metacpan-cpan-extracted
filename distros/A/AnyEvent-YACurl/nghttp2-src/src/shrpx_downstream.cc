@@ -144,7 +144,8 @@ Downstream::Downstream(Upstream *upstream, MemchunkPool *mcpool,
       request_header_sent_(false),
       accesslog_written_(false),
       new_affinity_cookie_(false),
-      blocked_request_data_eof_(false) {
+      blocked_request_data_eof_(false),
+      expect_100_continue_(false) {
 
   auto &timeoutconf = get_config()->http2.timeout;
 
@@ -192,7 +193,7 @@ Downstream::~Downstream() {
   if (dconn_) {
     const auto &group = dconn_->get_downstream_addr_group();
     if (group) {
-      const auto &mruby_ctx = group->mruby_ctx;
+      const auto &mruby_ctx = group->shared_addr->mruby_ctx;
       mruby_ctx->delete_downstream(this);
     }
   }
@@ -230,7 +231,7 @@ void Downstream::detach_downstream_connection() {
 #ifdef HAVE_MRUBY
   const auto &group = dconn_->get_downstream_addr_group();
   if (group) {
-    const auto &mruby_ctx = group->mruby_ctx;
+    const auto &mruby_ctx = group->shared_addr->mruby_ctx;
     mruby_ctx->delete_downstream(this);
   }
 #endif // HAVE_MRUBY
@@ -255,7 +256,7 @@ std::unique_ptr<DownstreamConnection> Downstream::pop_downstream_connection() {
 
   const auto &group = dconn_->get_downstream_addr_group();
   if (group) {
-    const auto &mruby_ctx = group->mruby_ctx;
+    const auto &mruby_ctx = group->shared_addr->mruby_ctx;
     mruby_ctx->delete_downstream(this);
   }
 #endif // HAVE_MRUBY
@@ -857,6 +858,11 @@ void Downstream::inspect_http1_request() {
       chunked_request_ = true;
     }
   }
+
+  auto expect = req_.fs.header(http2::HD_EXPECT);
+  expect_100_continue_ =
+      expect &&
+      util::strieq(expect->value, StringRef::from_lit("100-continue"));
 }
 
 void Downstream::inspect_http1_response() {
@@ -1158,5 +1164,9 @@ void Downstream::set_blocked_request_data_eof(bool f) {
 }
 
 void Downstream::set_ws_key(const StringRef &key) { ws_key_ = key; }
+
+bool Downstream::get_expect_100_continue() const {
+  return expect_100_continue_;
+}
 
 } // namespace shrpx

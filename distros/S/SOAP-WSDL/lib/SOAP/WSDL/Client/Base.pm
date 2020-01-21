@@ -4,7 +4,7 @@ use warnings;
 use base 'SOAP::WSDL::Client';
 use Scalar::Util qw(blessed);
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 sub call {
     my ($self, $method, $body, $header) = @_;

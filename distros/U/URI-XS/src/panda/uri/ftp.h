@@ -3,11 +3,16 @@
 
 namespace panda { namespace uri {
 
-class URI::ftp : public UserPass {
-public:
-    ftp () : Strict() {}
-    ftp (const string& source, int flags = 0) : Strict(source, flags) { strict_scheme(); }
-    ftp (const URI& source)                   : Strict(source)        { strict_scheme(); }
+struct URI::ftp : Strict<URI::ftp> {
+    using Strict<URI::ftp>::Strict;
+
+    static string default_scheme () { return "ftp"; }
+};
+
+struct URI::sftp : Strict<URI::sftp> {
+    using Strict<URI::sftp>::Strict;
+
+    static string default_scheme () { return "sftp"; }
 };
 
 }}

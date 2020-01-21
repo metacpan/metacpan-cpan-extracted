@@ -1,0 +1,6 @@
+0.01 2020-01-21T04:40:00Z
+    - First release.
+    
+0.02 2020-01-21T05:17:00Z
+    - Removed method new.
+    - Removed $self from methods

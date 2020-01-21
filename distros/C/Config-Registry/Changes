@@ -1,5 +1,10 @@
 Revision history for Perl extension Config-Registry.
 
+0.02 2020-01-20T19:30:15Z
+
+ - Stop using Hash::Merge since when it uses Storable for cloning it
+   fails on objects.
+
 0.01 2020-01-19T15:53:56Z
 
  - First release.

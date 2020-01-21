@@ -2,3 +2,6 @@ name = "Catalyst-Model-Curio"
 authority="cpan:BLUEFEET"
 markdown_maker = "Pod::Markdown::Github"
 license = "gpl_3"
+
+[Metadata]
+x_deprecated = 1

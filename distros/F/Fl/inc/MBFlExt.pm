@@ -103,7 +103,19 @@ package inc::MBFlExt;
                 sub export_constant { $exports{+pop}          = pop; }
                 sub include         { $includes{+pop}++; }
                 sub widget_type     { $xsubs[-1]{widget_type} = shift; }
+				sub disabled 		{ delete $xsubs[-1]; }
                 #
+
+
+				@pod = sort grep {
+					$_ !~ m[HtmlView]i
+				} @pod;
+
+
+				#use Data::Dump;
+				#ddx \@pod;
+				#die;
+
                 require $_ for @pod;
                 *isa = $isa;
                 open my $in, '<', 'xs/Fl_cxx.template';
@@ -112,13 +124,18 @@ package inc::MBFlExt;
                 my $template = Template::Liquid->parse($raw);
                 open(my $fh, '>', 'xs/Fl.cxx') || die $!;
                 #
+
+
                 my $output =
                     $template->render(xsubs    => \@xsubs,
                                       exports  => \%exports,
                                       includes => \%includes
                     );
+
+
                 syswrite $fh, $output;
                 close $fh;
+
                 $self->add_to_cleanup('xs/Fl.cxx');
                 print 'okay (' . length($output) . " bytes)\n";
             }

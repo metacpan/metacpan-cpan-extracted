@@ -93,20 +93,28 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
     if ( 0 < CvDEPTH( code_hook ) ) {
         return real_pp_func(aTHXR);
     }
+    SV **sp = PL_stack_sp;
+    /* DON'T call dMARK... it has unintended side effects.
+     * it actually calls POPMARK! sad! This causes total breakage everywhere */
+
+    /* This is copied from pp_ctl.c It fixes things on freebsd 13, and also
+     * under certain circumstances under Linux. I don't know why it's actually
+     * needed. But apparently you need to POPMARK but only in certain cases */
+    if (PL_markstack_ptr[-1] > TOPMARK) {
+        POPMARK;
+    }
+    /* Initialize mark ourselves. (removed for now, but in case we need mark again
+     * I am leaving this part in */
+    /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
+    ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
     ENTER;
         /* Save the temporaries stack */
         SAVETMPS;
             /* sp (stack pointer) is used by some macros we call below. mysp is *ours* */
-            SV **sp = PL_stack_sp;
             /* Save the stack pointer location */
             SV **mysp = PL_stack_sp;
             /*assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow"); */
-            /* DON'T call dMARK... it has unintended side effects.
-             * it actually calls POPMARK! sad! */
-            /* Initialize mark ourselves instead. */
-            /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
             /* Save the number of items (number of arguments) */
-            ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
             if (myitems < 0)
                 DIE(aTHXR_ "panic: overload::open internal error. This should not happen.");
 

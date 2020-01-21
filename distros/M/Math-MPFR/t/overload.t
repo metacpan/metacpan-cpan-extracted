@@ -939,7 +939,7 @@ $ok = '';
 
 my $nan = Math::MPFR->new();
 
-$ok .= 'a' if lc(Math::MPFR::overload_string($nan, 10, 0, GMP_RNDN)) eq '@nan@';
+$ok .= 'a' if lc(Math::MPFR::overload_string($nan, 10, 0, GMP_RNDN)) eq 'nan';
 
 my ($man, $exp) = Rmpfr_deref2($nan, 10, 0, GMP_RNDN);
 
@@ -951,23 +951,23 @@ my $zero = Math::MPFR->new(0);
 my $minus_zero = Math::MPFR->new(-0.0);
 
 my $inf = $one / $zero;
-$ok .= 'c' if lc(Math::MPFR::overload_string($inf)) eq '@inf@';
+$ok .= 'c' if lc(Math::MPFR::overload_string($inf)) eq 'inf';
 
 $inf = $minus_one / $minus_zero;
-$ok .= 'd' if lc(Math::MPFR::overload_string($inf)) eq '@inf@';
+$ok .= 'd' if lc(Math::MPFR::overload_string($inf)) eq 'inf';
 
 $inf = $one / $minus_zero;
-$ok .= 'e' if lc(Math::MPFR::overload_string($inf)) eq '-@inf@';
+$ok .= 'e' if lc(Math::MPFR::overload_string($inf)) eq '-inf';
 
 $inf = $minus_one / $zero;
-$ok .= 'f' if lc(Math::MPFR::overload_string($inf)) eq '-@inf@';
+$ok .= 'f' if lc(Math::MPFR::overload_string($inf)) eq '-inf';
 
 $ok .= 'g' if Math::MPFR::overload_string($zero) eq '0';
 $ok .= 'h' if Math::MPFR::overload_string($minus_zero) eq '-0';
 
 my $minus_zero2 = Math::MPFR->new(-0);
 $ok .= 'i' if Math::MPFR::overload_string($minus_zero2) eq '0';
-$ok .= 'j' if lc(Math::MPFR::overload_string($zero / $minus_zero)) eq '@nan@';
+$ok .= 'j' if lc(Math::MPFR::overload_string($zero / $minus_zero)) eq 'nan';
 
 if($ok eq 'abcdefghij') {print "ok 55\n"}
 else {print "not ok 55 $ok\n"}

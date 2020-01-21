@@ -35,6 +35,10 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
      Else returns false - which implies that either perl or C is buggy
      in its assignment of that value. (Or they could both be buggy.)
 
+     When is_eq() returns false, the 2 differing values are by
+     default printed to STDOUT (in hex). To disable this behaviour
+     set $Math::NV::no_warn to 2.
+
    $ternary = is_inexact($str); # requires mpfr-3.1.6
      If $ternary is 0, then the value specified by $str is exactly
      representable by an NV.
@@ -49,8 +53,12 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
      Returns true if the value perl assigns from the string $str is
      equal to the value mpfr assigns from the same string. If the
-     string represents a subnormal value we first subnormalize the
-     mpfr value before comparing the two values.
+     string represents a subnormal value then the mpfr value is
+     subnormalised before the comparison is made.
+
+     When is_eq_mpfr() returns false, the 2 differing values are by
+     default printed to STDOUT (in hex). To disable this behaviour
+     set $Math::NV::no_warn to 2.
 
 
    $nv = nv($str);        # scalar context
@@ -84,19 +92,18 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
    $hex = nv_mpfr($str, [$bits]); # Returns a hex dump of the NV,
                                   # not the actual NV.
 
-    (Again, values will be subnormalized if appropriate.)
+    Again, values will be subnormalized if appropriate.
     If $bits is not specified, it will be set to the value returned by
     mant_dig() - which is the appropriate value for the current perl
     that is being run.
     Valid values for $bits are 53 (double), 64 (80-bit extended
-    precision long double), 106 (double-double) and 113 (128-bit quad
-    long double or __float128). Other values will cause an error.
-    If $bits is set to 113, the string will be treated as a 128-bit
-    IEEE 754 long double iff $Math::MPFR::VERSION >= 3.33 &&
-    $Config{longdblkind} is either 1 or 2. Otherwise the value of 113
-    will be taken to indicate __float128, though this is not
-    necessarily correct when $Math::MPFR::VERSION is less than 3.33 or
-    the version of perl itself is less than 5.22.
+    precision long double), 113 (128-bit quad long double or __float128).
+    To signify the double-double type, set $bits to either 106 or 2098.
+    (While the double-double has only 106 mantissa bits, it can
+    encapsulate precisions up to 2098 bits for some values. It makes no
+    difference whether you specify 106 or 2098 - just go with the number
+    you consider to be the more appropriate or easiest to memorise.)
+    Any values other than 53, 64, 106, 113, or 2098 will cause an error.
 
     Uses the mpfr library to assign the value represented by $str as a
     double or long double or double-double or __float128 (as determined
@@ -104,10 +111,9 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     make up that C data type.
 
     For example, nv_mpfr('1e+127', 53) returns 5a4d8ba7f519c84f.
-    This is the same as should be returned by
+    This is the same as will be returned by
     scalar(reverse(unpack("h*", pack("d<", 1e+127))))
-    except that, on my Windows machine, it returns 5a4d8ba7f519c851 .
-    (Yes, perl's assignment of that value is out by 2 ULP's.)
+    if the assignment of 1e+127 to a double has been done correctly.
 
     For the double-double, the returned scalar is a reference to a list
     that contains 2 elements - the hex dump of the most significant
@@ -148,7 +154,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     it can be either 64 (extended precision long double), 113 (quad
     long double) or 106 (IBM double-double).
     For nv_type() of '__float128', mant_dig() will return 113.
-    This module accommodates no other than those 4 values.
+    This function returns no other than one of those 4 values.
     IOW, expect mant_dig() to return the value of the float.h macro
     DBL_MANT_DIG, LDBL_MANT_DIG, or FLT128_MANT_DIG depending upon
     whichever is appropriate for perl's configuration.
@@ -162,25 +168,26 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     $mantissa is the mantissa (significand).
     $exponent is the exponent.
     $precision is the precision (in bits) of the mantissa - trailing
-    zero bits are not counted.
+    zero bits are not counted. For example:
+
+      @x = ld2binary(2 ** 45);
+      will, upon investigation of the contents of @x, reveal that the
+      mantissa is 0.1, the exponent is 46, and the precision is 1.
 
 
    ($mantissa, $exponent, $precision) = ld_str2binary($str);
 
-    Uses code taken from tests/tset_ld.c in the mpfr library source
-    and returns a base 2 representation of the value of the NV
-    represented by the string $str - irrespective of whether the NV
-    type ($Config{nvtype}) is double, long double or __float128.
-    $mantissa is the mantissa (significand).
-    $exponent is the exponent.
-    $precision is the precision (in bits) of the mantissa - trailing
-    zero bits are not counted.
+    As for ld2binary, except that the argument is a string, not an NV:
+
+      @x = ld_str2binary('35184372088832');
+           produces same result as doing:
+      @x = ld2binary(2 ** 45);
 
    $nv = bin2val($mantissa, $exponent, $precision);
 
     Takes the return values of ld_str2binary() or ld2binary() and
-    returns the original NV. (Probably doesn't work if the original
-    NV is an inf or a nan.)
+    returns the original NV. (Doesn't work if the original NV is an inf
+    or a nan.)
 
    Cprintf($fmt, $nv);
     Uses C's printf() function to format the NV $nv, according to the
@@ -200,8 +207,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     Initially set to 0 - which means that if either nv(), nv_mpfr(),
     is_eq() or is_eq_mpfr() are handed an argument that is not a string,
     then a warning will be emitted.
-    To disable this warning, simply assign 1 (or any other true numeric
-    value) to this variable.
+    To disable this warning, simply set this variable to 1.
     Set to 2 to disable output of the 2 non-matching values when is_eq()
     or is_eq_mpfr() return false.
     Set to 3 to disable both of the above warnings.
@@ -210,7 +216,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
    This program is free software; you may redistribute it and/or modify
    it under the same terms as Perl itself.
-   Copyright 2013-16, 2018-19 Sisyphus
+   Copyright 2013-16, 2018-20 Sisyphus
 
 
 =head1 AUTHOR

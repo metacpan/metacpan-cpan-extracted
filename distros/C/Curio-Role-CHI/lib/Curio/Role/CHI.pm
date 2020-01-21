@@ -1,5 +1,5 @@
 package Curio::Role::CHI;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use CHI;
 use Scalar::Util qw( blessed );
@@ -53,7 +53,7 @@ __END__
 
 =head1 NAME
 
-Curio::Role::CHI - Build Curio classes around CHI.
+Curio::Role::CHI - Build Curio classes around CHI. (DEPRECATED)
 
 =head1 SYNOPSIS
 

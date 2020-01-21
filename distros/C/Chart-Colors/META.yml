@@ -1,0 +1,21 @@
+---
+abstract: 'Perl extension to return an endless stream of new distinct RGB colours codes (good for coloring any number of chart lines)'
+author:
+  - 'Chris Drake<cdrake@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chart-Colors
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '1.02'

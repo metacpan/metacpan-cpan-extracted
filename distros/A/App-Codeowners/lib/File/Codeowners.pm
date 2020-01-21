@@ -10,7 +10,7 @@ use Path::Tiny 0.089;
 use Scalar::Util qw(openhandle);
 use Text::Gitignore qw(build_gitignore_matcher);
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_); }
 sub _usage { _croak("Usage: @_\n") }
@@ -65,11 +65,13 @@ sub parse_from_fh {
         }
         elsif ($line =~ /^\h*#(.*)/) {
             my $comment = $1;
+            my $project;
             if ($comment =~ /^\h*Project:\h*(.+?)\h*$/i) {
-                $current_project = $1 || undef;
+                $project = $current_project = $1 || undef;
             }
             $lines[$lineno] = {
                 comment => $comment,
+                $project ? (project => $project) : (),
             };
         }
         elsif ($line =~ /^\h*$/) {
@@ -278,11 +280,60 @@ sub update_owners {
 
     $self->_clear;
 
+    my $count = 0;
+
     for my $line (@{$self->_lines}) {
         next if !$line->{pattern};
         next if $pattern ne $line->{pattern};
         $line->{owners} = [@$owners];
+        ++$count;
     }
+
+    return $count;
+}
+
+
+sub update_owners_by_project {
+    my $self    = shift;
+    my $project = shift;
+    my $owners  = shift;
+    $project && $owners or _usage(q{$codeowners->update_owners_by_project($project => \@owners)});
+
+    $owners = [$owners] if ref($owners) ne 'ARRAY';
+
+    $self->_clear;
+
+    my $count = 0;
+
+    for my $line (@{$self->_lines}) {
+        next if !$line->{project} || !$line->{owners};
+        next if $project ne $line->{project};
+        $line->{owners} = [@$owners];
+        ++$count;
+    }
+
+    return $count;
+}
+
+
+sub rename_project {
+    my $self        = shift;
+    my $old_project = shift;
+    my $new_project = shift;
+    $old_project && $new_project or _usage(q{$codeowners->rename_project($project => $new_project)});
+
+    $self->_clear;
+
+    my $count = 0;
+
+    for my $line (@{$self->_lines}) {
+        next if !exists $line->{project} || $old_project ne $line->{project};
+        $line->{project} = $new_project;
+        $line->{comment} = " Project: $new_project" if exists $line->{comment};
+        ++$count;
+    }
+
+    return $count;
 }
 
 
@@ -354,7 +405,7 @@ File::Codeowners - Read and write CODEOWNERS files
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 METHODS
 
@@ -465,6 +516,22 @@ Set a new set of owners for a given pattern. If for some reason the file has
 multiple such patterns, they will all be updated.
 
 Nothing happens if the file does not already have at least one such pattern.
+
+=head2 update_owners_by_project
+
+    $codeowners->update_owners_by_project($project => \@new_owners);
+
+Set a new set of owners for all patterns under the given project.
+
+Nothing happens if the file does not have a project with the given name.
+
+=head2 rename_project
+
+    $codeowners->rename_project($old_name => $new_name);
+
+Rename a project.
+
+Nothing happens if the file does not have a project with the old name.
 
 =head2 append
 

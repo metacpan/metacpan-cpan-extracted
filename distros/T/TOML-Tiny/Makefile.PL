@@ -19,7 +19,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::Dumper" => 0,
-    "DateTime::Format::RFC3339" => 0,
     "Exporter" => 0,
     "Scalar::Util" => "1.14"
   },
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t t/toml-test/invalid/*.t t/toml-test/valid/*.t"
   }

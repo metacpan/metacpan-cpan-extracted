@@ -5,11 +5,22 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use 5.010;
 
+# With mpfr-3.1.5 and earlier, the ternary value returned
+# by mpfr_strtofr is unreliable - thereby making that function
+# unusable with mpfr_subnormalize.
+use constant MPFR_STRTOFR_BUG => MPFR_VERSION() <= 196869        ? 1 : 0;
+
+# check for presence of mpfr bug in handling of long doubles.
+use constant LD_SUBNORMAL_BUG => Math::MPFR::_ld_subnormal_bug() ? 1 : 0;
+
+# Math::MPFR::bytes semantics changed in Math-MPFR-4.13
+use constant OLD_MATH_MPFR    => $Math::MPFR::VERSION < 4.13     ? 1 : 0;
+
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '2.02';
+$Math::NV::VERSION = '2.03';
 
 DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 
@@ -18,12 +29,14 @@ DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
     set_C set_mpfr is_inexact
+    MPFR_STRTOFR_BUG LD_SUBNORMAL_BUG
     );
 
 %Math::NV::EXPORT_TAGS = (all => [qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
     set_C set_mpfr is_inexact
+    MPFR_STRTOFR_BUG LD_SUBNORMAL_BUG
     )]);
 
 if($Math::MPFR::VERSION < 4.07) {
@@ -77,18 +90,6 @@ if($Math::MPFR::VERSION < 4.07) {
                            '106MIN' => $Math::NV::DBL_DENORM_MIN_MIN,
                            '113MIN' => $Math::NV::FLT128_DENORM_MIN_MIN,
                            );
-
-if(Math::MPFR::_ld_subnormal_bug()) {
-  $Math::NV::_ld_subnormal_bug = 1;
-}
-else {
-  $Math::NV::_ld_subnormal_bug = 0;
-}
-
-# With mpfr-3.1.5 and earlier, the ternary value returned
-# by mpfr_strtofr is unreliable - thereby making that function
-# unusable with mpfr_subnormalize.
-$Math::NV::mpfr_strtofr_bug = MPFR_VERSION() <= 196869 ? 1 : 0;
 
 $Math::NV::no_warn = 0; # set to 1 to disable warning about non-string argument
                         # set to 2 to disable output of the 2 non-matching values
@@ -204,7 +205,7 @@ sub is_eq_mpfr {
     $fr = Rmpfr_init2($bits);
     my $inex = Rmpfr_strtofr($fr, $nv, 0, 0);
 
-    unless($Math::NV::mpfr_strtofr_bug) {
+    unless(MPFR_STRTOFR_BUG) {
       $fr = _subnormalize($_[0], $bits);
     }
     else {
@@ -259,11 +260,12 @@ sub nv_mpfr {
 
   $bits = defined($_[1]) ? $_[1] : mant_dig();
 
-  return _double_double($_[0]) if $bits == 106; # doubledouble
+  # Accept $bits values of either 2098 or 106 as indicating double-double.
+  return _double_double($_[0]) if $bits == 106 || $bits == 2098;
 
   if($bits == mant_dig() ) { # 53, 64 or 113 bits
 
-    unless($Math::NV::mpfr_strtofr_bug) {
+    unless(MPFR_STRTOFR_BUG) {
       $val = _subnormalize($_[0], $bits);
     }
     else { # ELSE1
@@ -283,7 +285,7 @@ sub nv_mpfr {
 
   if($bits == 53) {
 
-    unless($Math::NV::mpfr_strtofr_bug) {
+    unless(MPFR_STRTOFR_BUG) {
       $val = _subnormalize($_[0], 53);
     }
     else { # ELSE1
@@ -300,22 +302,23 @@ sub nv_mpfr {
   }
 
   if($bits == 64) {
-    my @bytes = Math::MPFR::_ld_bytes($_[0], 64);
-    return join('', @bytes);
+    if(OLD_MATH_MPFR) { return Math::MPFR::bytes($_[0], 'long double') }
+    return Math::MPFR::bytes($_[0], 64);
   }
 
   if($bits == 113) {
 
     my $t;
     eval{$t = Math::MPFR::_have_IEEE_754_long_double();}; # needs Math-MPFR-3.33, perl-5.22.
-    if(!$@ && $t) {
-      my @bytes = Math::MPFR::_ld_bytes($_[0], 113);
-      return join('', @bytes);
+    if(OLD_MATH_MPFR) {
+      if(!$@ && $t) {
+        return Math::MPFR::bytes($_[0], 'long double');
+      }
+      else { # assume __float128 (though that might not be the case)
+          return Math::MPFR::bytes($_[0], '__float128');
+      }
     }
-    else { # assume __float128 (though that might not be the case)
-        my @bytes = Math::MPFR::_f128_bytes($_[0], 113);
-      return join('', @bytes);
-    }
+    return Math::MPFR::bytes($_[0], 113);
   }
 
   die "Unrecognized value for bits ($bits)";
@@ -347,7 +350,7 @@ sub set_mpfr {
   die "In set_mpfr: unrecognized nv precision of $bits bits"
     unless($bits == 53 || $bits == 64 || $bits == 113);
 
-    unless($Math::NV::mpfr_strtofr_bug) {
+    unless(MPFR_STRTOFR_BUG) {
       $val = _subnormalize($_[0], $bits);
     }
     else { # ELSE1
@@ -365,8 +368,7 @@ sub set_mpfr {
 
 sub is_inexact {
 
-  die "is_inexact() requires at least mpfr-3.1.6"
-    if $Math::NV::mpfr_strtofr_bug;
+  die "is_inexact() requires at least mpfr-3.1.6" if MPFR_STRTOFR_BUG;
 
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
@@ -416,7 +418,8 @@ sub _dd_obj {
   return ($msd, Rmpfr_get_d($obj, 0));
 }
 
-# use _subnormalize instead if MPFR_VERSION > 196869
+# Optionally (ie preferably) use _subnormalize instead
+# if MPFR_VERSION > 196869 (MPFR_STRTOFR_BUG == 0).
 sub get_subnormal {
 
   my($str, $prec, $bits) = (shift, shift, shift);
@@ -461,7 +464,8 @@ sub get_relevant_prec {
 
 }
 
-# use get_subnormal instead if MPFR_VERSION <= 196869
+# Must use get_subnormal instead if MPFR_VERSION <= 196869
+# because mpfr_strtofr is buggy (MPFR_STRTOFR_BUG == 1).
 sub _subnormalize {
   # Called as: $val = _subnormalize($string, $bits);
   # mpfr_subnormalize(fr, inex, MPFR_RNDN);

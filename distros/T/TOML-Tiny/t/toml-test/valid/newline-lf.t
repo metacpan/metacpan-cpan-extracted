@@ -2,14 +2,18 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
-               'os' => 'unix',
-               'newline' => 'lf'
+               'newline' => 'lf',
+               'os' => 'unix'
              };
 
 

@@ -96,3 +96,5 @@ Revision history for Perl module Term::Highlight and script hl.
 
 2020/01/15 - Version 2.1.1 - corrected and faster line endings split.
 
+2020/01/20 - Version 2.1.2 - performance improvements.
+

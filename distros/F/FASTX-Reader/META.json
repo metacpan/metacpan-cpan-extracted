@@ -34,7 +34,7 @@
    "provides" : {
       "FASTX::Reader" : {
          "file" : "lib/FASTX/Reader.pm",
-         "version" : "0.61"
+         "version" : "0.70"
       }
    },
    "release_status" : "stable",
@@ -43,7 +43,7 @@
          "url" : "https://github.com/telatin/FASTQ-Parser"
       }
    },
-   "version" : "0.61",
+   "version" : "0.70",
    "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }

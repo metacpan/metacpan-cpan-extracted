@@ -1,48 +1,105 @@
 #include "Date.h"
 #include "DateRel.h"
-#include "format.hpp"
+#include "../time/format.h"
 
 namespace panda { namespace date {
 
-string Date::_strfmt;
-bool   Date::_range_check = false;
+bool Date::_range_check = false;
 
-#define INPLACE_FORMAT(F) do {\
-    using format_t = F; \
-    dcheck(); \
-    char buff[format_t::N + 1]; \
-    char* buff_end = format_t::apply(buff, _date, &_mksec); \
-    output.append(buff, buff_end - buff); \
-} while (0)
-
-void Date::esync () const { // w/o date normalization
-    _has_epochMUT = true;
-    _epochMUT = timeanyl(&_dateMUT, _zone);
+inline static ptime_t epoch_cmp (ptime_t s1, uint32_t mks1, ptime_t s2, uint32_t mks2) {
+    return (s1 == s2) ? mks1 - mks2 : s1 - s2;
 }
 
-void Date::dsync () const {
-    _normalizedMUT = true;
-    if (_has_epoch) { // no date -> calculate from epoch
-        _has_dateMUT = true;
-        bool success = anytime(_epoch, &_dateMUT, _zone);
-        if (!success) error_set(E_RANGE);
-    } else { // no epoch -> normalize from date (set epoch as a side effect as well)
-        _has_epochMUT = true;
-        _epochMUT = timeany(&_dateMUT, _zone);
+inline static ptime_t pseudo_epoch (const datetime& date) {
+    return date.sec + date.min*61 + date.hour*60*61 + date.mday*24*60*61 + date.mon*31*24*60*61 + ptime_t(date.year)*12*31*24*60*61;
+}
+
+inline static ptime_t date_cmp (const datetime& d1, uint32_t mks1, const datetime& d2, uint32_t mks2) {
+    return epoch_cmp(pseudo_epoch(d1), mks1, pseudo_epoch(d2), mks2);
+}
+
+void Date::set (string_view str, const Timezone* zone, int fmt) {
+    if (zone) _zone = zone;
+    parse(str, fmt); // parse() can parse and create zone
+    if (!_zone) _zone = tzlocal();
+
+    if (_error == errc::ok) {
+        _has_date = true;
+        dchg_auto();
+        if (_range_check) validate_range();
+    }
+    else epoch(0);
+}
+
+void Date::set (int32_t year, ptime_t month, ptime_t day, ptime_t hour, ptime_t min, ptime_t sec, ptime_t mksec, int isdst, const Timezone* zone) {
+    _zone_set(zone);
+    _error      = errc::ok;
+    _date.year  = year;
+    _date.mon   = month - 1;
+    _date.mday  = day;
+    _date.hour  = hour;
+    _date.min   = min;
+    _date.sec   = sec;
+    _date.isdst = isdst;
+    _has_date   = true;
+
+    if (mksec >= 0 && mksec < MICROSECONDS_IN_SECOND) _mksec = mksec;
+    else {
+        _mksec = (uint64_t)(mksec + MAX_MICROSECONDS) % MICROSECONDS_IN_SECOND;
+        _date.sec += (mksec - _mksec) / MICROSECONDS_IN_SECOND;
+    }
+
+    dchg();
+
+    if (_range_check) validate_range();
+}
+
+void Date::set (const Date& source, const Timezone* zone) {
+    _error = source._error;
+    if (!zone || _error != errc::ok) {
+        _has_epoch  = source._has_epoch;
+        _has_date   = source._has_date;
+        _normalized = source._normalized;
+        _zone       = source._zone;
+        _epoch      = source._epoch;
+        _mksec      = source._mksec;
+        if (_has_date) _date  = source._date;
+    } else {
+        source.dcheck();
+        _has_epoch  = false;
+        _has_date   = true;
+        _normalized = source._normalized;
+        _date       = source._date;
+        _zone       = zone;
+        _mksec      = source._mksec;
     }
 }
 
-err_t Date::validate_range () {
+void Date::esync () const { // w/o date normalization
+    _has_epoch = true;
+    _epoch = timeanyl(&_date, _zone);
+}
+
+void Date::dsync () const {
+    _normalized = true;
+    if (_has_epoch) { // no date -> calculate from epoch
+        _has_date = true;
+        bool success = anytime(_epoch, &_date, _zone);
+        if (!success) error_set(errc::out_of_range);
+    } else { // no epoch -> normalize from date (set epoch as a side effect as well)
+        _has_epoch = true;
+        _epoch = timeany(&_date, _zone);
+    }
+}
+
+void Date::validate_range () {
     datetime old = _date;
     dsync();
 
     if (old.sec != _date.sec || old.min != _date.min || old.hour != _date.hour || old.mday != _date.mday ||
         old.mon != _date.mon || old.year != _date.year) {
-        _error = E_RANGE;
-        return E_RANGE;
+        _error = errc::out_of_range;
     }
-
-    return E_OK;
 }
 
 ptime_t Date::compare (const Date& operand) const {
@@ -88,85 +145,42 @@ Date& Date::operator-= (const DateRel& operand) {
     return *this;
 }
 
-panda::string Date::strftime (const char* format, panda::string *output) const {
+using namespace panda::time::format;
+using iso_t          = exp_t<tag_year, tag_char<'-'>, tag_month, tag_char<'-'>, tag_day, tag_char<' '>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_mksec>;
+using iso_tz_t       = exp_t<tag_year, tag_char<'-'>, tag_month, tag_char<'-'>, tag_day, tag_char<' '>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_mksec, tag_tzoff>;
+using iso_date_t     = exp_t<tag_year, tag_char<'-'>, tag_month, tag_char<'-'>, tag_day>;
+using iso8601_t      = exp_t<tag_year, tag_char<'-'>, tag_month, tag_char<'-'>, tag_day, tag_char<'T'>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_mksec, tag_tzoff>;
+using iso8601_notz_t = exp_t<tag_year, tag_char<'-'>, tag_month, tag_char<'-'>, tag_day, tag_char<'T'>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_mksec>;
+using rfc1123_t      = exp_t<tag_wday_short, tag_char<','>, tag_char<' '>, tag_day, tag_char<' '>, tag_month_short, tag_char<' '>, tag_year, tag_char<' '>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_char<' '>, tag_tz1123>;
+using rfc850_t       = exp_t<tag_wday_long, tag_char<','>, tag_char<' '>, tag_day, tag_char<'-'>, tag_month_short, tag_char<'-'>, tag_yr, tag_char<' '>, tag_hour, tag_char<':'>, tag_min, tag_char<':'>, tag_sec, tag_char<' '>, tag_tz1123>;
+using ymd_s_t        = exp_t<tag_year,  tag_char<'/'>, tag_month, tag_char<'/'>, tag_day>;
+using dot_t          = exp_t<tag_day,   tag_char<'.'>, tag_month, tag_char<'.'>, tag_year>;
+
+#define INPLACE_FORMAT(FMT) do {                    \
+    char buf[FMT::length + 1];                      \
+    char* buf_end = FMT::apply(buf, _date, _mksec); \
+    output.append(buf, buf_end - buf);              \
+} while (0)
+
+string Date::to_string (Format fmt) const {
+    if (_error != errc::ok) return {};
     dcheck();
-    panda::string result;
-    char stack_buff[1000];
-    auto maxsize = 1000;
-    size_t reslen = panda::time::strftime(stack_buff, maxsize, format, &_date);
-    if (reslen > 0) {
-        result = string(stack_buff, reslen);
-        if (output) *output = result;
+    string output;
+    switch (fmt) {
+        case Format::iso          : INPLACE_FORMAT(iso_t); break;
+        case Format::iso_date     : INPLACE_FORMAT(iso_date_t); break;
+        case Format::iso_tz       : INPLACE_FORMAT(iso_tz_t); break;
+        case Format::iso8601      : INPLACE_FORMAT(iso8601_t); break;
+        case Format::iso8601_notz : INPLACE_FORMAT(iso8601_notz_t); break;
+        case Format::rfc1123      : INPLACE_FORMAT(rfc1123_t); break;
+        case Format::rfc850       : INPLACE_FORMAT(rfc850_t); break;
+        case Format::ansi_c       : INPLACE_FORMAT(ansi_c_t); break;
+        case Format::ymd          : INPLACE_FORMAT(ymd_s_t); break;
+        case Format::dot          : INPLACE_FORMAT(dot_t); break;
+        case Format::hms          : INPLACE_FORMAT(hms_t); break;
+        default: throw std::invalid_argument("unknown format type for date output");
     }
-    return result;
-}
-
-void Date::iso (panda::string& output) const {
-    if (_mksec) INPLACE_FORMAT(format::iso_t);
-    else        INPLACE_FORMAT(format::iso_sec_t);
-}
-TOSTR_WRAPPER(Date::iso, format::iso_t::N);
-
-
-void Date::iso_sec (panda::string& output) const {
-    INPLACE_FORMAT(format::iso_sec_t);
-}
-TOSTR_WRAPPER(Date::iso_sec, format::iso_sec_t::N);
-
-
-void Date::mysql (panda::string& output) const {
-    INPLACE_FORMAT(format::mysql_t);
-}
-TOSTR_WRAPPER(Date::mysql , format::mysql_t::N);
-
-
-void Date::hms (panda::string& output) const {
-    INPLACE_FORMAT(format::hms_t);
-}
-TOSTR_WRAPPER(Date::hms, format::hms_t::N);
-
-
-void Date::ymd (panda::string& output) const {
-    INPLACE_FORMAT(format::ymd_t);
-}
-TOSTR_WRAPPER(Date::ymd, format::ymd_t::N);
-
-
-void Date::mdy (panda::string& output) const {
-    INPLACE_FORMAT(format::mdy_t);
-}
-TOSTR_WRAPPER(Date::mdy, format::mdy_t::N);
-
-
-void Date::dmy (panda::string& output) const {
-    INPLACE_FORMAT(format::dmy_t);
-}
-TOSTR_WRAPPER(Date::dmy, format::dmy_t::N);
-
-
-void Date::meridiam (panda::string& output) const {
-    INPLACE_FORMAT(format::meridiam_t);
-}
-TOSTR_WRAPPER(Date::meridiam, format::meridiam_t::N);
-
-
-void Date::ampm (panda::string& output) const {
-    INPLACE_FORMAT(format::ampm_t);
-}
-TOSTR_WRAPPER(Date::ampm, format::ampm_t::N);
-
-
-string_view Date::errstr () const {
-    switch (_error) {
-        case E_OK:
-            return string_view();
-        case E_UNPARSABLE:
-            return "can't parse date string";
-        case E_RANGE:
-            return "input date is out of range";
-        default:
-            return "unknown error";
-    }
+    return output;
 }
 
 void swap (Date& a, Date& b) {

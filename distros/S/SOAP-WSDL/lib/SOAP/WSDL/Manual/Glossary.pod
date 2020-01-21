@@ -16,7 +16,7 @@ for Simple Object Access Protocol.
 SOAP is a W3C recommendation. The latest version of the SOAP specification
 may be found at L<http://www.w3.org/TR/soap/>.
 
-SOAP defines a protocoll for message exchange between applications.
+SOAP defines a protocol for message exchange between applications.
 The most popular usage is to use SOAP for remote procedure calls (RPC).
 
 While one of the constituting aspects of a web service is its

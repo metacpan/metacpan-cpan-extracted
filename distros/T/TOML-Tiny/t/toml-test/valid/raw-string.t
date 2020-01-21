@@ -2,19 +2,23 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
-               'formfeed' => 'This string has a \\f form feed character.',
-               'slash' => 'This string has a \\/ slash character.',
-               'carriage' => 'This string has a \\r carriage return character.',
-               'tab' => 'This string has a \\t tab character.',
                'backspace' => 'This string has a \\b backspace character.',
                'newline' => 'This string has a \\n new line character.',
-               'backslash' => 'This string has a \\\\ backslash character.'
+               'formfeed' => 'This string has a \\f form feed character.',
+               'carriage' => 'This string has a \\r carriage return character.',
+               'backslash' => 'This string has a \\\\ backslash character.',
+               'tab' => 'This string has a \\t tab character.',
+               'slash' => 'This string has a \\/ slash character.'
              };
 
 

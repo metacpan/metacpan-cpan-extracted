@@ -1,6 +1,8 @@
 Build.PL
 Changes
 lib/Commandable.pm
+lib/Commandable/Finder.pod
+lib/Commandable/Finder/Packages.pm
 lib/Commandable/Invocation.pm
 LICENSE
 MANIFEST			This list of files
@@ -9,4 +11,6 @@ META.yml
 README
 t/00use.t
 t/01invocation.t
+t/10finder-packages-namemethod.t
+t/11finder-packages-namepkg.t
 t/99pod.t

@@ -6,6 +6,8 @@ README.md
 cpanfile
 lib/Config/Registry.pm
 minil.toml
-t/basic.t
+t/inheritance.t
+t/merge.t
+t/validation.t
 META.yml
 MANIFEST

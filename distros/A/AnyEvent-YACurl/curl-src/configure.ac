@@ -49,6 +49,7 @@ CURL_CHECK_OPTION_CURLDEBUG
 CURL_CHECK_OPTION_SYMBOL_HIDING
 CURL_CHECK_OPTION_ARES
 CURL_CHECK_OPTION_RT
+CURL_CHECK_OPTION_ESNI
 
 XC_CHECK_PATH_SEPARATOR
 
@@ -155,8 +156,8 @@ AC_SUBST(PKGADD_VENDOR)
 
 dnl
 dnl initialize all the info variables
-    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl} )"
-    curl_ssh_msg="no      (--with-libssh2)"
+    curl_ssl_msg="no      (--with-{ssl,gnutls,nss,mbedtls,wolfssl,schannel,secure-transport,mesalink,amissl,bearssl} )"
+    curl_ssh_msg="no      (--with-{libssh,libssh2})"
    curl_zlib_msg="no      (--with-zlib)"
  curl_brotli_msg="no      (--with-brotli)"
     curl_gss_msg="no      (--with-gssapi)"
@@ -1202,16 +1203,23 @@ AC_HELP_STRING([--disable-ipv6],[Disable IPv6 support]),
        ;;
   esac ],
 
-  AC_TRY_RUN([ /* is AF_INET6 available? */
+  AC_TRY_RUN([ /* are AF_INET6 and sockaddr_in6 available? */
 #include <sys/types.h>
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #else
 #include <sys/socket.h>
+#include <netinet/in.h>
+#if defined (__TANDEM)
+# include <netinet/in6.h>
+#endif
 #endif
 #include <stdlib.h> /* for exit() */
 main()
 {
+ struct sockaddr_in6 s;
+ (void)s;
  if (socket(AF_INET6, SOCK_STREAM, 0) < 0)
    exit(1);
  else
@@ -1226,12 +1234,12 @@ main()
   ipv6=yes
 ))
 
-if test "$ipv6" = "yes"; then
-  curl_ipv6_msg="enabled"
-fi
-
-# Check if struct sockaddr_in6 have sin6_scope_id member
 if test "$ipv6" = yes; then
+  curl_ipv6_msg="enabled"
+  AC_DEFINE(ENABLE_IPV6, 1, [Define if you want to enable IPv6 support])
+  IPV6_ENABLED=1
+  AC_SUBST(IPV6_ENABLED)
+
   AC_MSG_CHECKING([if struct sockaddr_in6 has sin6_scope_id member])
   AC_TRY_COMPILE([
 #include <sys/types.h>
@@ -2215,12 +2223,7 @@ OPT_WOLFSSL=no
 
 _cppflags=$CPPFLAGS
 _ldflags=$LDFLAGS
-AC_ARG_WITH(cyassl,dnl
-AC_HELP_STRING([--with-cyassl=PATH],[where to look for CyaSSL, PATH points to the installation root (default: system lib default)])
-AC_HELP_STRING([--without-cyassl], [disable CyaSSL detection]),
-  OPT_WOLFSSL=$withval)
 
-dnl provide --with-wolfssl as an alias for --with-cyassl
 AC_ARG_WITH(wolfssl,dnl
 AC_HELP_STRING([--with-wolfssl=PATH],[where to look for WolfSSL, PATH points to the installation root (default: system lib default)])
 AC_HELP_STRING([--without-wolfssl], [disable WolfSSL detection]),
@@ -2235,86 +2238,33 @@ if test -z "$ssl_backends" -o "x$OPT_WOLFSSL" != xno; then
       OPT_WOLFSSL=""
     fi
 
-    dnl This should be reworked to use pkg-config instead
-
-    cyassllibname=cyassl
-
-    if test -z "$OPT_WOLFSSL" ; then
-      dnl check for lib in system default first
-
-      AC_CHECK_LIB(cyassl, CyaSSL_Init,
-      dnl libcyassl found, set the variable
-       [
-         AC_DEFINE(USE_WOLFSSL, 1, [if wolfSSL is enabled])
-         AC_SUBST(USE_WOLFSSL, [1])
-         WOLFSSL_ENABLED=1
-         USE_WOLFSSL="yes"
-         ssl_msg="CyaSSL"
-	 test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
-        ])
-    fi
-
     addld=""
     addlib=""
     addcflags=""
-    cyassllib=""
 
     if test "x$USE_WOLFSSL" != "xyes"; then
-      dnl add the path and test again
       addld=-L$OPT_WOLFSSL/lib$libsuff
       addcflags=-I$OPT_WOLFSSL/include
-      cyassllib=$OPT_WOLFSSL/lib$libsuff
+      wolfssllibpath=$OPT_WOLFSSL/lib$libsuff
 
       LDFLAGS="$LDFLAGS $addld"
       if test "$addcflags" != "-I/usr/include"; then
          CPPFLAGS="$CPPFLAGS $addcflags"
       fi
 
-      AC_CHECK_LIB(cyassl, CyaSSL_Init,
-       [
-       AC_DEFINE(USE_WOLFSSL, 1, [if CyaSSL is enabled])
-       AC_SUBST(USE_WOLFSSL, [1])
-       WOLFSSL_ENABLED=1
-       USE_WOLFSSL="yes"
-       ssl_msg="CyaSSL"
-       test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
-       ],
-       [
-         CPPFLAGS=$_cppflags
-         LDFLAGS=$_ldflags
-         cyassllib=""
-       ])
-    fi
-
-    addld=""
-    addlib=""
-    addcflags=""
-
-    if test "x$USE_WOLFSSL" != "xyes"; then
-      dnl libcyassl renamed to libwolfssl as of 3.4.0
-      addld=-L$OPT_WOLFSSL/lib$libsuff
-      addcflags=-I$OPT_WOLFSSL/include
-      cyassllib=$OPT_WOLFSSL/lib$libsuff
-
-      LDFLAGS="$LDFLAGS $addld"
-      if test "$addcflags" != "-I/usr/include"; then
-         CPPFLAGS="$CPPFLAGS $addcflags"
-      fi
-
-      cyassllibname=wolfssl
       my_ac_save_LIBS="$LIBS"
-      LIBS="-l$cyassllibname -lm $LIBS"
+      LIBS="-lwolfssl -lm $LIBS"
 
-      AC_MSG_CHECKING([for CyaSSL_Init in -lwolfssl])
+      AC_MSG_CHECKING([for wolfSSL_Init in -lwolfssl])
       AC_LINK_IFELSE([
 	AC_LANG_PROGRAM([[
 /* These aren't needed for detection and confuse WolfSSL.
    They are set up properly later if it is detected.  */
 #undef SIZEOF_LONG
 #undef SIZEOF_LONG_LONG
-#include <cyassl/ssl.h>
+#include <wolfssl/ssl.h>
 	]],[[
-	  return CyaSSL_Init();
+	  return wolfSSL_Init();
 	]])
       ],[
          AC_MSG_RESULT(yes)
@@ -2323,25 +2273,25 @@ if test -z "$ssl_backends" -o "x$OPT_WOLFSSL" != xno; then
          WOLFSSL_ENABLED=1
          USE_WOLFSSL="yes"
          ssl_msg="WolfSSL"
-	 test cyassl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+	 test wolfssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
        ],
        [
          AC_MSG_RESULT(no)
          CPPFLAGS=$_cppflags
          LDFLAGS=$_ldflags
-         cyassllib=""
+         wolfssllibpath=""
        ])
       LIBS="$my_ac_save_LIBS"
     fi
 
     if test "x$USE_WOLFSSL" = "xyes"; then
-      AC_MSG_NOTICE([detected $cyassllibname])
+      AC_MSG_NOTICE([detected wolfSSL])
       check_for_ca_bundle=1
 
-      dnl cyassl/ctaocrypt/types.h needs SIZEOF_LONG_LONG defined!
+      dnl wolfssl/ctaocrypt/types.h needs SIZEOF_LONG_LONG defined!
       AX_COMPILE_CHECK_SIZEOF(long long)
 
-      LIBS="-l$cyassllibname -lm $LIBS"
+      LIBS="-lwolfssl -lm $LIBS"
 
       dnl Recent WolfSSL versions build without SSLv3 by default
       dnl WolfSSL needs configure --enable-opensslextra to have *get_peer*
@@ -2349,15 +2299,15 @@ if test -z "$ssl_backends" -o "x$OPT_WOLFSSL" != xno; then
                      wolfSSL_get_peer_certificate \
                      wolfSSL_UseALPN)
 
-      if test -n "$cyassllib"; then
+      if test -n "$wolfssllibpath"; then
         dnl when shared libs were found in a path that the run-time
         dnl linker doesn't search through, we need to add it to
         dnl CURL_LIBRARY_PATH to prevent further configure tests to fail
         dnl due to this
         if test "x$cross_compiling" != "xyes"; then
-          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$cyassllib"
+          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$wolfssllibpath"
           export CURL_LIBRARY_PATH
-          AC_MSG_NOTICE([Added $cyassllib to CURL_LIBRARY_PATH])
+          AC_MSG_NOTICE([Added $wolfssllibpath to CURL_LIBRARY_PATH])
         fi
       fi
 
@@ -2456,6 +2406,98 @@ if test -z "$ssl_backends" -o "x$OPT_MESALINK" != xno; then
     fi
 
   fi dnl MesaLink not disabled
+
+  test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
+fi
+
+dnl ----------------------------------------------------
+dnl check for BearSSL
+dnl ----------------------------------------------------
+
+OPT_BEARSSL=no
+
+_cppflags=$CPPFLAGS
+_ldflags=$LDFLAGS
+AC_ARG_WITH(bearssl,dnl
+AC_HELP_STRING([--with-bearssl=PATH],[where to look for BearSSL, PATH points to the installation root])
+AC_HELP_STRING([--without-bearssl], [disable BearSSL detection]),
+  OPT_BEARSSL=$withval)
+
+if test -z "$ssl_backends" -o "x$OPT_BEARSSL" != xno; then
+  ssl_msg=
+
+  if test X"$OPT_BEARSSL" != Xno; then
+
+    if test "$OPT_BEARSSL" = "yes"; then
+      OPT_BEARSSL=""
+    fi
+
+    if test -z "$OPT_BEARSSL" ; then
+      dnl check for lib first without setting any new path
+
+      AC_CHECK_LIB(bearssl, br_ssl_client_init_full,
+      dnl libbearssl found, set the variable
+       [
+         AC_DEFINE(USE_BEARSSL, 1, [if BearSSL is enabled])
+         AC_SUBST(USE_BEARSSL, [1])
+         BEARSSL_ENABLED=1
+         USE_BEARSSL="yes"
+         ssl_msg="BearSSL"
+	 test bearssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+        ], [], -lbearssl)
+    fi
+
+    addld=""
+    addlib=""
+    addcflags=""
+    bearssllib=""
+
+    if test "x$USE_BEARSSL" != "xyes"; then
+      dnl add the path and test again
+      addld=-L$OPT_BEARSSL/lib$libsuff
+      addcflags=-I$OPT_BEARSSL/include
+      bearssllib=$OPT_BEARSSL/lib$libsuff
+
+      LDFLAGS="$LDFLAGS $addld"
+      if test "$addcflags" != "-I/usr/include"; then
+         CPPFLAGS="$CPPFLAGS $addcflags"
+      fi
+
+      AC_CHECK_LIB(bearssl, br_ssl_client_init_full,
+       [
+       AC_DEFINE(USE_BEARSSL, 1, [if BearSSL is enabled])
+       AC_SUBST(USE_BEARSSL, [1])
+       BEARSSL_ENABLED=1
+       USE_BEARSSL="yes"
+       ssl_msg="BearSSL"
+       test bearssl != "$DEFAULT_SSL_BACKEND" || VALID_DEFAULT_SSL_BACKEND=yes
+       ],
+       [
+         CPPFLAGS=$_cppflags
+         LDFLAGS=$_ldflags
+       ], -lbearssl)
+    fi
+
+    if test "x$USE_BEARSSL" = "xyes"; then
+      AC_MSG_NOTICE([detected BearSSL])
+      check_for_ca_bundle=1
+
+      LIBS="-lbearssl $LIBS"
+
+      if test -n "$bearssllib"; then
+        dnl when shared libs were found in a path that the run-time
+        dnl linker doesn't search through, we need to add it to
+        dnl CURL_LIBRARY_PATH to prevent further configure tests to fail
+        dnl due to this
+        if test "x$cross_compiling" != "xyes"; then
+          CURL_LIBRARY_PATH="$CURL_LIBRARY_PATH:$bearssllib"
+          export CURL_LIBRARY_PATH
+          AC_MSG_NOTICE([Added $bearssllib to CURL_LIBRARY_PATH])
+        fi
+      fi
+    fi
+
+  fi dnl BearSSL not disabled
 
   test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
 fi
@@ -2590,10 +2632,10 @@ if test -z "$ssl_backends" -o "x$OPT_NSS" != xno; then
   test -z "$ssl_msg" || ssl_backends="${ssl_backends:+$ssl_backends, }$ssl_msg"
 fi
 
-case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$WINSSL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$AMISSL_ENABLED" in
+case "x$OPENSSL_ENABLED$GNUTLS_ENABLED$NSS_ENABLED$MBEDTLS_ENABLED$WOLFSSL_ENABLED$WINSSL_ENABLED$SECURETRANSPORT_ENABLED$MESALINK_ENABLED$BEARSSL_ENABLED$AMISSL_ENABLED" in
 x)
   AC_MSG_WARN([SSL disabled, you will not be able to use HTTPS, FTPS, NTLM and more.])
-  AC_MSG_WARN([Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink or --with-amissl to address this.])
+  AC_MSG_WARN([Use --with-ssl, --with-gnutls, --with-wolfssl, --with-mbedtls, --with-nss, --with-schannel, --with-secure-transport, --with-mesalink, --with-amissl or --with-bearssl to address this.])
   ;;
 x1)
   # one SSL backend is enabled
@@ -4021,14 +4063,6 @@ AC_CHECK_FUNCS([fnmatch \
   fi
 ])
 
-if test "$ipv6" = "yes"; then
-  if test "$curl_cv_func_getaddrinfo" = "yes"; then
-    AC_DEFINE(ENABLE_IPV6, 1, [Define if you want to enable IPv6 support])
-    IPV6_ENABLED=1
-    AC_SUBST(IPV6_ENABLED)
-  fi
-fi
-
 CURL_CHECK_NONBLOCKING_SOCKET
 
 dnl ************************************************************
@@ -4460,7 +4494,7 @@ dnl
 AC_MSG_CHECKING([whether to support DNS shuffling])
 AC_ARG_ENABLE(dnsshuffle,
 AC_HELP_STRING([--enable-dnsshuffle],[Enable DNS shuffling])
-AC_HELP_STRING([--disable-dnsshuffle],[Disable DNS shufflinf]),
+AC_HELP_STRING([--disable-dnsshuffle],[Disable DNS shuffling]),
 [ case "$enableval" in
   no)
        AC_MSG_RESULT(no)
@@ -4495,6 +4529,36 @@ AC_HELP_STRING([--disable-alt-svc],[Disable alt-svc support]),
 if test "$enable_altsvc" = "yes"; then
   AC_DEFINE(USE_ALTSVC, 1, [to enable alt-svc])
   experimental="$experimental alt-svc"
+fi
+
+dnl *************************************************************
+dnl check whether ESNI support, if desired, is actually available
+dnl
+if test "x$want_esni" != "xno"; then
+  AC_MSG_CHECKING([whether ESNI support is available])
+
+  dnl assume NOT and look for sufficient condition
+  ESNI_ENABLED=0
+  ESNI_SUPPORT=''
+
+  dnl OpenSSL with a chosen ESNI function should be enough
+  dnl so more exhaustive checking seems unnecessary for now
+  if test "x$OPENSSL_ENABLED" = "x1"; then
+    AC_CHECK_FUNCS(SSL_get_esni_status,
+      ESNI_SUPPORT="ESNI support available (OpenSSL with SSL_get_esni_status)"
+      ESNI_ENABLED=1)
+
+  dnl add 'elif' chain here for additional implementations
+  fi
+
+  dnl now deal with whatever we found
+  if test "x$ESNI_ENABLED" = "x1"; then
+    AC_DEFINE(USE_ESNI, 1, [if ESNI support is available])
+    AC_MSG_RESULT($ESNI_SUPPORT)
+    experimental="$experimental ESNI"
+  else
+    AC_MSG_ERROR([--enable-esni ignored: No ESNI support found])
+  fi
 fi
 
 dnl ************************************************************
@@ -4616,6 +4680,10 @@ fi
 if test "x$OPENSSL_ENABLED" = "x1" -o "x$GNUTLS_ENABLED" = "x1" \
     -o "x$NSS_ENABLED" = "x1"; then
   SUPPORT_FEATURES="$SUPPORT_FEATURES HTTPS-proxy"
+fi
+
+if test "x$ESNI_ENABLED" = "x1"; then
+  SUPPORT_FEATURES="$SUPPORT_FEATURES ESNI"
 fi
 
 AC_SUBST(SUPPORT_FEATURES)
@@ -4801,6 +4869,7 @@ AC_MSG_NOTICE([Configured to build curl/libcurl:
   Alt-svc:          ${curl_altsvc_msg}
   HTTP2:            ${curl_h2_msg}
   HTTP3:            ${curl_h3_msg}
+  ESNI:             ${curl_esni_msg}
   Protocols:        ${SUPPORT_PROTOCOLS}
   Features:         ${SUPPORT_FEATURES}
 ])

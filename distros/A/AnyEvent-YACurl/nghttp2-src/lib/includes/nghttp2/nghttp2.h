@@ -2651,6 +2651,17 @@ NGHTTP2_EXTERN void nghttp2_option_set_no_closed_streams(nghttp2_option *option,
 /**
  * @function
  *
+ * This function sets the maximum number of outgoing SETTINGS ACK and
+ * PING ACK frames retained in :type:`nghttp2_session` object.  If
+ * more than those frames are retained, the peer is considered to be
+ * misbehaving and session will be closed.  The default value is 1000.
+ */
+NGHTTP2_EXTERN void nghttp2_option_set_max_outbound_ack(nghttp2_option *option,
+                                                        size_t val);
+
+/**
+ * @function
+ *
  * Initializes |*session_ptr| for client use.  The all members of
  * |callbacks| are copied to |*session_ptr|.  Therefore |*session_ptr|
  * does not store |callbacks|.  The |user_data| is an arbitrary user
@@ -4757,6 +4768,19 @@ NGHTTP2_EXTERN int nghttp2_check_header_name(const uint8_t *name, size_t len);
  * http://tools.ietf.org/html/rfc7230#section-3.2
  */
 NGHTTP2_EXTERN int nghttp2_check_header_value(const uint8_t *value, size_t len);
+
+/**
+ * @function
+ *
+ * Returns nonzero if the |value| which is supposed to the value of
+ * :authority or host header field is valid according to
+ * https://tools.ietf.org/html/rfc3986#section-3.2
+ *
+ * |value| is valid if it merely consists of the allowed characters.
+ * In particular, it does not check whether |value| follows the syntax
+ * of authority.
+ */
+NGHTTP2_EXTERN int nghttp2_check_authority(const uint8_t *value, size_t len);
 
 /* HPACK API */
 

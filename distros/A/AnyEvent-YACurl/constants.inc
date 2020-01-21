@@ -70,6 +70,7 @@
         hv_stores(the_hv, "CURLE_GOT_NOTHING", newSViv(CURLE_GOT_NOTHING));
         hv_stores(the_hv, "CURLE_HTTP2", newSViv(CURLE_HTTP2));
         hv_stores(the_hv, "CURLE_HTTP2_STREAM", newSViv(CURLE_HTTP2_STREAM));
+        hv_stores(the_hv, "CURLE_HTTP3", newSViv(CURLE_HTTP3));
         hv_stores(the_hv, "CURLE_HTTP_NOT_FOUND", newSViv(CURLE_HTTP_NOT_FOUND));
         hv_stores(the_hv, "CURLE_HTTP_PORT_FAILED", newSViv(CURLE_HTTP_PORT_FAILED));
         hv_stores(the_hv, "CURLE_HTTP_POST_ERROR", newSViv(CURLE_HTTP_POST_ERROR));
@@ -300,6 +301,7 @@
         hv_stores(the_hv, "CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE", newSViv(CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE));
         hv_stores(the_hv, "CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE", newSViv(CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE));
         hv_stores(the_hv, "CURLMOPT_MAXCONNECTS", newSViv(CURLMOPT_MAXCONNECTS));
+        hv_stores(the_hv, "CURLMOPT_MAX_CONCURRENT_STREAMS", newSViv(CURLMOPT_MAX_CONCURRENT_STREAMS));
         hv_stores(the_hv, "CURLMOPT_MAX_HOST_CONNECTIONS", newSViv(CURLMOPT_MAX_HOST_CONNECTIONS));
         hv_stores(the_hv, "CURLMOPT_MAX_PIPELINE_LENGTH", newSViv(CURLMOPT_MAX_PIPELINE_LENGTH));
         hv_stores(the_hv, "CURLMOPT_MAX_TOTAL_CONNECTIONS", newSViv(CURLMOPT_MAX_TOTAL_CONNECTIONS));
@@ -325,6 +327,7 @@
         hv_stores(the_hv, "CURLM_OUT_OF_MEMORY", newSViv(CURLM_OUT_OF_MEMORY));
         hv_stores(the_hv, "CURLM_RECURSIVE_API_CALL", newSViv(CURLM_RECURSIVE_API_CALL));
         hv_stores(the_hv, "CURLM_UNKNOWN_OPTION", newSViv(CURLM_UNKNOWN_OPTION));
+        hv_stores(the_hv, "CURLM_WAKEUP_FAILURE", newSViv(CURLM_WAKEUP_FAILURE));
         hv_stores(the_hv, "CURLOPTTYPE_FUNCTIONPOINT", newSViv(CURLOPTTYPE_FUNCTIONPOINT));
         hv_stores(the_hv, "CURLOPTTYPE_LONG", newSViv(CURLOPTTYPE_LONG));
         hv_stores(the_hv, "CURLOPTTYPE_OBJECTPOINT", newSViv(CURLOPTTYPE_OBJECTPOINT));
@@ -685,6 +688,7 @@
         hv_stores(the_hv, "CURLSSH_AUTH_PASSWORD", newSViv(CURLSSH_AUTH_PASSWORD));
         hv_stores(the_hv, "CURLSSH_AUTH_PUBLICKEY", newSViv(CURLSSH_AUTH_PUBLICKEY));
         hv_stores(the_hv, "CURLSSLBACKEND_AXTLS", newSViv(CURLSSLBACKEND_AXTLS));
+        hv_stores(the_hv, "CURLSSLBACKEND_BEARSSL", newSViv(CURLSSLBACKEND_BEARSSL));
         hv_stores(the_hv, "CURLSSLBACKEND_BORINGSSL", newSViv(CURLSSLBACKEND_BORINGSSL));
         hv_stores(the_hv, "CURLSSLBACKEND_CYASSL", newSViv(CURLSSLBACKEND_CYASSL));
         hv_stores(the_hv, "CURLSSLBACKEND_DARWINSSL", newSViv(CURLSSLBACKEND_DARWINSSL));
@@ -701,6 +705,7 @@
         hv_stores(the_hv, "CURLSSLBACKEND_SECURETRANSPORT", newSViv(CURLSSLBACKEND_SECURETRANSPORT));
         hv_stores(the_hv, "CURLSSLBACKEND_WOLFSSL", newSViv(CURLSSLBACKEND_WOLFSSL));
         hv_stores(the_hv, "CURLSSLOPT_ALLOW_BEAST", newSViv(CURLSSLOPT_ALLOW_BEAST));
+        hv_stores(the_hv, "CURLSSLOPT_NO_PARTIALCHAIN", newSViv(CURLSSLOPT_NO_PARTIALCHAIN));
         hv_stores(the_hv, "CURLSSLOPT_NO_REVOKE", newSViv(CURLSSLOPT_NO_REVOKE));
         hv_stores(the_hv, "CURLSSLSET_NO_BACKENDS", newSViv(CURLSSLSET_NO_BACKENDS));
         hv_stores(the_hv, "CURLSSLSET_OK", newSViv(CURLSSLSET_OK));
@@ -745,6 +750,7 @@
         hv_stores(the_hv, "CURLU_DISALLOW_USER", newSViv(CURLU_DISALLOW_USER));
         hv_stores(the_hv, "CURLU_GUESS_SCHEME", newSViv(CURLU_GUESS_SCHEME));
         hv_stores(the_hv, "CURLU_NON_SUPPORT_SCHEME", newSViv(CURLU_NON_SUPPORT_SCHEME));
+        hv_stores(the_hv, "CURLU_NO_AUTHORITY", newSViv(CURLU_NO_AUTHORITY));
         hv_stores(the_hv, "CURLU_NO_DEFAULT_PORT", newSViv(CURLU_NO_DEFAULT_PORT));
         hv_stores(the_hv, "CURLU_PATH_AS_IS", newSViv(CURLU_PATH_AS_IS));
         hv_stores(the_hv, "CURLU_URLDECODE", newSViv(CURLU_URLDECODE));
@@ -823,6 +829,7 @@
         hv_stores(the_hv, "CURL_POLL_NONE", newSViv(CURL_POLL_NONE));
         hv_stores(the_hv, "CURL_POLL_OUT", newSViv(CURL_POLL_OUT));
         hv_stores(the_hv, "CURL_POLL_REMOVE", newSViv(CURL_POLL_REMOVE));
+        hv_stores(the_hv, "CURL_PROGRESSFUNC_CONTINUE", newSViv(CURL_PROGRESSFUNC_CONTINUE));
         hv_stores(the_hv, "CURL_PUSH_DENY", newSViv(CURL_PUSH_DENY));
         hv_stores(the_hv, "CURL_PUSH_OK", newSViv(CURL_PUSH_OK));
         hv_stores(the_hv, "CURL_READFUNC_ABORT", newSViv(CURL_READFUNC_ABORT));
@@ -881,6 +888,7 @@
         hv_stores(the_hv, "CURL_VERSION_CONV", newSViv(CURL_VERSION_CONV));
         hv_stores(the_hv, "CURL_VERSION_CURLDEBUG", newSViv(CURL_VERSION_CURLDEBUG));
         hv_stores(the_hv, "CURL_VERSION_DEBUG", newSViv(CURL_VERSION_DEBUG));
+        hv_stores(the_hv, "CURL_VERSION_ESNI", newSViv(CURL_VERSION_ESNI));
         hv_stores(the_hv, "CURL_VERSION_GSSAPI", newSViv(CURL_VERSION_GSSAPI));
         hv_stores(the_hv, "CURL_VERSION_GSSNEGOTIATE", newSViv(CURL_VERSION_GSSNEGOTIATE));
         hv_stores(the_hv, "CURL_VERSION_HTTP2", newSViv(CURL_VERSION_HTTP2));

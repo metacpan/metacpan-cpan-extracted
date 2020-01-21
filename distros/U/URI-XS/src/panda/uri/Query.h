@@ -5,11 +5,8 @@
 
 namespace panda { namespace uri {
 
-class Query : public panda::string_multimap<string, string> {
-private:
-    typedef panda::string_multimap<key_type,mapped_type> Base;
-
-public:
+struct Query : panda::string_multimap<string, string> {
+    using Base = panda::string_multimap<key_type,mapped_type>;
     uint32_t rev;
 
     Query ()               : Base(),  rev(1) {}

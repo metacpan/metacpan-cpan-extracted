@@ -1,5 +1,5 @@
 package Curio::Role::DBIx::Connector;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use DBIx::Connector;
 use Scalar::Util qw( blessed );
@@ -66,7 +66,7 @@ __END__
 
 =head1 NAME
 
-Curio::Role::DBIx::Connector - Build Curio classes around DBIx::Connector.
+Curio::Role::DBIx::Connector - Build Curio classes around DBIx::Connector. (DEPRECATED)
 
 =head1 SYNOPSIS
 

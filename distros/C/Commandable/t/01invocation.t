@@ -25,25 +25,25 @@ use Commandable::Invocation;
    is( $inv->pull_token, undef, '->pull_token at EOF' );
 }
 
-# remaining
+# peek_remaining
 {
    my $inv = Commandable::Invocation->new( "more tokens here" );
 
-   is( $inv->remaining, "more tokens here", '->remaining initially' );
+   is( $inv->peek_remaining, "more tokens here", '->peek_remaining initially' );
 
    $inv->pull_token;
-   is( $inv->remaining, "tokens here", '->remaining after ->pull_token' );
+   is( $inv->peek_remaining, "tokens here", '->peek_remaining after ->pull_token' );
 }
 
 # "quoted tokens"
 {
    my $inv = Commandable::Invocation->new( q("quoted token" here) );
 
-   is( $inv->remaining, q("quoted token" here), '->remaining initially' );
+   is( $inv->peek_remaining, q("quoted token" here), '->peek_remaining initially' );
 
    is( $inv->pull_token, "quoted token", '->pull_token yields string' );
 
-   is( $inv->remaining, "here", '->remaining after ->pull_token' );
+   is( $inv->peek_remaining, "here", '->peek_remaining after ->pull_token' );
 
    $inv = Commandable::Invocation->new( q("three" "quoted" "tokens") );
 
@@ -75,7 +75,7 @@ use Commandable::Invocation;
    is( $inv->pull_token, "c", '->pull_token after putback' );
 
    $inv->putback_tokens( "foo", "bar splot" );
-   is( $inv->remaining, q(foo "bar splot"), '->remaining after putback' );
+   is( $inv->peek_remaining, q(foo "bar splot"), '->peek_remaining after putback' );
 }
 
 # new_from_tokens

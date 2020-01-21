@@ -1,126 +1,165 @@
-MODULE = Date                PACKAGE = Date
-PROTOTYPES: DISABLE
-#///////////////////////////// STATIC FUNCTIONS ///////////////////////////////////
+MODE: INLINE
 
-DateRel* rdate (SV* from = NULL, SV* till = NULL) {
-    RETVAL = new DateRel(sv2daterel(from, till));
+#include "private.h"
+
+static inline DateRel xs_daterel_ctor (SV* arg, SV* till) {
+    return till ? DateRel(sv2date(arg), sv2date(till)) : sv2daterel(arg);
 }
 
-const DateRel* rdate_const (SV* from = NULL, SV* till = NULL) {
-    RETVAL = new DateRel(sv2daterel(from, till));
+static inline DateRel xs_daterel_ymd (SV** args, I32 items) {
+    ptime_t vals[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    list2vals(args, items, vals);
+    return DateRel(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5]);
+}
+
+MODULE = Date                PACKAGE = Date
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash("Date::Rel", GV_ADD);
+    
+    xs::exp::create_constants(stash, {
+        {"FORMAT_SIMPLE",   (int)DateRel::Format::simple},
+        {"FORMAT_ISO8601D", (int)DateRel::Format::iso8601d},
+        {"FORMAT_ISO8601I", (int)DateRel::Format::iso8601i},
+        
+        {"INPUT_FORMAT_ALL",      DateRel::InputFormat::all},
+        {"INPUT_FORMAT_SIMPLE",   DateRel::InputFormat::simple},
+        {"INPUT_FORMAT_ISO8601",  DateRel::InputFormat::iso8601},
+        {"INPUT_FORMAT_ISO8601D", DateRel::InputFormat::iso8601d},
+        {"INPUT_FORMAT_ISO8601I", DateRel::InputFormat::iso8601i},
+    });
+}
+
+#///////////////////////////// STATIC FUNCTIONS ///////////////////////////////////
+
+DateRel* rdate (SV* from = {}, SV* till = {}) {
+    RETVAL = new DateRel(xs_daterel_ctor(from, till));
+}
+
+DateRel* rdate_ymd (...) {
+    RETVAL = new DateRel(xs_daterel_ymd(&ST(0), items));
+}
+
+const DateRel* rdate_const (SV* from = {}, SV* till = {}) {
+    RETVAL = new DateRel(xs_daterel_ctor(from, till));
+}
+
+const DateRel* rdate_ymd_const (...) {
+    RETVAL = new DateRel(xs_daterel_ymd(&ST(0), items));
 }
 
 #///////////////////////////// OBJECT METHODS ///////////////////////////////////
 MODULE = Date                PACKAGE = Date::Rel
 PROTOTYPES: DISABLE
 
-DateRel* new (SV*, SV* from = NULL, SV* till = NULL) {
-    RETVAL = new DateRel(sv2daterel(from, till));
+DateRel* new (SV*, SV* from = {}, SV* till = {}) {
+    RETVAL = new DateRel(xs_daterel_ctor(from, till));
 }
 
-void DateRel::set (SV* from, SV* till = NULL) {
-    *THIS = sv2daterel(from, till);
+DateRel* new_ymd (...) {
+    RETVAL = new DateRel(xs_daterel_ymd(&ST(1), items - 1));
 }
 
-ptime_t DateRel::sec (SV* newval = NULL) : ALIAS(second=1, secs=2, seconds=3) {
+void DateRel::set (SV* from, SV* till = {}) {
+    *THIS = xs_daterel_ctor(from, till);
+}
+
+void DateRel::set_ymd (...) {
+    *THIS = xs_daterel_ymd(&ST(1), items - 1);
+}
+
+ptime_t DateRel::sec (SV* newval = NULL) {
     if (newval) {
         THIS->sec(xs::in<ptime_t>(newval));
     }
     RETVAL = THIS->sec();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::min (SV* newval = NULL) : ALIAS(mins=1, minute=2, minutes=3) {
+ptime_t DateRel::min (SV* newval = NULL) {
     if (newval) THIS->min(xs::in<ptime_t>(newval));
     RETVAL = THIS->min();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::hour (SV* newval = NULL) : ALIAS(hours=1) {
+ptime_t DateRel::hour (SV* newval = NULL) {
     if (newval) {
         THIS->hour(xs::in<ptime_t>(newval));
     }
     RETVAL = THIS->hour();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::day (SV* newval = NULL) : ALIAS(days=1) {
+ptime_t DateRel::day (SV* newval = NULL) {
     if (newval) {
         THIS->day(xs::in<ptime_t>(newval));
     }
     RETVAL = THIS->day();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::month (SV* newval = NULL) : ALIAS(mon=1, months=2, mons=3) {
+ptime_t DateRel::month (SV* newval = NULL) {
     if (newval) {
         THIS->month(xs::in<ptime_t>(newval));
     }
     RETVAL = THIS->month();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::year (SV* newval = NULL) : ALIAS(years=1) {
+ptime_t DateRel::year (SV* newval = NULL) {
     if (newval) {
         THIS->year(xs::in<ptime_t>(newval));
     }
     RETVAL = THIS->year();
-    PERL_UNUSED_VAR(ix);
 }
 
-ptime_t DateRel::to_sec () : ALIAS(to_second=1, to_secs=2, to_seconds=3, duration=4) const {
-    RETVAL = THIS->to_sec();
-    PERL_UNUSED_VAR(ix);
+Date* DateRel::from (SV* fromSV = NULL) {
+    if (fromSV) {
+        THIS->from(sv2date(fromSV));
+        XSRETURN_UNDEF;
+    }
+    if (!THIS->from()) XSRETURN_UNDEF;
+    RETVAL = new Date(*(THIS->from()));
 }
 
-double DateRel::to_min () : ALIAS(to_minute=1, to_mins=2, to_minutes=3) const {
-    RETVAL = THIS->to_min();
-    PERL_UNUSED_VAR(ix);
+Date* DateRel::till () : const {
+    auto till = THIS->till();
+    if (!till) XSRETURN_UNDEF;
+    RETVAL = new Date(*till);
 }
 
-double DateRel::to_hour () : ALIAS(to_hours=1) const {
-    RETVAL = THIS->to_hour();
+ptime_t DateRel::to_secs () : ALIAS(duration=1) const {
     PERL_UNUSED_VAR(ix);
+    RETVAL = THIS->to_secs();
 }
 
-double DateRel::to_day () : ALIAS(to_days=1) const {
-    RETVAL = THIS->to_day();
-    PERL_UNUSED_VAR(ix);
+double DateRel::to_mins () : const
+
+double DateRel::to_hours () : const
+
+double DateRel::to_days () : const
+
+double DateRel::to_months () : const
+
+double DateRel::to_years () : const
+
+string DateRel::to_string (int format = (int)DateRel::Format::simple) : const {
+    RETVAL = THIS->to_string((DateRel::Format)format);
 }
 
-double DateRel::to_month () : ALIAS(to_mon=1, to_months=2, to_mons=3) const {
-    RETVAL = THIS->to_month();
-    PERL_UNUSED_VAR(ix);
-}
-
-double DateRel::to_year () : ALIAS(to_years=1) const {
-    RETVAL = THIS->to_year();
-    PERL_UNUSED_VAR(ix);
-}
-
-string DateRel::to_string (...) : ALIAS(as_string=1, string=2) const {
+string DateRel::_op_str (...) : const {
     RETVAL = THIS->to_string();
-    PERL_UNUSED_VAR(ix);
 }
 
 bool DateRel::to_bool (...) : const {
-    RETVAL = THIS->to_sec();
+    RETVAL = THIS->duration();
 }
 
 ptime_t DateRel::to_number (...) : const {
-    RETVAL = THIS->to_sec();
+    RETVAL = THIS->duration();
 }
 
-Sv DateRel::sum (Sv arg, ...) : ALIAS(add_new=1) const {
-    if (ix == 1) warn("add_new() is deprecated, use sum() instead");
+Sv DateRel::sum (Sv arg, ...) : const {
     if (arg.is_object_ref()) {
         Stash s = Object(arg).stash();
-        if (s.name() == "Date::Rel")
-            RETVAL = xs::out(new DateRel(*THIS + *xs::in<const DateRel*>(arg)), Object(ST(0)).stash());
-        else if (s.name() == "Date")
-            RETVAL = xs::out(new Date(*xs::in<Date*>(arg) + *THIS));
-        else
-            RETVAL = xs::out(new DateInt(*xs::in<DateInt*>(arg) + *THIS));
+        if (s.name() == "Date") RETVAL = xs::out(new Date(*xs::in<Date*>(arg) + *THIS));
+        else                    RETVAL = xs::out(new DateRel(*THIS + *xs::in<const DateRel*>(arg)), Object(ST(0)).stash());
     }
     else RETVAL = xs::out(new DateRel(*THIS + sv2daterel(arg)), Object(ST(0)).stash());
 }
@@ -130,8 +169,7 @@ SV* DateRel::add (Sv arg, ...) {
     XSRETURN(1);
 }
 
-DateRel* DateRel::difference (Sv arg, bool reverse = false) : ALIAS(subtract_new=1) const {
-    if (ix == 1) warn("subtract_new() is deprecated, use difference() instead");
+DateRel* DateRel::difference (Sv arg, bool reverse = false) : const {
     auto op = sv2daterel(arg);
     RETVAL = new DateRel(reverse ? (op - *THIS) : (*THIS - op));
     PROTO = Object(ST(0)).stash();
@@ -142,8 +180,7 @@ SV* DateRel::subtract (Sv arg, ...) {
     XSRETURN(1);
 }
 
-DateRel* DateRel::product (SV* arg, ...) : ALIAS(multiply_new=1) const {
-    if (ix == 1) warn("multiply_new() is deprecated, use product() instead");
+DateRel* DateRel::product (SV* arg, ...) : const {
     RETVAL = new DateRel(*THIS * SvNV(arg));
     PROTO = Object(ST(0)).stash();
 }
@@ -153,8 +190,7 @@ SV* DateRel::multiply (SV* arg, ...) {
     XSRETURN(1);
 }
 
-DateRel* DateRel::quotient (SV* arg, bool reverse = false) : ALIAS(divide_new=1) const {
-    if (ix == 1) warn("divide_new() is deprecated, use quotient() instead");
+DateRel* DateRel::quotient (SV* arg, bool reverse = false) : const {
     if (reverse) throw "Date: illegal divison $num/$reldate";
     RETVAL = new DateRel(*THIS / SvNV(arg));
     PROTO = Object(ST(0)).stash();
@@ -166,14 +202,12 @@ SV* DateRel::divide (SV* arg, bool reverse = false) {
     XSRETURN(1);
 }
 
-DateRel* DateRel::negated (...) : ALIAS(negative_new=1) const {
-    if (ix == 1) warn("negative_new() is deprecated, use negated() instead");
+DateRel* DateRel::negated (...) : const {
     RETVAL = new DateRel(THIS->negated());
     PROTO = Object(ST(0)).stash();
 }
 
-SV* DateRel::negate () : ALIAS(negative=1) {
-    if (ix == 1) warn("negative() is deprecated, use negate() instead");
+SV* DateRel::negate () {
     THIS->negate();
     XSRETURN(1);
 }
@@ -185,9 +219,12 @@ int DateRel::compare (Sv arg, bool reverse) : const {
     else if (RETVAL > 0) RETVAL = 1;
 }
 
-bool DateRel::is_same (Sv arg, ...) : ALIAS(equals=1) const {
-    if (ix == 1) warn("equals() is deprecated, use is_same() instead");
+bool DateRel::is_same (Sv arg, ...) : const {
     RETVAL = THIS->is_same(sv2daterel(arg));
+}
+
+int DateRel::includes (Sv arg) : const {
+    RETVAL = THIS->includes(sv2date(arg));
 }
 
 DateRel* DateRel::clone () {

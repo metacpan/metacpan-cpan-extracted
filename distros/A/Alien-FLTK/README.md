@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/sanko/alien-fltk.svg?branch=master)](https://travis-ci.org/sanko/alien-fltk)
+[![Build Status](https://travis-ci.org/sanko/alien-fltk.svg?branch=master)](https://travis-ci.org/sanko/alien-fltk) [![MetaCPAN Release](https://badge.fury.io/pl/Alien-FLTK.svg)](https://metacpan.org/release/Alien-FLTK)
 # NAME
 
-Alien::FLTK - Build and use the stable 1.3.3 branch of the Fast Light Toolkit
+Alien::FLTK - Build and use the stable 1.3.x branch of the Fast Light Toolkit
 
 # Description
 
-This distribution builds and installs libraries for the (stable) `1.3.3`
+This distribution builds and installs libraries for the (stable) `1.3.x`
 branch of the FLTK GUI toolkit.
 
 # Synopsis
@@ -47,14 +47,14 @@ branch of the FLTK GUI toolkit.
 # Constructor
 
 There are no per-object configuration options as of this version, but there
-may be in the future, so any new code using [Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) should
+may be in the future, so any new code using [Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) should
 create objects with the `new` constructor.
 
     my $AF = Alien::FLTK->new( );
 
 # Methods
 
-After creating a new [Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) object, use the following
+After creating a new [Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) object, use the following
 methods to gather information:
 
 ## `include_dirs`
@@ -110,7 +110,7 @@ Prerequisites differ by system...
 
 - Win32
 
-    The fltk libs and [Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) both build right out of the box
+    The fltk libs and [Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) both build right out of the box
     with MinGW. Further testing is needed for other setups.
 
 - X11/\*nix
@@ -131,7 +131,7 @@ Prerequisites differ by system...
 
 ## Installation
 
-The distribution is based on [Module::Build](https://metacpan.org/pod/Module::Build), so use the
+The distribution is based on [Module::Build](https://metacpan.org/pod/Module%3A%3ABuild), so use the
 following procedure:
 
     > perl Build.PL
@@ -145,7 +145,7 @@ following procedure:
 
     http://github.com/sanko/alien-fltk/issues
 
-    Please only report [Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) related bugs to this tracker.
+    Please only report [Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) related bugs to this tracker.
     For [FLTK](https://metacpan.org/pod/FLTK) issues, use http://github.com/sanko/fltk-perl/issues/
 
 - Commit Log
@@ -166,7 +166,7 @@ following procedure:
 - Mailing List
 
     Once I find someone to host a list for the [FLTK](https://metacpan.org/pod/FLTK) project, I'll use it
-    for [Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) too.
+    for [Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) too.
 
 - Repository
 
@@ -174,7 +174,7 @@ following procedure:
 
 ## Examples
 
-Please see the [Synopsis](https://metacpan.org/pod/Alien::FLTK#Synopsis) and the files in the
+Please see the [Synopsis](https://metacpan.org/pod/Alien%3A%3AFLTK#Synopsis) and the files in the
 `/examples/`.
 
 ## Bugs
@@ -183,11 +183,11 @@ Numerous, I'm sure.
 
 ## To Do
 
-Please see [Alien::FLTK::Todo](https://metacpan.org/pod/Alien::FLTK::Todo)
+Please see [Alien::FLTK::Todo](https://metacpan.org/pod/Alien%3A%3AFLTK%3A%3ATodo)
 
 # See Also
 
-[FLTK](https://metacpan.org/pod/FLTK), [Alien::FLTK2](https://metacpan.org/pod/Alien::FLTK2)
+[FLTK](https://metacpan.org/pod/FLTK), [Alien::FLTK2](https://metacpan.org/pod/Alien%3A%3AFLTK2)
 
 # Acknowledgments
 
@@ -195,13 +195,13 @@ Please see [Alien::FLTK::Todo](https://metacpan.org/pod/Alien::FLTK::Todo)
 
 # Author
 
-Sanko Robinson &lt;sanko@cpan.org> - http://sankorobinson.com/
+Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
 
 CPAN ID: SANKO
 
 # License and Legal
 
-Copyright (C) 2009-2016 by Sanko Robinson &lt;sanko@cpan.org>
+Copyright (C) 2009-2020 by Sanko Robinson <sanko@cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of The Artistic License 2.0. See the `LICENSE` file included with
@@ -213,5 +213,5 @@ Creative Commons Attribution-Share Alike 3.0 License. See
 http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
 clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
-[Alien::FLTK](https://metacpan.org/pod/Alien::FLTK) is based in part on the work of the FLTK project.
+[Alien::FLTK](https://metacpan.org/pod/Alien%3A%3AFLTK) is based in part on the work of the FLTK project.
 See http://www.fltk.org/.

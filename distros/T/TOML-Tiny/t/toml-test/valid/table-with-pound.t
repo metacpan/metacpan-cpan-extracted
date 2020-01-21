@@ -2,6 +2,10 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
@@ -10,9 +14,11 @@ binmode STDOUT, ':encoding(UTF-8)';
 my $expected1 = {
                'key#group' => {
                                 'answer' => bless( {
-                                                     '_file' => '(eval 425)',
-                                                     'name' => '<Custom Code>',
+                                                     '_lines' => [
+                                                                   6
+                                                                 ],
                                                      'operator' => 'CODE(...)',
+                                                     'name' => '<Custom Code>',
                                                      'code' => sub {
                                                                    BEGIN {${^WARNING_BITS} = "\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x55\x15\x00\x04\x40\x05\x04\x54"}
                                                                    use strict;
@@ -21,9 +27,7 @@ my $expected1 = {
                                                                    require Math::BigInt;
                                                                    'Math::BigInt'->new('42')->beq($_);
                                                                },
-                                                     '_lines' => [
-                                                                   6
-                                                                 ]
+                                                     '_file' => '(eval 425)'
                                                    }, 'Test2::Compare::Custom' )
                               }
              };

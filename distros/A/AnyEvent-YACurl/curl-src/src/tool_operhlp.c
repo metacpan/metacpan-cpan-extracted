@@ -37,18 +37,20 @@
 
 void clean_getout(struct OperationConfig *config)
 {
-  struct getout *next;
-  struct getout *node = config->url_list;
+  if(config) {
+    struct getout *next;
+    struct getout *node = config->url_list;
 
-  while(node) {
-    next = node->next;
-    Curl_safefree(node->url);
-    Curl_safefree(node->outfile);
-    Curl_safefree(node->infile);
-    Curl_safefree(node);
-    node = next;
+    while(node) {
+      next = node->next;
+      Curl_safefree(node->url);
+      Curl_safefree(node->outfile);
+      Curl_safefree(node->infile);
+      Curl_safefree(node);
+      node = next;
+    }
+    config->url_list = NULL;
   }
-  config->url_list = NULL;
 }
 
 bool output_expected(const char *url, const char *uploadfile)
@@ -113,16 +115,17 @@ char *add_file_name_to_url(char *url, const char *filename)
         urlbuffer = aprintf("%s/%s", url, encfile);
 
       curl_free(encfile);
+
+      if(!urlbuffer) {
+        url = NULL;
+        goto end;
+      }
+
       Curl_safefree(url);
-
-      if(!urlbuffer)
-        return NULL;
-
       url = urlbuffer; /* use our new URL instead! */
     }
-    else
-      Curl_safefree(url);
   }
+  end:
   curl_easy_cleanup(curl);
   return url;
 }

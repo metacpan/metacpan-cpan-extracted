@@ -104,14 +104,17 @@ REQUIRED_LDBL_MANT_DIG   : Defined to float.h's LDBL_MANT_DIG unless
                            This is needed to ensure that the mpfr value is
                            an accurate rendition of the double-double value.
 
-MAXIMUM_ALLOWABLE_BASE   : Defined to 62 if mpfr version >= 3.0.0.
-                           Else defined to 32.
-
-CHECK_ROUNDING_VALUE     : Macro that checks (on mpfr-versions 2.x.x only)
+CHECK_ROUNDING_VALUE     : Macro that checks (on pre-4.0.0 mpfr versions only)
                            that the rounding value provided is in the
-                           allowable range of 0-3 inclusive.
-                           (The range has been extended for versions 3.0.0
-                           and later.)
+                           allowable range of 0-4 inclusive.
+                           (On 2.x.x versions the allowable range is only 0-3,
+                           but we don't support those versions anyway.)
+
+CHECK_INPUT_BASE         : Macro that checks that the base (where specified)
+                           is in the accepted range.
+
+CHECK_OUTPUT_BASE        : Macro that checks that the base (where specified)
+                           is in the accepted range.
 
 DEAL_WITH_NANFLAG_BUG    : Macro that corrects certain failures (in mpfr
                            versions prior to 3.1.4) to set the NaN flag.
@@ -143,15 +146,17 @@ IVSIZE_BITS              : Defined only if MATH_MPFR_NEED_LONG_LONG_INT is
                            Currently, I think this symbol will only ever be
                            either undefined or set to 64 - and I suspect
                            that it could (currently) be replaced with a hard
-                           code 64 wherever it occurs in the code.
+                           coded 64 wherever it occurs in the code.
 
 _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
                            (as expressed by $]) is less than 5.022.
-                           These earlier perl versions generally stringified
-                           NaNs as (-)1.#IND and Infs as (-)1.#INF.
+                           These earlier perl versions had bizarre strings
+                           representing NaNs (eg 1.#IND) and Infs (eg 1.#INF)
+                           on Win32.
 
 LD_SUBNORMAL_BUG         : Defined for mpfr-3.1.4 and earlier if and only if
                            LDBL_MANT_DIG == 64
+                           (The bug is in mpfr_get_ld)
 
 FALLBACK_NOTIFY          : If defined, $Math::MPFR::doubletoa_fallback
                            (initially set to 0) will be incremented by 1 on
@@ -219,7 +224,16 @@ typedef _Decimal128 D128;
 #define NV_IS_53_BIT 1
 #endif
 
-#define MAXIMUM_ALLOWABLE_BASE 62
+#define CHECK_INPUT_BASE \
+     if(SvIV(base) < 0 || SvIV(base) > 62 || SvIV(base) == 1) {
+
+#if MPFR_VERSION >= 262400 /* Allowable range of base has been expanded */
+#define CHECK_OUTPUT_BASE \
+     if(SvIV(base) < -36 || SvIV(base) > 62 || abs(SvIV(base)) < 2 )  {
+#else
+#define CHECK_OUTPUT_BASE \
+     if(SvIV(base) < 2 || SvIV(base) > 62)                    {
+#endif
 
 /* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
  * (as this function's "round" arg is "unsigned int", not SV*) */
@@ -367,12 +381,45 @@ typedef _Decimal128 D128;
 #define MATH_MPFR_NV_MAX 1.7976931348623157e+308
 #define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
 
+# if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
+
+# define D_CONDITION_1 i<=7
+# define D_INC_OR_DEC i++;
+# define DIND_0 0
+# define DIND_1 1
+
+# else						/* little endian architecture */
+
+# define D_CONDITION_1 i>=0
+# define D_INC_OR_DEC i--;
+# define DIND_0 7
+# define DIND_1 6
+
+# endif
+
 #elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
 #define MATH_MPFR_MAX_DIG 21
 #define MATH_MPFR_BITS 64
 #define MATH_MPFR_NV_MAX 1.18973149535723176502e4932L
-
 #define MATH_MPFR_NORMAL_MIN 3.36210314311209350626e-4932L
+
+# if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
+
+# define LD_CONDITION_1 i<=9
+# define LD_INC_OR_DEC i++;
+# define LDIND_0 0
+# define LDIND_1 1
+# define LDIND_2 2
+
+# else						/* little endian architecture */
+
+# define LD_CONDITION_1 i>=0
+# define LD_INC_OR_DEC i--;
+# define LDIND_0 9
+# define LDIND_1 8
+# define LDIND_2 7
+
+# endif
 
 #elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
 #define MATH_MPFR_MAX_DIG 33
@@ -380,11 +427,63 @@ typedef _Decimal128 D128;
 #define MATH_MPFR_NV_MAX 1.797693134862315807937289714053e+308L
 #define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
 
+# if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
+# define DD_CONDITION_1 i<=7
+# define DD_CONDITION_2 i=2;i<8;i++
+# define DD_INC_OR_DEC i++;
+# define IND_0 0
+# define IND_1 1
+# define LSD_BYTE_1 8
+# define LSD_BYTE_2 9
+# define LSD_BYTE_3 10
+# define LSD_BYTE_4 11
+# define LSD_BYTE_5 12
+# define LSD_BYTE_6 13
+# define LSD_BYTE_7 14
+# define LSD_BYTE_8 15
+
+# else                                        /* little endian architecture */
+
+# define DD_CONDITION_1 i>=0
+# define DD_CONDITION_2 i=13;i>7;i--
+# define DD_INC_OR_DEC i--;
+# define IND_0 15
+# define IND_1 14
+# define LSD_BYTE_1 7
+# define LSD_BYTE_2 6
+# define LSD_BYTE_3 5
+# define LSD_BYTE_4 4
+# define LSD_BYTE_5 3
+# define LSD_BYTE_6 2
+# define LSD_BYTE_7 1
+# define LSD_BYTE_8 0
+
+# endif /* MPFR_HAVE_BENDIAN */
+
 #else
 #define MATH_MPFR_MAX_DIG 36
 #define MATH_MPFR_BITS 113
 #define MATH_MPFR_NV_MAX 1.18973149535723176508575932662800702e+4932Q
 #define MATH_MPFR_NORMAL_MIN 3.3621031431120935062626778173217526e-4932Q
+
+# if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
+
+# define Q_CONDITION_1 i<=15
+# define Q_INC_OR_DEC i++;
+# define QIND_0 0
+# define QIND_1 1
+# define QIND_2 2
+
+# else						/* little endian architecture */
+
+# define Q_CONDITION_1 i>=0
+# define Q_INC_OR_DEC i--;
+# define QIND_0 15
+# define QIND_1 14
+# define QIND_2 13
+
+# endif
+
 #endif
 
 /* End of defines for nvtoa() */

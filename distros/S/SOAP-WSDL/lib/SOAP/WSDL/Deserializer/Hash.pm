@@ -8,7 +8,7 @@ use SOAP::WSDL::Expat::Message2Hash;
 use SOAP::WSDL::Factory::Deserializer;
 SOAP::WSDL::Factory::Deserializer->register( '1.1', __PACKAGE__ );
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 sub BUILD {
     my ($self, $ident, $args_of_ref) = @_;
@@ -98,7 +98,7 @@ Examples:
      }
  }
 
-List reference creation is triggered by the second occurance of an element.
+List reference creation is triggered by the second occurrence of an element.
 XML Array types with one element only will not be represented as list
 references.
 

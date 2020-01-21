@@ -1,5 +1,9 @@
 Revision history for Perl extension Curio-Role-CHI.
 
+0.03 2020-01-20T20:38:15Z
+
+ - Deprecate.
+
 0.02 2019-08-16T22:02:14Z
 
  - Fix tests to work against the latest Curio, 0.08.

@@ -1,5 +1,5 @@
-#include <xs/time.h>
 #include <xs/date.h>
+#include <xs/export.h>
 #include <panda/endian.h>
 
 using namespace xs;
@@ -17,6 +17,6 @@ BOOT {
 
 INCLUDE: DateRel.xsi
 
-INCLUDE: DateInt.xsi
-
 INCLUDE: serialize.xsi
+
+INCLUDE: Timezone.xsi

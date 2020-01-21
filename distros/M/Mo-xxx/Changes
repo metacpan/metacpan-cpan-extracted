@@ -1,16 +1,12 @@
----
-version: 0.12
-date:    Wed Jul 25 09:36:13 PDT 2012
-changes:
-- Fix $DumpModule feature (again)
-- Get rid of 'once' warning
----
-version: 0.11
-date:    Mon Oct  3 14:31:40 BST 2011
-changes:
-- Fix $DumperModule feature
----
-version: 0.10
-date:    Mon Oct  3 00:44:55 BST 2011
-changes:
-- First Release
+0.13 2020-01-20 14:50:26 floating
+ - Fix $DumpModule feature (again)
+
+0.12 2012-07-25 09:36:13 -0700
+ - Fix $DumpModule feature (again)
+ - Get rid of 'once' warning
+
+0.11 2011-10-03 14:31:40 floating
+ - Fix $DumperModule feature
+
+0.10 2011-10-03 00:44:55 floating
+ - First Release

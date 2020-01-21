@@ -1,5 +1,5 @@
 {
-   "abstract" : "Procurer of fine resources and services.",
+   "abstract" : "Procurer of fine resources and services. (DEPRECATED)",
    "author" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
@@ -74,26 +74,26 @@
    "provides" : {
       "Curio" : {
          "file" : "lib/Curio.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Curio::Declare" : {
          "file" : "lib/Curio/Declare.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Curio::Factory" : {
          "file" : "lib/Curio/Factory.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Curio::Guard" : {
          "file" : "lib/Curio/Guard.pm"
       },
       "Curio::Role" : {
          "file" : "lib/Curio/Role.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Curio::Util" : {
          "file" : "lib/Curio/Util.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -107,11 +107,12 @@
          "web" : "https://github.com/bluefeet/Curio"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
+   "x_deprecated" : 1,
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

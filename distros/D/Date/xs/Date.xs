@@ -1,15 +1,158 @@
-#include <xs/time.h>
 #include <xs/date.h>
+#include <xs/export.h>
+#include "private.h"
 
 using namespace xs;
 using namespace xs::date;
 using panda::string;
 using panda::string_view;
 
+#ifdef _WIN32
+    const auto LT_FORMAT = string_view("%a %b %d %H:%M:%S %Y");
+#else
+    const auto LT_FORMAT = string_view("%a %b %e %H:%M:%S %Y");
+#endif
+    
+static const unsigned char relchars[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};
+
+// arguments overloading for new_ymd(), date_ymd(), ->set_ymd()
+static inline Date xs_date_ymd (SV** args, I32 items) {
+    ptime_t vals[8] = {1970, 1, 1, 0, 0, 0, 0, -1};
+    auto tz = list2vals(args, items, vals);
+    return Date(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], tz);
+}
+
 MODULE = Date::Date                PACKAGE = Date
 PROTOTYPES: DISABLE
 
+BOOT {
+    Stash stash(__PACKAGE__);
+    
+    xs::exp::create_constants(stash, {
+        {"FORMAT_ISO",          (int)Date::Format::iso},
+        {"FORMAT_ISO_TZ",       (int)Date::Format::iso_tz},
+        {"FORMAT_ISO_DATE",     (int)Date::Format::iso_date},
+        {"FORMAT_ISO8601",      (int)Date::Format::iso8601},
+        {"FORMAT_ISO8601_NOTZ", (int)Date::Format::iso8601_notz},
+        {"FORMAT_RFC1123",      (int)Date::Format::rfc1123},
+        {"FORMAT_COOKIE",       (int)Date::Format::cookie},
+        {"FORMAT_RFC850",       (int)Date::Format::rfc850},
+        {"FORMAT_ANSI_C",       (int)Date::Format::ansi_c},
+        {"FORMAT_YMD",          (int)Date::Format::ymd},
+        {"FORMAT_DOT",          (int)Date::Format::dot},
+        {"FORMAT_HMS",          (int)Date::Format::hms},
+        
+        {"INPUT_FORMAT_ALL",     Date::InputFormat::all},
+        {"INPUT_FORMAT_ISO",     Date::InputFormat::iso},
+        {"INPUT_FORMAT_ISO8601", Date::InputFormat::iso8601},
+        {"INPUT_FORMAT_RFC1123", Date::InputFormat::rfc1123},
+        {"INPUT_FORMAT_RFC850",  Date::InputFormat::rfc850},
+        {"INPUT_FORMAT_ANSI_C",  Date::InputFormat::ansi_c},
+        {"INPUT_FORMAT_DOT",     Date::InputFormat::dot},
+    });
+    
+    Stash ecstash("Date::errc", GV_ADD);
+    xs::exp::create_constants(ecstash, {
+        {"parser_error",  xs::out(make_error_code(errc::parser_error))},
+        {"out_of_range", xs::out(make_error_code(errc::out_of_range))},
+    });
+    
+    stash.add_const_sub("error_category", xs::out<const std::error_category*>(&error_category));
+}
+
 #///////////////////////////// STATIC FUNCTIONS ///////////////////////////////////
+
+const Timezone* tzget (string_view zonename = {})
+
+void tzset (const Timezone* newzone = {})
+
+string tzdir (SV* newdir = NULL) {
+    if (newdir) {
+        tzdir(xs::in<string>(newdir));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = tzdir();
+}
+
+string tzsysdir () {
+    RETVAL = tzsysdir();
+}
+
+void gmtime (SV* epochSV = {}, const Timezone* tz = {}) : ALIAS(localtime=1, anytime=2) {
+    ptime_t epoch;
+    if (epochSV) epoch = xs::in<ptime_t>(epochSV);
+    else epoch = (ptime_t) ::time(NULL);
+
+    datetime date;
+    bool success = false;
+    switch (ix) {
+        case 0: success = gmtime(epoch, &date);                       break;
+        case 1: success = localtime(epoch, &date);                    break;
+        case 2: success = anytime(epoch, &date, tz ? tz : tzlocal()); break;
+    }
+
+    if (GIMME_V == G_ARRAY) {
+        if (!success) XSRETURN_EMPTY;
+        EXTEND(SP, 9);
+        EXTEND_MORTAL(9);
+        mPUSHu(date.sec);
+        mPUSHu(date.min);
+        mPUSHu(date.hour);
+        mPUSHu(date.mday);
+        mPUSHu(date.mon);
+        mPUSHi(date.year);
+        mPUSHu(date.wday);
+        mPUSHu(date.yday);
+        mPUSHu(date.isdst);
+        XSRETURN(9);
+    } else {
+        EXTEND(SP, 1);
+        if (!success) XSRETURN_UNDEF;
+        mPUSHs(xs::out(strftime(LT_FORMAT, date)).detach());
+        XSRETURN(1);
+    }
+}
+
+ptime_t timegm (SV* sec, SV* min, SV* hour, SV* mday, SV* mon, SV* year, SV* isdst = {}, const Timezone* tz = {}) : ALIAS(timelocal=1, timeany=2, timegmn=3, timelocaln=4, timeanyn=5) {
+    datetime date;
+    date.sec  = xs::in<ptime_t>(sec);
+    date.min  = xs::in<ptime_t>(min);
+    date.hour = xs::in<ptime_t>(hour);
+    date.mday = xs::in<ptime_t>(mday);
+    date.mon  = xs::in<ptime_t>(mon);
+    date.year = xs::in<ptime_t>(year);
+
+    if (isdst) date.isdst = SvIV(isdst);
+    else date.isdst = -1;
+
+    switch (ix) {
+        case 0: RETVAL = timegml(&date);                       break;
+        case 1: RETVAL = timelocall(&date);                    break;
+        case 2: RETVAL = timeanyl(&date, tz ? tz : tzlocal()); break;
+        case 3: RETVAL = timegm(&date);                        break;
+        case 4: RETVAL = timelocal(&date);                     break;
+        case 5: RETVAL = timeany(&date, tz ? tz : tzlocal());  break;
+        default: croak("not reached");
+    }
+
+    if (ix >= 3) {
+        sv_setiv(sec, date.sec);
+        sv_setiv(min, date.min);
+        sv_setiv(hour, date.hour);
+        sv_setiv(mday, date.mday);
+        sv_setiv(mon, date.mon);
+        sv_setiv(year, date.year);
+        if (isdst) sv_setiv(isdst, date.isdst);
+    }
+}
 
 Date* now () {
     RETVAL = new Date(Date::now());
@@ -32,17 +175,12 @@ ptime_t today_epoch () {
     RETVAL = timelocall(&date);
 }
 
-Date* date (SV* date = NULL, SV* zone = NULL) {
-    RETVAL = new Date(sv2date(date, tzget_optional(zone)));
+Date* date (SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+    RETVAL = new Date(sv2date(val, tz, fmt));
 }
 
-string string_format (Simple newval = Simple()) {
-    if (newval) {
-        if (newval.defined()) Date::string_format(string((string_view)newval));
-        else Date::string_format(string());
-    }
-    RETVAL = Date::string_format();
-    if (!RETVAL) XSRETURN_UNDEF;
+Date* date_ymd (...) {
+    RETVAL = new Date(xs_date_ymd(&ST(0), items));
 }
 
 bool range_check (Simple newval = Simple()) {
@@ -52,12 +190,20 @@ bool range_check (Simple newval = Simple()) {
 
 #///////////////////////////// OBJECT METHODS ///////////////////////////////////
 
-Date* new (SV*, SV* date = NULL, SV* zone = NULL) {
-    RETVAL = new Date(sv2date(date, tzget_optional(zone)));
+Date* new (SV*, SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+    RETVAL = new Date(sv2date(val, tz, fmt));
 }
 
-void Date::set (SV* arg, SV* zone = NULL) {
-    THIS->set(sv2date(arg, tzget_optional(zone)));
+Date* new_ymd (...) {
+    RETVAL = new Date(xs_date_ymd(&ST(1), items - 1));
+}
+
+void Date::set (SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+    THIS->set(sv2date(val, tz, fmt));
+}
+
+void Date::set_ymd (...) {
+    THIS->set(xs_date_ymd(&ST(1), items - 1));
 }
 
 void Date::epoch (SV* newval = NULL) {
@@ -165,78 +311,103 @@ bool Date::isdst () : ALIAS(daylight_savings=1) {
     RETVAL = THIS->isdst();
 }
 
-string Date::to_string (...) : ALIAS(as_string=1, string=2) {
-    PERL_UNUSED_VAR(ix);
+string Date::to_string (int format = (int)Date::Format::iso) {
+    if (THIS->error()) XSRETURN_UNDEF;
+    RETVAL = THIS->to_string((Date::Format)format);
+}
+
+string Date::_op_str (...) {
     if (THIS->error()) XSRETURN_UNDEF;
     RETVAL = THIS->to_string();
 }
 
+#// $date->strftime($format)
+#// Date::strftime($format, $epoch, [$timezone])
+#// Date::strftime($format, $sec, $min, $hour, $mday, $mon, $year, [$isdst], [$timezone])
+string strftime (Sv arg0, SV* arg1, ...) {
+    if (items == 2 && arg0.is_object_ref()) {
+        auto THIS = xs::in<Date*>(arg0);
+        RETVAL = THIS->strftime(xs::in<string_view>(arg1));
+    }
+    else {
+        string_view format = xs::in<string_view>(arg0);
+        const Timezone* tz = nullptr;
+        datetime date;
+        date.isdst = -1;
+        
+        switch (items) {
+            case 9: tz = xs::in<const Timezone*>(ST(8));
+            case 8: date.isdst = SvIV(ST(7));
+            case 7:
+                date.sec   = xs::in<ptime_t>(ST(1));
+                date.min   = xs::in<ptime_t>(ST(2));
+                date.hour  = xs::in<ptime_t>(ST(3));
+                date.mday  = xs::in<ptime_t>(ST(4));
+                date.mon   = xs::in<ptime_t>(ST(5));
+                date.year  = xs::in<ptime_t>(ST(6));
+                timeany(&date, tz ? tz : tzlocal());
+                break;
+            case 3: tz = xs::in<const Timezone*>(ST(2));
+            case 2: {
+                auto epoch  = xs::in<ptime_t>(arg1);
+                if (!anytime(epoch, &date, tz ? tz : tzlocal())) XSRETURN_UNDEF;
+                break;
+            }
+            default:
+                throw "wrong number of arguments";
+        }
+        RETVAL = strftime(format, date);
+    }    
+}
+
 bool Date::to_bool (...) {
-    RETVAL = THIS->error() == E_OK ? true : false;
+    RETVAL = THIS->error() ? false : true;
 }
 
 ptime_t Date::to_number (...) {
-    RETVAL = THIS->error() == E_OK ? THIS->epoch() : 0;
+    RETVAL = THIS->error() ? 0 : THIS->epoch();
 }
 
-string Date::strftime (const char* format) {
-    RETVAL = THIS->strftime(format, NULL);
-}
-
-string Date::monthname () : ALIAS(monname=1) {
-    RETVAL = THIS->strftime("%B", NULL);
+string_view Date::month_name () : ALIAS(monname=1, monthname=2) {
     PERL_UNUSED_VAR(ix);
+    RETVAL = THIS->month_name();
 }
 
-string Date::wdayname () : ALIAS(day_of_weekname=1) {
-    RETVAL = THIS->strftime("%A", NULL);
+string_view Date::month_sname ()
+
+string_view Date::wday_name () : ALIAS(day_of_weekname=1, wdayname=2) {
     PERL_UNUSED_VAR(ix);
+    RETVAL = THIS->wday_name();
 }
 
-string Date::iso () : ALIAS(sql=1) {
-    RETVAL = THIS->iso();
-    PERL_UNUSED_VAR(ix);
-}
-
-string Date::iso_sec ()
-
-string Date::mysql ()
-
-string Date::hms ()
-
-string Date::ymd ()
-
-string Date::mdy ()
-
-string Date::dmy ()
-
-string Date::ampm ()
-
-string Date::meridiam ()
+string_view Date::wday_sname ()
 
 int Date::gmtoff ()
 
 string_view Date::tzabbr ()
 
-string Date::tzname () {
-    RETVAL = THIS->timezone()->name;
+#// Date::tzname()
+#// $date->tzname()
+string tzname (Date* date = nullptr) {
+    const Timezone* zone = date ? date->timezone() : tzlocal();
+    RETVAL = zone->name;
 }
 
 bool Date::tzlocal () {
     RETVAL = THIS->timezone()->is_local;
 }
 
-TimezoneSP Date::tz (SV* newzone = NULL) : ALIAS(timezone=1, zone=2) {
+const Timezone* Date::timezone (const Timezone* newzone = {}) : ALIAS(tz=1, zone=2) {
     if (newzone) {
-        THIS->timezone(tzget_required(newzone));
+        THIS->timezone(newzone);
         XSRETURN_UNDEF;
     }
     RETVAL = THIS->timezone();
     PERL_UNUSED_VAR(ix);
 }
 
-void Date::to_tz (SV* newzone) : ALIAS(to_timezone=1, to_zone=2) {
-    THIS->to_timezone(tzget_required(newzone));
+void Date::to_timezone (const Timezone* newzone) : ALIAS(to_tz=1, to_zone=2) {
+    THIS->to_timezone(newzone);
     PERL_UNUSED_VAR(ix);
 }
 
@@ -253,19 +424,6 @@ void Date::array () {
     XSRETURN(cnt);
 }
 
-Array Date::aref () {
-    RETVAL = Array::create();
-    auto cnt = THIS->mksec() ? 7 : 6;
-    RETVAL.reserve(cnt);
-    RETVAL.store(0, Simple(THIS->year()));
-    RETVAL.store(1, Simple(THIS->month()));
-    RETVAL.store(2, Simple(THIS->day()));
-    RETVAL.store(3, Simple(THIS->hour()));
-    RETVAL.store(4, Simple(THIS->min()));
-    RETVAL.store(5, Simple(THIS->sec()));
-    if (THIS->mksec()) RETVAL.store(6, Simple(THIS->mksec()));
-}
-
 void Date::struct () {
     EXTEND(SP, 9);
     mPUSHu(THIS->sec());
@@ -280,77 +438,14 @@ void Date::struct () {
     XSRETURN(9);
 }
 
-Array Date::sref () {
-    RETVAL = Array::create();
-    RETVAL.reserve(8);
-    RETVAL.store(0, Simple(THIS->sec()));
-    RETVAL.store(1, Simple(THIS->min()));
-    RETVAL.store(2, Simple(THIS->hour()));
-    RETVAL.store(3, Simple(THIS->day()));
-    RETVAL.store(4, Simple(THIS->c_month()));
-    RETVAL.store(5, Simple(THIS->c_year()));
-    RETVAL.store(6, Simple(THIS->c_wday()));
-    RETVAL.store(7, Simple(THIS->c_yday()));
-    RETVAL.store(8, Simple(THIS->isdst() ? 1 : 0));
-}
-
-void Date::hash () {
-    int cnt = 12;
-    if (THIS->mksec()) cnt = 14;
-    
-    EXTEND(SP, cnt);
-    mPUSHp("year", 4);
-    mPUSHi(THIS->year());
-    mPUSHp("month", 5);
-    mPUSHu(THIS->month());
-    mPUSHp("day", 3);
-    mPUSHu(THIS->day());
-    mPUSHp("hour", 4);
-    mPUSHu(THIS->hour());
-    mPUSHp("min", 3);
-    mPUSHu(THIS->min());
-    mPUSHp("sec", 3);
-    mPUSHu(THIS->sec());
-    if (THIS->mksec()) {
-        mPUSHp("mksec", 5);
-        mPUSHu(THIS->mksec());
-    }
-    
-    XSRETURN(cnt);
-}
-
-Hash Date::href () {
-    RETVAL = Hash::create();
-    RETVAL.store("year",  Simple(THIS->year()));
-    RETVAL.store("month", Simple(THIS->month()));
-    RETVAL.store("day",   Simple(THIS->day()));
-    RETVAL.store("hour",  Simple(THIS->hour()));
-    RETVAL.store("min",   Simple(THIS->min()));
-    RETVAL.store("sec",   Simple(THIS->sec()));
-    if (THIS->mksec()) RETVAL.store("mksec", Simple(THIS->mksec()));
-}
-
-Date* Date::clone (SV* diff = NULL, SV* zoneSV = NULL) {
-    if (diff) {
-        auto zone = tzget_optional(zoneSV);
-        if (SvOK(diff)) {
-            if (!SvRV(diff)) throw "bad argument type";
-            diff = SvRV(diff);
-            ptime_t vals[] = {-1, -1, -1, -1, -1, -1, -1, -1};
-            if (SvTYPE(diff) == SVt_PVHV) {
-                Hash hash = (HV*)diff;
-                hash2vals(hash, vals, &zone);
-            }
-            else if (SvTYPE(diff) == SVt_PVAV) {
-                Array arr = (AV*)diff;
-                array2vals(arr, vals);
-            }
-            else throw "bad argument type";
-            RETVAL = new Date(THIS->clone(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], zone));
-        }
-        else RETVAL = new Date(*THIS, zone);
+Date* Date::clone (...) {
+    if (items > 1) {
+        ptime_t vals[] = {-1, -1, -1, -1, -1, -1, -1, -1};
+        auto tz = list2vals(&ST(1), items - 1, vals);
+        RETVAL = new Date(THIS->clone(vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6], vals[7], tz));
     }
     else RETVAL = new Date(*THIS);
+    
     PROTO = Object(ST(0)).stash();
 }
 
@@ -378,32 +473,27 @@ int Date::days_in_month () {
     RETVAL = THIS->days_in_month();
 }
 
-uint8_t Date::error () {
-    RETVAL = (uint8_t) THIS->error();
-}
-
-string_view Date::errstr ()
+std::error_code Date::error ()
 
 SV* Date::truncate () {
     THIS->truncate();
     XSRETURN(1);
 }
 
-Date* Date::truncated () : ALIAS(truncate_new=1) {
-    if (ix == 1) warn("truncate_new() is deprecated, use truncated() instead");
+Date* Date::truncated () {
     RETVAL = new Date(THIS->truncated());
     PROTO = Object(ST(0)).stash();
 }
 
 int Date::compare (Sv arg, bool reverse = false) {
-    RETVAL = THIS->compare(sv2date(arg, THIS->timezone(), true, true));
+    if (arg.is_ref() && !arg.is_object_ref()) XSRETURN_IV(-1); // avoid exception in typemap for wrong types
+    RETVAL = THIS->compare(sv2date(arg, THIS->timezone()));
     if (reverse) RETVAL = -RETVAL;
     if      (RETVAL < 0) RETVAL = -1;
     else if (RETVAL > 0) RETVAL = 1;
 }
 
-Date* Date::sum (Sv arg, ...) : ALIAS(add_new=1) {
-    if (ix == 1) warn("add_new() is deprecated, use sum() instead");
+Date* Date::sum (Sv arg, ...) {
     RETVAL = new Date(*THIS + sv2daterel(arg));
     PROTO = Object(ST(0)).stash();
 }
@@ -413,29 +503,11 @@ SV* Date::add (Sv arg, ...) {
     XSRETURN(1);
 }
 
-Sv Date::difference (Sv arg, bool reverse = false) : ALIAS(subtract_new=1) {
-    if (ix == 1) warn("subtract_new() is deprecated, use difference() instead");
-    if (arg.is_object_ref()) { // reverse is impossible here
-        if (Object(arg).stash().name() == "Date::Rel")
-            RETVAL = xs::out(new Date(*THIS - *xs::in<const DateRel*>(arg)), Object(ST(0)).stash());
-        else
-            RETVAL = xs::out(new DateInt(*xs::in<Date*>(arg), *THIS));
-    }
-    else if (reverse) { // only date supported for reverse
-        RETVAL = xs::out(new DateInt(*THIS, sv2date(arg, THIS->timezone())));
-    }
-    else if (looks_like_number(arg)) {
-        auto ret = new Date(*THIS);
-        ret->epoch(ret->epoch() - xs::in<ptime_t>(arg));
-        RETVAL = xs::out(ret, Object(ST(0)).stash());
-    }
-    else { // date or rdate scalar
-        if (looks_like_relative(xs::in<string_view>(arg))) { // not a date -> reldate
-            RETVAL = xs::out(new Date(*THIS - sv2daterel(arg)), Object(ST(0)).stash());
-        } else { // date
-            RETVAL = xs::out(new DateInt(sv2date(arg, THIS->timezone()), *THIS));
-        }
-    }
+Sv Date::difference (Sv arg, bool reverse = false) {
+    bool is_date = arg.is_object_ref() && Object(arg).stash().name() == "Date";
+    if (is_date)      RETVAL = xs::out(new DateRel(*xs::in<Date*>(arg), *THIS));
+    else if (reverse) throw "wrong date operation";
+    else              RETVAL = xs::out(new Date(*THIS - sv2daterel(arg)), Object(ST(0)).stash());
 }
 
 SV* Date::subtract (Sv arg, ...) {

@@ -47,6 +47,7 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
             }
 
             // add the items
+            var msg = callbackery.ui.MsgBox.getInstance();
             for (var i = 0; i < items.length; i++) {
                 var label = this._createLabel(names[i], items[i]);
                 label.set({
@@ -61,14 +62,29 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
                 });
                 label.setBuddy(item);
                 this._add(item, {row: this._row, column: 1});
-                if (itemOptions != null && itemOptions[i] != null && itemOptions[i].note ){
-                    this._add(new qx.ui.basic.Label(itemOptions[i].note).set({
-                        rich: true,
-                        marginLeft: 20,
-                        marginRight: 20
-                    }),{
-                        row: this._row,
-                        column: 2
+                if (itemOptions != null && itemOptions[i] != null) {
+                    if ( itemOptions[i].note ){
+                        this._add(new qx.ui.basic.Label(itemOptions[i].note).set({
+                            rich: true,
+                            marginLeft: 20,
+                            marginRight: 20
+                        }),{
+                            row: this._row,
+                            column: 2
+                        });
+                    }
+                }
+                if ( itemOptions[i].copyOnTap
+                        && item.getReadOnly()){
+                    var that = this;
+                    item.addListener('tap',function(e){
+                        try {
+                            navigator.clipboard.writeText(item.getValue())
+                            .then(function(err){ msg.info(that.tr("Text Copied"),that.tr("The Text has been copied to clipboard"))})
+                            .catch(function(err){ msg.info(that.tr("Copy failed"),that.tr("Select text and press [ctr]+[c]")) });
+                        } catch (err) {
+                            msg.info(that.tr("Copy Failed"),that.tr("Select text with the Mouse and press [ctr]+[c]"))
+                        }
                     });
                 }
                 this._row++;

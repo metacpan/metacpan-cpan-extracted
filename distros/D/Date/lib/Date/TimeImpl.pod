@@ -1,0 +1,139 @@
+=head1 WHY THIS MODULE DOESN'T USE STANDARD POSIX TIME FUNCTIONS
+
+As it is said in description of L<Date>, this module implements and uses its own time functions: C<gmtime>, C<timegm>, C<localtime>, C<timelocal>.
+
+The first and the main reason is that POSIX's reverse functions (which make epoch from YMDHMS - timegm, timelocal) are very very slow on BSD systems
+(FreeBSD, MacOS, etc). See L<PERFORMANCE> at the bottom of this page.
+
+
+The second reason is that POSIX's functions do not expose a timezone object to user, so that you can't pass this object to localtime/timelocal to make
+calculations in that zone. It's not a big deal if you only use GMT zone or localzone. But if you want to use multiple zone simultaneously
+
+    $date1 = date("2019-01-01 10:00:00", 'Europe/Moscow');
+    $date2 = date("2019-01-01 09:00:00", 'Europe/Kiev');
+    $date1 == $date2; # true
+    
+with POSIX it is impossible, you can only set some zone globally via extremely slow function C<tzset()>.
+
+To implement such a behaviour, this module internally (in C interface) has additional functions anytime/timeany, which receives additional parameter -
+C<Timezone*> object in which calculations should be made.
+
+
+The third reason is that POSIX's implementation has various bugs, see L<POSIX BUGS>.
+
+
+Normally, these very fast and correctly re-implemented time functions are not needed at perl level,
+as perl's interface cannot provide perfomance which these functions have at C level.
+
+However they are exposed to perl via C<Date::gmtime/...etc> functions in case you need them.
+
+
+
+=head1 POSIX BUGS
+
+While developing all the time functions from scratch and comparing results with POSIX's system functions i discovered
+that many operating systems have buggy implementations of localtime/timelocal functions which causes them to return
+wrong results in case of certain dates (actually rare dates). Therefore in such cases the result won't match with POSIX functions
+because this module handles all these cases correctly.
+
+Bugs i discovered (exact times may for now differ as many timezones have changed since i first wrote this):
+
+=head4 Linux and FreeBSD (and possibly more Unix-like systems)
+
+=over
+
+=item timelocal cannot correctly handle forward time jump at last transition.
+
+     For example Europe/Moscow, date "2011/03/27 02:00:00"
+     Must return 1301180400 ("2011/03/27 03:00:00")
+     In fact returns
+       - linux: 1301176800 ("2011/03/27 01:00:00")
+       - freebsd: -1
+     If transition is not the last one, it works correctly:
+     "2010/03/28 02:00:00" returns 1269730800 ("2010/03/28 03:00:00")
+
+=item localtime/timelocal handles DST transitions in future (outside of transitions) incorrectly when using leap second zones
+
+     $ TZ=right/Australia/Melbourne perl -E 'say scalar localtime 4284028799'
+     Sun Oct  4 01:59:34 2105
+     $ TZ=right/Australia/Melbourne perl -E 'say scalar localtime 4284028800'
+     Sun Oct  4 02:59:35 2105
+
+=back
+
+=head4 FreeBSD only
+
+=over
+
+=item America/Anchorage timezone behaves like it has no POSIX string (no DST changes after last transition)
+
+=item timelocal cannot handle dates before year 1900
+
+=item Wrong forward jump normalization with non-DST transitions
+
+     - Simple forward jump 1h somewhy normalized back
+      CORRECT: epoch=-1539492257 (1921/03/21 00:15:43  MSD) from 1921/03/20 23:15:43 DST=-1 (Europe/Moscow)
+      POSIX:   epoch=-1539495857 (1921/03/20 22:15:43  MSD) from 1921/03/20 23:15:43 DST=-1 (Europe/Moscow)
+     - Forward jump 2h normalized just 1h
+      CORRECT: epoch=-1627961251 (1918/06/01 01:03:17 MDST) from 1918/05/31 23:03:17 DST=-1 (Europe/Moscow)
+      POSIX:   epoch=-1627964851 (1918/06/01 00:03:17 MDST) from 1918/05/31 23:03:17 DST=-1 (Europe/Moscow)
+     - Simple forward jump 1h somewhy normalized 30min
+      CORRECT: epoch=372787481 (1981/10/25 03:34:41 LHST) from 1981/10/25 02:34:41 DST=-1 (Australia/Lord_Howe)
+      POSIX:   epoch=372785681 (1981/10/25 03:04:41 LHST) from 1981/10/25 02:34:41 DST=-1 (Australia/Lord_Howe)
+     - Simple forward jump 1h somewhy normalized 2h
+      CORRECT: epoch=449595541 (1984/04/01 01:39:01 CHOST) from 1984/04/01 00:39:01 DST=-1 (Asia/Choibalsan)
+      POSIX:   epoch=449599141 (1984/04/01 02:39:01 CHOST) from 1984/04/01 00:39:01 DST=-1 (Asia/Choibalsan)
+     - Forward jump 3h normalized 2h
+      CORRECT: epoch=354905851 (1981/04/01 04:57:31 MAGST) from 1981/04/01 01:57:31 DST=-1 (Asia/Ust-Nera)
+      POSIX:   epoch=354902251 (1981/04/01 03:57:31 MAGST) from 1981/04/01 01:57:31 DST=-1 (Asia/Ust-Nera)
+
+=back
+
+=head4 Linux only
+
+=over
+
+=item Complex bug with static variable deep inside POSIX code
+
+Steps to reproduce: (TZ=Europe/Moscow, date strings are for compactness, actually 'struct tm' required)
+    
+    mktime("1998/10/25 03:-1:61"); // returns 909273601 (Sun Oct 25 03:00:01 1998) - that's ok
+    mktime("2011/-2/1 00:00:00"); // returns 1285876800 (Fri Oct  1 00:00:00 2010) - that's ok
+    // now run the first line again
+    mktime("1998/10/25 03:-1:61"); // returns 909270001 (Sun Oct 25 02:00:01 1998) - OOPS
+    // again and again
+    mktime("1998/10/25 03:-1:61"); // returns 909270001 (Sun Oct 25 02:00:01 1998) - OOPS forever :(
+
+=back
+
+
+    
+=head1 PERFORMANCE
+
+Tests were performed on MacOSX, Core i7 3.2Ghz 2012.
+
+    -------------------------------------------------------------------------------------------------
+    |         Function        |   This module  |  libc(MacOSX)  |   libc(Linux)  |   libc(FreeBSD)  |
+    -------------------------------------------------------------------------------------------------
+    | gmtime(epoch, &date)    |     53 M/s     |     11 M/s     |     15 M/s     |       12 M/s     |
+    | timegm(&date)           |     30 M/s     |    0.4 M/s     |     10 M/s     |     0.15 M/s     |
+    | timegml(&date)*         |    135 M/s     |       --       |       --       |        --        |
+    | localtime(epoch, &date) |     26 M/s     |    5.5 M/s     |      7 M/s     |        3 M/s     |
+    | timelocal(&date)        |     23 M/s     |    0.5 M/s     |    1.2 M/s     |      0.1 M/s     |
+    | timelocall(&date)*      |     50 M/s     |       --       |       --       |        --        |
+    -------------------------------------------------------------------------------------------------
+    
+* additional functions ('l' stands for 'lite') behave like original ones, but do not normalize struct values, only calculates epoch.
+Calculations are done correctly even when input values are not normalized, these functions just don't put normalized values back to struct.
+
+** there are 2 more functions with 'll' (superlite) at the end, which only allows normalized input struct. They run even faster.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

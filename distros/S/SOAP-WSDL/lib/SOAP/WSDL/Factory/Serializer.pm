@@ -2,7 +2,7 @@ package SOAP::WSDL::Factory::Serializer;
 use strict;
 use warnings;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %SERIALIZER = (
     '1.1' => 'SOAP::WSDL::Serializer::XSD',

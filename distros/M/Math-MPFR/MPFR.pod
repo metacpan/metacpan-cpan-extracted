@@ -359,11 +359,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    the only interest is whether it evaluates as false or true.
 
    "$str" simply means a string of symbols that represent a number,
-   eg '1234567890987654321234567@7' which might be a base 10 number,
-   or 'zsa34760sdfgq123r5@11' which would have to represent at least
-   a base 36 number (because "z" is a valid digit only in bases 36
-   and above). Valid bases for MPFR numbers are 0 and 2 to 36 (2 to 62
-   if Math::MPFR has been built against mpfr-3.0.0 or later).
+   eg '1234567890987654321234567E7' or 'zsa34760sdfgq123r5@11'.
+   Valid bases for MPFR numbers are 2 to 62.
 
    "$rnd" is simply one of the 5 rounding mode values (discussed above).
 
@@ -653,8 +650,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     as follows. If the significand starts with '0b' or '0B', base 2 is
     assumed. If the significand starts with '0x' or '0X', base 16 is
     assumed. Otherwise base 10 is assumed. Other allowable values for
-    $base are 2 to 36 (2 to 62 if Math::MPFR has been built against
-    mpfr-3.0.0 or later).
+    $base are 2 to 62.
 
     Note: The exponent must contain at least a digit. Otherwise the
     possible exponent prefix and sign are not part of the number
@@ -715,11 +711,10 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Math::GMPq, Math::GMPz, orMath::GMP) If $arg is a string, an
     optional additional argument that specifies the base of the
     number can be supplied to new(). Legal values for base are 0
-    and 2 to 36 (2 to 62 if Math::MPFR has been built against
-    mpfr-3.0.0 or later). If $arg is a string and no
-    additional argument is supplied, an attempt is made to deduce
-    base. See 'Rmpfr_set_str' above for an explanation of how
-    that deduction is attempted.
+    and 2 to 62. If $arg is a string and no additional argument is
+    supplied, the base will be deduced.
+    See 'Rmpfr_set_str' above for an explanation of how that
+    deduction is done.
 
     NOTE: If $arg is *both* an NV (floating point value) and PV
     (string), then the value specified by the PV (string) will be
@@ -783,6 +778,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     large enough so that re-reading the printed value with the same
     precision, assuming both output and input use rounding to nearest,
     will recover the original value of $op.
+    $str will be set to 'Nan', '-Inf' or 'Inf' whenever $op is
+    (respectively) a NaN, a negative infinity or a positive infinity.
 
    ($str, $si) = Rmpfr_deref2($op, $base, $digits, $rnd);
     Returns the mantissa to $str (as a string of digits, prefixed with
@@ -794,11 +791,17 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     large enough so that re-reading the printed value with the same
     precision, assuming both output and input use rounding to nearest,
     will recover the original value of $op.
+    Unlike Rmpfr_get_str() and Rmpfr_integer_string(), $str will be set
+    to '@NaN@', '-@Inf@' or '@Inf@' whenever $op is (respectively) a
+    NaN, a negative infinity or a positive infinity, as those are the
+    strings that the mpfr library assigns.
 
    $str = Rmpfr_integer_string($op, $base, $rnd);
     Returns the truncated integer value of $op as a string. (No exponent
     is returned). For example, if $op contains the value 2.3145679e2,
     $str will be set to "231".
+    $str will be set to 'Nan', '-Inf' or 'Inf' whenever $op is
+    (respectively) a NaN, a negative infinity or a positive infinity.
     (This function is mainly to provide a simple means of getting 'sj'
     and 'uj' values on a 64-bit perl where the MPFR library does not
     support mpfr_get_uj and mpfr_get_sj functions - which may happen,
@@ -841,7 +844,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                            # given to Makefile.PL
    $nv     = Rmpfr_get_NV($op, $rnd);    # double/long double/__float128
    $float  = Rmpfr_get_flt($op, $rnd);   # mpfr-3.0.0 and later
-   Rmpfr_get_LD($LD, $op, $rnd); # $LD is a Math::LongDouble object.
+   Rmpfr_get_LD($LD, $op, $rnd);         # $LD is a Math::LongDouble object.
    Rmpfr_get_DECIMAL64($d64, $op, $rnd); # mpfr-3.1.0 or later &&
                                          # mpfr lib built with
                                          # --enable-decimal-float
@@ -1479,8 +1482,9 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $ui = Rmpfr_out_str([$prefix,] $op, $base, $digits, $round [, $suffix]);
     BEST TO USE TRmpfr_out_str INSTEAD
     Output $op to STDOUT, as a string of digits in base $base,
-    rounded in direction $round.  The base may vary from 2 to 36
-    (2 to 62 if Math::MPFR has been built against mpfr-3.0.0 or later).
+    rounded in direction $round.  $base may be i the range 2 to 62
+    (or -36..-2, 2 .. 62 if Math::MPFR has been built against
+    mpfr-4.1.0 or later).
     Print $digits significant digits exactly, or if $digits is 0,
     enough digits so that $op can be read back exactly
     (see Rmpfr_get_str). In addition to the significant
@@ -1513,8 +1517,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     exponent written in decimal for the specified base, and in base 16,
     'B' is the binary exponent written in decimal (i.e. it indicates
     the power of 2 by which the mantissa is to be scaled).
-    The argument $base may be in the range 2 to 36 (2 to 62 if Math::MPFR
-    has been built against mpfr-3.0.0 or later).
+    The argument $base may be in the range 2 to 62.
     Special values can be read as follows (the case does not matter):
     '@NaN@', '@Inf@', '+@Inf@' and '-@Inf@', possibly followed by
     other characters; if the base is smaller or equal to 16, the
@@ -1537,11 +1540,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
        TRmpfr_inp_str($rop, *stdin, $base, $round);
     To read from an open filehandle (let's call it FH):
        TRmpfr_inp_str($rop, \*FH, $base,  $round);
-
-   Rmpfr_print_binary($op);
-    Removed in Math-MPFR-3.30. Should have been removed long ago.
-    Output $op on stdout in raw binary format (the exponent is in
-    decimal, yet).
 
    Rmpfr_dump($op);
     Output "$op\n" on stdout in base 2.
@@ -1595,22 +1593,24 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     of the ISO C standard.
 
    $si2 = Rmpfr_check_range($op, $si1, $rnd);
-    This function has changed from earlier implementations.
-    It now forces $op to be in the current range of acceptable
-    values, $si1 the current ternary value: negative if $op is
-    smaller than the exact value, positive if $op is larger than the
-    exact value and zero if $op is exact (before the call). It generates
-    an underflow or an overflow if the exponent of $op is outside the
-    current allowed range; the value of $si1 may be used to avoid a
-    double rounding. This function returns zero if the rounded result
-    is equal to the exact one, a positive value if the rounded result
-    is larger than the exact one, a negative value if the rounded
-    result is smaller than the exact one. Note that unlike most
-    functions, the result is compared to the exact one, not the input
-    value $op, i.e. the ternary value is propagated.
-    Note: If $op is an infinity and $si1 is different from zero
-    (i.e., if the rounded result is an inexact infinity), then the
-    overflow flag is set.
+    This function assumes that $op is the correctly rounded value of
+    some real value X in the direction $rnd and some extended exponent
+    range, and that $si1 is the corresponding ternary value. Thus $si1
+    is negative if $op is smaller than X, positive if $op is larger than
+    X, and zero if $op equals X.
+    This function modifies $op if needed to be in the current range of
+    acceptable values. It generates an underflow or an overflow if the
+    exponent of $op is outside the current allowed range; the value of
+    $si1 may be used to avoid a double rounding. This function returns
+    zero if the new value of $op equals the exact one X, a positive
+    value if that new value is larger than X, and a negative value if
+    it is smaller than X. Note that unlike most functions, the new
+    result $op is compared to the (unknown) exact one X, not the input
+    value $op, i.e., the ternary value is propagated.
+
+    Note: If $op is an infinity and $si1 is different from zero (i.e.,
+          if the rounded result is an inexact infinity), then the
+          overflow flag is set.
 
    Rmpfr_set_underflow();
    Rmpfr_set_overflow();
@@ -1730,22 +1730,25 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     $str will appear in standard decimal format, containing the
     *minimum* number of digits such that the condition ($str == $nv)
     is true.
-    NOTE 1: Except for perls whose nvtype is __float128, perl versions
-            prior to 5.29.4, or subsequent versions that don't define
-            $Config{d_strtod} (or, respectively, $Config{d_strtold}
-            for -Duselongdouble builds) are buggy in their assignment
-            of values to the NV. The nvtoa() function looks only at
-            the value that was passed to it - which, with such buggy
-            perls, may differ from the intended value by a few ULPs.
-            When it matters, assign with atonv() - which requires
-            mpfr-3.1.6.
-    NOTE 2: Be wary of values assigned by perl to double-double NVs.
-            Such assignments may be incorrect by up to a few ULPs,
-            irrespective of the perl version.
-            When it matters, assign with atonv() - which requires
-            mpfr-3.1.6.
+    NOTE 1: Except for perls whose nvtype is __float128:
+             1) perl versions prior to 5.30.0 are buggy in their
+                assignemt of values to the NV;
+             2) perl versions from 5.30.0 on that don't define
+                $Config{d_strtod} (or respectively $Config{d_strtold}
+                for -Duselongdouble builds) are also buggy in their
+                assignmentof values to the NV.
+            The nvtoa() function looks only at the value that was
+            passed to it - which, with such buggy perls, may differ
+            from the intended value by a few ULPs.
+            On these buggy perls, the bug can be avoided by assigning
+            with atonv() - which requires mpfr-3.1.6 or later.
+    NOTE 2: Be wary of values assigned by perl to double-double NVs,
+            as such assignments may also be buggy, irrespective of
+            the perl version.
+            Again, with these perls, assign using atonv() - which
+            requires mpfr-3.1.6 or later.
             With double-double NVs, nvtoa() currently requires
-            mpfr-4.0.0.
+            mpfr-4.0.0 or later.
 
    $MPFR_version = Rmpfr_get_version();
     Returns the version of the MPFR library (eg 4.0.2) being used by
@@ -1785,7 +1788,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     of Math::MPFR took place.
 
    $ui = MPFR_VERSION_NUM($major, $minor, $patchlevel);
-    Returns the value for MPFR_VERSION on "MPFR-$major.$minor.$patchlevel".
+    Returns the value for MPFR_VERSION for "MPFR-$major.$minor.$patchlevel".
 
    $str = Rmpfr_get_patches();
     Return a string containing the ids of the patches applied to the
@@ -1963,50 +1966,36 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     Resets the nok_pok flag to 0.(Essentially the same
     as running set_nok_pok(0).)
 
-   $bytes = Math::MPFR::bytes($val, $type);
-    $type must be either 'double', 'long double', 'IEEE long double',
-    'double-double', or '__float128' (all case-insensitive).
-    $val must either be a string (eg '1.6e+45', '2.3', '0x17.8')
+   $bytes = Math::MPFR::bytes($val, $bits);
+    (The semantics for calling this function have changed as of
+    Math-MPFR-4.13.)
+    $val must either be a string (eg '1.613e-45', '2.3', '0x17.8')
     or a Math::MPFR object.
-    For the given value expressed by the string (or encapsulated in
-    the object) the internal hex form of that value for the given
-    ($type) datatype is returned.
+    $bits must be one of 53, 64, 2098 or 113.
+    $bytes will be set to the hex representation of $val.
+    If $bits is 53, $bytes will display the byte structure (in
+    hex) of the standard 8-byte double, $val.
+    If $bits is 64, the structure returned will be that of $val
+    as an extended precison 10-byte long double.
+    If $bits is 2098, the structure returned will be that of $val
+    as the 16-byte IBM doubledouble.
+    If $bits is 113, the structure returned will be that of $val
+    as the quad precison 16-byte IEEE long double (or __float128,
+    which is identical in byte structure).
 
     eg:
-      bytes('1.3', 'double') returns the string 3ff4cccccccccccd
+      bytes('1.3', 53)   returns 3ff4cccccccccccd
+      bytes('1.3', 64)   returns 3fffa666666666666666
+      bytes('1.3', 2098) returns 3ff4cccccccccccdbc8999999999999a
+      bytes('1.3', 113)  returns 3fff4ccccccccccccccccccccccccccd
 
-    If $val is a Math::MPFR object, its precision must be:
-      53  if $type is 'double'
-      64  if $type is 'long double'
-      113 if $type is 'IEEE long double' or '__float128'
-      106 if $type is 'double-double'
+    If $val is a Math::MPFR object, its precision must be $bits.
 
-    'double' assumes 53-bit precision (8-byte) double.
-    'long double' assumes 64-bit precision (80-bit) long double.
-    'ieee long double' assumes 113-bit precision (16-byte) IEEE 754
-     long double.
-    'double-double' assumes 106-bit prec (16-byte) double-double
-    '__float128' assumes 113-bit prec (16-byte) __float128.
-
-
-    You should specify 'long double' only if your compiler's long
-    double matches the above assumption.
-    You should specify 'ieee long double' only if your compiler's
-    long double matches the above assumption.
-    If your compiler's 'long double' matches neither of those
-    assumptions but is the same as the double, then you need to
-    specify 'double'.
-
-    You can get representations of a 'double' and a 'double-double'
-    on all but the rarest of architectures.
-    You can also get the representation of a __float128 if both
-    Math::MPFR and mpfr have been built with quadmath support - in
-    which case Math::MPFR::_MPFR_WANT_FLOAT128() will return 1.
-    Note however, that not all architectures support quadmath, and
-    even then mpfr-4.0.0 or later is needed.
-    If you have the __float128 representation you also have the
-    IEEE long double representation, as they are identical.
-
+    For many architectures and mpfr configurations, the structures
+    for all 4 allowed values of $bits will be accessible.
+    In some cases, however, $bits values of 64 and/or 113 might
+    throw a fatal error (with diagnostic message stating that the
+    requested byte structure is not currently available).
 
    ##############
 
@@ -2394,78 +2383,75 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                   # been loaded, or quadmath.h does not
                                   # define FLT128_DIG
 .
-   $min_prec = mpfr_min_inter_prec($orig_base, $orig_length, $to_base);
-   $max_len  = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
-   $min_base = mpfr_min_inter_base($orig_base, $orig_length, $to_prec);
-   $max_base = mpfr_max_orig_base($orig_length, $to_base, $to_prec);
+   $min_prec = mpfr_min_inter_prec($orig_base, $orig_prec, $to_base);
 
-   The last 4 of the above functions establish the relationship between
-   $orig_base, $orig_length, $to_base and $to_prec.
-   Given any 3 of those 4, there's a function there to determine the
-   value of the 4th.
+     NOTE: $min_prec can be (very rarely) off by one if $orig_prec is in
+           the millions, or if either $orig_base or $to_base are
+           outside of the range 2..64.
 
-   Let's say we have some base 10 floating point numbers comprising 16
-   significant digits, and we want to convert those numbers to a base 2
-   data type (say, 'long double').
-   If we then convert the value of that long double to a 16-digit base 10
-   float are we guaranteed of getting the original value back ?
-   It all depends upon the precision of the 'long double' type, and the
-   min_inter_prec() subroutine will tell you what the minimum
-   required precision is (in order to be sure of getting the original
-   value back). We have:
+     Example 1:
+     Let's say we have some base 10 integers comprising 16 base 10
+     digits, and we want to represent those numbers in base 2 (binary).
+     What is the minimum required number of bits, such that it can be
+     guaranteed that converting the base 2 representations back to base
+     10 will result in the original 16 digit representations ?
 
-    $min_prec = mpfr_min_inter_prec($orig_base, $orig_length, $to_base);
+     We can calculate that minimum required precision with:
+       $min_prec = mpfr_min_inter_prec($orig_base, $orig_prec, $to_base);
 
-   In our example case that becomes:
+     In this example case that becomes:
+     $min_prec = mpfr_min_inter_prec(10, 16, 2);
+     which will set $min_prec to 55.
 
-    $min_prec = mpfr_min_inter_prec(10, 16, 2);
+     That is, so long as our base 2 representations provide at least 55
+     bits, we can pass 16-digit, base 10, integer values to them,
+     and be assured of retrieving the original base 10 representation when
+     we convert the base 2 representations back to base 10.
+     Sure ... not all 16-digit values require 55 bits, but there are some
+     that do ... and there are none that require more than  55 bits.
 
-   which will set $min_prec to 55.
-   That is, so long as the long double type has a precision of at least 55
-   bits, you can pass 16-digit, base 10, floating point values to it and
-   back again, and be assured of retrieving the original value.
-   (Naturally, this is assuming absence of buggy behaviour, and correct
-   rounding practice.)
+     Example 2:
+     $min_prec = mpfr_min_inter_prec(2, 53, 10);
+     $min_prec is set to 17.
+     This tells us that a base 10 representation of a 53-bit integer needs
+     to comprise at least 17 digits if we are to be assured that assigning
+     that base 10 representation to a 53-bit integer will result in a
+     53-bit integer that is identical to the first.
+     Otherwise, there is no such assurance.
 
-   Similarly, you might like to know the maximum significant number of
-   base 10 digits that can be specified, when assigning to (say) a
-   53-bit double. We have:
 
-    $max_len = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
+   $max_prec = mpfr_max_orig_prec ($orig_base, $to_base, $to_prec);
 
-   For this second example that becomes:
+     NOTE: $max_prec can be (very rarely) off by one if $to_prec is in
+           the millions, or if either $orig_base or $to_base are
+           outside of the range 2..64.
 
-    $max_len = mpfr_max_orig_len(10, 2, 53);
+     For example:
+     To determine the maximum significant number of base 10 digits that
+     can be specified, when assigning to a 53-bit double. We have:
 
-   which will set $max_len to 15.
+     $max_len = mpfr_max_orig_len($orig_base, $to_base, $to_prec);
 
-   That is, so long as your base 10 float consists of no more than 15
-   siginificant digits, you can pass it to a 53-bit double and back again,
-   and be assured of retrieving the original value.
-   (Again, we assume absence of bugs and correct rounding practice.)
+     For this example that becomes:
 
-   It is to be expected that
-    mpfr_max_orig_len(10, 2, $double_prec)
-    and
-    mpfr_max_orig_len(10, 2, $long_double_prec)
-   will (resp.) return the same values as MPFR_DBL_DIG and MPFR_LDBL_DIG.
-   ($double_prec is the precision, in bits, of the C 'double' type,
-   and $long_double_prec is the precision, in bits, of the C 'long double'
-   type.)
+     $max_len = mpfr_max_orig_len(10, 2, 53);
 
-   The last 2 of the above subroutines (ie mpfr_min_inter_base and
-   mpfr_max_orig_base) are provided mainly for completeness.
-   Normally, there wouldn't be a need to use these last 2 forms ... but
-   who knows ...
+     which will set $max_len to 15.
+     That is, so long as our base 10 integer consists of no more than
+     15 significant digits, we can assign it to a 53-bit double and be
+     assured of retrieving the original value upon converting that
+     double back to a 15-digit base 10 representation.
+     Otherwise, there is no such assurance.
 
-   The above examples demonstrate usage in relation to conversion between
-   bases 2 and 10. The functions apply just as well to conversions
-   between bases of any values.
+     It is to be expected that
+      mpfr_max_orig_len(10, 2, 53) == DBL_DIG
+      and
+      mpfr_max_orig_len(10, 2, 113) == FLT128_DIG
+      and
+      mpfr_max_orig_len(10, 2, $long_double_prec) == LDBL_DIG
 
-   The Math::LongDouble module provides 4 identical functions, prefixed
-   with 'ld_' instead of 'mpfr_' (to avoid name clashes).
-   Similarly, it provides constants (prefixed with 'LD_' instead of
-   'MPFR_') that reflect the values of float.h's DBL_DIG and LDBL_DIG.
+     (where $long_double_prec is the precision, in bits, of the
+     the C 'long double' type - usually either 53 or 64 or 113.)
 
    #####################
 
@@ -2489,7 +2475,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2019 Sisyphus
+    Copyright 2006-2020 Sisyphus
 
 =head1 AUTHOR
 

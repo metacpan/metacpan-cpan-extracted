@@ -61,6 +61,7 @@ t/new_in_4.0.0.t
 t/new_in_4.1.0.t
 t/nvtoa.t
 t/nvtoa2.t
+t/nvtoa3.t
 t/NV_overloading.t
 t/out_str.t
 t/overload.t

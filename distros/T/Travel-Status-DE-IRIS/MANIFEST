@@ -16,7 +16,6 @@ share/csv2json
 share/enhance
 share/json2csv
 share/json2json
-share/stations.csv
 share/stations.json
 share/xml2json
 t/20-iris-class.t

@@ -26,22 +26,19 @@ Those will be replaced some time in the future.
 INSTALLING
 ----------
 
-Use the following mantra:
-
- perl Build.PL
- perl Build
- perl Build test
- perl Build install
-
-If you don't have Module::Build installed, you may also use
+Do the following:
 
  perl Makefile.PL
  make
- make test
+ make test              # optional
  make install
 
+BUGS
+----
+
 Note that Module::Build is the recommended installer - make will not run
-all tests provided with SOAP-WSDL.
+all tests provided with SOAP-WSDL.  But Module::Build was removed and
+replaced entirely MakeMaker whose use is documented above.
 
 SOLARIS INSTALLATION NOTES
 --------------------------

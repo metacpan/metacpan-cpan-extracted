@@ -1,7 +1,6 @@
 #!perl
 use strict;
 use warnings;
-use feature qw/ say /;;
 use Test::More;
 use Fcntl;
 use File::Temp;

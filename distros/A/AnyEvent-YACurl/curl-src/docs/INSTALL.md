@@ -7,6 +7,18 @@ document does not describe how to install curl or libcurl using such a binary
 package. This document describes how to compile, build and install curl and
 libcurl from source code.
 
+## Building using vcpkg
+
+You can download and install curl and libcurl using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager:
+
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    ./vcpkg integrate install
+    vcpkg install curl[tool]
+
+The curl port in vcpkg is kept up to date by Microsoft team members and community contributors. If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
+
 ## Building from git
 
 If you get your code off a git repository instead of a release tarball, see
@@ -56,12 +68,12 @@ you have pkg-config installed, set the pkg-config path first, like this:
 
 Without pkg-config installed, use this:
 
-   ./configure --with-ssl=/opt/OpenSSL
+    ./configure --with-ssl=/opt/OpenSSL
 
 If you insist on forcing a build without SSL support, even though you may
 have OpenSSL installed in your system, you can run configure like this:
 
-   ./configure --without-ssl
+    ./configure --without-ssl
 
 If you have OpenSSL installed, but with the libraries in one place and the
 header files somewhere else, you have to set the `LDFLAGS` and `CPPFLAGS`
@@ -108,6 +120,7 @@ libressl.
  - schannel: `--without-ssl --with-schannel`
  - secure transport: `--without-ssl --with-secure-transport`
  - MesaLink: `--without-ssl --with-mesalink`
+ - BearSSL: `--without-ssl --with-bearssl`
 
 # Windows
 
@@ -183,20 +196,8 @@ The configure utility, unfortunately, is not available for the Windows
 environment, therefore, you cannot use the various disable-protocol options of
 the configure utility on this platform.
 
-However, you can use the following defines to disable specific
-protocols:
-
- - `HTTP_ONLY`             disables all protocols except HTTP
- - `CURL_DISABLE_FTP`      disables FTP
- - `CURL_DISABLE_LDAP`     disables LDAP
- - `CURL_DISABLE_TELNET`   disables TELNET
- - `CURL_DISABLE_DICT`     disables DICT
- - `CURL_DISABLE_FILE`     disables FILE
- - `CURL_DISABLE_TFTP`     disables TFTP
- - `CURL_DISABLE_HTTP`     disables HTTP
- - `CURL_DISABLE_IMAP`     disables IMAP
- - `CURL_DISABLE_POP3`     disables POP3
- - `CURL_DISABLE_SMTP`     disables SMTP
+You can use specific defines to disable specific protocols and features. See
+[CURL-DISABLE.md](CURL-DISABLE-md) for the full list.
 
 If you want to set any of these defines you have the following options:
 
@@ -283,6 +284,47 @@ will run on cats as old as OS X 10.6 ("Snow Leopard") (using bash):
     export MACOSX_DEPLOYMENT_TARGET="10.6"
     ./configure --with-darwinssl
     make
+
+# Android
+
+When building curl for Android it's recommended to use a Linux environment
+since using curl's `configure` script is the easiest way to build curl
+for Android. Before you can build curl for Android, you need to install the
+Android NDK first. This can be done using the SDK Manager that is part of
+Android Studio. Once you have installed the Android NDK, you need to figure out
+where it has been installed and then set up some environment variables before
+launching `configure`. On macOS, those variables could look like this to compile
+for `aarch64` and API level 29:
+
+    export NDK=~/Library/Android/sdk/ndk/20.1.5948944
+    export HOST_TAG=darwin-x86_64
+    export TOOLCHAIN=$NDK/toolchains/llvm/prebuilt/$HOST_TAG
+    export AR=$TOOLCHAIN/bin/aarch64-linux-android-ar
+    export AS=$TOOLCHAIN/bin/aarch64-linux-android-as
+    export CC=$TOOLCHAIN/bin/aarch64-linux-android29-clang
+    export CXX=$TOOLCHAIN/bin/aarch64-linux-android29-clang++
+    export LD=$TOOLCHAIN/bin/aarch64-linux-android-ld
+    export RANLIB=$TOOLCHAIN/bin/aarch64-linux-android-ranlib
+    export STRIP=$TOOLCHAIN/bin/aarch64-linux-android-strip
+
+When building on Linux or targeting other API levels or architectures, you need
+to adjust those variables accordingly. After that you can build curl like this:
+
+    ./configure --host aarch64-linux-android --with-pic --disable-shared
+
+Note that this won't give you SSL/TLS support. If you need SSL/TLS, you have
+to build curl against a SSL/TLS layer, e.g. OpenSSL, because it's impossible for
+curl to access Android's native SSL/TLS layer. To build curl for Android using
+OpenSSL, follow the OpenSSL build instructions and then install `libssl.a` and
+`libcrypto.a` to `$TOOLCHAIN/sysroot/usr/lib` and copy `include/openssl` to
+`$TOOLCHAIN/sysroot/usr/include`. Now you can build curl for Android using
+OpenSSL like this:
+    
+    ./configure --host aarch64-linux-android --with-pic --disable-shared --with-ssl="$TOOLCHAIN/sysroot/usr"
+
+Note, however, that you must target at least Android M (API level 23) or `configure`
+won't be able to detect OpenSSL since `stderr` (and the like) weren't defined
+before Android M.
 
 # Cross compile
 

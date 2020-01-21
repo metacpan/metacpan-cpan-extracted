@@ -4,7 +4,7 @@ PROTOTYPES: DISABLE
 SV* encode_uri_component (string_view input, bool plus = false) : ALIAS(encodeURIComponent=1) {
     RETVAL = newSV(input.length()*3 + 1);
     SvPOK_on(RETVAL);
-    size_t rlen = encode_uri_component(input, SvPVX(RETVAL), plus ? unsafe_query_component_plus : unsafe_query_component);
+    size_t rlen = encode_uri_component(input, SvPVX(RETVAL), plus ? URIComponent::query_param_plus : URIComponent::query_param);
     SvPVX(RETVAL)[rlen] = 0;
     SvCUR_set(RETVAL, rlen);
     PERL_UNUSED_VAR(ix);

@@ -29,7 +29,9 @@ sub set_value {
     @time_from = map { !defined $_ ? 0 : $_ } @time_from;
 
     my $time_str;
-    if ( $time_from[-1] ) {
+    if ( $time_from[6] ) {
+        # if we parsed a timezone
+        # don't think this works, ever.  if this path is taken, we wind up with something like 2007-08-31T00:32:00.0000000+00:00.
         $time_str = sprintf(
             '%04d-%02d-%02dT%02d:%02d:%02d.0000000%+03d:%02d',
             $time_from[5] + 1900,

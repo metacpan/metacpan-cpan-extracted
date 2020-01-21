@@ -1,6 +1,6 @@
 package TOML::Tiny::Grammar;
-# ABSTRACT: exports regex definition of TOML grammar
-$TOML::Tiny::Grammar::VERSION = '0.03';
+# ABSTRACT: exports regex definitions used to parse TOML source
+$TOML::Tiny::Grammar::VERSION = '0.05';
 use strict;
 use warnings;
 use v5.18;
@@ -141,11 +141,11 @@ __END__
 
 =head1 NAME
 
-TOML::Tiny::Grammar - exports regex definition of TOML grammar
+TOML::Tiny::Grammar - exports regex definitions used to parse TOML source
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -162,36 +162,57 @@ Exports various regexex for parsing TOML source.
 =head1 PATTERNS
 
 =head2 White space and ignorables
+
 =head3 $WS
+
 =head3 $CRLF
+
 =head3 $EOL
+
 =head3 $Comment
 
 =head2 Keys
+
 =head3 $BareKey
+
 =head3 $QuotedKey
+
 =head3 $SimpleKey
+
 =head3 $DottedKey
+
 =head3 $Key
 
 =head2 Values
+
 =head3 $Boolean
 
 =head3 $Escape
+
 =head3 $StringLiteral
+
 =head3 $MultiLineStringLiteral
+
 =head3 $BasicString
+
 =head3 $MultiLineString
+
 =head3 $String
 
 =head3 $Date
+
 =head3 $Time
+
 =head3 $DateTime
 
 =head3 $Hex
+
 =head3 $Oct
+
 =head3 $Bin
+
 =head3 $Dec
+
 =head3 $Integer
 
 =head3 $Float

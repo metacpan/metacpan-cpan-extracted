@@ -1,8 +1,12 @@
 Revision history for Perl extension Catalyst-Model-Curio.
 
+0.04 2020-01-20T20:46:13Z
+
+ - Deprecate.
+
 0.03 2019-08-23T18:35:48Z
 
- - Depend on Curio 0.08 or better when does_keys() was removed.
+ - Depend on Curio 0.08 or better.
 
 0.02 2019-08-16T22:33:03Z
 

@@ -12,7 +12,6 @@ check the changelog of the current development status, as one or more of these
 problems may have been fixed or changed somewhat since this was written!
 
  1. HTTP
- 1.1 CURLFORM_CONTENTLEN in an array
  1.3 STARTTRANSFER time is wrong for HTTP POSTs
  1.4 multipart formposts file name encoding
  1.5 Expect-100 meets 417
@@ -31,6 +30,7 @@ problems may have been fixed or changed somewhat since this was written!
  2.6 CURL_GLOBAL_SSL
  2.7 Client cert (MTLS) issues with Schannel
  2.8 Schannel disable CURLOPT_SSL_VERIFYPEER and verify hostname
+ 2.9 TLS session cache doesn't work with TFO
 
  3. Email protocols
  3.1 IMAP SEARCH ALL truncated response
@@ -55,6 +55,7 @@ problems may have been fixed or changed somewhat since this was written!
  5.7 Visual Studio project gaps
  5.8 configure finding libs in wrong directory
  5.9 Utilize Requires.private directives in libcurl.pc
+ 5.10 IDN tests failing on Windows / MSYS2
 
  6. Authentication
  6.1 NTLM authentication and unicode
@@ -101,6 +102,8 @@ problems may have been fixed or changed somewhat since this was written!
 
  12. LDAP and OpenLDAP
  12.1 OpenLDAP hangs after returning results
+ 12.2 LDAP on Windows does authentication wrong?
+ 12.3 LDAP on Windows doesn't work
 
  13. TCP/IP
  13.1 --interface for ipv6 binds to unusable IP address
@@ -111,15 +114,6 @@ problems may have been fixed or changed somewhat since this was written!
 ==============================================================================
 
 1. HTTP
-
-1.1 CURLFORM_CONTENTLEN in an array
-
- It is not possible to pass a 64-bit value using CURLFORM_CONTENTLEN with
- CURLFORM_ARRAY, when compiled on 32-bit platforms that support 64-bit
- integers. This is because the underlying structure 'curl_forms' uses a dual
- purpose char* for storing these values in via casting. For more information
- see the now closed related issue:
- https://github.com/curl/curl/issues/608
 
 1.3 STARTTRANSFER time is wrong for HTTP POSTs
 
@@ -263,6 +257,10 @@ problems may have been fixed or changed somewhat since this was written!
 
  https://github.com/curl/curl/issues/3284
 
+2.9 TLS session cache doesn't work with TFO
+
+ See https://github.com/curl/curl/issues/4301
+
 3. Email protocols
 
 3.1 IMAP SEARCH ALL truncated response
@@ -347,7 +345,7 @@ problems may have been fixed or changed somewhat since this was written!
 
 5.1 USE_UNIX_SOCKETS on Windows
 
- Due to incorrect CMake checks for the presense of the feature, it will never
+ Due to incorrect CMake checks for the presence of the feature, it will never
  be enabled for windows in a cmake build.
 
  See https://github.com/curl/curl/issues/4040
@@ -427,6 +425,13 @@ problems may have been fixed or changed somewhat since this was written!
 5.9 Utilize Requires.private directives in libcurl.pc
 
  https://github.com/curl/curl/issues/864
+
+5.10 IDN tests failing on Windows / MSYS2
+
+ It seems like MSYS2 does some UTF-8-to-something-else conversion for Windows
+ compatibility.
+
+ https://github.com/curl/curl/issues/3747
 
 6. Authentication
 
@@ -675,7 +680,8 @@ problems may have been fixed or changed somewhat since this was written!
  CURLINFO_LOCAL_PORT (and possibly a few other) fails when TCP Fast Open is
  enabled.
 
- See https://github.com/curl/curl/issues/1332
+ See https://github.com/curl/curl/issues/1332 and
+ https://github.com/curl/curl/issues/4296
 
 11.6 slow connect to localhost on Windows
 
@@ -725,6 +731,16 @@ problems may have been fixed or changed somewhat since this was written!
  See https://github.com/curl/curl/issues/622 and
      https://curl.haxx.se/mail/lib-2016-01/0101.html
 
+12.2 LDAP on Windows does authentication wrong?
+
+ https://github.com/curl/curl/issues/3116
+
+12.3 LDAP on Windows doesn't work
+
+ A simple curl command line getting "ldap://ldap.forumsys.com" returns an
+ error that says "no memory" !
+
+ https://github.com/curl/curl/issues/4261
 
 13. TCP/IP
 

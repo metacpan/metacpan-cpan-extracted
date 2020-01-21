@@ -2,12 +2,13 @@ class 'Fl::HtmlView';
 isa 'Fl::Group';
 include 'FL/Fl_Help_View.H';
 widget_type 'Fl_Help_View';
+disabled;
 
 =pod
 
 =head1 NAME
 
-Help::HtmlView - HTML Display Widget
+Fl::HtmlView - HTML Display Widget
 
 =head1 Description
 

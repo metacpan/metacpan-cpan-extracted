@@ -1,5 +1,5 @@
 package Curio::Declare;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Package::Stash;
 use Curio::Util;

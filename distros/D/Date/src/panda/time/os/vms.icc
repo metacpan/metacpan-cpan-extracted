@@ -1,0 +1,15 @@
+#define __PTIME_TZDIR "/usr/share/zoneinfo"
+
+namespace panda { namespace time {
+
+static inline bool get_os_localzone_name (char* lzname) {
+    if (
+        tz_from_env(lzname, "SYS$TIMEZONE_RULE") ||
+        tz_from_env(lzname, "SYS$TIMEZONE_NAME") ||
+        tz_from_env(lzname, "UCX$TZ")            ||
+        tz_from_env(lzname, "TCPIP$TZ")
+    ) return true;
+    return false;
+}
+
+}}

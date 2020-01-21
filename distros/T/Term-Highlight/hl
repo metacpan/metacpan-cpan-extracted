@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.1.1";
+$VERSION = "2.1.2";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -270,7 +270,7 @@ while ( defined ( my $arg = shift ) )
 
 
 #create a new highlight object
-my $hl = Term::Highlight->new( tagtype => $TAGTYPE );
+my $hl = Term::Highlight->new( tagtype => $TAGTYPE, skip_nl_check => 1 );
 
 #process command line arguments
 if ( $UTF8Support )
@@ -305,7 +305,7 @@ my $hl_loc = undef;
 if ( exists $ENV{ HL_LOCATION } && ! $GrepList &&
      ( $GrepRecursively || $LineNumbers || $ManyFiles ) )
 {
-    $hl_loc = Term::Highlight->new( tagtype => $TAGTYPE );
+    $hl_loc = Term::Highlight->new( tagtype => $TAGTYPE, skip_nl_check => 1 );
     $hl_loc->LoadArgs( [ split '\s+', $ENV{ HL_LOCATION } ] );
 }
 
@@ -314,7 +314,8 @@ my $CtxDelim = '--';
 
 if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
 {
-    my $hl_ctx = Term::Highlight->new( tagtype => $TAGTYPE );
+    my $hl_ctx = Term::Highlight->new( tagtype => $TAGTYPE,
+                                                        skip_nl_check => 1 );
     $hl_ctx->LoadArgs( [ split '\s+', $ENV{ HL_CTXDELIM } ] );
     $hl_ctx->Process( \$CtxDelim );
 }
@@ -435,6 +436,7 @@ sub ProcessFile
                 ! $CheckCtx && ! $matches;
             $Location = $LineNumbers ? $FullFile . ':' . $. : $FullFile;
             $hl_loc->Process( \$Location ) if defined $hl_loc;
+            $Location .= ': ';
         }
         else
         {
@@ -467,14 +469,7 @@ sub ProcessFile
         #debug purpose
         #print "$_->[ 0 ], $_->[ 1 ], $_->[ 2 ], $_->[ 3 ], ",
         #      "@${ $_->[ 4 ] }\n" foreach $hl->Process( \$line );
-        if ( $as_node )
-        {
-            print "$Location: $line$end";
-        }
-        else
-        {
-            print $Location, "$line$end";
-        }
+        print $Location, "$line$end";
         $LastLine = $.;
     }
     close $FileHandle;

@@ -11,8 +11,7 @@ const DateRel HOUR  (0,0,0,1);
 const DateRel MIN   (0,0,0,0,1);
 const DateRel SEC   (0,0,0,0,0,1);
 
-static inline void relstr_val (char* st, char*& ptr, ptime_t val, char units) {
-    if (ptr != st) *(ptr++) = ' ';
+static inline void relstr_val (char*& ptr, ptime_t val, char units) {
     auto res = to_chars(ptr, ptr+20, val);
     assert(!res.ec);
     ptr = res.ptr;
@@ -21,6 +20,7 @@ static inline void relstr_val (char* st, char*& ptr, ptime_t val, char units) {
 
 void DateRel::set (const Date& from_date, const Date& till_date) {
     _sec = _min = _hour = _day = _month = _year = 0;
+    _from = from_date;
     bool reverse = from_date > till_date;
     auto& from = reverse ? till_date.date() : from_date.date();
     auto& till = reverse ? from_date.date() : till_date.date();
@@ -39,7 +39,7 @@ void DateRel::set (const Date& from_date, const Date& till_date) {
         int tmpy = till.year;
         int tmpm = till.mon-1;
         if (tmpm < 0) { tmpm += 12; tmpy--; }
-        int days = days_in_month(tmpy, tmpm);
+        int days = panda::time::days_in_month(tmpy, tmpm);
         _day += days;
         _month--;
     }
@@ -52,18 +52,40 @@ void DateRel::set (const Date& from_date, const Date& till_date) {
     if (reverse) negate();
 }
 
-string DateRel::to_string () const {
-    string ret(65);
-    auto ptr = ret.buf();
-    auto st = ptr;
-    if (_year  != 0) { relstr_val(st, ptr, _year, 'Y'); }
-    if (_month != 0) { relstr_val(st, ptr, _month, 'M'); }
-    if (_day   != 0) { relstr_val(st, ptr, _day, 'D'); }
-    if (_hour  != 0) { relstr_val(st, ptr, _hour, 'h'); }
-    if (_min   != 0) { relstr_val(st, ptr, _min, 'm'); }
-    if (_sec   != 0) { relstr_val(st, ptr, _sec, 's'); }
-    ret.length(ptr - st);
-    return ret;
+string DateRel::to_string (Format fmt) const {
+    char buf[150];
+    char* ptr = buf;
+    switch (fmt) {
+        case Format::simple:
+            if (_year ) { relstr_val(ptr, _year, 'Y'); }
+            if (_month) { if (ptr != buf) *(ptr++) = ' '; relstr_val(ptr, _month, 'M'); }
+            if (_day  ) { if (ptr != buf) *(ptr++) = ' '; relstr_val(ptr, _day, 'D'); }
+            if (_hour ) { if (ptr != buf) *(ptr++) = ' '; relstr_val(ptr, _hour, 'h'); }
+            if (_min  ) { if (ptr != buf) *(ptr++) = ' '; relstr_val(ptr, _min, 'm'); }
+            if (_sec  ) { if (ptr != buf) *(ptr++) = ' '; relstr_val(ptr, _sec, 's'); }
+            break;
+        case Format::iso8601i:
+            if (_from) {
+                auto dstr = _from->to_string(Date::Format::iso8601);
+                auto len = dstr.length();
+                memcpy(ptr, dstr.data(), len);
+                ptr += len;
+                *ptr++ = '/';
+            }
+        case Format::iso8601d:
+            *ptr++ = 'P';
+            if (_year ) { relstr_val(ptr, _year, 'Y'); }
+            if (_month) { relstr_val(ptr, _month, 'M'); }
+            if (_day  ) { relstr_val(ptr, _day, 'D'); }
+            if (_hour | _min | _sec) *ptr++ = 'T';
+            if (_hour ) { relstr_val(ptr, _hour, 'H'); }
+            if (_min  ) { relstr_val(ptr, _min, 'M'); }
+            if (_sec  ) { relstr_val(ptr, _sec, 'S'); }
+            break;
+
+        default: throw std::invalid_argument("unknown format type for relative date output");
+    }
+    return string(buf, ptr - buf);
 }
 
 DateRel& DateRel::operator+= (const DateRel& op) {

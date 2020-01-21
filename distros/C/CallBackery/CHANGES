@@ -1,3 +1,13 @@
+0.26.1 2020-01-20 15:59:33 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fixed js syntax (excess ,)
+
+0.26.0 2020-01-20 15:27:13 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - pop config option cancelLabel to override label on calcle button in popups
+ - form field option 'copyOnTap' added to copy readOnly field content to
+   clipboard on tap.
+
 0.25.1 2019-12-16 09:50:38 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - merge translations

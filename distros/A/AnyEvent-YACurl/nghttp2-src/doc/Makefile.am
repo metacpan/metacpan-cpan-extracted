@@ -27,6 +27,7 @@ APIDOCS= \
 	macros.rst \
 	enums.rst \
 	types.rst \
+	nghttp2_check_authority.rst \
 	nghttp2_check_header_name.rst \
 	nghttp2_check_header_value.rst \
 	nghttp2_hd_deflate_bound.rst \
@@ -67,6 +68,7 @@ APIDOCS= \
 	nghttp2_option_set_no_recv_client_magic.rst \
 	nghttp2_option_set_peer_max_concurrent_streams.rst \
 	nghttp2_option_set_user_recv_extension_type.rst \
+	nghttp2_option_set_max_outbound_ack.rst \
 	nghttp2_pack_settings_payload.rst \
 	nghttp2_priority_spec_check_default.rst \
 	nghttp2_priority_spec_default_init.rst \

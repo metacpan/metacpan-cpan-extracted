@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(confess);
 use Class::Std::Fast::Storable constructor => 'none';
 use Scalar::Util qw(blessed);
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %namespace_prefix_map_of :ATTR(:name<namespace_prefix_map>   :default<{}>);
 my %namespace_map_of        :ATTR(:name<namespace_map>          :default<{}>);

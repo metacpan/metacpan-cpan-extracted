@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 use DateTime;
 use DateTime::Format::Strptime;
@@ -144,14 +144,14 @@ if ($use_cache) {
 	eval {
 		use Cache::File;
 		$schedule_cache = Cache::File->new(
-			cache_root     => $schedule_cache_path,
-			defaut_expires => '6 hours',
-			lock_level     => Cache::File::LOCK_LOCAL(),
+			cache_root      => $schedule_cache_path,
+			default_expires => '6 hours',
+			lock_level      => Cache::File::LOCK_LOCAL(),
 		);
 		$realtime_cache = Cache::File->new(
-			cache_root     => $realtime_cache_path,
-			defaut_expires => '180 seconds',
-			lock_level     => Cache::File::LOCK_LOCAL(),
+			cache_root      => $realtime_cache_path,
+			default_expires => '180 seconds',
+			lock_level      => Cache::File::LOCK_LOCAL(),
 		);
 	};
 	if ($@) {
@@ -571,7 +571,7 @@ B<db-iris> [B<-rx>] [B<-d> I<date>] [B<-o> I<output-flags>]
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 DESCRIPTION
 

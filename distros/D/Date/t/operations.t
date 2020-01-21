@@ -13,9 +13,7 @@ subtest 'compare' => sub {
     cmp_ok($date, '>=', 1000);
     cmp_ok($date, '<', 1001);
     cmp_ok($date, '>', "1970-01-01 03:16:00");
-    cmp_ok($date, '>', [1970,1,1,3,16]);
     cmp_ok($date, '<', "1970-01-01 03:17:00");
-    cmp_ok($date, '<', {year => 1970, month => 1, day => 1, hour => 3, min => 17});
     cmp_ok($date, '==', "1970-01-01 03:16:40");
     is($date, "1970-01-01 03:16:40");
     cmp_ok(date("2013-05-06 01:02:03"), '<', date("2013-05-06 01:02:04"));
@@ -28,9 +26,6 @@ subtest 'compare' => sub {
     cmp_ok(1000000000, '==', date("2001-09-09 05:46:40"));
     cmp_ok(1000000001, '>', date("2001-09-09 05:46:40"));
     cmp_ok(999999999, '<', date("2001-09-09 05:46:40"));
-
-    dies_ok { $date > rdate(10) };
-    dies_ok { rdate(10) > $date };
 };
 
 subtest 'add relative date' => sub {
@@ -63,7 +58,6 @@ subtest 'check ops table' => sub {
         cmp_ok("1Y 1m" + $date, '==', "2013-03-02 15:48:32"); # $scalar $date
         cmp_ok($date + HOUR, '==', "2012-03-02 16:47:32"); # $date $rel
         dies_ok { $date + date(0) }; # $date $date
-        dies_ok { $date + idate(0,0) }; # $date $idate
     };
     subtest '"+="' => sub {
         # $date $scalar
@@ -81,17 +75,12 @@ subtest 'check ops table' => sub {
         is(YEAR, "1Y");
         # $date $date
         dies_ok { $date += date(123) };
-        #  $date $idate
-        dies_ok { $date += idate(123,123) };
     };
     subtest '"-"' => sub {
         my $date = date("2012-03-02 15:47:32");
         cmp_ok($date - "1D", '==', "2012-03-01 15:47:32"); # $date $scalar-rel
-        is($date - "2011-04-03 16:48:33", ["2011-04-03 16:48:33", "2012-03-02 15:47:32"]); # $date $scalar-date
-        is("2013-04-03 16:48:33" - $date, ["2012-03-02 15:47:32", "2013-04-03 16:48:33"]); # $scalar $date
         cmp_ok($date - HOUR, '==', "2012-03-02 14:47:32"); # $date $rel
-        is(date("2013-04-03 16:48:33") - $date, ["2012-03-02 15:47:32", "2013-04-03 16:48:33"]); # $date $date
-        dies_ok { $date - idate(111,111) }; # $date $idate
+        is(date("2013-04-03 16:48:33") - $date, rdate("2012-03-02 15:47:32", "2013-04-03 16:48:33")); # $date $date
     };
     subtest '"-="' => sub {
         # $date $scalar
@@ -100,18 +89,11 @@ subtest 'check ops table' => sub {
         is($date, "2012-02-02 15:47:32");
         is($date+1, "2012-02-02 15:47:33");
         is($date-1, "2012-02-02 15:47:31");
-        # $scalar $date
-        my $scalar = "2013-04-03 16:48:33";
-        $scalar -= $date;
-        is($date, "2012-02-02 15:47:32");
-        is($scalar, ["2012-02-02 15:47:32", "2013-04-03 16:48:33"]);
         # $date $rel
         $date -= DAY;
         is($date, "2012-02-01 15:47:32");
         # $date $date
         dies_ok { $date -= date(123) };
-        # $date $idate
-        dies_ok { $date -= idate(123,123) };
     };
     subtest '"<=>"' => sub {
         my $date = date("2012-03-02 15:47:32");
@@ -128,15 +110,12 @@ subtest 'check ops table' => sub {
         cmp_ok(1330688853, '>', $date);
         cmp_ok(1330688852, '==', $date);
         # $date $rel
-        dies_ok { $date > MONTH };
         # $date $date
         cmp_ok($date, '>', date(0));
         cmp_ok($date, '<', date(2000000000));
         cmp_ok(date(1330688851), '<', $date);
         cmp_ok(date(1330688853), '>', $date);
         cmp_ok(date(1330688852), '==', $date);
-        # $date $idate
-        dies_ok { $date == idate(0,0) };
     };
     subtest '"eq"' => sub {
         my $date = date("2012-03-02 15:47:32");
@@ -157,8 +136,6 @@ subtest 'check ops table' => sub {
         ok $date ne date(0);
         ok date(1330688852) eq $date;
         ok !(date(1330688852) ne $date);
-        # $date $idate
-        dies_ok { $date eq idate(0,0) };
         # accepts reference to primitive (to workaround using as inflate/deflate in DBIx::Class)
         ok !($date eq \"epta");
         ok $date ne \"epta";

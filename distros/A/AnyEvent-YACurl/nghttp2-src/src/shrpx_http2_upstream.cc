@@ -492,7 +492,7 @@ void Http2Upstream::initiate_downstream(Downstream *downstream) {
 #ifdef HAVE_MRUBY
   const auto &group = dconn_ptr->get_downstream_addr_group();
   if (group) {
-    const auto &mruby_ctx = group->mruby_ctx;
+    const auto &mruby_ctx = group->shared_addr->mruby_ctx;
     if (mruby_ctx->run_on_request_proc(downstream) != 0) {
       if (error_reply(downstream, 500) != 0) {
         rst_stream(downstream, NGHTTP2_INTERNAL_ERROR);
@@ -1262,7 +1262,10 @@ int Http2Upstream::downstream_read(DownstreamConnection *dconn) {
   } else {
     auto rv = downstream->on_read();
     if (rv == SHRPX_ERR_EOF) {
-      return downstream_eof(dconn);
+      if (downstream->get_request_header_sent()) {
+        return downstream_eof(dconn);
+      }
+      return SHRPX_ERR_RETRY;
     }
     if (rv == SHRPX_ERR_DCONN_CANCELED) {
       downstream->pop_downstream_connection();
@@ -1378,7 +1381,11 @@ int Http2Upstream::downstream_error(DownstreamConnection *dconn, int events) {
     } else {
       unsigned int status;
       if (events & Downstream::EVENT_TIMEOUT) {
-        status = 504;
+        if (downstream->get_request_header_sent()) {
+          status = 504;
+        } else {
+          status = 408;
+        }
       } else {
         status = 502;
       }
@@ -1658,7 +1665,7 @@ int Http2Upstream::on_downstream_header_complete(Downstream *downstream) {
     auto dconn = downstream->get_downstream_connection();
     const auto &group = dconn->get_downstream_addr_group();
     if (group) {
-      const auto &dmruby_ctx = group->mruby_ctx;
+      const auto &dmruby_ctx = group->shared_addr->mruby_ctx;
 
       if (dmruby_ctx->run_on_response_proc(downstream) != 0) {
         if (error_reply(downstream, 500) != 0) {

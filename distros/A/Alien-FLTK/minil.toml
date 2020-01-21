@@ -1,8 +1,11 @@
 name = "Alien-FLTK"
-badges = ["travis"]
+badges = ["travis", 'metacpan']
 module_maker="ModuleBuildTiny"
 license="artistic_2"
+authority="cpan:SANKO"
 requires_external_bin=["sh');\nuse lib 'inc';\nuse MBTFLTK;\n('1"]
 
 [release]
-pause_config = "C:/Strawberry/pause.upload"
+hook=[
+    'tidyall -a'
+]

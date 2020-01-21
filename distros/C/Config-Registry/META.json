@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Hash::Merge" : "0",
             "MRO::Compat" : "0",
             "Moo" : "0",
             "namespace::clean" : "0",
@@ -59,7 +58,7 @@
    "provides" : {
       "Config::Registry" : {
          "file" : "lib/Config/Registry.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -73,7 +72,7 @@
          "web" : "https://github.com/bluefeet/Config-Registry"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

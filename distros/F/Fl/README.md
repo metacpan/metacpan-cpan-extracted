@@ -5,17 +5,15 @@ Fl - Bindings for the Stable 1.3.x Branch of the Fast Light Toolkit
 
 # SYNOPSIS
 
-```perl
-use Fl qw[:event :label :box :font];
-my $window = Fl::Window->new(100, 100, 300, 180);
-my $box = Fl::Box->new(FL_UP_BOX, 20, 40, 260, 100, 'Hello, World');
-$box->labelfont(FL_BOLD + FL_ITALIC);
-$box->labelsize(36);
-$box->labeltype(FL_SHADOW_LABEL);
-$window->end();
-$window->show();
-exit run();
-```
+    use Fl qw[:event :label :box :font];
+    my $window = Fl::Window->new(100, 100, 300, 180);
+    my $box = Fl::Box->new(FL_UP_BOX, 20, 40, 260, 100, 'Hello, World');
+    $box->labelfont(FL_BOLD + FL_ITALIC);
+    $box->labelsize(36);
+    $box->labeltype(FL_SHADOW_LABEL);
+    $window->end();
+    $window->show();
+    exit run();
 
 # DESCRIPTION
 
@@ -36,30 +34,26 @@ Fl provides many types of buttons:
     <center><img src="http://www.fltk.org/doc-1.3/buttons.png" /></center>
 </div>
 
-- [Fl::Button](https://metacpan.org/pod/Fl::Button) - A standard push button
-- [Fl::CheckButton](https://metacpan.org/pod/Fl::CheckButton) - A button with a check box
-- [Fl::LightButton](https://metacpan.org/pod/Fl::LightButton) - A push buton with a light
-- [Fl::RepeatButton](https://metacpan.org/pod/Fl::RepeatButton) - A push button that continues to trigger its callback when held
-- [Fl::ReturnButton](https://metacpan.org/pod/Fl::ReturnButton) - A push button that is activated by the Enter key
-- [Fl::RoundButton](https://metacpan.org/pod/Fl::RoundButton) - A button with a radio circle (See also [Fl::RadioRoundButton](https://metacpan.org/pod/Fl::RadioRoundButton))
+- [Fl::Button](https://metacpan.org/pod/Fl%3A%3AButton) - A standard push button
+- [Fl::CheckButton](https://metacpan.org/pod/Fl%3A%3ACheckButton) - A button with a check box
+- [Fl::LightButton](https://metacpan.org/pod/Fl%3A%3ALightButton) - A push buton with a light
+- [Fl::RepeatButton](https://metacpan.org/pod/Fl%3A%3ARepeatButton) - A push button that continues to trigger its callback when held
+- [Fl::ReturnButton](https://metacpan.org/pod/Fl%3A%3AReturnButton) - A push button that is activated by the Enter key
+- [Fl::RoundButton](https://metacpan.org/pod/Fl%3A%3ARoundButton) - A button with a radio circle (See also [Fl::RadioRoundButton](https://metacpan.org/pod/Fl%3A%3ARadioRoundButton))
 
 The constructor for all of these buttons takes the bounding box of the button
 and an optional label string:
 
-```perl
-my $fl_btn = Fl::Button->new($x, $y, $width, $height, "label");
-my $fl_lbtn = Fl::LightButton->new($x, $y, $width, $height);
-my $fl_rbtn = Fl::RoundButton->new($x, $y, $width, $height, "label");
-```
+    my $fl_btn = Fl::Button->new($x, $y, $width, $height, "label");
+    my $fl_lbtn = Fl::LightButton->new($x, $y, $width, $height);
+    my $fl_rbtn = Fl::RoundButton->new($x, $y, $width, $height, "label");
 
 Each button has an associated `type()` which allows it to behave as a push
 button, toggle button, or radio button.
 
-```
-$fl_btn->type(FL_NORMAL_BUTTON);
-$fl_lbtn->type(FL_TOGGLE_BUTTON);
-$fl_rbtn->type(FL_RADIO_BUTTON);
-```
+    $fl_btn->type(FL_NORMAL_BUTTON);
+    $fl_lbtn->type(FL_TOGGLE_BUTTON);
+    $fl_rbtn->type(FL_RADIO_BUTTON);
 
 For toggle and radio buttons, the `value()` method returns the current button
 state (0 = off, 1 = on). The `set()` and `clear()` methods can be used on
@@ -74,7 +68,7 @@ group.
 </div>
 
 Widgets are drawn on screen according to their box types. The full list of
-these may be found in [":box" in Fl::Enumerations](https://metacpan.org/pod/Fl::Enumerations#box) and may be imported into your
+these may be found in [":box" in Fl::Enumerations](https://metacpan.org/pod/Fl%3A%3AEnumerations#box) and may be imported into your
 namespace with the `:box` tag.
 
 FL\_NO\_BOX means nothing is drawn at all, so whatever is already on the screen
@@ -136,7 +130,7 @@ aligned at the bottom. Outside labels only.
 - FL\_ALIGN\_TEXT\_NEXT\_TO\_IMAGE - The image will appear to the right of the text.
 - FL\_ALIGN\_IMAGE\_BACKDROP - The image will be used as a background for the widget.
 
-Please see the [:align](https://metacpan.org/pod/Fl::Enumerations#align) tag for more.
+Please see the [:align](https://metacpan.org/pod/Fl%3A%3AEnumerations#align) tag for more.
 
 ## `labeltype()`
 
@@ -151,60 +145,50 @@ label types are included:
 - FL\_ICON\_LABEL - draws the icon associated with the text.
 
 These are imported with the `:label` tag. Please see
-[Fl::Enumerations](https://metacpan.org/pod/Fl::Enumerations#label) for more.
+[Fl::Enumerations](https://metacpan.org/pod/Fl%3A%3AEnumerations#label) for more.
 
 # Callbacks
 
 Callbacks are functions that are called when the value of a widget is changed.
 A callback function is sent the widget's pointer and the data you provided.
 
-```perl
-sub xyz_callback {
-    my ($widget, $data) = @_;
-    ...
-}
-```
+    sub xyz_callback {
+        my ($widget, $data) = @_;
+        ...
+    }
 
 The `callback(...)` method sets the callback function for a widget. You can
 optionally pass data needed for the callback:
 
-```perl
-my $xyz_data = 'Fire Kingdom';
-$button->callback(&xyz_callback, $xyz_data);
-```
+    my $xyz_data = 'Fire Kingdom';
+    $button->callback(&xyz_callback, $xyz_data);
 
 You can also pass an anonymous sub to the `callback(...)` method:
 
-```perl
-$button->callback(sub { warn 'Click!' });
-```
+    $button->callback(sub { warn 'Click!' });
 
 Normally, callbacks are performed only when the value of the widget changes.
-You can change this using the [when()](https://metacpan.org/pod/Fl::Widget#when) method:
+You can change this using the [when()](https://metacpan.org/pod/Fl%3A%3AWidget#when) method:
 
-```
-$button->when(FL_WHEN_NEVER);
-$button->when(FL_WHEN_CHANGED);
-$button->when(FL_WHEN_RELEASE);
-$button->when(FL_WHEN_RELEASE_ALWAYS);
-$button->when(FL_WHEN_ENTER_KEY);
-$button->when(FL_WHEN_ENTER_KEY_ALWAYS);
-$button->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
-```
+    $button->when(FL_WHEN_NEVER);
+    $button->when(FL_WHEN_CHANGED);
+    $button->when(FL_WHEN_RELEASE);
+    $button->when(FL_WHEN_RELEASE_ALWAYS);
+    $button->when(FL_WHEN_ENTER_KEY);
+    $button->when(FL_WHEN_ENTER_KEY_ALWAYS);
+    $button->when(FL_WHEN_CHANGED | FL_WHEN_NOT_CHANGED);
 
 These values may be imported with the `:when` tag. Please see
-[Fl::Enumerations](https://metacpan.org/pod/Fl::Enumerations#when) for more.
+[Fl::Enumerations](https://metacpan.org/pod/Fl%3A%3AEnumerations#when) for more.
 
 A word of caution: care has been taken not to tip over when you delete a
 widget inside it's own callback but it's still not the best idea so...
 
-```perl
-$button->callback(
-    sub {
-        $button = undef; # Might be okay. Might implode.
-    }
-);
-```
+    $button->callback(
+        sub {
+            $button = undef; # Might be okay. Might implode.
+        }
+    );
 
 Eventually, I'll provide an explicit `delete_widget()` method that will mark
 the widget for deletion when it's safe to do so.
@@ -214,35 +198,33 @@ the widget for deletion when it's safe to do so.
 Shortcuts are key sequences that activate widgets such as buttons or menu
 items. The `shortcut(...)` method sets the shortcut for a widget:
 
-```
-$button->shortcut(FL_Enter);
-$button->shortcut(FL_SHIFT + 'b');
-$button->shortcut(FL_CTRL + 'b');
-$button->shortcut(FL_ALT + 'b');
-$button->shortcut(FL_CTRL + FL_ALT + 'b');
-$button->shortcut(0); # no shortcut
-```
+    $button->shortcut(FL_Enter);
+    $button->shortcut(FL_SHIFT + 'b');
+    $button->shortcut(FL_CTRL + 'b');
+    $button->shortcut(FL_ALT + 'b');
+    $button->shortcut(FL_CTRL + FL_ALT + 'b');
+    $button->shortcut(0); # no shortcut
 
 The shortcut value is the key event value - the ASCII value or one of the
-special keys described in [Fl::Enumerations](https://metacpan.org/pod/Fl::Enumerations#keyboard)
+special keys described in [Fl::Enumerations](https://metacpan.org/pod/Fl%3A%3AEnumerations#keyboard)
 combined with any modifiers like Shift, Alt, and Control.
 
 These values may be imported with the `:keyboard` tag. Please see
-[Fl::Enumerations](https://metacpan.org/pod/Fl::Enumerations#keyboard) for an expansive lis
+[Fl::Enumerations](https://metacpan.org/pod/Fl%3A%3AEnumerations#keyboard) for an expansive lis
 &#x3d;head1 Other Classes
 
 Fl contains several other widgets and other classes including:
 
-- [Fl::Box](https://metacpan.org/pod/Fl::Box)
-- [Fl::Input](https://metacpan.org/pod/Fl::Input) - Simple text input widget
-- [Fl::SecretInput](https://metacpan.org/pod/Fl::SecretInput) - Think 'password field'
-- [Fl::FloatInput](https://metacpan.org/pod/Fl::FloatInput)
-- [Fl::IntInput](https://metacpan.org/pod/Fl::IntInput)
-- [Fl::Chart](https://metacpan.org/pod/Fl::Chart)
-- [Fl::Valuator](https://metacpan.org/pod/Fl::Valuator)
-- [Fl::Adjuster](https://metacpan.org/pod/Fl::Adjuster)
-- [Fl::Group](https://metacpan.org/pod/Fl::Group)
-- [Fl::Window](https://metacpan.org/pod/Fl::Window)
+- [Fl::Box](https://metacpan.org/pod/Fl%3A%3ABox)
+- [Fl::Input](https://metacpan.org/pod/Fl%3A%3AInput) - Simple text input widget
+- [Fl::SecretInput](https://metacpan.org/pod/Fl%3A%3ASecretInput) - Think 'password field'
+- [Fl::FloatInput](https://metacpan.org/pod/Fl%3A%3AFloatInput)
+- [Fl::IntInput](https://metacpan.org/pod/Fl%3A%3AIntInput)
+- [Fl::Chart](https://metacpan.org/pod/Fl%3A%3AChart)
+- [Fl::Valuator](https://metacpan.org/pod/Fl%3A%3AValuator)
+- [Fl::Adjuster](https://metacpan.org/pod/Fl%3A%3AAdjuster)
+- [Fl::Group](https://metacpan.org/pod/Fl%3A%3AGroup)
+- [Fl::Window](https://metacpan.org/pod/Fl%3A%3AWindow)
 
 This is the current list and will expand as the distribution develops.
 

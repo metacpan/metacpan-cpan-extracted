@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Class::Std::Fast::Storable;
 
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %definitions_of :ATTR(:name<definitions> :default<()>);
 my %type_prefix_of :ATTR(:name<type_prefix> :default<()>);
@@ -58,7 +58,7 @@ The Visitor design pattern is one of the object oriented design pattern
 described by [GHJV1995].
 
 A Visitor is an object implementing some behaviour for a fixed set of classes,
-whose implementation would otherwise need to be scattered accross those
+whose implementation would otherwise need to be scattered across those
 classes' implementations.
 
 Visitors are usually combined with Iterators for traversing either a list or
@@ -182,7 +182,7 @@ programmers accessing the service
 
 Both Type Classes and Interface Classes include documentation. Additional
 documentation may be generated as a hint for programmers, or later for
-mimicing .NET's .asmx example pages.
+mimicking .NET's .asmx example pages.
 
 =back
 

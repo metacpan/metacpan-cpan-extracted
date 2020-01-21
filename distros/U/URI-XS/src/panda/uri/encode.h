@@ -3,28 +3,23 @@
 
 namespace panda { namespace uri {
 
-static const int UNSAFE_DIGIT      =  1;
-static const int UNSAFE_ALPHA      =  2;
-static const int UNSAFE_SUBDELIMS  =  4;
-static const int UNSAFE_GENDELIMS  =  8;
-static const int UNSAFE_RESERVED   = 16;
-static const int UNSAFE_UNRESERVED = 32;
-static const int UNSAFE_PCHAR      = 64;
+struct URIComponent {
+    static char scheme[256];
+    static char user_info[256];
+    static char host[256];
+    static char path[256];
+    static char path_segment[256];
+    static char query[256];
+    static char query_param[256];
+    static char query_param_plus[256];
+    static char fragment[256];
+};
 
-extern char unsafe_scheme[256];
-extern char unsafe_uinfo[256];
-extern char unsafe_host[256];
-extern char unsafe_path[256];
-extern char unsafe_path_segment[256];
-extern char unsafe_query[256];
-extern char unsafe_query_component[256];
-extern char unsafe_fragment[256];
-
-size_t encode_uri_component (const string_view src, char* dest, const char* unsafe = unsafe_query_component);
+size_t encode_uri_component (const string_view src, char* dest, const char* component = URIComponent::query_param);
 size_t decode_uri_component (const string_view src, char* dest);
 
-inline void encode_uri_component (const string_view src, panda::string& dest, const char* unsafe = unsafe_query_component) {
-    size_t final_size = encode_uri_component(src, dest.reserve(src.length()*3), unsafe);
+inline void encode_uri_component (const string_view src, panda::string& dest, const char* component = URIComponent::query_param) {
+    size_t final_size = encode_uri_component(src, dest.reserve(src.length()*3), component);
     dest.length(final_size);
 }
 
@@ -33,9 +28,9 @@ inline void decode_uri_component (const string_view src, panda::string& dest) {
     dest.length(final_size);
 }
 
-inline panda::string encode_uri_component (const string_view src, const char* unsafe = unsafe_query_component) {
+inline panda::string encode_uri_component (const string_view src, const char* component = URIComponent::query_param) {
     panda::string ret;
-    encode_uri_component(src, ret, unsafe);
+    encode_uri_component(src, ret, component);
     return ret;
 }
 
@@ -44,7 +39,5 @@ inline panda::string decode_uri_component (const string_view src) {
     decode_uri_component(src, ret);
     return ret;
 }
-
-void unsafe_generate (char* unsafe, int flags, const char* chars = NULL);
 
 }}

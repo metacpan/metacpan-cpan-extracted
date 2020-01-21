@@ -35,6 +35,8 @@
     use constant MPFR_FLAGS_ALL         => 63;
     use constant MPFR_FREE_LOCAL_CACHE  => 1;
     use constant MPFR_FREE_GLOBAL_CACHE => 2;
+    use constant LITTLE_ENDIAN          => $Config{byteorder} =~ /^1/ ? 1 : 0;
+    use constant MM_HP                  => LITTLE_ENDIAN ? 'h*' : 'H*';
 
 
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
@@ -180,7 +182,7 @@ Rmpfr_round_nearest_away rndna
 atonv nvtoa atodouble doubletoa Rmpfr_dot Rmpfr_get_str_ndigits
 );
 
-    our $VERSION = '4.12';
+    our $VERSION = '4.13';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -299,6 +301,18 @@ $Math::MPFR::doubletoa_fallback = 0; # If FALLBACK_NOTIFY is defined, this scala
 
 %Math::MPFR::NV_properties = _get_NV_properties();
 
+my %bytes = (53   =>  \&_d_bytes,
+             64   =>  \&_ld_bytes,
+             2098 => \&_dd_bytes,
+             113  => \&_f128_bytes,
+            );
+
+my %fmt = (53   =>  'a8',
+           64   =>  'a10',
+           2098 => 'a16',
+           113  => 'a16',
+          );
+
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
 
 sub Rmpfr_out_str {
@@ -341,7 +355,7 @@ sub TRmpfr_out_str {
 sub Rmpfr_get_str {
     my ($mantissa, $exponent) = Rmpfr_deref2($_[0], $_[1], $_[2], $_[3]);
 
-    if($mantissa =~ /\@Inf\@/i || $mantissa =~ /\@NaN\@/i) {return $mantissa}
+    if($mantissa =~ s/@//g) { return $mantissa }
     if($mantissa =~ /\-/ && $mantissa !~ /[^0,\-]/) {return '-0'}
     if($mantissa !~ /[^0]/ ) {return '0'}
 
@@ -374,7 +388,7 @@ sub overload_string {
 sub Rmpfr_integer_string {
     if($_[1] < 2 || $_[1] > 36) {die("Second argument supplied to Rmpfr_integer_string() is not in acceptable range")}
     my($mantissa, $exponent) = Rmpfr_deref2($_[0], $_[1], 0, $_[2]);
-    if($mantissa =~ /\@Inf\@/i || $mantissa =~ /\@NaN\@/i) {return $mantissa}
+    if($mantissa =~ s/@//g) { return $mantissa }
     if($mantissa =~ /\-/ && $mantissa !~ /[^0,\-]/) {return '-0'}
     return 0 if $exponent < 1;
     my $sign = substr($mantissa, 0, 1) eq '-' ? 1 : 0;
@@ -467,7 +481,6 @@ sub new {
         }
       }
       $base = shift if @_;
-      if($base < 0 || $base == 1 || $base > 36) {die "Invalid value for base"}
       @ret = Rmpfr_init_set_str($arg1, $base, Rmpfr_get_default_rounding_mode());
       return $ret[0];
     }
@@ -576,74 +589,105 @@ sub GMP_LIMB_BITS           () {return _GMP_LIMB_BITS()}
 sub GMP_NAIL_BITS           () {return _GMP_NAIL_BITS()}
 
 sub mpfr_min_inter_prec {
-    die "Wrong number of args to minimum_intermediate_prec()" if @_ != 3;
-    my $orig_base = shift;
-    my $orig_length = shift;
-    my $to_base = shift;
-    return ceil(1 + ($orig_length * log($orig_base) / log($to_base)));
-}
+    die "Wrong number of args to mpfr_min_inter_prec()" unless @_ == 3;
+    my $ob = shift; # base of original representation
+    my $op = shift; # precision (no. of base $ob digits in mantissa) of original representation
+    my $nb = shift; # base of new representation
+    my $np;         # min required precision (no. of base $nb digits in mantissa) of new representation
 
-sub mpfr_min_inter_base {
-    die "Wrong number of args to minimum_intermediate_base()" if @_ != 3;
-    my $orig_base = shift;
-    my $orig_length = shift;
-    my $to_prec = shift;
-    return ceil(exp($orig_length * log($orig_base) / ($to_prec - 1)));
+    my %h = (2 => 1, 4 => 2, 8 => 3, 16 => 4, 32 => 5, 64 => 6,
+             3 => 1, 9 => 2, 27 => 3,
+             5 => 1, 25 => 2,
+             6 => 1, 36 => 2,
+             7 => 1, 49 => 2);
+
+    return $op
+      if $ob == $nb;
+
+    if(_bases_are_power_of_same_integer($ob, $nb)) {
+      $np = POSIX::ceil($op * $h{$ob} / $h{$nb});
+      return $np;
+    }
+
+    $np = POSIX::ceil(1 + ($op * log($ob) / log($nb)));
+    return $np;
 }
 
 sub mpfr_max_orig_len {
     die "Wrong number of args to maximum_orig_length()" if @_ != 3;
-    my $orig_base = shift;
-    my $to_base = shift;
-    my $to_prec = shift;
-    return floor(1 / (log($orig_base) / log($to_base) / ($to_prec - 1)));
+    my $ob = shift; # base of original representation
+    my $nb = shift; # base of new representation
+    my $np = shift; # precision (no. of base $nb digits in mantissa) of new representation
+    my $op;         # max precision (no. of base $ob digits in mantissa) of original representation
+
+    my %h = (2 => 1, 4 => 2, 8 => 3, 16 => 4, 32 => 5, 64 => 6,
+             3 => 1, 9 => 2, 27 => 3,
+             5 => 1, 25 => 2,
+             6 => 1, 36 => 2,
+             7 => 1, 49 => 2);
+
+    return $np
+      if $ob == $nb;
+
+    if(_bases_are_power_of_same_integer($ob, $nb)) {
+      $op = POSIX::floor($np * $h{$nb} / $h{$ob});
+      return $op;
+    }
+
+    $op = POSIX::floor(($np - 1) * log($nb) / log($ob));
+    return $op;
 }
 
-sub mpfr_max_orig_base {
-    die "Wrong number of args to maximum_orig_base()" if @_ != 3;
-    my $orig_length = shift;
-    my $to_base = shift;
-    my $to_prec = shift;
-    return floor(exp(1 / ($orig_length / log($to_base) / ($to_prec -1))));
+sub _bases_are_power_of_same_integer {
+
+  # This function currently doesn't get called if $_[0] == $_[1]
+  # Return true if:
+  # 1) Both $_[0] and $_[1] are in the range 2..64 (inclusive)
+  #    &&
+  # 2) Both $_[0] and $_[1] are powers of the same integer - eg 8 & 32, or 9 & 27, or 7 & 49, ....
+  # Else return false.
+
+  return 1
+    if( ($_[0] == 2 || $_[0] == 16 || $_[0] == 8 || $_[0] == 64 || $_[0] == 32 || $_[0] == 4)
+           &&
+        ($_[1] == 2 || $_[1] == 16 || $_[1] == 8 || $_[1] == 64 || $_[1] == 32 || $_[1] == 4) );
+
+  return 1
+    if( ($_[0] == 3 || $_[0] == 9 || $_[0] == 27)
+           &&
+        ($_[1] == 3 || $_[1] == 9 || $_[1] == 27) );
+
+  return 1
+    if( ($_[0] == 5 || $_[0] == 25)
+           &&
+        ($_[1] == 5 || $_[1] == 25) );
+
+  return 1
+    if( ($_[0] == 6 || $_[0] == 36)
+           &&
+        ($_[1] == 6 || $_[1] == 36) );
+
+  return 1
+    if( ($_[0] == 7 || $_[0] == 49)
+           &&
+        ($_[1] == 7 || $_[1] == 49) );
+
+  return 0;
 }
 
 sub bytes {
-  my($val, $type, $ret) = (shift, shift);
+  my($val, $bits, $ret) = (shift, shift);
   my $itsa = _itsa($val);
   die "1st arg to Math::MPFR::bytes must be either a string or a Math::MPFR object"
     if($itsa != 4 && $itsa != 5);
 
-  if(lc($type) eq 'double') {
-    $ret = $itsa == 4 ? join '', _d_bytes   ($val, 53)
-                      : join '', _d_bytes_fr($val, 53);
-    return $ret;
-  }
+  die "2nd argument given to Math::MPFR::bytes is neither 53 nor 64 nor 2098 nor 113"
+    unless($bits == 53 || $bits == 64 || $bits == 2098 || $bits == 113);
 
-  if(lc($type) eq 'long double') {
-    $ret = $itsa == 4 ? join '', _ld_bytes   ($val, 64)
-                      : join '', _ld_bytes_fr($val, 64);
-    return $ret;
-  }
-
-  if(lc($type) eq 'ieee long double') {
-    $ret = $itsa == 4 ? join '', _ld_bytes   ($val, 113)
-                      : join '', _ld_bytes_fr($val, 113);
-    return $ret;
-  }
-
-  if(lc($type) eq 'double-double') {
-    $ret = $itsa == 4 ? join '', _dd_bytes   ($val, 106)
-                      : join '', _dd_bytes_fr($val, 106);
-    return $ret;
-  }
-
-  if(lc($type) eq '__float128') {
-    $ret = $itsa == 4 ? join '', _f128_bytes   ($val, 113)
-                      : join '', _f128_bytes_fr($val, 113);
-    return $ret;
-  }
-
-  die "2nd arg to Math::MPFR::bytes must be (case-insensitive) either 'double', 'double-double', 'long double' or '__float128'";
+  $ret = $itsa == 4 ? unpack MM_HP, pack $fmt{$bits}, $bytes   {$bits} -> ($val)
+                    : unpack MM_HP, pack $fmt{$bits}, _bytes_fr($val, $bits);
+  return scalar reverse $ret if LITTLE_ENDIAN;
+  return $ret;
 }
 
 sub rndna {

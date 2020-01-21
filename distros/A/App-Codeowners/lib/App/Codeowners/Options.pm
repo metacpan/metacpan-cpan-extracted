@@ -8,7 +8,7 @@ use strict;
 use Getopt::Long 2.39 ();
 use Path::Tiny;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 sub pod2usage {
     eval { require Pod::Usage };
@@ -299,7 +299,7 @@ App::Codeowners::Options - Getopt and shell completion for App::Codeowners
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 METHODS
 

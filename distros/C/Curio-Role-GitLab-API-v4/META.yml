@@ -1,5 +1,5 @@
 ---
-abstract: 'Build Curio classes around GitLab::API::v4.'
+abstract: 'Build Curio classes around GitLab::API::v4. (DEPRECATED)'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
@@ -27,7 +27,7 @@ no_index:
 provides:
   Curio::Role::GitLab::API::v4:
     file: lib/Curio/Role/GitLab/API/v4.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Curio::Role: '0.04'
   GitLab::API::v4: '0.07'
@@ -42,7 +42,8 @@ resources:
   bugtracker: https://github.com/bluefeet/Curio-Role-GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/Curio-Role-GitLab-API-v4
   repository: git://github.com/bluefeet/Curio-Role-GitLab-API-v4.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:BLUEFEET
+x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

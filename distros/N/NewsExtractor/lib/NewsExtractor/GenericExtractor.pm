@@ -186,6 +186,10 @@ sub journalist {
             qr< （記者 (\p{Letter}+) 綜合報導）\s+ （ (責任編輯：\p{Letter}+) ） \z>x,
             qr< （ (責任編輯：\p{Letter}+) ）\z>x,
             qr< \s (公民記者 .+ 採訪報導) \z>x,
+            qr<\A 【大成報記者 (\p{Letter}+) / .+報導】 >x,
+            qr<\A  記者 (\p{Letter}+) ／報導 >x,
+            qr<\A  \[ (記者.+報導) \] >x,
+            qr<\A  （ (記者.+報導) ） >x,
         );
 
         for my $pat (@patterns) {

@@ -15,7 +15,7 @@ use SOAP::WSDL::XSD::Typelib::Builtin::anySimpleType;
 use LWP::UserAgent;
 
 # perl -p -i -e 's{our \$VERSION = 3\.\d*;}{our \$VERSION = 3.003;}' `ack -l 'our \\$VERSION = '`      # in the lib/ directory, to change version numbers
-our $VERSION = 3.003;
+our $VERSION = 3.004;
 
 my %no_dispatch_of      :ATTR(:name<no_dispatch>);
 my %wsdl_of             :ATTR(:name<wsdl>);
@@ -668,7 +668,7 @@ such interfaces.
 =head2 Debugging / Tracing
 
 While SOAP::Lite features a global tracing facility, SOAP::WSDL
-allows to switch tracing on/of on a per-object base.
+allows one to switch tracing on/of on a per-object base.
 
 This has to be done in the SOAP client used by SOAP::WSDL - see
 L<get_client|get_client> for an example and L<SOAP::WSDL::Client> for
@@ -737,7 +737,7 @@ See L<SOAP::WSDL::Manual::XSD> for details.
 
 =item * Serialization of hash refs does not work for ambiguous values
 
-If you have list elements with multiple occurences allowed, SOAP::WSDL
+If you have list elements with multiple occurrences allowed, SOAP::WSDL
 has no means of finding out which variant you meant.
 
 Passing in item => [1,2,3] could serialize to
@@ -811,7 +811,7 @@ This code incorporates fixes contributed by C<< NORDIC@cpan.org >>, C<< dam@cpan
 
 Martin Kutter wrote:
 
-There are many people out there who fostered SOAP::WSDL's developement.
+There are many people out there who fostered SOAP::WSDL's development.
 I would like to thank them all (and apologize to all those I have forgotten).
 
 Giovanni S. Fois wrote a improved version of SOAP::WSDL (which eventually
@@ -838,7 +838,7 @@ Numerous people sent me their real-world WSDL files and error reports for
 testing. Thank you.
 
 Noah Robin contributed lots of documentation fixes, and the mod_perl server,
-and eventually joined SOAP::WSDL's developement. Thanks.
+and eventually joined SOAP::WSDL's development. Thanks.
 
 Mark Overmeer wrote XML::Compile::SOAP - competition is good for business.
 

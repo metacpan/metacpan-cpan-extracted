@@ -178,7 +178,7 @@ typemap included in every generated one):
  );
 
 The lines are hash key - value pairs. The keys are the XPath expressions
-without occurence numbers (like [1]) relative to the Body element.
+without occurrence numbers (like [1]) relative to the Body element.
 Namespaces are ignored.
 
 If you don't know about XPath: They are just the names of the XML tags,

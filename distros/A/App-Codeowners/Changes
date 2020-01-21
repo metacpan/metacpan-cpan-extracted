@@ -1,5 +1,9 @@
 Revision history for App-Codeowners.
 
+0.48      2020-01-21 10:13:14-07:00 MST7MDT
+  * Add rename_project and update_owners_by_project functions.
+  * No changes to the CLI.
+
 0.47      2019-11-17 17:36:49-07:00 MST7MDT
   * Configure git in unit tests to avoid unnecessary test failures.
   * Compare long paths on win32 (thanks CPAN testers).

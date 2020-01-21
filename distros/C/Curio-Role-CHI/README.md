@@ -1,6 +1,6 @@
 # NAME
 
-Curio::Role::CHI - Build Curio classes around CHI.
+Curio::Role::CHI - Build Curio classes around CHI. (DEPRECATED)
 
 # SYNOPSIS
 

@@ -129,7 +129,7 @@ else {
 
 eval { is_inexact('0.5') };
 
-if($Math::NV::mpfr_strtofr_bug && $@ && $@ =~ /is_inexact\(\) requires/) {
+if(MPFR_STRTOFR_BUG && $@ && $@ =~ /is_inexact\(\) requires/) {
   warn "\nskipping tests 12 to $tests - mpfr-3.1.6 or later is needed\n";
   for(12 .. $tests) { print "ok $_\n" }
 

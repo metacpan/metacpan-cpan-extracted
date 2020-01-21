@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 use strict;
-use lib './lib';
+
 use Schedule::Cron::Events;
 use Getopt::Std;
 use Time::Local;

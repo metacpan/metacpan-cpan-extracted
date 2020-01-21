@@ -1,3 +1,10 @@
+0.05 2020-01-21
+-POD fixes for TOML::Tiny::Grammar
+
+0.04 2020-01-21
+-Remove superfluous dependency on DateTime::Format::RFC3339, which was only
+ needed for unit tests
+
 0.03 2020-01-18
 -Remove automatic inflation of numerical types using Math::Big(Int|Float);
  this may now be done with inflate_integer and inflate_float

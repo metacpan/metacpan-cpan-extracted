@@ -75,7 +75,7 @@ A class resolver package might look like this:
 
 =head3 Skipping unwanted items
 
-Sometimes there's unneccessary information transported in SOAP messages.
+Sometimes there's unnecessary information transported in SOAP messages.
 
 To skip XML nodes (including all child nodes), just edit the type map for
 the message and set the type map entry to '__SKIP__'.

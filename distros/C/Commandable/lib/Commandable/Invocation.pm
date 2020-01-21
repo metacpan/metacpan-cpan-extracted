@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ C<Commandable::Invocation> - represents one invocation of a CLI command
 
    my %commands = (
       exit  => sub { exit },
-      print => sub { print $_[0]->remaining },
+      print => sub { print $_[0]->peek_remaining },
       ...
    );
 
@@ -170,15 +170,17 @@ sub pull_token
    return $token;
 }
 
-=head2 remaining
+=head2 peek_remaining
 
-   $text = $inv->remaining
+   $text = $inv->peek_remaining
+
+I<Since version 0.04.>
 
 Returns the entire unparsed content of the rest of the text string.
 
 =cut
 
-sub remaining
+sub peek_remaining
 {
    my $self = shift;
 

@@ -1,4 +1,10 @@
 Revision history for Perl module Math::NV
+ 2.03
+    - "use constant" to replace $Math::NV::mpfr_strtofr_bug with MPFR_STRTOFR_BUG
+       and to replace $Math::NV::_ld_subnormal_bug with LD_SUBNORMAL_BUG
+    - Accommodate changes made to Math-MPFR private functions _d_bytes, _ld_bytes,
+      _dd_bytes and _f128_bytes that were made in Math-MPFR-4.13
+
  2.02
     - Remove "Perl_strtod" from NV.xs.
     - Remove references to Perl_strtod from NV.pod.

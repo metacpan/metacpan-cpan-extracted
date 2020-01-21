@@ -4,13 +4,13 @@
       "Chris Drake<cdrake@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Uncompress-Untar",
    "no_index" : {
@@ -31,9 +31,13 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Archive::Tar::Stream" : "0",
+            "IO::File" : "0",
+            "IO::Uncompress::AnyUncompress" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01"
+   "version" : "1.02"
 }

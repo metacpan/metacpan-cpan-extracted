@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load('Text::Markdown::Discount', $VERSION);
@@ -57,7 +57,6 @@ sub markdown {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 

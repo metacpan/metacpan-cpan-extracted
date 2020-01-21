@@ -2,19 +2,23 @@
 use utf8;
 use Test2::V0;
 use Data::Dumper;
+use DateTime;
+use DateTime::Format::RFC3339;
+use Math::BigInt;
+use Math::BigFloat;
 use TOML::Tiny;
 
 binmode STDIN,  ':encoding(UTF-8)';
 binmode STDOUT, ':encoding(UTF-8)';
 
 my $expected1 = {
-               'equivalent_three' => 'The quick brown fox jumps over the lazy dog.',
-               'equivalent_one' => 'The quick brown fox jumps over the lazy dog.',
-               'equivalent_two' => 'The quick brown fox jumps over the lazy dog.',
-               'multiline_empty_four' => '',
                'multiline_empty_one' => '',
+               'equivalent_one' => 'The quick brown fox jumps over the lazy dog.',
+               'multiline_empty_three' => '',
                'multiline_empty_two' => '',
-               'multiline_empty_three' => ''
+               'multiline_empty_four' => '',
+               'equivalent_three' => 'The quick brown fox jumps over the lazy dog.',
+               'equivalent_two' => 'The quick brown fox jumps over the lazy dog.'
              };
 
 

@@ -36,7 +36,7 @@ check_PROGRAMS = 10-at-a-time anyauthput cookie_interface debug fileupload \
   ftpuploadresume sslbackend postit2-formadd multi-formadd                 \
   shared-connection-cache sftpuploadresume http2-pushinmemory parseurl     \
   urlapi imap-authzid pop3-authzid smtp-authzid http3 altsvc               \
-  http3-present
+  http3-present multi-poll
 
 # These examples require external dependencies that may not be commonly
 # available on POSIX systems, so don't bother attempting to compile them here.
@@ -45,4 +45,4 @@ COMPLICATED_EXAMPLES = curlgtk.c curlx.c htmltitle.cpp cacertinmem.c \
   sampleconv.c synctime.c threaded-ssl.c evhiperfifo.c \
   smooth-gtk-thread.c version-check.pl href_extractor.c asiohiper.cpp \
   multi-uv.c xmlstream.c usercertinmem.c sessioninfo.c \
-  threaded-shared-conn.c crawler.c ephiperfifo.c
+  threaded-shared-conn.c crawler.c ephiperfifo.c multi-event.c

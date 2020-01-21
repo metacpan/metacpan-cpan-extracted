@@ -163,7 +163,7 @@ wsdl2perl.pl - create perl bindings for SOAP webservices.
 
 =head1 OPTIONS
 
- NAME            SHORT  DESCRITPION
+ NAME            SHORT  DESCRIPTION
  ----------------------------------------------------------------------------
  prefix            p   Prefix for all generated classes. If you set "-p=Foo",
                        you will get "FooAttributes", "FooTypes",

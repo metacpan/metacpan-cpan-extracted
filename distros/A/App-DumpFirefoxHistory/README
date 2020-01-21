@@ -2,8 +2,8 @@ NAME
     App::DumpFirefoxHistory - Dump Firefox history
 
 VERSION
-    This document describes version 0.004 of App::DumpFirefoxHistory (from
-    Perl distribution App-DumpFirefoxHistory), released on 2019-11-21.
+    This document describes version 0.005 of App::DumpFirefoxHistory (from
+    Perl distribution App-DumpFirefoxHistory), released on 2019-11-23.
 
 SYNOPSIS
     See the included script dump-firefox-history.
@@ -71,9 +71,9 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    App::DumpChromeHistory
+    App::DumpChromeHistory, App::DumpOperaHistory
 
-    App::DumpOperaHistory
+    App::FirefoxUtils
 
 AUTHOR
     perlancar <perlancar@cpan.org>

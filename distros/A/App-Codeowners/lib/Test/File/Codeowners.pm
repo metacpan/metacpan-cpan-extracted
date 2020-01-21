@@ -10,7 +10,7 @@ use Encode qw(encode);
 use File::Codeowners;
 use Test::Builder;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -88,7 +88,7 @@ Test::File::Codeowners - Write tests for CODEOWNERS files
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
