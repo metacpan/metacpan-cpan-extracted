@@ -20,10 +20,10 @@ name: App-xspf2m3u
 provides:
   App::xspf2m3u:
     file: lib/App/xspf2m3u.pm
-    version: v0.0.1
+    version: v0.0.2
   App::xspf2m3u::Command::convert:
     file: lib/App/xspf2m3u/Command/convert.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   App::Cmd::Setup: '0'
   Path::Tiny: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-xspf2m3u/issues
   homepage: http://metacpan.org/release/App-xspf2m3u
   repository: https://github.com/shlomif/App-xspf2m3u.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -137,7 +137,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -245,6 +245,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -303,7 +307,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

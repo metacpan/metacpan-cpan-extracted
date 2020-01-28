@@ -1,5 +1,5 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.0800';
+$App::XML::DocBook::Builder::VERSION = '0.0801';
 use warnings;
 use strict;
 
@@ -48,19 +48,19 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+App::XML::DocBook::Builder - Build DocBook/XML files.
+
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 
     use App::XML::DocBook::Builder;
 
     my $foo = App::XML::DocBook::Builder->new();
-
-=head1 NAME
-
-App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 FUNCTIONS
 
@@ -228,7 +228,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Shlomi Fish.
+This software is Copyright (c) 2020 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -28,6 +28,12 @@ capability of handling multi-byte wide characters properly.
     Use just like perl's _printf_ and _sprintf_ functions
     except that _printf_ does not take FILEHANDLE as a first argument.
 
+# BUGS
+
+Text truncation is not supported.  Next program does not work.
+
+    vsprintf("%.4s", "一二三");
+
 # IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
@@ -36,6 +42,10 @@ before formatting, and recovered after the process.
 Unique replacement string contains a combination of control characters
 (Control-A to Control-E).  If the FORMAT contains all of these two
 bytes combinations, the function behaves just like a standard one.
+
+Because this mechanism expects entire replacement string can be found
+in formatted text, it does not work when the string is truncated by
+maximum precision.
 
 # SEE ALSO
 

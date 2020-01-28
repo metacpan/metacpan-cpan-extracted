@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish ( http://www.shlomifish.org/ )"
   ],
   "dist_name" => "Error",
-  "dist_version" => "0.17028",
+  "dist_version" => "0.17029",
   "license" => "perl",
   "module_name" => "Error",
   "recursive_test_files" => 1,

@@ -54,7 +54,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 
 <blockquote>
 ExifTool issues can be discussed on the ExifTool forum at
-<a href="http://u88.n24.queensu.ca/exiftool/forum/">http://u88.n24.queensu.ca/exiftool/forum/</a>
+<a href="https://exiftool.org/forum/">https://exiftool.org/forum/</a>
 </blockquote>
 
 <a name="Q2"></a>
@@ -209,8 +209,8 @@ CreateDate and ModifyDate.  See the <a href="TagNames/Shortcuts.html">Shortcuts
 Tags documentation</a> for more information.]</i></blockquote>
 
 <blockquote>The <code>-d</code> option provides additional flexibility in
-parsing strings when writing date/time tags if POSIX::strptime or Time::Piece is
-installed and the ExifTool version is 10.32 or later (use "<code>exiftool -ver -v</code>"
+parsing strings when writing date/time tags with ExifTool 10.32 or later if
+POSIX::strptime or Time::Piece is installed (use "<code>exiftool -ver -v</code>"
 to check the installed packages).  The format of the <code>-d</code> argument is
 the same for reading and writing.</blockquote>
 
@@ -1300,7 +1300,7 @@ ability to combine the values of multiple tags.  See the
 <a href="config.html">config file documentation</a> for more details about
 user-defined tags, and lib/Image/ExifTool/README in the full distribution for a
 complete description of ValueConv features.  Also, a
-<a href="http://u88.n24.queensu.ca/exiftool/forum/index.php?action=search2&amp;search=code+userdefined">quick
+<a href="https://exiftool.org/forum/index.php?action=search2&amp;search=code+userdefined">quick
 search of the ExifTool forum</a> should reveal a number of user-defined tag
 examples, and there are other good (and often more complex) examples which can
 be found in the %Image::ExifTool::Exif::Composite hash of the
@@ -1579,8 +1579,8 @@ Here is an example command to apply these validation checks to a JPEG image:
 
 <pre>exiftool -validate -warning -error -a test.jpg</pre>
 
-Note that there are other packages that are designed specifically for file
-validation, for example: <a href="https://github.com/openpreserve/jhove">JHOVE</a>.</blockquote>
+Note there are other packages specifically designed for file validation, for
+example: <a href="https://github.com/openpreserve/jhove">JHOVE</a>.</blockquote>
 
 <a name="Q26"></a>
 <p>26. <b>"How do I import information from a database?"</b></p>
@@ -1666,10 +1666,25 @@ shifted date/time value to be copied to another tag.  So this is the proper
 technique for shifting a date/time value when copying:
 
 <pre>exiftool "-datetimeoriginal&lt;filemodifydate" -globaltimeshift -2 image.jpg</pre>
+
+An alternative is to use the ShiftTime function of the
+<a href="exiftool_pod.html#Advanced-formatting-feature">advanced formatting feature</a>:
+
+<pre>exiftool '-datetimeoriginal&lt;${filemodifydate;ShiftTime("-2")}' image.jpg</pre>
+
+(Note: Swap the single and double quotes when running this command under Windows.)
+</blockquote><blockquote class=prog>
+<b>Programmers</b>: Here are the equivalent ExifTool API function calls:
+<pre><span class='blk'># using the GlobalTimeShift option</span>
+$exiftool->Options(GlobalTimeShift => '-2');
+$exifTool->SetNewValuesFromFile($src, 'datetimeoriginal&lt;filemodifydate');
+
+<span class='blk'># using ShiftTime in an advanced formatting expression</span>
+$exifTool->SetNewValuesFromFile($src, 'datetimeoriginal&lt;${filemodifydate;ShiftTime("-2")}');</pre>
 </blockquote>
 
 <hr>
-<i>Last revised Aug. 22, 2019</i>
+<i>Last revised Dec. 20, 2019</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -1,16 +1,16 @@
+# NAME
+
+csv2chart - command line utility to convert CSV data to a graphical chart
+
 # VERSION
 
-version 0.8.0
+version 0.8.2
 
 # SYNOPSIS
 
     ( echo "time,value" ; echo -n $'1,24\n2,36\n3,1977') | \
         csv2chart xlsx --output spreadsheet.xlsx
     gnumeric ./spreadsheet.xlsx
-
-# NAME
-
-csv2chart - command line utility to convert CSV data to a graphical chart
 
 # SEE ALSO
 

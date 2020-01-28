@@ -30,7 +30,7 @@ ok( $fail == 0 , 'Constants' );
 
 my $httpd = run_http_server {
     my $req = shift;
-    if ($req->header('Authorization') ne 'Basic c291cmNlOnBhJCR3b3JkIQ==') {
+    if (!$req->header('Authorization') || $req->header('Authorization') ne 'Basic c291cmNlOnBhJCR3b3JkIQ==') {
         return HTTP::Response->new( 401, "Need authorization" );
     }
     return HTTP::Response->new( 200 );

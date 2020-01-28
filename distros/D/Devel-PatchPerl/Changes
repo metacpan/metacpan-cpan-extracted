@@ -1,6 +1,43 @@
 ==================================================
-Changes from 2014-11-20 00:00:00 +0000 to present.
+Changes from 2015-01-29 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.84 at 2020-01-28 19:00:25 +0000
+-----------------------------------------
+
+  Change: 64abf332fa8344c14becb070727cec3b6e8c06d8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-01-28 19:00:25 +0000
+
+    Release engineering for 1.84
+
+    - fixed problem with 1.82 release that stops perls < 5.10
+
+    from being patched
+
+    (I suck at Perl Versions). 
+
+-----------------------------------------
+version 1.82 at 2020-01-28 18:45:38 +0000
+-----------------------------------------
+
+  Change: f367dbcb8e4fd2b998450e2f52a2844cb7be2d71
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-01-28 18:45:38 +0000
+
+    Release engineering for 1.82
+
+    Certified perl version < 5.031004 
+
+  Change: ead35cf30015274f8b98c0f93c93882b1502345a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-01-28 18:38:42 +0000
+
+    Fix issue with SDBM_File on perls > 5.10.0 and < 5.14.4
+
+    I've only seen an issue without the patch on Alpine Linux
+    (https://github.com/Perl/perl5/commit/acdbe25bd91) 
 
 -----------------------------------------
 version 1.80 at 2019-11-19 16:27:40 +0000
@@ -497,31 +534,6 @@ version 1.32 at 2015-03-30 15:52:27 +0000
 
     Updated the included hints to latest from blead 
 
------------------------------------------
-version 1.30 at 2014-12-23 22:41:27 +0000
------------------------------------------
-
-  Change: b24bdbf3acebd609a1765de0f527429b139074bb
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-12-23 22:41:27 +0000
-
-    Release engineering for 1.30 
-
-  Change: 01c501f02b6c02d952d904e9d6c09362aa083191
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2014-12-23 21:31:37 +0000
-
-    Merge pull request #18 from
-    dagolden/add-patchperl-version-to-patchlevel
-
-    add Devel::PatchPerl version to list of local patches 
-
-  Change: 86a0e5b2de764deb73c641c4ce6f69df1f0b79e9
-  Author: David Golden <dagolden@cpan.org>
-  Date : 2014-12-23 14:38:10 +0000
-
-    add Devel::PatchPerl version to list of local patches 
-
 =================================================
-Plus 64 releases after 2014-11-20 00:00:00 +0000.
+Plus 65 releases after 2015-01-29 00:00:00 +0000.
 =================================================

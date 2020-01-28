@@ -21,7 +21,7 @@ use Template;
 use YAML;
 
 
-our $VERSION = '0.0105';
+our $VERSION = '0.0106';
 
 
 1; # End of Task::Latemp
@@ -32,19 +32,19 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Task::Latemp - Specifications for modules needed by the Latemp static site generator.
+
 =head1 VERSION
 
-version 0.0105
+version 0.0106
 
 =head1 DESCRIPTION
 
 Latemp ( L<https://web-cpan.shlomifish.org/latemp/> ) is a static site
 generator based on Website Meta Language. This task installs all of its
 required dependencies.
-
-=head1 NAME
-
-Task::Latemp - Specifications for modules needed by the Latemp static site generator.
 
 =head1 AUTHOR
 
@@ -98,7 +98,7 @@ Copyright 2006 Shlomi Fish, all rights reserved.
 
 This program is released under the following license: MIT / Expat .
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -132,14 +132,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Task-Latemp>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Task-Latemp>
 
 =item *
 

@@ -20,7 +20,7 @@ name: Task-Sites-BetterScm
 provides:
   Task::Sites::BetterScm:
     file: lib/Task/Sites/BetterScm.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   App::Deps::Verify: '0'
   App::Gezer: '0'
@@ -111,7 +111,7 @@ resources:
   bugtracker: https://github.com/shlomif/better-scm/issues
   homepage: http://metacpan.org/release/Task-Sites-BetterScm
   repository: git://github.com/shlomif/better-scm.git
-version: 0.0.2
+version: 0.0.3
 x_Dist_Zilla:
   perl:
     version: '5.030001'

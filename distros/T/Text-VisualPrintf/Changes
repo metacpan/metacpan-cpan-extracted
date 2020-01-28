@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-VisualPrintf
 
+2.05 2020-01-28T17:50:07Z
+
+    - Add test and document.
+
 2.04 2020-01-24T04:04:12Z
 
     - Fix incorrect use of printf() in VisualPrintf::printf.

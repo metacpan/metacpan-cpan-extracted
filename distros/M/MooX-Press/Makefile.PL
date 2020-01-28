@@ -38,8 +38,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.032 },
-                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.032 },
+                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.035 },
+                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.035 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +53,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                         },
-  "version"          => 0.032,
+  "version"          => 0.035,
   "x_static_install" => 1,
 };
 

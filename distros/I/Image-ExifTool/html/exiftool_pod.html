@@ -99,45 +99,46 @@
 
 <pre><code>  File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DSS   r     | J2C   r     | ODP   r     | RAW   r/w
-  3G2   r/w   | DV    r     | JNG   r/w   | ODS   r     | RIFF  r
-  3GP   r/w   | DVB   r/w   | JP2   r/w   | ODT   r     | RSRC  r
-  A     r     | DVR-MS r    | JPEG  r/w   | OFR   r     | RTF   r
-  AA    r     | DYLIB r     | JSON  r     | OGG   r     | RW2   r/w
-  AAE   r     | EIP   r     | K25   r     | OGV   r     | RWL   r/w
-  AAX   r/w   | EPS   r/w   | KDC   r     | OPUS  r     | RWZ   r
-  ACR   r     | EPUB  r     | KEY   r     | ORF   r/w   | RM    r
-  AFM   r     | ERF   r/w   | LA    r     | OTF   r     | SEQ   r
-  AI    r/w   | EXE   r     | LFP   r     | PAC   r     | SKETCH r
-  AIFF  r     | EXIF  r/w/c | LNK   r     | PAGES r     | SO    r
-  APE   r     | EXR   r     | LRV   r/w   | PBM   r/w   | SR2   r/w
-  ARQ   r/w   | EXV   r/w/c | M2TS  r     | PCD   r     | SRF   r
-  ARW   r/w   | F4A/V r/w   | M4A/V r/w   | PCX   r     | SRW   r/w
-  ASF   r     | FFF   r/w   | MAX   r     | PDB   r     | SVG   r
-  AVI   r     | FITS  r     | MEF   r/w   | PDF   r/w   | SWF   r
-  AZW   r     | FLA   r     | MIE   r/w/c | PEF   r/w   | THM   r/w
-  BMP   r     | FLAC  r     | MIFF  r     | PFA   r     | TIFF  r/w
-  BPG   r     | FLIF  r/w   | MKA   r     | PFB   r     | TORRENT r
-  BTF   r     | FLV   r     | MKS   r     | PFM   r     | TTC   r
-  CHM   r     | FPF   r     | MKV   r     | PGF   r     | TTF   r
-  COS   r     | FPX   r     | MNG   r/w   | PGM   r/w   | VCF   r
-  CR2   r/w   | GIF   r/w   | MOBI  r     | PLIST r     | VRD   r/w/c
-  CR3   r/w   | GPR   r/w   | MODD  r     | PICT  r     | VSD   r
-  CRM   r/w   | GZ    r     | MOI   r     | PMP   r     | WAV   r
-  CRW   r/w   | HDP   r/w   | MOS   r/w   | PNG   r/w   | WDP   r/w
-  CS1   r/w   | HDR   r     | MOV   r/w   | PPM   r/w   | WEBP  r
-  DCM   r     | HEIC  r/w   | MP3   r     | PPT   r     | WEBM  r
-  DCP   r/w   | HEIF  r/w   | MP4   r/w   | PPTX  r     | WMA   r
-  DCR   r     | HTML  r     | MPC   r     | PS    r/w   | WMV   r
-  DFONT r     | ICC   r/w/c | MPG   r     | PSB   r/w   | WTV   r
-  DIVX  r     | ICS   r     | MPO   r/w   | PSD   r/w   | WV    r
-  DJVU  r     | IDML  r     | MQV   r/w   | PSP   r     | X3F   r/w
-  DLL   r     | IIQ   r/w   | MRW   r/w   | QTIF  r/w   | XCF   r
-  DNG   r/w   | IND   r/w   | MXF   r     | R3D   r     | XLS   r
-  DOC   r     | INSV  r     | NEF   r/w   | RA    r     | XLSX  r
-  DOCX  r     | INX   r     | NRW   r/w   | RAF   r/w   | XMP   r/w/c
-  DPX   r     | ISO   r     | NUMBERS r   | RAM   r     | ZIP   r
-  DR4   r/w/c | ITC   r     | O     r     | RAR   r     |
+  3FR   r     | DSS   r     | J2C   r     | ODS   r     | RSRC  r
+  3G2   r/w   | DV    r     | JNG   r/w   | ODT   r     | RTF   r
+  3GP   r/w   | DVB   r/w   | JP2   r/w   | OFR   r     | RW2   r/w
+  A     r     | DVR-MS r    | JPEG  r/w   | OGG   r     | RWL   r/w
+  AA    r     | DYLIB r     | JSON  r     | OGV   r     | RWZ   r
+  AAE   r     | EIP   r     | K25   r     | OPUS  r     | RM    r
+  AAX   r/w   | EPS   r/w   | KDC   r     | ORF   r/w   | SEQ   r
+  ACR   r     | EPUB  r     | KEY   r     | OTF   r     | SKETCH r
+  AFM   r     | ERF   r/w   | LA    r     | PAC   r     | SO    r
+  AI    r/w   | EXE   r     | LFP   r     | PAGES r     | SR2   r/w
+  AIFF  r     | EXIF  r/w/c | LNK   r     | PBM   r/w   | SRF   r
+  APE   r     | EXR   r     | LRV   r/w   | PCD   r     | SRW   r/w
+  ARQ   r/w   | EXV   r/w/c | M2TS  r     | PCX   r     | SVG   r
+  ARW   r/w   | F4A/V r/w   | M4A/V r/w   | PDB   r     | SWF   r
+  ASF   r     | FFF   r/w   | MAX   r     | PDF   r/w   | THM   r/w
+  AVI   r     | FITS  r     | MEF   r/w   | PEF   r/w   | TIFF  r/w
+  AVIF  r/w   | FLA   r     | MIE   r/w/c | PFA   r     | TORRENT r
+  AZW   r     | FLAC  r     | MIFF  r     | PFB   r     | TTC   r
+  BMP   r     | FLIF  r/w   | MKA   r     | PFM   r     | TTF   r
+  BPG   r     | FLV   r     | MKS   r     | PGF   r     | TXT   r
+  BTF   r     | FPF   r     | MKV   r     | PGM   r/w   | VCF   r
+  CHM   r     | FPX   r     | MNG   r/w   | PLIST r     | VRD   r/w/c
+  COS   r     | GIF   r/w   | MOBI  r     | PICT  r     | VSD   r
+  CR2   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WAV   r
+  CR3   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WDP   r/w
+  CRM   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WEBP  r
+  CRW   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WEBM  r
+  CS1   r/w   | HEIC  r/w   | MP3   r     | PPTX  r     | WMA   r
+  DCM   r     | HEIF  r/w   | MP4   r/w   | PS    r/w   | WMV   r
+  DCP   r/w   | HTML  r     | MPC   r     | PSB   r/w   | WTV   r
+  DCR   r     | ICC   r/w/c | MPG   r     | PSD   r/w   | WV    r
+  DFONT r     | ICS   r     | MPO   r/w   | PSP   r     | X3F   r/w
+  DIVX  r     | IDML  r     | MQV   r/w   | QTIF  r/w   | XCF   r
+  DJVU  r     | IIQ   r/w   | MRW   r/w   | R3D   r     | XLS   r
+  DLL   r     | IND   r/w   | MXF   r     | RA    r     | XLSX  r
+  DNG   r/w   | INSP  r/w   | NEF   r/w   | RAF   r/w   | XMP   r/w/c
+  DOC   r     | INSV  r     | NRW   r/w   | RAM   r     | ZIP   r
+  DOCX  r     | INX   r     | NUMBERS r   | RAR   r     |
+  DPX   r     | ISO   r     | O     r     | RAW   r/w   |
+  DR4   r/w/c | ITC   r     | ODP   r     | RIFF  r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -217,8 +218,8 @@
   -ee         (-extractEmbedded)   Extract information from embedded files
   -ext[+] EXT (-extension)         Process files with specified extension
   -F[OFFSET]  (-fixBase)           Fix the base for maker notes offsets
-  -fast[NUM]                       Increase speed for slow devices
-  -fileOrder [-]TAG                Set file processing order
+  -fast[NUM]                       Increase speed when extracting metadata
+  -fileOrder[NUM] [-]TAG           Set file processing order
   -i DIR      (-ignore)            Ignore specified directory name
   -if[NUM] EXPR                    Conditionally process files
   -m          (-ignoreMinorErrors) Ignore minor errors and warnings
@@ -370,11 +371,15 @@
 
 <p>Other than these differences, the <b>-tagsFromFile</b> and <b>-addTagsFromFile</b> options are equivalent.</p>
 
-<p>6) The <b>-a</b> option (allow duplicate tags) is always in effect when copying tags from <i>SRCFILE</i>.</p>
+<p>6) The <b>-a</b> option (allow duplicate tags) is always in effect when copying tags from <i>SRCFILE</i>, but the highest priority tag is always copied last so it takes precedence.</p>
 
 <p>7) Structured tags are copied by default when copying tags. See the <b>-struct</b> option for details.</p>
 
-<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for list-type tags, <a>shortcut tags</a>, tag names containing wildcards, or UserParam variables. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed. Also, UserParam variables are available only when interpolated in a string.</p>
+<p>8) With the redirection feature, copying a tag directly (ie. &quot;&#39;-<i>DSTTAG</i>&lt;<i>SRCTAG</i>&#39;&quot;) is not the same as interpolating its value inside a string (ie. &quot;&#39;-<i>DSTTAG</i>&lt;$<i>SRCTAG</i>&#39;&quot;) for list-type tags, <a>shortcut tags</a>, tag names containing wildcards, or UserParam variables. When copying directly, the values of each matching source tag are copied individually to the destination tag (as if they were separate assignments). However, when interpolated inside a string, list items and the values of shortcut tags are concatenated (with a separator set by the <b>-sep</b> option), and wildcards are not allowed. Also, UserParam variables are available only when interpolated in a string. Another difference is that a minor warning is generated if a tag doesn&#39;t exist when interpolating its value in a string (with <code>$</code>), but isn&#39;t when copying the tag directly.</p>
+
+<p>Finally, the behaviour is different when a destination tag or group of <code>All</code> is used. When copying directly, a destination group and/or tag name of <code>All</code> writes to the same family 1 group and/or tag name as the source. But when interpolated in a string, the identity of the source tags are lost and the value is written to all possible groups/tags. For example, the string form must be used in the following command since the intent is to set the value of all existing date/time tags from <code>CreateDate</code>:</p>
+
+<pre><code>    exiftool &quot;-time:all&lt;$createdate&quot; -wm w FILE</code></pre>
 
 </dd>
 <dt id="x-TAG--exclude"><b>-x</b> <i>TAG</i> (<b>-exclude</b>)</dt>
@@ -474,7 +479,7 @@
     QuickTime  Internal encoding of QuickTime strings       MacRoman
     RIFF       Internal encoding of RIFF strings            0</code></pre>
 
-<p>See <a href="http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q10">http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q10</a> for more information about coded character sets, and the <a>Image::ExifTool Options</a> for more details about the <b>-charset</b> settings.</p>
+<p>See <a href="https://exiftool.org/faq.html#Q10">https://exiftool.org/faq.html#Q10</a> for more information about coded character sets, and the <a>Image::ExifTool Options</a> for more details about the <b>-charset</b> settings.</p>
 
 </dd>
 <dt id="csv-CSVFILE"><b>-csv</b>[[+]=<i>CSVFILE</i>]</dt>
@@ -610,7 +615,7 @@
 
 <p>6. Edit the generated language module lib/Image/ExifTool/Lang/ru.pm, and search and replace all &#39;MISSING&#39; strings in the file with your translations.</p>
 
-<p>7. Email the module (&#39;ru.pm&#39; in this example) to phil at owl.phy.queensu.ca</p>
+<p>7. Email the module (&#39;ru.pm&#39; in this example) to philharvey66 at gmail.com</p>
 
 <p>8. Thank you!!</p>
 
@@ -649,7 +654,7 @@
 
 <p>Print output in the format specified by the given file or string. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format file or string begin with a <code>$</code> symbol and may contain a leading group names and/or a trailing <code>#</code>. Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text. Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline.</p>
 
-<p>Multiple <b>-p</b> options may be used, each contributing a line (or more) of text to the output. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output around each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but all BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. For example, this format file:</p>
+<p>Multiple <b>-p</b> options may be used, each contributing a line (or more) of text to the output. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output before and after each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but all BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. For example, this format file:</p>
 
 <pre><code>    # this is a comment line
     #[HEAD]-- Generated by ExifTool $exifToolVersion --
@@ -663,7 +668,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 11.70 --
+<pre><code>    -- Generated by ExifTool 11.85 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -727,7 +732,7 @@
 <dt id="struct---struct"><b>-struct</b>, <b>--struct</b></dt>
 <dd>
 
-<p>Output structured XMP information instead of flattening to individual tags. This option works well when combined with the XML (<b>-X</b>) and JSON (<b>-j</b>) output formats. For other output formats, XMP structures and lists are serialized into the same format as when writing structured information (see <a href="http://owl.phy.queensu.ca/~phil/exiftool/struct.html">http://owl.phy.queensu.ca/~phil/exiftool/struct.html</a> for details). When copying, structured tags are copied by default unless <b>--struct</b> is used to disable this feature (although flattened tags may still be copied by specifying them individually unless <b>-struct</b> is used). These options have no effect when assigning new values since both flattened and structured tags may always be used when writing.</p>
+<p>Output structured XMP information instead of flattening to individual tags. This option works well when combined with the XML (<b>-X</b>) and JSON (<b>-j</b>) output formats. For other output formats, XMP structures and lists are serialized into the same format as when writing structured information (see <a href="https://exiftool.org/struct.html">https://exiftool.org/struct.html</a> for details). When copying, structured tags are copied by default unless <b>--struct</b> is used to disable this feature (although flattened tags may still be copied by specifying them individually unless <b>-struct</b> is used). These options have no effect when assigning new values since both flattened and structured tags may always be used when writing.</p>
 
 </dd>
 <dt id="t--tab"><b>-t</b> (<b>-tab</b>)</dt>
@@ -889,7 +894,7 @@
 
 <p>Extract information from embedded documents in EPS files, embedded EPS information and JPEG and Jpeg2000 images in PDF files, embedded MPF images in JPEG and MPO files, streaming metadata in AVCHD videos, and the resource fork of Mac OS files. Implies the <b>-a</b> option. Use <b>-g3</b> or <b>-G3</b> to identify the originating document for extracted information. Embedded documents containing sub-documents are indicated with dashes in the family 3 group name. (eg. <code>Doc2-3</code> is the 3rd sub-document of the 2nd embedded document.) Note that this option may increase processing time substantially, especially for PDF files with many embedded images or videos with streaming metadata.</p>
 
-<p>When used with <b>-ee</b>, the <b>-p</b> option is evaluated for each embedded document as if it were a separate input file. This allows, for example, generation of GPS track logs from timed metadata in videos. See <a href="http://owl.phy.queensu.ca/~phil/exiftool/geotag.html#Inverse">http://owl.phy.queensu.ca/~phil/exiftool/geotag.html#Inverse</a> for examples.</p>
+<p>When used with <b>-ee</b>, the <b>-p</b> option is evaluated for each embedded document as if it were a separate input file. This allows, for example, generation of GPS track logs from timed metadata in videos. See <a href="https://exiftool.org/geotag.html#Inverse">https://exiftool.org/geotag.html#Inverse</a> for examples.</p>
 
 </dd>
 <dt id="ext-EXT---ext-EXT--extension"><b>-ext</b>[+] <i>EXT</i>, <b>--ext</b> <i>EXT</i> (<b>-extension</b>)</dt>
@@ -920,17 +925,19 @@
 <dt id="fast-NUM"><b>-fast</b>[<i>NUM</i>]</dt>
 <dd>
 
-<p>Increase speed of extracting information. With this option, ExifTool will not scan to the end of a JPEG image to check for an AFCP or PreviewImage trailer, or past the first comment in GIF images or the audio/video data in WAV/AVI files to search for additional metadata. These speed benefits are small when reading images directly from disk, but can be substantial if piping images through a network connection. For more substantial speed benefits, <b>-fast2</b> also causes exiftool to avoid extracting any EXIF MakerNote information. <b>-fast3</b> avoids extracting metadata from the file, and returns only pseudo System tags, but still reads the file header to obtain an educated guess at FileType. <b>-fast4</b> doesn&#39;t even read the file header, and determines FileType based only on the file extension. Has no effect when writing.</p>
+<p>Increase speed of extracting information. With <b>-fast</b> (or <b>-fast1</b>), ExifTool will not scan to the end of a JPEG image to check for an AFCP or PreviewImage trailer, or past the first comment in GIF images or the audio/video data in WAV/AVI files to search for additional metadata. These speed benefits are small when reading images directly from disk, but can be substantial if piping images through a network connection. For more substantial speed benefits, <b>-fast2</b> also causes exiftool to avoid extracting any EXIF MakerNote information. <b>-fast3</b> avoids extracting metadata from the file, and returns only pseudo System tags, but still reads the file header to obtain an educated guess at FileType. <b>-fast4</b> doesn&#39;t even read the file header, and returns only System tags and a FileType based on the file extension. Has no effect when writing.</p>
+
+<p>Note that a separate <b>-fast</b> setting may be used for evaluation of a <b>-if</b> condition, or when ordering files with the <b>-fileOrder</b> option. See the <b>-if</b> and <b>-fileOrder</b> options for details.</p>
 
 </dd>
-<dt id="fileOrder---TAG"><b>-fileOrder</b> [-]<i>TAG</i></dt>
+<dt id="fileOrder-NUM---TAG"><b>-fileOrder</b>[<i>NUM</i>] [-]<i>TAG</i></dt>
 <dd>
 
 <p>Set file processing order according to the sorted value of the specified <i>TAG</i>. For example, to process files in order of date:</p>
 
 <pre><code>    exiftool -fileOrder DateTimeOriginal DIR</code></pre>
 
-<p>Additional <b>-fileOrder</b> options may be added for secondary sort keys. Numbers are sorted numerically, and all other values are sorted alphabetically. The sort order may be reversed by prefixing the tag name with a <code>-</code> (eg. <code>-fileOrder -createdate</code>). Print conversion of the sorted values is disabled with the <b>-n</b> option, or a <code>#</code> appended to the tag name. Other formatting options (eg. <b>-d</b>) have no effect on the sorted values. Note that the <b>-fileOrder</b> option has a large performance impact since it involves an additional processing pass of each file.</p>
+<p>Additional <b>-fileOrder</b> options may be added for secondary sort keys. Numbers are sorted numerically, and all other values are sorted alphabetically. Files missing the specified tag are sorted last. The sort order may be reversed by prefixing the tag name with a <code>-</code> (eg. <code>-fileOrder -createdate</code>). Print conversion of the sorted values is disabled with the <b>-n</b> option, or a <code>#</code> appended to the tag name. Other formatting options (eg. <b>-d</b>) have no effect on the sorted values. Note that the <b>-fileOrder</b> option can have a large performance impact since it involves an additional processing pass of each file, but this impact may be reduced by specifying a <i>NUM</i> for the <b>-fast</b> level used during the metadata-extraction phase. For example, <b>-fileOrder4</b> may be used if <i>TAG</i> is a pseudo System tag. If multiple <b>-fileOrder</b> options are used, the extraction is done at the lowest <b>-fast</b> level.</p>
 
 </dd>
 <dt id="i-DIR--ignore"><b>-i</b> <i>DIR</i> (<b>-ignore</b>)</dt>
@@ -1077,7 +1084,7 @@
 <dt id="z--zip"><b>-z</b> (<b>-zip</b>)</dt>
 <dd>
 
-<p>When reading, causes information to be extracted from .gz and .bz2 compressed images (only one image per archive; requires gzip and bzip2 to be available). When writing, causes compressed information to be written if supported by the metadata format (eg. compressed textual metadata in PNG), disables the recommended padding in embedded XMP (saving 2424 bytes when writing XMP in a file), and writes XMP in shorthand format -- the equivalent of setting the API Compress and Compact=&quot;Padding,Shorthand&quot;.</p>
+<p>When reading, causes information to be extracted from .gz and .bz2 compressed images (only one image per archive; requires gzip and bzip2 to be available). When writing, causes compressed information to be written if supported by the metadata format (eg. compressed textual metadata in PNG), disables the recommended padding in embedded XMP (saving 2424 bytes when writing XMP in a file), and writes XMP in shorthand format -- the equivalent of setting the API Compress=1 and Compact=&quot;NoPadding,Shorthand&quot;.</p>
 
 </dd>
 </dl>
@@ -1148,7 +1155,7 @@
 <pre><code>    exiftool -geotag trk.log image.jpg
     exiftool -geotag trk.log &quot;-Geotime&lt;DateTimeOriginal#&quot; image.jpg</code></pre>
 
-<p>When the <code>Geotime</code> value is converted to UTC, the local system timezone is assumed unless the date/time value contains a timezone. Writing <code>Geotime</code> causes the following tags to be written (provided they can be calculated from the track log, and they are supported by the destination metadata format): GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp, GPSTimeStamp, GPSDateTime, GPSTrack, GPSTrackRef, GPSSpeed, GPSSpeedRef, GPSImgDirection, GPSImgDirectionRef, GPSPitch, GPSRoll and AmbientTemperature. By default, tags are created in EXIF, and updated in XMP only if they already exist. However, <code>EXIF:Geotime</code> or <code>XMP:Geotime</code> may be specified to write only EXIF or XMP tags respectively. Note that GPSPitch and GPSRoll are non-standard, and require user-defined tags in order to be written.</p>
+<p>When the <code>Geotime</code> value is converted to UTC, the local system timezone is assumed unless the date/time value contains a timezone. Writing <code>Geotime</code> causes the following tags to be written (provided they can be calculated from the track log, and they are supported by the destination metadata format): GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp, GPSTimeStamp, GPSDateTime, GPSTrack, GPSTrackRef, GPSSpeed, GPSSpeedRef, GPSImgDirection, GPSImgDirectionRef, GPSPitch, GPSRoll, AmbientTemperature and CameraElevationAngle. By default, tags are created in EXIF, and updated in XMP only if they already exist. However, <code>EXIF:Geotime</code> or <code>XMP:Geotime</code> may be specified to write only EXIF or XMP tags respectively. Note that GPSPitch and GPSRoll are non-standard, and require user-defined tags in order to be written.</p>
 
 <p>The <code>Geosync</code> tag may be used to specify a time correction which is applied to each <code>Geotime</code> value for synchronization with GPS time. For example, the following command compensates for image times which are 1 minute and 20 seconds behind GPS:</p>
 
@@ -1180,7 +1187,7 @@
 <dt id="use-MODULE"><b>-use</b> <i>MODULE</i></dt>
 <dd>
 
-<p>Add features from specified plug-in <i>MODULE</i>. Currently, the MWG module is the only plug-in module distributed with exiftool. This module adds read/write support for tags as recommended by the Metadata Working Group. To save typing, <code>-use MWG</code> is assumed if the <code>MWG</code> group is specified for any tag on the command line. See the <a>MWG Tags documentation</a> for more details. Note that this option is not reversible, and remains in effect until the application terminates, even across the <code>-execute</code> option.</p>
+<p>Add features from specified plug-in <i>MODULE</i>. Currently, the MWG module is the only plug-in module distributed with exiftool. This module adds read/write support for tags as recommended by the Metadata Working Group. As a convenience, <code>-use MWG</code> is assumed if the <code>MWG</code> group is specified for any tag on the command line. See the <a>MWG Tags documentation</a> for more details. Note that this option is not reversible, and remains in effect until the application terminates, even across the <code>-execute</code> option.</p>
 
 </dd>
 </dl>
@@ -1230,7 +1237,7 @@
 <dt id="config-CFGFILE"><b>-config</b> <i>CFGFILE</i></dt>
 <dd>
 
-<p>Load specified configuration file instead of the default &quot;.ExifTool_config&quot;. If used, this option must come before all other arguments on the command line and applies to all <b>-execute</b>&#39;d commands. The <i>CFGFILE</i> must exist relative to the current working directory or the exiftool application directory unless an absolute path is specified. Loading of the default config file may be disabled by setting <i>CFGFILE</i> to an empty string (ie. &quot;&quot;). See <a href="http://owl.phy.queensu.ca/~phil/exiftool/config.html">http://owl.phy.queensu.ca/~phil/exiftool/config.html</a> and config_files/example.config in the full ExifTool distribution for details about the configuration file syntax.</p>
+<p>Load specified configuration file instead of the default &quot;.ExifTool_config&quot;. If used, this option must come before all other arguments on the command line and applies to all <b>-execute</b>&#39;d commands. The <i>CFGFILE</i> must exist relative to the current working directory or the exiftool application directory unless an absolute path is specified. Loading of the default config file may be disabled by setting <i>CFGFILE</i> to an empty string (ie. &quot;&quot;). See <a href="https://exiftool.org/config.html">https://exiftool.org/config.html</a> and config_files/example.config in the full ExifTool distribution for details about the configuration file syntax.</p>
 
 </dd>
 <dt id="echo-NUM-TEXT"><b>-echo</b>[<i>NUM</i>] <i>TEXT</i></dt>
@@ -1340,7 +1347,7 @@
 
 <p>In Windows, command-line arguments are specified using the current code page and are recoded automatically to the system code page. This recoding is not done for arguments in ExifTool arg files, so by default filenames in arg files use the system code page. Unfortunately, these code pages are not complete character sets, so not all file names may be represented.</p>
 
-<p>ExifTool 9.79 and later allow the file name encoding to be specified with <code>-charset filename=CHARSET</code>, where <code>CHARSET</code> is the name of a valid ExifTool character set, preferably <code>UTF8</code> (see the <b>-charset</b> option for a complete list). Setting this triggers the use of Windows wide-character i/o routines, thus providing support for most Unicode file names (see note 4). But note that it is not trivial to pass properly encoded file names on the Windows command line (see <a href="http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q18">http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q18</a> for details), so placing them in a UTF-8 encoded <b>-@</b> argfile and using <code>-charset filename=utf8</code> is recommended if possible.</p>
+<p>ExifTool 9.79 and later allow the file name encoding to be specified with <code>-charset filename=CHARSET</code>, where <code>CHARSET</code> is the name of a valid ExifTool character set, preferably <code>UTF8</code> (see the <b>-charset</b> option for a complete list). Setting this triggers the use of Windows wide-character i/o routines, thus providing support for most Unicode file names (see note 4). But note that it is not trivial to pass properly encoded file names on the Windows command line (see <a href="https://exiftool.org/faq.html#Q18">https://exiftool.org/faq.html#Q18</a> for details), so placing them in a UTF-8 encoded <b>-@</b> argfile and using <code>-charset filename=utf8</code> is recommended if possible.</p>
 
 <p>A warning is issued if a specified filename contains special characters and the filename character set was not provided. However, the warning may be disabled by setting <code>-charset filename=&quot;&quot;</code>, and ExifTool may still function correctly if the system code page matches the character set used for the file names.</p>
 
@@ -1643,7 +1650,7 @@
 <dt id="exiftool--hierarchicalkeywords-keyword-one-children-keyword-B">exiftool -hierarchicalkeywords=&#39;{keyword=one,children={keyword=B}}&#39;</dt>
 <dd>
 
-<p>Write structured XMP information. See <a href="http://owl.phy.queensu.ca/~phil/exiftool/struct.html">http://owl.phy.queensu.ca/~phil/exiftool/struct.html</a> for more details.</p>
+<p>Write structured XMP information. See <a href="https://exiftool.org/struct.html">https://exiftool.org/struct.html</a> for more details.</p>
 
 </dd>
 <dt id="exiftool--trailer:all-image.jpg">exiftool -trailer:all= image.jpg</dt>
@@ -1784,7 +1791,7 @@
 
 <h1 id="RENAMING-EXAMPLES">RENAMING EXAMPLES</h1>
 
-<p>By writing the <code>FileName</code> and <code>Directory</code> tags, files are renamed and/or moved to new directories. This can be particularly useful and powerful for organizing files by date when combined with the <b>-d</b> option. New directories are created as necessary, but existing files will not be overwritten. The format codes %d, %f and %e may be used in the new file name to represent the directory, name and extension of the original file, and %c may be used to add a copy number if the file already exists (see the <b>-w</b> option for details). Note that if used within a date format string, an extra &#39;%&#39; must be added to pass these codes through the date/time parser. (And further note that in a Windows batch file, all &#39;%&#39; characters must also be escaped, so in this extreme case &#39;%%%%f&#39; is necessary to pass a simple &#39;%f&#39; through the two levels of parsing.) See <a href="http://owl.phy.queensu.ca/~phil/exiftool/filename.html">http://owl.phy.queensu.ca/~phil/exiftool/filename.html</a> for additional documentation and examples.</p>
+<p>By writing the <code>FileName</code> and <code>Directory</code> tags, files are renamed and/or moved to new directories. This can be particularly useful and powerful for organizing files by date when combined with the <b>-d</b> option. New directories are created as necessary, but existing files will not be overwritten. The format codes %d, %f and %e may be used in the new file name to represent the directory, name and extension of the original file, and %c may be used to add a copy number if the file already exists (see the <b>-w</b> option for details). Note that if used within a date format string, an extra &#39;%&#39; must be added to pass these codes through the date/time parser. (And further note that in a Windows batch file, all &#39;%&#39; characters must also be escaped, so in this extreme case &#39;%%%%f&#39; is necessary to pass a simple &#39;%f&#39; through the two levels of parsing.) See <a href="https://exiftool.org/filename.html">https://exiftool.org/filename.html</a> for additional documentation and examples.</p>
 
 <dl>
 
@@ -1840,7 +1847,7 @@
 
 <h1 id="GEOTAGGING-EXAMPLES">GEOTAGGING EXAMPLES</h1>
 
-<p>ExifTool implements geotagging via 3 special tags: Geotag (which for convenience is also implemented as an exiftool option), Geosync and Geotime. The examples below highlight some geotagging features. See <a href="http://owl.phy.queensu.ca/~phil/exiftool/geotag.html">http://owl.phy.queensu.ca/~phil/exiftool/geotag.html</a> for additional documentation.</p>
+<p>ExifTool implements geotagging via 3 special tags: Geotag (which for convenience is also implemented as an exiftool option), Geosync and Geotime. The examples below highlight some geotagging features. See <a href="https://exiftool.org/geotag.html">https://exiftool.org/geotag.html</a> for additional documentation.</p>
 
 <dl>
 
@@ -1960,7 +1967,7 @@
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
-<p>Copyright 2003-2019, Phil Harvey</p>
+<p>Copyright 2003-2020, Phil Harvey</p>
 
 <p>This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
 

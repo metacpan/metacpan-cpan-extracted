@@ -1,9 +1,9 @@
 This archive contains the distribution App-Notifier-Service,
-version 0.0701:
+version 0.0702:
 
   an HTTP service for the notifier application for notifying that an event (such as the finish of a task) occured.
 
-This software is Copyright (c) 2019 by Shlomi Fish.
+This software is Copyright (c) 2020 by Shlomi Fish.
 
 This is free software, licensed under:
 

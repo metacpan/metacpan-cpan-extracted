@@ -1,5 +1,12 @@
 Revision history for Task-Latemp:
 
+0.0106  2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.0105  2019-09-10
     - Add META.json
         - https://github.com/thewml/latemp/pull/2

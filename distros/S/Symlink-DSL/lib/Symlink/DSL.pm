@@ -1,5 +1,5 @@
 package Symlink::DSL;
-$Symlink::DSL::VERSION = '0.2.2';
+$Symlink::DSL::VERSION = '0.2.3';
 use strict;
 use warnings;
 use autodie;
@@ -174,9 +174,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Symlink::DSL - a domain-specific language for setting up symbolic links.
+
 =head1 VERSION
 
-version 0.2.2
+version 0.2.3
 
 =head1 SYNOPSIS
 
@@ -200,10 +204,6 @@ And in C<< setup.symlinks.manifest.txt >>:
     symlink from ~/bin/mplayer-shuffle to ./bin/mplayer-shuffle
     symlink from ~/bin/sus to ./bin/sus
     symlink from ~/bin/tail-extract to ./bin/tail-extract
-
-=head1 NAME
-
-Symlink::DSL - a domain-specific language for setting up symbolic links.
 
 =head1 METHODS
 
@@ -264,7 +264,7 @@ L<Setup> .
 
 L<Doit> .
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -298,14 +298,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Symlink-DSL>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Symlink-DSL>
 
 =item *
 

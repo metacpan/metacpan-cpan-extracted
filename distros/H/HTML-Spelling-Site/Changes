@@ -1,5 +1,12 @@
 Revision history for HTML-Spelling-Site
 
+0.4.2       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.4.1      2019-11-28
     - Convert ':utf8' to ':encoding(UTF-8)'
 

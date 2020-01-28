@@ -1,5 +1,5 @@
 package App::File::IsSorted;
-$App::File::IsSorted::VERSION = '0.0.4';
+$App::File::IsSorted::VERSION = '0.0.5';
 use strict;
 use warnings;
 use 5.016;
@@ -13,9 +13,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+App::File::IsSorted - see L<is-sorted>
+
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 SYNOPSIS
 
@@ -25,17 +29,13 @@ version 0.0.4
 
 Check if the lines of files are sorted.
 
-=head1 NAME
-
-App::File::IsSorted - see L<is-sorted>
-
 =head1 METHODS
 
 =head2 info
 
 Implement the info subcommand.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -69,14 +69,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-IsSorted>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-IsSorted>
 
 =item *
 

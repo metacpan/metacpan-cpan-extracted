@@ -354,6 +354,28 @@ DESCRIPTION
           package main;
           MyApp->new_foo()->bar();
 
+    `multimethod` *(ArrayRef)*
+        An arrayref of name-spec pairs suitable for passing to
+        Sub::MultiMethod.
+
+          package MyApp;
+          use MooX::Press (
+            class => [
+              'Foo' => {
+                 multimethod => [
+                   'bar' => {
+                     signature => [ 'HashRef' ],
+                     code      => sub { my ($self, $hash)  = @_; ... },
+                   },
+                   'bar' => {
+                     signature => [ 'ArrayRef' ],
+                     code      => sub { my ($self, $array) = @_; ... },
+                   },
+                 ],
+               },
+            ],
+          );
+
     `constant` *(HashRef[Item])*
         A hashref of scalar constants to define in the package.
 
@@ -701,6 +723,9 @@ DESCRIPTION
         import functions. It can be useful for many MooX, MooseX, and MouseX
         extensions though.
 
+    `overload` *(HashRef)*
+        Options to pass to `use overload`.
+
    Role Options
     Options for roles are largely the same as for classes with the following
     exceptions:
@@ -804,6 +829,9 @@ DESCRIPTION
         This option is silently ignored.
 
     `mutable` *(Any)*
+        This option is silently ignored.
+
+    `overload` *(Any)*
         This option is silently ignored.
 
    Attribute Specifications

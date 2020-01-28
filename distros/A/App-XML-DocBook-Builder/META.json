@@ -80,19 +80,19 @@
    "provides" : {
       "App::Docmake" : {
          "file" : "lib/App/Docmake.pm",
-         "version" : "0.0800"
+         "version" : "0.0801"
       },
       "App::XML::DocBook::Builder" : {
          "file" : "lib/App/XML/DocBook/Builder.pm",
-         "version" : "0.0800"
+         "version" : "0.0801"
       },
       "App::XML::DocBook::Docmake" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.0800"
+         "version" : "0.0801"
       },
       "App::XML::DocBook::Docmake::CmdComponent" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.0800"
+         "version" : "0.0801"
       }
    },
    "release_status" : "stable",
@@ -107,7 +107,7 @@
          "web" : "https://github.com/shlomif/docmake"
       }
    },
-   "version" : "0.0800",
+   "version" : "0.0801",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -386,6 +386,11 @@
                         "version" : "4.015"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Name",
+                        "version" : "4.015"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
@@ -458,7 +463,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.011"
+                        "version" : "1.012"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",

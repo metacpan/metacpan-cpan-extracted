@@ -1,5 +1,12 @@
 Revision history for HTML-TabbedExamples-Generate
 
+0.2.1       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.2.0   2019-08-23
     - Convert to @SHLOMIF
     - Now at https://github.com/shlomif/perl-html-tabbedexamples-generate

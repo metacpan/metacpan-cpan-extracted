@@ -1,5 +1,5 @@
 package HTML::Acronyms;
-$HTML::Acronyms::VERSION = '0.0.2';
+$HTML::Acronyms::VERSION = '0.0.3';
 use strict;
 use warnings;
 use 5.014;
@@ -41,9 +41,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+HTML::Acronyms - Generate HTML5/etc. markup for acronyms
+
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -80,10 +84,6 @@ version 0.0.2
 
 Acronyms and other abbreviations can be quite cryptic ("What do you mean by 'WDYM')
 and this module aims to help expanding them in HTML5/XHTML5 documents.
-
-=head1 NAME
-
-HTML::Acronyms - Generate HTML5/etc. markup for acronyms
 
 =head1 METHODS
 

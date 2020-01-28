@@ -1,14 +1,14 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 11.55
-[File, System, Image] FileName - File Name: XMP.jpg
-[File, System, Image] Directory - Directory: t/images
-[File, System, Image] FileSize - File Size: 10 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2011:01:03 13:24:04-05:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2019:07:03 12:17:04-04:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2019:07:02 12:56:21-04:00
-[File, System, Image] FilePermissions - File Permissions: rw-r--r--
-[File, File, Image] FileType - File Type: JPEG
-[File, File, Image] FileTypeExtension - File Type Extension: jpg
-[File, File, Image] MIMEType - MIME Type: image/jpeg
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 11.78
+[File, System, Other] FileName - File Name: XMP.jpg
+[File, System, Other] Directory - Directory: t/images
+[File, System, Other] FileSize - File Size: 10 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2019:12:04 11:00:48-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2019:12:04 11:01:39-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2019:12:04 11:00:48-05:00
+[File, System, Other] FilePermissions - File Permissions: rw-r--r--
+[File, File, Other] FileType - File Type: JPEG
+[File, File, Other] FileTypeExtension - File Type Extension: jpg
+[File, File, Other] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
@@ -88,7 +88,7 @@
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
-[XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
+[XMP, XMP-xmpRights, Author] WebStatement - Web Statement: https://exiftool.org/
 [ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Linotronic
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile

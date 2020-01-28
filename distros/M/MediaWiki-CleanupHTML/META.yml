@@ -20,7 +20,7 @@ name: MediaWiki-CleanupHTML
 provides:
   MediaWiki::CleanupHTML:
     file: lib/MediaWiki/CleanupHTML.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   HTML::TreeBuilder::XPath: '0'
   Scalar::Util: '0'
@@ -31,10 +31,10 @@ resources:
   bugtracker: https://github.com/shlomif/perl-mediawiki-cleanuphtml/issues
   homepage: http://metacpan.org/release/MediaWiki-CleanupHTML
   repository: git://github.com/shlomif/perl-mediawiki-cleanuphtml.git
-version: 0.0.4
+version: 0.0.5
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -132,7 +132,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -240,6 +240,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -298,7 +302,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'
@@ -386,5 +390,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

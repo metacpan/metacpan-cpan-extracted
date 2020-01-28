@@ -1,7 +1,7 @@
 #       $Id: /mirror/lab/perl/File-Find-Rule/lib/File/Find/Rule.pm 2102 2006-06-01T15:39:03.942922Z richardc  $
 
 package File::Find::Object::Rule;
-$File::Find::Object::Rule::VERSION = '0.0311';
+$File::Find::Object::Rule::VERSION = '0.0312';
 use strict;
 use warnings;
 
@@ -544,9 +544,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+File::Find::Object::Rule - Alternative interface to File::Find::Object
+
 =head1 VERSION
 
-version 0.0311
+version 0.0312
 
 =head1 SYNOPSIS
 
@@ -575,10 +579,6 @@ B<WARNING> : This module is a fork of version 0.30 of L<File::Find::Rule>
 still have some bugs due to its reliance on File::Find'isms. As such it is
 considered Alpha software. Please report any problems with
 L<File::Find::Object::Rule> to its RT CPAN Queue.
-
-=head1 NAME
-
-File::Find::Object::Rule - Alternative interface to File::Find::Object
 
 =head1 METHODS
 
@@ -1109,7 +1109,7 @@ they're wanted in exec blocks.
 
 =end Developers
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1143,14 +1143,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Object-Rule>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Find-Object-Rule>
 
 =item *
 
@@ -1235,7 +1227,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Richard Clamp.
+This software is copyright (c) 2020 by Richard Clamp.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

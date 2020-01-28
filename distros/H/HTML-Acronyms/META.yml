@@ -21,7 +21,7 @@ name: HTML-Acronyms
 provides:
   HTML::Acronyms:
     file: lib/HTML/Acronyms.pm
-    version: v0.0.2
+    version: v0.0.3
 requires:
   Carp: '0'
   Moo: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/shlomif/HTML-Acronyms/issues
   homepage: http://metacpan.org/release/HTML-Acronyms
   repository: git://github.com/shlomif/HTML-Acronyms.git
-version: 0.0.2
+version: 0.0.3
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -241,6 +241,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -299,7 +303,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.011'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

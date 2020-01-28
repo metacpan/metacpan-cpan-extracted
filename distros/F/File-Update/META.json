@@ -59,7 +59,7 @@
    "provides" : {
       "File::Update" : {
          "file" : "lib/File/Update.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/shlomif/perl-File-Update"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -343,6 +343,11 @@
                         "version" : "4.015"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Name",
+                        "version" : "4.015"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
@@ -415,7 +420,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.010"
+                        "version" : "1.012"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "2.04";
+our $VERSION = "2.05";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
@@ -15,19 +15,17 @@ sub vsprintf { &sprintf(@_) }
 
 sub sprintf {
     my($format, @args) = @_;
-
     my $uniqstr = _sub_uniqstr($format, @args)
 	or return CORE::sprintf($format, @args);
-
-    my @list;
+    my @replace;
     for (@args) {
 	defined and /\P{ASCII}/ or next;
-	my $replacement = $uniqstr->($_) // next;
-	push @list, $replacement => $_;
-	$_ = $replacement;
+	my $replace = $uniqstr->($_) // next;
+	push @replace, $replace => $_;
+	$_ = $replace;
     }
     my $result = CORE::sprintf($format, @args);
-    while (my($tmp, $orig) = splice(@list, 0, 2)) {
+    while (my($tmp, $orig) = splice(@replace, 0, 2)) {
 	$result =~ s/$tmp/$orig/;
     }
     $result;
@@ -58,7 +56,7 @@ sub _sub_uniqstr {
     sub {
 	my $len = Text::VisualWidth::PP::width(shift);
 	return undef if $len < 2;
-	CORE::sprintf("%s%s", $seq[$n++ % @seq], "_" x ($len - 2));
+	$seq[$n++ % @seq] . ("_" x ($len - 2));
     }
 }
 
@@ -105,6 +103,12 @@ except that I<printf> does not take FILEHANDLE as a first argument.
 
 =back
 
+=head1 BUGS
+
+Text truncation is not supported.  Next program does not work.
+
+    vsprintf("%.4s", "一二三");
+
 =head1 IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
@@ -113,6 +117,10 @@ before formatting, and recovered after the process.
 Unique replacement string contains a combination of control characters
 (Control-A to Control-E).  If the FORMAT contains all of these two
 bytes combinations, the function behaves just like a standard one.
+
+Because this mechanism expects entire replacement string can be found
+in formatted text, it does not work when the string is truncated by
+maximum precision.
 
 =head1 SEE ALSO
 

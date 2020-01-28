@@ -8,7 +8,6 @@ build_requires:
   IPC::Open3: '0'
   Module::Build: '0.28'
   Test::More: '0.88'
-  perl: '5.006'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
@@ -21,28 +20,29 @@ name: App-CSV2Chart
 provides:
   App::CSV2Chart:
     file: lib/App/CSV2Chart.pm
-    version: v0.8.0
+    version: v0.8.2
   App::CSV2Chart::API::ToXLSX:
     file: lib/App/CSV2Chart/API/ToXLSX.pm
-    version: v0.8.0
+    version: v0.8.2
   App::CSV2Chart::Command::svg:
     file: lib/App/CSV2Chart/Command/svg.pm
-    version: v0.8.0
+    version: v0.8.2
   App::CSV2Chart::Command::xlsx:
     file: lib/App/CSV2Chart/Command/xlsx.pm
-    version: v0.8.0
+    version: v0.8.2
 requires:
   App::Cmd::Setup: '0'
   Excel::Writer::XLSX: '0'
   Path::Tiny: '0'
   Text::CSV: '0'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/shlomif/app-csv2chart/issues
   homepage: http://metacpan.org/release/App-CSV2Chart
   repository: https://github.com/shlomif/CSV2Chart.git
-version: 0.8.0
+version: 0.8.2
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -249,6 +249,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version

@@ -1,5 +1,12 @@
 Revision history for Spork-Shlomify
 
+0.0401  2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.0400  2019-02-18
         - Add lib/Spork/Shlomify/Slides/FromSpork.pm
             - forked from spork to get rid of "Wide character in print"

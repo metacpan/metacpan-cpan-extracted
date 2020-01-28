@@ -1,5 +1,5 @@
 package Spork::Shlomify::Formatter;
-$Spork::Shlomify::Formatter::VERSION = '0.0400';
+$Spork::Shlomify::Formatter::VERSION = '0.0401';
 use strict;
 use warnings;
 
@@ -23,11 +23,7 @@ Spork::Shlomif::Formatter - the formatting class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0400
-
-=head1 VERSION
-
-version 0.0400
+version 0.0401
 
 =head1 AUTHOR
 
@@ -41,36 +37,9 @@ MIT X11 License.
 
 L<Spork::Shlomify>
 
-=head1 AUTHOR
-
-Shlomi Fish
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/Spork-Shlomify/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Spork::Shlomify::Formatter
 
 =head2 Websites
 
@@ -102,14 +71,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Spork-Shlomify>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Spork-Shlomify>
 
 =item *
 
@@ -168,5 +129,26 @@ from your repository :)
 L<https://github.com/shlomif/Spork-Shlomify>
 
   git clone http://github.com/shlomif/perl-Spork-Shlomify
+
+=head1 AUTHOR
+
+Shlomi Fish
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Spork-Shlomify/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

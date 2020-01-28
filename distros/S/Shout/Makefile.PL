@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Pod" => 0
   },
-  "VERSION" => "2.1.2",
+  "VERSION" => "2.1.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     CCFLAGS => `PKG_CONFIG_PATH=\${PKG_CONFIG_PATH:-/usr/local/lib/pkgconfig} pkg-config --cflags shout`,
-    LIBS => `PKG_CONFIG_PATH=\${PKG_CONFIG_PATH:-/usr/local/lib/pkgconfig} pkg-config --libs shout`,
+    LIBS => (`PKG_CONFIG_PATH=\${PKG_CONFIG_PATH:-/usr/local/lib/pkgconfig} pkg-config --libs shout` || die "libshout not found"),
 );
 
 my %FallbackPrereqs = (

@@ -1,4 +1,11 @@
 Revision history for App-xspf2m3u
 
+0.0.2       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.0.1       2019-12-17
     - First version, released on an unsuspecting world

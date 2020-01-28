@@ -1,5 +1,5 @@
 package HTML::TabbedExamples::Generate;
-$HTML::TabbedExamples::Generate::VERSION = '0.2.0';
+$HTML::TabbedExamples::Generate::VERSION = '0.2.1';
 use strict;
 use warnings;
 
@@ -123,9 +123,14 @@ __END__
 
 =encoding utf-8
 
+=head1 NAME
+
+HTML::TabbedExamples::Generate - generate syntax-highlighted examples for
+codes with a markup compatible with jQueryUI's tab widgets.
+
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -204,11 +209,6 @@ version 0.2.0
             }
         );
 
-=head1 NAME
-
-HTML::TabbedExamples::Generate - generate syntax-highlighted examples for
-codes with a markup compatible with jQueryUI's tab widgets.
-
 =head1 METHODS
 
 =head2 my $obj = HTML::TabbedExamples::Generate->new({ default_syntax => "perl", main_pre_css_classes => [qw( code my_example1 )]})
@@ -245,7 +245,7 @@ Same arguments as render() with the addition of C<'title'> which is a title
 to be placed inside an C<< <h3>..</h3> >> tag, which will be escaped.
 Returns the complete markup.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -279,14 +279,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TabbedExamples-Generate>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-TabbedExamples-Generate>
 
 =item *
 

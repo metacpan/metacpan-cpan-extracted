@@ -1,7 +1,8 @@
 package App::CSV2Chart::Command::svg;
-$App::CSV2Chart::Command::svg::VERSION = '0.8.0';
+$App::CSV2Chart::Command::svg::VERSION = '0.8.2';
 use strict;
 use warnings;
+use 5.014;
 
 use App::CSV2Chart -command;
 use App::CSV2Chart::API::ToXLSX ();
@@ -84,14 +85,14 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.8.0
-
 =head1 NAME
 
 csv2chart svg - generate an .svg file of a chart from CSV data (requires a recent version of
 gnumeric's ssconvert utility).
+
+=head1 VERSION
+
+version 0.8.2
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

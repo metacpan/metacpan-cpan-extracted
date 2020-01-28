@@ -6,9 +6,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+File::Find::Object::Rule::Extending - the mini-guide to extending File::Find::Object::Rule
+
 =head1 VERSION
 
-version 0.0311
+version 0.0312
 
 =head1 SYNOPSIS
 
@@ -76,10 +80,6 @@ If you hadn't declared C<random> with a null prototype it would have
 consumed C<in> as a parameter to it, then got all confused as it
 doesn't know about a C<'.'> rule.
 
-=head1 NAME
-
-File::Find::Object::Rule::Extending - the mini-guide to extending File::Find::Object::Rule
-
 =head1 NOTES ABOUT THE CALLBACK
 
 The callback can access the L<File::Find::Object::Result> using
@@ -103,7 +103,7 @@ L<File::Find::Object::Rule>
 L<File::Find::::Rule::MMagic> was the first extension module for
 L<File::Find::Rule>, so maybe check that out.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -137,14 +137,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Object-Rule>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Find-Object-Rule>
 
 =item *
 
@@ -229,7 +221,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Richard Clamp.
+This software is copyright (c) 2020 by Richard Clamp.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -21,16 +21,16 @@ name: File-IsSorted
 provides:
   App::File::IsSorted:
     file: lib/App/File/IsSorted.pm
-    version: v0.0.4
+    version: v0.0.5
   App::File::IsSorted::Command::check:
     file: lib/App/File/IsSorted/Command/check.pm
-    version: v0.0.4
+    version: v0.0.5
   File::IsSorted:
     file: lib/File/IsSorted.pm
-    version: v0.0.4
+    version: v0.0.5
   Test::File::IsSorted:
     file: lib/Test/File/IsSorted.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   App::Cmd::Setup: '0'
   List::Util: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/shlomif/file-issorted/issues
   homepage: http://metacpan.org/release/File-IsSorted
   repository: https://github.com/shlomif/perl-File-IsSorted.git
-version: 0.0.4
+version: 0.0.5
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -148,7 +148,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -256,6 +256,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -314,7 +318,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

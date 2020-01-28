@@ -9,7 +9,7 @@ use AutoLoader;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '2.1.2';
+$VERSION = '2.1.4';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

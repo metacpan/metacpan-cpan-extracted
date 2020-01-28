@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.032';
+our $VERSION   = '0.035';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -19,6 +19,7 @@ my @delete_keys = qw(
 	has
 	with
 	extends
+	overload
 	factory
 	coerce
 	around
@@ -95,6 +96,8 @@ sub import {
 	}
 	for my $pkg (@roles) {
 		$pkg->[1] = { $pkg->[1]->$_handle_list };
+		# qualify names in role list early
+		$pkg->[0] = '::' . $builder->qualify_name($pkg->[0], exists($pkg->[1]{prefix})?$pkg->[1]{prefix}:$opts{prefix});
 		$builder->munge_role_options($pkg->[1], \%opts);
 	}
 	for my $pkg (@classes) {
@@ -152,17 +155,17 @@ sub import {
 		$builder->do_coercions_for_class($pkg->[0], %opts, reg => $reg, %{$pkg->[1]});
 	}
 	
-	for my $pkg (@class_generators) {
-		$builder->make_class_generator($pkg->[0], %opts, %{$pkg->[1]});
-	}
 	for my $pkg (@role_generators) {
 		$builder->make_role_generator($pkg->[0], %opts, %{$pkg->[1]});
 	}
+	for my $pkg (@class_generators) {
+		$builder->make_class_generator($pkg->[0], %opts, %{$pkg->[1]});
+	}
 	for my $pkg (@roles) {
-		$builder->make_role($pkg->[0], %opts, %{$pkg->[1]});
+		$builder->make_role($pkg->[0], _parent_opts => \%opts, _roles => \@roles, %opts, %{$pkg->[1]});
 	}
 	for my $pkg (@classes) {
-		$builder->make_class($pkg->[0], %opts, %{$pkg->[1]});
+		$builder->make_class($pkg->[0], _parent_opts => \%opts, _roles => \@roles, %opts, %{$pkg->[1]});
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
@@ -508,7 +511,10 @@ sub _make_package {
 	}->{lc $opts{toolkit}} || $opts{toolkit};
 	
 	if ($opts{is_role}) {
-		eval "package $qname; use $toolkit\::Role; use namespace::autoclean; 1"
+		no strict 'refs';
+		return if ${"$qname\::BUILT"};
+		
+		eval "package $qname; use $toolkit\::Role; use namespace::autoclean; our \$BUILT = 1"
 			or $builder->croak("Could not create package $qname: $@");
 	}
 	else {
@@ -578,10 +584,22 @@ sub _make_package {
 					push @processed, $gen->generate_package(@args);
 				}
 				else {
-					push @processed, $builder->qualify_name(shift(@roles), $opts{prefix});
+					my $role_qname = $builder->qualify_name(shift(@roles), $opts{prefix});
+					push @processed, $role_qname;
+					no strict 'refs';
+					if ( $role_qname !~ /\?$/ and not ${"$role_qname\::BUILT"} ) {
+						my ($role_dfn) = grep { $_->[0] eq "::$role_qname" } @{$opts{_roles}};
+						$builder->make_role(
+							"::$role_qname",
+							_parent_opts => $opts{_parent_opts},
+							_roles       => $opts{_roles},
+							%{ $opts{_parent_opts} },
+							%{ $role_dfn->[1] },
+						) if $role_dfn;
+					}
 				}
 			}
-			$builder->$method($qname, \@processed);
+			$builder->$method($qname, $opts{is_role}?'role':'class', \@processed);
 		}
 	}
 	
@@ -717,6 +735,15 @@ sub _make_package {
 			$shv_toolkit->install_delegations($shv_data) if $shv_data;
 		}
 	}
+	
+	if ($opts{multimethod}) {
+		my $method = $opts{toolkit_install_multimethod} || 'install_multimethod';
+		my @mm = $opts{multimethod}->$_handle_list_add_nulls;
+		while (@mm) {
+			my ($method_name, $method_spec) = splice(@mm, 0, 2);
+			$builder->$method($qname, $opts{is_role}?'role':'class', $method_name, $method_spec);
+		}
+	}
 
 	if ($opts{is_role}) {
 		my $method   = $opts{toolkit_require_methods} || ("require_methods_".lc $toolkit);
@@ -739,6 +766,13 @@ sub _make_package {
 	}
 	
 	unless ($opts{is_role}) {
+		
+		if ($opts{overload}) {
+			my @overloads = $opts{overload}->$_handle_list;
+			require overload;
+			require Import::Into;
+			'overload'->import::into($qname, @overloads);
+		}
 		
 		if ($toolkit eq 'Moose' && !$opts{'mutable'}) {
 			require Moose::Util;
@@ -862,7 +896,7 @@ sub generate_package {
 	
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
-		toolkit version authority mutable begin end requires import /) {
+		toolkit version authority mutable begin end requires import overload /) {
 		if (exists $local_opts{$key}) {
 			$opts{$key} = delete $local_opts{$key};
 		}
@@ -995,6 +1029,30 @@ sub extend_class_mouse {
 	(Mouse::Util::find_meta($class) or $class->meta)->superclasses(@$isa);
 }
 
+sub install_multimethod {
+	my $builder = shift;
+	my ($target, $kind, $method_name, $method_spec) = @_;
+	
+	HashRef->($method_spec);
+	Ref->($method_spec->{signature});
+	CodeRef->($method_spec->{code});
+	
+	my $new_sig = $builder->_build_method_signature_check(
+		$target,
+		$method_name,
+		CodeRef->check($method_spec->{signature})
+			? 'code'
+			: ($method_spec->{named} ? 'named' : 'positional'),
+		$method_spec->{signature},
+		undef,
+		1,
+	);
+	$method_spec->{signature} = $new_sig;
+	
+	require Sub::MultiMethod;
+	'Sub::MultiMethod'->install_candidate($target, $method_name, no_dispatcher=>($kind eq 'role'), %$method_spec);
+}
+
 {
 	my $_process_roles = sub {
 		my ($r, $tk) = @_;
@@ -1009,26 +1067,42 @@ sub extend_class_mouse {
 		} @$r;
 	};
 	
+	my $_maybe_do_multimethods = sub {
+		my $tk = 'Sub::MultiMethod';
+		if ($INC{'Sub/MultiMethod.pm'} and $tk->can('copy_package_candidates')) {
+			my ($target, $kind, @sources) = @_;
+			$tk->copy_package_candidates(@sources => $target);
+			$tk->install_missing_dispatchers($target) unless $kind eq 'role';
+		}
+		return;
+	};
+	
 	sub apply_roles_moo {
 		my $builder = shift;
-		my ($class, $roles) = @_;
+		my ($class, $kind, $roles) = @_;
 		my $helper = $builder->_get_moo_helper($class, 'with');
-		$helper->($roles->$_process_roles('Moo'));
+		my @roles = $roles->$_process_roles('Moo');
+		$helper->(@roles);
+		$class->$_maybe_do_multimethods($kind, @roles);
 	}
 
 	sub apply_roles_moose {
 		my $builder = shift;
-		my ($class, $roles) = @_;
+		my ($class, $kind, $roles) = @_;
 		require Moose::Util;
-		Moose::Util::ensure_all_roles($class, $roles->$_process_roles('Moose'));
+		my @roles = $roles->$_process_roles('Moose');
+		Moose::Util::ensure_all_roles($class, @roles);
+		$class->$_maybe_do_multimethods($kind, @roles);
 	}
 
 	sub apply_roles_mouse {
 		my $builder = shift;
-		my ($class, $roles) = @_;
+		my ($class, $kind, $roles) = @_;
 		require Mouse::Util;
+		my @roles = $roles->$_process_roles('Mouse');
 		# this can double-apply roles? :(
-		Mouse::Util::apply_all_roles($class, $roles->$_process_roles('Mouse'));
+		Mouse::Util::apply_all_roles($class, @roles);
+		$class->$_maybe_do_multimethods($kind, @roles);
 	}
 }
 
@@ -1171,7 +1245,7 @@ sub _optimize_signature {
 # need to partially parse stuff for Type::Params to look up type names
 sub _build_method_signature_check {
 	my $builder = shift;
-	my ($method_class, $method_name, $signature_style, $signature) = @_;
+	my ($method_class, $method_name, $signature_style, $signature, $invocants, $gimme_list) = @_;
 	my $type_library;
 	
 	return sub { @_ } if $signature_style eq 'none';
@@ -1246,6 +1320,7 @@ sub _build_method_signature_check {
 	
 	my $next = $is_named ? \&Type::Params::compile_named_oo : \&Type::Params::compile;
 	@_ = ($global_opts, @params);
+	return [@_] if $gimme_list;
 	goto($next);
 }
 
@@ -1721,6 +1796,29 @@ preference.
   package main;
   MyApp->new_foo()->bar();
 
+=item C<< multimethod >> I<< (ArrayRef) >>
+
+An arrayref of name-spec pairs suitable for passing to
+L<Sub::MultiMethod>.
+
+  package MyApp;
+  use MooX::Press (
+    class => [
+      'Foo' => {
+         multimethod => [
+           'bar' => {
+             signature => [ 'HashRef' ],
+             code      => sub { my ($self, $hash)  = @_; ... },
+           },
+           'bar' => {
+             signature => [ 'ArrayRef' ],
+             code      => sub { my ($self, $array) = @_; ... },
+           },
+         ],
+       },
+    ],
+  );
+
 =item C<< constant >> I<< (HashRef[Item]) >>
 
 A hashref of scalar constants to define in the package.
@@ -2081,6 +2179,10 @@ Note that the coderefs you pass to MooX::Press are evaluated in the caller
 namespace, so this isn't very useful if you're looking to import functions.
 It can be useful for many MooX, MooseX, and MouseX extensions though.
 
+=item C<< overload >> I<< (HashRef) >>
+
+Options to pass to C<< use overload >>.
+
 =back
 
 =head3 Role Options
@@ -2194,6 +2296,10 @@ This option is silently ignored.
 This option is silently ignored.
 
 =item C<< mutable >> I<< (Any) >>
+
+This option is silently ignored.
+
+=item C<< overload >> I<< (Any) >>
 
 This option is silently ignored.
 

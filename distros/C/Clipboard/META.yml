@@ -23,16 +23,16 @@ name: Clipboard
 provides:
   Clipboard:
     file: lib/Clipboard.pm
-    version: '0.21'
+    version: '0.22'
   Clipboard::MacPasteboard:
     file: lib/Clipboard/MacPasteboard.pm
-    version: '0.21'
+    version: '0.22'
   Clipboard::Win32:
     file: lib/Clipboard/Win32.pm
-    version: '0.21'
+    version: '0.22'
   Clipboard::Xclip:
     file: lib/Clipboard/Xclip.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   CGI: '0'
   File::Spec: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/shlomif/clipboard/issues
   homepage: http://metacpan.org/release/Clipboard
   repository: https://github.com/shlomif/Clipboard
-version: '0.21'
+version: '0.22'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -227,6 +227,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -285,7 +289,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

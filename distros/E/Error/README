@@ -1,9 +1,9 @@
 This archive contains the distribution Error,
-version 0.17028:
+version 0.17029:
 
   Error/exception handling in an OO-ish way
 
-This software is copyright (c) 2019 by Shlomi Fish ( http://www.shlomifish.org/ ).
+This software is copyright (c) 2020 by Shlomi Fish ( http://www.shlomifish.org/ ).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

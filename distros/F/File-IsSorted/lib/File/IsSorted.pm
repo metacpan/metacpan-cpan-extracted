@@ -1,5 +1,5 @@
 package File::IsSorted;
-$File::IsSorted::VERSION = '0.0.4';
+$File::IsSorted::VERSION = '0.0.5';
 use strict;
 use warnings;
 use autodie;
@@ -52,9 +52,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+File::IsSorted - check if the lines of a file are sorted lexicographically
+
 =head1 VERSION
 
-version 0.0.4
+version 0.0.5
 
 =head1 SYNOPSIS
 
@@ -71,10 +75,6 @@ increasing, (= are already sorted). It may consume less RAM and be faster than t
 naive way of doing C<< cmp myfile.txt <(LC_ALL=C sort myfile.txt) >> and it runs at
 O(n) instead of O(n*log(n)) time and keeps O(1) lines instead of O(n).
 
-=head1 NAME
-
-File::IsSorted - check if the lines of a file are sorted lexicographically
-
 =head1 METHODS
 
 =head2 my $checker = File::IsSorted->new
@@ -90,7 +90,7 @@ if it is.
 Checks if the file at path is sorted - throws an exception if it is not sorted
 and returns true if it is.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -124,14 +124,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-IsSorted>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-IsSorted>
 
 =item *
 

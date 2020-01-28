@@ -1,5 +1,5 @@
 package App::Notifier::Service;
-$App::Notifier::Service::VERSION = '0.0701';
+$App::Notifier::Service::VERSION = '0.0702';
 use 5.014;
 
 use Dancer2;
@@ -138,9 +138,14 @@ __END__
 
 =encoding utf-8
 
+=head1 NAME
+
+App::Notifier::Service - an HTTP service for the notifier application for
+notifying that an event (such as the finish of a task) occured.
+
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -172,11 +177,6 @@ version 0.0701
     # When you want to notify that an event occured:
     $ curl 'http://127.0.0.1:3000/notify'
     $ curl 'http://127.0.0.1:3000/notify?cmd_id=shine'
-
-=head1 NAME
-
-App::Notifier::Service - an HTTP service for the notifier application for
-notifying that an event (such as the finish of a task) occured.
 
 =head1 AUTHOR
 
@@ -246,7 +246,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -280,14 +280,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Notifier-Service>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Notifier-Service>
 
 =item *
 
@@ -362,7 +354,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Shlomi Fish.
+This software is Copyright (c) 2020 by Shlomi Fish.
 
 This is free software, licensed under:
 

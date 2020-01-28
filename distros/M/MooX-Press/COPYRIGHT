@@ -15,6 +15,9 @@ Files: Changes
  t/19smooth.t
  t/20moosex.t
  t/21coderef.t
+ t/22overload.t
+ t/23roleorder.t
+ t/24mm.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -47,16 +50,16 @@ Files: README
 Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/MooX/Press/Keywords.pm
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/MooX/Press/Keywords.pm
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

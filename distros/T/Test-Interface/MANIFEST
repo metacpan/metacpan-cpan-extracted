@@ -1,0 +1,12 @@
+CHANGES
+cpanfile
+lib/Test/Interface.pm
+lib/Test/Interface.pod
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/00_use_ok.t
+t/01_test_test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

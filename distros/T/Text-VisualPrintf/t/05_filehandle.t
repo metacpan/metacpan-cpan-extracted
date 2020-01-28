@@ -9,9 +9,7 @@ use Text::VisualPrintf qw(vprintf vsprintf);
 use Test::More;
 
 {
-    my $out;
-
-    open OUT, ">", \$out or die;
+    open OUT, ">", \(my $out) or die;
     Text::VisualPrintf::printf OUT "%12s\n", "あいうえお";
     close OUT;
 
@@ -24,9 +22,7 @@ use Test::More;
 }
 
 {
-    my $out;
-
-    open OUT, ">", \$out or die;
+    open OUT, ">", \(my $out) or die;
     vprintf OUT "%13s\n", "あいうえお";
     close OUT;
 
@@ -34,9 +30,7 @@ use Test::More;
 }
 
 {
-    my $out;
-
-    open OUT, ">", \$out or die;
+    open OUT, ">", \(my $out) or die;
     OUT->vprintf("%14s\n", "あいうえお");
     close OUT;
 
@@ -55,7 +49,8 @@ sub subprocess (&) {
     $out;
 }
 
-{
+SKIP: {
+    skip "windows", 1 if $^O eq 'MSWin32';
     my $out = subprocess {
 	use IO::Handle;
 	my $io = IO::Handle->new();
@@ -67,7 +62,8 @@ sub subprocess (&) {
     is( $out,  "    あいうえお\n", 'IO::Handle' );
 }
 
-{
+SKIP: {
+    skip "windows", 1 if $^O eq 'MSWin32';
     my $out = subprocess {
 	use IO::File;
 	my $io = IO::File->new(">/dev/stdout") or die;

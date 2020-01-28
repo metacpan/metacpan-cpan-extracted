@@ -12,11 +12,11 @@ use feature ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.013';
 
 use Keyword::Declare;
 use B::Hooks::EndOfScope;
-use Exporter::Shiny our @EXPORT = qw( version authority );
+use Exporter::Shiny our @EXPORT = qw( version authority overload );
 
 BEGIN {
 	package MooX::Pression::_Gather;
@@ -367,8 +367,16 @@ my $handle_role_list = sub {
 	return join(",", @return);
 };
 
+keytype MyAttribute is /:[^\W0-9]\w*(?:\([^\)]+\))?/xs;
+
 sub _handle_factory_keyword {
-	my ($me, $name, $via, $code, $has_sig, $sig, $optim) = @_;
+	my ($me, $name, $via, $code, $has_sig, $sig, $attrs) = @_;
+	
+	my $optim;
+	for my $attr (@$attrs) {
+		$optim = 1 if $attr =~ /^:optim\b/;
+	}
+	
 	if ($via) {
 		return sprintf(
 			'q[%s]->_factory(%s, \\(%s));',
@@ -402,7 +410,12 @@ sub _handle_factory_keyword {
 
 sub _handle_method_keyword {
 	my $me = shift;
-	my ($name, $code, $has_sig, $sig, $optim) = @_;
+	my ($name, $code, $has_sig, $sig, $attrs) = @_;
+	
+	my $optim;
+	for my $attr (@$attrs) {
+		$optim = 1 if $attr =~ /^:optim\b/;
+	}
 	
 	if (defined $name) {
 		if ($has_sig) {
@@ -454,9 +467,50 @@ sub _handle_method_keyword {
 	}
 }
 
-sub _handle_modifier_keyword {
-	my ($me, $kind, $name, $code, $has_sig, $sig, $optim) = @_;
+sub _handle_multimethod_keyword {
+	my $me = shift;
+	my ($name, $code, $has_sig, $sig, $attrs) = @_;
 	
+	my $optim;
+	my $extra_code = '';
+	for my $attr (@$attrs) {
+		$optim = 1 if $attr =~ /^:optim\b/;
+		$extra_code .= sprintf('alias=>%s', B::perlstring($1)) if $attr =~ /^:alias\((.+)\)$/;
+	}
+	
+	if ($has_sig) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+		return sprintf(
+			'q[%s]->_multimethod(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
+			$me,
+			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
+			$extra_code,
+		);
+	}
+	else {
+		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+		return sprintf(
+			'q[%s]->_multimethod(%s, { caller => __PACKAGE__, code => %s, named => 0, signature => sub { @_ }, %s });',
+			$me,
+			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$munged_code,
+			$extra_code,
+		);
+	}
+}
+
+sub _handle_modifier_keyword {
+	my ($me, $kind, $name, $code, $has_sig, $sig, $attrs) = @_;
+
+	my $optim;
+	for my $attr (@$attrs) {
+		$optim = 1 if $attr =~ /^:optim\b/;
+	}
+
 	if ($has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 		my $munged_code;
@@ -753,53 +807,62 @@ sub import {
 	
 	# `method` keyword
 	#
-	keyword method (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_method_keyword($name, $code, $has_sig, $sig, !!$optim);
+	keyword method (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_method_keyword($name, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword method (Identifier|Block $name, ':optimize'? $optim, Block $code) {
-		$me->_handle_method_keyword($name, $code, undef, undef, !!$optim);
+	keyword method (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_method_keyword($name, $code, undef, undef, \@attrs);
 	}
-	keyword method (                        ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_method_keyword(undef, $code, $has_sig, $sig, !!$optim);
+	keyword method (                        MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_method_keyword(undef, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword method (                        ':optimize'? $optim, Block $code) {
-		$me->_handle_method_keyword(undef, $code, undef, undef, !!$optim);
+	keyword method (                        MyAttribute? @attrs, Block $code) {
+		$me->_handle_method_keyword(undef, $code, undef, undef, \@attrs);
 	}
-	
+
+	# `multi method` keyword
+	#
+	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs);
+	}
+	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_multimethod_keyword($name, $code, undef, undef, \@attrs);
+	}
+
 	# `before`, `after`, and `around` keywords
 	#
-	keyword before (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code, $has_sig, $sig, !!$optim);
+	keyword before (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(before => $name, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword before (Identifier|Block $name, ':optimize'? $optim, Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code, undef, undef, !!$optim);
+	keyword before (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_modifier_keyword(before => $name, $code, undef, undef, \@attrs);
 	}
-	keyword after (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code, $has_sig, $sig, !!$optim);
+	keyword after (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(after => $name, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword after (Identifier|Block $name, ':optimize'? $optim, Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code, undef, undef, !!$optim);
+	keyword after (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_modifier_keyword(after => $name, $code, undef, undef, \@attrs);
 	}
-	keyword around (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code, $has_sig, $sig, !!$optim);
+	keyword around (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(around => $name, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword around (Identifier|Block $name, ':optimize'? $optim, Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code, undef, undef, !!$optim);
+	keyword around (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_modifier_keyword(around => $name, $code, undef, undef, \@attrs);
 	}
 	
 	# `factory` keyword
 	#
-	keyword factory (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, !!$optim);
+	keyword factory (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, \@attrs);
 	}
-	keyword factory (Identifier|Block $name, ':optimize'? $optim, Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, undef, undef, !!$optim);
+	keyword factory (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
+		$me->_handle_factory_keyword($name, undef, $code, undef, undef,  \@attrs);
 	}
 	keyword factory (Identifier|Block $name, 'via', Identifier $via) {
-		$me->_handle_factory_keyword($name, $via, undef, undef, undef, !!0);
+		$me->_handle_factory_keyword($name, $via, undef, undef, undef, []);
 	}
 	keyword factory (Identifier|Block $name) {
-		$me->_handle_factory_keyword($name, 'new', undef, undef, undef, !!0);
+		$me->_handle_factory_keyword($name, 'new', undef, undef, undef, []);
 	}
 	
 	# `coerce` keyword
@@ -846,6 +909,20 @@ sub version {
 #
 sub authority {
 	$OPTS{authority} = shift;
+}
+
+# `overload` keyword
+#
+sub overload {
+	if (@_ == 1 and ref($_[0]) eq 'HASH') {
+		push @{ $OPTS{overload} ||= [] }, %{+shift};
+	}
+	elsif (@_ == 1 and ref($_[0]) eq 'ARRAY') {
+		push @{ $OPTS{overload} ||= [] }, @{+shift};
+	}
+	else {
+		push @{ $OPTS{overload} ||= [] }, @_;
+	}
 }
 
 
@@ -912,6 +989,11 @@ sub _can {
 	my ($name, $code) = @_;
 	$OPTS{can}{$name} = $code;
 }
+sub _multimethod {
+	shift;
+	my ($name, $spec) = @_;
+	push @{ $OPTS{multimethod} ||= [] }, $name => $spec;
+}
 sub _modifier {
 	shift;
 	my ($kind, $name, $value) = @_;
@@ -921,7 +1003,7 @@ sub _modifier {
 #{
 #	package MooX::Pression::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.012';
+#	our $VERSION   = '0.013';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -932,7 +1014,7 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.012';
+#	our $VERSION   = '0.013';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -945,12 +1027,12 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.012';
+#	our $VERSION   = '0.013';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	
 #	package MooX::Pression::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.012';
+#	our $VERSION   = '0.013';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -964,7 +1046,7 @@ sub _modifier {
 #
 #	package MooX::Pression::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.012';
+#	our $VERSION   = '0.013';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1827,6 +1909,31 @@ A workaround is to wrap it in a C<< do { ... } >> block.
 
   my $x = do { method { ... } };
 
+=head4 Multimethods
+
+Multi methods should I<< Just Work [tm] >> if you prefix them with the
+keyword C<multi>
+
+  use MooX::Pression prefix => 'MyApp';
+  
+  class Widget {
+    multi method foo :alias(quux) (Any $x) {
+      say "Buzz";
+    }
+    multi method foo (HashRef $h) {
+      say "Fizz";
+    }
+  }
+  
+  my $thing = MyApp->new_widget;
+  $thing->foo( {} );       # Fizz
+  $thing->foo( 42 );       # Buzz
+  
+  $thing->quux( {} );      # Buzz
+
+This feature requires L<MooX::Press> 0.035 and L<Sub::MultiMethod> to be
+installed.
+
 =head3 require
 
 Indicates that a role requires classes to fulfil certain methods.
@@ -1921,6 +2028,9 @@ are not shifted off C<< @_ >> for you, but the variables are still defined.
   }
 
 The C<< :optimize >> attribute is supported for C<around>.
+
+Note that C<< SUPER:: >> won't work as expected in MooX::Pression, so
+C<around> should be used instead.
 
 =head3 C<< factory >>
 
@@ -2107,6 +2217,16 @@ statement more readable.
 
 The C<< :optimize >> attribute is not currently supported for C<coerce>.
 
+=head3 C<< overload >>
+
+  class Collection {
+    has @items;
+    overload '@{}' => sub { shift->list };
+  }
+
+The list passed to C<overload> is passed to L<overload> with no other
+processing.
+
 =head3 C<< version >>
 
   class Person {
@@ -2253,7 +2373,13 @@ You can, of course, turn on extra features yourself.
     ...;
   }
 
-And MooX::Pression exports L<Syntax::Keyword::Try> for you. Useful to have.
+(The C<current_sub> feature is unlikely to work fully unless you
+have C<:optimize> switched on for that method, or the method does not
+include a signature. For non-optimized methods with a signature, a
+wrapper is installed that handles checks, coercions, and defaults.
+C<< __SUB__ >> will point to the "inner" sub, minus the wrapper.)
+
+MooX::Pression exports L<Syntax::Keyword::Try> for you. Useful to have.
 
 And last but not least, it exports all the types, C<< is_* >> functions,
 and C<< assert_* >> functions from L<Types::Standard>,
@@ -2507,39 +2633,9 @@ package's namespace!
 
 =head3 Multimethods
 
-Moops:
-
-  class Foo {
-    multi method foo (ArrayRef $x) {
-      say "Fizz";
-    }
-    multi method foo (HashRef $x) {
-      say "Buzz";
-    }
-  }
-  
-  Foo->foo( [] );  # Fizz
-  Foo->foo( {} );  # Buzz
-
-Multimethods are not currently implemented in MooX::Pression.
-The workaround would be something like this:
-
-  class Foo {
-    method foo_arrayref (ArrayRef $x) {
-      say "Fizz";
-    }
-    method foo_hashref (HashRef $x) {
-      say "Buzz";
-    }
-    method foo (ArrayRef|HashRef $x) {
-      is_ArrayRef($x)
-        ? $self->foo_arrayref($x)
-        : $self->foo_hashref($x)
-    }
-  }
-  
-  Foo->foo( [] );  # Fizz
-  Foo->foo( {} );  # Buzz
+Moops/Kavorka multimethods are faster, but MooX::Pression is smarter at
+picking the best candidate to dispatch to, and intelligently selecting
+candidates across inheritance hierarchies and role compositions.
 
 =head3 Other crazy Kavorka features
 

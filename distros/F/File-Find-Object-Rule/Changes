@@ -1,6 +1,13 @@
 Changes Log for File-Find-Object-Rule:
 --------------------------------------
 
+0.0312  2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see:
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF#L3
+    ).
+        - VERSION used to appear before NAME.
+
 0.0311  2019-08-23
     - Moved the VCS repo to https://github.com/shlomif/perl-file-find-object-rule .
 

@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.4.1';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.4.2';
 use strict;
 use warnings;
 use autodie;
@@ -12,10 +12,10 @@ use IO::All qw/ io /;
 
 has '_general_whitelist' => ( is => 'ro', default => sub { return []; } );
 has '_records'           => ( is => 'ro', default => sub { return []; } );
-has '_general_hashref' => ( is => 'ro', default => sub { return +{}; } );
-has '_per_file'        => ( is => 'ro', default => sub { return +{}; } );
-has '_was_parsed'      => ( is => 'rw', default => '' );
-has 'filename' => ( is => 'ro', isa => 'Str', required => 1 );
+has '_general_hashref'   => ( is => 'ro', default => sub { return +{}; } );
+has '_per_file'          => ( is => 'ro', default => sub { return +{}; } );
+has '_was_parsed'        => ( is => 'rw', default => '' );
+has 'filename'           => ( is => 'ro', isa     => 'Str', required => 1 );
 
 sub check_word
 {
@@ -231,9 +231,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+HTML::Spelling::Site::Whitelist - handles the whitelist file.
+
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 SYNOPSIS
 
@@ -258,10 +262,6 @@ version 0.4.1
 
 The instances of this class can be used to manage a whitelist of words to
 spell check.
-
-=head1 NAME
-
-HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 METHODS
 
@@ -319,7 +319,7 @@ L<https://bitbucket.org/shlomif/shlomi-fish-homepage/src/493302cc5f1d81584f6f21b
 You should keep the whitelist file canonicalised and sorted by using
 write_sorted_file() and is_sorted() .
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -353,14 +353,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Spelling-Site>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Spelling-Site>
 
 =item *
 

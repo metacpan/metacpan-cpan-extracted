@@ -28,20 +28,18 @@ Backtrace::Backtrace () noexcept {
     buffer.resize(depth);
 }
 
+#else
+
+Backtrace::Backtrace () noexcept {}
+
+#endif
+
 Backtrace::~Backtrace() {}
 
 iptr<BacktraceInfo> Backtrace::get_backtrace_info() const noexcept {
     if (producer) { return (*producer)(buffer); }
     return iptr<BacktraceInfo>();
 }
-
-#else
-  
-backtrace::backtrace () noexcept {}
-string backtrace::get_trace_string () const { return {}; }
-
-#endif
-
 
 exception::exception () noexcept {}
 

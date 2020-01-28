@@ -1,3 +1,10 @@
+0.0702   2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see 0.001004 in
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF
+    ).
+        - VERSION used to appear before NAME.
+
 0.0701  2019-08-23
     - Move to https://github.com/shlomif/app-notifier .
 

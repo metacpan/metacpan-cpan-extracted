@@ -3911,12 +3911,18 @@ extracted.</p>
 <td class=r title='48 = 0x30'>48</td>
 <td>LensID</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(tags from here onward used for Nikkor Z lenses only)</span>
-  <br>1 = Nikkor Z 24-70mm f/4 S
+<td><span class=s><span class=n>(tags from here onward used for Nikkor Z lenses only)</span></span><table class=cols><tr>
+  <td>1 = Nikkor Z 24-70mm f/4 S
   <br>2 = Nikkor Z 14-30mm f/4 S
   <br>4 = Nikkor Z 35mm f/1.8 S
+  <br>8 = Nikkor Z 58mm f/0.95 S Noct
   <br>9 = Nikkor Z 50mm f/1.8 S
-  <br>13 = Nikkor Z 24-70mm f/2.8 S</span></td></tr>
+  <br>11 = Nikkor Z DX 16-50mm f/3.5-6.3 VR
+  <br>12 = Nikkor Z DX 50-250mm f/4.5-6.3 VR
+  <br>13 = Nikkor Z 24-70mm f/2.8 S
+  <br>14 = Nikkor Z 85mm f/1.8 S
+  <br>15 = Nikkor Z 24mm f/1.8 S</td></tr></table>
+</td></tr>
 <tr class=b>
 <td class=r title='54 = 0x36'>54</td>
 <td>MaxAperture</td>
@@ -6083,7 +6089,7 @@ videos from some Nikon cameras.</p>
 <tr class=b>
 <td title='0x2000007 = 33554439'>0x2000007</td>
 <td>FocusMode</td>
-<td class=c>string</td>
+<td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x200000b = 33554443'>0x200000b</td>
@@ -6093,7 +6099,7 @@ videos from some Nikon cameras.</p>
 <tr class=b>
 <td title='0x200001b = 33554459'>0x200001b</td>
 <td>CropHiSpeed</td>
-<td class=c>int16u[7]</td>
+<td class=c>no</td>
 <td><table class=cols><tr>
   <td>0 = Off
   <br>1 = 1.3x Crop
@@ -6123,7 +6129,7 @@ videos from some Nikon cameras.</p>
 <tr>
 <td title='0x2000022 = 33554466'>0x2000022</td>
 <td>ActiveD-Lighting</td>
-<td class=c>int16u</td>
+<td class=c>no</td>
 <td><table class=cols><tr>
   <td>0 = Off
   <br>1 = Low
@@ -6139,8 +6145,7 @@ videos from some Nikon cameras.</p>
 <tr class=b>
 <td title='0x2000023 = 33554467'>0x2000023</td>
 <td>PictureControlData</td>
-<td class=c title=' ! = Unsafe
- ^ = Deletable'>undef!^</td>
+<td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#PictureControl'>Nikon PictureControl Tags</a>
   <br>--&gt; <a href='Nikon.html#PictureControl2'>Nikon PictureControl2 Tags</a>
   <br>--&gt; <a href='Nikon.html#PictureControl3'>Nikon PictureControl3 Tags</a>
@@ -6158,7 +6163,7 @@ videos from some Nikon cameras.</p>
 <tr>
 <td title='0x200002a = 33554474'>0x200002a</td>
 <td>VignetteControl</td>
-<td class=c>int16u</td>
+<td class=c>no</td>
 <td><span class=s>0 = Off
   <br>1 = Low
   <br>3 = Normal
@@ -6196,7 +6201,7 @@ videos from some Nikon cameras.</p>
 <tr>
 <td title='0x2000087 = 33554567'>0x2000087</td>
 <td>FlashMode</td>
-<td class=c>int8u</td>
+<td class=c>no</td>
 <td><table class=cols><tr>
   <td>0 = Did Not Fire
   <br>1 = Fired, Manual
@@ -6249,12 +6254,12 @@ videos from some Nikon cameras.</p>
 <tr>
 <td title='0x20000ab = 33554603'>0x20000ab</td>
 <td>VariProgram</td>
-<td class=c>string</td>
+<td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x20000b1 = 33554609'>0x20000b1</td>
 <td>HighISONoiseReduction</td>
-<td class=c>int16u</td>
+<td class=c>no</td>
 <td><table class=cols><tr>
   <td>0 = Off
   <br>1 = Minimal
@@ -6914,12 +6919,14 @@ used to specify the lens for ExifTool to choose in these cases (see the
 </tr><tr><td>'7F 48 2B 5C 24 34 1C 06'</td><td>= Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF</td>
 </tr><tr><td>'7F 48 2D 50 24 24 1C 06'</td><td>= Sigma 18-50mm F2.8 EX DC Macro</td>
 </tr><tr><td>'80 48 1A 1A 24 24 85 06'</td><td>= AF DX Fisheye-Nikkor 10.5mm f/2.8G ED</td>
+</tr><tr><td>'80 48 1C 29 24 24 7A 06'</td><td>= Tokina atx-i 11-16mm F2.8 CF</td>
 </tr><tr><td>'81 34 76 A6 38 40 4B 0E'</td><td>= Sigma 150-600mm F5-6.3 DG OS HSM | S</td>
 </tr><tr><td>'81 54 80 80 18 18 86 0E'</td><td>= AF-S VR Nikkor 200mm f/2G IF-ED</td>
 </tr><tr><td>'82 34 76 A6 38 40 4B 0E'</td><td>= Sigma 150-600mm F5-6.3 DG OS HSM | C</td>
 </tr><tr><td>'82 48 8E 8E 24 24 87 0E'</td><td>= AF-S VR Nikkor 300mm f/2.8G IF-ED</td>
 </tr><tr><td>'83 00 B0 B0 5A 5A 88 04'</td><td>= FSA-L2, EDG 65, 800mm F13 G</td>
 </tr><tr><td>'88 54 50 50 0C 0C 4B 06'</td><td>= Sigma 50mm F1.4 DG HSM | A</td>
+</tr><tr><td>'89 30 2D 80 2C 40 4B 0E'</td><td>= Sigma 18-200mm F3.5-6.3 DC Macro OS HS | C</td>
 </tr><tr><td>'89 3C 53 80 30 3C 8B 06'</td><td>= AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED</td>
 </tr><tr><td>'8A 3C 37 6A 30 30 4B 0E'</td><td>= Sigma 24-105mm F4 DG OS HSM</td>
 </tr><tr><td>'8A 54 6A 6A 24 24 8C 0E'</td><td>= AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED</td>
@@ -6963,6 +6970,7 @@ used to specify the lens for ExifTool to choose in these cases (see the
 </tr><tr><td>'9E 38 11 29 34 3C 4B 06'</td><td>= Sigma 8-16mm F4.5-5.6 DC HSM</td>
 </tr><tr><td>'9E 40 2D 6A 2C 3C A0 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-105mm f/3.5-5.6G ED</td>
 </tr><tr><td>'9F 37 50 A0 34 40 4B 0E'</td><td>= Sigma 50-500mm F4.5-6.3 DG OS HSM</td>
+</tr><tr><td>'9F 48 48 48 24 24 A1 06'</td><td>= Yongnuo YN40mm F2.8N</td>
 </tr><tr><td>'9F 58 44 44 14 14 A1 06'</td><td>= AF-S DX Nikkor 35mm f/1.8G</td>
 </tr><tr><td>'A0 40 2D 53 2C 3C CA 0E'</td><td>= AF-P DX Nikkor 18-55mm f/3.5-5.6G VR</td>
 </tr><tr><td>'A0 40 2D 53 2C 3C CA 8E'</td><td>= AF-P DX Nikkor 18-55mm f/3.5-5.6G</td>
@@ -7119,7 +7127,7 @@ used to specify the lens for ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 1, 2019</i>
+<br><i>Last revised Jan 2, 2020</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

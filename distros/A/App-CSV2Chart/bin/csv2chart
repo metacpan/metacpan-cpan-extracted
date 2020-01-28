@@ -14,13 +14,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.8.0
-
 =head1 NAME
 
 csv2chart - command line utility to convert CSV data to a graphical chart
+
+=head1 VERSION
+
+version 0.8.2
 
 =head1 COPYRIGHT & LICENSE
 

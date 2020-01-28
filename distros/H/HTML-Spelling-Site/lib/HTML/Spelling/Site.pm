@@ -1,5 +1,5 @@
 package HTML::Spelling::Site;
-$HTML::Spelling::Site::VERSION = '0.4.1';
+$HTML::Spelling::Site::VERSION = '0.4.2';
 use strict;
 use warnings;
 
@@ -13,9 +13,14 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+HTML::Spelling::Site - a system/framework for spell-checking an entire static
+HTML site.
+
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 SYNOPSIS
 
@@ -30,11 +35,6 @@ duplicate functionality for spell checking my web-sites. Currently
 documentation is somewhat lacking and the modules could use some extra
 automated tests, but I'm anxious to get something out the door.
 
-=head1 NAME
-
-HTML::Spelling::Site - a system/framework for spell-checking an entire static
-HTML site.
-
 =head1 SEE ALSO
 
 L<Test::HTML::Spelling> - possibly somewhat less generic than
@@ -42,7 +42,7 @@ HTML::Spelling::Site and can also only handle one file at the time. Note that
 I contributed a little to it, but only after I started working on the code
 that became this framework.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -76,14 +76,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Spelling-Site>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Spelling-Site>
 
 =item *
 

@@ -4,7 +4,10 @@ use utf8;
 use open IO => ':utf8', ':std';
 use Text::VisualPrintf;
 
-use Test::More tests => 16;
+use Test::More;
+
+is( Text::VisualPrintf::sprintf( "%12s",    "abcde"),  "       abcde", 'ASCII %s' );
+
 
 is( Text::VisualPrintf::sprintf( "%12s",    "あいうえお"),  "  あいうえお", 'wide %s' );
 is( Text::VisualPrintf::sprintf( "%12s",   "aあいうえお"),  " aあいうえお", 'wide %s' );

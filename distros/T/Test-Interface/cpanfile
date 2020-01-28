@@ -1,0 +1,13 @@
+on runtime => sub {
+    requires            "Test::Builder";
+    requires            "Role::Inspector";
+};
+
+on test => sub {
+    requires            "Test::Most";
+    requires            "Test::Builder::Tester";
+    requires            "Role::Tiny";
+    requires            "Class::Method::Modifiers";
+                        #
+                        # not a dependency on Role::Tiny ?
+};

@@ -1,5 +1,5 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.21';
+$Clipboard::Xclip::VERSION = '0.22';
 use strict;
 use warnings;
 
@@ -87,9 +87,9 @@ __END__
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -123,14 +123,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Clipboard>
 
 =item *
 
@@ -205,7 +197,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Ryan King <rking@panoptic.com>.
+This software is copyright (c) 2020 by Ryan King <rking@panoptic.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

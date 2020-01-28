@@ -1,5 +1,5 @@
 package App::Docmake;
-$App::Docmake::VERSION = '0.0800';
+$App::Docmake::VERSION = '0.0801';
 use strict;
 use warnings;
 use 5.014;
@@ -15,9 +15,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+App::Docmake - translate DocBook/XML to other formats
+
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 
@@ -31,10 +35,6 @@ version 0.0800
 
 Created as a shorthand namespace so people can say
 C<cpanm App::Docmake> or similar.
-
-=head1 NAME
-
-App::Docmake - translate DocBook/XML to other formats
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -144,7 +144,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Shlomi Fish.
+This software is Copyright (c) 2020 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -14,6 +14,7 @@ inc/Test/Run/Builder.pm
 lib/File/Find/Object/Rule.pm
 lib/File/Find/Object/Rule/Extending.pod
 lib/File/Find/Object/Rule/Procedural.pod
+scripts/tag-release.pl
 t/00-compile.t
 t/File-Find-Rule.t
 t/findorule.t

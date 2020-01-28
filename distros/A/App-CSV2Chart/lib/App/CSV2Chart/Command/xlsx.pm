@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.8.0';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.8.2';
 use strict;
 use warnings;
 
@@ -56,13 +56,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.8.0
-
 =head1 NAME
 
 csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
+
+=head1 VERSION
+
+version 0.8.2
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -777,6 +777,30 @@ DESCRIPTION
 
       my $x = do { method { ... } };
 
+   Multimethods
+    Multi methods should *Just Work [tm]* if you prefix them with the keyword
+    `multi`
+
+      use MooX::Pression prefix => 'MyApp';
+  
+      class Widget {
+        multi method foo :alias(quux) (Any $x) {
+          say "Buzz";
+        }
+        multi method foo (HashRef $h) {
+          say "Fizz";
+        }
+      }
+  
+      my $thing = MyApp->new_widget;
+      $thing->foo( {} );       # Fizz
+      $thing->foo( 42 );       # Buzz
+  
+      $thing->quux( {} );      # Buzz
+
+    This feature requires MooX::Press 0.035 and Sub::MultiMethod to be
+    installed.
+
    require
     Indicates that a role requires classes to fulfil certain methods.
 
@@ -868,6 +892,9 @@ DESCRIPTION
       }
 
     The `:optimize` attribute is supported for `around`.
+
+    Note that `SUPER::` won't work as expected in MooX::Pression, so `around`
+    should be used instead.
 
    `factory`
     The `factory` keyword is used to define alternative constructors for your
@@ -1050,6 +1077,15 @@ DESCRIPTION
 
     The `:optimize` attribute is not currently supported for `coerce`.
 
+   `overload`
+      class Collection {
+        has @items;
+        overload '@{}' => sub { shift->list };
+      }
+
+    The list passed to `overload` is passed to overload with no other
+    processing.
+
    `version`
       class Person {
         version 1.0;
@@ -1190,7 +1226,13 @@ DESCRIPTION
         ...;
       }
 
-    And MooX::Pression exports Syntax::Keyword::Try for you. Useful to have.
+    (The `current_sub` feature is unlikely to work fully unless you have
+    `:optimize` switched on for that method, or the method does not include a
+    signature. For non-optimized methods with a signature, a wrapper is
+    installed that handles checks, coercions, and defaults. `__SUB__` will
+    point to the "inner" sub, minus the wrapper.)
+
+    MooX::Pression exports Syntax::Keyword::Try for you. Useful to have.
 
     And last but not least, it exports all the types, `is_*` functions, and
     `assert_*` functions from Types::Standard, Types::Common::String, and
@@ -1434,39 +1476,9 @@ DESCRIPTION
     namespace!
 
    Multimethods
-    Moops:
-
-      class Foo {
-        multi method foo (ArrayRef $x) {
-          say "Fizz";
-        }
-        multi method foo (HashRef $x) {
-          say "Buzz";
-        }
-      }
-  
-      Foo->foo( [] );  # Fizz
-      Foo->foo( {} );  # Buzz
-
-    Multimethods are not currently implemented in MooX::Pression. The
-    workaround would be something like this:
-
-      class Foo {
-        method foo_arrayref (ArrayRef $x) {
-          say "Fizz";
-        }
-        method foo_hashref (HashRef $x) {
-          say "Buzz";
-        }
-        method foo (ArrayRef|HashRef $x) {
-          is_ArrayRef($x)
-            ? $self->foo_arrayref($x)
-            : $self->foo_hashref($x)
-        }
-      }
-  
-      Foo->foo( [] );  # Fizz
-      Foo->foo( {} );  # Buzz
+    Moops/Kavorka multimethods are faster, but MooX::Pression is smarter at
+    picking the best candidate to dispatch to, and intelligently selecting
+    candidates across inheritance hierarchies and role compositions.
 
    Other crazy Kavorka features
     Kavorka allows you to mark certain parameters as read-only or aliases,

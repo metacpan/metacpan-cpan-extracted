@@ -43,6 +43,7 @@
             "Excel::Writer::XLSX" : "0",
             "Path::Tiny" : "0",
             "Text::CSV" : "0",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -52,27 +53,26 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
-            "perl" : "5.006"
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.8.2"
       },
       "App::CSV2Chart::API::ToXLSX" : {
          "file" : "lib/App/CSV2Chart/API/ToXLSX.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.8.2"
       },
       "App::CSV2Chart::Command::svg" : {
          "file" : "lib/App/CSV2Chart/Command/svg.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.8.2"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.8.2"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.8.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -353,6 +353,11 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {

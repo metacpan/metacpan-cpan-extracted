@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Symlink-DSL",
-  "dist_version" => "0.2.2",
+  "dist_version" => "0.2.3",
   "license" => "mit",
   "module_name" => "Symlink::DSL",
   "recursive_test_files" => 1,

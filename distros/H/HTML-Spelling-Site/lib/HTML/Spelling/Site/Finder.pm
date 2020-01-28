@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.4.1';
+$HTML::Spelling::Site::Finder::VERSION = '0.4.2';
 use strict;
 use warnings;
 
@@ -46,9 +46,14 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+HTML::Spelling::Site::Finder - find the relevant .html/.xhtml files in
+a directory tree.
+
 =head1 VERSION
 
-version 0.4.1
+version 0.4.2
 
 =head1 SYNOPSIS
 
@@ -74,11 +79,6 @@ The instances of this class can be used to scan a directory tree of files
 ending with C<.html> and C<.xhtml> and to return a list of them as a sorted
 array reference.
 
-=head1 NAME
-
-HTML::Spelling::Site::Finder - find the relevant .html/.xhtml files in
-a directory tree.
-
 =head1 METHODS
 
 =head2 ->new({ prune_cb => sub { ... }, root_dir => $root_dir })
@@ -98,7 +98,7 @@ Returns the prune callback. Mostly for internal use.
 
 Returns the root directory.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -132,14 +132,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Spelling-Site>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Spelling-Site>
 
 =item *
 

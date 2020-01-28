@@ -1,5 +1,5 @@
 package Task::Sites::BetterScm;
-$Task::Sites::BetterScm::VERSION = '0.0.2';
+$Task::Sites::BetterScm::VERSION = '0.0.3';
 use 5.014;
 use warnings;
 use strict;
@@ -13,9 +13,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Task::Sites::BetterScm - Specifications for modules needed by the better scm site.
+
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 DESCRIPTION
 
@@ -192,10 +196,6 @@ See L<https://better-scm.shlomifish.org/> and L<https://github.com/shlomif/bette
 =head3 L<vars>
 
 =head3 L<warnings>
-
-=head1 NAME
-
-Task::Sites::BetterScm - Specifications for modules needed by the better scm site.
 
 =head1 AUTHOR
 

@@ -22,7 +22,7 @@ name: File-Update
 provides:
   File::Update:
     file: lib/File/Update.pm
-    version: v0.2.0
+    version: v0.2.1
 requires:
   Exporter: '0'
   parent: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/shlomif/file-update/issues
   homepage: http://metacpan.org/release/File-Update
   repository: https://github.com/shlomif/perl-File-Update.git
-version: 0.2.0
+version: 0.2.1
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -241,6 +241,10 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
+              version: '4.015'
+            -
               class: Pod::Weaver::Section::Version
               name: '@SHLOMIF/Version'
               version: '4.015'
@@ -299,7 +303,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.010'
+              version: '1.012'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

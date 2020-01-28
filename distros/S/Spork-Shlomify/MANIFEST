@@ -9,7 +9,6 @@ META.yml
 README
 bin/shspork
 dist.ini
-inc/Test/Run/Builder.pm
 lib/Spork/Shlomify.pm
 lib/Spork/Shlomify/Config.pm
 lib/Spork/Shlomify/Formatter.pm

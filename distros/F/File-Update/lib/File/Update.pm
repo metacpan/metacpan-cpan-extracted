@@ -1,5 +1,5 @@
 package File::Update;
-$File::Update::VERSION = '0.2.0';
+$File::Update::VERSION = '0.2.1';
 use strict;
 use warnings;
 
@@ -67,9 +67,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+File::Update - update/modify/mutate a file only on change in contents.
+
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -95,10 +99,6 @@ version 0.2.0
         );
     }
 
-=head1 NAME
-
-File::Update - update/modify/mutate a file only on change in contents.
-
 =head1 FUNCTIONS
 
 =head2 write_on_change($path, \"new contents")
@@ -123,7 +123,7 @@ Like write_on_change() but while using L<Path::Tiny>'s C<*_raw> methods.
 
 Added in v0.2.0.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -157,14 +157,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Update>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/File-Update>
 
 =item *
 

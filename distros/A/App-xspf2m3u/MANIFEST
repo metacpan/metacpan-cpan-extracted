@@ -13,7 +13,6 @@ inc/Test/Run/Builder.pm
 lib/App/xspf2m3u.pm
 lib/App/xspf2m3u/Command/convert.pm
 scripts/tag-release.pl
-t.m3u
 t/00-compile.t
 t/cmd-line.t
 t/data/test1.m3u

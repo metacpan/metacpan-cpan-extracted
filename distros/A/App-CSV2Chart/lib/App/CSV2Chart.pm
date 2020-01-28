@@ -1,6 +1,6 @@
 # ABSTRACT: generate charts on the command line.
 package App::CSV2Chart;
-$App::CSV2Chart::VERSION = '0.8.0';
+$App::CSV2Chart::VERSION = '0.8.2';
 use strict;
 use warnings;
 
@@ -14,19 +14,19 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+csv2chart - command line utility to convert CSV data to a graphical chart
+
 =head1 VERSION
 
-version 0.8.0
+version 0.8.2
 
 =head1 SYNOPSIS
 
     ( echo "time,value" ; echo -n $'1,24\n2,36\n3,1977') | \
         csv2chart xlsx --output spreadsheet.xlsx
     gnumeric ./spreadsheet.xlsx
-
-=head1 NAME
-
-csv2chart - command line utility to convert CSV data to a graphical chart
 
 =head1 SEE ALSO
 

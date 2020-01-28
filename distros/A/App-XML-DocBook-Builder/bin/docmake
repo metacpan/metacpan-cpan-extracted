@@ -16,9 +16,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+docmake - a tool to render DocBook/XML into various output formats.
+
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 
@@ -137,10 +141,6 @@ Behave like make in building files only if their dependencies are newer.
 =head2 EXAMPLES
 
 There are some examples for sample invocation in the Synopsis.
-
-=head1 NAME
-
-docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 SUPPORT
 
@@ -299,7 +299,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Shlomi Fish.
+This software is Copyright (c) 2020 by Shlomi Fish.
 
 This is free software, licensed under:
 

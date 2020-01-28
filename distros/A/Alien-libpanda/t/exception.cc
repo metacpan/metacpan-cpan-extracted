@@ -143,14 +143,15 @@ void fn43() { fn42(); ++v; }
 void fn44() { fn43(); ++v; }
 void fn45() { fn44(); ++v; }
 void fn46() { fn45(); ++v; }
-void fn47() { fn46(); ++v;}
+void fn47() { fn46(); ++v; }
+void fn48() { fn47(); ++v; }
 
 }
 
 TEST_CASE("exception with trace, catch exact exception", "[exception]") {
     bool was_catch = false;
     try {
-        fn47();
+        fn48();
     } catch( const bt<std::invalid_argument>& e) {
         auto trace = e.get_backtrace_info();
         REQUIRE(e.get_trace().size() == 50);
@@ -158,23 +159,23 @@ TEST_CASE("exception with trace, catch exact exception", "[exception]") {
         REQUIRE(e.what() == std::string("Oops!"));
 
         auto frames = trace->get_frames();
-        auto& frame0 = frames[0];
-        CHECK_THAT( frame0->library, Catch::Matchers::Contains( "libpanda.so" ) );
-
+        REQUIRE(frames.size() >= 47);
+        
         StackframePtr fn00_frame = nullptr;
-        StackframePtr fn47_frame = nullptr;
+        StackframePtr fn46_frame = nullptr;
 
         for(auto& f : frames)  {
+            std::cout << f->name << "\n";
             if (f->name.find("fn00") != string::npos) { fn00_frame = f; }
-            if (f->name.find("fn47") != string::npos) { fn47_frame = f; }
+            if (f->name.find("fn46") != string::npos) { fn46_frame = f; }
         }
-        CHECK(fn00_frame);
+        REQUIRE(fn00_frame);
+        REQUIRE(fn46_frame);
         CHECK_THAT( fn00_frame->library, Catch::Matchers::Contains( "MyTest.so" ) );
         CHECK_THAT( fn00_frame->name, Catch::Matchers::Contains( "fn00" ) );
-        CHECK( fn00_frame->address > 0);
-        CHECK( fn00_frame->offset > 0);
-        CHECK(fn47_frame);
-        CHECK_THAT( fn47_frame->library, Catch::Matchers::Contains( "MyTest.so" ) );
+        CHECK( fn46_frame->address > 0);
+        CHECK( fn46_frame->offset > 0);
+        CHECK_THAT( fn46_frame->library, Catch::Matchers::Contains( "MyTest.so" ) );
 
         was_catch = true;
     }
@@ -184,7 +185,7 @@ TEST_CASE("exception with trace, catch exact exception", "[exception]") {
 TEST_CASE("exception with trace, catch non-final class", "[exception]") {
     bool was_catch = false;
     try {
-        fn47();
+        fn48();
     } catch( const std::logic_error& e) {
         REQUIRE(e.what() == std::string("Oops!"));
         auto bt = dyn_cast<const panda::Backtrace*>(&e);
@@ -193,15 +194,16 @@ TEST_CASE("exception with trace, catch non-final class", "[exception]") {
         auto trace = bt->get_backtrace_info();
         REQUIRE((bool)trace);
         auto frames = trace->get_frames();
+        REQUIRE(frames.size() >= 47);
         StackframePtr fn00_frame = nullptr;
-        StackframePtr fn47_frame = nullptr;
+        StackframePtr fn46_frame = nullptr;
 
         for(auto& f : frames)  {
             if (f->name.find("fn00") != string::npos) { fn00_frame = f; }
-            if (f->name.find("fn47") != string::npos) { fn47_frame = f; }
+            if (f->name.find("fn46") != string::npos) { fn46_frame = f; }
         }
         CHECK(fn00_frame);
-        CHECK(fn47_frame);
+        CHECK(fn46_frame);
         was_catch = true;
     }
     REQUIRE(was_catch);

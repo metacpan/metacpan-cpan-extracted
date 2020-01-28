@@ -1,5 +1,17 @@
 Revision history for App-CSV2Chart
 
+0.8.2       2020-01-28
+    - Set minimal version of perl to 5.14.0.
+        - https://github.com/shlomif/CSV2Chart/issues/2
+        - Thanks to @jwrightecs for the report!
+
+0.8.1       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see:
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF#L3
+    ).
+        - VERSION used to appear before NAME.
+
 0.8.0   2020-01-03
     - Add the svg subcommand.
     - Add lib/App/CSV2Chart/API/ToXLSX.pm .

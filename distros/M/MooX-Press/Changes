@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.035	2020-01-28
+
+ [ Bug Fixes ]
+ - Don't install multimethod dispatchers into roles.
+
+0.034	2020-01-28
+
+ [ Bug Fixes ]
+ - Skip trying to just-in-time look for a role definition if the role ends
+   in a question mark; that role will already be built just-in-time.
+
+0.033	2020-01-28
+
+ - Added: Sub::MultiMethod support (optional dependency).
+ - Added: Support `overload` in classes.
+ - Build roles in an intelligent order.
+ - Process role generators before class generators.
+
 0.032	2020-01-24
 
  - Added: MooX::Press->wrap_coderef utility.

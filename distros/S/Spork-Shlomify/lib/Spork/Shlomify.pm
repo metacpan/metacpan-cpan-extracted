@@ -1,5 +1,5 @@
 package Spork::Shlomify;
-$Spork::Shlomify::VERSION = '0.0400';
+$Spork::Shlomify::VERSION = '0.0401';
 use warnings;
 use strict;
 
@@ -24,7 +24,7 @@ Spork::Shlomify - An improved Spork.
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -35,10 +35,6 @@ This module is an improved Spork derivative. What it does is:
 2. Create a central C<slide.css> CSS stylesheet.
 
 You can build presentations with it using the shspork executable.
-
-=head1 VERSION
-
-version 0.0400
 
 =head1 AUTHOR
 
@@ -60,36 +56,9 @@ Copyright 2006 Shlomi Fish, all rights reserved.
 
 This program is released under the following license: MIT X11.
 
-=head1 AUTHOR
-
-Shlomi Fish
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2019 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/Spork-Shlomify/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Spork::Shlomify
 
 =head2 Websites
 
@@ -121,14 +90,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Spork-Shlomify>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Spork-Shlomify>
 
 =item *
 
@@ -187,5 +148,26 @@ from your repository :)
 L<https://github.com/shlomif/Spork-Shlomify>
 
   git clone http://github.com/shlomif/perl-Spork-Shlomify
+
+=head1 AUTHOR
+
+Shlomi Fish
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/Spork-Shlomify/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

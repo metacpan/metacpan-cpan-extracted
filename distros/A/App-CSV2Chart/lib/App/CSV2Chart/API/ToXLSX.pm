@@ -1,7 +1,8 @@
 package App::CSV2Chart::API::ToXLSX;
-$App::CSV2Chart::API::ToXLSX::VERSION = '0.8.0';
+$App::CSV2Chart::API::ToXLSX::VERSION = '0.8.2';
 use strict;
 use warnings;
+use 5.014;
 
 use Excel::Writer::XLSX ();
 use Text::CSV           ();
@@ -227,13 +228,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.8.0
-
 =head1 NAME
 
 App::CSV2Chart::API::ToXLSX - convert CSV to xlsx internal API
+
+=head1 VERSION
+
+version 0.8.2
 
 =head1 FUNCTIONS
 
