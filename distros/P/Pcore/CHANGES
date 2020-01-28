@@ -1,3 +1,22 @@
+v0.115.0 2020-01-25T13:59:18Z
+ - api reader role refactored
+ - dbi limit params
+ - app tmpl updated
+
+v0.114.2 2020-01-23T23:17:32Z
+ - dbi get_query -> GET_SQL_QUERY
+ - dbi improved
+ - dbi ON kwd added
+
+v0.114.1 2020-01-23T16:19:45Z
+ - api reader role fixed
+
+v0.114.0 2020-01-23T15:36:44Z
+ - api reader role updated
+
+v0.113.0 2020-01-23T04:46:12Z
+ - sql having added
+
 v0.112.1 2020-01-19T18:17:45Z
  - dockerignore builder fixed
  - app tmpl fixed

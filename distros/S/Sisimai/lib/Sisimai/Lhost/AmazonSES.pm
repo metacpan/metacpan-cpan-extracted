@@ -6,9 +6,9 @@ use warnings;
 
 # https://aws.amazon.com/ses/
 my $Indicators = __PACKAGE__->INDICATORS;
+my $ReBackbone = qr|^content-type:[ ]message/rfc822|m;
 my $StartingOf = {
     'message' => ['The following message to <', 'An error occurred while trying to deliver the mail '],
-    'rfc822'  => ['content-type: message/rfc822'],
 };
 my $MessagesOf = { 'expired' => ['Delivery expired'] };
 
@@ -35,11 +35,25 @@ sub make {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
+    my $recipients = 0; # (Integer) The number of 'Final-Recipient' header
+
     if( index($$mbody, '{') == 0 ) {
         # The message body is JSON string
         return undef unless exists $mhead->{'x-amz-sns-message-id'};
         return undef unless $mhead->{'x-amz-sns-message-id'};
 
+        # https://docs.aws.amazon.com/en_us/ses/latest/DeveloperGuide/notification-contents.html
+        my $bouncetype = {
+            'Permanent' => { 'General' => '', 'NoEmail' => '', 'Suppressed' => '' },
+            'Transient' => {
+                'General'            => '',
+                'MailboxFull'        => 'mailboxfull',
+                'MessageTooLarge'    => 'mesgtoobig',
+                'ContentRejected'    => '',
+                'AttachmentRejected' => '',
+            },
+        };
         my $jsonstring = '';
         my $foldedline = 0;
         my $sespayload = undef;
@@ -80,16 +94,139 @@ sub make {
             warn sprintf(" ***warning: Failed to decode JSON: %s", $@);
             return undef;
         }
-        return __PACKAGE__->json($sespayload);
+        return undef unless exists $sespayload->{'notificationType'};
+
+        my $rfc822head = {};    # (Hash) Check flags for headers in RFC822 part
+        my $labeltable = {
+            'Bounce'    => 'bouncedRecipients',
+            'Complaint' => 'complainedRecipients',
+        };
+        my $p = $sespayload;
+        my $v = undef;
+
+        if( $p->{'notificationType'} eq 'Bounce' || $p->{'notificationType'} eq 'Complaint' ) {
+            # { "notificationType":"Bounce", "bounce": { "bounceType":"Permanent",...
+            my $o = $p->{ lc $p->{'notificationType'} };
+            my $r = $o->{ $labeltable->{ $p->{'notificationType'} } } || [];
+
+            for my $e ( @$r ) {
+                # 'bouncedRecipients' => [ { 'emailAddress' => 'bounce@si...' }, ... ]
+                # 'complainedRecipients' => [ { 'emailAddress' => 'complaint@si...' }, ... ]
+                next unless Sisimai::RFC5322->is_emailaddress($e->{'emailAddress'});
+
+                $v = $dscontents->[-1];
+                if( $v->{'recipient'} ) {
+                    # There are multiple recipient addresses in the message body.
+                    push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
+                    $v = $dscontents->[-1];
+                }
+                $recipients++;
+                $v->{'recipient'} = $e->{'emailAddress'};
+
+                if( $p->{'notificationType'} eq 'Bounce' ) {
+                    # 'bouncedRecipients => [ {
+                    #   'emailAddress' => 'bounce@simulator.amazonses.com',
+                    #   'action' => 'failed',
+                    #   'status' => '5.1.1',
+                    #   'diagnosticCode' => 'smtp; 550 5.1.1 user unknown'
+                    # }, ... ]
+                    $v->{'action'} = $e->{'action'};
+                    $v->{'status'} = $e->{'status'};
+
+                    if( $e->{'diagnosticCode'} =~ /\A(.+?);[ ]*(.+)\z/ ) {
+                        # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
+                        $v->{'spec'} = uc $1;
+                        $v->{'diagnosis'} = $2;
+
+                    } else {
+                        $v->{'diagnosis'} = $e->{'diagnosticCode'};
+                    }
+
+                    # 'reportingMTA' => 'dsn; a27-23.smtp-out.us-west-2.amazonses.com',
+                    $v->{'lhost'} = $1 if $o->{'reportingMTA'} =~ /\Adsn;[ ](.+)\z/;
+
+                    if( exists $bouncetype->{ $o->{'bounceType'} } &&
+                        exists $bouncetype->{ $o->{'bounceType'} }->{ $o->{'bounceSubType'} } ) {
+                        # 'bounce' => {
+                        #       'bounceType' => 'Permanent',
+                        #       'bounceSubType' => 'General'
+                        # },
+                        $v->{'reason'} = $bouncetype->{ $o->{'bounceType'} }->{ $o->{'bounceSubType'} };
+                    }
+                } else {
+                    # 'complainedRecipients' => [ {
+                    #   'emailAddress' => 'complaint@simulator.amazonses.com' }, ... ],
+                    $v->{'reason'} = 'feedback';
+                    $v->{'feedbacktype'} = $o->{'complaintFeedbackType'} || '';
+                }
+                ($v->{'date'} = $o->{'timestamp'} || $p->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
+            }
+        } elsif( $p->{'notificationType'} eq 'Delivery' ) {
+            # { "notificationType":"Delivery", "delivery": { ...
+            my $o = $p->{'delivery'};
+            my $r = $o->{'recipients'} || [];
+
+            for my $e ( @$r ) {
+                # 'delivery' => {
+                #       'timestamp' => '2016-11-23T12:01:03.512Z',
+                #       'processingTimeMillis' => 3982,
+                #       'reportingMTA' => 'a27-29.smtp-out.us-west-2.amazonses.com',
+                #       'recipients' => [
+                #           'success@simulator.amazonses.com'
+                #       ],
+                #       'smtpResponse' => '250 2.6.0 Message received'
+                #   },
+                next unless Sisimai::RFC5322->is_emailaddress($e);
+
+                $v = $dscontents->[-1];
+                if( $v->{'recipient'} ) {
+                    # There are multiple recipient addresses in the message body.
+                    push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
+                    $v = $dscontents->[-1];
+                }
+                $recipients++;
+                $v->{'recipient'} = $e;
+                $v->{'lhost'}     = $o->{'reportingMTA'} || '';
+                $v->{'diagnosis'} = $o->{'smtpResponse'} || '';
+                $v->{'status'}    = Sisimai::SMTP::Status->find($v->{'diagnosis'}) || '';
+                $v->{'replycode'} = Sisimai::SMTP::Reply->find($v->{'diagnosis'})  || '';
+                $v->{'reason'}    = 'delivered';
+                $v->{'action'}    = 'deliverable';
+                ($v->{'date'} = $o->{'timestamp'} || $p->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
+            }
+        } else {
+            # The value of "notificationType" is not any of "Bounce", "Complaint",
+            # or "Delivery".
+            return undef;
+        }
+        return undef unless $recipients;
+
+        map { $_->{'agent'} = __PACKAGE__->smtpagent } @$dscontents;
+        if( exists $p->{'mail'}->{'headers'} ) {
+            # "headersTruncated":false,
+            # "headers":[ { ...
+            for my $e ( @{ $p->{'mail'}->{'headers'} } ) {
+                # 'headers' => [ { 'name' => 'From', 'value' => 'neko@nyaan.jp' }, ... ],
+                next unless $e->{'name'} =~ /\A(?:From|To|Subject|Message-ID|Date)\z/;
+                $rfc822head->{ lc $e->{'name'} } = $e->{'value'};
+            }
+        }
+
+        unless( $rfc822head->{'message-id'} ) {
+            # Try to get the value of "Message-Id".
+            # 'messageId' => '01010157e48f9b9b-891e9a0e-9c9d-4773-9bfe-608f2ef4756d-000000'
+            $rfc822head->{'message-id'} = $p->{'mail'}->{'messageId'} if $p->{'mail'}->{'messageId'};
+        }
+        return { 'ds' => $dscontents, 'rfc822' => $rfc822head };
 
     } else {
         # The message body is an email
         # 'from'    => qr/\AMAILER-DAEMON[@]email[-]bounces[.]amazonses[.]com\z/,
         # 'subject' => qr/\ADelivery Status Notification [(]Failure[)]\z/,
-        my $match = 0;
         my $xmail = $mhead->{'x-mailer'} || '';
-
         return undef if index($xmail, 'Amazon WorkMail') > -1;
+
+        my $match = 0;
         $match ||= 1 if $mhead->{'x-aws-outgoing'};
         $match ||= 1 if $mhead->{'x-ses-outgoing'};
         return undef unless $match;
@@ -97,17 +234,12 @@ sub make {
         require Sisimai::RFC1894;
         my $fieldtable = Sisimai::RFC1894->FIELDTABLE;
         my $permessage = {};    # (Hash) Store values of each Per-Message field
-
-        my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-        my $rfc822part = '';    # (String) message/rfc822-headers part
-        my $rfc822list = [];    # (Array) Each line in message/rfc822 part string
-        my $blanklines = 0;     # (Integer) The number of blank lines
         my $readcursor = 0;     # (Integer) Points the current cursor position
-        my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
+        my $emailsteak = Sisimai::RFC5322->fillet($mbody, $ReBackbone);
         my $v = undef;
         my $p = '';
 
-        for my $e ( split("\n", $$mbody) ) {
+        for my $e ( split("\n", $emailsteak->[0]) ) {
             # Read each line between the start of the message and the start of rfc822 part.
             unless( $readcursor ) {
                 # Beginning of the bounce message or message/delivery-status part
@@ -117,70 +249,50 @@ sub make {
                     next;
                 }
             }
+            next unless $readcursor & $Indicators->{'deliverystatus'};
+            next unless length $e;
 
-            unless( $readcursor & $Indicators->{'message-rfc822'} ) {
-                # Beginning of the original message part(message/rfc822)
-                if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
-                    $readcursor |= $Indicators->{'message-rfc822'};
-                    next;
-                }
-            }
+            if( my $f = Sisimai::RFC1894->match($e) ) {
+                # $e matched with any field defined in RFC3464
+                next unless my $o = Sisimai::RFC1894->field($e);
+                $v = $dscontents->[-1];
 
-            if( $readcursor & $Indicators->{'message-rfc822'} ) {
-                # message/rfc822 or text/rfc822-headers part
-                unless( length $e ) {
-                    last if ++$blanklines > 1;
-                    next;
-                }
-                push @$rfc822list, $e;
-
-            } else {
-                # message/delivery-status part
-                next unless $readcursor & $Indicators->{'deliverystatus'};
-                next unless length $e;
-
-                if( my $f = Sisimai::RFC1894->match($e) ) {
-                    # $e matched with any field defined in RFC3464
-                    next unless my $o = Sisimai::RFC1894->field($e);
-                    $v = $dscontents->[-1];
-
-                    if( $o->[-1] eq 'addr' ) {
+                if( $o->[-1] eq 'addr' ) {
+                    # Final-Recipient: rfc822; kijitora@example.jp
+                    # X-Actual-Recipient: rfc822; kijitora@example.co.jp
+                    if( $o->[0] eq 'final-recipient' ) {
                         # Final-Recipient: rfc822; kijitora@example.jp
-                        # X-Actual-Recipient: rfc822; kijitora@example.co.jp
-                        if( $o->[0] eq 'final-recipient' ) {
-                            # Final-Recipient: rfc822; kijitora@example.jp
-                            if( $v->{'recipient'} ) {
-                                # There are multiple recipient addresses in the message body.
-                                push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
-                                $v = $dscontents->[-1];
-                            }
-                            $v->{'recipient'} = $o->[2];
-                            $recipients++;
-
-                        } else {
-                            # X-Actual-Recipient: rfc822; kijitora@example.co.jp
-                            $v->{'alias'} = $o->[2];
+                        if( $v->{'recipient'} ) {
+                            # There are multiple recipient addresses in the message body.
+                            push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
+                            $v = $dscontents->[-1];
                         }
-                    } elsif( $o->[-1] eq 'code' ) {
-                        # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
-                        $v->{'spec'} = $o->[1];
-                        $v->{'diagnosis'} = $o->[2];
+                        $v->{'recipient'} = $o->[2];
+                        $recipients++;
 
                     } else {
-                        # Other DSN fields defined in RFC3464
-                        next unless exists $fieldtable->{ $o->[0] };
-                        $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
-
-                        next unless $f == 1;
-                        $permessage->{ $fieldtable->{ $o->[0] } } = $o->[2];
+                        # X-Actual-Recipient: rfc822; kijitora@example.co.jp
+                        $v->{'alias'} = $o->[2];
                     }
+                } elsif( $o->[-1] eq 'code' ) {
+                    # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
+                    $v->{'spec'} = $o->[1];
+                    $v->{'diagnosis'} = $o->[2];
+
                 } else {
-                    # Continued line of the value of Diagnostic-Code field
-                    next unless index($p, 'Diagnostic-Code:') == 0;
-                    next unless $e =~ /\A[ \t]+(.+)\z/;
-                    $v->{'diagnosis'} .= ' '.$1;
+                    # Other DSN fields defined in RFC3464
+                    next unless exists $fieldtable->{ $o->[0] };
+                    $v->{ $fieldtable->{ $o->[0] } } = $o->[2];
+
+                    next unless $f == 1;
+                    $permessage->{ $fieldtable->{ $o->[0] } } = $o->[2];
                 }
-            } # End of message/delivery-status
+            } else {
+                # Continued line of the value of Diagnostic-Code field
+                next unless index($p, 'Diagnostic-Code:') == 0;
+                next unless $e =~ /\A[ \t]+(.+)\z/;
+                $v->{'diagnosis'} .= ' '.$1;
+            }
         } continue {
             # Save the current line for the next loop
             $p = $e;
@@ -211,168 +323,8 @@ sub make {
                 last;
             }
         }
-        $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
-        return { 'ds' => $dscontents, 'rfc822' => $$rfc822part };
+        return { 'ds' => $dscontents, 'rfc822' => $emailsteak->[1] };
     }
-}
-
-sub json {
-    # Adapt Amazon SES bounce object for Sisimai::Message format
-    # @param        [Hash] argvs     bounce object(JSON) retrieved from Amazon SNS
-    # @return       [Hash, Undef]    Bounce data list and message/rfc822 part
-    #                                or Undef if it failed to parse or the
-    #                                arguments are missing
-    # @since v4.20.0
-    # @until v4.25.5
-    my $class = shift;
-    my $argvs = shift;
-
-    return undef unless ref $argvs eq 'HASH';
-    return undef unless keys %$argvs;
-    return undef unless exists $argvs->{'notificationType'};
-
-    # https://docs.aws.amazon.com/en_us/ses/latest/DeveloperGuide/notification-contents.html
-    my $bouncetype = {
-        'Permanent' => {
-            'General'    => '',
-            'NoEmail'    => '',
-            'Suppressed' => '',
-        },
-        'Transient' => {
-            'General'            => '',
-            'MailboxFull'        => 'mailboxfull',
-            'MessageTooLarge'    => 'mesgtoobig',
-            'ContentRejected'    => '',
-            'AttachmentRejected' => '',
-        },
-    };
-
-    my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my $rfc822head = {};    # (Hash) Check flags for headers in RFC822 part
-    my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
-    my $labeltable = {
-        'Bounce'    => 'bouncedRecipients',
-        'Complaint' => 'complainedRecipients',
-    };
-    my $v = undef;
-
-    if( $argvs->{'notificationType'} eq 'Bounce' || $argvs->{'notificationType'} eq 'Complaint' ) {
-        # { "notificationType":"Bounce", "bounce": { "bounceType":"Permanent",...
-        my $o = $argvs->{ lc $argvs->{'notificationType'} };
-        my $r = $o->{ $labeltable->{ $argvs->{'notificationType'} } } || [];
-
-        for my $e ( @$r ) {
-            # 'bouncedRecipients' => [ { 'emailAddress' => 'bounce@si...' }, ... ]
-            # 'complainedRecipients' => [ { 'emailAddress' => 'complaint@si...' }, ... ]
-            next unless Sisimai::RFC5322->is_emailaddress($e->{'emailAddress'});
-
-            $v = $dscontents->[-1];
-            if( $v->{'recipient'} ) {
-                # There are multiple recipient addresses in the message body.
-                push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
-                $v = $dscontents->[-1];
-            }
-            $recipients++;
-            $v->{'recipient'} = $e->{'emailAddress'};
-
-            if( $argvs->{'notificationType'} eq 'Bounce' ) {
-                # 'bouncedRecipients => [ {
-                #   'emailAddress' => 'bounce@simulator.amazonses.com',
-                #   'action' => 'failed',
-                #   'status' => '5.1.1',
-                #   'diagnosticCode' => 'smtp; 550 5.1.1 user unknown'
-                # }, ... ]
-                $v->{'action'} = $e->{'action'};
-                $v->{'status'} = $e->{'status'};
-
-                if( $e->{'diagnosticCode'} =~ /\A(.+?);[ ]*(.+)\z/ ) {
-                    # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
-                    $v->{'spec'} = uc $1;
-                    $v->{'diagnosis'} = $2;
-
-                } else {
-                    $v->{'diagnosis'} = $e->{'diagnosticCode'};
-                }
-
-                # 'reportingMTA' => 'dsn; a27-23.smtp-out.us-west-2.amazonses.com',
-                $v->{'lhost'} = $1 if $o->{'reportingMTA'} =~ /\Adsn;[ ](.+)\z/;
-
-                if( exists $bouncetype->{ $o->{'bounceType'} } &&
-                    exists $bouncetype->{ $o->{'bounceType'} }->{ $o->{'bounceSubType'} } ) {
-                    # 'bounce' => {
-                    #       'bounceType' => 'Permanent',
-                    #       'bounceSubType' => 'General'
-                    # },
-                    $v->{'reason'} = $bouncetype->{ $o->{'bounceType'} }->{ $o->{'bounceSubType'} };
-                }
-            } else {
-                # 'complainedRecipients' => [ {
-                #   'emailAddress' => 'complaint@simulator.amazonses.com' }, ... ],
-                $v->{'reason'} = 'feedback';
-                $v->{'feedbacktype'} = $o->{'complaintFeedbackType'} || '';
-            }
-            ($v->{'date'} = $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
-        }
-    } elsif( $argvs->{'notificationType'} eq 'Delivery' ) {
-        # { "notificationType":"Delivery", "delivery": { ...
-        my $o = $argvs->{'delivery'};
-        my $r = $o->{'recipients'} || [];
-
-        for my $e ( @$r ) {
-            # 'delivery' => {
-            #       'timestamp' => '2016-11-23T12:01:03.512Z',
-            #       'processingTimeMillis' => 3982,
-            #       'reportingMTA' => 'a27-29.smtp-out.us-west-2.amazonses.com',
-            #       'recipients' => [
-            #           'success@simulator.amazonses.com'
-            #       ],
-            #       'smtpResponse' => '250 2.6.0 Message received'
-            #   },
-            next unless Sisimai::RFC5322->is_emailaddress($e);
-
-            $v = $dscontents->[-1];
-            if( $v->{'recipient'} ) {
-                # There are multiple recipient addresses in the message body.
-                push @$dscontents, __PACKAGE__->DELIVERYSTATUS;
-                $v = $dscontents->[-1];
-            }
-            $recipients++;
-            $v->{'recipient'} = $e;
-            $v->{'lhost'}     = $o->{'reportingMTA'} || '';
-            $v->{'diagnosis'} = $o->{'smtpResponse'} || '';
-            $v->{'status'}    = Sisimai::SMTP::Status->find($v->{'diagnosis'}) || '';
-            $v->{'replycode'} = Sisimai::SMTP::Reply->find($v->{'diagnosis'})  || '';
-            $v->{'reason'}    = 'delivered';
-            $v->{'action'}    = 'deliverable';
-            ($v->{'date'} = $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
-        }
-    } else {
-        # The value of "notificationType" is not any of "Bounce", "Complaint",
-        # or "Delivery".
-        return undef;
-    }
-    return undef unless $recipients;
-
-    for my $e ( @$dscontents ) {
-        $e->{'agent'} = __PACKAGE__->smtpagent;
-    }
-
-    if( exists $argvs->{'mail'}->{'headers'} ) {
-        # "headersTruncated":false,
-        # "headers":[ { ...
-        for my $e ( @{ $argvs->{'mail'}->{'headers'} } ) {
-            # 'headers' => [ { 'name' => 'From', 'value' => 'neko@nyaan.jp' }, ... ],
-            next unless $e->{'name'} =~ /\A(?:From|To|Subject|Message-ID|Date)\z/;
-            $rfc822head->{ lc $e->{'name'} } = $e->{'value'};
-        }
-    }
-
-    unless( $rfc822head->{'message-id'} ) {
-        # Try to get the value of "Message-Id".
-        # 'messageId' => '01010157e48f9b9b-891e9a0e-9c9d-4773-9bfe-608f2ef4756d-000000'
-        $rfc822head->{'message-id'} = $argvs->{'mail'}->{'messageId'} if $argvs->{'mail'}->{'messageId'};
-    }
-    return { 'ds' => $dscontents, 'rfc822' => $rfc822head };
 }
 
 1;
@@ -424,7 +376,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

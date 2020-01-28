@@ -65,9 +65,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-2109",
          "schema:domainIncludes" : [
-            "schema:Person",
+            "schema:Vehicle",
             "schema:BroadcastService",
-            "schema:Vehicle"
+            "schema:Person"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -82,6 +82,26 @@
          "schema:inverseOf" : "schema:providesBroadcastService",
          "schema:rangeIncludes" : "schema:BroadcastChannel"
       },
+      "schema:inLanguage" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2382",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
+         "rdfs:label" : "inLanguage",
+         "schema:category" : "issue-2382",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:WriteAction",
+            "schema:LinkRole",
+            "schema:BroadcastService",
+            "schema:CommunicateAction",
+            "schema:Event",
+            "schema:PronounceableText"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Language"
+         ]
+      },
       "schema:parentService" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A broadcast service to which the broadcast service may belong to such as regional variations of a national channel.",
@@ -94,8 +114,8 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
-            "schema:BroadcastService",
             "schema:ScreeningEvent",
+            "schema:BroadcastService",
             "schema:BroadcastEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"

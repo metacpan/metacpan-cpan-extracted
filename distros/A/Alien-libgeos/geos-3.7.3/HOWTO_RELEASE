@@ -1,0 +1,49 @@
+1. Verify that the versions currently set (see 10 and 11 below) make
+   sense for this release.
+
+2. Run 'make distcheck', fix any problem with it.
+
+3. Update the NEWS file (extract most important things from the
+   repository log). Make sure to update the release date
+
+4. Commit the changes in the NEWS file.
+
+5. Tag the release:
+   $ git tag MAJOR.MINOR.PATCH
+
+6. Run 'make dist-bzip2'.
+   $ make distclean && ./autogen.sh && ./configure && make dist-bzip2
+
+7. Verify that you can unpack and build the tarball
+
+8. Copy the tarball to upload.osgeo.org:/osgeo/download/geos
+
+9. Increment all the version numbers for the next release, as below.
+
+10. Increment CAPI_INTERFACE_X in configure.ac
+    - For a release with no interface changes just bump REVISION.
+      [ Even if *nothing* changed in CAPI ]
+    - Adding interfaces, bump CURRENT/AGE, set REVISION to 0.
+    - Deleting interfaces / compatibility issues - bump CURRENT, others to zero
+      [ THIS MUST BE CAREFULLY AVOIDED ]
+
+11. Increment release version:
+    - In configure.ac
+    - In include/geos/version.h.vc
+    - In capi/geos_c.h.in
+      - VERSION_PATCH for bugfixes/improvements (even breaking C++ API)
+      - VERSION_MINOR for NEW interfaces in the C lib
+      - VERSION_MAJOR for SUBSTANTIAL additions or C lib ABI break
+        [ THIS MUST BE CAREFULLY AVOIDED ]
+    - In main CMakeLists.txt main one
+       - CHANGE the line: project(GEOS VERSION <mayor>.<minor>.<micro> LANGUAGES C CXX)
+       - CAPI_INTERFACE_*
+
+    - In README.md make sure all links are pointing at new bot branches
+
+12. Update wiki page https://trac.osgeo.org/geos/ at Download section
+    - Add latest release
+    - Remove previos patch level release (if any)
+
+13. Announce
+

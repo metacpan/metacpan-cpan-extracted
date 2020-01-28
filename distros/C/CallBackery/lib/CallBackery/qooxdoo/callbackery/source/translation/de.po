@@ -23,23 +23,23 @@ msgstr "Implementiert von %1"
 msgid "Version %1, %2%3"
 msgstr ""
 
-#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:109
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:110
 msgid "Login"
 msgstr "Anmelden"
 
-#: callbackery/ui/Login.js:80
+#: callbackery/ui/Login.js:81
 msgid "User"
 msgstr "Benutzer"
 
-#: callbackery/ui/Login.js:96
+#: callbackery/ui/Login.js:97
 msgid "Password"
 msgstr "Passwort"
 
-#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:112
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:113
 msgid "OK"
 msgstr ""
 
-#: callbackery/ui/Login.js:137
+#: callbackery/ui/Login.js:138
 msgid "release %1, %2 by %3"
 msgstr "Version %1, %2 by %3"
 
@@ -63,19 +63,40 @@ msgstr "Nein"
 msgid "RPC Error %1"
 msgstr "Kommunikations-Fehler %1"
 
-#: callbackery/ui/TabView.js:45
+#: callbackery/ui/TabView.js:46
 msgid "Unsaved Data"
 msgstr "Nicht gespeicherte Daten"
 
-#: callbackery/ui/TabView.js:46
+#: callbackery/ui/TabView.js:47
 msgid "This form contains unsaved data. Do you still want to switch?"
 msgstr ""
 "Dieses Formular enthält nicht gespeicherte Daten. Wollen Sie trotzdem "
 "umschalten?"
 
-#: callbackery/ui/form/Auto.js:72 callbackery/ui/form/Auto.js:80
+#: callbackery/ui/form/Auto.js:78 callbackery/ui/form/Auto.js:86
 msgid "dd.MM.yyyy"
 msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:83
+msgid "%1 copied to clipboard."
+msgstr "%1 in die Zwischenablage kopiert."
+
+#: callbackery/ui/form/renderer/NoteForm.js:83
+msgid "Success"
+msgstr "Erfolg"
+
+#: callbackery/ui/form/renderer/NoteForm.js:84
+#: callbackery/ui/form/renderer/NoteForm.js:86
+msgid "Copy failed"
+msgstr "Kopie fehlgeschlagen"
+
+#: callbackery/ui/form/renderer/NoteForm.js:84
+msgid "Select %1 and press [ctrl]+[c]"
+msgstr "Selektiere %1 und drücke [ctrl]+[c]"
+
+#: callbackery/ui/form/renderer/NoteForm.js:86
+msgid "Select %1 and press [ctrl]+[c]"
+msgstr "Selektiere %1 und drücke [ctrl]+[c]"
 
 #: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
 #: callbackery/ui/plugin/Action.js:235
@@ -102,7 +123,7 @@ msgstr "Download Fehler."
 msgid "Upload Exception"
 msgstr "Upload Fehler"
 
-#: callbackery/ui/plugin/Form.js:213
+#: callbackery/ui/plugin/Form.js:225
 msgid "Loading Form Data"
 msgstr "Daten werden geladen"
 

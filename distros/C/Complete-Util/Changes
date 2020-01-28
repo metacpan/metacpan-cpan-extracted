@@ -1,3 +1,29 @@
+0.611   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - [build] [doc] Rebuild with Perinci::To::POD 0.869 to fix rendering
+          error.
+
+
+0.610   2020-01-28  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] [doc] Rebuild to actually hide ununiquify_answer
+          (Perinci::To::POD 0.868 observes 'hidden' tag).
+
+
+0.609   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- complete_comma_sep: Don't use ununiquify_answer to prevent space being
+	  added; instead, use the is_partial property as it is more proper. We
+	  need Complete::Bash 0.334 to properly render this though.
+
+	- Mark the ununiquify_answer function as hidden, as it is now
+	  unused.
+
+
 0.608   2020-01-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add functions: answer_has_entries, answer_num_entries.
@@ -335,7 +361,7 @@
 	- Add tests for map_case and exp_im_path.
 
 
-0.19    2014-12-25 (PERLANCAR) - ♪ the magic of christmas day
+0.19    2014-12-25  Released-By: PERLANCAR; Note: ♪ the magic of christmas day
 
 	- Extracted most functionality of complete_file() to Complete-Path, to
           make the code reusable for other modules e.g. Complete-Module and

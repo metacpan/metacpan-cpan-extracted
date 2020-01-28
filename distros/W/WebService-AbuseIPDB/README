@@ -1,0 +1,63 @@
+WebService-AbuseIPDB 0.02
+-------------------------
+
+Released 23nd January 2020
+
+DESCRIPTION
+-----------
+
+This distribution is a client for version 2 of the AbuseIPDB API as
+described at https://docs.abuseipdb.com/ and it may be used to check the
+current status of an IP address in that database or submit reports of
+nefarious activity.
+
+This is alpha code. Expect the internals and interface to change.
+
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc WebService::AbuseIPDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs and suggest improvements here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-AbuseIPDB
+
+    Search CPAN
+        https://metacpan.org/pod/WebService-AbuseIPDB/
+
+
+LICENSE AND COPYRIGHT
+---------------------
+
+Copyright © 2020 Pete Houston.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991 or at your option
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is available in the source tree;
+if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+

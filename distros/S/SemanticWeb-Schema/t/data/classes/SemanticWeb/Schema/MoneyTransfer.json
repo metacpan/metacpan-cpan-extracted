@@ -1,8 +1,8 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:FIBO",
-         "https://github.com/schemaorg/schemaorg/issues/1253"
+         "https://github.com/schemaorg/schemaorg/issues/1253",
+         "schemadotorgsources:FIBO"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The act of transferring money from one place to another place. This may occur electronically or physically.",
@@ -14,22 +14,22 @@
    "properties" : {
       "schema:amount" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1253",
-            "issue-1698"
+            "issue-1698",
+            "issue-1253"
          ],
          "schema:domainIncludes" : [
             "schema:MonetaryGrant",
             "schema:InvestmentOrDeposit",
-            "schema:DatedMoneySpecification",
             "schema:MoneyTransfer",
-            "schema:LoanOrCredit"
+            "schema:LoanOrCredit",
+            "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
@@ -38,8 +38,8 @@
       },
       "schema:beneficiaryBank" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A bank or bankâs branch, financial institution or international financial institution operating the beneficiaryâs bank account or releasing funds for the beneficiary",

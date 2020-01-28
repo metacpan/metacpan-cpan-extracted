@@ -1,3 +1,6 @@
+0.7 2020-01-24
+  - add defined check for branches and conditions (thanks to bonkr)
+
 0.6 2019-12-01
   - add conditions to branches
   - minimum Devel::Cover 1.25

@@ -6,7 +6,7 @@ use warnings;
 use lib qw{ inc };
 
 use Astro::Coord::ECI;
-use Astro::Coord::ECI::Utils qw{ :time deg2rad PERL2000 PI rad2deg };
+use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PERL2000 PI rad2deg };
 use My::Module::Test qw{ :tolerance velocity_sanity };
 use POSIX qw{strftime floor};
 use Test::More 0.88;
@@ -40,13 +40,13 @@ Astro::Coord::ECI->set (debug => 0);
 # We just make sure we get the same thing back.
 
 {
-    my $want = time_gm( 0, 0, 0, 1, 0, 2000 );
+    my $want = greg_time_gm( 0, 0, 0, 1, 0, 2000 );
     my $got = Astro::Coord::ECI->universal( $want )->universal();
 
     cmp_ok $got, '==', $want,
 	'Univeral time round trip: Jan 1 2000';
 
-    $want = time_gm( 0, 0, 0, 1, 0, 2005 );
+    $want = greg_time_gm( 0, 0, 0, 1, 0, 2005 );
     $got = Astro::Coord::ECI->universal( $want )->universal();
 
     cmp_ok $got, '==', $want,
@@ -58,14 +58,14 @@ Astro::Coord::ECI->set (debug => 0);
 # Tests: dynamical()
 
 {
-    my $univ = time_gm( 0, 0, 0, 1, 0, 2000 );
+    my $univ = greg_time_gm( 0, 0, 0, 1, 0, 2000 );
     my $dyn = floor(
 	Astro::Coord::ECI->universal( $univ )->dynamical + .5 );
 
     cmp_ok $dyn, '==', $univ + 65,
 	'Universal to dynamical time: Jan 1 2000';
 
-    $univ = time_gm( 0, 0, 0, 1, 0, 2005 );
+    $univ = greg_time_gm( 0, 0, 0, 1, 0, 2005 );
     $dyn = floor(
 	Astro::Coord::ECI->universal( $univ )->dynamical + .5 );
 
@@ -78,7 +78,7 @@ Astro::Coord::ECI->set (debug => 0);
 # tests: dynamical()
 
 {
-    my $dyn = time_gm( 0, 0, 0, 1, 0, 2000 );
+    my $dyn = greg_time_gm( 0, 0, 0, 1, 0, 2000 );
     my $univ = floor(
 	Astro::Coord::ECI->dynamical( $dyn
 	)->universal() + .5 );
@@ -86,7 +86,7 @@ Astro::Coord::ECI->set (debug => 0);
     cmp_ok $univ, '==', $dyn - 65,
 	'Dynamical to universal time: Jan 1 2000 dynamical';
 
-    $dyn = time_gm( 0, 0, 0, 1, 0, 2005 );
+    $dyn = greg_time_gm( 0, 0, 0, 1, 0, 2005 );
     $univ = floor(
 	Astro::Coord::ECI->dynamical( $dyn
 	)->universal() + .5 );
@@ -289,7 +289,7 @@ EOD
 # Standard is from http://celestrak.com/columns/v02n03/ (Kelso)
 
 {
-    my $time = time_gm( 0, 0, 9, 1, 9, 1995 );
+    my $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
     my ( $x, $y, $z ) =
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
@@ -301,7 +301,7 @@ EOD
 
     tolerance_frac $z, 4077.984, 1e-6, 'Geodetic to ECI: Z';
 
-    $time = time_gm( 0, 0, 9, 1, 9, 1995 );
+    $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
     ( $x, $y, $z ) =
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
@@ -321,7 +321,7 @@ EOD
 # This is the reverse of the previous test.
 
 {
-    my $time = time_gm( 0, 0, 9, 1, 9, 1995 );
+    my $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
     my ( $lat, $long, $elev ) =
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
@@ -337,7 +337,7 @@ EOD
     tolerance_frac $elev, EQUATORIALRADIUS, 1e-6,
 	'ECI to geodetic: distance from center';
 
-    $time = time_gm( 0, 0, 9, 1, 9, 1995 );
+    $time = greg_time_gm( 0, 0, 9, 1, 9, 1995 );
 
     ( $lat, $long, $elev ) =
 	Astro::Coord::ECI->new( ellipsoid => 'WGS72' )->
@@ -372,7 +372,7 @@ tests are really more of a sanity check.
 EOD
 
 {
-    my $time = time_gm( 0, 0, 5, 27, 7, 2005 );
+    my $time = greg_time_gm( 0, 0, 5, 27, 7, 2005 );
     my $sta = Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
 	geodetic( deg2rad( 38 ), deg2rad( -80 ), 1 );
     my $sat = Astro::Coord::ECI->new( ellipsoid => 'GRS80' )->
@@ -506,7 +506,7 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my $t0 = PERL2000;
     my $alphae = deg2rad( 41.547214 );
     my $deltae = deg2rad( 49.348483 );
-    my $time = time_gm( 0, 0, 0, 13, 10, 2028 ) + .19 * 86400;
+    my $time = greg_time_gm( 0, 0, 0, 13, 10, 2028 ) + .19 * 86400;
 
     my $eci = Astro::Coord::ECI->dynamical( $t0 )->equatorial(
 	deg2rad( $alpha0 ), deg2rad( $delta0 ),
@@ -531,7 +531,7 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
     my $t0 = PERL2000;
     my $alphae = deg2rad( 41.547214 );
     my $deltae = deg2rad( 49.348483 );
-    my $time = time_gm( 0, 0, 0, 13, 10, 2028 ) + .19 * 86400;
+    my $time = greg_time_gm( 0, 0, 0, 13, 10, 2028 ) + .19 * 86400;
 
     my $sta = Astro::Coord::ECI->dynamical( $t0 )->eci( 0, 0, 0 )->set(
 	equinox_dynamical => $t0 );
@@ -569,7 +569,7 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
 # gave the desired obliquity value of 23.4392911 degrees.
 
 {
-    my $time = time_gm( 36, 27, 2, 30, 6, 2009 );
+    my $time = greg_time_gm( 36, 27, 2, 30, 6, 2009 );
 
     my ( $lat, $long ) = Astro::Coord::ECI->equatorial(
 	deg2rad( 116.328942 ), deg2rad( 28.026183 ), 1e12, $time )->ecliptic();
@@ -589,7 +589,7 @@ use constant LIGHTYEAR2KILOMETER => 9.4607e12;
 # Based on inverting the above test.
 
 {
-    my $time = time_gm( 36, 27, 2, 30, 6, 2009 );
+    my $time = greg_time_gm( 36, 27, 2, 30, 6, 2009 );
 
     my ( $ra, $dec ) = Astro::Coord::ECI->ecliptic(
 	deg2rad( 6.684170 ), deg2rad( 113.215630 ), 1e12, $time )->equatorial();
@@ -609,7 +609,7 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 # This test is based on Meeus' example 26.a.
 
 {
-    my $time = time_gm( 0, 0, 0, 13, 9, 1992 );
+    my $time = greg_time_gm( 0, 0, 0, 13, 9, 1992 );
     my $lat = .62 / 3600;
     my $lon = 199.907347;
     my $rho = .99760775 * ASTRONOMICAL_UNIT;
@@ -635,7 +635,7 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 # This test is based on http://www.statoids.com/tconcept.html
 
 {
-    my $time = time_gm( 0, 0, 0, 1, 0, 2001 );
+    my $time = greg_time_gm( 0, 0, 0, 1, 0, 2001 );
     my $lat = 29/60 + 40;
     my $lon = -( 8/60 + 86 );
     my $offset = -( ( 5 * 60 + 44 ) * 60 + 32 );
@@ -655,7 +655,7 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 # This test is the inverse of the previous one.
 
 {
-    my $time = time_gm( 28, 15, 18, 31, 11, 2000 );
+    my $time = greg_time_gm( 28, 15, 18, 31, 11, 2000 );
     my $lat = 29/60 + 40;
     my $lon = -( 8/60 + 86 );
     my $offset = -( ( 5 * 60 + 44 ) * 60 + 32 );
@@ -780,7 +780,7 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
 
 # Velocity sanity tests
 {
-    my $time = time_gm( 0, 0, 12, 1, 3, 2012 );
+    my $time = greg_time_gm( 0, 0, 12, 1, 3, 2012 );
 
     my $body = Astro::Coord::ECI->new(
 	name => 'eci coordinates',

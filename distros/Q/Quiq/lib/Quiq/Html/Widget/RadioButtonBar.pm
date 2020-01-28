@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 use Quiq::Html::Widget::RadioButton;
 
@@ -74,6 +74,10 @@ CSS Definition des Konstruktes (inline).
 
 Tooltip-Texte der Radio Buttons.
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =item value => $value (Default: undef)
 
 Aktueller Wert. Stimmt dieser mit dem Wert (s. Attribut option)
@@ -120,6 +124,7 @@ sub new {
         buttonClass => undef,
         style => undef,
         titles => [],
+        undefIf => 0,
         value => undef,
     );
     $self->set(@_);
@@ -157,9 +162,15 @@ sub html {
     # Attribute
 
     my ($class,$disabled,$hidden,$id,$labelA,$name,$onClickA,$optionA,
-        $orientation,$buttonClass,$style,$titleA,$value) =
+        $orientation,$buttonClass,$style,$titleA,$undefIf,$value) =
         $self->get(qw/class disabled hidden id labels name onClick options
-        orientation buttonClass style titles value/);
+        orientation buttonClass style titles undefIf value/);
+
+    # Generierung
+
+    if ($undefIf) {
+        return undef;
+    }
 
     if ($hidden || !@$optionA) {
         return '';
@@ -198,7 +209,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

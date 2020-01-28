@@ -134,7 +134,6 @@ connection to the RIPE Database service desired.
 		unfiltered   => 0,
 		types        => undef,
 		disconnected => 0,
-		hostname => undef,
 	);
 
 	sub new
@@ -378,9 +377,9 @@ sub disconnect
 	my $self = shift;
 	if ($self->is_connected) {
 		my $socket = $self->{__state}{socket};
+		$socket->close;
 		$self->{__state}{ioselect}->remove($socket)
 			if $self->{__state}{ioselect};
-		$socket->close;
 		delete $self->{__state}{socket};
 	}
 }
@@ -717,7 +716,7 @@ L<http://cpanratings.perl.org/d/net-whois-ripe>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/net-whois-ripe>
+L<http://search.cpan.org/dist/Net-Whois-RIPE>
 
 =back
 

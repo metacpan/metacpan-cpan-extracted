@@ -8,7 +8,7 @@ my %params = (
     CPLUS         => 11,
     SRC           => ['src', 'xsi', 'xsi/algorithm', 'xsi/noding'],
     INC           => '-Isrc',
-    BIN_DEPS      => ['XS::Framework', 'Export::XS', 'CPP::geos'],
+    BIN_DEPS      => ['XS::Framework', 'Export::XS', 'Alien::libgeos'],
     BIN_SHARE     => {INCLUDE  => {'src' => '/'}},
     CCFLAGS       => '-Wall -Wextra -DUSE_UNSTABLE_GEOS_CPP_API',
 );

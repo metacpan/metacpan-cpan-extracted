@@ -29,8 +29,8 @@
          "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>. For media, including audio and video, it's the time offset of the end of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "endTime",
          "schema:domainIncludes" : [
-            "schema:Action",
             "schema:FoodEstablishmentReservation",
+            "schema:Action",
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
@@ -57,14 +57,14 @@
          "rdfs:comment" : "The location of for example where the event is happening, an organization is located, or where an action takes place.",
          "rdfs:label" : "location",
          "schema:domainIncludes" : [
-            "schema:Organization",
             "schema:Action",
-            "schema:Event"
+            "schema:Event",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
             "schema:Place",
-            "schema:Text",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:Text"
          ]
       },
       "schema:object" : {
@@ -80,8 +80,8 @@
          "rdfs:label" : "participant",
          "schema:domainIncludes" : "schema:Action",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:result" : {
@@ -101,8 +101,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:target" : {

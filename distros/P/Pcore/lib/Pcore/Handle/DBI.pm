@@ -165,7 +165,7 @@ sub prepare_query ( $self, $query ) {
 
         # Object value
         elsif ( is_blessed_hashref $token) {
-            my ( $sql, $bind ) = $token->get_query( $self, 1, \$i );
+            my ( $sql, $bind ) = $token->GET_SQL_QUERY( $self, \$i );
 
             if ( defined $sql ) {
                 push @sql, $sql;

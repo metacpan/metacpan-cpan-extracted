@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 
+find.hack
 perlpod.css
 README.rpod
 README.txt
@@ -44,12 +45,18 @@ DiaColloDB/Compat/v0_11/Relation/Unigrams.pm
 DiaColloDB/Compat/v0_11/Relation/Unigrams.pod
 DiaColloDB/Corpus.pm
 DiaColloDB/Corpus.pod
+DiaColloDB/Corpus/Compiled.pm
+DiaColloDB/Corpus/Compiled.pod
+DiaColloDB/Corpus/Filters.pm
+DiaColloDB/Corpus/Filters.pod
 DiaColloDB/Document.pm
 DiaColloDB/Document.pod
 DiaColloDB/Document/DDCTabs.pm
 DiaColloDB/Document/DDCTabs.pod
 DiaColloDB/Document/JSON.pm
 DiaColloDB/Document/JSON.pod
+DiaColloDB/Document/Storable.pm
+DiaColloDB/Document/Storable.pod
 DiaColloDB/Document/TCF.pm
 DiaColloDB/Document/TCF.pod
 DiaColloDB/Document/TEI.pm
@@ -122,10 +129,31 @@ DiaColloDB/Upgrade/v0_10_x2t.pm
 DiaColloDB/Upgrade/v0_10_x2t.pod
 DiaColloDB/Upgrade/v0_12_sliceN.pm
 DiaColloDB/Upgrade/v0_12_sliceN.pod
+DiaColloDB/methods/compile.pm
+DiaColloDB/methods/compile.pod
+DiaColloDB/methods/export.pm
+DiaColloDB/methods/export.pod
 
 PDL-Utils/Makefile.PL
 PDL-Utils/pdlutils.pd
+PDL-Utils/t/00_basic.t
 
+XS/Makefile.PL
+XS/XS.pm
+XS/XS.pod
+XS/XS.xs
+XS/XS/CofUtils.pm
+XS/XS/CofUtils.pod
+XS/utils.h
+XS/cof-compile.h
+XS/cof-gen.h
+XS/cxx.mak
+XS/dcdb-cof-compile.cc
+XS/dcdb-cof-gen.cc
+XS/CofUtils.xs
+XS/t/00_basic.t
+
+dcdb-corpus-compile.perl
 dcdb-create.perl
 dcdb-export.perl
 dcdb-info.perl

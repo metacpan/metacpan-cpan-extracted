@@ -12,14 +12,14 @@
          "rdfs:comment" : "The anatomy of the underlying organ system or structures associated with this entity.",
          "rdfs:label" : "associatedAnatomy",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem",
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalSystem"
+            "schema:AnatomicalStructure"
          ]
       },
       "schema:cause" : {
@@ -46,10 +46,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:DrugClass",
-            "schema:TherapeuticProcedure",
+            "schema:MedicalCondition",
             "schema:Patient",
-            "schema:MedicalCondition"
+            "schema:DrugClass",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -59,8 +59,8 @@
          "rdfs:comment" : "The characteristics of associated patients, such as age, gender, race etc.",
          "rdfs:label" : "epidemiology",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -105,8 +105,8 @@
          "rdfs:comment" : "A possible treatment to address this condition, sign or symptom.",
          "rdfs:label" : "possibleTreatment",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:MedicalSignOrSymptom"
+            "schema:MedicalSignOrSymptom",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"
@@ -162,8 +162,8 @@
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalStudyStatus",
             "schema:Text",
+            "schema:MedicalStudyStatus",
             "schema:EventStatusType"
          ]
       },

@@ -30,15 +30,20 @@ open my $fh, '<', 't/misc_files/testplan.mpc' or die "Can not open 't/misc_files
 my $content; {local $/; $content = <$fh>};
 close $fh;
 
-my $testplan_id = $cmd->add($content, 'test.for.testplan.support');
+my $answer = $cmd->add($content, 'test.for.testplan.support');
+my $testplan_id = $answer->{testplan_id};
+my $testrun_ids = $answer->{testrun_ids};
 ok(defined($testplan_id), 'Adding testrun');
+diag "tr: $_" foreach @$testrun_ids;
 
 my $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($testplan_id);
 is($testplan->testruns->count, 4, 'Testruns for testplan created');
 
-my $rerun_id = $cmd->rerun($testplan_id);
+$answer = $cmd->rerun($testplan_id);
+my $rerun_id = $answer->{testplan_id};
+$testrun_ids = $answer->{testrun_ids};
 ok(defined($rerun_id), 'Rerun testplan');
-
+diag "tr: $_" foreach @$testrun_ids;
 
 my $rerun_testplan = model('TestrunDB')->resultset('TestplanInstance')->find($rerun_id);
 
@@ -75,8 +80,11 @@ is($testplan, undef, 'Testplan instance is gone');
 open $fh, '<', 't/misc_files/testplan_with_scenario.mpc' or die "Can not open 't/misc_files/testplan_with_scenario.mpc': $!";
 $content = do {local $/; <$fh>};
 
-$testplan_id = $cmd->add($content, 'test.for.testplan.support');
+$answer = $cmd->add($content, 'test.for.testplan.support');
+$testplan_id = $answer->{testplan_id};
+$testrun_ids = $answer->{testrun_ids};
 ok(defined($testplan_id), 'Adding testrun');
+diag "tr: $_" foreach @$testrun_ids;
 
 $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($testplan_id);
 is($testplan->testruns->count, 3, 'Testruns for testplan created');
@@ -96,7 +104,7 @@ $testplan_id = $cmd->testplannew({file => 't/misc_files/testplan_with_substitute
                                   include => ['t/includes/'],
                                   substitutes => {hosts_all => ['bullock', 'dickstone'],
                                                   hosts_any => ['iring', 'bascha'], },
-                            });
+                            })->{testplan_id};
 $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($testplan_id);
 is($testplan->testruns->count, 4, 'Testruns for testplan created');
 

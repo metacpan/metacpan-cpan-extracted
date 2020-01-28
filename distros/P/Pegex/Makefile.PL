@@ -26,17 +26,17 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "File::ShareDir::Install" => 0,
-    "JSON::XS" => 0,
+    "JSON::PP" => 0,
     "Scalar::Util" => 0,
-    "XXX" => 0,
-    "YAML::XS" => "0.74"
+    "XXX" => "0.35",
+    "YAML::PP" => "0.018"
   },
   "TEST_REQUIRES" => {
     "JSON::PP" => 0,
     "Test::Pod" => 0,
     "Tie::IxHash" => 0
   },
-  "VERSION" => "0.72",
+  "VERSION" => "0.74",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,12 +47,11 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "File::ShareDir::Install" => 0,
   "JSON::PP" => 0,
-  "JSON::XS" => 0,
   "Scalar::Util" => 0,
   "Test::Pod" => 0,
   "Tie::IxHash" => 0,
-  "XXX" => 0,
-  "YAML::XS" => "0.74"
+  "XXX" => "0.35",
+  "YAML::PP" => "0.018"
 );
 
 

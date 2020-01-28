@@ -5,7 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
+
+use Quiq::Html::Widget::TextField;
 
 # -----------------------------------------------------------------------------
 
@@ -51,6 +53,10 @@ JavaScript-Code, der an den Widget-Code angehängt wird.
 
 Name des Widget.
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =item value => $str (Default: undef)
 
 Anfänglich ausgewählter Wert.
@@ -72,6 +78,10 @@ Liste der möglichen Werte und ihrer Anzeigetexte. Beispiel:
       1 => 'Ja',
       2 => 'Vielleicht',
   ]
+
+=item readonly => $bool (Default: 0)
+
+Zeige das Feld und seinen Wert unveränderbar an.
 
 =item texts => \@text (Default: [])
 
@@ -119,10 +129,12 @@ sub new {
         onChange => undef,
         options => [],
         optionPairs => [],
+        readonly => 0,
         style => undef,
         styles => [],
         texts => [],
         title => undef,
+        undefIf => 0,
         value => undef,
     );
 
@@ -167,52 +179,72 @@ sub html {
     # Attribute
 
     my ($class,$disabled,$id,$javaScript,$name,$onChange,$optionPairs,
-        $options,$style,$styles,$texts,$title,$value) =
+        $options,$readonly,$style,$styles,$texts,$title,$undefIf,$value) =
         $self->get(qw/class disabled id javaScript name onChange optionPairs
-        options style styles texts title value/);
+        options readonly style styles texts title undefIf value/);
 
     # Generierung
 
-    my (@options,@texts);
-    if (@$optionPairs) {
-        for (my $i = 0; $i < @$optionPairs; $i += 2) {
-            push @options,$optionPairs->[$i];
-            push @texts,$optionPairs->[$i+1];
-        }
-    }
-    else {
-        for (my $i = 0; $i < @$options; $i++) {
-            push @options,$options->[$i];
-            push @texts,$texts->[$i] // $options->[$i];
-        }
+    if ($undefIf) {
+        return undef;
     }
 
-    my $str;
-    for (my $i = 0; $i < @options; $i++) {
-        my $option = $options[$i];
-        my $text = $texts[$i];
-        my $style = $styles->[$i];
-
-        $str .= $h->tag('option',
-            -nl => 0,
-            value => $option,
+    my $html;
+    if ($readonly) {
+        $html = Quiq::Html::Widget::TextField->html($h,
+            name => $name,
+            id => $id,
+            class => $class,
             style => $style,
-            selected => defined($value) && $option eq $value,
-            $text
+            disabled => $disabled,
+            readonly => 1,
+            size => length($value),
+            title => $title,
+            value => $value,
         );
     }
+    else {
+        my (@options,@texts);
+        if (@$optionPairs) {
+            for (my $i = 0; $i < @$optionPairs; $i += 2) {
+                push @options,$optionPairs->[$i];
+                push @texts,$optionPairs->[$i+1];
+            }
+        }
+        else {
+            for (my $i = 0; $i < @$options; $i++) {
+                push @options,$options->[$i];
+                push @texts,$texts->[$i] // $options->[$i];
+            }
+        }
 
-    my $html = $h->tag('select',
-        name => $name,
-        id => $id,
-        class => $class,
-        style => $style,
-        disabled => $disabled,
-        onchange => $onChange,
-        title => $title,
-        '-',
-        $str
-    );
+        my $str;
+        for (my $i = 0; $i < @options; $i++) {
+            my $option = $options[$i];
+            my $text = $texts[$i];
+            my $style = $styles->[$i];
+
+            $str .= $h->tag('option',
+                -nl => 0,
+                value => $option,
+                style => $style,
+                selected => defined($value) && $option eq $value,
+                $text
+            );
+        }
+
+        $html = $h->tag('select',
+            name => $name,
+            id => $id,
+            class => $class,
+            style => $style,
+            disabled => $disabled,
+            onchange => $onChange,
+            title => $title,
+            '-',
+            $str
+        );
+    }
     chomp $html;
 
     if ($javaScript) {
@@ -226,7 +258,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

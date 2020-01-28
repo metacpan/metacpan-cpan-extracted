@@ -10,11 +10,11 @@ build_requires:
   Test::Simple: '0.96'
   Test::Warnings: '0'
 configure_requires:
-  CPP::geos: v3.7.2.0
-  CPP::panda::lib: v1.2.11
-  Export::XS: v3.0.0
-  XS::Framework: v1.2.0
-  XS::Install: v1.2.11
+  Alien::libgeos: v3.7.3.3
+  Alien::libpanda: v1.3.6
+  Export::XS: v3.0.2
+  XS::Framework: v1.2.4
+  XS::Install: v1.2.12
   next::XS: v1.0.7
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
@@ -28,11 +28,11 @@ no_index:
     - t
     - inc
 requires:
-  CPP::geos: v3.7.2.0
-  CPP::panda::lib: v1.2.11
-  Export::XS: v3.0.0
-  XS::Framework: v1.2.0
-  XS::Install: v1.2.11
+  Alien::libgeos: v3.7.3.3
+  Alien::libpanda: v1.3.6
+  Export::XS: v3.0.2
+  XS::Framework: v1.2.4
+  XS::Install: v1.2.12
   next::XS: v1.0.7
-version: v1.0.2
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

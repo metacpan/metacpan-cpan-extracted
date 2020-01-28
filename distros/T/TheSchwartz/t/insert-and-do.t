@@ -115,6 +115,8 @@ run_tests(
             );
         }
 
+        $client->set_current_job(undef);
+
         teardown_dbs('ts1');
     }
 );
@@ -168,7 +170,7 @@ sub work {
 }
 
 sub keep_exit_status_for {
-    20
+    20;
 }    # keep exit status for 20 seconds after on_complete
 
 sub grab_for {10}

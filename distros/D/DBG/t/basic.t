@@ -15,6 +15,9 @@ use DBG;
 use Test::More tests => 25;
 use Capture::Tiny qw(capture_stderr);
 
+# Don't let perltidy find an rc file
+delete @ENV{qw< HOME PERLTIDY USERPROFILE HOMESHARE >};
+
 my ( $stderr, $log );
 $log = '';
 $log .= $stderr = capture_stderr {
@@ -59,7 +62,7 @@ $log .= $stderr = capture_stderr { prp 'foo', 0 };
 ok $stderr =~ /^foo\? no$/, 'prp false';
 
 $log .= $stderr = capture_stderr { cnm sub {} };
-ok $stderr =~ /^main::__ANON__ defined at .*\bbasic\.t:22/, 'cnm';
+ok $stderr =~ /^main::__ANON__ defined at .*\bbasic\.t:25/, 'cnm';
 
 {
     package Foo;

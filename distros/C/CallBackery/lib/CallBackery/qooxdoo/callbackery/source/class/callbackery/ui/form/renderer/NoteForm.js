@@ -48,52 +48,64 @@ qx.Class.define("callbackery.ui.form.renderer.NoteForm", {
 
             // add the items
             var msg = callbackery.ui.MsgBox.getInstance();
-            for (var i = 0; i < items.length; i++) {
-                var label = this._createLabel(names[i], items[i]);
+            var that = this;
+            for (var i = 0; i < items.length; i++) { (function(){ // context
+                var label = that._createLabel(names[i], items[i]);
+                var labelName = names[i];
                 label.set({
                     marginTop: 2,
                     marginBottom: 2
                 });
-                this._add(label, {row: this._row, column: 0});
+                that._add(label, {row: that._row, column: 0});
                 var item = items[i];
                 item.set({
                     marginTop: 2,
                     marginBottom: 2
                 });
                 label.setBuddy(item);
-                this._add(item, {row: this._row, column: 1});
+                that._add(item, {row: that._row, column: 1});
                 if (itemOptions != null && itemOptions[i] != null) {
                     if ( itemOptions[i].note ){
-                        this._add(new qx.ui.basic.Label(itemOptions[i].note).set({
+                        that._add(new qx.ui.basic.Label(itemOptions[i].note).set({
                             rich: true,
                             marginLeft: 20,
                             marginRight: 20
                         }),{
-                            row: this._row,
+                            row: that._row,
                             column: 2
                         });
                     }
                 }
                 if ( itemOptions[i].copyOnTap
                         && item.getReadOnly()){
-                    var that = this;
+                    var copyFailMsg = itemOptions[i].copyFailMsg || 
+                        that.tr("Select %1 and press [ctrl]+[c]",labelName);
+                    var copySuccessMsg = itemOptions[i].copySuccessMsg || 
+                        that.tr("Select %1 and press [ctrl]+[c]",labelName);
+
                     item.addListener('tap',function(e){
                         try {
                             navigator.clipboard.writeText(item.getValue())
-                            .then(function(err){ msg.info(that.tr("Text Copied"),that.tr("The Text has been copied to clipboard"))})
-                            .catch(function(err){ msg.info(that.tr("Copy failed"),that.tr("Select text and press [ctr]+[c]")) });
+                            .then(function(ret){ 
+                                msg.info(that.tr("Success"),copySuccessMsg);
+                            })
+                            .catch(function(err){ 
+                                msg.info(that.tr("Copy failed"),copyFailMsg);
+                            })
                         } catch (err) {
-                            msg.info(that.tr("Copy Failed"),that.tr("Select text with the Mouse and press [ctr]+[c]"))
+                            msg.info(that.tr("Copy failed"),copyFailMsg);
                         }
                     });
                 }
-                this._row++;
-                this._connectVisibility(item, label);
-            // store the names for translation
-            if (qx.core.Environment.get("qx.dynlocale")) {
-                  this._names.push({name: names[i], label: label, item: items[i]});
-            }
-         }
+                that._row++;
+                that._connectVisibility(item, label);
+                // store the names for translation
+                if (qx.core.Environment.get("qx.dynlocale")) {
+                    that._names.push({
+                        name: names[i], label: label, item: items[i]
+                    });
+                }
+            })(); } // end context
         }
     }
 });

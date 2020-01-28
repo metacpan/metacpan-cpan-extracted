@@ -23,8 +23,10 @@ devel/cospectral-regular.gp
 devel/cospectral.gp
 devel/cospectral.pl
 devel/crown.pl
+devel/cubic-integral.pl
 devel/Doyle-squarefree-words.pl
 devel/dragon.pl
+devel/dudeney.pl
 devel/equimatchable.pl
 devel/even-odd-tree.pl
 devel/excess-configurations.pl
@@ -44,14 +46,13 @@ devel/hanoi.pl
 devel/hex-grid.pl
 devel/hexpawns.pl
 devel/hypercube.pl
+devel/integral.pl
 devel/johnson.pl
 devel/keller.pl
 devel/kneser.pl
 devel/knight-grid.pl
 devel/konigsberg.pl
 devel/lib/Graph/Maker/BestOf.pm
-devel/lib/Graph/Maker/BinomialBoth.pm
-devel/lib/Graph/Maker/BinomialBoth.t
 devel/lib/Graph/Maker/CatalansUpto.pm
 devel/lib/Graph/Maker/CatalansUpto.t
 devel/lib/Graph/Maker/Caterpillar.pm
@@ -85,6 +86,7 @@ devel/Makefile
 devel/maximum-matching.pl
 devel/minimal-domsets.pl
 devel/misc.pl
+devel/most-maximum-matchings-tree.pl
 devel/my-hog-search.pl
 devel/noughts-and-crosses.pl
 devel/olive-tree.pl
@@ -112,6 +114,7 @@ devel/wiener-line-iterated.pl
 devel/wiener.pl
 lib/Graph/Maker/Beineke.pm
 lib/Graph/Maker/BinaryBeanstalk.pm
+lib/Graph/Maker/BinomialBoth.pm
 lib/Graph/Maker/BinomialTree.pm
 lib/Graph/Maker/BiStar.pm
 lib/Graph/Maker/BulgarianSolitaire.pm
@@ -127,6 +130,7 @@ lib/Graph/Maker/Johnson.pm
 lib/Graph/Maker/Keller.pm
 lib/Graph/Maker/Kneser.pm
 lib/Graph/Maker/KnightGrid.pm
+lib/Graph/Maker/MostMaximumMatchingsTree.pm
 lib/Graph/Maker/NoughtsAndCrosses.pm
 lib/Graph/Maker/Petersen.pm
 lib/Graph/Maker/QuartetTree.pm
@@ -139,6 +143,7 @@ MANIFEST.SKIP
 SIGNATURE
 t/Beineke.t
 t/BinaryBeanstalk.t
+t/BinomialBoth.t
 t/BinomialTree.t
 t/BiStar.t
 t/BulgarianSolitaire.t
@@ -155,6 +160,7 @@ t/Johnson.t
 t/Keller.t
 t/Kneser.t
 t/KnightGrid.t
+t/MostMaximumMatchingsTree.t
 t/MyTestHelpers.pm
 t/NoughtsAndCrosses.t
 t/Petersen.t
@@ -193,6 +199,7 @@ xt/Keller-slow.t
 xt/Kneser-slow.t
 xt/KnightGrid-isomorphic.t
 xt/Misc.t
+xt/MostMaximumMatchingsTree-isomorphic.t
 xt/MyGraphs-various.t
 xt/MyOEIS.pm
 xt/NoughtsAndCrosses-isomorphic.t

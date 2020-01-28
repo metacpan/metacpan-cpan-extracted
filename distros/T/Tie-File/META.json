@@ -43,6 +43,6 @@
          "url" : "https://github.com/toddr/Tie-File"
       }
    },
-   "version" : "1.01",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

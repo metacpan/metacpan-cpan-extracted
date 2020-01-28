@@ -18,11 +18,10 @@ no_index:
     - t
     - inc
 recommends:
-  DDC::XS: '0.15'
+  DDC::XS: '0.23'
   PDL: '2.007'
   PDL::CCS: v1.23.1
   PDL::VectorValued: v1.0.5
-  forks: '0.36'
 requires:
   Algorithm::BinarySearch::Vec: '0.07'
   DB_File: '0'
@@ -44,5 +43,5 @@ requires:
   XML::LibXML: '1.70'
   perl: '5.01'
 resources: {}
-version: v0.12.011
+version: v0.12.013
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

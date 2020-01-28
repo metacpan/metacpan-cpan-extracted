@@ -28,6 +28,7 @@ corpus/darwin/usr/lib/libfoo.dylib.1
 corpus/darwin/usr/lib/libfoo.dylib.1.2
 corpus/darwin/usr/lib/libfoo.dylib.1.2.3
 corpus/generic.dll
+corpus/lib/Alien/libbar.pm
 corpus/unix/custom/libfoo.so
 corpus/unix/foo-1.00/src/libs/libbar.so
 corpus/unix/foo-1.00/src/libs/libbaz.so

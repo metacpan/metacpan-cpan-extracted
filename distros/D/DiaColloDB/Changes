@@ -2,6 +2,34 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.013 Tue, 28 Jan 2020 08:49:33 +0100 moocow
+	* try to avoid "Attempt to reload XYZ.pm aborted." errors from cpantesters
+	  (http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad)
+
+v0.12.012 Mon, 27 Jan 2020 14:15:14 +0100 moocow
+	* added DTA::CAB-style "find.hack" to avoid symlink-related ExtUtils::MakeMaker pancakes
+	* added new class DiaColloDB::Corpus::Compiled - pre-compiled, pre-filtered corpora (JSON)
+	  - added dcdb-corpus-compile.perl for corpus creation & union
+	  - DiaColloDB::create() method now implicitly compiles temporary corpus if required
+	  - corpus document parsing in parallel using threads module
+	* added DiaColloDB::XS sub-module - fast XS/C++ implementations for compile-time operations
+	  - requires OpenMP, only tested on linux/gcc, pure-perl fallbacks still in place
+	* added global $DiaColloDB::NJOBS - number of parallel compile-time worker threads
+	  - default=-1 uses all available cores, via DiaColloDB::Utils::nJobs()
+	* factored out corpus content filters (stop/go-lists & -regexes) to new module DiaColloDB::Corpus::Filters
+	  - use Exporter for backwards-compatibility
+	* factored out DiaColloDB compile+create and import+export methods to DiaColloDB/methods/(compile|export).pm
+	  - use (sort TMPFILE|cut) instead of (cut|sort -) for frequency filters in methods/compile.pm
+	* added APPEND option to tmparray(), tmphash() - mostly useful for debugging
+	* added DiaColloDB::Document::Storable subclass
+	  - not really used: JSON is almost as fast, substantially smaller, and more portable
+	* use threads instead of forks in Client::list (requires DDC::Any via DDC::PP or DDC::XS >= v0.23)
+	  - renamed sentinel variable HAVE_FORKS->HAVE_THREADS
+	* use temporary sort-file in Relation::TDF::create (parallel sort)
+	* added thread- and XS-related options for dcdb-create.perl, dcdb-corpus-compile.perl
+	  - "-jobs=NJOBS" : number of parallel jobs
+	  - "-xs" / "-pp" : do/don't use XS implementations
+
 v0.12.011 Tue, 16 Apr 2019 12:31:38 +0200 moocow
 	* decode UTF-8 on dcdb-create.perl arguments
 	* fixed deep recursion typo in Utils::file_timestamp()

@@ -17,6 +17,13 @@ MAKE_TEST: {
         '01' => { 'status' => qr/\A5[.]1[.]1\z/, 'reason' => qr/userunknown/ },
         '02' => { 'status' => qr/\A5[.]5[.]0\z/, 'reason' => qr/userunknown/ },
         '03' => { 'status' => qr/\A5[.]2[.]0\z/, 'reason' => qr/spamdetected/ },
+        '04' => { 'status' => qr/\A5[.]2[.]0\z/, 'reason' => qr/spamdetected/ },
+        '05' => { 'status' => qr/\A5[.]5[.]0\z/, 'reason' => qr/suspend/ },
+        '06' => { 'status' => qr/\A4[.]0[.]0\z/, 'reason' => qr/blocked/ },
+        '07' => { 'status' => qr/\A4[.]0[.]0\z/, 'reason' => qr/blocked/ },
+        '08' => { 'status' => qr/\A4[.]2[.]0\z/, 'reason' => qr/systemerror/ },
+        '10' => { 'status' => qr/\A4[.]5[.]0\z/, 'reason' => qr/undefined/ },
+        '11' => { 'status' => qr/\A4[.]2[.]1\z/, 'reason' => qr/undefined/ },
     };
     is $PackageName->get, undef;
 

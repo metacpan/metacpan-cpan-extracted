@@ -1,26 +1,33 @@
 Revision history for net-whois-ripe
 
-2.006002    2017-11-7
-        -  Fix a weird bug in Net::Whois::Generif::disconnect() occuring with older Perl versions (reproduced on 5.12)
-           Thanks to all the CPAN testers for their reports!!!
+2.007002    2020-01-23
+            - Minor improvement to fix Kwalitee issues (use warnings, License information in META files)
+            - Fix bogus test (Inet6Num)
 
-2.006001    2017-11-2
-        -  Fix bug when hostname was used in constructor
-        -  Dirty workaround to handle RADB until a complete handling is written
+2.007001    2020-01-22
+            - Minor improvement to fix Kwalitee issues (use strict, non ASCII characters in POD)
+
+2.007000    2020-01-16
+            - Version BUMP to allow an upload on PAUSE
+
+2.006001    2020-01-16
+            - Fix bug issue # 26 reported by Moritz Lenz on github
+               (Bad parsing when `assignment-size` is in response)
+            - Update some objects attribute (changed -> last-modified...)
 
 2.006000    2015-05-23
-	    -  Fix bug in attribute autogeneration which affected Inet6Num.pm
+            -  Fix bug in attribute autogeneration which affected Inet6Num.pm
 
 2.005006    2015-05-23
             - Add helper scripts to automatically cope with RIPE database modification
             - Modify Objects to match RIPE database version 1.79.2
-	    - Fix to make Net::Whois::Object now emit warning instead of dieing on unknwon attribute
+            - Fix to make Net::Whois::Object now emit warning instead of dieing on unknwon attribute
 
 2.005005    2015-03-26
-	    - Fix to make Net::Whois::Generic use 'hostname' parameter
+            - Fix to make Net::Whois::Generic use 'hostname' parameter
               (reported by Stanislav Sinyagin)
-	    - Fix on Net::Whois::Object::AutNum to accept lowecase AutNum name
-            
+            - Fix on Net::Whois::Object::AutNum to accept lowecase AutNum name
+
 2.005004    2014-06-29
             - Modify Objects to match RIPE database version 1.74.1
 

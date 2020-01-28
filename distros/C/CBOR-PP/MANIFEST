@@ -17,6 +17,7 @@ t/examples.t
 t/general.t
 t/half_float.t
 t/hash.t
+t/roundtrip.t
 t/utf8.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

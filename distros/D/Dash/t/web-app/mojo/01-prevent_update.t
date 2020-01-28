@@ -7,9 +7,12 @@ use aliased 'Dash::Core::Components' => 'dcc';
 use aliased 'Dash::Html::Components' => 'html';
 use Dash::Exceptions::PreventUpdate;
 
-my $t = Test::Mojo->new('Dash');
+use Dash;
 
-my $app = $t->app;
+my $app = Dash->new();
+
+my $t = Test::Mojo->new( $app->backend );
+
 $app->layout(
       html->Div(
           children =>

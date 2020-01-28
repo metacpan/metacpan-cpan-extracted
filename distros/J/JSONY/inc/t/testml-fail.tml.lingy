@@ -1,0 +1,17 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*jsony"],
+      ["==",
+        [".",
+          ["*","jsony"],
+          ["jsony-load"],
+          ["Catch"],
+          ["Type"]],
+        "error"]]],
+  "data": [
+    { "label": "Comma in bareword",
+      "point": {
+        "jsony": "{ url: http://foo.com,2012 }"}},
+    { "label": "Unmatched [",
+      "point": {
+        "jsony": "foo[bar"}}]}

@@ -16,14 +16,14 @@ use warnings;
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::TLE;
 use Astro::Coord::ECI::TLE::Set;
-use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :time };
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg };
 
 use Date::Manip;
 use Getopt::Long 2.33;
 use Pod::Usage;
 use POSIX qw{strftime};
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 my %opt;
 

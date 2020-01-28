@@ -120,8 +120,8 @@ sub parseCeString {
   my $sents =
     [
      map {
-       {tokens=>[map {{text=>$_}} split(/\t/,$_)]}
-     } split(/\n+/,$$src)
+       {tokens=>[map {{text=>$_}} split(/\t/,($_//''))]}
+     } split(/\n/,$$src)
     ];
   $fmt->{doc} = bless({body=>$sents}, 'DTA::CAB::Document');
 

@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -24,11 +24,14 @@ my @files = (
     't/author-pod-syntax.t',
     't/dpath_mason.t',
     't/dpath_tt.t',
+    't/dpath_tt_testrundata.t',
     't/dpath_tt_utilmethods.t',
     't/fixtures/testrundb/report.yml',
+    't/fixtures/testrundb/testrun_with_scheduling_features.yml',
     't/helloworld.mas',
     't/helloworld.tt',
     't/path.t',
+    't/path_deprecated_internal_functions.t',
     't/pod-coverage.t',
     't/pod.t',
     't/tapper_reports_dpath.t'

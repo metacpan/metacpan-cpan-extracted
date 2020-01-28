@@ -13,6 +13,9 @@ Options:
   * Add pattern no-compile option, when compiling later e.g. with re::engine::RE2.
 
 Patterns:
+  * tighten trait object version_number to not capture trailing zero segments
+    '(?P<version_number>\d(?:(?:\.0)?\.[1-9])*)(?:\.0)*'
+  * relax trait object license_label to match 'license": "'
   * Cover license directories:
     + FSF: https://directory.fsf.org/wiki/Category:License
     + CC (retired): https://creativecommons.org/retiredlicenses/

@@ -2,8 +2,8 @@ NAME
     Complete::Util - General completion routine
 
 VERSION
-    This document describes version 0.608 of Complete::Util (from Perl
-    distribution Complete-Util), released on 2020-01-13.
+    This document describes version 0.611 of Complete::Util (from Perl
+    distribution Complete-Util), released on 2020-01-28.
 
 DESCRIPTION
     This package provides some generic completion routines that follow the
@@ -350,24 +350,6 @@ FUNCTIONS
     *   prefix => *str*
 
     *   suffix => *str*
-
-    Return value: (undef)
-
-  ununiquify_answer
-    Usage:
-
-     ununiquify_answer(%args) -> undef
-
-    If answer contains only one item, make it two.
-
-    For example, if answer is "["a"]", then will make answer become "["a","a
-    "]". This will prevent shell from automatically adding space.
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   answer* => *hash|array*
 
     Return value: (undef)
 

@@ -234,3 +234,10 @@ Revision history for Regexp-Debugger
 
     - Harden extraction of lexical hints
       (thanks, Timothy)
+
+
+0.002002  Mon Jan 27 21:58:28 2020
+
+    - Worked around spurious "EVAL without pos change exceeded limit"
+      under Perl 5.24 to 5.30. See: https://github.com/Perl/perl5/issues/17490
+      (Thanks, Hugo!)

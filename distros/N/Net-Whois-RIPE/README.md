@@ -31,7 +31,7 @@ You can also look for information at:
 
 
     Search CPAN
-        http://search.cpan.org/dist/net-whois-ripe
+        http://search.cpan.org/dist/Net-Whois-RIPE
 
 ## COPYRIGHT AND LICENCE
 

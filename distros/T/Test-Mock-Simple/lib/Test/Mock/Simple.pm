@@ -4,7 +4,7 @@ use 5.008008;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $allow_new_methods = 0;
 
@@ -20,10 +20,20 @@ sub new {
     Carp::croak("No module name provided to mock");
   }
 
-  if (!$self->{no_load}) {
-    my $module = $self->{module} . '.pm';
-    $module =~ s/::/\//g;
-    require $module;
+  my $module_location;
+  if ($self->{module_location}) {
+    $module_location = $self->{module_location};
+  }
+  else {
+    $module_location = $self->{module} . '.pm';
+    $module_location =~ s/::/\//g;
+  }
+
+  if ($self->{no_load}) {
+    $INC{$module_location} = 1;
+  }
+  else {
+    require $module_location;
   }
 
   $allow_new_methods = 1 if $self->{allow_new_methods} || $self->{no_load};
@@ -71,17 +81,17 @@ Test::Mock::Simple - A simple way to mock out parts of or a whole module.
 
   use Test::Mock::Simple;
 
-  my $total = 0; 
+  my $total = 0;
 
   # Original::Module has methods increase, decrease, and sum
   my $mock = Test::Mock::Simple->new(module => 'Original::Module');
-  $mock->add(increase => sub { shift; return $total += shift; }); 
-  $mock->add(decrease => sub { shift; return $total -= shift; }); 
-  
-  my $obj = Original::Module->new(); 
-  $obj->increase(5); 
-  $obj->decrease(2); 
-  print $obj->sum . "\n"; # prints 3 
+  $mock->add(increase => sub { shift; return $total += shift; });
+  $mock->add(decrease => sub { shift; return $total -= shift; });
+
+  my $obj = Original::Module->new();
+  $obj->increase(5);
+  $obj->decrease(2);
+  print $obj->sum . "\n"; # prints 3
 
 =head1 DESCRIPTION
 
@@ -136,6 +146,27 @@ being called.  This may change in later versions.
 
 =over 4
 
+=item module_location
+
+module_location expects a PATHNAME to the file (relative to the @INC paths) which
+contains the namespace (or module) that you want to mock.
+
+This is useful when a single file declares multiple namespaces or in the event of bad
+coding where the module's namespace does not map to the module's location.
+
+Example:
+
+  use Test::Mock::Simple;
+
+  my $mock = Test::Mock::Simple->new(
+    module          => 'Original::Module',
+    module_location => 'Modules/Orignal/Module.pm',
+  );
+
+=back
+
+=over 4
+
 =item allow_new_methods
 
 To create methods that do not exist in the module that is being mocked.
@@ -156,7 +187,9 @@ If this is not desired set no_load to 1 which will stop this from happening.
 If set then you are required to mock the whole module (or at least every command
 required for code to work).
 
-Setting no_load to 1 will force allow_new_methods to 1 as well.
+Setting no_load to 1 will force allow_new_methods to 1 as well. This is done since
+without the module actually loaded there is no way of knowing what methods the
+module has.
 
 =back
 
@@ -170,11 +203,11 @@ one.
 
 =head1 AUTHOR
 
-Erik Tank, E<lt>tank@jundy.com<gt>
+Erik Tank, E<lt>tank@jundy.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 by Erik Tank
+Copyright (C) 2020 by Erik Tank
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

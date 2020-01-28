@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testplan::VERSION = '5.0.10';
+$Tapper::Cmd::Testplan::VERSION = '5.0.11';
 use 5.010;
 use Moose;
 
@@ -64,7 +64,7 @@ sub add {
                 push @testrun_ids, @new_ids;
 
         }
-        return $instance->id;
+        return { testplan_id => $instance->id, testrun_ids => \@testrun_ids };
 }
 
 
@@ -223,9 +223,9 @@ instances in the database.
     use Tapper::Cmd::Testplan;
 
     my $cmd = Tapper::Cmd::Testplan->new();
-    my $plan_id = $cmd->add($plan);
-    $cmd->update($plan_id, $new_plan);
-    $cmd->del($plan_id);
+    my $res = $cmd->add($plan);
+    $cmd->update($res->{testplan_id}, $new_plan);
+    $cmd->del($res->{testplan_id});
 
     ...
 
@@ -376,7 +376,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

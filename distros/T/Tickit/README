@@ -4,23 +4,23 @@ NAME
 
 SYNOPSIS
 
-     use Tickit;
-     use Tickit::Widget::Box;
-     use Tickit::Widget::Static;
+       use Tickit;
+       use Tickit::Widget::Box;
+       use Tickit::Widget::Static;
     
-     my $box = Tickit::Widget::Box->new(
-        h_border => 4,
-        v_border => 2,
-        bg       => "green",
-        child    => Tickit::Widget::Static->new(
-           text     => "Hello, world!",
-           bg       => "black",
-           align    => "centre",
-           valign   => "middle",
-        ),
-     );
+       my $box = Tickit::Widget::Box->new(
+          h_border => 4,
+          v_border => 2,
+          bg       => "green",
+          child    => Tickit::Widget::Static->new(
+             text     => "Hello, world!",
+             bg       => "black",
+             align    => "centre",
+             valign   => "middle",
+          ),
+       );
     
-     Tickit->new( root => $box )->run;
+       Tickit->new( root => $box )->run;
 
 DESCRIPTION
 
@@ -81,35 +81,78 @@ CONSTRUCTOR
 
 METHODS
 
- later
+ watch_later
 
-       $tickit->later( $code )
+       $id = $tickit->watch_later( $code )
+
+    Since version 0.70.
 
     Runs the given CODE reference at some time soon in the future. It will
     not be invoked yet, but will be invoked at some point before the next
     round of input events are processed.
 
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
+ later
+
+       $tickit->later( $code )
+
+    For back-compatibility this method is a synonym for "watch_later".
+
+ watch_timer_at
+
+       $id = $tickit->watch_timer_at( $epoch, $code )
+
+    Since version 0.70.
+
+    Runs the given CODE reference at the given absolute time expressed as
+    an epoch number. Fractions are supported to a resolution of
+    microseconds.
+
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
+ watch_timer_after
+
+       $id = $tickit->watch_timer_after( $delay, $code )
+
+    Since version 0.70.
+
+    Runs the given CODE reference at the given relative time expressed as a
+    number of seconds hence. Fractions are supported to a resolution of
+    microseconds.
+
+    Returns an opaque integer value that may be passed to "watch_cancel".
+    This value is safe to ignore if not required.
+
  timer
 
-     $id = $tickit->timer( at => $epoch, $code )
+       $id = $tickit->timer( at => $epoch, $code )
     
-     $id = $tickit->timer( after => $delay, $code )
+       $id = $tickit->timer( after => $delay, $code )
 
-    Runs the given CODE reference at some fixed point in time in the
-    future. The first argmuent must be either the string at, or after; and
-    specifies that second argument gives either the absolute epoch time
-    ($epoch), or the delay relative to now ($delay), respectively.
-    Fractions are supported to a resolution of microseconds.
+    For back-compatibility this method is a wrapper for either
+    "watch_timer_at" or "watch_timer_after" depending on the first
+    argument.
 
     Returns an opaque integer value that may be passed to "cancel_timer".
     This value is safe to ignore if not required.
 
+ watch_cancel
+
+       $tickit->watch_cancel( $id )
+
+    Since version 0.70.
+
+    Removes an idle or timer watch previously installed by one of the other
+    watch_* methods. After doing so the code will no longer be invoked.
+
  cancel_timer
 
-     $tickit->cancel_timer( $id )
+       $tickit->cancel_timer( $id )
 
-    Removes a timer previously installed by "timer". After doing so the
-    code will no longer be invoked.
+    For back-compatibility this method is a synonym for "watch_cancel".
 
  term
 
@@ -135,7 +178,7 @@ METHODS
     Installs a callback to invoke if the given key is pressed, overwriting
     any previous callback for the same key. The code block is invoked as
 
-     $code->( $tickit, $key )
+       $code->( $tickit, $key )
 
     If $code is missing or undef, any existing callback is removed.
 
@@ -160,10 +203,21 @@ METHODS
 
  tick
 
-       $tickit->tick
+       $tickit->tick( $flags )
 
     Run a single round of IO events. Does not call setup_term or
     teardown_term.
+
+    $flags may optionally be a bitmask of the following exported constants:
+
+    RUN_NOHANG
+
+      Does not block waiting for IO; simply process whatever is available
+      then return immediately.
+
+    RUN_NOSETUP
+
+      Do not perform initial terminal setup before waiting on IO events.
 
  run
 
@@ -179,6 +233,21 @@ METHODS
 
     Causes a currently-running run method to stop processing events and
     return.
+
+MISCELLANEOUS FUNCTIONS
+
+ version_major
+
+ version_minor
+
+ version_patch
+
+       $major = Tickit::version_major()
+       $minor = Tickit::version_minor()
+       $patch = Tickit::version_patch()
+
+    These non-exported functions query the version of the libtickit library
+    that the module is linked to.
 
 AUTHOR
 

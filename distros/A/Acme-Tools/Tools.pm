@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package Acme::Tools;
 
-our $VERSION = '0.24';
+our $VERSION = '0.26';
 
 use 5.008;     #Perl 5.8 was released July 18th 2002
 use strict;
@@ -37,6 +37,8 @@ our @EXPORT = qw(
   eqarr
   sorted
   sortedstr
+  sortby
+  subarrays
   pushsort
   pushsortstr
   binsearch
@@ -54,6 +56,7 @@ our @EXPORT = qw(
   decode
   decode_num
   between
+  btw
   curb
   bound
   log10
@@ -87,6 +90,9 @@ our @EXPORT = qw(
   bunzip2
   ipaddr
   ipnum
+  ipnum_ok
+  iprange_ok
+  in_iprange
   webparams
   urlenc
   urldec
@@ -107,6 +113,9 @@ our @EXPORT = qw(
   range
   globr
   permutations
+  perm
+  permute
+  permute_continue
   trigram
   sliding
   chunks
@@ -117,6 +126,19 @@ our @EXPORT = qw(
   roman2int
   num2code
   code2num
+  dec2bin
+  dec2hex
+  dec2oct
+  bin2dec
+  bin2hex
+  bin2oct
+  hex2dec
+  hex2bin
+  hex2oct
+  oct2dec
+  oct2bin
+  oct2hex
+  base
   gcd
   lcm
   pivot
@@ -136,6 +158,7 @@ our @EXPORT = qw(
   sec_readable
   distance
   tms
+  s2t
   easter
   time_fp
   timems
@@ -176,10 +199,13 @@ our @EXPORT = qw(
   keysr
   valuesr
   eachr
+  joinr
+  pile
   aoh2sql
   aoh2xls
   base64
   unbase64
+  opts
   ed
   changed
   $Edcursor
@@ -328,15 +354,18 @@ C<num2code()> can be used to compress numeric IDs to something shorter:
 #Math::BaseCnv
 
 sub num2code {
+  return num2code($_[0],0,$_[1]) if @_==2;
   my($num,$digits,$validchars,$start)=@_;
   my $l=length($validchars);
   my $key;
+  $digits||=9e9;
   no warnings;
   croak if $num<$start;
   $num-=$start;
   for(1..$digits){
     $key=substr($validchars,$num%$l,1).$key;
     $num=int($num/$l);
+    last if $digits==9e9 and !$num;
   }
   croak if $num>0;
   return $key;
@@ -349,6 +378,63 @@ sub code2num {
   $num=$num*$l+index($validchars,$_) for split//,$code;
   return $num+$start;
 }
+
+=head2 base
+
+Numbers in any number system of base between 2 and 36. Using capital letters A-Z for base higher than 10.
+
+ base(2,15)                 # 1111  2 --> binary
+ base(8,4096)               # 10000 8 --> octal
+ base(10,4096)              # 4096 of course
+ base(16,254)               # FE   16 --> hex
+ base(16,254.3)             # FE   16 --> hex, can not handle decimal numbers (yet...todo)
+ base(36,123456)            # FE   16 --> hex, can not handle decimal numbers (yet...todo)
+ base(36,1234567891011)     # FR5HUHC3  base36 using all 0-9 and A-Z as digits, 10+26=36
+ base(37,1)                 # die with message 'base not 2-36'
+ base($x,0)                 # 0
+ base(16, 14,15,16,17)      # list of four elements: E F 10 11
+
+=head2 dec2bin dec2hex dec2oct bin2dec bin2hex bin2oct hex2dec hex2bin hex2oct oct2dec oct2bin oct2hex
+
+ print dec2bin(101);          # 1100101
+ print dec2hex(101);          # 65
+ print dec2oct(101);          # 145
+ print bin2dec(1010011110);   # 670
+ print bin2hex(1010011110);   # 29e
+ print bin2oct(1010011110);   # 1236
+ print hex2dec(101);          # 257
+ print hex2bin(101);          # 100000001
+ print hex2oct(101);          # 401
+ print oct2dec(101);          # 65
+ print oct2bin(101);          # 1000001
+ print oct2hex(101);          # 41
+
+=cut
+
+sub _base{my($b,$n)=@_;$n?_base($b,int$n/$b).chr(48+$n%$b+7*($n%$b>9)):''} #codegolf
+sub base {
+  my($b,$n)=@_;
+  @_>2        ? (map base($b,$_),@_[1..$#_])
+ :$b<2||$b>36 ? croak"base not 2-36"
+ :$n>0        ?     _base($b,$n)
+ :$n<0        ? "-"._base($b,-$n)
+ :!defined $n ? undef
+ :$n==0       ? 0
+ :              croak
+}
+
+sub dec2bin { sprintf"%b",shift           }
+sub dec2hex { sprintf"%x",shift           }
+sub dec2oct { sprintf"%o",shift           }
+sub bin2dec {             oct("0b".shift) }
+sub bin2hex { sprintf"%x",oct("0b".shift) }
+sub bin2oct { sprintf"%o",oct("0b".shift) }
+sub hex2dec {             hex(shift)      }
+sub hex2bin { sprintf"%b",hex(shift)      }
+sub hex2oct { sprintf"%o",hex(shift)      }
+sub oct2dec {             oct(shift)      }
+sub oct2bin { sprintf"%b",oct(shift)      }
+sub oct2hex { sprintf"%x",oct(shift)      }
 
 
 =head2 gcd
@@ -512,7 +598,9 @@ our $Resolve_time;
 
 #sub resolve(\[&$]@) {
 #sub resolve(&@) { <=0.17
-#todo: perl -MAcme::Tools -le 'print resolve(sub{$_[0]**2-9431**2});print$Acme::Tools::Resolve_iterations'
+#todo: perl -MAcme::Tools -le'print resolve(sub{$_[0]**2-9431**2});print$Acme::Tools::Resolve_iterations'
+#todo: perl -MAcme::Tools -le'sub d{5.3*1.0094**$_[0]-10.2*1.0072**$_[0]} print resolve(\&d)' #err, pop norway vs sweden
+#todo: perl -MAcme::Tools -le' print resolve(sub{5.3*1.0094**$_[0]-10.2*1.0072**$_[0]})' #err, pop norway vs sweden
 #    =>Div by zero: df(x) = 0 at n'th iteration, n=0, delta=0.0001, fx=CODE(0xc81d470) at -e line 1
 #todo: ren solve?
 sub resolve {
@@ -715,6 +803,8 @@ our %conv=(
 		  _m      => 1,
 		  meter   => 1,
 		  meters  => 1,
+		  metre   => 1,
+		  metres  => 1,
 		  km      => 1000,
 		  mil     => 10000,                   #scandinavian #also: inch/1000!
 		  in      => 0.0254,
@@ -742,62 +832,83 @@ our %conv=(
                   nmi                => 1852,           #nautical mile
                   'nautical mile'    => 1852,
                   'nautical miles'   => 1852,
+		  micron             => 1e-6,
+		  microns            => 1e-6,
+		  micrometre         => 1e-6,
+		  micrometres        => 1e-6,
                   'Å'                => 1e-10,
                   'ångstrøm'         => 1e-10,
                   'angstrom'         => 1e-10,
+		  fm                 => 1e-15,
+		  fermi              => 1e-15, #in honour of Enrico Fermi
+		  fermis             => 1e-15, #in honour of Enrico Fermi
+		  femtometer         => 1e-15, #derived from "femten" (=fifteen in Norwegian and Danish)
+		  femtometre         => 1e-15,
+		  femtometers        => 1e-15, #derived from "femten" (=fifteen in Norwegian and Danish)
+		  femtometres        => 1e-15,
+		  attometer          => 1e-18, #derived from "atten/atton" (=eighteen)
+		  attometre          => 1e-18,
+		  attometers         => 1e-18, #derived from "atten/atton" (=eighteen)
+		  attometres         => 1e-18,
 		  ly                 => 299792458*3600*24*365.25,
 		  lightyear          => 299792458*3600*24*365.25, # = 9460730472580800 by def
 		  ls                 => 299792458,      #light-second
-                  pc                 => 3.0857e16,      #3.26156 ly
-                 _pc                 => 3.0857e16,      #3.26156 ly
-                  parsec             => 3.0857e16,
-                  au                 => 149597870700, # by def, earth-sun
+                  au                 => 149597870700,   # by def: meters earth to sun
+                  astronomical_unit  => 149597870700,
                  'astronomical unit' => 149597870700,
+                  pc                 => 149597870700*648000/$PI, #3.0857e16 = 3.26156 ly
+                 _pc                 => 149597870700*648000/$PI,
+                  parsec             => 149597870700*648000/$PI,
+		  attoparsec         => 149597870700*648000/$PI/1e18,
+		  apc                => 149597870700*648000/$PI/1e18,
 		  planck             => 1.61619997e-35, #planck length
 		  #Norwegian (old) lengths:
-		  tomme   => 0.0254,
-		  tommer  => 0.0254,
-		  fot     => 0.0254*12,               #0.3048m
-		  alen    => 0.0254*12*2,             #0.6096m
-		  favn    => 0.0254*12*2*3,           #1.8288m
-		  kvart   => 0.0254*12*2/4,           #0.1524m a quarter alen
+		  tomme         => 0.0254,
+		  tommer        => 0.0254,
+		  fot           => 0.0254*12,               #0.3048m
+		  alen          => 0.0254*12*2,             #0.6096m
+		  favn          => 0.0254*12*2*3,           #1.8288m
+		  kvart         => 0.0254*12*2/4,           #0.1524m a quarter alen
                   #--https://upload.wikimedia.org/wikipedia/commons/e/eb/English_length_units_graph.svg
-                  twip          => 0.254 / 6 / 12 / 20,
-                  point         => 0.254 / 6 / 12,
-                  pica          => 0.254 / 6,
-                  line          => 0.254 / 12,
-                  barleycorn    => 0.254 / 3,
-                  poppyseed     => 0.254 / 3 / 4,
-                  finger        => 0.254 / 6 / 12 * 63,
-                  palm          => 0.254 * 3,
-                  digit         => 0.254 * 3 / 4,
-                  nail          => 0.254 * 3 / 4 * 3,
-                  stick         => 0.254 * 2,
-                  hand          => 0.254 * 2 * 2,
-                  foot          => 0.254 * 2 * 2 * 3,
-                  shaftment     => 0.254 * 3 * 2,
-                  span          => 0.254 * 3 * 3,
-                  ell           => 0.254 * 3 * 3 * 5,
-                  pace          => 0.254 * 3 * 2 * 5,
-                  step          => 0.254 * 3 * 2 * 5,
-                  cubit         => 0.254 * 3 * 2 * 3,
-                  rod           => 0.254 * 3 * 2 * 3 * 11,
-                  link          => 0.254 * 3 * 2 * 3 * 11 / 25,
-                  yard          => 0.254 * 2 * 2 * 3 * 3,
-                  grade         => 0.254 * 3 * 2 * 5 * 2,
-                  rope          => 0.254 * 3 * 2 * 5 * 2 * 4,
-                  skein         => 0.254 * 3 * 3 * 5 * 96,                   # 96 ell
-                  fathom        => 0.254 * 2 * 2 * 3 * 3 * 2,                # 2 yard
-                  spindle       => 0.254 * 3 * 3 * 5 * 96 * 120,             # 120 skein
-                  gunter_chain  => 0.254 * 2 * 2 * 3 * 3 * 2 * 11,           # 11 fathom
-                  ramsden_chain => 0.254 * 3 * 2 * 5 * 2 * 4 * 5,            # 5 rope
-                  shackle       => 0.254 * 2 * 2 * 3 * 3 * 2 * 15,           # 15 fathom
-                  cable         => 0.254 * 2 * 2 * 3 * 3 * 2 * 100,          # 100 fathom
-                  furlong       => 0.254 * 2 * 2 * 3 * 3 * 2 * 11 * 10,      # 10 gunter_chain, 220 yard
-                  roman_mile    => 0.254 * 3 * 2 * 5 * 2 * 4 * 5 * 50,       # 50 ramsden_chain
-                  statute_mile  => 0.254 * 2 * 2 * 3 * 3 * 2 * 11 * 10 * 8,  # 8 furlong
-                  nautic_mile   => 0.254 * 2 * 2 * 3 * 3 * 2 * 100 * 10,     # 10 cable
-                  league        => 0.254 * 2 * 2 * 3 * 3 * 2 * 100 * 10 * 5, # 5 nautic_mile
+                  twip          => 0.0254 / 6 / 12 / 20,
+                  point         => 0.0254 / 6 / 12,
+                  pica          => 0.0254 / 6,
+                  line          => 0.0254 / 12,
+		  thou          => 0.0254 / 1000,
+                  barleycorn    => 0.0254 / 3,
+                  poppyseed     => 0.0254 / 3 / 4,
+                  finger        => 0.0254 / 6 / 12 * 63,
+                  palm          => 0.0254 * 3,
+                  digit         => 0.0254 * 3 / 4,
+                  nail          => 0.0254 * 3 / 4 * 3,
+                  rack          => 0.0254 * 1.75,
+                  stick         => 0.0254 * 2,
+                  hand          => 0.0254 * 2 * 2,
+                  foot          => 0.0254 * 2 * 2 * 3,
+                  shaftment     => 0.0254 * 3 * 2,
+                  span          => 0.0254 * 3 * 3,
+                  ell           => 0.0254 * 3 * 3 * 5,
+                  pace          => 0.0254 * 3 * 2 * 5,
+                  step          => 0.0254 * 3 * 2 * 5,
+                  cubit         => 0.0254 * 3 * 2 * 3,
+                  rod           => 0.0254 * 3 * 2 * 3 * 11,
+                  link          => 0.0254 * 3 * 2 * 3 * 11 / 25,
+		  yard          => 0.0254 * 2 * 2 * 3 * 3,
+                  grade         => 0.0254 * 3 * 2 * 5 * 2,
+                  rope          => 0.0254 * 3 * 2 * 5 * 2 * 4,
+                  skein         => 0.0254 * 3 * 3 * 5 * 96,                   # 96 ell
+                  fathom        => 0.0254 * 2 * 2 * 3 * 3 * 2,                # 2 yard
+                  spindle       => 0.0254 * 3 * 3 * 5 * 96 * 120,             # 120 skein
+                  gunter_chain  => 0.0254 * 2 * 2 * 3 * 3 * 2 * 11,           # 11 fathom
+                  ramsden_chain => 0.0254 * 3 * 2 * 5 * 2 * 4 * 5,            # 5 rope
+                  shackle       => 0.0254 * 2 * 2 * 3 * 3 * 2 * 15,           # 15 fathom
+                  cable         => 0.0254 * 2 * 2 * 3 * 3 * 2 * 100,          # 100 fathom
+                  furlong       => 0.0254 * 2 * 2 * 3 * 3 * 2 * 11 * 10,      # 10 gunter_chain, 220 yard
+                  roman_mile    => 0.0254 * 3 * 2 * 5 * 2 * 4 * 5 * 50,       # 50 ramsden_chain
+                  statute_mile  => 0.0254 * 2 * 2 * 3 * 3 * 2 * 11 * 10 * 8,  # 8 furlong
+                  nautic_mile   => 0.0254 * 2 * 2 * 3 * 3 * 2 * 100 * 10,     # 10 cable
+                  league        => 0.0254 * 2 * 2 * 3 * 3 * 2 * 100 * 10 * 5, # 5 nautic_mile
+		  siriometer    => 149597870700*1e6,                          # 1 million astronomical units
 		 },
 	 mass  =>{ #https://en.wikipedia.org/wiki/Unit_conversion#Mass
 		  g            => 1,
@@ -810,32 +921,33 @@ our %conv=(
 		  tonn         => 1000000,
 		  tonne        => 1000000,
 		  tonnes       => 1000000,
-		  seer         => 933.1,         #~14400 grains (if 933.104304), India, Aden, Saudi-Arabia
-		  maund        => 37320,         #avg of Indias different mauds, ~ 40 x seer
-		  lb           => 453.59237,
+		  seer         => 933.1,          # ~14400 grains (if 933.104304), India, Aden, Saudi-Arabia
+		  maund        => 37320,          # avg of Indias different mauds, ~ 40 x seer
+		  lb           => 453.59237,      # ~453g
 		  lbs          => 453.59237,
+		  lbm          => 453.59237,
 		  lb_av        => 453.59237,
-		  lb_t         => 373.2417216,   #5760 grains
-		  lb_troy      => 373.2417216,
-		  pound        => 453.59237,     #7000 grains
+		  lb_t         => 373.2417216,
+		  lb_troy      => 373.2417216,    # 5760 grains = 453.59237*144/175
+		  pound        => 453.59237,      # 7000 grains
 		  pounds       => 453.59237,
                   pound_av     => 453.59237,
-                  pound_troy   => 373.2417216,
-                  pound_metric => 500,
-		  ounce        => 28,            # US food, 28g
-		  ounce_av     => 453.59237/16,  # avoirdupois  lb/16 = 28.349523125g
-		  ounce_troy   => 31.1034768,    # lb_troy / 12
-		  oz           => 28,            # US food, 28g
-		  oz_av        => 453.59237/16,  # avoirdupois  lb/16 = 28.349523125g
-		  oz_t         => 31.1034768,    # lb_troy / 12,
-		  grain        => 64.79891/1000, # 453.59237/7000
+                  pound_troy   => 373.2417216,    # ~373g
+                  pound_metric => 500,            # 0.5kg
+		  ounce        => 28,             # US food, 28g
+		  ounce_av     => 453.59237/16,   # avoirdupois  lb/16 = 28.349523125g
+		  ounce_troy   => 31.1034768,     # lb_troy / 12
+		  oz           => 28,             # US food, 28g
+		  oz_av        => 453.59237/16,   # avoirdupois  lb/16 = 28.349523125g
+		  oz_t         => 31.1034768,     # lb_troy / 12,
+		  grain        => 453.59237/7000, # 64.79891/1000, # 
 		  grains       => 64.79891/1000,
                   pennyweight  => 31.1034768 / 20,
                   pwt          => 31.1034768 / 20,
                   dwt          => 31.1034768 / 20,
-                  st           => 6350.29318,               # 14 lb_av
-                  stone        => 6350.29318,
-		  wey          => 114305.27724,             # 252 lb  =  18 stone
+                  stone        => 453.59237*14,             # 6.35029318 kg
+                  st           => 453.59237*14,             # 14 lb_av
+		  wey          => 453.59237*14*18,          # 252 lb = 18 stone = 114.30527724 kg
                   carat        => 0.2,
                   ct           => 0.2,                      #carat (metric)
                   kt           => 64.79891/1000 * (3+1/6),  #carat/karat
@@ -848,7 +960,8 @@ our %conv=(
 		  electronvolt => 1.78266172802679e-33,
                  'solar mass'  => 1.99e33,
                   solar_mass   => 1.99e33,
-                  bag          => 60*1000, #60kg coffee
+                  bag          => 60*1000,           #60kg coffee
+		  firkin       => 90 * 453.59237,    #90lb
 		 },
 	 area  =>{               # https://en.wikipedia.org/wiki/Unit_conversion#Area
                   m2      => 1,
@@ -875,9 +988,13 @@ our %conv=(
                   hektar  => 10000,
                   hectare => 10000,
                   hectares=> 10000,
+                  in2     => 0.0254**2,
+                  inch2   => 0.0254**2,
                   ft2     => (0.0254*12)**2,
                   sqft    => (0.0254*12)**2,
 		  mi2     => 1609.344**2,
+		  mile2   => 1609.344**2,
+		  miles2  => 1609.344**2,
 		  sqmi    => 1609.344**2,
                   yd2     => (0.0254*12*3)**2, #square yard
                   sqyd    => (0.0254*12*3)**2,
@@ -912,55 +1029,63 @@ our %conv=(
                   barn      => 1e-28,       #physics
                   outhouse  => 1e-34,       #physics
                   shed      => 1e-52,       #physics
+		  brass     => 100*(0.0254*12)**2, #100 square feet ~ 9.29 m2
+		  square    => 100*(0.0254*12)**2, #100 square feet ~ 9.29 m2
+		  morgen    => 0.856532 * 10000,   #0.856532 hectares
+		  bornholm  => 588.36e6,           #area of danish island bornholm, 588km2
+		  texas     => 695670e6,           #area of texas, 695 670 square km
         	 },
 	 volume=>{
-		  l         => 1,
-		  L         => 1,
-		  _L        => 1,
-		  _l        => 1,
-		  liter     => 1,
-		  liters    => 1,
-		  litre     => 1,
-		  litres    => 1,
-		  gal       => 231*2.54**3/1000, #3.785411784, #231 cubic inches
-		  gallon    => 231*2.54**3/1000,
-		  gallons   => 231*2.54**3/1000,
-		  gallon_us => 231*2.54**3/1000, #231 cubic inches
-		  gallon_wine=>231*2.54**3/1000,
-		  gallon_uk => 4.54609,
-		  gallon_imp=> 4.54609,
-		  gallon_us_dry => 4.40488377086, # ~ 9.25**2*pi*2.54**3/1000 L
+		  m3            => 1,                #1000 L
+		  l             => 0.001,
+		  L             => 0.001,
+		  _L            => 0.001,
+		  _l            => 0.001,
+		  liter         => 0.001,
+		  liters        => 0.001,
+		  litre         => 0.001,
+		  litres        => 0.001,
+		  gal           => 231 * 0.0254**3, #3.785411784 L = 0.003785411784 m3, #231 cubic inches
+		  gallon        => 231 * 0.0254**3,
+		  gallons       => 231 * 0.0254**3,
+		  gallon_us     => 231 * 0.0254**3, #231 cubic inches
+		  gallon_wine   => 231 * 0.0254**3, #queen anne's gallon
+		  gallon_ale    => 282 * 0.0254**3, #beer
+		  gallon_corn   => 268.8*0.0254**3, #corn, or winchester gallon
+		  gallon_uk     => 4.54609/1000,    #constant 4.54609 from definition
+		  gallon_imp    => 4.54609/1000,    #imperial
+		  gallon_us_dry => 4.40488377086/1000, # ~ 9.25**2*pi*2.54**3/1000 L
 		  #hogshead, gill, pail, jigger, jackpot, The Science of Measurement - A Historical Survey (Klein)
-		  m3        => 10**3,      #1000 L
-		  cm3       => 0.1**3,     #0.001 L
-                  in3       => 0.254**3,   #0.016387064 L
-                  ft3       => (0.254*12)**3,
+		  cm3       => 0.01**3,               #0.001 L
+                  in3       => 0.0254**3,             #0.016387064 L
+                  ft3       => (0.0254*12)**3,
 		  tablespoon=> 3.785411784/256,       #14.78676478125 mL
 		  tsp       => 3.785411784/256/3,     #4.92892159375 mL
 		  teaspoon  => 3.785411784/256/3,     #4.92892159375 mL
                   floz      => 3.785411784/128,       #fluid ounce US
                   floz_uk   => 4.54609/160,           #fluid ounce UK
-                  pint      => 4.54609/8,             #0.56826125 L
-                  pint_uk   => 4.54609/8,
-                  pint_imp  => 4.54609/8,
-                  pint_us   => 3.785411784/8,         #0.473176473
-		  quart     => 4.54609/4,             #2*pint
-		  pottle    => 4.54609/2,             #2*quart = gallon_uk/2
-		  therm     => 2.74e3,                #? 100000BTUs?   (!= thermie)
-		  thm       => 2.74e3,                #?               (!= th)
-                  fat       => 42*231*2.54**3/1000,
-                  bbl       => 42*231*2.54**3/1000,   #oil barrel ~159 liters https://en.wikipedia.org/wiki/Barrel_(unit)
-		  Mbbl      => 42*231*2.54**3,        #mille (thousand) oil barrels
-		  MMbbl     => 42*231*2.54**3*1000,   #mille mille (million) oil barrels
-		  drum      => 200,
+                  pint      => 4.54609/8000,          #0.56826125 L
+                  pint_uk   => 4.54609/8000,
+                  pint_imp  => 4.54609/8000,
+                  pint_us   => 3.785411784/8000,      #0.473176473
+		  quart     => 4.54609/4000,             #2*pint
+		  pottle    => 4.54609/2000,             #2*quart = gallon_uk/2
+		 #therm     => 2.74,                #? 100000BTUs?   (!= thermie)
+		 #thm       => 2.74,                #?               (!= th)
+                  fat       => 42*231*2.54**3/1e6,
+                  bbl       => 42*231*2.54**3/1e6,  #oil barrel ~159 liters https://en.wikipedia.org/wiki/Barrel_(unit)
+		  Mbbl      => 42*231*2.54**3/1e3,  #mille (thousand) oil barrels, M er mille her, ikke mega!
+		  MMbbl     => 42*231*2.54**3,      #mille mille (million) oil barrels
+		  drum      => 0.208,               #208 L
 		  container     => 33.1e3,  #container20
 		  container20   => 33.1e3,
 		  container40   => 67.5e3,
 		  container40HC => 75.3e3,
 		  container45HC => 86.1e3,
+		  firkin        => 282*0.0254**3 * 8, #8 gallon_ale
 		  #Norwegian:
-                  meterfavn => 2 * 2 * 0.6,           #ved 2.4 m3
-                  storfavn  => 2 * 2 * 3,             #ved 12 m3
+                  meterfavn => 2 * 2 * 0.6,           #fire wood/ved 2.4 m3
+                  storfavn  => 2 * 2 * 3,             #fire wood/ved 12 m3
 		 },
 	 time  =>{
 		  s           => 1,
@@ -1013,6 +1138,8 @@ our %conv=(
 		  ke          => 864,      #1/100th of a day, trad Chinese, 14m24s
 		  fortnight   => 14*24*3600,
                   tp          => 5.3910632e-44,  #planck time, time for ligth to travel 1 planck length
+		  nanocentury =>  100 * 60*60*24*365.2425 / 1e9,   #3.156 ~ pi seconds, response time limit (usability)
+		  warhol      => 15*60,                            #"fifteen minutes of fame"
 		 },
           speed=>{
                  'm/s'      => 1,
@@ -1023,7 +1150,7 @@ our %conv=(
                   kmh       => 1/3.6,
                   kmph      => 1/3.6,
                  'km/h'     => 1/3.6,
-                  kmt       => 1/3.6, # t=time or temps (scandinavian and french and dutch)
+                  kmt       => 1/3.6, # t=time(=hour) or temps (scandinavian and french and dutch)
                  'km/t'     => 1/3.6,
  		  kt        => 1852/3600,
  		  kts       => 1852/3600,
@@ -1031,7 +1158,7 @@ our %conv=(
  		  knot      => 1852/3600,
  		  knots     => 1852/3600,
  		  knop      => 1852/3600,    #scandinavian
-		  c         => 299792458,    #speed of light
+		  c         => 299792458,    #speed of light, exact due to definition of meter
 		  mach      => 340.3,        #speed of sound
 		  machs     => 340.3,
                   fps       => 0.3048, #0.0254*12
@@ -1119,8 +1246,6 @@ our %conv=(
                    _eV          => 1.60217656535e-19,
                    BeV          => 1.60217656535e-10,
   		   electronvolt => 1.60217656535e-19,
-                   thermie      => 4.1868e6,
-                   th           => 4.1868e6,
 		   hph          => 3600*746,
 		   PSh          => 3600*746/1.014,
 		   galatm_imp   => 460.63256925,
@@ -1129,11 +1254,15 @@ our %conv=(
 		   Ry           => 2.179872e-18,
 		   rydberg      => 2.179872e-18,
 		   th           => 4.1868e6,
+		   thm          => 4.1868e6,
+		   therm        => 4.1868e6,
 		   thermie      => 4.1868e6,
-                   boe          => 6.12e9,            #barrel of oil equivalent
-		   TCE          => 29.288e9,          #ton of coal equivalent
-		   toe          => 41.868e9,          #tonne of oil equivalent
-		   tTNT         => 4.184e9,           #ton of TNT equivalent
+                   boe          => 6.12e9,         #barrel of oil equivalent
+		   TCE          => 29.288e9,       #ton of coal equivalent
+		   toe          => 41.868e9,       #tonne of oil equivalent
+		   tTNT         => 4.184e9,        #ton of TNT equivalent
+		   CMO          => 4.454e13*3.6e6, #cubic mile of oil = 4.454*10^13 kWh
+		   CKO          => 4.454e13*3.6e6*1.609344**3, #cubic km   of oil
                  },
          force=> {
 	          newton=> 1,
@@ -1361,7 +1490,7 @@ sub conv {
   my @type=intersect(@types);
   push @err, "from=$from and to=$to has more than one possible conversions: ".join(", ", @type) if @type>1;
   push @err, "from $from (".(join(",",@{$types[0]})||'?').") and "
-              ."to $to ("  .(join(",",@{$types[1]})||'?').") has no known common unit type.\n" if @type<1;
+              ."to $to ("  .(join(",",@{$types[1]})||'?').") has no known common dimension (unit type).\n" if @type<1;
   croak join"\n",map"conv: $_",@err if @err;
   my $type=$type[0];
   conv_prepare_money()        if $type eq 'money' and time() >= $conv_prepare_money_time + $Currency_rates_expire;
@@ -1449,8 +1578,8 @@ Examples:
  print bytes_readable(1181116006.4);                     # 1.10 GB
  print bytes_readable(1209462790553.6);                  # 1.10 TB
  print bytes_readable(1088516511498.24*1000);            # 990.00 TB
- print bytes_readable(1088516511498.24*1000,3);          # 990.000 TB
- print bytes_readable(1088516511498.24*1000,1);          # 990.0 TB
+ print bytes_readable(1088516511498.24*1000, 3);         # 990.000 TB
+ print bytes_readable(1088516511498.24*1000, 1);         # 990.0 TB
 
 =cut
 
@@ -1584,6 +1713,7 @@ sub int2roman {
       $n
      }
 }
+sub int2roman_golfed{my$r='I'x pop;for(qw(IVX XLC CDM)){my($I,$V,$X)=split//;$r=~s,$I$I$I$I($I?),$1?$V:"$I$V",ge;$r=~s,$V($I?)$V,$1$X,g}$r}
 
 sub roman2int {
   my($r,$n,%c)=(shift,0,'',0,qw/I 1 V 5 X 10 L 50 C 100 D 500 M 1000/);
@@ -1839,22 +1969,52 @@ B<Output:> True or false (1 or 0)
 
 =cut
 
-our $Re_isnum=qr/^ \s* [\-\+]? (?: \d*\.\d+ | \d+ ) (?:[eE][\-\+]?\d+)?\s*$/x;
+our $Re_isnum     =qr/^ \s* [\-\+]? (?: \d*\.\d+ | \d+ ) (?:[eE][\-\+]?\d+)?\s*$/x;
+our $Re_isnum_wolz=qr/^ \s* [\-\+]? (?: ([1-9]\d*|0)?\.\d+ | [1-9]\d* | 0 ) (?:[eE][\-\+]?\d+)?\s*$/x; #without leading zero
 sub isnum {(@_?$_[0]:$_)=~$Re_isnum}
 
 =head2 between
 
 Input: Three arguments.
 
-Returns: Something I<true> if the first argument is numerically between the two next.
+Returns: Something I<true> if the first argument is numerically between the two next. Uses Perls C<< < >>, C<< >= >> and C<< <= >> operators.
+
+=head2 btw
+
+Like L<between> but instead of assuming numbers it checks all three input args
+and does alphanumerical comparisons (with Perl operators C<lt>, C<ge> and C<le>) if any of the
+three input args don't look like a number or look like a number but with
+one or more leading zeros.
+
+ btw(1,1,10)             #true numeric order since all three looks like number according to =~$Re_isnum
+ btw(1,'02',13)          #true leading zero in '02' leads to alphabetical order
+ btw(10, 012,10)         #true leading zero here means oct number, 012 = 10 (8*1+2), so 10 is btw 10 and 10
+ btw('003', '02', '09')  #false because '003' lt '02'
+ btw('a', 'b', 'c')      #false because 'a' lt 'b'
+ btw('a', 'B', 'c')      #true because upper case letters comes before lower case ones in the "ascii alphabet"
+ btw('a', 'c', 'B')      #true, btw() and between switches from and to if the first is > the second
+ btw( -1, -2, 1)         #true
+ btw( -1, -2, 0)         #true
+
+Both between and btw returns C<undef> if any of the three input args are C<undef> (not defined).
+If you're doing only numerical comparisons, using C<between> is faster than C<btw>.
 
 =cut
 
 sub between {
   my($test ,$fom, $tom)=@_;
-  no warnings;
-  $fom<$tom ? $test>=$fom && $test<=$tom
-            : $test>=$tom && $test<=$fom;
+  return if !defined$test or !defined$fom or !defined$tom;
+  $fom < $tom ? $test >= $fom && $test <= $tom : $test >= $tom && $test <= $fom;
+}
+
+sub btw {
+  my($test,$fom,$tom)=@_;
+  return if !defined$test or !defined$fom or !defined$tom;
+  $fom =~ $Re_isnum_wolz &&
+  $tom =~ $Re_isnum_wolz &&
+  $test=~ $Re_isnum_wolz
+  ? $fom <  $tom ? $test >= $fom && $test <= $tom : $test >= $tom && $test <= $fom
+  : $fom lt $tom ? $test ge $fom && $test le $tom : $test ge $tom && $test le $fom 
 }
 
 =head2 curb
@@ -1891,17 +2051,17 @@ sub bound { curb(@_) }
 
 =head2 logn
 
-print log10(1000);           # prints 3
-print log10(10000*sqtr(10)); # prints 4.5
-print log2(16);              # prints 4
-print logn(4096, 8);         # prints 4 (12/3=4)
-print logn($PI, 2.71828182845905);  # same as  print log($PI)  using perls builtin log()
+ print log10(1000);                  # prints 3
+ print log10(10000*sqtr(10));        # prints 4.5
+ print log2(16);                     # prints 4
+ print logn(4096, 8);                # prints 4 (12/3=4)
+ print logn($PI, 2.71828182845905);  # same as  print log($PI)  using perls builtin log()
 
 =cut
 
-sub log10 { log($_[0])/log(10) }
-sub log2  { log($_[0])/log(2)  }
-sub logn  { log($_[0])/log($_[1]) }
+sub log10 { log($_[0]) / log(10)    }
+sub log2  { log($_[0]) / log(2)     }
+sub logn  { log($_[0]) / log($_[1]) }
 
 =head1 STRINGS
 
@@ -2287,28 +2447,30 @@ Todo: more doc
 
 =cut
 
+#Todo:
+#peat -le'print join", ",sim("GskOk",[zip([qw(Gsk_ok Vgdoknr Personnavn Adferdkode Ordenkode G_kok)],[0..5])],0.7,0.127)'
+#Use of uninitialized value in subroutine entry at /usr/local/share/perl/5.22.1/Acme/Tools.pm line 2365.
+#Use of uninitialized value $simlikest in numeric ge (>=) at /usr/local/share/perl/5.22.1/Acme/Tools.pm line 2366.
+#Use of uninitialized value in subroutine entry at /usr/local/share/perl/5.22.1/Acme/Tools.pm line 2365.
+#Use of uninitialized value $simnestlikest in numeric ge (>=) at /usr/local/share/perl/5.22.1/Acme/Tools.pm line 2372.
+
 sub sim {
   require String::Similarity;
   my($str,@r)=@_;
-  @r==1 and return String::Similarity::similarity(@_); #to param
+  return String::Similarity::similarity(@_) if @r==1; #to param
   my($min,$mindiff);
   if(ref($r[0]) eq 'ARRAY'){
     ($min,$mindiff)=@r[1,2];
     @r=@{$r[0]};
   }
-  $min||=0;
-  my $likest;
-  my $simlikest;
-  my $simnestlikest;
-  my $idlikest;
+  $min//=0;
+  my($simlikest,$simnestlikest,$likest,$idlikest)=(-1,-1);
   for(@r){
     my($s,$id)=ref($_) eq 'ARRAY' ? @$_ : ($_);
-    my $sim=String::Similarity::similarity($str,$s,$simnestlikest);
+    my $sim=String::Similarity::similarity($str,$s,$simnestlikest//0);
     if($sim>=$simlikest){
-      $simnestlikest=$simlikest;
-      $likest=$s;
-      $simlikest=$sim;
-      $idlikest=$id if defined $id;
+      ($simnestlikest,$likest,$simlikest)=($simlikest,$s,$sim);
+      $idlikest=$id if defined$id;
     }
     elsif($sim>=$simnestlikest){
       $simnestlikest=$sim;
@@ -2342,20 +2504,19 @@ While sim() is case sensitive, sim_perm() is not.
  Humfrey DeForest Boghart           BOGART HUMPHREY                        0.05       0.87
  Humphrey                           Bogart Humphrey                        0.70       1.00
  Humfrey Deforest Boghart           BOGART D. HUMFREY                      0.15       0.78 *)
+ Presley, Elvis Aaron               Elvis Presley                          0.424242   1.00
 
 sim_perm() was written to identify double-profiles in databases: two people with
 either the same (or similar) email or phone number or zip code and similar enough
 names are going on the list of probable doubles.
 
-*) Todo: should be higher than 0.78, deal with initials better
+*) Todo: deal with initials better, should be higher than 0.78
 
 =cut
 
 sub sim_perm {
   require String::Similarity;
-  my($s1,$s2)=map upper($_), @_;
-  $s1=~s/^\s*(.+?)\s*$/$1/;
-  $s2=~s/^\s*(.+?)\s*$/$1/;
+  my($s1,$s2)=map s/^\s*(.+?)\s*$/$1/r, map upper($_), @_;
   croak if not length($s1) or not length($s2);
   my $max;
   for(cart([permutations(split(/[\s,]+/,$s1))],
@@ -2394,6 +2555,7 @@ Same as pushsort except that the array is kept sorted alphanumerically (cmp) ins
 
 =cut
 
+#todo: use List::BinarySearch::XS 'binsearch_pos';
 our $Pushsort_cmpsub=undef;
 sub pushsort (\@@) {
   my $ar=shift;
@@ -2674,13 +2836,44 @@ Return true if the input array is I<alpha>numerically sorted.
 
 sub sorted (\@@) {
   my($a,$cmpsub)=@_;
-  for(0..$#$a-1){
-    return 0 if !$cmpsub and $$a[$_]>$$a[$_+1]
-             or  $cmpsub and &$cmpsub($$a[$_],$$a[$_+1])>0;
-  }
+  if($cmpsub){ &$cmpsub($$a[$_],$$a[$_+1])>0 and return 0 for 0..$#$a-1 }
+  else       { $$a[$_] > $$a[$_+1]           and return 0 for 0..$#$a-1 }
   return 1;
 }
-sub sortedstr { sorted(@_,sub{$_[0]cmp$_[1]}) }
+#sub sortedstr { sorted(@_,sub{$_[0]cmp$_[1]}) }
+sub sortedstr { $_[$_] gt $_[$_+1] and return 0 for 0..$#$_-1; return 1 }
+
+sub sortby {
+    my($arr,@by)=@_;
+    die if grep/^-/,@by; #hm 4now todo! - dash meaning descending order
+    my $pattern=join(" ",map"%-40s",@by);#hm 4now bad, cant handle numeric sort
+    map$$_[0],
+    sort{$$a[1]cmp$$b[1]}
+    map[$_,sprintf($pattern,@$_{@by})],
+    @$arr;
+}
+
+
+=head2 subarrays
+
+Returns all 2^n-1 combinatory subarrays of an array where each element
+of input array participates or not. Note: The empty array is not among
+the returned arrayrefs unless an empty input is given.
+
+ my @a = subarrays( 'a', 'b', 'c' );         # same as:
+ my @a = ( ['a'    ],
+           [    'b'],
+           ['a','b'],
+           [        'c'],
+           ['a',    'c'],
+           [    'b','c'],
+           ['a','b','c'] );
+
+ sub subarrays { map { my $n = 2*$_; [ grep {($n/=2)%2} @_ ] } 1 .. 2**@_-1 } #implemented as
+
+=cut
+
+sub subarrays { map { my $n = 2*$_; [ grep {($n/=2)%2} @_ ] } 1 .. 2**@_-1 }
 
 =head2 part
 
@@ -2700,7 +2893,7 @@ whether the predicate (a code-ref) is true or false for that element.
 
 =head2 parth
 
-Like C<part> but returns any number of lists.
+Like C<part> but returns any number of lists. Not just two. Sort of like I<group by> in SQL.
 
 B<Input:> A code-ref and a list
 
@@ -2714,11 +2907,11 @@ Result:
  %hash = (  T=>['These','the','this'],
             A=>['are','array'],
             O=>['of'],
-            W=>['words']                )
+            W=>['words']  )
 
 =head2 parta
 
-Like L<parth> but returns an array of lists.
+Like L<parth> but returns an array of lists where the predicate returns an index number.
 
  my @a = parta { length } qw/These are the words of this array/;
 
@@ -2800,6 +2993,8 @@ sub refhh { ref($_[0]) eq 'HASH'   ? refh((values%{$_[0]})[0]) : ref($_[0]) ? 0 
 
 =head2 eachr
 
+=head2 joinr
+
 In Perl versions 5.12 - 5.22 push, pop, shift, unshift, splice, keys, values and each
 handled references to arrays and references to hashes just as if they where arrays and hashes. Examples:
 
@@ -2824,9 +3019,26 @@ sub valuesr  { values( %{shift()} )    }
 sub eachr    { ref($_[0]) eq 'HASH'  ? each(%{shift()})
              #:ref($_[0]) eq 'ARRAY' ? each(@{shift()})  # perl 5.8.8 cannot compile each on array! eval?
 		   :                        croak("eachr needs hashref or arrayref got '".ref($_[0])."'") }
+sub joinr    {join(shift(),@{shift()})}
 #sub mapr    # som scala: hvis map faar subref se kalles den sub paa hvert elem og resultatet returneres
 
 #sub eachr    { each(%{shift()}) }
+
+=head2 pile
+
+B<Input:> a pile size s and a list
+
+B<Output:> A list of lists of length s or the length of the remainer in
+the last list. Piles together the input list in lists of the given size.
+
+ my @list=(1,2,3,4,5,6,7,8,9,10);
+ my @piles = pile(3, @list );        # ([1,2,3], [4,5,6], [7,8,9], [10])
+ my $i=0;
+ my @piles = parta {$i++/3} @list;   # same as above pile(3, @list)
+
+=cut
+
+sub pile { my $size=shift; my @r; for (@_){ push@r,[] if !@r or 0+@{$r[-1]}>=$size; push @{$r[-1]}, $_ } @r }
 
 =head2 aoh2sql
 
@@ -3518,7 +3730,7 @@ Note: C<List::Util::shuffle()> is approximately four times faster. Both respects
 =cut
 
 sub mix {
-  if(@_==1 and ref($_[0]) eq 'ARRAY'){ #kun ett arg, og det er ref array
+  if(@_==1 and ref($_[0]) eq 'ARRAY'){ #just one arg, and its ref array
     my $r=$_[0];
     push@$r,splice(@$r,rand(@$r-$_),1) for 0..(@$r-1);
     return $r;
@@ -3652,7 +3864,7 @@ Example:
 
 =cut
 
-sub distinct { return sort keys %{{map {($_,1)} @_}} }
+sub distinct { sort keys %{{map {($_,1)} @_}} }
 
 =head2 in
 
@@ -3678,19 +3890,8 @@ Just as sub L</in>, but for numbers. Internally uses the perl operator C<< == >>
 
 =cut
 
-sub in {
-  no warnings 'uninitialized';
-  my $val=shift;
-  for(@_){ return 1 if $_ eq $val }
-  return 0;
-}
-
-sub in_num {
-  no warnings 'uninitialized';
-  my $val=shift;
-  for(@_){ return 1 if $_ == $val }
-  return 0;
-}
+sub in     { no warnings 'uninitialized'; my $val=shift; $_ eq $val and return 1 for @_; return 0 }
+sub in_num { no warnings 'uninitialized'; my $val=shift; $_ == $val and return 1 for @_; return 0 }
 
 =head2 union
 
@@ -3779,6 +3980,14 @@ Example:
 
  my @t=(7,2,3,3,4,2,1,4,5,3,"x","xx","x",02,"07");
  print join " ", uniq @t;                          # prints  7 2 3 4 1 5 x xx 07
+
+Beware of using C<sort> like the following because sort will see C<uniq>
+as the subroutine for comparing elements! Which you most likely didnt mean.
+This has nothing to do with the way uniq is implemented. It's Perl's C<sort>.
+
+ print sort uniq('a','dup','z','dup');  # will return this four element array: a dup z dup
+ print sort(uniq('a','dup','z','dup')); # better, probably what you meant
+ print distinct('a','dup','z','dup'));  # same, distinct includes alphanumeric sort
 
 =cut
 
@@ -4074,10 +4283,10 @@ Decompressed something compressed by bzip2() or data from a C<.bz2> file. See L<
 
 =cut
 
-sub gzip    { my $s=shift(); eval"require Compress::Zlib"  if !$INC{'Compress/Zlib.pm'};  croak "Compress::Zlib not found"  if $@; Compress::Zlib::memGzip(    ref($s)?$s:\$s ) }
-sub gunzip  { my $s=shift(); eval"require Compress::Zlib"  if !$INC{'Compress/Zlib.pm'};  croak "Compress::Zlib not found"  if $@; Compress::Zlib::memGunzip(  ref($s)?$s:\$s ) }
-sub bzip2   { my $s=shift(); eval"require Compress::Bzip2" if !$INC{'Compress/Bzip2.pm'}; croak "Compress::Bzip2 not found" if $@; Compress::Bzip2::memBzip(   ref($s)?$s:\$s ) }
-sub bunzip2 { my $s=shift(); eval"require Compress::Bzip2" if !$INC{'Compress/Bzip2.pm'}; croak "Compress::Bzip2 not found" if $@; Compress::Bzip2::memBunzip( ref($s)?$s:\$s ) }
+sub gzip    { my $s=shift; eval"require Compress::Zlib"  if !$INC{'Compress/Zlib.pm'};  croak "Compress::Zlib not found"  if $@; Compress::Zlib::memGzip(    ref($s)?$s:\$s ) }
+sub gunzip  { my $s=shift; eval"require Compress::Zlib"  if !$INC{'Compress/Zlib.pm'};  croak "Compress::Zlib not found"  if $@; Compress::Zlib::memGunzip(  ref($s)?$s:\$s ) }
+sub bzip2   { my $s=shift; eval"require Compress::Bzip2" if !$INC{'Compress/Bzip2.pm'}; croak "Compress::Bzip2 not found" if $@; Compress::Bzip2::memBzip(   ref($s)?$s:\$s ) }
+sub bunzip2 { my $s=shift; eval"require Compress::Bzip2" if !$INC{'Compress/Bzip2.pm'}; croak "Compress::Bzip2 not found" if $@; Compress::Bzip2::memBunzip( ref($s)?$s:\$s ) }
 
 =head1 NET, WEB, CGI-STUFF
 
@@ -4139,6 +4348,47 @@ sub ipnum {
   my $ipnum = join(".",unpack("C4",$h));
   $IPNUM_memo{$ipaddr} = $ipnum=~/^(\d+\.){3}\d+$/ ? $ipnum : undef;
   return $IPNUM_memo{$ipaddr};
+}
+
+our $Ipnum_errmsg;
+our $Ipnum;
+sub ipnum_ok {
+    my $ipnum=shift;
+    $Ipnum=undef;
+    eval{
+      die "malformed ipnum $ipnum\n" if not $ipnum=~/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/;
+      die "invalid ipnum $ipnum\n"   if grep$_>255,$1,$2,$3,$4;
+      $Ipnum=$1*256**3 + $2*256**2 + $3*256 + $4;
+    };
+    my$r=($Ipnum_errmsg=$@) ? 0 : 1;
+    $r
+}
+our $Iprange_errmsg;
+our $Iprange_start;
+sub iprange_ok {
+    my $iprange=shift;
+    $Iprange_start=undef;
+    my($r,$m);
+    eval{
+      die "malformed iprange $iprange\n"   if not $iprange=~m|^(\d+)\.(\d+)\.(\d+)\.(\d+)(?:/(\d+))$|;
+      die "iprange part should be 0-255\n" if grep$_<0||$_>255,$1,$2,$3,$4;
+      die "iprange mask should be 0-32\n"  if defined$5 and $5>32;
+      ($r,$m)=($1*256**3+$2*256**2+$3*256+$4,32-$5);
+    };
+    return if $Iprange_errmsg=$@;
+    my $x=$r>>$m<<$m;
+    return if $r!=$x and $Iprange_errmsg=sprintf("need zero in last %d bits, should be %d.%d.%d.%d/%d",
+						 $m, $x>>24, ($x>>16)&255, ($x>>8)&255, $x&255, 32-$m);
+    $Iprange_start=$r;
+    return 1;
+}
+sub in_iprange {
+  my($ipnum,$iprange)=@_;
+  croak $Ipnum_errmsg   if !ipnum_ok($ipnum);
+  croak $Iprange_errmsg if !iprange_ok($iprange=~m|/\d+$| ? $iprange : "$iprange/32");
+  "$iprange/32"=~m|/(\d+)| or die;
+  $Ipnum>=$Iprange_start &&
+  $Ipnum<=$Iprange_start + 2**(32-$1)-1;
 }
 
 =head2 webparams
@@ -4920,9 +5170,6 @@ The following list of codes in the first argument will be replaced:
   JDN     Julian day number. Integer. The number of days since the day starting at noon on January 1 4713 BC
   JD      Same as JDN but a float accounting for the time of day
 
-TODO:  sub smt() (tms backward... or something better named, converts the other way)
-       As to_date and to_char in Oracle. Se maybe L<Date::Parse> instead
-
 B<Third argument:> (optional) Is_date. False|true, default false. If true, the second argument is
 interpreted as a date of the form YYYYMMDD, not as a number of seconds since epoch (January 1st 1970).
 
@@ -4989,6 +5236,37 @@ sub tms_init {
 
 sub totime {
 
+}
+
+=head2 s2t
+
+Convert strings to "time pieces". Example:
+
+ my($dd,$mm,$yyyy,$str) = s2t("18/february/2019:13:53","DD","MM","YYYY","YYYYMMDD-HH24:MI:SS")
+ print "dd: $dd   mm: $mm   yyyy: $yyyy   str: $str\n";  # dd: 18   mm: 02   yyyy: 2019   str: 20190218-13:53:00
+
+=cut
+
+sub s2t {
+  require Date::Parse;
+  my $s=shift;
+  if($s=~/\b(?:mai|okt|des|juni|juli|februar)/i){ #fix norwegian/danish (for now)
+     $s=~s/\bMai\b/May/i;         $s=~s/\bmai\b/may/i;         $s=~s/\bMAI\b/MAY/i;
+     $s=~s/\bOkt\b/Oct/i;         $s=~s/\bokt\b/oct/i;         $s=~s/\bOKT\b/OCT/i;
+     $s=~s/\bDes/Dec/;            $s=~s/\bdes/dec/;            $s=~s/\bDES/DEC/;
+     $s=~s/\bFebruar\b/February/; $s=~s/\bfebruar\b/february/; $s=~s/\bFEBRUAR\b/FEBRUARY/;
+     $s=~s/\bjuli\b/July/i;
+     $s=~s/\bjuni\b/June/i;
+  }
+  elsif($s           =~ /^[19]\d{9}$/){ $s=localtime($s)      } #hm, make faster
+  elsif($s           =~ /^[19]\d{12}$/
+    and int($s/1000) =~ /^[19]\d{9}$/){ $s=localtime($s/1000) } #hm
+  elsif($s=~/^((?:17|18|19|20|21)\d\d)(0[1-9]|1[012])(0[1-9]|[12]\d|3[01])$/){#hm
+      $s="$1-$2-$3T00:00:00";
+  }
+  return Date::Parse::str2time($s)                  if !@_;
+  return tms(Date::Parse::str2time($s),shift(@_))   if 0+@_ == 1;
+  return map tms(Date::Parse::str2time($s),$_), @_;
 }
 
 sub date_ok {
@@ -5244,7 +5522,7 @@ Estimated time of arrival (ETA).
     print "" . localtime($eta);
  }
 
- ..DOC MISSING..
+TODO: eta is borken and out of wack, good idea?: http://en.wikipedia.org/wiki/Kalman_filter
 
 =head2 etahhmm
 
@@ -5252,7 +5530,6 @@ Estimated time of arrival (ETA).
 
 =cut
 
-#http://en.wikipedia.org/wiki/Kalman_filter good idea?
 our %Eta;
 our $Eta_forgetfulness=2;
 sub eta {
@@ -5721,18 +5998,18 @@ sub _range_accellerated {
 
 =head2 globr
 
-Works like and uses Perls builtin C<< glob() >> function but adds support for ranges
+Works like and uses Perls builtin C<< glob() >> but adds support for ranges
 with C<< {from..to} >> and C<< {from..to..step} >>. Like brace expansion in bash.
 
 Examples:
 
- my @arr = glob  "X{a,b,c,d}Z";         # return four element array: XaZ XbZ XcZ XdZ
+ my @arr = glob  "X{a,b,c,d}Z";         # @arr now have four elements: XaZ XbZ XcZ XdZ
  my @arr = globr "X{a,b,c,d}Z";         # same as above
  my @arr = globr "X{a..d}Z";            # same as above
- my @arr = globr "X{a..d..2}Z";         # step 2, returns array: XaZ XcZ
- my @arr = globr "X{aa..bz..13}Z";      # XaaZ XanZ XbaZ XbnZ
+ my @arr = globr "X{a..f..2}";          # step 2, returns array: Xa Xc Xe
+ my @arr = globr "{aa..bz..13}Z";       # aaZ anZ baZ bnZ
  my @arr = globr "{1..12}b";            # 1b 2b 3b 4b 5b 6b 7b 8b 9b 10b 11b 12b
- my @arr = globr "{01..12}b";           # 01b 02b 03b 04b 05b 06b 07b 08b 09b 10b 11b 12b
+ my @arr = globr "{01..11}b";           # 01b 02b 03b 04b 05b 06b 07b 08b 09b 10b 11b (keep leading zero)
  my @arr = globr "{01..12..3}b";        # 01b 04b 07b 10b
 
 =cut
@@ -5904,6 +6181,81 @@ sub permutations {
   }
 }
 
+=head2 perm
+
+ print @$_,"\n" for perm("a".."c");           # prints six lines: abc acb bac bca cab cba
+
+=head2 permute
+
+ my $c = permute { print @_,"\n" } "a".."c";  # prints six lines: abc acb bac bca cab cba
+ print "count: $c\n";                         # prints 6 = 3*2*1 = 3!
+
+The permute BLOCK needs to return true (which print does) for permute to continue:
+
+ my $c = permute { print @_,"\n"; rand()<.5 } "a".."d";  # probably prints less than 24 strings
+ print "count: $c\n";                                    # prints random number up to 24 = 4*3*2*1 = 4!
+
+=head2 permute_continue
+
+ my @abc   = ("a", "b", "c");
+ my @start = ("b", "a", "c");                               # starting sequence to continue from
+ my $c = permute_continue { print @_,"\n" } \@abc, \@start; # prints four lines: bac bca cab cba
+ my $c = permute          { print @_,"\n" } \@abc, \@start; # same, =permute_continue when coreref+arrayref+arrayref
+ print "count: $c\n";                                       # prints 6-2 = 3*2*1-2 = 3!-2
+
+The permute BLOCK needs to return true (which print does) for permute to continue:
+
+ my $c = permute { print @_,"\n"; rand()<.5 } "a".."d";  # probably prints less than 24 strings
+ print "count: $c\n";                                    # prints random number up to 24 = 4*3*2*1 = 4!
+
+=cut
+
+sub perm {
+    my(@i,@r) = 0..$#_;
+    @_ || return;
+    while ( push @r, [@_[@i]] ) {
+	my $p = $#i || last;
+	--$p || last while $i[$p-1] > $i[$p];
+	push @i, reverse splice @i, my$q=$p;
+	++$q while $i[$p-1] > $i[$q];
+	@i[$p-1,$q] = @i[$q,$p-1];
+    }
+    @r
+}
+
+sub permute (&@) {
+    return permute_continue(@_) if 'CODE,ARRAY,ARRAY' eq join',',map ref,@_;
+    my $f = shift;
+    my @i = 0..$#_;
+    my $n = 0;
+    @_ || do{ &$f(@_); return 0 };
+    while ( ++$n and &$f(@_[@i]) ) {
+	my $p = $#i || last;
+	--$p || last while $i[$p-1] > $i[$p];
+	push @i, reverse splice @i, my$q=$p;
+	++$q while $i[$p-1] > $i[$q];
+	@i[$p-1,$q] = @i[$q,$p-1];
+    }
+    $n;
+}
+
+#Fischer-Krause permutation starting from a specific sequence, for example to farm out permute to more than one process
+sub permute_continue (&\@\@) {
+    my ($f,$begin,$from) = @_;
+    my %h; @h{@$begin} = 0 .. $#$begin;
+    my @idx = @h{@$from};
+    my $n = 0;
+    while ( ++$n and &$f(@$begin[@idx]) ) {
+	my $p = $#idx || last;
+	--$p || last while $idx[$p-1] > $idx[$p];
+	push @idx, reverse splice @idx, my$q=$p;
+	++$q while $idx[$p-1] > $idx[$q];
+	@idx[$p-1,$q]=@idx[$q,$p-1];
+    }
+    $n
+}
+
+
 =head2 cart
 
 Cartesian product
@@ -6023,7 +6375,7 @@ sub cart_easy { #not tested, not exported http://stackoverflow.com/questions/245
 
 =head2 reduce
 
-From: Why Functional Programming Matters: L<http://www.md.chalmers.se/~rjmh/Papers/whyfp.pdf>
+From: Why Functional Programming Matters: L<http://www.md.chalmers.se/~rjmh/Papers/whyfp.pdf> L<http://www.cse.chalmers.se/~rjmh/Papers/whyfp.html>
 
 L<http://www.md.chalmers.se/~rjmh/Papers/whyfp.html>
 
@@ -7002,11 +7354,11 @@ Returns 1 on success. Dies (croaks) if more strings than capacity is added.
 
 =head2 bfcheck
 
-  my $phone_number="97713246";
+  my $phone_number="99999999";
   if ( bfcheck($bf, $phone_number) ) {
     print "Yes, $phone_number was PROBABLY added\n";
   }
-  else{
+  else {
     print "No, $phone_number was DEFINITELY NOT added\n";
   }
 
@@ -7665,7 +8017,25 @@ The commands C<2xz>, C<2bz2> and C<2gz> are just synonyms for C<z2z> with an imp
  z2z [-p -k -v -o -1 -2 -3 -4 -5 -6 -7 -8 -9 ] files
 
 Converts (recompresses) files from one compression type to another. For instance from .gz to .bz2
+Keeps uid, gid, mode (chmod) and mtime.
 
+ -p              Show a progress meter using the pv program if installed
+ -k              Keeps original file
+ -v              Verbose, shows info on degree of compression and file
+                 number if more than one file is being converted
+ -o              Overwrites existing result file, otherwise stop with error msg
+ -1 .. -9        Degree of compression, -1 fastest .. -9 best
+ -e              With -t xz (or 2xz) passes -e to xz (-9e = extreme compression)
+
+ -L rate         With -p. Slow down, ex:  -L 200K  means 200 kilobytes per second
+ -D sec          With -p. Only turn on progress meter (pv) after x seconds
+ -i sec          With -p. Info update rate
+ -l              With -p. Line mode
+ -I              With -p. Show ETA as time of arrival as well as time left
+ -q              With -p. Quiet. Useful with -L to limit rate, but no output
+
+The options -L -D -i -l -I -q implicitly turns on -p. Those options are passed
+through to pv. See: man pv.
 
 =head3 due
 
@@ -7677,6 +8047,8 @@ Like C<du> command but views space used by file extentions instead of dirs. Opti
  due -K          Like -k but uses 1000 instead of 1024
  due -z          View two extentions if .z .Z .gz .bz2 .rz or .xz (.tar.gz, not just .gz)
  due -M          Also show min, medium and max date (mtime) of files, give an idea of their age
+ due -C          Like -M, but create time instead (ctime)
+ due -A          Like -M, but access time instead (atime)
  due -P          Also show 10, 50 (medium) and 90 percentile of file date
  due -MP         Both -M and -P, shows min, 10p, 50p, 90p and max
  due -a          Sort output alphabetically by extention (default order is by size)
@@ -7705,7 +8077,7 @@ finding the MD5sums of the whole files.
  finddup -h <files> # make hard links of duplicate files
  finddup -v ...     # verbose, print before -d, -s or -h
  finddup -n -d <files>  # dry run: show rm commands without actually running them
- finddup -n -s <files>  # dry run: show ln commands to make symlinks of duplicate files
+ finddup -n -s <files>  # dry run: show ln commands to make symlinks of duplicate files todo:NEEDS FIX!
  finddup -n -h <files>  # dry run: show ln commands to make hard links of duplicate files
  finddup -q ...         # quiet
  finddup -k o           # keep oldest with -d, -s, -h, consider newer files duplicates
@@ -7713,6 +8085,8 @@ finding the MD5sums of the whole files.
  finddup -k O           # same as -k o, just use access time instead of modify time
  finddup -k N           # same as -k n, just use access time instead of modify time
  finddup -0 ...         # use ascii 0 instead of the normal \n, for xargs -0
+ finddup -P n           # use n bytes from start of file in 1st md5 check (default 8192)
+ finddup -p             # view progress in last and slowest of the three steps
 
 Default ordering of files without C<-k n> or C<-k o> is the order they
 are mentioned on the command line. For directory args the order might be
@@ -7734,35 +8108,37 @@ our @Due_fake_stdin;
 #TODO: output from tar tvf and ls and find -ls
 sub cmd_due {
   my %o;
-  my @argv=args("zkKmhciMPate:lE:t",\%o,@_);
+  my @argv=opts("zkKmhciMCAPate:lE:t",\%o,@_);
   require File::Find;
   no warnings 'uninitialized';
   die"$0: -l not implemented yet\n"                if $o{l}; #man du: default is not to count hardlinks more than once, with -l it does
   die"$0: -h, -k or -m can not be used together\n" if $o{h}+$o{k}+$o{m}>1;
   die"$0: -c and -a can not be used together\n"    if $o{a}+$o{c}>1;
   die"$0: -k and -m can not be used together\n"    if $o{k}+$o{m}>1;
-  my(%c,%b,$cnt,$bts,%mtime);
+  die"$0: -M, -C, -A can not be used together\n"   if $o{M}+$o{C}+$o{A}>1;
+  my(%c,%b,$cnt,$bts,%xtime);
   my $zext=$o{z}?'(\.(z|Z|gz|bz2|xz|rz|kr|lrz|rz))?':'';
   $o{E}||=11;
   my $r=qr/(\.[^\.\/]{1,$o{E}}$zext)$/i;
   my $qrexcl=exists$o{e}?qr/$o{e}/:0;
- #TODO: ought to work: tar cf - .|tar tvf -|due
+  #TODO: ought to work: tar cf - .|tar tvf -|due
+  my $x=$o{M}?9:$o{C}?10:$o{A}?8:9;
   if(-p STDIN or @Due_fake_stdin){
     die "due: can not combine STDIN and args\n" if @argv;
     my $stdin=join"",map"$_\n",@Due_fake_stdin; #test
     open(local *STDIN, '<', \$stdin) or die "ERR: $! $?\n" if $stdin;
     my $rl=qr/(^| )\-[rwx\-sS]{9}\s+(?:\d )?(?:[\w\-]+(?:\/|\s+)[\w\-]+)\s+(\d+)\s+.*?([^\/]*\.[\w,\-]+)?$/;
-    my $MorP=$o{M}||$o{P}?"due: -M and -P not yet implemented for STDIN unless list of filenames only\n":0;
+    my $MorP=$o{M}||$o{C}||$o{A}||$o{P}?"due: -M, -C, -A and -P not yet implemented for STDIN unless list of filenames only\n":0;
     while(<STDIN>){
       chomp;
       next if /\/$/;
-      my($f,$sz,$mtime)=(/$rl/?($3,$2):-f$_?($_,(stat)[7,9]):next);
+      my($f,$sz,$xtime)=(/$rl/?($3,$2):-f$_?($_,(stat)[7,$x]):next);
       #   1576142    240 -rw-r--r--   1 root     root       242153 april  4  2016 /opt/wine-staging/share/wine/wine.inf
       my $ext=$f=~$r?$1:'';
       $ext=lc($ext) if $o{i};
       $cnt++;    $c{$ext}++;
       $bts+=$sz; $b{$ext}+=$sz;
-      defined $mtime and $mtime{$ext}.=",$mtime" or die $MorP if $MorP;
+      defined $xtime and $xtime{$ext}.=",$xtime" or die $MorP if $MorP;
     }
   }
   else { #hm DRY
@@ -7771,12 +8147,12 @@ sub cmd_due {
       sub {
         return if !-f$_;
         return if $qrexcl and defined $File::Find::name and $File::Find::name=~$qrexcl;
-        my($sz,$mtime)=(stat($_))[7,9];
+        my($sz,$xtime)=(stat($_))[7,$x];
         my $ext=m/$r/?$1:'';
         $ext=lc($ext) if $o{i};
         $cnt++;    $c{$ext}++;
         $bts+=$sz; $b{$ext}+=$sz;
-        $mtime{$ext}.=",$mtime" if $o{M} || $o{P};
+        $xtime{$ext}.=",$xtime" if $o{M} || $o{C} || $o{A} || $o{P};
 	1;
       } },@argv);
   }
@@ -7788,13 +8164,13 @@ sub cmd_due {
   my @e=$o{a}?(sort(keys%c))
        :$o{c}?(sort{$c{$a}<=>$c{$b} or $a cmp $b}keys%c)
        :      (sort{$b{$a}<=>$b{$b} or $a cmp $b}keys%c);
-  my $perc=!$o{M}&&!$o{P}?sub{""}:
+  my $perc=!$o{M}&&!$o{C}&&!$o{A}&&!$o{P}?sub{""}:
     sub{
       my @p=$o{P}?(10,50,90):(50);
-      my @m=@_>0 ? do {grep$_, split",", $mtime{$_[0]}}
-                 : do {grep$_, map {split","} values %mtime};
+      my @m=@_>0 ? do {grep$_, split",", $xtime{$_[0]}}
+                 : do {grep$_, map {split","} values %xtime};
       my @r=percentile(\@p,@m);
-      @r=(min(@m),@r,max(@m)) if $o{M};
+      @r=(min(@m),@r,max(@m)) if $o{M}||$o{C}||$o{A};
       @r=map int($_), @r;
       my $fmt=$o{t}?'YYYY/MM/DD-MM:MI:SS':'YYYY/MM/DD';
       @r=map tms($_,$fmt), @r;
@@ -7808,7 +8184,7 @@ sub cmd_due {
 sub cmd_resubst {
   my %o;
   my $zo="123456789e";
-  my @argv=args("f:t:vno:gi$zo",\%o,@_);
+  my @argv=opts("f:t:vno:gi$zo",\%o,@_);
   if(exists$o{t}){ $o{t}=~s,\\,\$, } else { $o{t}='' }
   my($i,$tc,$tbfr,$tbto)=(0,0,0,0);
   for my $file (@argv){
@@ -7868,7 +8244,7 @@ sub cmd_finddup {
   # http://www.commandlinefu.com/commands/view/3555/find-duplicate-files-based-on-size-first-then-md5-hash
   # die "todo: finddup not ready yet"
   my %o;
-  my @argv=args("ak:dhsnqv0P:FMR",\%o,@_); $o{P}//=1024*8; $o{k}//=''; #die srlz(\%o,'o','',1);
+  my @argv=opts("ak:dhsnqv0P:FMRp",\%o,@_); $o{P}//=1024*8; $o{k}//=''; #die srlz(\%o,'o','',1);
   croak"ERR: cannot combine -a with -d, -s or -h" if $o{a} and $o{d}||$o{s}||$o{h};
   require File::Find;
   @argv=map{
@@ -7886,7 +8262,7 @@ sub cmd_finddup {
       close($fh);
       md5sum(\$buf);
   };
-  my @checks=(
+  my @checks=( #todo: stat()[0,1] (or[0,1,7]?) and diff filename => no need for md5, is hardlink! just linux?
       sub{-s$_[0]},
       sub{-s$_[0]<=$o{P}?md5sum($_[0]):&$md5sum_1st_part($_[0])},
       sub{md5sum($_[0])}
@@ -7896,9 +8272,22 @@ sub cmd_finddup {
   my %s=map{($_=>++$i)}@argv; #sort
   my %f=map{($_=>[$_])}@argv; #also weeds out dupl params
   for my $c (@checks){
-      my %n; push @{$n{&$c($_)}}, $_ for map @{$f{$_}}, sort keys %f;
-      delete @n{grep@{$n{$_}}<2,keys%n};
-      %f=%n;
+    my @f=map @{$f{$_}}, sort keys %f;
+    if($o{p} and $c eq $checks[-1]){ #view progress for last check, todo: eta() is wacky here! everywhere?
+      my $sum=@f?sum(map -s$_,@f):0;
+      my($corg,$cnt,$cntmb,$mb)=($c,0,0,$sum/1e6);
+      $c=sub{
+	  $cntmb+=(-s$_[0])/1e6;
+	  my $eol=++$cnt==@f?"\n":"\r";
+	  print STDERR sprintf("%d/%d files checked (%d%%), %d/%d MB (%d%%), ETA in %d sec       $eol",
+			       $cnt, 0+@f, 100*$cnt/@f, $cntmb, $mb, 100*$cntmb/$mb,
+			       curb(nvl(eta($cnt,0+@f),time)-time(),0,1e7));
+	  &$corg(@_)
+      };
+    }
+    my %n; push @{$n{&$c($_)}}, $_ for @f;
+    delete @n{grep@{$n{$_}}<2,keys%n};
+    %f=%n;
   }
   return %f if $o{F};
   my@r=sort{$s{$$a[0]}<=>$s{$$b[0]}}values%f;
@@ -7920,8 +8309,9 @@ sub cmd_finddup {
   return @r if $o{R}; #hm
   unlink@r                              if $o{d}||$o{s}||$o{h} and !$o{n}; #delete duplicates
   map &$go(qq(rm "$_")             ),@r if $o{d}&& $o{n}; #delete duplicates, dryrun
-  map &$go(qq(ln -s "$of{$_}" "$_")),@r if $o{s}; #replace duplicates with symlink
   map &$go(qq(ln    "$of{$_}" "$_")),@r if $o{h}; #replace duplicates with hardlink
+  map &$go(qq(ln -s "$of{$_}" "$_")),@r if $o{s}; #replace duplicates with symlink,
+                                                  #todo: BUG! abc/def/file -> ghi/file should be abc/def/file -> ../../ghi/file
   return if $o{q} or $o{n};    #quiet or dryrun
   &$print("$_$nl") for @r;
 }
@@ -7944,10 +8334,12 @@ sub cmd_ccmd {
 
 sub cmd_trunc { die "todo: trunc not ready yet"} #truncate a file, size 0, keep all other attr
 
-#todo:   wipe -n 4 filer*   #virker ikke! tror det er args() som ikke virker
+#todo:   wipe -n 4 filer*   #virker ikke! tror det er args() eller opts() som ikke virker
 sub cmd_wipe  {
   my %o;
-  my @argv=args("n:k",\%o,@_);
+  my @argv=opts("n:k0123456789",\%o,@_);
+  die if 1<grep exists$o{$_},'n',0..9;
+  $o{$_} and $o{n}=$_ for 0..9;
   wipe($_,$o{n},$o{k}) for @argv;
 }
 
@@ -7962,15 +8354,21 @@ sub cmd_2xz    {cmd_z2z("-t","xz", @_)}
 #todo: .tgz same as .tar.gz (but not .tbz2/.txz)
 sub cmd_z2z {
   my %o;
-  my @argv=args("pt:kvhon123456789es:",\%o,@_);
+  my $pvopts="L:D:i:lIq";
+  my @argv=opts("pt:kvhon123456789es:$pvopts",\%o,@_);
   my $t=repl(lc$o{t},qw/gzip gz bzip2 bz2/);
   die "due: unknown compression type $o{t}, known are gz, bz2 and xz" if $t!~/^(gz|bz2|xz)$/;
+  $o{p}//=1 if grep$pvopts=~/$_/,keys%o;
   delete $o{e} if $o{e} and $o{t} ne 'xz' and warn "-e available only for type xz\n";
   my $sum=sum(map -s$_,@argv);
   print "Converting ".@argv." files, total ".bytes_readable($sum)."\n" if $o{v} and @argv>1;
   my $cat='cat';
   if($o{p}){ if(which('pv')){ $cat='pv' } else { warn repl(<<"",qr/^\s+/) } }
     due: pv for -p not found, install with sudo yum install pv, sudo apt-get install pv or similar
+
+  $o{$_} and $o{$_}=" " for qw(l q); #still true, but no cmd arg for:
+  $o{I} and $o{I}="-pterb";
+  exists$o{$_} and $cat=~s,pv,pv -$_ $o{$_}, for $pvopts=~/(\w)/g; #warn "cat: $cat\n";
 
   my $sumnew=0;
   my $start=time_fp();
@@ -7989,12 +8387,13 @@ sub cmd_z2z {
     #todo: my $cnt="tee >(wc -c>$cntfile)" if $ENV{SHELL}=~/bash/ and $o{v}; #hm dash vs bash
     my $z=  {qw/gz gzip   bz2 bzip2   xz xz/}->{$t};
     $z.=" -$_" for grep$o{$_},1..9,'e';
+    $z.=" -$_ $o{$_}" for grep exists$o{$_},'L';
     my $cmd=qq($cat "$_"|$unz|$z>"$new");
      #todo: "$cat $_|$unz|$cnt|$z>$new";
     #cat /tmp/kontroll-linux.xz|unxz|tee >(wc -c>/tmp/p)|gzip|wc -c;cat /tmp/p
     $cmd=~s,\|+,|,g; #print "cmd: $cmd\n";
     sys($cmd);
-    chall($_,$new)||die if !$o{n};
+    chall($_,$new) or croak("$0 cannot chmod|chown|touch $new") if !$o{n};
     my($szold,$sznew)=map{-s$_}($_,$new);
     $bsf+=-s$_;
     unlink $_ if !$o{k};
@@ -8037,7 +8436,7 @@ sub cmd_z2z {
 Parses command line options and arguments:
 
  my %opt;
- my @argv=args('i:nJ123',\%opt,@ARGV);   #returns remaining command line elements after C<-o ptions> are parsed into C<%opt>.
+ my @argv=Acme::Tools::args('i:nJ123',\%opt,@ARGV);   #returns remaining command line elements after C<-o ptions> are parsed into C<%opt>.
 
 Uses C<Getopt::Std::getopts()>. First arg names the different one char
 options and an optional C<:> behind the letter or digit marks that the
@@ -8057,16 +8456,47 @@ sub args {
     (@ARGV);
 }
 
+sub opts {
+    my($def, $hashref, @a)=@_;
+    @a=@ARGV if @_<=2;
+    my %def=map{/(\w)(:?)/;($1=>$2?2:1)}$def=~/(\w:?)/g;
+    my $o1=join"",grep$def{$_}==1,sort keys%def;
+    my $o= join"",                sort keys%def;
+    my @r;
+    while(@a){
+	my $a=shift(@a);
+	if($a=~/^-([$o1])([$o].*)$/){
+	    unshift@a,"-$1","-$2";
+	}
+	elsif($a=~/^-(\w)(.*)$/){
+	    my $d=$def{$1}//0;
+	    push@{$$hashref{$1}},$d==1 && length($2) ? croak"opt -$1 has no arg (is $2 here)"
+		                :$d==1               ? 1
+				:$d==2 && length($2) ? $2
+				:$d==2               ? shift(@a)
+				:croak"unknown opt -$1";
+	}
+	elsif($a eq '--'){
+	    last;
+	}
+	else {
+	    push @r, $a;
+	}
+    }
+    $_=join",",@$_ for values %$hashref;
+    (@r,@a)
+}
+
 #cat Tools.pm|perl -I. /usr/local/bin/zsize -tp
 #cat Tools.pm|perl -I. /usr/local/bin/zsize -tp -
 #cat Tools.pm|perl -I. /usr/local/bin/zsize -tp Tools.pm
 sub cmd_zsize {
   my %o;
-  my @argv=args("heEpts",\%o,@_);
+  my @argv=opts("heEpts",\%o,@_);
   my $stdin=!@argv || join(",",@argv) eq '-';
   @argv=("/tmp/acme-tools.$$.stdin") if $stdin;
   writefile($argv[0],join("",<STDIN>)) if $stdin;
-  my @prog=grep qx(which $_), qw(gzip bzip2 xz zstd);
+  my @prog=grep qx(which $_), qw(gzip bzip2 xz zstd brotli);
   for my $f (@argv){
       my $sf=-s$f;
       print "--- $f does not exists\n" and next if !-e$f;
@@ -8081,10 +8511,11 @@ sub cmd_zsize {
           push @l,map"e$_",1..9 if $prog eq 'xz' and $o{e};
           @l=map"e$_",1..9      if $prog eq 'xz' and $o{E};
           @l=map 10+$_,@l       if $prog eq 'zstd';
+          @l=map"q $_",3..11    if $prog eq 'brotli';
           printf "%-6s",$prog;
           push @t, $prog, [] if $o{t};
           push @s, $prog, [] if $o{p} and $o{s};
-          for my $l (@l){
+          for my $l (@l){ #level
               my $t=time_fp();
               my $b=qx(cat $f|$prog -$l|wc -c);
               push@{$t[-1]},time_fp()-$t if $o{t};
@@ -8261,35 +8692,36 @@ sub sum      { &Acme::Tools::bfsum      }
 1;
 
 # Ny versjon:
-# + git clone https://github.com/kjetillll/Acme-Tools.git
-# + c-s todo
-# + endre $VERSION
-# + endre Release history under HISTORY
-# + endre årstall under =head1 COPYRIGHT
-# + oppd default valutakurser inkl datoen
-# + emacs Changes
-# + emacs README + aarstall
-# + diff -byW200 <(grep -a ^sub Acme-Tools-0.22/Tools.pm|sort) <(grep -a ^sub Tools.pm|sort)|less
-# + emacs MANIFEST legg til ev nye t/*.t
-# + perl            Makefile.PL;make test
-# + /usr/bin/perl   Makefile.PL;make test
-# + perlbrew exec "perl Makefile.PL ; time make test"
-# + perlbrew exec "perl Makefile.PL ; make test" | grep -P '^(perl-|All tests successful)'
-# + perlbrew use perl-5.10.1; perl Makefile.PL; make test; perlbrew off
-# + test evt i cygwin og mingw-perl
-# + pod2html Tools.pm > Tools.html ; firefox Tools.html
-# + https://metacpan.org/pod/Acme::Tools
-# + http://cpants.cpanauthors.org/dist/Acme-Tools   #kvalitee
-# + perl Makefile.PL ; make test && make dist
-# + cp -p *tar.gz /htdocs/
-# + #ci -l -mversjon -d `cat MANIFEST` #no
-# + git add `cat MANIFEST`
-# + git status
-# + git commit -am versjon
-# + git push                    #eller:
-# + git push origin master
-# + http://pause.perl.org/
-# + tegnsett/utf8-kroell
+# - git clone https://github.com/kjetillll/Acme-Tools.git
+# - c-s todo
+# - endre $VERSION
+# - endre Release history under HISTORY
+# - endre årstall under =head1 COPYRIGHT
+# - oppd default valutakurser inkl datoen
+# - emacs Changes
+# - emacs README versjon + aarstall
+# - diff -byW200 <(grep -a ^sub Acme-Tools-0.22/Tools.pm|sort) <(grep -a ^sub Tools.pm|sort)|less
+# - emacs MANIFEST legg til ev nye t/*.t
+# - perl            Makefile.PL && make test
+# - /usr/bin/perl   Makefile.PL && make test
+# - perlbrew exec "perl Makefile.PL && time make test"
+# - perlbrew exec "perl Makefile.PL && make test" | grep -P '^(perl-|All tests successful)'
+# - perlbrew use perl-5.10.1; perl Makefile.PL && make test; perlbrew off
+# - test evt i cygwin og mingw-perl
+# - pod2html Tools.pm > Tools.html ; firefox Tools.html
+# - https://metacpan.org/pod/Acme::Tools
+# - http://cpants.cpanauthors.org/dist/Acme-Tools   #kvalitee
+# - perl Makefile.PL && make test && make dist
+# - cp -p *tar.gz /htdocs/
+# - #ci -l -mversjon -d `cat MANIFEST` #no
+# - git add `cat MANIFEST`
+# - git status
+# - git commit -am versjon
+# - git push                    #eller:
+# - git push origin master
+# - http://pause.perl.org/
+# - tegnsett/utf8-kroell
+# - https://rt.cpan.org/Dist/Display.html?Queue=Acme-Tools
 # http://en.wikipedia.org/wiki/Birthday_problem#Approximations
 
 # memoize_expire()           http://perldoc.perl.org/Memoize/Expire.html
@@ -8339,7 +8771,12 @@ sub sum      { &Acme::Tools::bfsum      }
 
 Release history
 
- 0.24  Feb 2019   fixed failes on perl5.16 and older
+ 0.26  Jan 2020   Convert subs: base bin2dec bin2hex bin2oct dec2bin dec2hex dec2oct
+                  hex2bin hex2dec hex2oct oct2bin oct2dec oct2hex
+                  Array subs: joinr perm permute permute_continue pile sortby subarrays
+                  Other subs: btw in_iprange ipnum_ok iprange_ok opts s2t
+
+ 0.24  Feb 2019   fixed failes on perl 5.16 and older
 
  0.23  Jan 2019   Subs: logn, egrep, which. More UTF-8 "oriented" (lower, upper, ...)
                   Commands: zsize, finddup, due (improved), conv (improved, [MGT]?Wh
@@ -8378,7 +8815,7 @@ Kjetil Skotheim, E<lt>kjetil.skotheim@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-2008-2019, Kjetil Skotheim
+2008-2020, Kjetil Skotheim
 
 =head1 LICENSE
 

@@ -3,6 +3,7 @@ package VCS::CMSynergy::Object;
 # Copyright (c) 2001-2015 argumentum GmbH
 # See COPYRIGHT section in VCS/CMSynergy.pod for usage and distribution rights.
 
+use feature 'state';
 use strict;
 use warnings;
 
@@ -54,13 +55,20 @@ This synopsis only lists the major methods.
 
 =cut
 
-use base qw(Class::Accessor::Fast);
-__PACKAGE__->mk_ro_accessors(qw/objectname ccm/);
-
 use Carp;
 
-use Type::Params qw( validate );
+use Type::Params qw( compile );
 use Types::Standard qw( slurpy Str ArrayRef );
+use Scalar::Util qw( weaken );
+
+use constant 
+{
+    CCM         => 0,
+    OBJECTNAME  => 1,
+    ACACHE      => 2,
+    MYDATA      => 3,
+    ALIST       => 4,           # used in VCS::CMSynergy::ObjectTieHash
+};
 
 # NOTE: We can't just alias string conversion to objectname()
 # as it is called (as overloaded operator) with three arguments
@@ -69,9 +77,6 @@ use overload
     '""'        => sub { $_[0]->objectname },
     cmp         => sub { $_[0]->objectname cmp $_[1]->objectname },
     fallback    => 1;
-
-my $have_weaken = eval "use Scalar::Util qw(weaken); 1";
-
 
 my %cvtype2subclass = qw(
     baseline          Baseline
@@ -96,17 +101,20 @@ sub new
         unless $objectname =~ /$ccm->{objectname_rx}/;
 
     # canonicalize delimiter to colon
-    $objectname =~ s/$ccm->{delimiter_rx}/:/;
+    if ((my @parts = split(":", $objectname)) == 3)
+    {
+        # beware of databases with allow_delimiter_in_name=TRUE:
+        # replace the *last* "-" in the "name-version" part 
+        substr($parts[0], rindex($parts[0], $ccm->{delimiter}), 1, ":");
+        $objectname = join(":", @parts);
+    }
+    # else @parts == 4, i.e. already in canonical form
 
     # return "unique" object if we already "know" it
-    return $ccm->{objects}->{$objectname} if $ccm->{objects}->{$objectname};
+    return $ccm->{objects}{$objectname} if $ccm->{objects}{$objectname};
 
-    my %fields = (
-        objectname => $objectname,
-        ccm        => $ccm,
-    );
-    Scalar::Util::weaken($fields{ccm}) if $have_weaken;
-    $fields{acache} = {} if VCS::CMSynergy::use_cached_attributes();
+    my @fields = ( $ccm, $objectname );  # at indexes CCM, OBJECTNAME
+    weaken($fields[CCM]);
 
     if (my $subclass = $cvtype2subclass{ (split(":", $objectname))[2] })
     {
@@ -117,47 +125,41 @@ sub new
     my $self;
     if (VCS::CMSynergy::use_tied_objects())
     {
-        $self = bless {}, $class;
-        tie %$self, 'VCS::CMSynergy::ObjectTieHash', \%fields;
+        $self = bless {}, 'VCS::CMSynergy::Object::TI';
+        tie %$self, $class, \@fields;
     }
     else
     {
-        $self = bless \%fields, $class;
+        $self = bless \@fields, $class;
     }
 
     # remember new object
-    $ccm->{objects}->{$objectname} = $self;
+    $ccm->{objects}{$objectname} = $self;
+    weaken($ccm->{objects}{$objectname});
 
     return $self;
 }
 
+# NOTE: these need to be redefined for :tied_objects
+sub ccm         { return shift->[CCM] }
+sub objectname  { return shift->[OBJECTNAME] }
+
+
 # access to the parts of the objectname
-# NOTE: DON'T use "shift->{objectname}" as it won't work for :tied_objects
-sub name        { return (split(":", shift->objectname))[0] }
-sub version     { return (split(":", shift->objectname))[1] }
-sub cvtype      { return (split(":", shift->objectname))[2] }
-sub instance    { return (split(":", shift->objectname))[3] }
+sub name        { return (split(":", shift->[OBJECTNAME]))[0] }
+sub version     { return (split(":", shift->[OBJECTNAME]))[1] }
+sub cvtype      { return (split(":", shift->[OBJECTNAME]))[2] }
+sub instance    { return (split(":", shift->[OBJECTNAME]))[3] }
 
 # convenience methods for frequently used tests
 sub is_dir      { return shift->cvtype eq "dir"; }
 sub is_project  { return shift->cvtype eq "project"; }
 
 
-# NOTE: All access to a VCS::CMSynergy::Objects data _must_ either use
-# methods, e.g. "$self->foo", or use _private(), e.g. "$self->_private->{foo}".
-# _Don't_ access its member directly, e.g. "$self->{foo}", because this
-# doesn't work when :tied_objects are enabled.
-# The only exception to this rule are the primary getter methods (objectname,
-# version etc) which use direct access for speed. Hence they need to be
-# redefined in ObjectTieHash.pm.
-
-# access to private parts
-sub _private    { return shift; }
-
 sub mydata
 {
     my $self = shift;
-    return $self->_private->{mydata} ||= {};
+    return $self->[MYDATA] //= {};
 }
 
 
@@ -170,11 +172,12 @@ sub list_attributes
 sub get_attribute
 {
     my $self = shift;
-    my ($name) = validate(\@_, Str);
+    state $check = compile( Str );
+    my ($name) = $check->(@_);
 
     if (VCS::CMSynergy::use_cached_attributes())
     {
-        my $acache = $self->_private->{acache};
+        my $acache = $self->[ACACHE];
         return $acache->{$name} if exists $acache->{$name};
     }
 
@@ -187,7 +190,8 @@ sub get_attribute
 sub set_attribute
 {
     my $self = shift;
-    my ($name, $value) = validate(\@_, Str, Str);
+    state $check = compile( Str, Str );
+    my ($name, $value) = $check->(@_);
 
     my $rc = $self->ccm->set_attribute($name, $self, $value);
 
@@ -200,7 +204,8 @@ sub set_attribute
 sub create_attribute
 {
     my $self = shift;
-    my ($name, $type, $value) = validate(\@_, Str, Str, Str);
+    state $check = compile( Str, Str, Str );
+    my ($name, $type, $value) = $check->(@_);
 
     my $rc = $self->ccm->create_attribute($name, $type, $value, $self);
 
@@ -213,7 +218,8 @@ sub create_attribute
 sub delete_attribute
 {
     my $self = shift;
-    my ($name) = validate(\@_, Str);
+    state $check = compile( Str );
+    my ($name) = $check->(@_);
 
     my $rc = $self->ccm->delete_attribute($name, $self);
 
@@ -227,8 +233,8 @@ sub delete_attribute
 sub copy_attribute
 {
     my $self = shift;
-    my ($names, $to_file_specs) =
-        validate(\@_, (Str | ArrayRef[Str]), slurpy ArrayRef);
+    state $check = compile( (Str | ArrayRef[Str]), slurpy ArrayRef );
+    my ($names, $to_file_specs) = $check->(@_);
     $names = [ $names ] unless ref $names;
 
     # NOTE: no $flags allowed, because honouring them would need
@@ -239,7 +245,7 @@ sub copy_attribute
     if (VCS::CMSynergy::use_cached_attributes())
     {
         my @objects = grep { UNIVERSAL::isa($_, 'VCS::CMSynergy') } @$to_file_specs;
-        my $acache = $self->_private->{acache};
+        my $acache = $self->[ACACHE];
 
         foreach my $name (@$names)
         {
@@ -274,7 +280,7 @@ sub _update_acache
 
     while (my ($k, $v) = each %$attrs)
     {
-        $self->_private->{acache}{$k} = $v unless $dont_cache{$k};
+        $self->[ACACHE]{$k} = $v unless $dont_cache{$k};
     }
 }
 
@@ -284,7 +290,7 @@ sub _forget_acache
     return unless VCS::CMSynergy::use_cached_attributes();
 
     my $self = shift;
-    delete $self->_private->{acache}{$_} foreach @_;
+    delete $self->[ACACHE]{$_} foreach @_;
 }
 
 
@@ -299,7 +305,8 @@ sub exists
 sub property
 {
     my $self = shift;
-    my ($keyword_s) = validate(\@_, Str | ArrayRef[Str]);
+    state $check = compile( Str | ArrayRef[Str] );
+    my ($keyword_s) = $check->(@_);
 
     my $props = $self->ccm->property($keyword_s, $self);
     $self->_update_acache(ref $keyword_s ? $props : { $keyword_s => $props });
@@ -317,7 +324,7 @@ sub displayname
     #    foreach (@$result) {
     #      ... $_->displayname ...      # cached, no "ccm property ..." called
     #    }
-    return $self->_private->{acache}{displayname} ||= $self->property('displayname');
+    return $self->[ACACHE]{displayname} //= $self->property('displayname');
 }
 
 sub cvid
@@ -331,7 +338,7 @@ sub cvid
     #    foreach (@$result) {
     #      ... $_->cvid ...             # cached, no "ccm property ..." called
     #    }
-    return $self->_private->{acache}{cvid} ||= $self->property('cvid');
+    return $self->[ACACHE]{cvid} //= $self->property('cvid');
 }
 
 sub cat_object
@@ -376,7 +383,8 @@ sub AUTOLOAD
 sub show_hashref
 {
     my $self = shift;
-    my ($what, $keywords) = validate(\@_, Str, VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( Str, VCS::CMSynergy::_KEYWORDS() );
+    my ($what, $keywords) = $check->(@_);
     return $self->_show($what, $keywords, VCS::CMSynergy::ROW_HASH());
 }
 
@@ -384,10 +392,91 @@ sub show_hashref
 sub show_object
 {
     my $self = shift;
-    my ($what, $keywords) = validate(\@_, Str, VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( Str, VCS::CMSynergy::_KEYWORDS() );
+    my ($what, $keywords) = $check->(@_);
     return $self->_show($what, $keywords, VCS::CMSynergy::ROW_OBJECT());
 }
 
+
+# only for :tied_objects
+
+my %builtin = map { $_ => 1 } qw( objectname name version cvtype instance );
+
+# TIEHASH(class, \@fields)
+sub TIEHASH
+{
+    my ($class, $fields) = @_;
+    return bless $fields, $class;
+}
+
+sub FETCH
+{
+    my ($self, $key) = @_;
+    return $builtin{$key} ? $self->$key : $self->get_attribute($key);
+}
+
+sub STORE
+{
+    my ($self, $key, $value) = @_;
+    carp(__PACKAGE__ . qq[::STORE: pseudo attribute "$key" is read-only]) if $builtin{$key};
+    return $self->set_attribute($key, $value);
+}
+
+sub EXISTS
+{
+    my ($self, $key) = @_;
+    return $builtin{$key} || defined $self->get_attribute($key);
+}
+
+sub FIRSTKEY
+{
+    my ($self) = @_;
+    my $attrs = $self->list_attributes;
+
+    # Note: You can't "get" the "source" attribute, 
+    # "ccm attribute -show source ..." will only raise a Synergy error.
+    # Therefore omit this attribute.
+    delete $attrs->{source};
+
+    # FIXME are %builtin pseudo attrs shown by "ccm attr -la"? esp. objectname
+    $self->[ALIST] = [ keys %$attrs ];
+
+    my $key = pop @{ $self->[ALIST] };
+    return unless defined $key;
+    return wantarray ? ($key, $self->FETCH($key)) : $key;
+}
+
+sub NEXTKEY
+{
+    my ($self, $lastkey) = @_;
+
+    my $key = pop @{ $self->[ALIST] };
+    return unless defined $key;
+    return wantarray ? ($key, $self->FETCH($key)) : $key;
+}
+
+package VCS::CMSynergy::Object::TI;
+
+# inline these for performance
+sub ccm        { my $self = shift; tied(%$self)->[VCS::CMSynergy::Object::CCM] }
+sub objectname { my $self = shift; tied(%$self)->[VCS::CMSynergy::Object::OBJECTNAME] }
+
+use overload
+    '""'        => sub { $_[0]->objectname },
+    cmp         => sub { $_[0]->objectname cmp $_[1]->objectname },
+    fallback    => 1;
+
+our $AUTOLOAD;
+
+sub AUTOLOAD
+{
+    my ($class, $method) = $AUTOLOAD =~ /^(.*)::([^:]*)$/;
+    return if $method eq 'DESTROY';
+
+    no strict 'refs';
+    *{$method} = sub { my $self = shift; tied(%$self)->$method(@_) };
+    goto &$method;
+}
 
 1;
 

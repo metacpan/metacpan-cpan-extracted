@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2405",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<a class=\"localLink\" href=\"http://schema.org/Recommendation\">Recommendation</a> is a type of <a class=\"localLink\" href=\"http://schema.org/Review\">Review</a> that suggests or proposes something as the best option or best course of action. Recommendations may be for products or services, or other concrete things, as in the case of a ranked list or product guide. A <a class=\"localLink\" href=\"http://schema.org/Guide\">Guide</a> may list multiple recommendations for different categories. For example, in a <a class=\"localLink\" href=\"http://schema.org/Guide\">Guide</a> about which TVs to buy, the author may have several <a class=\"localLink\" href=\"http://schema.org/Recommendation\">Recommendation</a>s.",
+      "rdfs:label" : "Recommendation",
+      "rdfs:subClassOf" : "schema:Review",
+      "schema:category" : "issue-2405",
+      "schema:isPartOf" : "http:pending.schema.org"
+   },
+   "properties" : {
+      "schema:category" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
+         "rdfs:label" : "category",
+         "schema:category" : "issue-1741",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:Product",
+            "schema:Recommendation",
+            "schema:PhysicalActivity",
+            "schema:ActionAccessSpecification",
+            "schema:Invoice",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:PhysicalActivityCategory",
+            "schema:Text",
+            "schema:Thing"
+         ]
+      }
+   }
+}

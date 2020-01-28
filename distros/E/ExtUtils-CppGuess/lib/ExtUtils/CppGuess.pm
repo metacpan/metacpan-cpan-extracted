@@ -172,7 +172,7 @@ use Capture::Tiny 'capture_merged';
 use File::Spec::Functions qw(catfile);
 use File::Temp qw(tempdir);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub new {
     my( $class, %args ) = @_;
@@ -286,10 +286,10 @@ EOF
 }
 
 sub _get_cflags {
-  my $self = shift;
+  my ($self, $omit_ccflags) = @_;
   $self->guess_compiler or die;
   join ' ', '', map _trim_whitespace($_), grep defined && length,
-    $self->_config->{ccflags},
+    ($omit_ccflags ? '' : $self->_config->{ccflags}),
     $self->{guess}{extra_cflags},
     $self->{extra_compiler_flags},
     ($self->is_clang ? '-Wno-reserved-user-defined-literal' : ()),
@@ -323,7 +323,10 @@ sub module_build_options {
     my $self = shift;
 
     my $lflags = $self->_get_lflags;
-    my $cflags = $self->_get_cflags;
+    # We're omitting ccflags to avoid duplication of flags, because unlike
+    # makemaker, we're appending to the compiler flags, not overriding
+    # them. They already contain $Config{ccflags}.
+    my $cflags = $self->_get_cflags(1);
 
     return (
       extra_compiler_flags => $cflags,

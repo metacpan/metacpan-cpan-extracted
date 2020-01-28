@@ -3,7 +3,7 @@ use base 'Pegex::Grammar';
 
 use constant file => './share/jsony.pgx';
 
-sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.57)
+sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.73)
   {
     '+grammar' => 'jsony',
     '+toprule' => 'jsony',

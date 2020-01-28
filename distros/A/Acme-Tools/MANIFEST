@@ -30,7 +30,7 @@ t/23_ed.t
 t/24_db.t
 t/25_pwgen.t
 t/26_openstr.t
-t/27_tms.t
+t/27_timestuff.t
 t/28_wipe.t
 t/29_cmd_z2z.t
 t/30_cnttbl.t
@@ -47,6 +47,9 @@ t/40_aoh2.t
 t/41_changed.t
 t/42_finddup.t
 t/43_egrep.t
+t/44_toposort.t
+t/45_opts.t
+t/46_x2y_numeric_base_converts.t
 t/common.pl
 t/test_binsearch_bench.pl
 t/test_fork_bloom.pl

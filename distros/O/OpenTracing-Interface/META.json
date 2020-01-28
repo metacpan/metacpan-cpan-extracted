@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "API definition for OpenTransport implementations",
    "author" : [
       "unknown"
    ],
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

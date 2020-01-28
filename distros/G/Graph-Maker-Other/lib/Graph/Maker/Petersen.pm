@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -161,7 +161,7 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=746> (etc)
     1022    N=4, K=1    cube
     588     N=4, K=2    
     660     N=5, K=2    Petersen
-    32798   N=6, K=1    cross-connected 5-cycles
+    32798   N=6, K=1    cross-connected 6-cycles
     28482   N=7, K=2    
     1229    N=8, K=3    Mobius Kantor
     6700    N=9, K=3    
@@ -194,9 +194,13 @@ L<Graph::Maker>,
 L<Graph::Maker::Cycle>,
 L<Graph::Maker::Hypercube>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

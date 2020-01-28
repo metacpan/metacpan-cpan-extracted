@@ -3,8 +3,6 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::SHLOMIF;
 
-our $VERSION = '0.0010000';
-
 use Pod::Weaver 4; # he played knick-knack on my door
 use Pod::Weaver::Config::Assembler;
 
@@ -34,7 +32,7 @@ sub mvp_bundle_config {
         [ '@SHLOMIF/SingleEncoding', _exp('-SingleEncoding'), {} ],
         [ '@SHLOMIF/WikiDoc',        _exp('-WikiDoc'),        {} ],
         [ '@SHLOMIF/CorePrep',       _exp('@CorePrep'),       {} ],
-        [ '@SHLOMIF/Name',           _exp('Name'),            {} ],
+        [ '@SHLOMIF/Name',        _exp('Generic'),         { header => 'NAME',}, ],
         [ '@SHLOMIF/Version',        _exp('Version'),         {} ],
 
         [ '@SHLOMIF/Prelude',     _exp('Region'),  { region_name => 'prelude' } ],

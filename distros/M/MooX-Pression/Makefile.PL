@@ -20,20 +20,23 @@ my $meta = {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
-                                         recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.018000" },
+                                         recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.022000" },
                                          requires   => {
                                                          "B::Hooks::EndOfScope" => 0,
-                                                         "Exporter::Tiny"       => "1.000000",
-                                                         "Import::Into"         => 0,
-                                                         "Keyword::Declare"     => 0.001014,
-                                                         "MooX::Press"          => 0.026,
-                                                         "perl"                 => "5.014000",
+                                                         "Exporter::Tiny" => "1.000000",
+                                                         "Import::Into" => 0,
+                                                         "Keyword::Declare" => 0.001014,
+                                                         "MooX::Press" => 0.032,
+                                                         "perl" => "5.014000",
+                                                         "Syntax::Keyword::Try" => 0.11,
                                                        },
                                        },
-                          test      => { requires => { "Test::More" => 0.96 } },
+                          test      => {
+                                         requires => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Requires" => 0 },
+                                       },
                         },
   "provides"         => {
-                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.008 },
+                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.012 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -49,7 +52,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Pression/project",
                         },
-  "version"          => 0.008,
+  "version"          => 0.012,
   "x_static_install" => 1,
 };
 

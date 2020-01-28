@@ -1,5 +1,7 @@
 Revision history for Perl extension Remedy::ARSTools.
 
+1.25	Mon Jan 27 13:55:35 CST 2020
+	added getAttachments argument to QueryNew()
 
 1.23	Thu Jun  6 12:47:00 CDT 2019
 	fixed bug in CheckFields on epoch conversion for Date fields

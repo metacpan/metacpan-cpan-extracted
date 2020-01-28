@@ -4,6 +4,6 @@
 ## Description: DTA::CAB version constants (auto-generated)
 ##
 package DTA::CAB::Version;
-$DTA::CAB::VERSION = '1.109';
-$DTA::CAB::SVNVERSION = '29762';
+$DTA::CAB::VERSION = '1.111';
+$DTA::CAB::SVNVERSION = '31398';
 1;

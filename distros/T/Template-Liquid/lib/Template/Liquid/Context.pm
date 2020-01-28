@@ -1,5 +1,5 @@
 package Template::Liquid::Context;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Utility;
 require Template::Liquid::Error;
 use strict;
@@ -16,20 +16,16 @@ sub new {
 
 sub push {
     my ($s, $context) = @_;
-    return
-        raise Template::Liquid::Error {type    => 'Stack',
-                                       message => 'Cannot push new scope!'
-        }
+    return raise Template::Liquid::Error {type => 'Stack',
+                                          message => 'Cannot push new scope!'}
         if scalar @{$s->{'scopes'}} == 100;
     return push @{$s->{'scopes'}}, (defined $context ? $context : {});
 }
 
 sub pop {
     my ($s) = @_;
-    return
-        raise Template::Liquid::Error {type    => 'Stack',
-                                       message => 'Cannot pop scope!'
-        }
+    return raise Template::Liquid::Error {type => 'Stack',
+                                          message => 'Cannot pop scope!'}
         if scalar @{$s->{'scopes'}} == 1;
     return pop @{$s->{'scopes'}};
 }
@@ -53,17 +49,13 @@ sub _merge {    # Deeply merges data structures
     my ($source, $target) = @_;
     my $return = $target;
     for (keys %$source) {
-        if ('ARRAY' eq ref $target->{$_}
-            && ('ARRAY' eq ref $source->{$_}
-                || !ref $source->{$_})
-            )
-        {   @{$return->{$_}} = [@{$target->{$_}}, @{$source->{$_}}];
+        if ('ARRAY' eq ref $target->{$_} &&
+            ('ARRAY' eq ref $source->{$_} || !ref $source->{$_})) {
+            @{$return->{$_}} = [@{$target->{$_}}, @{$source->{$_}}];
         }
-        elsif ('HASH' eq ref $target->{$_}
-               && ('HASH' eq ref $source->{$_}
-                   || !ref $source->{$_})
-            )
-        {   $return->{$_} = _merge($source->{$_}, $target->{$_});
+        elsif ('HASH' eq ref $target->{$_} &&
+               ('HASH' eq ref $source->{$_} || !ref $source->{$_})) {
+            $return->{$_} = _merge($source->{$_}, $target->{$_});
         }
         else { $return->{$_} = $source->{$_}; }
     }
@@ -104,14 +96,13 @@ sub __merge {    # unless right is more interesting, this is a left-
 
 sub get {
     my ($s, $var) = @_;
-    return if !defined $var;
+    return    if !defined $var;
     return $2 if $var =~ m[^(["'])(.+)\1$]o;
     my @path = split $Template::Liquid::Utility::VariableAttributeSeparator,
         $var;
     my $cursor = \$s->{scopes}[-1];
     return $var
-        if $var =~ m[^[-\+]?(\d*\.)?\d+$]o
-        && !exists $$cursor->{$path[0]};
+        if $var =~ m[^[-\+]?(\d*\.)?\d+$]o && !exists $$cursor->{$path[0]};
     return     if $var eq '';
     return     if $var eq 'null';
     return     if $var eq 'nil';
@@ -243,16 +234,15 @@ CPAN ID: SANKO
 Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of
-L<The Artistic License 2.0|http://www.perlfoundation.org/artistic_license_2_0>.
-See the F<LICENSE> file included with this distribution or
-L<notes on the Artistic License 2.0|http://www.perlfoundation.org/artistic_2_0_notes>
-for clarification.
+the terms of L<The Artistic License
+2.0|http://www.perlfoundation.org/artistic_license_2_0>. See the F<LICENSE>
+file included with this distribution or L<notes on the Artistic License
+2.0|http://www.perlfoundation.org/artistic_2_0_notes> for clarification.
 
-When separated from the distribution, all original POD documentation is
-covered by the
-L<Creative Commons Attribution-Share Alike 3.0 License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>.
-See the
-L<clarification of the CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
+When separated from the distribution, all original POD documentation is covered
+by the L<Creative Commons Attribution-Share Alike 3.0
+License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+L<clarification of the
+CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
 
 =cut

@@ -5,8 +5,8 @@
       "rdfs:comment" : "A payment method using a credit, debit, store or other card to associate the payment with an account.",
       "rdfs:label" : "PaymentCard",
       "rdfs:subClassOf" : [
-         "schema:FinancialProduct",
-         "schema:PaymentMethod"
+         "schema:PaymentMethod",
+         "schema:FinancialProduct"
       ]
    },
    "properties" : {
@@ -22,8 +22,8 @@
          "schema:domainIncludes" : "schema:PaymentCard",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Boolean",
-            "schema:Number"
+            "schema:Number",
+            "schema:Boolean"
          ]
       },
       "schema:contactlessPayment" : {

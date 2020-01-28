@@ -4,9 +4,9 @@ extends 'Pegex::Tree';
 
 use boolean;
 
-sub got_json { $_[1][0] }
-sub got_object { +{map @$_, map @$_, @{(pop)}} }
-sub got_array { [map @$_, @{(pop)}] }
+sub got_json { shift @{(pop)} }
+
+sub got_object { +{map @$_, @{(pop)}} }
 
 my %escapes = (
     '"' => '"',
@@ -28,7 +28,7 @@ sub got_string {
     return $string;
 }
 
-sub got_number { $_[1] + 0 }
+sub got_number { (pop) + 0 }
 sub got_true { &boolean::true }
 sub got_false { &boolean::false }
 sub got_null { undef }

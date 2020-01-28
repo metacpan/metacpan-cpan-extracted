@@ -220,14 +220,10 @@ Files: Changes
  t/devscripts.t
  t/encoding.t
  t/grant.t
- t/license.t
-Copyright: Copyright 2020 Jonas Smedegaard.
-License: GPL-3.0
-
-Files: t/fedora.t
  t/lib/Test/Licensecheck.pm
  t/lib/Test/Licensecheck/ScanCode.pm
-Copyright: Copyright 2019 Jonas Smedegaard.
+ t/license.t
+Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: COPYRIGHT
@@ -248,6 +244,10 @@ License: GPL-1.0+ or Artistic-1.0
 Files: t/devscripts/artistic-2-0-modules.pm
 Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
 License: Artistic-2.0
+
+Files: t/fedora.t
+Copyright: Copyright 2019 Jonas Smedegaard.
+License: GPL-3.0
 
 License: GPL-3.0
  This software is Copyright (c) 2020 by Jonas Smedegaard.

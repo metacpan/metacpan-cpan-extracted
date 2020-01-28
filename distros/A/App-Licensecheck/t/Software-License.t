@@ -35,13 +35,13 @@ my %LICENSES = (
 	'MPL-2.0'  => 'MPL-2.0',
 
 #	None                                    => 'UNKNOWN',
-	OpenSSL                                 => 'Apache-1.0 and/or OpenSSL',
+	OpenSSL => 'Apache-1.0 and/or BSD-4-clause and/or OpenSSL',
 	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'Artistic or GPL-1+',
 	PostgreSQL                              => 'PostgreSQL',
 	'QPL-1.0'                               => 'QPL-1.0',
-	SSLeay                                  => 'BSD-2-clause',
-	SISSL                                   => 'UNKNOWN',
-	Zlib                                    => 'Zlib',
+	SSLeay => 'BSD-2-clause and/or BSD~unspecified',
+	SISSL  => 'UNKNOWN',
+	Zlib   => 'Zlib',
 );
 
 my $workdir = Path::Tiny->tempdir( CLEANUP => ( not $ENV{PRESERVE} ) );
@@ -71,7 +71,14 @@ foreach ( split /\v+/, $stdout ) {
 		my $file    = $1;
 		my $result  = $2;
 		my $success = is( $result, $LICENSES{$file}, $file );
-		if ( $LICENSES{$file} eq 'UNKNOWN' and $success ) {
+		if ((      $LICENSES{$file} eq 'UNKNOWN'
+				or $LICENSES{$file} eq
+				'Apache-1.0 and/or BSD-4-clause and/or OpenSSL'
+				or $LICENSES{$file} eq 'BSD-2-clause and/or BSD~unspecified'
+			)
+			and $success
+			)
+		{
 			diag("licensecheck failed to parse $file as expected");
 		}
 	}

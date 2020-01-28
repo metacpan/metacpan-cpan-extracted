@@ -1,0 +1,257 @@
+---
+
+# -------------------- owners
+
+- schema: Owner
+  name: sschwigo
+  data:
+    id: 12
+    name: Steffen Schwigon
+    login: sschwigo
+    password: verysecret
+
+# -------------------- topics
+
+- schema: Topic
+  name: software
+  data:
+    name: Software
+    description: any non-kernel software, e.g., libraries, programs
+
+
+# -------------------- preconditions
+
+- schema: Precondition
+  name: autoinstall
+  data:
+    id: 101
+    shortname: auto_auto
+    precondition: |
+      ---
+      precondition_type: autoinstall
+      timeout: 10800
+      filename: suse/SLES10SP3_x86_64.lst
+
+
+# -------------------- "autoinstall"
+
+- schema: TestrunPrecondition
+  name: First precondition for autoinstall
+  data:
+    testrun_id: 100
+    precondition_id: 101
+    succession: 1
+
+
+# ==================== "scheduling"
+
+# -------------------- "queues"
+
+- schema: Queue
+  name: Xen Queue
+  data:
+    id: 1
+    name: Xen
+    priority: 300
+    active: 1
+
+
+- schema: Queue
+  name: KVM Queue
+  data:
+    id: 2
+    name: KVM
+    priority: 200
+    active: 1
+
+- schema: Queue
+  name: Kernel Queue
+  data:
+    id: 3
+    name: Kernel
+    priority: 10
+    active: 1
+
+# -------------------- "test requests" (Testruns)
+
+# ======================= Xen requests =========================
+
+# ======================= Kernel requests =========================
+
+# --- ecc1 ---
+
+- schema: Testrun
+  name: tr_ecc1
+  data:
+    id: 1001
+    owner_id: 12
+    shortname: ecc1
+    notes: has_ecc
+    topic_name: ecc_topic
+
+- schema: TestrunScheduling
+  name: ts_ecc1
+  data:
+    id: 2001
+    testrun_id: 1001            # ccc
+    host_id: 5
+    queue_id: 3                 # Kernel
+    auto_rerun: 0
+    status: finished
+
+
+# --- ecc2 ---
+
+- schema: Testrun
+  name: tr_ecc2
+  data:
+    id: 1002
+    owner_id: 12
+    shortname: ecc2
+    notes: has_ecc
+    topic_name: ecc_topic
+
+- schema: TestrunScheduling
+  name: ts_ecc2
+  data:
+    id: 2002
+    testrun_id: 1002
+    host_id: 5
+    queue_id: 3
+    auto_rerun: 0
+    status: running
+
+# --- ecc3 ---
+
+- schema: Testrun
+  name: tr_ecc2
+  data:
+    id: 1003
+    owner_id: 12
+    shortname: ecc3
+    notes: has_ecc
+    topic_name: ecc_topic
+
+- schema: TestrunScheduling
+  name: ts_ecc2
+  data:
+    id: 2003
+    testrun_id: 1003
+    queue_id: 3
+    auto_rerun: 0
+    status: schedule
+
+- schema: TestrunRequestedFeature
+  name: has_ecc
+  data:
+    id: 5001
+    testrun_id: 1001
+    feature: |
+      has_ecc
+
+- schema: TestrunRequestedFeature
+  name: has_ecc
+  data:
+    id: 5002
+    testrun_id: 1002
+    feature: |
+      has_ecc
+
+
+# -------------------- hosts --------------------
+
+- schema: Host
+  name: iring
+  data:
+    id: 5
+    name: iring
+    free: 1
+    active: 1
+
+- schema: Host
+  name: kobold
+  data:
+    id: 101
+    name: kobold
+    free: 1
+    active: 1
+
+
+
+
+# ---------------- HostFeature ------------
+
+- schema: HostFeature
+  name: kobold_ram
+  data:
+    id: 1
+    host_id: 101
+    entry: mem
+    value: 4096
+
+- schema: HostFeature
+  name: kobold_vendor
+  data:
+    id: 2
+    host_id: 101
+    entry: vendor
+    value: AMD
+
+- schema: HostFeature
+  name: kobold_cores
+  data:
+    id: 3
+    host_id: 101
+    entry: cores
+    value: 2
+
+- schema: HostFeature
+  name: kobold_ram
+  data:
+    id: 4
+    host_id: 101
+    entry: keyword
+    value: server
+
+
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 5
+    host_id: 5
+    entry: mem
+    value: 8192
+
+- schema: HostFeature
+  name: iring_vendor
+  data:
+    id: 6
+    host_id: 5
+    entry: vendor
+    value: Intel
+
+- schema: HostFeature
+  name: iring_cores
+  data:
+    id: 7
+    host_id: 5
+    entry: cores
+    value: 1
+
+- schema: HostFeature
+  name: iring_ram
+  data:
+    id: 8
+    host_id: 5
+    entry: keyword
+    value: testmachine
+
+- schema: HostFeature
+  name: kobold_ecc
+  data:
+    id: 9
+    host_id: 101
+    entry: has_ecc
+    value: 1
+

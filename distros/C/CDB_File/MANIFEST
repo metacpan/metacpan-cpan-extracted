@@ -2,11 +2,11 @@ ACKNOWLEDGE
 bun-x.pl
 CDB_File.pm
 CDB_File.xs
-CHANGES
+Changelog
 COPYRIGHT
 INSTALL
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
 README.md

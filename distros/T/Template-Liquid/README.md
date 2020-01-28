@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sanko/template-liquid.svg?branch=master)](https://travis-ci.org/sanko/template-liquid)
+[![Build Status](https://travis-ci.org/sanko/template-liquid.svg?branch=master)](https://travis-ci.org/sanko/template-liquid) [![MetaCPAN Release](https://badge.fury.io/pl/Template-Liquid.svg)](https://metacpan.org/release/Template-Liquid)
 # NAME
 
 Template::Liquid - A Simple, Stateless Template System
@@ -12,8 +12,7 @@ Template::Liquid - A Simple, Stateless Template System
 
 # Description
 
-The original Liquid template engine was crafted for very specific
-requirements:
+The original Liquid template engine was crafted for very specific requirements:
 
 - It has to have simple markup and beautiful results.
 
@@ -102,7 +101,7 @@ documentation.
 
     This is a line of text.
 
-For more, see [Template::Liquid::Tag::Comment](https://metacpan.org/pod/Template::Liquid::Tag::Comment).
+For more, see [Template::Liquid::Tag::Comment](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AComment).
 
 ## `raw`
 
@@ -117,7 +116,7 @@ Raw temporarily disables tag processing. This is useful for generating content
 
     In Handlebars, {{ this }} will be HTML-escaped, but {{{ that }}} will not.
 
-For more, see [Template::Liquid::Tag::Raw](https://metacpan.org/pod/Template::Liquid::Tag::Raw).
+For more, see [Template::Liquid::Tag::Raw](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ARaw).
 
 ## `if` / `elseif` / `else`
 
@@ -128,9 +127,8 @@ For more, see [Template::Liquid::Tag::Raw](https://metacpan.org/pod/Template::Li
         </div>
     {% endunless %}
 
-For more, see [Template::Liquid::Tag::If](https://metacpan.org/pod/Template::Liquid::Tag::If) and
-[Template::Liquid::Condition](https://metacpan.org/pod/Template::Liquid::Condition).
-.
+For more, see [Template::Liquid::Tag::If](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AIf) and
+[Template::Liquid::Condition](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ACondition). .
 
 ## `unless` / `elseif` / `else`
 
@@ -145,8 +143,8 @@ This is sorta the opposite of `if`.
        Psst! It's {{some.value}}.
     {% endunless %}
 
-For more, see [Template::Liquid::Tag::Unless](https://metacpan.org/pod/Template::Liquid::Tag::Unless)
-and [Template::Liquid::Condition](https://metacpan.org/pod/Template::Liquid::Condition).
+For more, see [Template::Liquid::Tag::Unless](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AUnless)
+and [Template::Liquid::Condition](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ACondition).
 
 ## `case`
 
@@ -161,7 +159,7 @@ If you need more conditions, you can use the case statement:
             ... else ...
     {% endcase %}
 
-For more, see [Template::Liquid::Tag::Case](https://metacpan.org/pod/Template::Liquid::Tag::Case).
+For more, see [Template::Liquid::Tag::Case](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACase).
 
 ## `cycle`
 
@@ -183,8 +181,8 @@ has built-in support for such operations, using the cycle tag.
 If no name is supplied for the cycle group, then it's assumed that multiple
 calls with the same parameters are one group.
 
-If you want to have total control over cycle groups, you can optionally
-specify the name of the group. This can even be a variable.
+If you want to have total control over cycle groups, you can optionally specify
+the name of the group. This can even be a variable.
 
     {% cycle 'group 1': 'one', 'two', 'three' %}
     {% cycle 'group 1': 'one', 'two', 'three' %}
@@ -198,7 +196,7 @@ specify the name of the group. This can even be a variable.
     one
     two
 
-For more, see [Template::Liquid::Tag::Cycle](https://metacpan.org/pod/Template::Liquid::Tag::Cycle).
+For more, see [Template::Liquid::Tag::Cycle](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACycle).
 
 ## `for`
 
@@ -208,13 +206,13 @@ Liquid allows for loops over collections:
         {{ item }}
     {% endfor %}
 
-Please see see [Template::Liquid::Tag::For](https://metacpan.org/pod/Template::Liquid::Tag::For).
+Please see see [Template::Liquid::Tag::For](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AFor).
 
 ## `assign`
 
-You can store data in your own variables, to be used in output or other tags
-as desired. The simplest way to create a variable is with the assign tag,
-which has a pretty straightforward syntax:
+You can store data in your own variables, to be used in output or other tags as
+desired. The simplest way to create a variable is with the assign tag, which
+has a pretty straightforward syntax:
 
     {% assign name = 'freestyle' %}
 
@@ -238,13 +236,13 @@ variable:
 If you want to combine a number of strings into a single string and save it to
 a variable, you can do that with the capture tag.
 
-For more, see [Template::Liquid::Tag::Assign](https://metacpan.org/pod/Template::Liquid::Tag::Assign).
+For more, see [Template::Liquid::Tag::Assign](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3AAssign).
 
 ## `capture`
 
 This tag is a block which "captures" whatever is rendered inside it, then
-assigns the captured value to the given variable instead of rendering it to
-the screen.
+assigns the captured value to the given variable instead of rendering it to the
+screen.
 
     {% capture attribute_name %}{{ item.title | handleize }}-{{ i }}-color{% endcapture %}
 
@@ -255,12 +253,11 @@ the screen.
         <option value="blue">Blue</option>
     </select>
 
-For more, see [Template::Liquid::Tag::Capture](https://metacpan.org/pod/Template::Liquid::Tag::Capture).
+For more, see [Template::Liquid::Tag::Capture](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag%3A%3ACapture).
 
 # Standard Liquid Filters
 
-Please see
-[Template::Liquid::Filters::Standard](https://metacpan.org/pod/Template::Liquid::Filters::Standard).
+Please see [Template::Liquid::Filters](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3AFilters).
 
 # Extending Template::Liquid
 
@@ -269,15 +266,15 @@ simple. Keep reading.
 
 ## Custom Tags
 
-See the section entitled
-[Extending Template::Liquid with Custom Tags](https://metacpan.org/pod/Template::Liquid::Tag#Extending-Template::Liquid-with-Custom-Tags)
-in [Template::Liquid::Tag](https://metacpan.org/pod/Template::Liquid::Tag) for more information.
+See the section entitled [Extending Template::Liquid with Custom
+Tags](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag#Extending-Template::Liquid-with-Custom-Tags) in
+[Template::Liquid::Tag](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3ATag) for more information.
 
-Also check out the examples of [Template::LiquidX::Tag::Dump](https://metacpan.org/pod/Template::LiquidX::Tag::Dump) and
-[Template::LiquidX::Tag::Include](https://metacpan.org/pod/Template::LiquidX::Tag::Include) now on CPAN.
+Also check out the examples of [Template::LiquidX::Tag::Dump](https://metacpan.org/pod/Template%3A%3ALiquidX%3A%3ATag%3A%3ADump) and
+[Template::LiquidX::Tag::Include](https://metacpan.org/pod/Template%3A%3ALiquidX%3A%3ATag%3A%3AInclude) now on CPAN.
 
-To assist with custom tag creation, Template::Liquid provides several basic tag types
-for subclassing and exposes the following methods:
+To assist with custom tag creation, Template::Liquid provides several basic tag
+types for subclassing and exposes the following methods:
 
 ### `Template::Liquid::register_tag( ... )`
 
@@ -291,8 +288,8 @@ both a `parse` and `render` method.
     Template::Liquid::register_tag( 'newtag' );
     # ...and Template::Liquid will assume the new tag is in the calling package
 
-Pre-existing tags are replaced when new tags are registered with the same
-name. You may want to do this to override some functionality.
+Pre-existing tags are replaced when new tags are registered with the same name.
+You may want to do this to override some functionality.
 
 ## Custom Filters
 
@@ -301,8 +298,8 @@ by design and must return the modified content.
 
 ### `Template::Liquid::register_filter( ... )`
 
-This registers a package which Template::Liquid will assume contains one or more
-filters.
+This registers a package which Template::Liquid will assume contains one or
+more filters.
 
     # Register a package as a filter
     Template::Liquid::register_filter( 'Template::Solution::Filter::Amalgamut' );
@@ -336,11 +333,11 @@ I'd really rather use Solution::{Package} for extentions but Template::LiquidX
 really is a better choice.
 
 As I understand it, the original project's name, Liquid, is a reference to the
-classical states of matter (the engine itself being stateless). I wanted to
-use [solution](http://en.wikipedia.org/wiki/Solution) because it's liquid but
-with bits of other stuff floating in it. (Pretend you majored in chemistry
-instead of mathematics or computer science.) Liquid tempates will _always_
-work with Template::Liquid but (due to Template::LiquidX's expanded syntax)
+classical states of matter (the engine itself being stateless). I wanted to use
+[solution](http://en.wikipedia.org/wiki/Solution) because it's liquid but with
+bits of other stuff floating in it. (Pretend you majored in chemistry instead
+of mathematics or computer science.) Liquid tempates will _always_ work with
+Template::Liquid but (due to Template::LiquidX's expanded syntax)
 Template::LiquidX templates _may not_ be compatible with Liquid or
 Template::Liquid.
 
@@ -351,22 +348,21 @@ Sanko Robinson <sanko@cpan.org> - http://sankorobinson.com/
 CPAN ID: SANKO
 
 The original Liquid template system was developed by
-[jadedPixel](http://jadedpixel.com/) and
-[Tobias Lütke](http://blog.leetsoft.com/).
+[jadedPixel](http://jadedpixel.com/) and [Tobias
+LÃ¼tke](http://blog.leetsoft.com/).
 
 # License and Legal
 
 Copyright (C) 2009-2016 by Sanko Robinson <sanko@cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of
-[The Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
-See the `LICENSE` file included with this distribution or
-[notes on the Artistic License 2.0](http://www.perlfoundation.org/artistic_2_0_notes)
-for clarification.
+the terms of [The Artistic License
+2.0](http://www.perlfoundation.org/artistic_license_2_0). See the `LICENSE`
+file included with this distribution or [notes on the Artistic License
+2.0](http://www.perlfoundation.org/artistic_2_0_notes) for clarification.
 
-When separated from the distribution, all original POD documentation is
-covered by the
-[Creative Commons Attribution-Share Alike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/us/legalcode).
-See the
-[clarification of the CCA-SA3.0](http://creativecommons.org/licenses/by-sa/3.0/us/).
+When separated from the distribution, all original POD documentation is covered
+by the [Creative Commons Attribution-Share Alike 3.0
+License](http://creativecommons.org/licenses/by-sa/3.0/us/legalcode). See the
+[clarification of the
+CCA-SA3.0](http://creativecommons.org/licenses/by-sa/3.0/us/).

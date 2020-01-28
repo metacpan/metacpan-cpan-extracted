@@ -33,7 +33,7 @@ sub mock_dynaloader {
     my $lib = $libref[$libref];
     $lib->has_symbol($symbol);
   });
-  
+
   $mock;
 }
 
@@ -43,7 +43,7 @@ package
 sub new
 {
   my($class, $filename) = @_;
-  
+
   my @list = do {
     my $fh;
     open $fh, '<', $filename;
@@ -51,13 +51,13 @@ sub new
     close $fh;
     @list;
   };
-  
+
   chomp @list;
-  
+
   my $name = shift @list;
   my $version = shift @list;
   my %symbols = map { $_ => 1 } @list;
-  
+
   bless {
     filename => $filename,
     name     => $name,

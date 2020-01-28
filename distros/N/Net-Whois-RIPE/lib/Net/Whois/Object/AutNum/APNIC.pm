@@ -1,5 +1,7 @@
 package Net::Whois::Object::AutNum::APNIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -h whois.apnic.net -t aut-num
@@ -50,7 +52,7 @@ for Autonomous Systems.
 
 The aut-num object specifies routing policies. It refers to a group of IP
 networks that have a single and clearly defined external routing policy,
-operated by one or more network operators – an Autonomous System (AS).
+operated by one or more network operators, an Autonomous System (AS).
 
 =head1 METHODS
 

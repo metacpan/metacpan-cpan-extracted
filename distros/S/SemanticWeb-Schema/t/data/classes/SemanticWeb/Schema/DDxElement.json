@@ -12,8 +12,8 @@
          "rdfs:comment" : "One or more alternative conditions considered in the differential diagnosis process as output of a diagnosis process.",
          "rdfs:label" : "diagnosis",
          "schema:domainIncludes" : [
-            "schema:DDxElement",
-            "schema:Patient"
+            "schema:Patient",
+            "schema:DDxElement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalCondition"

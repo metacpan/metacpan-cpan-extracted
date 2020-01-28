@@ -13,30 +13,34 @@ run_tests(
     sub {
         my $client = test_client( dbs => ['ts1'] );
 
-        my $job2h;
-        for ( 1 .. 2 ) {
-            my $job = TheSchwartz::Job->new(
-                funcname => 'Worker::CoalesceTest',
-                arg      => { n => $_ },
-                coalesce => "a$_",
-            );
-            my $h = $client->insert($job);
-            $job2h = $h if $_ == 2;
-            ok( $h, "inserted $h" );
+        {
+            my $job2h;
+            for ( 1 .. 2 ) {
+                my $job = TheSchwartz::Job->new(
+                    funcname => 'Worker::CoalesceTest',
+                    arg      => { n => $_ },
+                    coalesce => "a$_",
+                );
+                my $h = $client->insert($job);
+                $job2h = $h if $_ == 2;
+                ok( $h, "inserted $h" );
+            }
+
+            $client->reset_abilities;
+            $client->can_do("Worker::CoalesceTest");
+
+            my $job = $client->find_job_with_coalescing_prefix(
+                "Worker::CoalesceTest", "a1" );
+            Worker::CoalesceTest->work_safely($job);
+
+            # this one should have succeeded:
+            is( $job->handle->failures, 0, "no failures on first job" );
+
+            # the second one should have failures:
+            is( $job2h->failures, 1, "1 failure on second job" );
         }
 
-        $client->reset_abilities;
-        $client->can_do("Worker::CoalesceTest");
-
-        my $job = $client->find_job_with_coalescing_prefix(
-            "Worker::CoalesceTest", "a1" );
-        Worker::CoalesceTest->work_safely($job);
-
-        # this one should have succeeded:
-        is( $job->handle->failures, 0, "no failures on first job" );
-
-        # the second one should have failures:
-        is( $job2h->failures, 1, "1 failure on second job" );
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }
@@ -58,7 +62,7 @@ sub work {
 }
 
 sub keep_exit_status_for {
-    20
+    20;
 }    # keep exit status for 20 seconds after on_complete
 sub grab_for    {10}
 sub max_retries {1}

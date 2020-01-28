@@ -1,5 +1,8 @@
+0.14 2020-01-22 10:37:58 floating
+ - Fix Changes file
+
 0.13 2020-01-20 14:50:26 floating
- - Fix $DumpModule feature (again)
+ - Use YAML::PP based XXX
 
 0.12 2012-07-25 09:36:13 -0700
  - Fix $DumpModule feature (again)

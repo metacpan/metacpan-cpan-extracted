@@ -1,5 +1,7 @@
 package Net::Whois::Object::Inet6Num;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 #######################################################################################
@@ -13,14 +15,15 @@ use base qw/Net::Whois::Object/;
 # 
 # inet6num:       [mandatory]  [single]     [primary/lookup key]
 # netname:        [mandatory]  [single]     [lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # country:        [mandatory]  [multiple]   [ ]
 # geoloc:         [optional]   [single]     [ ]
 # language:       [optional]   [multiple]   [ ]
 # org:            [optional]   [single]     [inverse key]
-# sponsoring-org: [generated]  [single]     [ ]
+# sponsoring-org: [optional]   [single]     [ ]
 # admin-c:        [mandatory]  [multiple]   [inverse key]
 # tech-c:         [mandatory]  [multiple]   [inverse key]
+# abuse-c:        [optional]   [single]     [inverse key]
 # status:         [mandatory]  [single]     [ ]
 # assignment-size:[optional]   [single]     [ ]
 # remarks:        [optional]   [multiple]   [ ]
@@ -30,19 +33,18 @@ use base qw/Net::Whois::Object/;
 # mnt-routes:     [optional]   [multiple]   [inverse key]
 # mnt-domains:    [optional]   [multiple]   [inverse key]
 # mnt-irt:        [optional]   [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-1)
+# % This query was served by the RIPE Database Query Service version 1.96 (ANGUS)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'inet6num' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'inet6num', 'netname', 'descr', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'geoloc', 'language', 'org', 'sponsoring_org', 'assignment_size', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'mnt_domains', 'mnt_irt', 'created', 'last_modified' ] );
-__PACKAGE__->attributes( 'single',      [ 'inet6num', 'netname', 'geoloc', 'org', 'sponsoring_org', 'status', 'assignment_size', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_routes', 'mnt_domains', 'mnt_irt', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'inet6num', 'netname', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'geoloc', 'language', 'org', 'sponsoring_org', 'abuse_c', 'assignment_size', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'mnt_domains', 'mnt_irt', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'single',      [ 'inet6num', 'netname', 'geoloc', 'org', 'sponsoring_org', 'abuse_c', 'status', 'assignment_size', 'created', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_routes', 'mnt_domains', 'mnt_irt' ] );
 
 # End of auto-generated lines
 #######################################################################################

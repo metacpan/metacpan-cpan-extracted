@@ -3,11 +3,11 @@ abstract: 'Settings bundler.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test2::V0: '0'
+  Test2::V0: '0.000126'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,18 +26,18 @@ no_index:
 provides:
   Config::Registry:
     file: lib/Config/Registry.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Carp: '0'
-  MRO::Compat: '0'
-  Moo: '0'
-  namespace::clean: '0'
-  strictures: '0'
+  MRO::Compat: '0.12'
+  Moo: '2.003000'
+  namespace::clean: '0.27'
+  strictures: '2.000003'
 resources:
   bugtracker: https://github.com/bluefeet/Config-Registry/issues
   homepage: https://github.com/bluefeet/Config-Registry
   repository: git://github.com/bluefeet/Config-Registry.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -12,14 +12,14 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Service",
-            "schema:Place",
-            "schema:CreativeWork",
-            "schema:Organization",
-            "schema:Event",
             "schema:Product",
-            "schema:Brand"
+            "schema:Event",
+            "schema:Place",
+            "schema:Service",
+            "schema:Offer",
+            "schema:Brand",
+            "schema:Organization",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
@@ -30,15 +30,15 @@
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
+            "schema:Product",
             "schema:Service",
             "schema:Place",
             "schema:Brand",
-            "schema:Organization",
-            "schema:Product"
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : [
-            "schema:ImageObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:ImageObject"
          ]
       },
       "schema:review" : {
@@ -46,14 +46,14 @@
          "rdfs:comment" : "A review of the item.",
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
-            "schema:Product",
+            "schema:CreativeWork",
             "schema:Organization",
             "schema:Event",
-            "schema:Place",
-            "schema:Offer",
+            "schema:Product",
             "schema:Brand",
-            "schema:CreativeWork",
-            "schema:Service"
+            "schema:Place",
+            "schema:Service",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -62,11 +62,11 @@
          "rdfs:comment" : "A slogan or motto associated with the item.",
          "rdfs:label" : "slogan",
          "schema:domainIncludes" : [
-            "schema:Place",
             "schema:Service",
             "schema:Brand",
-            "schema:Product",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Place",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

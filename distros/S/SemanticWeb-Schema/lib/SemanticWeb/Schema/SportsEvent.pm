@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has away_team => (
@@ -42,6 +42,14 @@ has home_team => (
 
 
 
+has sport => (
+    is        => 'rw',
+    predicate => '_has_sport',
+    json_ld   => 'sport',
+);
+
+
+
 
 
 1;
@@ -58,7 +66,7 @@ SemanticWeb::Schema::SportsEvent - Event type: Sports event.
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -124,6 +132,22 @@ A home_team should be one of the following types:
 
 A predicate for the L</home_team> attribute.
 
+=head2 C<sport>
+
+A type of sport (e.g. Baseball).
+
+A sport should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_sport>
+
+A predicate for the L</sport> attribute.
+
 =head1 SEE ALSO
 
 L<SemanticWeb::Schema::Event>
@@ -148,7 +172,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

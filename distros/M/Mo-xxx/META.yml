@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/ingydotnet/mo-xxx-pm/issues
   homepage: https://github.com/ingydotnet/mo-xxx-pm
   repository: https://github.com/ingydotnet/mo-xxx-pm.git
-version: '0.13'
+version: '0.14'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -243,7 +243,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.13'
+          tag: '0.14'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

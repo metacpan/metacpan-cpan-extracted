@@ -1,5 +1,7 @@
 package Net::Whois::Object::RouteSet::APNIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -h whois.apnic.net -t route-set

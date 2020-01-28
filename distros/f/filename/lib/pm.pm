@@ -1,6 +1,10 @@
 
+
+
 use strict;
 use warnings;
+
+
 
 package pm;
 # ABSTRACT: Perl module to load files at compile-time, without BEGIN blocks.
@@ -26,7 +30,7 @@ pm - Perl module to load files at compile-time, without BEGIN blocks.
     # use the more succinct:
     use pm '/path/to/file.pm';
 
-    # Or, if you need to do include a Per module relative to the program:
+    # Or, if you need to include a Perl module relative to the program:
     use FindBin qw($Bin);
     use pm "$Bin/../lib/Application.pm";
 
@@ -52,7 +56,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.010 of this module.
+This document describes version v0.20.022 of this module.
 
 =head1 AUTHOR
 

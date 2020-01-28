@@ -12,14 +12,14 @@
          "rdfs:comment" : "The anatomy of the underlying organ system or structures associated with this entity.",
          "rdfs:label" : "associatedAnatomy",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem",
             "schema:SuperficialAnatomy",
-            "schema:AnatomicalSystem"
+            "schema:AnatomicalStructure"
          ]
       },
       "schema:category" : {
@@ -30,15 +30,16 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:Recommendation",
+            "schema:PhysicalActivity",
+            "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:ActionAccessSpecification"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:PhysicalActivityCategory",
+            "schema:Text",
             "schema:Thing"
          ]
       },
@@ -47,8 +48,8 @@
          "rdfs:comment" : "The characteristics of associated patients, such as age, gender, race etc.",
          "rdfs:label" : "epidemiology",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"

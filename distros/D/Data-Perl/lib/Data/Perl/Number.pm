@@ -1,5 +1,5 @@
 package Data::Perl::Number;
-$Data::Perl::Number::VERSION = '0.002009';
+$Data::Perl::Number::VERSION = '0.002011';
 # ABSTRACT: Wrapping class for Perl scalar numbers.
 
 use strictures 1;
@@ -20,7 +20,7 @@ Data::Perl::Number - Wrapping class for Perl scalar numbers.
 
 =head1 VERSION
 
-version 0.002009
+version 0.002011
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Matthew Phillips <mattp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

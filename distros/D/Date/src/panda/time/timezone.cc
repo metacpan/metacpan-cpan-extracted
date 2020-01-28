@@ -57,6 +57,8 @@ static string readfile (const string_view& path) {
     #include "os/vms.icc"
 #elif defined _WIN32
     #include "os/win.icc"
+#elif defined(sun) || defined(__sun)
+    #include "os/solaris.icc"
 #else
     #error "Current operating system is not supported"
 #endif

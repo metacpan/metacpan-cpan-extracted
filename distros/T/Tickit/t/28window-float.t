@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Identity;
 use Test::Refcount;
 
 use Tickit::Test;
@@ -73,7 +72,7 @@ is_refcount( $root, 1, '$root has refcount 1 after ->make_float' );
 
    is_oneref( $popupwin, '$popupwin has refcount 1 initially' );
 
-   identical( $popupwin->parent, $root, '$popupwin->parent is $root' );
+   cmp_ok( $popupwin->parent, '==', $root, '$popupwin->parent is $root' );
 
    ok( $popupwin->is_steal_input, '$popupwin is stealing input events' );
 

@@ -45,4 +45,5 @@ t/0200_tags/02080_user_defined.t
 t/0200_tags/lib/Template/LiquidX/Tag/Random.pm
 t/0300_basics/03001_context_object.t
 t/0400_classes/04001_context.t
+t/0500_bugs/05001_conditions.t
 META.yml

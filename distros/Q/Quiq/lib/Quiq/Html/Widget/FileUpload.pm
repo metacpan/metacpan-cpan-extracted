@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 # -----------------------------------------------------------------------------
 
@@ -61,6 +61,10 @@ Name des Feldes.
 
 CSS Definition (inline).
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =back
 
 =head1 METHODS
@@ -91,6 +95,7 @@ sub new {
         name => undef,
         size => undef,
         style => undef,
+        undefIf => 0,
         value => undef,
     );
     $self->set(@_);
@@ -123,8 +128,8 @@ sub html {
     # Attribute
 
     my ($accept,$class,$disabled,$hidden,$id,$maxLength,$name,$size,
-        $style,$value) = $self->get(qw/accept class disabled hidden id
-        maxLength name size style value/);
+        $style,$undefIf,$value) = $self->get(qw/accept class disabled hidden
+        id maxLength name size style undefIf value/);
 
     if (!defined $maxLength) {
         $maxLength = $size;
@@ -134,6 +139,10 @@ sub html {
     }
 
     # Generierung
+
+    if ($undefIf) {
+        return undef;
+    }
 
     if ($hidden) {
         return '';
@@ -156,7 +165,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

@@ -10,28 +10,28 @@
    "properties" : {
       "schema:availabilityEnds" : {
          "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end of the availability of the product or service included in the offer.",
          "rdfs:label" : "availabilityEnds",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:ActionAccessSpecification",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
+            "schema:Date",
             "schema:Time",
-            "schema:DateTime",
-            "schema:Date"
+            "schema:DateTime"
          ]
       },
       "schema:availabilityStarts" : {
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "schemadotorgsources:source_GoodRelationsTerms"
+            "schemadotorgsources:source_GoodRelationsTerms",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The beginning of the availability of the product or service included in the offer.",
@@ -39,13 +39,13 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:ActionAccessSpecification",
-            "schema:Offer",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
-            "schema:Time",
-            "schema:Date"
+            "schema:Date",
+            "schema:Time"
          ]
       },
       "schema:category" : {
@@ -56,15 +56,16 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:Recommendation",
+            "schema:PhysicalActivity",
+            "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:ActionAccessSpecification"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:PhysicalActivityCategory",
+            "schema:Text",
             "schema:Thing"
          ]
       },
@@ -79,15 +80,15 @@
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Demand",
-            "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:Offer"
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:Place",
             "schema:Text",
-            "schema:GeoShape",
-            "schema:Place"
+            "schema:GeoShape"
          ]
       },
       "schema:expectsAcceptanceOf" : {
@@ -97,8 +98,8 @@
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ConsumeAction",
             "schema:ActionAccessSpecification",
+            "schema:ConsumeAction",
             "schema:MediaSubscription"
          ],
          "schema:rangeIncludes" : "schema:Offer"
@@ -110,15 +111,15 @@
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:Demand",
             "schema:DeliveryChargeSpecification",
-            "schema:ActionAccessSpecification",
-            "schema:Offer"
+            "schema:ActionAccessSpecification"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:GeoShape",
+            "schema:Text",
             "schema:Place"
          ]
       },
@@ -129,8 +130,8 @@
          "rdfs:label" : "requiresSubscription",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Boolean",

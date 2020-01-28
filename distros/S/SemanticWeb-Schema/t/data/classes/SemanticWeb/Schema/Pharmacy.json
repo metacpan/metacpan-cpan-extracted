@@ -4,8 +4,8 @@
       "rdfs:comment" : "A pharmacy or drugstore.",
       "rdfs:label" : "Pharmacy",
       "rdfs:subClassOf" : [
-         "schema:MedicalOrganization",
-         "schema:MedicalBusiness"
+         "schema:MedicalBusiness",
+         "schema:MedicalOrganization"
       ]
    },
    "properties" : {}

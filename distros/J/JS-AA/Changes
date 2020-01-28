@@ -1,0 +1,10 @@
+0.01 2020-01-23T21:40:00Z
+    - First release.
+    
+0.02 2020-01-23T22:05:00Z
+    - Added pod.
+
+0.03 2020-01-27T16:20:00Z
+    - Removed $self from methods.
+    - Solved bug from method encode.
+    - Changed file test.t

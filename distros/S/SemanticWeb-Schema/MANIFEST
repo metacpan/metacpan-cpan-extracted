@@ -292,6 +292,7 @@ lib/SemanticWeb/Schema/FindAction.pm
 lib/SemanticWeb/Schema/FireStation.pm
 lib/SemanticWeb/Schema/Flight.pm
 lib/SemanticWeb/Schema/FlightReservation.pm
+lib/SemanticWeb/Schema/FloorPlan.pm
 lib/SemanticWeb/Schema/Florist.pm
 lib/SemanticWeb/Schema/FollowAction.pm
 lib/SemanticWeb/Schema/FoodEstablishment.pm
@@ -323,6 +324,7 @@ lib/SemanticWeb/Schema/GovernmentPermit.pm
 lib/SemanticWeb/Schema/GovernmentService.pm
 lib/SemanticWeb/Schema/Grant.pm
 lib/SemanticWeb/Schema/GroceryStore.pm
+lib/SemanticWeb/Schema/Guide.pm
 lib/SemanticWeb/Schema/HVACBusiness.pm
 lib/SemanticWeb/Schema/HairSalon.pm
 lib/SemanticWeb/Schema/HardwareStore.pm
@@ -419,6 +421,7 @@ lib/SemanticWeb/Schema/MapCategoryType.pm
 lib/SemanticWeb/Schema/MarryAction.pm
 lib/SemanticWeb/Schema/Mass.pm
 lib/SemanticWeb/Schema/MaximumDoseSchedule.pm
+lib/SemanticWeb/Schema/MediaGallery.pm
 lib/SemanticWeb/Schema/MediaObject.pm
 lib/SemanticWeb/Schema/MediaSubscription.pm
 lib/SemanticWeb/Schema/MedicalAudience.pm
@@ -467,6 +470,8 @@ lib/SemanticWeb/Schema/MensClothingStore.pm
 lib/SemanticWeb/Schema/Menu.pm
 lib/SemanticWeb/Schema/MenuItem.pm
 lib/SemanticWeb/Schema/MenuSection.pm
+lib/SemanticWeb/Schema/MerchantReturnEnumeration.pm
+lib/SemanticWeb/Schema/MerchantReturnPolicy.pm
 lib/SemanticWeb/Schema/Message.pm
 lib/SemanticWeb/Schema/MiddleSchool.pm
 lib/SemanticWeb/Schema/MobileApplication.pm
@@ -634,6 +639,7 @@ lib/SemanticWeb/Schema/RealEstateAgent.pm
 lib/SemanticWeb/Schema/RealEstateListing.pm
 lib/SemanticWeb/Schema/ReceiveAction.pm
 lib/SemanticWeb/Schema/Recipe.pm
+lib/SemanticWeb/Schema/Recommendation.pm
 lib/SemanticWeb/Schema/RecommendedDoseSchedule.pm
 lib/SemanticWeb/Schema/RecyclingCenter.pm
 lib/SemanticWeb/Schema/RefundTypeEnumeration.pm
@@ -739,7 +745,6 @@ lib/SemanticWeb/Schema/TechArticle.pm
 lib/SemanticWeb/Schema/TelevisionChannel.pm
 lib/SemanticWeb/Schema/TelevisionStation.pm
 lib/SemanticWeb/Schema/TennisComplex.pm
-lib/SemanticWeb/Schema/TextDigitalDocument.pm
 lib/SemanticWeb/Schema/TheaterEvent.pm
 lib/SemanticWeb/Schema/TheaterGroup.pm
 lib/SemanticWeb/Schema/TherapeuticProcedure.pm
@@ -1109,6 +1114,7 @@ t/data/classes/SemanticWeb/Schema/FireStation.json
 t/data/classes/SemanticWeb/Schema/Flight.json
 t/data/classes/SemanticWeb/Schema/FlightReservation.json
 t/data/classes/SemanticWeb/Schema/Float.json
+t/data/classes/SemanticWeb/Schema/FloorPlan.json
 t/data/classes/SemanticWeb/Schema/Florist.json
 t/data/classes/SemanticWeb/Schema/FollowAction.json
 t/data/classes/SemanticWeb/Schema/FoodEstablishment.json
@@ -1140,6 +1146,7 @@ t/data/classes/SemanticWeb/Schema/GovernmentPermit.json
 t/data/classes/SemanticWeb/Schema/GovernmentService.json
 t/data/classes/SemanticWeb/Schema/Grant.json
 t/data/classes/SemanticWeb/Schema/GroceryStore.json
+t/data/classes/SemanticWeb/Schema/Guide.json
 t/data/classes/SemanticWeb/Schema/HVACBusiness.json
 t/data/classes/SemanticWeb/Schema/HairSalon.json
 t/data/classes/SemanticWeb/Schema/HardwareStore.json
@@ -1237,6 +1244,7 @@ t/data/classes/SemanticWeb/Schema/MapCategoryType.json
 t/data/classes/SemanticWeb/Schema/MarryAction.json
 t/data/classes/SemanticWeb/Schema/Mass.json
 t/data/classes/SemanticWeb/Schema/MaximumDoseSchedule.json
+t/data/classes/SemanticWeb/Schema/MediaGallery.json
 t/data/classes/SemanticWeb/Schema/MediaObject.json
 t/data/classes/SemanticWeb/Schema/MediaSubscription.json
 t/data/classes/SemanticWeb/Schema/MedicalAudience.json
@@ -1286,6 +1294,8 @@ t/data/classes/SemanticWeb/Schema/MensClothingStore.json
 t/data/classes/SemanticWeb/Schema/Menu.json
 t/data/classes/SemanticWeb/Schema/MenuItem.json
 t/data/classes/SemanticWeb/Schema/MenuSection.json
+t/data/classes/SemanticWeb/Schema/MerchantReturnEnumeration.json
+t/data/classes/SemanticWeb/Schema/MerchantReturnPolicy.json
 t/data/classes/SemanticWeb/Schema/Message.json
 t/data/classes/SemanticWeb/Schema/MiddleSchool.json
 t/data/classes/SemanticWeb/Schema/MobileApplication.json
@@ -1420,6 +1430,7 @@ t/data/classes/SemanticWeb/Schema/ProfessionalService.json
 t/data/classes/SemanticWeb/Schema/ProfilePage.json
 t/data/classes/SemanticWeb/Schema/ProgramMembership.json
 t/data/classes/SemanticWeb/Schema/Project.json
+t/data/classes/SemanticWeb/Schema/PronounceableText.json
 t/data/classes/SemanticWeb/Schema/Property.json
 t/data/classes/SemanticWeb/Schema/PropertyValue.json
 t/data/classes/SemanticWeb/Schema/PropertyValueSpecification.json
@@ -1453,6 +1464,7 @@ t/data/classes/SemanticWeb/Schema/RealEstateAgent.json
 t/data/classes/SemanticWeb/Schema/RealEstateListing.json
 t/data/classes/SemanticWeb/Schema/ReceiveAction.json
 t/data/classes/SemanticWeb/Schema/Recipe.json
+t/data/classes/SemanticWeb/Schema/Recommendation.json
 t/data/classes/SemanticWeb/Schema/RecommendedDoseSchedule.json
 t/data/classes/SemanticWeb/Schema/RecyclingCenter.json
 t/data/classes/SemanticWeb/Schema/RefundTypeEnumeration.json

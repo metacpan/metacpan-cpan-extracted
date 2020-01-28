@@ -3,6 +3,7 @@ package VCS::CMSynergy::Project;
 # Copyright (c) 2001-2015 argumentum GmbH
 # See COPYRIGHT section in VCS/CMSynergy.pod for usage and distribution rights.
 
+use feature 'state';
 use strict;
 use warnings;
 
@@ -33,7 +34,7 @@ This synopsis only lists the major methods.
 use base qw(VCS::CMSynergy::Object);
 
 use Carp;
-use Type::Params qw( validate );
+use Type::Params qw( compile );
 use Types::Standard qw( Str Optional InstanceOf Maybe
                         ArrayRef CodeRef HashRef );
 use File::Spec;
@@ -303,8 +304,8 @@ my %traverse_opts =
 sub traverse
 {
     my $self = shift;
-    my ($arg_wanted, $dir) =
-        validate(\@_, (CodeRef | HashRef), Optional[InstanceOf["VCS::CMSynergy::Object"]]);
+    state $check = compile( (CodeRef | HashRef), Optional[InstanceOf["VCS::CMSynergy::Object", "VCS::CMSynergy::Object::TI"]] );
+    my ($arg_wanted, $dir) = $check->(@_);
 
     my %wanted;
     if (ref $arg_wanted eq 'CODE')
@@ -448,8 +449,9 @@ to L<VCS::CMSynergy/query_object> as additional keywords.
 sub recursive_is_member_of
 {
     my $self = shift;
-    my ($order_spec, $keywords) = @_ ? validate(\@_, Maybe[Str], VCS::CMSynergy::_KEYWORDS()) : ();
-    $order_spec ||= "none";
+    state $check = compile( Maybe[Str], VCS::CMSynergy::_KEYWORDS() );
+    my ($order_spec, $keywords) = @_ ? $check->(@_) : (undef, []);
+    $order_spec //= "none";
 
     return $self->ccm->query_object("recursive_is_member_of('$self',$order_spec)", @$keywords);
 }
@@ -458,8 +460,9 @@ sub recursive_is_member_of
 sub hierarchy_project_members
 {
     my $self = shift;
-    my ($order_spec, $keywords) = @_ ? validate(\@_, Maybe[Str], VCS::CMSynergy::_KEYWORDS()) : ();
-    $order_spec ||= "none";
+    state $check = compile( Maybe[Str], VCS::CMSynergy::_KEYWORDS() );
+    my ($order_spec, $keywords) = @_ ? $check->(@_) : (undef, []);
+    $order_spec //= "none";
 
     return $self->ccm->query_object("hierarchy_project_members('$self',$order_spec)", @$keywords);
 }
@@ -499,8 +502,8 @@ to L<VCS::CMSynergy/query_object> as additional keywords.
 sub is_child_of
 {
     my $self = shift;
-    my ($dir, $keywords) =
-        validate(\@_, Maybe[InstanceOf["VCS::CMSynergy::Object"]], VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( Maybe[InstanceOf["VCS::CMSynergy::Object", "VCS::CMSynergy::Object::TI"]], VCS::CMSynergy::_KEYWORDS() );
+    my ($dir, $keywords) = $check->(@_);
     if (defined $dir)
     {
         croak(__PACKAGE__."::is_child_of: argument 1 ($dir) must have cvtype `dir'")
@@ -517,8 +520,8 @@ sub is_child_of
 sub has_child
 {
     my $self = shift;
-    my ($obj, $keywords) =
-        validate(\@_, InstanceOf["VCS::CMSynergy::Object"], VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( InstanceOf["VCS::CMSynergy::Object", "VCS::CMSynergy::Object::TI"], VCS::CMSynergy::_KEYWORDS() );
+    my ($obj, $keywords) = $check->(@_);
 
     return $self->ccm->query_object("has_child('$obj','$self')", @$keywords);
 }
@@ -581,7 +584,8 @@ See L<VCS::CMSynergy/object_from_proj_ref> for details.
 sub object_from_path
 {
     my $self = shift;
-    my ($path, $keywords) = validate(\@_, (Str | ArrayRef[Str]), VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( (Str | ArrayRef[Str]), VCS::CMSynergy::_KEYWORDS() );
+    my ($path, $keywords) = $check->(@_);
 
     return $self->ccm->object_from_proj_ref($path, $self, @$keywords);
 }
@@ -704,7 +708,8 @@ sub show_reconfigure_properties
 {
     my $self = shift;
     my $opts = @_ && ref $_[-1] eq "HASH" ? pop : {};
-    my ($what, $keywords) = validate(\@_, Str, VCS::CMSynergy::_KEYWORDS());
+    state $check = compile( Str, VCS::CMSynergy::_KEYWORDS() );
+    my ($what, $keywords) = $check->(@_);
 
     VCS::CMSynergy::_must_be_one_of($what, qw( tasks folders tasks_and_folders all_tasks objects ));
 

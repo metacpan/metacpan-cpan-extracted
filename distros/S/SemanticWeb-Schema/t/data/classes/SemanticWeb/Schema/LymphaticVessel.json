@@ -20,8 +20,8 @@
          "rdfs:comment" : "The anatomical or organ system drained by this vessel; generally refers to a specific part of an organ.",
          "rdfs:label" : "regionDrained",
          "schema:domainIncludes" : [
-            "schema:Vein",
-            "schema:LymphaticVessel"
+            "schema:LymphaticVessel",
+            "schema:Vein"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [

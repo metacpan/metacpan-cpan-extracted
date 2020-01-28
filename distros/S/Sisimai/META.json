@@ -60,22 +60,13 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.4"
+         "version" : "v4.25.5"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
       },
       "Sisimai::Address" : {
          "file" : "lib/Sisimai/Address.pm"
-      },
-      "Sisimai::Bite" : {
-         "file" : "lib/Sisimai/Bite.pm"
-      },
-      "Sisimai::Bite::Email" : {
-         "file" : "lib/Sisimai/Bite/Email.pm"
-      },
-      "Sisimai::Bite::JSON" : {
-         "file" : "lib/Sisimai/Bite/JSON.pm"
       },
       "Sisimai::Data" : {
          "file" : "lib/Sisimai/Data.pm"
@@ -272,20 +263,8 @@
       "Sisimai::Message" : {
          "file" : "lib/Sisimai/Message.pm"
       },
-      "Sisimai::Message::Email" : {
-         "file" : "lib/Sisimai/Message/Email.pm"
-      },
-      "Sisimai::Message::JSON" : {
-         "file" : "lib/Sisimai/Message/JSON.pm"
-      },
       "Sisimai::Order" : {
          "file" : "lib/Sisimai/Order.pm"
-      },
-      "Sisimai::Order::Email" : {
-         "file" : "lib/Sisimai/Order/Email.pm"
-      },
-      "Sisimai::Order::JSON" : {
-         "file" : "lib/Sisimai/Order/JSON.pm"
       },
       "Sisimai::RFC1894" : {
          "file" : "lib/Sisimai/RFC1894.pm"
@@ -443,14 +422,16 @@
          "web" : "https://github.com/sisimai/p5-Sisimai"
       }
    },
-   "version" : "v4.25.4",
+   "version" : "v4.25.5",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",
+      "Alexandre Derumier <aderumier@odiso.com>",
       "Jon Jensen <jon@endpoint.com>",
       "Jonathan Leroy <jonathan@inikup.com>",
       "Mutsutoshi Yoshimoto <negachov@gmail.com>",
       "Stefan Hornburg (Racke) <racke@linuxia.de>",
+      "Xavier <yadd@debian.org>",
       "Xavier Guimard <x.guimard@free.fr>",
       "azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>",
       "azumakuniyuki <azumakuniyuki+github.com@gmail.com>",

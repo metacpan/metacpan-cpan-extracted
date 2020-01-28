@@ -64,7 +64,8 @@ use constant FAIL_BADEXIT   => q{"%s" unexpectedly returned exit value %d};
 
 use constant FAIL_UNDEF     => q{%s called with undefined command};
 
-use constant FAIL_POSIX     => q{IPC::System::Simple does not understand the POSIX error '%s'.  Please check http://search.cpan.org/perldoc?IPC::System::Simple to see if there is an updated version.  If not please report this as a bug to http://rt.cpan.org/Public/Bug/Report.html?Queue=IPC-System-Simple};
+
+use constant FAIL_POSIX     => q{IPC::System::Simple does not understand the POSIX error '%s'.  Please check https://metacpan.org/pod/IPC::System::Simple to see if there is an updated version.  If not please report this as a bug to https://github.com/pjf/ipc-system-simple/issues};
 
 # On Perl's older than 5.8.x we can't assume that there'll be a
 # $^{TAINT} for us to check, so we assume that our args may always
@@ -86,7 +87,7 @@ our @EXPORT_OK = qw(
     $EXITVAL EXIT_ANY
 );
 
-our $VERSION = '1.25'; # VERSION : From dzil
+our $VERSION = '1.26'; # VERSION : From dzil
 our $EXITVAL = -1;
 
 my @Signal_from_number = split(' ', $Config{sig_name});
@@ -145,8 +146,10 @@ sub _native_wcoredump {
 
 # system simply calls run
 
+no warnings 'once';
 *system  = \&run;
 *systemx = \&runx;
+use warnings;
 
 # run is our way of running a process with system() semantics
 
@@ -303,7 +306,7 @@ sub _win32_capture {
 
         my $err;
         my $pid = eval { 
-                _spawn_or_die($exe, "$command @args"); 
+                _spawn_or_die($exe, qq{"$command" @args}); 
         }
         or do {
                 $err = $@;
@@ -715,7 +718,7 @@ or process diagnostics, then read on!
 =head2 run() and system()
 
 C<IPC::System::Simple> provides a subroutine called
-C<run>, that executes a command using the same semantics is
+C<run>, that executes a command using the same semantics as
 Perl's built-in C<system>:
 
     use IPC::System::Simple qw(run);
@@ -734,7 +737,7 @@ same behaviour:
 
     use IPC::System::Simple qw(system);
 
-    system("cat *.txt");  # system now suceeds or dies!
+    system("cat *.txt");  # system now succeeds or dies!
 
 C<system> and C<run> are aliases to each other.
 
@@ -989,17 +992,18 @@ to provide as much information as possible.  Rather than requiring
 the developer to inspect C<$?>, C<IPC::System::Simple> does the
 hard work for you.
 
-If an odd exit status is provided, you're informed of what it is.  If
-a signal kills your process, you are informed of both its name and
-number.  If tainted data or environment prevents your command from
-running, you are informed of exactly which datais 
+If an odd exit status is provided, you're informed of what it is.  If a
+signal kills your process, you are informed of both its name and number.
+If tainted data or environment prevents your command from running, you
+are informed of exactly which data or environmental variable is
+tainted.
 
 =item Exceptions on failure
 
 C<IPC::System::Simple> takes an aggressive approach to error handling.
 Rather than allow commands to fail silently, exceptions are thrown
 when unexpected results are seen.  This allows for easy development
-using a try/catch style, and avoids the possibility of accidently
+using a try/catch style, and avoids the possibility of accidentally
 continuing after a failed command.
 
 =item Easy access to exit status
@@ -1036,7 +1040,7 @@ C<WIFSTOPPED> status is not checked, as perl never spawns processes
 with the C<WUNTRACED> option.
 
 Signals are not supported under Win32 systems, since they don't
-work at all like Unix signals.  Win32 singals cause commands to
+work at all like Unix signals.  Win32 signals cause commands to
 exit with a given exit value, which this modules I<does> capture.
 
 Only 8-bit values are returned when C<run()> or C<system()> 

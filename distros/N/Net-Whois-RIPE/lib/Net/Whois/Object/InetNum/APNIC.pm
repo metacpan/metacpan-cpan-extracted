@@ -1,5 +1,7 @@
 package Net::Whois::Object::InetNum::APNIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -h whois.apnic.net -t inetnum
@@ -22,16 +24,16 @@ use base qw/Net::Whois::Object/;
 # mnt-lower:      [optional]   [multiple]   [inverse key]
 # mnt-routes:     [optional]   [multiple]   [inverse key]
 # mnt-irt:        [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
+# last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
 # % This query was served by the APNIC Whois Service version 1.68.5 (WHOIS4)
 
 __PACKAGE__->attributes( 'primary',   [ 'inetnum' ] );
-__PACKAGE__->attributes( 'mandatory', [ 'inetnum', 'netname', 'descr', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'mnt_irt', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',  [ 'geoloc', 'language', 'org', 'remarks', 'notify', 'mnt_lower', 'mnt_routes' ] );
-__PACKAGE__->attributes( 'single',    [ 'inetnum', 'netname', 'geoloc', 'org', 'status', 'source' ] );
-__PACKAGE__->attributes( 'multiple',  [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_routes', 'mnt_irt', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory', [ 'inetnum', 'netname', 'descr', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'mnt_irt', 'source' ] );
+__PACKAGE__->attributes( 'optional',  [ 'geoloc', 'language', 'org', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'last_modified' ] );
+__PACKAGE__->attributes( 'single',    [ 'inetnum', 'netname', 'geoloc', 'org', 'status', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',  [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_routes', 'mnt_irt' ] );
 
 =head1 NAME
 
@@ -227,11 +229,10 @@ The identifier of a registered Mntner object used to control the creation of
 Domain objects associated with the address range specified by the Inetnum
 object.
 
-=head2 B<changed( [$changed] )>
+=head2 B<last-modified()>
 
-Accessor to the changed attribute.
-Accepts an optional changed value to be added to the changed array,
-always return the current changed array.
+Accessor to the last-modified attribute.
+always return the latest modification date.
 
 The email address of who last updated the database object and the date it
 occurred.

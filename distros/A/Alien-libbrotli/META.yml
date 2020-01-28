@@ -8,12 +8,6 @@ build_requires:
   Test::Simple: '0.96'
 configure_requires:
   Alien::cmake3: '0.04'
-  Alien::patch: '0.14'
-  Archive::Tar: '0'
-  Digest::SHA1: '0'
-  ExtUtils::MakeMaker: '6.52'
-  File::Path: '0'
-  HTTP::Tiny: '0'
   XS::Install: v1.2.12
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
@@ -28,5 +22,5 @@ no_index:
     - inc
 requires:
   XS::Install: v1.2.12
-version: v1.0.7.4
+version: v1.0.7.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

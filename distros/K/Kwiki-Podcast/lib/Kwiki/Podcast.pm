@@ -3,7 +3,7 @@ use Kwiki::Plugin -Base;
 use mixin 'Kwiki::Installer';
 use XML::RSS;
 use URI;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 const class_id => 'podcast';
 const class_title => 'Podcast';

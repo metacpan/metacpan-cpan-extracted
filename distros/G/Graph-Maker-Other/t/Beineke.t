@@ -35,7 +35,7 @@ require Graph::Maker::Beineke;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::Beineke::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Beineke->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Beineke->VERSION($want_version); 1 }, 1,

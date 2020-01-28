@@ -31,7 +31,6 @@ t/error-messages.t
 t/example-array-of-hashes.t
 t/headers.t
 t/invalid-json.t
-t/invalid-x-mojo-name.t
 t/issue-24-booleans-in-yaml-schema.t
 t/issue-48-refs.t
 t/load-and-validate-spec.t
@@ -65,6 +64,7 @@ t/v3-invalid_file_refs.t
 t/v3-invalid_file_refs_no_path.t
 t/v3-nullable.t
 t/v3-security.t
+t/v3-style-array.t
 t/v3-valid_file_refs.t
 t/v3.t
 t/validate.t

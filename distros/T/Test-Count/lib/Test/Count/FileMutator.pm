@@ -1,5 +1,5 @@
 package Test::Count::FileMutator;
-$Test::Count::FileMutator::VERSION = '0.1101';
+$Test::Count::FileMutator::VERSION = '0.1102';
 use warnings;
 use strict;
 
@@ -139,23 +139,6 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.1101
-
-=head1 SYNOPSIS
-
-    # TODO: fill in
-    #
-=head1 DESCRIPTION
-
-After initiating a parser one can input assignment expressions, and count
-update expressions. Both of them use arithmetic operations, integers, and
-Perl-like variable names.
-
-At the end one should call C<$parser->get_count()> in order to get the
-total number of tests.
-
 =head1 NAME
 
 Test::Count::FileMutator - modify a file in place
@@ -187,6 +170,23 @@ Can be a regex or a string.
 =head2 $filter->modify()
 
 Modify the file in-place.
+
+=head1 VERSION
+
+version 0.1102
+
+=head1 SYNOPSIS
+
+    # TODO: fill in
+    #
+=head1 DESCRIPTION
+
+After initiating a parser one can input assignment expressions, and count
+update expressions. Both of them use arithmetic operations, integers, and
+Perl-like variable names.
+
+At the end one should call C<$parser->get_count()> in order to get the
+total number of tests.
 
 =head1 FUNCTIONS
 

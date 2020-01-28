@@ -1,5 +1,5 @@
 package Dir::Manifest::Key;
-$Dir::Manifest::Key::VERSION = '0.6.0';
+$Dir::Manifest::Key::VERSION = '0.6.1';
 use strict;
 use warnings;
 use 5.014;
@@ -19,9 +19,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Dir::Manifest::Key - a Dir::Manifest key.
+
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 DESCRIPTION
 
@@ -32,10 +36,6 @@ put each in a separate file in a directory, create a manifest file listing all v
 filenames/key and then say something like
 C<<< my $text = $dir->text("deal24solution.txt", {lf => 1}) >>>. And hopefully it will
 be done securely and reliably.
-
-=head1 NAME
-
-Dir::Manifest::Key - a Dir::Manifest key.
 
 =head1 METHODS
 

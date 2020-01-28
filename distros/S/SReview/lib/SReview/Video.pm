@@ -88,6 +88,32 @@ has 'url' => (
 	required => 1,
 );
 
+=head2 mtime
+
+The mtime of the file backing this asset. Only defined if the file
+exists at the time the attribute is first read, and is not updated later
+on.
+
+=cut
+
+has 'mtime' => (
+	is => 'ro',
+	lazy => 1,
+	builder => '_probe_mtime',
+);
+
+sub _probe_mtime {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->mtime;
+	}
+	my @statdata = stat($self->url);
+	if(scalar(@statdata) == 0) {
+		return undef;
+	}
+	return $statdata[9];
+}
+
 =head2 duration
 
 The duration of this asset.
@@ -472,6 +498,38 @@ sub _probe_astream_id {
 	return $self->_get_audiodata->{index};
 }
 
+=head2 astream_ids
+
+Returns an array with the IDs for the audio streams in this file.
+
+=head2 astream_count
+
+Returns the number of audio streams in this file. 
+
+=cut
+
+has 'astream_ids' => (
+	is => 'rw',
+	traits => ['Array'],
+	isa => 'ArrayRef[Int]',
+	builder => '_probe_astream_ids',
+	lazy => 1,
+	handles => {
+		astream_count => "count",
+	},
+);
+
+sub _probe_astream_ids {
+	my $self = shift;
+	my @rv;
+	foreach my $stream(@{$self->_get_probedata->{streams}}) {
+		if($stream->{codec_type} eq "audio") {
+			push @rv, $stream->{index};
+		}
+	}
+	return \@rv;
+}
+
 =head2 vstream_id
 
 Returns the numeric ID for the first video stream in this file. Useful
@@ -618,6 +676,10 @@ sub writeopts {
 		}
 	}
 
+	if(exists($ENV{SREVIEW_NONSTRICT})) {
+		push @opts, ("-strict", "-2");
+	}
+
 	push @opts, $self->url;
 
 	return @opts;
@@ -629,7 +691,7 @@ sub _probe {
 	if($self->has_reference) {
 		return $self->reference->_get_probedata;
 	}
-	open JSON, "ffprobe -print_format json -show_format -show_streams '" . $self->url . "' 2>/dev/null|";
+	open JSON, "-|:encoding(UTF-8)", "ffprobe", "-loglevel", "quiet", "-print_format", "json", "-show_format", "-show_streams", $self->url;
 	my $json = "";
 	while(<JSON>) {
 		$json .= $_;

@@ -5,6 +5,7 @@ name     'lib-abs';
 all_from 'lib/lib/abs.pm';
 author   'Mons Anderson <mons@cpan.org>';
 license  'perl';
+repository 'https://github.com/Mons/lib-abs';
 
 build_requires 'Test::More';
 

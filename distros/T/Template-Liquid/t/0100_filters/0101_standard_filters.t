@@ -244,13 +244,13 @@ Truncate a string down to C<x> characters.
 =cut
 is( Template::Liquid->parse(
         q[{{'This is a very quick test of truncating a number of words'|truncatewords:5,'...'}}]
-        )->render(),
+    )->render(),
     'This is a very quick...',
     q[ {{ ... | truncatewords:5,'...' }} => 'This is a very quick...']
 );
 is( Template::Liquid->parse(
         q[{{'This is a very quick test of truncating a number of words where the limit is fifteen by default'|truncatewords}}]
-        )->render(),
+    )->render(),
     'This is a very quick test of truncating a number of words where the limit...',
     q[ {{ ... | truncatewords }} => 'This is a very quick [...] limit...']
 );
@@ -331,7 +331,7 @@ is( Template::Liquid->parse(
 # money
 is( Template::Liquid->parse(
         q[{{ 4.6 | money }} {{ -4.3 | money }} {{ 4.5612 | money }} {{ 4.6 | money:'€' }}]
-        )->render(),
+    )->render(),
     '$4.60 -$4.30 $4.56 €4.60',
     q[{{ 4.6 | money }} {{ -4.3 | money }} {{ 4.5612 | money }} {{ 4.6 | money:'€' }} => $4.60 -$4.30 $4.56 €4.60]
 );
@@ -339,7 +339,7 @@ is( Template::Liquid->parse(
 # stock_price
 is( Template::Liquid->parse(
         q[{{ 4.6 | stock_price }} {{ .30 | stock_price }} {{ 4.5612 | stock_price }} {{ 4.6 | stock_price:'€' }}]
-        )->render(),
+    )->render(),
     '$4.60 $0.3000 $4.56 €4.60',
     q[{{ 4.6 | stock_price }} {{ .30 | stock_price }} {{ 4.5612 | stock_price }} {{ 4.6 | stock_price:'€' }} => $4.60 $0.3000 $4.56 €4.60]
 );
@@ -361,10 +361,7 @@ is( Template::Liquid->parse(q[{{ 4.6 | floor }} {{ 4.3 | floor }}])->render(),
 # default
 is( Template::Liquid->parse(
         q[{{ fun | default:"wow!" }} {{ Key | default:"wow!" }} {{ Zero | default:"empty" }} {{ One | default:"another one" }}]
-        )->render(Key  => 'Value',
-                  Zero => '',
-                  One  => ' '
-        ),
+    )->render(Key => 'Value', Zero => '', One => ' '),
     'wow! Value empty  ',
     q[{{ fun | default:"wow!" }} {{ Key | default:"wow!" }} {{ Zero | default:"empty" }} {{ One | default:"another one" }} => wow! Value empty  ]
 );

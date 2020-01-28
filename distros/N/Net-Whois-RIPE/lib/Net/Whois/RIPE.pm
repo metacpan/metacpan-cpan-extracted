@@ -28,11 +28,11 @@ Net::Whois::RIPE - a pure-Perl implementation of the RIPE Database client.
 
 =head1 VERSION
 
-Version 2.006002
+Version 2.007002
 
 =cut
 
-our $VERSION = 2.006002;
+our $VERSION = 2.007002;
 
 =head1 SYNOPSIS
 
@@ -593,7 +593,7 @@ L<http://cpanratings.perl.org/d/net-whois-ripe>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/net-whois-ripe>
+L<http://search.cpan.org/dist/Net-Whois-RIPE>
 
 =back
 

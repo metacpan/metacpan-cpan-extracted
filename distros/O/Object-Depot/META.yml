@@ -3,11 +3,11 @@ abstract: 'Decouple object instantiation from usage.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
-  Test2::V0: '0'
+  Test2::V0: '0.000126'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,27 +26,27 @@ no_index:
 provides:
   Object::Depot:
     file: lib/Object/Depot.pm
-    version: '0.01'
-  Object::Depot::Singleton:
-    file: lib/Object/Depot/Singleton.pm
+    version: '0.03'
+  Object::Depot::Role:
+    file: lib/Object/Depot/Role.pm
 requires:
   Carp: '0'
   Exporter: '0'
-  Guard: '0'
-  List::MoreUtils: '0'
-  Moo: '0'
-  Role::Tiny: '0'
+  Guard: '1.023'
+  List::MoreUtils: '0.410'
+  Moo: '2.003000'
+  Role::Tiny: '2.000005'
   Scalar::Util: '0'
-  Sub::Name: '0'
-  Types::Common::String: '0'
-  Types::Standard: '0'
-  namespace::clean: '0'
-  strictures: '0'
+  Sub::Name: '0.21'
+  Types::Common::String: '1.002001'
+  Types::Standard: '1.002001'
+  namespace::clean: '0.27'
+  strictures: '2.000003'
 resources:
   bugtracker: https://github.com/bluefeet/Object-Depot/issues
   homepage: https://github.com/bluefeet/Object-Depot
   repository: git://github.com/bluefeet/Object-Depot.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

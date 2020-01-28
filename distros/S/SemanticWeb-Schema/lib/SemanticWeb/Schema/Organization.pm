@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has actionable_feedback_policy => (
@@ -258,6 +258,14 @@ has has_credential => (
 
 
 
+has has_merchant_return_policy => (
+    is        => 'rw',
+    predicate => '_has_has_merchant_return_policy',
+    json_ld   => 'hasMerchantReturnPolicy',
+);
+
+
+
 has has_offer_catalog => (
     is        => 'rw',
     predicate => '_has_has_offer_catalog',
@@ -274,10 +282,10 @@ has has_pos => (
 
 
 
-has has_product_return_policy => (
+has interaction_statistic => (
     is        => 'rw',
-    predicate => '_has_has_product_return_policy',
-    json_ld   => 'hasProductReturnPolicy',
+    predicate => '_has_interaction_statistic',
+    json_ld   => 'interactionStatistic',
 );
 
 
@@ -522,7 +530,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -1103,6 +1111,24 @@ A has_credential should be one of the following types:
 
 A predicate for the L</has_credential> attribute.
 
+=head2 C<has_merchant_return_policy>
+
+C<hasMerchantReturnPolicy>
+
+Indicates a MerchantReturnPolicy that may be applicable.
+
+A has_merchant_return_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MerchantReturnPolicy']>
+
+=back
+
+=head2 C<_has_has_merchant_return_policy>
+
+A predicate for the L</has_merchant_return_policy> attribute.
+
 =head2 C<has_offer_catalog>
 
 C<hasOfferCatalog>
@@ -1140,23 +1166,25 @@ A has_pos should be one of the following types:
 
 A predicate for the L</has_pos> attribute.
 
-=head2 C<has_product_return_policy>
+=head2 C<interaction_statistic>
 
-C<hasProductReturnPolicy>
+C<interactionStatistic>
 
-Indicates a ProductReturnPolicy that may be applicable.
+The number of interactions for the CreativeWork using the WebSite or
+SoftwareApplication. The most specific child type of InteractionCounter
+should be used.
 
-A has_product_return_policy should be one of the following types:
+A interaction_statistic should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ProductReturnPolicy']>
+=item C<InstanceOf['SemanticWeb::Schema::InteractionCounter']>
 
 =back
 
-=head2 C<_has_has_product_return_policy>
+=head2 C<_has_interaction_statistic>
 
-A predicate for the L</has_product_return_policy> attribute.
+A predicate for the L</interaction_statistic> attribute.
 
 =head2 C<isic_v4>
 
@@ -1747,7 +1775,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

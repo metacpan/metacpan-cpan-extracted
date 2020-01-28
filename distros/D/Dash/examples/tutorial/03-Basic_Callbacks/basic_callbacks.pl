@@ -1,6 +1,7 @@
 use Dash;
 use aliased 'Dash::Html::Components' => 'html';
 use aliased 'Dash::Core::Components' => 'dcc';
+use aliased 'Dash::Dependencies' => 'deps';
 
 my $external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'];
 
@@ -17,9 +18,9 @@ $app->layout(
 );
 
 $app->callback(
-    Output => {component_id => 'my-div', component_property => 'children'},
-    Inputs => [{component_id=>'my-id', component_property=> 'value'}],
-    callback => sub {
+    deps->Output('my-div', 'children'),
+    [deps->Input('my-id', 'value')],
+    sub {
         my $input_value = shift;
         return "You've entered '$input_value'";
     }

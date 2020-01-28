@@ -12,6 +12,7 @@
 <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008000"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-MultiValueOrdered>;
 	doap:created         "2012-11-08"^^xsd:date;
@@ -22,7 +23,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "JSON-MultiValueOrdered";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-001>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-002>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-003>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-004>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-005>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-001>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-002>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-003>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-004>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-005>, <http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-006>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-json-multivalueordered>;
@@ -100,6 +101,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-MultiValueOrdered-0.005.tar.gz>;
 	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "JSON-MultiValueOrdered-0.006"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Tie::Hash::MultiValueOrdered `pairs` and `pair_refs` (and `all_values` which calls them) shouldn't need to deep clone values, just shallow clone the lists of values.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-MultiValueOrdered-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/davido>
 	a                    foaf:Person;

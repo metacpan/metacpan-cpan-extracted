@@ -1,3 +1,11 @@
+0.333   2019-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Update documentation: logging is now done using Log::ger,
+	  not Log::Any.
+
+
 0.332   2019-09-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add start() to allow running a process in the background.

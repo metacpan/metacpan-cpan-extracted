@@ -1,6 +1,6 @@
 package Pod::Elemental::Transformer::Gatherer;
 # ABSTRACT: gather related paragraphs under a shared header
-$Pod::Elemental::Transformer::Gatherer::VERSION = '0.103004';
+$Pod::Elemental::Transformer::Gatherer::VERSION = '0.103005';
 use Moose;
 with 'Pod::Elemental::Transformer';
 
@@ -124,7 +124,7 @@ Pod::Elemental::Transformer::Gatherer - gather related paragraphs under a shared
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 OVERVIEW
 
@@ -197,7 +197,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

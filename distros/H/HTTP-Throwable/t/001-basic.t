@@ -4,7 +4,8 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
-use t::lib::Test::HT;
+use lib 't/lib';
+use Test::HT;
 
 ht_test(
     { status_code => 500, reason => 'Internal Server Error' },

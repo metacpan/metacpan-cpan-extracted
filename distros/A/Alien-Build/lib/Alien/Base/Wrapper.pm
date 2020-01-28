@@ -2,7 +2,7 @@ package Alien::Base::Wrapper;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.006;
 use Config;
 use Text::ParseWords qw( shellwords );
 
@@ -16,7 +16,7 @@ use Text::ParseWords qw( shellwords );
 # distributed with Alien-Build.
 
 # ABSTRACT: Compiler and linker wrapper for Alien
-our $VERSION = '1.94'; # VERSION
+our $VERSION = '1.96'; # VERSION
 
 
 my @cflags_I;
@@ -201,7 +201,7 @@ Alien::Base::Wrapper - Compiler and linker wrapper for Alien
 
 =head1 VERSION
 
-version 1.94
+version 1.96
 
 =head1 SYNOPSIS
 
@@ -392,7 +392,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2019 by Graham Ollis.
+This software is copyright (c) 2011-2020 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

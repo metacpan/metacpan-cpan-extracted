@@ -1,7 +1,7 @@
 package Alien::libbrotli;
 use 5.012;
 
-our $VERSION = "1.0.7.4";
+our $VERSION = "1.0.7.6";
 
 use XS::Loader;
 

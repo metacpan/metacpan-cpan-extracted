@@ -1,3 +1,5 @@
+0.021 2020-01-23 22:00:00+0000
+  -Fix bug with goto :eof after previous goto :label
 0.020 2020-01-14 12:00:00+0000
   -Add support for call subroutines
 0.019 2019-12-15 14:00:00+0000

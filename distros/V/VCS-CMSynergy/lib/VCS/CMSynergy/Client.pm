@@ -24,7 +24,7 @@ This synopsis only lists the major methods.
 
 =cut
 
-use 5.008_001;                                  # i.e. v5.8.1
+use feature 'state';
 use strict;
 use warnings;
 
@@ -86,6 +86,7 @@ our %opts =
     PrintError          => undef,
     RaiseError          => undef,
     CCM_HOME            => undef,
+    utf8                => undef,
 );
 
 
@@ -99,6 +100,7 @@ sub new
         PrintError      => 1,
         RaiseError      => 0,
         CCM_HOME        => $ENV{CCM_HOME},
+        utf8            => 0,
         env             => {},
         ccm_command     => undef,
         error           => undef,
@@ -165,7 +167,7 @@ sub start
 }
 
 
-sub _default    { $Default ||= shift->new(); }
+sub _default    { $Default //= shift->new(); }
 
 
 sub ccm                                         # class/instance method
@@ -192,23 +194,25 @@ sub _ccm
 
     $Error = $this->{error} = undef;
     $Ccm_command = $this->{ccm_command} = join(" ", @_);
+    $this->{ccm_calls}++;
 
 
     my ($rc, $out, $err);
     my %default_opts = 
     (
-        in      => \undef,
-        out     => \$out,
-        err     => \$err,
+        out => \$out,
+        err => \$err,
+        $this->{utf8} ? 
+        (
+            binmode_stdin  => ":utf8",
+            binmode_stdout => ":utf8",
+            binmode_stderr => ":utf8",
+        ) : ()
     );
-    if ($this->{utf8})
-    {
-        $default_opts{$_} = ":utf8" foreach qw( binmode_stdin binmode_stdout binmode_stderr );
-    }
 
     # let settings in %$opts override those in %default_opts
     my %run_opts = (%default_opts, %$opts);
-    my ($run_in, $run_out, $run_err) = delete @run_opts{qw(in out err)};
+    my ($run_out, $run_err) = delete @run_opts{qw(out err)};
 
     my $t0 = [ Time::HiRes::gettimeofday() ];
 
@@ -271,7 +275,7 @@ sub _ccm
 
         # simple ccm sub process
         $rc = $this->run([ $this->ccm_exe, @_ ], 
-                         $run_in, $run_out, $run_err, \%run_opts);
+                         $run_out, $run_err, \%run_opts);
     }
 
     unless (exists $opts->{out})
@@ -326,7 +330,8 @@ sub run
     # don't screw up global $? (e.g. when being called
     # in VCS::CMSynergy::DESTROY at program termination)
     local $?;                   
-    run3(@_);
+    my $cmd = shift;
+    run3($cmd, \undef, @_);     # STDIN redirected to /dev/null
     return $?;
 }
 
@@ -582,7 +587,7 @@ sub databases
     push @server_status, -s => $servername if defined $servername;
 
     my ($out, $err);
-    my $rc = $this->run(\@server_status, \undef, \$out, \$err);
+    my $rc = $this->run(\@server_status, \$out, \$err);
     chomp ($out, $err);
     return $this->set_error($err || $out) unless $rc == 0;
 
@@ -606,7 +611,9 @@ sub hostname
     unless (exists $Hostname{$ccm_home})
     {
         my ($out, $err);
-        my $rc = $this->run([ File::Spec->catfile($ccm_home, qw/bin util ccm_hostname/) ], \undef, \$out, \$err);
+        my $rc = $this->run(
+            [ File::Spec->catfile($ccm_home, qw/bin util ccm_hostname/) ], 
+            \$out, \$err);
         chomp($out, $err);
         # ignore bogus exit code (seems to be length of output in bytes, arghh)
         $Hostname{$ccm_home} = $out;
@@ -987,10 +994,11 @@ called in scalar or in list context, resp.
 
 =head2 run
 
-  $client->run(\@cmd, $in, $out, $err);
+  $client->run(\@cmd, $out, $err);
 
 Runs C<run3> from L<IPC::Run3> with the given arguments in an
-environment (C<$ENV{CCM_HOME}>, C<$ENV{PATH> etc) set up for C<$client>.
+environment (C<$ENV{CCM_HOME}>, C<$ENV{PATH> etc) set up for C<$client>
+and C<STDIN> redirected to C</dev/null>.
 Returns the exit status (i.e. C<$?>) from executing C<@cmd>.
 
 =head2 databases

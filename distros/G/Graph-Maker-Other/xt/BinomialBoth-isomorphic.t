@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2019 Kevin Ryde
+# Copyright 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -33,11 +33,11 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
+use Graph::Maker::BinomialBoth;
+
 use File::Spec;
 use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
-
-use Graph::Maker::BinomialBoth;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -54,7 +54,7 @@ plan tests => 47;
     my $content = File::Slurp::read_file
       (File::Spec->catfile($FindBin::Bin,
                            File::Spec->updir,
-                           'devel','lib','Graph','Maker','BinomialBoth.pm'));
+                           'lib','Graph','Maker','BinomialBoth.pm'));
     $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
     $content = $&;
     my $count = 0;

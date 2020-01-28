@@ -12,11 +12,11 @@ use FFI::CheckLib;
 );
 
 subtest 'check_lib_or_exit' => sub {
-  
+
   subtest 'found' => sub {
     never_exits_ok { check_lib_or_exit( lib => 'foo' ) };
   };
-  
+
   subtest 'not found' => sub {
     exits_zero { note_stderr { check_lib_or_exit( lib => 'foobar') } };
   };
@@ -24,7 +24,7 @@ subtest 'check_lib_or_exit' => sub {
 };
 
 subtest 'find_lib_or_exit' => sub {
-  
+
   subtest 'found' => sub {
     my $path;
     never_exits_ok { $path = find_lib_or_exit( lib => 'foo' ) };
@@ -33,7 +33,7 @@ subtest 'find_lib_or_exit' => sub {
     my $path2 = eval { find_lib_or_exit( lib => 'foo' ) };
     is $path, $path2, 'scalar context';
   };
-  
+
   subtest 'not found' => sub {
     exits_zero { note_stderr { find_lib_or_exit( lib => 'foobar') } };
   };

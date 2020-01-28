@@ -1,5 +1,7 @@
 package Net::Whois::Object::Irt::AFRINIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -t irt -h whois.afrinic.net

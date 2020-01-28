@@ -3,46 +3,52 @@ package Pcore::App::API::Role::Read;
 use Pcore -const, -role, -sql, -res;
 use Pcore::Util::Scalar qw[is_ref];
 
-const our $DEFAULT_PAGE_SIZE => 100;
+has max_limit        => 100;
+has default_limit    => 0;
+has default_order_by => undef;
 
-sub _read ( $self, $args, $total_sql, $main_sql, $where, $page_size = $DEFAULT_PAGE_SIZE ) {
+sub _read ( $self, $total_query, $main_query, $args = undef ) {
     my $dbh = $self->{dbh};
 
-    my $data;
-
     # get by id
-    if ( exists $args->{id} ) {
-        $data = $dbh->selectrow( is_ref $main_sql ? $main_sql : [ $main_sql, $where // () ] );
-    }
+    return $dbh->selectrow($main_query) if $args->{id};
 
-    # get all matched rows
-    else {
-        my $total = $dbh->selectrow( is_ref $total_sql ? $total_sql : [ $total_sql, $where // () ] );
+    my ( $total, $total_count );
+
+    if ($total_query) {
+        $total = $dbh->selectrow($total_query);
 
         # total query error
-        if ( !$total ) {
-            $data = $total;
-        }
+        return $total if !$total;
+
+        $total_count = $total->{data}->{total};
 
         # no results
-        elsif ( !$total->{data}->{total} ) {
-            $data = res 200,
-              total   => 0,
-              summary => { total => 0 };
+        if ( !$total_count ) {
+            return res 200,
+              total   => $total_count,
+              summary => $total->{data};
         }
 
-        # has results
-        else {
-            $args->{start} = 0          if !defined $args->{start} || $args->{start} < 0;
-            $args->{limit} = $page_size if !$args->{limit}         || $args->{limit} > $page_size;
-
-            $data = $dbh->selectall( is_ref $main_sql ? $main_sql : [ $main_sql, $where // (), ORDER_BY $args->{sort}, LIMIT $args->{limit}, OFFSET $args->{start} ] );
-
-            if ($data) {
-                $data->{total}   = $total->{data}->{total};
-                $data->{summary} = $total->{data};
-            }
+        # do not perform main query if offset >= total
+        elsif ( $args->{offset} && $args->{offset} >= $total_count ) {
+            return res 200,
+              total   => $total_count,
+              summary => $total->{data};
         }
+    }
+
+    # has results
+    my $data = $dbh->selectall( [    #
+        $main_query->@*,
+        ORDER_BY( $args->{order_by} || $self->{default_order_by} ),
+        LIMIT( $args->{limit}, max => $self->{max_limit}, default => $self->{default_limit} ),
+        OFFSET( $args->{offset} ),
+    ] );
+
+    if ( $data && $total ) {
+        $data->{total}   = $total_count;
+        $data->{summary} = $total->{data};
     }
 
     return $data;
@@ -55,9 +61,9 @@ sub _read ( $self, $args, $total_sql, $main_sql, $where, $page_size = $DEFAULT_P
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 8                    | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 10                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 8                    | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_read' declared but not used        |
+## |    3 | 10                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_read' declared but not used        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

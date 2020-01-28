@@ -1,10 +1,11 @@
 NAME
-    Bencher::Scenario::RegexpPatternGit - Benchmark Regexp::Pattern::Git
+    Bencher::Scenario::RegexpPatternGit - Benchmark patterns in
+    Regexp::Pattern::Git
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Bencher::Scenario::RegexpPatternGit (from Perl distribution
-    Bencher-Scenario-RegexpPatternGit), released on 2019-10-25.
+    Bencher-Scenario-RegexpPatternGit), released on 2019-12-15.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -44,9 +45,9 @@ BENCHMARK DATASETS
     *   one/two/three/four/five/six
 
 SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.24.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
-    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
-    version 4.8.0-53-generic*.
+    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.04*, OS kernel: *Linux
+    version 5.0.0-37-generic*.
 
     Benchmark with default options ("bencher -m RegexpPatternGit"):
 
@@ -54,9 +55,9 @@ SAMPLE BENCHMARK RESULTS
      +-----------------------------+-----------+-----------+------------+---------+---------+
      | dataset                     | rate (/s) | time (μs) | vs_slowest |  errors | samples |
      +-----------------------------+-----------+-----------+------------+---------+---------+
-     | one/two/three/four/five/six |    460000 |      2.2  |        1   | 3.3e-09 |      20 |
-     | one/two                     |    900000 |      1.1  |        2   | 1.6e-09 |      23 |
-     | .one                        |   3600000 |      0.28 |        7.7 | 1.4e-09 |      20 |
+     | one/two/three/four/five/six |    470570 |    2.1251 |      1     | 1.7e-11 |      20 |
+     | one/two                     |    836700 |    1.195  |      1.778 | 2.3e-11 |      20 |
+     | .one                        |   3598000 |    0.2779 |      7.647 | 2.3e-11 |      21 |
      +-----------------------------+-----------+-----------+------------+---------+---------+
 
     To display as an interactive HTML table on a browser, you can add option

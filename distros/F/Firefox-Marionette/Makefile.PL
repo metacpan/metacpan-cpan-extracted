@@ -3,7 +3,16 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec();
 
-delete $ENV{HOME};
+if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+} elsif ($> == 0) { # see RT#131304
+	my $current = $ENV{HOME};
+	my $correct = (getpwuid($>))[7];
+	if ($current eq $correct) {
+	} else {
+		$ENV{HOME} = $correct;
+		print "Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}\n";
+	}
+}
 
 sub last_desperate_search {
     if ( ( $^O eq 'MSWin32' ) ) {
@@ -137,6 +146,7 @@ WriteMakefile(
         'HTTP::Response'  => 0,
         'File::HomeDir'   => 0,
         'IO::Socket::SSL' => 0,
+	$] ge '5.010' ? ( 'PDF::API2' => 0 ) : (),
     },
     PREREQ_PM => {
         'Config::INI::Reader' => 0,

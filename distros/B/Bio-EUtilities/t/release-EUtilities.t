@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    print "1..0 # SKIP these tests are for release candidate testing\n";
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
     exit
   }
 }
@@ -35,6 +35,7 @@ plan tests => $test_ct;
 
 my $debug = $ENV{BIOPERLDEBUG} || $ENV{BIOPERL_DEBUG} || 0;
 my $email = $ENV{BIOPERL_EMAIL};
+my $api_key = $ENV{BIOPERL_APIKEY};
 
 my ($eutil, $response);
 
@@ -75,6 +76,7 @@ sub efetch {
                                         -db         => 'protein',
                                         -id         => [$ids[0]],
                                         -rettype    => 'fasta',
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -105,6 +107,7 @@ sub epost {
                                         -eutil      => 'epost',
                                         -db         => 'protein',
                                         -id         => \@ids,
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -223,6 +226,7 @@ sub esummary {
                                          -eutil      => 'esummary',
                                          -db         => 'protein',
                                          -id            => \@ids,
+                                         -api_key    => $api_key,
                                          -email      => $email
                                            );
         isa_ok($eutil, 'Bio::DB::GenericWebAgent');
@@ -239,20 +243,26 @@ sub esummary {
             isa_ok($ds, 'Bio::Tools::EUtilities::Summary::DocSum');
 
             my $id = $ds->get_id();
-            ok(exists($docsum{$id}), '$docsum->get_id()');
+            if (exists($docsum{$id})) {
+                ok(exists($docsum{$id}), '$docsum->get_id()');
 
-            my %items = %{ $docsum{$id} };
+                my %items = %{ $docsum{$id} };
 
-            # iterate using item names
+                # iterate using item names
 
-            for my $name ($ds->get_all_names()) {
-                $ct++;
-                my ($it) = $ds->get_Items_by_name($name);
-                ok(exists $items{$name},'DocSum Name exists');
-                is($it->get_name, $name, 'get_name(),DocSum Name');
-                is($ds->get_type_by_name($name), $items{$name}->[0],
-                   'get_type_by_name() from DocSum');
-                is($it->get_type, $items{$name}->[0], 'get_type() from Item');
+                for my $name ($ds->get_all_names()) {
+                    my ($it) = $ds->get_Items_by_name($name);
+                    if (exists $items{$name}) {
+                        $ct++;
+                        ok(exists $items{$name},'DocSum Name exists');
+                        is($it->get_name, $name, 'get_name(),DocSum Name');
+                        is($ds->get_type_by_name($name), $items{$name}->[0],
+                           'get_type_by_name() from DocSum');
+                        is($it->get_type, $items{$name}->[0], 'get_type() from Item');
+                    } else {
+                        diag("Unmatched DocSum ".$name.", Type:".$it->get_type.", Content:".$it->get_content()) if $debug;
+                    }
+                }
             }
         }
         is($ct, 60);
@@ -268,6 +278,7 @@ sub esearch {
                                         -db         => 'protein',
                                         -term       => $term,
                                         -retmax     => 100,
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -289,6 +300,7 @@ sub esearch {
                                         -usehistory => 'y',
                                         -term       => $term,
                                         -retmax     => 100,
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -351,6 +363,7 @@ sub einfo {
         # all databases (list)
         $eutil = Bio::DB::EUtilities->new(
                                         -eutil      => 'einfo',
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -378,6 +391,7 @@ sub elink1 {
                                         -db         => 'taxonomy',
                                         -dbfrom     => 'protein',
                                         -id         => \@ids,
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -413,6 +427,7 @@ sub elink2 {
                                         -db         => 'nuccore',
                                         -dbfrom     => 'genomeprj',
                                         -id         => @genome_ids,
+                                        -api_key    => $api_key,
                                         -email      => $email
                                           );
 
@@ -444,6 +459,7 @@ sub egquery {
     $eutil = Bio::DB::EUtilities->new(
                                     -eutil      => 'egquery',
                                     -term       => $term,
+                                    -api_key    => $api_key,
                                     -email      => $email
                                       );
 

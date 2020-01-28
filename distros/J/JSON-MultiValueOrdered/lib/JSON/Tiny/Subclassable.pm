@@ -6,7 +6,7 @@ use warnings;
 	package JSON::Tiny::Subclassable;
 
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.005';
+	our $VERSION   = '0.006';
 	our @ISA       = qw(JSON::Tiny);
 	
 	use B;

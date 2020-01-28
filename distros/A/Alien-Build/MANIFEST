@@ -292,7 +292,6 @@ t/lib/MyTest/FauxFetchCommand.pm
 t/lib/MyTest/File.pm
 t/lib/MyTest/HTTP.pm
 t/lib/MyTest/System.pm
-t/lib/Test2/Require/Dev.pm
 t/test_alien.t
 t/test_alien_build.t
 t/test_alien_cancompile.t

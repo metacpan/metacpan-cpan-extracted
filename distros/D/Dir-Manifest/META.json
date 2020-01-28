@@ -61,15 +61,15 @@
    "provides" : {
       "Dir::Manifest" : {
          "file" : "lib/Dir/Manifest.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "Dir::Manifest::Key" : {
          "file" : "lib/Dir/Manifest/Key.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       },
       "Dir::Manifest::Slurp" : {
          "file" : "lib/Dir/Manifest/Slurp.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.6.1"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/shlomif/Dir-Manifest"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.6.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -350,6 +350,11 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {

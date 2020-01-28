@@ -1,5 +1,5 @@
 package Data::Perl::Role::Collection::Array;
-$Data::Perl::Role::Collection::Array::VERSION = '0.002009';
+$Data::Perl::Role::Collection::Array::VERSION = '0.002011';
 # ABSTRACT: Wrapping class for Perl's built in array structure.
 
 use strictures 1;
@@ -186,6 +186,29 @@ sub print {
   print { $fh || *STDOUT } CORE::join((defined $arg ? $arg : ','), @$self);
 }
 
+sub head {
+  my ($self, $count) = @_;
+
+  $count = $self->count if $count > $self->count;
+  $count = $self->count - -$count if $count < 0;
+
+  my @res = ($self->elements)[0 .. $count - 1];
+
+  blessed($self) ? blessed($self)->new(@res) : @res;
+}
+
+sub tail {
+  my ($self, $count) = @_;
+
+  $count = $self->count if $count > $self->count;
+  $count = $self->count - -$count if $count < 0;
+  my $start = $self->count - $count;
+
+  my @res = ($self->elements)[$start .. $self->count - 1];
+
+  blessed($self) ? blessed($self)->new(@res) : @res;
+}
+
 1;
 
 =pod
@@ -198,7 +221,7 @@ Data::Perl::Role::Collection::Array - Wrapping class for Perl's built in array s
 
 =head1 VERSION
 
-version 0.002009
+version 0.002011
 
 =head1 SYNOPSIS
 
@@ -409,6 +432,20 @@ L<List::MoreUtils>. The returned list is provided as a Collection::Array object.
 
 This method does not accept any arguments.
 
+=item B<head($count)>
+
+Returns the first C<$count> elements of the array. If C<$count> is greater
+than the number of elements in the array, the array (without spurious C<undef>s)
+is returned. Negative C<$count> means "all but the last C<$count> elements". The
+returned list is provided as a Collection::Array object.
+
+=item B<tail($count)>
+
+Returns the last C<$count> elements of the array. If C<$count> is greater
+than the number of elements in the array, the array (without spurious C<undef>s)
+is returned. Negative C<$count> means "all but the first C<$count> elements". The
+returned list is provided as a Collection::Array object.
+
 =item B<join($str)>
 
 Joins every element of the array using the separator given as argument, just
@@ -521,7 +558,7 @@ Matthew Phillips <mattp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

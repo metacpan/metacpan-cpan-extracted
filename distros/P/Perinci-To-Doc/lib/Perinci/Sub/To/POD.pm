@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.867'; # VERSION
+our $DATE = '2020-01-28'; # DATE
+our $VERSION = '0.869'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -13,6 +13,11 @@ extends 'Perinci::Sub::To::FuncBase';
 
 sub BUILD {
     my ($self, $args) = @_;
+}
+
+sub _podquote {
+    require String::PodQuote;
+    String::PodQuote::pod_quote($_[1]);
 }
 
 sub _md2pod {
@@ -62,9 +67,12 @@ sub after_gen_doc {
         }
     }
 
-    $self->add_doc_lines(
-        $dres->{summary}.($dres->{summary} =~ /\.$/ ? "":"."), "")
-        if $dres->{summary};
+    if (defined $dres->{summary}) {
+        $self->add_doc_lines(
+            $self->_podquote($dres->{summary}) .
+                  ($dres->{summary} =~ /\.$/ ? "":"."),
+            "");
+    }
 
     my $examples = $meta->{examples};
     my $orig_result_naked = $meta->{_orig_result_naked} // $meta->{result_naked};
@@ -220,7 +228,7 @@ sub after_gen_doc {
         }
         my @summary_lines;
         {
-            my $summary = $eg->{summary} //
+            my $summary = $self->_podquote($eg->{summary}) //
                 "Example #$i".(defined($eg->{name}) ? " ($eg->{name})" :"");
             push @summary_lines, ("=item * $summary" . ":", "");
         }
@@ -341,14 +349,17 @@ sub after_gen_doc {
                      " (" . __("default") .
                          ": $ra->{human_arg_default})" : "")
             ), "");
-            $self->add_doc_lines(
-                $ra->{summary} . ($ra->{summary} =~ /\.$/ ? "" : "."),
-                "") if $ra->{summary};
+            if (defined $ra->{summary}) {
+                $self->add_doc_lines(
+                    $self->_podquote($ra->{summary}) .
+                        ($ra->{summary} =~ /\.$/ ? "" : "."),
+                    "");
+            }
             $self->add_doc_lines(
                 $self->_md2pod($ra->{description}),
                 "") if $ra->{description};
         }
-        $self->add_doc_lines("=back", "");
+        $self->add_doc_lines("", "=back", "");
     } else {
         $self->add_doc_lines(__("No arguments") . ".", "");
     }
@@ -372,8 +383,8 @@ sub after_gen_doc {
                          ": $spa->{default})" : "")
             ), "");
             $self->add_doc_lines(
-                $spa->{summary} . ($spa->{summary} =~ /\.$/ ? "" : "."),
-                "") if $spa->{summary};
+                $self->_podquote($spa->{summary}) . ($spa->{summary} =~ /\.$/ ? "" : "."),
+                "") if defined $spa->{summary};
         }
         $self->add_doc_lines("=back", "");
     }
@@ -407,8 +418,8 @@ that contains extra information.")), "")
     #        } else {
     #            $self->add_doc_lines("* L<$url>", "");
     #        }
-    #        $self->add_doc_lines($link->{summary}.".", "") if $link->{summary};
-    #        $self->add_doc_lines($self->_md2pod($link->{description}), "") if $link->{description};
+    #        $self->add_doc_lines($self->_podquote($link->{summary}).".", "") if defined $link->{summary};
+    #        $self->add_doc_lines($self->_md2pod($link->{description}), "") if defined $link->{description};
     #    }
     #    $self->add_doc_lines("=back", "");
     #}
@@ -429,7 +440,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.867 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2019-07-26.
+This document describes version 0.869 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-01-28.
 
 =head1 SYNOPSIS
 
@@ -467,7 +478,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

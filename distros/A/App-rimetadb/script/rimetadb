@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-15'; # DATE
-our $VERSION = '0.223'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $VERSION = '0.224'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.223 of rimetadb (from Perl distribution App-rimetadb), released on 2019-10-15.
+This document describes version 0.224 of rimetadb (from Perl distribution App-rimetadb), released on 2019-11-26.
 
 =head1 SYNOPSIS
 
@@ -85,13 +85,13 @@ Show some statistics (will be expanded further later):
 
  % rimetadb stats
 
-Lists packages in the database:
+List packages in the database:
 
  % rimetadb packages
  % rimetadb packages -l
  % rimetadb packages MyCompany
 
-Lists functions in the database:
+List functions in the database:
 
  % rimetadb functions
  % rimetadb functions -l
@@ -107,6 +107,27 @@ Get metadata of function/package:
  % rimetadb meta Foo::Bar::func
 
 =head1 DESCRIPTION
+
+This script (and backend Perl module, L<App::rimetadb>) maintains a database
+that catalogs Rinci metadata. The metadata can be used for various purposes:
+
+=over
+
+=item * Statistics
+
+Average number of functions in a package. Average number of arguments in a
+function. Most often used schema data types for arguments. And so on.
+
+=item * Allow access to Perl functions via HTTP
+
+See L<Perinci::Access::HTTP::Server> and L<Riap>.
+
+=item * Documentation
+
+=back
+
+You can add Rinci metadata from installed Perl modules, or manually by
+specifying JSON or data structure via CLI or Perl API.
 
 =head1 SUBCOMMANDS
 

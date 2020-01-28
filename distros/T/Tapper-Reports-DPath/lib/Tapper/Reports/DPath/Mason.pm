@@ -2,7 +2,7 @@
 package Tapper::Reports::DPath::Mason;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Mix DPath into Mason templates
-$Tapper::Reports::DPath::Mason::VERSION = '5.0.2';
+$Tapper::Reports::DPath::Mason::VERSION = '5.0.4';
 use 5.010;
         use Moose;
 
@@ -142,7 +142,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

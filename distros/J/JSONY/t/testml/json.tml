@@ -1,7 +1,7 @@
-%TestML 0.1.0
+#!/usr/bin/env testml
 
 # Test various json streams, to make sure jsony can parse it properly.
-*json.jsony_load.yaml == *json.json_decode.yaml
+*json.jsony-load.yaml == *json.json-decode.yaml
 
 === Various Numbers
 --- json: [1,-2,3,4.5,67,0.8e-9]

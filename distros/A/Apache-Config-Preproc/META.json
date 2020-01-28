@@ -53,7 +53,7 @@
    "provides" : {
       "Apache::Config::Preproc" : {
          "file" : "lib/Apache/Config/Preproc.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Apache::Config::Preproc::Expand" : {
          "file" : "lib/Apache/Config/Preproc/Expand.pm"
@@ -100,6 +100,6 @@
          "web" : "http://git.gnu.org.ua/cgit/acpp.git/"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

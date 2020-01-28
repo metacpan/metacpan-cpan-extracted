@@ -6,11 +6,13 @@ use Carp ();
 use Import::Into ();
 use MooX::Press 0.025 ();
 use MooX::Press::Keywords ();
+use Syntax::Keyword::Try ();
+use feature ();
 
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.012';
 
 use Keyword::Declare;
 use B::Hooks::EndOfScope;
@@ -42,13 +44,15 @@ BEGIN {
 		}
 		elsif ($action eq -go) {
 			if ($gather{$me}{$caller}{'_defer_role'}) {
-				die 'nested roles not currently supported';
+				require Carp;
+				Carp::croak('Nested roles are not supported');
 			}
 			if ($gather{$me}{$caller}{'_defer_role_generator'}) {
-				die 'nested role generators not currently supported';
+				require Carp;
+				Carp::croak('Nested role generators are not supported');
 			}
 			if ($gather{$me}{$caller}{'_defer_class_generator'}) {
-				die 'nested class generators not currently supported';
+				$me->_undefer_class_generators($gather{$me}{$caller}{'class_generator'}||=[], delete $gather{$me}{$caller}{'_defer_class_generator'});
 			}
 			if ($gather{$me}{$caller}{'_defer_class'}) {
 				$me->_undefer_classes($gather{$me}{$caller}{'class'}, delete $gather{$me}{$caller}{'_defer_class'});
@@ -74,7 +78,7 @@ BEGIN {
 	}
 	sub _undefer_classes {
 		my ($me, $classes, $d) = @_;
-		my %class_hash = @$classes;
+		my %class_hash = @{$classes||[]};
 		my @deferred;
 		my $max_depth = 0;
 		while (@$d) {
@@ -89,6 +93,15 @@ BEGIN {
 				next SPEC unless $spec->{_depth} == $depth;
 				my $parent_key = join('|', @{$spec->{_stack}});
 				my $my_key     = join('|', @{$spec->{_stack}}, $spec->{_class_name});
+				if (not $class_hash{$parent_key}) {
+					require Carp;
+					Carp::croak(sprintf(
+						'%s is nested in %s but %s is not a class',
+						$spec->{_class_name},
+						$spec->{_stack}[-1],
+						$spec->{_stack}[-1],
+					));
+				}
 				push @{ $class_hash{$parent_key}{subclass} ||=[] }, $spec->{_class_name}, $spec;
 				$class_hash{$my_key} = $spec;
 			}
@@ -99,7 +112,22 @@ BEGIN {
 			delete $spec->{_depth};
 		}
 	}
-	
+	sub _undefer_class_generators {
+		my ($me, $classes, $d) = @_;
+		while (@$d) {
+			my ($class, $spec) = splice(@$d, 0, 2);
+			my $extends = $spec->{_stack}[-1];
+			my $next = delete($spec->{code});
+			$spec->{code} = sub {
+				my $got = $next->(@_);
+				$got->{extends} ||= [$extends];
+				$got;
+			};
+			delete $spec->{_stack};
+			push @$classes, $class, $spec;
+		}
+	}
+
 	$INC{'MooX/Pression/_Gather.pm'} = __FILE__;
 };
 
@@ -140,6 +168,13 @@ my $handle_signature_list = sub {
 	my $seen_named = 0;
 	my $seen_pos   = 0;
 	my @parsed;
+	
+	return (
+		0,
+		'',
+		'[]',
+		'',
+	) if !$sig;
 	
 	while ($sig) {
 		$sig =~ s/^\s+//xs;
@@ -252,7 +287,7 @@ my $handle_signature_list = sub {
 };
 
 keytype RoleList is /
-	\+?\s*
+	\s*
 	(
 		(?&PerlBlock) | (?&PerlQualifiedIdentifier)
 	)
@@ -285,12 +320,6 @@ my $handle_role_list = sub {
 		my $role_is_block = 0;
 		my $suffix = '';
 		my $role_params   = undef;
-		
-		if ($rolelist =~ /^\+/xs) {
-			die 'unexpected plus sign' if $kind eq 'role';
-			$prefix = '+';
-			$rolelist =~ s/^\+\s*//xs;
-		}
 		
 		if ($rolelist =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xso) {
 			$role = $1;
@@ -339,7 +368,7 @@ my $handle_role_list = sub {
 };
 
 sub _handle_factory_keyword {
-	my ($me, $name, $via, $code, $sig) = @_;
+	my ($me, $name, $via, $code, $has_sig, $sig, $optim) = @_;
 	if ($via) {
 		return sprintf(
 			'q[%s]->_factory(%s, \\(%s));',
@@ -348,30 +377,87 @@ sub _handle_factory_keyword {
 			($via  =~ /^\{/ ? "scalar(do $via)"  : B::perlstring($via)),
 		);
 	}
-	if (!$sig) {
+	if (!$has_sig) {
+		my $munged_code = sprintf('sub { my ($factory, $class) = (@_); do %s }', $code);
 		return sprintf(
-			'q[%s]->_factory(%s, sub { my ($factory, $class) = (@_); do %s });',
+			'q[%s]->_factory(%s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$code,
+			$optim ? B::perlstring($munged_code) : $munged_code,
+			!!$optim,
 		);
 	}
 	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); %s; do %s }', $signature_var_list, $extra, $code);
 	sprintf(
-		'q[%s]->_factory(%s, { code => %s, named => %d, signature => %s });',
+		'q[%s]->_factory(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 		$me,
 		($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-		$munged_code,
+		$optim ? B::perlstring($munged_code) : $munged_code,
 		!!$signature_is_named,
 		$type_params_stuff,
+		!!$optim,
 	);
 }
 
-sub _handle_modifier_keyword {
-	my ($me, $kind, $name, $code, $sig) = @_;
+sub _handle_method_keyword {
+	my $me = shift;
+	my ($name, $code, $has_sig, $sig, $optim) = @_;
 	
-	if ($sig) {
+	if (defined $name) {
+		if ($has_sig) {
+			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			return sprintf(
+				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+				$me,
+				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+				$optim ? B::perlstring($munged_code) : $munged_code,
+				!!$signature_is_named,
+				$type_params_stuff,
+				!!$optim,
+			);
+		}
+		else {
+			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+			return sprintf(
+				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, optimize => %d });',
+				$me,
+				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+				$optim ? B::perlstring($munged_code) : $munged_code,
+				!!$optim,
+			);
+		}
+	}
+	else {
+		if ($has_sig) {
+			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
+			return sprintf(
+				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+				'MooX::Press',
+				$optim ? B::perlstring($munged_code) : $munged_code,
+				!!$signature_is_named,
+				$type_params_stuff,
+				!!$optim,
+			);
+		}
+		else {
+			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
+			return sprintf(
+				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, optimize => %d });',
+				'MooX::Press',
+				$optim ? B::perlstring($munged_code) : $munged_code,
+				!!$optim,
+			);
+		}
+	}
+}
+
+sub _handle_modifier_keyword {
+	my ($me, $kind, $name, $code, $has_sig, $sig, $optim) = @_;
+	
+	if ($has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 		my $munged_code;
 		if ($kind eq 'around') {
@@ -381,31 +467,36 @@ sub _handle_modifier_keyword {
 			$munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		}
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, { code => %s, named => %d, signature => %s });',
+			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 			$me,
 			$kind,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$munged_code,
+			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$signature_is_named,
 			$type_params_stuff,
+			!!$optim,
 		);
 	}
 	elsif ($kind eq 'around') {
+		my $munged_code = sprintf('sub { my ($next, $self) = @_; my $class = ref($self)||$self; do %s }', $code);
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, sub { my ($next, $self) = @_; my $class = ref($self)||$self; do %s });',
+			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$code,
+			$optim ? B::perlstring($munged_code) : $munged_code,
+			!!$optim,
 		);
 	}
 	else {
+		my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
 		sprintf(
-			'q[%s]->_modifier(q(%s), %s, sub { my $self = $_[0]; my $class = ref($self)||$self; do %s });',
+			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
 			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$code,
+			$optim ? B::perlstring($munged_code) : $munged_code,
+			!!$optim,
 		);
 	}
 }
@@ -417,19 +508,21 @@ sub _handle_modifier_keyword {
 
 sub import {
 	no warnings 'closure';
-	my $caller = caller;
 	my ($me, %opts) = (shift, @_);
+	my $caller = ($opts{caller} ||= caller);
+	
+	# Need to reproduce this logic from MooX::Press to find out
+	# the name of the type library.
+	#
+	require MooX::Press;
+	$opts{prefix}           = $opts{caller} unless exists $opts{prefix};
+	$opts{factory_package}  = $opts{prefix} unless exists $opts{factory_package};
+	$opts{type_library}     = 'Types'       unless exists $opts{type_library};
+	$opts{type_library}     = 'MooX::Press'->qualify_name($opts{type_library}, $opts{prefix});
 	
 	# Optionally export wrapper subs for pre-declared types
 	#
 	if ($opts{declare}) {
-		require MooX::Press;
-		# Need to reproduce this logic from MooX::Press to find out
-		# the name of the type library.
-		$opts{caller}  ||= $caller;
-		$opts{prefix}       = $opts{caller} unless exists $opts{prefix};
-		$opts{type_library} = 'Types'       unless exists $opts{type_library};
-		$opts{type_library} = 'MooX::Press'->qualify_name($opts{type_library}, $opts{prefix});
 		my $types = $opts{type_library};
 		for my $name (@{ $opts{declare} }) {
 			eval qq{
@@ -444,13 +537,20 @@ sub import {
 	# Export utility stuff
 	#
 	MooX::Pression::_Gather->import::into($caller, -gather => %opts);
-	MooX::Press::Keywords->import::into($caller, qw( -booleans -privacy -util -try ));
+	MooX::Press::Keywords->import::into($caller, qw( -booleans -privacy -util )); # imports strict and warnings
+	Syntax::Keyword::Try->import::into($caller);
+	if ($] >= 5.018) {
+		feature->import::into($caller, qw( say state unicode_strings unicode_eval evalbytes current_sub fc ));
+	}
+	elsif ($] >= 5.014) {
+		feature->import::into($caller, qw( say state unicode_strings ));
+	}
 	$_->import::into($caller, qw( -types -is -assert ))
 		for qw(Types::Standard Types::Common::Numeric Types::Common::String);
 	
 	# `class` keyword
 	#
-	keyword class ('+'? $plus, QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
+	keyword class ('+'? $plus, QualifiedIdentifier $classname, '(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
 		sprintf(
@@ -471,16 +571,43 @@ sub import {
 			$classdfn,
 		);
 	}
-	keyword class ('+'? $plus, QualifiedIdentifier $classname, ';') {
+	keyword class ('+'? $plus, QualifiedIdentifier $classname) {
 		sprintf(
 			'use MooX::Pression::_Gather -gather, %s => {};',
 			B::perlstring("class:$plus$classname"),
 		);
 	}
+	keyword class ('(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
+		sprintf(
+			'q[%s]->anonymous_generator(class => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
+			B::perlstring($opts{toolkit}||'Moo'),
+			B::perlstring($opts{prefix}),
+			B::perlstring($opts{factory_package}),
+			B::perlstring($opts{type_library}),
+		);
+	}
+	keyword class (Block? $classdfn) {
+		$classdfn ||= '{}';
+		sprintf(
+			'q[%s]->anonymous_package(class => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$classdfn,
+			B::perlstring($opts{toolkit}||'Moo'),
+			B::perlstring($opts{prefix}),
+			B::perlstring($opts{factory_package}),
+			B::perlstring($opts{type_library}),
+		);
+	}
 	
 	# `role` keyword
 	#
-	keyword role (QualifiedIdentifier $classname, '(', SignatureList $sig, ')', Block $classdfn) {
+	keyword role (QualifiedIdentifier $classname, '(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
 		sprintf(
@@ -501,11 +628,62 @@ sub import {
 			$classdfn,
 		);
 	}
-	keyword role (QualifiedIdentifier $classname, OWS, ';') {
+	keyword role (QualifiedIdentifier $classname) {
 		sprintf(
 			'use MooX::Pression::_Gather -gather, %s => {};',
 			B::perlstring('role:'.$classname),
 		);
+	}
+	keyword role ('(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
+		sprintf(
+			'q[%s]->anonymous_generator(role => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
+			B::perlstring($opts{toolkit}||'Moo'),
+			B::perlstring($opts{prefix}),
+			B::perlstring($opts{factory_package}),
+			B::perlstring($opts{type_library}),
+		);
+	}
+	keyword role (Block? $classdfn) {
+		$classdfn ||= '{}';
+		sprintf(
+			'q[%s]->anonymous_package(role => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$classdfn,
+			B::perlstring($opts{toolkit}||'Moo'),
+			B::perlstring($opts{prefix}),
+			B::perlstring($opts{factory_package}),
+			B::perlstring($opts{type_library}),
+		);
+	}
+	
+	# `toolkit` keyword
+	#
+	keyword toolkit (Identifier $tk, '(', QualifiedIdentifier|Comma @imports, ')') {
+		my @processed_imports;
+		while (@imports) {
+			no warnings 'uninitialized';
+			my $next = shift @imports;
+			if ($next =~ /^::(.+)$/) {
+				push @processed_imports, $1;
+			}
+			elsif ($next =~ /^[^\W0-9]/) {
+				push @processed_imports, sprintf('%sX::%s', $tk, $next);
+			}
+			else {
+				die "Expected package name, got $next";
+			}
+			$imports[0] eq ',' and shift @imports;
+		}
+		sprintf('q[%s]->_toolkit(%s);', $me, join ",", map(B::perlstring($_), $tk, @processed_imports));
+	}
+	keyword toolkit (Identifier $tk) {
+		sprintf('q[%s]->_toolkit(%s);', $me, B::perlstring($tk));
 	}
 	
 	# `begin` and `end` keywords
@@ -537,7 +715,7 @@ sub import {
 	
 	# `requires` keyword
 	#
-	keyword requires (Identifier|Block $name, '(', SignatureList $sig, ')') {
+	keyword requires (Identifier|Block $name, '(' $has_sig, SignatureList? $sig, ')') {
 		sprintf(
 			'q[%s]->_requires(%s);',
 			$me,
@@ -568,67 +746,60 @@ sub import {
 	}
 	
 	# `constant` keyword
+	#
 	keyword constant (Identifier $name, '=', Expr $value) {
 		sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $value);
 	}
 	
 	# `method` keyword
 	#
-	keyword method (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
-		sprintf(
-			'q[%s]->_can(%s, { code => %s, named => %d, signature => %s });',
-			$me,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$munged_code,
-			!!$signature_is_named,
-			$type_params_stuff,
-		);
+	keyword method (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_method_keyword($name, $code, $has_sig, $sig, !!$optim);
 	}
-	keyword method (Identifier|Block $name, Block $code) {
-		sprintf(
-			'q[%s]->_can(%s, sub { my $self = $_[0]; my $class = ref($self)||$self; do %s });',
-			$me,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-			$code,
-		);
+	keyword method (Identifier|Block $name, ':optimize'? $optim, Block $code) {
+		$me->_handle_method_keyword($name, $code, undef, undef, !!$optim);
+	}
+	keyword method (                        ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_method_keyword(undef, $code, $has_sig, $sig, !!$optim);
+	}
+	keyword method (                        ':optimize'? $optim, Block $code) {
+		$me->_handle_method_keyword(undef, $code, undef, undef, !!$optim);
 	}
 	
 	# `before`, `after`, and `around` keywords
 	#
-	keyword before (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code, $sig);
+	keyword before (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(before => $name, $code, $has_sig, $sig, !!$optim);
 	}
-	keyword before (Identifier|Block $name, Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code);
+	keyword before (Identifier|Block $name, ':optimize'? $optim, Block $code) {
+		$me->_handle_modifier_keyword(before => $name, $code, undef, undef, !!$optim);
 	}
-	keyword after (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code, $sig);
+	keyword after (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(after => $name, $code, $has_sig, $sig, !!$optim);
 	}
-	keyword after (Identifier|Block $name, Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code);
+	keyword after (Identifier|Block $name, ':optimize'? $optim, Block $code) {
+		$me->_handle_modifier_keyword(after => $name, $code, undef, undef, !!$optim);
 	}
-	keyword around (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code, $sig);
+	keyword around (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_modifier_keyword(around => $name, $code, $has_sig, $sig, !!$optim);
 	}
-	keyword around (Identifier|Block $name, Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code);
+	keyword around (Identifier|Block $name, ':optimize'? $optim, Block $code) {
+		$me->_handle_modifier_keyword(around => $name, $code, undef, undef, !!$optim);
 	}
 	
 	# `factory` keyword
 	#
-	keyword factory (Identifier|Block $name, '(', SignatureList $sig, ')', Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, $sig);
+	keyword factory (Identifier|Block $name, ':optimize'? $optim, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
+		$me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, !!$optim);
 	}
-	keyword factory (Identifier|Block $name, Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, undef);
+	keyword factory (Identifier|Block $name, ':optimize'? $optim, Block $code) {
+		$me->_handle_factory_keyword($name, undef, $code, undef, undef, !!$optim);
 	}
 	keyword factory (Identifier|Block $name, 'via', Identifier $via) {
-		$me->_handle_factory_keyword($name, $via, undef, undef);
+		$me->_handle_factory_keyword($name, $via, undef, undef, undef, !!0);
 	}
-	keyword factory (Identifier|Block $name, ';') {
-		$me->_handle_factory_keyword($name, 'new', undef, undef);
+	keyword factory (Identifier|Block $name) {
+		$me->_handle_factory_keyword($name, 'new', undef, undef, undef, !!0);
 	}
 	
 	# `coerce` keyword
@@ -713,6 +884,12 @@ sub _with {
 	shift;
 	push @{ $OPTS{with}||=[] }, @_;
 }
+sub _toolkit {
+	shift;
+	my ($toolkit, @imports) = @_;
+	$OPTS{toolkit} = $toolkit;
+	push @{ $OPTS{import}||=[] }, @imports if @imports;
+}
 sub _requires {
 	shift;
 	push @{ $OPTS{requires}||=[] }, @_;
@@ -739,6 +916,104 @@ sub _modifier {
 	shift;
 	my ($kind, $name, $value) = @_;
 	push @{ $OPTS{$kind} ||= [] }, $name, $value;
+}
+
+#{
+#	package MooX::Pression::Anonymous::Package;
+#	our $AUTHORITY = 'cpan:TOBYINK';
+#	our $VERSION   = '0.012';
+#	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
+#	sub DESTROY {}
+#	sub AUTOLOAD {
+#		my $me = shift;
+#		(my $method = our $AUTOLOAD) =~ s/.*:://;
+#		$$me->$method(@_);
+#	}
+#	
+#	package MooX::Pression::Anonymous::Class;
+#	our $AUTHORITY = 'cpan:TOBYINK';
+#	our $VERSION   = '0.012';
+#	our @ISA       = qw(MooX::Pression::Anonymous::Package);
+#	sub new {
+#		my $me = shift;
+#		$$me->new(@_);
+#	}
+#	use overload q[&{}] => sub {
+#		my $me = shift;
+#		sub { $me->new(@_) }
+#	};
+#	
+#	package MooX::Pression::Anonymous::Role;
+#	our $AUTHORITY = 'cpan:TOBYINK';
+#	our $VERSION   = '0.012';
+#	our @ISA       = qw(MooX::Pression::Anonymous::Package);
+#	
+#	package MooX::Pression::Anonymous::ParameterizableClass;
+#	our $AUTHORITY = 'cpan:TOBYINK';
+#	our $VERSION   = '0.012';
+#	our @ISA       = qw(MooX::Pression::Anonymous::Package);
+#	sub generate_package {
+#		my $me  = shift;
+#		my $gen = $$me->generate_package(@_);
+#		bless \$gen, 'MooX::Pression::Anonymous::Class';
+#	}
+#	use overload q[&{}] => sub {
+#		my $me = shift;
+#		sub { $me->new_class(@_) }
+#	};
+#
+#	package MooX::Pression::Anonymous::ParameterizableRole;
+#	our $AUTHORITY = 'cpan:TOBYINK';
+#	our $VERSION   = '0.012';
+#	our @ISA       = qw(MooX::Pression::Anonymous::Package);
+#	sub generate_package {
+#		my $me  = shift;
+#		my $gen = $$me->generate_package(@_);
+#		bless \$gen, 'MooX::Pression::Anonymous::Class';
+#	}
+#	use overload q[&{}] => sub {
+#		my $me = shift;
+#		sub { $me->new_role(@_) }
+#	};
+#}
+
+my $i = 0;
+sub anonymous_package {
+	my $me = shift;
+	my ($kind, $callback, %opts) = @_;
+	my $package_dfn = $me->_package_callback($callback);
+	
+	for my $forbidden (qw/ factory type_name coerce /) {
+		die if exists $package_dfn->{$forbidden};
+	}
+	$package_dfn->{type_name}  = undef;
+	$package_dfn->{factory}    = undef;
+	
+	my $qname = sprintf('%s::__ANON_%06d__', __PACKAGE__, ++$i);
+	
+	require MooX::Press;
+	my $method = "make_$kind";
+	MooX::Press->$method("::$qname", %opts, %$package_dfn);
+	
+	require Module::Runtime;
+	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
+	#return bless(\$qname, "MooX::Pression::Anonymous::".ucfirst($kind));
+	return $qname;
+}
+
+sub anonymous_generator {
+	my $me = shift;
+	my ($kind, $callback, %opts) = @_;
+	my $qname = sprintf('%s::__ANON_%06d__', __PACKAGE__, ++$i);
+	
+	require MooX::Press;
+	my $method = "make_$kind\_generator";
+	MooX::Press->$method("::$qname", %opts, generator => $callback);
+	
+	require Module::Runtime;
+	$INC{Module::Runtime::module_notional_filename($qname)} = __FILE__;
+	#return bless(\$qname, "MooX::Pression::Anonymous::Parameterizable".ucfirst($kind));
+	return $qname;
 }
 
 1;
@@ -1002,57 +1277,6 @@ It is possible to prefix a class name with a plus sign:
 Now the employee class will be named C<MyApp::Person::Employee> instead of
 the usual C<MyApp::Employee>.
 
-=head4 Parameterizable classes
-
-  package MyApp {
-    use MooX::Pression;
-    
-    class Animal {
-      has name;
-    }
-    
-    class Species ( Str $common_name, Str $binomial ) {
-      extends Animal;
-      constant common_name  = $common_name;
-      constant binomial     = $binomial;
-    }
-    
-    class Dog {
-      extends Species('dog', 'Canis familiaris');
-      method bark () {
-        say "woof!";
-      }
-    }
-  }
-
-Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
-instances of it. It's like a template for generating classes. Then 
-"MyApp::Dog" generates a class from the template and inherits from that.
-
-  my $Cat = MyApp->generate_species('cat', 'Felis catus');
-  my $mog = $Cat->new(name => 'Mog');
-  
-  $mog->isa('MyApp::Animal');         # true
-  $mog->isa('MyApp::Species');        # false!!!
-  $mog->isa($Cat);                    # true
-
-Because there are never any instances of "MyApp::Species", it doesn't
-make sense to have a B<Species> type constraint. Instead there are
-B<SpeciesClass> and B<SpeciesInstance> type constraints.
-
-  use MyApp::Types -is;
-  
-  my $lassie = MyApp->new_dog;
-  
-  is_Animal( $lassie );               # true
-  is_Dog( $lassie );                  # true
-  is_SpeciesInstance( $lassie );      # true
-  is_SpeciesClass( ref($lassie) );    # true
-
-Subclasses cannot be nested inside parameterizable classes.
-It should theoretically be possible to nest parameterizable classes
-within regular classes, but this isn't implemented yet.
-
 =head3 C<< role >>
 
 Define a very basic role:
@@ -1070,39 +1294,41 @@ This is just the same as C<class> but defines a role instead of a class.
 Roles cannot be nested within each other, nor can roles be nested in classes,
 nor classes in roles.
 
-=head4 Parameterizable roles
+=head3 C<< toolkit >>
 
-Often it makes more sense to parameterize roles than classes.
+Use a different toolkit instead of Moo.
 
-  package MyApp {
-    use MooX::Pression;
-    
-    class Animal {
-      has name;
-    }
-    
-    role Species ( Str $common_name, Str $binomial ) {
-      constant common_name  = $common_name;
-      constant binomial     = $binomial;
-    }
-    
-    class Dog {
-      extends Animal;
-      with Species('dog', 'Canis familiaris'), GoodBoi?;
-      method bark () {
-        say "woof!";
-      }
-    }
+  # use Mouse
+  class Foo {
+    toolkit Mouse;
+  }
+  
+  # use Moose
+  # use MooseX::Aliases
+  # use MooseX::StrictConstructor
+  class Bar {
+    toolkit Moose ( Aliases, StrictConstructor );
   }
 
-=head3 C<< type_name >>
+You can of course specify you want to use Moo:
 
-  class Homo::Sapiens {
-    type_name Human;
+  class Baz {
+    toolkit Moo;
   }
 
-The class will still be called L<MyApp::Homo::Sapiens> but the type in the
-type library will be called B<Human> instead of B<Homo_Sapiens>.
+Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor will.
+
+It is possible to set a default toolkit when you import MooX::Pression.
+
+  use MooX::Pression (
+    ...,
+    toolkit => 'Moose',
+  );
+
+  use MooX::Pression (
+    ...,
+    toolkit => 'Mouse',
+  );
 
 =head3 C<< extends >>
 
@@ -1289,7 +1515,7 @@ For enumerations, you can define them like this:
   }
 
 MooX::Pression integrates support for L<MooX::Enumeration> (and
-L<MooseX::Enumeration>).
+L<MooseX::Enumeration>, but MouseX::Enumeration doesn't exist).
 
   class Person {
     ...;
@@ -1312,6 +1538,29 @@ C<status_is_alive>, C<status_is_dead>, and C<status_is_undead>.
 Checking C<< $bob->status eq 'alvie' >> is prone to typos, but
 C<< $bob->status_is_alvie >> will cause a runtime error because the
 method is not defined.
+
+MooX::Pression also integrates support for L<Sub::HandlesVia> allowing
+you to delegate certain methods to unblessed references and non-reference
+values. For example:
+
+  class Person {
+    has age (
+      type         => 'Int',
+      default      => 0,
+      handles_via  => 'Counter',
+      handles      => {
+        birthday => 'inc',   # increment age
+      },
+    );
+    after birthday {
+      if ($self->age < 30) {
+        say "yay!";
+      }
+      else {
+        say "urgh!";
+      }
+    }
+  }
 
 It is possible to add hints to the attribute name as a shortcut for common
 specifications.
@@ -1526,6 +1775,58 @@ deal with C<< @_ >> in the body of the method. In the second, there
 is a signature, but it is a signature showing that the method expects
 no arguments (other than the invocant of course).
 
+=head4 Optimizing Methods
+
+For a slight compiled-time penalty, you can improve the speed which
+methods run at using the C<< :optimize >> attribute:
+
+  method foo :optimize (...) {
+    ...;
+  }
+
+Optimized methods must not close over any lexical (C<my> or C<our>)
+variables; they can only access the variables declared in their,
+signature, C<< $self >>, C<< $class >>, C<< @_ >>, and globals.
+
+=head4 Anonymous Methods
+
+It I<is> possible to use C<method> without a name to return an
+anonymous method (coderef):
+
+  use MooX::Pression prefix => 'MyApp';
+  
+  class MyClass {
+    method get_method ($foo) {
+      method ($bar) {
+        return $foo . $bar;
+      }
+    }
+  }
+  
+  my $obj   = MyApp->new_myclass;
+  my $anon  = $obj->get_method("FOO");
+  say ref($anon);                       # CODE
+  say $obj->$anon("BAR");               # FOOBAR
+
+Note that while C<< $anon >> is a coderef, it is still a method, and
+still expects to be passed an object as C<< $self >>.
+
+Due to limitations with L<Keyword::Declare> and L<Keyword::Simple>,
+keywords are always complete statements, so C<< method ... >> has an
+implicit semicolon before and after it. This means that this won't
+work:
+
+  my $x = method { ... };
+
+Because it gets treated as:
+
+  my $x = ;
+  method { ... };
+
+A workaround is to wrap it in a C<< do { ... } >> block.
+
+  my $x = do { method { ... } };
+
 =head3 require
 
 Indicates that a role requires classes to fulfil certain methods.
@@ -1570,6 +1871,8 @@ not care about the types of the arguments, so can omit checking them.
     say "Speak now or forever hold your peace!";
   }
 
+The C<< :optimize >> attribute is supported for C<before>.
+
 =head3 C<< after >>
 
 There's not much to say about C<after>. It's just like C<before>.
@@ -1585,6 +1888,8 @@ There's not much to say about C<after>. It's just like C<before>.
   after marry ( $partner, $date? ) {
     say "You may kiss the bride!";
   }
+
+The C<< :optimize >> attribute is supported for C<after>.
 
 =head3 C<< around >>
 
@@ -1614,6 +1919,8 @@ are not shifted off C<< @_ >> for you, but the variables are still defined.
     say "You may kiss the bride!";
     return $return;
   }
+
+The C<< :optimize >> attribute is supported for C<around>.
 
 =head3 C<< factory >>
 
@@ -1715,6 +2022,40 @@ Now C<< MyApp->new_man >> will call C<< MyApp::Person->new_guy >>.
 C<< factory new_person >> with no C<via> or method body is basically
 like saying C<< via new >>.
 
+The C<< :optimize >> attribute is supported for C<factory>.
+
+=head4 Implementing a singleton
+
+Factories make it pretty easy to implement a singleton.
+
+  class AppConfig {
+    ...;
+    
+    factory get_appconfig () {
+      state $config = $class->new();
+    }
+  }
+
+Now C<< MyApp->get_appconfig >> will always return the same AppConfig object.
+Because any explicit use of the C<factory> keyword in a class definition
+suppresses the automatic creation of a factory method for the class, there
+will be no C<< MyApp->new_appconfig >> method for creating new objects
+of that class.
+
+(People can still manually call C<< MyApp::AppConfig->new >> to get a new
+AppConfig object, but remember MooX::Pression discourages calling constructors
+directly, and encourages you to use the factory package for instantiating
+objects!)
+
+=head3 C<< type_name >>
+
+  class Homo::Sapiens {
+    type_name Human;
+  }
+
+The class will still be called L<MyApp::Homo::Sapiens> but the type in the
+type library will be called B<Human> instead of B<Homo_Sapiens>.
+
 =head3 C<< coerce >>
 
   class Person {
@@ -1764,6 +2105,8 @@ statement more readable.
     $class->new(name => $_);
   }
 
+The C<< :optimize >> attribute is not currently supported for C<coerce>.
+
 =head3 C<< version >>
 
   class Person {
@@ -1803,6 +2146,71 @@ If C<class> definitions are nested, C<authority> will be inherited by
 child classes. If a parent class is specified via C<extends>, C<authority>
 will not be inherited.
 
+=head2 Helper Subs
+
+Earlier it was stated that C<sub> cannot be used to define methods in
+classes and roles. This is true, but that doesn't mean that it has no
+use.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    sub helper_function { ... }
+    
+    class Foo {
+      method foo {
+        ...;
+        helper_function(...);
+        ...;
+      }
+    }
+    
+    class Bar {
+      sub other_helper { ... }
+      method bar {
+        ...;
+        helper_function(...);
+        other_helper(...);
+        ...;
+      }
+    }
+  }
+
+The subs defined by C<sub> end up in the "MyApp" package, not
+"MyApp::Foo" or "MyApp::Bar". They can be called by any of the classes
+and roles defined in MyApp. This makes them suitable for helper subs
+like logging, L<List::Util>/L<Scalar::Util> sorts of functions, and
+so on.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    use List::Util qw( any all first reduce );
+    # the above functions are now available within
+    # all of MyApp's classes and roles, but won't
+    # pollute any of their namespaces.
+    
+    use namespace::clean;
+    # And now they won't even pollute MyApp's namespace.
+    # Though I'm pretty sure this will also stop them
+    # from working in any methods that used ":optimize".
+    
+    class Foo { ... } 
+    role Bar { ... } 
+    role Baz { ... } 
+  }
+
+C<sub> is also usually your best option for those tiny little
+coderefs that need to be defined here and there:
+
+  has foo (
+    is       => lazy,
+    type     => ArrayRef[Str],
+    builder  => sub {  []  },
+  );
+
+Though consider using L<Sub::Quote> if you're using Moo.
+
 =head2 Utilities
 
 MooX::Pression also exports constants C<true> and C<false> into your
@@ -1821,30 +2229,187 @@ of C<confess> is super-powered and runs its arguments through C<sprintf>.
     }
   }
 
-And MooX::Pression exports everything from L<Try::Tiny> because it's
-cool. (This might be replaced with another C<try> module in the future?)
+MooX::Pression turns on strict, warnings, and the following modern Perl
+features:
+
+  # Perl 5.14 and Perl 5.16
+  say state unicode_strings
+  
+  # Perl 5.18 or above
+  say state unicode_strings unicode_eval evalbytes current_sub fc
+
+If you're wondering why not other features, it's because I didn't want to
+enable any that are currently classed as experimental, nor any that require
+a version of Perl above 5.18. The C<switch> feature is mostly seen as a
+failed experiment these days, and C<lexical_subs> cannot be called as methods
+so are less useful in object-oriented code.
+
+You can, of course, turn on extra features yourself.
+
+  package MyApp {
+    use MooX::Pression;
+    use feature qw( lexical_subs postderef );
+    
+    ...;
+  }
+
+And MooX::Pression exports L<Syntax::Keyword::Try> for you. Useful to have.
 
 And last but not least, it exports all the types, C<< is_* >> functions,
 and C<< assert_* >> functions from L<Types::Standard>,
 L<Types::Common::String>, and L<Types::Common::Numeric>.
 
-=head2 MooseX::Pression or MouseX::Pression?
+=head2 Anonymous Classes and Roles
 
-  use MooX::Pression (
-    ...,
-    toolkit => 'Moose',
-  );
+=head3 Anonymous classes
 
-  use MooX::Pression (
-    ...,
-    toolkit => 'Mouse',
-  );
+It is possible to make anonymous classes:
 
-The ability to choose a toolkit on a package-by-package basis is not
-currently supported. (Though it's implemented in MooX::Press.)
+  my $class  = do { class; };
+  my $object = $class->new;
 
-The C<< handles => 1 >> and C<< handles => 2 >> features for enum
-attributes are not supported with Mouse.
+The C<< do { ... } >> block is necessary because of a limitation in
+L<Keyword::Declare> and L<Keyword::Simple>, where any keywords they
+define must be complete statements.
+
+Anonymous classes can have methods and attributes and so on:
+
+  my $class = do { class {
+    has foo (type => Int);
+    has bar (type => Int);
+  }};
+  
+  my $object = $class->new(foo => 1, bar => 2);
+
+Anonymous classes I<do not> implicitly inherit from their parent like
+named nested classes do. Named classes nested inside anonymous classes
+I<do not> implicitly inherit from the anonymous class.
+
+Having one anonymous class inherit from another can be done though:
+
+  my $base     = do { class; }
+  my $derived  = do { class {
+    extends {"::$k1"};
+  }};
+
+This works because C<extends> accepts a block which returns a string for
+the package name, and the string needs to begin with "::" to avoid the
+auto prefix mechanism.
+
+=head3 Anonymous roles
+
+Anonymous roles work in much the same way.
+
+=head2 Parameterizable Classes and Roles
+
+=head3 Parameterizable classes
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Animal {
+      has name;
+    }
+    
+    class Species ( Str $common_name, Str $binomial ) {
+      extends Animal;
+      constant common_name  = $common_name;
+      constant binomial     = $binomial;
+    }
+    
+    class Dog {
+      extends Species('dog', 'Canis familiaris');
+      method bark () {
+        say "woof!";
+      }
+    }
+  }
+
+Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
+instances of it. It's like a template for generating classes. Then 
+"MyApp::Dog" generates a class from the template and inherits from that.
+
+  my $Cat = MyApp->generate_species('cat', 'Felis catus');
+  my $mog = $Cat->new(name => 'Mog');
+  
+  $mog->isa('MyApp::Animal');         # true
+  $mog->isa('MyApp::Species');        # false!!!
+  $mog->isa($Cat);                    # true
+
+Because there are never any instances of "MyApp::Species", it doesn't
+make sense to have a B<Species> type constraint. Instead there are
+B<SpeciesClass> and B<SpeciesInstance> type constraints.
+
+  use MyApp::Types -is;
+  
+  my $lassie = MyApp->new_dog;
+  
+  is_Animal( $lassie );               # true
+  is_Dog( $lassie );                  # true
+  is_SpeciesInstance( $lassie );      # true
+  is_SpeciesClass( ref($lassie) );    # true
+
+Subclasses cannot be nested inside parameterizable classes, but
+parameterizable classes can be nested inside regular classes, in
+which case the classes they generate will inherit from the outer
+class.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Animal {
+      has name;
+      class Species ( Str $common_name, Str $binomial ) {
+        constant common_name  = $common_name;
+        constant binomial     = $binomial;
+      }
+    }
+    
+    class Dog {
+      extends Species('dog', 'Canis familiaris');
+      method bark () {
+        say "woof!";
+      }
+    }
+  }
+
+Anonymous parameterizable classes are possible:
+
+  my $generator = do { class ($footype, $bartype) {
+    has foo (type => $footype);
+    has bar (type => $bartype);
+  };
+  
+  my $class = $generator->generate_package(Int, Num);
+  
+  my $object = $class->new(foo => 42, bar => 4.2);
+
+=head3 Parameterizable roles
+
+Often it makes more sense to parameterize roles than classes.
+
+  package MyApp {
+    use MooX::Pression;
+    
+    class Animal {
+      has name;
+    }
+    
+    role Species ( Str $common_name, Str $binomial ) {
+      constant common_name  = $common_name;
+      constant binomial     = $binomial;
+    }
+    
+    class Dog {
+      extends Animal;
+      with Species('dog', 'Canis familiaris'), GoodBoi?;
+      method bark () {
+        say "woof!";
+      }
+    }
+  }
+
+Anonymous parameterizable roles are possible.
 
 =head2 MooX::Pression vs Moops
 
@@ -1853,6 +2418,8 @@ rely on L<Package::Keyword> and L<Devel::CallParser> which have... issues.
 MooX::Pression uses Damian Conway's excellent L<Keyword::Declare>
 (which in turn uses L<PPR>) to handle most parsing needs, so parsing should
 be more predictable.
+
+Moops is faster though.
 
 Here are a few key syntax and feature differences.
 
@@ -2071,11 +2638,10 @@ MooX::Pression:
     constant PI = 3.2;
   }
 
-=head2 Future Directions
+=head3 Parameterizable classes and roles
 
-Something like MooX::HandlesVia or Moose native traits would be good.
-MooX::HandlesVia doesn't work well for non-reference values though.
-MooX::Enumeration proves that it's possible to do!
+These were always on my todo list for Moops; I doubt they'll ever be done.
+They work nicely in MooX::Pression though.
 
 =head1 BUGS
 

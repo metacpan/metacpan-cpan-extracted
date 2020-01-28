@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 
@@ -97,6 +97,35 @@ Graph::Maker->add_factory_type('best_of' => __PACKAGE__);
 1;
 
 __END__
+
+
+
+
+
+
+    # foreach my $remaining (reverse 0 .. $N-2) {
+    #   my @new_v;
+    #   my @new_score;
+    #   while (@v) {
+    #     my $parent = shift @v;
+    #     my $score  = shift @score;
+    #     foreach my $win (0, 1) {
+    #       my $child = ++$upto;
+    #       $graph->add_edge($parent, $child);
+    #       if ($directed) { $graph->add_edge($child, $parent); }
+    # 
+    #       $score += $win;
+    #       unless ($score > $half
+    #               || $score+$remaining < $half) {
+    #         push @new_v, $child;
+    #         push @new_score, $score;
+    #       }
+    #     }
+    #   }
+    #   @v = @new_v;
+    #   @score = @new_score;
+    # }
+
 
 =for stopwords Ryde
 
@@ -173,9 +202,13 @@ undirected graph and for it there is a single edge from parent to child.
 
 L<Graph::Maker>, L<Graph::Maker::BalancedTree>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2015 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
@@ -191,30 +224,3 @@ You should have received a copy of the GNU General Public License along with
 This file.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
-
-
-
-
-
-    # foreach my $remaining (reverse 0 .. $N-2) {
-    #   my @new_v;
-    #   my @new_score;
-    #   while (@v) {
-    #     my $parent = shift @v;
-    #     my $score  = shift @score;
-    #     foreach my $win (0, 1) {
-    #       my $child = ++$upto;
-    #       $graph->add_edge($parent, $child);
-    #       if ($directed) { $graph->add_edge($child, $parent); }
-    # 
-    #       $score += $win;
-    #       unless ($score > $half
-    #               || $score+$remaining < $half) {
-    #         push @new_v, $child;
-    #         push @new_score, $score;
-    #       }
-    #     }
-    #   }
-    #   @v = @new_v;
-    #   @score = @new_score;
-    # }

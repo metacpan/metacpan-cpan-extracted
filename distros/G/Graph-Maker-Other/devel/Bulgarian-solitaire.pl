@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,6 +31,32 @@ $|=1;
 # use Smart::Comments;
 
 
+{
+  # Bulgarian Solitaire, all n
+  MyGraphs::hog_searches_html
+      (
+       '>>sparse6<<:@',      # n=1 singleton
+       '>>sparse6<<:Ab',     # n=2 2-cycle
+       '>>sparse6<<:Bc',     # n=3 path-3
+       '>>sparse6<<:DaXIN',  # n=4 3-cycle and hanging path-2 
+       ':FaYgxb',            # n=5
+
+       # n=6 tree
+       '>>sparse6<<:J`E_xRcYcW^',
+
+       ':N`E_xTeY\RwdQKN',
+       ':U_`dBaebcFcfgGhJnBMeiad`_',
+       ':]_`dBaehBcFgcghImiNjcfPhlqbekad`_',  # n=9
+       ':i_OWoMDFd?w_aJHaQXOqZPdrIcuJHddY@YdWn@BkaTNjow{yDE_oN',
+
+       # n=10 tree
+       ':i_OWoMDFd?w_aJHaQXOqZPdrIcuJHddY@YdWn@BkaTNjow{yDE_oN',
+       
+       # n=15
+       ':~?Ao_C@`?B_SH`wB__I_kE_{J`cL`sZ?cJ`wPakWbK]aCacoPaOba[cckkAcedwTaofa{gbCXDKYDSD`cQaojbKYb{cd?kdSmdgpeSmEcyf{nGTBg{oeLIeTNEXJhcselS?sLa[VbHLcCddChHsme@Ne[zf|@IDEILGhtWiPZjl`ktRloF`sRapjbC_c`kc{ld{yLk}gDDhlVjT_mDroWF`iAaSTb{bcskfK|gdUjLno[E`cPac]cSjfC{ilm_kJaC\cKvicC`SNbcu_[Hb[A`C@_F',
+      );
+  exit 0;
+}
 {
   # HOG
   # N=4 3-cycle and hanging 2-path

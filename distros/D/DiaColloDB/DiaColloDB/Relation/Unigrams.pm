@@ -6,7 +6,7 @@
 package DiaColloDB::Relation::Unigrams;
 use DiaColloDB::Relation;
 use DiaColloDB::PackedFile;
-use DiaColloDB::Utils qw(:fcntl :sort :env :run :pack :file);
+use DiaColloDB::Utils qw(:fcntl :sort :env :run :pack :file :jobs);
 use Fcntl qw(:DEFAULT :seek);
 use File::Basename qw(dirname);
 use version;
@@ -356,7 +356,7 @@ sub create {
       or $ug->logconfess("create(): failed to open unigrams database: $!");
 
   env_push(LC_ALL=>'C');
-  my $cmdfh = opencmd("sort -nk1 -nk2 $datfile | uniq -c |")
+  my $cmdfh = opencmd("sort -nk1 -nk2 ".sortJobs()." $datfile | uniq -c |")
     or $ug->logconfess("create(): failed to open pipe from sort: $!");
   $ug->loadTextFh($cmdfh)
     or $ug->logconfess("create(): failed to load unigram data: $!");

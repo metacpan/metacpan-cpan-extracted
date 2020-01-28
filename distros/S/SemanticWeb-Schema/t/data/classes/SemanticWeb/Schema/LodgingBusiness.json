@@ -12,9 +12,9 @@
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
+            "schema:LodgingBusiness",
             "schema:Place",
-            "schema:LodgingBusiness"
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -23,12 +23,12 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:Event",
+            "schema:Service",
             "schema:PlayAction",
             "schema:CreativeWork",
-            "schema:Service",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:Event",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : "schema:Audience"
       },
@@ -37,10 +37,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
-            "schema:LodgingBusiness",
             "schema:ServiceChannel",
-            "schema:TouristAttraction"
+            "schema:TouristAttraction",
+            "schema:LodgingBusiness",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -65,8 +65,8 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:Time",
@@ -80,15 +80,16 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Suite",
-            "schema:LodgingBusiness",
-            "schema:House",
+            "schema:Accommodation",
             "schema:Apartment",
+            "schema:House",
+            "schema:LodgingBusiness",
             "schema:SingleFamilyResidence",
-            "schema:Accommodation"
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:petsAllowed" : {
@@ -111,8 +112,8 @@
          "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
          "rdfs:label" : "starRating",
          "schema:domainIncludes" : [
-            "schema:LodgingBusiness",
-            "schema:FoodEstablishment"
+            "schema:FoodEstablishment",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : "schema:Rating"
       }

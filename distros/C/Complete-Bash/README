@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.332 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2019-12-22.
+    This document describes version 0.334 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2020-01-28.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.
@@ -78,48 +78,6 @@ FUNCTIONS
     "Complete" POD. Aside from "words", this function also recognizes these
     keys:
 
-    *   "as" (str): Either "string" (the default) or "array" (to return
-        array of lines instead of the lines joined together). Returning
-        array is useful if you are doing completion inside "Term::ReadLine",
-        for example, where the library expects an array.
-
-    *   "esc_mode" (str): Escaping mode for entries. Either "default" (most
-        nonalphanumeric characters will be escaped), "shellvar" (like
-        "default", but dollar sign "$" will not be escaped, convenient when
-        completing environment variables for example), "filename" (currently
-        equals to "default"), "option" (currently equals to "default"), or
-        "none" (no escaping will be done).
-
-    *   "path_sep" (str): If set, will enable "path mode", useful for
-        completing/drilling-down path. Below is the description of "path
-        mode".
-
-        In shell, when completing filename (e.g. "foo") and there is only a
-        single possible completion (e.g. "foo" or "foo.txt"), the shell will
-        display the completion in the buffer and automatically add a space
-        so the user can move to the next argument. This is also true when
-        completing other values like variables or program names.
-
-        However, when completing directory (e.g. "/et" or "Downloads") and
-        there is solely a single completion possible and it is a directory
-        (e.g. "/etc" or "Downloads"), the shell automatically adds the path
-        separator character instead ("/etc/" or "Downloads/"). The user can
-        press Tab again to complete for files/directories inside that
-        directory, and so on. This is obviously more convenient compared to
-        when shell adds a space instead.
-
-        The "path_sep" option, when set, will employ a trick to mimic this
-        behaviour. The trick is, if you have a completion array of
-        "['foo/']", it will be changed to "['foo/', 'foo/ ']" (the second
-        element is the first element with added space at the end) to prevent
-        bash from adding a space automatically.
-
-        Path mode is not restricted to completing filesystem paths. Anything
-        path-like can use it. For example when you are completing Java or
-        Perl module name (e.g. "com.company.product.whatever" or
-        "File::Spec::Unix") you can use this mode (with "path_sep"
-        appropriately set to, e.g. "." or "::").
-
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
@@ -135,6 +93,22 @@ FUNCTIONS
         Specify options.
 
         Known options:
+
+        *   as
+
+            Either "string" (the default) or "array" (to return array of
+            lines instead of the lines joined together). Returning array is
+            useful if you are doing completion inside "Term::ReadLine", for
+            example, where the library expects an array.
+
+        *   esc_mode
+
+            Escaping mode for entries. Either "default" (most
+            nonalphanumeric characters will be escaped), "shellvar" (like
+            "default", but dollar sign "$" will also be escaped, convenient
+            when completing environment variables for example), "filename"
+            (currently equals to "default"), "option" (currently equals to
+            "default"), or "none" (no escaping will be done).
 
         *   word
 
@@ -369,7 +343,8 @@ FUNCTIONS
 
 ENVIRONMENT
   COMPLETE_BASH_DEFAULT_ESC_MODE
-    Str.
+    Str. To provide default for the "esc_mode" option in
+    "format_completion".
 
   COMPLETE_BASH_FZF
     Bool. Whether to pass large completion answer to fzf instead of directly
@@ -452,7 +427,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

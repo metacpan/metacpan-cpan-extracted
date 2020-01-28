@@ -24,8 +24,8 @@
          "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
          "rdfs:label" : "doseSchedule",
          "schema:domainIncludes" : [
-            "schema:Drug",
-            "schema:TherapeuticProcedure"
+            "schema:TherapeuticProcedure",
+            "schema:Drug"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:DoseSchedule"
@@ -35,10 +35,10 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:DrugClass",
-            "schema:TherapeuticProcedure",
+            "schema:MedicalCondition",
             "schema:Patient",
-            "schema:MedicalCondition"
+            "schema:DrugClass",
+            "schema:TherapeuticProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Drug"
@@ -48,9 +48,9 @@
          "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
          "rdfs:label" : "indication",
          "schema:domainIncludes" : [
-            "schema:MedicalDevice",
+            "schema:MedicalProcedure",
             "schema:TherapeuticProcedure",
-            "schema:MedicalProcedure"
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalIndication"

@@ -48,7 +48,7 @@ my $data = get_data_section('data.vcf');
 $data =~ s/\n/\r\n/g;
 
 my $string = $vc->load_hashref($hashref)->as_string();
-is $string, $data, 'as_string()';                                                   # 4
+is $string, $data, 'as_string()';                                                   # 1
 
 $vc->as_file('got.vcf');
 my $got = path('got.vcf');
@@ -58,7 +58,7 @@ SKIP: {
     my $expected = path( 't', 'V3', 'Expected', 'win32.vcf' );
     open my $fh_got, '<', $got;
     open my $fh_expected, '<', $expected;
-    is diff( $fh_got, $fh_expected ), '', 'as_file()';  # 3
+    is diff( $fh_got, $fh_expected ), '', 'as_file() for Windows';                  # 2
     close $fh_got;
     close $fh_expected;
 }
@@ -68,7 +68,7 @@ SKIP: {
     my $expected = path( 't', 'V3', 'Expected', 'unix.vcf' );
     open my $fh_got, '<', $got;
     open my $fh_expected, '<', $expected;
-    is diff( $fh_got, $fh_expected ), '', 'as_file()';  # 3
+    is diff( $fh_got, $fh_expected ), '', 'as_file() for Unix-like OS';             # 3
     close $fh_got;
     close $fh_expected;
 }
@@ -77,10 +77,10 @@ $got->remove();
 my $in_file = path( 't', 'V3', 'Expected', 'unix.vcf' );
 $string = $vc->load_file($in_file)->as_string();
 my $expected_content = $in_file->slurp_utf8;
-is $string, $expected_content, 'load_file()';                                       # 7
+is $string, $expected_content, 'load_file()';                                       # 4
 
 my $load_s = $vc->load_string($data);
-is $load_s->as_string(), $data, 'load_string()';                                    # 8
+is $load_s->as_string(), $data, 'load_string()';                                    # 5
 
 done_testing;
 

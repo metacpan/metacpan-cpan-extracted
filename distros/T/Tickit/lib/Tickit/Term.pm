@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Term;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 use Carp;
 
@@ -48,7 +48,20 @@ This object is not normally constructed directly by the containing
 application; instead it is used indirectly by other parts of the C<Tickit>
 distribution.
 
+Note that a given program may contain multiple objects in this class that all
+refer to the same underlying C<TickitTerm> instance from the C library. This
+is especially true of the first argument provided to event binding callbacks.
+This class overloads numify and stringify operations, so that instances may be
+compared using the C<==> or C<eq> operators, or used as keys in hashes, and
+they will act as expected. Do not rely on plain C<refaddr> comparison however
+as you may get incorrect results.
+
 =cut
+
+use overload
+   '0+' => "_xs_addr",
+   '""' => sub { sprintf "Tickit::Term=XS(tt=0x%x)", $_[0]->_xs_addr },
+   fallback => 1;
 
 =head1 CONSTRUCTOR
 

@@ -1,7 +1,8 @@
 package IPC::System::Options;
 
-our $DATE = '2019-09-03'; # DATE
-our $VERSION = '0.332'; # VERSION
+our $DATE = '2019-11-23'; # DATE
+our $DIST = 'IPC-System-Options'; # DIST
+our $VERSION = '0.333'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -413,7 +414,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.332 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-09-03.
+This document describes version 0.333 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-11-23.
 
 =head1 SYNOPSIS
 
@@ -445,7 +446,7 @@ This document describes version 0.332 of IPC::System::Options (from Perl distrib
  # set LC_ALL/LANGUAGE/LANG environment variable
  $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
 
- # log using Log::Any, die on failure
+ # log using Log::ger, die on failure
  system({log=>1, die=>1}, "blah", ...);
 
  # chdir first before running program (and chdir back afterwards)
@@ -510,7 +511,7 @@ Temporarily set environment variables.
 =item * log => bool
 
 If set to true, then will log invocation as well as return/result value. Will
-log using L<Log::Any> at the C<trace> level.
+log using L<Log::ger> at the C<trace> level.
 
 =item * die => bool
 

@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Raw;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Tag';
 sub import { Template::Liquid::register_tag('raw') }
@@ -11,10 +11,8 @@ sub new {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     my $s = bless {name     => '?-' . int rand(time),
                    blocks   => [],
@@ -41,8 +39,8 @@ sub _dump_nodes {
         $ret .= defined $rendering ? $rendering : '';
         $ret .= _dump_nodes(@{$node->{'nodelist'}})
             if ref $node && $node->{'nodelist'};
-        $ret .= ref $node
-            && defined $node->{'markup_2'} ? $node->{'markup_2'} : '';
+        $ret .= ref $node &&
+            defined $node->{'markup_2'} ? $node->{'markup_2'} : '';
     }
     return $ret;
 }
@@ -114,9 +112,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

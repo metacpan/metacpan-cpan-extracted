@@ -11,7 +11,6 @@ BEGIN {
 
 use Test::More;
 use Test::HexString;
-use Test::Identity;
 use Test::Refcount;
 
 use Errno qw( EAGAIN );
@@ -79,7 +78,7 @@ my $rootwin = $tickit->rootwin;
 
 isa_ok( $rootwin, "Tickit::Window", '$tickit->rootwin' );
 
-identical( $rootwin->tickit, $tickit, '$tickit->rootwin->tickit is $tickit' );
+cmp_ok( $rootwin->tickit, '==', $tickit, '$tickit->rootwin->tickit is $tickit' );
 
 is_oneref( $tickit, '$tickit has refcount 1 at EOF' );
 

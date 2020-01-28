@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 # -----------------------------------------------------------------------------
 
@@ -56,13 +56,21 @@ Name des Textfelds.
 
 JavaScript-Handler.
 
+=item readonly => $bool (Default: 0)
+
+Zeige das Feld und seinen Wert unveränderbar an.
+
 =item size => $n (Default: undef)
 
 Breite des Feldes in Zeichen.
 
-=item title => $text (Deafult: undef)
+=item title => $text (Default: undef)
 
 Text Tooltip.
+
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
 
 =item value => $str (Default: undef)
 
@@ -98,9 +106,11 @@ sub new {
         maxLength => undef,
         name => undef,
         onKeyUp => undef,
+        readonly => 0,
         size => undef,
         style => undef,
         title => undef,
+        undefIf => 0,
         value => undef,
     );
 
@@ -134,9 +144,9 @@ sub html {
 
     # Attribute
 
-    my ($class,$disabled,$id,$maxLength,$name,$onKeyUp,$size,$style,
-        $title,$value) = $self->get(qw/class disabled id maxLength name
-        onKeyUp size style title value/);
+    my ($class,$disabled,$id,$maxLength,$name,$onKeyUp,$readonly,$size,$style,
+        $title,$undefIf,$value) = $self->get(qw/class disabled id maxLength
+        name onKeyUp readonly size style title undefIf value/);
 
     if (!defined $maxLength) {
         $maxLength = $size;
@@ -154,12 +164,17 @@ sub html {
 
     # Generierung
 
+    if ($undefIf) {
+        return undef;
+    }
+
     return $h->tag('input',
         type => 'text',
         id => $id,
         class => $class,
         style => $style,
         name => $name,
+        readonly => $readonly,
         disabled => $disabled,
         onkeyup => $onKeyUp,
         size => $size,
@@ -173,7 +188,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

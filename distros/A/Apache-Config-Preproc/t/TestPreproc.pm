@@ -48,8 +48,6 @@ sub new {
 	    $fd = undef;
 	} elsif ($fd) {
 	    s/\$server_root/$dir/;
-	    s/{{(.+)}}
-             /File::Spec->catfile(split m{\/}, $1)/gex;
 	    print $fd $_;
 	}
     }
@@ -73,14 +71,18 @@ sub dump_test {
 
 sub dump_reformat_synclines {
     my $self = shift;
-    dump_reformat_synclines_worker($self, qr{$self->{_cwd}});
+    dump_reformat_synclines_worker($self, $self->{_cwd});
 }
 
 
 sub dump_reformat_synclines_worker {
     my ($tree, $dir) = @_;
+    my $sep = File::Spec->catfile('','');
+
     join('', map {
-	(my $l = $_->locus->format) =~ s{$dir/}{}g;
+	my $l = $_->locus->format;
+	$l =~ s{\Q$sep\E}{/}g;
+	$l =~ s{\Q$dir\E/}{}g;
 	"# $l\n" .
 	do {
 	    if ($_->type eq 'section') {

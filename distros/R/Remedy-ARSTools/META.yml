@@ -22,5 +22,5 @@ requires:
   Data::DumpXML: '1.03'
   Date::Parse: '2.3'
   Time::Interval: '1.233'
-version: 1.23
+version: 1.25
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

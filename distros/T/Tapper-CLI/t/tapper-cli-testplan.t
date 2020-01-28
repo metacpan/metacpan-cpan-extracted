@@ -13,11 +13,17 @@ construct_fixture( schema  => testrundb_schema, fixture => 't/fixtures/testrundb
 # -----------------------------------------------------------------------------------------------------------------
 
 
-SKIP: { skip "testplan handling not yet implemented", 11;
-my $testplan_id = `$^X -Ilib bin/tapper testplan-new --file t/files/testplan/osrc/athlon/kernel.mpc  -It/files/testplan/`;
-chomp $testplan_id;
+my $answer = `$^X -Ilib bin/tapper testplan-new --file t/files/testplan/osrc/athlon/kernel.mpc  -It/files/testplan/`;
+chomp $answer;
+like($answer, qr/^(\d+)\s*:\s*(\d+?\s?)*$/, 'testplan-new - output format');
+my ($testplan_id, $testrun_ids_str) = $answer =~ m/^(\d+)\s*:\s*((?:\d+?\s?)*)$/g;
+my @testrun_ids = split(/\s+/, $testrun_ids_str);
 like($testplan_id, qr/^\d+$/, 'Testplan id is actually an id');
+diag "answer:   $answer";
+diag "testplan: $testplan_id";
+diag "testrun:  $_" foreach @testrun_ids;
 
+SKIP: { skip "testplan handling not yet implemented", 10;
 my $instance = model('TestrunDB')->resultset('TestplanInstance')->find($testplan_id);
 ok($instance, 'Testplan instance found');
 is(int $instance->testruns, 4, 'Testruns created from requested_hosts_all, requested_hosts_any, requested_hosts_any');

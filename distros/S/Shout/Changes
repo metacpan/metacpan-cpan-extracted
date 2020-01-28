@@ -1,0 +1,33 @@
+Revision history for Perl extension Shout.
+
+2.1.2  2020-01-23 22:13:29 MSK
+    - Remove INIT block
+    - Add any tests
+    - Add test on connect
+    - recreated by h2xs 1.23 with options
+        -b 5.10.1 -n Shout shout/shout.h
+
+2.1.2  2020-01-18 00:47:42 MSK
+    - New maintainer
+    - Dist::Zilla support
+
+2.1.1 Mon Feb 14 12:10:00 2004
+    - updated to libshout 2.1
+
+2.0   Sat Jul  5 14:47:00 2003
+	- full implementation
+	- backward compatible with Shout 1.0
+
+1.1.2 Thu Jul  3 12:40:40 2003
+	- updated for libshout 2
+
+1.0   Sat Apr 21 14:12:00 2001
+	- stable release
+	- update for latest libshout changes including
+      additional icy parameters
+
+0.95  Thu Mar 16 00:10:00 2000
+	- first release, no docs :(
+
+0.01  Tue Feb  8 03:07:32 2000
+	- original version; created by h2xs 1.19

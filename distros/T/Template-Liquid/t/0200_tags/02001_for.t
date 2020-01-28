@@ -320,21 +320,21 @@ like(Template::Liquid->parse(
 like(
     Template::Liquid->parse(
         '{ {% for x in var reversed %} {{ x.key }} => {{ x.value }},{% endfor %} }'
-        )->render(var => {A => 3, B => 2, C => 1}),
+    )->render(var => {A => 3, B => 2, C => 1}),
     qr[^{ (?: [ABC] => [123],){3} }$],
     'hash reversed'
 );
 like(
     Template::Liquid->parse(
         '{ {% for x in var offset:1 %} {{ x.key }} => {{ x.value }},{% endfor %} }'
-        )->render(var => {A => 3, B => 2, C => 1}),
+    )->render(var => {A => 3, B => 2, C => 1}),
     qr[^{ (?: [ABC] => [123],){2} }$],
     'hash offset:1'
 );
 like(
     Template::Liquid->parse(
         '{ {% for x in var limit:1 %} {{ x.key }} => {{ x.value }},{% endfor %} }'
-        )->render(var => {A => 3, B => 2, C => 1}),
+    )->render(var => {A => 3, B => 2, C => 1}),
     qr[^{ (?: [ABC] => [123],) }$],
     'hash limit:1'
 );

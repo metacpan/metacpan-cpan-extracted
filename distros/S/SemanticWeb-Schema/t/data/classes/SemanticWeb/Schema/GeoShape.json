@@ -12,11 +12,11 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:Person",
+            "schema:Organization",
+            "schema:GeoShape",
             "schema:Place",
             "schema:GeoCoordinates",
-            "schema:Organization",
-            "schema:GeoShape"
+            "schema:Person"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -29,12 +29,12 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:PostalAddress",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Country"
+            "schema:Country",
+            "schema:Text"
          ]
       },
       "schema:box" : {
@@ -56,12 +56,12 @@
          "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>). Values may be of the form 'NUMBER UNIT<em>OF</em>MEASUREMENT' (e.g., '1,000 m', '3,200 ft') while numbers alone should be assumed to be a value in meters.",
          "rdfs:label" : "elevation",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:line" : {
@@ -83,9 +83,9 @@
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
+            "schema:GeoCoordinates",
             "schema:GeoShape",
-            "schema:PostalAddress",
-            "schema:GeoCoordinates"
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

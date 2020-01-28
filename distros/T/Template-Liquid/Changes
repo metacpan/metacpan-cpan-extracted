@@ -1,5 +1,9 @@
  Changelog for Perl dist Template-Liquid
 
+1.0.11 2020-01-24T23:55:47Z
+
+	- Fix old missing conditions bug
+
 1.0.10 2016-09-07T12:02:20Z
 
   - Add default filter
@@ -18,7 +22,7 @@
 
 1.0.7 2016-08-10T21:19:10Z
 
-  - Crumb trails can map to bject methods during render
+  - Crumb trails can map to object methods during render
   - Improve range parser
 
 1.0.6 2016-05-13T14:46:52Z

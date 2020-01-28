@@ -1,5 +1,15 @@
 Revision history for overload::open
 
+1.9.6 Jan 23, 2020
+    - Initialize the MUTEX's properly so threaded perl doesn't panic
+
+1.9.5 Jan 22, 2020
+    - Have `make test` run verbose by default
+
+1.9.4 Jan 22, 2020
+    - Use the markstack to find the number of items in the argument list
+    - Remove POPMARK which made ASAN very sad
+
 1.9.3 Jan 21, 2020
     - Conditionally POPMARK. This fixes FreeBSD 13 running out of memory
       in t/04

@@ -1,0 +1,30 @@
+=head1 NAME
+
+Alien::boost::mini - C++ Boost library (no perl interface).
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    write_makefile(
+        ...
+        BIN_DEPS => 'Alien::boost::mini',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+Includes libraries: 
+callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof preprocessor integer io logic uuid
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Boost itself.
+
+=cut

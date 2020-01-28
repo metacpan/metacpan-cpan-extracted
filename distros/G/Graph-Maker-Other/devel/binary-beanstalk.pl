@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -39,13 +39,15 @@ use MyGraphs;
   # height=8 hog not
 
   my @graphs;
-  # foreach my $height (0 .. 8) {
-  foreach my $N (1 .. 32) {
+  # foreach my $height (8..13) {
+  foreach my $N (8..13) {
     # print "height=$height\n";
     my $graph = Graph::Maker->new('binary_beanstalk', undirected => 1,
                                   N => $N,
                                   # height => $height,
                                  );
+    print "---------\n";
+    print $graph->get_graph_attribute('name'),"\n";
     MyGraphs::Graph_tree_print($graph);
     push @graphs, $graph;
   }

@@ -3,16 +3,22 @@ use warnings;
 
 package Mail::Qmail::Filter::DMARC;
 
-our $VERSION = '1.0';
+our $VERSION = '1.2';
 
 sub domain {
     shift =~ s/.*\@//r;
 }
 
 sub if_set {
-    my ( $key, $value ) = @_;
+    my ( $key, $value, @additional_checks ) = @_;
     return unless defined $value && length $value;
+    $_->($value) or return for @additional_checks;
     $key => $value;
+}
+
+sub is_valid_domain {
+    require Mail::DMARC::Base;
+    Mail::DMARC::Base->new->is_valid_domain(shift);
 }
 
 sub spf_query {
@@ -71,8 +77,14 @@ sub filter {
             my $dmarc_result = Mail::DMARC::PurePerl->new(
                 source_ip   => $ENV{TCPREMOTEIP},
                 envelope_to => domain( ( $message->to )[0] ),
-                if_set( envelope_from => domain( $message->from ) ),
-                if_set( header_from   => $header_from_domain ),
+                if_set(
+                    envelope_from => domain( $message->from ),
+                    \&is_valid_domain
+                ),
+                if_set(
+                    header_from => $header_from_domain,
+                    \&is_valid_domain
+                ),
                 dkim => $dkim,
                 spf  => {
                     if_set( domain => $header_from_domain ),
@@ -144,6 +156,13 @@ be rejected with C<554 Failed DMARC test.>
 
 =back
 
+Please note: This only works for valid sender addresses.
+If the message has no valid RFC5322.From, this filter will I<not> reject
+the message, because L<Mail::DMARC> does not like invalid sender addresses.
+If you also happen to not like these, please use
+L<Mail::Qmail::Filter::ValidateFrom> and/or
+L<Mail::Qmail::Filter::ValidateSender> I<before> this filter.
+
 =head1 OPTIONAL PARAMETERS
 
 =head2 dry_run
@@ -158,7 +177,8 @@ Default: C<Failed DMARC test.>
 
 =head1 SEE ALSO
 
-L<Mail::Qmail::Filter/COMMON PARAMETERS FOR ALL FILTERS>
+L<Mail::Qmail::Filter/COMMON PARAMETERS FOR ALL FILTERS>,
+L<Mail::Qmail::Filter::ValidateFrom>, L<Mail::Qmail::Filter::ValidateSender>
 
 =head1 LICENSE AND COPYRIGHT
 

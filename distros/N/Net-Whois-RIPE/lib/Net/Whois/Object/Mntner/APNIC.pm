@@ -1,12 +1,14 @@
 package Net::Whois::Object::Mntner::APNIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -h whois.apnic.net -t mntner
 # % [whois.apnic.net]
 # % Whois data copyright terms    http://www.apnic.net/db/dbcopyright.html
 # 
-# mntner:         [mandatory]  [single]     [primary/lookup key]
+# mntner:         [mandatory]  [single]     [primary/look-up key]
 # descr:          [mandatory]  [multiple]   [ ]
 # country:        [optional]   [single]     [ ]
 # org:            [optional]   [multiple]   [inverse key]
@@ -19,17 +21,17 @@ use base qw/Net::Whois::Object/;
 # notify:         [optional]   [multiple]   [inverse key]
 # abuse-mailbox:  [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# referral-by:    [mandatory]  [single]     [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
+# referral-by:    [optional]   [single]     [inverse key]
+# last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the APNIC Whois Service version 1.68.5 (WHOIS4)
+# % This query was served by the APNIC Whois Service version 1.88.15-46 (WHOIS-UK4)
 
 __PACKAGE__->attributes( 'primary',   [ 'mntner' ] );
-__PACKAGE__->attributes( 'mandatory', [ 'mntner', 'descr', 'admin_c', 'upd_to', 'auth', 'mnt_by', 'referral_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',  [ 'country', 'org', 'tech_c', 'mnt_nfy', 'remarks', 'notify', 'abuse_mailbox' ] );
-__PACKAGE__->attributes( 'single',    [ 'mntner', 'country', 'referral_by', 'source' ] );
-__PACKAGE__->attributes( 'multiple',  [ 'descr', 'org', 'admin_c', 'tech_c', 'upd_to', 'mnt_nfy', 'auth', 'remarks', 'notify', 'abuse_mailbox', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory', [ 'mntner', 'descr', 'admin_c', 'upd_to', 'auth', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',  [ 'country', 'org', 'tech_c', 'mnt_nfy', 'remarks', 'notify', 'abuse_mailbox', 'referral_by',  'last_modified' ] );
+__PACKAGE__->attributes( 'single',    [ 'mntner', 'country', 'referral_by', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',  [ 'descr', 'org', 'admin_c', 'tech_c', 'upd_to', 'mnt_nfy', 'auth', 'remarks', 'notify', 'abuse_mailbox', 'mnt_by' ] );
 
 =head1 NAME
 

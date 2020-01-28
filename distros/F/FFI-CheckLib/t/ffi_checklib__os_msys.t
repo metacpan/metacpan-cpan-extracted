@@ -19,7 +19,7 @@ subtest '_cmp' => sub {
       @_
     ];
   };
-  
+
   is(
     $process->(qw( msys-foo-1.dll msys-bar-2.dll msys-baz-0.dll )),
     [

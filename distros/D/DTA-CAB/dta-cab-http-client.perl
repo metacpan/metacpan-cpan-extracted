@@ -152,6 +152,7 @@ if (DTA::CAB::Client::HTTP->lwpUrl($serverURL) =~ m{([^:]+://[^/:]*)(/[^:]*)$}) 
   ##-- default port (tcp URLs only)
   $serverURL = "$1:${defaultPort}$2";
 }
+DTA::CAB::Logger->trace("serverURL=$serverURL");
 
 ##-- trace request file?
 our $tracefh = undef;

@@ -53,6 +53,8 @@ run_tests(
         my $rv = eval { $client->work_once; };
         ok( !$rv, "nothing to do now" );
 
+        $client->set_current_job(undef);
+
         teardown_dbs('ts1');
 
         # test we get in jobid order for equal priority RT #99075
@@ -87,6 +89,8 @@ run_tests(
         $rv = eval { $client2->work_once; };
         ok( !$rv, "nothing to do now 1-5" );
 
+        $client2->set_current_job(undef);
+
         teardown_dbs('ts2');
 
         # test floor RT #50842
@@ -118,6 +122,8 @@ run_tests(
         }
         $rv = eval { $client2->work_once; };
         ok( !$rv, "sub-floor jobs remaining but you can't have them" );
+
+        $client2->set_current_job(undef);
 
         teardown_dbs('ts3');
         $testnum = 0;

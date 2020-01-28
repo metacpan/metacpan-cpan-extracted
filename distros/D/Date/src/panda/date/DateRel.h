@@ -131,6 +131,8 @@ private:
     }
 };
 
+#undef SEC // fuck solaris
+
 extern const DateRel YEAR;
 extern const DateRel MONTH;
 extern const DateRel WEEK;

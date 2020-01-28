@@ -24,7 +24,7 @@
 #   https://en.wikipedia.org/wiki/Divisor_function
 #   https://en.wikipedia.org/wiki/Faulhaber%27s_formula
 #   https://en.wikipedia.org/wiki/Bernoulli_polynomials
-#   https://trizenx.blogspot.com/2018/08/interesting-formulas-and-exercises-in.html
+#   https://trizenx.blogspot.com/2018/11/partial-sums-of-arithmetical-functions.html
 
 use 5.020;
 use strict;
@@ -42,7 +42,10 @@ sub faulhaber_partial_sum_of_sigma($n, $m, $j) {      # using Faulhaber's formul
     my $u = int($n / ($s + 1));
 
     for my $k (1 .. $s) {
-        $total += faulhaber_sum($k, $m) * (faulhaber_sum(int($n/$k), $m+$j) - faulhaber_sum(int($n/($k+1)), $m+$j));
+        $total += faulhaber_sum($k, $m) * (
+                  faulhaber_sum(int($n/$k),     $m+$j)
+                - faulhaber_sum(int($n/($k+1)), $m+$j)
+            );
     }
 
     for my $k (1 .. $u) {
@@ -60,12 +63,34 @@ sub bernoulli_partial_sum_of_sigma($n, $m, $j) {      # using Bernoulli polynomi
     my $u = int($n / ($s + 1));
 
     for my $k (1 .. $s) {
-        $total += (bernoulli($m+1, $k+1) - bernoulli($m+1))/($m+1) * (bernoulli($m+$j+1, 1+int($n/$k)) - bernoulli($m+$j+1, 1+int($n/($k+1))))/($m+$j+1);
+        $total += (
+                      bernoulli($m+1, $k+1)
+                    - bernoulli($m+1)
+                  )/($m+1)
+                * (
+                      bernoulli($m+$j+1, 1+int($n/$k))
+                    - bernoulli($m+$j+1, 1+int($n/($k+1)))
+                  )/($m+$j+1);
     }
 
     for my $k (1 .. $u) {
         $total += ipow($k, $m+$j) * (bernoulli($m+1, 1+int($n/$k)) - bernoulli($m+1)) / ($m+1);
     }
+
+    return $total;
+}
+
+sub dirichlet_partial_sum_of_sigma ($n, $m, $j) {    # using Dirichlet's hyperbola method
+
+    my $total = 0;
+    my $s = isqrt($n);
+
+    for my $k (1 .. $s) {
+        $total += ipow($k, $m)    * faulhaber_sum(int($n/$k), $m+$j);
+        $total += ipow($k, $m+$j) * faulhaber_sum(int($n/$k), $m);
+    }
+
+    $total -= faulhaber_sum($s, $m) * faulhaber_sum($s, $j+$m);
 
     return $total;
 }
@@ -77,8 +102,10 @@ for my $m (0..10) {
 
     my $t1 = faulhaber_partial_sum_of_sigma($n, $m, $j);
     my $t2 = bernoulli_partial_sum_of_sigma($n, $m, $j);
+    my $t3 = dirichlet_partial_sum_of_sigma($n, $m, $j);
 
     die "error: $t1 != $t2" if ($t1 != $t2);
+    die "error: $t1 != $t3" if ($t1 != $t3);
 
     say "Sum_{k=1..$n} k^$m * sigma_$j(k) = $t2";
 }

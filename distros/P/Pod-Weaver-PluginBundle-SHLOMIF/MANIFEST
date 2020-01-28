@@ -21,6 +21,7 @@ lib/Pod/Weaver/PluginBundle/SHLOMIF.pm
 lib/Pod/Weaver/PluginBundle/SHLOMIF.pm~
 perlcritic.rc
 t/00-compile.t
+t/has-version.t
 tidyall.ini
 xt/author/eol.t
 xt/author/no-tabs.t

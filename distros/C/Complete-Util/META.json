@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Complete" : "0.201",
+            "Complete" : "0.202",
             "Rinci" : "v1.1.90"
          }
       },
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Util"
       }
    },
-   "version" : "0.608",
+   "version" : "0.611",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

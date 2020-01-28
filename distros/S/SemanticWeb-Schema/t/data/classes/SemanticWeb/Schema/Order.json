@@ -31,8 +31,8 @@
             "schema:Service"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:confirmationNumber" : {
@@ -41,8 +41,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -51,8 +51,8 @@
          "rdfs:comment" : "Party placing the order or paying the invoice.",
          "rdfs:label" : "customer",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -65,8 +65,8 @@
          "rdfs:label" : "discount",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:discountCode" : {
@@ -96,8 +96,8 @@
          "rdfs:label" : "merchant",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ],
          "schema:supersededBy" : "schema:seller"
       },
@@ -141,13 +141,13 @@
          "rdfs:comment" : "The item ordered.",
          "rdfs:label" : "orderedItem",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Product",
+            "schema:OrderItem",
             "schema:Service",
-            "schema:OrderItem"
+            "schema:Product"
          ]
       },
       "schema:partOfInvoice" : {
@@ -186,8 +186,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -196,8 +196,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -214,11 +214,11 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Flight",
-            "schema:Offer",
-            "schema:BuyAction",
             "schema:Order",
-            "schema:Demand"
+            "schema:BuyAction",
+            "schema:Demand",
+            "schema:Flight",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

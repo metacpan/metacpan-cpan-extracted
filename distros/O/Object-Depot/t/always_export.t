@@ -7,9 +7,9 @@ use strictures 2;
 {
     package MyApp::ae;
     use Moo;
-    with 'Object::Depot::Singleton';
+    with 'Object::Depot::Role';
 
-    __PACKAGE__->init(
+    __PACKAGE__->init_depot(
         class => 'Test::ae',
         export_name => 'myapp_test',
         always_export => 1,

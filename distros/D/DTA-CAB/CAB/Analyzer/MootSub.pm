@@ -104,12 +104,13 @@ sub analyzeSentences {
   $lz->_analyzeGuts($toks,$opts) if ($lz->enabled($opts));
 
   ##-- Step 3: lemma-extraction & tag-sensitive lemmatization hacks
-  my %cache = qw(); ##-- $cache{"$word\t$tag"} = $best_analysis
-  my ($t,$la,$l,$key,$ma,$maa,%l2d, $ld, $a0,$ld0);
+  my %cache = qw(); ##-- $cache{"$tok_text/$moot_word/$moot_tag"} = $best_analysis
+  my ($u,$t,$la,$l,$key,$ma,$maa,%l2d, $ld, $a0,$ld0);
   foreach $tok (@$toks) {
+    $u      = $tok->{text};
     $m      = $tok->{$mlabel};
     ($w,$t) = @$m{qw(word tag)};
-    $key    = "$w/$t";
+    $key    = "$u/$w/$t";
     if (defined($la=$cache{$key})) {
       ##-- cached value
       @$m{qw(details lemma)} = ($la,$la->{lemma});

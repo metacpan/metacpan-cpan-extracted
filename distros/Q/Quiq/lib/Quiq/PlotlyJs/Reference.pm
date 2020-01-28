@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 use Quiq::Hash;
 use HTML::TreeBuilder ();
@@ -62,16 +62,6 @@ produziert auf stdout
             <dl>
               <dt>Parent:</dt>
               <dd>layout</dd>
-              <dt>Type:</dt>
-              <dd>object containing one or more of the keys listed below.</dd>
-              <dt>Default:</dt>
-              <dd>[0, 1]</dd>
-            </dl>
-            <p>
-              Legacy polar charts are deprecated! Please switch to "polar" subplots. Defines the start and end point of this angular axis.
-            </p>
-          </div>
-        </details>
   ... und mehr als 11.000 weitere Zeilen ...
 
 =head1 METHODS
@@ -381,7 +371,7 @@ sub asHtml {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

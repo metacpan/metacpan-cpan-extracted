@@ -1,4 +1,4 @@
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -34,6 +34,19 @@ sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
 }
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
+}
+sub _add_edge_reverse {
+  my ($graph, $u, $v) = @_;
+  $graph->add_edge($v,$u);    # reverse
+}
+my %add_edge_method = (smaller => \&_add_edge_reverse,
+                       bigger  => 'add_edge',
+                       both    => 'add_cycle');
+
 sub _vertex_name_func_decimal {
   my ($v) = @_;
   return $v;
@@ -61,7 +74,7 @@ sub init {
   my ($self, %params) = @_;
 
   my $level = delete($params{level}) || 0;
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  my $direction_type  = delete($params{'direction_type'}) || 'both';
 
   # undocumented parameter
   my $vertex_name_type = delete($params{'vertex_name_type'}) || 'decimal';
@@ -71,33 +84,35 @@ sub init {
   ### $level
   ### $vertex_name_type
 
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
   $graph->set_graph_attribute(name => "Twin Alternate Area Tree $level");
   $graph->set_graph_attribute(vertex_name_type => $vertex_name_type);
   $graph->add_vertex($vertex_names_func->(0));
-  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
+  my $add_edge = ($graph->is_undirected ? 'add_edge'
+                  : ($add_edge_method{$direction_type}
+                     || croak "Unrecognised direction_type ",$direction_type));
 
  V: foreach my $v (0 .. 2**$level-1) {
     ### $v
 
-    # ...1 edge to ...0
+    #      v    = ...1
+    # edge from = ...0
     if ($v & 1) {
       ### horizontal ...
-      my $to = $v ^ 1;
-      $graph->$add_edge($vertex_names_func->($v),
-                        $vertex_names_func->($to));
+      my $from = $v ^ 1;
+      $graph->$add_edge($vertex_names_func->($from),
+                        $vertex_names_func->($v));
     }
 
-    #  ...00 11...11
-    #        \-----/ zero or more low 1 bits
-    # edge to
-    #  ...11 00...00
+    #  v = ...00 11...11
+    #            \-----/ zero or more low 1 bits
+    # to = ...11 00...00
     #
     my $bit  = 1;
     for (my $pos = 1; ; $pos++, $bit<<=1) {
       $pos < $level or next V;
       next if $v & $bit;  # still all 1s
-      unless ($v & ($bit<<1)) {  # 00 11..11
+      unless ($v & ($bit<<1)) {  # must be 00 11..11
         my $to = $v+1+($bit<<1);
         $graph->$add_edge($vertex_names_func->($v),
                           $vertex_names_func->($to));
@@ -348,9 +363,13 @@ L<Graph::Maker::BalancedTree>
 
 L<Math::PlanePath::AlternatePaper>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2017, 2018, 2019 Kevin Ryde
+Copyright 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

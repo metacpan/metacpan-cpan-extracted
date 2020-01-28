@@ -33,8 +33,8 @@ do not need to know how to create the objects in order to use them.
 
 The primary use case for this library is for storing the connection
 logic to external services and making these connections globally
-available to all application logic.  See [Object::Depot::Singleton](https://metacpan.org/pod/Object::Depot::Singleton)
-for turning your depot object into a global singleton.
+available to all application logic.  See [Object::Depot::Role](https://metacpan.org/pod/Object%3A%3ADepot%3A%3ARole) for
+turning your depot object into a global singleton.
 
 # ARGUMENTS
 
@@ -57,8 +57,8 @@ will just return `undef`.
 
 ```perl
 constuctor => sub{
-    my ($depot, $args) = @_;
-    return $depot->class->new( $args );
+    my ($args) = @_;
+    return __PACKAGE__->depot->class->new( $args );
 },
 ```
 
@@ -79,11 +79,22 @@ set.  If it is not set then the default code ref will return `undef`.
 type => InstanceOf[ 'CHI::Driver' ],
 ```
 
-Set this to a [Type::Tiny](https://metacpan.org/pod/Type::Tiny) type to control how objects in the depot
+Set this to a [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) type to control how objects in the depot
 are validated when they are stored.
 
 Defaults to `InstanceOf` ["class"](#class), if set.  If the class is not set
-then this defaults to `Object` (both are from [Types::Standard](https://metacpan.org/pod/Types::Standard)).
+then this defaults to `Object` (both are from [Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard)).
+
+## injection\_type
+
+```perl
+injection_type => Object,
+```
+
+By default objects that are injected (see ["inject"](#inject)) are validated
+against ["type"](#type).  Set this to a type that injections validate
+against if it needs to be different (such as to support mock
+objects).
 
 ## per\_process
 
@@ -172,7 +183,7 @@ Defaults to an empty hash ref.
 export_name => 'myapp_cache',
 ```
 
-Set the name of a function that [Object::Depot::Singleton](https://metacpan.org/pod/Object::Depot::Singleton) will
+Set the name of a function that [Object::Depot::Role](https://metacpan.org/pod/Object%3A%3ADepot%3A%3ARole) will
 export to importers of your depot package.
 
 Has no default.  If this is not set, then nothing will be exported.
@@ -183,7 +194,7 @@ Has no default.  If this is not set, then nothing will be exported.
 always_export => 1,
 ```
 
-Turning this on causes [Object::Depot::Singleton](https://metacpan.org/pod/Object::Depot::Singleton) to always export
+Turning this on causes [Object::Depot::Role](https://metacpan.org/pod/Object%3A%3ADepot%3A%3ARole) to always export
 the ["export\_name"](#export_name), rather than only when listed in the import
 arguments. This is synonymous with the difference between
 [Exporter](https://metacpan.org/pod/Exporter)'s `@EXPORT_OK` and `@EXPORT`.

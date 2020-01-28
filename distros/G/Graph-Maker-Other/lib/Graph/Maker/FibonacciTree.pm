@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,9 +20,10 @@ package Graph::Maker::FibonacciTree;
 use 5.004;
 use strict;
 use Graph::Maker;
+use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -37,16 +38,23 @@ sub _make_graph {
   my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
   return $graph_maker->(%params);
 }
-
-# require Math::NumSeq::FibonacciWord;
-# my $seq = Math::NumSeq::FibonacciWord->new;
+sub _add_edge_reverse {
+  my ($graph, $u, $v) = @_;
+  $graph->add_edge($v,$u);    # reverse
+}
+my %add_edge_method = (smaller => \&_add_edge_reverse,
+                       parent  => \&_add_edge_reverse,
+                       bigger  => 'add_edge',
+                       child   => 'add_edge',
+                       both    => 'add_cycle');
 
 sub init {
   my ($self, %params) = @_;
 
-  my $height         = delete($params{'height'}) || 0;
-  my $series_reduced = delete($params{'series_reduced'}) ? 1 : 0;
-  my $leaf_reduced   = delete $params{'leaf_reduced'};
+  my $height          = delete($params{'height'}) || 0;
+  my $series_reduced  = delete($params{'series_reduced'}) ? 1 : 0;
+  my $leaf_reduced    = delete $params{'leaf_reduced'};
+  my $direction_type  = delete($params{'direction_type'}) || 'both';
 
   ### FibonacciTree ...
   ### $height
@@ -68,7 +76,9 @@ sub init {
     my @pending_depth = (1);
     my @pending_type  = (0);  # left
     my $upto = 1;
-    my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
+    my $add_edge = ($graph->is_undirected ? 'add_edge'
+                    : $add_edge_method{$direction_type}
+                    || croak "Unrecognised direction_type ",$direction_type);
 
     my $add = sub {
       my ($parent) = @_;
@@ -202,7 +212,7 @@ __END__
   #
   #         # 1 or 2 children for $parent
   #         foreach (1 .. (1 + ($fibbinary & 1))) {
-  #           $graph->add_edge($parent, ++$upto);
+  #           $graph->$add_edge($parent, ++$upto);
   #         }
   #
   #         my $filled = ($fibbinary >> 1) | $fibbinary;
@@ -275,6 +285,8 @@ __END__
   #   return $graph;
   # }
 
+
+# Cf also Martin Gardner "Mathematical Circus" figure 67 page 154
 
 
 =for stopwords Ryde subtrees Steinhaus Stechert AVL ie undirected Viswanathan Iyer Udaya Kumar Reddy Intl Math Engg WTb preprint MeanDist OEIS
@@ -454,6 +466,20 @@ above these are nodes 8 and 11.
 The effect of this is merely to repeat the second last row, ie. the last row
 is a single child under each node of the second last.
 
+=head2 Direction Type
+
+The default is a directed graph with edges both ways between vertices (like
+most C<Graph::Maker> directed graphs).  This is parameter C<direction_type
+=E<gt> 'both'>.
+
+Optional C<direction_type =E<gt> 'bigger'> or C<'child'> gives edges
+directed to the bigger vertex number, so from smaller to bigger.  This means
+parent down to child.
+
+Option C<direction_type =E<gt> 'smaller'> or C<'parent'> gives edges
+directed to the smaller vertex number, so from bigger to smaller.  This is
+from child up to parent.
+
 =head1 FUNCTIONS
 
 =over
@@ -462,9 +488,11 @@ is a single child under each node of the second last.
 
 The key/value parameters are
 
-    height          =>  integer
-    series_reduced  =>  boolean (default false)
-    leaf_reduced    =>  boolean (default false)
+    height         =>  integer
+    series_reduced =>  boolean (default false)
+    leaf_reduced   =>  boolean (default false)
+    direction_type => string, "both" (default), 
+                        "bigger", "smaller", "parent, "child"
     graph_maker => subr(key=>value) constructor, default Graph->new
 
 Other parameters are passed to the constructor, either C<graph_maker> or
@@ -473,10 +501,9 @@ C<Graph-E<gt>new()>.
 C<height> is how many rows of nodes.  So C<height =E<gt> 1> is a single row,
 being the root node only.
 
-Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
-then edges are added both up and down between each parent and child.  Option
-C<undirected =E<gt> 1> creates an undirected graph and for it there is a
-single edge from parent to child.
+If the graph is directed (the default) then edges are added as described in
+L</Direction Type> above.  Option C<undirected =E<gt> 1> is an undirected
+graph and for it there is always a single edge between parent and child.
 
 =back
 
@@ -735,9 +762,13 @@ L<Graph::Maker>, L<Graph::Maker::BalancedTree>
 
 L<Math::NumSeq::FibonacciWord>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

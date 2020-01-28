@@ -1,0 +1,123 @@
+NAME
+    Bencher::Scenario::strftimeq - Benchmark strftimeq() routines
+
+VERSION
+    This document describes version 0.001 of Bencher::Scenario::strftimeq
+    (from Perl distribution Bencher-Scenario-strftimeq), released on
+    2019-11-20.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m strftimeq
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m strftimeq
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Date::strftimeq 0.001
+
+    DateTimeX::strftimeq 0.004
+
+    POSIX 1.65
+
+BENCHMARK PARTICIPANTS
+    *   Date::strftimeq::strftimeq (perl_code) [Date_strftimeq]
+
+        Function call template:
+
+         Date::strftimeq::strftimeq(<format>, @{<time>})
+
+    *   DateTimeX::strftimeq::strftimeq (perl_code) [DateTimeX_strftimeq]
+
+        Function call template:
+
+         DateTimeX::strftimeq::strftimeq(<format>, @{<time>})
+
+    *   strftime (perl_code) [strftime]
+
+        Function call template:
+
+         POSIX::strftime(<format>, @{<time>})
+
+BENCHMARK DATASETS
+    *   %Y-%m-%d
+
+    *   %Y-%m-%d%( Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) ==
+        2 ? "tue":"" )q
+
+    *   %Y-%m-%d%( $_->day_of_week == 2 ? "tue":"" )q
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.24.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher -m strftimeq"):
+
+     #table1#
+     +---------------------------------+--------------------------------------------------------------------------------------+---------------------+-----------+-----------+------------+---------+---------+
+     | participant                     | dataset                                                                              | p_tags              | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +---------------------------------+--------------------------------------------------------------------------------------+---------------------+-----------+-----------+------------+---------+---------+
+     | DateTimeX::strftimeq::strftimeq | %Y-%m-%d%( $_->day_of_week == 2 ? "tue":"" )q                                        | DateTimeX_strftimeq |      9900 |     100   |       1    | 4.5e-07 |      20 |
+     | Date::strftimeq::strftimeq      | %Y-%m-%d%( Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 2 ? "tue":"" )q | Date_strftimeq      |     15000 |      68   |       1.5  | 1.3e-07 |      20 |
+     | DateTimeX::strftimeq::strftimeq | %Y-%m-%d                                                                             | DateTimeX_strftimeq |     65600 |      15.2 |       6.61 | 6.2e-09 |      23 |
+     | Date::strftimeq::strftimeq      | %Y-%m-%d                                                                             | Date_strftimeq      |     66000 |      15   |       6.6  |   2e-08 |      20 |
+     | strftime                        | %Y-%m-%d                                                                             | strftime            |    540000 |       1.8 |      55    | 3.3e-09 |      20 |
+     +---------------------------------+--------------------------------------------------------------------------------------+---------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m strftimeq
+    --module-startup"):
+
+     #table2#
+     +----------------------+-----------+------------------------+------------+---------+---------+
+     | participant          | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +----------------------+-----------+------------------------+------------+---------+---------+
+     | POSIX                |        11 |                      8 |          1 | 3.3e-05 |      20 |
+     | Date::strftimeq      |        11 |                      8 |          1 | 5.9e-05 |      21 |
+     | DateTimeX::strftimeq |        11 |                      8 |          1 | 2.3e-05 |      20 |
+     | perl -e1 (baseline)  |         3 |                      0 |          4 | 3.9e-05 |      21 |
+     +----------------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-strftimeq>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-strftimeq>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-strf
+    timeq>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

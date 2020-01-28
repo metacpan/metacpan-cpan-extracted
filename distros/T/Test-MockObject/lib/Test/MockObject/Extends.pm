@@ -1,5 +1,5 @@
 package Test::MockObject::Extends;
-$Test::MockObject::Extends::VERSION = '1.20191002';
+$Test::MockObject::Extends::VERSION = '1.20200122';
 use strict;
 use warnings;
 

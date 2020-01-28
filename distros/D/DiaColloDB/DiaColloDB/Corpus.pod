@@ -156,8 +156,9 @@ true if iterator is valid
 =item ifile
 
  $label = $corpus->ifile();
+ $label = $corpus->ifile($pos);
 
-current iterator label
+gets current iterator label (1st form) or label for document at $pos (2nd form).
 
 =item idocument
 
@@ -196,7 +197,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Bryan Jurish
+Copyright (C) 2015-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,
@@ -204,6 +205,7 @@ at your option, any later version of Perl 5 you may have available.
 
 =head1 SEE ALSO
 
+L<DiaColloDB::Corpus::Compiled(3pm)|DiaColloDB::Corpus::Compiled>,
 L<DiaColloDB::Document(3pm)|DiaColloDB::Document>,
 L<DiaColloDB(3pm)|DiaColloDB>,
 L<perl(1)|perl>,

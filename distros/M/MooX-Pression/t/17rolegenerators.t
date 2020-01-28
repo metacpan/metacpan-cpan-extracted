@@ -47,4 +47,30 @@ is($obj->foo, 1);
 is($obj->bar, 2);
 is($obj->baz, 3);
 
+my $hmm = q{
+	package MyApp3 {
+		use MooX::Pression;
+		role Foo (Int $x) {
+			class Bar;
+		}
+	}
+};
+
+undef $@;
+ok !eval "$hmm; 1";
+like($@, qr/Foo is not a class/);
+
+$hmm = q{
+	package MyApp4 {
+		use MooX::Pression;
+		role Foo {
+			class Bar;
+		}
+	}
+};
+
+undef $@;
+ok !eval "$hmm; 1";
+like($@, qr/Foo is not a class/);
+
 done_testing;

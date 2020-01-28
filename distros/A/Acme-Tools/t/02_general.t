@@ -1,8 +1,8 @@
 # make test
-# perl Makefile.PL; make; perl -Iblib/lib t/02_general.t
+# perl Makefile.PL && make && perl -Iblib/lib t/02_general.t
 
 use lib '.'; BEGIN{require 't/common.pl'}
-use Test::More tests => 171;
+use Test::More tests => 204;
 use Digest::MD5 qw(md5_hex);
 
 my @empty;
@@ -100,11 +100,32 @@ ok( decode($test, 123.0=>3, 214=>7)      == 3             ,'decode float');
 ok( decode_num($test, 121=>3, 221=>7, '123.0','b') eq 'b' ,'decode_num');
 
 #--between
-my $n=7;
-ok( between($n, 1,10)          ,'between 1');
-ok( between(undef, 1,10) eq '' ,'between 2');
-ok( between($n, 10,1)          ,'between 3');
-ok( between(5,5,5)             ,'between 4');
+ok( between(7, 1,10)           ,'between a');
+ok( between(undef, 1,10) eq '' ,'between b');
+ok( between(7, 10,1)           ,'between c');
+ok( between(5,5,5)             ,'between d');
+
+#--btw, a better(?) between
+ok( btw(7, 1,10)           ,'btw a');
+ok( btw(undef, 1,10) eq '' ,'btw b');
+ok( btw(7, 10,1)           ,'btw c');
+ok( btw(5,5,5)             ,'btw d');
+ok( btw(1,1,10)            ,'btw e'); # numeric order since all three looks like number according to =~$Re_isnum
+ok( btw(1,'02',13)         ,'btw f'); # leading zero in '02' leads to alphabetical order
+ok( btw(10, 012,10)        ,'btw h'); # leading zero here means oct number, 012 = 10 (8*1+2), so 10 is btw 10 and 10
+ok(!btw('003', '02', '09') ,'btw i'); #
+ok(!btw('a', 'b', 'c')     ,'btw j'); #
+ok( btw('a', 'B', 'c')     ,'btw k'); #
+ok( btw('a', 'c', 'B')     ,'btw l'); #
+ok( btw( -1, -2, 1)        ,'btw m');
+ok( btw( -1, -2, 0)        ,'btw n');
+ok( btw( -1, -2, '0e0')    ,'btw o');
+#my($btw,$btw2)=(0,0);
+#my @errs=grep{my@a=map rand(),1..3;$btw++ if btw(@a);$btw2++ if btw2(@a);btw(@a)!=btw2(@a)}1..1000;
+#ok( !@errs, "btw2==btw, btw=$btw btw2=$btw2" );
+#use Benchmark qw(:all) ;
+#cmpthese(1e5, { btw => sub { btw(rand(),rand(),rand()) },
+#                btw2=> sub { btw2(rand(),rand(),rand()) } }); exit;
 
 #--curb
 my $vb = 234;
@@ -160,17 +181,36 @@ ok_ref( {hashtrans(\%h)},
          b=>{1=>55,2=>22,3=>99}}, 'hashtrans' );
 
 #--ipaddr, ipnum
-my $ipnum=ipnum('www.uio.no'); # !defined implies no network
+my $ipnum=ipnum('www.vg.no'); # !defined implies no network
 my $ipaddr=defined$ipnum?ipaddr($ipnum):undef;
 if( defined $ipaddr ){
   ok( $ipnum=~/^(\d+\.\d+\.\d+\.\d+)$/, 'ipnum'); #hm ip6
-  ok( ipaddr($ipnum) eq 'www.uio.no' );
-  ok( $Acme::Tools::IPADDR_memo{$ipnum} eq 'www.uio.no' );
-  ok( $Acme::Tools::IPNUM_memo{'www.uio.no'} eq $ipnum );
+  is( ipaddr($ipnum), 'www.vg.no' );
+  is( $Acme::Tools::IPADDR_memo{$ipnum}, 'www.vg.no' );
+  is( $Acme::Tools::IPNUM_memo{'www.vg.no'}, $ipnum );
 }
 else{
   ok( 1, 'skip: no network') for 1..4
 }
+
+#--in_iprange
+
+eval{in_iprange('x','255.255.255.255')};                  ok( $@=~/malformed ipnum x/,            'in_iprange, malformed ipnum' );
+eval{in_iprange('255.255.255.255','x')};                  ok( $@=~/malformed iprange x/,          'in_iprange, malformed iprange' );
+eval{in_iprange('0.0.0.0','255.255.255.256')};            ok( $@=~/iprange part should be 0-255/, 'in_iprange, iprange part should be 0-255' );
+eval{in_iprange('255.255.256.255','255.255.255.255')};    ok( $@=~/invalid ipnum/,                'in_iprange, invalid ipnum' );
+eval{in_iprange('255.255.255.255','255.255.255.255/33')}; ok( $@=~/iprange mask should be 0-32/,  'in_iprange, invalid iprange' );
+eval{in_iprange('100.255.255.255','100.255.255.0/22')};   ok( $@=~m|need zero in last 10 bits, should be 100.255.252.0/22|, 'in_iprange, need zero in last 10...' );
+ok( in_iprange('255.255.255.255','255.255.255.0/24'), 'in_iprange' );
+ok( in_iprange('255.255.255.254','255.255.254.0/23'), 'in_iprange' );
+ok( in_iprange('100.255.255.255','100.255.254.0/23'), 'in_iprange, yes' );
+ok( in_iprange('100.255.254.0','100.255.254.0/23'),   'in_iprange, y' );
+ok( in_iprange('100.255.255.0','100.255.254.0/23'),   'in_iprange, y' );
+ok(!in_iprange('100.255.0.1','100.254.254.0/23'),     'in_iprange, n' );
+ok( in_iprange('100.255.0.1','100.255.0.1'),          'in_iprange, same' );
+ok( in_iprange('100.255.0.1','100.255.0.1/32'),       'in_iprange, same/32' );
+ok( in_iprange('0.0.0.1','0.0.0.0/1'),                'in_iprange, /1' );
+ok( in_iprange(join('.',map int(rand(256)),1..4),'0.0.0.0/0'), 'in_iprange, /0' );
 
 #--webparams, urlenc, urldec
 my $s=join"",map random([qw/hip hop and you dont stop/]), 1..1000;
@@ -228,9 +268,19 @@ if($^O eq 'linux' and -w$tmp){
 }
 else{ok(1) for 1..5}     # not linux
 
-#--permutations
-ok(join("-", map join("",@$_), permutations('a','b')) eq 'ab-ba', 'permutations 1');
-ok(join("-", map join("",@$_), permutations('a','b','c')) eq 'abc-acb-bac-bca-cab-cba','permutations 2');
+#--permutations, perm, permutate
+ok(join("-", map join("",@$_), permutations('a','b'))  eq 'ab-ba',                  'permutations 1');
+ok(join("-", map join("",@$_), permutations('a'..'c')) eq 'abc-acb-bac-bca-cab-cba','permutations 2');
+ok(join("-", map join("",@$_), perm(        'a'..'c')) eq 'abc-acb-bac-bca-cab-cba','perm');
+
+my @p=('a'..'e');
+my $permute=printed { print permute{print @_,"\n"}@p };
+is($permute, join('',map join('',@$_)."\n", perm(@p)).120,'permute');
+
+my $permute2=printed { print permute{print @_,"\n"}\@p,['b','a','c'] };
+my @perm=perm('a'..'c'); splice@perm,0,2;
+is($permute2, join('',map join('',@$_)."\n", @perm).4,'permute start at');
+
 
 #--trigram
 ok( join(", ",trigram("Kjetil Skotheim"))   eq 'Kje, jet, eti, til, il , l S,  Sk, Sko, kot, oth, the, hei, eim',        'trigram');

@@ -2,6 +2,17 @@
 ##
 ## Change log for perl distribution DTA::CAB
 
+v1.111 Thu, 23 Jan 2020 10:15:17 +0100 moocow
+	* fixed normalized-key bug in DTA:CAB::Analyzer::DmootSub, ::MootSub
+	  - earlier versions used normalized text as type-key ($dmoot->{tag},$moot->{word})
+	  - old code caused bogus data-sharing for distinct input types mapped to same normalized form
+ 	  - bug observed for type-wise analysis of dwb1 lemmata ("aasz","asz") both mapped to "As", both assigned lemma ("aasz")
+	    if processed in the same document, otherwise "asz" gets assigned lemma "asz"
+
+v1.110 Mon, 23 Sep 2019 15:57:09 +0200 moocow
+	* added http+unix support to dta-cab-check.perl
+	* added CAB::Server::HTTP::Handler::sanitizeCharset() : tweak UTF-8 charset args to browser-friendly "utf-8"
+
 v1.109 Tue, 26 Mar 2019 13:52:49 +0100 moocow
 	* added Analyzer::DTAClean 'cleanPublic' option
 	  - implements 'clean' option for public web-service

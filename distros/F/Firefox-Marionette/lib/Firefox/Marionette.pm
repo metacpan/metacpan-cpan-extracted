@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -3367,6 +3367,114 @@ sub alert_text {
     return $self->_response_result_value($response);
 }
 
+my %_pdf_sizes = (
+
+    #    '4A0' => { width => 168.2, height => 237.8 },
+    #    '2A0' => { width => 118.9, height => 168.2 },
+    #    A9    => { width => 3.7,  height => 5.2 },
+    #    A10   => { width => 2.6,  height => 3.7 },
+    #    B0    => { width => 100,  height => 141.4 },
+    A1           => { width => 59.4, height => 84.1 },
+    A2           => { width => 42,   height => 59.4 },
+    A3           => { width => 29.7, height => 42 },
+    A4           => { width => 21,   height => 29.7 },
+    A5           => { width => 14.8, height => 21 },
+    A6           => { width => 10.5, height => 14.8 },
+    A7           => { width => 7.4,  height => 10.5 },
+    A8           => { width => 5.2,  height => 7.4 },
+    B1           => { width => 70.7, height => 100 },
+    B2           => { width => 50,   height => 70.7 },
+    B3           => { width => 35.3, height => 50 },
+    B4           => { width => 25,   height => 35.3 },
+    B5           => { width => 17.6, height => 25 },
+    B6           => { width => 12.5, height => 17.6 },
+    B7           => { width => 8.8,  height => 12.5 },
+    B8           => { width => 6.2,  height => 8.8 },
+    HALF_LETTER  => { width => 14,   height => 21.6 },
+    LETTER       => { width => 21.6, height => 27.9 },
+    LEGAL        => { width => 21.6, height => 35.6 },
+    JUNIOR_LEGAL => { width => 12.7, height => 20.3 },
+    LEDGER       => { width => 12.7, height => 20.3 },
+);
+
+sub paper_sizes {
+    my @keys = sort { $a cmp $b } keys %_pdf_sizes;
+    return @keys;
+}
+
+sub _initialise_pdf_parameters {
+    my ( $self, %parameters ) = @_;
+    foreach my $key (qw(landscape shrinkToFit printBackground)) {
+        if ( defined $parameters{$key} ) {
+            $parameters{$key} =
+              $parameters{$key} ? JSON::true() : JSON::false();
+        }
+    }
+    if ( defined $parameters{page} ) {
+        foreach my $key ( sort { $a cmp $b } keys %{ $parameters{page} } ) {
+            next if ( $key eq 'width' );
+            next if ( $key eq 'height' );
+            Carp::croak("Unknown key $key for the page parameter");
+        }
+    }
+    if ( defined $parameters{margin} ) {
+        foreach my $key ( sort { $a cmp $b } keys %{ $parameters{margin} } ) {
+            next if ( $key eq 'top' );
+            next if ( $key eq 'left' );
+            next if ( $key eq 'bottom' );
+            next if ( $key eq 'right' );
+            Carp::croak("Unknown key $key for the margin parameter");
+        }
+    }
+    if ( my $size = delete $parameters{size} ) {
+        $size =~ s/[ ]/_/smxg;
+        if ( defined( my $instance = $_pdf_sizes{ uc $size } ) ) {
+            $parameters{page}{width}  = $instance->{width};
+            $parameters{page}{height} = $instance->{height};
+        }
+        else {
+            Carp::croak("Page size of $size is unknown");
+        }
+    }
+    return %parameters;
+}
+
+sub pdf {
+    my ( $self, %parameters ) = @_;
+    %parameters = $self->_initialise_pdf_parameters(%parameters);
+    my $raw        = delete $parameters{raw};
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(),                         $message_id,
+            $self->_command('WebDriver:Print'), \%parameters
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    if ($raw) {
+        my $content = $self->_response_result_value($response);
+        return MIME::Base64::decode_base64($content);
+    }
+    else {
+        my $handle = File::Temp::tempfile(
+            File::Spec->catfile(
+                File::Spec->tmpdir(), 'firefox_marionette_print_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to open temporary file for writing:$EXTENDED_OS_ERROR");
+        binmode $handle;
+        my $content = $self->_response_result_value($response);
+        $handle->print( MIME::Base64::decode_base64($content) )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to temporary file:$EXTENDED_OS_ERROR");
+        $handle->seek( 0, Fcntl::SEEK_SET() )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+        return $handle;
+    }
+}
+
 sub selfie {
     my ( $self, $element, @remaining ) = @_;
     my $message_id = $self->_new_message_id();
@@ -4784,7 +4892,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =head1 SYNOPSIS
 
@@ -5421,6 +5529,47 @@ Returns the window handle for the new window.
 =head2 new_session
 
 creates a new WebDriver session.  It is expected that the caller performs the necessary checks on the requested capabilities to be WebDriver conforming.  The WebDriver service offered by Marionette does not match or negotiate capabilities beyond type and bounds checks.
+
+=head2 paper_sizes 
+
+returns a list of all the recognised names for paper sizes, such as A4 or LEGAL.
+
+=head2 pdf
+
+returns a L<File::Temp|File::Temp> object containing a PDF.
+
+accepts a optional hash as the first parameter with the following allowed keys;
+
+=over 4
+
+=item * landscape - Paper orientation.  Boolean value.  Defaults to false
+
+=item * margin - A hash describing the margins.  The hash may have the following optional keys, 'top', 'left', 'right' and 'bottom'.  All these keys are in cm and default to 1 (~0.4 inches)
+
+=item * page - A hash describing the page.  The hash may have the following keys; 'height' and 'width'.  Both keys are in cm and default to US letter size.  See the 'size' key.
+
+=item * printBackground - Print background graphics.  Boolean value.  Defaults to false. 
+
+=item * raw - rather than a file handle containing the PDF, the binary PDF will be returned.
+
+=item * scale - Scale of the webpage rendering.  Defaults to 1.
+
+=item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<page_sizes|Firefox::Marionette#page_sizes> method for a list of accepted page size names. 
+
+=item * shrinkToFit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
+
+=back
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $handle = $firefox->pdf();
+    foreach my $paper_size ($firefox->paper_sizes()) {
+	    $handle = $firefox->pdf(size => $paper_size, landscape => 1);
+            ...
+	    $handle = $firefox->pdf(page => { width => 21, height => 27 });
+            ...
+    }
 
 =head2 property
 

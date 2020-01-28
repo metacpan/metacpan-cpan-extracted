@@ -1,5 +1,7 @@
 package Net::Whois::Object::Response;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 __PACKAGE__->attributes( 'mandatory',   [ 'response' ] );

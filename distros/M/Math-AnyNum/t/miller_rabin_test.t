@@ -5,29 +5,35 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 1;
+plan tests => 27;
 
-use Math::AnyNum qw(sqr imod irand powmod);
+use Math::AnyNum qw(sqr imod irand powmod valuation is_prime);
 
-sub is_prime {
+sub miller_rabin {
     my ($n, $k) = @_;
 
-    return 1 if $n == 2;
-    return 0 if $n < 2 or $n % 2 == 0;
+    return 1 if ($n == 2);
+    return 0 if ($n < 2 or $n % 2 == 0);
 
     my $d = $n - 1;
     my $s = 0;
 
-    while (!($d % 2)) {
+    while (!($d & 1)) {
         $d >>= 1;
         $s++;
+    }
+
+    if (valuation($n - 1, 2) != $s) {
+        die "error for valuation($n-1, 2) != $s";
     }
 
   LOOP: for (1 .. $k) {
         my $a = irand(2, $n - 1);    # note: irand() is inclusive in both sides
 
+        say "Testing: $a";
+
         my $x = powmod($a, $d, $n);
-        next if $x->is_one or $x == $n - 1;
+        next if ($x->is_one or $x == $n - 1);
 
         for (1 .. $s - 1) {
             $x = imod(sqr($x), $n);
@@ -48,6 +54,30 @@ my $expect = join(' ', split(/\R/, <<'EOT'));
 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397
 EOT
 
-my $got = join ", ", grep { is_prime($_, 10) } (1 .. 400);
+my $got = join ", ", grep { miller_rabin($_, 10) } (1 .. 400);
 
 is($expect, $got);
+
+foreach my $n (
+    qw(
+    1396981702787004809899378463251
+    7816076831599927579457721304003
+    2427199981108710298388119761391
+    5990938163438463046654401441403
+    104697960363078656014680366403
+
+    1408378786769679646513359725568001
+    2336499973230914707696136445710401
+    4672817187498140693466251773742401
+    305076899838452167397969075514740401
+    372472369984823319158419982809886401
+
+    134068318522377744480445881187113897616025270246401
+    161692087192151385871156481366675877853717201966081
+    271262582631319415960660375412865650506040216253441
+    )
+  ) {
+    my $m = Math::AnyNum->new($n);
+    ok(!is_prime($m),         "!is_prime($m)");
+    ok(!miller_rabin($m, 30), "!miller_rabin($m)");
+}

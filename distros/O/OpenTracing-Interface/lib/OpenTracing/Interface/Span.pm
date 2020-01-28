@@ -3,6 +3,10 @@ package OpenTracing::Interface::Span;
 use strict;
 use warnings;
 
+
+our $VERSION = '0.10';
+
+
 use Role::MethodReturns;
 
 use Types::Standard qw/ Str Maybe Value HashRef/;

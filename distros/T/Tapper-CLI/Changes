@@ -1,5 +1,8 @@
 Revision history for Tapper-CLI
 
+5.0.6     2020-01-22
+        - testplan-new ... new output format, also printing list of testruns
+
 5.0.5     2017-02-14
         - testplan-pause ... pause testrun by setting state to 'prepared'
         - testplan-continue ... continue a paused testrun by setting state to 'schedule'

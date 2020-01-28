@@ -1,4 +1,4 @@
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is part of Graph-Maker-Other.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 15, January 2020
+    - BinaryBeanstalk, BinomialTree, FibonacciTree, direction_type
+    - new BinomialBoth
 
 Version 14, December 2019
     - new Crown

@@ -1,5 +1,11 @@
 Revision history for Math-AnyNum
 
+0.34    2020-01-23
+
+        - Increased the default value of `r` in `is_prime` from 20 to 23.
+        - Documented the Baillie-PSW test used by `is_prime` with GMP >= 6.2.0.
+        - LCM of an empty list, now returns 1. (previously returned 0)
+
 0.33    2019-08-18
 
         [ADDITIONS]

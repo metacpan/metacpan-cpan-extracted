@@ -4,9 +4,9 @@
       "Luis Motta Campos <lmc@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -48,5 +48,6 @@
          "url" : "https://github.com/arhuman/Net-Whois-RIPE"
       }
    },
-   "version" : "2.006002"
+   "version" : 2.007002,
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

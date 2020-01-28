@@ -3,14 +3,15 @@ use warnings;
 
 package Mail::Qmail::Filter::ValidateFrom;
 
-our $VERSION = '1.0';
+our $VERSION = '1.21';
 
 use Mo qw(coerce default);
 extends 'Mail::Qmail::Filter';
 
-has 'params' => {};
-has 'reject_text' =>
-  sub { "Invalid e-mail address <$_[0]> in From header line" };
+has params      => {};
+has reject_text => sub {
+    sub { "Invalid e-mail address <$_[0]> in From header line" }
+};
 
 sub filter {
     my $self                = shift;

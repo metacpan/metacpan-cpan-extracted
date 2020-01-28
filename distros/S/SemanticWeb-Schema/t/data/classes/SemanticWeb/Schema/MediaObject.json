@@ -35,19 +35,26 @@
          "schema:rangeIncludes" : "schema:URL"
       },
       "schema:duration" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1457",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
-         "schema:category" : "issue-1698",
+         "schema:category" : [
+            "issue-1698",
+            "issue-1457"
+         ],
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:Audiobook",
             "schema:MusicRecording",
-            "schema:MediaObject",
-            "schema:QuantitativeValueDistribution",
             "schema:MusicRelease",
-            "schema:Movie"
+            "schema:Event",
+            "schema:Schedule",
+            "schema:QuantitativeValueDistribution",
+            "schema:Audiobook",
+            "schema:Movie",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -71,8 +78,8 @@
          "rdfs:comment" : "Media type typically expressed using a MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\">MDN reference</a>) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).<br/><br/>\n\nIn cases where a <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a> has several media type representations, <a class=\"localLink\" href=\"http://schema.org/encoding\">encoding</a> can be used to indicate each <a class=\"localLink\" href=\"http://schema.org/MediaObject\">MediaObject</a> alongside particular <a class=\"localLink\" href=\"http://schema.org/encodingFormat\">encodingFormat</a> information.<br/><br/>\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.",
          "rdfs:label" : "encodingFormat",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -84,8 +91,8 @@
          "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>. For media, including audio and video, it's the time offset of the end of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "endTime",
          "schema:domainIncludes" : [
-            "schema:Action",
             "schema:FoodEstablishmentReservation",
+            "schema:Action",
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
@@ -99,9 +106,9 @@
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
             "schema:VisualArtwork",
-            "schema:Person",
+            "schema:MediaObject",
             "schema:Product",
-            "schema:MediaObject"
+            "schema:Person"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -122,12 +129,12 @@
          "schema:domainIncludes" : [
             "schema:Episode",
             "schema:MovieSeries",
+            "schema:VideoGameSeries",
+            "schema:RadioSeries",
+            "schema:MediaObject",
             "schema:Movie",
             "schema:TVSeries",
-            "schema:RadioSeries",
-            "schema:VideoGameSeries",
-            "schema:CreativeWorkSeason",
-            "schema:MediaObject"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -145,8 +152,8 @@
          "rdfs:label" : "requiresSubscription",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
             "schema:Boolean",
@@ -163,8 +170,8 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Time",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Time"
          ]
       },
       "schema:uploadDate" : {
@@ -179,13 +186,13 @@
          "rdfs:comment" : "The width of the item.",
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
+            "schema:VisualArtwork",
             "schema:Product",
-            "schema:MediaObject",
-            "schema:VisualArtwork"
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       }
    }

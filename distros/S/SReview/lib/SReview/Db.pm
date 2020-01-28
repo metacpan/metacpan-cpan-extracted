@@ -34,8 +34,13 @@ sub init {
 	$init->name('init');
 	$init->from_data();
 	#$code->migrate(0);
-	$init->migrate();
-	$code->migrate();
+	$init->migrate() or return 0;
+	$code->migrate() or return 0;
+	if(defined($config->get("adminuser")) && defined($config->get("adminpw"))) {
+		$db->db->dbh->prepare("INSERT INTO users(email, password, isadmin) VALUES(?, crypt(?, gen_salt('bf', 8)), true) ON CONFLICT ON CONSTRAINT users_email_unique DO NOTHING")->execute($config->get("adminuser"), $config->get("adminpw"));
+	}
+
+	return 1;
 }
 
 1;
@@ -1026,6 +1031,23 @@ INSERT INTO properties(name) VALUES('offset_end');
 LOCK TABLE corrections IN SHARE MODE;
 DELETE FROM corrections USING properties WHERE corrections.property = properties.id AND properties.name = 'offset_end';
 DELETE FROM properties WHERE name = 'offset_end';
+-- 17 up
+ALTER TABLE raw_files ADD mtime INTEGER;
+-- 17 down
+ALTER TABLE raw_files DROP mtime;
+-- 18 up
+CREATE TABLE config_overrides (
+    id SERIAL PRIMARY KEY,
+    event integer REFERENCES events(id),
+    nodename character varying,
+    value character varying NOT NULL
+);
+-- 18 down
+DROP TABLE config_overrides;
+-- 19 up
+ALTER TABLE users ADD CONSTRAINT users_email_unique UNIQUE (email);
+-- 19 down
+ALTER TABLE users DROP CONSTRAINT users_email_unique;
 @@ code
 -- 1 up
 CREATE VIEW last_room_files AS

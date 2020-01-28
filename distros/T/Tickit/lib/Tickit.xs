@@ -144,7 +144,7 @@ static int tickit_name2mousewheel(const char *name)
 struct GenericEventData
 {
   int ev;
-  SV *self;
+  SV *self;  // only for window bindings; unused for term
   CV *code;
   SV *data;
 };
@@ -351,6 +351,19 @@ static SV *newSVrb(TickitRenderBuffer *rb)
 
 typedef TickitTerm *Tickit__Term, *Tickit__Term_MAYBE;
 
+static SV *newSVterm_noinc(TickitTerm *tt, char *package)
+{
+  SV *sv = newSV(0);
+  sv_setref_pv(sv, package, tt);
+
+  return sv;
+}
+
+static SV *newSVterm(TickitTerm *tt, char *package)
+{
+  return newSVterm_noinc(tickit_term_ref(tt), package);
+}
+
 static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info, void *user)
 {
   struct GenericEventData *data = user;
@@ -404,7 +417,7 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
 
     PUSHMARK(SP);
     EXTEND(SP, 4);
-    mPUSHs(newSVsv(data->self));
+    mPUSHs(newSVterm(tt, "Tickit::Term"));
     mPUSHs(newSVivpv(data->ev, evname));
     mPUSHs(info_sv);
     mPUSHs(newSVsv(data->data));
@@ -422,7 +435,6 @@ static int term_userevent_fn(TickitTerm *tt, TickitEventFlags flags, void *_info
   }
 
   if(flags & TICKIT_EV_UNBIND) {
-    SvREFCNT_dec(data->self);
     SvREFCNT_dec(data->code);
     SvREFCNT_dec(data->data);
     Safefree(data);
@@ -455,19 +467,6 @@ static void term_output_fn(TickitTerm *tt, const char *bytes, size_t len, void *
 
   FREETMPS;
   LEAVE;
-}
-
-static SV *newSVterm_noinc(TickitTerm *tt, char *package)
-{
-  SV *sv = newSV(0);
-  sv_setref_pv(sv, package, tt);
-
-  return sv;
-}
-
-static SV *newSVterm(TickitTerm *tt, char *package)
-{
-  return newSVterm_noinc(tickit_term_ref(tt), package);
 }
 
 /*********************
@@ -983,6 +982,9 @@ static void setup_constants(void)
   DO_CONSTANT(TICKIT_MOD_SHIFT)
   DO_CONSTANT(TICKIT_MOD_ALT)
   DO_CONSTANT(TICKIT_MOD_CTRL)
+
+  DO_CONSTANT(TICKIT_RUN_NOHANG)
+  DO_CONSTANT(TICKIT_RUN_NOSETUP)
 
   DO_CONSTANT(TICKIT_BIND_FIRST)
 
@@ -2247,6 +2249,14 @@ DESTROY(self)
      */
     tickit_term_unref(self);
 
+UV
+_xs_addr(self, ...)
+  Tickit::Term  self
+  CODE:
+    RETVAL = (UV)self;
+  OUTPUT:
+    RETVAL
+
 int
 get_input_fd(self)
   Tickit::Term  self
@@ -2379,11 +2389,8 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
 
     Newx(user, 1, struct GenericEventData);
     user->ev = _ev;
-    user->self = newSVsv(ST(0));
     user->code = (CV*)SvREFCNT_inc(code);
     user->data = newSVsv(data);
-
-    sv_rvweaken(user->self);
 
     RETVAL = tickit_term_bind_event(self, _ev, flags|TICKIT_EV_UNBIND, term_userevent_fn, user);
   OUTPUT:
@@ -3594,29 +3601,36 @@ setctl(self, ctl, value)
     RETVAL
 
 UV
-watch_timer_after_msec(self, msec, code)
+watch_timer_after(self, delay, code)
   Tickit::_Tickit  self
-  int              msec
+  NV               delay
   CV              *code
+  INIT:
+    struct timeval after;
   CODE:
-    RETVAL = PTR2UV(tickit_watch_timer_after_msec(self, msec, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+    /* For convenience of the calling Perl code we take fractional seconds and
+     * convert to struct timeval here.
+     */
+    after.tv_sec = (long)delay;
+    after.tv_usec = (delay - after.tv_sec) * 1000000;
+
+    RETVAL = PTR2UV(tickit_watch_timer_after_tv(self, &after, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
   OUTPUT:
     RETVAL
 
 UV
-watch_timer_at_msec(self, msec, code)
-  Tickit::_Tickit self
-  long             msec
+watch_timer_at(self, epoch, code)
+  Tickit::_Tickit  self
+  NV               epoch
   CV              *code
   INIT:
     struct timeval at;
   CODE:
-    /* For convenience of the calling Perl code we'll invent a _timer_at_msec
-     * function, even though the underlying tickit library doesn't.
+    /* For convenience of the calling Perl code we take fractional seconds and
+     * convert to struct timeval here.
      */
-
-    at.tv_sec = (int)(msec / 1000);
-    at.tv_usec = (msec % 1000) * 1000;
+    at.tv_sec = (long)epoch;
+    at.tv_usec = (epoch - at.tv_sec) * 1000000;
 
     RETVAL = PTR2UV(tickit_watch_timer_at_tv(self, &at, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
   OUTPUT:
@@ -3629,12 +3643,14 @@ watch_cancel(self, id)
   CODE:
     tickit_watch_cancel(self, INT2PTR(void *,id));
 
-void
+UV
 watch_later(self, code)
   Tickit::_Tickit  self
   CV              *code
   CODE:
-    tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code));
+    RETVAL = PTR2UV(tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback, SvREFCNT_inc(code)));
+  OUTPUT:
+    RETVAL
 
 void
 run(self)
@@ -3657,5 +3673,29 @@ tick(self, flags=0)
 
 MODULE = Tickit  PACKAGE = Tickit
 
+int
+version_major()
+  ALIAS:
+    version_major = 0
+    version_minor = 1
+    version_patch = 2
+  CODE:
+    switch(ix) {
+      case 0: RETVAL = tickit_version_major(); break;
+      case 1: RETVAL = tickit_version_minor(); break;
+      case 2: RETVAL = tickit_version_patch(); break;
+    }
+  OUTPUT:
+    RETVAL
+
 BOOT:
+  /* Check libtickit version */
+  if(tickit_version_major() != TICKIT_VERSION_MAJOR ||
+     tickit_version_minor() != TICKIT_VERSION_MINOR ||
+     tickit_version_patch() <  TICKIT_VERSION_PATCH) {
+    croak("libtickit version mismatch: compiled for version %d.%d.%d, running with %d.%d.%d\n",
+      TICKIT_VERSION_MAJOR, TICKIT_VERSION_MINOR, TICKIT_VERSION_PATCH,
+      tickit_version_major(), tickit_version_minor(), tickit_version_patch());
+  }
+
   setup_constants();

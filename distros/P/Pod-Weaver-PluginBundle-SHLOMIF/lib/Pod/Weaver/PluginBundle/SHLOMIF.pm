@@ -2,9 +2,7 @@ use strict;
 use warnings;
 
 package Pod::Weaver::PluginBundle::SHLOMIF;
-
-our $VERSION = '0.0010000';
-
+$Pod::Weaver::PluginBundle::SHLOMIF::VERSION = '0.001004';
 use Pod::Weaver 4; # he played knick-knack on my door
 use Pod::Weaver::Config::Assembler;
 
@@ -34,6 +32,7 @@ sub mvp_bundle_config {
         [ '@SHLOMIF/SingleEncoding', _exp('-SingleEncoding'), {} ],
         [ '@SHLOMIF/WikiDoc',        _exp('-WikiDoc'),        {} ],
         [ '@SHLOMIF/CorePrep',       _exp('@CorePrep'),       {} ],
+        [ '@SHLOMIF/Name',           _exp('Generic'),         { header => 'NAME', }, ],
         [ '@SHLOMIF/Version',        _exp('Version'),         {} ],
 
         [ '@SHLOMIF/Prelude',     _exp('Region'),  { region_name => 'prelude' } ],
@@ -59,7 +58,7 @@ sub mvp_bundle_config {
     push @plugins,
       (
         [ '@SHLOMIF/Leftovers', _exp('Leftovers'), {} ],
-        [ '@SHLOMIF/postlude', _exp('Region'), { region_name => 'postlude' } ],
+        [ '@SHLOMIF/postlude',  _exp('Region'),    { region_name => 'postlude' } ],
         [
             '@SHLOMIF/Support',
             _exp('Support'),
@@ -72,7 +71,7 @@ sub mvp_bundle_config {
         [ '@SHLOMIF/Bugs',         _exp('Bugs'),         {} ],
         [ '@SHLOMIF/Contributors', _exp('Contributors'), {} ],
         [ '@SHLOMIF/Legal',        _exp('Legal'),        {} ],
-        [ '@SHLOMIF/List', _exp('-Transformer'), { 'transformer' => 'List' } ],
+        [ '@SHLOMIF/List',         _exp('-Transformer'), { 'transformer' => 'List' } ],
       );
 
     return @plugins;
@@ -95,7 +94,7 @@ Pod::Weaver::PluginBundle::SHLOMIF - SHLOMIF's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.001002
+version 0.001004
 
 =head1 DESCRIPTION
 
@@ -149,7 +148,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by David Golden.
+This software is Copyright (c) 2020 by David Golden.
 
 This is free software, licensed under:
 

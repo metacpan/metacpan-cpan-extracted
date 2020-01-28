@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "filename",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "filename",
   "PREREQ_PM" => {
+    "Array::RefElem" => 0,
     "Carp" => "1.50",
     "File::Spec" => 0,
+    "Scalar::Util" => 0,
     "locale" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -27,7 +30,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "v0.20.010",
+  "VERSION" => "v0.20.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,9 +38,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Array::RefElem" => 0,
   "Carp" => "1.50",
   "File::Spec" => 0,
   "FindBin" => 0,
+  "Scalar::Util" => 0,
   "Test2::V0" => 0,
   "locale" => 0,
   "parent" => 0,

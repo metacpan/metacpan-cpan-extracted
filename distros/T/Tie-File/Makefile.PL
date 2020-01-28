@@ -11,7 +11,7 @@ WriteMakefile(
     'ABSTRACT_FROM'   => 'lib/Tie/File.pm',
     'AUTHOR'          => 'Mark Jason Dominus <MJD@cpan.org>',
     'dist'=> { COMPRESS => 'gzip -6f', SUFFIX => 'gz', },
-    ($] < 5.008 && $] > 5.011) ? () : ( INSTALLDIRS => 'perl' ),
+    INSTALLDIRS => ($] >= 5.007 && $] < 5.012) ? 'perl' : 'site',
     DIR => [],
     META_MERGE  => {
         resources => {

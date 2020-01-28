@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 585;
+plan tests => 586;
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -399,7 +399,7 @@ is(ipow10($o->new(3)),      1000);
 is(ipow10($o->new('13/2')), 1000000);
 is(ipow10($o->new('3.7')),  1000);
 
-is(lcm(),   0);
+is(lcm(),   1);
 is(lcm(42), 42);
 is(lcm(13,          14),          182);
 is(lcm(14,          $o->new(13)), 182);
@@ -772,6 +772,7 @@ ok(is_prime($o->new('165001'), 30), 'is_prime');
 ok(!is_prime('113822804831'), '!is_prime');
 ok(!is_prime('113822804831',          30),          '!is_prime');
 ok(!is_prime($o->new('113822804831'), $o->new(30)), '!is_prime');
+ok(!is_prime('1396981702787004809899378463251'), '!is_prime');
 
 #ok(is_smooth(0,                      0));
 #ok(is_smooth(0,                      40));

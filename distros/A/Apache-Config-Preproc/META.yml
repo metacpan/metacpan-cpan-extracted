@@ -25,7 +25,7 @@ no_index:
 provides:
   Apache::Config::Preproc:
     file: lib/Apache/Config/Preproc.pm
-    version: '1.05'
+    version: '1.06'
   Apache::Config::Preproc::Expand:
     file: lib/Apache/Config/Preproc/Expand.pm
   Apache::Config::Preproc::Server::Probe:
@@ -61,5 +61,5 @@ requires:
   perl: '5.014002'
 resources:
   repository: git://git.gnu.org.ua/acpp.git
-version: '1.05'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

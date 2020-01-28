@@ -1,5 +1,3 @@
-## Please see file perltidy.ERR
-## Please see file perltidy.ERR
 #!/usr/bin/env perl
 
 use strict;
@@ -25,14 +23,10 @@ sub generate_table {
     $max_rows //= 10;
 
     return html->Table(
-        children => [
-            html->Tr(
-                children =>
-                  [ map { html->Th( children => $_ ) } @{ $csv->[0] } ]
-            ),
+        [
+            html->Tr( [ map { html->Th($_) } @{ $csv->[0] } ] ),
             map {
-                html->Tr(
-                    children => [ map { html->Td( children => $_ ) } @{$_} ] )
+                html->Tr( [ map { html->Td($_) } @{$_} ] )
             } @{$csv}[ 1 .. $max_rows ]
         ]
     );
@@ -45,10 +39,7 @@ my $app = Dash->new(
 
 $app->layout(
     html->Div(
-        children => [
-            html->H4( children => 'US Agriculture Exports (2011)' ),
-            generate_table($csv)
-        ]
+        [ html->H4('US Agriculture Exports (2011)'), generate_table($csv) ]
     )
 );
 

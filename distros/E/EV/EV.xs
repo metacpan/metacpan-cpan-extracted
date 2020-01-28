@@ -84,13 +84,20 @@ sv_fileno (SV *fh)
     ev_ ## type ## _stop (e_loop (w), w);	\
   } while (0)
 
-#define RESET(type,w,seta)			\
-  do {                                          \
-    int active = ev_is_active (w);              \
-    if (active) STOP (type, w);                 \
-    ev_ ## type ## _set seta;                   \
-    if (active) START (type, w);                \
+#define PAUSE(type)				\
+  do {						\
+    int active = ev_is_active (w);		\
+    if (active) STOP  (type, w)
+
+#define RESUME(type)				\
+    if (active) START (type, w);		\
   } while (0)
+
+
+#define RESET(type,w,seta)			\
+  PAUSE (type);					\
+    ev_ ## type ## _set seta;                   \
+  RESUME (type)
 
 typedef int Signal;
 
@@ -864,23 +871,27 @@ int ev_clear_pending (ev_watcher *w)
 void ev_feed_event (ev_watcher *w, int revents = EV_NONE)
 	C_ARGS: e_loop (w), w, revents
 
-int keepalive (ev_watcher *w, int new_value = 0)
+int keepalive (ev_watcher *w, SV *new_value = NO_INIT)
 	CODE:
 {
         RETVAL = w->e_flags & WFLAG_KEEPALIVE;
-        new_value = new_value ? WFLAG_KEEPALIVE : 0;
 
-        if (items > 1 && ((new_value ^ w->e_flags) & WFLAG_KEEPALIVE))
+        if (items > 1)
           {
-            w->e_flags = (w->e_flags & ~WFLAG_KEEPALIVE) | new_value;
-            REF (w);
-            UNREF (w);
+            int value = SvTRUE (new_value) ? WFLAG_KEEPALIVE : 0;
+
+            if ((value ^ w->e_flags) & WFLAG_KEEPALIVE)
+              {
+                w->e_flags = (w->e_flags & ~WFLAG_KEEPALIVE) | value;
+                REF (w);
+                UNREF (w);
+              }
           }
 }
 	OUTPUT:
         RETVAL
 
-SV *cb (ev_watcher *w, SV *new_cb = 0)
+SV *cb (ev_watcher *w, SV *new_cb = NO_INIT)
 	CODE:
 {
         if (items > 1)
@@ -895,7 +906,7 @@ SV *cb (ev_watcher *w, SV *new_cb = 0)
 	OUTPUT:
         RETVAL
 
-SV *data (ev_watcher *w, SV *new_data = 0)
+SV *data (ev_watcher *w, SV *new_data = NO_INIT)
 	CODE:
 {
 	RETVAL = w->data ? newSVsv (w->data) : &PL_sv_undef;
@@ -915,7 +926,7 @@ SV *loop (ev_watcher *w)
 	OUTPUT:
         RETVAL
 
-int priority (ev_watcher *w, int new_priority = 0)
+int priority (ev_watcher *w, SV *new_priority = NO_INIT)
 	CODE:
 {
         RETVAL = w->priority;
@@ -933,7 +944,7 @@ int priority (ev_watcher *w, int new_priority = 0)
                 call_method ("stop", G_DISCARD | G_VOID);
               }
 
-            ev_set_priority (w, new_priority);
+            ev_set_priority (w, SvIV (new_priority));
 
             if (active)
               {
@@ -972,7 +983,7 @@ void set (ev_io *w, SV *fh, int events)
         RESET (io, w, (w, fd, events));
 }
 
-SV *fh (ev_io *w, SV *new_fh = 0)
+SV *fh (ev_io *w, SV *new_fh = NO_INIT)
 	CODE:
 {
         if (items > 1)
@@ -991,13 +1002,17 @@ SV *fh (ev_io *w, SV *new_fh = 0)
 	OUTPUT:
         RETVAL
 
-int events (ev_io *w, int new_events = EV_UNDEF)
+int events (ev_io *w, int new_events = NO_INIT)
 	CODE:
 {
         RETVAL = w->events;
 
-        if (items > 1)
-          RESET (io, w, (w, w->fd, new_events));
+        if (items > 1 && (new_events ^ w->events) & (EV_READ | EV_WRITE))
+          {
+            PAUSE (io);
+            ev_io_modify (w, new_events);
+            RESUME (io);
+          }
 }
 	OUTPUT:
         RETVAL
@@ -1026,7 +1041,7 @@ void set (ev_signal *w, SV *signal)
         RESET_SIGNAL (w, (w, signum));
 }
 
-int signal (ev_signal *w, SV *new_signal = 0)
+int signal (ev_signal *w, SV *new_signal = NO_INIT)
 	CODE:
 {
         RETVAL = w->signum;
@@ -1035,7 +1050,6 @@ int signal (ev_signal *w, SV *new_signal = 0)
           {
             Signal signum = s_signum (new_signal);
             CHECK_SIG (new_signal, signum);
-
             RESET_SIGNAL (w, (w, signum));
           }
 }
@@ -1056,11 +1070,16 @@ void ev_timer_stop (ev_timer *w)
 
 void ev_timer_again (ev_timer *w, NV repeat = NO_INIT)
         CODE:
+{
         if (items > 1)
-          w->repeat = repeat;
-        CHECK_REPEAT (w->repeat);
+          {
+            CHECK_REPEAT (repeat);
+            w->repeat = repeat;
+          }
+
         ev_timer_again (e_loop (w), w);
         UNREF (w);
+}
 
 NV ev_timer_remaining (ev_timer *w)
 	C_ARGS: e_loop (w), w
@@ -1075,6 +1094,18 @@ void set (ev_timer *w, NV after, NV repeat = 0.)
         CHECK_REPEAT (repeat);
 	CODE:
         RESET (timer, w, (w, after, repeat));
+
+NV repeat (ev_timer *w, SV *new_repeat = NO_INIT)
+	CODE:
+        RETVAL = w->repeat;
+        if (items > 1)
+          {
+            NV repeat = SvNV (new_repeat);
+            CHECK_REPEAT (repeat);
+            w->repeat = repeat;
+          }
+	OUTPUT:
+        RETVAL
 
 MODULE = EV		PACKAGE = EV::Periodic	PREFIX = ev_periodic_
 
@@ -1112,6 +1143,37 @@ void set (ev_periodic *w, NV at, NV interval = 0., SV *reschedule_cb = &PL_sv_un
 NV at (ev_periodic *w)
 	CODE:
         RETVAL = ev_periodic_at (w);
+	OUTPUT:
+        RETVAL
+
+NV offset (ev_periodic *w, SV *new_offset = NO_INIT)
+	CODE:
+        RETVAL = w->offset;
+        if (items > 1)
+          w->offset = SvNV (new_offset);
+	OUTPUT:
+        RETVAL
+
+NV interval (ev_periodic *w, SV *new_interval = NO_INIT)
+	CODE:
+        RETVAL = w->interval;
+        if (items > 1)
+          {
+            NV interval = SvNV (new_interval);
+            CHECK_REPEAT (interval);
+            w->interval = interval;
+          }
+	OUTPUT:
+        RETVAL
+
+SV *reschedule_cb (ev_periodic *w, SV *new_reschedule_cb = NO_INIT)
+	CODE:
+        RETVAL = e_fh (w) ? e_fh (w) : &PL_sv_undef;
+        if (items > 1)
+          {
+            sv_2mortal (RETVAL);
+            e_fh (w) = SvTRUE (new_reschedule_cb) ? newSVsv (new_reschedule_cb) : 0;
+          }
 	OUTPUT:
         RETVAL
 
@@ -1257,14 +1319,14 @@ void set (ev_stat *w, SV *path, NV interval)
 	RESET (stat, w, (w, SvPVbyte_nolen (e_fh (w)), interval));
 }
 
-SV *path (ev_stat *w, SV *new_path = 0)
+SV *path (ev_stat *w, SV *new_path = NO_INIT)
 	CODE:
 {
-        RETVAL = SvREFCNT_inc (e_fh (w));
+        RETVAL = e_fh (w) ? e_fh (w) : &PL_sv_undef;
 
         if (items > 1)
           {
-            SvREFCNT_dec (e_fh (w));
+            sv_2mortal (RETVAL);
             e_fh (w) = newSVsv (new_path);
             RESET (stat, w, (w, SvPVbyte_nolen (e_fh (w)), w->interval));
           }
@@ -1272,14 +1334,15 @@ SV *path (ev_stat *w, SV *new_path = 0)
 	OUTPUT:
         RETVAL
 
-NV interval (ev_stat *w, NV new_interval = 0.)
+NV interval (ev_stat *w, SV *new_interval = NO_INIT)
 	CODE:
-{
         RETVAL = w->interval;
-
         if (items > 1)
-          RESET (stat, w, (w, SvPVbyte_nolen (e_fh (w)), new_interval));
-}
+          {
+            PAUSE (stat);
+            w->interval = SvNV (new_interval);
+            RESUME (stat);
+          }
 	OUTPUT:
         RETVAL
 

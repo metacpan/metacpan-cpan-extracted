@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs
 
+0.036     2020-01-27 00:25:40Z
+          - use -nologo option for VC Perl (nmake) builds (in tests); (RT#131185
+          and PR#2; thanks Graham Ollis!)
+          - fix misidentified version in error message in requires(),
+            *_requires() subs
+
 0.035     2019-04-03 04:46:16Z
           - the result of parse_args() is now cached so it can be called
             multiple times with efficiency

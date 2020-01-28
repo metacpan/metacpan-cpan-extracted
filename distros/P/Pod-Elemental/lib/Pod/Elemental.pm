@@ -1,6 +1,6 @@
 package Pod::Elemental;
 # ABSTRACT: work with nestable Pod elements
-$Pod::Elemental::VERSION = '0.103004';
+$Pod::Elemental::VERSION = '0.103005';
 use Moose;
 
 use namespace::autoclean;
@@ -128,7 +128,7 @@ Pod::Elemental - work with nestable Pod elements
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 SYNOPSIS
 
@@ -192,9 +192,33 @@ These methods read the given input and return a Pod::Elemental::Document.
 
 Ricardo SIGNES <rjbs@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Christian Walde Justin Cook Karen Etheridge Philippe Bruhat (BooK)
+
+=over 4
+
+=item *
+
+Christian Walde <walde.christian@googlemail.com>
+
+=item *
+
+Justin Cook <jcook@cray.com>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

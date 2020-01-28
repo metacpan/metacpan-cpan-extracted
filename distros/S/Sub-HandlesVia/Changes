@@ -6,6 +6,93 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011	2020-01-27
+
+ [ Documentation ]
+ - Document which aliases MouseX::NativeTraits provides.
+
+ [ Other ]
+ - Added: `any` method for Array.
+
+0.010	2020-01-27
+
+ - Added: `apply` method for Array.
+ - Added: `for_each_key` method for Hash.
+ - Added: `for_each_pair` method for Array.
+ - Added: `for_each_pair` method for Hash.
+ - Added: `for_each_value` method for Hash.
+ - Added: `for_each` method for Array.
+ - Added: `pick_random` method for Array.
+
+0.009	2020-01-27
+
+ [ Test Suite ]
+ - Revert MooX::TypeTiny test verbosity from 0.008_xxx.
+ - Skip Array trait tests under Mouse if Mouse is not using XS due to
+   Mouse::PurePerl bug.
+
+ [ Packaging ]
+ - Revert testing dependency additions from 0.008_xxx.
+
+0.008_003	2020-01-27
+
+ [ Test Suite ]
+ - Skip t/03moo_mxtt/trait_hash.t if Type::Tiny is not using XS.
+
+0.008_002	2020-01-27
+
+ [ Test Suite ]
+ - Spew even more output in t/03moo_mxtt/trait_hash.t.
+
+0.008_001	2020-01-26
+
+ [ Test Suite ]
+ - Load Carp::Always for failing test case.
+
+0.008_000	2020-01-26
+
+ [ Test Suite ]
+ - Spew some output in t/03moo_mxtt/trait_hash.t.
+
+ [ Packaging ]
+ - Require MooX::TypeTiny and Moo.
+
+0.007	2020-01-25	Bond... James Bond
+
+ [ Bug Fixes ]
+ - Better handling for non-hashref-based Moose instances.
+
+ [ Other ]
+ - Added: `scalar_ref` method for Scalar.
+
+0.006	2020-01-23
+
+ [ Test Suite ]
+ - Output some version numbers and environment variables in test suite.
+
+0.005	2020-01-23
+
+ [ Bug Fixes ]
+ - Stop accidentally setting coerce=>'' for some Moo attributes. It
+   confuses Moo.
+
+ [ Other ]
+ - Added: `head` method for Array.
+ - Added: `tail` method for Array.
+
+0.004	2020-01-22
+
+ - Support for Moo::Role, Moose::Role, and Mouse::Role.
+
+0.003	2020-01-21
+
+ [ Documentation ]
+ - Document API for how Sub::HandlesVia interacts with OO frameworks.
+
+ [ Other ]
+ - A lot of refactoring, reducing duplication in Moo, Moose, and Mouse
+   integration.
+
 0.002	2020-01-21
 
  [ Documentation ]

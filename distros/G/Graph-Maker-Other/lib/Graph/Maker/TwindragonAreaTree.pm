@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,10 +19,11 @@
 package Graph::Maker::TwindragonAreaTree;
 use 5.004;
 use strict;
+use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -33,23 +34,38 @@ sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
 }
+sub _make_graph {
+  my ($params) = @_;
+  my $graph_maker = delete($params->{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%$params);
+}
+sub _add_edge_reverse {
+  my ($graph, $u, $v) = @_;
+  $graph->add_edge($v,$u);    # reverse
+}
+my %add_edge_method = (smaller => \&_add_edge_reverse,
+                       bigger  => 'add_edge',
+                       both    => 'add_cycle');
+
 sub init {
   my ($self, %params) = @_;
 
-  my $level = delete($params{level}) || 0;
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  my $level           = delete($params{level}) || 0;
+  my $direction_type  = delete($params{'direction_type'}) || 'both';
   ### $level
 
-  my $graph = $graph_maker->(%params);
+  my $graph = _make_graph(\%params);
   $graph->set_graph_attribute(name => "Twindragon Area Tree $level");
   $graph->add_vertex(0);
-  my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
+  my $add_edge = ($graph->is_undirected ? 'add_edge'
+                  : ($add_edge_method{$direction_type}
+                     || croak "Unrecognised direction_type ",$direction_type));
 
  V: foreach my $v (0 .. 2**$level-1) {
-    # ...1 edge to ...0
+    # ...1 edge from ...0
     if ($v & 1) {
-      my $to = $v ^ 1;
-      $graph->$add_edge($v, $to);
+      my $from = $v ^ 1;
+      $graph->$add_edge($from, $v);  # smaller to bigger
     }
 
     #  ...10 11...11
@@ -65,8 +81,8 @@ sub init {
     }
     $bit <<= 1;
     if ($v & $bit) {
-      my $to = $v-$bit+1;
-      $graph->$add_edge($v, $to);
+      my $from = $v-$bit+1;
+      $graph->$add_edge($from, $v);  # smaller to bigger
     }
   }
   return $graph;
@@ -286,9 +302,13 @@ L<http://www.archive.org/details/byte-magazine-1987-08>
 
 =back
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

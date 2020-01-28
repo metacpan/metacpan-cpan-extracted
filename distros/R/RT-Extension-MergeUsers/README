@@ -2,6 +2,9 @@ NAME
     RT::Extension::MergeUsers - Merges two users into the same effective
     user
 
+RT VERSION
+    Works with RT 4.0, 4.2 and 4.4.
+
 DESCRIPTION
     This RT extension adds a "Merge Users" box to the User Administration
     page, which allows you to merge the user you are currently viewing with
@@ -94,7 +97,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MergeUsers>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
     This is free software, licensed under:
 

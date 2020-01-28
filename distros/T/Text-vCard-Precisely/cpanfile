@@ -17,7 +17,7 @@ requires 'utf8';
 requires 'Path::Tiny';
 
 on build => sub {
-    requires 'File::Compare';
+    requires 'Text::Diff';
     requires 'Data::Section::Simple';
     requires 'Test::More';
     requires 'lib';

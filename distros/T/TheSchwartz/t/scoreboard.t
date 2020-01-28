@@ -33,15 +33,16 @@ run_tests(
                         pass   => $ENV{TS_DB_PASS},
                         prefix => $pfx,
                     }
-                    } @$dbs
+                } @$dbs
             ]
         );
 
         my $sb_file = $client->scoreboard;
         {
-            ( undef, my ( $sb_dir, $sb_name ) )
+            my ( $sb_volume, $sb_dir, $sb_name )
                 = File::Spec->splitpath($sb_file);
-            ok( -e $sb_dir, "Looking for dir $sb_dir" );
+            ok( -e File::Spec->catpath( $sb_volume, $sb_dir ),
+                "Looking for dir $sb_dir" );
         }
 
         {
@@ -62,7 +63,7 @@ run_tests(
             my %info = map { chomp; /^([^=]+)=(.*)$/ } <FH>;
             close(FH);
 
-            ok( $info{pid} == $$, 'Has our PID' );
+            ok( $info{pid} == $$,                      'Has our PID' );
             ok( $info{funcname} eq 'Worker::Addition', 'Has our funcname' );
             ok( $info{started} =~ /\d+/, 'Started time is a number' );
             ok( $info{started} <= time, 'Started time is in the past' );
@@ -75,6 +76,8 @@ run_tests(
             ok( !-e $sb_file,
                 'Scoreboard file goes away when worker finishes' );
         }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }

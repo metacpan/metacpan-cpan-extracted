@@ -44,7 +44,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -3198,7 +3198,7 @@ eod
 	my ( $time ) = @_;
 	my @t = gmtime $time;
 	$t[5] += 1900;
-	return time_local( @t );
+	return greg_time_local( @t );
     }
 
 
@@ -3276,7 +3276,7 @@ BEGIN {
     #	results where needed.
 
 	my $date_manip_fudge = 
-	    $^O eq 'MacOS' ? time_gm( 0, 0, 0, 1, 0, 1970 ) : 0;
+	    $^O eq 'MacOS' ? greg_time_gm( 0, 0, 0, 1, 0, 1970 ) : 0;
 
 	*_parse_time_absolute = sub {
 	    my ( $string ) = @_;

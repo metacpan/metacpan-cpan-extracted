@@ -1,4 +1,13 @@
 
+[Changes for 1.32 - 2020-01-27]
+
+**** INTERFACE CHANGE ****
+* Change default for LoadBlessed to false
+
+* Remove YAML::Syck tests which parse META.yml
+* Switch to github actions for testing
+* Remove 'use vars' from code in favor of our
+
 [Changes for 1.31 - 2018-10-25]
 
 * Switch to ExtUtils::MakeMaker for builder

@@ -77,7 +77,7 @@
          "web" : "https://github.com/ingydotnet/mo-xxx-pm"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -344,7 +344,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.13",
+                  "tag" : "0.14",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

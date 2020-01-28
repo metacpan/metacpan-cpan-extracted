@@ -13,30 +13,34 @@ run_tests(
     sub {
         my $client = test_client( dbs => ['ts1'] );
 
-        my @keys = qw(foo bar baz);
-        my $n    = 0;
-        for ( 1 .. 10 ) {
-            my $key = $keys[ $n++ % 3 ];
-            my $job = TheSchwartz::Job->new(
-                funcname => 'Worker::CoalesceTest',
-                arg      => { key => $key, num => $_ },
-                coalesce => $key
-            );
-            my $h = $client->insert($job);
-            ok( $h, "inserted $h ($_ = $key)" );
-        }
+        {
+            my @keys = qw(foo bar baz);
+            my $n    = 0;
+            for ( 1 .. 10 ) {
+                my $key = $keys[ $n++ % 3 ];
+                my $job = TheSchwartz::Job->new(
+                    funcname => 'Worker::CoalesceTest',
+                    arg      => { key => $key, num => $_ },
+                    coalesce => $key
+                );
+                my $h = $client->insert($job);
+                ok( $h, "inserted $h ($_ = $key)" );
+            }
 
-        $client->reset_abilities;
-        $client->can_do("Worker::CoalesceTest");
+            $client->reset_abilities;
+            $client->can_do("Worker::CoalesceTest");
 
-        Worker::CoalesceTest->set_client($client);
+            Worker::CoalesceTest->set_client($client);
 
-        for ( 1 .. 3 ) {
+            for ( 1 .. 3 ) {
+                my $rv = eval { $client->work_once; };
+                ok( $rv, "did stuff" );
+            }
             my $rv = eval { $client->work_once; };
-            ok( $rv, "did stuff" );
+            ok( !$rv, "nothing to do now" );
         }
-        my $rv = eval { $client->work_once; };
-        ok( !$rv, "nothing to do now" );
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }
@@ -79,7 +83,7 @@ sub work {
 }
 
 sub keep_exit_status_for {
-    20
+    20;
 }    # keep exit status for 20 seconds after on_complete
 
 sub grab_for {10}

@@ -1,0 +1,33 @@
+=head1 NAME
+
+Alien::catch - Catch test library http://catch-lib.net
+
+=head1 SYNOPSIS
+
+in Makefile.PL
+
+    use XS::Install;
+    WriteMakefile(
+        ...
+        BIN_DEPS => 'Alien::catch',
+        ...
+    );
+    
+in your C test files
+
+    #include <catch.hpp>
+    ...
+    
+=head1 DESCRIPTION
+
+This module installs C<catch> headers
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

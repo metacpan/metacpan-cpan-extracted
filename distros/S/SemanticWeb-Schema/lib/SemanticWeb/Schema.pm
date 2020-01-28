@@ -15,7 +15,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -48,7 +48,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 SYNOPSIS
 
@@ -69,17 +69,17 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<https://schema.org/version/5.0/ext-auto.rdf>
+=item L<https://schema.org/version/6.0/ext-auto.rdf>
 
-=item L<https://schema.org/version/5.0/ext-bib.rdf>
+=item L<https://schema.org/version/6.0/ext-bib.rdf>
 
-=item L<https://schema.org/version/5.0/ext-health-lifesci.rdf>
+=item L<https://schema.org/version/6.0/ext-health-lifesci.rdf>
 
-=item L<https://schema.org/version/5.0/ext-meta.rdf>
+=item L<https://schema.org/version/6.0/ext-meta.rdf>
 
-=item L<https://schema.org/version/5.0/ext-pending.rdf>
+=item L<https://schema.org/version/6.0/ext-pending.rdf>
 
-=item L<https://schema.org/version/5.0/schema.rdf>
+=item L<https://schema.org/version/6.0/schema.rdf>
 
 =back
 
@@ -141,7 +141,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

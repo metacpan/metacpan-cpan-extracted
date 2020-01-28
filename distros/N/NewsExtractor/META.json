@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.0.8"
+         "version" : "v0.4.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -77,6 +77,18 @@
       "NewsExtractor::SiteSpecificExtractor" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::www_allnews_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::www_ntdtv_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::www_peopo_org" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm"
+      },
       "NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm"
       },
@@ -91,7 +103,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.8",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

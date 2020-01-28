@@ -2,7 +2,7 @@ package File::BackupCopy;
 use strict;
 use warnings;
 use File::Copy;
-use File::Temp;
+use File::Temp 'tempfile';
 use File::Basename;
 use File::Spec;
 use Exporter;
@@ -10,7 +10,7 @@ use re '/aa';
 use Carp;
 use Errno;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our @ISA = qw(Exporter);
 our @EXPORT = qw(BACKUP_NONE
                  BACKUP_SINGLE
@@ -89,7 +89,7 @@ sub backup_copy_simple {
     croak "unrecognized keyword arguments" if keys %_;    
     my $backup_name = $file_name . '~';
     if ($dir) {
-	$backup_name = File::Spec->catfile($dir, $backup_name);
+	$backup_name = File::Spec->catfile($dir, basename($backup_name));
     }
     copy($file_name, $backup_name)
 	or return _backup_copy_error($error,
@@ -113,17 +113,8 @@ sub backup_copy_internal {
 	croak "wrong number of arguments";
     }
  
-    my $fh = eval { File::Temp->new(DIR => $dir || dirname($file_name)) };
-    if ($@) {
-	return _backup_copy_error($error, $@);
-    }
-
-    copy($file_name, $fh)
-	or return _backup_copy_error($error,
-				"failed to make a temporary copy of $file_name: $!");
-
-    my $pat = $dir ? File::Spec->catfile($dir, "$file_name.~*~")
-	           : "$file_name.~*~";
+    my $backup_stub = $dir ? File::Spec->catfile($dir, basename($file_name))
+ 	                   : $file_name;
     my $num = (sort { $b <=> $a }
 	       map {
 		   if (/.+\.~(\d+)~$/) {
@@ -131,31 +122,134 @@ sub backup_copy_internal {
 		   } else {
 		       ()
 	           }
-               } glob($pat))[0];
+               } glob("$backup_stub.~*~"))[0];
 
-    if (!defined($num)) {
+    if (defined($num)) {
+	++$num;
+    } else {
 	return backup_copy_simple($file_name, error => $error, dir => $dir)
 	    if $if_exists;
 	$num = '1';
     }
     
+    my ($fh, $tempname) = eval { tempfile(DIR => $dir || dirname($file_name)) };
+    if ($@) {
+	return _backup_copy_error($error, $@);
+    }
+
+    copy($file_name, $fh)
+	or return _backup_copy_error($error,
+			 "failed to make a temporary copy of $file_name: $!");
+    close $fh;
+    
+    my $backup_name = rename_backup($tempname, $backup_stub, $num, $error);
+    unless ($backup_name) {
+	unlink($tempname) or carp("can't unlink $tempname: $!");
+    }
+    return $backup_name;
+}
+
+# The rename_backup function performs the final stage of numbered backup
+# creation: atomical rename of the temporary backup file to the actual
+# backup name.
+# The calling sequence is:
+#    rename_backup($tempfile, $backup_stub, $num, $error)
+# where $tempfile    is the name of the temporary file holding the backup,
+#       $backup_stub is the name of the backup file without the actual
+#                    numbered suffix (may contain directory components,
+#                    if required).
+#       $num         is the first unused backup number,
+#       $error       is the reference to error message storage or undef.
+# The function creates the new backup file name from $backup_stub and
+# $num and attempts to rename $tempfile to it.  If the rename failed
+# because such file already exists (i.e. another process created it in
+# between), the function increases the $num and retries.  The process
+# continues until the rename succeeds or a fatal error is encountered,
+# whichever occurs first.
+#
+# Three versions of the function are provided.  The right one to use
+# is selected when the module is loaded:
+
+BEGIN {
+    if (eval { symlink("",""); 1 }) {
+	*{rename_backup} = \&rename_backup_posix;
+    } elsif ($^O eq 'MSWin32' && eval { require Win32API::File }) {
+	Win32API::File->import(qw(MoveFile fileLastError));
+	*{rename_backup} = \&rename_backup_win32;
+    } else {
+	warn "using last resort rename method susceptible to a race condition";
+	*{rename_backup} = \&rename_backup_last_resort;
+    }
+}
+
+# rename_backup_posix - rename_backup for POSIX systems.
+# -------------------
+# In order to ensure atomic rename, the temporary file is first
+# symlinked to the desired backup name.  This will fail if the
+# name already exists, in which case the function will try next
+# backup number.  Once the symlink is created, temporary file
+# is renamed to it.  This operation will silently destroy the
+# symlink and replace it with the backup file.
+sub rename_backup_posix {
+    my ($tempfilename, $backup_stub, $num, $error) = @_;
     my $backup_name;
     while (1) {
-	$backup_name = "$file_name.~$num~";
-	if ($dir) {
-	    $backup_name = File::Spec->catfile($dir, $backup_name);
-	}
-	last if symlink($fh->filename, $backup_name);
+	$backup_name = "$backup_stub.~$num~";
+	last if symlink($tempfilename, $backup_name);
 	unless ($!{EEXIST}) {
-	    return _backup_copy_error("can't link "
-				 . $fh->filename .
-				 " to $backup_name: $!");
+	    return _backup_copy_error($error,
+			  "can't link $tempfilename to $backup_name: $!");
 	}
 	++$num;
     }
     
-    unless (rename($fh->filename, $backup_name)) {
-	return _backup_copy_error("can't rename temporary file to $backup_name: $!");
+    unless (rename($tempfilename, $backup_name)) {
+	return _backup_copy_error($error,
+		      "can't rename temporary file to $backup_name: $!");
+    }
+    return $backup_name;
+}
+
+# rename_backup_win32 - rename_backup for MSWin32 systems with Win32API::File
+# -------------------
+# This function is used if Win32API::File was loaded successfully.  It uses
+# the MoveFile function to ensure atomic renames.
+sub rename_backup_win32 {
+    my ($tempfilename, $backup_stub, $num, $error) = @_;
+    my $backup_name;
+    while (1) {
+	$backup_name = "$backup_stub.~$num~";
+	last if MoveFile($tempfilename, $backup_name);
+	# 80  - ERROR_FILE_EXISTS
+	#     - "The file exists."
+        # 183 - ERROR_ALREADY_EXISTS
+	#     - "Cannot create a file when that file already exists."
+	unless (fileLastError() == 80 || fileLastError() == 183) {
+	    return _backup_copy_error($error,
+			  "can't rename $tempfilename to $backup_name: $^E");
+	}
+	++$num;
+    }
+    return $backup_name;
+}
+
+# rename_backup_last_resort - a weaker version for the rest of systems
+# -------------------------
+# It is enabled on systems not offering the symlink function (except where
+# Win32API::File can be used).  This version uses a combination of -f test
+# and rename.  It suffers from an obvious race condition which occurs in
+# the time window between these.
+sub rename_backup_last_resort {
+    my ($tempfilename, $backup_stub, $num, $error) = @_;
+    my $backup_name;
+    while (1) {
+	$backup_name = "$backup_stub.~$num~";
+	unless (-f $backup_name) {
+	    last if rename($tempfilename, $backup_name);
+	    return _backup_copy_error($error,
+			  "can't rename temporary file to $backup_name: $!");
+	}
+	++$num;
     }
     return $backup_name;
 }
@@ -334,5 +428,17 @@ the file.  Otherwise, creates simple backup.
 
 Optional I<%opts> have the same meaning as in
 B<backup_copy>, except that, obviously, B<type> keyword is not accepted.    
-    
-=cut    
+
+=head1 LICENSE
+
+GPLv3+: GNU GPL version 3 or later, see
+L<http://gnu.org/licenses/gpl.html>.
+
+This  is  free  software:  you  are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+=head1 AUTHORS
+
+Sergey Poznyakoff <gray@gnu.org>
+
+=cut

@@ -1,4 +1,4 @@
-package t::lib::Test::HT;
+package Test::HT;
 use strict;
 use warnings;
 

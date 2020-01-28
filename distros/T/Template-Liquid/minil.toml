@@ -1,7 +1,10 @@
 name = "Template-Liquid"
-badges = ["travis"]
+badges=['travis', 'metacpan']
 module_maker="ModuleBuildTiny"
 license="artistic_2"
+authority="cpan:SANKO"
 
 [release]
-pause_config = "C:/Strawberry/pause.upload"
+hook=[
+    'tidyall -a'
+]

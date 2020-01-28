@@ -4,43 +4,45 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "handle JSON like {\"a\":1, \"a\":2}",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "JSON-MultiValueOrdered",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        test => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "JSON::MultiValueOrdered"      => { file => "lib/JSON/MultiValueOrdered.pm", version => 0.005 },
-                        "JSON::Tiny::Subclassable"     => { file => "lib/JSON/Tiny/Subclassable.pm", version => 0.005 },
-                        "Tie::Hash::MultiValueOrdered" => { file => "lib/Tie/Hash/MultiValueOrdered.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=JSON-MultiValueOrdered",
-                                        },
-                        homepage     => "https://metacpan.org/release/JSON-MultiValueOrdered",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-json-multivalueordered.git",
-                                          web  => "https://github.com/tobyink/p5-json-multivalueordered",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/project",
-                      },
-  "version"        => 0.005,
-  "x_contributors" => ["David J. Oswald (DAVIDO) <davido\@cpan.org>"],
+  "abstract"         => "handle JSON like {\"a\":1, \"a\":2}",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "JSON-MultiValueOrdered",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { perl => "5.008000" } },
+                          test => { requires => { "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "JSON::MultiValueOrdered"      => { file => "lib/JSON/MultiValueOrdered.pm", version => 0.006 },
+                          "JSON::Tiny::Subclassable"     => { file => "lib/JSON/Tiny/Subclassable.pm", version => 0.006 },
+                          "Tie::Hash::MultiValueOrdered" => { file => "lib/Tie/Hash/MultiValueOrdered.pm", version => 0.006 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=JSON-MultiValueOrdered",
+                                          },
+                          homepage     => "https://metacpan.org/release/JSON-MultiValueOrdered",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-json-multivalueordered.git",
+                                            web  => "https://github.com/tobyink/p5-json-multivalueordered",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/project",
+                        },
+  "version"          => 0.006,
+  "x_contributors"   => ["David J. Oswald (DAVIDO) <davido\@cpan.org>"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

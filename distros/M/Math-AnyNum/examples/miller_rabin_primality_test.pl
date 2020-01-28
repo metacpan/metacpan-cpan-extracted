@@ -11,7 +11,7 @@ use warnings;
 use lib qw(../lib);
 use Math::AnyNum qw(valuation irand powmod);
 
-sub is_prime {
+sub miller_rabin {
     my ($n, $k) = @_;
 
     return 1 if $n == 2;
@@ -38,4 +38,4 @@ sub is_prime {
     return 1;
 }
 
-say join ", ", grep { is_prime($_, 10) } (1 .. 1000);
+say join ", ", grep { miller_rabin($_, 10) } (1 .. 1000);

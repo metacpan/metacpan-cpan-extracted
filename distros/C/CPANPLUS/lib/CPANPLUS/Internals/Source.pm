@@ -19,7 +19,7 @@ use Module::Load::Conditional   qw[can_load];
 use Locale::Maketext::Simple    Class => 'CPANPLUS', Style => 'gettext';
 
 use vars qw[$VERSION];
-$VERSION = "0.9904";
+$VERSION = "0.9906";
 
 $Params::Check::VERBOSE = 1;
 

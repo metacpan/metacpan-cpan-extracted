@@ -1,5 +1,7 @@
 package Net::Whois::Object::FilterSet::APNIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -h whois.apnic.net -t filter-set
@@ -35,7 +37,7 @@ Net::Whois::Object::FilterSet::APNIC - an object representation of a RPSL Filter
 =head1 DESCRIPTION
 
 A FilterSet object defines a set of routes that match the criteria that you
-specify in your 'filter' – in other words it filters out routes that you do
+specify in your 'filter', in other words it filters out routes that you do
 not want to see.
 
 =head1 METHODS
@@ -97,7 +99,7 @@ Accepts an optional filter value, always return the current filter.
 The filter attribute defines the policy filter of the set.
 
 A policy filter is a logical expression which, when applied to a
-set of routes, returns a subset of these routes – the ones that
+set of routes, returns a subset of these routes, the ones that
 you have said you want to see.
 
 =head2 B<mp_filter( [$mp_filter] )>

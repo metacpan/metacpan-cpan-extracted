@@ -3,6 +3,7 @@
 use Test::More $ENV{CCM_TEST_DB} 
     ? ( tests => 21 )
     : ( skip_all => "no test database specified (set CCM_TEST_DB)" );
+use lib '.';
 use t::util;
 use strict;
 

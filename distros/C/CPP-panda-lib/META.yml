@@ -3,13 +3,13 @@ abstract: 'panda::lib C++ library (alien).'
 author:
   - unknown
 build_requires:
-  CPP::catch: v1.0.8
+  CPP::catch: v1.0.9
   Test::Catch: v1.0.10
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::catch: v1.0.8
+  CPP::catch: v1.0.9
   Test::Catch: v1.0.10
   XS::Install: v1.2.12
 dynamic_config: 1
@@ -26,5 +26,5 @@ no_index:
 requires:
   XS::Install: v1.2.12
   perl: '5.012000'
-version: v1.3.4
+version: v1.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use String::RewritePrefix;
 
@@ -49,11 +49,15 @@ is_deeply(
       ''  => 'plus ',
     } }
   );
-  
+
   is_deeply(
     [ pfx_rw(qw(+10 10 -10 0)) ],
     [ 'plus 10', 'plus 10', 'minus 10', 'plus 0' ],
     'rewrote with import',
   );
+
+  # Scalar context
+  my $x = pfx_rw('+2');
+  is($x, 'plus 2', 'scalar context');
 }
 

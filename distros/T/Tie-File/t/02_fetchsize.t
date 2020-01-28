@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-my $file = "tf$$.txt";
+my $file = "tf02-$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = "rec1$:rec2$:rec3$:";
 
@@ -10,7 +10,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-open F, "> $file" or die $!;
+open F, '>', $file or die $!;
 binmode F;
 print F $data;
 close F;

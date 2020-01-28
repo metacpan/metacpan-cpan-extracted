@@ -5,7 +5,7 @@ use Pcore::Util::Scalar qw[is_ref is_plain_scalarref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
-sub get_query ( $self, $dbh, $final, $i ) {
+sub GET_SQL_QUERY ( $self, $dbh, $i ) {
     my @bind;
 
     if ( defined $self->{_buf} ) {

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has area => (
@@ -82,6 +82,14 @@ has has_broadcast_channel => (
 
 
 
+has in_language => (
+    is        => 'rw',
+    predicate => '_has_in_language',
+    json_ld   => 'inLanguage',
+);
+
+
+
 has parent_service => (
     is        => 'rw',
     predicate => '_has_parent_service',
@@ -114,7 +122,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -271,6 +279,30 @@ A has_broadcast_channel should be one of the following types:
 
 A predicate for the L</has_broadcast_channel> attribute.
 
+=head2 C<in_language>
+
+C<inLanguage>
+
+=for html <p>The language of the content or performance or used in an action. Please
+use one of the language codes from the <a
+href="http://tools.ietf.org/html/bcp47">IETF BCP 47 standard</a>. See also
+<a class="localLink"
+href="http://schema.org/availableLanguage">availableLanguage</a>.<p>
+
+A in_language should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_in_language>
+
+A predicate for the L</in_language> attribute.
+
 =head2 C<parent_service>
 
 C<parentService>
@@ -333,7 +365,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

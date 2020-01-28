@@ -1,5 +1,5 @@
 package Template::Liquid::Block;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Document';
 
@@ -11,10 +11,8 @@ sub new {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
              type    => 'Syntax',
@@ -29,32 +27,28 @@ sub new {
                    parent     => $args->{'parent'},
     }, $class;
     $s->{'conditions'} = (
-        $args->{'tag_name'} eq 'else' ?
-            [1]
-        : sub {    # Oh, what a mess...
-            my @conditions
-                = split m[\s+\b(and|or)\b\s+]o,
-                $args->{parent}->{tag_name} eq 'for' ?
-                1
+        $args->{'tag_name'} eq 'else' ? [1] : sub {    # Oh, what a mess...
+            my @conditions = split m[\s+\b(and|or)\b\s+]o,
+                $args->{parent}->{tag_name} eq 'for'
+                ? 1
                 : (defined $args->{'attrs'} ? $args->{'attrs'} : '');
             my @equality;
             while (my $x = shift @conditions) {
                 push @equality, (
-                    $x =~ m[\b(?:and|or)\b]o    # XXX - ARG
-                    ?
-                        bless({template  => $args->{'template'},
-                               parent    => $s,
-                               condition => $x,
-                               lvalue    => pop @equality,
-                               rvalue =>
-                                   Template::Liquid::Condition->new(
+                    $x =~ m[\b(?:and|or)\b]o           # XXX - ARG
+                    ? bless({template  => $args->{'template'},
+                             parent    => $s,
+                             condition => $x,
+                             lvalue    => pop @equality,
+                             rvalue =>
+                                 Template::Liquid::Condition->new(
                                           {template => $args->{'template'},
                                            parent   => $s,
                                            attrs    => shift @conditions
                                           }
-                                   )
-                              },
-                              'Template::Liquid::Condition'
+                                 )
+                            },
+                            'Template::Liquid::Condition'
                         )
                     : Template::Liquid::Condition->new(
                                           {attrs    => $x,
@@ -65,7 +59,7 @@ sub new {
                 );
             }
             \@equality;
-            }
+        }
             ->()
     );
     return $s;
@@ -83,8 +77,9 @@ Template::Liquid::Block - Simple Node Type
 =head1 Description
 
 There's not really a lot to say about basic blocks. The real action is in the
-classes which make use of them or subclass it. See L<if|Template::Liquid::Tag::If>,
-L<unless|Template::Liquid::Tag::Unless>, or L<case|Template::Liquid::Tag::Case>.
+classes which make use of them or subclass it. See
+L<if|Template::Liquid::Tag::If>, L<unless|Template::Liquid::Tag::Unless>, or
+L<case|Template::Liquid::Tag::Case>.
 
 =head1 Bugs
 
@@ -105,8 +100,8 @@ It's just... not pretty but I'll work on it.
 
 =head1 See Also
 
-See L<Template::Liquid::Condition|Template::Liquid::Condition> for a list of supported
-inequalities.
+See L<Template::Liquid::Condition|Template::Liquid::Condition> for a list of
+supported inequalities.
 
 =head1 Author
 
@@ -124,9 +119,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

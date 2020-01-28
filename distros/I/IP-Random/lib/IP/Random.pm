@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016-2018 Joelle Maslak
+# Copyright (C) 2016-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package IP::Random;
-$IP::Random::VERSION = '1.008';
+$IP::Random::VERSION = '1.200230';
 # ABSTRACT: Generate IP Addresses Randomly
 
 
@@ -19,6 +19,10 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Carp;
+
+use Exporter;
+@IP::Random::ISA = qw(Exporter);
+@IP::Random::EXPORT_OK = qw(random_ipv4 in_ipv4_subnet default_ipv4_exclude);
 
 # We need a version of List::Util with uniq in it
 use List::Util 1.50 qw(any none notall pairs uniq);
@@ -183,7 +187,7 @@ IP::Random - Generate IP Addresses Randomly
 
 =head1 VERSION
 
-version 1.008
+version 1.200230
 
 =head1 SYNOPSIS
 

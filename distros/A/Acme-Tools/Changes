@@ -2,7 +2,12 @@ Revision history for Perl extension Acme::Tools.
 
 See also HISTORY in Acme::Tools doc.
 
-0.24  Feb 2019   Fixed failes on perl5.16 and older
+0.26  Jan 2020   Convert subs: base bin2dec bin2hex bin2oct dec2bin dec2hex dec2oct
+                 hex2bin hex2dec hex2oct oct2bin oct2dec oct2hex
+                 Array subs: joinr perm permute permute_continue pile sortby subarrays
+                 Other subs: btw in_iprange ipnum_ok iprange_ok opts s2t
+
+0.24  Feb 2019   Fixed failes on perl 5.16 and older
 
 0.23  Jan 2019   Subs: logn, egrep, which. More UTF-8 "oriented" (lower, upper, ...)
                  Commands: zsize, finddup, due (improved), conv (improved, [MGT]?Wh

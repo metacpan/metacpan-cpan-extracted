@@ -212,6 +212,17 @@ sub getMetabolitesFromSource {
     
     my $entriesNb = 0 ;
     
+    if (!defined $source) {
+
+    	$source = dist_file('Metabolomics-Fragment-Annotation', 'BloodExposome_v1_0.txt');
+    	if (-e $source) {
+    		print "loading $source...\n" ;
+    	}
+    	else {
+    		croak "The source file ($source) does not exist at this path\n" ;
+    	}
+    }
+    
     if ( (defined $source) and (-e $source) ) {
     	
     	my $oEntry = $self->__refBloodExposomeEntry__() ;

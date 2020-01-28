@@ -114,7 +114,7 @@ If you specify wrong sub or const name in import list an exception will also be 
 =head1 C FUNCTIONS
 
 API is thread-safe. C<Sv>, C<Stash>, and so on is SVAPI classes (Perl C++ API), see L<XS::Framework>.
-C<string_view> is a C<panda::string_view> which is implementation of C++17's string_view, see L<CPP::panda::lib>.
+C<string_view> is a C<panda::string_view> which is implementation of C++17's string_view, see L<Alien::libpanda>.
 
     struct Constant {
         Constant (string_view name, const Sv& val);

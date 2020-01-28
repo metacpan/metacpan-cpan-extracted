@@ -4,7 +4,7 @@
 
 #pod =head1 SYNOPSIS
 #pod
-#pod     lrrr [--watch|-w <dir>]... <command>
+#pod     lrrr [--watch|-w <dir[,dir...]> --backend|-b]... <command>
 #pod     lrrr --help|-h
 #pod
 #pod =head1 DESCRIPTION
@@ -27,9 +27,15 @@
 #pod
 #pod =head2 C<-w>, C<--watch>
 #pod
-#pod A directory or directories to watch. Defaults to the first argument (if
-#pod it's a path to a file) and the C<lib> and C<templates> directories in
-#pod the current directory.
+#pod A directory or directories to watch, separated by commas. Defaults
+#pod to the first argument (if it's a path to a file) and the C<lib>
+#pod and C<templates> directories in the current directory.
+#pod
+#pod =head2 C<-b>, C<--backend>
+#pod
+#pod Choose a specific backend for watching file changes. The default
+#pod is C<Poll> (L<Mojo::Server::Morbo::Backend::Poll>). Takes
+#pod precedence over the C<MOJO_MORBO_BACKEND> environment variable.
 #pod
 #pod =head1 ENVIRONMENT
 #pod
@@ -59,29 +65,35 @@ use v5.16;
 use Mojo::Base -strict;
 use Mojo::Loader qw( load_class );
 use Pod::Usage qw( pod2usage );
-use Getopt::Long qw( GetOptions );
+use Getopt::Long qw( GetOptions Configure);
 use POSIX 'WNOHANG';
 
+Configure( 'require_order' );
 my %opt;
 GetOptions( \%opt,
     'watch|w=s@',
+    'backend|b=s',
     'help|h' => sub { pod2usage(1) },
 );
 
 if ( !$opt{ watch } ) {
-    $opt{ watch } = \[ qw( lib templates ) ];
+    $opt{ watch } = [ qw( lib templates ) ];
     if ( -f $ARGV[0] ) {
-        push @${$opt{watch}}, $ARGV[0];
+        push @{$opt{watch}}, $ARGV[0];
     }
+} else {
+  #process csv
+  $opt{watch} = [ map { split /,/ } @{$opt{watch}} ]
 }
 
-my $backend_class = 'Mojo::Server::Morbo::Backend::' . ( $ENV{MOJO_MORBO_BACKEND} // 'Poll' );
+
+my $backend_class = 'Mojo::Server::Morbo::Backend::' . ( $opt{backend} // $ENV{MOJO_MORBO_BACKEND} // 'Poll' );
 if ( my $e = load_class $backend_class ) {
     die $e if ref $e;
     die "Could not find class $backend_class in \@INC (\@INC includes @INC)\n";
 }
 
-my $backend = $backend_class->new( watch => ${ $opt{watch} } );
+my $backend = $backend_class->new( watch => $opt{watch} );
 my $finished = 0;
 my $worker_pid = 0;
 my $modified = 1;
@@ -136,11 +148,11 @@ lrrr - Little Restart Runner (Really)
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
-    lrrr [--watch|-w <dir>]... <command>
+    lrrr [--watch|-w <dir[,dir...]> --backend|-b]... <command>
     lrrr --help|-h
 
 =head1 DESCRIPTION
@@ -163,9 +175,15 @@ Choose a specific one by setting C<MOJO_MORBO_BACKEND>.
 
 =head2 C<-w>, C<--watch>
 
-A directory or directories to watch. Defaults to the first argument (if
-it's a path to a file) and the C<lib> and C<templates> directories in
-the current directory.
+A directory or directories to watch, separated by commas. Defaults
+to the first argument (if it's a path to a file) and the C<lib>
+and C<templates> directories in the current directory.
+
+=head2 C<-b>, C<--backend>
+
+Choose a specific backend for watching file changes. The default
+is C<Poll> (L<Mojo::Server::Morbo::Backend::Poll>). Takes
+precedence over the C<MOJO_MORBO_BACKEND> environment variable.
 
 =head1 ENVIRONMENT
 

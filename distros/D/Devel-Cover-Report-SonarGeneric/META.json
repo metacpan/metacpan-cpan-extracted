@@ -56,6 +56,6 @@
          "url" : "https://github.com/tomk3003/devel-cover-report-sonargeneric"
       }
    },
-   "version" : "0.6",
+   "version" : "0.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

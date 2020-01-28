@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -39,7 +39,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 405;
+plan tests => 1661;
 
 
 require Graph::Maker::FibonacciTree;
@@ -82,7 +82,7 @@ sub stringize_sorted {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::FibonacciTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::FibonacciTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::FibonacciTree->VERSION($want_version); 1 }, 1,
@@ -91,6 +91,53 @@ sub stringize_sorted {
   ok (! eval { Graph::Maker::FibonacciTree->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# direction_type
+
+foreach my $series_reduced (0, 1) {
+  foreach my $leaf_reduced (1, 1) {
+    foreach my $height (0 .. 8) {
+      {
+        my $graph = Graph::Maker->new('fibonacci_tree',
+                                      height => $height,
+                                      leaf_reduced => $leaf_reduced,
+                                      series_reduced => $series_reduced,
+                                      direction_type => 'bigger');
+        foreach my $edge ($graph->edges) {
+          my ($from,$to) = @$edge;
+          ok ($from < $to, 1);
+        }
+
+        my $graph2 = Graph::Maker->new('fibonacci_tree',
+                                       height => $height,
+                                       leaf_reduced => $leaf_reduced,
+                                       series_reduced => $series_reduced,
+                                       direction_type => 'child');
+        ok ($graph->eq($graph2)?1:0, 1);
+      }
+      {
+        my $graph = Graph::Maker->new('fibonacci_tree',
+                                      height => $height,
+                                      leaf_reduced => $leaf_reduced,
+                                      series_reduced => $series_reduced,
+                                      direction_type => 'smaller');
+        foreach my $edge ($graph->edges) {
+          my ($from,$to) = @$edge;
+          ok ($from > $to, 1);
+        }
+
+        my $graph2 = Graph::Maker->new('fibonacci_tree',
+                                       height => $height,
+                                       leaf_reduced => $leaf_reduced,
+                                       series_reduced => $series_reduced,
+                                       direction_type => 'parent');
+        ok ($graph->eq($graph2)?1:0, 1);
+      }
+    }
+  }
+}
+
 
 #------------------------------------------------------------------------------
 # full tree

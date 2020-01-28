@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
 
 package MyApp {
 	use MooX::Pression;
@@ -85,5 +86,27 @@ ok(
 	SpeciesInstance->check($lassie),
 	'$lassie passes SpeciesInstance',
 );
+
+package MyApp2 {
+	use MooX::Pression;
+	our $XYZZY;
+	class Bumph () {
+		has xyzzy ( default => $XYZZY );
+	}
+}
+
+$MyApp2::XYZZY = 42;
+my $k1 = MyApp2->generate_bumph;
+
+$MyApp2::XYZZY = 666;
+my $k2 = MyApp2->generate_bumph;
+
+isnt(
+	exception { MyApp2->generate_bumph(5) },
+	undef,
+);
+
+is($k1->new->xyzzy, 42);
+is($k2->new->xyzzy, 666);
 
 done_testing;

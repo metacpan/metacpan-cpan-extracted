@@ -10,7 +10,7 @@ const our $SQL_SORT_ORDER => {
     desc => 'DESC',
 };
 
-sub get_query ( $self, $dbh, $final, $i ) {
+sub GET_SQL_QUERY ( $self, $dbh, $i ) {
     my @sql;
 
     for my $token ( $self->{_buf}->@* ) {

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More skip_all => 'todo';
+use Test::More; # skip_all => 'todo';
 
 package MyApp {
 	use MooX::Pression;
@@ -85,5 +85,18 @@ ok(
 	SpeciesInstance->check($lassie),
 	'$lassie passes SpeciesInstance',
 );
+
+my $hmm = q{
+	package MyApp2 {
+		use MooX::Pression;
+		class Foo (Int $x) {
+			class Bar;
+		}
+	}
+};
+
+undef $@;
+ok !eval "$hmm; 1";
+like($@, qr/Foo is not a class/);
 
 done_testing;

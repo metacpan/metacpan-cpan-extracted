@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
+
+
+has date_posted => (
+    is        => 'rw',
+    predicate => '_has_date_posted',
+    json_ld   => 'datePosted',
+);
+
 
 
 has lease_length => (
@@ -42,7 +50,7 @@ SemanticWeb::Schema::RealEstateListing - A RealEstateListing is a listing that d
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -57,6 +65,24 @@ itself represents the overall listing, as manifested in some <a
 class="localLink" href="http://schema.org/WebPage">WebPage</a>.<p>
 
 =head1 ATTRIBUTES
+
+=head2 C<date_posted>
+
+C<datePosted>
+
+Publication date of an online listing.
+
+A date_posted should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_date_posted>
+
+A predicate for the L</date_posted> attribute.
 
 =head2 C<lease_length>
 
@@ -105,7 +131,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

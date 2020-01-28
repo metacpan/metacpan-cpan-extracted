@@ -1,5 +1,7 @@
 package Net::Whois::Object::KeyCert;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 #######################################################################################

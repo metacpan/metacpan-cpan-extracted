@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Dash;
 use JSON;
@@ -113,5 +113,39 @@ sub IsStructureEqualJSON {
     IsStructureEqualJSON( $test_app->_update_component( from_json($input_update_component) ),
                           '{"response": {"props": {"children": "You have entered initial value and state value"}}}',
                           'Update component with state dependency' );
+}
+
+{
+    my $test_app = Dash->new;
+
+    $test_app->layout(
+                       html->Div(
+                                  children => [dcc->Input( id => 'input-id', value => 'initial value', type => 'text' ),
+                                               html->Div( id => 'output-id' )
+                                  ]
+                       )
+    );
+
+    my $context_output;
+    $test_app->callback(
+        Output   => { component_id => 'output-id', component_property => 'children' },
+        Inputs   => [ { component_id => 'input-id', component_property => 'value' } ],
+        callback => sub {
+            my $input_value = shift;
+            my $context     = shift;
+            $context_output = $context;
+            return "You have entered $input_value";
+        }
+    );
+
+    my $input_update_component =
+      '{"output":"output-id.children","changedPropIds":["input-id.value"],"inputs":[{"id":"input-id","property":"value","value":"initial value"}]}';
+    $test_app->_update_component( from_json($input_update_component) );
+    is_deeply( $context_output,
+               { inputs    => { 'input-id.value' => 'initial value' },
+                 triggered => [ { prop_id => 'input-id.value', value => 'initial value' } ]
+               },
+               'Context is correctly received by the callback'
+    );
 }
 

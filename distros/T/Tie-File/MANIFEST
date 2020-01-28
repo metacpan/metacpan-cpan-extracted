@@ -4,7 +4,7 @@ lib/Tie/File.pm
 Makefile.PL
 MANIFEST
 README
-t/00_version.t
+README.md
 t/01_gen.t
 t/02_fetchsize.t
 t/03_longfetch.t

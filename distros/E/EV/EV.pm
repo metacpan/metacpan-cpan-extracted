@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = '4.31';
+   our $VERSION = '4.32';
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -648,6 +648,14 @@ value.
 
 Calculates and returns the remaining time till the timer will fire.
 
+=item $repeat = $w->repeat
+
+=item $old_repeat = $w->repeat ($new_repeat)
+
+Returns the current value of the repeat attribute and optionally sets a
+new one. Setting the new one will not restart the watcher - if the watcher
+is active, the new repeat value is used whenever it expires next.
+
 =back
 
 
@@ -749,6 +757,26 @@ Simply stops and starts the watcher again.
 =item $time = $w->at
 
 Return the time that the watcher is expected to trigger next.
+
+=item $offset = $w->offset
+
+=item $old_offset = $w->offset ($new_offset)
+
+Returns the current value of the offset attribute and optionally sets a
+new one. Setting the new one will not restart the watcher - if the watcher
+is active, the new offset value is used whenever it expires next.
+
+=item $interval = $w->interval
+
+=item $old_interval = $w->interval ($new_interval)
+
+See above, for the interval attribute.
+
+=item $reschedule_cb = $w->reschedule_cb
+
+=item $old_reschedule_cb = $w->reschedule_cb ($new_reschedule_cb)
+
+See above, for the reschedule callback.
 
 =back
 

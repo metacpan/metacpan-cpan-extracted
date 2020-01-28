@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has accommodation_category => (
     is        => 'rw',
     predicate => '_has_accommodation_category',
     json_ld   => 'accommodationCategory',
+);
+
+
+
+has accommodation_floor_plan => (
+    is        => 'rw',
+    predicate => '_has_accommodation_floor_plan',
+    json_ld   => 'accommodationFloorPlan',
 );
 
 
@@ -74,6 +82,14 @@ has number_of_full_bathrooms => (
 
 
 
+has number_of_partial_bathrooms => (
+    is        => 'rw',
+    predicate => '_has_number_of_partial_bathrooms',
+    json_ld   => 'numberOfPartialBathrooms',
+);
+
+
+
 has number_of_rooms => (
     is        => 'rw',
     predicate => '_has_number_of_rooms',
@@ -98,6 +114,14 @@ has pets_allowed => (
 
 
 
+has year_built => (
+    is        => 'rw',
+    predicate => '_has_year_built',
+    json_ld   => 'yearBuilt',
+);
+
+
+
 
 
 1;
@@ -114,7 +138,7 @@ SemanticWeb::Schema::Accommodation - An accommodation is a place that can accomm
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -151,6 +175,25 @@ A accommodation_category should be one of the following types:
 =head2 C<_has_accommodation_category>
 
 A predicate for the L</accommodation_category> attribute.
+
+=head2 C<accommodation_floor_plan>
+
+C<accommodationFloorPlan>
+
+=for html <p>A floorplan of some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>.<p>
+
+A accommodation_floor_plan should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::FloorPlan']>
+
+=back
+
+=head2 C<_has_accommodation_floor_plan>
+
+A predicate for the L</accommodation_floor_plan> attribute.
 
 =head2 C<amenity_feature>
 
@@ -287,6 +330,29 @@ A number_of_full_bathrooms should be one of the following types:
 
 A predicate for the L</number_of_full_bathrooms> attribute.
 
+=head2 C<number_of_partial_bathrooms>
+
+C<numberOfPartialBathrooms>
+
+=for html <p>Number of partial bathrooms - The total number of half and Â¼ bathrooms
+in an <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>. This corresponds
+to the <a
+href="https://ddwiki.reso.org/display/DDW17/BathroomsPartial+Field">Bathroo
+msPartial field in RESO</a>.<p>
+
+A number_of_partial_bathrooms should be one of the following types:
+
+=over
+
+=item C<Num>
+
+=back
+
+=head2 C<_has_number_of_partial_bathrooms>
+
+A predicate for the L</number_of_partial_bathrooms> attribute.
+
 =head2 C<number_of_rooms>
 
 C<numberOfRooms>
@@ -349,6 +415,28 @@ A pets_allowed should be one of the following types:
 
 A predicate for the L</pets_allowed> attribute.
 
+=head2 C<year_built>
+
+C<yearBuilt>
+
+=for html <p>The year an <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a> was constructed.
+This corresponds to the <a
+href="https://ddwiki.reso.org/display/DDW17/YearBuilt+Field">YearBuilt
+field in RESO</a>.<p>
+
+A year_built should be one of the following types:
+
+=over
+
+=item C<Num>
+
+=back
+
+=head2 C<_has_year_built>
+
+A predicate for the L</year_built> attribute.
+
 =head1 SEE ALSO
 
 L<SemanticWeb::Schema::Place>
@@ -373,7 +461,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

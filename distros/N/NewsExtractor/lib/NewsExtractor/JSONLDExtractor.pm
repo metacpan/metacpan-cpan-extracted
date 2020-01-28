@@ -20,7 +20,7 @@ has schema_ld => (
 
 sub _build_schema_ld {
     my ($self) = @_;
-    my $el = $self->dom->at('head script[type="application/ld+json"]');
+    my $el = $self->dom->at('script[type="application/ld+json"]');
     return from_json( $el->text );
 }
 
@@ -41,7 +41,8 @@ sub dateline {
 
 sub content_text {
     my ($self) = @_;
-    return u($self->schema_ld->{description});
+    my $text = $self->schema_ld->{articleBody} // $self->schema_ld->{description} // '';
+    return u($text);
 }
 
 1;

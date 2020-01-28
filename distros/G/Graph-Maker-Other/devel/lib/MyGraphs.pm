@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Hyde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Hyde
 #
 # This file is shared by a couple of distributions.
 #
@@ -171,8 +171,10 @@ sub graphviz_view_file {
   ### $ps_filename
 
   require IPC::Run;
-  IPC::Run::run(['dot','-Tps'], '<',$filename, '>',$ps_filename);
-  # IPC::Run::run(['neato','-Tps','-s2'], '<',$filename, '>',$ps_filename);
+  IPC::Run::run(['dot','-Tps',
+                ],
+                '<',$filename, '>',$ps_filename);
+  # ['neato','-Tps','-s2']
 
   postscript_view_file ($ps->filename, %options);
 }
@@ -243,13 +245,15 @@ sub Graph_sorted_vertices {
 }
 
 sub Graph_print_adjacency_matrix {
-  my ($graph) = @_;
+  my ($graph, $fh) = @_;
+  $fh //= \*STDOUT;
   my @vertices = Graph_sorted_vertices($graph);
-  print "[";
+  print $fh "[" or die;
   foreach my $from (0 .. $#vertices) {
     foreach my $to (0 .. $#vertices) {
-      print $graph->has_edge($vertices[$from], $vertices[$to]) ? '1' : '0',
-        $to==$#vertices ? ($from==$#vertices ? ']' : ';') : ',';
+      print$fh $graph->has_edge($vertices[$from], $vertices[$to]) ? '1' : '0',
+        $to==$#vertices ? ($from==$#vertices ? ']' : ';') : ','
+        or die;
     }
     # print "\n";
   }
@@ -1291,7 +1295,9 @@ HERE
         # print $graphviz;
 
         require IPC::Run;
-        IPC::Run::run(['dot','-Tpng'], '<',\$graphviz, '>',$png_filename);
+        IPC::Run::run(['dot','-Tpng',
+                      ],
+                      '<',\$graphviz, '>',$png_filename);
         # IPC::Run::run(['neato','-Tpng'], '<',\$graphviz, '>',$png_filename);
         # IPC::Run::run(['fdp','-Tpng'], '<',\$graphviz, '>',$png_filename);
         # print $easy->as_ascii;
@@ -1728,7 +1734,7 @@ sub vpar_name {
 }
 sub vpar_to_GraphViz2 {
   my ($vpar, %options) = @_;
-  ### Graph_to_GraphViz2: %options
+  ### vpar_to_GraphViz2(): %options
   require GraphViz2;
 
   my $name = $options{'name'} // vpar_name($vpar);
@@ -2546,6 +2552,11 @@ sub Graph_to_GraphViz2 {
     (global => { directed => $graph->is_directed },
      graph  => { (defined $name ? (label   => $name) : ()),
                  (defined $flow ? (rankdir => $flow) : ()),
+
+                 # ENHANCE-ME: take this in %options somehow
+                 # Scale like "3" means input coordinates are tripled, so
+                 # actual drawing is 1/3 of an inch steps.
+                 inputscale => 3,
                },
      node => { margin => 0,  # cf default 0.11,0.055
              },

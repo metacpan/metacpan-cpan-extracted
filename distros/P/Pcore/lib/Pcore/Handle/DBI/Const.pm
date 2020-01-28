@@ -4,10 +4,10 @@ use Pcore -const, -export;
 use Pcore::Util::Scalar qw[is_plain_arrayref is_blessed_hashref is_blessed_arrayref];
 
 use Pcore::Handle::DBI::Query::Type;
+use Pcore::Handle::DBI::Query::Condition;
 use Pcore::Handle::DBI::Query::SQL;
 use Pcore::Handle::DBI::Query::SET;
 use Pcore::Handle::DBI::Query::VALUES qw[:ALL];
-use Pcore::Handle::DBI::Query::WHERE;
 use Pcore::Handle::DBI::Query::IN;
 use Pcore::Handle::DBI::Query::GROUP_BY;
 use Pcore::Handle::DBI::Query::ORDER_BY;
@@ -17,7 +17,7 @@ use Pcore::Handle::DBI::Query::OFFSET;
 our $EXPORT = {
     CONST          => [qw[$SQL_ABSTIME $SQL_ABSTIMEARRAY $SQL_ACLITEM $SQL_ACLITEMARRAY $SQL_ANY $SQL_ANYARRAY $SQL_ANYELEMENT $SQL_ANYENUM $SQL_ANYNONARRAY $SQL_ANYRANGE $SQL_BIT $SQL_BITARRAY $SQL_BOOL $SQL_BOOLARRAY $SQL_BOX $SQL_BOXARRAY $SQL_BPCHAR $SQL_BPCHARARRAY $SQL_BYTEA $SQL_BYTEAARRAY $SQL_CHAR $SQL_CHARARRAY $SQL_CID $SQL_CIDARRAY $SQL_CIDR $SQL_CIDRARRAY $SQL_CIRCLE $SQL_CIRCLEARRAY $SQL_CSTRING $SQL_CSTRINGARRAY $SQL_DATE $SQL_DATEARRAY $SQL_DATERANGE $SQL_DATERANGEARRAY $SQL_EVENT_TRIGGER $SQL_FDW_HANDLER $SQL_FLOAT4 $SQL_FLOAT4ARRAY $SQL_FLOAT8 $SQL_FLOAT8ARRAY $SQL_GTSVECTOR $SQL_GTSVECTORARRAY $SQL_INDEX_AM_HANDLER $SQL_INET $SQL_INETARRAY $SQL_INT2 $SQL_INT2ARRAY $SQL_INT2VECTOR $SQL_INT2VECTORARRAY $SQL_INT4 $SQL_INT4ARRAY $SQL_INT4RANGE $SQL_INT4RANGEARRAY $SQL_INT8 $SQL_INT8ARRAY $SQL_INT8RANGE $SQL_INT8RANGEARRAY $SQL_INTERNAL $SQL_INTERVAL $SQL_INTERVALARRAY $SQL_JSON $SQL_JSONARRAY $SQL_JSONB $SQL_JSONBARRAY $SQL_LANGUAGE_HANDLER $SQL_LINE $SQL_LINEARRAY $SQL_LSEG $SQL_LSEGARRAY $SQL_MACADDR $SQL_MACADDRARRAY $SQL_MONEY $SQL_MONEYARRAY $SQL_NAME $SQL_NAMEARRAY $SQL_NUMERIC $SQL_NUMERICARRAY $SQL_NUMRANGE $SQL_NUMRANGEARRAY $SQL_OID $SQL_OIDARRAY $SQL_OIDVECTOR $SQL_OIDVECTORARRAY $SQL_OPAQUE $SQL_PATH $SQL_PATHARRAY $SQL_PG_ATTRIBUTE $SQL_PG_CLASS $SQL_PG_DDL_COMMAND $SQL_PG_LSN $SQL_PG_LSNARRAY $SQL_PG_NODE_TREE $SQL_PG_PROC $SQL_PG_TYPE $SQL_POINT $SQL_POINTARRAY $SQL_POLYGON $SQL_POLYGONARRAY $SQL_RECORD $SQL_RECORDARRAY $SQL_REFCURSOR $SQL_REFCURSORARRAY $SQL_REGCLASS $SQL_REGCLASSARRAY $SQL_REGCONFIG $SQL_REGCONFIGARRAY $SQL_REGDICTIONARY $SQL_REGDICTIONARYARRAY $SQL_REGNAMESPACE $SQL_REGNAMESPACEARRAY $SQL_REGOPER $SQL_REGOPERARRAY $SQL_REGOPERATOR $SQL_REGOPERATORARRAY $SQL_REGPROC $SQL_REGPROCARRAY $SQL_REGPROCEDURE $SQL_REGPROCEDUREARRAY $SQL_REGROLE $SQL_REGROLEARRAY $SQL_REGTYPE $SQL_REGTYPEARRAY $SQL_RELTIME $SQL_RELTIMEARRAY $SQL_SMGR $SQL_TEXT $SQL_TEXTARRAY $SQL_TID $SQL_TIDARRAY $SQL_TIME $SQL_TIMEARRAY $SQL_TIMESTAMP $SQL_TIMESTAMPARRAY $SQL_TIMESTAMPTZ $SQL_TIMESTAMPTZARRAY $SQL_TIMETZ $SQL_TIMETZARRAY $SQL_TINTERVAL $SQL_TINTERVALARRAY $SQL_TRIGGER $SQL_TSM_HANDLER $SQL_TSQUERY $SQL_TSQUERYARRAY $SQL_TSRANGE $SQL_TSRANGEARRAY $SQL_TSTZRANGE $SQL_TSTZRANGEARRAY $SQL_TSVECTOR $SQL_TSVECTORARRAY $SQL_TXID_SNAPSHOT $SQL_TXID_SNAPSHOTARRAY $SQL_UNKNOWN $SQL_UUID $SQL_UUIDARRAY $SQL_VARBIT $SQL_VARBITARRAY $SQL_VARCHAR $SQL_VARCHARARRAY $SQL_VOID $SQL_XID $SQL_XIDARRAY $SQL_XML $SQL_XMLARRAY]],
     TYPES          => [qw[SQL_BOOL SQL_BYTEA SQL_JSON SQL_UUID SQL_TEXT]],
-    QUERY          => [qw[SQL SET VALUES WHERE IN GROUP_BY ORDER_BY LIMIT OFFSET]],
+    QUERY          => [qw[SQL SET VALUES ON WHERE IN GROUP_BY HAVING ORDER_BY LIMIT OFFSET]],
     SQL_VALUES_IDX => [qw[$SQL_VALUES_IDX_FIRST $SQL_VALUES_IDX_SCAN]],
 };
 
@@ -216,24 +216,12 @@ sub VALUES : prototype(;$) {
     return bless { _buf => $_[0] }, 'Pcore::Handle::DBI::Query::VALUES';
 }
 
+sub ON : prototype(;$) {
+    return _condition( 'ON', $_[0] );
+}
+
 sub WHERE : prototype(;$) {
-    if ( is_plain_arrayref $_[0] ) {
-        if ( $_[0]->@* == 1 && is_blessed_hashref $_[0]->[0] && ref $_[0]->[0] eq 'Pcore::Handle::DBI::Query::WHERE' ) {
-            return $_[0]->[0];
-        }
-        else {
-            return bless { _buf => $_[0] }, 'Pcore::Handle::DBI::Query::WHERE';
-        }
-    }
-    elsif ( is_blessed_hashref $_[0] && ref $_[0] eq 'Pcore::Handle::DBI::Query::WHERE' ) {
-        return $_[0];
-    }
-    elsif ( !defined $_[0] ) {
-        return bless { is_not_empty => 0 }, 'Pcore::Handle::DBI::Query::WHERE';
-    }
-    else {
-        die 'Invalid ref type';
-    }
+    return _condition( 'WHERE', $_[0] );
 }
 
 sub IN : prototype(;$) {
@@ -244,12 +232,41 @@ sub GROUP_BY : prototype(;$) {
     return bless { _buf => $_[0] }, 'Pcore::Handle::DBI::Query::GROUP_BY';
 }
 
+sub HAVING : prototype(;$) {
+    return _condition( 'HAVING', $_[0] );
+}
+
+sub _condition {
+    if ( is_plain_arrayref $_[1] ) {
+        if ( $_[1]->@* == 1 && is_blessed_hashref $_[1]->[0] && ref $_[1]->[0] eq 'Pcore::Handle::DBI::Query::Condition' ) {
+            return $_[1]->[0];
+        }
+        else {
+            return bless { _buf => $_[1], _type => $_[0] }, 'Pcore::Handle::DBI::Query::Condition';
+        }
+    }
+    elsif ( is_blessed_hashref $_[1] && ref $_[1] eq 'Pcore::Handle::DBI::Query::Condition' ) {
+        return $_[1];
+    }
+    elsif ( !defined $_[1] ) {
+        return bless { is_not_empty => 0, _type => $_[0] }, 'Pcore::Handle::DBI::Query::Condition';
+    }
+    else {
+        die 'Invalid ref type';
+    }
+}
+
 sub ORDER_BY : prototype(;$) {
     return bless { _buf => $_[0] }, 'Pcore::Handle::DBI::Query::ORDER_BY';
 }
 
-sub LIMIT : prototype(;$) {
-    return bless { _buf => $_[0] }, 'Pcore::Handle::DBI::Query::LIMIT';
+sub LIMIT : prototype(;$@) ( $val, %args ) {
+    return bless {
+        max     => $args{max},
+        default => $args{default},
+        _buf    => $val,
+      },
+      'Pcore::Handle::DBI::Query::LIMIT';
 }
 
 sub OFFSET : prototype(;$) {

@@ -1,6 +1,6 @@
 package HTTP::Throwable::Factory;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Factory::VERSION = '0.026';
+$HTTP::Throwable::Factory::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -121,6 +121,7 @@ my %lookup = (
     415 => 'UnsupportedMediaType',
     416 => 'RequestedRangeNotSatisfiable',
     417 => 'ExpectationFailed',
+    418 => 'ImATeapot',
 
     500 => 'InternalServerError',
     501 => 'NotImplemented',
@@ -149,7 +150,7 @@ HTTP::Throwable::Factory - a factory that throws HTTP::Throwables for you
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 OVERVIEW
 
@@ -267,7 +268,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Infinity Interactive, Inc..
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

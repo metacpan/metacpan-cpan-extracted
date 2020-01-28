@@ -20,12 +20,13 @@ my $meta = {
                             configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                             runtime => {
                               requires => {
+                                "Array::IntSpan"            => 0,
                                 "autodie"                   => 0,
                                 "Encode"                    => 0,
                                 "experimental"              => 0,
                                 "Fcntl"                     => 0,
                                 "Getopt::Long::Descriptive" => 0,
-                                "List::Util"                => 1.45,
+                                "List::SomeUtils"           => 0,
                                 "Log::Any"                  => 0,
                                 "Log::Any::Adapter::Screen" => 0,
                                 "Moo"                       => "1.001000",
@@ -62,7 +63,7 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.39" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.40" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -77,7 +78,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.0.39",
+  "version"            => "v3.0.40",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
   "x_help_wanted"      => ["tester", "documenter"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },

@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/kaz-utashiro/Text-VisualPrintf.svg?branch=master)](https://travis-ci.com/kaz-utashiro/Text-VisualPrintf) [![MetaCPAN Release](https://badge.fury.io/pl/Text-VisualPrintf.svg)](https://metacpan.org/release/Text-VisualPrintf)
 # NAME
 
 Text::VisualPrintf - printf family functions to handle Non-ASCII characters
@@ -44,11 +45,11 @@ bytes combinations, the function behaves just like a standard one.
 
 # AUTHOR
 
-Kaz Utashiro
+Kazumasa Utashiro
 
 # LICENSE
 
-Copyright (C) 2011-2017 Kaz Utashiro.
+Copyright (C) 2011-2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

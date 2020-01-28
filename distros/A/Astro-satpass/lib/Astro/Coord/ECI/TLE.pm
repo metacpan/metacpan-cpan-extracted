@@ -231,11 +231,11 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
-use Astro::Coord::ECI::Utils qw{ :params :ref :time deg2rad distsq
+use Astro::Coord::ECI::Utils qw{ :params :ref :greg_time deg2rad distsq
     dynamical_delta embodies find_first_true fold_case
     format_space_track_json_time load_module looks_like_number max min
     mod2pi PI PIOVER2 rad2deg SECSPERDAY TWOPI thetag __default_station
@@ -363,7 +363,7 @@ my %attrib = (
 	if ( defined $value && ! looks_like_number( $value ) ) {
 	    if ( $value =~ m{ \A ([0-9]+) / ([0-9]+) / ([0-9]+) : ([0-9]+) :
 		    ([0-9]+ (?: [.] [0-9]* )? ) \z }smx ) {
-		$value = time_gm( 0, 0, 0, 1, 0,
+		$value = greg_time_gm( 0, 0, 0, 1, 0,
 		    __tle_year_to_Gregorian_year( $1 + 0 ) ) + (
 		    (($2 - 1) * 24 + $3) * 60 + $4) * 60 + $5;
 	    } else {
@@ -734,7 +734,7 @@ be defaulted, and no attempt has been made to make this a pretty error.
 #	days since Y2K, and then add the magic number needed to get
 #	us to days since 1950 Jan 0 0h UT.
 
-    my $y2k = time_gm( 0, 0, 0, 1, 0, 2000 );	# Calc. time of 2000 Jan 1 0h UT
+    my $y2k = greg_time_gm( 0, 0, 0, 1, 0, 2000 );	# Calc. time of 2000 Jan 1 0h UT
 
     sub ds50 {
 	my ($self, $epoch) = @_;
@@ -1345,7 +1345,7 @@ eod
 	foreach (qw{epoch}) {
 	    my ($yr, $day) = $ele{$_} =~ m/(..)(.*)/;
 	    $yr = __tle_year_to_Gregorian_year( $yr );
-	    $ele{$_} = time_gm( 0, 0, 0, 1, 0, $yr ) +
+	    $ele{$_} = greg_time_gm( 0, 0, 0, 1, 0, $yr ) +
 		( $day - 1 ) * SECSPERDAY;
 	}
 
@@ -7622,7 +7622,7 @@ encoded with a four-digit year.
 	my $frac = $7;
 	$time[0] = __tle_year_to_Gregorian_year( $time[0] );
 	$time[1] -= 1;
-	my $rslt = time_gm( reverse @time );
+	my $rslt = greg_time_gm( reverse @time );
 	defined $frac
 	    and $frac ne '.'
 	    and $rslt += $frac;

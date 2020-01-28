@@ -51,9 +51,9 @@ $pobj->retmode('text');
 is($pobj->parameters_changed, 1);
 
 is(join(',',$pobj->available_parameters('epost')),
-   'db,retmode,id,tool,email,idtype,WebEnv,query_key', 'available_parameters');
+   'db,retmode,id,tool,email,api_key,idtype,WebEnv,query_key', 'available_parameters');
 is(join(',',$pobj->available_parameters('efetch')),
-   'db,retmode,id,retmax,retstart,rettype,strand,seq_start,seq_stop,complexity,report,tool,email,idtype,WebEnv,query_key', 'available_parameters');
+   'db,retmode,id,retmax,retstart,rettype,strand,seq_start,seq_stop,complexity,report,tool,email,api_key,idtype,WebEnv,query_key', 'available_parameters');
 
 my %data = $pobj->get_parameters;
 is_deeply($data{id}, $params{-id}, 'get_parameters');

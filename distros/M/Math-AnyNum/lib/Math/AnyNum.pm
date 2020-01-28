@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -8533,7 +8533,7 @@ sub rising_factorial ($$) {
 sub gcd {
     my ($x, $y) = @_;
 
-    @_ or goto &zero;
+    @_ or goto &zero;  # By convention, gcd of an empty set is 0.
     @_ == 1 and return $x;
 
     my $r = Math::GMPz::Rmpz_init();
@@ -8607,7 +8607,7 @@ sub __lcm__ {
 sub lcm {
     my ($x, $y) = @_;
 
-    @_ or goto &zero;
+    @_ or goto &one;    # By convention, lcm of an empty set is 1.
     @_ == 1 and return $x;
 
     if (@_ > 2) {
@@ -8718,7 +8718,7 @@ sub is_prime ($;$) {
     }
 
     Math::GMPz::Rmpz_sgn($n) > 0 or return 0;
-    $r = defined($r) ? (CORE::abs(CORE::int($r)) || 20) : 20;
+    $r = defined($r) ? (CORE::abs(CORE::int($r)) || 23) : 23;
     Math::GMPz::Rmpz_probab_prime_p($n, $r);
 }
 
@@ -10452,7 +10452,7 @@ sub rat_approx ($) {
     Math::MPFR::Rmpfr_set($f1, $x, $ROUND);
 
     while (1) {
-        Math::MPFR::Rmpfr_round($f2, $f1);
+        Math::MPFR::Rmpfr_floor($f2, $f1);
         Math::MPFR::Rmpfr_get_z($z, $f2, $ROUND);
 
         Math::GMPz::Rmpz_addmul($n1, $n2, $z);    # n1 += n2 * z

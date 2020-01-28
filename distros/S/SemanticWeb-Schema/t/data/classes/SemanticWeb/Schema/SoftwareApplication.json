@@ -75,8 +75,8 @@
          "rdfs:label" : "featureList",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:fileSize" : {
@@ -99,8 +99,8 @@
          "rdfs:label" : "memoryRequirements",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:operatingSystem" : {
@@ -130,8 +130,8 @@
          "rdfs:label" : "releaseNotes",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:requirements" : {
@@ -151,8 +151,8 @@
          "rdfs:label" : "screenshot",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:ImageObject",
-            "schema:URL"
+            "schema:URL",
+            "schema:ImageObject"
          ]
       },
       "schema:softwareAddOn" : {
@@ -192,8 +192,8 @@
          "rdfs:label" : "storageRequirements",
          "schema:domainIncludes" : "schema:SoftwareApplication",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:supportingData" : {

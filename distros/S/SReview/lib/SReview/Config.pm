@@ -5,10 +5,11 @@ package SReview::Config;
 
 use Data::Dumper;
 use Carp;
+use Mojo::JSON qw/decode_json encode_json/;
 
 =head1 NAME
 
-SReview::Config - Self-reproducing and self-documentating configuration file system
+SReview::Config - Self-reproducing and self-documenting configuration file system
 
 =head1 SYNOPSIS
 
@@ -43,7 +44,9 @@ sub new {
 	my $cfile = shift;
 
 	if (! -f $cfile) {
-		carp "Warning: could not find configuration file $cfile, falling back to defaults";
+		unless (grep /^SREVIEW_/, keys(%ENV)) {
+			carp "Warning: could not find configuration file $cfile, falling back to defaults";
+		}
 	} else {
 		package SReview::Config::_private;
 		use Carp;
@@ -80,6 +83,10 @@ sub define {
 	}
 	$self->{defs}{$name}{doc} = $doc;
 	$self->{defs}{$name}{default} = $default;
+	my $NAME = uc $name;
+	if(exists($ENV{"SREVIEW_${NAME}"})) {
+		$self->set($name => decode_json($ENV{"SREVIEW_${NAME}"}));
+	}
 };
 
 sub define_computed {
@@ -97,7 +104,9 @@ definitions of this configuration file; that is, once this method has
 been called, the C<define> method above will croak.
 
 The returned value will either be the default value configured at
-C<define> time, or the value configured in the configuration file.
+C<define> time, the value configured in the configuration file, or the
+value set in the environment variable C<SREVIEW_I<name> >, where I<name>
+is the upper-case version of the name of the configuration item.
 
 =cut
 
@@ -116,12 +125,11 @@ sub get {
 	$self->{fixed} = 1;
 	if(exists($SReview::Config::_private::{$name})) {
 		return ${$SReview::Config::_private::{$name}};
-	} else {
-		if(defined($ENV{'SREVIEW_VERBOSE'}) && $ENV{'SREVIEW_VERBOSE'} gt 0) {
-			print "No configuration value found for $name, using defaults\n";
-		}
-		return $self->{defs}{$name}{default};
 	}
+	if(defined($ENV{'SREVIEW_VERBOSE'}) && $ENV{'SREVIEW_VERBOSE'} gt 0) {
+		print "No configuration value found for $name, using defaults\n";
+	}
+	return $self->{defs}{$name}{default};
 };
 
 =head2 $config->set('name', value);
@@ -207,6 +215,32 @@ sub dump {
 };
 
 =back
+
+=head2 $config->dump_item("item")
+
+Print a JSON value for the given configuration item. Prints the default
+item if this item hasn't been set a value.
+
+=cut
+
+sub dump_item {
+	my ($self, $item) = @_;
+
+	print encode_json($self->get($item));
+}
+
+=head2 $config->is_default("item")
+
+Return a truthy value if the given configuration item is still at its
+default value.
+
+=cut
+
+sub is_default {
+	my ($self, $item) = @_;
+
+	return (exists($SReview::Config::_private::{$item})) ? 0 : 1;
+}
 
 =head1 BUGS
 

@@ -1,5 +1,5 @@
 package Template::Liquid::Error;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 sub message { return $_[0]->{'message'} }
 sub fatal   { return $_[0]->{'fatal'} }
 
@@ -45,16 +45,15 @@ CPAN ID: SANKO
 Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of
-L<The Artistic License 2.0|http://www.perlfoundation.org/artistic_license_2_0>.
-See the F<LICENSE> file included with this distribution or
-L<notes on the Artistic License 2.0|http://www.perlfoundation.org/artistic_2_0_notes>
-for clarification.
+the terms of L<The Artistic License
+2.0|http://www.perlfoundation.org/artistic_license_2_0>. See the F<LICENSE>
+file included with this distribution or L<notes on the Artistic License
+2.0|http://www.perlfoundation.org/artistic_2_0_notes> for clarification.
 
-When separated from the distribution, all original POD documentation is
-covered by the
-L<Creative Commons Attribution-Share Alike 3.0 License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>.
-See the
-L<clarification of the CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
+When separated from the distribution, all original POD documentation is covered
+by the L<Creative Commons Attribution-Share Alike 3.0
+License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+L<clarification of the
+CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
 
 =cut

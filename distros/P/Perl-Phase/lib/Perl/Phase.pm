@@ -3,31 +3,30 @@ package Perl::Phase;
 use strict;
 use warnings;
 
-use 5.14.0;    # for ${^GLOBAL_PHASE}
+our $VERSION = '0.02';
 
-our $VERSION = '0.01';
+use XSLoader;
+XSLoader::load(__PACKAGE__);
 
 sub is_compile_time {
-
-    # why not just `return !is_run_time();`? more explicit/accurate && save a `pp_entersub` op
-    return ${^GLOBAL_PHASE}
-      if ${^GLOBAL_PHASE} eq "CONSTRUCT"
-      || ${^GLOBAL_PHASE} eq "START"
-      || ${^GLOBAL_PHASE} eq "CHECK";
+    my $current_phase = current_phase();
+    return 1 if $current_phase == PERL_PHASE_CONSTRUCT();
+    return 1 if $current_phase == PERL_PHASE_START();
+    return 1 if $current_phase == PERL_PHASE_CHECK();
     return;
 }
 
 sub is_run_time {
-    return ${^GLOBAL_PHASE}
-      if ${^GLOBAL_PHASE} eq "INIT"
-      || ${^GLOBAL_PHASE} eq "RUN"
-      || ${^GLOBAL_PHASE} eq "END"
-      || ${^GLOBAL_PHASE} eq "DESTRUCT";
+    my $current_phase = current_phase();
+    return 1 if $current_phase == PERL_PHASE_INIT();
+    return 1 if $current_phase == PERL_PHASE_RUN();
+    return 1 if $current_phase == PERL_PHASE_END();
+    return 1 if $current_phase == PERL_PHASE_DESTRUCT();
     return;
 }
 
 sub assert_is_run_time {
-    return ${^GLOBAL_PHASE} if is_run_time();
+    return 1 if is_run_time();
 
     my @caller = caller(1);
     if (@caller) {
@@ -37,11 +36,11 @@ sub assert_is_run_time {
         die "This code should not be executed at compile time";
     }
 
-    return ${^GLOBAL_PHASE};
+    return;
 }
 
 sub assert_is_compile_time {
-    return ${^GLOBAL_PHASE} if is_compile_time();
+    return 1 if is_compile_time();
 
     my @caller = caller(1);
     if (@caller) {
@@ -58,20 +57,22 @@ sub assert_is_compile_time {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Perl::Phase - Check if you are currently in compile time or run time
 
 =head1 VERSION
 
-This document describes Perl::Phase version 0.01
+This document describes Perl::Phase version 0.02
 
 =head1 SYNOPSIS
 
-    use Perl::Phase;
+    use Perl::Phase ();
 
-    sub foo {
-        Perl::Phase::assert_is_run_time();
+    sub init_data {
+        Perl::Phase::assert_is_run_time(); # so we don’t forever bake the data in if this is perlcc’d
 
         …
     }
@@ -82,12 +83,9 @@ Some code should only run at runtime some only at compile time.
 
 This functions let you check (boolean) or assert (die) either.
 
-
 =head1 INTERFACE
 
 None of these functions take any arguments.
-
-Any true value returned is also the current phase name.
 
 =head2 Perl::Phase::is_compile_time()
 
@@ -105,26 +103,71 @@ Returns true if executed at run time, false if executed at compile time.
 
 Dies if executed at compile time, otherwise returns true.
 
+=head2 Perl::Phase::current_phase()
+
+Returns perl’s internal numeric id of the phase perl is currently in.
+
+Much faster than string comparing C<${^GLOBAL_PHASE}> in a string comparison.
+
+=head3 CONSTANTS
+
+These are perl’s internal numeric id of the C<${^GLOBAL_PHASE}> in the name.
+
+=head4 PERL_PHASE_CONSTRUCT
+
+=head4 PERL_PHASE_START
+
+=head4 PERL_PHASE_CHECK
+
+=head4 PERL_PHASE_INIT
+
+=head4 PERL_PHASE_RUN
+
+=head4 PERL_PHASE_END
+
+=head4 PERL_PHASE_DESTRUCT
+
+=head2 If you care about the exact stage you are in …
+
+This module aims to give you the fastest and smallest way to determine if you are in run time or compile time.
+
+If you care about the exact stage you are in you have some options:
+
+=head3 Look at C<${^GLOBAL_PHASE}>
+
+This module, as well as L<Check::GlobalPhase>, use XS to do this logic via perl’s internal numeric id which is much faster.
+
+Note that C<${^GLOBAL_PHASE}> only works on perl 5.14 and newer or unless you use a module that sets it on earlier versions like L<Devel::GlobalPhase>.
+
+=head3 use L<Check::GlobalPhase>’s C<is_global_phase_<lc phase name>()> functions
+
+Most of the time we really only care if we are in compile time or run time so this module does not implement these.
+
+=head3 Use current_phase() and constants
+
+    if (Perl::Phase::current_phase() == Perl::Phase::PERL_PHASE_INIT ) { … we are in INIT … }
+
+    if (Perl::Phase::current_phase() & (Perl::Phase::PERL_PHASE_INIT | Perl::Phase::PERL_PHASE_RUN) ) { … we are either in INIT or RUN … }
+
 =head1 DIAGNOSTICS
 
-Assert can have two types of die message depending on the caller information.
+Assert can have two types of die messages depending on the caller information:
 
 =over
 
-=item C<< "%s() called at (run|compile) time at %s line %n\n">>
+=item C<< %s() called at (run|compile) time at %s line %n >>
 
-=item C<< This code should not be executed at (run|compile) time" >>
+=item C<< This code should not be executed at (run|compile) time >>
 
 =back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-C<${^GLOBAL_PHASE}>
+None.
 
 =head1 DEPENDENCIES
 
-Perl 5.14 for C<${^GLOBAL_PHASE}>.
-
+L<XSLoader>
 
 =head1 INCOMPATIBILITIES AND LIMITATIONS
 
@@ -139,14 +182,12 @@ Please report any bugs or feature requests (and a pull request for bonus points)
 
 Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
 
-
 =head1 LICENCE AND COPYRIGHT
 
 Copyright (c) 2019, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
-
 
 =head1 DISCLAIMER OF WARRANTY
 

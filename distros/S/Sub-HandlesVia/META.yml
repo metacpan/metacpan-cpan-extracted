@@ -27,58 +27,70 @@ optional_features: {}
 provides:
   Sub::HandlesVia:
     file: lib/Sub/HandlesVia.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Handler:
     file: lib/Sub/HandlesVia/Handler.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Handler::CodeRef:
     file: lib/Sub/HandlesVia/Handler.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Handler::Traditional:
     file: lib/Sub/HandlesVia/Handler.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary:
     file: lib/Sub/HandlesVia/HandlerLibrary.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Array:
     file: lib/Sub/HandlesVia/HandlerLibrary/Array.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Bool:
     file: lib/Sub/HandlesVia/HandlerLibrary/Bool.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Code:
     file: lib/Sub/HandlesVia/HandlerLibrary/Code.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Counter:
     file: lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Hash:
     file: lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::Number:
     file: lib/Sub/HandlesVia/HandlerLibrary/Number.pm
-    version: '0.002'
+    version: '0.011'
+  Sub::HandlesVia::HandlerLibrary::Scalar:
+    file: lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
+    version: '0.011'
   Sub::HandlesVia::HandlerLibrary::String:
     file: lib/Sub/HandlesVia/HandlerLibrary/String.pm
-    version: '0.002'
+    version: '0.011'
+  Sub::HandlesVia::Toolkit:
+    file: lib/Sub/HandlesVia/Toolkit.pm
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Moo:
     file: lib/Sub/HandlesVia/Toolkit/Moo.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Moose:
     file: lib/Sub/HandlesVia/Toolkit/Moose.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Moose::PackageTrait:
     file: lib/Sub/HandlesVia/Toolkit/Moose.pm
-    version: '0.002'
+    version: '0.011'
+  Sub::HandlesVia::Toolkit::Moose::RoleTrait:
+    file: lib/Sub/HandlesVia/Toolkit/Moose.pm
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Mouse:
     file: lib/Sub/HandlesVia/Toolkit/Mouse.pm
-    version: '0.002'
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Mouse::PackageTrait:
     file: lib/Sub/HandlesVia/Toolkit/Mouse.pm
-    version: '0.002'
+    version: '0.011'
+  Sub::HandlesVia::Toolkit::Mouse::RoleTrait:
+    file: lib/Sub/HandlesVia/Toolkit/Mouse.pm
+    version: '0.011'
   Sub::HandlesVia::Toolkit::Plain:
     file: lib/Sub/HandlesVia/Toolkit/Plain.pm
-    version: '0.002'
+    version: '0.011'
 recommends:
   Sub::Util: '0'
 requires:
@@ -88,7 +100,7 @@ requires:
   Exporter::Shiny: '0'
   List::Util: '1.50'
   Role::Tiny: '0'
-  Type::Params: '0'
+  Type::Params: '1.004000'
   Types::Standard: '0'
   perl: '5.008'
 resources:
@@ -97,6 +109,6 @@ resources:
   homepage: https://metacpan.org/release/Sub-HandlesVia
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-handlesvia.git
-version: '0.002'
+version: '0.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

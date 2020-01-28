@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has additional_name => (
@@ -290,6 +290,14 @@ has honorific_suffix => (
 
 
 
+has interaction_statistic => (
+    is        => 'rw',
+    predicate => '_has_interaction_statistic',
+    json_ld   => 'interactionStatistic',
+);
+
+
+
 has isic_v4 => (
     is        => 'rw',
     predicate => '_has_isic_v4',
@@ -522,7 +530,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -1153,6 +1161,26 @@ A honorific_suffix should be one of the following types:
 
 A predicate for the L</honorific_suffix> attribute.
 
+=head2 C<interaction_statistic>
+
+C<interactionStatistic>
+
+The number of interactions for the CreativeWork using the WebSite or
+SoftwareApplication. The most specific child type of InteractionCounter
+should be used.
+
+A interaction_statistic should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::InteractionCounter']>
+
+=back
+
+=head2 C<_has_interaction_statistic>
+
+A predicate for the L</interaction_statistic> attribute.
+
 =head2 C<isic_v4>
 
 C<isicV4>
@@ -1690,7 +1718,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

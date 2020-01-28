@@ -1,3 +1,7 @@
+0.31 Wed Jan 22 13:20:04 PST 2020
+ - Use YAML::PP for testing
+ - Use new Pegex which has no XS deps
+
 0.30 Wed Aug 29 21:19:34 PDT 2018
  - Support Perl 5.8.9
 

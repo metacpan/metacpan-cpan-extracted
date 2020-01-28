@@ -4,7 +4,7 @@
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "gpl_3"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -43,22 +43,22 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "MRO::Compat" : "0",
-            "Moo" : "0",
-            "namespace::clean" : "0",
-            "strictures" : "0"
+            "MRO::Compat" : "0.12",
+            "Moo" : "2.003000",
+            "namespace::clean" : "0.27",
+            "strictures" : "2.000003"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0"
+            "Test2::V0" : "0.000126"
          }
       }
    },
    "provides" : {
       "Config::Registry" : {
          "file" : "lib/Config/Registry.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/bluefeet/Config-Registry"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

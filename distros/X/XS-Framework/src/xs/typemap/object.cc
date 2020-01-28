@@ -1,5 +1,6 @@
 #include "object.h"
 #include <cxxabi.h>
+#include "error.h"
 
 namespace xs { namespace typemap { namespace object {
 
@@ -49,3 +50,4 @@ void _throw_no_package (const std::type_info& ti) {
 }
 
 }}}
+

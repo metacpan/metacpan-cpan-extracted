@@ -1,5 +1,5 @@
 package YAML;
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use YAML::Mo;
 
@@ -13,11 +13,9 @@ our (
     $UseHeader, $UseVersion, $UseBlock, $UseFold, $UseAliases,
     $Indent, $SortKeys, $Preserve,
     $AnchorPrefix, $CompressSeries, $InlineSeries, $Purity,
-    $Stringify, $Numify, $LoadBlessed,
+    $Stringify, $Numify, $LoadBlessed, $QuoteNumericStrings,
+    $DumperClass, $LoaderClass
 );
-
-$LoadBlessed = 1;
-
 
 use YAML::Node; # XXX This is a temp fix for Module::Build
 use Scalar::Util qw/ openhandle /;

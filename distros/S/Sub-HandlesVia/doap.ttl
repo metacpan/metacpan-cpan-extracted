@@ -1,3 +1,4 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
 @prefix dc:    <http://purl.org/dc/terms/> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
@@ -14,7 +15,9 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-recommendation [ doap-deps:on "Sub::Util"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Type::Params"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Params 1.004000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [
 		doap-deps:on "Class::Method::Modifiers"^^doap-deps:CpanId;
 	], [ doap-deps:on "List::Util 1.50"^^doap-deps:CpanId ];
 	doap-deps:test-recommendation [ doap-deps:on "Moose"^^doap-deps:CpanId ], [ doap-deps:on "Mouse"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ];
@@ -28,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-HandlesVia";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_000>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-011>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-handlesvia>;
@@ -66,6 +69,217 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.002.tar.gz>;
 	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.003"^^xsd:string;
+	dc:issued            "2020-01-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "A lot of refactoring, reducing duplication in Moo, Moose, and Mouse integration.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document API for how Sub::HandlesVia interacts with OO frameworks.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.004"^^xsd:string;
+	dc:issued            "2020-01-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Support for Moo::Role, Moose::Role, and Mouse::Role.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.005"^^xsd:string;
+	dc:issued            "2020-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`head` method for Array.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`tail` method for Array.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Stop accidentally setting coerce=>'' for some Moo attributes. It confuses Moo.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.006"^^xsd:string;
+	dc:issued            "2020-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Output some version numbers and environment variables in test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "Bond... James Bond";
+	dc:identifier        "Sub-HandlesVia-0.007"^^xsd:string;
+	dc:issued            "2020-01-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`scalar_ref` method for Scalar.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Better handling for non-hashref-based Moose instances.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_000>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.008_000"^^xsd:string;
+	dc:issued            "2020-01-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Spew some output in t/03moo_mxtt/trait_hash.t.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::TypeTiny and Moo.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.008_000.tar.gz>;
+	doap:revision        "0.008_000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_001>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.008_001"^^xsd:string;
+	dc:issued            "2020-01-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Load Carp::Always for failing test case.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.008_001.tar.gz>;
+	doap:revision        "0.008_001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_002>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.008_002"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Spew even more output in t/03moo_mxtt/trait_hash.t.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.008_002.tar.gz>;
+	doap:revision        "0.008_002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_003>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.008_003"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Skip t/03moo_mxtt/trait_hash.t if Type::Tiny is not using XS.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.008_003.tar.gz>;
+	doap:revision        "0.008_003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.009"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Revert MooX::TypeTiny test verbosity from 0.008_xxx.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Revert testing dependency additions from 0.008_xxx.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Skip Array trait tests under Mouse if Mouse is not using XS due to Mouse::PurePerl bug.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.010"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`apply` method for Array.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`for_each` method for Array.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`for_each_pair` method for Array.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`pick_random` method for Array.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`for_each_pair` method for Hash.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`for_each_key` method for Hash.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`for_each_value` method for Hash.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.011"^^xsd:string;
+	dc:issued            "2020-01-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`any` method for Array.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document which aliases MouseX::NativeTraits provides.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

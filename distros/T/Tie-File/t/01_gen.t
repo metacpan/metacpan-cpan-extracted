@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 $| = 1;
-my $file = "tf$$.txt";
+my $file = "tf01-$$.txt";
 1 while unlink $file;
 
 print "1..75\n";
@@ -119,7 +119,7 @@ sub check_contents {
   my $x = join $:, @c, '';
   local *FH = $o->{fh};
   seek FH, 0, SEEK_SET;
-#  my $open = open FH, "< $file";
+#  my $open = open FH, "<", $file;
   my $a;
   { local $/; $a = <FH> }
   $a = "" unless defined $a;

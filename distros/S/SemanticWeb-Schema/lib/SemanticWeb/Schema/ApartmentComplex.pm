@@ -15,7 +15,23 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
+
+
+has number_of_accommodation_units => (
+    is        => 'rw',
+    predicate => '_has_number_of_accommodation_units',
+    json_ld   => 'numberOfAccommodationUnits',
+);
+
+
+
+has number_of_available_accommodation_units => (
+    is        => 'rw',
+    predicate => '_has_number_of_available_accommodation_units',
+    json_ld   => 'numberOfAvailableAccommodationUnits',
+);
+
 
 
 
@@ -34,11 +50,67 @@ SemanticWeb::Schema::ApartmentComplex - Residence type: Apartment complex.
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
 Residence type: Apartment complex.
+
+=head1 ATTRIBUTES
+
+=head2 C<number_of_accommodation_units>
+
+C<numberOfAccommodationUnits>
+
+=for html <p>Indicates the total (available plus unavailable) number of accommodation
+units in an <a class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a>, or the
+number of accommodation units for a specific <a class="localLink"
+href="http://schema.org/FloorPlan">FloorPlan</a> (within its specific <a
+class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a>). See also
+<a class="localLink"
+href="http://schema.org/numberOfAvailableAccommodationUnits">numberOfAvaila
+bleAccommodationUnits</a>.<p>
+
+A number_of_accommodation_units should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<_has_number_of_accommodation_units>
+
+A predicate for the L</number_of_accommodation_units> attribute.
+
+=head2 C<number_of_available_accommodation_units>
+
+C<numberOfAvailableAccommodationUnits>
+
+=for html <p>Indicates the number of available accommodation units in an <a
+class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a>, or the
+number of accommodation units for a specific <a class="localLink"
+href="http://schema.org/FloorPlan">FloorPlan</a> (within its specific <a
+class="localLink"
+href="http://schema.org/ApartmentComplex">ApartmentComplex</a>). See also
+<a class="localLink"
+href="http://schema.org/numberOfAccommodationUnits">numberOfAccommodationUn
+its</a>.<p>
+
+A number_of_available_accommodation_units should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<_has_number_of_available_accommodation_units>
+
+A predicate for the L</number_of_available_accommodation_units> attribute.
 
 =head1 SEE ALSO
 
@@ -64,7 +136,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

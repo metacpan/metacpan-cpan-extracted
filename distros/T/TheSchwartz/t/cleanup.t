@@ -17,52 +17,60 @@ run_tests(
     10,
     sub {
         my $client = test_client( dbs => ['ts1'] );
-        my $dbh = DBI->connect( dsn_for("ts1"), $ENV{TS_DB_USER},
-            $ENV{TS_DB_PASS} );
-        $client->can_do("Worker::Fail");
-        $client->can_do("Worker::Complete");
 
-        # insert a job which will fail, then succeed.
         {
-            my $handle = $client->insert("Worker::Fail");
-            isa_ok $handle, 'TheSchwartz::JobHandle', "inserted job";
+            my $dbh = DBI->connect( dsn_for("ts1"), $ENV{TS_DB_USER},
+                $ENV{TS_DB_PASS} );
+            $client->can_do("Worker::Fail");
+            $client->can_do("Worker::Complete");
 
-            $client->work_until_done;
-            is( $handle->failures, 1, "job has failed once" );
+            # insert a job which will fail, then succeed.
+            {
+                my $handle = $client->insert("Worker::Fail");
+                isa_ok $handle, 'TheSchwartz::JobHandle', "inserted job";
 
-            my $min;
-            my $rows
-                = $dbh->selectrow_array("SELECT COUNT(*) FROM exitstatus");
-            is( $rows, 1, "has 1 exitstatus row" );
+                $client->work_until_done;
+                is( $handle->failures, 1, "job has failed once" );
 
-            ok( $client->insert("Worker::Complete"),
-                "inserting to-pass job" );
-            $client->work_until_done;
-            $rows = $dbh->selectrow_array("SELECT COUNT(*) FROM exitstatus");
-            is( $rows, 2, "has 2 exitstatus rows" );
-            ( $rows, $min )
-                = $dbh->selectrow_array(
-                "SELECT COUNT(*), MIN(jobid) FROM error");
-            is( $rows, 1, "has 1 error rows" );
-            is( $min,  1, "error jobid is the old one" );
+                my $min;
+                my $rows
+                    = $dbh->selectrow_array(
+                    "SELECT COUNT(*) FROM exitstatus");
+                is( $rows, 1, "has 1 exitstatus row" );
 
-            # wait for exit status to pass
-            sleep 3;
+                ok( $client->insert("Worker::Complete"),
+                    "inserting to-pass job" );
+                $client->work_until_done;
+                $rows = $dbh->selectrow_array(
+                    "SELECT COUNT(*) FROM exitstatus");
+                is( $rows, 2, "has 2 exitstatus rows" );
+                ( $rows, $min )
+                    = $dbh->selectrow_array(
+                    "SELECT COUNT(*), MIN(jobid) FROM error");
+                is( $rows, 1, "has 1 error rows" );
+                is( $min,  1, "error jobid is the old one" );
 
-            # now make another job fail to cleanup some errors
-            $handle = $client->insert("Worker::Fail");
-            $client->work_until_done;
+                # wait for exit status to pass
+                sleep 3;
 
-            $rows = $dbh->selectrow_array("SELECT COUNT(*) FROM exitstatus");
-            is( $rows, 1, "1 exit status row now" );
+                # now make another job fail to cleanup some errors
+                $handle = $client->insert("Worker::Fail");
+                $client->work_until_done;
 
-            ( $rows, $min )
-                = $dbh->selectrow_array(
-                "SELECT COUNT(*), MIN(jobid) FROM error");
-            is( $rows, 1, "has 1 error row still" );
-            is( $min,  3, "error jobid is only the new one" );
+                $rows = $dbh->selectrow_array(
+                    "SELECT COUNT(*) FROM exitstatus");
+                is( $rows, 1, "1 exit status row now" );
 
+                ( $rows, $min )
+                    = $dbh->selectrow_array(
+                    "SELECT COUNT(*), MIN(jobid) FROM error");
+                is( $rows, 1, "has 1 error row still" );
+                is( $min,  3, "error jobid is only the new one" );
+
+            }
         }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }
@@ -79,7 +87,7 @@ sub work {
 }
 
 sub keep_exit_status_for {
-    1
+    1;
 }    # keep exit status for 20 seconds after on_complete
 
 sub max_retries {0}

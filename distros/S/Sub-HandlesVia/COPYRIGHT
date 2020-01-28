@@ -16,12 +16,15 @@ Files: Changes
  lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
  lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
  lib/Sub/HandlesVia/HandlerLibrary/Number.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm
  lib/Sub/HandlesVia/HandlerLibrary/String.pm
  lib/Sub/HandlesVia/Toolkit/Moo.pm
  lib/Sub/HandlesVia/Toolkit/Moose.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
+ t/00begin.t
  t/02moo.t
+ t/02moo/role.t
  t/02moo/trait_array.t
  t/02moo/trait_bool.t
  t/02moo/trait_code.t
@@ -30,6 +33,7 @@ Files: Changes
  t/02moo/trait_number.t
  t/02moo/trait_string.t
  t/03moo_mxtt.t
+ t/03moo_mxtt/role.t
  t/03moo_mxtt/trait_array.t
  t/03moo_mxtt/trait_bool.t
  t/03moo_mxtt/trait_code.t
@@ -38,6 +42,7 @@ Files: Changes
  t/03moo_mxtt/trait_number.t
  t/03moo_mxtt/trait_string.t
  t/04moose.t
+ t/04moose/role.t
  t/04moose/trait_array.t
  t/04moose/trait_bool.t
  t/04moose/trait_code.t
@@ -46,6 +51,7 @@ Files: Changes
  t/04moose/trait_number.t
  t/04moose/trait_string.t
  t/05moose_nativetypes.t
+ t/05moose_nativetypes/role.t
  t/05moose_nativetypes/trait_array.t
  t/05moose_nativetypes/trait_bool.t
  t/05moose_nativetypes/trait_code.t
@@ -54,6 +60,7 @@ Files: Changes
  t/05moose_nativetypes/trait_number.t
  t/05moose_nativetypes/trait_string.t
  t/06mouse.t
+ t/06mouse/role.t
  t/06mouse/trait_array.t
  t/06mouse/trait_bool.t
  t/06mouse/trait_code.t
@@ -62,6 +69,7 @@ Files: Changes
  t/06mouse/trait_number.t
  t/06mouse/trait_string.t
  t/07mouse_nativetypes.t
+ t/07mouse_nativetypes/role.t
  t/07mouse_nativetypes/trait_array.t
  t/07mouse_nativetypes/trait_bool.t
  t/07mouse_nativetypes/trait_code.t
@@ -73,11 +81,18 @@ Files: Changes
  t/09barebones.t
  t/10barebones_eagerbuilder.t
  t/11delegation.t
+ t/12slotaccess.t
+ t/95any.t
+ t/96foreach.t
+ t/97pickrandom.t
+ t/98apply.t
+ t/99headtail.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
  lib/Sub/HandlesVia.pm
+ lib/Sub/HandlesVia/Toolkit.pm
  t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0

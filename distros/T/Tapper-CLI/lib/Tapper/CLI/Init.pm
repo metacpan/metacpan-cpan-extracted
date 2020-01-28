@@ -1,6 +1,6 @@
 package Tapper::CLI::Init;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::Init::VERSION = '5.0.5';
+$Tapper::CLI::Init::VERSION = '5.0.6';
 use 5.010;
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

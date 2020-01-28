@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -172,9 +172,32 @@ sub new {
     $profile->set_value( 'browser.download.defaultFolder',  $dirname, 1 );
     $profile->set_value( 'browser.download.folderList',     2,        0 )
       ;    # the last folder specified for a download
-    $profile->set_value( 'marionette.port',                _ANY_PORT() );
-    $profile->set_value( 'devtools.toolbox.host',          'window', 1 );
-    $profile->set_value( 'devtools.netmonitor.persistlog', 'true', 0 );
+    $profile->set_value( 'marionette.port',                       _ANY_PORT() );
+    $profile->set_value( 'devtools.toolbox.host',                 'window', 1 );
+    $profile->set_value( 'devtools.netmonitor.persistlog',        'true', 0 );
+    $profile->set_value( 'browser.safebrowsing.phishing.enabled', 'false', 0 );
+    $profile->set_value( 'browser.safebrowsing.malware.enabled',  'false', 0 );
+    $profile->set_value( 'datareporting.healthreport.uploadEnabled',
+        'false', 0 );
+    $profile->set_value( 'network.cookie.lifetimePolicy', '2',     0 );
+    $profile->set_value( 'toolkit.telemetry.enabled',     'false', 0 );
+    $profile->set_value( 'browser.send_pings',            'false', 0 );
+    $profile->set_value( 'browser.urlbar.speculativeConnect.enable',
+        'false', 0 );
+    $profile->set_value( 'dom.battery.enabled',       'false', 0 );
+    $profile->set_value( 'media.navigator.enabled',   'false', 0 );
+    $profile->set_value( 'browser.chrome.favicons',   'false', 0 );
+    $profile->set_value( 'browser.chrome.site_icons', 'false', 0 );
+    $profile->set_value( 'browser.bookmarks.restore_default_bookmarks',
+        'false', 0 );
+    $profile->set_value( 'browser.shell.shortcutFavicons', 'false', 0 );
+    $profile->set_value( 'extensions.blocklist.enabled',   'false', 0 );
+    $profile->set_value( 'browser.safebrowsing.downloads.remote.enabled',
+        'false', 0 );
+    $profile->set_value( 'extensions.getAddons.cache.enabled', 'false', 0 );
+    $profile->set_value( 'app.normandy.enabled',               'false', 0 );
+    $profile->set_value( 'media.gmp-gmpopenh264.enabled',      'false', 0 );
+    $profile->set_value( 'browser.casting.enabled',            'false', 0 );
 
     return $profile;
 }
@@ -284,7 +307,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =head1 SYNOPSIS
 

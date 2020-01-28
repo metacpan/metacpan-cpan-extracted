@@ -8,7 +8,6 @@ build_requires:
   Test::More: '0'
   Test::Most: '0'
   aliased: '0'
-  utf8: '0'
 configure_requires:
   Const::Fast: '0'
   Data::Dump: '0'
@@ -25,10 +24,11 @@ name: Dash
 requires:
   Browser::Open: '0'
   Exporter::Auto: '0'
-  File::ShareDir: '0'
+  File::ShareDir: '1.116'
   JSON: '0'
   Module::Load: '0'
   Mojo::Base: '0'
+  Mojolicious: '8.27'
   Moo: '0'
   Path::Tiny: '0'
   Scalar::Util: '0'
@@ -36,14 +36,16 @@ requires:
   Try::Tiny: '0'
   aliased: '0'
   namespace::clean: '0'
+  overload: '0'
   perl: '5.020'
   strict: '0'
   strictures: '2'
+  utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/pablrod/perl-Dash/issues
   homepage: https://github.com/pablrod/perl-Dash
   repository: https://github.com/pablrod/perl-Dash.git
-version: '0.06'
+version: '0.10'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

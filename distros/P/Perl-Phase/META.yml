@@ -3,7 +3,10 @@ abstract: 'Check if you are currently in compile time or run time'
 author:
   - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
 build_requires:
+  Devel::Peek: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Spec: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,6 +21,13 @@ no_index:
     - t
     - inc
 requires:
-  Test::More: '0'
-  Test::Spec: '0'
-version: '0.01'
+  XSLoader: '0'
+  perl: '5.014'
+resources:
+  X_keywords:
+    - perl
+    - global
+    - phase
+  bugtracker: https://github.com/drmuey/p5-Perl-Phase/issues
+  repository: https://github.com/drmuey/p5-Perl-Phase.git
+version: '0.02'

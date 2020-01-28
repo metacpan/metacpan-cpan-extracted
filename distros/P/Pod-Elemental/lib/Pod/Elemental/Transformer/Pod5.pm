@@ -1,6 +1,6 @@
 package Pod::Elemental::Transformer::Pod5;
 # ABSTRACT: the default, minimal semantics of Perl5's pod element hierarchy
-$Pod::Elemental::Transformer::Pod5::VERSION = '0.103004';
+$Pod::Elemental::Transformer::Pod5::VERSION = '0.103005';
 use Moose;
 with 'Pod::Elemental::Transformer';
 
@@ -30,7 +30,7 @@ with 'Pod::Elemental::Transformer';
 #pod
 #pod =item * non-data paragraphs that start with spaces are "verbatim" paragraphs
 #pod
-#pod =item * groups of data or verbatim paragraphs can be consolodated
+#pod =item * groups of data or verbatim paragraphs can be consolidated
 #pod
 #pod =back
 #pod
@@ -301,7 +301,7 @@ Pod::Elemental::Transformer::Pod5 - the default, minimal semantics of Perl5's po
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 SYNOPSIS
 
@@ -329,7 +329,7 @@ described here:
 
 =item * non-data paragraphs that start with spaces are "verbatim" paragraphs
 
-=item * groups of data or verbatim paragraphs can be consolodated
+=item * groups of data or verbatim paragraphs can be consolidated
 
 =back
 
@@ -348,7 +348,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

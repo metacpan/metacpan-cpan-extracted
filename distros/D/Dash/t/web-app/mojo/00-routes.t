@@ -3,7 +3,11 @@ use Mojo::Base -strict;
 use Test::Mojo;
 use Test::More tests => 17;
 
-my $t = Test::Mojo->new('Dash');
+use Dash;
+
+my $app = Dash->new();
+
+my $t = Test::Mojo->new( $app->backend );
 
 $t->get_ok('/')->status_is(200)->content_like(qr/Loading/);
 

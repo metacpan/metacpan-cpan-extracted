@@ -22,3 +22,4 @@ ether
 irc
 lib
 perl
+plicease

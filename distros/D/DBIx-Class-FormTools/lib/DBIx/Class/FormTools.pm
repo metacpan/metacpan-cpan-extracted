@@ -1,6 +1,6 @@
 package DBIx::Class::FormTools;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000011';
 
 use 5.10.1;
 use strict;
@@ -26,7 +26,7 @@ DBIx::Class::FormTools - Helper module for building forms with multiple related 
 
 =head1 VERSION
 
-This document describes DBIx::Class::FormTools version 0.0.8
+This document describes DBIx::Class::FormTools version 0.0.11
 
 =head1 SYNOPSIS
 
@@ -269,22 +269,14 @@ sub fieldname
 }
 
 
-sub field_id {
-    my $self = shift;
-    my $field_name = $self->fieldname(@_);
-    $field_name =~ s/[:|]+/_/go;
-    return $field_name;
-}
-
-
-=head2 C<formdata_to_objects>
+=head2 C<formdata_to_object_hash>
 
 Arguments: \%formdata
 
     my @objects = $formtool->formdata_to_objects($formdata);
 
-Turn formdata(a querystring) in the form of a C<HASHREF> into an C<ARRAY> of
-C<DBIx::Class> objects.
+Turn formdata(a querystring) in the form of a C<HASHREF> into an C<HASHREF> of
+C<DBIx::Class> objects indexed by object_id.
 
 =cut
 sub formdata_to_object_hash
@@ -368,6 +360,16 @@ sub formdata_to_object_hash
     return($objects);
 }
 
+=head2 C<formdata_to_objects>
+
+Arguments: \%formdata
+
+    my @objects = $formtool->formdata_to_objects($formdata);
+
+Turn formdata(a querystring) in the form of a C<HASHREF> into an C<ARRAY> of
+C<DBIx::Class> objects.
+
+=cut
 sub formdata_to_objects {
     my ($self,$formdata,$inflate_only) = @_;
     my $hash = $self->formdata_to_object_hash($formdata,$inflate_only);

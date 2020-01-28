@@ -1,5 +1,6 @@
 #pragma once
 #include "object.h"
+#include "../Object.h"
 #include <system_error>
 #include <panda/exception.h>
 #include <panda/error.h>
@@ -22,6 +23,8 @@ template <> struct Typemap<const std::error_category*> : TypemapObject<const std
 };
 
 template <> struct Typemap<std::error_code> : TypemapBase<std::error_code> {
+    static thread_local Stash stash;
+
     static std::error_code in (const Sv& arg) {
         if (!arg.defined()) return {};
         SV* sv = SvROK(arg) ? SvRV(arg) : arg.get();
@@ -32,13 +35,14 @@ template <> struct Typemap<std::error_code> : TypemapBase<std::error_code> {
 
     static Sv out (const std::error_code& var, const Sv& = {}) {
         if (!var) return Sv::undef;
-        thread_local Stash stash("XS::STL::ErrorCode");
         auto base = Simple(panda::string_view(reinterpret_cast<const char*>(&var), sizeof(var)));
         return stash.bless(base).ref();
     }
 };
 
 template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
+    static thread_local Stash stash;
+
     static panda::ErrorCode in (const Sv& arg) {
         if (!arg.defined()) return {};
         if (!arg.is_object_ref()) throw panda::exception("invalid panda::ErrorCode ref");
@@ -53,7 +57,6 @@ template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
 
         auto ret = var.private_access<Simple>(panda::private_tags::ErrorCodeXsOut{});
 
-        thread_local Stash stash("XS::ErrorCode");
         return stash.bless(ret).ref();
     }
 };

@@ -1,6 +1,6 @@
 package HTTP::Throwable;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::VERSION = '0.026';
+$HTTP::Throwable::VERSION = '0.027';
 use Types::Standard qw(Int Str ArrayRef);
 
 use Moo::Role;
@@ -101,7 +101,7 @@ HTTP::Throwable - a set of strongly-typed, PSGI-friendly HTTP 1.1 exception libr
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,7 @@ better suits your needs, then by all means, use it.
 
 It should be noted that even though these are all exception objects,
 only the 500 Internal Server Error error actually includes the stack
-trace (albiet optionally). This is because more often then not you will
+trace (albeit optionally). This is because more often then not you will
 not actually care about the stack trace and therefore do not the extra
 overhead. If you do find you want a stack trace though, it is as simple
 as adding the L<StackTrace::Auto> role to your exceptions.
@@ -416,7 +416,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brian Cassidy Chris Prather Fitz Elliott Karen Etheridge
+=for stopwords Brian Cassidy Chris Prather Edward Betts Fitz Elliott Karen Etheridge
 
 =over 4
 
@@ -430,6 +430,10 @@ Chris Prather <chris@prather.org>
 
 =item *
 
+Edward Betts <edward@4angle.com>
+
+=item *
+
 Fitz Elliott <felliott@fiskur.org>
 
 =item *
@@ -440,7 +444,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Infinity Interactive, Inc..
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -542,7 +546,7 @@ __END__
 #pod
 #pod It should be noted that even though these are all exception objects,
 #pod only the 500 Internal Server Error error actually includes the stack
-#pod trace (albiet optionally). This is because more often then not you will
+#pod trace (albeit optionally). This is because more often then not you will
 #pod not actually care about the stack trace and therefore do not the extra
 #pod overhead. If you do find you want a stack trace though, it is as simple
 #pod as adding the L<StackTrace::Auto> role to your exceptions.

@@ -6,7 +6,7 @@ README.md
 cpanfile
 dist.ini
 lib/Object/Depot.pm
-lib/Object/Depot/Singleton.pm
+lib/Object/Depot/Role.pm
 minil.toml
 t/_process_key_arg.t
 t/aliases.t

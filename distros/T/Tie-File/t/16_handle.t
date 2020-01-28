@@ -3,7 +3,7 @@
 # Basic operation, initializing the object from an already-open handle
 # instead of from a filename
 
-my $file = "tf$$.txt";
+my $file = "tf16-$$.txt";
 $: = Tie::File::_default_recsep();
 
 if ($^O =~ /vms/i) {
@@ -117,7 +117,7 @@ sub check_contents {
   my $x = join $:, @c, '';
   local *FH = $o->{fh};
   seek FH, 0, SEEK_SET;
-#  my $open = open FH, "< $file";
+#  my $open = open FH, '<', $file;
   my $a;
   { local $/; $a = <FH> }
   $a = "" unless defined $a;

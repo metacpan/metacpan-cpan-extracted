@@ -12,7 +12,7 @@
 
 use POSIX 'SEEK_SET';
 
-my $file = "tf$$.txt";
+my $file = "tf10-$$.txt";
 my $data = "rec0blahrec1blahrec2blah";
 
 print "1..101\n";
@@ -175,7 +175,7 @@ check_contents("");
 
 sub init_file {
   my $data = shift;
-  open F, "> $file" or die $!;
+  open F, '>', $file or die $!;
   binmode F;
   print F $data;
   close F;

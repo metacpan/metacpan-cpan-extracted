@@ -11,6 +11,12 @@
 #========================================================================
 
 #-----------------------------------------------------------------------
+# Version 3.007 - TBA 
+#------------------------------------------------------------------------
+
+* Fixes cpanm by adding VERSION to Template/Toolkit.pm
+
+#-----------------------------------------------------------------------
 # Version 3.006 - 16th January 2020
 #------------------------------------------------------------------------
 
@@ -30,8 +36,8 @@
 # Version 3.004 - 13th January 2020
 #------------------------------------------------------------------------
 
-* Use three-args open - fixes CVE-2019-19781 reported by Mikhail Klyuchnikov
-from Positive Technologies.
+* Use three-args open which fix an issue in Datafile plugin
+as reported by Mikhail Klyuchnikov from Positive Technologies.
 
 #-----------------------------------------------------------------------
 # Version 3.003 - 27th December 2019

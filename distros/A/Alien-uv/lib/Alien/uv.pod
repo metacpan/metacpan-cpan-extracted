@@ -1,0 +1,29 @@
+=head1 NAME
+
+Alien::uv - libuv shared library (alien, without perl-adapters).
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    WriteMakefile(
+       ...
+       BIN_DEPS => 'Alien::uv',
+       ...
+    );
+
+=head1 DESCRIPTION
+
+This package can be used by XS modules to ensure that L<libuv|http://libuv.org/> is installed.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

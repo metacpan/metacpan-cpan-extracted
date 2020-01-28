@@ -13,7 +13,7 @@ inc/lib/TestML/Bridge.pm
 inc/lib/TestML/Run.pm
 inc/lib/TestML/Run/TAP.pm
 inc/lib/TestML/StdLib.pm
-inc/t/test.tml.json
+inc/t/test.tml.lingy
 lib/Pegex/JSON.pm
 lib/Pegex/JSON.pod
 lib/Pegex/JSON/Data.pm

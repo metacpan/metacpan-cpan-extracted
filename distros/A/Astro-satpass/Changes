@@ -1,3 +1,11 @@
+0.112		2020-01-26	T. R. Wyant
+    Add Astro::Coord::ECI::Utils subroutines greg_time_gm() and
+    greg_time_local(), which convert date and time into epoch time.
+    Unlike time_gm() and time_local() (which interpret the year however
+    Time::Local timegm() and timelocal() do), the new routines always
+    interpret the year as Gregorian. The older routines are now
+    discouraged, and have been eliminated in this package's code.
+
 0.111		2020-01-11	T. R. Wyant
     Fix Y2020 bug.
 

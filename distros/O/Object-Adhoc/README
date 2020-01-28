@@ -1,0 +1,117 @@
+NAME
+    Object::Adhoc - make objects without the hassle of defining a class first
+
+SYNOPSIS
+     use Object::Adhoc;
+ 
+     my $object = object { name => 'Alice' };
+ 
+     if ($object->has_name) {
+       print $object->name, "\n";
+     }
+
+DESCRIPTION
+    Object::Adhoc is designed to be an alternative to returning hashrefs from
+    functions and methods. It's similar to Object::Anon but doesn't do
+    anything special with references or overloading.
+
+  Functions
+    `object(\%data, \@keys)`
+        Returns a blessed object built from the given arrayref.
+
+        For each key in the list of keys, a getter (`name` in the SYNOPSIS)
+        and predicate (`has_name` in the SYNOPSIS) method are created.
+
+        Objects are read-only.
+
+        Note that Object::Adhoc does not make a clone of %data before blessing
+        it; it is blessed directly.
+
+    `object(\%data)`
+        If @keys is not supplied, Object::Adhoc will do this:
+
+          @keys = keys(%data);
+
+        If there are some keys that will not always be present in your data,
+        passing Object::Adhoc a full list of every possible key is strongly
+        recommended!
+
+    `make_class(\@keys)`
+        Just makes the class, but doesn't bless a hashref into it. Returns a
+        string which is the name of the class. If called repeatedly with the
+        same keys, will return the same class name.
+
+        The class won't have a `new` method; if you need to create objects,
+        just directly bless hashrefs into it.
+
+        It is possible to use this in an @ISA, though that's not really the
+        intention of Object::Adhoc.
+
+          package My::Class {
+            use Object::Adhoc qw(make_class);
+            our @ISA = make_class[qw/ foo bar baz /];
+            sub new {
+              my ($class, $data) = (shift, @_);
+              bless $data, $class;
+            }
+            sub foobar {
+              my ($self) = (shift);
+              $self->foo . $self->bar;
+            }
+          }
+
+        `make_class` is not exported by default.
+
+  Diagnostics
+   Ambiguous method %s is getter, not predicate
+    Given the following:
+
+      my $object = object {
+        name     => 'Alice',
+        has_name => 1,
+      };
+
+    Object::Adhoc doesn't know if you want the `has_name` method to be a
+    getter for the "has_name" attribute, or a predicate for the "name"
+    attribute. The getter wins, but it will issue a warning.
+
+   Key %s would be bad method name, not generating methods
+    You've got a key with a name that cannot be called as a method. For
+    example:
+
+      my $alice = object { 'given name' => 'Alice' };
+
+    Perl methods cannot contain spaces, so Object::Adhoc refuses to create the
+    method and gives you a warning. (Technically it is possible to create and
+    call methods containing spaces, but it's fiddly.)
+
+   Usage %s(self)
+    The methods defined by Object::Adhoc expect to be invoked with a blessed
+    object and no other parameters.
+
+      my $alice = object { 'name' => 'Alice' };
+      $alice->name(1234);   # error
+
+    This throws an exception rather than just printing a warning.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc>.
+
+SEE ALSO
+    Object::Anon, Object::Result.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

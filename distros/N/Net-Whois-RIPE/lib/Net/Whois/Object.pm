@@ -239,7 +239,7 @@ sub new {
             $attribute = 'response';
             $value     = $1;
 
-        } elsif ( $line =~ /^(\S+):\s+(.*)/ ) {
+        } elsif ( $line =~ /^(\S+):\s*(.*)/ ) {
 
             # Attribute line
             $attribute = $1;
@@ -680,10 +680,6 @@ sub _object_factory {
             $rir = $a->[1];
             $rir =~ s/^(\S+)\s*#.*/$1/;
             $rir = uc $rir;
-            # RADB use same database as RIPE
-            if ($rir eq 'RADB') {
-                    $rir = 'RIPE';
-            }   
             $rir = undef if $rir =~ /^(RIPE|TEST)$/;    # For historical/compatibility reason RIPE objects aren't derived
         }
     }

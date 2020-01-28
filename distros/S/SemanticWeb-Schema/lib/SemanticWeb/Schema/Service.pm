@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has aggregate_rating => (
@@ -226,7 +226,7 @@ SemanticWeb::Schema::Service - A service provided by an organization, e
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -487,13 +487,22 @@ A predicate for the L</logo> attribute.
 
 =head2 C<offers>
 
-An offer to provide this item&#x2014;for example, an offer to sell a
+=for html <p>An offer to provide this item&#x2014;for example, an offer to sell a
 product, rent the DVD of a movie, perform a service, or give away tickets
-to an event.
+to an event. Use <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a> to indicate
+the kind of transaction offered, i.e. sell, lease, etc. This property can
+also be used to describe a <a class="localLink"
+href="http://schema.org/Demand">Demand</a>. While this property is listed
+as expected on a number of common types, it can be used in others. In that
+case, using a second type, such as Product or a subtype of Product, can
+clarify the nature of the offer.<p>
 
 A offers should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::Demand']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
@@ -708,7 +717,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

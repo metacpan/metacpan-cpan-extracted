@@ -251,4 +251,19 @@ is $collection->pluck('reverse'), "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
 is $collection->pluck(join => '-'), "1-2-3\n4-5-6\n7-8-9", 'right result';
 =cut
 
+# head
+$collection = array(qw{a b c d e f});
+is_deeply [$collection->head(0)->all], [], 'right result';
+is_deeply [$collection->head(3)->all], [qw{a b c}], 'right result';
+is_deeply [$collection->head(30)->all], [qw{a b c d e f}], 'right result';
+is_deeply [$collection->head(-2)->all], [qw{a b c d}], 'right result';
+is_deeply [$collection->head(-30)->all], [], 'right result';
+
+# tail
+is_deeply [$collection->tail(0)->all], [], 'right result';
+is_deeply [$collection->tail(3)->all], [qw{d e f}], 'right result';
+is_deeply [$collection->tail(30)->all], [qw{a b c d e f}], 'right result';
+is_deeply [$collection->tail(-2)->all], [qw{c d e f}], 'right result';
+is_deeply [$collection->tail(-30)->all], [], 'right result';
+
 done_testing();

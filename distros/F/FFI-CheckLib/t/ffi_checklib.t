@@ -24,7 +24,7 @@ subtest 'star' => sub {
   $FFI::CheckLib::system_path = [];
 
   my @libs = find_lib(
-    libpath   => File::Spec->catdir( 'corpus', 'unix', 'foo-1.00'  ), 
+    libpath   => File::Spec->catdir( 'corpus', 'unix', 'foo-1.00'  ),
     lib       => '*',
     recursive => 1,
   );
@@ -78,7 +78,7 @@ subtest 'which' => sub {
   );
 
   subtest 'with name' => sub {
-  
+
     is( [where('foo')], ['/usr/lib/libfoo.so.1.2.3','/usr/lib/libbar.so.1.2.3'] );
     is(
       \%find_lib_args,
@@ -92,7 +92,7 @@ subtest 'which' => sub {
   };
 
   subtest 'with wildcard' => sub {
-  
+
     is( [where('*')], ['/usr/lib/libfoo.so.1.2.3','/usr/lib/libbar.so.1.2.3'] );
     is(
       \%find_lib_args,
@@ -157,21 +157,48 @@ subtest 'alien' => sub {
 
   @{ $FFI::CheckLib::system_path } = ();
 
-  my $alien = mock 'Alien::libfoo' => (
-    add => [
-      dynamic_libs => sub {
-        'corpus/unix/lib/libfoo.so.2.3.4',
-      },
-    ],
-  );
+  subtest 'preloaded' => sub {
 
-  is(
-    [FFI::CheckLib::find_lib( lib => 'foo', alien => ['Alien::libfoo'])],
-    array {
-      item 0 => match qr/foo/;
-      end;
-    },
-  );
+   my $alien = mock 'Alien::libfoo' => (
+      add => [
+        dynamic_libs => sub {
+          'corpus/unix/lib/libfoo.so.2.3.4',
+        },
+      ],
+    );
+
+    is(
+      [FFI::CheckLib::find_lib( lib => 'foo', alien => ['Alien::libfoo'])],
+      array {
+        item 0 => match qr/foo/;
+        end;
+      },
+    );
+
+  };
+
+  subtest 'autoload' => sub {
+
+    local @INC = @INC;
+    unshift @INC, 'corpus/lib';
+
+    is(
+      [FFI::CheckLib::find_lib( lib => 'bar', alien => ['Alien::libbar'])],
+      array {
+        item 0 => match qr/bar/;
+        end;
+      },
+    );
+
+  };
+
+  subtest 'invalid name' => sub {
+
+    local $@ = '';
+    eval { FFI::CheckLib::find_lib( lib => 'bar', alien => ['x..y']) };
+    like "$@", qr/Doesn't appear to be a valid Alien name x\.\.y/;
+
+  };
 
 };
 

@@ -26,12 +26,6 @@
       "configure" : {
          "requires" : {
             "Alien::cmake3" : "0.04",
-            "Alien::patch" : "0.14",
-            "Archive::Tar" : "0",
-            "Digest::SHA1" : "0",
-            "ExtUtils::MakeMaker" : "6.52",
-            "File::Path" : "0",
-            "HTTP::Tiny" : "0",
             "XS::Install" : "v1.2.12"
          }
       },
@@ -49,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.7.4",
+   "version" : "v1.0.7.6",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

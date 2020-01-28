@@ -1,5 +1,5 @@
 package Test::Count::FileMutator::ByFileType::App;
-$Test::Count::FileMutator::ByFileType::App::VERSION = '0.1101';
+$Test::Count::FileMutator::ByFileType::App::VERSION = '0.1102';
 use strict;
 use warnings;
 
@@ -38,9 +38,14 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Test::Count::FileMutator::ByFileType::App - a standalone command line
+application that modifies a file in place based on its type.
+
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -49,11 +54,6 @@ version 0.1101
 
     # To process Perl 5 code
     $ perl -MTest::Count::Filter::ByFileType::App -e 'run()' myfile.pl
-
-=head1 NAME
-
-Test::Count::FileMutator::ByFileType::App - a standalone command line
-application that modifies a file in place based on its type.
 
 =head1 FUNCTIONS
 

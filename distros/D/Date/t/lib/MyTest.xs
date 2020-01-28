@@ -15,21 +15,10 @@ using panda::string_view;
 #  define SYSTIMELOCAL(x) timelocal(x)
 #endif
 
-static inline void dt2tm (tm& to, const datetime& from) {
-    to.tm_sec    = from.sec;
-    to.tm_min    = from.min;
-    to.tm_hour   = from.hour;
-    to.tm_mday   = from.mday;
-    to.tm_mon    = from.mon;
-    to.tm_year   = from.year-1900;
-    to.tm_isdst  = from.isdst;
-    to.tm_wday   = from.wday;
-    to.tm_yday   = from.yday;
-#ifndef _WIN32
-    to.tm_gmtoff = from.gmtoff;
-    to.tm_zone   = const_cast<char*>(from.zone);
+#if !defined(_WIN32) && !defined(sun) && !defined(__sun)
+    #define DATE_TEST_SYS
 #endif
-}
+
 
 MODULE = MyTest                PACKAGE = MyTest
 PROTOTYPES: DISABLE
@@ -72,7 +61,7 @@ time_t systimegm (int64_t sec, int64_t min, int64_t hour, int64_t mday, int64_t 
     else RETVAL = SYSTIMELOCAL(&date);
 }
 
-#ifndef _WIN32
+#ifdef DATE_TEST_SYS
 
 bool test_gmtime (ptime_t step, ptime_t from, ptime_t till) : ALIAS(test_localtime=1) {
     datetime date1;
@@ -195,6 +184,20 @@ bool test_timegm (ptime_t step, ptime_t from, ptime_t till) : ALIAS(test_timeloc
         }
 
         if (ix == 1) date1.isdst = -1;
+
+        auto dt2tm = [](tm& to, const datetime& from) {
+            to.tm_sec    = from.sec;
+            to.tm_min    = from.min;
+            to.tm_hour   = from.hour;
+            to.tm_mday   = from.mday;
+            to.tm_mon    = from.mon;
+            to.tm_year   = from.year-1900;
+            to.tm_isdst  = from.isdst;
+            to.tm_wday   = from.wday;
+            to.tm_yday   = from.yday;
+            to.tm_gmtoff = from.gmtoff;
+            to.tm_zone   = const_cast<char*>(from.zone);
+        };
         dt2tm(date2, date1);
         
         datetime copy1 = date1;

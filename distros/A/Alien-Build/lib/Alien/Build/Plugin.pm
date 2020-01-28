@@ -2,13 +2,12 @@ package Alien::Build::Plugin;
 
 use strict;
 use warnings;
-use Module::Load ();
 use Carp ();
 
 our @CARP_NOT = qw( alienfile Alien::Build Alien::Build::Meta );
 
 # ABSTRACT: Plugin base class for Alien::Build
-our $VERSION = '1.94'; # VERSION
+our $VERSION = '1.96'; # VERSION
 
 
 sub new
@@ -66,7 +65,9 @@ sub subplugin
   my(undef, $name, %args) = @_;
   Carp::carp("subplugin method is deprecated");
   my $class = "Alien::Build::Plugin::$name";
-  Module::Load::load($class) unless eval { $class->can('new') };
+  my $pm = "$class.pm";
+  $pm =~ s/::/\//g;
+  require $pm unless eval { $class->can('new') };
   delete $args{$_} for grep { ! defined $args{$_} } keys %args;
   $class->new(%args);
 }
@@ -137,7 +138,7 @@ Alien::Build::Plugin - Plugin base class for Alien::Build
 
 =head1 VERSION
 
-version 1.94
+version 1.96
 
 =head1 SYNOPSIS
 
@@ -237,8 +238,8 @@ B<DEPRECATED>: Maybe removed, but not before 1 October 2018.
 
  my $plugin2 = $plugin1->subplugin($plugin_name, %args);
 
-Finds the given plugin and loads it using L<Module::Load> (unless already loaded)
-and creats a new instance and returns it.  Most useful from a Negotiate plugin,
+Finds the given plugin and loads it (unless already loaded) and creats a
+new instance and returns it.  Most useful from a Negotiate plugin,
 like this:
 
  sub init
@@ -334,7 +335,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2019 by Graham Ollis.
+This software is copyright (c) 2011-2020 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

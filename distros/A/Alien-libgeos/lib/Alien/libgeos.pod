@@ -1,0 +1,35 @@
+=head1 NAME
+
+Alien::libgeos - geos C++ library (alien, without perl-adapters).
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+    write_makefile(
+        ...
+        BIN_DEPS => 'Alien::libgeos',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+This is C++ GEOS (Geometry Engine - Open Source) L<library|https://trac.osgeo.org/geos/>.
+
+It is build as B<shared library> (opposed to static libraries build by Alien::*) and
+includes all headers, to be able to write perl-adapters for it.
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+Ivan Baidakou <dmol@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+

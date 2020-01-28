@@ -1,0 +1,83 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*jsony","*json"],
+      ["==",
+        [".",
+          ["*","jsony"],
+          ["jsony-load"],
+          ["yaml"]],
+        [".",
+          ["*","json"],
+          ["json-decode"],
+          ["yaml"]]]],
+    ["%<>",["*json"],
+      ["==",
+        [".",
+          ["*","json"],
+          ["jsony-load"],
+          ["yaml"]],
+        [".",
+          ["*","json"],
+          ["json-decode"],
+          ["yaml"]]]]],
+  "data": [
+    { "label": "String splitting 1",
+      "point": {
+        "jsony": "foo bar baz",
+        "json": "[ \"foo\", \"bar\", \"baz\" ]"}},
+    { "label": "String splitting 2",
+      "point": {
+        "jsony": "foo bar\nbaz\n",
+        "json": "[ \"foo\", \"bar\", \"baz\" ]"}},
+    { "label": "String splitting 3",
+      "point": {
+        "jsony": "foo \"bar baz\"",
+        "json": "[ \"foo\", \"bar baz\" ]"}},
+    { "label": "Number conversion",
+      "point": {
+        "jsony": "foo 3 bar",
+        "json": "[ \"foo\", 3, \"bar\" ]"}},
+    { "label": "Specials",
+      "point": {
+        "jsony": "one true two false three null",
+        "json": "[ \"one\", true, \"two\", false, \"three\", null ]"}},
+    { "label": "Object 1",
+      "point": {
+        "jsony": "{ foo bar baz 1 }\n",
+        "json": "{\n  \"foo\": \"bar\",\n  \"baz\": 1\n}\n"}},
+    { "label": "Object 2",
+      "point": {
+        "jsony": "plugin Server {\n  host example.com\n  port 8080\n}\nplugin Frobnicator {\n  harder true\n}\n",
+        "json": "[\n  \"plugin\", \"Server\", {\n    \"host\": \"example.com\",\n    \"port\": 8080\n  },\n  \"plugin\", \"Frobnicator\", {\n    \"harder\": true\n  }\n]\n"}},
+    { "label": "Log line example",
+      "point": {
+        "jsony": "2012-09-10T17:00:34 /users/bob/edit { user admin }\n",
+        "json": "[ \"2012-09-10T17:00:34\", \"/users/bob/edit\", { \"user\": \"admin\" } ]\n"}},
+    { "label": "Config file example",
+      "point": {
+        "jsony": "plugin Server {\n  host example.com\n  port 8080\n}\ndsn \"dbi:SQLite:filename=my.db\"\nallow hosts [ jules sherlock kitty ]\n",
+        "json": "[\n  \"plugin\", \"Server\", {\n    \"host\": \"example.com\",\n    \"port\": 8080\n  },\n  \"dsn\", \"dbi:SQLite:filename=my.db\",\n  \"allow\", \"hosts\", [ \"jules\", \"sherlock\", \"kitty\" ]\n]\n"}},
+    { "label": "activitystrea.ms example",
+      "point": {
+        "jsony": "{\npublished 2011-02-10T15:04:55Z\n  actor {\n    url http://example.org/martin\n    objectType person\n    id 'tag:example.org,2011:martin'\n    image {\n      url http://example.org/martin/image\n      width 250\n      height 250\n    }\n    displayName \"Martin Smith\"\n  }\n  verb post\n  object {\n    url http://example.org/blog/2011/02/entry\n    id 'tag:example.org,2011:abc123/xyz'\n  }\n  target {\n    url http://example.org/blog/\n    objectType blog\n    id 'tag:example.org,2011:abc123'\n    displayName \"Martin's Blog\"\n  }\n}\n",
+        "json": "{\n  \"published\": \"2011-02-10T15:04:55Z\",\n  \"actor\": {\n    \"url\": \"http://example.org/martin\",\n    \"objectType\" : \"person\",\n    \"id\": \"tag:example.org,2011:martin\",\n    \"image\": {\n      \"url\": \"http://example.org/martin/image\",\n      \"width\": 250,\n      \"height\": 250\n    },\n    \"displayName\": \"Martin Smith\"\n  },\n  \"verb\": \"post\",\n  \"object\" : {\n    \"url\": \"http://example.org/blog/2011/02/entry\",\n    \"id\": \"tag:example.org,2011:abc123/xyz\"\n  },\n  \"target\" : {\n    \"url\": \"http://example.org/blog/\",\n    \"objectType\": \"blog\",\n    \"id\": \"tag:example.org,2011:abc123\",\n    \"displayName\": \"Martin's Blog\"\n  }\n}\n"}},
+    { "label": "Comments",
+      "point": {
+        "jsony": "foo bar     # comment\n# Comment\nurl http://xyz.com#not_comment\n",
+        "json": "[\n    \"foo\",\n    \"bar\",\n    \"url\",\n    \"http://xyz.com#not_comment\"\n]\n"}},
+    { "label": "Top Level Mapping",
+      "point": {
+        "jsony": "foo: bar\nbaz: 42\n",
+        "json": "{\"foo\": \"bar\", \"baz\": 42}"}},
+    { "label": "Top Level Sequence",
+      "point": {
+        "jsony": "- foo bar\n- foo bar\n",
+        "json": "[[\"foo\", \"bar\"],[\"foo\", \"bar\"]]"}},
+    { "label": "Terminal comment",
+      "point": {
+        "jsony": "abcd: goldfish\n# Terminal Comment w/ newline\n",
+        "json": "{\"abcd\": \"goldfish\"}"}},
+    { "label": "Terminal comment w/ no final newline (Issue 3)",
+      "point": {
+        "jsony": "abcd: goldfish\n# Terminal Comment w/o newline|\n",
+        "json": "{\"abcd\": \"goldfish\"}"}}]}

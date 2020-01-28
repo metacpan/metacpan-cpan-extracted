@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.1.99
+Version v3.1.100
 
 =cut
 
-our $VERSION = version->declare("v3.1.99");
+our $VERSION = version->declare("v3.1.100");
 
 =head STATUS
 
@@ -246,7 +246,7 @@ our %RE = (
 	copr_perms      => { pat => 'this copyright and permissions notice' },
 	copr_cond_discl => {
 		pat =>
-			'the above copyright notice, this list of conditions and the following disclaimer'
+			'the above copyright notice, this list of conditions,? and the following disclaimer'
 	},
 	notices   => { pat => '[Tt]he above notices' },
 	used_perm => { pat => '[Uu]sed by permission' },

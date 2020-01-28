@@ -1,4 +1,5 @@
 package Template::LiquidX::Tag::Random;
+
 # This is based on the example we build in Template::Liquid::Tag
 use base 'Template::Liquid::Tag';
 sub import { Template::Liquid::register_tag('random') }

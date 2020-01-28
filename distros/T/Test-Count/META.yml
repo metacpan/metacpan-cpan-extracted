@@ -40,31 +40,31 @@ name: Test-Count
 provides:
   Test::Count:
     file: lib/Test/Count.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::Base:
     file: lib/Test/Count/Base.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::FileMutator:
     file: lib/Test/Count/FileMutator.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::FileMutator::ByFileType::App:
     file: lib/Test/Count/FileMutator/ByFileType/App.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::FileMutator::ByFileType::Lib:
     file: lib/Test/Count/FileMutator/ByFileType/Lib.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::Filter:
     file: lib/Test/Count/Filter.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::Filter::ByFileType::App:
     file: lib/Test/Count/Filter/ByFileType/App.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::Lib:
     file: lib/Test/Count/Lib.pm
-    version: '0.1101'
+    version: '0.1102'
   Test::Count::Parser:
     file: lib/Test/Count/Parser.pm
-    version: '0.1101'
+    version: '0.1102'
 requires:
   Exporter: '0'
   File::Basename: '0'
@@ -77,7 +77,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-test-count/issues
   homepage: http://metacpan.org/release/Test-Count
   repository: git://github.com/shlomif/perl-test-count.git
-version: '0.1101'
+version: '0.1102'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -284,6 +284,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version

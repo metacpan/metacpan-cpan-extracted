@@ -1,14 +1,14 @@
 package Bencher::Scenario::RegexpPatternGit;
 
-our $DATE = '2019-10-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-12-15'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 our $scenario = {
-    summary => 'Benchmark Regexp::Pattern::Git',
+    summary => 'Benchmark patterns in Regexp::Pattern::Git',
     modules => {
         # minimum versions
         #'Foo' => {version=>'0.31'},
@@ -30,7 +30,7 @@ our $scenario = {
 };
 
 1;
-# ABSTRACT: Benchmark Regexp::Pattern::Git
+# ABSTRACT: Benchmark patterns in Regexp::Pattern::Git
 
 __END__
 
@@ -40,11 +40,11 @@ __END__
 
 =head1 NAME
 
-Bencher::Scenario::RegexpPatternGit - Benchmark Regexp::Pattern::Git
+Bencher::Scenario::RegexpPatternGit - Benchmark patterns in Regexp::Pattern::Git
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::RegexpPatternGit (from Perl distribution Bencher-Scenario-RegexpPatternGit), released on 2019-10-25.
+This document describes version 0.002 of Bencher::Scenario::RegexpPatternGit (from Perl distribution Bencher-Scenario-RegexpPatternGit), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
 
 Benchmark with default options (C<< bencher -m RegexpPatternGit >>):
 
@@ -102,9 +102,9 @@ Benchmark with default options (C<< bencher -m RegexpPatternGit >>):
  +-----------------------------+-----------+-----------+------------+---------+---------+
  | dataset                     | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +-----------------------------+-----------+-----------+------------+---------+---------+
- | one/two/three/four/five/six |    460000 |      2.2  |        1   | 3.3e-09 |      20 |
- | one/two                     |    900000 |      1.1  |        2   | 1.6e-09 |      23 |
- | .one                        |   3600000 |      0.28 |        7.7 | 1.4e-09 |      20 |
+ | one/two/three/four/five/six |    470570 |    2.1251 |      1     | 1.7e-11 |      20 |
+ | one/two                     |    836700 |    1.195  |      1.778 | 2.3e-11 |      20 |
+ | .one                        |   3598000 |    0.2779 |      7.647 | 2.3e-11 |      21 |
  +-----------------------------+-----------+-----------+------------+---------+---------+
 
 

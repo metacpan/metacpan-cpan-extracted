@@ -5,7 +5,7 @@ use warnings;
 use Path::Tiny qw(path);
 use JSON::MaybeXS qw(encode_json);
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 sub report {
     my ( $pkg, $db, $options ) = @_;
@@ -31,8 +31,8 @@ sub report {
                 $covered |= $scov || $sunc;
             }
             my $sto = $covered > 0 ? 'co' : 'uc';
-            my $binfo = $br->location($lnr) // [];
-            my $cinfo = $cn->location($lnr) // [];
+            my $binfo = defined($br) ? $br->location($lnr) // [] : [];
+            my $cinfo = defined($cn) ? $cn->location($lnr) // [] : [];
             my $btot = my $bcov = 0;
             for my $b ( @$binfo, @$cinfo ) {
                 $btot += $b->total;

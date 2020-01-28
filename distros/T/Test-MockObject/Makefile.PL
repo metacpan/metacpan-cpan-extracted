@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-MockObject",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Test::MockObject",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "overload" => 0,
     "vars" => 0
   },
-  "VERSION" => "1.20191002",
+  "VERSION" => "1.20200122",
   "test" => {
     "TESTS" => "t/*.t"
   }

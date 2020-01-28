@@ -6,7 +6,7 @@
 #
 
 use POSIX 'SEEK_SET';
-my $file = "tf$$.txt";
+my $file = "tf32-$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = "rec0$:rec1$:rec2$:";
 my ($o, $n);
@@ -17,7 +17,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-open F, "> $file" or die $!;
+open F, '>', $file or die $!;
 binmode F;
 print F $data;
 close F;

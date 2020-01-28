@@ -1,5 +1,23 @@
 Revision history for Perl extension Object-Depot.
 
+0.03 2020-01-27T22:25:22Z
+
+ - Added the injection_type argument.
+ - Silenced redefine warnings when exporting.
+ - Allow the exported subroutine to be customized.
+ - Renamed Object::Depot::Singleton to Object::Depot::Role.
+ - Fixed tests failing on Perl <= 5.16.
+ - Declare minimum version of dependencies.
+
+0.02 2020-01-22T23:23:51Z
+
+ - Fixed injections.
+ - Fixed singleton methods to point to the correct caller when
+   throwing a Carp exception.
+ - Stop passing the depot object to the constructor as the
+   constructor has access to it via __PACKAGE__->depot().
+ - Renamed init() to init_depot().
+
 0.01 2020-01-20T20:32:07Z
 
  - First release.

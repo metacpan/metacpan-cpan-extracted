@@ -1,6 +1,5 @@
 { "testml": "0.3.0",
   "code": [
-    ["=","Plan",58],
     ["%<>",["*grammar","*input","*tree"],
       ["==",
         [".",
@@ -198,7 +197,7 @@
       "point": {
         "grammar": "a: zero empty undef\nzero: /(b+)/\nempty: /(c+)/\nundef: /(d+)/\n",
         "input": "bbccdd",
-        "ast": "- 0\n- ''\n- \n"}},
+        "ast": "- 0\n- ''\n- null\n"}},
     { "label": "Wrap",
       "point": {
         "grammar": "a: b c d\nb: /(b+)/\nc: /(c+)/\nd: /(d+)/\n",

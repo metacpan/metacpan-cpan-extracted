@@ -1,10 +1,10 @@
 ## no critic (RequireUseStrict)
 package Tapper::Reports::DPath;
-# git description: v5.0.1-2-g176ea62
+# git description: v5.0.3-2-g27f36fd
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Extended DPath functionality for Tapper reports
-$Tapper::Reports::DPath::VERSION = '5.0.2';
+$Tapper::Reports::DPath::VERSION = '5.0.4';
 use 5.010;
         use Moose;
 
@@ -16,29 +16,66 @@ use 5.010;
 
         our $puresqlabstract = 0;
 
-        use Sub::Exporter -setup => { exports =>           [ 'reportdata' ],
-                                      groups  => { all  => [ 'reportdata' ] },
+        use Sub::Exporter -setup => { exports =>           [ 'reportdata', 'testrundata', 'testplandata' ],
+                                      groups  => { all  => [ 'reportdata', 'testrundata', 'testplandata' ] },
                                     };
 
-        sub _extract_condition_and_part {
-                my ($reports_path) = @_;
-                my ($condition, $path) = extract_codeblock($reports_path, '{}');
-                $path =~ s/^\s*::\s*//;
-                return ($condition, $path);
+        sub _extract_condition_attrs_and_path {
+                my ($query_path) = @_;
+
+                my $condition;
+                my $attrs;
+                my $path;
+
+                my $head;
+                my $tail;
+                my $count;
+
+                # first codeblock is condition
+                ($condition, $tail) = extract_codeblock($query_path, '{}');
+                $count = ($tail =~ s/^\s*::\s*//g);
+
+                # Maybe there is an optional second codeblock (attrs)
+                # but we need to find out by looking for a third block
+                # and then decide.
+                ($head, $tail) = extract_codeblock($tail, '{}');
+                $count = ($tail =~ s/^\s*::\s*//g);
+
+                if ($count) {
+                    $attrs = $head;
+                    $path = $tail;
+                } else {
+                    $attrs = undef;
+                    $path = $head;
+                }
+
+                # tail is path
+                $path = $tail;
+                return ($condition, $attrs, $path);
         }
 
-        # better use alias
-        sub rds($) { reports_dpath_search(@_) } ## no critic (ProhibitSubroutinePrototypes)
+        # backwards compatible frontend to new triplet API
+        sub _extract_condition_and_path {
+                my ($condition, $attrs, $path) = _extract_condition_attrs_and_path(@_);
+                warn "DEPRECATED _extract_condition_and_path() - use _extract_condition_attrs_and_path()\n";
+                return ($condition, $path); # no attrs
+        }
 
-        # better use alias
-        sub reportdata($) { reports_dpath_search(@_) } ## no critic (ProhibitSubroutinePrototypes)
+        # frontend alias for reports_dpath_search
+        sub reportdata { reports_dpath_search(@_) } ## no critic (ProhibitSubroutinePrototypes)
+
+        # frontend alias for testrun_dpath_search
+        sub testrundata { testrun_dpath_search(@_) } ## no critic (ProhibitSubroutinePrototypes)
+
+        # frontend alias for testplan_dpath_search
+        sub testplandata { testplan_dpath_search(@_) } ## no critic (ProhibitSubroutinePrototypes)
 
         # allow trivial better readable column names
         # - foo => 23           ... mapped to "me.foo" => 23
         # - "report.foo" => 23  ... mapped to "me.foo" => 23
         # - suite_name => "bar" ... mapped to "suite.name" => "bar"
         # - -and => ...         ... mapped to "-and" => ...            # just to ensure that it doesn't produce: "me.-and" => ...
-        sub _fix_condition
+        sub _fix_condition_reportdata
         {
                 no warnings 'uninitialized';
                 my $SQLKEYWORDS = 'like|-in|-and|-or';
@@ -53,18 +90,35 @@ use 5.010;
 
         }
 
+        # allow trivial better readable column names
+        # - foo => 23           ... mapped to "me.foo" => 23
+        # - "report.foo" => 23  ... mapped to "me.foo" => 23
+        # - testrun_id => 23    ... mapped to "me.testrun_id" => 23
+        # - suite_name => "bar" ... mapped to "suite.name" => "bar"
+        # - -and => ...         ... mapped to "-and" => ...            # just to ensure that it doesn't produce: "me.-and" => ...
+        sub _fix_condition_testrundata
+        {
+                no warnings 'uninitialized';
+                my $SQLKEYWORDS = 'like|-in|-and|-or';
+                my ($condition) = @_;
+                # joined suite
+                $condition      =~ s/([^-\w])(?<!\.)(['"])?((host|queue|testrun)_)(\w+)\b(['"])?(\s*)=>/$1"$4.$5" =>/g;        # ';
+                return $condition;
+
+        }
+
         # ===== CACHE =====
 
         # ----- cache complete Tapper::Reports::DPath queries -----
 
         sub _cachekey_whole_dpath {
-                my ($reports_path) = @_;
-                my $key = ($ENV{TAPPER_DEVELOPMENT} || "0") . '::' . $reports_path;
+                my ($query_path) = @_;
+                my $key = ($ENV{TAPPER_DEVELOPMENT} || "0") . '::' . $query_path;
                 return $key;
         }
 
         sub cache_whole_dpath  {
-                my ($reports_path, $rs_count, $res) = @_;
+                my ($query_path, $rs_count, $res) = @_;
 
                 return if $ENV{HARNESS_ACTIVE};
 
@@ -79,8 +133,8 @@ use 5.010;
                 # we cache on the dpath
                 # but need count to verify and maintain cache validity
 
-#                say STDERR "  -> set whole: $reports_path ($rs_count)";
-                $cache->set( _cachekey_whole_dpath($reports_path),
+#                say STDERR "  -> set whole: $query_path ($rs_count)";
+                $cache->set( _cachekey_whole_dpath($query_path),
                              {
                               count => $rs_count,
                               res   => $res,
@@ -88,7 +142,7 @@ use 5.010;
         }
 
         sub cached_whole_dpath {
-                my ($reports_path, $rs_count) = @_;
+                my ($query_path, $rs_count) = @_;
 
                 return if $ENV{HARNESS_ACTIVE};
 
@@ -98,10 +152,10 @@ use 5.010;
                                       compress => 1,
                                     );
                 $cache->clear() if -e '/tmp/TAPPER_CACHE_CLEAR';
-                my $cached_res = $cache->get(  _cachekey_whole_dpath($reports_path) );
+                my $cached_res = $cache->get(  _cachekey_whole_dpath($query_path) );
 
                 my $cached_res_count = $cached_res->{count} || 0;
-#                say STDERR "  <- get whole: $reports_path ($rs_count vs. $cached_res_count)";
+#                say STDERR "  <- get whole: $query_path ($rs_count vs. $cached_res_count)";
                 return if not defined $cached_res;
 
                 if ($cached_res_count == $rs_count) {
@@ -110,7 +164,7 @@ use 5.010;
                 }
 
                 # clean up when matching report count changed
-                $cache->remove( $reports_path );
+                $cache->remove( $query_path );
                 return;
         }
 
@@ -124,7 +178,7 @@ use 5.010;
         }
 
         sub cache_single_dpath {
-                my ($path, $reports_id, $res) = @_;
+                my ($path, $cache_key, $res) = @_;
 
                 return if $ENV{HARNESS_ACTIVE};
 
@@ -134,13 +188,13 @@ use 5.010;
                                       compress => 1,
                                     );
                 $cache->clear() if -e '/tmp/TAPPER_CACHE_CLEAR';
-                $cache->set( _cachekey_single_dpath( $path, $reports_id ),
+                $cache->set( _cachekey_single_dpath( $path, $cache_key ),
                              $res
                            );
         }
 
         sub cached_single_dpath {
-                my ($path, $reports_id) = @_;
+                my ($path, $cache_key) = @_;
 
                 return if $ENV{HARNESS_ACTIVE};
 
@@ -150,20 +204,21 @@ use 5.010;
                                       compress => 1,
                                     );
                 $cache->clear() if -e '/tmp/TAPPER_CACHE_CLEAR';
-                my $cached_res = $cache->get( _cachekey_single_dpath( $path, $reports_id ));
+                my $cached_res = $cache->get( _cachekey_single_dpath( $path, $cache_key ));
 
-#                print STDERR "  <- get single: $reports_id -- $path: ".Dumper($cached_res);
+#                print STDERR "  <- get single: $cache_key -- $path: ".Dumper($cached_res);
                 return $cached_res;
         }
 
         # ===== the query search =====
 
         sub reports_dpath_search($) { ## no critic (ProhibitSubroutinePrototypes)
-                my ($reports_path) = @_;
+                my ($query_path) = @_;
 
-                my ($condition, $path) = _extract_condition_and_part($reports_path);
+                my ($condition, $path) = _extract_condition_and_path($query_path);
+                $path =~ s/^\s+|\s+$//; # drop leading+trailing whitespace
                 my $dpath              = new Data::DPath::Path( path => $path );
-                $condition             = _fix_condition($condition) unless $puresqlabstract;
+                $condition             = _fix_condition_reportdata($condition) unless $puresqlabstract;
                 my %condition          = $condition ? %{ eval $condition } : (); ## no critic (ProhibitStringyEval)
                 my $rs = model('TestrunDB')->resultset('Report')->search
                     (
@@ -205,30 +260,162 @@ use 5.010;
                 my @res = ();
 
                 # layer 2 cache
-                my $cached_res = cached_whole_dpath( $reports_path, $rs_count );
+                my $cached_res = cached_whole_dpath( $query_path, $rs_count );
                 return @$cached_res if defined $cached_res;
 
                 while (my $row = $rs->next)
                 {
                         my $report_id = $row->id;
-                        # layer 1 cache
 
-                        my $cached_row_res = cached_single_dpath( $path, $report_id );
+                        # layer 1 cache
+                        my $cached_row_res = cached_single_dpath( $path, "r$report_id" );
 
                         if (defined $cached_row_res) {
                                 push @res, @$cached_row_res;
                                 next;
                         }
 
-                        my $data = _as_data($row);
+                        my $data = _report_as_data($row);
                         my @row_res = $dpath->match( $data );
 
-                        cache_single_dpath($path, $report_id, \@row_res);
+                        cache_single_dpath($path, "r$report_id", \@row_res);
 
                         push @res, @row_res;
                 }
 
-                cache_whole_dpath($reports_path, $rs_count, \@res);
+                cache_whole_dpath($query_path, $rs_count, \@res);
+
+                return @res;
+        }
+
+        sub testrun_dpath_search($) { ## no critic (ProhibitSubroutinePrototypes)
+                my ($query_path, $nohost) = @_;
+
+                #my ($condition, $path) = _extract_condition_and_path($query_path);
+                my ($condition, $attrs, $path) = _extract_condition_attrs_and_path($query_path);
+                my $dpath              = Data::DPath::Path->new( path => $path );
+                $condition             = _fix_condition_testrundata($condition) unless $puresqlabstract;
+                my %condition          = $condition ? %{ eval $condition } : (); ## no critic (ProhibitStringyEval)
+                my %attrs              = $attrs     ? %{ eval $attrs     } : (); ## no critic (ProhibitStringyEval)
+
+                my $joins   = [ ($nohost ? () : ('host')), 'requested_hosts', 'requested_features', 'queue', 'testrun' ];
+                my $selects = [ ($nohost ? () : ('host.name', 'host.free', 'host.active')), 'queue.name', 'testrun.shortname', 'testrun.notes', 'testrun.starttime_testrun', 'testrun.starttime_test_program', 'testrun.endtime_test_program', 'testrun.owner_id', 'testrun.testplan_id', 'testrun.wait_after_tests', 'testrun.rerun_on_error', 'testrun.created_at', 'testrun.updated_at', 'testrun.topic_name', ];
+                my $as      = [ ($nohost ? () : ('host_name', 'host_free', 'host_active')), 'queue_name', 'testrun_shortname', 'testrun_notes', 'testrun_starttime_testrun', 'testrun_starttime_test_program', 'testrun_endtime_test_program', 'testrun_owner_id', 'testrun_testplan_id', 'testrun_wait_after_tests', 'testrun_rerun_on_error', 'testrun_created_at', 'testrun_updated_at', 'testrun_topic_name', ];
+
+                my %merged_attrs = (
+                      order_by  => 'testrun_id asc',
+                      columns   => [ qw(
+                                         testrun_id
+                                         queue_id
+                                         prioqueue_seq
+                                         status
+                                         auto_rerun
+                                         created_at
+                                         updated_at
+                                     ),
+                                     ($nohost ? () : ('host_id')),
+                                   ],
+                      join      => $joins,
+                      '+select' => $selects,
+                      '+as'     => $as,
+                      limit => 10,
+                      %attrs,
+                    );
+
+                print STDERR "query: $query_path\n";
+                # print STDERR "testrun_dpath_search: ".Dumper(
+                #     {
+                #         condition    => \%condition,
+                #         attrs        => \%attrs,
+                #         merged_attrs => \%merged_attrs,
+                #     });
+
+                my $rs = model('TestrunDB')->resultset('TestrunScheduling')->search
+                    (
+                     { %condition },
+                     { %merged_attrs },
+                    );
+
+                #print STDERR Dumper($rs);
+
+                my $rs_count = $rs->count();
+                my @res = ();
+
+                # layer 2 cache
+                my $cached_res = cached_whole_dpath( $query_path, $rs_count );
+                return @$cached_res if defined $cached_res;
+
+                while (my $row = $rs->next)
+                {
+                        my $testrun_id = $row->testrun_id;
+
+                        # layer 1 cache
+                        my $cached_row_res = cached_single_dpath( $path, "tr$testrun_id" );
+
+                        if (defined $cached_row_res) {
+                                push @res, @$cached_row_res;
+                                next;
+                        }
+
+                        my $data = _testrun_as_data($row, $nohost);
+                        my @row_res = $dpath->match( $data );
+
+                        cache_single_dpath($path, "tr$testrun_id", \@row_res);
+
+                        push @res, @row_res;
+                }
+
+                cache_whole_dpath($query_path, $rs_count, \@res);
+
+                return @res;
+        }
+
+        sub testplan_dpath_search($) { ## no critic (ProhibitSubroutinePrototypes)
+                my ($query_path) = @_;
+
+                my ($condition, $attrs, $path) = _extract_condition_attrs_and_path($query_path);
+                my $dpath              = Data::DPath::Path->new( path => $path );
+                my %condition          = $condition ? %{ eval $condition } : (); ## no critic (ProhibitStringyEval)
+                my %attrs              = $attrs     ? %{ eval $attrs     } : (); ## no critic (ProhibitStringyEval)
+
+                print STDERR "testplan_dpath_search: ".Dumper(
+                    {
+                        condition => \%condition,
+                        attrs => \%attrs,
+                    });
+                my $rs = model('TestrunDB')->resultset('TestplanInstance')->search
+                    (
+                     {
+                      %condition
+                     },
+                     {
+                      order_by  => 'id asc',
+                      columns   => [ qw(
+                                         id
+                                         path
+                                         name
+                                         evaluated_testplan
+                                         created_at
+                                         updated_at
+                                      )],
+                      limit => 10,
+                      %attrs,
+                     }
+                    );
+
+                #print STDERR Dumper($rs);
+
+                my @res = ();
+
+                while (my $row = $rs->next)
+                {
+                        my $testplan_id = $row->id;
+
+                        my $data = _testplan_as_data($row);
+                        my @row_res = $dpath->match( $data );
+
+                        push @res, @row_res;
+                }
 
                 return @res;
         }
@@ -327,7 +514,7 @@ use 5.010;
                 return $reportgroupstats;
         }
 
-        sub _as_data
+        sub _report_as_data
         {
                 my ($report) = @_;
 
@@ -360,6 +547,58 @@ use 5.010;
                                   };
                 return $simple_hash;
         }
+
+        sub _testrun_as_data
+        {
+                my ($testrun, $nohost) = @_;
+
+                my $simple_hash = {
+                  testrun => {
+                    $testrun->get_columns,
+                  },
+                  ($nohost ? () : ( host => { $testrun->host->get_columns } ) ),
+                  queue => {
+                    $testrun->queue->get_columns,
+                  },
+                };
+                return $simple_hash;
+        }
+
+        sub _testplan_as_data
+        {
+            my ($testplan) = @_;
+
+            my @testruns = $testplan->testruns->all;
+
+            my $simple_hash = {
+                testplan => {
+                    id                          => $testplan->id,
+                    name                        => $testplan->name,
+                    created_at_ymd_hms          => $testplan->created_at->ymd('-')." ".$testplan->created_at->hms(':'),
+                    created_at_ymd              => $testplan->created_at->ymd('-'),
+                    #testplan_evaluated_testplan => $testplan->evaluated_testplan,
+                },
+                testruns => [
+                    map {
+                        my $ts   = $_->testrun_scheduling;
+                        my $rgts = $_->reportgrouptestrunstats;
+                        my $host = $ts->host;
+                        my $host_name = $host ? $host->name : 'undefined_host';
+                        {
+                            id         => $_->id,
+                            topic_name => $_->topic_name,
+                            host_name  => $host_name,
+                            status     => $ts->status->value,
+                            stats      => {
+                                $rgts ? $rgts->get_columns : (),
+                            },
+                        }
+                    } @testruns
+                    ],
+            };
+            return $simple_hash;
+        }
+
 1;
 
 __END__
@@ -400,28 +639,64 @@ the DB.
 
 =head1 API FUNCTIONS
 
-=head2 reports_dpath_search
-
-Takes an extended DPath expression, applies it to Tapper Reports
-with TAP::DOM structure and returns the matching results in an array.
-
-=head2 rds
-
-Alias for reports_dpath_search.
-
 =head2 reportdata
 
-Alias for reports_dpath_search.
+The actually exported API function which is the frontend to
+reports_dpath_search.
+
+=head2 testrundata
+
+The actually exported API function which is the frontend to
+testrun_dpath_search.
+
+=head2 testrundata_nohost
+
+Similar to I<testrundata> but without host data, so it also
+returns testruns that are not yet started (state C<prepare>
+or C<schedule>).
+
+=head2 testplandata
+
+The actually exported API function which is the frontend to
+testplan_dpath_search.
 
 =head1 UTILITY FUNCTIONS
 
+=head2 reports_dpath_search
+
+This is the backend behind the API function reportdata.
+
+It takes an extended DPath expression, applies it to Tapper Reports
+with TAP::DOM structure and returns the matching results in an array.
+
+=head2 testrun_dpath_search($DPATH, $NOHOST)
+
+This is the backend behind the API function testrundata.
+
+It takes an extended DPath expression, applies it to Tapper Testrun
+with the resultset as data structure and returns the matching results
+in an array.
+
+Optionally you can pass a flag B<NOHOST> which does not JOIN the host
+table behind the scenes and therefore also returns testruns that are
+not yet started (and therefore do not have that host set yet),
+usually in state C<prepare> or C<schedule>.
+
+=head2 testplan_dpath_search
+
+This is the backend behind the API function testplandata.
+
+It takes an extended DPath expression, applies it to Tapper Testplan
+with the resultset as data structure and returns the matching results
+in an array.
+
 =head2 cache_single_dpath
 
-Cache a result for a raw dpath on a report id.
+Cache a result for a raw dpath on a cache key.
 
 =head2 cached_single_dpath
 
-Return cached result for a raw dpath on a report id.
+Return cached result for a raw dpath on a cache key.
 
 =head2 cache_whole_dpath
 
@@ -447,7 +722,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

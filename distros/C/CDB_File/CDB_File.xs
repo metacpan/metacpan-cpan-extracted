@@ -692,7 +692,7 @@ cdbmaker_DESTROY(sv)
         CODE:
         if (sv_isobject(sv) && (SvTYPE(SvRV(sv)) == SVt_PVMG) ) {
           this = (cdb_make*)SvIV(SvRV(sv));
-          
+          if(this->f){PerlIO_close(this->f);}
           Safefree(this);
         }
 
@@ -816,6 +816,7 @@ cdbmaker_finish(this)
 
 	if (fsync(PerlIO_fileno(this->f)) == -1) XSRETURN_NO;
 	if (PerlIO_close(this->f) == EOF) XSRETURN_NO;
+     this->f=0;
 
 	if (rename(this->fntemp, this->fn)) XSRETURN_NO;
 	

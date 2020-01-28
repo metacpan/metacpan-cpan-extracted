@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   TheSchwartz:
     file: lib/TheSchwartz.pm
-    version: '1.14'
+    version: '1.15'
   TheSchwartz::Error:
     file: lib/TheSchwartz/Error.pm
   TheSchwartz::ExitStatus:
@@ -49,13 +49,14 @@ resources:
   bugtracker: https://github.com/akiym/TheSchwartz/issues
   homepage: https://github.com/akiym/TheSchwartz
   repository: git://github.com/akiym/TheSchwartz.git
-version: '1.14'
+version: '1.15'
 x_authority: cpan:AKIYM
 x_contributors:
   - 'Akira Sawada <akira@peatix.com>'
   - 'Brad Fitzpatrick <brad@danga.com>'
   - 'Jeff Fearn <Jeff.Fearn@gmail.com>'
   - 'Jeff Fearn <jfearn@redhat.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Six Apart Ltd. <cpan@sixapart.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'

@@ -4,13 +4,13 @@
       "Chris Drake<cdrake@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Chart-Colors",
    "no_index" : {
@@ -35,5 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.02"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

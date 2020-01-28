@@ -8,9 +8,37 @@ with qw[Pcore::App::API::Role::Read];
 has default_gravatar       => ();
 has default_gravatar_image => ();
 
+has max_limit        => 100;
+has default_order_by => sub { [ [ 'name', 'DESC' ] ] };
+
 sub API_read ( $self, $auth, $args ) {
-    state $total_sql = 'SELECT COUNT(*) AS "total" FROM "user"';
-    state $main_sql  = <<"SQL";
+    my $where = WHERE;
+
+    # get by id
+    if ( exists $args->{id} ) {
+        $where &= WHERE [ '"id" = ', \$args->{id} ];
+    }
+
+    # get all matched rows
+    else {
+
+        # filter search
+        if ( my $search = delete $args->{where}->{search} ) {
+            my $val = lc "%$search->[1]%";
+
+            $where &= WHERE [ '"name" LIKE', \$val, 'OR "email" LIKE', \$val, 'OR "telegram_name" LIKE', \$val ];
+        }
+
+        # filter status
+        if ( exists $args->{where}->{status} ) {
+            $where &= [ '"enabled"', IN [ map { SQL_BOOL $_} $args->{where}->{status}->[1]->@* ] ];
+        }
+    }
+
+    my $total_query = [ 'SELECT COUNT(*) AS "total" FROM "user"', $where ];
+
+    my $main_query = [
+        <<"SQL",
         SELECT
             *,
             CASE
@@ -20,46 +48,10 @@ sub API_read ( $self, $auth, $args ) {
         FROM
             "user"
 SQL
+        $where
+    ];
 
-    my $where;
-
-    # get by id
-    if ( exists $args->{id} ) {
-        $where = WHERE [ '"id" = ', \$args->{id} ];
-    }
-
-    # get all matched rows
-    else {
-
-        # default sort
-        $args->{sort} = [ [ 'name', 'DESC' ] ] if !$args->{sort};
-
-        # filter search
-        my $where1 = WHERE do {
-            if ( my $search = delete $args->{filter}->{search} ) {
-                my $val = lc "%$search->[1]%";
-
-                [ '"name" LIKE', \$val, 'OR "email" LIKE', \$val, 'OR "telegram_name" LIKE', \$val ];
-            }
-            else {
-                undef;
-            }
-        };
-
-        # filter status
-        my $where2 = WHERE do {
-            if ( exists $args->{filter}->{status} ) {
-                [ '"enabled"', IN [ map { SQL_BOOL $_} $args->{filter}->{status}->[1]->@* ] ];
-            }
-            else {
-                undef;
-            }
-        };
-
-        $where = $where1 & $where2;
-    }
-
-    my $res = $self->_read( $args, $total_sql, $main_sql, $where, 100 );
+    my $res = $self->_read( $total_query, $main_query, $args );
 
     return $res;
 }
@@ -144,7 +136,7 @@ sub API_set_enabled ( $self, $auth, $user_id, $enabled ) {
 }
 
 sub API_read_permissions ( $self, $auth, $args ) {
-    my $user_id = $args->{filter}->{user_id}->[1];
+    my $user_id = $args->{where}->{user_id}->[1];
 
     my $permissions;
     my $auth_permissions = $auth->{permissions};
@@ -213,8 +205,8 @@ sub API_write_permissions ( $self, $auth, $user_id, $permissions ) {
 
 sub API_suggest ( $self, $auth, $args ) {
     my $where = WHERE do {
-        if ( defined $args->{filter}->{name}->[1] ) {
-            my $val = lc "%$args->{filter}->{name}->[1]%";
+        if ( defined $args->{where}->{name}->[1] ) {
+            my $val = lc "%$args->{where}->{name}->[1]%";
 
             [ '"name" LIKE', \$val, 'OR "email" LIKE', \$val, 'OR "telegram_name" LIKE', \$val ];
         }

@@ -1,5 +1,5 @@
 package Template::Liquid::Document;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Variable;
 require Template::Liquid::Utility;
 use strict;
@@ -20,23 +20,22 @@ sub new {
 sub parse {
     my ($class, $args, $tokens);
     (scalar @_ == 3 ? ($class, $args, $tokens) : ($class, $tokens)) = @_;
-    my $s = ref $class ? $class : $class->new($args);
+    my $s     = ref $class ? $class : $class->new($args);
     my %_tags = $s->{template}->tags;
 NODE: while (my $token = shift @{$tokens}) {
         if ($token =~ $Template::Liquid::Utility::TagMatch) {
             my ($tag, $attrs) = (split ' ', $1, 2);
             my $package = $_tags{$tag};
-            my $call = $package ? $package->can('new') : ();
+            my $call    = $package ? $package->can('new') : ();
             if (defined $call) {
-                my $_tag =
-                    $call->($package,
-                            {template => $s->{template},
-                             parent   => $s,
-                             tag_name => $tag,
-                             markup   => $token,
-                             attrs    => $attrs
-                            }
-                    );
+                my $_tag = $call->($package,
+                                   {template => $s->{template},
+                                    parent   => $s,
+                                    tag_name => $tag,
+                                    markup   => $token,
+                                    attrs    => $attrs
+                                   }
+                );
                 push @{$s->{'nodelist'}}, $_tag;
                 if ($_tag->conditional_tag) {
                     push @{$_tag->{'blocks'}},
@@ -62,9 +61,8 @@ NODE: while (my $token = shift @{$tokens}) {
                 $s->{'markup_2'} = $token;
                 last NODE;
             }
-            elsif (   $s->conditional_tag
-                   && $tag =~ $s->conditional_tag)
-            {   $s->push_block({tag_name => $tag,
+            elsif ($s->conditional_tag && $tag =~ $s->conditional_tag) {
+                $s->push_block({tag_name => $tag,
                                 attrs    => $attrs,
                                 markup   => $token,
                                 template => $s->{template},
@@ -74,26 +72,24 @@ NODE: while (my $token = shift @{$tokens}) {
                 );
             }
             else {
-                raise Template::Liquid::Error {
-                                           type    => 'Syntax',
-                                           message => 'Unknown tag: ' . $token
-                };
+                raise Template::Liquid::Error {type => 'Syntax',
+                                         message => 'Unknown tag: ' . $token};
             }
         }
         elsif ($token =~ $Template::Liquid::Utility::VarMatch) {
             my ($variable, $filters) = split qr[\s*\|\s*]o, $1, 2;
             my @filters;
             for my $filter (split $Template::Liquid::Utility::FilterSeparator,
-                            $filters || '')
-            {   my ($filter, $args)
+                            $filters || '') {
+                my ($filter, $args)
                     = split
                     $Template::Liquid::Utility::FilterArgumentSeparator,
                     $filter, 2;
                 $filter =~ s[\s*$][]o;    # XXX - the splitter should clean...
                 $filter =~ s[^\s*][]o;    # XXX -  ...this up for us.
                 my @args
-                    = $args ?
-                    split
+                    = $args
+                    ? split
                     $Template::Liquid::Utility::VariableFilterArgumentParser,
                     $args
                     : ();
@@ -158,9 +154,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

@@ -61,12 +61,29 @@ my $configure_fullautoapi=sub {
    $handle->cwd('~');
    my $userhome=$handle->cmd('pwd');
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
-   ($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
+   my $security_group='FullAutoAPISecurityGroup';
+   ($stdout,$stderr)=setup_aws_security(
+      $security_group,'FullAutoAPI Security Group');
+   my $c='aws ec2 describe-security-groups '.
+         "--group-names $security_group";
+   my ($hash,$output,$error)=('','','');
+   ($hash,$output,$error)=run_aws_cmd($c);
+   my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
+           ->[0]->{IpRanges}->[0]->{CidrIp};
+   $c='aws ec2 authorize-security-group-ingress '.
+      "--group-name $security_group --protocol ".
+      'tcp --port 80 --cidr '.$cidr." 2>&1";
+   ($hash,$output,$error)=run_aws_cmd($c);
+   $c='aws ec2 authorize-security-group-ingress '.
+      "--group-name $security_group --protocol ".
+      'tcp --port 443 --cidr '.$cidr." 2>&1";
+   ($hash,$output,$error)=run_aws_cmd($c);
+   ($stdout,$stderr)=$handle->cmd($sudo."perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
    $builddir=$stdout;
    my $fa_ver=$Net::FullAuto::VERSION;
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}ls -1t $builddir | grep Net-FullAuto-$fa_ver");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "ls -1t $builddir | grep Net-FullAuto-$fa_ver");
    my @lstmp=split /\n/,$stdout;
    foreach my $line (@lstmp) {
       unshift @ls_tmp, $line if $line!~/\.yml$/;
@@ -181,65 +198,37 @@ if ($do==1) {
          $handle->print('/bin/exim-config');
          $prompt=$handle->prompt();
          while (1) {
-            my $output.=Net::FullAuto::FA_Core::fetch($handle);
+            my $output=fetch($handle);
             last if $output=~/$prompt/;
             print $output;
             if (-1<index $output,'local postmaster') {
                $handle->print();
-               $output='';
-               next;
             } elsif (-1<index $output,'Is it') {
                $handle->print('yes');
-               $output='';
-               next;
             } elsif (-1<index $output,'change that setting') {
                $handle->print('no');
-               $output='';
-               next;
             } elsif (-1<index $output,'standard values') {
                $handle->print('yes');
-               $output='';
-               next;
             } elsif (-1<index $output,'be links to') {
                $handle->print('yes');
-               $output='';
-               next;
             } elsif (-1<index $output,'some CPAN') {
                $handle->print('no');
-               $output='';
-               next;
             } elsif (-1<index $output,'install the exim') {
                $handle->print('yes');
-               $output='';
-               next;
             } elsif (-1<index $output,'in minutes') {
                $handle->print();
-               $output='';
-               next;
             } elsif (-1<index $output,'CYGWIN for the daemon') {
                $handle->print('default');
-               $output='';
-               next;
             } elsif (-1<index $output,'the cygsla package') {
                $handle->print('yes');
-               $output='';
-               next;
             } elsif (-1<index $output,'another privileged account') {
                $handle->print('no');
-               $output='';
-               next;
             } elsif (-1<index $output,'enter the password') {
                $handle->print($service_and_cert_password);
-               $output='';
-               next;
             } elsif (-1<index $output,'Reenter') {
                $handle->print($service_and_cert_password);
-               $output='';
-               next;
             } elsif (-1<index $output,'start the exim') {
                $handle->print('yes');
-               $output='';
-               next;
             }
             next;
          }
@@ -537,7 +526,7 @@ if ($do==1) {
       "cp -v $builddir/$ls_tmp[0]/api/wrapper.tt2 ".
       "FullAutoAPI/root",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v $builddir/$ls_tmp[0]/demo/FA.ico ".
+      "cp -v $builddir/$ls_tmp[0]/installer/FA.ico ".
       "FullAutoAPI/root/favicon.ico",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chmod -v 755 FullAutoAPI/root/static/images/*",
@@ -569,7 +558,7 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd("unzip -o master.zip",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf master.zip','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -Rv $username:$username libsodium-master",'__display__')
+      "chown -Rv $username:$username libsodium-master",'3600')
       if $^O ne 'cygwin';
    ($stdout,$stderr)=$handle->cwd('libsodium-master');
    ($stdout,$stderr)=$handle->cmd('./autogen.sh','__display__');
@@ -1433,13 +1422,11 @@ print "DOING NGINX\n";
       "/etc/nginx/ssl.key/$public_ip.key -out ".
       "/etc/nginx/ssl.crt/$public_ip.crt");
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      my $output=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'Enter pass phrase') {
          $handle->print($service_and_cert_password);
-         $output='';
-         next;
       } 
    }
    ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
@@ -1548,13 +1535,11 @@ END
       $handle->print($sudo."/usr/local/nginx/nginx");
       $prompt=$handle->prompt();
       while (1) {
-         my $output.=fetch($handle);
+         my $output=fetch($handle);
          last if $output=~/$prompt/;
          print $output;
          if (-1<index $output,'PEM pass phrase') {
             $handle->print($service_and_cert_password);
-            $output='';
-            next;
          }
       }
    }
@@ -1625,36 +1610,23 @@ exit;
       } 
       $prompt=$handle->prompt();
       while (1) {
-         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         my $output=fetch($handle);
          last if $output=~/$prompt/;
          print 'm'.$output;
          if (-1<index $output,'possible automatically') {
             $handle->print('yes');
-            $output='';
-            next;
          } elsif (-1<index $output,'by bootstrapping') {
             $handle->print('sudo');
-            $output='';
-            next;
          } elsif (-1<index $output,'some CPAN') {
             $handle->print('no');
-            $output='';
-            next;
          } elsif (-1<index $output,'pick from') {
             $handle->print('no');
-            $output='';
-            next;
          } elsif (-1<index $output,'CPAN site') {
             $handle->print('http://www.cpan.org');
-            $output='';
-            next;
          } elsif (-1<index $output,'ENTER to quit') {
             $handle->print();
-            $output='';
-            next;
          } elsif ($output=~/cpan[[]\d+[]][>]/) {
             $handle->print('bye');
-            next;
          }
       }
    }
@@ -1965,14 +1937,15 @@ END
          $handle->print($sudo."cpan $module 2>&1");
       }
       my $prompt=$handle->prompt();
-      my $error=0;my $force=0;my $tries=0;my $allout='';
+      my $error=0;my $force=0;my $tries=0;my $allout='';my $save='';
       while (1) {
          my $done=eval {
             local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
             alarm 120;
             select(undef,undef,undef,0.02);
             # sleep for 1/50th second;
-            my $output=fetch($handle);
+            my $output='';
+            ($output,$save)=fetch($handle,$save,'__display__');
             $allout.=$output;
             if ($output=~/$prompt/) {
                if ($error) {
@@ -1981,11 +1954,23 @@ END
                      'perl -MCPAN -e \'CPAN::Shell->force('.
                      "\"install\",\"$module\")\'"
                   )
+               } elsif ($output=~/y\s*y\s*y/s) {
+                  print "\n\nCLEARING MEMORY ...\n\n";
+                  sleep 3;
+                  clean_filehandle($handle);
+                  $handle->close();
+                  $handle=connect_shell();
+                  return 'done';
                } else {
-                  $output=~s/$prompt$//s;
-                  print $output;
                   return 'done';
                }
+            } elsif ($output=~/y\s*y\s*y/s) {
+               print "\n\nCLEARING MEMORY ...\n\n";
+               sleep 3;
+               clean_filehandle($handle);
+               $handle->close();
+               $handle=connect_shell();
+               return 'done';
             } elsif ($output=~/build the XS Stash module/) {
                $handle->print('y');
             } elsif ($output=~/use the XS Stash by default/) {
@@ -1999,21 +1984,21 @@ END
                   ((-1<index $allout,'[test_dynamic] Error 255') ||
                   (-1<index $allout,'Connection reset by peer'))) {
                $error=1;
-               $output=~s/$prompt//gs;
+               #$output=~s/$prompt//gs;
             }
-            print $output;
+            #print $output;
             return 'continue';
          };
          next if $done eq 'continue';
          if ($done=~/^\d$/ && $done==1) {
-            my $output=Net::FullAuto::FA_Core::fetch($handle);
+            my $output=fetch($handle);
             my $attempt='attempts';
             $attempt='attempt' if $tries==0;
             print "\n\n   FATAL ERROR!: Could not install CPAN Module",
                   ":  $module\n\n",
                   "                 --> $output\n",
                   "                 after ",++$tries," $attempt\n\n";
-            &Net::FullAuto::FA_Core::cleanup;
+            cleanup;
          } elsif ($@ && ++$tries<4) {
             alarm(0);$allout='';
             $handle->print("\003");
@@ -2030,7 +2015,7 @@ END
                      ":  $module\n\n",
                      "                 --> could not recover handle after \n",
                      "                 ",++$tries," $attempt\n\n";
-               &Net::FullAuto::FA_Core::cleanup;
+               cleanup;
             } elsif ($done) {
                next
             } else {
@@ -2038,14 +2023,14 @@ END
                      "                 $module\n",
                      "                 - Unknown Error after ",
                      --$tries," attempts\n\n";
-               &Net::FullAuto::FA_Core::cleanup;
+               cleanup;
             }
          } elsif ($tries>3) {
             my $attempt='attempts';
             print "\n\n   FATAL ERROR!: Could not install CPAN Module",
                   ":  $module\n\n",
                   "                 after ",++$tries," $attempt\n\n";
-            &Net::FullAuto::FA_Core::cleanup;
+            cleanup;
          }
          last if $done;
       }
@@ -2066,20 +2051,17 @@ END
    } else {
       $handle->print($sudo.'cpan Catalyst::Devel');
    }
-   $prompt=$handle->prompt();
+   $prompt=$handle->prompt();my $save='';
    while (1) {
-      my $output.=fetch($handle);
+      my $output='';
+      ($output,$save)=fetch($handle,$save,'__display__');
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'XS Stash module?') {
-         $handle->print('Y');
-         $output='';
-         next;
+         $handle->print('y');
       }
       if (-1<index $output,'XS Stash by default?') {
-         $handle->print('Y');
-         $output='';
-         next;
+         $handle->print('y');
       }
    }
    $show=<<END;
@@ -2102,7 +2084,8 @@ END
 
 ########################################
 END
-   $handle->cmd_raw("${sudo}cpan DBIx::Class::Schema::Loader",
+   $handle->cmd_raw($sudo.
+      'cpan DBIx::Class::Schema::Loader',
       '__display__');
 #   $show=<<END;
 #
@@ -2146,7 +2129,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Controller::REST",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Controller::REST','__display__');
 #   $show=<<END;
 #
 ########################################
@@ -2168,7 +2152,9 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::View::JSON",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::View::JSON',
+           '__display__');
    $show=<<END;
 
 ########################################
@@ -2179,7 +2165,9 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::View::TT::Alloy",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::View::TT::Alloy',
+           '__display__');
    $show=<<END;
 
 ########################################
@@ -2190,7 +2178,9 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Unicode",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Unicode',
+           '__display__');
    $show=<<END;
 
 ########################################
@@ -2201,7 +2191,9 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan DBIx::Class::PassphraseColumn",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan DBIx::Class::PassphraseColumn',
+           '__display__');
    $show=<<END;
 
 ########################################
@@ -2212,7 +2204,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Authen::Passphrase::BlowfishCrypt",
+   $handle->cmd_raw($sudo.
+           'cpan Authen::Passphrase::BlowfishCrypt',
            '__display__');
    $show=<<END;
 
@@ -2224,7 +2217,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Method::Signatures::Simple",
+   $handle->cmd_raw($sudo.
+           'cpan Method::Signatures::Simple',
            '__display__');
 #   $show=<<END;
 #
@@ -2274,7 +2268,9 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Session",'__display__');
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Session',
+           '__display__');
    $show=<<END;
 
 ########################################
@@ -2286,7 +2282,8 @@ END
    print $show;
    sleep 1;
    # http://vasil9v.tumblr.com/post/31921755331/compiling-memcached-on-cygwinwindows
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Session::Store::Memcached",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Session::Store::Memcached',
            '__display__');
    $show=<<END;
 
@@ -2298,7 +2295,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Session::State::Cookie",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Session::State::Cookie',
            '__display__');
    $show=<<END;
 
@@ -2310,7 +2308,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Authentication",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Authentication',
            '__display__');
    $show=<<END;
 
@@ -2322,7 +2321,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Authentication::Store::DBIx::Class",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Authentication::Store::DBIx::Class',
            '__display__');
    $show=<<END;
 
@@ -2334,7 +2334,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Plugin::Authorization::Roles",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Plugin::Authorization::Roles',
            '__display__');
    $show=<<END;
 
@@ -2359,7 +2360,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan DBIx::Class::TimeStamp",
+   $handle->cmd_raw($sudo.
+           'cpan DBIx::Class::TimeStamp',
            '__display__');
    $show=<<END;
 
@@ -2371,7 +2373,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Controller::ActionRole",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Controller::ActionRole',
            '__display__');
    $show=<<END;
 
@@ -2383,7 +2386,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::ActionRole::ACL",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::ActionRole::ACL',
            '__display__');
    $show=<<END;
 
@@ -2395,7 +2399,7 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan FCGI",
+   $handle->cmd_raw($sudo.'cpan FCGI',
            '__display__');
    $show=<<END;
 
@@ -2407,7 +2411,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan FCGI::ProcManager",
+   $handle->cmd_raw($sudo.
+           'cpan FCGI::ProcManager',
            '__display__');
    $show=<<END;
 
@@ -2419,7 +2424,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::Helper::Model::DBIC::Schema",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::Helper::Model::DBIC::Schema',
            '__display__');
    $show=<<END;
 
@@ -2431,7 +2437,8 @@ END
 END
    print $show;
    sleep 1;
-   $handle->cmd_raw("${sudo}cpan Catalyst::View::Email",
+   $handle->cmd_raw($sudo.
+           'cpan Catalyst::View::Email',
            '__display__');
    $show=<<END;
 
@@ -2442,10 +2449,10 @@ END
 ########################################
 END
    print $show;
-   $handle->print("${sudo}cpan Finance::Quote");
+   $handle->print($sudo.'cpan Finance::Quote');
    $prompt=$handle->prompt();
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      my $output.=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
       if (-1<index $output,'traffic to external sites') {
@@ -2459,10 +2466,10 @@ END
          next;
       }
    }
-   ($stdout,$stderr)=$handle->cwd("~");
-   ($stdout,$stderr)=$handle->cmd("catalyst.pl FullAutoAPI",'__display__');
-   ($stdout,$stderr)=$handle->cwd("FullAutoAPI");
-   ($stdout,$stderr)=$handle->cmd("perl Makefile.PL",'__display__');
+   ($stdout,$stderr)=$handle->cwd('~');
+   ($stdout,$stderr)=$handle->cmd('catalyst.pl FullAutoAPI','__display__');
+   ($stdout,$stderr)=$handle->cwd('FullAutoAPI');
+   ($stdout,$stderr)=$handle->cmd('perl Makefile.PL','__display__');
    # http://www.catalystframework.org/calendar/2011/15
    # http://search.cpan.org/~bobtfish/Catalyst-Plugin-Authentication-0.10023/
    my $pm_path="./lib/FullAutoAPI.pm";
@@ -3194,7 +3201,20 @@ ENDD
          "'s#{ \"cache_redzone#// { \"cache_redzone#' testapp.c");
    }
    ($stdout,$stderr)=$handle->cmd('make','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__'); 
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   unless ($^O eq 'cygwin') {
+      ($stdout,$stderr)=$handle->cwd('scripts');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v memcached.service /etc/systemd/system',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v memcached.sysconfig /etc/sysconfig/memcached',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s/nobody/www-data/\' /etc/sysconfig/memcached");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 777 /var/run','__display__');
+   }
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI');
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -4535,15 +4555,15 @@ END
       ($stdout,$stderr)=$handle->cmd("cygrunsrv --start fullautoapi");
       sleep 15;
       print "\n   ACCESS FULLAUTO API MANAGEMENT DASHBOARD AT:\n\n",
-            " https://$public_ip  -OR-  https://localhost\n";
+            " https://$domain_url  -OR-  https://localhost\n";
    } else {
-      ($stdout,$stderr)=$handle->cmd($sudo."chown -Rv $username:$username .",
-         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "cp -v $builddir/$ls_tmp[0]/api/memcached /etc/init.d",
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'chmod -v 755 /etc/init.d/memcached','__display__');
+         "chown -Rv $username:$username .",'3600');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   "cp -v $builddir/$ls_tmp[0]/api/memcached /etc/init.d",
+      #   '__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'chmod -v 755 /etc/init.d/memcached','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "cp -v $builddir/$ls_tmp[0]/api/fullautoapi /etc/init.d",
          '__display__');
@@ -4558,7 +4578,7 @@ END
          'service fullautoapi start','__display__');
       sleep 15;
       print "\n   ACCESS FULLAUTO API MANAGEMENT DASHBOARD AT:\n\n",
-            " https://$public_ip\n";
+            " https://$domain_url\n";
    }
    my $thanks=<<'END';
 

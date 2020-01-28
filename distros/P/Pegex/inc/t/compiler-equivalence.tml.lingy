@@ -1,6 +1,5 @@
 { "testml": "0.3.0",
   "code": [
-    ["=","Plan",50],
     ["%<>",[],
       ["=>",[],
         [["<>",
@@ -127,4 +126,8 @@
     { "label": "Leading WS, mulitline regex (part2)",
       "point": {
         "grammar1": "a: /-\n  'foo'\n/\n",
-        "grammar2": "a: /-foo/\n"}}]}
+        "grammar2": "a: /-foo/\n"}},
+    { "label": "No parens around a regex to add modifiers",
+      "point": {
+        "grammar1": "a: ./ (b) /\n",
+        "grammar2": "a: .(/ (b) /)\n"}}]}

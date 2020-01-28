@@ -1,3 +1,18 @@
+What's new in version 1.05
+ - Remove unnecessary version change test
+
+What's new in version 1.04
+ - Bump to add Changelog to source control.
+
+What's new in version 1.03
+ - Rebreak lines to achieve <80 recommended line length.
+ - Fix various pod errors.
+ - RT #116250: Fail the right number of tests on timeout.
+ - Switch most open() calls to three-argument form.
+ - Add L<> around link in pod.
+ - Use L</Foo>, not L<"Foo"> in pod.
+ - Use unique tmp filenames in test files.
+
 What's new in version 1.01:
  - Change documentation for line numbering.
  - Switch to github for issue tracking.
@@ -10,7 +25,7 @@ What's new in version 0.99:
 
 What's new in version 0.98:
  - No changes. Production release after CPAN testers cleared.
-	
+
 What's new in version 0.97_01:
 All changes in this release are from perl 5 porters:
  - Update address for FSF in POD
@@ -34,7 +49,7 @@ What's new in version 0.95:
   (<tels@bloodgate.com>)
 
   ->flock method now discards read cache and offsets table when
-  successful.  
+  successful.
 
   Miscellaneous minor bugs fixes and test suite enhancements.
 

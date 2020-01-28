@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Pod::Elemental::Selectors;
 # ABSTRACT: predicates for selecting elements
-$Pod::Elemental::Selectors::VERSION = '0.103004';
+$Pod::Elemental::Selectors::VERSION = '0.103005';
 #pod =head1 OVERVIEW
 #pod
 #pod Pod::Elemental::Selectors provides a number of routines to check for
@@ -145,7 +145,7 @@ Pod::Elemental::Selectors - predicates for selecting elements
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 OVERVIEW
 
@@ -176,7 +176,6 @@ The selectors can be imported individually or as the C<-all> group, and can be
 renamed with L<Sub::Exporter> features.  (Selectors cannot I<yet> be curried by
 Sub::Exporter.)
 
-
 =head2 s_blank
 
   my $callback = s_blank;
@@ -184,7 +183,6 @@ Sub::Exporter.)
   if( s_blank($para) ) { ... }
 
 C<s_blank> tests whether a paragraph is a Generic::Blank element.
-
 
 =head2 s_flat
 
@@ -195,7 +193,6 @@ C<s_blank> tests whether a paragraph is a Generic::Blank element.
 C<s_flat> tests whether a paragraph does Pod::Elemental::Flat -- in other
 words, is content-only.
 
-
 =head2 s_node
 
   my $callback = s_node;
@@ -204,7 +201,6 @@ words, is content-only.
 
 C<s_node> tests whether a paragraph does Pod::Elemental::Node -- in other
 words, whether it may have children.
-
 
 =head2 s_command
 
@@ -227,7 +223,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

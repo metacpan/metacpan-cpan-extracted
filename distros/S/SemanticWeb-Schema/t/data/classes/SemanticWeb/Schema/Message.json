@@ -13,9 +13,9 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
+            "schema:ContactPoint",
             "schema:Person",
-            "schema:Organization",
-            "schema:ContactPoint"
+            "schema:Organization"
          ]
       },
       "schema:ccRecipient" : {
@@ -36,8 +36,8 @@
          "rdfs:label" : "dateRead",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:dateReceived" : {
@@ -67,21 +67,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:SendAction",
+            "schema:CommunicateAction",
             "schema:GiveAction",
+            "schema:PayAction",
+            "schema:DonateAction",
             "schema:ReturnAction",
             "schema:Message",
             "schema:TipAction",
-            "schema:CommunicateAction",
-            "schema:SendAction",
-            "schema:PayAction",
-            "schema:DonateAction",
             "schema:AuthorizeAction"
          ],
          "schema:rangeIncludes" : [
+            "schema:Audience",
             "schema:Person",
             "schema:Organization",
-            "schema:ContactPoint",
-            "schema:Audience"
+            "schema:ContactPoint"
          ]
       },
       "schema:sender" : {
@@ -90,13 +90,13 @@
          "rdfs:label" : "sender",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Message",
-            "schema:ReceiveAction"
+            "schema:ReceiveAction",
+            "schema:Message"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
             "schema:Organization",
-            "schema:Audience"
+            "schema:Audience",
+            "schema:Person"
          ]
       },
       "schema:toRecipient" : {
@@ -106,10 +106,10 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Audience",
+            "schema:Person",
             "schema:ContactPoint",
-            "schema:Person"
+            "schema:Organization",
+            "schema:Audience"
          ]
       }
    }

@@ -1,7 +1,6 @@
 #!inc/bin/testml-cpan
 
 
-
 *grammar.bootstrap-compile.yaml.clean == *yaml
   :"+ (bootstrap compile)"
 
@@ -13,6 +12,7 @@
 --- grammar
 --- yaml
 {}
+
 
 === Whitespace Tokens
 --- grammar
@@ -29,6 +29,7 @@ a:
   - .ref: _
 b:
   .rgx: <_>cat<__>dog<_>
+
 
 === Simple Grammar
 --- grammar
@@ -47,12 +48,14 @@ b:
 c:
   .ref: x
 
+
 === Dash in Rule Names
 --- grammar
 a-b: c-d
 --- yaml
 a_b:
   .ref: c_d
+
 
 === Single Rule Reference
 --- grammar
@@ -61,10 +64,12 @@ a: x
 a:
   .ref: x
 
+
 === Single Rule brackets
 --- grammar
 a: <x>
 --- ^yaml
+
 
 === All Rules
 --- grammar
@@ -76,6 +81,7 @@ a:
   - .ref: y
   - .ref: z
 
+
 === Any Rules
 --- grammar
 a: x | y | z
@@ -86,6 +92,7 @@ a:
   - .ref: y
   - .ref: z
 
+
 === Any Rules with Leading Pipe
 --- grammar
 a: | x | y | z
@@ -95,6 +102,7 @@ a:
   - .ref: x
   - .ref: y
   - .ref: z
+
 
 === Separator Syntax
 --- grammar
@@ -119,6 +127,7 @@ a:
       - .ref: d
     - +max: 1
       .ref: e
+
 
 === Complex All/Any Precedence
 --- grammar
@@ -145,6 +154,7 @@ a:
         - .ref: h
     - .ref: i
 
+
 === Single Rule With Trailing Quantifier
 --- grammar
 a: x*
@@ -153,10 +163,12 @@ a:
   +min: 0
   .ref: x
 
+
 === Single Rule With Trailing Quantifier (no angles)
 --- grammar
 a: x*
 --- ^yaml
+
 
 === Single Rule With Leading Assertion
 --- grammar
@@ -165,6 +177,7 @@ a: =x
 a:
   +asr: 1
   .ref: x
+
 
 === Negative and Positive Assertion
 --- grammar
@@ -177,12 +190,14 @@ a:
   - +asr: 1
     .ref: c
 
+
 === Single Regex
 --- grammar
 a: /x/
 --- yaml
 a:
   .rgx: x
+
 
 === Quoted Regex
 --- grammar
@@ -191,6 +206,7 @@ a: '*** <foo>  + - bar '
 a:
   .rgx: '\*\*\*\ <foo\>\ \ \+\ \-\ bar\ '
 
+
 === Quoted String in Regex
 --- grammar
 a: /('(foo*)')*/
@@ -198,12 +214,14 @@ a: /('(foo*)')*/
 a:
   .rgx: (\(foo\*\))*
 
+
 === Single Error
 --- grammar
 a: `x`
 --- yaml
 a:
   .err: x
+
 
 === Skip and Wrap Marker
 --- grammar
@@ -220,6 +238,7 @@ a:
     -flat: 1
     .ref: d
 
+
 === Unbracketed All Group
 --- grammar
 a: /x/ y
@@ -228,6 +247,7 @@ a:
   .all:
   - .rgx: x
   - .ref: y
+
 
 === Unbracketed Any Group
 --- grammar
@@ -238,6 +258,7 @@ a:
   - .rgx: x
   - .ref: y
   - .err: z
+
 
 === Any Group with Leading Pipe
 --- grammar
@@ -251,6 +272,7 @@ a:
   - .ref: b
   - .ref: c
 
+
 === Bracketed All Group
 --- grammar
 a: ( x y )
@@ -259,6 +281,7 @@ a:
   .all:
   - .ref: x
   - .ref: y
+
 
 === Bracketed Group With Trailing Modifier
 --- grammar
@@ -270,6 +293,7 @@ a:
   - .ref: x
   - .ref: y
 
+
 === Bracketed Group With Leading Modifier
 --- grammar
 a: .( =x y )
@@ -280,6 +304,7 @@ a:
   - +asr: 1
     .ref: x
   - .ref: y
+
 
 === Multiple Groups
 --- grammar
@@ -293,6 +318,7 @@ a:
   - .any:
     - .ref: z
     - .rgx: zzz
+
 
 === List Separator
 --- grammar
@@ -310,6 +336,7 @@ a:
       - .ref: c
     - +max: 1
       .rgx: d
+
 
 === Separators with Quantifiers
 --- grammar
@@ -339,6 +366,7 @@ a:
       +min: 2
       .ref: e
 
+
 === All Quantifier Forms
 --- grammar
 a: b c? d* e+ <f>55 <g>5+ <h>5-55
@@ -360,6 +388,7 @@ a:
   - +max: 55
     +min: 5
     .ref: h
+
 
 === Whitespace Tokens
 --- grammar
@@ -383,6 +412,7 @@ c:
 d:
   .rgx: <__><kitty>
 
+
 === Whitespace in Regex
 --- grammar
 a: /<DOT>* (<DASH>{3})
@@ -392,6 +422,7 @@ a: /<DOT>* (<DASH>{3})
 a:
   .rgx: <DOT>*(<DASH>{3})<BANG><BANG>
 
+
 # Drop support for --
 === Dash and Plus as whitespace tokens
 --- grammar
@@ -400,26 +431,27 @@ a: / - foo + bar+ -- baz /
 a:
   .rgx: <_><foo><__><bar>+<__><baz>
 
+
 === Directives
 --- grammar
 %grammar foo
 %version 1.2.3
-
 --- yaml
 +grammar: foo
 +version: 1.2.3
+
 
 === Multiple Duplicate Directives
 --- grammar
 %grammar foo
 %include bar
 %include baz
-
 --- yaml
 +grammar: foo
 +include:
 - bar
 - baz
+
 
 === Meta Lines
 --- grammar
@@ -435,6 +467,7 @@ a: /b/
 +version: 1.1.1
 a:
   .rgx: b
+
 
 === Dash and Plus as whitespace tokens
 --- grammar

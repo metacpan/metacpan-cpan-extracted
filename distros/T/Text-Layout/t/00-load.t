@@ -9,6 +9,12 @@ BEGIN {
 
 diag( "Testing Text::Layout $Text::Layout::VERSION, Perl $], $^X" );
 
+eval {
+    require HarfBuzz::Shaper;
+    diag( "Shaping enabled (HarfBuzz::Shaper $HarfBuzz::Shaper::VERSION)" );
+    1;
+} || diag( "Shaping disabled (HarfBuzz::Shaper not found)" );
+
 BEGIN {
     use_ok( 'Text::Layout::Markdown' );
     use_ok( 'Text::Layout::PDFAPI2' );

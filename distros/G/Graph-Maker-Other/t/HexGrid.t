@@ -39,7 +39,7 @@ require Graph::Maker::HexGrid;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::HexGrid::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::HexGrid->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::HexGrid->VERSION($want_version); 1 }, 1,

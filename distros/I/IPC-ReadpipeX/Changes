@@ -1,3 +1,8 @@
+0.003     2020-01-22 19:14:50 EST
+  - The copy-pastable implementation of readpipex shown in the documentation
+    (unchanged from previous versions) is now licensed under The Unlicense so
+    it may be freely copied without attribution or warranty.
+
 0.002     2019-04-20 12:51:53 EDT
   - Fix tests to not trigger weird failures on Windows
 

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Test-Count",
-  "dist_version" => "0.1101",
+  "dist_version" => "0.1102",
   "license" => "mit",
   "module_name" => "Test::Count",
   "recursive_test_files" => 1,

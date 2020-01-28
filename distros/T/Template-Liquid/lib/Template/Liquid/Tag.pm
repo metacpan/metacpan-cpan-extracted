@@ -1,5 +1,5 @@
 package Template::Liquid::Tag;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 use base 'Template::Liquid::Document';
 sub tag             { return $_[0]->{'tag_name'}; }
 sub end_tag         { return $_[0]->{'end_tag'} || undef; }
@@ -18,11 +18,11 @@ sub new {
 sub push_block {
     return
         Template::Liquid::Error->new(
-           {type => 'Subclass',
-            message =>
-                'Please define a push_block method (for conditional tags) in '
-                . $_[0]
-           }
+         {type => 'Subclass',
+          message =>
+              'Please define a push_block method (for conditional tags) in ' .
+              $_[0]
+         }
         );
 }
 1;
@@ -37,8 +37,8 @@ Template::Liquid::Tag - Documentation for Template::Liquid's Standard Tagsets
 
 =head1 Description
 
-Tags are used for the logic in your L<template|Template::Liquid>. For a list
-of standard tags, see the L<Liquid|Template::Liquid/"Standard Tagset">
+Tags are used for the logic in your L<template|Template::Liquid>. For a list of
+standard tags, see the L<Liquid|Template::Liquid/"Standard Tagset">
 documentation.
 
 =head1 Extending the Basic Liquid Syntax with Custom Tags
@@ -47,9 +47,9 @@ To create a new tag, simply inherit from
 L<Template::Liquid::Tag|Template::Liquid::Tag> and register your block
 L<globally|Template::Liquid/"Template::Liquid::register_tag( ... )">.
 
-For a complete example of this, keep reading. To see real world examples,
-check out L<Template::LiquidX::Tag::Include> and
-L<Template::LiquidX::Tag::Dump> on CPAN.
+For a complete example of this, keep reading. To see real world examples, check
+out L<Template::LiquidX::Tag::Include> and L<Template::LiquidX::Tag::Dump> on
+CPAN.
 
 Your constructor should expect the following arguments:
 
@@ -67,8 +67,8 @@ This is a hash ref which contains these values (at least)
 
 =item C<attrs>
 
-The attributes within the tag. For example, given C<{% for x in (1..10)%}>,
-you would find C<x in (1..10)> in the C<attrs> value.
+The attributes within the tag. For example, given C<{% for x in (1..10)%}>, you
+would find C<x in (1..10)> in the C<attrs> value.
 
 =item C<parent>
 
@@ -76,9 +76,8 @@ The direct parent of this new node.
 
 =item C<markup>
 
-The tag as it appears in the template. For example, given
-C<{% for x in (1..10)%}>, the full C<markup> would be
-C<{% for x in (1..10)%}>.
+The tag as it appears in the template. For example, given C<{% for x in
+(1..10)%}>, the full C<markup> would be C<{% for x in (1..10)%}>.
 
 =item C<tag_name>
 
@@ -93,10 +92,10 @@ A quick link back to the top level template object.
 
 =back
 
-Your object should at least contain the C<parent> and C<template> values
-handed to you in C<$args>. For completeness, you should also include a C<name>
-(defined any way you want) and the C<$markup> and C<tag_name> from the
-C<$args> variable.
+Your object should at least contain the C<parent> and C<template> values handed
+to you in C<$args>. For completeness, you should also include a C<name>
+(defined any way you want) and the C<$markup> and C<tag_name> from the C<$args>
+variable.
 
 Enough jibba jabba... the next few sections show actual code...
 
@@ -140,10 +139,9 @@ This will print a random integer between C<0> and C<30>.
 If you just want a quick sample, you'll find an example C<{^% dump var %}> tag
 bundled as a separate dist named C<Template::LiquidX::Tag::Dump> on CPAN.
 
-Block-like tags are very similar to
-L<simple|Template::Liquid::Tag/"Create Your Own Tags">. Inherit from
-L<Template::Liquid::Tag|Template::Liquid::Tag> and register your block
-L<globally|Template::Liquid/"register_tag">.
+Block-like tags are very similar to L<simple|Template::Liquid::Tag/"Create Your
+Own Tags">. Inherit from L<Template::Liquid::Tag|Template::Liquid::Tag> and
+register your block L<globally|Template::Liquid/"register_tag">.
 
 The only difference is you define an C<end_tag> in your object.
 
@@ -193,15 +191,13 @@ Using this example tag...
     print Template::Liquid->parse(q[{% random 2 %}Now, that's money well spent!{% endrandom %}])->render();
 
 In this example, we expect a single argument. During the render stage, we
-resolve the variable (this allows for constructs like:
-C<{% random value %}...>) and depending on a call to C<rand($odds)> the tag
-either renders to an empty string or we continue to render the child nodes.
-Here, our C<random> tag prints only 50% of the time, C<{% random 1 %}> would
-work every time.
+resolve the variable (this allows for constructs like: C<{% random value
+%}...>) and depending on a call to C<rand($odds)> the tag either renders to an
+empty string or we continue to render the child nodes. Here, our C<random> tag
+prints only 50% of the time, C<{% random 1 %}> would work every time.
 
-The biggest changes between this and the
-L<random tag|Template::Liquid/"Create Your Own Tags"> we build above are in
-the constructor.
+The biggest changes between this and the L<random tag|Template::Liquid/"Create
+Your Own Tags"> we build above are in the constructor.
 
 The extra C<end_tag> attribute in the object's reference lets the parser know
 that this is a block that will slurp until the end tag is found. In our
@@ -209,8 +205,9 @@ example, we use C<'end' . $args->{'tag_name'}> because you may eventually
 subclass this tag and let it inherit this constructor. Now that we're sure the
 parser knows what to look for, we go ahead and continue
 L<parsing|Template::Liquid/"parse"> the list of tokens. The parser will shove
-child nodes (L<tags|Template::Liquid::Tag>, L<variables|Template::Liquid::Variable>, and
-simple strings) onto your stack until the C<end_tag> is found.
+child nodes (L<tags|Template::Liquid::Tag>,
+L<variables|Template::Liquid::Variable>, and simple strings) onto your stack
+until the C<end_tag> is found.
 
 In the render step, we must return the stringification of all child nodes
 pushed onto the stack by the parser.
@@ -219,8 +216,8 @@ pushed onto the stack by the parser.
 
 The internals are still kinda rough around this bit so documenting it is on my
 TODO list. If you're a glutton for punishment, I guess you can skim the source
-for the L<if tag|Template::Liquid::Tag::If> and its subclass, the
-L<unless tag|Template::Liquid::Tag::Unless>.
+for the L<if tag|Template::Liquid::Tag::If> and its subclass, the L<unless
+tag|Template::Liquid::Tag::Unless>.
 
 =head1 Author
 
@@ -238,9 +235,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

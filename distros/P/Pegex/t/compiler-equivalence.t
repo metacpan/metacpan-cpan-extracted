@@ -1,6 +1,5 @@
 #!inc/bin/testml-cpan
 
-Plan = 50
 
 =>
   *grammar1.bootstrap-compile.yaml == *grammar2.bootstrap-compile.yaml
@@ -10,13 +9,13 @@ Plan = 50
     :"+ (pegex compile)"
 
 
-
 === Simple Test Case
 --- grammar1
 a: /x/
 --- grammar2
 a:
     /x/
+
 
 === Token Per Line
 --- SKIP: TODO
@@ -27,17 +26,20 @@ a
 :
 /b/
 
+
 === And over Or Precedence
 --- grammar1
 a: b c | d
 --- grammar2
 a: ( b c ) | d
 
+
 === And/Or Precedence with joining
 --- grammar1
 a: b % c | d %% e
 --- grammar2
 a: ( b % c ) | ( d %% e )
+
 
 === And/Or Precedence with grouping
 --- grammar1
@@ -51,11 +53,13 @@ a:
 --- grammar2
 a: ( b c ) | ( d | e | ( f g h i ) )
 
+
 === Extra Leading Pipe
 --- grammar1
 a: | b | c
 --- grammar2
 a: b | c
+
 
 === Extra Leading Pipe w/ Parens
 --- grammar1
@@ -65,6 +69,7 @@ a: (
 )
 --- grammar2
 a: b | c
+
 
 === In-Line Comments
 --- grammar1
@@ -76,6 +81,7 @@ a:  # test
 --- grammar2
 a: b c /q/ % e
 
+
 === Dashes in names
 --- grammar1
 a-a: b-b+ c-c
@@ -86,6 +92,7 @@ a_a: b_b+ c_c
 b-b: c-c_c /d/
 c_c_c: e
 
+
 === Whitespace Tokens
 --- grammar1
 a: - b + c -
@@ -94,10 +101,12 @@ b: /- cat + dog -/
 a: _ b __ c _
 b: /<_> cat <__> dog <_>/
 
+
 === Regex Combination
 --- SKIP: TODO
 --- grammar1: a: /b/ /c/
 --- grammar2: a: /bc/
+
 
 === Separator Reduction a % b
 --- grammar1
@@ -105,11 +114,13 @@ x: a % b
 --- grammar2
 x: a
 
+
 === Separator Reduction a %% b
 --- grammar1
 x: a %% b
 --- grammar2
 x: a b?
+
 
 === Separator Reduction a? % b
 --- grammar1
@@ -117,11 +128,13 @@ x: a? % b
 --- grammar2
 x: a?
 
+
 === Separator Reduction a? %% b
 --- grammar1
 x: a? %% b
 --- grammar2
 x: a? b?
+
 
 === Separator Reduction a* % b
 --- grammar1
@@ -129,11 +142,13 @@ x: a* % b
 --- grammar2
 x: (a -(b a)*)?
 
+
 === Separator Reduction a* %% b
 --- grammar1
 x: a* %% b
 --- grammar2
 x: (a -(b a)* b?)?
+
 
 === Separator Reduction a+ % b
 --- grammar1
@@ -141,11 +156,13 @@ x: a+ % b
 --- grammar2
 x: a -(b a)*
 
+
 === Separator Reduction a+ %% b
 --- grammar1
 x: a+ %% b
 --- grammar2
 x: a -(b a)* b?
+
 
 === Separator Reduction <a>3 % b
 --- grammar1
@@ -153,11 +170,13 @@ x: <a>3 % b
 --- grammar2
 x: a -(b a)2
 
+
 === Separator Reduction <a>3 %% b
 --- grammar1
 x: <a>3 %% b
 --- grammar2
 x: a -(b a)2 b?
+
 
 === Separator Reduction <a>3+ % b
 --- grammar1
@@ -165,11 +184,13 @@ x: <a>3+ % b
 --- grammar2
 x: a -(b a)2+
 
+
 === Separator Reduction <a>3+ %% b
 --- grammar1
 x: <a>3+ %% b
 --- grammar2
 x: a -(b a)2+ b?
+
 
 === Separator Reduction <a>3-7 % b
 --- grammar1
@@ -177,11 +198,13 @@ x: <a>3-7 % b
 --- grammar2
 x: a -(b a)2-6
 
+
 === Separator Reduction <a>3-7 %% b
 --- grammar1
 x: <a>3-7 %% b
 --- grammar2
 x: a -(b a)2-6 b?
+
 
 === Leading WS, mulitline regex
 --- grammar1
@@ -191,6 +214,7 @@ a: /-
 --- grammar2
 a: /- 'foo'/
 
+
 === Leading WS, mulitline regex (part2)
 --- grammar1
 a: /-
@@ -198,3 +222,10 @@ a: /-
 /
 --- grammar2
 a: /-foo/
+
+
+=== No parens around a regex to add modifiers
+--- grammar1
+a: ./ (b) /
+--- grammar2
+a: .(/ (b) /)

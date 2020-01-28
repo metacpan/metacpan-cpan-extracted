@@ -79,7 +79,7 @@ or
 require Exporter;
 
 our @ISA = qw(Exporter);
-our($VERSION)='1.02';
+our($VERSION)='1.03';
 our($UntarError) = '';
 
 our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );

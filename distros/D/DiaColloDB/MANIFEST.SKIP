@@ -13,7 +13,7 @@
 \bpm_to_blib$
 ^blib
 \bpod2htm[di]\.
-^MYMETA\.
+(^|/)MYMETA\.
 \.svn
 ^\.\#
 \/\.\#
@@ -23,8 +23,11 @@
 \.log$
 \.out$
 \.o$
+\.dir-locals\.el$
 \btestme$
 ^PDL-Utils/.*\.(?:[co]|pm|xs|bs)$
+^XS/.*\.(?:c|cc|o|bs)$
+^XS/(misc|orig|dcdb-cof-gen.perl$)
 ^testme\.perl$
 \.(?:db|ttd|1g|types|i|d[0-9]?|d[ex]|dxd|bin|ng[0-5]|i[0-5]|cld|files|tabs|lab|kv|kvr|dat|rdat|tmp|export|[ls]|hdr|prf|xi)$
 ^cofgen
@@ -49,6 +52,7 @@ dump.mak
 ^dcdb-update-header\.perl$
 ^kern[0-9]*\b
 ^zeit[0-9]*\b
+^z1k
 ^nhess\b
 ^logo/
 ^tags\.map$

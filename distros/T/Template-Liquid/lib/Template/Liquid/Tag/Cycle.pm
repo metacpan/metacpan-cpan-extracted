@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Cycle;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
 use base 'Template::Liquid::Tag';
@@ -12,10 +12,8 @@ sub new {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
                    type    => 'Syntax',
@@ -68,16 +66,12 @@ sub new {
 
 sub render {
     my ($s) = @_;
-    my $name = $s->{template}{context}->get($s->{'name'})
-        || $s->{'name'};
+    my $name = $s->{template}{context}->get($s->{'name'}) || $s->{'name'};
     $s = $s->{template}{document}->{'_CYCLES'}{$name} || $s;
     my $node = $s->{'list'}[$s->{'position'}++];
     my $return
-        = ref $node ?
-        $node->render()
-        : $s->{template}{context}->get($node);
-    $s->{'position'} = 0
-        if $s->{'position'} >= scalar @{$s->{'list'}};
+        = ref $node ? $node->render() : $s->{template}{context}->get($node);
+    $s->{'position'} = 0 if $s->{'position'} >= scalar @{$s->{'list'}};
     return $return;
 }
 1;
@@ -113,8 +107,8 @@ using the C<cycle> tag.
 If no name is supplied for the cycle group, then it’s assumed that multiple
 calls with the same parameters are one group.
 
-If you want to have total control over cycle groups, you can optionally
-specify the name of the group. This can even be a variable.
+If you want to have total control over cycle groups, you can optionally specify
+the name of the group. This can even be a variable.
 
     {% cycle 'group 1': 'one', 'two', 'three' %}
     {% cycle 'group 1': 'one', 'two', 'three' %}
@@ -130,8 +124,8 @@ specify the name of the group. This can even be a variable.
 
 =head1 Notes
 
-The cycle tag is the only one which retains state between calls to render For
-a particular document. So...
+The cycle tag is the only one which retains state between calls to render For a
+particular document. So...
 
     use Template::Liquid;
     my $solution = Template::Liquid->parse(<<'TEMPLATE');
@@ -222,9 +216,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

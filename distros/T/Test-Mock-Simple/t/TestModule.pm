@@ -19,4 +19,12 @@ sub two     { return 2;                   }
 sub three   { return 3;                   }
 sub rooster { return 'cock-a-doodle-doo'; }
 
+package Namespace::Within;
+
+sub new {
+  return bless({}, __PACKAGE__);
+}
+
+sub foo { return 'bar'; }
+
 1;

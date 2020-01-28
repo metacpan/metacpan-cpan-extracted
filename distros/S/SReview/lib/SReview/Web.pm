@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious';
 use Mojo::Collection 'c';
 use Mojo::JSON qw(encode_json);
 use Mojo::Pg;
+use Mojo::URL;
 use SReview;
 use SReview::Config;
 use SReview::Config::Common;
@@ -41,7 +42,9 @@ sub startup {
 		my $c = shift;
 		my $vpr = $config->get('vid_prefix');
 		my $media = "media-src 'self'";
-		if(defined($vpr) && length($vpr) > 0) {
+		my $url = Mojo::URL->new($vpr);
+		if(defined($url->host)) {
+			$vpr = $url->host;
 			$media = "media-src $vpr;";
 		}
 		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
@@ -51,7 +54,33 @@ sub startup {
 		state $pg = Mojo::Pg->new->dsn($config->get('dbistring'));
 		return $pg->db->dbh;
 	});
-	
+	$self->helper(srconfig => sub {
+		return $config;
+	});
+
+	$self->helper(auth_scope => sub {
+		my $c = shift;
+		my $scope = shift;
+		$self->log->debug("checking if authorized for $scope");
+		if($c->session->{admin}) {
+			return 1;
+		} elsif($scope eq "api") {
+			return 1;
+		} elsif($scope eq "api/event") {
+			return 1;
+		} elsif($scope eq "api/talks") {
+			if(exists($c->session->{id})) {
+				return 1;
+			}
+		} elsif($scope eq "api/talks/detailed") {
+			if(exists($c->session->{id})) {
+				return 1;
+			}
+		}
+		$self->log->debug("not authorized for $scope");
+		return 0;
+	});
+
 	$self->helper(talk_update => sub {
 		my $c = shift;
 		my $talk = shift;
@@ -109,7 +138,11 @@ sub startup {
 		$rv = <GIT>;
 		close GIT;
 		if(!defined $rv) {
-			return $SReview::VERSION;
+			if(exists($ENV{GIT_DESCRIBE})) {
+				$rv = $ENV{GIT_DESCRIBE};
+			} else {
+				$rv = $SReview::VERSION;
+			}
 		}
 		chomp $rv;
 		return $rv;
@@ -275,7 +308,10 @@ sub startup {
 					slug => $row->{slug},
 					room => $row->{room},
 					date => $row->{date},
+					event => $row->{event},
+					upstreamid => $row->{upstreamid},
 					year => $row->{year} });
+				chomp $video->{details_url};
 			}
 			$video->{video} = join('/',$outputdir, $row->{slug}) . "." . $formats{default}->exten;
 			push @$videos, $video;
@@ -289,8 +325,10 @@ sub startup {
 		my $st;
 		if($config->get("anonreviews")) {
 			$st = $c->dbh->prepare('SELECT nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
+			$c->stash(autorefresh => 1);
 		} else {
 			$st = $c->dbh->prepare('SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
+			$c->stash(autorefresh => 0);
 		}
 		my $tot = $c->dbh->prepare('SELECT state, count(*) FROM talks WHERE event = ? GROUP BY state ORDER BY state;');
 		my %expls;
@@ -372,6 +410,53 @@ sub startup {
 	});
 
 	$vol->get('/list')->to('volunteer#list');
+
+	my $api = $r->under('/api/v1' => sub {
+		my $c = shift;
+		if(!$c->auth_scope("api")) {
+			$c->res->code(403);
+			$self->log->debug("failed auth scope api");
+			$c->render(text => 'Unauthorized');
+			return 0;
+		}
+		return 1;
+	});
+
+	my $event_api = $api->under('/events' => sub {
+		my $c = shift;
+		if(!$c->auth_scope("api/event")) {
+			$c->res->code(403);
+			$self->log->debug("failed auth scope event");
+			$c->render(text => 'Unauthorized');
+			return 0;
+		}
+		return 1;
+	});
+
+	$event_api->post('/create')->to(controller => 'event', action => 'create');
+	$event_api->get('/by-title/:title')->to(controller => 'event', action => 'by_title');
+	$event_api->get('/by-id/:id')->to(controller => 'event', action => 'by_id');
+	$event_api->post('/update/:id')->to(controller => 'event', action => 'update');
+	$event_api->get('/list')->to(controller => 'event', action => 'list');
+	$event_api->delete('/delete/:id')->to(controller => 'event', action => 'delete');
+
+	my $talk_api = $api->under('/event/:event/talks' => sub {
+		my $c = shift;
+		if(!$c->auth_scope("api/talks")) {
+			$c->res->code(403);
+			$c->render(text => 'Unauthorized');
+			return 0;
+		}
+		return 1;
+	});
+
+	$talk_api->post('/create')->to(controller => 'talk', action => 'create');
+	$talk_api->get('/by-title/:title')->to(controller => 'talk', action => 'by_title');
+	$talk_api->get('/by-id/:id')->to(controller => 'talk', action => 'by_id');
+	$talk_api->get('/by-nonce/:nonce')->to(controller => 'talk', action => 'by_nonce');
+	$talk_api->get('/list')->to(controller => 'talk', action => 'list');
+	$talk_api->post('/update')->to(controller => 'talk', action => 'update');
+	$talk_api->delete('/delete')->to(controller => 'talk', action => 'delete');
 
 	my $admin = $r->under('/admin' => sub {
 		my $c = shift;
@@ -493,6 +578,7 @@ sub startup {
 		$c->stash(header => 'Broken talks');
 		$c->stash(layout => 'admin');
 		$c->stash(totals => undef);
+		$c->stash(autorefresh => 0);
 		$c->render(template => 'table');
 	} => 'broken_table');
 

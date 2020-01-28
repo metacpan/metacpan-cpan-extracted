@@ -5,7 +5,7 @@
 #
 
 
-my $file = "tf$$.txt";
+my $file = "tf07-$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = "rec0$:rec1$:rec2$:";
 
@@ -177,7 +177,7 @@ check_result();
 
 sub init_file {
   my $data = shift;
-  open F, "> $file" or die $!;
+  open F, '>', $file or die $!;
   binmode F;
   print F $data;
   close F;

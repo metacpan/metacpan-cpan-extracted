@@ -1,0 +1,96 @@
+{
+   "abstract" : "Create and cache DB connections using common connection info",
+   "author" : [
+      "Adam Hopkins"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-DB-Connector",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Mojo::DB::Role::ResultsRoles" : "0",
+            "Mojo::Pg" : "0",
+            "Mojo::mysql" : "0"
+         },
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "List::Util" : "0",
+            "Mojolicious" : "0",
+            "Role::Tiny" : "2.000001",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::DB::Connector" : {
+         "file" : "lib/Mojo/DB/Connector.pm",
+         "version" : "0.05"
+      },
+      "Mojo::DB::Connector::Base" : {
+         "file" : "lib/Mojo/DB/Connector/Base.pm"
+      },
+      "Mojo::DB::Connector::Role::Cache" : {
+         "file" : "lib/Mojo/DB/Connector/Role/Cache.pm"
+      },
+      "Mojo::DB::Connector::Role::ResultsRoles" : {
+         "file" : "lib/Mojo/DB/Connector/Role/ResultsRoles.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/srchulo/Mojo-DB-Connector/issues"
+      },
+      "homepage" : "https://github.com/srchulo/Mojo-DB-Connector",
+      "repository" : {
+         "url" : "git://github.com/srchulo/Mojo-DB-Connector.git",
+         "web" : "https://github.com/srchulo/Mojo-DB-Connector"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Adam Hopkins <violapiratejunky@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

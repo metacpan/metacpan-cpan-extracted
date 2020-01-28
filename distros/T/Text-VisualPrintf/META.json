@@ -1,10 +1,10 @@
 {
    "abstract" : "printf family functions to handle Non-ASCII characters",
    "author" : [
-      "Kaz Utashiro"
+      "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.8",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -55,7 +55,10 @@
    "provides" : {
       "Text::VisualPrintf" : {
          "file" : "lib/Text/VisualPrintf.pm",
-         "version" : "2.03"
+         "version" : "2.04"
+      },
+      "Text::VisualPrintf::IO" : {
+         "file" : "lib/Text/VisualPrintf/IO.pm"
       }
    },
    "release_status" : "stable",
@@ -69,9 +72,10 @@
          "web" : "https://github.com/kaz-utashiro/Text-VisualPrintf"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"
-   ]
+   ],
+   "x_static_install" : 1
 }

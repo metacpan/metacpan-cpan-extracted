@@ -10,11 +10,12 @@ build_requires:
   HTTP::Response: '0'
   HTTP::Status: '0'
   IO::Socket::SSL: '0'
+  PDF::API2: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,5 +46,5 @@ requires:
   base: '0'
   overload: '0'
   perl: '5.006'
-version: '0.90'
+version: '0.91'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

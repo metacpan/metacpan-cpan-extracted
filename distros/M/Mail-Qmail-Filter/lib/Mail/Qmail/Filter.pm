@@ -3,7 +3,7 @@ use warnings;
 
 package Mail::Qmail::Filter;
 
-our $VERSION = '1.1';
+our $VERSION = '1.21';
 
 use Carp qw(confess);
 use FindBin    ();

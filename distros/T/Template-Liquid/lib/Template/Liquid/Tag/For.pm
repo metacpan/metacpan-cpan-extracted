@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
 use base 'Template::Liquid::Tag::If';
@@ -15,10 +15,8 @@ sub new {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
                    type    => 'Syntax',
@@ -35,7 +33,7 @@ sub new {
     }
     my ($var, $range, $attr) = ($1, $2, $3 || '');
     my $reversed = $attr =~ s[^reversed\b][]o ? 1 : 0;
-    my %attr = map {
+    my %attr     = map {
         my ($k, $v)
             = split($Template::Liquid::Utility::FilterArgumentSeparator, $_,
                     2);
@@ -64,41 +62,39 @@ sub render {
     my $reversed = $s->{'reversed'};
     my $sorted
         = exists $attr->{'sorted'}
-        ?
-        $s->{template}{context}->get($attr->{'sorted'})
-        || $attr->{'sorted'} || 'key'
+        ? $s->{template}{context}->get($attr->{'sorted'}) ||
+        $attr->{'sorted'} ||
+        'key'
         : ();
     $sorted = 'key'
-        if (defined $sorted
-            && (($sorted ne 'key') && ($sorted ne 'value')));
+        if (defined $sorted && (($sorted ne 'key') && ($sorted ne 'value')));
     my $offset
         = defined $attr->{'offset'}
-        ?
-        $s->{template}{context}->get($attr->{'offset'})
+        ? $s->{template}{context}->get($attr->{'offset'})
         : ();
     my $limit
         = defined $attr->{'limit'}
-        ?
-        $s->{template}{context}->get($attr->{'limit'})
+        ? $s->{template}{context}->get($attr->{'limit'})
         : ();
     my $list = $s->{template}{context}->get($range);
     my $type = 'ARRAY';
     #
     my $_undef_list = 0;
     if (ref $list eq 'HASH') {
-        $list = [map { {key => $_, value => $list->{$_}} } keys %$list];
+        $list  = [map { {key => $_, value => $list->{$_}} } keys %$list];
         @$list = sort {
-            $a->{$sorted} =~ m[^\d+$]o && $b->{$sorted} =~ m[^\d+$]o
-                ?
-                ($a->{$sorted} <=> $b->{$sorted})
+            $a->{$sorted} =~ m[^\d+$]o &&
+                $b->{$sorted} =~ m[^\d+$]o
+                ? ($a->{$sorted} <=> $b->{$sorted})
                 : ($a->{$sorted} cmp $b->{$sorted})
         } @$list if defined $sorted;
         $type = 'HASH';
     }
     elsif (defined $sorted) {
         @$list = sort {
-            $a =~ m[^\d+$] && $b =~ m[^\d+$] ?
-                ($a <=> $b)
+            $a =~ m[^\d+$] &&
+                $b =~ m[^\d+$]
+                ? ($a <=> $b)
                 : ($a cmp $b)
         } @$list;
     }
@@ -108,10 +104,10 @@ sub render {
     }
     else {    # Break it down to only the items we plan on using
         my $min = (defined $offset ? $offset : 0);
-        my $max = (defined $limit ?
-                       $limit + (defined $offset ? $offset : 0) - 1
-                   : $#$list
-        );
+        my $max
+            = (defined $limit
+               ? $limit + (defined $offset ? $offset : 0) - 1
+               : $#$list);
         $max    = $#$list if $max > $#$list;
         @$list  = @{$list}[$min .. $max];
         @$list  = reverse @$list if $reversed;
@@ -246,8 +242,8 @@ lets you start the collection with the nth item.
 
 =head3 Reversing the Loop
 
-You can reverse the direction the loop works with the C<reversed> attribute.
-To comply with the Ruby lib's functionality, C<reversed> B<must> be the first
+You can reverse the direction the loop works with the C<reversed> attribute. To
+comply with the Ruby lib's functionality, C<reversed> B<must> be the first
 attribute.
 
     {% for item in collection reversed %} {{item}} {% endfor %}
@@ -255,8 +251,7 @@ attribute.
 =head3 Sorting
 
 You can sort the variable with the C<sorted> attribute. This is an extention
-beyond the scope of Liquid's syntax and thus incompatible but it's useful.
-The
+beyond the scope of Liquid's syntax and thus incompatible but it's useful. The
 
     {% for item in collection sorted %} {{item}} {% endfor %}
 
@@ -314,9 +309,9 @@ The C<else> branch is executed whenever the for branch will never be executed
 
 =head1 TODO
 
-Since this is a customer facing template engine, Liquid should provide some
-way to limit L<ranges|Template::Liquid::Tag::For/"Numeric Ranges"> and/or depth to avoid
-(functionally) infinite loops with code like...
+Since this is a customer facing template engine, Liquid should provide some way
+to limit L<ranges|Template::Liquid::Tag::For/"Numeric Ranges"> and/or depth to
+avoid (functionally) infinite loops with code like...
 
     {% for w in (1..10000000000) %}
         {% for x in (1..10000000000) %}
@@ -332,8 +327,8 @@ way to limit L<ranges|Template::Liquid::Tag::For/"Numeric Ranges"> and/or depth 
 
 Liquid for Designers: http://wiki.github.com/tobi/liquid/liquid-for-designers
 
-L<Template::Liquid|Template::Liquid/"Create your own filters">'s docs on
-custom filter creation
+L<Template::Liquid|Template::Liquid/"Create your own filters">'s docs on custom
+filter creation
 
 L<Template::Liquid::Tag::Break|Template::Liquid::Tag::Break> and
 L<Template::Liquid::Tag::Continue|Template::Liquid::Tag::Continue>
@@ -349,16 +344,15 @@ CPAN ID: SANKO
 Copyright (C) 2009-2012 by Sanko Robinson E<lt>sanko@cpan.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of
-L<The Artistic License 2.0|http://www.perlfoundation.org/artistic_license_2_0>.
-See the F<LICENSE> file included with this distribution or
-L<notes on the Artistic License 2.0|http://www.perlfoundation.org/artistic_2_0_notes>
-for clarification.
+the terms of L<The Artistic License
+2.0|http://www.perlfoundation.org/artistic_license_2_0>. See the F<LICENSE>
+file included with this distribution or L<notes on the Artistic License
+2.0|http://www.perlfoundation.org/artistic_2_0_notes> for clarification.
 
-When separated from the distribution, all original POD documentation is
-covered by the
-L<Creative Commons Attribution-Share Alike 3.0 License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>.
-See the
-L<clarification of the CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
+When separated from the distribution, all original POD documentation is covered
+by the L<Creative Commons Attribution-Share Alike 3.0
+License|http://creativecommons.org/licenses/by-sa/3.0/us/legalcode>. See the
+L<clarification of the
+CCA-SA3.0|http://creativecommons.org/licenses/by-sa/3.0/us/>.
 
 =cut

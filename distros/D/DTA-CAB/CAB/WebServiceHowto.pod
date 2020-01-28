@@ -24,7 +24,7 @@ L<Jurish (2012)|http://./#jurish2012>.
 
 Due to legal restrictions on some of the underlying resources,
 not all available analysis layers can be returned
-by the publically accessible "demo" web-service, but it is hoped that the available
+by the publically accessible web-service, but it is hoped that the available
 layers (linguistically salient TEI-XML serialization,
 sentence- and word-level tokenization,
 orthographic normalization,
@@ -519,19 +519,19 @@ I<avf>, I<Auffichten>, and I<Büberchens>:
 
 =item *
 
-L<generic|http://www.deutschestextarchiv.de/demo/cab/?a=default1&q=avf%20Auffichten%20B%C3%BCberchens>
+L<generic|http://www.deutschestextarchiv.de/cab/?a=default1&q=avf%20Auffichten%20B%C3%BCberchens>
 
 =item *
 
-L<1600-1700|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1600-1700&q=avf%20Auffichten%20B%C3%BCberchens>
+L<1600-1700|http://www.deutschestextarchiv.de/cab/?a=default1.1600-1700&q=avf%20Auffichten%20B%C3%BCberchens>
 
 =item *
 
-L<1700-1800|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1700-1800&q=avf%20Auffichten%20B%C3%BCberchens>
+L<1700-1800|http://www.deutschestextarchiv.de/cab/?a=default1.1700-1800&q=avf%20Auffichten%20B%C3%BCberchens>
 
 =item *
 
-L<1800-1900|http://www.deutschestextarchiv.de/demo/cab/?a=default1.1800-1900&q=avf%20Auffichten%20B%C3%BCberchens>
+L<1800-1900|http://www.deutschestextarchiv.de/cab/?a=default1.1800-1900&q=avf%20Auffichten%20B%C3%BCberchens>
 
 =back
 
@@ -627,7 +627,7 @@ typically less than one week old.
 
 Type-wise exception lexicon extracted from the
 L<DTA EvalCorpus|http://odo.dwds.de/~jurish/software/dtaec/>
-and the DTA::CAB error database (demo L<here|http://kaskade.dwds.de/demo/caberr/>),
+and the DTA::CAB error database (demo L<here|http://kaskade.dwds.de/caberr/>),
 typically updated weekly.
 
 =item L<tokpp|DTA::CAB::Analyzer::TokPP>
@@ -1463,7 +1463,7 @@ To analyze a L<TEI-like|/TEI> XML file F<FILE.tei.xml> using L<curl|http://curl.
 and save the analysis results to a "spliced" TEI file F<FILE.teiws.xml>,
 the following command-line ought to suffice:
 
- curl -X POST -sSF "qd=@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/demo/cab/query?fmt=tei"
+ curl -X POST -sSF "qd=@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/cab/query?fmt=tei"
 
 Alternative L<IO formats|/I-O Formats> and L<request parameters|DTA::CAB::HttpProtocol/query-Requests>
 can be accommodated by inserting them into the L<URL query string|http://en.wikipedia.org/wiki/Query_string>
@@ -1473,7 +1473,7 @@ inline POSTDATA mechanism (a.k.a. "xpost") described in L<the DTA::CAB::HttpProt
 in order to save yourself and the CAB server the effort of encoding/decoding the document data.
 In this case, you need to specify an appropriate "C<Content-Type>" header, e.g:
 
- curl -X POST -sSH "Content-Type: text/tei+xml; charset=utf8" --data-binary "@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/demo/cab/query?fmt=tei"
+ curl -X POST -sSH "Content-Type: text/tei+xml; charset=utf8" --data-binary "@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/cab/query?fmt=tei"
 
 You might be interested in the L<cab-curl-post.sh|http://./cab-curl-post.sh> and/or L<cab-curl-xpost.sh|http://./cab-curl-xpost.sh>
 wrapper scripts, which encapsulate some of the common curl command-line options.

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.0.2
+    version v0.0.3
 
 SYNOPSIS
 
@@ -42,6 +42,10 @@ COPYRIGHT AND LICENSE
 CONTRIBUTORS
 
       * Doug Bell <doug.bell@grantstreet.com>
+
+      * Doug Bell <preaction@users.noreply.github.com>
+
+      * LapVeesh <rabbiveesh@gmail.com>
 
       * Steven Arnott <steven.arnott@grantstreet.com>
 

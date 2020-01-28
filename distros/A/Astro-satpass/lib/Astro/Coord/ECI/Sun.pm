@@ -36,7 +36,6 @@ is a subclass of B<Astro::Coord::ECI>, with the id, name, and diameter
 attributes initialized appropriately, and the time_set() method
 overridden to compute the position of the Sun at the given time.
 
-
 =head2 Methods
 
 The following methods should be considered public:
@@ -50,7 +49,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use base qw{Astro::Coord::ECI};
 
@@ -754,6 +753,38 @@ to be more accurate for reasonably-current times.
 This attribute is new with version 0.088_01.
 
 =back
+
+=head2 Historical Calculations
+
+This class was written for the purpose of calculating whether the Sun
+was shining on a given point on the Earth (or in space) at a given time
+in or reasonably close to the present. I can not say how accurate it is
+at times far from the present. Those interested in such calculations may
+want to consider using
+L<Astro::Coord::ECI::VSOP87D::Sun|Astro::Coord::ECI::VSOP87D::Sun>
+instead.
+
+Historical calculations will need to use a 64-bit Perl, or at least one
+with 64-bit integers, to represent times more than about 38 years from
+the system epoch.
+
+In addition, you will need to be careful how you do input and output
+conversions.
+
+L<Time::Local|Time::Local> is a core module and an obvious choice, but
+it only does Gregorian dates. Historical calculations prior to 1587
+typically use the Julian calendar. For this you will need to go to
+something like L<DateTime::Calendar::Julian|DateTime::Calendar::Julian>,
+or L<DateTime::Calendar::Christian|DateTime::Calendar::Christian> which
+does either Julian or Gregorian as needed.
+
+Should you decide to use L<Time::Local|Time::Local>, you should be aware
+that its C<timegm()> and C<timelocal()> interpret the year argument
+strangely: years in the range C<0 - 999> inclusive are not interpreted
+as Gregorian years, though years outside that range are so interpreted.
+Beginning with version 1.27 (released July 9 2018), additional
+subroutines C<timegm_modern()> and C<timelocal_modern()> were added.
+These always interpret the year argument as a Gregorian year.
 
 =head1 ACKNOWLEDGMENTS
 

@@ -17,14 +17,15 @@ name: Kwiki-Podcast
 provides:
   Kwiki::Podcast:
     file: lib/Kwiki/Podcast.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Kwiki: '0'
+  URI: '0'
   XML::RSS: '0'
   mixin: '0'
 resources:
   repository: https://github.com/gugod/Kwiki-Podcast.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: '1'

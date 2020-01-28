@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has about => (
@@ -514,6 +514,14 @@ has main_entity => (
 
 
 
+has maintainer => (
+    is        => 'rw',
+    predicate => '_has_maintainer',
+    json_ld   => 'maintainer',
+);
+
+
+
 has material => (
     is        => 'rw',
     predicate => '_has_material',
@@ -810,7 +818,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -1101,6 +1109,8 @@ A audio should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::AudioObject']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Clip']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
 
 =back
 
@@ -1924,6 +1934,8 @@ A is_part_of should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
+=item C<Str>
+
 =back
 
 =head2 C<_has_is_part_of>
@@ -2022,6 +2034,44 @@ A main_entity should be one of the following types:
 
 A predicate for the L</main_entity> attribute.
 
+=head2 C<maintainer>
+
+=for html <p>A maintainer of a <a class="localLink"
+href="http://schema.org/Dataset">Dataset</a>, software package (<a
+class="localLink"
+href="http://schema.org/SoftwareApplication">SoftwareApplication</a>), or
+other <a class="localLink" href="http://schema.org/Project">Project</a>. A
+maintainer is a <a class="localLink"
+href="http://schema.org/Person">Person</a> or <a class="localLink"
+href="http://schema.org/Organization">Organization</a> that manages
+contributions to, and/or publication of, some (typically complex) artifact.
+It is common for distributions of software and data to be based on
+"upstream" sources. When <a class="localLink"
+href="http://schema.org/maintainer">maintainer</a> is applied to a specific
+version of something e.g. a particular version or packaging of a <a
+class="localLink" href="http://schema.org/Dataset">Dataset</a>, it is
+always possible that the upstream source has a different maintainer. The <a
+class="localLink" href="http://schema.org/isBasedOn">isBasedOn</a> property
+can be used to indicate such relationships between datasets to make the
+different maintenance roles clear. Similarly in the case of software, a
+package may have dedicated maintainers working on integration into software
+distributions such as Ubuntu, as well as upstream maintainers of the
+underlying work.<p>
+
+A maintainer should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<_has_maintainer>
+
+A predicate for the L</maintainer> attribute.
+
 =head2 C<material>
 
 A material that something is made from, e.g. leather, wool, cotton, paper.
@@ -2080,13 +2130,22 @@ A predicate for the L</mentions> attribute.
 
 =head2 C<offers>
 
-An offer to provide this item&#x2014;for example, an offer to sell a
+=for html <p>An offer to provide this item&#x2014;for example, an offer to sell a
 product, rent the DVD of a movie, perform a service, or give away tickets
-to an event.
+to an event. Use <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a> to indicate
+the kind of transaction offered, i.e. sell, lease, etc. This property can
+also be used to describe a <a class="localLink"
+href="http://schema.org/Demand">Demand</a>. While this property is listed
+as expected on a number of common types, it can be used in others. In that
+case, using a second type, such as Product or a subtype of Product, can
+clarify the nature of the offer.<p>
 
 A offers should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::Demand']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
@@ -2748,7 +2807,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

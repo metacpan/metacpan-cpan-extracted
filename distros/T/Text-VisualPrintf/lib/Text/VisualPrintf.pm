@@ -3,12 +3,9 @@ package Text::VisualPrintf;
 use v5.10;
 use strict;
 use warnings;
-
-our $VERSION = "2.03";
-
-use strict;
-use warnings;
 use Carp;
+
+our $VERSION = "2.04";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(&vprintf &vsprintf);
@@ -37,8 +34,8 @@ sub sprintf {
 }
 
 sub printf {
-    my $fh = ref $_[0] eq 'GLOB' ? shift : select;
-    $fh->printf(&sprintf(@_));
+    my $fh = ref($_[0]) =~ /^(?:GLOB|IO::)/ ? shift : select;
+    $fh->print(&sprintf(@_));
 }
 
 use Text::VisualWidth::PP;
@@ -125,11 +122,11 @@ L<https://github.com/kaz-utashiro/Text-VisualPrintf>
 
 =head1 AUTHOR
 
-Kaz Utashiro
+Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright (C) 2011-2017 Kaz Utashiro.
+Copyright (C) 2011-2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

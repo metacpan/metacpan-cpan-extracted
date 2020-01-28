@@ -62,6 +62,8 @@ t/18-call_subroutine_label.cmd
 t/18-call_subroutine_label.t
 t/19-call_subroutine_label_exit.cmd
 t/19-call_subroutine_label_exit.t
+t/20-goto_eof_with_previous_goto.cmd
+t/20-goto_eof_with_previous_goto.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

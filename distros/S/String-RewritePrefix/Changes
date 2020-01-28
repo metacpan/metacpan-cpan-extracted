@@ -1,5 +1,9 @@
 Revision history for String-RewritePrefix
 
+0.008     2020-01-25 16:10:30-05:00 America/New_York
+          more tests (thanks, Olivier Mengué!)
+          warn when rewriting an empty list in scalar context (thanks, Olivier Mengué!)
+
 0.007     2013-10-15 22:37:01 America/New_York
           update bugtracker and repo metadata
 

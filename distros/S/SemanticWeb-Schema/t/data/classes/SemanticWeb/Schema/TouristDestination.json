@@ -35,9 +35,9 @@
          "rdfs:label" : "touristType",
          "schema:category" : "issue-1810",
          "schema:domainIncludes" : [
+            "schema:TouristDestination",
             "schema:TouristTrip",
-            "schema:TouristAttraction",
-            "schema:TouristDestination"
+            "schema:TouristAttraction"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

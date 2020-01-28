@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has about => (
@@ -110,6 +110,14 @@ has end_date => (
     is        => 'rw',
     predicate => '_has_end_date',
     json_ld   => 'endDate',
+);
+
+
+
+has event_schedule => (
+    is        => 'rw',
+    predicate => '_has_event_schedule',
+    json_ld   => 'eventSchedule',
 );
 
 
@@ -314,7 +322,7 @@ SemanticWeb::Schema::Event - An event happening at a certain time and location
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -539,6 +547,41 @@ A end_date should be one of the following types:
 
 A predicate for the L</end_date> attribute.
 
+=head2 C<event_schedule>
+
+C<eventSchedule>
+
+=for html <p>Associates an <a class="localLink"
+href="http://schema.org/Event">Event</a> with a <a class="localLink"
+href="http://schema.org/Schedule">Schedule</a>. There are circumstances
+where it is preferable to share a schedule for a series of repeating events
+rather than data on the individual events themselves. For example, a
+website or application might prefer to publish a schedule for a weekly gym
+class rather than provide data on every event. A schedule could be
+processed by applications to add forthcoming events to a calendar. An <a
+class="localLink" href="http://schema.org/Event">Event</a> that is
+associated with a <a class="localLink"
+href="http://schema.org/Schedule">Schedule</a> using this property should
+not have <a class="localLink"
+href="http://schema.org/startDate">startDate</a> or <a class="localLink"
+href="http://schema.org/endDate">endDate</a> properties. These are instead
+defined within the associated <a class="localLink"
+href="http://schema.org/Schedule">Schedule</a>, this avoids any ambiguity
+for clients using the data. The property might have repeated values to
+specify different schedules, e.g. for different months or seasons.<p>
+
+A event_schedule should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Schedule']>
+
+=back
+
+=head2 C<_has_event_schedule>
+
+A predicate for the L</event_schedule> attribute.
+
 =head2 C<event_status>
 
 C<eventStatus>
@@ -660,13 +703,22 @@ A predicate for the L</maximum_attendee_capacity> attribute.
 
 =head2 C<offers>
 
-An offer to provide this item&#x2014;for example, an offer to sell a
+=for html <p>An offer to provide this item&#x2014;for example, an offer to sell a
 product, rent the DVD of a movie, perform a service, or give away tickets
-to an event.
+to an event. Use <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a> to indicate
+the kind of transaction offered, i.e. sell, lease, etc. This property can
+also be used to describe a <a class="localLink"
+href="http://schema.org/Demand">Demand</a>. While this property is listed
+as expected on a number of common types, it can be used in others. In that
+case, using a second type, such as Product or a subtype of Product, can
+clarify the nature of the offer.<p>
 
 A offers should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::Demand']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Offer']>
 
@@ -1004,7 +1056,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

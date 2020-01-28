@@ -1,5 +1,9 @@
 Revision history for Perl extension Config-Registry.
 
+0.03 2020-01-27T22:24:14Z
+
+ - Declare minimum version of dependencies.
+
 0.02 2020-01-20T19:30:15Z
 
  - Stop using Hash::Merge since when it uses Storable for cloning it

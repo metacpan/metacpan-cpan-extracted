@@ -77,7 +77,7 @@
         "grammar": "b: ( /x/ )+\n"}},
     { "label": "Comments",
       "point": {
-        "grammar": "# line comment\n\na: b    # end of line comment\n\nb: /\n\n    foo  # regex comment\n\n    # regex line comment\n\n    bar\n\n    # regex line comment\n/\n\n"}},
+        "grammar": "# line comment\n\na: b    # end of line comment\n\nb: /\n\n    foo  # regex comment\n\n    # regex line comment\n\n    bar\n\n    # regex line comment\n\n/\n"}},
     { "label": "Comment between rules",
       "point": {
         "grammar": "a: b\n# comment\nb: c\n"}}]}

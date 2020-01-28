@@ -10,7 +10,7 @@ use warnings;
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::TLE;
 use Astro::Coord::ECI::TLE::Set;
-use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :time };
+use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg :greg_time };
 
 use POSIX qw{strftime};
 
@@ -24,7 +24,8 @@ my $station = Astro::Coord::ECI->new(
 
 my @time = gmtime(time());
 splice @time, 0, 3, 0, 0, 0;
-my $start = timegm(@time);	# Start is today midnight GMT
+$time[5] += 1900;
+my $start = greg_time_gm(@time);	# Start is today midnight GMT
 my $end = $start + 86400;	# End is tomorrow midnight GMT
 my $delta = 60;			# Step size is 60 seconds
 my $timfmt = '%d-%b-%Y %H:%M:%S';	# Date/time format.

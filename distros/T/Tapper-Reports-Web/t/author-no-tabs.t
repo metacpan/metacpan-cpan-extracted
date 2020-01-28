@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -36,6 +36,7 @@ my @files = (
     'lib/Tapper/Reports/Web/Controller/Tapper/ReportFile/Id.pm',
     'lib/Tapper/Reports/Web/Controller/Tapper/Reports.pm',
     'lib/Tapper/Reports/Web/Controller/Tapper/Reports/Id.pm',
+    'lib/Tapper/Reports/Web/Controller/Tapper/Reports/Info.pm',
     'lib/Tapper/Reports/Web/Controller/Tapper/Reports/Tap.pm',
     'lib/Tapper/Reports/Web/Controller/Tapper/Rss.pm',
     'lib/Tapper/Reports/Web/Controller/Tapper/Schedule.pm',
@@ -71,6 +72,7 @@ my @files = (
     't/controller-create-kernelboot-usecase.t',
     't/controller_Tapper-ReportFile-Id.t',
     't/controller_Tapper-Reports-Id.t',
+    't/controller_Tapper-Reports-LastId.t',
     't/controller_Tapper-Reports.t',
     't/controller_Tapper-Schedule.t',
     't/controller_Tapper-Testruns.t',

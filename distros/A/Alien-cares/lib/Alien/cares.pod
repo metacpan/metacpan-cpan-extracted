@@ -1,0 +1,29 @@
+=head1 NAME
+
+Alien::cares - c-ares C library (alien, without perl-adapters).
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    write_makefile(
+        ...
+        BIN_DEPS => 'Alien::cares',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+This is c-ares L<library|https://c-ares.haxx.se/>.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

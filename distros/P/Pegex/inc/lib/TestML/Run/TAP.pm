@@ -40,10 +40,9 @@ sub testml_eq {
       $got ne $want and
       $want =~ /\n/ and
       (not defined $self->getv('Diff') or $self->getv('Diff')) and
-      not($ENV{TESTML_NO_DIFF})
+      not($ENV{TESTML_NO_DIFF}) and
+      eval { require Text::Diff }
   ) {
-    require Text::Diff;
-
     $self->tap_ok(0, $label ? ($label) : ());
 
     my $diff = Text::Diff::diff(

@@ -1,6 +1,5 @@
 package Bio::Tools::EUtilities;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::Tools::EUtilities::VERSION = '1.75';
+$Bio::Tools::EUtilities::VERSION = '1.76';
 use utf8;
 use strict;
 use warnings;
@@ -133,16 +132,27 @@ sub parse_data {
     my $response = $self->response ? $self->response :
                    $self->_fh      ? $self->_fh      :
         $self->throw('No response or stream specified');
-    my $simple = ($eutil eq 'espell') ?
-            $xs->XMLin($self->_fix_espell($response), forcearray => $EUTIL_DATA{$eutil}) :
-        ($response && $response->isa("HTTP::Response")) ?
-            $xs->XMLin($response->content, forcearray => $EUTIL_DATA{$eutil}) :
-            $xs->XMLin($response, forcearray => $EUTIL_DATA{$eutil});
-    # check for errors
-    if ($simple->{ERROR}) {
-        my $error = $simple->{ERROR};
-        $self->throw("NCBI $eutil fatal error: ".$error) unless ref $error;
+
+    my $data;
+    if ($eutil eq 'espell') {
+        $data = $self->_fix_espell($response);
+    } elsif ($response && $response->isa("HTTP::Response")) {
+        $data = $response->content;
+    } else {
+        $data = $response;
     }
+    my $simple = $xs->XMLin($data, ForceArray => $EUTIL_DATA{$eutil});
+
+    ## The ERROR element is #PCDATA only, so it can only have one text
+    ## element.  However, it can still have zero text elements in
+    ## which case it will be a reference to an empty hash.
+    if (defined $simple->{ERROR} && ! ref($simple->{ERROR})) {
+        ## Some errors may not be fatal but there doesn't seem to be a
+        ## way for us to know.  So we warn.
+        self->warn("NCBI $eutil error: " . $simple->{ERROR});
+    }
+
+
     if ($simple->{InvalidIdList}) {
         $self->warn("NCBI $eutil error: Invalid ID List".$simple->{InvalidIdList});
         return;
@@ -777,7 +787,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -785,7 +795,7 @@ Bio::Tools::EUtilities - NCBI eutil XML parsers.
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -1435,8 +1445,8 @@ for instance.
             describing the specific main object iterator to reset. The following
             are recognized (case-insensitive):
 
-            'all' - rewind all objects and also recursively resets nested object interators
-                    (such as LinkSets and DocSums).
+            'all' - rewind all objects and also recursively resets nested object
+                    iterators (such as LinkSets and DocSums).
             'globalqueries' - GlobalQuery objects
             'fieldinfo' or 'fieldinfos' - FieldInfo objects
             'linkinfo' or 'linkinfos' - LinkInfo objects in this layer
@@ -1510,14 +1520,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem
@@ -1529,7 +1538,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://github.com/bioperl/%%7Bdist%7D
+  https://github.com/bioperl/bio-eutilities/issues
 
 =head1 AUTHOR
 

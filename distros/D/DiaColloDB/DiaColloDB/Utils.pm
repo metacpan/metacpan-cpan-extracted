@@ -26,15 +26,15 @@ use strict;
 ## Globals
 
 our @ISA = qw(Exporter DiaColloDB::Logger);
-our @EXPORT= qw();
+our @EXPORT = qw();
 our %EXPORT_TAGS =
     (
      fcntl => [qw(fcflags fcread fcwrite fctrunc fccreat fcperl fcopen fcgetfl)],
      json  => [qw(jsonxs loadJsonString loadJsonFile saveJsonString saveJsonFile)],
      sort  => [qw(csort_to csortuc_to)],
-     run   => [qw(crun opencmd)],
+     run   => [qw(crun opencmd runcmd)],
      env   => [qw(env_set env_push env_pop)],
-     pack  => [qw(packsize packsingle packFilterFetch packFilterStore)],
+     pack  => [qw(packsize packsingle packeq packFilterFetch packFilterStore)],
      math  => [qw(isNan isInf isFinite $LOG2 log2 min2 max2 lmax lmin lsum)],
      list  => [qw(luniq sluniq xluniq lcounts)],
      regex => [qw(regex)],
@@ -48,6 +48,7 @@ our %EXPORT_TAGS =
 	       qw(maxval mintype),
 	      ],
      temp  => [qw($TMPDIR tmpdir tmpfh tmpfile tmparray tmparrayp tmphash)],
+     jobs  => [qw(nCores nJobs sortJobs)],
     );
 our @EXPORT_OK = map {@$_} values(%EXPORT_TAGS);
 $EXPORT_TAGS{all} = [@EXPORT_OK];
@@ -242,8 +243,10 @@ sub env_set {
   my ($key,$val);
   while (($key,$val)=each(%setenv)) {
     if (!defined($val)) {
+      #$that->trace("ENV_UNSET $key");
       delete($ENV{$key});
     } else {
+      #$that->trace("ENV_SET $key=$val");
       $ENV{$key} = $val;
     }
   }
@@ -272,6 +275,15 @@ sub env_pop {
 
 ##==============================================================================
 ## Functions: run
+
+## $rc = PACKAGE::runcmd($cmd)
+## $rc = PACKAGE::runcmd(@cmd)
+##  + does log trace at level $TRACE_RUNCMD
+sub runcmd {
+  my $that = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  $that->trace("CMD ", join(' ',@_));
+  return system(@_);
+}
 
 ## $fh_or_undef = PACKAGE::opencmd($cmd)
 ## $fh_or_undef = PACKAGE::opencmd($mode,@argv)
@@ -344,6 +356,15 @@ sub packsingle {
   shift if (UNIVERSAL::isa($_[0],__PACKAGE__));
   return (packsize($_[0],0)==packsize($_[0],0,0)
 	  && $_[0] !~ m{\*|(?:\[(?:[2-9]|[0-9]{2,})\])|(?:[[:alpha:]].*[[:alpha:]])});
+}
+
+## $bool = PACKAGE::packeq($packfmt1,$packfmt2,$val=0x123456789abcdef)
+##  + returns true iff $packfmt1 and $packfmt2 are equivalent for $val
+sub packeq {
+  shift if (UNIVERSAL::isa($_[0],__PACKAGE__));
+  my ($fmt1,$fmt2,$val) = @_;
+  $val //= 0x12345678;
+  return pack($fmt1,$val) eq pack($fmt2,$val);
 }
 
 ## \&filter_sub = PACKAGE::packFilterStore($pack_template)
@@ -1038,7 +1059,7 @@ sub tmpfh {
     do { $opts{DIR} =~ s{/$}{}; $filename  = "$opts{DIR}/$filename"; } if ($filename !~ m{^/} && defined($opts{DIR}));
     $filename  = $that->tmpdir."/".$filename if ($filename !~ m{^/} && $opts{TMPDIR});
     $filename .= $opts{SUFFIX} if (defined($opts{SUFFIX}));
-    CORE::open($fh, "+>", $filename)
+    CORE::open($fh, ($opts{APPEND} ? '+<' : '+>'), $filename)
 	or $that->logconfess("tmpfh(): open failed for file '$filename': $!");
     push(@TMPFILES, $filename) if ($opts{UNLINK});
   }
@@ -1069,6 +1090,7 @@ sub tmparray {
   $template     //= 'dcdbXXXXXX';
   $opts{SUFFIX} //= '.tmpa';
   $opts{UNLINK}   = 1 if (!exists($opts{UNLINK}));
+  $opts{APPEND}   = 0 if (!exists($opts{APPEND}));
 
   ##-- tie it up
   my $tmpfile = $that->tmpfile($template, %opts);
@@ -1092,10 +1114,12 @@ sub tmparrayp {
   $template     //= 'dcdbXXXXXX';
   $opts{SUFFIX} //= '.pf';
   $opts{UNLINK}   = 1 if (!exists($opts{UNLINK}));
+  $opts{APPEND}   = 0 if (!exists($opts{APPEND}));
 
   ##-- tie it up
   my $tmpfile = $that->tmpfile($template, %opts);
-  tie(my @tmparray, 'DiaColloDB::PackedFile', $tmpfile, 'rw', packas=>$packas, temp=>$opts{UNLINK}, %opts)
+  my $mode    = 'rw'.($opts{APPEND} ? 'a' : '');
+  tie(my @tmparray, 'DiaColloDB::PackedFile', $tmpfile, $mode, packas=>$packas, temp=>$opts{UNLINK}, %opts)
     or $that->logconfess("tmparrayp(): failed to tie file '$tmpfile' via DiaColloDB::PackedFile: $@");
   return \@tmparray;
 }
@@ -1115,12 +1139,70 @@ sub tmphash {
   $template     //= 'dcdbXXXXXX';
   $opts{SUFFIX} //= '.tmph';
   $opts{UNLINK}   = 1 if (!exists($opts{UNLINK}));
+  $opts{APPEND}   = 0 if (!exists($opts{APPEND}));
+  $opts{flags} //= fcflags('rw'.($opts{APPEND} ? 'a' : ''));
 
   ##-- tie it up
-  my $tmpfile = $that->tmpfile($template, %opts);
+  my $tmpfile  = $that->tmpfile($template, %opts);
   tie(my %tmphash, 'DiaColloDB::Temp::Hash', $tmpfile, %opts)
     or $that->logconfess("tmphash(): failed to tie file '$tmpfile' via DiaColloDB::Temp::Hash: $@");
   return \%tmphash;
+}
+
+##==============================================================================
+## Functions: jobs: parallelization
+
+## %NCORES : cache for nCores() utility ($cpuinfo_file=>$n, ...)
+our %NCORES = qw();
+
+## $ncores = PACKAGE::nCores()
+## $ncores = PACKAGE::nCores($proc_cpuinfo_filename)
+##  + returns the number of CPU cores on the system according to /proc/cpuinfo, or zero if unavailable
+##  + caches result in %NCORES
+sub nCores {
+  my $that  = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my $filename = shift || '/proc/cpuinfo';
+  return $NCORES{$filename} if (exists($NCORES{$filename}));
+
+  if (CORE::open(my $fh, "<$filename")) {
+    my $ncores = 0;
+    while (defined($_=<$fh>)) {
+      ++$ncores if (/^processor\s*:/);
+    }
+    close($fh);
+    $NCORES{$filename} = $ncores;
+  }
+  elsif (CORE::open(my $pipefh, "nproc|")) {
+    my $ncores = <$pipefh>;
+    chomp $ncores;
+    close($pipefh);
+    $NCORES{$filename} = $NCORES{'nproc|'} = $ncores if ($ncores);
+  }
+  return ($NCORES{$filename} //= 0);
+}
+
+## $njobs = PACKAGE::nJobs($njobs=$DiaColloDB::NJOBS)
+##  + gets non-negative number of jobs for user request $njobs (default=-1)
+##  + returns nCores() if $njobs is negative
+##  + returns int($njobs*nCores()) if  (0 < $njobs < 1)
+##  + otherwise returns $njobs+0
+sub nJobs {
+  my $that  = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my $njobs = @_ ? shift : $DiaColloDB::NJOBS;
+  $njobs   //= -1;
+  return $that->nCores() if ($njobs < 0);
+  return $njobs*$that->nCores if (0 < $njobs && $njobs < 1);
+  return int($njobs+0);
+}
+
+## $sort_parallel_option = sortJobs($njobs=$DiaColloDB::NJOBS)
+##  + returns --parallel option for 'sort' calls to use $njobs jobs
+sub sortJobs {
+  my $that  = UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
+  my $njobs = @_ ? shift : $DiaColloDB::NJOBS;
+  my $args = (!$njobs || $njobs < 1 ? '' : ("--parallel=".nJobs($njobs)));
+  return $args ? ($args) : qw() if (wantarray);
+  return $args;
 }
 
 ##==============================================================================

@@ -20,13 +20,13 @@ name: Dir-Manifest
 provides:
   Dir::Manifest:
     file: lib/Dir/Manifest.pm
-    version: v0.6.0
+    version: v0.6.1
   Dir::Manifest::Key:
     file: lib/Dir/Manifest/Key.pm
-    version: v0.6.0
+    version: v0.6.1
   Dir::Manifest::Slurp:
     file: lib/Dir/Manifest/Slurp.pm
-    version: v0.6.0
+    version: v0.6.1
 requires:
   Exporter: '0'
   Moo: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/shlomif/dir-manifest/issues
   homepage: http://metacpan.org/release/Dir-Manifest
   repository: https://github.com/shlomif/Dir-Manifest.git
-version: 0.6.0
+version: 0.6.1
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -247,6 +247,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version

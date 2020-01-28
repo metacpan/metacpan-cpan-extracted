@@ -1,5 +1,7 @@
 package Net::Whois::Object::InetRtr::AFRINIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -t inet-rtr -h whois.afrinic.net

@@ -1,3 +1,7 @@
+0.9906      Thu Jan 23 18:39:57 GMT 2020
+
+* Correctly resolved testing issues on MSWin32
+
 0.9904      Mon Dec  9 21:24:17 GMT 2019
 
 * Fixed tests on MSWin32

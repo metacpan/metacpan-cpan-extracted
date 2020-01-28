@@ -25,23 +25,6 @@ static std::string get_type_name (const std::type_info& ti) {
     return ret;
 }
 
-/*
-static panda::string get_reduced_backtrace (const panda::backtrace& bt) {
-    auto full_backtrace = bt.get_trace_string();
-    auto perl_backtrace = panda::backtrace().get_trace_string();
-    auto it_full = full_backtrace.rbegin();
-    auto it_perl = perl_backtrace.rbegin();
-    while(*it_full == *it_perl) {
-        it_full++;
-        it_perl++;
-    }
-    auto tail_size = std::distance(full_backtrace.rbegin(), it_full);
-    auto size = full_backtrace.size() - tail_size;
-    full_backtrace.resize(size);
-    return full_backtrace;
-}
-*/
-
 static Sv _exc2sv_default (const Sub&) {
     try { throw; }
     catch (SV* err)                  { return err; }

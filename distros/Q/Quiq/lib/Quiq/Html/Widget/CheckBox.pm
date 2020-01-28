@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 # -----------------------------------------------------------------------------
 
@@ -63,6 +63,10 @@ CSS Definition (inline).
 
 Tooltip-Text.
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =item value => $value (Default: undef)
 
 Aktueller Wert. Stimmt dieser mit dem Wert des Attributs option
@@ -101,6 +105,7 @@ sub new {
         option => undef,
         style => undef,
         title => undef,
+        undefIf => 0,
         value => undef,
     );
     $self->set(@_);
@@ -132,8 +137,14 @@ sub html {
     # Attribute
 
     my ($class,$disabled,$hidden,$id,$label,$name,$onClick,$option,$style,
-        $title,$value) = $self->get(qw/class disabled hidden id label name
-        onClick option style title value/);
+        $title,$undefIf,$value) = $self->get(qw/class disabled hidden id
+        label name onClick option style title undefIf value/);
+
+    # Generierung
+
+    if ($undefIf) {
+        return undef;
+    }
 
     if ($hidden) {
         return '';
@@ -164,7 +175,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

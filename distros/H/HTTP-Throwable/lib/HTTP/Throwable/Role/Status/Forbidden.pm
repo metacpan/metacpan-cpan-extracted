@@ -1,6 +1,6 @@
 package HTTP::Throwable::Role::Status::Forbidden;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::Status::Forbidden::VERSION = '0.026';
+$HTTP::Throwable::Role::Status::Forbidden::VERSION = '0.027';
 use Moo::Role;
 
 with(
@@ -23,7 +23,7 @@ HTTP::Throwable::Role::Status::Forbidden - 403 Forbidden
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Infinity Interactive, Inc..
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

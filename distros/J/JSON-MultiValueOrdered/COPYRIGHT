@@ -17,17 +17,9 @@ License: GPL-1.0+ or Artistic-1.0
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: CONTRIBUTING
- INSTALL
- LICENSE
- examples/eg1.pl
-Copyright: Unknown
-License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -35,23 +27,33 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/05j.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
+Files: INSTALL
+ LICENSE
+ examples/eg1.pl
+Copyright: Unknown
+License: Unknown
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/05j.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

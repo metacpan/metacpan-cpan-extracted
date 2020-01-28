@@ -21,7 +21,7 @@ sub timer
    $static->set_text( "Counter: $counter" );
    $counter++;
 
-   $tickit->timer( after => 1, \&timer );
+   $tickit->watch_timer_after( 1, \&timer );
 }
 
 timer();

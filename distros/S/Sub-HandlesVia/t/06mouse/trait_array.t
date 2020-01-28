@@ -14,6 +14,12 @@ use Test::More;
 use Test::Fatal;
 #use Test::Moose;
 
+BEGIN {
+	require Mouse::Util;
+	Mouse::Util::MOUSE_XS()
+		or plan skip_all => 'https://github.com/xslate/p5-Mouse/issues/106';
+};
+
 {
     my %handles = (
         count    => 'count',

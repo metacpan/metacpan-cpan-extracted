@@ -1,10 +1,10 @@
 {
    "abstract" : "Support module for the 'pegex' CLI command",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,10 +15,10 @@
    "name" : "Pegex-Cmd",
    "no_index" : {
       "directory" : [
+         "example",
          "inc",
          "t",
-         "xt",
-         "example"
+         "xt"
       ]
    },
    "prereqs" : {
@@ -34,12 +34,14 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Cmd" : "0",
-            "Module::Pluggable" : "0",
-            "Mouse" : "0",
-            "MouseX::App::Cmd" : "0",
-            "Pegex" : "0.30",
+            "Pegex" : "0.74",
             "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "JSON::PP" : "0"
          }
       }
    },
@@ -55,6 +57,8 @@
          "web" : "https://github.com/ingydotnet/pegex-cmd-pm"
       }
    },
-   "version" : "0.26"
+   "version" : "0.28",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

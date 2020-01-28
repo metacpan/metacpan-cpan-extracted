@@ -34,8 +34,11 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.99" },
-                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.99" },
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.100" },
+                          "Regexp::Pattern::License::Parts" => {
+                                                                 file => "lib/Regexp/Pattern/License/Parts.pm",
+                                                                 version => "v3.1.100",
+                                                               },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -48,8 +51,8 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                         },
-  "version"          => "v3.1.99",
-  "x_help_wanted"    => ["documenter", "tester"],
+  "version"          => "v3.1.100",
+  "x_help_wanted"    => ["tester", "documenter"],
   "x_static_install" => 1,
 };
 

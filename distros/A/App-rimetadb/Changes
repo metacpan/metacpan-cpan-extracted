@@ -1,3 +1,20 @@
+0.224   2019-11-26  Released-By: PERLANCAR; Urgency: high
+
+        - Merge two releases (0.223.1, 0.223).
+
+
+0.223.1 2019-11-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Add rationale.
+
+        - [doc] Fix grammar.
+
+        - UPDATE 2019-11-25: rename 0.223 -> 0.223.1, cancel release (duplicate
+          version).
+
+
 0.223   2019-10-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.

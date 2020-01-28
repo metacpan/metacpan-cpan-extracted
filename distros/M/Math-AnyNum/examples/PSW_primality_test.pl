@@ -40,13 +40,13 @@ sub PSW_primality_test ($n) {
     return 0 if is_power($n);
 
     # Fermat base-2 test
-    powmod(2, $n - 1, $n) == 1 or return 0;
+    powmod(2, $n-1, $n) == 1 or return 0;
 
     my $P = findP($n);
     my $Q = -1;
 
     # If LucasU(P, -1, n+1) = 0 (mod n), then n is probably prime.
-    lucasUmod($P, $Q, $n + 1, $n) == 0;
+    lucasUmod($P, $Q, $n+1, $n) == 0;
 }
 
 #

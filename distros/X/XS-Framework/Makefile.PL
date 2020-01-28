@@ -12,7 +12,7 @@ my %params = (
     SRC       => ['src'],
     INC       => '-Isrc',
     TYPEMAPS  => ['typemap', "typemap$ivbits"],
-    BIN_DEPS  => ['CPP::panda::lib', 'next::XS'],
+    BIN_DEPS  => ['Alien::libpanda', 'next::XS'],
     PARSE_XS  => 'XS::Framework::ParseXS',
     BIN_SHARE => {
         INCLUDE  => {'src' => '/'},

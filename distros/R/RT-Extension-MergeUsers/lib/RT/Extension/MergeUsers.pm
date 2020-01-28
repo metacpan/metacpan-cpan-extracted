@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+# This software is Copyright (c) 1996-2020 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 
@@ -411,36 +411,29 @@ sub NameAndEmail {
 package RT::Users;
 use RT::Users;
 
-sub Next {
-    my $self = shift;
-
-    my $user = $self->SUPER::Next(@_);
-    unless ($user and $user->id) {
-        $self->{seen_users} = undef;
-        return undef;
+sub AddRecord {
+    my $self   = shift;
+    my $record = shift;
+    if ( $record->id ) {
+        my ($effective_id) = $record->Attributes->Named("EffectiveId");
+        my $original_id = $record->Id;
+        if ( $effective_id && $effective_id->Content && $effective_id->Content != $record->id ) {
+            my $user = RT::User->new( $record->CurrentUser );
+            $user->LoadByCols( id => $effective_id->Content );
+            if ( $user->id ) {
+                return if $self->{seen_users}{ $user->id };
+                $record = $user;
+            }
+        }
     }
-
-
-
-    my ($effective_id) = $user->Attributes->Named("EffectiveId");
-    my $original_id = $user->Id;
-    if ($effective_id && $effective_id->Content && $effective_id->Content != $user->id) {
-        $user->LoadByCols(id =>$effective_id->Content);
-    }
-    return $self->Next() if ($user->Id and $self->{seen_users}->{$user->id}++);
-
-    # Failed to load the effective user record for some reason, so expose
-    # this user again.
-    $user->LoadByCols( Id => $original_id )
-        unless $user->Id;
-
-    return $user;
+    $self->{seen_users}{ $record->id }++;
+    return $self->SUPER::AddRecord($record);
 }
 
-sub GotoFirstItem {
+sub _DoSearch {
     my $self = shift;
-    $self->{seen_users} = undef;
-    $self->GotoItem(0);
+    delete $self->{seen_users};
+    return $self->SUPER::_DoSearch(@_);
 }
 
 
@@ -464,6 +457,204 @@ sub SetDisabled {
     return ($ret, $msg);
 }
 
+{
+    package RT::Group;
+    my $orig_delete_member = \&RT::Group::DeleteMember;
+    *DeleteMember = sub {
+        my $self      = shift;
+        my $member_id = shift;
+
+        my $principal = RT::Principal->new( $self->CurrentUser );
+        $principal->Load($member_id);
+        if ( $principal->IsUser ) {
+
+            # Not call GetMergedUsers as we don't want to create the attribute here
+            my $merged_users = $principal->Object->FirstAttribute('MergedUsers');
+            if ( $merged_users && @{ $merged_users->Content } ) {
+                my $members = $self->MembersObj;
+                $members->Limit(
+                    FIELD    => 'MemberId',
+                    VALUE    => [ $member_id, @{ $merged_users->Content } ],
+                    OPERATOR => 'IN',
+                );
+
+                if ( $members->Count ) {
+                    my ( $ret, $msg );
+                    $RT::Handle->BeginTransaction;
+                    while ( my $member = $members->Next ) {
+                        ( $ret, $msg ) = $orig_delete_member->( $self, $member->MemberId, @_ );
+                        if ( !$ret ) {
+                            $RT::Handle->Rollback;
+                            return ( $ret, $msg );
+                        }
+                    }
+                    $RT::Handle->Commit;
+                    return ( $ret, $msg );
+
+                }
+            }
+        }
+        return $orig_delete_member->( $self, $member_id, @_ );
+    };
+
+}
+
+{
+    package RT::Groups;
+    sub WithMember {
+        my $self = shift;
+        my %args = ( PrincipalId => undef,
+                     Recursively => undef,
+                     @_);
+        my $members = $self->Join(
+            ALIAS1 => 'main', FIELD1 => 'id',
+            $args{'Recursively'}
+                ? (TABLE2 => 'CachedGroupMembers')
+                # (GroupId, MemberId) is unique in GM table
+                : (TABLE2 => 'GroupMembers', DISTINCT => 1)
+            ,
+            FIELD2 => 'GroupId',
+        );
+
+        my $principal = RT::Principal->new( $self->CurrentUser );
+        $principal->Load($args{'PrincipalId'});
+        my @ids = $args{'PrincipalId'};
+        if ( $principal->IsUser ) {
+
+            # Not call GetMergedUsers as we don't want to create the attribute here
+            my $merged_users = $principal->Object->FirstAttribute('MergedUsers');
+            push @ids, @{ $merged_users->Content } if $merged_users;
+        }
+
+        $self->Limit(ALIAS => $members, FIELD => 'MemberId', OPERATOR => 'IN', VALUE => \@ids);
+        $self->Limit(ALIAS => $members, FIELD => 'Disabled', VALUE => 0)
+            if $args{'Recursively'};
+
+        return $members;
+    }
+
+    sub WithoutMember {
+        my $self = shift;
+        my %args = (
+            PrincipalId => undef,
+            Recursively => undef,
+            @_
+        );
+
+        my $members = $args{'Recursively'} ? 'CachedGroupMembers' : 'GroupMembers';
+        my $members_alias = $self->Join(
+            TYPE   => 'LEFT',
+            FIELD1 => 'id',
+            TABLE2 => $members,
+            FIELD2 => 'GroupId',
+            DISTINCT => $members eq 'GroupMembers',
+        );
+
+        my $principal = RT::Principal->new( $self->CurrentUser );
+        $principal->Load($args{'PrincipalId'});
+        my @ids = $args{'PrincipalId'};
+        if ( $principal->IsUser ) {
+
+            # Not call GetMergedUsers as we don't want to create the attribute here
+            my $merged_users = $principal->Object->FirstAttribute('MergedUsers');
+            push @ids, @{ $merged_users->Content } if $merged_users;
+        }
+        $self->Limit(
+            LEFTJOIN => $members_alias,
+            ALIAS    => $members_alias,
+            FIELD    => 'MemberId',
+            OPERATOR => 'IN',
+            VALUE    => \@ids,
+        );
+
+        $self->Limit(
+            LEFTJOIN => $members_alias,
+            ALIAS    => $members_alias,
+            FIELD    => 'Disabled',
+            VALUE    => 0
+        ) if $args{'Recursively'};
+        $self->Limit(
+            ALIAS    => $members_alias,
+            FIELD    => 'MemberId',
+            OPERATOR => 'IS',
+            VALUE    => 'NULL',
+            QUOTEVALUE => 0,
+        );
+    }
+}
+
+# Partially copied from RT::SearchBuilder::Role::Roles::RoleLimit.  It's to
+# expand user id with all merged users ids. Patching
+# RT::SearchBuilder::Role::Roles::RoleLimit directly won't work because the
+# method is exported to RT::Tickets and RT::Assets quite early before this
+# plugin is imported.
+
+sub TweakRoleLimitArgs {
+    my $self = shift;
+    my %args = (
+        TYPE     => '',
+        CLASS    => '',
+        FIELD    => undef,
+        OPERATOR => '=',
+        VALUE    => undef,
+        @_
+    );
+
+    my $class = $args{CLASS} || $self->_RoleGroupClass;
+
+    $args{FIELD} ||= 'id' if $args{VALUE} =~ /^\d+$/;
+
+    my $type = $args{TYPE};
+    if ( $type and not $class->HasRole($type) ) {
+        RT->Logger->warn("RoleLimit called with invalid role $type for $class");
+        return %args;
+    }
+
+    my $column = $type ? $class->Role($type)->{Column} : undef;
+
+    # if it's equality op and search by Email or Name then we can preload user
+    # we do it to help some DBs better estimate number of rows and get better plans
+    if ( $args{OPERATOR} =~ /^(!?)=$/
+        && ( !$args{FIELD} || $args{FIELD} eq 'id' || $args{FIELD} eq 'Name' || $args{FIELD} eq 'EmailAddress' ) )
+    {
+        my $is_negative = $1;
+        my $o           = RT::User->new( $self->CurrentUser );
+        my $method
+            = !$args{FIELD} ? ( $column ? 'Load' : 'LoadByEmail' )
+            : $args{FIELD} eq 'EmailAddress' ? 'LoadByEmail'
+            :                                  'Load';
+        $o->$method( $args{VALUE} );
+        $args{FIELD} = 'id';
+        if ( $o->id ) {
+            if ( my $merged_users = $o->FirstAttribute('MergedUsers') ) {
+                $args{VALUE} = [ $o->id, @{ $merged_users->Content } ];
+                $args{OPERATOR} = $is_negative ? 'NOT IN' : 'IN';
+            }
+            else {
+                $args{VALUE} = $o->id;
+            }
+        }
+        else {
+            $args{VALUE} = 0;
+        }
+    }
+    return %args;
+}
+
+{
+    my $original_role_limit = \&RT::Tickets::RoleLimit;
+    *RT::Tickets::RoleLimit = sub {
+        return $original_role_limit->( $_[0], TweakRoleLimitArgs(@_) );
+    };
+}
+
+{
+    my $original_role_limit = \&RT::Assets::RoleLimit;
+    *RT::Assets::RoleLimit = sub {
+        return $original_role_limit->( $_[0], TweakRoleLimitArgs(@_) );
+    };
+}
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -480,7 +671,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
 This is free software, licensed under:
 

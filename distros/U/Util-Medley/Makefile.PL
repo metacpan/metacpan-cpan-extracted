@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Moose::Role" => 0,
     "Path::Iterator::Rule" => 0,
+    "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
     "Sort::Naturally" => 0,
     "String::Util" => 0,
@@ -70,7 +71,7 @@ my %WriteMakefileArgs = (
     "Test2::Plugin::DieOnFail" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.023",
+  "VERSION" => "0.024",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -105,6 +106,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Moose::Role" => 0,
   "Path::Iterator::Rule" => 0,
+  "Scalar::Util" => 0,
   "Scalar::Util::Numeric" => 0,
   "Sort::Naturally" => 0,
   "String::Util" => 0,

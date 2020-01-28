@@ -4,8 +4,8 @@
       "rdfs:comment" : "A medical procedure intended primarily for palliative purposes, aimed at relieving the symptoms of an underlying health condition.",
       "rdfs:label" : "PalliativeProcedure",
       "rdfs:subClassOf" : [
-         "schema:MedicalTherapy",
-         "schema:MedicalProcedure"
+         "schema:MedicalProcedure",
+         "schema:MedicalTherapy"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },

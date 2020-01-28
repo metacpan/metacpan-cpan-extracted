@@ -24,8 +24,8 @@
          "rdfs:subPropertyOf" : "schema:object",
          "schema:domainIncludes" : "schema:ChooseAction",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Thing"
+            "schema:Thing",
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:actionOption"
       }

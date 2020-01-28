@@ -39,7 +39,7 @@ my $debug         = 0;
 my $downstream    = 0;
 
 my $email = "";
-
+my $api_key = "";
 my $format        = 'genbank';
 
 my $genes         = '';
@@ -111,6 +111,7 @@ GetOptions(
             'debug'               => \$debug,
             'down|downstream=i'   => \$downstream,
             'email=s'             => \$email,
+            'api_key=s'           => \$api_key,
             'format=s'            => \$format,
             'genes:s'             => \&genes_option_parsing,
             'limit=i'             => \$limit,
@@ -188,6 +189,7 @@ sub gb_search {
                                             -db      => 'gene',
                                             -term    => $_[0],
                                             -retmax  => $limit,
+                                            -api_key => $api_key,
                                             -email   => $email,
                                             );
   log_it (3, "Entrez gene: query $_[0] translated into '" . $searcher->get_query_translation . "'");
@@ -216,6 +218,7 @@ sub analyze_entrez_genes {
                                           -id      => $uid_ref,
                                           -retmode => 'text',
                                           -rettype => 'asn1',
+                                          -api_key => $api_key,
                                           -email   => $email,
                                          );
   my $response = $fetcher->get_Response->content;
@@ -481,6 +484,7 @@ sub create_fetcher {
                                           -db       => $searched,
                                           -retmode  => 'text',
                                           -rettype  => $rettype,
+                                          -api_key => $api_key,
                                           -email    => $email,
                                           );
   return $fetcher;
@@ -752,8 +756,7 @@ sub create_csv {
 ## Structure methods
 ################################################################################
 package Structure;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Structure::VERSION = '1.75';
+$Structure::VERSION = '1.76';
 ## creates a new instance of the object
 sub new {
   my $class = shift;
@@ -893,7 +896,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -901,7 +904,7 @@ bp_genbank_ref_extractor - Retrieves all related sequences for a list of searche
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -949,6 +952,10 @@ A valid email used to connect to the NCBI servers. This may be used by
 NCBI to contact users in case of problems and before blocking access in
 case of heavy usage.
 
+=item B <--api_key>
+NCBI requires an API key for requests over 10/sec as of December 2018. You
+may generate one in the "My NCBI" area
+
 =item B<--format>
 
 Specifies the format that the sequences will be saved. Defaults to I<genbank> format.
@@ -992,7 +999,7 @@ By default, sequences of pseudo genes will be saved. B<--nopseudo> can be used t
 =item B<--save>
 
 Specifies the path for the directory where the sequence and log files will be saved. If the
-directory does not exist it will be created altough the path to it must exist. Files on the
+directory does not exist it will be created although the path to it must exist. Files on the
 directory may be rewritten if necessary. If unspecified, a directory named F<extracted sequences>
 on the current directory will be used.
 
@@ -1033,43 +1040,56 @@ For help in debugging, consider using B<--debug>
 
 =head1 EXAMPLES
 
-=over
+ bp_genbank_ref_extractor \
+   --transcripts=accession \
+   '"homo sapiens"[organism] AND H2B'
 
-=item C<bp_genbank_ref_extractor --transcripts=accession '"homo sapiens"[organism] AND H2B'>
+Search Entrez Gene with the query C<'"homo sapiens"[organism] AND H2B'>
+and save their transcripts sequences only.  Note that default value
+of B<--limit> may only extract some of the hits.
 
-Search Entrez gene with the query C<'"homo sapiens"[organism] AND H2B'>, and
-save their transcripts sequences. Note that default value of B<--limit> may only extract
-some of the hits.
+ bp_genbank_ref_extractor \
+   --transcripts=accession --proteins=accession \
+    --format=fasta \
+    '"homo sapiens"[organism] AND H2B' \
+    '"homo sapiens"[organism] AND MCPH1'
 
-=item C<bp_genbank_ref_extractor --transcripts=accession --proteins=accession --format=fasta '"homo sapiens"[organism] AND H2B' '"homo sapiens"[organism] AND MCPH1'>
+Save both transcript and protein sequences in the fasta format, for
+two queries, C<'"homo sapiens"[organism] AND H2B'> and C<'"homo
+sapiens"[organism] AND MCPH1'>.
 
-Same as first example but also searches for C<'"homo sapiens"[organism] AND MCPH1'>,
-proteins sequences, and saves them in the fasta format.
+ bp_genbank_ref_extractor \
+   --genes --down=500 --up=100 \
+   '"homo sapiens"[organism] AND H2B'
 
-=item C<bp_genbank_ref_extractor --genes --up=100 --down=500 '"homo sapiens"[organism] AND H2B'>
+Download genomic sequences, including 500 bp downstream and 100 bp
+upstream of each gene.
 
-Same search as first example but saves the genomic sequences instead including
-100 and 500 bp upstream and downstream.
+ bp_genbank_ref_extractor \
+   --genes --asembly='Alternate HuRef' \
+   '"homo sapiens"[organism] AND H2B'
 
-=item C<bp_genbank_ref_extractor --genes --asembly='Alternate HuRef' '"homo sapiens"[organism] AND H2B'>
+Download genomic sequences from the Alternate HuRef genome assembly.
 
-Same search as first example but saves genomic sequences and from the Alternate HuRef genome assembly instead.
+ bp_genbank_ref_extractor --save-data=CSV \
+   '"homo sapiens"[organism] AND H2B'
 
-=item C<bp_genbank_ref_extractor --save-data=CSV '"homo sapiens"[organism] AND H2B'>
+Do not save any sequence, only save the results in a CSV file.
 
-Same search as first example but does not save any sequence but saves all the results in a CSV file.
+ bp_genbank_ref_extractor --save='search-results' \
+   --genes=name  downstream=500 --upstream=200 \
+   --nopseudo --nonnon-coding --transcripts --proteins \
+   --format=fasta --save-data=CSV \
+   '"homo sapiens"[organism] AND H2B' \
+   '"homo sapiens"[organism] AND MCPH1'
 
-=item C<bp_genbank_ref_extractor --save='search results' --genes=name --upstream=200 downstream=500 --nopseudo --nonnon-coding  --transcripts --proteins  --format=fasta --save-data=CSV '"homo sapiens"[organism] AND H2B' '"homo sapiens"[organism] AND MCPH1'>
+Ignoring non-coding and pseudo genes, downloads: genomic sequences
+with 500 and 200 bp downstream and upstream respectively, using the
+gene name as filename; transcript and proteins sequences using their
+accession number as filename; everything in fasta format plus a CSV
+file with search results; saved in a directory named F<search-results>
 
-Searches on Entrez gene for both C<'"homo sapiens"[organism] AND H2B'> and C<'"homo sapiens"[organism] AND MCPH1'>
-and saves the gene sequences of all hits (not passing the default limit and ignoring pseudogenes) plus 200 and 500bp
-upstream and downstream of them. It will also save the sequences of all transcripts and proteins of each gene (but
-ignoring non-coding transcripts). It will save the sequences in the fasta format, inside a directory C<search results>,
-and save the results in a CSV file
-
-=back
-
-=head1 KNOWN BUGS
+=head1 NON-BUGS
 
 =over
 
@@ -1079,21 +1099,22 @@ When supplying options, it's possible to not supply a value and use their defaul
 when the expected value is a string, the next argument may be confused as value for the
 option. For example, when using the following command:
 
-C<bp_genbank_ref_extractor --transcripts 'H2A AND homo sapiens'>
+ bp_genbank_ref_extractor --transcripts \
+   'H2A AND homo sapiens'
 
 we mean to search for 'H2A AND homo sapiens' saving only the transcripts and using the default
 as base for the filename. However, the search terms will be interpreted as the base for the
 filenames (but since it's not a valid identifier, it will return an error). To prevent
 this, you can either specify the values:
 
-C<bp_genbank_ref_extractor --transcripts 'accession' 'H2A AND homo sapiens'>
-
-C<bp_genbank_ref_extractor --transcripts='accession' 'H2A AND homo sapiens'>
+ bp_genbank_ref_extractor --transcripts='accession' \
+   'H2A AND homo sapiens'
 
 or you can use the double hash to stop processing options. Note that this should only be used
 after the last option. All arguments supplied after the double dash will be interpreted as search terms
 
-C<bp_genbank_ref_extractor --transcripts -- 'H2A AND homo sapiens'>
+ bp_genbank_ref_extractor --transcripts \
+   -- 'H2A AND homo sapiens'
 
 =back
 
@@ -1141,14 +1162,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem
@@ -1160,7 +1180,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://github.com/bioperl/%%7Bdist%7D
+  https://github.com/bioperl/bio-eutilities/issues
 
 =head1 AUTHOR
 

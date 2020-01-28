@@ -13,24 +13,30 @@ run_tests(
     sub {
         my $client = test_client( dbs => ['ts1'] );
 
-        my $handle = $client->insert( "Worker::Foo", { cluster => 'all' } );
-        ok($handle);
+        {
+            my $handle
+                = $client->insert( "Worker::Foo", { cluster => 'all' } );
+            ok($handle);
 
-        my $job = Worker::Foo->grab_job($client);
-        ok( $job, "no addition jobs to be grabbed" );
+            my $job = Worker::Foo->grab_job($client);
+            ok( $job, "no addition jobs to be grabbed" );
 
-        Worker::Foo->work_safely($job);
+            Worker::Foo->work_safely($job);
 
-        $client->can_do("Worker::Foo");
-        $client->work_until_done;    # should process 5 jobs.
+            $client->can_do("Worker::Foo");
+            $client->work_until_done;    # should process 5 jobs.
 
-        # finish a job by replacing it with nothing
-        $handle
-            = $client->insert( "Worker::Foo", { cluster => 'gibberish' } );
-        ok( $handle->is_pending, "job is still pending" );
-        $job = $handle->job;
-        $job->replace_with();
-        ok( !$handle->is_pending, "job no longer pending" );
+            # finish a job by replacing it with nothing
+            $handle
+                = $client->insert( "Worker::Foo",
+                { cluster => 'gibberish' } );
+            ok( $handle->is_pending, "job is still pending" );
+            $job = $handle->job;
+            $job->replace_with();
+            ok( !$handle->is_pending, "job no longer pending" );
+        }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }

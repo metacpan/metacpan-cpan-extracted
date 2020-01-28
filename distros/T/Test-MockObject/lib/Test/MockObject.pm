@@ -1,5 +1,5 @@
 package Test::MockObject;
-$Test::MockObject::VERSION = '1.20191002';
+$Test::MockObject::VERSION = '1.20200122';
 use strict;
 use warnings;
 
@@ -33,12 +33,15 @@ sub new
 
 sub mock
 {
-    my ($self, $name, $sub) = @_;
-    $sub ||= sub {};
+    my ($self, @names_and_subs) = @_;
 
-    # leading dash means unlog, otherwise do log
-    _set_log( $self, $name, ( $name =~ s/^-// ? 0 : 1 ) );
-    _subs( $self )->{$name} = $sub;
+    while ( my ($name, $sub) = splice @names_and_subs, 0, 2 ) {
+        $sub ||= sub {};
+
+        # leading dash means unlog, otherwise do log
+        _set_log( $self, $name, ( $name =~ s/^-// ? 0 : 1 ) );
+        _subs( $self )->{$name} = $sub;
+    }
 
     $self;
 }
@@ -545,10 +548,10 @@ feature came about in version 0.09.  Shorter testing code is nice!
 
 =over 4
 
-=item * C<mock(I<name>, I<coderef>)>
+=item * C<mock(I<name>, I<coderef> [, I<name2>, I<coderef2>, ...])>
 
-Adds a coderef to the object.  This allows code to call the named method on the
-object.  For example, this code:
+Adds one or more coderefs to the object.  This allows code to call the named
+methods on the object.  For example, this code:
 
     my $mock = Test::MockObject->new();
     $mock->mock( 'fluorinate',

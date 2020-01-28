@@ -4,16 +4,18 @@ package # hide from PAUSE
 use strict;
 use warnings;
 
+use File::Spec;
+use File::Temp;
 use Schema;
 
-our $dbfile = './t/tmp/test.db';
-our $dsn    = "dbi:SQLite:${dbfile}";
-our $schema = Schema->connect($dsn);
+our $tmp_dir = File::Temp->newdir();
+our $dbfile  = File::Spec->catdir($tmp_dir,'test.db');
+our $dsn     = "dbi:SQLite:${dbfile}";
+our $schema  = Schema->connect($dsn);
 
 sub initialize
 {
-    unlink($dbfile) if -e './t/tmp/test.db';
-    mkdir('./t/tmp/') unless -d './t/tmp';
+    unlink($dbfile) if -e $dbfile;
 
     my $dbh = $schema->storage->dbh;
 

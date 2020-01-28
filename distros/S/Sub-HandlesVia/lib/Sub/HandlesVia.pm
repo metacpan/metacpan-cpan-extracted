@@ -7,69 +7,79 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
-
-sub import {
-	my $me     = shift;
-	my $target = caller;
-	
-	if ($INC{'Moo/Role.pm'}
-	and Moo::Role->is_role($target)) {
-		require Sub::HandlesVia::Toolkit::Moo;
-		Sub::HandlesVia::Toolkit::Moo->setup_for($target);
-	}
-	
-	elsif ($INC{'Moo.pm'}
-	and $Moo::MAKERS{$target}
-	and $Moo::MAKERS{$target}{is_class}) {
-		require Sub::HandlesVia::Toolkit::Moo;
-		Sub::HandlesVia::Toolkit::Moo->setup_for($target);
-	}
-	
-	elsif ($INC{'Moose/Role.pm'}
-	and $target->can('meta')
-	and $target->meta->isa('Moose::Meta::Role')) {
-		require Sub::HandlesVia::Toolkit::Moose;
-		Sub::HandlesVia::Toolkit::Moose->setup_for($target);
-	}
-	
-	elsif ($INC{'Moose.pm'}
-	and $target->can('meta')
-	and $target->meta->isa('Moose::Meta::Class')) {
-		require Sub::HandlesVia::Toolkit::Moose;
-		Sub::HandlesVia::Toolkit::Moose->setup_for($target);
-	}
-
-	elsif ($INC{'Mouse/Role.pm'}
-	and $target->can('meta')
-	and $target->meta->isa('Mouse::Meta::Role')) {
-		require Sub::HandlesVia::Toolkit::Mouse;
-		Sub::HandlesVia::Toolkit::Mouse->setup_for($target);
-	}
-	
-	elsif ($INC{'Mouse.pm'}
-	and $target->can('meta')
-	and $target->meta->isa('Mouse::Meta::Class')) {
-		require Sub::HandlesVia::Toolkit::Mouse;
-		Sub::HandlesVia::Toolkit::Mouse->setup_for($target);
-	}
-	
-	if (@_) {
-		unshift @_, $me;
-		goto \&Exporter::Tiny::import;
-	}
-}
+our $VERSION   = '0.011';
 
 sub _generate_delegations {
-	my $me = shift;
-	my ($name, $args, $globals) = @_;
+	my ($me, $name, $args, $globals) = (shift, @_);
 	
 	my $target = $globals->{into};
 	!defined $target and die;
 	ref $target and die;
+
+	my $toolkit = $me->detect_toolkit($target);
+	return sub { $toolkit->install_delegations(target => $target, @_) };
+}
+
+sub _exporter_validate_opts {
+	my ($me, $globals) = (shift, @_);
+
+	my $target = $globals->{into};
+	!defined $target and die;
+	ref $target and die;
+
+	my $toolkit = $me->detect_toolkit($target);
+	$toolkit->setup_for($target) if $toolkit->can('setup_for');
+}
+
+sub detect_toolkit {
+	my $toolkit = sprintf(
+		'%s::Toolkit::%s',
+		__PACKAGE__,
+		shift->_detect_framework(@_),
+	);
+	eval "require $toolkit" or Exporter::Tiny::_croak($@);
+	return $toolkit;
+}
+
+sub _detect_framework {
+	my ($me, $target) = (shift, @_);
 	
-	require Sub::HandlesVia::Toolkit::Plain;
-	sub { Sub::HandlesVia::Toolkit::Plain->delegations(target => $target, @_) };
+	if ($INC{'Moo/Role.pm'}
+	and Moo::Role->is_role($target)) {
+		return 'Moo';
+	}
+	
+	if ($INC{'Moo.pm'}
+	and $Moo::MAKERS{$target}
+	and $Moo::MAKERS{$target}{is_class}) {
+		return 'Moo';
+	}
+	
+	if ($INC{'Moose/Role.pm'}
+	and $target->can('meta')
+	and $target->meta->isa('Moose::Meta::Role')) {
+		return 'Moose';
+	}
+	
+	if ($INC{'Moose.pm'}
+	and $target->can('meta')
+	and $target->meta->isa('Moose::Meta::Class')) {
+		return 'Moose';
+	}
+
+	if ($INC{'Mouse/Role.pm'}
+	and $target->can('meta')
+	and $target->meta->isa('Mouse::Meta::Role')) {
+		return 'Mouse';
+	}
+	
+	if ($INC{'Mouse.pm'}
+	and $target->can('meta')
+	and $target->meta->isa('Mouse::Meta::Class')) {
+		return 'Mouse';
+	}
+	
+	return 'Plain';
 }
 
 1;
@@ -326,122 +336,128 @@ the setter is also passed a value to set.
 Really, I don't think there's any object system that this won't work
 for!
 
+(The C<delegations> function can be imported into Moo/Mouse/Moose classes
+too, in which case the C<attribute> needs to be the same attribute name
+you passed to C<has>. You cannot use a arrayref, coderef, hash key, or
+array index.)
+
 =head2 What methods can be delegated to?
 
 The following table compares Sub::HandlesVia with L<Data::Perl>, L<Moose>
-native traits, and L<MouseX::NativeTraits>. Mouse L<looks> like it's
-ahead of the rest, but quite a few of their extra methods are just
-aliases for existing methods.
+native traits, and L<MouseX::NativeTraits>.
 
   Array ===========================================
-            accessor : SubHV  DataP  Moose  Mouse
-                 all : SubHV  DataP              
-                 any :                      Mouse
-               apply :                      Mouse
-               clear : SubHV  DataP  Moose  Mouse
-               count : SubHV  DataP  Moose  Mouse
-              delete : SubHV  DataP  Moose  Mouse
-            elements : SubHV  DataP  Moose  Mouse
-               fetch :                      Mouse
-               first : SubHV  DataP  Moose  Mouse
-         first_index : SubHV  DataP  Moose       
-             flatten : SubHV  DataP              
-        flatten_deep : SubHV  DataP              
-            for_each :                      Mouse
-       for_each_pair :                      Mouse
-                 get : SubHV  DataP  Moose  Mouse
-                grep : SubHV  DataP  Moose  Mouse
-              insert : SubHV  DataP  Moose  Mouse
-            is_empty : SubHV  DataP  Moose  Mouse
-                join : SubHV  DataP  Moose  Mouse
-                 map : SubHV  DataP  Moose  Mouse
-            natatime : SubHV  DataP  Moose       
-                 pop : SubHV  DataP  Moose  Mouse
-               print : SubHV  DataP              
-                push : SubHV  DataP  Moose  Mouse
-              reduce : SubHV  DataP  Moose  Mouse
-              remove :                      Mouse
-             reverse : SubHV  DataP              
-                 set : SubHV  DataP  Moose  Mouse
-       shallow_clone : SubHV  DataP  Moose       
-               shift : SubHV  DataP  Moose  Mouse
-             shuffle : SubHV  DataP  Moose  Mouse
-    shuffle_in_place : SubHV                     
-                sort : SubHV  DataP  Moose  Mouse
-             sort_by :                      Mouse
-       sort_in_place : SubHV  DataP  Moose  Mouse
-    sort_in_place_by :                      Mouse
-              splice : SubHV  DataP  Moose  Mouse
-               store :                      Mouse
-                uniq : SubHV  DataP  Moose  Mouse
-       uniq_in_place : SubHV                     
-             unshift : SubHV  DataP  Moose  Mouse
+            accessor : SubHV  DataP  Moose  Mouse  
+                 all : SubHV  DataP                
+                 any : SubHV                Mouse  
+               apply : SubHV                Mouse  
+               clear : SubHV  DataP  Moose  Mouse  
+               count : SubHV  DataP  Moose  Mouse  
+              delete : SubHV  DataP  Moose  Mouse  
+            elements : SubHV  DataP  Moose  Mouse  
+               fetch :                      Mouse  (alias: get)
+               first : SubHV  DataP  Moose  Mouse  
+         first_index : SubHV  DataP  Moose         
+             flatten : SubHV  DataP                
+        flatten_deep : SubHV  DataP                
+            for_each : SubHV                Mouse  
+       for_each_pair : SubHV                Mouse  
+                 get : SubHV  DataP  Moose  Mouse  
+                grep : SubHV  DataP  Moose  Mouse  
+                head : SubHV  DataP                
+              insert : SubHV  DataP  Moose  Mouse  
+            is_empty : SubHV  DataP  Moose  Mouse  
+                join : SubHV  DataP  Moose  Mouse  
+                 map : SubHV  DataP  Moose  Mouse  
+            natatime : SubHV  DataP  Moose         
+         pick_random : SubHV                       
+                 pop : SubHV  DataP  Moose  Mouse  
+               print : SubHV  DataP                
+                push : SubHV  DataP  Moose  Mouse  
+              reduce : SubHV  DataP  Moose  Mouse  
+              remove :                      Mouse  (alias: delete)
+             reverse : SubHV  DataP                
+                 set : SubHV  DataP  Moose  Mouse  
+       shallow_clone : SubHV  DataP  Moose         
+               shift : SubHV  DataP  Moose  Mouse  
+             shuffle : SubHV  DataP  Moose  Mouse  
+    shuffle_in_place : SubHV                       
+                sort : SubHV  DataP  Moose  Mouse  
+             sort_by :                      Mouse  (sort)
+       sort_in_place : SubHV  DataP  Moose  Mouse  
+    sort_in_place_by :                      Mouse  (sort_in_place)
+              splice : SubHV  DataP  Moose  Mouse  
+               store :                      Mouse  (alias: set)
+                tail : SubHV  DataP                
+                uniq : SubHV  DataP  Moose  Mouse  
+       uniq_in_place : SubHV                       
+             unshift : SubHV  DataP  Moose  Mouse  
 
   Bool ============================================
-                 not : SubHV  DataP  Moose  Mouse
-               reset : SubHV                     
-                 set : SubHV  DataP  Moose  Mouse
-              toggle : SubHV  DataP  Moose  Mouse
-               unset : SubHV  DataP  Moose  Mouse
+                 not : SubHV  DataP  Moose  Mouse  
+               reset : SubHV                       
+                 set : SubHV  DataP  Moose  Mouse  
+              toggle : SubHV  DataP  Moose  Mouse  
+               unset : SubHV  DataP  Moose  Mouse  
 
   Code ============================================
-             execute : SubHV  DataP  Moose  Mouse
-      execute_method : SubHV         Moose  Mouse
+             execute : SubHV  DataP  Moose  Mouse  
+      execute_method : SubHV         Moose  Mouse  
 
   Counter =========================================
-                 dec : SubHV  DataP  Moose  Mouse
-                 inc : SubHV  DataP  Moose  Mouse
-               reset : SubHV  DataP  Moose  Mouse
-                 set : SubHV         Moose  Mouse
+                 dec : SubHV  DataP  Moose  Mouse  
+                 inc : SubHV  DataP  Moose  Mouse  
+               reset : SubHV  DataP  Moose  Mouse  
+                 set : SubHV         Moose  Mouse  
 
   Hash ============================================
-            accessor : SubHV  DataP  Moose  Mouse
-                 all : SubHV  DataP              
-               clear : SubHV  DataP  Moose  Mouse
-               count : SubHV  DataP  Moose  Mouse
-             defined : SubHV  DataP  Moose  Mouse
-              delete : SubHV  DataP  Moose  Mouse
-            elements : SubHV  DataP  Moose  Mouse
-              exists : SubHV  DataP  Moose  Mouse
-               fetch :                      Mouse
-        for_each_key :                      Mouse
-       for_each_pair :                      Mouse
-      for_each_value :                      Mouse
-                 get : SubHV  DataP  Moose  Mouse
-            is_empty : SubHV  DataP  Moose  Mouse
-                keys : SubHV  DataP  Moose  Mouse
-                  kv : SubHV  DataP  Moose  Mouse
-                 set : SubHV  DataP  Moose  Mouse
-       shallow_clone : SubHV  DataP  Moose       
-         sorted_keys : SubHV                Mouse
-               store :                      Mouse
-              values : SubHV  DataP  Moose  Mouse
+            accessor : SubHV  DataP  Moose  Mouse  
+                 all : SubHV  DataP                
+               clear : SubHV  DataP  Moose  Mouse  
+               count : SubHV  DataP  Moose  Mouse  
+             defined : SubHV  DataP  Moose  Mouse  
+              delete : SubHV  DataP  Moose  Mouse  
+            elements : SubHV  DataP  Moose  Mouse  
+              exists : SubHV  DataP  Moose  Mouse  
+               fetch :                      Mouse  (alias: get)
+        for_each_key : SubHV                Mouse  
+       for_each_pair : SubHV                Mouse  
+      for_each_value : SubHV                Mouse  
+                 get : SubHV  DataP  Moose  Mouse  
+            is_empty : SubHV  DataP  Moose  Mouse  
+                keys : SubHV  DataP  Moose  Mouse  
+                  kv : SubHV  DataP  Moose  Mouse  
+                 set : SubHV  DataP  Moose  Mouse  
+       shallow_clone : SubHV  DataP  Moose         
+         sorted_keys : SubHV                Mouse  
+               store :                      Mouse  (alias: set)
+              values : SubHV  DataP  Moose  Mouse  
 
   Number ==========================================
-                 abs : SubHV  DataP  Moose  Mouse
-                 add : SubHV  DataP  Moose  Mouse
-                 div : SubHV  DataP  Moose  Mouse
-                 get : SubHV                     
-                 mod : SubHV  DataP  Moose  Mouse
-                 mul : SubHV  DataP  Moose  Mouse
-                 set : SubHV         Moose       
-                 sub : SubHV  DataP  Moose  Mouse
+                 abs : SubHV  DataP  Moose  Mouse  
+                 add : SubHV  DataP  Moose  Mouse  
+                 div : SubHV  DataP  Moose  Mouse  
+                 get : SubHV                       
+                 mod : SubHV  DataP  Moose  Mouse  
+                 mul : SubHV  DataP  Moose  Mouse  
+                 set : SubHV         Moose         
+                 sub : SubHV  DataP  Moose  Mouse  
 
   String ==========================================
-              append : SubHV  DataP  Moose  Mouse
-               chomp : SubHV  DataP  Moose  Mouse
-                chop : SubHV  DataP  Moose  Mouse
-               clear : SubHV  DataP  Moose  Mouse
-                 get : SubHV                     
-                 inc : SubHV  DataP  Moose  Mouse
-              length : SubHV  DataP  Moose  Mouse
-               match : SubHV  DataP  Moose  Mouse
-             prepend : SubHV  DataP  Moose  Mouse
-             replace : SubHV  DataP  Moose  Mouse
-    replace_globally : SubHV                Mouse
-               reset : SubHV                     
-                 set : SubHV                     
-              substr : SubHV  DataP  Moose  Mouse
+              append : SubHV  DataP  Moose  Mouse  
+               chomp : SubHV  DataP  Moose  Mouse  
+                chop : SubHV  DataP  Moose  Mouse  
+               clear : SubHV  DataP  Moose  Mouse  
+                 get : SubHV                       
+                 inc : SubHV  DataP  Moose  Mouse  
+              length : SubHV  DataP  Moose  Mouse  
+               match : SubHV  DataP  Moose  Mouse  
+             prepend : SubHV  DataP  Moose  Mouse  
+             replace : SubHV  DataP  Moose  Mouse  
+    replace_globally : SubHV                Mouse  
+               reset : SubHV                       
+                 set : SubHV                       
+              substr : SubHV  DataP  Moose  Mouse  
 
 =head2 Method Chaining
 

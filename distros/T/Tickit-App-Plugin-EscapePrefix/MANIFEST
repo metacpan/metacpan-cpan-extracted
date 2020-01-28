@@ -1,0 +1,11 @@
+Build.PL
+examples/demo-input.pl
+lib/Tickit/App/Plugin/EscapePrefix.pm
+MANIFEST			This list of files
+t/00use.t
+t/01plugin.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -3,13 +3,13 @@ abstract: 'Relaxed JSON with a little bit of YAML'
 author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires:
-  JSON: '2.90'
-  YAML: '0.90'
+  JSON::PP: '0'
+  YAML::PP: '0.018'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,12 +22,13 @@ no_index:
     - t
     - xt
 requires:
-  Pegex: '0.50'
-  boolean: '0.31'
+  Pegex: '0.74'
+  boolean: '0.46'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/ingydotnet/jsony-pm/issues
   homepage: https://github.com/ingydotnet/jsony-pm
   repository: https://github.com/ingydotnet/jsony-pm.git
-version: 0.1.18
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: 0.1.19
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

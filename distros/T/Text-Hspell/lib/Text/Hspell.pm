@@ -8,7 +8,7 @@ require DynaLoader;
 use vars qw(@ISA);
 @ISA = qw/ DynaLoader /;
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 bootstrap Text::Hspell $VERSION;
 
@@ -33,9 +33,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Text::Hspell - wrapper for the hspell (= Hebrew speller) library
+
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -50,10 +54,6 @@ version 0.2.1
 
 This module allows one to use libhspell ( L<http://hspell.ivrix.org.il/> ) to
 spell check Hebrew words.
-
-=head1 NAME
-
-Text::Hspell - wrapper for the hspell (= Hebrew speller) library
 
 =head1 METHODS
 

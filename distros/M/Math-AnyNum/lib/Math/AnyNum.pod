@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     is_coprime(n,k)           return 1 if gcd(n,k) = 1
     is_smooth(n,k)            return 1 if all prime factors of n are <= k
     is_smooth_over_prod(n,k)  return 1 if n is smooth over the primes p|k
-    is_prime(n,r=20)          Miller-Rabin primality test
+    is_prime(n,r=23)          Miller-Rabin primality test
     primorial(n)              product of primes <= n
     next_prime(n)             next prime > n
     valuation(n,k)            number of times n is divisible by k
@@ -1572,22 +1572,24 @@ Returns the next prime after C<n>.
 
 =head2 is_prime
 
-    is_prime(n)                                   #=> Scalar
-    is_prime(n, r)                                #=> Scalar
+    is_prime(n, r=23)                             #=> Scalar
 
-Returns 2 if C<n> is definitely prime, 1 if C<n> is probably prime (without
-being certain), or 0 if C<n> is definitely composite. This method does some
-trial divisions, then some Miller-Rabin probabilistic primality tests. It
-also accepts an optional argument for specifying the accuracy of the test.
-By default, it uses an accuracy value of 20.
+Returns 2 if C<n> is definitely prime, 1 if C<n> is probably prime (without being certain), or 0 if C<n> is definitely composite.
 
-Reasonable accuracy values are between 15 and 50.
+This method does some trial divisions, then C<r> Miller-Rabin probabilistic primality tests.
+
+A higher C<r> value reduces the chances of a composite being identified as "probably prime". Reasonable values of C<r> are between 20 and 50.
+
+Starting with GMP 6.2.0, a Baillie-PSW probable prime test is performed, which has no known counter-examples.
+By specifying a value of r > 24, if C<n> passes the B-PSW test, C<r-24> additional Miller-Rabin tests are performed.
 
 See also:
 
 =over 4
 
 =item * L<https://en.wikipedia.org/wiki/Miller–Rabin_primality_test>
+
+=item * L<https://en.wikipedia.org/wiki/Baillie%E2%80%93PSW_primality_test>
 
 =item * L<https://gmplib.org/manual/Number-Theoretic-Functions.html>
 
@@ -2558,7 +2560,7 @@ interface to L<Math::GMPz> and L<Math::MPFR>, which he talked about at the YAPC 
 See his great presentation at: L<https://www.youtube.com/watch?v=Dhl4_Chvm_g>.
 
 The main aim of this module is to provide a fast and correct alternative to L<Math::BigInt>,
-L<Maht::BigFloat> and L<Math::BigRat>, as well as to L<bigint>, L<bignum> and L<bigrat> pragmas.
+L<Math::BigFloat> and L<Math::BigRat>, as well as to L<bigint>, L<bignum> and L<bigrat> pragmas.
 
 The original project was called C<Math::BigNum>, but because of some design flaws, that project
 was abandoned and much of its code ended up in this module.
@@ -2605,7 +2607,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2019 Daniel Șuteu
+Copyright (C) 2017-2020 Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.22.0 or,

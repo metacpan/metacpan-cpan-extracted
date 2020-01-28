@@ -1,0 +1,39 @@
+=head1 NAME
+
+Net::SockAddr::Inet4 - IPv4 sockaddr
+
+=head1 SYNOPSIS & DESCRIPTION
+
+See L<Net::SockAddr>
+    
+=head1 METHODS
+
+=head4 new($ip, $port) [CLASS METHOD]
+
+Creates object from ip in human-readable form and port. Dies if C<$ip> is not a valid IPv4 address
+
+=head4 from_addr($addr, $port) [CLASS METHOD]
+
+Creates object from binary IPv4 address (4-byte string) and port.
+
+=head4 ip()
+
+Returns ip in human-readable form
+
+=head4 port()
+
+Returns port
+
+=head4 addr()
+
+Return ip in binary form (4-byte string)
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

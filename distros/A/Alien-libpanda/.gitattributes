@@ -1,0 +1,6 @@
+*.pl text eol=lf
+*.pm text eol=lf
+*.cc text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.t text eol=lf

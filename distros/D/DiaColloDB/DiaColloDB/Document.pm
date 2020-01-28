@@ -55,6 +55,32 @@ sub label {
   return $_[0]{label} // "$_[0]";
 }
 
+## $ext = $doc->extension()
+##  + default extension (including dot), for Corpus::Compiled
+sub extension {
+  return '';
+}
+
+##==============================================================================
+## Storable hooks
+
+## ($serialized, $ref1, ...) = $obj->STORABLE_freeze($cloning)
+sub STORABLE_freeze {
+  my ($obj,$cloning) = @_;
+  my $ref = {};
+  foreach (keys %$obj) {
+    $ref->{$_} = (UNIVERSAL::isa($obj->{$_},'Regexp') ? "$obj->{$_}" : $obj->{$_});
+  }
+  return ('',$ref);
+}
+
+## $obj = STORABLE_thaw($obj, $cloning, $serialized, $ref1,...)
+sub STORABLE_thaw {
+  my ($obj,$cloning,$ser,$ref) = @_;
+  @$obj{keys %$ref} = values %$ref;
+  return $obj;
+}
+
 
 ##==============================================================================
 ## Footer

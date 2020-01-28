@@ -4,7 +4,7 @@ use warnings;
 require './t/lib/db-common.pl';
 
 use TheSchwartz;
-use Test::More tests => (5 + 21) * 3;
+use Test::More tests => ( 5 + 21 ) * 3;
 
 our $decline = 1;
 
@@ -32,6 +32,8 @@ run_tests(
             ok( !$job,
                 "didn't get a job, because job is 'held' not retrying" );
         }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }
@@ -75,6 +77,8 @@ run_tests(
                 ok( $rv, "end stuff 1-5" );
             }
         }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts2');
     }

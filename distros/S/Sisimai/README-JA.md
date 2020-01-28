@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.30-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.25.4-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.25.5-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README(English)**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
@@ -18,7 +18,6 @@
 - [使い方 | Usage](#usage)
     - [基本的な使い方 | Basic usage](#basic-usage)
     - [解析結果をJSONで得る | Convert to JSON](#convert-to-json)
-    - [バウンスオブジェクトを読む | Read bounce object](#read-bounce-object)
     - [コールバック機能 | Callback feature](#callback-feature)
     - [ワンライナー | One-Liner](#one-liner)
     - [出力例 | Output example](#output-example)
@@ -55,8 +54,6 @@ Key features
   * 解析精度はbounceHammerの2倍
   * 29種類のMTAに対応
   * 22種類の著名なMSPに対応
-  * 2種類の著名なメール配信クラウドに対応(JSON)
-    * **Sisimai 4.25.5で削除予定**
   * Feedback Loopにも対応
   * 29種類のエラー理由を検出
 * __bounceHammer 2.7.13p3よりも高速に解析__
@@ -88,11 +85,11 @@ Install
 ```shell
 $ cpanm --sudo Sisimai
 --> Working on Sisimai
-Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.25.2.tar.gz ... OK
+Fetching http://www.cpan.org/authors/id/A/AK/AKXLIX/Sisimai-4.25.5.tar.gz ... OK
 ...
 1 distribution installed
 $ perldoc -l Sisimai
-/usr/local/lib/perl5/site_perl/5.20.0/Sisimai.pm
+/usr/local/lib/perl5/site_perl/5.30.0/Sisimai.pm
 ```
 
 ### From GitHub
@@ -102,7 +99,7 @@ $ git clone https://github.com/sisimai/p5-Sisimai.git
 $ cd ./p5-Sisimai
 $ sudo make install-from-local
 --> Working on .
-Configuring Sisimai-4.25.2 ... OK
+Configuring Sisimai-4.25.5 ... OK
 1 distribution installed
 ```
 
@@ -165,29 +162,6 @@ print $j;                               # parsed data as JSON
 # dump() method also accepts "delivered" option like the following code:
 my $j = Sisimai->dump('/path/to/mbox', 'delivered' => 1);
 ```
-
-Read bounce object
--------------------------------------------------------------------------------
-**この機能はSisimai 4.25.5で削除されます**
-
-メール配信クラウドからAPIで取得したバウンスオブジェクト(JSON)を読んで解析する
-場合は、次のようなコードを書いてください。この機能はSisimai v4.20.0で実装され
-ました。
-
-```perl
-#! /usr/bin/env perl
-use JSON;
-use Sisimai;
-
-my $j = JSON->new;
-my $q = '{"json":"string",...}'
-my $v = Sisimai->make($j->decode($q), 'input' => 'json');
-
-if( defined $v ) {
-    for my $e ( @$v ) { ... }
-}
-```
-現時点ではAmazon SESとSendGridのみをサポートしています。
 
 Callback feature
 -------------------------------------------------------------------------------
@@ -255,7 +229,7 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | WebUIとAPI                                     | あり          | 無し        |
 | 解析済バウンスデータを保存するDBスキーマ       | あり          | 無し[1]     |
 | 解析精度の割合(2000通のメール)[2]              | 0.61          | 1.00        |
-| メール解析速度(1000通のメール)                 | 4.24秒        | 1.50秒[3]   |
+| メール解析速度(1000通のメール)                 | 4.24秒        | 1.35秒[3]   |
 | 検出可能なバウンス理由の数                     | 19            | 29          |
 | 2件以上のバウンスがあるメールの解析            | 1件目だけ     | 全件解析可能|
 | FeedBack Loop/ARF形式のメール解析              | 非対応        | 対応済      |
@@ -264,8 +238,8 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | インストール作業が簡単かどうか                 | やや面倒      | 簡単で楽    |
 | cpan, cpanm, cpmコマンドでのインストール       | 非対応        | 対応済      |
 | 依存モジュール数(Perlのコアモジュールを除く)   | 24モジュール  | 2モジュール |
-| LOC:ソースコードの行数                         | 18200行       | 8300行      |
-| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 250000件    |
+| LOC:ソースコードの行数                         | 18200行       | 7100行      |
+| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 255000件    |
 | ライセンス                                     | GPLv2かPerl   | 二条項BSD   |
 | 開発会社によるサポート契約                     | 終売(EOS)     | 提供中      |
 
@@ -324,7 +298,7 @@ Author
 
 Copyright
 ===============================================================================
-Copyright (C) 2014-2019 azumakuniyuki, All Rights Reserved.
+Copyright (C) 2014-2020 azumakuniyuki, All Rights Reserved.
 
 License
 ===============================================================================

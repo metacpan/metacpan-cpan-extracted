@@ -5,10 +5,11 @@ author:
 build_requires:
   Test::Exception: '0.32'
   Test::More: '0.98'
+  bignum: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.5, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +28,7 @@ no_index:
 provides:
   Hashids:
     file: lib/Hashids.pm
-    version: '1.001010'
+    version: '1.001012'
   Hashids::Util:
     file: lib/Hashids/Util.pm
 requires:
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://github.com/zakame/hashids.pm/issues
   homepage: http://hashids.org/perl
   repository: git://github.com/zakame/hashids.pm.git
-version: '1.001010'
+version: '1.001012'
 x_contributors:
   - 'C. A. Church <thisdroneeatspeople@gmail.com>'
   - 'Troy Morehouse <troymore@nbnet.nb.ca>'

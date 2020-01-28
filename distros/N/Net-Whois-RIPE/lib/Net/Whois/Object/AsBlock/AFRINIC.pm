@@ -1,5 +1,7 @@
 package Net::Whois::Object::AsBlock::AFRINIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -t as-block -h whois.afrinic.net

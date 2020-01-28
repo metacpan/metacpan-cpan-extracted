@@ -1,3 +1,9 @@
+0.28 Thu Jan 23 13:26:16 PST 2020
+ - Get rid of heavy dependencies
+
+0.27 Wed Jan 22 13:26:27 PST 2020
+ - Depend on latest Pegex
+
 0.26 Thu Jul  9 10:36:54 PDT 2015
  - Support PEGEX_COMBINATE_RULES
 
@@ -49,4 +55,3 @@
 
 0.10 Tue Oct  4 00:05:44 BST 2011
  - First Release
-

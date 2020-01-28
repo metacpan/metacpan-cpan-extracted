@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,7 +25,7 @@ use 5.004;
 use Graph;
 
 use Test;
-plan tests => 200;
+plan tests => 331;
 
 use lib 't';
 use MyTestHelpers;
@@ -36,7 +36,7 @@ require Graph::Maker::BinaryBeanstalk;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::BinaryBeanstalk::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BinaryBeanstalk->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BinaryBeanstalk->VERSION($want_version); 1 }, 1,
@@ -47,28 +47,91 @@ require Graph::Maker::BinaryBeanstalk;
 }
 
 #------------------------------------------------------------------------------
+# direction_type
+
+foreach my $height (0 .. 8) {
+  {
+    my $graph = Graph::Maker->new('binary_beanstalk',
+                                  height => $height,
+                                  direction_type => 'bigger');
+    foreach my $edge ($graph->edges) {
+      my ($from,$to) = @$edge;
+      ok ($from < $to, 1);
+    }
+
+    my $graph2 = Graph::Maker->new('binary_beanstalk',
+                                   height => $height,
+                                   direction_type => 'child');
+    ok ($graph->eq($graph2)?1:0, 1);
+  }
+  {
+    my $graph = Graph::Maker->new('binary_beanstalk',
+                                  height => $height,
+                                  direction_type => 'smaller');
+    foreach my $edge ($graph->edges) {
+      my ($from,$to) = @$edge;
+      ok ($from > $to, 1);
+    }
+
+    my $graph2 = Graph::Maker->new('binary_beanstalk',
+                                   height => $height,
+                                   direction_type => 'parent');
+    ok ($graph->eq($graph2)?1:0, 1);
+  }
+}
+
+
+#------------------------------------------------------------------------------
 
 {
   # height=0 empty
   my $graph = Graph::Maker->new('binary_beanstalk', height => 0);
   my $num_vertices = $graph->vertices;
   ok ($num_vertices, 0);
+  my $num_edges = $graph->edges;
+  ok ($num_edges, 0);
 }
 {
   # height=1
   my $graph = Graph::Maker->new('binary_beanstalk', height => 1);
   my $num_vertices = $graph->vertices;
   ok ($num_vertices, 1);
+  my $num_edges = $graph->edges;
+  ok ($num_edges, 0);
 }
 {
   #  0
   #  |
   #  1
-  my $graph = Graph::Maker->new('binary_beanstalk', height => 2);
-  my $num_vertices = $graph->vertices;
-  ok ($num_vertices, 2);
-  ok ($graph->has_edge(0,1)?1:0, 1);
-  ok ($graph->has_edge(1,0)?1:0, 1);
+  {
+    my $graph = Graph::Maker->new('binary_beanstalk', height => 2);
+    my $num_vertices = $graph->vertices;
+    ok ($num_vertices, 2);
+    my $num_edges = $graph->edges;
+    ok ($num_edges, 2);
+    ok ($graph->has_edge(0,1)?1:0, 1);
+    ok ($graph->has_edge(1,0)?1:0, 1);
+  }
+  {
+    my $graph = Graph::Maker->new('binary_beanstalk', height => 2,
+                                  direction_type => 'bigger');
+    my $num_vertices = $graph->vertices;
+    ok ($num_vertices, 2);
+    my $num_edges = $graph->edges;
+    ok ($num_edges, 1);
+    ok ($graph->has_edge(0,1)?1:0, 1);
+    ok ($graph->has_edge(1,0)?1:0, 0);
+  }
+  {
+    my $graph = Graph::Maker->new('binary_beanstalk', height => 2,
+                                  direction_type => 'smaller');
+    my $num_vertices = $graph->vertices;
+    ok ($num_vertices, 2);
+    my $num_edges = $graph->edges;
+    ok ($num_edges, 1);
+    ok ($graph->has_edge(0,1)?1:0, 0);
+    ok ($graph->has_edge(1,0)?1:0, 1);
+  }
 }
 {
   #   0

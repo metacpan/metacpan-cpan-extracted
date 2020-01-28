@@ -1,0 +1,23 @@
+Revision history for Perl extension Mojo-DB-Connector
+
+0.05 2020-01-27T21:42:27Z
+    - Return database as a string when defaulting from URL path.
+
+0.04 2020-01-27T02:27:37Z
+    - Add required methods to Mojo::DB::Connector::Role::Cache.
+    - Add Mojo::DB::Connector::Base.
+
+0.03 2020-01-26T22:29:07Z
+    - Add database, options, and url attributes.
+    - Require named parameters to new_connection.
+    - Allow attributes to be overridden in new_connection.
+    - Allow attributes to be derived from a URL.
+    - Support appending, merging, and replacing options via Mojo::Parameters.
+
+0.02 2020-01-26T17:13:27Z
+
+    - Add env_prefix.
+
+0.01 2020-01-26T01:24:29Z
+
+    - original version

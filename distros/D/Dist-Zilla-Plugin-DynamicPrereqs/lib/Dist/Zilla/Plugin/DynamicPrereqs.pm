@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.034-10-gf786638
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.035-7-g8dc8d99
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use Moose;
 with
@@ -409,7 +409,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -737,11 +737,21 @@ I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
 =for stopwords Graham Ollis
 
+=over 4
+
+=item *
+
 Graham Ollis <perl@wdlabs.com>
+
+=item *
+
+Graham Ollis <plicease@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 

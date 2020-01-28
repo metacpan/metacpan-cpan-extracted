@@ -35,5 +35,5 @@ requires:
 resources:
   homepage: https://github.com/fany/Mail-Qmail-Filter
   repository: https://github.com/fany/Mail-Qmail-Filter.git
-version: '1.1'
+version: '1.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

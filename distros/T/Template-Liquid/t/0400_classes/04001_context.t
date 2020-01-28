@@ -8,8 +8,8 @@ my %assigns = (
         array => {array => [10 .. 20]},
         list  => [qw[a b c d]],
         lol => [[], [qw[this that the other]], [qw[fred wilma barney betty]]],
-        hash => {hash => {var => 'val'}, list => ['g' .. 'q']},
-        70   => 'seventy',
+        hash    => {hash => {var => 'val'}, list => ['g' .. 'q']},
+        70      => 'seventy',
         80      => [1, 2, 3],
         range_1 => 15,
         range_2 => 30

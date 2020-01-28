@@ -16,5 +16,5 @@ sub new {
 sub magnatude { shift->{students}[0] }
 
 package Magnatude;
-sub new { bless pop, pop }
+sub new         { bless pop, pop }
 sub catchphrase { shift->{catchphrase} }

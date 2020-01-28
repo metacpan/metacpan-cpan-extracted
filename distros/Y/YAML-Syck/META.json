@@ -49,6 +49,6 @@
          "url" : "http://github.com/toddr/YAML-Syck"
       }
    },
-   "version" : "1.31",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.32",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

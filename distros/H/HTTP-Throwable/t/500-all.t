@@ -6,7 +6,8 @@ use Test::Deep qw(ignore re);
 use Test::More;
 use Test::Fatal;
 
-use t::lib::Test::HT;
+use lib 't/lib';
+use Test::HT;
 
 ht_test(InternalServerError => {}, {
     code   => 500,

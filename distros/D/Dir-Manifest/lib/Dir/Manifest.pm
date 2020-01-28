@@ -1,5 +1,5 @@
 package Dir::Manifest;
-$Dir::Manifest::VERSION = '0.6.0';
+$Dir::Manifest::VERSION = '0.6.1';
 use strict;
 use warnings;
 
@@ -177,9 +177,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
+
 =head1 VERSION
 
-version 0.6.0
+version 0.6.1
 
 =head1 SYNOPSIS
 
@@ -215,10 +219,6 @@ put each in a separate file in a directory, create a manifest file listing all v
 filenames/key and then say something like
 C<<< my $text = $dir->text("deal24solution.txt", {lf => 1}) >>>. And hopefully it will
 be done securely and reliably.
-
-=head1 NAME
-
-Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
 
 =head1 METHODS
 

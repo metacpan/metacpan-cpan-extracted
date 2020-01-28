@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Identity;
 use Test::Refcount;
 
 use Tickit::Test;
@@ -41,10 +40,10 @@ is( $rect->left,   10, '$win->rect->left' );
 is( $rect->bottom,  7, '$win->rect->bottom' );
 is( $rect->right,  30, '$win->rect->right' );
 
-identical( $win->parent, $rootwin, '$win->parent' );
-identical( $win->root,   $rootwin, '$win->root' );
+cmp_ok( $win->parent, '==', $rootwin, '$win->parent' );
+cmp_ok( $win->root,   '==', $rootwin, '$win->root' );
 
-identical( $win->tickit, $rootwin->tickit, '$win->tickit' );
+cmp_ok( $win->tickit, '==', $rootwin->tickit, '$win->tickit' );
 
 is_deeply( [ $rootwin->subwindows ],
            [ $win ], '$rootwin->subwindows' );
@@ -93,8 +92,8 @@ isa_ok( $win->term, "Tickit::Term", '$win->term' );
    is( $subwin->lines,  1, '$subwin->lines' );
    is( $subwin->cols,  10, '$subwin->cols' );
 
-   identical( $subwin->parent, $win, '$subwin->parent' );
-   identical( $subwin->root,   $rootwin, '$subwin->root' );
+   cmp_ok( $subwin->parent, '==', $win, '$subwin->parent' );
+   cmp_ok( $subwin->root,   '==', $rootwin, '$subwin->root' );
 
    isa_ok( $subwin->term, "Tickit::Term", '$subwin->term' );
 

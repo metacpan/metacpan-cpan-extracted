@@ -1,5 +1,10 @@
 Revision history for FFI-CheckLib
 
+0.26      2020-01-22 05:54:02 -0700
+  - Name check on alien option is always done, even if the Alien is already
+    loaded (gh#21)
+  - Remove dependency on Module::Load (gh#21)
+
 0.25      2019-06-25 12:27:58 -0400
   - Add support for Alien::Base with alien option (gh#18)
 

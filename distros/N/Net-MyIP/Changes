@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::MyIP.
+
+0.01  Sun Dec 29 16:59:03 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn Net::MyIP
+

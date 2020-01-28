@@ -1,12 +1,12 @@
 {
    "class" : {
       "core:closeMatch" : [
-         "ontology:LegalExpression",
-         "ontology:LegalResource"
+         "ontology:LegalResource",
+         "ontology:LegalExpression"
       ],
       "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1156",
-         "eli:index.html"
+         "eli:index.html",
+         "https://github.com/schemaorg/schemaorg/issues/1156"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A legal document such as an act, decree, bill, etc. (enforceable or not) or a component of a legal act (like an article).",
@@ -64,8 +64,8 @@
       "schema:legislationDate" : {
          "core:exactMatch" : "ontology:date_document",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:date_document",
          "rdf:type" : "rdf:Property",
@@ -80,8 +80,8 @@
       "schema:legislationDateVersion" : {
          "core:exactMatch" : "ontology:version_date",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:version_date",
          "rdf:type" : "rdf:Property",
@@ -106,8 +106,8 @@
          "schema:domainIncludes" : "schema:Legislation",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       },
       "schema:legislationJurisdiction" : {
@@ -166,8 +166,8 @@
       "schema:legislationResponsible" : {
          "core:exactMatch" : "ontology:responsibility_of",
          "dc:source" : [
-            "eli:index.html",
-            "https://github.com/schemaorg/schemaorg/issues/1156"
+            "https://github.com/schemaorg/schemaorg/issues/1156",
+            "eli:index.html"
          ],
          "owl:equivalentProperty" : "ontology:responsibility_of",
          "rdf:type" : "rdf:Property",
@@ -184,8 +184,8 @@
       "schema:legislationTransposes" : {
          "core:exactMatch" : "ontology:transposes",
          "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1156",
-            "eli:index.html"
+            "eli:index.html",
+            "https://github.com/schemaorg/schemaorg/issues/1156"
          ],
          "owl:equivalentProperty" : "ontology:transposes",
          "rdf:type" : "rdf:Property",
@@ -212,8 +212,8 @@
          "schema:domainIncludes" : "schema:Legislation",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:Text"
          ]
       }
    }

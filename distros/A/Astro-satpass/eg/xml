@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Pod::Usage;
 use XML::Writer;
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 my %opt = (
     latitude => 52.069858,	# Degrees north of Equator

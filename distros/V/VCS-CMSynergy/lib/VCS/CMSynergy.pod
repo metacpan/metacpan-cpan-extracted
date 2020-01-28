@@ -304,6 +304,24 @@ on to the other program.
 
 It defaults to false unless you also specify C<CCM_ADDR>.
 
+=item C<utf8> (boolean) 
+
+If this attribute is true then all strings retrieved from Synergy will be 
+Perl I<Unicode> strings (instead of I<byte> strings). It defaults to false.
+
+The only exception is the string returned from the C<cat_object> method
+which is always a I<byte> string.
+
+Be sure to study the L<perlunicode> documentation when setting
+this attribute to true.
+
+Note that this will only work if the Synergy session is running
+in a UTF-8 locale (at least on Linux), e.g. by setting the environment
+variable C<LANG> to an appropriate (system dependent) value. 
+The variable must be set B<before> starting a Synergy session.
+Setting it B<after> starting the session has no effect on the ouput
+of the C<ccm> program.
+
 =item C<UseCoprocess> (boolean) B<(classic mode only)>
 
 This feature is highly experimental, B<use it at your own risk>.

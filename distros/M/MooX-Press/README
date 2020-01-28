@@ -684,6 +684,23 @@ DESCRIPTION
 
         See "Import Options".
 
+    `import` *(OptList)*
+        Allows you to import packages into classes.
+
+          use MooX::Press (
+            prefix => 'Library',
+            class  => [
+              toolkit  => 'Moose',
+              import   => [ 'MooseX::StrictConstructor' ],
+              ...,
+            ],
+          );
+
+        Note that the coderefs you pass to MooX::Press are evaluated in the
+        caller namespace, so this isn't very useful if you're looking to
+        import functions. It can be useful for many MooX, MooseX, and MouseX
+        extensions though.
+
    Role Options
     Options for roles are largely the same as for classes with the following
     exceptions:
@@ -804,6 +821,9 @@ DESCRIPTION
         This is optional rather than being required, and defaults to "rw".
         (Yes, I prefer "ro" generally, but whatever.)
 
+        MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
+        will translate them if you're using Moose or Mouse.
+
     `isa` *(Str|Object)*
         When the type constraint is a string, it is always assumed to be a
         class name and your application's namespace prefix is added. So `isa
@@ -887,11 +907,6 @@ DESCRIPTION
         applies the package prefix to it; `type` assumes it's the name of a
         type constraint which has been defined in some type library somewhere.
 
-    `coerce` *(Bool)*
-        MooX::Press automatically implies `coerce => 1` when you give a type
-        constraint that has a coercion. If you don't want coercion then
-        explicitly provide `coerce => 0`.
-
     `does` *(Str)*
         Similarly to `isa`, these will be given your namespace prefix.
 
@@ -929,6 +944,29 @@ DESCRIPTION
           if ( $leaf->colour_is_green ) {
             print "leaf is green!\n";
           }
+
+    `handles_via` *(Str|ArrayRef[Str])*
+        If your attribute has a `handles_via` option, MooX::Press will load
+        Sub::HandlesVia for you.
+
+    `coerce` *(Bool|CodeRef)*
+        MooX::Press automatically implies `coerce => 1` when you give a type
+        constraint that has a coercion. If you don't want coercion then
+        explicitly provide `coerce => 0`.
+
+        `coerce => sub { ... }` is supported even for Moose and Mouse.
+
+    `builder` *("1"|Str|CodeRef)*
+        MooX::Press supports the Moo-specific `builder => 1` and `builder =>
+        sub { ... }` and will translate them if you're using Moose or Mouse.
+
+    `trigger` *("1"|Str|CodeRef)*
+        MooX::Press supports the Moo-specific `trigger => 1` and `trigger =>
+        $methodname` and will translate them if you're using Moose or Mouse.
+
+    `clearer` *("1"|Str)*
+        MooX::Press supports the Moo-specific `clearer => 1` and will
+        translate it if you're using Moose or Mouse.
 
    Method Signatures
     Most places where a coderef is expected, MooX::Press will also accept a
@@ -1019,6 +1057,21 @@ DESCRIPTION
     Methods with a mixture of named and positional parameters are not
     supported. If you really want such a method, don't provide a signature;
     just provide a coderef and manually unpack @_.
+
+    Advanced features:
+
+    `signature` may be a coderef, which is passed @_ (minus invocants) and is
+    expected to return a new @_ in list context after checking and optionally
+    coercing parameters.
+
+    Setting `optimize => 1` tells MooX::Press to attempt to perform additional
+    compile-time optimizations on the signature to make it slightly faster at
+    runtime. (Sometimes it will find it's unable to optimize anything, so
+    you've just wasted time at compile time.)
+
+    `code` can be a string of Perl code like `sub { ... }` instead of a real
+    coderef. This doesn't let you close over any variables, but if you can
+    provide code this way, it might be slightly faster.
 
   Optimization Features
     MooX::Press will automatically load MooX::TypeTiny if it's installed,

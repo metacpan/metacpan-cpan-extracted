@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Layout",
    "no_index" : {
@@ -48,7 +48,7 @@
    "provides" : {
       "Text::Layout" : {
          "file" : "lib/Text/Layout.pm",
-         "version" : "0.013"
+         "version" : "v0.14.1"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/sciurius/perl-Text-Layout"
       }
    },
-   "version" : "0.013",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.014.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

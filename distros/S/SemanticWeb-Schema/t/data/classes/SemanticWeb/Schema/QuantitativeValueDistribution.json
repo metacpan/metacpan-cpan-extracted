@@ -9,19 +9,26 @@
    },
    "properties" : {
       "schema:duration" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1457",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
+         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
-         "schema:category" : "issue-1698",
+         "schema:category" : [
+            "issue-1698",
+            "issue-1457"
+         ],
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:Audiobook",
             "schema:MusicRecording",
-            "schema:MediaObject",
-            "schema:QuantitativeValueDistribution",
             "schema:MusicRelease",
-            "schema:Movie"
+            "schema:Event",
+            "schema:Schedule",
+            "schema:QuantitativeValueDistribution",
+            "schema:Audiobook",
+            "schema:Movie",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },

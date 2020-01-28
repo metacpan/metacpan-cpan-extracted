@@ -1,4 +1,9 @@
 Revision history for DBIx-Class-FormTools
+0.0.11  Thu Jan 23 13:47:18 CET 2020
+        - Make tests use system supplied tmp directory instead of ./t/tmp/
+
+0.0.10  Wed Jan 22 09:51:00 CET 2020
+        - Added docs for formdata_to_objects() and removed field_id()
 
 0.0.9   Sat Nov 16 01:05:42 CET 2013
         - Updated Build.PL to no longer create Makefile.PL

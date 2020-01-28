@@ -1,5 +1,8 @@
 Revision history for lib-abs
 
+0.94    2020-01-23
+        Merge test fixes
+
 0.93    2013-10-25
         Fix for not-existant path. RT#83706
         Added -soft flag

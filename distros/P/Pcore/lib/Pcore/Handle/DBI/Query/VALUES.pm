@@ -11,7 +11,7 @@ our $EXPORT = [qw[$SQL_VALUES_IDX_FIRST $SQL_VALUES_IDX_SCAN]];
 const our $SQL_VALUES_IDX_FIRST => 1;    # treat first row as columns index, index row will be ignored
 const our $SQL_VALUES_IDX_SCAN  => 2;    # full scan rows keys
 
-sub get_query ( $self, $dbh, $final, $i ) {
+sub GET_SQL_QUERY ( $self, $dbh, $i ) {
     my ( @sql, @idx, @bind, $ignore_idx );
 
     # create columns idx
@@ -88,7 +88,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 
                 # object
                 elsif ( is_blessed_hashref $token->{$field} ) {
-                    my ( $sql, $bind ) = $token->{$field}->get_query( $dbh, 0, $i );
+                    my ( $sql, $bind ) = $token->{$field}->GET_SQL_QUERY( $dbh, $i );
 
                     if ($sql) {
                         push @row, $sql;
@@ -120,7 +120,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 
                 # object
                 elsif ( is_blessed_hashref $field ) {
-                    my ( $sql, $bind ) = $field->get_query( $dbh, 0, $i );
+                    my ( $sql, $bind ) = $field->GET_SQL_QUERY( $dbh, $i );
 
                     if ($sql) {
                         push @row, $sql;
@@ -156,7 +156,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "get_query" with high complexity score (42)                 |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "GET_SQL_QUERY" with high complexity score (42)             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

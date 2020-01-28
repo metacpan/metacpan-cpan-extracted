@@ -1,0 +1,90 @@
+==================================================
+Changes from 2019-01-24 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.4.1 at 2020-01-24 19:49:37 +0000
+-------------------------------------------
+
+  Change: 595145763a384f92e027794c7dbc7b8422292c4a
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-15 22:03:36 +0000
+
+    Add distribution files 
+
+  Change: 39fbcf950dbd3bed16f8dff3902bc9e973e1633c
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-10 18:10:43 +0000
+
+    Remove experimental `when` uses
+
+    This caused warnings that made Dist::Zilla unhappy. 
+
+  Change: 234c083cbbbc3a5179628308961863542b358a85
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-10 18:10:43 +0000
+
+    Fix tests if there's a perltidyrc 
+
+  Change: eedc4902e9c23ee00dacded73eb677f8dfff8e58
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-10 18:10:37 +0000
+
+    Switch to Dist::Zilla::PluginBundle::Author::GSG 
+
+-------------------------------------------
+version v0.4.0 at 2020-01-10 20:06:19 +0000
+-------------------------------------------
+
+  Change: 61b3b6b8fa55743e7b5f17245b93c0c6b241e517
+  Author: David Houghton <david.houghton@grantstreet.com>
+  Date : 2020-01-10 15:06:19 +0000
+
+    Version 0.004
+
+    change to t/basic.t to allow it to pass in more distributions 
+
+-------------------------------------------
+version v0.3.0 at 2020-01-10 20:05:17 +0000
+-------------------------------------------
+
+  Change: d9d4b323615ae433faf1aa35c002870ba0b6bbd6
+  Author: David Houghton <david.houghton@grantstreet.com>
+  Date : 2020-01-10 15:05:17 +0000
+
+    Version 0.003
+
+    - documentation fixes - made Devel::Size only suggested, not
+    required, to facilitate
+
+    installation under Perl 5.20 
+
+-------------------------------------------
+version v0.2.0 at 2020-01-10 20:04:55 +0000
+-------------------------------------------
+
+  Change: 564951cf7a0d935b299ea5a94cc827bbdf2cfb46
+  Author: David Houghton <david.houghton@grantstreet.com>
+  Date : 2020-01-10 15:04:55 +0000
+
+    Version 0.002
+
+    minor bug fix: $DBG::Header checked when printing footer 
+
+-------------------------------------------
+version v0.1.0 at 2020-01-10 20:04:17 +0000
+-------------------------------------------
+
+  Change: 5af35027c42e217319bbe5a880bfa1f56d854c8a
+  Author: David Houghton <david.houghton@grantstreet.com>
+  Date : 2020-01-10 15:04:17 +0000
+
+    Version 0.001
+
+    This is simply a collection of debugging code that I find accelerates
+    development, particularly of distributed, multi-process apps for
+    which one cannot use the standard debugger. 
+
+================
+End of releases.
+================

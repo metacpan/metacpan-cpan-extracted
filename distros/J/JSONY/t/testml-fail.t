@@ -1,8 +1,10 @@
-use lib (-e 't' ? 't' : 'test'), 'inc';
-use TestML1;
-use TestMLBridge;
+#!inc/bin/testml-cpan
 
-TestML1->new(
-    testml => 'testml/fail.tml',
-    bridge => 'TestMLBridge',
-)->run;
+# Make sure these strings do not parse as JSONY.
+*jsony.jsony-load.Catch.Type == 'error'
+
+=== Comma in bareword
+--- jsony: { url: http://foo.com,2012 }
+
+=== Unmatched [
+--- jsony: foo[bar

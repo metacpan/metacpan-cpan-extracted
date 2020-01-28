@@ -46,6 +46,11 @@ SKIP: {
     # is_connected()
     ok $c->is_connected, 'The client is connected.';
 
+    # reconnect()
+    eval {$c->reconnect };
+    ok !$@,'The client re-connected without dying.';
+    ok $c->is_connected, 'The client is connected (once more).';
+
     # ios()
     isa_ok $c->ios, 'IO::Select';
     ok $c->ios->count >= 1,
@@ -61,7 +66,6 @@ SKIP: {
         my $as_set;
         eval { ($as_set) = $c->query('AS-JAGUAR', {type => 'AsSet'}) };
         ok !$@, q{Client performs queries without dying $@};
-        ok($as_set, "Net::Whois::Object::AsSet returned for 'AS-JAGUAR' query");
         isa_ok $as_set, 'Net::Whois::Object::AsSet';
     }
 
@@ -89,30 +93,19 @@ my @objects;
 eval { @objects = Net::Whois::Generic->query('AS30781', {attribute => 'remarks'}) };
 
 SKIP: {
-    my $not_string;
     skip "Network issue",14 if ( $@ =~ /IO::Socket::INET/ );
 
     for my $object (@objects) {
-        $not_string = ref($object) if ref($object);
+        ok(!ref($object), "query() : String returned for 'remarks' attribute filter")
     }
-    ok(!$not_string, "Only string returned for 'remarks' attribute filter on 'AS30781' query");
 }
 
 eval {    @objects = Net::Whois::Generic->query('AS30781') };
 
 SKIP: {
-    my %objects;
     skip "Network issue",14 if ( $@ =~ /IO::Socket::INET/ );
     for my $object (@objects) {
-        if (ref($object) =~ /Net::Whois::Object::([a-zA-Z]+)/ and !$objects{$object}) {
-            $objects{$1} = 1;
-        } else {
-            ok(ref($object), "Object returned for 'AS30781' query");
-        }
-    }
-
-    for my $t ('Information', 'AutNum', 'AsBlock') {
-        ok($objects{$t}, "Expected $t object returned sor 'AS30781' query");
+        ok(ref($object) =~ /Net::Whois::Object/ , "query() : Object ".ref($object)." returned for 'remarks' attribute filter")
     }
 
 }

@@ -1,13 +1,12 @@
 package Pod::Elemental::Node;
 # ABSTRACT: a thing with Pod::Elemental::Nodes as children
-$Pod::Elemental::Node::VERSION = '0.103004';
+$Pod::Elemental::Node::VERSION = '0.103005';
 use Moose::Role;
 
 use namespace::autoclean;
 
 use MooseX::Types;
 use MooseX::Types::Moose qw(ArrayRef);
-use Moose::Util::TypeConstraints qw(class_type);
 
 requires 'as_pod_string';
 requires 'as_debug_string';
@@ -60,7 +59,7 @@ Pod::Elemental::Node - a thing with Pod::Elemental::Nodes as children
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 OVERVIEW
 
@@ -82,7 +81,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

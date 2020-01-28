@@ -8,7 +8,8 @@ use Test::EOL;
 
 my @files = (
     'lib/Pod/Weaver/PluginBundle/SHLOMIF.pm',
-    't/00-compile.t'
+    't/00-compile.t',
+    't/has-version.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

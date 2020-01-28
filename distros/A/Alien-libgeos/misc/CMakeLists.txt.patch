@@ -1,0 +1,33 @@
+--- /tmp/geos-3.7.2/CMakeLists.txt	2019-05-03 01:29:15.000000000 +0300
++++ CMakeLists.txt	2019-08-09 10:29:57.924673856 +0300
+@@ -95,6 +95,10 @@
+ option(GEOS_BUILD_SHARED
+   "Set to OFF|ON (default) to build GEOS shared libraries" ON)
+ 
++option(GEOS_BUILD_CAPI
++  "Set to OFF|ON (default) to build GEOS C API library" ON)
++
++
+ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+   option(GEOS_ENABLE_FLOATSTORE
+     "Set to OFF|ON (default) to control IEEE754 conformance and remove extra precision" ON)
+@@ -186,7 +190,7 @@
+ 
+ check_include_files(stdint.h HAVE_STDINT_H)
+ check_include_files(inttypes.h HAVE_INTTYPES_H)
+-check_include_files(ieeefp.h HAVE_IEEEFP_H)
++#check_include_files(ieeefp.h HAVE_IEEEFP_H)
+ 
+ # check types and sizes
+ include(CheckTypeSize)
+@@ -344,7 +352,9 @@
+ #################################################################################
+ add_subdirectory(include)
+ add_subdirectory(src)
+-add_subdirectory(capi)
++if(GEOS_BUILD_CAPI)
++    add_subdirectory(capi)
++endif()
+ add_subdirectory(tests)
+ add_subdirectory(tools)
+ 

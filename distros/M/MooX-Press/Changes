@@ -6,6 +6,44 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.032	2020-01-24
+
+ - Added: MooX::Press->wrap_coderef utility.
+
+0.031	2020-01-23
+
+ [ Bug Fixes ]
+ - Fix broken signatures-as-coderefs feature.
+
+ [ Documentation ]
+ - Document signatures-as-coderefs feature.
+
+ [ Other ]
+ - Added: Add `optimize` feature for method signatures.
+
+0.030	2020-01-23
+
+ [ Bug Fixes ]
+ - Bugfix for `import`.
+
+0.029	2020-01-23
+
+ - Allow `import` option to apply to class/role generators.
+ - Removed: MooX::Press::Keywords no longer imports Try::Tiny for you.
+
+0.028	2020-01-23
+
+ [ Packaging ]
+ - Require Sub::HandlesVia 0.004.
+
+ [ Other ]
+ - Added: Add an `import` option.
+ - Smooth over differences between `has` in Moo, Moose, and Mouse.
+
+0.027	2020-01-21
+
+ - Added: Support for Sub::HandlesVia.
+
 0.026	2020-01-18
 
  [ Bug Fixes ]

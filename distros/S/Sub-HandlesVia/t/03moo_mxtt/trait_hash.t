@@ -15,7 +15,9 @@ use Test::Fatal;
 #use Test::Moose;
 
 BEGIN {
-	$ENV{TRAVIS} and plan skip_all => 'this test randomly fails on Travis?!';
+	require Type::Tiny;
+	Type::Tiny::_USE_XS()
+		or plan skip_all => 'https://rt.cpan.org/Ticket/Display.html?id=131576';
 };
 
 {
@@ -86,13 +88,10 @@ use Types::Standard qw( HashRef Str );
 sub run_tests {
     my ( $class, $handles ) = @_;
 
-note "Testing class $class";
-
     can_ok( $class, $_ ) for sort keys %{$handles};
-
 #    with_immutable {
-        my $obj = $class->new( options => {} );
 
+        my $obj = $class->new( options => {} );
         ok( $obj->has_no_options, '... we have no options' );
         is( $obj->num_options, 0, '... we have no options' );
 

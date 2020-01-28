@@ -151,7 +151,7 @@ SKIP: {
         $conf->set_conf( lib => [ TEST_CONF_INSTALL_DIR ] );
 
         ok( $Mod->install(  force           => 1,
-                            makeflags  => 'PREFIX='.TEST_CONF_INSTALL_DIR,
+                            makemakerflags  => 'PREFIX='.TEST_CONF_INSTALL_DIR,
                         ),      "Installing module" );
     }
 

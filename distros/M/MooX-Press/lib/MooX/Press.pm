@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.026';
+our $VERSION   = '0.032';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -545,6 +545,23 @@ sub _make_package {
 		}
 	}
 	
+	if (defined $opts{'import'}) {
+		my @imports = $opts{'import'}->$_handle_list;
+		while (@imports) {
+			my $import = shift @imports;
+			my @params;
+			if (is_HashRef($imports[0])) {
+				@params = %{ shift @imports };
+			}
+			elsif (is_ArrayRef($imports[0])) {
+				@params = @{ shift @imports };
+			}
+			require Import::Into;
+			eval "require $import";
+			$import->import::into($qname, @params);
+		}
+	}
+	
 	if (ref $opts{'begin'}) {
 		$opts{'begin'}->($qname, $opts{is_role} ? 'role' : 'class');
 	}
@@ -622,9 +639,17 @@ sub _make_package {
 				$spec{builder} = $buildername;
 				$builder->$method_installer($qname, { $buildername => $code });
 			}
+			if (defined $spec{clearer} and !ref $spec{clearer} and $spec{clearer} eq 1) {
+				$spec{clearer} = $clearername;
+			}
 			
 			%spec = (%spec_hints, %spec);
 			$spec{is} ||= 'rw';
+			if ($spec{is} eq 'lazy') {
+				$spec{is}   = 'ro',
+				$spec{lazy} = !!1;
+				$spec{builder} ||= $buildername;
+			}
 			
 			if ($spec{does}) {
 				my $target = $builder->qualify_name(delete($spec{does}), $opts{prefix});
@@ -662,7 +687,34 @@ sub _make_package {
 				$spec{coerce} = 1;
 			}
 			
+			if ($toolkit ne 'Moo') {
+				if (defined $spec{trigger} and !ref $spec{trigger} and $spec{trigger} eq 1) {
+					$spec{trigger} = sprintf('_trigger_%s', $attrname);
+				}
+				if (defined $spec{trigger} and !ref $spec{trigger}) {
+					my $trigger_method = delete $spec{trigger};
+					$spec{trigger} = sub { shift->$trigger_method(@_) };
+				}
+				if ($spec{is} eq 'rwp') {
+					$spec{is} = 'ro';
+					$spec{writer} = '_set_'.$attrname unless exists $spec{writer};
+				}
+			}
+			
+			if (is_CodeRef $spec{coerce}) {
+				$spec{isa}    = $spec{isa}->no_coercions->plus_coercions(Types::Standard::Any, $spec{coerce});
+				$spec{coerce} = !!1;
+			}
+			
+			my ($shv_toolkit, $shv_data);
+			if ($spec{handles_via}) {
+				$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
+				eval "require $shv_toolkit" or die($@);
+				$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
+			}
+			
 			$builder->$method($qname, $attrname, \%spec);
+			$shv_toolkit->install_delegations($shv_data) if $shv_data;
 		}
 	}
 
@@ -810,7 +862,7 @@ sub generate_package {
 	
 	my %opts;
 	for my $key (qw/ extends with has can constant around before after
-		toolkit version authority mutable begin end requires /) {
+		toolkit version authority mutable begin end requires import /) {
 		if (exists $local_opts{$key}) {
 			$opts{$key} = delete $local_opts{$key};
 		}
@@ -1001,51 +1053,119 @@ sub require_methods_mouse {
 	(Mouse::Util::find_meta($role) or $role->meta)->add_required_methods(sort keys %$methods);
 }
 
+sub wrap_coderef {
+	my $builder = shift;
+	my %method  = (@_==1) ? %{$_[0]} : @_;
+	my $qname   = delete($method{package}) || caller;
+	$method{lexical} = !!1;
+	my $return = $builder->install_methods($qname, { '__ANON__' => \%method });
+	$return->{'__ANON__'};
+}
+
 sub install_methods {
 	my $builder = shift;
 	my ($class, $methods) = @_;
+	my %return;
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
-		my ($coderef, $signature, $signature_style, $invocant_count, @curry);
+		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, @curry);
+		$caller = $class;
 		
 		if (is_CodeRef($methods->{$name})) {
-			$coderef = $methods->{$name};
-			$signature_style = 'code';
+			$code            = $methods->{$name};
+			$signature_style = 'none';
 		}
 		elsif (is_HashRef($methods->{$name})) {
-			$coderef   = $methods->{$name}{code};
-			$signature = $methods->{$name}{signature};
-			@curry     = @{ $methods->{$name}{curry} || [] };
+			$code       = $methods->{$name}{code};
+			$signature  = $methods->{$name}{signature};
+			@curry      = @{ $methods->{$name}{curry} || [] };
 			$invocant_count  = exists($methods->{$name}{invocant_count}) ? $methods->{$name}{invocant_count} : 1;
-			$signature_style = $methods->{$name}{named} ? 'named' : 'positional';
+			$signature_style = is_CodeRef($signature)
+				? 'code'
+				: ($methods->{$name}{named} ? 'named' : 'positional');
+			$is_coderef = !!$methods->{$name}{lexical};
+			$caller     = $methods->{$name}{caller};
 		}
 		
-		my $ok;
 		if ($signature) {
-			$signature_style eq 'code'
-				? CodeRef->assert_valid($signature)
-				: ArrayRef->assert_valid($signature);
-			
-			$ok = eval qq{
-				package $class;
-				my \$check;
-				sub $name :method {
-					my \@invocants = splice(\@_, 0, $invocant_count);
-					\$check ||= q($builder)->_build_method_signature_check(q($class), q($class\::$name), \$signature_style, \$signature, \\\@invocants);
-					\@_ = (\@invocants, \@curry, \&\$check);
-					goto \$coderef;
-				};
-				1;
-			};
+			CodeRef->assert_valid($signature)  if $signature_style eq 'code';
+			ArrayRef->assert_valid($signature) if $signature_style eq 'named';
+			ArrayRef->assert_valid($signature) if $signature_style eq 'positional';
+		};
+		
+		my $optimized = 0;
+		my $checkcode = '&$check';
+		if ($signature and $methods->{$name}{optimize}) {
+			if (my $r = $builder->_optimize_signature($class, "$class\::$name", $signature_style, $signature)) {
+				$checkcode = $r;
+				++$optimized;
+			}
+		}
+		
+		my $callcode;
+		if (is_CodeRef($code)) {
+			$callcode = 'goto $code';
 		}
 		else {
-			# Why use a wrapper? Because don't want to rename coderefs with Sub::Name.
-			# Why not rename? Because it could be installed into multiple packages.
-			$ok = eval "package $class; sub $name :method { goto \$coderef }; 1";
+			($callcode = $code) =~ s/sub/do/;
+			$callcode = "package $caller; $callcode" if defined $caller;
 		}
 		
-		$ok or $builder->croak("Could not create method $name in package $class: $@");
+		my $subcode = sprintf(
+			q{
+				package %-49s  # package name
+				%-49s          # my $check variable to close over
+				sub %-49s      # method name
+				{
+					%-49s          # strip @invocants from @_ if necessary
+					%-49s          # build $check
+					%-49s          # reassemble @_ from @invocants, @curry, and &$check
+					%-49s          # run sub code
+				};
+				%s
+			},
+			"$class;",
+			(($signature && !$optimized)
+				? 'my $check;'
+				: ''),
+			($is_coderef ? '' : "$name :method"),
+			($signature
+				? sprintf('my @invocants = splice(@_, 0, %d);', $invocant_count)
+				: ''),
+			(($signature && !$optimized)
+				? sprintf('$check = %s->_build_method_signature_check(%s, %s, %s, $signature, \\@invocants);', map(B::perlstring($_), $builder, $class, "$class\::$name", $signature_style))
+				: ''),
+			($signature
+				? (@curry ? sprintf('@_ = (@invocants, @curry, %s);', $checkcode) : sprintf('@_ = (@invocants, %s);', $checkcode))
+				: (@curry ? sprintf('splice(@_, %d, 0, @curry);', $invocant_count) : '')),
+			$callcode,
+			($is_coderef ? '' : '1;'),
+		);
+		($return{$name} = eval($subcode))
+			or $builder->croak("Could not create method $name in package $class: $@");
 	}
+	\%return;
+}
+
+sub _optimize_signature {
+	my $builder = shift;
+	my ($method_class, $method_name, $signature_style, $signature) = @_;
+	
+	return if $signature_style eq 'none';
+	return if $signature_style eq 'code';
+	
+	my @sig = @$signature;
+	require Type::Params;
+	my $global_opts = {};
+	$global_opts = shift(@sig) if is_HashRef($sig[0]) && !$sig[0]{slurpy};
+	$global_opts->{want_details} = 1;
+	
+	my $details = $builder->_build_method_signature_check($method_class, $method_name, $signature_style, [$global_opts, @sig]);
+	return if keys %{$details->{environment}};
+	return if $details->{source} =~ /return/;
+	
+	$details->{source} =~ /^sub \{(.+)\};$/s or return;
+	return "do { $1 }";
 }
 
 # need to partially parse stuff for Type::Params to look up type names
@@ -1053,9 +1173,10 @@ sub _build_method_signature_check {
 	my $builder = shift;
 	my ($method_class, $method_name, $signature_style, $signature) = @_;
 	my $type_library;
-	my @sig = @$signature;
 	
+	return sub { @_ } if $signature_style eq 'none';
 	return $signature if $signature_style eq 'code';
+	my @sig = @$signature;
 	
 	require Type::Params;
 	
@@ -1943,6 +2064,23 @@ Override C<begin> for this class and any child classes.
 
 See L</Import Options>.
 
+=item C<< import >> I<< (OptList) >>
+
+Allows you to import packages into classes.
+
+  use MooX::Press (
+    prefix => 'Library',
+    class  => [
+      toolkit  => 'Moose',
+      import   => [ 'MooseX::StrictConstructor' ],
+      ...,
+    ],
+  );
+
+Note that the coderefs you pass to MooX::Press are evaluated in the caller
+namespace, so this isn't very useful if you're looking to import functions.
+It can be useful for many MooX, MooseX, and MouseX extensions though.
+
 =back
 
 =head3 Role Options
@@ -2080,6 +2218,9 @@ The following are exceptions:
 This is optional rather than being required, and defaults to "rw".
 (Yes, I prefer "ro" generally, but whatever.)
 
+MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
+will translate them if you're using Moose or Mouse.
+
 =item C<< isa >> I<< (Str|Object) >>
 
 When the type constraint is a string, it is B<always> assumed to be a class
@@ -2165,12 +2306,6 @@ how they'll interpret a string. C<isa> assumes it's a class name as applies
 the package prefix to it; C<type> assumes it's the name of a type constraint
 which has been defined in some type library somewhere.
 
-=item C<< coerce >> I<< (Bool) >>
-
-MooX::Press automatically implies C<< coerce => 1 >> when you give a
-type constraint that has a coercion. If you don't want coercion then
-explicitly provide C<< coerce => 0 >>.
-
 =item C<< does >> I<< (Str) >>
 
 Similarly to C<isa>, these will be given your namespace prefix.
@@ -2211,6 +2346,36 @@ Mouse.)
   if ( $leaf->colour_is_green ) {
     print "leaf is green!\n";
   }
+
+=item C<< handles_via >> I<< (Str|ArrayRef[Str]) >>
+
+If your attribute has a C<handles_via> option, MooX::Press will load
+L<Sub::HandlesVia> for you.
+
+=item C<< coerce >> I<< (Bool|CodeRef) >>
+
+MooX::Press automatically implies C<< coerce => 1 >> when you give a
+type constraint that has a coercion. If you don't want coercion then
+explicitly provide C<< coerce => 0 >>.
+
+C<< coerce => sub { ... } >> is supported even for Moose and Mouse.
+
+=item C<< builder >> I<< ("1"|Str|CodeRef) >>
+
+MooX::Press supports the Moo-specific C<< builder => 1 >> and
+C<< builder => sub { ... } >> and will translate them if you're using
+Moose or Mouse.
+
+=item C<< trigger >> I<< ("1"|Str|CodeRef) >>
+
+MooX::Press supports the Moo-specific C<< trigger => 1 >> and
+C<< trigger => $methodname >> and will translate them if you're using
+Moose or Mouse.
+
+=item C<< clearer >> I<< ("1"|Str) >>
+
+MooX::Press supports the Moo-specific C<< clearer => 1 >> and
+will translate it if you're using Moose or Mouse.
 
 =back
 
@@ -2305,6 +2470,21 @@ Example with positional parameters:
 Methods with a mixture of named and positional parameters are not supported.
 If you really want such a method, don't provide a signature; just provide a
 coderef and manually unpack C<< @_ >>.
+
+B<< Advanced features: >>
+
+C<signature> may be a coderef, which is passed C<< @_ >> (minus invocants)
+and is expected to return a new C<< @_ >> in list context after checking
+and optionally coercing parameters.
+
+Setting C<< optimize => 1 >> tells MooX::Press to attempt to perform
+additional compile-time optimizations on the signature to make it slightly
+faster at runtime. (Sometimes it will find it's unable to optimize anything,
+so you've just wasted time at compile time.)
+
+C<code> can be a string of Perl code like C<< sub { ... } >> instead of
+a real coderef. This doesn't let you close over any variables, but if
+you can provide code this way, it might be slightly faster.
 
 =head2 Optimization Features
 

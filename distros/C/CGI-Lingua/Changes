@@ -1,5 +1,8 @@
 Revision history for CGI-Lingua
 
+0.61	Mon 27 Jan 15:43:18 EST 2020
+	Added timezone()
+
 0.60	Sun Jan  5 14:39:05 EST 2020
 	Fix testing on some platforms
 	Fix RT#131347 - thanks to Slaven Rezic <SREZIC@cpan.org> for reporting

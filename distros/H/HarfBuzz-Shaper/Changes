@@ -1,0 +1,33 @@
+Revision history for HarfBuzz::Shaper.
+
+0.016 Mon Jan 27 08:47:55
+
+    - Raise requirement for the harfbuzz library to version 1.7.7.
+
+0.015 Sun Jan 26 22:22:22
+
+    - Modify include paths to work on more systems.
+    - Now also builds with Strawberry Perl 5.30 on Windows.
+
+0.014 Sun Jan 26 21:37:34
+
+    - Compare metrics with some fuzz to cope with differences between
+      harfbuzz versions.
+    - Add hb_version_string() method.
+
+0.013 Sun Jan 26 19:38:03 2020
+
+    - Fix build on FreeBSD.
+
+0.012 Sun Jan 26 12:25:06 2020
+
+    - Fix build on FreeBSD.
+
+0.011 Sat Jan 25 21:11:34 2020
+
+    - First CPAN release.
+
+0.01  Wed Jan 22 21:11:34 2020
+
+    - Initial version.
+

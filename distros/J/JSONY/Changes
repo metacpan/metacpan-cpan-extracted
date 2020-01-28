@@ -1,7 +1,10 @@
 # This Changes log is JSONY!
 
-- 0.1.18 'Fri Jul 27 18:43:53 PDT 2018',
-    'Switch to TestML1 for testing'
+- 0.1.19 'Wed Jan 22 20:08:39 PST 2020',
+    'Use latest Pegex and TestML',
+    'Fix tests to use JSON::PP and YAML::PP'
+- 0.1.18 'Wed Jan 22 13:32:47 PST 2020',
+    'Use latest Pegex and TestML'
 - 0.1.17 'Sun Feb 12 14:00:02 PST 2017',
     'Release after pause-cleanup removed wrong dists'
 - 0.1.16 'Tue Mar 29 14:13:00 PDT 2016',

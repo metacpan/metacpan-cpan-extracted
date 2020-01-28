@@ -26,4 +26,4 @@
         "pgx": "all: 'xxx' /\\x{FEFF}/ 'yyy'\n",
         "not": ["/","/u$"]}}],
   "bridge": {
-    "perl5": "use Pegex::Compiler;\nuse TestML::Boolean;\n\nsub compile {\n    my ($self, $pgx) = @_;\n    my $unit = Pegex::Compiler->new->compile($pgx);\n    return $unit;\n}\n\nsub ok {\n    my ($self, $compiled) = @_;\n    return $compiled->tree ? true : false;\n}\n\nsub perl {\n    my ($self, $compiled) = @_;\n    return $compiled->to_perl;\n}\n"}}
+    "perl5": "use lib 'lib';  # Avoid using testml/ext/perl5/Pegex*\nuse Pegex::Compiler;\nuse TestML::Boolean;\n\nsub compile {\n    my ($self, $pgx) = @_;\n    my $unit = Pegex::Compiler->new->compile($pgx);\n    return $unit;\n}\n\nsub ok {\n    my ($self, $compiled) = @_;\n    return $compiled->tree ? true : false;\n}\n\nsub perl {\n    my ($self, $compiled) = @_;\n    return $compiled->to_perl;\n}\n"}}

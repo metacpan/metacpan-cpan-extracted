@@ -1,2 +1,6 @@
+0.03
+        - Fix dependency declaration,
+          By https://github.com/gugod/Kwiki-Podcast/pull/1
+
 0.02
         - Fix dependency declaration.

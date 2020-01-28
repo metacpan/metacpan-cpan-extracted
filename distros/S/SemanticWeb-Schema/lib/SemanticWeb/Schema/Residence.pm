@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
+
+
+has accommodation_floor_plan => (
+    is        => 'rw',
+    predicate => '_has_accommodation_floor_plan',
+    json_ld   => 'accommodationFloorPlan',
+);
+
 
 
 
@@ -34,11 +42,32 @@ SemanticWeb::Schema::Residence - The place where a person lives.
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
 The place where a person lives.
+
+=head1 ATTRIBUTES
+
+=head2 C<accommodation_floor_plan>
+
+C<accommodationFloorPlan>
+
+=for html <p>A floorplan of some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>.<p>
+
+A accommodation_floor_plan should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::FloorPlan']>
+
+=back
+
+=head2 C<_has_accommodation_floor_plan>
+
+A predicate for the L</accommodation_floor_plan> attribute.
 
 =head1 SEE ALSO
 
@@ -64,7 +93,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

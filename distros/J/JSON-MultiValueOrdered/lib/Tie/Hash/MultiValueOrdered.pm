@@ -6,7 +6,7 @@ use warnings;
 	package Tie::Hash::MultiValueOrdered;
 	
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.005';
+	our $VERSION   = '0.006';
 	
 	use constant {
 		IDX_DATA  => 0,
@@ -28,7 +28,6 @@ use warnings;
 	sub fetch_list     { $_[0][IDX_MODE] = MODE_REF }
 	sub fetch_iterator { $_[0][IDX_MODE] = MODE_ITER }
 	
-	use Storable qw( dclone );
 	sub TIEHASH {
 		my $class = shift;
 		bless [{}, [], 0, {}, -1], $class;
@@ -100,18 +99,27 @@ use warnings;
 		my ($tied, $key) = @_;
 		return my @list = @{ $tied->[IDX_DATA]{"$key"} || [] };
 	}
+	# not deep clone but data clone
+	sub _dclone {
+		my $tied = shift;
+		my %data;
+		while (my ($key, $value) = each %{$tied->[IDX_DATA]}) {
+			$data{$key} = [@$value];
+		}
+		\%data;
+	}
 	sub pairs {
 		my $tied = shift;
-		my $clone = dclone( $tied->[IDX_DATA] );
+		my %clone = %{ $tied->_dclone };
 		return map {
-			$_, shift @{$clone->{$_}}
+			$_, shift @{$clone{$_}}
 		} @{$tied->[IDX_ORDER]}
 	}
 	sub pair_refs {
 		my $tied = shift;
-		my $clone = dclone( $tied->[IDX_DATA] );
+		my %clone = %{ $tied->_dclone };
 		return map {
-			[ $_, shift @{$clone->{$_}} ]
+			[ $_, shift @{$clone{$_}} ]
 		} @{$tied->[IDX_ORDER]}
 	}
 	sub all_keys {

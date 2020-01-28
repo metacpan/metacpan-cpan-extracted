@@ -30,8 +30,9 @@ Note that there is no “right way” to determine whether an arbitrary
 Perl (non-reference) scalar should be encoded as a string or as a number.
 The above seems a reasonable enough approach.
 
-=item * UTF-8 strings are encoded as text; others are encoded as binary.
-Note that UTF-8 string encoding is a bit slower.
+=item * UTF8-flagged strings are encoded as text; others are encoded as
+binary. This is a “best-guess” merely; Perl’s UTF8 flag doesn’t reliably
+indicate whether a given string is a text or a byte string.
 
 =item * undef, Types::Serialiser::true(), and Types::Serialiser::false()
 are encoded as null, true, and false, respectively.

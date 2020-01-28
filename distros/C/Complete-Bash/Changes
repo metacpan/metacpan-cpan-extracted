@@ -1,3 +1,30 @@
+0.334   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Also prevent shell's automatic addition of space when
+	  is_partial=1.
+
+
+0.333   2020-01-28  Released-By: PERLANCAR; Urgency: high
+
+        [Incompatible changes]
+
+        - Adjust to Complete 0.202 specification.
+
+	- format_completion: Move 'as' and 'esc_mode' to options (second
+	  argument) to avoid cluttering the completion answer structure.
+	  'esc_mode' is no longer in the specification, to avoid abstraction
+	  leak.
+
+        - Switch the meaning of the escape modes 'default' and 'shellvar', so
+	  now in 'default' the dollar sign is not escaped while in 'shellvar' it
+	  is. This is more convenient in general.
+
+        [Documentation]
+
+	- Remove explanation for 'path_sep' (moved to the Complete
+	  specification).
+
+
 0.332   2019-12-22  Released-By: PERLANCAR; Urgency: medium
 
         - [experimental] Observe COMPLETE_BASH_DEFAULT_ESC_MODE.

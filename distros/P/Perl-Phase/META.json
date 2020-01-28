@@ -32,11 +32,32 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Peek" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "Test::Spec" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "X_keywords" : [
+         "perl",
+         "global",
+         "phase"
+      ],
+      "bugtracker" : {
+         "web" : "https://github.com/drmuey/p5-Perl-Phase/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/drmuey/p5-Perl-Phase.git"
+      }
+   },
+   "version" : "0.02"
 }

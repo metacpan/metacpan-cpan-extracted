@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+appveyor.yml
 cpanfile
 lib/Hashids.pm
 lib/Hashids/Util.pm
@@ -12,6 +13,7 @@ t/01_hashids.t
 t/01_util.t
 t/02_subclass.t
 t/03_collision.t
+t/04_misc.t
 t/lib/SubClassTest.pm
 META.yml
 MANIFEST

@@ -1,5 +1,12 @@
 Revision history for RT-Extension-MergeUsers
 
+1.04 2020-01-22
+ - Extend user search to merged users in ticket/asset search
+ - Check all the merged users for user's group memberships
+ - Support to delete group members for merged users
+ - Check user merge info in deeper RT::Users search code
+ - Update documentation
+
 1.03 2016-11-28
  - Fix tests not being able to load RT::Test
  - Update documentation

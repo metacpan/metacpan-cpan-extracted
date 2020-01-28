@@ -1,5 +1,5 @@
 package Test::Count::FileMutator::ByFileType::Lib;
-$Test::Count::FileMutator::ByFileType::Lib::VERSION = '0.1101';
+$Test::Count::FileMutator::ByFileType::Lib::VERSION = '0.1102';
 use strict;
 use warnings;
 
@@ -100,9 +100,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Test::Count::FileMutator::ByFileType::Lib - API to mutate files in place.
+
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -114,10 +118,6 @@ version 0.1101
     );
 
     $obj->run;
-
-=head1 NAME
-
-Test::Count::FileMutator::ByFileType::Lib - API to mutate files in place.
 
 =head1 FUNCTIONS
 

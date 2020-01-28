@@ -10,7 +10,7 @@ use MyTest tests => 101;
 
 license_covered(
 	'adobe_2006',
-	name => 'Adobe 2006 License',
+	name => 'Adobe-2006 License',
 	text => <<EOF,
 Adobe Systems Incorporated grants to you a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license, to reproduce, prepare derivative works of, publicly display, publicly perform, and distribute this source code and such derivative works in source or object code form without any attribution requirements.
 
@@ -42,10 +42,13 @@ EOF
 
 license_covered(
 	'afl',
-	name    => 'Academic Free License',
-	license => <<EOF,
-This Academic Free License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following licensing notice adjacent to the copyright notice for the Original Work:
-EOF
+	name => 'Academic Free License',
+
+# TODO: readd when children cover same region
+#	license => <<EOF,
+#This Academic Free License (the "License") applies to any original work of authorship (the "Original Work") whose owner (the "Licensor") has placed the following licensing notice adjacent to the copyright notice for the Original Work:
+#EOF
+	TODO => [qw(subject_license)]
 );
 
 license_covered(

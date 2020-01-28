@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5abce076fd8d3707a2d7e7112998fcd2e225b2e5 Changes
+SHA1 f251c78a528ba8ef717433c498d6bf457c334e88 MANIFEST
+SHA1 c10f19370658e73222434cd2249e429c63afaa91 META.yml
+SHA1 96192595a334fd77bcacd49a9c9605284ffe2409 Makefile.PL
+SHA1 86265d817d8e8f7b766376a1c7975d60ea466bf4 README.md
+SHA1 98c7471eea1dc975c7fb0c23429360709af667d9 bin/jsonld-compact
+SHA1 aefc63c13dd8e8d49ef23bbc4363d3c53e57a5e3 bin/jsonld-expand
+SHA1 9f330f63a8f5c0a0a77ea34231ffc01aed4de2a3 bin/jsonld-nq
+SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
+SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
+SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
+SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
+SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
+SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
+SHA1 fa532ce949d1c607589aded93d5ea1d49a27e5d8 inc/Module/Install/Scripts.pm
+SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
+SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
+SHA1 85fb410247fc1213188b4d9534f34a5e78466d52 lib/JSONLD.pm
+SHA1 5601e570444de775d045327a965fb289bb868075 meta/changes.ttl
+SHA1 b366e7addb62f2915ae0a13ba50ad28188c33f63 t/00.load.t
+SHA1 8d62325b1ec6fcadd2237bbb698ade4ffaa54df4 t/simple.t
+SHA1 929a28352946c0ae371899181ce6ac2583428037 xt/compact.t
+SHA1 be529fa34881a7bb5cd365e385484fc78bdfef7c xt/expand.t
+SHA1 c09ea7f79580f6d037ca6d1ee7d3b158921c4d62 xt/to-rdf.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAl4t3JgACgkQhPK6VMqoyC1KcQCaA921aPSY4PDTUrCWnKDKzclh
+6uMAn2+KC9hCsOxpowzWeZs0TRWej4ZF
+=SzOv
+-----END PGP SIGNATURE-----

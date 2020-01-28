@@ -3,13 +3,13 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Module::Metadata;
 
-WriteMakefile(
+my %makefile_args = (
     NAME              => 'File::BackupCopy',
     VERSION_FROM      => 'lib/File/BackupCopy.pm',
     ABSTRACT_FROM     => 'lib/File/BackupCopy.pm',
     LICENSE           => 'gpl_3',
     AUTHOR            => 'Sergey Poznyakoff <gray@gnu.org>',
-    MIN_PERL_VERSION  => 5.006,
+    MIN_PERL_VERSION  => 5.014002,
     PREREQ_PM         => {
 	'File::Temp'  => 0.23
     },
@@ -30,5 +30,12 @@ WriteMakefile(
     }    
 );
 
-    
+unless (eval { symlink("",""); 1 }) {
+    if ($^O eq 'MSWin32') {
+	$makefile_args{PREREQ_PM}{'Win32API::File'} = 0.1203;
+    }
+}
+
+WriteMakefile(%makefile_args);
+
     

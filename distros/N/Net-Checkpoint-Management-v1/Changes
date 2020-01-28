@@ -1,4 +1,13 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001003
+Revision history for Net-Checkpoint-Management-v1: 0.001004
+
+0.001004  2020-01-22 14:30:27+01:00 Europe/Vienna
+    - fix error handling of responses which contain the error message in a key
+      named 'message' instead of 'errors'
+    - use 'blocking-errors' instead of 'errors' from responses for exceptions
+    - fix Data::Dumper::Concise usage without declaring it as a dependency
+    - fix update with multiple id parameters
+      uid will be preferred over name and rule-number
+    - add access_roles methods
 
 0.001003  2019-07-09 15:48:51+02:00 Europe/Vienna
     - fix get methods required an unnecessary id

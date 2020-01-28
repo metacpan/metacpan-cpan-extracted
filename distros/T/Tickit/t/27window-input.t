@@ -17,7 +17,8 @@ flush_tickit;
 my $keyev;
 my @key_events;
 my $bind_id_key = $win->bind_event( key => sub {
-   ( undef, undef, $keyev ) = @_;
+   ( my $_win, undef, $keyev ) = @_;
+   is( $_win, $win, '$win for key event' );
    push @key_events, [ $keyev->type => $keyev->str ];
    return 1;
 } );

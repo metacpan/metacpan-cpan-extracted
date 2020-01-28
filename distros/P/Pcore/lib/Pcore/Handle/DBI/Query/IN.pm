@@ -5,7 +5,7 @@ use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_blessed_arrayref];
 
 has _buf => ( required => 1 );    # ArrayRef
 
-sub get_query ( $self, $dbh, $final, $i ) {
+sub GET_SQL_QUERY ( $self, $dbh, $i ) {
     my ( @sql, @bind );
 
     for my $token ( $self->{_buf}->@* ) {
@@ -21,7 +21,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
         }
     }
 
-    return @sql ? ( 'IN (' . join( q[, ], @sql ) . ')', \@bind ) : ( undef, undef );
+    return @sql ? ( 'IN (' . join( ', ', @sql ) . ')', \@bind ) : ( undef, undef );
 }
 
 1;

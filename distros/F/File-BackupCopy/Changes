@@ -1,4 +1,7 @@
-Revision history for Perl extension File::BackupCopy
+Revision history for Perl extension File::BackupCopy.
+
+1.01  2020-01-27
+	- Fix portability issues.
 
 1.00  2020-01-20
 	- Initial release.

@@ -13,27 +13,31 @@
          "rdfs:label" : "about",
          "schema:category" : "issue-1670",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
             "schema:CommunicateAction",
-            "schema:Event"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:inverseOf" : "schema:subjectOf",
          "schema:rangeIncludes" : "schema:Thing"
       },
       "schema:inLanguage" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2382",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
+         "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:CommunicateAction",
-            "schema:LinkRole",
             "schema:CreativeWork",
             "schema:WriteAction",
-            "schema:Event"
+            "schema:LinkRole",
+            "schema:BroadcastService",
+            "schema:CommunicateAction",
+            "schema:Event",
+            "schema:PronounceableText"
          ],
          "schema:rangeIncludes" : [
-            "schema:Language",
-            "schema:Text"
+            "schema:Text",
+            "schema:Language"
          ]
       },
       "schema:language" : {
@@ -54,21 +58,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:SendAction",
+            "schema:CommunicateAction",
             "schema:GiveAction",
+            "schema:PayAction",
+            "schema:DonateAction",
             "schema:ReturnAction",
             "schema:Message",
             "schema:TipAction",
-            "schema:CommunicateAction",
-            "schema:SendAction",
-            "schema:PayAction",
-            "schema:DonateAction",
             "schema:AuthorizeAction"
          ],
          "schema:rangeIncludes" : [
+            "schema:Audience",
             "schema:Person",
             "schema:Organization",
-            "schema:ContactPoint",
-            "schema:Audience"
+            "schema:ContactPoint"
          ]
       }
    }

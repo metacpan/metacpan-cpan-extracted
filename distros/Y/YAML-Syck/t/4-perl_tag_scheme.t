@@ -5,6 +5,9 @@ use TestYAML tests => 18;
 
 ok( YAML::Syck->VERSION );
 
+# These tests assume object creation.
+$YAML::Syck::LoadBlessed = 1;
+
 #use YAML;
 #use Test::More 'no_plan';
 
@@ -52,7 +55,7 @@ sub yaml_is {
 }
 
 {
-    my $hash = { foo => "bar" };
+    my $hash        = { foo => "bar" };
     my $deep_scalar = \$hash;
     yaml_is( Dump($deep_scalar), "--- !!perl/ref\n=:\n  foo: bar\n" );
     bless $deep_scalar, "Foo::Bar";

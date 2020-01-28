@@ -14,15 +14,19 @@ run_tests(
     sub {
         my $client = test_client( dbs => ['ts1'] );
 
-        my $handle = $client->insert("Worker::Dummy");
-        ok( $handle, "inserted job" );
+        {
+            my $handle = $client->insert("Worker::Dummy");
+            ok( $handle, "inserted job" );
 
-        $client->can_do("Worker::Dummy");
-        $client->can_do("Worker::Dummy2");
-        $client->can_do("Worker::Dummy3");
-        $client->work_until_done;
+            $client->can_do("Worker::Dummy");
+            $client->can_do("Worker::Dummy2");
+            $client->can_do("Worker::Dummy3");
+            $client->work_until_done;
 
-        ok( !$handle->is_pending, "job is done" );
+            ok( !$handle->is_pending, "job is done" );
+        }
+
+        $client->set_current_job(undef);
 
         teardown_dbs('ts1');
     }

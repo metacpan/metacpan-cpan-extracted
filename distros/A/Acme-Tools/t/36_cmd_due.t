@@ -4,11 +4,12 @@
 
 use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests    => 6;
+use Time::Local;
 warn <<"" and map ok(1),1..6 and exit if $^O!~/^(linux|cygwin)$/;
 Tests for cmd_due not available for $^O, only linux and cygwin
 
 my($tmp,$p,$ok,@d)=(tmp());
-sub okk{ ok($p eq $ok, shift); $p eq $ok or deb "$p\n!=\n$ok\n"};
+sub okk{ is($p, $ok, shift); $p eq $ok or deb "$p\n!=\n$ok\n"};
 
 my %f=( a=>10, b=>20, c=>30 );
 my $i=1;
@@ -67,10 +68,20 @@ okk('find -ls|due -ihz');
 
 my @f;File::Find::find(sub{-f$_&&push@f,"$tmp/$_"},$tmp);
 @Acme::Tools::Due_fake_stdin=@f;
-utime 0, .5<rand()?8e8:9e8, $_ for @f;
-$ok=repl($answer,'ymd','1998/07/09');
-$p=printed { Acme::Tools::cmd_due('-Mihz') };
-$p=~s{\b(\d{4}/\d\d/\d\d)\b}{push@d,$1;'1998/07/09'}ge;
-ok(mins(@d) eq '1995/05/09','min');
-ok(maxs(@d) eq '1998/07/09','max');
-okk('find|due -Mihz  ...with -M');
+
+SKIP: {
+#  skip "",3 if join('',(localtime(8e8))[3..5]) ne '9495'
+#            or join('',(localtime(9e8))[3..5]) ne '9698'; #tz?
+  my $cnt=0;$cnt+=
+  utime 0, .5<rand()?timelocal(0,0,0,9,5-1,1995)
+                    :timelocal(0,0,0,9,7-1,1998), $_ for @f;
+  skip "cnt $cnt != ".@f, 3 if $cnt != 0+@f;		   
+  $ok=repl($answer,'ymd','1998/07/09');
+  $p=printed { Acme::Tools::cmd_due('-Mihz') };
+  print "--\n$p" if $ENV{ATDEBUG};
+  $p=~s{\b(\d{4}/\d\d/\d\d)\b}{push@d,$1;'1998/07/09'}ge;
+  print "--\n$p" if $ENV{ATDEBUG};
+  is(mins(@d),'1995/05/09','min');
+  is(maxs(@d),'1998/07/09','max');
+  okk('find|due -Mihz  ...with -M');
+};

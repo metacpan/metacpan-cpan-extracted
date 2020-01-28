@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Util
   homepage: https://metacpan.org/release/Complete-Util
   repository: git://github.com/perlancar/perl-Complete-Util.git
-version: '0.608'
+version: '0.611'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

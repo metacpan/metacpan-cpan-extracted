@@ -1,0 +1,24 @@
+lib/Bio/WGS2NCBI.pm
+lib/Bio/WGS2NCBI/CdsFeature.pm
+lib/Bio/WGS2NCBI/Config.pm
+lib/Bio/WGS2NCBI/Feature.pm
+lib/Bio/WGS2NCBI/FeatureSet.pm
+lib/Bio/WGS2NCBI/GeneFeature.pm
+lib/Bio/WGS2NCBI/Logger.pm
+lib/Bio/WGS2NCBI/MrnaFeature.pm
+lib/Bio/WGS2NCBI/Seq.pm
+lib/Bio/WGS2NCBI/StrandedFeature.pm
+lib/Bio/WGS2NCBI/TableReader.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/wgs2ncbi
+t/0-pod.t
+t/1-seq.t
+t/2-config.t
+t/3-config-env.t
+t/4-config-cli.t
+t/5-logger.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

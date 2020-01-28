@@ -1,5 +1,10 @@
 Revision history for Bio-EUtilities
 
+1.76      2020-01-26 00:12:19-06:00 America/Chicago
+  * Added NCBI API key option.
+  * Update remote tests (minor)
+  * Add simple distribution-named module 
+
 1.75      2016-09-25 23:06:59-05:00 America/Chicago
 
 1.74      2016-09-25 20:09:15-05:00 America/Chicago

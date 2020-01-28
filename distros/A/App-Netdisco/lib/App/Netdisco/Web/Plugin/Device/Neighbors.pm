@@ -205,7 +205,7 @@ ajax '/ajax/data/device/netmap' => require_login sub {
 
     my $devices = schema('netdisco')->resultset('Device')->search({}, {
       '+select' => [\'floor(log(throughput.total))'], '+as' => ['log'],
-      join => 'throughput',
+      join => 'throughput', distinct => 1,
     })->with_times;
 
     # filter by vlan for all or neighbors only

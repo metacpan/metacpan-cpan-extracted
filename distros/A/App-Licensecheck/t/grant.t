@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 46;
+use Test::Licensecheck tests => 45;
 
 # AFL
 license_is(
@@ -27,12 +27,9 @@ license_is(
 license_is( 't/grant/Apache_and_more/PIE.htc', 'Apache-2.0 or GPL-2' );
 license_is(
 	't/grant/Apache_and_more/rust.lang',
-	[ 'Apache-2.0 and/or MIT~unspecified', 'Apache-2.0 or MIT~unspecified' ]
+	'Apache-2.0 or MIT~unspecified'
 );
-license_is(
-	't/grant/Apache_and_more/select2.js',
-	[ 'Apache-2.0 and/or Apache-2.0 or GPL-2', 'Apache-2.0 or GPL-2' ]
-);
+license_is( 't/grant/Apache_and_more/select2.js', 'Apache-2.0 or GPL-2' );
 license_is(
 	't/grant/Apache_and_more/test_run.py',
 	'Apache-2.0 or BSD-3-clause'
@@ -43,7 +40,10 @@ license_is(
 	't/grant/CC-BY-SA_and_more/WMLA',
 	'CC-BY-SA-3.0 and/or GFDL-1.2'
 );
-license_is( 't/grant/CC-BY-SA_and_more/cewl.rb', 'CC-BY-SA-2.0 or GPL-3' );
+license_is(
+	't/grant/CC-BY-SA_and_more/cewl.rb',
+	[ 'UNKNOWN', 'CC-BY-SA-2.0 or GPL-3' ]
+);
 license_is(
 	't/grant/CC-BY-SA_and_more/utilities.scad',
 	'CC-BY-SA-3.0 or LGPL-2'

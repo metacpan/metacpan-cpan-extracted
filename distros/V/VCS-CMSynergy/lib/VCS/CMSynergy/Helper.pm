@@ -52,9 +52,9 @@ The following options are recognized:
 absolute database path; this option corresponds to option C<database>
 for C<VCS::CMSynergy/start>
 
-=item C<-H>, C<--host>
+=item C<-S>, C<--server>
 
-engine host; this option corresponds to option C<host> for
+server URL; this option corresponds to option C<server> for
 for C<VCS::CMSynergy/start>
 
 =item C<-U>, C<--user>
@@ -66,12 +66,6 @@ for C<VCS::CMSynergy/start>
 
 user's password; this option corresponds to option C<password> for
 for C<VCS::CMSynergy/start>
-
-=item C<--ui_database_dir>
-
-path name to which your database information is copied when you are
-running a remote client session; this option corresponds to
-option C<ui_database_dir> for B<ccm start>, it implies C<remote_client>
 
 =back
 
@@ -95,10 +89,9 @@ can cut and paste into your script's POD:
   Synergy Options:
 
   -D PATH | --database PATH       database path
-  -H HOST | --host HOST           engine host
+  -S URL | --server URL           server URL
   -U NAME | --user NAME           user name
   -P STRING | --password STRING   user's password
-  --ui_database_dir PATH          path to copy database information to
 
 =cut
 
@@ -111,14 +104,12 @@ sub GetOptions
     my %opts;
     Getopt::Long::GetOptions(\%opts,
         'database|D=s',
-        'host|H=s',
+        'server|S=s',
         'user|U=s',
-        'password|P=s',
-        'ui_database_dir=s') or return;
+        'password|P=s') or return;
 
     Getopt::Long::Configure($saved_config);
 
-    $opts{remote_client} = 1 if defined $opts{ui_database_dir};
     $opts{CCM_ADDR} = $ENV{CCM_ADDR} unless defined $opts{database};
 
     return \%opts;

@@ -1,6 +1,6 @@
 package Tapper::Cmd::Scenario;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Scenario::VERSION = '5.0.10';
+$Tapper::Cmd::Scenario::VERSION = '5.0.11';
 use warnings;
 use strict;
 use 5.010;
@@ -204,7 +204,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

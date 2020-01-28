@@ -1,5 +1,5 @@
 package Test::Count::Base;
-$Test::Count::Base::VERSION = '0.1101';
+$Test::Count::Base::VERSION = '0.1102';
 
 use strict;
 use warnings;
@@ -24,13 +24,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.1101
-
 =head1 NAME
 
 Test::Count::Base - Base Class for Test::Count.
+
+=head1 VERSION
+
+version 0.1102
 
 =head1 FUNCTIONS
 

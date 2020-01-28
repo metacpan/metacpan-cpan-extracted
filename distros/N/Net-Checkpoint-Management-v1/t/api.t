@@ -2,7 +2,6 @@ use Test2::V0;
 use Test2::Tools::Compare qw( array hash F );
 use Net::Checkpoint::Management::v1;
 use JSON qw();
-use Data::Dumper::Concise;
 
 SKIP: {
     skip_all "environment variables not set"
@@ -80,6 +79,7 @@ ok(my $acme_net_clients = $cpmgmt->create_network({
     name    => 'acme_net-clients',
     subnet4 => '10.0.0.0',
     'mask-length4'  => 24,
+    'ignore-warnings' => 1,
 }), "create network 'acme_net-clients' successful");
 
 ok(my $tcp_services = $cpmgmt->list_services_tcp(),
@@ -174,6 +174,7 @@ is($access_rule->{uid}, $ipv4_object_rule->{uid},
 is($access_rule->{enabled}, T(), "access rule is enabled");
 ok($access_rule = $cpmgmt->update_accessrule({
         uid     => $access_rule->{uid},
+        name    => $access_rule->{name},
         layer   => $acl_uid,
     }, {
         enabled => JSON->boolean(0),

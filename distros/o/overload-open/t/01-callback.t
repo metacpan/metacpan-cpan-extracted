@@ -34,7 +34,7 @@ my $sysopen_fh;
 die if ! -f $temp_file;
 sysopen($sysopen_fh, $temp_file, O_RDONLY);
 my $a;
-($a = <$sysopen_fh>) or warn $!;
+ok(defined ($a = <$sysopen_fh>), "gets defined value from fh read");
 is $a, 'words', "file has correct content";
 
 unlink $temp_file;

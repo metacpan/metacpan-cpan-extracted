@@ -1,6 +1,6 @@
-Build.PL
 Changes
 lib/Perl/Phase.pm
+Phase.xs
 Makefile.PL
 MANIFEST			This list of files
 README

@@ -26,8 +26,11 @@ This implements a basic CBOR decoder in pure Perl.
 =item * Indefinite-length objects are supported, but streamed parsing
 is not; the data structure must be complete to be decoded.
 
-=item * Binary and UTF-8 strings are decoded as Perl represents them.
-Note that UTF-8 string decoding is a bit slower.
+=item * CBOR text strings are decoded to UTF8-flagged strings, while
+binary strings are decoded to non-UTF8-flagged strings. In practical
+terms, this means that a decoded CBOR binary string will have no code point
+above 255, while a decoded CBOR text string can contain any valid Unicode
+code point.
 
 =item * null, undefined, true, and false become undef, undef,
 Types::Serialiser::true(), and Types::Serialiser::false(), respectively.
@@ -189,6 +192,11 @@ sub decode {
 
             my $v = substr( $_, $hdrlen, $len );
             utf8::decode($v);
+
+            # A no-op if $v is already UTF8-flagged, but if it’s not,
+            # then this will apply the flag. We thus preserve the ability
+            # to round-trip a character string through Perl.
+            utf8::upgrade($v);
 
             return ($hdrlen + $len, $v);
         }

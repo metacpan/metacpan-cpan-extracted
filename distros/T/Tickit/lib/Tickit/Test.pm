@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Test;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 use Carp;
 
@@ -16,6 +16,7 @@ use Exporter 'import';
 
 our @EXPORT = qw(
    mk_term
+   mk_tickit
    mk_window
    mk_term_and_window
    flush_tickit
@@ -39,8 +40,6 @@ our @EXPORT = qw(
    CLEAR
    GOTO
    ERASECH
-   INSERTCH
-   DELETECH
    SCROLLRECT
    PRINT
    SETPEN
@@ -54,6 +53,7 @@ use Tickit;
 use Tickit::Utils qw( textwidth substrwidth );
 
 use Test::Builder;
+use Time::HiRes qw( time );
 
 =head1 NAME
 
@@ -61,28 +61,28 @@ C<Tickit::Test> - unit testing for C<Tickit>-based code
 
 =head1 SYNOPSIS
 
- use Test::More tests => 2;
- use Tickit::Test;
+   use Test::More tests => 2;
+   use Tickit::Test;
 
- use Tickit::Widget::Static;
+   use Tickit::Widget::Static;
 
- my $win = mk_window;
+   my $win = mk_window;
 
- my $widget = Tickit::Widget::Static->new( text => "Message" );
+   my $widget = Tickit::Widget::Static->new( text => "Message" );
 
- $widget->set_window( $win );
+   $widget->set_window( $win );
 
- flush_tickit;
+   flush_tickit;
 
- is_termlog( [ SETPEN,
-               CLEAR,
-               GOTO(0,0),
-               SETPEN,
-               PRINT("Message"),
-               SETBG(undef),
-               ERASECH(73) ] );
+   is_termlog( [ SETPEN,
+                 CLEAR,
+                 GOTO(0,0),
+                 SETPEN,
+                 PRINT("Message"),
+                 SETBG(undef),
+                 ERASECH(73) ] );
 
- is_display( [ "Message" ] );
+   is_display( [ "Message" ] );
 
 =head1 DESCRIPTION
 
@@ -114,13 +114,36 @@ want a root window as well; for convenience see instead C<mk_term_and_window>.
 The mock terminal usually starts with a size of 80 columns and 25 lines,
 though can be overridden by passing named arguments.
 
- $term = mk_term lines => 30, cols => 100;
+   $term = mk_term lines => 30, cols => 100;
 
 =cut
 
 sub mk_term
 {
    return $term ||= Tickit::Test::MockTerm->new( @_ );
+}
+
+=head2 mk_tickit
+
+   $tickit = mk_tickit
+
+Constructs and returns the mock toplevel L<Tickit> instance to unit test with.
+This object will be cached and returned if the function is called again.
+
+Note that this object is not a full implementation and in particular does not
+have a real event loop. Any later or timer watches are stored internally and
+flushed by the L</flush_tickit> function. This helps isolate unit tests from
+real-world effects.
+
+=cut
+
+sub mk_tickit
+{
+   mk_term;
+
+   return $tickit ||= __PACKAGE__->new(
+      term => $term
+   );
 }
 
 =head2 mk_window
@@ -133,15 +156,9 @@ Construct a root window using the mock terminal, to unit test with.
 
 sub mk_window
 {
-   mk_term;
-
-   $tickit = __PACKAGE__->new(
-      term => $term
-   );
+   mk_tickit;
 
    my $win = $tickit->rootwin;
-
-   #$tickit->setup_term;
 
    # Clear the method log from ->setup_term
    $term->get_methodlog;
@@ -169,28 +186,68 @@ sub mk_term_and_window
 ## Actual object implementation
 
 use base qw( Tickit );
+use Struct::Dumb 0.04;
 
 my @later;
-sub later { push @later, $_[1] }
+sub watch_later { push @later, $_[1]; return \$later[-1] }
+
+my @timers;
+BEGIN {
+   struct Timer => [qw( after code )],
+      predicate => "is_Timer";
+}
+
+sub watch_timer_after {
+   # keep list sorted
+   @timers = sort { $a->after <=> $b->after } @timers, my $w = Timer( $_[1], $_[2] );
+   return $w;
+}
+sub watch_timer_at {
+   watch_timer_after( $_[0], $_[1] - time, $_[2] );
+}
+
+sub watch_cancel {
+   my ( undef, $w ) = @_;
+   if( ref $w eq "REF" ) {
+      # later
+      @later = grep { \$_ != $w } @later;
+   }
+   if( is_Timer $w ) {
+      @timers = grep { $_ != $w } @timers;
+   }
+}
 
 sub lines { return $term->lines }
 sub cols  { return $term->cols  }
 
 =head2 flush_tickit
 
-   flush_tickit
+   flush_tickit( $timeskip )
 
-Flushes any pending C<later> events in the testing C<Tickit> object. Because
-the unit test script has no real event loop, this is required instead, to
-flush any pending events.
+Flushes any pending timer or later events in the testing C<Tickit> object.
+Because the unit test script has no real event loop, this is required instead,
+to flush any pending events.
+
+If the optional C<$timeskip> argument has a nonzero value then any queued
+timers will experience the given amount of time passing; any that should now
+expire will be invoked.
 
 =cut
 
 sub flush_tickit
 {
+   my ( $timeskip ) = @_;
+
    while( @later ) {
       my @queue = @later; @later = ();
       $_->() for @queue;
+   }
+
+   if( $timeskip ) {
+      $_->after -= $timeskip for @timers;
+   }
+   while( @timers and $timers[0]->after <= 0 ) {
+      ( shift @timers )->code->();
    }
 
    $tickit->rootwin->flush if $tickit && $tickit->rootwin;
@@ -312,8 +369,8 @@ This differs from the simpler ARRAY reference form by being somewhat more
 robust against rendering order. It checks that every expectation sequence
 happens exactly once, but does not care which order the sections happen in.
 
- is_termlog( { "0,0" => [ PRINT("Hello") ],
-               "0,6" => [ PRINT("World!") ] } );
+   is_termlog( { "0,0" => [ PRINT("Hello") ],
+                 "0,6" => [ PRINT("World!") ] } );
 
 =cut
 
@@ -437,34 +494,32 @@ If a plain string is given, it asserts that the characters on display are
 those as given by the string (trailing blanks may be omitted). The pen
 attributes of the characters do not matter in this case.
 
- is_display( [ "some lines of",
-               "content here" ] );
+   is_display( [ "some lines of",
+                 "content here" ] );
 
 If an ARRAY reference is given, it should contain chunks of content from the
 C<TEXT> function. Each chunk represents content on display for the
 corresponding columns.
 
- is_display( [ [TEXT("some"), TEXT(" lines of")],
-               "content here" ] );
+   is_display( [ [TEXT("some"), TEXT(" lines of")],
+                 "content here" ] );
 
 The C<TEXT> function accepts pen attributes, to assert that the displayed
 characters have exactly the attributes given. In character cells containing
 spaces, only the C<bg> attribute is tested.
 
- is_display( [ [TEXT("This is ",fg=>2), TEXT("bold",fg=>2,b=>1) ] ] );
+   is_display( [ [TEXT("This is ",fg=>2), TEXT("bold",fg=>2,b=>1) ] ] );
 
 The C<BLANK> function is a shortcut to providing a number of blank cells
 
- BLANK(20,bg=>1)  is   TEXT("                    ",bg=>1)
+   BLANK(20,bg=>1)  is   TEXT("                    ",bg=>1)
 
 The C<BLANKLINE> and C<BLANKLINES> functions are a shortcut to providing an
 entire line, or several lines, of blank content. They yield an array reference
 or list of array references directly.
 
- BLANKLINE      is   [TEXT("")]
- BLANKLINES(3)  is   [TEXT("")], [TEXT("")], [TEXT("")]
-
-
+   BLANKLINE      is   [TEXT("")]
+   BLANKLINES(3)  is   [TEXT("")], [TEXT("")], [TEXT("")]
 
 =cut
 
@@ -608,13 +663,13 @@ use constant DEFAULTPEN => map { $_ => undef } @Tickit::Pen::ALL_ATTRS;
 The following functions can be used to help write the expected log for a call
 to C<is_termlog>.
 
- CLEAR
- GOTO($line,$col)
- ERASECH($count,$move_to_end)
- SCROLLRECT($top,$left,$lines,$cols,$downward,$rightward)
- PRINT($string)
- SETPEN(%attrs)
- SETBG($bg_attr)
+   CLEAR
+   GOTO($line,$col)
+   ERASECH($count,$move_to_end)
+   SCROLLRECT($top,$left,$lines,$cols,$downward,$rightward)
+   PRINT($string)
+   SETPEN(%attrs)
+   SETBG($bg_attr)
 
 =cut
 
@@ -625,12 +680,6 @@ sub SCROLLRECT { [ scrollrect => @_[0..5] ] }
 sub PRINT      { [ print => $_[0] ] }
 sub SETPEN     { [ setpen => { DEFAULTPEN, @_ } ] }
 sub SETBG      { [ setpen_bg => $_[0] ] }
-
-# Deprecated, will never match now
-sub INSERTCH   { carp "INSERTCH() is no longer used by MockTerm";
-                 [ insertch => $_[0] ] }
-sub DELETECH   { carp "DELETECH() is no longer used by MockTerm";
-                 [ deletech => $_[0] ] }
 
 =head1 AUTHOR
 

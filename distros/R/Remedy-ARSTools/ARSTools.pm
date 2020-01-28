@@ -23,7 +23,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $errstr %currency_codes);
 @ISA 		= qw(Exporter);
 @EXPORT		= qw(&ParseDBDiary &EncodeDBDiary);
 @EXPORT_OK	= qw($VERSION $errstr);
-$VERSION	= 1.23;
+$VERSION	= 1.25;
 
 ## this is a global lookup table for currencies
 our %currency_codes = (
@@ -1930,6 +1930,9 @@ sub QueryNew {
 		}
 	}
 
+	## 1/27/2020 -- default getAttachments is false
+	if (! ($p{'getAttachments'} == 1)){ $p{'getAttachments'} = 0; }
+
 	#we need to make sure we 'know' the schema
 	exists($self->{'ARSConfig'}->{$p{'Schema'}}) || do {
 
@@ -2047,9 +2050,9 @@ sub QueryNew {
 
 	#and now, finally, we go and get the selected fields out of each ticket
 	my @out = ();
-	foreach (keys %tickets){
+	foreach my $t (keys %tickets){
 		my %values = ();
-		(%values = ARS::ars_GetEntry($self->{'ctrl'}, $p{'Schema'}, $_, @get_list)) || do {
+		(%values = ARS::ars_GetEntry($self->{'ctrl'}, $p{'Schema'}, $t, @get_list)) || do {
 			#if it was an ARERR 161 (staleLogin), reconnect and try it again
 			if ($ARS::ars_errstr =~/ARERR \#161/){
 				warn("QueryNew: reloading stale login") if $self->{'Debug'};
@@ -2060,28 +2063,52 @@ sub QueryNew {
 					return (undef);
 				};
 				#try it again
-				(%values = ARS::ars_GetEntry($self->{'ctrl'}, $p{'Schema'}, $_, @get_list)) || do {
+				(%values = ARS::ars_GetEntry($self->{'ctrl'}, $p{'Schema'}, $t, @get_list)) || do {
 					$self->{'errstr'} = "QueryNew: can't get ticket fields: " . $p{'Schema'} . " / " .
-										$p{'QBE'} . "/" . $_ . ": " . $ARS::ars_errstr;
+										$p{'QBE'} . "/" . $t . ": " . $ARS::ars_errstr;
 					warn($self->{'errstr'}) if $self->{'Debug'};
 					return (undef);
 				};
 			}
 			$self->{'errstr'} = "QueryNew: can't get ticket fields: " . $p{'Schema'} . " / " .
-			$p{'QBE'} . "/" . $_ . ": " . $ARS::ars_errstr;
+			$p{'QBE'} . "/" . $t . ": " . $ARS::ars_errstr;
 			warn($self->{'errstr'}) if $self->{'Debug'};
 			return (undef);
 		};
 
 		my $converted_row_data = $self->ConvertFieldsToHumanReadable(
-			Schema			=> $p{'Schema'},
-			Fields			=> \%values,
+			Schema					=> $p{'Schema'},
+			Fields					=> \%values,
 			DateConversionTimeZone	=> $p{'DateConversionTimeZone'}
 		) || do {
 			$self->{'errstr'} = "QueryNew: can't convert data returned on API (this should not happen!): " . $self->{'errstr'};
 			warn($self->{'errstr'}) if $self->{'Debug'};
 			return (undef);
 		};
+
+		## handle attachments
+		## 1/24/2020 -- this is not probably the best place for it
+		if ($p{'getAttachments'} == 1){
+			foreach my $field_name (keys (%{$converted_row_data})){
+				if ($self->{'ARSConfig'}->{$p{'Schema'}}->{'fields'}->{$field_name}->{'dataType'} eq "attach"){
+					if (exists($converted_row_data->{$field_name}->{'origSize'}) && $converted_row_data->{$field_name}->{'origSize'} > 0){
+						my $a = ARS::ars_GetEntryBLOB(
+							$self->{'ctrl'},
+							$p{'Schema'},
+							$t,
+							$self->{'ARSConfig'}->{$p{'Schema'}}->{'fields'}->{$field_name}->{'id'},
+							ARS::AR_LOC_BUFFER
+						) || do {
+							$self->{'errstr'} = "QueryNew: failed to retrieve attachment content (" . $p{'Schema'} . "[" . $t . "]/" . $field_name . "): " . $ARS::ars_errstr;
+							warn($self->{'errstr'}) if $self->{'Debug'};
+							return (undef);
+						};
+						$converted_row_data->{$field_name}->{'buffer'} = $a;
+						$converted_row_data->{$field_name}->{'size'} = length($a);
+					}
+				}
+			}
+		}
 
 		#push it on list of results
 		push (@out, $converted_row_data);
@@ -2438,7 +2465,6 @@ sub ConvertFieldsToHumanReadable {
 			}
 		}
 	}
-
 
 	#send the translated data back
 	return(\%translated);

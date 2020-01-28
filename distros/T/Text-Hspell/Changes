@@ -1,5 +1,12 @@
 Revision history for Text-Hspell
 
+0.2.2       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see:
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF#L3
+    ).
+        - VERSION used to appear before NAME.
+
 0.2.1       2020-01-15
     - Documentation updates.
 

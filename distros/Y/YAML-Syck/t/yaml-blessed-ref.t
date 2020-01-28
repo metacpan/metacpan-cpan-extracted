@@ -6,7 +6,10 @@ use TestYAML tests => 1;
 use YAML::Syck;
 use Data::Dumper;
 
-my $bref = bless \eval { my $scalar = 'YAML::Syck' }, 'foo';
+# These tests assume object creation.
+$YAML::Syck::LoadBlessed = 1;
+
+my $bref      = bless \eval { my $scalar = 'YAML::Syck' }, 'foo';
 my $bref2bref = bless \$bref, 'bar';
 
 my $dd = Dumper $bref2bref;

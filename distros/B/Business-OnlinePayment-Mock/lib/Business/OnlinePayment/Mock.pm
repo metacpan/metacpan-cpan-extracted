@@ -9,7 +9,7 @@ use Business::OnlinePayment::HTTPS;
 use parent qw(Business::OnlinePayment::HTTPS);
 our $me = 'Business::OnlinePayment::Mock';
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 # PODNAME: Business::OnlinePayment::Mock
 # ABSTRACT: A backend for mocking fake results for test cards
 
@@ -19,6 +19,13 @@ our $default_mock = {
     error_message => 'Declined',
     is_success    => 0,
     error_code    => 100,
+    order_number  => sub { time },
+};
+
+our $default_approved_mock = {
+    error_message => 'Approved',
+    is_success    => 1,
+    error_code    => 0,
     order_number  => sub { time },
 };
 
@@ -39,7 +46,8 @@ sub _info {
                 'Credit',
                 'Void',
                 'Auth Reversal',
-                'PreAuth'
+                'PreAuth',
+                'Mark Token Used', # very few bop modules use this
             ],
         },
     };
@@ -87,6 +95,7 @@ sub submit {
         }
     }
     die 'Unsupported action' unless $action;
+    local $default_mock = $default_approved_mock if $action eq 'Mark Token Used'; # these always approve
 
     my $result = { %{ $mock_responses->{$action}->{ $content{'card_number'} } || $default_mock } };    # cheap clone
 
@@ -113,7 +122,7 @@ Business::OnlinePayment::Mock - A backend for mocking fake results for test card
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -209,7 +218,7 @@ Jason Terry <oaxlin@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Jason Terry.
+This software is copyright (c) 2020 by Jason Terry.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

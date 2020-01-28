@@ -47,7 +47,7 @@ sub test_unitTest: Test(1) {
     # Write a formatted and unformatted string, row and column notation.
 
     my $col = my $row = 0;
-    $wks->write($row,$col,'Hi Excel!',$fmt );
+    $wks->write($row,$col,'Hi Excel!',$fmt);
     $wks->write(1,$col,'Hi Excel!');
  
     # Write a number and a formula using A1 notation

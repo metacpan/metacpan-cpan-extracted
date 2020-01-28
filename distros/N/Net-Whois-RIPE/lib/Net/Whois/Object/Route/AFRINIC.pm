@@ -1,5 +1,7 @@
 package Net::Whois::Object::Route::AFRINIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -t route -h whois.afrinic.net

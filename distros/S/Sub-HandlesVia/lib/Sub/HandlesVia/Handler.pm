@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Handler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
 use Class::Tiny (
 	qw(
@@ -181,6 +181,7 @@ sub _process_template {
 	$template =~ s/\$ARG\[([0-9]+)\]/$callbacks{arg}->($1)/eg;
 	$template =~ s/\$ARG/$callbacks{arg}->(1)/eg;
 	$template =~ s/\$SELF/$callbacks{self}->()/eg;
+	$template =~ s/\$SLOT/$callbacks{slot}->()/eg;
 	$template =~ s/\#ARG/$callbacks{argc}->()/eg;
 	$template =~ s/\@ARG/$callbacks{args}->()/eg;
 	$template =~ s/«(.+?)»/$callbacks{set}->($1)/eg;
@@ -196,6 +197,8 @@ sub _coderef {
 	my $max_args = $self->max_args;
 	
 	my @code = ('sub {');
+	
+	push @code, sprintf('package %s::__SANDBOX__;', __PACKAGE__);
 	
 	my $sig_was_checked = 0;
 	if (@{ $self->signature || [] }) {
@@ -334,20 +337,20 @@ sub install_method {
 	
 	if ( eval { require Sub::Util }) {
 		$coderef = Sub::Util::set_subname("$target\::$name", $coderef);
-		no strict 'refs';
-		*{"$target\::$name"} = $coderef;
 	}
 	elsif ( eval { require Sub::Name }) {
 		$coderef = Sub::Name::subname("$target\::$name", $coderef);
-		no strict 'refs';
-		*{"$target\::$name"} = $coderef;
+	}
+	
+	if ($callbacks{install_method}) {
+		$callbacks{install_method}->($name, $coderef);
+	}
+	elsif ($callbacks{install_method_fq}) {
+		$callbacks{install_method}->("$target\::$name", $coderef);
 	}
 	else {
-		eval qq{
-			package $target;
-			sub $name { goto \$coderef };
-			1;
-		} or die($@);
+		no strict 'refs';
+		*{"$target\::$name"} = $coderef;
 	}
 }
 
@@ -381,7 +384,7 @@ sub _generate_handler {
 package Sub::HandlesVia::Handler::Traditional;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
 BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
 
@@ -393,6 +396,8 @@ sub _coderef {
 	my ($self, %callbacks) = @_;
 	
 	my @code = 'sub {';
+	push @code, sprintf('package %s::__SANDBOX__;', __PACKAGE__);
+	
 	my $env = {};
 	
 	if (my $curried = $self->curried) {
@@ -422,7 +427,7 @@ sub _coderef {
 package Sub::HandlesVia::Handler::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
 BEGIN { our @ISA = 'Sub::HandlesVia::Handler' };
 
@@ -436,6 +441,8 @@ sub _coderef {
 	my ($self, %callbacks) = @_;
 	
 	my @code = 'sub {';
+	push @code, sprintf('package %s::__SANDBOX__;', __PACKAGE__);
+	
 	my $env = { '$shv_callback' => \($self->delegated_coderef) };
 	
 	if (my $curried = $self->curried) {

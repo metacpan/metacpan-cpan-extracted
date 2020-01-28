@@ -52,7 +52,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         var that = this;
         structure.forEach(function(s){
             var options = {};
-            ['note','copyOnTap'].forEach(function(prop){
+            ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(function(prop){
                 if (s[prop]){
                     options[prop] = qx.lang.Type.isString(s[prop]) ?
                         that['tr'](s[prop]) : s[prop];

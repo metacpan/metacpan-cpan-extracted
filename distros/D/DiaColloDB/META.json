@@ -37,11 +37,10 @@
       },
       "runtime" : {
          "recommends" : {
-            "DDC::XS" : "0.15",
+            "DDC::XS" : "0.23",
             "PDL" : "2.007",
             "PDL::CCS" : "v1.23.1",
-            "PDL::VectorValued" : "v1.0.5",
-            "forks" : "0.36"
+            "PDL::VectorValued" : "v1.0.5"
          },
          "requires" : {
             "Algorithm::BinarySearch::Vec" : "0.07",
@@ -68,6 +67,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.12.011",
+   "version" : "v0.12.013",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

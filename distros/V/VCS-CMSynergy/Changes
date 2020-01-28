@@ -1,3 +1,53 @@
+1.52  2020-01-23 
+  [BEWARE - USER VISIBLE CHANGE]
+
+  - Replace new() option --host with option --server
+    
+    --host makes no sense for Synergy 7.2 and above; also drop --ui_database_dir
+
+  [Bug fixes]
+
+  - Fix problem with object names that contain the database delimiter
+    
+    This is legal when the attribute allow_delimiter_in_name (on base-1:model:base) is TRUE.
+    In this case (assuming delim "-"), an objectname "foo - bar.txt-1:ascii:1"
+    would get canonicalized to "foo : bar.txt-1:ascii:1" instead of "foo - bar.txt:1:ascii:1".
+
+  - :tied_objects: silently omit "source" from the keys of the tied hash
+    
+  [Other changes]
+
+  - Make "utf8" available as a session option
+    
+    Using $ccm = VCS::CMSynergy->new(utf8 => 1, ...) ensures that
+    all strings retrieved from Synergy using $ccm are Perl unicode
+    strings.
+    Note that this will only work if the Synergy session was actually started
+    in a UTF-8 locale (at least on Linux). Setting e.g. the environment
+    variable LANG *after* starting a session has no effect on Synergy ouput.
+
+  - Add a session counter for the number of times "ccm" was executed
+
+  - Change implementation of :tied_objects
+
+  - Put VCS::CMSynergy::Objects on a diet
+    
+    - use an array instead of a hash as implementation
+    - no need to inherit from Class::Accessor::Fast anymore
+
+  - Weaken the objects in the session's "objects" cache
+
+  - Compile all Type::Params validations
+    
+    compile()d validations are not only faster, they don't leak memory
+    like their "ad hoc" variants (i.e. using validate()).
+    The leakage is small (~20 kB per call for some specifications), but may
+    add up if methods are called 100,000 times or more.
+    
+    NOTE: This requires feature 'state', hence bump MIN_PERL_VERSION to 5.10.0.
+
+  - Switch from Module::Install to ExtUtils::MakeMaker
+
 1.51  2016-04-02 
   
   [Bug fixes]

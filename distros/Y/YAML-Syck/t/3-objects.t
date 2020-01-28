@@ -10,6 +10,9 @@ use TestYAML tests => 51,
 
 ok( YAML::Syck->VERSION );
 
+# These tests assume object creation.
+$YAML::Syck::LoadBlessed = 1;
+
 is( Dump( bless( {}, 'foo' ) ), "--- !!perl/hash:foo {}\n\n" );
 
 sub ref_ok {
@@ -74,8 +77,8 @@ $YAML::Syck::UseCode = 1;
 
 {
     my $hash = Load( Dump( bless( { 1 .. 4 }, "code" ) ) );
-    is( ref($hash), "code", "blessed to code" );
-    is( eval { $hash->{1} }, 2, "it's a hash" );
+    is( ref($hash),          "code", "blessed to code" );
+    is( eval { $hash->{1} }, 2,      "it's a hash" );
 }
 
 TODO: {
@@ -111,12 +114,12 @@ run_ref_ok(
       )
 );
 
-my $hash = { a => [ 42, [], {} ], h => { 53, 12 } };
+my $hash   = { a => [ 42, [], {} ], h => { 53, 12 } };
 my $loaded = Load( Dump($hash) );
 is_deeply $loaded => $hash, "Deep hash round trips";
 
 my $blesshash = bless { a => [ 42, [], bless( {}, 'foo' ) ], h => { 53, 12 } }, 'bar';
-my $stripped = Load( Dump($blesshash) );
+my $stripped  = Load( Dump($blesshash) );
 is_deeply $stripped => $hash, "Deep hash round trips and strip blessings";
 
 $YAML::Syck::LoadBlessed = 1;

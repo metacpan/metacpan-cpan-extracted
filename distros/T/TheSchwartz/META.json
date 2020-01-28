@@ -4,7 +4,7 @@
       ", Six Apart Ltd, cpan@sixapart.com. All"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.5",
+   "generated_by" : "Minilla/v3.1.8",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "TheSchwartz" : {
          "file" : "lib/TheSchwartz.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "TheSchwartz::Error" : {
          "file" : "lib/TheSchwartz/Error.pm"
@@ -90,13 +90,14 @@
          "web" : "https://github.com/akiym/TheSchwartz"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_authority" : "cpan:AKIYM",
    "x_contributors" : [
       "Akira Sawada <akira@peatix.com>",
       "Brad Fitzpatrick <brad@danga.com>",
       "Jeff Fearn <Jeff.Fearn@gmail.com>",
       "Jeff Fearn <jfearn@redhat.com>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Six Apart Ltd. <cpan@sixapart.com>",
       "Takumi Akiyama <t.akiym@gmail.com>"

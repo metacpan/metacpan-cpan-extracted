@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
+use open IO => ':utf8', ':std';
 use Text::VisualPrintf;
 
 use Test::More tests => 8;

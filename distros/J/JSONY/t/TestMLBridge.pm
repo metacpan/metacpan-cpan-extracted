@@ -1,36 +1,35 @@
 package TestMLBridge;
-use base 'TestML1::Bridge';
-use TestML1::Util;
+use TestML::Bridge;
+use base 'TestML::Bridge';
 
 use JSONY;
-use JSON;
-use YAML;
+use JSON::PP;
+use YAML::PP;
 
 sub jsony_load {
     my ($self, $jsony) = @_;
-    $jsony = $jsony->value;
     $jsony =~ s/\|\n\z//;
-    return native 'JSONY'->new->load($jsony);
+    return 'JSONY'->new->load($jsony);
 }
 
 sub json_decode {
     my ($self, $json) = @_;
-    return native decode_json $json->value;
+    return decode_json $json;
 }
 
 sub yaml {
     my ($self, $object) = @_;
-    my $yaml = YAML::Dump $object->value;
+    my $yaml = YAML::PP->new(schema => [qw'Core Perl'])->dump($object);
 
     # Account for various JSONs
     $yaml =~
-        s{!!perl/scalar:JSON::(?:XS::|PP::|backportPP::|)Boolean}
-        {!!perl/scalar:boolean}g;
+        s{!perl/scalar:JSON::(?:XS::|PP::|backportPP::|)Boolean}
+        {!perl/scalar:boolean}g;
 
     # XXX Floating point discrepancy hack
     $yaml =~ s/\.000+1//g;
 
-    return str $yaml;
+    return $yaml;
 }
 
 1;

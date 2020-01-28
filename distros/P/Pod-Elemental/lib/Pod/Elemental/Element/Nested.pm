@@ -1,6 +1,6 @@
 package Pod::Elemental::Element::Nested;
 # ABSTRACT: an element that is a command and a node
-$Pod::Elemental::Element::Nested::VERSION = '0.103004';
+$Pod::Elemental::Element::Nested::VERSION = '0.103005';
 use Moose;
 extends 'Pod::Elemental::Element::Generic::Command';
 with 'Pod::Elemental::Node';
@@ -58,7 +58,7 @@ Pod::Elemental::Element::Nested - an element that is a command and a node
 
 =head1 VERSION
 
-version 0.103004
+version 0.103005
 
 =head1 OVERVIEW
 
@@ -79,7 +79,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

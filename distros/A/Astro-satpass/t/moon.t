@@ -7,7 +7,7 @@ use lib qw{ inc };
 
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Moon;
-use Astro::Coord::ECI::Utils qw{ :time deg2rad PI TWOPI };
+use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PI TWOPI };
 use My::Module::Test qw{ :tolerance format_time };
 use Test::More 0.88;
 
@@ -24,7 +24,7 @@ use Test::More 0.88;
 # disk.
 
 {
-    my $time = time_gm( 0, 0, 0, 12, 3, 1992 );
+    my $time = greg_time_gm( 0, 0, 0, 12, 3, 1992 );
 
     my ( $lat, $long, $delta ) = Astro::Coord::ECI::Moon->
 	dynamical( $time )->ecliptic();
@@ -45,7 +45,7 @@ use Test::More 0.88;
 # This test is based on Meeus' example 49.a, but worked backward.
 
 {
-    my $time = time_gm( 42, 37, 3, 18, 1, 1977 );
+    my $time = greg_time_gm( 42, 37, 3, 18, 1, 1977 );
 
     my $got = Astro::Coord::ECI::Moon->dynamical( $time )->phase();
     $got >= PI
@@ -60,7 +60,7 @@ use Test::More 0.88;
 # This test is based on Meeus' example 48.a.
 
 {
-    my $time = time_gm( 0, 0, 0, 12, 3, 1992 );
+    my $time = greg_time_gm( 0, 0, 0, 12, 3, 1992 );
     my ( $phase, $illum ) =
 	Astro::Coord::ECI::Moon->dynamical( $time )->phase();
 
@@ -77,8 +77,8 @@ use Test::More 0.88;
 # This test is based on Meeus' example 49.1, right way around.
 
 {
-    my $time = time_gm( 0, 0, 0, 1, 1, 1977 );
-    my $want = time_gm( 42, 37, 3, 18, 1, 1977 );
+    my $time = greg_time_gm( 0, 0, 0, 1, 1, 1977 );
+    my $want = greg_time_gm( 42, 37, 3, 18, 1, 1977 );
     my $moon = Astro::Coord::ECI::Moon->new();
     my $tolerance = 2;
 
@@ -128,7 +128,7 @@ SKIP: {
 	0,		# http://aa.usno.navy.mil/data/docs/RS_OneDay.php
     );
     my $moon = Astro::Coord::ECI::Moon->new();
-    my $time = time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
+    my $time = greg_time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
 
     my @events = $moon->universal( $time )->almanac( $sta );
 
@@ -144,7 +144,7 @@ SKIP: {
 
     is $events[0][3], 'Moon rise', q{First event description is 'Moon rise'};
 
-    tolerance $events[0][0], time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
 	\&format_time;
 
@@ -158,7 +158,7 @@ SKIP: {
     is $events[1][3], 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1][0], time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
 	\&format_time;
 
@@ -171,7 +171,7 @@ SKIP: {
 
     is $events[2][3], 'Moon set', q{Third event description is 'Moon set'};
 
-    tolerance $events[2][0], time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
 	\&format_time;
 }
@@ -188,7 +188,7 @@ SKIP: {
 	0,		# http://aa.usno.navy.mil/data/docs/RS_OneDay.php
     );
     my $moon = Astro::Coord::ECI::Moon->new( station => $sta );
-    my $time = time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
+    my $time = greg_time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
 
     my @events = $moon->universal( $time )->almanac();
 
@@ -204,7 +204,7 @@ SKIP: {
 
     is $events[0][3], 'Moon rise', q{First event description is 'Moon rise'};
 
-    tolerance $events[0][0], time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance $events[0][0], greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
 	\&format_time;
 
@@ -218,7 +218,7 @@ SKIP: {
     is $events[1][3], 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1][0], time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance $events[1][0], greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
 	\&format_time;
 
@@ -231,7 +231,7 @@ SKIP: {
 
     is $events[2][3], 'Moon set', q{Third event description is 'Moon set'};
 
-    tolerance $events[2][0], time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance $events[2][0], greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
 	\&format_time;
 }
@@ -245,7 +245,7 @@ SKIP: {
 	0,		# http://aa.usno.navy.mil/data/docs/RS_OneDay.php
     );
     my $moon = Astro::Coord::ECI::Moon->new();
-    my $time = time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
+    my $time = greg_time_gm( 0, 0, 5, 1, 0, 2008 );	# Jan 1, 2008 in TZ -5
 
     my @events = $moon->universal( $time )->almanac_hash( $sta );
 
@@ -264,7 +264,7 @@ SKIP: {
     is $events[0]{almanac}{description}, 'Moon rise',
 	q{First event description is 'Moon rise'};
 
-    tolerance $events[0]{time}, time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
+    tolerance $events[0]{time}, greg_time_gm( 0, 15,  6, 1, 0, 2008 ), 60,
 	'Moon rise occurred at January 1 2008 6:15:00 GMT',
 	\&format_time;
 
@@ -280,7 +280,7 @@ SKIP: {
     is $events[1]{almanac}{description}, 'Moon transits meridian',
 	q{Second event description is 'Moon transits meridian'};
 
-    tolerance $events[1]{time}, time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
+    tolerance $events[1]{time}, greg_time_gm( 0, 46, 11, 1, 0, 2008 ), 60,
 	'Moon culmination occurred at January 1 2008 11:46:00 GMT',
 	\&format_time;
 
@@ -296,7 +296,7 @@ SKIP: {
     is $events[2]{almanac}{description}, 'Moon set',
 	q{Third event description is 'Moon set'};
 
-    tolerance $events[2]{time}, time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
+    tolerance $events[2]{time}, greg_time_gm( 0, 8,  17, 1, 0, 2008 ), 60,
 	'Moon set occurred at January 1 2008 17:08:00 GMT',
 	\&format_time;
 }

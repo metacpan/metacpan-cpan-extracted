@@ -3,7 +3,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::lib::Test::HT;
+use lib 't/lib';
+use Test::HT;
 
 ht_test(MultipleChoices => { location => '/test' }, {
     code    => 300,

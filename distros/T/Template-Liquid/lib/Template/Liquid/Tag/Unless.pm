@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Unless;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
 use base 'Template::Liquid::Tag::If';
@@ -12,8 +12,7 @@ sub render {
              @{$s->{'blocks'}->[0]->{'conditions'}});
     for my $index (1 .. $#{$s->{'blocks'}}) {
         my $block = $s->{'blocks'}->[$index];
-        return $block->render()
-            if grep { $_ || 0 } @{$block->{'conditions'}};
+        return $block->render() if grep { $_ || 0 } @{$block->{'conditions'}};
     }
 }
 1;
@@ -28,8 +27,8 @@ Template::Liquid::Tag::Unless - Unless: The Opposite of If
 
 =head1 Description
 
-Unless is the opposite of L<if|Template::Liquid::Tag::If>. The block is rendered
-I<unless> the conditon is true.
+Unless is the opposite of L<if|Template::Liquid::Tag::If>. The block is
+rendered I<unless> the conditon is true.
 
 =head1 Synopsis
 
@@ -41,13 +40,14 @@ I<unless> the conditon is true.
 
 =head1 Bugs
 
-Since L<unless|Template::Liquid::Tag::Unless> is simply a subclass, see the list of
-bugs for L<if|Template::Liquid::Tag::If>. They basically apply here too.
+Since L<unless|Template::Liquid::Tag::Unless> is simply a subclass, see the
+list of bugs for L<if|Template::Liquid::Tag::If>. They basically apply here
+too.
 
 =head1 See Also
 
-See L<Template::Liquid::Condition|Template::Liquid::Condition> for a list of supported
-inequalities.
+See L<Template::Liquid::Condition|Template::Liquid::Condition> for a list of
+supported inequalities.
 
 =head1 Author
 
@@ -65,9 +65,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

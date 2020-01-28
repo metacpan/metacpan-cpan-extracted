@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2010 Mons Anderson <mons@cpan.org>. All rights reserved
+# Copyright (c) 2007-2020 Mons Anderson <mons@cpan.org>. All rights reserved
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 package lib::abs;
@@ -10,7 +10,7 @@ lib::abs - C<lib> that makes relative path absolute to caller.
 
 =cut
 
-our $VERSION = '0.93';
+our $VERSION = '0.95';
 
 =head1 SYNOPSIS
 
@@ -81,12 +81,11 @@ A: There are several reasons:
 
 None known
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2010 Mons Anderson.
+This software is copyright (c) 2007-2020 by Mons Anderson.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 
@@ -156,7 +155,9 @@ sub transform {
 					defined $x ? ($x) : ();
 				} glob $abs;
 			} else {
-				$_ = abs_path( $abs ) and -d $_
+				eval {
+					$_ = abs_path( $abs );
+				1} and -d $_
 					or $SOFT or _croak("Bad path specification: `$lib' => `$abs'" . ($! ? " ($!)" : ''));
 				_debug "$lib => $_" if DEBUG > 1;
 				defined $_ ? ($_) : ();

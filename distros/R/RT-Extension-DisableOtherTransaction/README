@@ -1,0 +1,42 @@
+NAME
+    RT-Extension-DisableOtherTransaction - Disables other transaction
+    messages
+
+DESCRIPTION
+    Hides the status messages like message sent, and ticket owner changed
+
+RT VERSION
+    Works with RT [What versions of RT is this known to work with?]
+
+    [Make sure to use requires_rt and rt_too_new in Makefile.PL]
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::DisableOtherTransaction');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    All bugs should be reported via email to
+        bug-RT-Extension-DisableOtherTransaction@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-DisableOtherTransaction
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2020 by fazekas.balint@mithrandir.hu
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

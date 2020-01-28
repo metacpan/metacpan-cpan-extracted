@@ -1,5 +1,9 @@
 Revision history for Perl module CBOR::PP
 
+0.04
+- Fix preservation of text string typing with all-ASCII text strings.
+- Fix tests with quad-math perls.
+
 0.03 Sun 12 May 2019
 - Another long-double fix--this one hopefully for good. :)
 

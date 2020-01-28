@@ -1,6 +1,5 @@
 package Bio::DB::EUtilities;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::DB::EUtilities::VERSION = '1.75';
+$Bio::DB::EUtilities::VERSION = '1.76';
 use utf8;
 use strict;
 use warnings;
@@ -388,7 +387,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -396,7 +395,7 @@ Bio::DB::EUtilities - Webagent which interacts with and retrieves data from NCBI
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -1164,7 +1163,7 @@ ones deemed absolutely necessary).  All others are available by calling
             are recognized (case-insensitive):
 
             'all' - rewind all objects and also recursively resets nested object
-                    interators (such as LinkSets and DocSums).
+                    iterators (such as LinkSets and DocSums).
             'globalqueries'
             'fieldinfo' or 'fieldinfos'
             'linkinfo' or 'linkinfos'
@@ -1223,14 +1222,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem
@@ -1242,7 +1240,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://github.com/bioperl/%%7Bdist%7D
+  https://github.com/bioperl/bio-eutilities/issues
 
 =head1 AUTHOR
 

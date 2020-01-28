@@ -180,13 +180,17 @@ def generate_perl_imports(project_shortname, components):
     if not os.path.exists("Perl"):
         os.makedirs("Perl")
     file_path = os.path.join("Perl", _perl_file_name_from_shortname(project_shortname))
+
+    children_omit_support = '    if ({}->can("children")) {{\n        if (((scalar @_) % 2)) {{\n            unshift @_, "children";\n        }}\n    }}\n'
+
     with open(file_path, 'w') as f:
         base_package_name = _perl_package_name_from_shortname(project_shortname)
         header_string = 'package ' + base_package_name + ';\nuse strict;\nuse warnings;\nuse Module::Load;\n\n'
         f.write(header_string)
         imports_string = '\n'.join(
-            'sub {} {{\n    shift @_;\n    load {};\n    return {}->new(@_);\n}}\n'.format(
+            ('sub {} {{\n    shift @_;\n    load {};\n' + children_omit_support + '    return {}->new(@_);\n}}\n').format(
                     x,
+                    base_package_name + "::" + x,
                     base_package_name + "::" + x,
                     base_package_name + "::" + x
                 ) for x in components)
@@ -202,8 +206,9 @@ def generate_perl_imports(project_shortname, components):
         header_string = 'package ' + functions_package_name + ';\nuse strict;\nuse warnings;\nuse Module::Load;\nuse Exporter::Auto;\n\n'
         f.write(header_string)
         imports_string = '\n'.join(
-            'sub {} {{\n    load {};\n    return {}->new(@_);\n}}\n'.format(
+            ('sub {} {{\n    load {};\n' + children_omit_support + '    return {}->new(@_);\n}}\n').format(
                     x,
+                    base_package_name + "::" + x,
                     base_package_name + "::" + x,
                     base_package_name + "::" + x
                 ) for x in components)

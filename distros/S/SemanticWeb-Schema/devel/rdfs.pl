@@ -20,7 +20,7 @@ use Text::Wrap qw/ wrap /;
 use Types::Standard -types;
 use URI;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 const my $MAX_ABSTRACT_LENGTH => 44;    # See ExtUtils::ModuleMaker
 
@@ -106,13 +106,13 @@ has definition => (
             ## 'http://dublincore.org/2012/06/14/dcterms.rdf',
 #            'https://schema.org/version/4.0/all-layers.rdf',
 #            'https://schema.org/version/4.0/ext-attic.rdf',
-            'https://schema.org/version/5.0/ext-auto.rdf',
-            'https://schema.org/version/5.0/ext-bib.rdf',
-            'https://schema.org/version/5.0/ext-health-lifesci.rdf',
+            'https://schema.org/version/6.0/ext-auto.rdf',
+            'https://schema.org/version/6.0/ext-bib.rdf',
+            'https://schema.org/version/6.0/ext-health-lifesci.rdf',
             # 'https://schema.org/version/4.0/ext-iot.rdf',
-            'https://schema.org/version/5.0/ext-meta.rdf',
-            'https://schema.org/version/5.0/ext-pending.rdf',
-            'https://schema.org/version/5.0/schema.rdf',
+            'https://schema.org/version/6.0/ext-meta.rdf',
+            'https://schema.org/version/6.0/ext-pending.rdf',
+            'https://schema.org/version/6.0/schema.rdf',
         ]
     },
 );

@@ -6,6 +6,11 @@ use Module::Load;
 sub DataTable {
     shift @_;
     load Dash::Table::DataTable;
+    if ( Dash::Table::DataTable->can("children") ) {
+        if ( ( ( scalar @_ ) % 2 ) ) {
+            unshift @_, "children";
+        }
+    }
     return Dash::Table::DataTable->new(@_);
 }
 1;
@@ -22,7 +27,7 @@ Dash::Table
 
 =head1 VERSION
 
-version 0.06
+version 0.10
 
 =head1 AUTHOR
 

@@ -12,8 +12,8 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
             "schema:Service",
+            "schema:ContactPoint",
             "schema:LocationFeatureSpecification"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
@@ -25,16 +25,16 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:PriceSpecification",
             "schema:Permit",
-            "schema:Demand",
+            "schema:MonetaryAmount",
             "schema:Offer",
-            "schema:MonetaryAmount"
+            "schema:Demand",
+            "schema:OpeningHoursSpecification",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:validThrough" : {
@@ -44,16 +44,16 @@
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:Offer",
+            "schema:MonetaryAmount",
             "schema:Demand",
             "schema:PriceSpecification",
-            "schema:MonetaryAmount",
             "schema:OpeningHoursSpecification",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       }
    }

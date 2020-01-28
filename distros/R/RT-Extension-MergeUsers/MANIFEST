@@ -4,8 +4,6 @@ bin/rt-merge-users.in
 bin/rt-update-merged-users.in
 Changes
 html/Callbacks/RT-Extension-MergeUsers/Admin/Users/Modify.html/RightColumnBottom
-html/Callbacks/RT-Extension-MergeUsers/User/Elements/AssetList/ModifyAssetSearch
-html/Callbacks/RT-Extension-MergeUsers/User/Elements/TicketList/ModifyWatcherSQL
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -19,7 +17,6 @@ inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/unicore/Name.pm
 inc/YAML/Tiny.pm
 lib/RT/Extension/MergeUsers.pm
 lib/RT/Extension/MergeUsers/Test.pm
@@ -32,3 +29,4 @@ README
 xt/01merge_users.t
 xt/change_email.t
 xt/collection.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

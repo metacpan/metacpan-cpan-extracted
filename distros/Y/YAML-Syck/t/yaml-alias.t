@@ -2,20 +2,23 @@
 use Test::More tests => 14;
 use YAML::Syck;
 
+# These tests assume object creation.
+$YAML::Syck::LoadBlessed = 1;
+
 my ( $undumped, $roundtripped );
 
-$undumped = [ {} ];
+$undumped      = [ {} ];
 $undumped->[1] = $undumped->[0];
-$roundtripped = Load( Dump($undumped) );
+$roundtripped  = Load( Dump($undumped) );
 is( Dump($roundtripped), Dump($undumped), "array with anchor" );
 
 $undumped->[1]     = 'xyz';
 $roundtripped->[1] = 'xyz';
 is( Dump($roundtripped), Dump($undumped), "touched array with anchor" );
 
-$undumped = { abc => {} };
+$undumped          = { abc => {} };
 $undumped->{'def'} = $undumped->{'abc'};
-$roundtripped = Load( Dump($undumped) );
+$roundtripped      = Load( Dump($undumped) );
 is( Dump($roundtripped), Dump($undumped), "hash with anchor" );
 
 $undumped->{'def'}     = 'xyz';
@@ -31,7 +34,7 @@ $undumped->[0]     = 'xyz';
 $roundtripped->[0] = 'xyz';
 is( Dump($roundtripped), Dump($undumped), "touched huge array with anchor" );
 
-$undumped = { abc => {}, def => {} };
+$undumped                   = { abc => {}, def => {} };
 $undumped->{abc}->{sibling} = $undumped->{def};
 $undumped->{def}->{sibling} = $undumped->{abc};
 $roundtripped               = Load( Dump($undumped) );
@@ -53,7 +56,7 @@ $roundtripped->[3] = 'def';
 is( Dump($roundtripped), Dump($undumped), "touched many anchors" );
 
 my $s = 'scal';
-$undumped = [ \$s, \$s, \$s ];
+$undumped     = [ \$s, \$s, \$s ];
 $roundtripped = Load( Dump($undumped) );
 is( Dump($roundtripped), Dump($undumped), "scalar reference" );
 
@@ -65,7 +68,7 @@ my $os = bless \$s, 'obj_scal';
 my $oa = bless ['array'], 'obj_array';
 my $oh = bless { key => 'value' }, 'obj_hash';
 
-$undumped = [ $os, $oa, $oh, $os, $oa, $oh ];
+$undumped     = [ $os, $oa, $oh, $os, $oa, $oh ];
 $roundtripped = Load( Dump($undumped) );
 TODO: {
     local $TODO = "Skip this because anchor #1 is going to be truncated. no problem";

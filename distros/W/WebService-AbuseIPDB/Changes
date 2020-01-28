@@ -1,0 +1,13 @@
+Revision history for WebService-AbuseIPDB
+
+0.02 2020-01-23
+    - Add tests for version numbers
+
+0.01 2020-01-23
+    - Use Scalar::Util::blessed to prevent calling isa on non-objects
+    - Set minimum version of Test::MockModule to allow 'redefine'
+    - POD clean-up
+
+0.00 2020-01-22
+    - Initial public alpha release
+

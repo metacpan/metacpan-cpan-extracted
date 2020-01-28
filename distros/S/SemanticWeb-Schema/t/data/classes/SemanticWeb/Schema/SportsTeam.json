@@ -27,13 +27,13 @@
          "rdfs:label" : "gender",
          "schema:category" : "issue-2341",
          "schema:domainIncludes" : [
-            "schema:Person",
-            "schema:SportsTeam"
+            "schema:SportsTeam",
+            "schema:Person"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:GenderType",
-            "schema:Text"
+            "schema:Text",
+            "schema:GenderType"
          ]
       }
    }

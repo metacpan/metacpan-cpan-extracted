@@ -37,8 +37,8 @@
          "rdfs:label" : "expectedArrivalFrom",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:expectedArrivalUntil" : {
@@ -47,8 +47,8 @@
          "rdfs:label" : "expectedArrivalUntil",
          "schema:domainIncludes" : "schema:ParcelDelivery",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:hasDeliveryMethod" : {
@@ -89,17 +89,17 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:CreativeWork",
-            "schema:Service",
-            "schema:Reservation",
             "schema:Invoice",
+            "schema:ParcelDelivery",
             "schema:Trip",
-            "schema:ParcelDelivery"
+            "schema:EducationalOccupationalProgram",
+            "schema:Service",
+            "schema:CreativeWork",
+            "schema:Reservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:trackingNumber" : {

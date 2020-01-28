@@ -1,5 +1,5 @@
 package Test::Count::Filter;
-$Test::Count::Filter::VERSION = '0.1101';
+$Test::Count::Filter::VERSION = '0.1102';
 use warnings;
 use strict;
 
@@ -135,31 +135,6 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.1101
-
-=head1 SYNOPSIS
-
-    use Test::Count::Parser;
-
-    my $parser = Test::Count::Parser->new();
-
-    $parser->update_assignments($string);
-
-    $parser->update_count($string);
-
-    my $value = $parser->get_count();
-
-=head1 DESCRIPTION
-
-After initiating a parser one can input assignment expressions, and count
-update expressions. Both of them use arithmetic operations, integers, and
-Perl-like variable names.
-
-At the end one should call C<$parser->get_count()> in order to get the
-total number of tests.
-
 =head1 NAME
 
 Test::Count::Filter - a filter that counts the tests and updates the test count.
@@ -195,6 +170,31 @@ Can be a regex or a string.
 =head2 $filter->process()
 
 Processes the stream.
+
+=head1 VERSION
+
+version 0.1102
+
+=head1 SYNOPSIS
+
+    use Test::Count::Parser;
+
+    my $parser = Test::Count::Parser->new();
+
+    $parser->update_assignments($string);
+
+    $parser->update_count($string);
+
+    my $value = $parser->get_count();
+
+=head1 DESCRIPTION
+
+After initiating a parser one can input assignment expressions, and count
+update expressions. Both of them use arithmetic operations, integers, and
+Perl-like variable names.
+
+At the end one should call C<$parser->get_count()> in order to get the
+total number of tests.
 
 =head1 FUNCTIONS
 

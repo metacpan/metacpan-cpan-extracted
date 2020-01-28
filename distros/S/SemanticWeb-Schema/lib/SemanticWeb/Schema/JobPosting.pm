@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has applicant_location_requirements => (
     is        => 'rw',
     predicate => '_has_applicant_location_requirements',
     json_ld   => 'applicantLocationRequirements',
+);
+
+
+
+has application_contact => (
+    is        => 'rw',
+    predicate => '_has_application_contact',
+    json_ld   => 'applicationContact',
 );
 
 
@@ -54,6 +62,14 @@ has education_requirements => (
     is        => 'rw',
     predicate => '_has_education_requirements',
     json_ld   => 'educationRequirements',
+);
+
+
+
+has employer_overview => (
+    is        => 'rw',
+    predicate => '_has_employer_overview',
+    json_ld   => 'employerOverview',
 );
 
 
@@ -170,6 +186,14 @@ has occupational_category => (
 
 
 
+has physical_requirement => (
+    is        => 'rw',
+    predicate => '_has_physical_requirement',
+    json_ld   => 'physicalRequirement',
+);
+
+
+
 has qualifications => (
     is        => 'rw',
     predicate => '_has_qualifications',
@@ -198,6 +222,22 @@ has salary_currency => (
     is        => 'rw',
     predicate => '_has_salary_currency',
     json_ld   => 'salaryCurrency',
+);
+
+
+
+has security_clearance_requirement => (
+    is        => 'rw',
+    predicate => '_has_security_clearance_requirement',
+    json_ld   => 'securityClearanceRequirement',
+);
+
+
+
+has sensory_requirement => (
+    is        => 'rw',
+    predicate => '_has_sensory_requirement',
+    json_ld   => 'sensoryRequirement',
 );
 
 
@@ -266,7 +306,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -294,6 +334,24 @@ A applicant_location_requirements should be one of the following types:
 =head2 C<_has_applicant_location_requirements>
 
 A predicate for the L</applicant_location_requirements> attribute.
+
+=head2 C<application_contact>
+
+C<applicationContact>
+
+Contact details for further information relevant to this job posting.
+
+A application_contact should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
+
+=back
+
+=head2 C<_has_application_contact>
+
+A predicate for the L</application_contact> attribute.
 
 =head2 C<base_salary>
 
@@ -337,7 +395,7 @@ A predicate for the L</benefits> attribute.
 
 C<datePosted>
 
-Publication date for the job posting.
+Publication date of an online listing.
 
 A date_posted should be one of the following types:
 
@@ -370,6 +428,25 @@ A education_requirements should be one of the following types:
 =head2 C<_has_education_requirements>
 
 A predicate for the L</education_requirements> attribute.
+
+=head2 C<employer_overview>
+
+C<employerOverview>
+
+A description of the employer, career opportunities and work environment
+for this position.
+
+A employer_overview should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_employer_overview>
+
+A predicate for the L</employer_overview> attribute.
 
 =head2 C<employment_type>
 
@@ -512,6 +589,8 @@ A industry should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
 =item C<Str>
 
 =back
@@ -641,6 +720,29 @@ A occupational_category should be one of the following types:
 
 A predicate for the L</occupational_category> attribute.
 
+=head2 C<physical_requirement>
+
+C<physicalRequirement>
+
+A description of the types of physical activity associated with the job.
+Defined terms such as those in O*net may be used, but note that there is no
+way to specify the level of ability as well as its nature when using a
+defined term.
+
+A physical_requirement should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_physical_requirement>
+
+A predicate for the L</physical_requirement> attribute.
+
 =head2 C<qualifications>
 
 Specific qualifications required for this role or Occupation.
@@ -712,6 +814,47 @@ A salary_currency should be one of the following types:
 =head2 C<_has_salary_currency>
 
 A predicate for the L</salary_currency> attribute.
+
+=head2 C<security_clearance_requirement>
+
+C<securityClearanceRequirement>
+
+A description of any security clearance requirements of the job.
+
+A security_clearance_requirement should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_security_clearance_requirement>
+
+A predicate for the L</security_clearance_requirement> attribute.
+
+=head2 C<sensory_requirement>
+
+C<sensoryRequirement>
+
+A description of any sensory requirements and levels necessary to function
+on the job, including hearing and vision. Defined terms such as those in
+O*net may be used, but note that there is no way to specify the level of
+ability as well as its nature when using a defined term.
+
+A sensory_requirement should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_sensory_requirement>
+
+A predicate for the L</sensory_requirement> attribute.
 
 =head2 C<skills>
 
@@ -849,7 +992,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

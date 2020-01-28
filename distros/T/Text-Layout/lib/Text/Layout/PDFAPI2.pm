@@ -8,9 +8,44 @@ package Text::Layout::PDFAPI2;
 
 use Carp;
 
+my $hb;
+
 sub init {
     my ( $pkg, @args ) = @_;
     $args[0];
+}
+
+sub _hb_init {
+    return $hb if defined $hb;
+    $hb = 0;
+    eval {
+	require HarfBuzz::Shaper;
+	$hb = HarfBuzz::Shaper->new;
+    };
+    return $hb;
+}
+
+sub _hb_font_check {
+    my ( $f ) = @_;
+#    use DDumper; DDumper($f);
+    if ( $f->get_shaping ) {
+	my $fn = $f->to_string;
+	if ( $f->{font}->can("fontfilename") ) {
+	    _hb_init();
+	    if ( $hb ) {
+		# warn("Font $fn will use shaping.\n");
+	    }
+	    else {
+		carp("Font $fn: Requires shaping but HarfBuzz cannot be loaded.");
+	    }
+	}
+	else {
+	    carp("Font $fn: Shaping not supported");
+	}
+    }
+    else {
+	# warn("Font ", $f->to_string, " does not need shaping.\n");
+    }
 }
 
 sub render {
@@ -33,29 +68,45 @@ sub render {
     $text->save;
     foreach my $fragment ( @{ $ctx->{_content} } ) {
 	next unless length($fragment->{text});
-	my $f = $fragment->{font}->get_font($ctx) || $ctx->{_currentfont}->{font};
-	$text->font( $f, $fragment->{size} || $ctx->{_currentsize} );
+	my $f = $fragment->{font};
+	my $font = $f->get_font($ctx);
+	unless ( $font ) {
+	    $f = $ctx->{_currentfont};
+	    $font = $f->getfont;
+	}
 	$text->strokecolor( $fragment->{color} );
 	$text->fillcolor( $fragment->{color} );
+	$text->font( $font, $fragment->{size} || $ctx->{_currentsize} );
 
-	printf("%.2f %.2f \"%s\" %s\n",
-	       $x, $y-$fragment->{base}-$bl,
-	       $fragment->{text},
-	       join(" ", $fragment->{font}->{family},
-		    $fragment->{font}->{style},
-		    $fragment->{font}->{weight},
-		    $fragment->{size} || $ctx->{_currentsize},
-		    $fragment->{color},
-		   ),
-	       ) if 0;
-	if ( $ENV{CHORDPRO_DEBUG_TEXT} ) {
-	    printf STDERR ( "T: %6.2f %6.2f %4.1f \"%s\"\n",
-			    $x, $y-$fragment->{base}-$bl,
-			    $fragment->{size}, $fragment->{text} );
+	_hb_font_check($f);
+	if ( $hb && $font->can("fontfilename") ) {
+	    $hb->set_font( $font->fontfilename );
+	    $hb->set_size( $fragment->{size} || $ctx->{_currentsize} );
+	    $hb->set_text( $fragment->{text} );
+	    my $info = $hb->shaper;
+	    my $y = $y - $fragment->{base} - $bl;
+	    foreach my $g ( @$info ) {
+		$text->translate( $x + $g->{dx}, $y - $g->{dy} );
+		$text->glyphByCId( $g->{g} );
+		$x += $g->{ax};
+		$y -= $g->{ay};
+	    }
 	}
-	$text->translate( $x, $y-$fragment->{base}-$bl );
-	$text->text( $fragment->{text} );
-	$x += $f->width( $fragment->{text} ) * $fragment->{size};
+	else {
+	    printf("%.2f %.2f \"%s\" %s\n",
+		   $x, $y-$fragment->{base}-$bl,
+		   $fragment->{text},
+		   join(" ", $fragment->{font}->{family},
+			$fragment->{font}->{style},
+			$fragment->{font}->{weight},
+			$fragment->{size} || $ctx->{_currentsize},
+			$fragment->{color},
+		       ),
+		  ) if 0;
+	    $text->translate( $x, $y-$fragment->{base}-$bl );
+	    $text->text( $fragment->{text} );
+	    $x += $font->width( $fragment->{text} ) * $fragment->{size};
+	}
     }
     $text->restore;
 }
@@ -64,11 +115,30 @@ sub bbox {
     my ( $ctx ) = @_;
     my ( $x, $w, $d, $a ) = (0) x 4;
     foreach ( @{ $ctx->{_content} } ) {
-	my $font = $_->{font}->get_font($ctx);
+	my $f = $_->{font};
+	my $font = $f->get_font($ctx);
+	unless ( $font ) {
+	    $f = $ctx->{_currentfont};
+	    $font = $f->getfont;
+	}
 	my $upem = 1000;	# as delivered by PDF::API2
 	my $size = $_->{size};
 	my $base = $_->{base};
-	$w += $font->width( $_->{text} ) * $size;
+
+	_hb_font_check( $f );
+	if ( $hb && $font->can("fontfilename") ) {
+	    $hb->set_font( $font->fontfilename );
+	    $hb->set_size($size);
+	    $hb->set_text( $_->{text} );
+	    my $info = $hb->shaper;
+	    foreach my $g ( @$info ) {
+		$w += $g->{ax};
+	    }
+	}
+	else {
+	    $w += $font->width( $_->{text} ) * $size;
+	}
+
 	my ( $d0, $a0 );
 	if ( 1 ) {
 	    # Use descender/ascender.
@@ -120,5 +190,21 @@ sub load_font {
     $self->{cache}->{font} = $ff;
     return $ff;
 }
+
+################ Extensions to PDF::API2 ################
+
+sub PDF::API2::Content::glyphByCId {
+    my ( $self, $cid ) = @_;
+    $self->add( sprintf("<%04x> Tj", $cid ) );
+    $self->{' font'}->fontfile->subsetByCId($cid);
+}
+
+# HarfBuzz requires a TT/OT font. Define the fontfilename method only
+# for classes that HarfBuzz can deal with.
+sub PDF::API2::Resource::CIDFont::TrueType::fontfilename {
+    my ( $self ) = @_;
+    $self->fontfile->{' font'}->{' fname'};
+}
+
 
 1;

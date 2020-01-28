@@ -6,7 +6,7 @@ package SemanticWeb::Schema::VideoGallery;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CollectionPage /;
+extends qw/ SemanticWeb::Schema::MediaGallery /;
 
 
 use MooX::JSON_LD 'VideoGallery';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::VideoGallery - Web page type: Video gallery page.
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Web page type: Video gallery page.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CollectionPage>
+L<SemanticWeb::Schema::MediaGallery>
 
 =head1 SOURCE
 
@@ -64,7 +64,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

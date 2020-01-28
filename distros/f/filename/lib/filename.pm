@@ -1,22 +1,27 @@
 
+use v5.10.1;
+
 use strict;
 use warnings;
 
 use locale;    # localize $!
 
+use Array::RefElem ();  #qw( hv_store );
+
 package filename;
 # ABSTRACT: Perl module to load files at compile-time, without BEGIN blocks.
 
 
-use Carp 1.50  ();
-use File::Spec ();
+use Carp 1.50    ();
+use File::Spec   ();
+use Scalar::Util ();    #qw( blessed refaddr );
 
 
-our $VERSION = 'v0.20.010'; # VERSION
+our $VERSION = 'v0.20.022'; # VERSION
 
 
 
-my ( $do, $error ) = ();    # Private subs
+my ( $do, $eval, $check_inc, $error ) = ();    # Private subs
 
 # Modified version of the code as specified in `perldoc -f require`
 *import = \&require;
@@ -26,31 +31,110 @@ sub require {
     my $filename = @_ ? shift : $_;
     Carp::croak("Null filename used") unless length($filename);
 
-    return $INC{$filename} if ( exists $INC{$filename} );
+    if ( exists $INC{$filename} ) {
+        return 1 if $INC{$filename};
+        Carp::croak(
+              "Attempt to reload $filename aborted.\n"
+            . "Compilation failed in require"
+        );
+    }
 
     if ( File::Spec->file_name_is_absolute($filename) ) {
         goto NOT_INC if $^V < v5.17.0 && !-r $filename;
         return $do->($filename);
     }
     foreach my $inc (@INC) {
-        my $prefix = $inc;
-        #if ( my $ref = ref($inc) ) {
-        #    # TODO ...
-        #}
-        next unless -f ( my $fullpath = "$prefix/$filename" );
-        next if $^V < v5.17.0 && !-r _;
-        return $do->( $fullpath => $filename );
+        my $fullpath = $check_inc->( $inc, $filename );
+        next unless length($fullpath);
+        return ref($fullpath)
+            ? $eval->( $$fullpath => $filename, $inc )
+            : $do->( $fullpath => $filename );
     }
     NOT_INC:
-        Carp::croak("Can't locate $filename in \@INC (\@INC contains: @INC)");
+    my $module = "";
+    if ( v5.18.0 <= $^V && $^V < v5.26.0 ) {
+        if ( ( my $pm = $filename ) =~ s/\.pm\z// ) {
+            $pm =~ s!/!::!g;
+            $module = $pm;
+        }
+        $module = "(you may need to install the $module module) "
+            if $module;
+    }
+    Carp::croak(
+        "Can't locate $filename in \@INC $module(\@INC contains: @INC)");
 }
+
+### Private subs ###
+
+$check_inc = sub {
+    my ( $inc, $filename ) = @_;
+
+    if ( my $ref = ref($inc) ) {
+        my $subref = undef;
+        if ( defined( my $pkg = Scalar::Util::blessed($inc) ) ) {
+            $subref = $inc->can("INC")
+                or Carp::croak(
+                    qq!Can't locate object method "INC" via package "$pkg"!
+                );
+        } else {
+            $subref
+                = $ref eq "ARRAY" ? $inc->[0]
+                : $ref eq "CODE"  ? $inc
+                :                   return;
+        }
+        my @elems = $subref->( $inc, $filename );
+        return unless @elems && ( my $elem_ref = ref( $elems[0] ) );
+        # Possible elements of @elems:
+        # SCALAR - Prepended code
+        # IO     - Filehandle to read
+        # CODE   - Code to execute with IO
+        # REF    - State for CODE
+
+        my $code = "";
+        if ( $elem_ref eq "SCALAR" ) {
+            $code = ${ shift @elems };
+            $elem_ref = ref( $elems[0] );
+        }
+
+        my $fh = undef;
+        if ( $elem_ref eq "GLOB" ) {
+            $fh = shift @elems;
+            $fh = *{$fh}{IO};
+            $elem_ref = ref( $elems[0] );
+        }
+
+        my $sub   = undef;
+        my $state = undef;
+        if ( $elem_ref eq "CODE" ) {
+            ( $sub, $state ) = @elems;
+
+            local $_;
+            $code .= $_
+                while do { $_ = <$fh> if $fh; $sub->( 0, $state ); };
+        } elsif ($fh) {
+            local $_;
+            $code .= $_ while (<$fh>);
+        }
+
+        return \$code;
+    }
+
+    return unless length($inc);
+    my $fullpath = "$inc/$filename";
+    return unless -f $fullpath;
+    return if $^V < v5.17.0 && !-r _;
+    return $fullpath;
+};
 
 my $do_text = <<'END';
 package $pkg;
 my $result = do($fullpath);
-die $@ if $@;
 $INC{$filename} = delete $INC{$fullpath}
     if $filename ne $fullpath && exists $INC{$fullpath};
+if ($@) {
+    $INC{$filename} && Array::RefElem::hv_store( %INC, $filename, undef );
+    die $@;
+}
 $result;
 END
 $do = sub {
@@ -62,14 +146,38 @@ $do = sub {
     return eval $do_eval || $error->( $filename => $fullpath );
 };
 
-# Private sub
+my $eval_text = <<'END';
+package $pkg;
+my $result = eval $code;
+Array::RefElem::hv_store( %INC, $filename, $@ ? undef : $inc );
+die $@ if $@;
+$result;
+END
+$eval = sub {
+    my $code     = @_ ? shift : $_;
+    my $filename = @_ ? shift : $code;
+    my $inc      = @_ ? shift : $filename;
+    my ($pkg)    = caller(2);
+
+    my $tmpfile = sprintf( "/loader/0x%x/%s",
+        Scalar::Util::refaddr( \$code ),
+        $filename
+    );
+    $code = "#line 0 $tmpfile\n" . $code;
+
+    ( my $eval_eval = $eval_text ) =~ s/\$pkg/$pkg/;
+    return eval $eval_eval || $error->( $filename => $inc );
+};
+
 $error = sub {
     my $filename = @_ ? shift : $_;
     my $fullpath = @_ ? shift : $filename;
 
-    $INC{$filename} &&= undef($!); # $! is invalid if $INC{$filename} is true.
-
     $@ && Carp::croak( $@, "Compilation failed in require" );
+
+    # $INC{$filename} shouldn't be set if we've gotten here,
+    # and $! is invalid if $INC{$filename} is true.
+    delete $INC{$filename} && undef($!);
 
     $! && Carp::croak(
         "Can't locate $filename:   ",
@@ -98,7 +206,7 @@ filename - Perl module to load files at compile-time, without BEGIN blocks.
     # use the more succinct:
     use filename '/path/to/file.pm';
 
-    # Or, if you need to do include a file relative to the program:
+    # Or, if you need to include a file relative to the program:
     use FindBin qw($Bin);
     use filename "$Bin/../lib/Application.pm";
 
@@ -138,17 +246,9 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=head1 TODO
-
-=over
-
-=item * Handle references in C<@INC>
-
-=back
-
 =head1 VERSION
 
-This document describes version v0.20.010 of this module.
+This document describes version v0.20.022 of this module.
 
 =head1 AUTHOR
 

@@ -1,5 +1,7 @@
-ToDo Tasks:
+TODO Tasks:
 
- * IPv6 Support
- * Performance improvements
+* IPv6 Support
+* Performance improvements (do not roll 2**32 die, roll die with only enough
+  sides to select one of the non-excluded IPs)
+* Command Line Tool to generate IP addresses
 

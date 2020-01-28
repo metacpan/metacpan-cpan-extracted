@@ -111,6 +111,11 @@ Likewise, only C<groupby> conditions over literal indexed term-attributes are su
 DiaColloDB::Relation::Cofreqs inherits from
 L<DiaColloDB::Relation|DiaColloDB::Relation>.
 
+=item Variable: $WANT_XS
+
+Attempt to use optimized L<DiaColloDB::XS::CofUtils|DiaColloDB::XS::CofUtils> subroutines?
+Default: C<undef>: use XS if available.
+
 =back
 
 =cut
@@ -141,6 +146,7 @@ L<DiaColloDB::Relation|DiaColloDB::Relation>.
  pack_d   => $pack_d,     ##-- pack-tempalte for dates (default='n')
  keeptmp  => $bool,       ##-- keep temporary files? (default=false)
  logCompat => $level,     ##-- log-level for compatibility warnings (default='warn')
+ logXS     => $level,     ##-- log-level for XS/PP dispatch (default='trace')
  ##
  ##-- size info (after open() or load())
  size1    => $size1,      ##-- == $r1->size()
@@ -257,9 +263,16 @@ supports multiple lines for collocation-triples C<($i1,$d1,$i2)> provided the ab
 
 supports loading of C<$cof-E<gt>{N}> from single-value lines
 
-=back
+=item *
+
+uses optimized L<DiaColloDB::XS::CofUtils::loadTextFhXS|DiaColloDB::XS::CofUtils/loadTextFhXS> if available,
+otherwise pure-perl fallback C<loadTextFhPP()> in this package.
+
+=item *
 
 C<%opts>: clobber C<%$cof>
+
+=back
 
 
 
@@ -390,7 +403,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Bryan Jurish
+Copyright (C) 2015-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

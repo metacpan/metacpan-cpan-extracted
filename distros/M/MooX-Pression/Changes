@@ -6,6 +6,53 @@ Home page:    <https://metacpan.org/release/MooX-Pression>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.012	2020-01-26
+
+ [ Documentation ]
+ - Document how `sub` acts inside classes and roles.
+
+ [ Test Suite ]
+ - Test how `sub` acts inside classes.
+
+ [ Other ]
+ - Added: Parameterizable classes can now be nested inside regular classes.
+
+0.011	2020-01-25
+
+ [ Bug Fixes ]
+ - Fixes for parsing and interpreting () signatures.
+
+ [ Test Suite ]
+ - Tests of () signatures for methods, method modifiers, and
+   parameterizable classes.
+
+0.010	2020-01-24
+
+ [ Packaging ]
+ - Require MooX::Press 0.032.
+
+ [ Other ]
+ - Added: Anonymous classes.
+ - Added: Anonymous methods.
+ - Added: Anonymous parameterized classes.
+ - Added: Anonymous parameterized roles.
+ - Added: Anonymous roles.
+ - Added: Methods can now have an :optimize attribute.
+ - MooX::Pression now loads modern Perl features like `state` and `say`.
+
+0.009	2020-01-23
+
+ [ Documentation ]
+ - Document Sub::HandlesVia support.
+ - Document how to achieve the singleton pattern.
+
+ [ Packaging ]
+ - Require MooX::Press 0.030.
+
+ [ Other ]
+ - Added: Add a `toolkit` keyword.
+ - Tightened up grammar for parsing.
+
 0.008	2020-01-18
 
  [ Packaging ]

@@ -13,7 +13,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.94'; # VERSION
+our $VERSION = '1.96'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1117,6 +1117,12 @@ sub apply_plugin
 
 package Alien::Build::TempDir;
 
+# TODO: it's confusing that there is both a AB::TempDir and AB::Temp
+# although they do different things.  there could maybe be a better
+# name for AB::TempDir (maybe AB::TempBuildDir, though that is a little
+# redundant).  Happily both are private classes, and either are able to
+# rename, if a good name can be thought of.
+
 use Path::Tiny qw( path );
 use overload '""' => sub { shift->as_string }, bool => sub { 1 }, fallback => 1;
 use File::Temp qw( tempdir );
@@ -1159,7 +1165,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.94
+version 1.96
 
 =head1 SYNOPSIS
 
@@ -2120,7 +2126,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2019 by Graham Ollis.
+This software is copyright (c) 2011-2020 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

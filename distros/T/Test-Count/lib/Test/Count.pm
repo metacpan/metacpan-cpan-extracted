@@ -1,5 +1,5 @@
 package Test::Count;
-$Test::Count::VERSION = '0.1101';
+$Test::Count::VERSION = '0.1102';
 use warnings;
 use strict;
 
@@ -127,9 +127,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Test::Count - Module for keeping track of the number of tests in a test script.
+
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -157,10 +161,6 @@ tests in the file is:
     function! Perl_Tests_Count()
         %!perl -MTest::Count::Filter -e 'Test::Count::Filter->new({})->process()'
     endfunction
-
-=head1 NAME
-
-Test::Count - Module for keeping track of the number of tests in a test script.
 
 =head1 FUNCTIONS
 

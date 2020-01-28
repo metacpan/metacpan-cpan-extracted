@@ -1,5 +1,5 @@
 package Dir::Manifest::Slurp;
-$Dir::Manifest::Slurp::VERSION = '0.6.0';
+$Dir::Manifest::Slurp::VERSION = '0.6.1';
 use strict;
 use warnings;
 
@@ -40,13 +40,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.6.0
-
 =head1 NAME
 
 Dir::Manifest::Slurp - utility functions for slurping .
+
+=head1 VERSION
+
+version 0.6.1
 
 =head1 EXPORTS
 

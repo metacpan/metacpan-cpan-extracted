@@ -59,6 +59,12 @@ sub new {
 ##==============================================================================
 ## API: I/O
 
+## $ext = $doc->extension()
+##  + default extension, for Corpus::Compiled
+sub extension {
+  return '.tabs';
+}
+
 ##--------------------------------------------------------------
 ## API: I/O: parse
 

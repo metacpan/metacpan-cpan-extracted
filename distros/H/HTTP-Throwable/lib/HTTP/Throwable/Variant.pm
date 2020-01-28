@@ -1,6 +1,6 @@
 package HTTP::Throwable::Variant;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Variant::VERSION = '0.026';
+$HTTP::Throwable::Variant::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ HTTP::Throwable::Variant - a package that constructs Moo-based HTTP::Throwables 
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 OVERVIEW
 
@@ -53,7 +53,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Infinity Interactive, Inc..
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

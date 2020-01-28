@@ -274,7 +274,7 @@ sub STORABLE_freeze {
   return ('',[map { {%$_,(defined($_->{filenameRegex}) ? (filenameRegex=>"$_->{filenameRegex}") : qw())} } @{$obj->{reg}}]);
 }
 
-## $fsm = STORABLE_thaw($fsm, $cloning, $serialized, $ref1,...)
+## $obj = STORABLE_thaw($obj, $cloning, $serialized, $ref1,...)
 sub STORABLE_thaw {
   my ($obj,$cloning,$ser,$classes) = @_;
   $obj->clear();

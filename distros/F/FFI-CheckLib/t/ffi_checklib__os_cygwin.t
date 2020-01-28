@@ -16,7 +16,7 @@ my $mock = mock_dynaloader;
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'dinosaur' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'dinosaur' );
   is $path, $path2, 'scalar context';
 };
@@ -24,7 +24,7 @@ subtest 'find_lib (good)' => sub {
 subtest 'find_lib (good) with lib and version' => sub {
   my($path) = find_lib( lib => 'apatosaurus' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'apatosaurus' );
   is $path, $path2, 'scalar context';
 };
@@ -32,18 +32,18 @@ subtest 'find_lib (good) with lib and version' => sub {
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'foo' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'foo' );
   is $path, $path2, 'scalar context';
-  
-  my $dll = TestDLL->new($path);  
+
+  my $dll = TestDLL->new($path);
   is $dll->name,    'foo',   'dll.name = foo';
   is $dll->version, '1.2.3', 'dll.version = 1.2.3';
 };
 
 subtest 'find_lib (fail)' => sub {
   my @path = find_lib( lib => 'foobar' );
-  
+
   ok @path == 0, 'libfoobar not found';
 };
 
@@ -64,13 +64,13 @@ subtest 'find_lib list' => sub {
     is $bar->name, 'bar', 'dll.name = bar';
     is $bar->version, '1.2.3', 'dll.version = 1.2.3';
   };
-  
+
 };
 
 subtest 'find_lib libpath' => sub {
   my($path) = find_lib( lib => 'foo', libpath => 'corpus/unix/custom' );
   ok -r $path, "path = $path is readable";
-  my $dll = TestDLL->new($path);  
+  my $dll = TestDLL->new($path);
   is $dll->name,    'foo',    'dll.name = foo';
   is $dll->version, '1.2.3a', 'dll.version = 1.2.3a';
 };
@@ -78,7 +78,7 @@ subtest 'find_lib libpath' => sub {
 subtest 'find_lib libpath (list)' => sub {
   my($path) = find_lib( lib => 'foo', libpath => ['corpus/unix/custom']);
   ok -r $path, "path = $path is readable";
-  my $dll = TestDLL->new($path);  
+  my $dll = TestDLL->new($path);
   is $dll->name,    'foo',    'dll.name = foo';
   is $dll->version, '1.2.3a', 'dll.version = 1.2.3a';
 };
@@ -86,9 +86,9 @@ subtest 'find_lib libpath (list)' => sub {
 subtest 'find_lib symbol' => sub {
   my($path) = find_lib( lib => 'foo', symbol => 'foo_init' );
   ok -r $path, "path = $path is readable";
-  my $dll = TestDLL->new($path);  
+  my $dll = TestDLL->new($path);
   is $dll->name,    'foo',   'dll.name = foo';
-  is $dll->version, '1.2.3', 'dll.version = 1.2.3';  
+  is $dll->version, '1.2.3', 'dll.version = 1.2.3';
 };
 
 subtest 'find_lib symbol (bad)' => sub {
@@ -99,9 +99,9 @@ subtest 'find_lib symbol (bad)' => sub {
 subtest 'find_lib symbol (list)' => sub {
   my($path) = find_lib( lib => 'foo', symbol => ['foo_init', 'foo_new', 'foo_delete'] );
   ok -r $path, "path = $path is readable";
-  my $dll = TestDLL->new($path);  
+  my $dll = TestDLL->new($path);
   is $dll->name,    'foo',   'dll.name = foo';
-  is $dll->version, '1.2.3', 'dll.version = 1.2.3';  
+  is $dll->version, '1.2.3', 'dll.version = 1.2.3';
 };
 
 subtest 'find_lib symbol (list) (bad)' => sub {
@@ -110,20 +110,20 @@ subtest 'find_lib symbol (list) (bad)' => sub {
 };
 
 subtest 'assert_lib' => sub {
-  
+
   subtest 'found' => sub {
     eval { assert_lib( lib => 'foo' ) };
     is $@, '', 'no exception';
   };
-  
+
   subtest 'not found' => sub {
     eval { assert_lib( lib => 'foobar') };
-    isnt $@, '', 'exception'; 
+    isnt $@, '', 'exception';
   };
 };
 
 subtest 'check_lib' => sub {
-  
+
   is check_lib( lib => 'foo' ), 1, 'found';
   is check_lib( lib => 'foobar'), 0, 'not found';
 };
@@ -134,14 +134,14 @@ subtest 'verify bad' => sub {
     lib => 'foo',
     verify => sub { 0 },
   );
-  
+
   ok @lib == 0, 'returned empty list';
 
   @lib = find_lib(
     lib => 'foo',
     verify => [ sub { 0 } ],
   );
-  
+
   ok @lib == 0, 'returned empty list';
 
 };
@@ -156,7 +156,7 @@ subtest 'verify' => sub {
       $lib->version ne '1.2.3'
     },
   );
-  
+
   ok -r $lib, "path = $lib is readable";
   my $dll = TestDLL->new($lib);
   is $dll->name, 'foo', 'dll.name = foo';
@@ -180,7 +180,7 @@ subtest '_cmp' => sub {
       @_
     ];
   };
-  
+
   is(
     $process->(qw( cygfoo-1.dll cygbar-2.dll cygbaz-0.dll )),
     [

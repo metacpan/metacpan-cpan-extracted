@@ -7,7 +7,6 @@ build_requires:
   Test::Builder::Tester: '0'
   Test::Fatal: '0'
   Test::HexString: '0'
-  Test::Identity: '0'
   Test::More: '0.88'
   Test::Refcount: '0'
 configure_requires:
@@ -23,53 +22,53 @@ name: Tickit
 provides:
   Tickit:
     file: lib/Tickit.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Debug:
     file: lib/Tickit/Debug.pm
   Tickit::Event:
     file: lib/Tickit/Event.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Pen:
     file: lib/Tickit/Pen.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Pen::Immutable:
     file: lib/Tickit/Pen.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Pen::Mutable:
     file: lib/Tickit/Pen.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Rect:
     file: lib/Tickit/Rect.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::RectSet:
     file: lib/Tickit/RectSet.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::RenderBuffer:
     file: lib/Tickit/RenderBuffer.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::StringPos:
     file: lib/Tickit/StringPos.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Term:
     file: lib/Tickit/Term.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Test:
     file: lib/Tickit/Test.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Test::MockTerm:
     file: lib/Tickit/Test/MockTerm.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Utils:
     file: lib/Tickit/Utils.pm
-    version: '0.69'
+    version: '0.70'
   Tickit::Window:
     file: lib/Tickit/Window.pm
-    version: '0.69'
+    version: '0.70'
 requires:
   Exporter: '5.57'
-  Struct::Dumb: '0'
+  Struct::Dumb: '0.04'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.69'
+version: '0.70'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,12 +2,12 @@ package XS::Framework;
 use 5.018;
 use Config;
 use next::XS;
-use CPP::panda::lib;
+use Alien::libpanda;
 use XS::ErrorCode();
 use XS::STL::ErrorCode();
 use XS::STL::ErrorCategory();
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.4';
 
 # threads::shared doesn't respect the fact that PL_destroyhook might be in use by other modules and doesn't proxy call to next hook
 # so that we must hook after threads::shared

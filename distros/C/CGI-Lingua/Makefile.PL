@@ -151,8 +151,8 @@ EOF
 		}
 		return $rc;
 	} else {
-		print "On-line tests disabled because I couldn't detect an Internet connexion\n";
-		print "Consider installing IP::Country, Geo::IPfree or Geo::IP\n";
+		print "On-line tests disabled because I couldn't detect an Internet connexion\n",
+			"Consider installing IP::Country, Geo::IPfree or Geo::IP\n";
 		return 0;
 	}
 }

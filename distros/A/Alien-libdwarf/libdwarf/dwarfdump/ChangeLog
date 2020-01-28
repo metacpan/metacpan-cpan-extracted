@@ -1,0 +1,22 @@
+2020-01-14:
+    * dwarf_names.c,dwarf_names.h,dwarfdump-ta-ext-table.h,
+      dwarfdump-ta-table.h,dwarfdump-tt-ext-table.h,dwarfdump-tt-table.h:
+      Updated version string.
+2020-01-05:
+    * dwconf.c: Fix CoveritySan CID 206594 resource leak
+      if an error reading dwarfdump.conf.
+    * sanitized.c(no_questionable_chars): Fixed CoverityScan
+      CID 206595. The code was
+      failing to sanitize % characters: the test for %
+      has been moved up a few lines.
+      do_sanity_insert() had the same problem with %. Fixed.
+      And do_sanity_insert() had a final line of unreachable
+      code; now fixed by simplifying the code (an ASSERT
+      added in a comment). Coverity Scan CID 206596.
+    * print_die.c(traverse_one_die): Was failing to check
+      for the normal dwarf return int and letting 
+      next code deal with the fallout (and leak an error
+      record). Now we check and avoid any leak or surprise.      
+      Coverity Scan CID 20659
+
+

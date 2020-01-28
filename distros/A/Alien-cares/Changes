@@ -1,0 +1,10 @@
+1.1.1.4   27.01.2020
+           - fix headers installation
+1.1.1.3   27.01.2020
+           - remove C++ requirements, improve Makefile.PL
+1.1.1.2   27.01.2020
+           - use Alien::cmake3 instead of Alien::CMake
+1.1.1.1   26.01.2020
+           - fix Makefile.PL and manifest
+1.1.1.0   25.01.2020
+           - c-ares 1.1.1

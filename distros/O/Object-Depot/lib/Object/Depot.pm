@@ -1,5 +1,5 @@
 package Object::Depot;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 use strictures 2;
 
 =encoding utf8
@@ -37,13 +37,12 @@ do not need to know how to create the objects in order to use them.
 
 The primary use case for this library is for storing the connection
 logic to external services and making these connections globally
-available to all application logic.  See L<Object::Depot::Singleton>
-for turning your depot object into a global singleton.
+available to all application logic.  See L<Object::Depot::Role> for
+turning your depot object into a global singleton.
 
 =cut
 
 use Guard qw( guard );
-use Object::Depot::Singleton qw();
 use Carp qw();
 use Role::Tiny qw();
 use Scalar::Util qw( blessed );
@@ -115,36 +114,6 @@ sub _process_key_arg {
     return $key;
 }
 
-sub _export {
-    my $self = shift;
-    my $package = shift;
-
-    return if !$self->_has_export_name();
-
-    my $name = $self->export_name();
-    my $do_it = $self->always_export();
-
-    foreach my $arg (@_) {
-        if (defined($arg) and $arg eq $name) {
-            $do_it = 1;
-            next;
-        }
-
-        croakf(
-            'Unknown export, %s, passed to %s',
-            defined($arg) ? qq["$arg"] : 'undef',
-            $package,
-        );
-    }
-
-    return if !$do_it;
-
-    my $sub = subname $name => sub{ $self->fetch(@_) };
-    { no strict 'refs'; *{"$package\::$name"} = $sub };
-
-    return;
-}
-
 has _all_objects => (
     is      => 'ro',
     default => sub{ {} },
@@ -202,8 +171,8 @@ has class => (
 =head2 constructor
 
     constuctor => sub{
-        my ($depot, $args) = @_;
-        return $depot->class->new( $args );
+        my ($args) = @_;
+        return __PACKAGE__->depot->class->new( $args );
     },
 
 Set this to a code ref to control how objects get constructed.
@@ -224,17 +193,19 @@ has constructor => (
     isa => CodeRef,
 );
 
-my $class_constructor = sub{
-    my $depot = shift;
-    return $depot->class->new( @_ );
-};
-
 my $undef_constructor = sub{ undef };
 
 sub _build_constructor {
     my ($self) = @_;
-    return $class_constructor if $self->_has_class();
-    return $undef_constructor;
+
+    return $undef_constructor if !$self->_has_class();
+
+    return _build_class_constructor( $self->class() );
+}
+
+sub _build_class_constructor {
+    my ($class) = @_;
+    return sub{ $class->new( @_ ) };
 }
 
 =head2 type
@@ -258,6 +229,27 @@ sub _build_type {
     my ($self) = @_;
     return InstanceOf[ $self->class() ] if $self->_has_class();
     return Object;
+}
+
+=head2 injection_type
+
+    injection_type => Object,
+
+By default objects that are injected (see L</inject>) are validated
+against L</type>.  Set this to a type that injections validate
+against if it needs to be different (such as to support mock
+objects).
+
+=cut
+
+has injection_type => (
+    is  => 'lazy',
+    isa => InstanceOf[ 'Type::Tiny' ],
+);
+
+sub _build_injection_type {
+    my ($self) = @_;
+    return $self->type();
 }
 
 =head2 per_process
@@ -379,7 +371,7 @@ has default_arguments => (
 
     export_name => 'myapp_cache',
 
-Set the name of a function that L<Object::Depot::Singleton> will
+Set the name of a function that L<Object::Depot::Role> will
 export to importers of your depot package.
 
 Has no default.  If this is not set, then nothing will be exported.
@@ -396,7 +388,7 @@ has export_name => (
 
     always_export => 1,
 
-Turning this on causes L<Object::Depot::Singleton> to always export
+Turning this on causes L<Object::Depot::Role> to always export
 the L</export_name>, rather than only when listed in the import
 arguments. This is synonymous with the difference between
 L<Exporter>'s C<@EXPORT_OK> and C<@EXPORT>.
@@ -429,7 +421,8 @@ sub fetch {
 sub _fetch {
     my ($self, $key) = @_;
 
-    my $object = $self->_objects->{$key};
+    my $object = $self->_injections->{ $key };
+    $object ||= $self->_objects->{$key};
     return $object if $object;
 
     return undef if !$self->_has_class();
@@ -522,7 +515,7 @@ sub _create {
 
     my $args = $self->_arguments( $key, $extra_args );
 
-    my $object = $self->constructor->( $self, $args );
+    my $object = $self->constructor->( $args );
 
     croakf(
         'Constructor returned an invalid value, %s, for key %s: %s',
@@ -606,8 +599,8 @@ sub inject {
     my $object = shift;
     croakf(
         'Invalid object passed to inject(): %s',
-        $self->type->get_message( $object ),
-    ) if !$self->type->check( $object );
+        $self->injection_type->get_message( $object ),
+    ) if !$self->injection_type->check( $object );
 
     croak qq[Already injected key, "$key", passed to inject()]
         if exists $self->_injections->{$key};

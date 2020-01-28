@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2020 -- leonerd@leonerd.org.uk
 
 package Tickit;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.69';
+   our $VERSION = '0.70';
 }
 
 use Carp;
@@ -37,23 +37,23 @@ C<Tickit> - Terminal Interface Construction KIT
 
 =head1 SYNOPSIS
 
- use Tickit;
- use Tickit::Widget::Box;
- use Tickit::Widget::Static;
+   use Tickit;
+   use Tickit::Widget::Box;
+   use Tickit::Widget::Static;
 
- my $box = Tickit::Widget::Box->new(
-    h_border => 4,
-    v_border => 2,
-    bg       => "green",
-    child    => Tickit::Widget::Static->new(
-       text     => "Hello, world!",
-       bg       => "black",
-       align    => "centre",
-       valign   => "middle",
-    ),
- );
+   my $box = Tickit::Widget::Box->new(
+      h_border => 4,
+      v_border => 2,
+      bg       => "green",
+      child    => Tickit::Widget::Static->new(
+         text     => "Hello, world!",
+         bg       => "black",
+         align    => "centre",
+         valign   => "middle",
+      ),
+   );
 
- Tickit->new( root => $box )->run;
+   Tickit->new( root => $box )->run;
 
 =head1 DESCRIPTION
 
@@ -188,29 +188,89 @@ sub _make_tickit
    return Tickit::_Tickit->new( @_ );
 }
 
-=head2 later
+=head2 watch_later
 
-   $tickit->later( $code )
+   $id = $tickit->watch_later( $code )
+
+I<Since version 0.70.>
 
 Runs the given CODE reference at some time soon in the future. It will not be
 invoked yet, but will be invoked at some point before the next round of input
 events are processed.
 
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+=head2 later
+
+   $tickit->later( $code )
+
+For back-compatibility this method is a synonym for L</watch_later>.
+
 =cut
 
-sub later { shift->_tickit->watch_later( @_ ) }
+sub watch_later
+{
+   my $self = shift;
+   my ( $code ) = @_;
+
+   return $self->_tickit->watch_later( $code )
+}
+
+sub later { shift->watch_later( @_ ); return }
+
+=head2 watch_timer_at
+
+   $id = $tickit->watch_timer_at( $epoch, $code )
+
+I<Since version 0.70.>
+
+Runs the given CODE reference at the given absolute time expressed as an epoch
+number. Fractions are supported to a resolution of microseconds.
+
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+=cut
+
+sub watch_timer_at
+{
+   my $self = shift;
+   my ( $epoch, $code ) = @_;
+
+   return $self->_tickit->watch_timer_at( $epoch, $code );
+}
+
+=head2 watch_timer_after
+
+   $id = $tickit->watch_timer_after( $delay, $code )
+
+I<Since version 0.70.>
+
+Runs the given CODE reference at the given relative time expressed as a number
+of seconds hence. Fractions are supported to a resolution of microseconds.
+
+Returns an opaque integer value that may be passed to L</watch_cancel>. This
+value is safe to ignore if not required.
+
+=cut
+
+sub watch_timer_after
+{
+   my $self = shift;
+   my ( $delay, $code ) = @_;
+
+   return $self->_tickit->watch_timer_after( $delay, $code );
+}
 
 =head2 timer
 
- $id = $tickit->timer( at => $epoch, $code )
+   $id = $tickit->timer( at => $epoch, $code )
 
- $id = $tickit->timer( after => $delay, $code )
+   $id = $tickit->timer( after => $delay, $code )
 
-Runs the given CODE reference at some fixed point in time in the future.
-The first argmuent must be either the string C<at>, or C<after>; and specifies
-that second argument gives either the absolute epoch time (C<$epoch>), or the
-delay relative to now (C<$delay>), respectively. Fractions are supported to a
-resolution of microseconds.
+For back-compatibility this method is a wrapper for either L</watch_timer_at>
+or L</watch_timer_after> depending on the first argument.
 
 Returns an opaque integer value that may be passed to L</cancel_timer>. This
 value is safe to ignore if not required.
@@ -222,29 +282,37 @@ sub timer
    my $self = shift;
    my ( $mode, $amount, $code ) = @_;
 
-   my $tickit = $self->_tickit;
-
-   if( $mode eq "at" ) {
-      return $tickit->watch_timer_at_msec( $amount * 1000, $code );
-   }
-   elsif( $mode eq "after" ) {
-      return $tickit->watch_timer_after_msec( $amount * 1000, $code );
-   }
-   else {
-      croak "Mode should be 'at' or 'after'";
-   }
+   return $self->watch_timer_at   ( $amount, $code ) if $mode eq "at";
+   return $self->watch_timer_after( $amount, $code ) if $mode eq "after";
+   croak "Mode should be 'at' or 'after'";
 }
+
+=head2 watch_cancel
+
+   $tickit->watch_cancel( $id )
+
+I<Since version 0.70.>
+
+Removes an idle or timer watch previously installed by one of the other
+C<watch_*> methods. After doing so the code will no longer be invoked.
 
 =head2 cancel_timer
 
- $tickit->cancel_timer( $id )
+   $tickit->cancel_timer( $id )
 
-Removes a timer previously installed by L</timer>. After doing so the code
-will no longer be invoked.
+For back-compatibility this method is a synonym for L</watch_cancel>.
 
 =cut
 
-sub cancel_timer { shift->_tickit->watch_cancel( @_ ) }
+sub watch_cancel
+{
+   my $self = shift;
+   my ( $id ) = @_;
+
+   $self->_tickit->watch_cancel( $id );
+}
+
+sub cancel_timer { shift->watch_cancel( @_ ) }
 
 =head2 term
 
@@ -279,7 +347,7 @@ sub cols  { shift->term->cols  }
 Installs a callback to invoke if the given key is pressed, overwriting any
 previous callback for the same key. The code block is invoked as
 
- $code->( $tickit, $key )
+   $code->( $tickit, $key )
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 
@@ -359,10 +427,25 @@ sub set_root_widget
 
 =head2 tick
 
-   $tickit->tick
+   $tickit->tick( $flags )
 
 Run a single round of IO events. Does not call C<setup_term> or
 C<teardown_term>.
+
+C<$flags> may optionally be a bitmask of the following exported constants:
+
+=over 4
+
+=item RUN_NOHANG
+
+Does not block waiting for IO; simply process whatever is available then
+return immediately.
+
+=item RUN_NOSETUP
+
+Do not perform initial terminal setup before waiting on IO events.
+
+=back
 
 =cut
 
@@ -411,6 +494,23 @@ Causes a currently-running C<run> method to stop processing events and return.
 =cut
 
 sub stop { shift->_tickit->stop( @_ ) }
+
+=head1 MISCELLANEOUS FUNCTIONS
+
+=head2 version_major
+
+=head2 version_minor
+
+=head2 version_patch
+
+   $major = Tickit::version_major()
+   $minor = Tickit::version_minor()
+   $patch = Tickit::version_patch()
+
+These non-exported functions query the version of the F<libtickit> library
+that the module is linked to.
+
+=cut
 
 =head1 AUTHOR
 

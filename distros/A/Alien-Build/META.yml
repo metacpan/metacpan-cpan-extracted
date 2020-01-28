@@ -6,9 +6,6 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   Test2::API: '1.302096'
-  Test2::Mock: '0.000060'
-  Test2::Require: '0.000060'
-  Test2::Require::Module: '0.000060'
   Test2::V0: '0.000060'
   perl: '5.008001'
 configure_requires:
@@ -39,7 +36,6 @@ requires:
   File::chdir: '0'
   JSON::PP: '0'
   List::Util: '1.33'
-  Module::Load: '0'
   Path::Tiny: '0.077'
   Test2::API: '1.302096'
   Text::ParseWords: '3.26'
@@ -49,7 +45,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/Perl5-Alien/Alien-Build.git
-version: '1.94'
+version: '1.96'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

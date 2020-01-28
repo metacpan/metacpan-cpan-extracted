@@ -1,12 +1,11 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001003';
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001004';
 # ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
 use feature 'signatures';
 use MooX::Role::Parameterized;
 use Carp::Clan qw(^Net::Checkpoint::Management::v1);
-use Clone qw( clone );
 use Moo::Role; # last for cleanup
 
 no warnings "experimental::signatures";
@@ -49,12 +48,25 @@ role {
     });
 
     $mop->method('update_' . $params->{singular} => sub ($self, $object, $object_data) {
-        my $id = $object->{id};
+        my $updated_data = { %$object, %$object_data };
+        if (exists $params->{id_keys} && ref $params->{id_keys} eq 'ARRAY') {
+            # ensure that only a single key is passed to the update call
+            # the order of keys is the priority
+            my @id_keys = $params->{id_keys}->@*;
+            while (my $key = shift @id_keys) {
+                last
+                    if exists $updated_data->{$key}
+                    && defined $updated_data->{$key};
+            }
+            delete $updated_data->{$_}
+                for @id_keys;
+        }
+
         return $self->_update(join('/',
             '/web_api',
             'v' . $self->api_version,
             $params->{update}
-        ), $object, $object_data);
+        ), $updated_data);
     });
 
     $mop->method('delete_' . $params->{singular} => sub ($self, $object) {
@@ -106,7 +118,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Manag
 
 =head1 VERSION
 
-version 0.001003
+version 0.001004
 
 =head1 SYNOPSIS
 
@@ -124,6 +136,7 @@ version 0.001003
             update   => 'set-package',
             delete   => 'delete-package',
             list_key => 'packages',
+            id_keys  => [qw( uid name )],
         },
         {
             object   => 'accessrules',
@@ -134,6 +147,7 @@ version 0.001003
             update   => 'set-access-rule',
             delete   => 'delete-access-rule',
             list_key => 'rulebase',
+            id_keys  => ['uid', 'name', 'rule-number'],
         },
     ]);
 
@@ -208,7 +222,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alexander Hartmaier.
+This software is copyright (c) 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

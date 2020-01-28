@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -358,7 +358,10 @@ sub _build_event {
     $event_desc_ref->{quantifier}  //= q{};
     $state{$regex_ID}{$event_ID} = $event_desc_ref;
 
-    return qq{(?{Regexp::Debugger::_report_event($regex_ID, $event_ID, pos()); \$^R })(?=)};
+    # Work around for bug in infinite-recursion checking in Perl 5.24 to 5.30...
+    state $lookahead = $] <= 5.022 || $] >= 5.032 ? q{(?=)} : q{(?=[\d\D]?(?{1}))};
+
+    return qq{(?{Regexp::Debugger::_report_event($regex_ID, $event_ID, pos()); \$^R})$lookahead};
 }
 
 sub _build_whitespace_event {
@@ -3332,7 +3335,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002001
+This document describes Regexp::Debugger version 0.002002
 
 
 =head1 SYNOPSIS

@@ -77,12 +77,6 @@ my $OrderE9 = [
     'Sisimai::Lhost::SurfControl',
 ];
 
-my $OrderJ1 = [
-    # These modules support JSON structure
-    'Sisimai::Lhost::AmazonSES',
-    'Sisimai::Lhost::SendGrid',
-];
-
 # This variable don't hold MTA module name which have one or more MTA specific
 # header such as X-AWS-Outgoing, X-Yandex-Uniq.
 my $Pattern = {
@@ -229,35 +223,6 @@ sub headers {
     return $table;
 }
 
-sub forjson {
-    # Returns a list of MTA modules which are ebale to read JSON structure
-    # This method will be removed at the future release of Sisimai
-    # @return   [Array] Ordered module list
-    # @since v4.25.4
-    # @until v4.25.6
-    return $OrderJ1;
-}
-
-sub warn {
-    # Print warnings about an obsoleted method
-    # This method will be removed at the future release of Sisimai
-    # @until v4.25.6
-    my $class = shift;
-    my $useit = shift || '';
-    my $label = ' ***warning:';
-
-    my $calledfrom = [caller(1)];
-    my $modulename = $calledfrom->[3]; $modulename =~ s/::[a-zA-Z]+\z//;
-    my $methodname = $calledfrom->[3]; $methodname =~ s/\A.+:://;
-    my $messageset = sprintf("%s %s->%s is marked as obsoleted", $label, $modulename, $methodname);
-
-    $useit ||= $methodname;
-    $messageset .= sprintf(" and will be removed at %s.", Sisimai::Lhost->removedat);
-    $messageset .= sprintf(" Use %s->%s instead.\n", __PACKAGE__, $useit) if $useit ne 'gone';
-
-    warn $messageset;
-}
-
 1;
 __END__
 
@@ -282,7 +247,7 @@ X-Failed-Recipients, which MTA modules for JSON structure.
 
 =head2 C<B<by(I<STRING>)>>
 
-C<by()> recieves a pattern name string as the 1st argument and returns a table
+C<by()> receives a pattern name string as the 1st argument and returns a table
 of MTA module. As of present, only C<subject> is supported at the 1st argument.
 
     my $tab = Sisimai::Order->by('subject');
@@ -300,13 +265,6 @@ C<another()> returns another list of MTA modules as an array reference. Another
 list is defined at this class.
 
     print for @{ Sisimai::Order->another };
-
-=head2 C<B<forjson()>>
-
-C<forjson()> returns a list of MTA modules which are able to read bounce data
-in JSON structure as an array or a hash reference.
-
-    print for @{ Sisimai::Order->forjson };
 
 =head2 C<B<headers()>>
 

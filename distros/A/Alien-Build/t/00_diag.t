@@ -20,6 +20,7 @@ $modules{$_} = $_ for qw(
   Archive::Zip
   Capture::Tiny
   Devel::Hide
+  Env::ShellWords
   ExtUtils::CBuilder
   ExtUtils::MakeMaker
   ExtUtils::ParseXS
@@ -29,7 +30,7 @@ $modules{$_} = $_ for qw(
   File::Listing::Ftpcopy
   File::Which
   File::chdir
-  HTML::LinkExtor
+  HTML::Parser
   HTTP::Tiny
   IO::Compress::Bzip2
   IO::Socket::SSL
@@ -39,7 +40,6 @@ $modules{$_} = $_ for qw(
   LWP
   LWP::Protocol::https
   List::Util
-  Module::Load
   Mojo::DOM58
   Mojolicious
   Net::FTP
@@ -50,9 +50,6 @@ $modules{$_} = $_ for qw(
   Readonly
   Sort::Versions
   Test2::API
-  Test2::Mock
-  Test2::Require
-  Test2::Require::Module
   Test2::V0
   Text::ParseWords
   URI
@@ -155,3 +152,4 @@ if($post_diag)
 spacer;
 
 done_testing;
+

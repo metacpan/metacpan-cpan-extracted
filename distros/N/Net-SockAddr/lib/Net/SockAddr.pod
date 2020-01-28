@@ -1,0 +1,100 @@
+=head1 NAME
+
+Net::SockAddr - Socket address OO-wrapper with Perl and C++ interface.
+
+=head1 DESCRIPTION
+
+Supports AF_INET, AF_INET6 and AF_UNIX, can create sockaddrs and pack/unpack ips.
+
+=head1 SYNOPSIS
+
+    use Net::SockAddr;
+    
+    $sa = Net::SockAddr::Inet4->new("1.2.3.4", 80);
+    $sa = Net::SockAddr::Inet6->new("2001:db8::ae21:ad12", 80);
+    $sa = Net::SockAddr::Unix->new("/tmp/mysock");
+    connect($sock, $sa->get);
+
+    $sa = Net::SockAddr->new($connection->getpeername());
+    if ($sa->is_inet4 or $sa->is_inet6) {
+        say $sa->ip;
+        say $sa->port;
+    } else { # UNIX socket
+        say $sa->path;
+    }
+                       
+=head1 C SYNOPSIS
+
+    #include <panda/net/sockaddr.h>
+    using panda::net::SockAddr;
+    
+=head1 METHODS
+
+=head4 new($sa)
+
+Creates SockAddr object from C<$sa>. Return value will be of class L<Net::SockAddr::Inet4>, L<Net::SockAddr::Inet6> or L<Net::SockAddr::Unix>
+depending on the C<$sa>.
+
+C<$sa> may be:
+
+=over
+
+=item
+    
+    A binary string representing struct sockaddr_in/in6/un (like what Socket::sockaddr_in returns)
+    
+=item 
+
+    A C<Net::SockAddr> object. In this case, copy is created.
+    
+=back
+
+If C<$sa> is undefined or contains sockaddr with AF_UNSPEC family, constructor returns undef.
+
+=head4 family()
+
+Returns AF_INET / AF_INET6 / AF_UNIX
+
+=head4 is_inet4()
+
+Returns true if C<family == AF_INET>
+
+=head4 is_inet6()
+
+Returns true if C<family == AF_INET6>
+
+=head4 is_unix()
+
+Returns true if C<family == AF_UNIX>
+
+=head4 get()
+
+Returns binary string suitable for passing to Perl's C<connect()> functions (representing struct sockaddr_in/in6/un, like what Socket::sockaddr_in returns)
+
+=head4 operator ""
+
+Object stringifies to "ip:port" for IPv4, "[ip]:port" for IPv6 and "path" for AF_UNIX
+
+=head4 operator==, operator!=
+
+Two objects are equal if all properties of their underlying sockaddrs are equal
+
+=head1 TYPEMAP
+
+This module exposes C<panda::net::SockAddr> typemap to use from XS modules. This typemap allows for receiving binary or object-based sockaddr from perl.
+
+    #include <xs/net/sockaddr.h>
+    
+    string myfunc (panda::net::SockAddr sa) {
+        RETVAL = sa->ip();
+    }
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

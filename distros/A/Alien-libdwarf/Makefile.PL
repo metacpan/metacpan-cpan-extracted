@@ -1,0 +1,40 @@
+use strict;
+use warnings;
+
+use Env qw/@PATH/;
+use XS::Install;
+use Alien::cmake3;
+
+print "The module expects zlib and libelf (i.e. libelf-dev debian package) to be installed\n";
+
+my $tag     = '20200114';
+my $src_dir = "libdwarf";
+
+if (! -f "$src_dir/build/Makefile"){
+    print "Going to generate Makefile(s)\n";
+    unshift @PATH, Alien::cmake3->bin_dir;
+    mkdir "$src_dir/build" unless -d "$src_dir/build";
+    my $result = system("cd $src_dir/build && cmake -DBUILD_NON_SHARED=on -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=\"-O2 -fPIC\" ..");
+    die "FATAL: can't configure\n" if $result != 0;
+}
+
+my %params = (
+    NAME   => 'Alien::libdwarf',
+    LDFROM => '-Wl,--whole-archive $(OBJECT) -Wl,--no-whole-archive',
+    CLIB   => [
+        {DIR => "$src_dir/build/libdwarf/",  FILE => 'libdwarf.a'},
+    ],
+    LIBS      => '-lz -lelf',
+    BIN_SHARE => {
+        INCLUDE  => {
+            "$src_dir/libdwarf/"       => '/libdwarf',
+            "$src_dir/build/libdwarf/" => '/libdwarf',
+        },
+    },
+    CONFIGURE_REQUIRES => {
+        "ExtUtils::MakeMaker"   => '6.52',
+        "Alien::cmake3"         => '0.04',
+    },
+);
+
+write_makefile(%params);

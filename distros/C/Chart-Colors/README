@@ -1,4 +1,4 @@
-Chart-Colors version 1.02
+Chart-Colors version 1.03
 =========================
 
 -Perl extension to return an endless stream of new distinct RGB colours codes (good for coloring any number of chart lines)

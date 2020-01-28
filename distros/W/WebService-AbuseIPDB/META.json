@@ -1,0 +1,87 @@
+{
+   "abstract" : "Client for the API (version 2) of AbuseIPDB",
+   "author" : [
+      "Pete Houston <cpan@openstrike.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-AbuseIPDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.11",
+            "IO::Socket::SSL" : "1.31",
+            "JSON::XS" : "2.34",
+            "LWP::Protocol::https" : "6.04",
+            "REST::Client" : "272",
+            "Scalar::Util" : "1.14",
+            "URI" : "1.60",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0.14",
+            "Test::More" : "0.41"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::AbuseIPDB" : {
+         "file" : "lib/WebService/AbuseIPDB.pm",
+         "version" : "0.02"
+      },
+      "WebService::AbuseIPDB::Category" : {
+         "file" : "lib/WebService/AbuseIPDB/Category.pm",
+         "version" : "0.02"
+      },
+      "WebService::AbuseIPDB::CheckResponse" : {
+         "file" : "lib/WebService/AbuseIPDB/CheckResponse.pm",
+         "version" : "0.02"
+      },
+      "WebService::AbuseIPDB::ReportResponse" : {
+         "file" : "lib/WebService/AbuseIPDB/ReportResponse.pm",
+         "version" : "0.02"
+      },
+      "WebService::AbuseIPDB::Response" : {
+         "file" : "lib/WebService/AbuseIPDB/Response.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=WebService-AbuseIPDB"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/openstrike/abuseipdb-client.git",
+         "web" : "https://gitlab.com/openstrike/abuseipdb-client"
+      }
+   },
+   "version" : "0.02"
+}

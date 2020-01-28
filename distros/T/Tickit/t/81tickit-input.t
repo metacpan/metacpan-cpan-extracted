@@ -38,40 +38,63 @@ $tickit->tick;
 
 is( $got_Ctrl_A, 1, 'got Ctrl-A after ->tick' );
 
-my $rootwin = $tickit->rootwin;
+# input events on root window
+{
+   my $rootwin = $tickit->rootwin;
 
-my @key_events;
-$rootwin->bind_event( key => sub {
-   my ( $win, undef, $info ) = @_;
-   push @key_events, [ $info->type => $info->str ];
-} );
+   my @key_events;
+   $rootwin->bind_event( key => sub {
+      my ( $win, undef, $info ) = @_;
+      push @key_events, [ $info->type => $info->str ];
+      return 0;
+   } );
 
-my @mouse_events;
-$rootwin->bind_event( mouse => sub {
-   my ( $win, undef, $info ) = @_;
-   push @mouse_events, [ $info->type => $info->button, $info->line, $info->col ];
-} );
+   my @mouse_events;
+   $rootwin->bind_event( mouse => sub {
+      my ( $win, undef, $info ) = @_;
+      push @mouse_events, [ $info->type => $info->button, $info->line, $info->col ];
+   } );
 
-syswrite( $my_wr, "A" );
-$tickit->tick;
+   syswrite( $my_wr, "A" );
+   $tickit->tick;
 
-is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
+   is_deeply( \@key_events, [ [ text => "A" ] ], 'on_key A' );
 
-# We'll test with a Unicode character outside of Latin-1, to ensure it
-# roundtrips correctly
-#
-# 'ĉ' [U+0109] - LATIN SMALL LETTER C WITH CIRCUMFLEX
-#  UTF-8: 0xc4 0x89
+   # We'll test with a Unicode character outside of Latin-1, to ensure it
+   # roundtrips correctly
+   #
+   # 'ĉ' [U+0109] - LATIN SMALL LETTER C WITH CIRCUMFLEX
+   #  UTF-8: 0xc4 0x89
 
-undef @key_events;
-syswrite( $my_wr, "\xc4\x89" );
-$tickit->tick;
+   undef @key_events;
+   syswrite( $my_wr, "\xc4\x89" );
+   $tickit->tick;
 
-is_deeply( \@key_events, [ [ text => "\x{109}" ] ], 'on_key UTF-8' );
+   is_deeply( \@key_events, [ [ text => "\x{109}" ] ], 'on_key UTF-8' );
 
-syswrite( $my_wr, "\e[M !!" );
-$tickit->tick;
+   syswrite( $my_wr, "\e[M !!" );
+   $tickit->tick;
 
-is_deeply( \@mouse_events, [ [ press => 1, 0, 0 ] ], 'on_mouse @0,0' );
+   is_deeply( \@mouse_events, [ [ press => 1, 0, 0 ] ], 'on_mouse @0,0' );
+}
+
+# input events on term
+{
+   my @key_events;
+
+   # Don't strongly hold a $term object during the test, to check the objects
+   # behave sensibly
+   $tickit->term->bind_event( key => sub {
+      my ( $term, undef, $info ) = @_;
+      isa_ok( $term, "Tickit::Term", '$term' );
+      push @key_events, [ $info->type => $info->str ];
+      return 0;
+   } );
+
+   syswrite( $my_wr, "B" );
+   $tickit->tick;
+
+   is_deeply( \@key_events, [ [ text => "B" ] ], 'term on_key B' );
+}
 
 done_testing;

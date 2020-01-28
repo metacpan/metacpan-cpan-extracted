@@ -6,6 +6,12 @@ use Test::Fatal ();
 use Path::Tiny ();
 use File::pushd ();
 use Capture::Tiny ();
+use Config;
+
+# Microsoft nmake outputs a copyright message that
+# messes up the output checks, but we can work around
+# this by setting the -nologo option using MAKEFLAGS
+$ENV{MAKEFLAGS} = join(' ', 'nologo', ($ENV{MAKEFLAGS} // ())) if $Config{make} eq 'nmake';
 
 sub run_makemaker
 {

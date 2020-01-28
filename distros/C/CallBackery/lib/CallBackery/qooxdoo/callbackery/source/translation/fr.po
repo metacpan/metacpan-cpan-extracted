@@ -23,23 +23,23 @@ msgstr ""
 msgid "Version %1, %2%3"
 msgstr ""
 
-#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:109
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:110
 msgid "Login"
 msgstr ""
 
-#: callbackery/ui/Login.js:80
+#: callbackery/ui/Login.js:81
 msgid "User"
 msgstr ""
 
-#: callbackery/ui/Login.js:96
+#: callbackery/ui/Login.js:97
 msgid "Password"
 msgstr ""
 
-#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:112
+#: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:113
 msgid "OK"
 msgstr ""
 
-#: callbackery/ui/Login.js:137
+#: callbackery/ui/Login.js:138
 msgid "release %1, %2 by %3"
 msgstr ""
 
@@ -63,16 +63,39 @@ msgstr "No"
 msgid "RPC Error %1"
 msgstr ""
 
-#: callbackery/ui/TabView.js:45
+#: callbackery/ui/TabView.js:46
 msgid "Unsaved Data"
 msgstr ""
 
-#: callbackery/ui/TabView.js:46
+#: callbackery/ui/TabView.js:47
 msgid "This form contains unsaved data. Do you still want to switch?"
-msgstr "Ce formulaire contient des données non sauvegardées. Voulez-vous toujours changer?"
+msgstr ""
+"Ce formulaire contient des données non sauvegardées. Voulez-vous toujours "
+"changer?"
 
-#: callbackery/ui/form/Auto.js:72 callbackery/ui/form/Auto.js:80
+#: callbackery/ui/form/Auto.js:78 callbackery/ui/form/Auto.js:86
 msgid "dd.MM.yyyy"
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:83
+msgid "%1 copied to clipboard."
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:83
+msgid "Success"
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:84
+#: callbackery/ui/form/renderer/NoteForm.js:86
+msgid "Copy failed"
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:84
+msgid "Select %1 and press [ctr]+[c]"
+msgstr ""
+
+#: callbackery/ui/form/renderer/NoteForm.js:86
+msgid "Select %1 and press [ctrl]+[c]"
 msgstr ""
 
 #: callbackery/ui/plugin/Action.js:102 callbackery/ui/plugin/Action.js:133
@@ -98,7 +121,7 @@ msgstr ""
 msgid "Upload Exception"
 msgstr ""
 
-#: callbackery/ui/plugin/Form.js:213
+#: callbackery/ui/plugin/Form.js:225
 msgid "Loading Form Data"
 msgstr ""
 

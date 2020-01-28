@@ -1,5 +1,4 @@
 package NewsExtractor::SiteSpecificExtractor;
 use Moo;
-use Types::Standard qw(InstanceOf);
-has tx => ( required => 1, is => 'ro', isa => InstanceOf['Mojo::Transaction::HTTP'] );
+extends 'NewsExtractor::TXExtractor';
 1;

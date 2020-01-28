@@ -1,7 +1,7 @@
 package Perinci::Sub::To::FuncBase;
 
-our $DATE = '2019-07-26'; # DATE
-our $VERSION = '0.867'; # VERSION
+our $DATE = '2020-01-28'; # DATE
+our $VERSION = '0.869'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -228,7 +228,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.867 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2019-07-26.
+This document describes version 0.869 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2020-01-28.
 
 =for Pod::Coverage .+
 
@@ -254,7 +254,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

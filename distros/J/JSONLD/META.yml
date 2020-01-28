@@ -1,0 +1,44 @@
+---
+abstract: 'A toolkit for transforming JSON-LD data.'
+author:
+  - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
+  - 'Gregory Todd Williams <gwilliams@cpan.org>'
+build_requires:
+  Attean: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::Modern: 0.012
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSONLD
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Clone: 0
+  Debug::ShowStuff: 0
+  IRI: 0.01
+  JSON: 4.02
+  LWP: 0
+  LWP::Protocol::https: 0
+  List::Util: 1.33
+  Moo: 0
+  namespace::clean: 0
+  perl: 5.14.0
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  bugtracker: https://github.com/kasei/perl-jsonld/issues
+  homepage: http://search.cpan.org/dist/JSONLD/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/kasei/perl-jsonld/
+version: '0.002'

@@ -1,4 +1,5 @@
-Revision history for Perl extension ExtUtils::CppGuess.
+0.21 2020-01-23
+- no give $Config{ccflags} in Module::Build as add not replace - thanks @xenu
 
 0.20    Sat 31 Aug 22:20:32 BST 2019
     - no link -lstdc++ if -static-libstdc++ - thanks @andygrundman

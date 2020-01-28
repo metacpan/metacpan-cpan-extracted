@@ -1,10 +1,11 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 t/Mock/TestModule.pm
 t/Mock/StrictModule.pm
 t/Failures.t
+t/hidden_namespace.t
 t/StrictModule.pm
 t/Test-Mock-Simple.t
 t/TestModule.pm

@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.013";
+my $version = "0.014.1";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -15,6 +15,7 @@ WriteMakefile(
  ABSTRACT_FROM       => $master,
  LICENSE             => 'perl_5',
  PL_FILES            => {},
+ DIR		     => [],
  MIN_PERL_VERSION    => '5.010001',
  PREREQ_PM => {
      'ExtUtils::MakeMaker' => 6.46, # for META_MERGE, LICENSE

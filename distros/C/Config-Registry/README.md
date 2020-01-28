@@ -73,7 +73,7 @@ __PACKAGE__->schema({
 });
 ```
 
-The schema is a hash ref of attribute name and [Type::Tiny](https://metacpan.org/pod/Type::Tiny) pairs.
+The schema is a hash ref of attribute name and [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) pairs.
 These pairs get turned into required [Moo](https://metacpan.org/pod/Moo) attributes when
 ["publish"](#publish) is called.
 
@@ -99,7 +99,7 @@ __PACKAGE__->schema({
 });
 ```
 
-Non-top level keys can be made optional using [Type::Standard](https://metacpan.org/pod/Type::Standard)'s
+Non-top level keys can be made optional using [Type::Standard](https://metacpan.org/pod/Type%3A%3AStandard)'s
 `Optional` type modifier:
 
 ```perl

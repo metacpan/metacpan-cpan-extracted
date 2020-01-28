@@ -1,3 +1,7 @@
+1.06 2020-01-23
+
+* Adopt the testsuite for systems with directory separator other than '/'.
+
 1.05 2020-01-21
 
 * Fix the testsuite.

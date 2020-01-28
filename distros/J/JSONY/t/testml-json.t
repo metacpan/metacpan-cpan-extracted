@@ -1,8 +1,10 @@
-use lib (-e 't' ? 't' : 'test'), 'inc';
-use TestML1;
-use TestMLBridge;
+#!inc/bin/testml-cpan
 
-TestML1->new(
-    testml => 'testml/json.tml',
-    bridge => 'TestMLBridge',
-)->run;
+# Test various json streams, to make sure jsony can parse it properly.
+*json.jsony-load.yaml == *json.json-decode.yaml
+
+=== Various Numbers
+--- json: [1,-2,3,4.5,67,0.8e-9]
+
+=== Object with no space
+--- json: {"a":"b","c":{"d":"e"},"f":["g","h"],"i":[{},[],[[]]]}

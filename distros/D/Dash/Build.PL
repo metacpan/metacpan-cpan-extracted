@@ -22,17 +22,18 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Dash",
-  "dist_version" => "0.06",
+  "dist_version" => "0.10",
   "license" => "mit",
   "module_name" => "Dash",
   "recursive_test_files" => 1,
   "requires" => {
     "Browser::Open" => 0,
     "Exporter::Auto" => 0,
-    "File::ShareDir" => 0,
+    "File::ShareDir" => "1.116",
     "JSON" => 0,
     "Module::Load" => 0,
     "Mojo::Base" => 0,
+    "Mojolicious" => "8.27",
     "Moo" => 0,
     "Path::Tiny" => 0,
     "Scalar::Util" => 0,
@@ -40,9 +41,11 @@ my %module_build_args = (
     "Try::Tiny" => 0,
     "aliased" => 0,
     "namespace::clean" => 0,
+    "overload" => 0,
     "perl" => "5.020",
     "strict" => 0,
     "strictures" => 2,
+    "utf8" => 0,
     "warnings" => 0
   },
   "share_dir" => {
@@ -52,8 +55,7 @@ my %module_build_args = (
     "Test::Mojo" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "aliased" => 0,
-    "utf8" => 0
+    "aliased" => 0
   }
 );
 
@@ -63,8 +65,7 @@ my %fallback_build_requires = (
   "Test::Mojo" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "aliased" => 0,
-  "utf8" => 0
+  "aliased" => 0
 );
 
 

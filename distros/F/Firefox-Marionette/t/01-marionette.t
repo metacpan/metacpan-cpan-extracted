@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 407;
+use Test::More;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -19,7 +19,17 @@ my $terminated;
 
 my $test_time_limit = 90;
 
-delete $ENV{HOME};
+if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+} elsif ($> == 0) { # see RT#131304
+	my $current = $ENV{HOME};
+	my $correct = (getpwuid($>))[7];
+	if ($current eq $correct) {
+	} else {
+		$ENV{HOME} = $correct;
+		diag("Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}");
+		diag("Could be running in an environment where sudo does not reset the HOME environment variable, such as ubuntu");
+	}
+}
 
 $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
@@ -825,29 +835,113 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 4);
+		skip($skip_message, 6);
 	}
 	if (!$tls_tests_ok) {
-		skip("TLS test infrastructure seems compromised", 4);
+		skip("TLS test infrastructure seems compromised", 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
 		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
-		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 2);
+		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 4);
 	}
 	ok($capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is true");
 	ok($firefox->go(URI->new("https://untrusted-root.badssl.com/")), "https://untrusted-root.badssl.com/ has been loaded");
+	my $raw_pdf;
+	eval {
+		my $handle = $firefox->pdf();
+		my $result;
+		while($result = $handle->read(my $buffer, 4096)) {
+			$raw_pdf .= $buffer;
+		}
+		defined $result or die "Failed to read from File::Temp handle:$!";
+		close $handle or die "Failed to close File::Temp handle:$!";
+		diag("Window:Print command is supported for " . $capabilities->browser_version());
+		1;
+	} or do {
+		diag("Window:Print command is not supported for " . $capabilities->browser_version());
+		skip("Window:Print command is not supported for " . $capabilities->browser_version(), 2);
+	};
+	ok($raw_pdf =~ /^%PDF\-\d+[.]\d+/smx, "PDF is produced in file handle for pdf method");
+	eval { require PDF::API2; } or do {
+		diag("PDF::API2 is not available");
+		skip("PDF::API2 is not available", 2);
+	};
+	diag("PDF::API2 tests are being run");
+	my $pdf = PDF::API2->open_scalar($raw_pdf);
+	my $pages = $pdf->pages();
+	my $page = $pdf->openpage(0);
+	my ($llx, $lly, $urx, $ury) = $page->mediabox();
+	ok($urx == 612 && $ury == 792, "Correct page height ($ury) and width ($urx)");
+	if ($ENV{RELEASE_TESTING}) {
+		$raw_pdf = $firefox->pdf(raw => 1, landscape => 0, page => { width => 7, height => 12 });
+		$pdf = PDF::API2->open_scalar($raw_pdf);
+		$page = $pdf->openpage(0);
+		($llx, $lly, $urx, $ury) = $page->mediabox();
+		ok(centimetres_to_points(7) == $urx && centimetres_to_points(12) == $ury, "Correct page height of " . centimetres_to_points(12) . " (was actually $ury) and width " . centimetres_to_points(7) . " (was actually $urx)");
+		$raw_pdf = $firefox->pdf(raw => 1, landscape => 1, page => { width => 7, height => 12 });
+		$pdf = PDF::API2->open_scalar($raw_pdf);
+		$page = $pdf->openpage(0);
+		($llx, $lly, $urx, $ury) = $page->mediabox();
+		ok(centimetres_to_points(12) == $urx && centimetres_to_points(7) == $ury, "Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
+		foreach my $paper_size ($firefox->paper_sizes()) {
+			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size);
+			$pdf = PDF::API2->open_scalar($raw_pdf);
+			$page = $pdf->openpage(0);
+			($llx, $lly, $urx, $ury) = $page->mediabox();
+			ok($raw_pdf =~ /^%PDF\-\d+[.]\d+/smx, "Raw PDF is produced for pdf method with size of $paper_size (width $urx points, height $ury points)");
+		}
+		my %paper_sizes = (
+						'A4' => { width => 21, height => 29.7 },
+						'leTter' => { width => 21.6, height => 27.9 },
+					);
+		foreach my $paper_size (sort { $a cmp $b } keys %paper_sizes) {
+			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, margin => { top => 2, left => 2, right => 2, bottom => 2 });
+			ok($raw_pdf =~ /^%PDF\-\d+[.]\d+/smx, "Raw PDF is produced for pdf method");
+			$pdf = PDF::API2->open_scalar($raw_pdf);
+			$pages = $pdf->pages();
+			$page = $pdf->openpage(0);
+			($llx, $lly, $urx, $ury) = $page->mediabox();
+			ok(((centimetres_to_points($paper_sizes{$paper_size}->{height}) == $ury) || (centimetres_to_points($paper_sizes{$paper_size}->{height}) + 1) == $ury) &&
+			   ((centimetres_to_points($paper_sizes{$paper_size}->{width}) == $urx) || (centimetres_to_points($paper_sizes{$paper_size}->{width}) + 1) == $urx), "Correct page height ($ury) and width ($urx) for " . uc $paper_size);
+		}
+		my $result;
+		eval { $firefox->pdf(size => 'UM'); $result = 1; } or do {
+			$result = 0;
+			chomp $@;
+		};
+		ok($result == 0, "Correctly throws exception for unknown PDF page size:$@");
+		$result = undef;
+		eval { $firefox->pdf(margin => { foo => 21 }); $result = 1; } or do {
+			$result = 0;
+			chomp $@;
+		};
+		ok($result == 0, "Correctly throws exception for unknown margin key:$@");
+		$result = undef;
+		eval { $firefox->pdf(page => { bar => 21 }); $result = 1; } or do {
+			$result = 0;
+			chomp $@;
+		};
+		ok($result == 0, "Correctly throws exception for unknown page key:$@");
+	}
+}
+
+sub centimetres_to_points {
+	my ($centimetres) = @_;
+	my $inches = $centimetres / 2.54;
+	my $points = int $inches * 72;
+	return $points;
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -872,7 +966,7 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, har => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
+	($skip_message, $firefox) = start_firefox(0, har => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -891,7 +985,7 @@ SKIP: {
 	}
 	ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
         if ($tls_tests_ok) {
-		ok($firefox->go(URI->new("https://metacpan.org/")), "https://metacpan.org/ has been loaded");
+		ok($firefox->go(URI->new("https://fastapi.metacpan.org/author/DDICK")), "https://fastapi.metacpan.org/author/DDICK has been loaded");
 		if ($major_version < 61) {
 			skip("HAR support not available in Firefox before version 61", 1);
 		}
@@ -1520,7 +1614,11 @@ SKIP: {
 	ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
 	TODO: {
 		local $TODO = ($major_version < 56) ? "\$cookies[0]->expiry() does not function for Firefox versions less than 56" : undef;
-		ok(defined $cookies[0]->expiry() && $cookies[0]->expiry() =~ /^\d+$/, "The first cookie name has an integer expiry date of '" . ($cookies[0]->expiry() || q[]) . "'");
+		if (defined $cookies[0]->expiry()) {
+			ok($cookies[0]->expiry() =~ /^\d+$/, "The first cookie name has an integer expiry date of '" . ($cookies[0]->expiry() || q[]) . "'");
+		} else {
+			ok(1, "The first cookie is a session cookie");
+		}
 	}
 	ok($cookies[0]->http_only() =~ /^[01]$/, "The first cookie httpOnly flag is a boolean set to '" . $cookies[0]->http_only() . "'");
 	ok($cookies[0]->secure() =~ /^[01]$/, "The first cookie secure flag is a boolean set to '" . $cookies[0]->secure() . "'");
@@ -1601,7 +1699,7 @@ SKIP: {
 					||
 					(($major_version > $min_major)))
 			{
-				my $max_version = '72.0.1'; # known bad version
+				my $max_version = '72.0.2'; # known bad version
 				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
 				if ((($major_version == $max_major)
 						&& (defined $minor_version)
@@ -1739,7 +1837,7 @@ SKIP: {
 	ok($capabilities->timeouts()->page_load() =~ /^\d+$/, "\$capabilities->timeouts->page_load() is an integer:" . $capabilities->timeouts()->page_load());
 	ok($capabilities->timeouts()->script() =~ /^\d+$/, "\$capabilities->timeouts->script() is an integer:" . $capabilities->timeouts()->script());
 	ok($capabilities->timeouts()->implicit() =~ /^\d+$/, "\$capabilities->timeouts->implicit() is an integer:" . $capabilities->timeouts()->implicit());
-	ok($capabilities->browser_version() =~ /^\d+[.]\d+([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
+	ok($capabilities->browser_version() =~ /^\d+[.]\d+(?:[a]\d+)?([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
 	TODO: {
 		local $TODO = ($major_version < 31) ? "\$capabilities->platform_version() may not exist for Firefox versions less than 31" : undef;
 		ok(defined $capabilities->platform_version() && $capabilities->platform_version() =~ /\d+/, "\$capabilities->platform_version() contains a number:" . ($capabilities->platform_version() || ''));
@@ -2163,3 +2261,4 @@ my $output = "$@";
 chomp $output;
 ok($@->isa('Firefox::Marionette::Exception') && $@ =~ / in .* at line \d+/, "When File::Temp::newdir is forced to fail, a Firefox::Marionette::Exception is thrown:$output");
 
+done_testing();

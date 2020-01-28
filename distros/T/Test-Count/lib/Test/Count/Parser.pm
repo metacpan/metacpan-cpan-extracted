@@ -1,5 +1,5 @@
 package Test::Count::Parser;
-$Test::Count::Parser::VERSION = '0.1101';
+$Test::Count::Parser::VERSION = '0.1102';
 use warnings;
 use strict;
 
@@ -196,9 +196,13 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Test::Count::Parser - A Parser for Test::Count.
+
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -211,10 +215,6 @@ version 0.1101
     $parser->update_count($string);
 
     my $value = $parser->get_count();
-
-=head1 NAME
-
-Test::Count::Parser - A Parser for Test::Count.
 
 =head1 DESCRIPTIONS
 

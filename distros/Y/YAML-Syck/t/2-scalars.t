@@ -5,10 +5,13 @@ use TestYAML tests => 134;
 
 ok( YAML::Syck->VERSION, "YAML::Syck has a version and is loaded" );
 
-is( Dump(42),         "--- 42\n", 'Dump a simple number' );
-is( Load("--- 42\n"), 42, "Load a simple number");
+# These tests assume object creation.
+$YAML::Syck::LoadBlessed = 1;
 
-is( Dump( \42 ),                           "--- !!perl/ref \n=: 42\n", "A pointer to 42 dumps" );
+is( Dump(42),         "--- 42\n", 'Dump a simple number' );
+is( Load("--- 42\n"), 42,         "Load a simple number" );
+
+is( Dump( \42 ), "--- !!perl/ref \n=: 42\n", "A pointer to 42 dumps" );
 is( ${ Load("--- !!perl/ref \n=: 42\n") }, 42, "A pointer to 42 loads" );
 
 my $x;
@@ -56,7 +59,7 @@ my $sub = Load("--- !!perl/code: '{ \"foo\" . \$_[0] }'\n");
 
 ok( defined $sub );
 
-is( ref($sub), "CODE" );
+is( ref($sub),              "CODE" );
 is( eval { $sub->("bar") }, "foobar" );
 is( $@, "", "no error" );
 
@@ -238,7 +241,7 @@ is( Dump('oFF'),  "--- oFF\n" );     # invalid case
 is( Dump('nULL'), "--- nULL\n" );    # invalid case
 
 # RT 52432 - '... X'
-my $bad_hash = { '... X' => '' };
+my $bad_hash        = { '... X' => '' };
 my $bad_hash_should = "--- \n... X: ''\n";
 TODO: {
     local $TODO;

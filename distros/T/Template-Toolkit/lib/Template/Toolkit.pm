@@ -18,6 +18,8 @@
 
 package Template::Toolkit;
 
+our $VERSION = '3.007';
+
 1;
 
 __END__

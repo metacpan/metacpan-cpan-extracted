@@ -4,29 +4,22 @@ use Pcore -role, -sql, -res;
 
 with qw[Pcore::App::API::Role::Read];
 
+has max_limit        => undef;
+has default_order_by => sub { [ [ 'created', 'DESC' ] ] };
+
 sub API_read ( $self, $auth, $args ) {
-    state $total_sql = 'SELECT COUNT(*) AS "total" FROM "user_token"';
-    state $main_sql  = 'SELECT * FROM "user_token"';
-
-    my $owner = WHERE [ '"user_id" =', \$auth->{user_id} ];
-
-    my $where;
+    my $where = WHERE [ '"user_id" =', \$auth->{user_id} ];
 
     # get by id
     if ( exists $args->{id} ) {
-        $where = $owner & WHERE [ '"id" = ', SQL_UUID $args->{id} ];
+        $where &= WHERE [ '"id" = ', SQL_UUID $args->{id} ];
     }
 
-    # get all matched rows
-    else {
+    my $total_query = [ 'SELECT COUNT(*) AS "total" FROM "user_token"', $where ];
 
-        # default sort
-        $args->{sort} = [ [ 'created', 'DESC' ] ] if !$args->{sort};
+    my $main_query = [ 'SELECT * FROM "user_token"', $where ];
 
-        $where = $owner;
-    }
-
-    return $self->_read( $args, $total_sql, $main_sql, $where, 100 );
+    return $self->_read( $total_query, $main_query, $args );
 }
 
 sub API_create ( $self, $auth, $args ) {
@@ -56,7 +49,7 @@ sub API_set_enabled ( $self, $auth, $token_id, $enabled ) {
 }
 
 sub API_read_permissions ( $self, $auth, $args ) {
-    my $token_id = $args->{filter}->{token_id}->[1];
+    my $token_id = $args->{where}->{token_id}->[1];
 
     my $res = $self->_check_token_permissions( $auth->{user_id}, $token_id );
 

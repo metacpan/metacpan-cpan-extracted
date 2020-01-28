@@ -533,6 +533,13 @@ WATCHER TYPES
     $after = $w->remaining
         Calculates and returns the remaining time till the timer will fire.
 
+    $repeat = $w->repeat
+    $old_repeat = $w->repeat ($new_repeat)
+        Returns the current value of the repeat attribute and optionally
+        sets a new one. Setting the new one will not restart the watcher -
+        if the watcher is active, the new repeat value is used whenever it
+        expires next.
+
    PERIODIC WATCHERS - to cron or not to cron?
     $w = EV::periodic $at, $interval, $reschedule_cb, $callback
     $w = EV::periodic_ns $at, $interval, $reschedule_cb, $callback
@@ -621,6 +628,21 @@ WATCHER TYPES
 
     $time = $w->at
         Return the time that the watcher is expected to trigger next.
+
+    $offset = $w->offset
+    $old_offset = $w->offset ($new_offset)
+        Returns the current value of the offset attribute and optionally
+        sets a new one. Setting the new one will not restart the watcher -
+        if the watcher is active, the new offset value is used whenever it
+        expires next.
+
+    $interval = $w->interval
+    $old_interval = $w->interval ($new_interval)
+        See above, for the interval attribute.
+
+    $reschedule_cb = $w->reschedule_cb
+    $old_reschedule_cb = $w->reschedule_cb ($new_reschedule_cb)
+        See above, for the reschedule callback.
 
    SIGNAL WATCHERS - signal me when a signal gets signalled!
     $w = EV::signal $signal, $callback

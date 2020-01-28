@@ -1,3 +1,15 @@
+1.30     2020-01-26
+
+- Identical to 1.30.
+
+
+1.29     2020-01-18 (TRIAL RELEASE)
+
+- Added timelocal_posix() and timegm_posix() subs. These are _exact_ opposites
+  of Perl's localtime() and gmtime(), meaning that a round trip between the
+  two pairs always produces the same value.
+
+
 1.28     2018-06-12
 
 - Some tests which required support for epoch values larger than 2**32 were

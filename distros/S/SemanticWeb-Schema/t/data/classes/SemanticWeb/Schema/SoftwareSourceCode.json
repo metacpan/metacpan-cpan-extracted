@@ -26,8 +26,8 @@
          "rdfs:label" : "programmingLanguage",
          "schema:domainIncludes" : "schema:SoftwareSourceCode",
          "schema:rangeIncludes" : [
-            "schema:ComputerLanguage",
-            "schema:Text"
+            "schema:Text",
+            "schema:ComputerLanguage"
          ]
       },
       "schema:runtime" : {

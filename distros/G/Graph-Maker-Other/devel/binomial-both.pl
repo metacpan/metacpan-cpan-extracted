@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017, 2019 Kevin Ryde
+# Copyright 2015, 2017, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,7 +30,7 @@ use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
 {
   # BinomialBoth by order
@@ -44,18 +44,21 @@ $|=1;
   # order=7
 
   my @graphs;
-  foreach my $order (2 .. 7) {
+  foreach my $order (4) {
     my $graph = Graph::Maker->new('binomial_both',
                                   order => $order,
+                                  undirected => 0,
+                                  direction_type => 'bigger',
                                  );
-    binomial_xy_hypercube($graph);
-    binomial_xy_flat($graph);
+    # binomial_xy_hypercube($graph);
+    # binomial_xy_flat($graph);
+    binomial_xy_arithmetic($graph);
     print $graph->get_graph_attribute ('name'),"\n";
     push @graphs, $graph;
     if ($order==3) {
     }
-    # MyGraphs::Graph_view($graph);
-    # MyGraphs::hog_upload_html($graph);
+      MyGraphs::Graph_view($graph);
+      MyGraphs::hog_upload_html($graph);
   }
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
@@ -132,6 +135,33 @@ sub binomial_xy_flat {
     $x += ($i-$parent)>>1;
     ### set: "$i to $x,$y"
     MyGraphs::Graph_set_xy_points($graph, $i => [$x,$y]);
+  }
+}
+
+sub _count_1bits {
+  my ($n) = @_;
+  my $ret = 0;
+  while ($n) { $ret += $n&1; $n >>= 1; }
+  return $ret;
+}
+sub binomial_xy_arithmetic {
+  my ($graph) = @_;
+  foreach my $i (0 .. scalar($graph->vertices)-1) {
+    ### $i
+    MyGraphs::Graph_set_xy_points($graph, $i => [$i>>1, - _count_1bits($i)]);
+
+    # my $x = 0;
+    # my $y = 0;
+    # my $v = $i;
+    # while ($v) {
+    #   $v > 0 or die "$v";
+    #   my $low1 = (($v ^ ($v-1)) + 1) >> 1;
+    #   ### $v
+    #   ### $low1
+    #   $x += $low1 >> 1;
+    #   $y--;
+    #   $v -= $low1;
+    # }
   }
 }
 

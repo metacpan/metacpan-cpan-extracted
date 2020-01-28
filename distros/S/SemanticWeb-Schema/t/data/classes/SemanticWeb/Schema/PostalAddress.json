@@ -12,12 +12,12 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:PostalAddress",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Country"
+            "schema:Country",
+            "schema:Text"
          ]
       },
       "schema:addressLocality" : {
@@ -46,9 +46,9 @@
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
+            "schema:GeoCoordinates",
             "schema:GeoShape",
-            "schema:PostalAddress",
-            "schema:GeoCoordinates"
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

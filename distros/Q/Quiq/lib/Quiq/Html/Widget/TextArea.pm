@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 use Quiq::Html::Tag;
 
@@ -61,6 +61,10 @@ Sichtbare Höhe des Texteingabefeldes in Zeilen.
 
 CSS Definition (inline).
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =item value => $str (Default: undef)
 
 Anfänglicher Wert des Felds.
@@ -97,6 +101,7 @@ sub new {
         onKeyUp => undef,
         rows => undef,
         style => undef,
+        undefIf => 0,
         value => undef,
     );
 
@@ -128,12 +133,17 @@ sub html {
 
     # Attribute
 
-    my ($class,$cols,$disabled,$id,$name,$onKeyUp,$rows,$style,$value) =
-        $self->get(qw/class cols disabled id name onKeyUp rows style value/);
+    my ($class,$cols,$disabled,$id,$name,$onKeyUp,$rows,$style,$undefIf,
+        $value) = $self->get(qw/class cols disabled id name onKeyUp rows
+        style undefIf value/);
 
     # Generierung
 
     my $h = Quiq::Html::Tag->new;
+
+    if ($undefIf) {
+        return undef;
+    }
 
     return $h->tag('textarea',
         id => $id,
@@ -152,7 +162,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

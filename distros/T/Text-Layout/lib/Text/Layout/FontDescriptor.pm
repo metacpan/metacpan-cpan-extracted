@@ -9,7 +9,8 @@ package Text::Layout::FontDescriptor;
 use Carp;
 
 
-our $VERSION = "0.013";
+
+our $VERSION = "0.014.1";
 
 =head1 NAME
 
@@ -103,7 +104,9 @@ sub get_font {
 
 =item get_weight
 
-Accessors to the font family, style. and weight.
+=item get_shaping
+
+Accessors to the font family, style, weight and shaping.
 
 Readonly.
 
@@ -131,6 +134,11 @@ sub get_size {
     $self->{size};
 }
 
+sub get_shaping {
+    my ( $self ) = @_;
+    $self->{shaping};
+}
+
 =over
 
 =item set_size
@@ -146,6 +154,21 @@ Sets/gets the size property of the font.
 sub set_size {
     my ( $self, $size ) = @_;
     $self->{size} = $size;
+}
+
+=over
+
+=item set_shaping
+
+Sets/gets the shaping property of the font.
+
+=back
+
+=cut
+
+sub set_shaping {
+    my ( $self, $sh ) = @_;
+    $self->{shaping} = $sh // 1;
 }
 
 =over

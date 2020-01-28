@@ -6,7 +6,7 @@
 # (tests _fill_offsets_to() )
 #
 
-my $file = "tf$$.txt";
+my $file = "tf12-$$.txt";
 my $data = "rec0blahrec1blahrec2blah";
 
 print "1..5\n";
@@ -15,7 +15,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-open F, "> $file" or die $!;
+open F, '>', $file or die $!;
 binmode F;
 print F $data;
 close F;

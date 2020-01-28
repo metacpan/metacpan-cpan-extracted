@@ -1,5 +1,13 @@
 Revision history for Text::Layout
 
+0.014.1	2020-01-26
+
+0.014	2020-01-23
+
+	Experimental support for text shaping using HarfBuzz.
+	Implemented for the PDF::API2/Builder backend only.
+	Requires perl module HarfBuzz::Shaper.
+
 0.013	2019-10-22
 
 	Fix test 102.

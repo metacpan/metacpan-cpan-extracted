@@ -3,8 +3,8 @@ NAME
     Indonesian National Agency of Drug and Food Control (POM)
 
 VERSION
-    This document describes version 0.001 of Business::ID::POM (from Perl
-    distribution Business-ID-POM), released on 2019-11-21.
+    This document describes version 0.002 of Business::ID::POM (from Perl
+    distribution Business-ID-POM), released on 2019-11-25.
 
 DESCRIPTION
     This module can be used to validate food/drug registration codes
@@ -129,7 +129,7 @@ FUNCTIONS
          }
 
     This routine does not check whether the code actually exists. Use
-    https://cekbpom.pom.go.id/ for that.
+    <https://cekbpom.pom.go.id/> for that.
 
     This function is not exported by default, but exportable.
 

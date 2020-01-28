@@ -1,0 +1,5 @@
+name = "Mojo-DB-Connector"
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+license="perl_5"

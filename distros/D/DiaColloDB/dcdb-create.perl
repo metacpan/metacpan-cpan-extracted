@@ -2,12 +2,13 @@
 
 use lib qw(. ./blib/lib ./blib/arch lib lib/blib/lib lib/blib/arch);
 use DiaColloDB;
-use DiaColloDB::Utils qw(:si);
+use DiaColloDB::Utils qw(:math :si :jobs);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use File::Basename qw(basename);
 use strict;
 
+#use DiaColloDB::XS; ##-- DEBUG
 #use DiaColloDB::Relation::TDF; ##-- DEBUG
 #use DiaColloDB::Document::TCF; ##-- DEBUG
 
@@ -27,7 +28,7 @@ our $listargs   = 0; ##-- args are file-lists?
 our $union      = 0; ##-- args are db-dirs?
 our $lazy_union = 0; ##-- union mode: create a list-client config?
 our $dotime     = 1; ##-- report timing?
-our %corpus   = (dclass=>'DDCTabs', dopts=>{});
+our %corpus     = (dclass=>'DDCTabs', dopts=>{});
 our %coldb    = (
 		 pack_id=>'N',
 		 pack_date=>'n',
@@ -59,16 +60,27 @@ sub pack64 {
   $coldb{tdfopts}{itype} = $_[1] ? 'ccs_indx' : 'long';
   $coldb{tdfopts}{vtype} = $_[1] ? 'double' : 'float';
 }
+sub wantxs {
+  #print STDERR "WANT_XS=$_[1]\n";
+  $DiaColloDB::Relation::Cofreqs::WANT_XS = $_[1];
+}
+sub njobs {
+  $DiaColloDB::NJOBS    = nJobs($_[1]);
+  $ENV{OMP_NUM_THREADS} = max2($DiaColloDB::NJOBS,1);
+}
 foreach (@ARGV) { utf8::decode($_) if (!utf8::is_utf8($_)); }
 GetOptions(##-- general
 	   'help|h' => \$help,
 	   'version|V' => \$version,
+           'xs!' => \&wantxs,
+           'pp!' => sub { wantxs($_[0],!$_[1]) },
 	   #'verbose|v=i' => \$verbose,
 
 	   ##-- corpus options
 	   'glob|g!' => \$globargs,
 	   'list|l!' => \$listargs,
 	   'union|u|merge!' => \$union,
+           'jobs|njobs|j=s' => \&njobs,
 	   'lazy-union|list-union|lazy|lu!' => \$lazy_union,
 	   'document-class|dclass|dc=s' => \$corpus{dclass},
 	   'document-option|docoption|dopt|do|dO=s%' => \$corpus{dopts},
@@ -79,8 +91,9 @@ GetOptions(##-- general
 	   ##-- coldb options
 	   'index-attributes|attributes|attrs|a=s' => \$coldb{attrs},
 	   'nofilters|no-filters|F|all|A|no-prune|noprune|use-all-the-data' => sub {
-	     $coldb{$_} = 0  foreach (grep {$_ =~ /fmin/} keys %coldb);
-	     $coldb{$_} = '' foreach (qw(pgood pbad wgood wbad lgood lbad));
+	     $coldb{$_} = 0     foreach (grep {$_ =~ /fmin/} keys %coldb);
+             $coldb{$_} = ''    foreach (@DiaColloDB::Corpus::Filters::NAMES);
+             $coldb{$_} = undef foreach (@DiaColloDB::Corpus::Filters::FILES);
 	     $coldb{tdfopts}{$_} = 0 foreach (grep {$_ =~ /min.*Freq/} keys %{$coldb{tdfopts}});
 	     $coldb{tdfopts}{$_} = 1 foreach (grep {$_ =~ /min.*Size/} keys %{$coldb{tdfopts}});
 	     $coldb{tdfopts}{$_} = 'inf' foreach (grep {$_ =~ /max.*(Freq|Size)/} keys %{$coldb{tdfopts}});
@@ -108,6 +121,8 @@ GetOptions(##-- general
 	   'timing|times|time|t!' => \$dotime,
 	   'log-level|level|ll=s' => sub { $log{level} = uc($_[1]); },
 	   'log-option|logopt|lo=s' => \%log,
+           'log-file|lf=s' => \$log{file},
+           'nolog-file|nolf' => sub { $log{file}=undef; },
 	   'output|outdir|od|o=s' => \$dbdir,
 	  );
 
@@ -137,6 +152,7 @@ $corpus->open(\@ARGV, 'glob'=>$globargs, 'list'=>$listargs, ($union ? (logOpen=>
 my $timer = DiaColloDB::Timer->start();
 my ($coldb);
 if ($lazy_union) {
+  ##-- lazy union: just create "thin" client URL
   $coldb = DiaColloDB::Client::list->new(%uopts)
     or die("$prog: failed to create lazy union list-client: $!");
   $coldb->open($corpus->{files})
@@ -145,14 +161,15 @@ if ($lazy_union) {
     or die("$prog: failed to save lazy union list-client configuration to 'rcfile://$dbdir': $!");
 }
 else {
+  ##-- physical DB
   $coldb = DiaColloDB->new(%coldb)
     or die("$prog: failed to create new DiaColloDB object: $!");
   if ($union) {
-    ##-- union: create from dbdirs
+    ##-- physical DB: union: create from dbdirs
     $coldb->union($corpus->{files}, dbdir=>$dbdir, flags=>'rw')
       or die("$prog: DiaColloDB::union() failed: $!");
   } else {
-    ##-- !union: create from corpus
+    ##-- physical DB: create from corpus
     $coldb->create($corpus, dbdir=>$dbdir, flags=>'rw', attrs=>($coldb{attrs}||'l,p'))
       or die("$prog: DiaColloDB::create() failed: $!");
   }
@@ -187,6 +204,7 @@ dcdb-create.perl - create a DiaColloDB diachronic collocation database
  General Options:
    -help                ##-- this help message
    -version             ##-- report version information and exit
+   -jobs NJOBS          ##-- number of threads for corpus compilation (default=-1: all cores)
 
  Corpus Options:
    -list , -nolist      ##-- INPUT(s) are/aren't file-lists (default=no)
@@ -235,7 +253,6 @@ dcdb-create.perl - create a DiaColloDB diachronic collocation database
                         ##   (p|w|l)badfile=FILE    # negative list-file for (postags|words|lemmata)
                         ##   ddcServer=HOST:PORT    # server for ddc relations
                         ##   ddcTimeout=SECONDS     # timeout for ddc relations
-   -noprune             ##-- disable all pruning filters
 
  I/O and Logging Options:
    -log-level LEVEL     ##-- set log-level (default=TRACE)
@@ -316,6 +333,15 @@ Display a brief help message and exit.
 
 Display version information and exit.
 
+=item -jobs NJOBS
+
+Run C<NJOBS> parallel compilation threads.
+If specified as 0, will run only a single thread.
+The default value (-1) will run as many jobs as there are cores on the (unix/linux) system;
+see L<DiaColloDB::Utils/nJobs> for details.
+Also sets the environment variable C<OMP_NUM_THREADS> after interpreting
+the C<NJOBS> request.
+
 =back
 
 =cut
@@ -327,13 +353,30 @@ Display version information and exit.
 
 =head2 Corpus Options
 
+Input corpora can be either "raw" corpora using the
+default L<DiaColloDB::Corpus|DiaColloDB::Corpus> class
+or a single "pre-compiled" corpus directory using the
+L<DiaColloDB::Corpus::Compiled|DiaColloDB::Corpus::Compiled> conventions
+as created by the L<dcdb-corpus-compile.perl(1)|dcdb-corpus-compile.perl>
+script.
+
+If a pre-compiled input corpus directory is specified,
+only the L<corpus content filters|DiaColloDB::Corpus::Filters> pre-compiled
+into the corpus itself are used, and the corpus content filter
+options to this script (C<-Opgood=REGEX> etc.) will have no effect.
+For "raw" input corpora, a temporary
+L<DiaColloDB::Corpus::Compiled|DiaColloDB::Corpus::Compiled> object
+will be created and the L<DiaColloDB::Corpus::Filters|DiaColloDB::Corpus::Filters>
+options to this script should be honored.
+
 =over 4
 
 =item -list
 
 =item -nolist
 
-Do/don't treat INPUT(s) as file-lists rather than corpus data files.
+Do/don't treat INPUT(s) as file-lists rather than corpus data files or
+L<pre-compiled corpus directories|DiaColloDB::Corpus::Compiled>.
 Default=don't.
 
 =item -glob
@@ -341,6 +384,7 @@ Default=don't.
 =item -noglob
 
 Do/don't expand wildcards in INPUT(s).
+Has no effect for L<pre-compiled corpus directories|DiaColloDB::Corpus::Compiled>.
 Default=do.
 
 =item -union
@@ -370,7 +414,7 @@ file.  The lazy configuration should behave like a physical DB created with L<-u
 can be created in near constant time,
 requires only a few bytes of disk space,
 and may even process queries faster than a physical DB if you have the
-L<forks|forks> module installed.
+L<threads|threads> module installed.
 
 Default=off.
 
@@ -378,37 +422,45 @@ Aliases: -lazy-union, -list-union, -lu
 
 =item -dclass CLASS
 
-Set corpus document class (default=DDCTabs).
+Set corpus document class (default=DDCTabs) for raw (i.e. not L<pre-compiled|DiaColloDB::Corpus::Compiled>) corpora.
 See L<DiaColloDB::Document/SUBCLASSES> for a list
 of supported input formats.
 If you are using the default L<DDCTabs|DiaColloDB::Document::DDCTabs> document class
 on your own (non-D*) corpus, you may also want to specify
 L<C<-dopt foreign=1>|/"-dopt OPT=VAL">.
 
+Has no effect for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
+
 =item -dopt OPT=VAL
 
-Set corpus document option, e.g.
+Set corpus document option for raw (i.e. not L<pre-compiled|DiaColloDB::Corpus::Compiled>) corpora, e.g.
 L<C<-dopt eosre=EOSRE>|DDCTabs/new> sets the end-of-sentence regex
 for the default L<DDCTabs|DiaColloDB::Document::DDCTabs> document class,
 and L<C<-dopt foreign=1>|DDCTabs/new> disables D*-specific hacks.
+
+Potentially dangerous for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
 
 Aliases: -document-option, -docoption, -dO
 
 =item -bysent
 
 Track collocations by sentence (default).
+Has no effect for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
 
 =item -byparagraph
 
 Track collocations by paragraph.
+Has no effect for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
 
 =item -bypage
 
 Track collocations by page.
+Has no effect for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
 
 =item -bydoc
 
 Track collocations by document.
+Has no effect for L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>.
 
 =back
 
@@ -440,14 +492,19 @@ inspired by Mark Lauersdorf; equivalent to:
  -tdf-dfmin=0 \
  -tdf-nmin=0 \
  -tdf-nmax=inf \
- -O=pgood='' \
- -O=wgood='' \
- -O=lgood='' \
- -O=pbad='' \
- -O=wbad='' \
- -O=lbad='' \
+ -O=pgood='' -O=poodfile='' \
+ -O=wgood='' -O=wgoodfile='' \
+ -O=lgood='' -O=lgoodfile='' \
+ -O=pbad='' -O=pbadfile='' \
+ -O=wbad='' -O=wbadfile='' \
+ -O=lbad='' -O=lbadfile='' \
  -tO=mgood='' \
  -tO=mbad=''
+
+Corpus L<content filters|DiaColloDB::Corpus::Filters>
+(C<pgood>, C<pgoodfile>, ..., C<lbad>, C<lbadfile>)
+have no effect for
+L<pre-compiled corpus directory INPUT(s)|DiaColloDB::Corpus::Compiled>
 
 Aliases: -all, -noprune, -nofilters, -F
 
@@ -521,10 +578,10 @@ Set arbitrary L<DiaColloDB|DiaColloDB> index option, e.g.
  pack_id=PACKFMT        # pack-format for IDs
  pack_f=PACKFMT         # pack-format for frequencies
  pack_date=PACKFMT      # pack-format for dates
- (p|w|l)good=REGEX      # positive regex for (postags|words|lemmata)
- (p|w|l)bad=REGEX       # negative regex for (postags|words|lemmata)
- (p|w|l)goodfile=REGEX  # positive list-file for (postags|words|lemmata)
- (p|w|l)badfile=REGEX   # negative list-file for (postags|words|lemmata)
+ (p|w|l)good=REGEX      # (raw input only) positive regex for (postags|words|lemmata)
+ (p|w|l)bad=REGEX       # (raw input only) negative regex for (postags|words|lemmata)
+ (p|w|l)goodfile=REGEX  # (raw input only) positive list-file for (postags|words|lemmata)
+ (p|w|l)badfile=REGEX   # (raw input only) negative list-file for (postags|words|lemmata)
  ddcServer=HOST:PORT    # server for ddc relations
  ddcTimeout=SECONDS     # timeout for ddc relations
 
@@ -603,6 +660,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 =head1 SEE ALSO
 
 L<DiaColloDB(3pm)|DiaColloDB>,
+L<dcdb-corpus-compile.perl(1)|dcdb-corpus-compile.perl>,
 L<dcdb-info.perl(1)|dcdb-info.perl>,
 L<dcdb-query.perl(1)|dcdb-query.perl>,
 L<dcdb-export.perl(1)|dcdb-export.perl>,

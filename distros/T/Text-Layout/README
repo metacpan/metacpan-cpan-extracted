@@ -19,6 +19,9 @@ Backends are included for:
 The package uses Text::Layout::FontConfig (included) to organize fonts
 by description.
 
+If module HarfBuzz::Shaper is installed, Text::Layout can use it for
+text shaping.
+
 Example:
 
     # Create a PDF document.
@@ -62,7 +65,6 @@ You can find documentation for this module with the perldoc command.
 
 Please report any bugs or feature requests using the issue tracker on
 GitHub.
-
 
 COPYRIGHT AND LICENCE
 

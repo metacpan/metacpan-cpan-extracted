@@ -10,7 +10,6 @@ BEGIN {
 }
 
 use Test::More;
-use Test::Identity;
 use Test::Refcount;
 
 use Tickit qw( BIND_FIRST );
@@ -30,7 +29,7 @@ is_oneref( $term, '$term has refcount 1 initially' );
    my ( $type, $str );
    my $id = $term->bind_event( key => sub {
       my ( undef, $ev, $info ) = @_;
-      identical( $_[0], $term, '$_[0] is term for resize event' );
+      cmp_ok( $_[0], '==', $term, '$_[0] is term for resize event' );
       is( $ev, "key", '$ev is key' );
       $type = $info->type;
       $str  = $info->str;

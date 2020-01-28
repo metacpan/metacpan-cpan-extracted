@@ -50,7 +50,7 @@
    "provides" : {
       "Text::Hspell" : {
          "file" : "lib/Text/Hspell.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/shlomif/Text-Hspell"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.2.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -298,6 +298,11 @@
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {

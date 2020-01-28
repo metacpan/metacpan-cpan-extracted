@@ -1,3 +1,5 @@
+5.0.1    22.01.2020
+           - add support for Solaris
 5.0.0    20.01.2020
            - fix typemaps (make all methods static)
            - change parser to ragel (more than 2x speedup) for Date, Date::Rel and Date::Int

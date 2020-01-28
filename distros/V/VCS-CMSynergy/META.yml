@@ -3,44 +3,40 @@ abstract: 'Perl interface to IBM Rational Synergy'
 author:
   - 'Roderich Schupp <schupp@argumentum.de>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 0
-generated_by: 'Module::Install version 1.16'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: VCS-CMSynergy
 no_index:
   directory:
-    - examples
-    - inc
     - t
-    - xt
+    - inc
   package:
     - Tie::ReadonlyArray
     - VCS::CMSynergy::ObjectTieHash
     - VCS::CMSynergy::Traversal
 requires:
-  Class::Accessor::Fast: 0
-  Digest::MD5: 0
-  File::Spec: 0
-  File::Temp: 0
+  Digest::MD5: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   IPC::Run3: '0.030'
   List::Util: '1.09'
-  Log::Log4perl: 0
-  Pod::Usage: 0
-  Scalar::Util: '1.09'
-  Tie::CPHash: 0
-  Time::HiRes: 0
-  Type::Params: 0
-  Types::Standard: 0
-  perl: '5.008001'
+  Log::Log4perl: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '1.19'
+  Tie::CPHash: '0'
+  Time::HiRes: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  perl: '5.010000'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/rschupp/VCS-CMSynergy
-version: '1.51'
+  repository: git://github.com/rschupp/VCS-CMSynergy.git
+version: '1.52'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

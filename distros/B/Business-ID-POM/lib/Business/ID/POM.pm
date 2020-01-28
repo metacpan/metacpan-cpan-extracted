@@ -1,8 +1,8 @@
 package Business::ID::POM;
 
-our $DATE = '2019-11-21'; # DATE
+our $DATE = '2019-11-25'; # DATE
 our $DIST = 'Business-ID-POM'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -25,7 +25,7 @@ $SPEC{parse_pom_reg_code} = {
     description => <<'_',
 
 This routine does not check whether the code actually exists. Use
-https://cekbpom.pom.go.id/ for that.
+<https://cekbpom.pom.go.id/> for that.
 
 _
     args => {
@@ -91,7 +91,7 @@ sub parse_pom_reg_code {
         else { return [400, "Invalid drug origin code '$res->{drug_origin_code}', valid codes are L/I/E/X"] }
 
         $res->{number} =~ /\A([0-9]{2})([0-9]{3})([0-9]{3})([0-9]{2})([A-Z])([0-9])\z/
-            or return [400, "D/G number needs to be 12-digit number/letter"];
+            or return [400, "Dxx/Gxx number needs to be 12-digit number/letter"];
 
         $res->{drug_year} = _2to4_dig_year($1);
         $res->{drug_company_code} = $2;
@@ -150,7 +150,7 @@ sub parse_pom_reg_code {
         else { return [400, "Invalid cosmetic category code ($res->{cosmetic_category_code}), valid code is A-E"] }
 
         $res->{number} =~ /\A([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{5})\z/
-            or return [400, "N number needs to be 11-digit number"];
+            or return [400, "Nx number needs to be 11-digit number"];
 
         $res->{cosmetic_country_code} = $1;
         $res->{cosmetic_year} = _2to4_dig_year($2);
@@ -167,7 +167,7 @@ sub parse_pom_reg_code {
         else { return [400, "Invalid traditional medicine origin code ($res->{trad_origin}), valid code is R/I/L"] }
 
         $res->{number} =~ /\A([0-9]{2})([0-9]{1})([0-9]{1})([0-9]{4})([0-9]{1})\z/
-            or return [400, "BT/T number needs to be 9-digit number"];
+            or return [400, "BTx/Tx number needs to be 9-digit number"];
 
         $res->{trad_year} = _2to4_dig_year($1);
         $res->{trad_company_type_code} = $2;
@@ -225,7 +225,7 @@ Business::ID::POM - Parse food/drug registration code published by the Indonesia
 
 =head1 VERSION
 
-This document describes version 0.001 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2019-11-21.
+This document describes version 0.002 of Business::ID::POM (from Perl distribution Business-ID-POM), released on 2019-11-25.
 
 =head1 DESCRIPTION
 
@@ -357,7 +357,7 @@ Result:
 =back
 
 This routine does not check whether the code actually exists. Use
-https://cekbpom.pom.go.id/ for that.
+L<https://cekbpom.pom.go.id/> for that.
 
 This function is not exported by default, but exportable.
 

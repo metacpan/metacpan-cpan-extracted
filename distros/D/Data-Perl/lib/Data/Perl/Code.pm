@@ -1,5 +1,5 @@
 package Data::Perl::Code;
-$Data::Perl::Code::VERSION = '0.002009';
+$Data::Perl::Code::VERSION = '0.002011';
 # ABSTRACT: Wrapping class for Perl coderefs.
 
 use strictures 1;
@@ -20,7 +20,7 @@ Data::Perl::Code - Wrapping class for Perl coderefs.
 
 =head1 VERSION
 
-version 0.002009
+version 0.002011
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Matthew Phillips <mattp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

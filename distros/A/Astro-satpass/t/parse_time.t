@@ -23,7 +23,7 @@ BEGIN {
     };
 }
 
-use Astro::Coord::ECI::Utils qw{ :time };
+use Astro::Coord::ECI::Utils qw{ :greg_time };
 
 if ( $mock_time && Time::y2038->can( 'VERSION' ) ) {
 
@@ -116,7 +116,7 @@ SKIP: {
     gmt 'tomorrow 9:30Z',	0, 30, 9, 2, 6, 2009;
 
     restore_time();
-    set_fixed_time( time_local( 0, 0, 6, 1, 6, 2009 ) );
+    set_fixed_time( greg_time_local( 0, 0, 6, 1, 6, 2009 ) );
 
     lcl 'yesterday',		0, 0, 0, 30, 5, 2009;
     lcl 'yesterday 9:30',	0, 30, 9, 30, 5, 2009;
@@ -131,7 +131,7 @@ SKIP: {
 
 sub gmt (@) {	## no critic (RequireArgUnpacking)
     my ( $string, @gmt ) = @_;
-    my $want = time_gm( @gmt );
+    my $want = greg_time_gm( @gmt );
     my $got;
     eval {
 	$got = Astro::Coord::ECI::Utils::__parse_time_iso_8601( $string );
@@ -145,7 +145,7 @@ sub gmt (@) {	## no critic (RequireArgUnpacking)
 
 sub lcl (@) {	## no critic (RequireArgUnpacking)
     my ( $string, @local ) = @_;
-    my $want = time_local( @local );
+    my $want = greg_time_local( @local );
     my $got;
     eval {
 	$got = Astro::Coord::ECI::Utils::__parse_time_iso_8601( $string );

@@ -1,6 +1,6 @@
 package HTTP::Throwable::Role::TextBody;
 our $AUTHORITY = 'cpan:STEVAN';
-$HTTP::Throwable::Role::TextBody::VERSION = '0.026';
+$HTTP::Throwable::Role::TextBody::VERSION = '0.027';
 use Moo::Role;
 
 sub body { $_[0]->text_body }
@@ -30,7 +30,7 @@ HTTP::Throwable::Role::TextBody - an exception with a plaintext body
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 OVERVIEW
 
@@ -61,7 +61,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Infinity Interactive, Inc..
+This software is copyright (c) 2011 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

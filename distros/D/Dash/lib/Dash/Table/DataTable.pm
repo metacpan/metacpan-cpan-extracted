@@ -106,7 +106,7 @@ Dash::Table::DataTable
 
 =head1 VERSION
 
-version 0.06
+version 0.10
 
 =head1 AUTHOR
 

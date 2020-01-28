@@ -5,7 +5,11 @@
 ## Description: DiaColloDB utilities: auto-magic upgrades: top level
 
 package DiaColloDB::Upgrade;
-use DiaColloDB;
+
+# "Attempt to reload DiaColloDB.pm aborted." on perl v5.31.7 (http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad)
+#  - may be due to 'eval "use threads";' in Client/list.pm
+#use DiaColloDB;
+
 use DiaColloDB::Upgrade::Base;
 use DiaColloDB::Upgrade::v0_04_dlimits;
 use DiaColloDB::Upgrade::v0_09_multimap;

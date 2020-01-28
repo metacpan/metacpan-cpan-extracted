@@ -18,15 +18,28 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Text"
       },
+      "schema:accommodationFloorPlan" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A floorplan of some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>.",
+         "rdfs:label" : "accommodationFloorPlan",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:Residence",
+            "schema:Accommodation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:FloorPlan"
+      },
       "schema:amenityFeature" : {
          "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
+            "schema:LodgingBusiness",
             "schema:Place",
-            "schema:LodgingBusiness"
+            "schema:Accommodation"
          ],
          "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
       },
@@ -55,13 +68,14 @@
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:RealEstateListing",
-            "schema:Accommodation"
+            "schema:Offer",
+            "schema:Accommodation",
+            "schema:RealEstateListing"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Duration"
+            "schema:Duration",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numberOfBathroomsTotal" : {
@@ -70,7 +84,10 @@
          "rdfs:comment" : "The total integer number of bathrooms in a some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, following real estate conventions as <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsTotalInteger+Field\">documented in RESO</a>: \"The simple sum of the number of bathrooms. For example for a property with two Full Bathrooms and one Half Bathroom, the Bathrooms Total Integer will be 3.\". See also <a class=\"localLink\" href=\"http://schema.org/numberOfRooms\">numberOfRooms</a>.",
          "rdfs:label" : "numberOfBathroomsTotal",
          "schema:category" : "issue-2373",
-         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:domainIncludes" : [
+            "schema:FloorPlan",
+            "schema:Accommodation"
+         ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Integer"
       },
@@ -80,7 +97,23 @@
          "rdfs:comment" : "Number of full bathrooms - The total number of full and Â¾ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsFull+Field\">BathroomsFull field in RESO</a>.",
          "rdfs:label" : "numberOfFullBathrooms",
          "schema:category" : "issue-2373",
-         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:domainIncludes" : [
+            "schema:FloorPlan",
+            "schema:Accommodation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:numberOfPartialBathrooms" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of partial bathrooms - The total number of half and Â¼ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsPartial+Field\">BathroomsPartial field in RESO</a>.",
+         "rdfs:label" : "numberOfPartialBathrooms",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:Accommodation",
+            "schema:FloorPlan"
+         ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Number"
       },
@@ -91,15 +124,16 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Suite",
-            "schema:LodgingBusiness",
-            "schema:House",
+            "schema:Accommodation",
             "schema:Apartment",
+            "schema:House",
+            "schema:LodgingBusiness",
             "schema:SingleFamilyResidence",
-            "schema:Accommodation"
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:permittedUsage" : {
@@ -123,6 +157,16 @@
             "schema:Text",
             "schema:Boolean"
          ]
+      },
+      "schema:yearBuilt" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The year an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a> was constructed. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/YearBuilt+Field\">YearBuilt field in RESO</a>.",
+         "rdfs:label" : "yearBuilt",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : "schema:Accommodation",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
       }
    }
 }

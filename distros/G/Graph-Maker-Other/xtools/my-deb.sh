@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -51,7 +51,7 @@ echo "DISTVNAME  $DISTVNAME"
 XS_FILES=`sed -n 's/^XS_FILES = \(.*\)/\1/p' Makefile`
 EXE_FILES=`sed -n 's/^EXE_FILES = \(.*\)/\1/p' Makefile`
 
-if test "$DISTNAME" = pngtextadd
+if test "$DISTNAME" = pngtextadd -o "$DISTNAME" = x2gpm
 then DPKG_ARCH=`dpkg --print-architecture`
 elif test -n "$XS_FILES"
 then DPKG_ARCH=`dpkg --print-architecture`

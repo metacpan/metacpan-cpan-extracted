@@ -19,6 +19,7 @@ lib/Util/Medley/File.pm
 lib/Util/Medley/File/Zip.pm
 lib/Util/Medley/List.pm
 lib/Util/Medley/Logger.pm
+lib/Util/Medley/Package.pm
 lib/Util/Medley/Roles/Attributes/Cache.pm
 lib/Util/Medley/Roles/Attributes/Crypt.pm
 lib/Util/Medley/Roles/Attributes/DateTime.pm
@@ -26,6 +27,7 @@ lib/Util/Medley/Roles/Attributes/File.pm
 lib/Util/Medley/Roles/Attributes/File/Zip.pm
 lib/Util/Medley/Roles/Attributes/List.pm
 lib/Util/Medley/Roles/Attributes/Logger.pm
+lib/Util/Medley/Roles/Attributes/Package.pm
 lib/Util/Medley/Roles/Attributes/Spawn.pm
 lib/Util/Medley/Roles/Attributes/String.pm
 lib/Util/Medley/Roles/Attributes/XML.pm
@@ -37,6 +39,7 @@ t/10-cache.t
 t/10-crypt.t
 t/10-datetime.t
 t/10-list.t
+t/10-package.t
 t/10-string.t
 t/20-logger.t
 t/30-spawn.t

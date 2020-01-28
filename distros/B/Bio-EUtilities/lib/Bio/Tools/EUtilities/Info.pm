@@ -1,6 +1,5 @@
 package Bio::Tools::EUtilities::Info;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::Tools::EUtilities::Info::VERSION = '1.75';
+$Bio::Tools::EUtilities::Info::VERSION = '1.76';
 use utf8;
 use strict;
 use warnings;
@@ -76,7 +75,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -84,7 +83,7 @@ Bio::Tools::EUtilities::Info - Interface class for storing einfo data.
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -173,7 +172,7 @@ For more information on einfo see:
  Title    : rewind
  Usage    : $info->rewind() # rewinds all (default)
             $info->rewind('links') # rewinds only links
- Function : 'rewinds' (resets) specified interators (all if no arg)
+ Function : 'rewinds' (resets) specified iterators (all if no arg)
  Returns  : none
  Args     : [OPTIONAL] String:
             'all'    - all iterators (default)
@@ -197,14 +196,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem
@@ -216,7 +214,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://github.com/bioperl/%%7Bdist%7D
+  https://github.com/bioperl/bio-eutilities/issues
 
 =head1 AUTHOR
 

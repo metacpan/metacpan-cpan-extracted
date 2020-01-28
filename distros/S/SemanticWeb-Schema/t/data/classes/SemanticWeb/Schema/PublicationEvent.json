@@ -19,10 +19,10 @@
          "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:CreativeWork",
+            "schema:PublicationEvent",
             "schema:Place",
-            "schema:PublicationEvent"
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
       },
@@ -33,8 +33,8 @@
          "schema:domainIncludes" : "schema:PublicationEvent",
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:publishedOn" : {

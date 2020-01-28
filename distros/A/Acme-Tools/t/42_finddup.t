@@ -14,7 +14,7 @@ sub mkf {
 mkf();
 sub fd{Acme::Tools::cmd_finddup(@_)}
 sub f{fd('-R',@_)}
-sub sr{repl(srlz(@_),"$tmp/")}
+sub sr{repl(srlz(@_),"$tmp/",'',qr/\n$/,'')}
 
 my %f=f(qw(-P 4 -M -F),@f);
 my $s=sr(\%f,'f');
@@ -22,7 +22,7 @@ my $s2=sr({md5sum(\"abcd")=>[map"file$_",0..3]},'f'); #print$s,$s2;
 ok($s eq $s2);
 
 my @r;
-sub test{my$sr=sr(\@r,'r')=~s,\n$,,r;print "Got:      $sr\nExpected: $_[0]\n\n" if $sr ne $_[0];ok($sr eq shift)}
+sub test{my$sr=sr(\@r,'r');print "Got:      $sr\nExpected: $_[0]\n\n" if $sr ne $_[0];ok($sr eq shift)}
 @r=f(qw(-P 4 -M  ),    @f[2,1,3,0]);test(q(@r=('file1','file3','file0');));
 @r=f(qw(-P 4 -M -k n ),@f[2,1,3,0]);test(q(@r=('file2','file1','file0');));
 @r=f(qw(-P 4 -M -k o ),@f[2,1,3,0]);test(q(@r=('file1','file2','file3');));

@@ -17,8 +17,8 @@
             "schema:AudioObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:Text"
          ]
       },
       "schema:transcript" : {

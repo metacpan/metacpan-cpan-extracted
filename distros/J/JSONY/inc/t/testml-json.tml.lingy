@@ -1,0 +1,19 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*json"],
+      ["==",
+        [".",
+          ["*","json"],
+          ["jsony-load"],
+          ["yaml"]],
+        [".",
+          ["*","json"],
+          ["json-decode"],
+          ["yaml"]]]]],
+  "data": [
+    { "label": "Various Numbers",
+      "point": {
+        "json": "[1,-2,3,4.5,67,0.8e-9]"}},
+    { "label": "Object with no space",
+      "point": {
+        "json": "{\"a\":\"b\",\"c\":{\"d\":\"e\"},\"f\":[\"g\",\"h\"],\"i\":[{},[],[[]]]}"}}]}

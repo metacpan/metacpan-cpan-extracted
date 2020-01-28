@@ -8,7 +8,8 @@
             ["*","input"]],
           ["Catch"],
           ["Msg"]],
-        ["*","error"]]]],
+        ["*","error"],
+        "Test error message: +"]]],
   "data": [
     { "label": "Error fails at furthest match",
       "point": {

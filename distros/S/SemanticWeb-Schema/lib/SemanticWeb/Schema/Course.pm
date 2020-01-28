@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has course_code => (
@@ -50,6 +50,14 @@ has has_course_instance => (
 
 
 
+has number_of_credits => (
+    is        => 'rw',
+    predicate => '_has_number_of_credits',
+    json_ld   => 'numberOfCredits',
+);
+
+
+
 has occupational_credential_awarded => (
     is        => 'rw',
     predicate => '_has_occupational_credential_awarded',
@@ -74,7 +82,7 @@ SemanticWeb::Schema::Course - A description of an educational course which may b
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -175,6 +183,27 @@ A has_course_instance should be one of the following types:
 
 A predicate for the L</has_course_instance> attribute.
 
+=head2 C<number_of_credits>
+
+C<numberOfCredits>
+
+The number of credits or units awarded by a Course or required to complete
+an EducationalOccupationalProgram.
+
+A number_of_credits should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
+
+=back
+
+=head2 C<_has_number_of_credits>
+
+A predicate for the L</number_of_credits> attribute.
+
 =head2 C<occupational_credential_awarded>
 
 C<occupationalCredentialAwarded>
@@ -221,7 +250,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

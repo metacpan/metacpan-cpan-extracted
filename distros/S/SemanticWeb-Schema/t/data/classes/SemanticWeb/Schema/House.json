@@ -14,15 +14,16 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Suite",
-            "schema:LodgingBusiness",
-            "schema:House",
+            "schema:Accommodation",
             "schema:Apartment",
+            "schema:House",
+            "schema:LodgingBusiness",
             "schema:SingleFamilyResidence",
-            "schema:Accommodation"
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       }
    }

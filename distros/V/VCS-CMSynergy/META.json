@@ -1,0 +1,71 @@
+{
+   "abstract" : "Perl interface to IBM Rational Synergy",
+   "author" : [
+      "Roderich Schupp <schupp@argumentum.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "VCS-CMSynergy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Tie::ReadonlyArray",
+         "VCS::CMSynergy::ObjectTieHash",
+         "VCS::CMSynergy::Traversal"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IPC::Run3" : "0.030",
+            "List::Util" : "1.09",
+            "Log::Log4perl" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "1.19",
+            "Tie::CPHash" : "0",
+            "Time::HiRes" : "0",
+            "Type::Params" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rschupp/VCS-CMSynergy.git",
+         "web" : "https://github.com/rschupp/VCS-CMSynergy"
+      }
+   },
+   "version" : "1.52",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

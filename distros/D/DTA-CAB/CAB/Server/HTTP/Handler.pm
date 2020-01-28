@@ -151,13 +151,22 @@ sub dumpResponse {
   my ($h,$dataref,%vars) = @_;
   my $returnRaw   = defined($vars{raw}) ? $vars{raw} : $h->{returnRaw};
   my $contentType = ($returnRaw || !$vars{type} ? 'text/plain' : $vars{type});
-  $contentType   .= "; charset=$vars{charset}" if ($vars{charset} && $contentType !~ m|application/octet-stream|);
+  my $charset     = $h->sanitizeCharset($vars{charset});
+  $contentType   .= "; charset=$charset" if ($charset && $contentType !~ m|application/octet-stream|);
   ##
   my $rsp = $h->response(RC_OK);
   $rsp->content_type($contentType);
   $rsp->content_ref($dataref) if (defined($dataref));
   $rsp->header('Content-Disposition' => "attachment; filename=\"$vars{filename}\"") if ($vars{filename} && !$returnRaw);
   return $rsp;
+}
+
+## $charset = $h->sanitizeCharset($charset)
+##  + maps "UTF8", "UTF-8", etc. to "utf-8"
+sub sanitizeCharset {
+  my ($that,$charset) = @_;
+  return "utf-8" if ($charset && $charset =~ /^utf\-?8$/i);
+  return $charset;
 }
 
 

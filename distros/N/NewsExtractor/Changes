@@ -1,3 +1,26 @@
+v0.4.0
+        - Released at 2020-01-26T01:51:45+0900
+        - Improve the extraction of a few news site.
+
+v0.3.0
+        2020-01-26T01:51:45+0900
+        Improve the extraction of a few news site.
+
+v0.2.0
+        2020-01-25T23:23:39+0900
+        Improve the extraction of a specific news site.
+
+v0.1.1
+        2020-01-24T11:13:11+0900
+        Fix an fat-finger mistake.
+
+v0.1.0
+        2020-01-24T09:16:11+0900
+	Improve the extraction of a few news sites.
+
+v0.0.9
+	Improve the recall of a specific news site.
+
 v0.0.8
         2020-01-20T22:08:39+0900
         Improve the extraction of journalist names on a few more news sites.

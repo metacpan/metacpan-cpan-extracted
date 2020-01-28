@@ -2575,7 +2575,19 @@ sub grep_for_string_existence_only
 
 sub fetch
 {
+   my @topcaller=caller;
+   print "\nINFO: main::fetch() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if !$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nINFO: main::fetch() (((((((CALLER))))))):\n       ",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=$_[0];my $output='';my $select_timeout=2;my $ready='';
+   my $save=$_[1]||'';
+   my $display=(grep { /__display__/ } @_)?1:0;
    if (select $ready=${${*{$self->{_cmd_handle}}}{'net_telnet'}}{'fdmask'},
           '', '', $select_timeout) {
       alarm($select_timeout+10);
@@ -2588,14 +2600,17 @@ sub fetch
       if ($@ eq "alarm\n") {
          $self->{_cmd_handle}->print();
       }
-      return $output;
-
-      #alarm($select_timeout+10);
-      #sysread $self->{_cmd_handle},$output,
-      #        ${${*{$self->{_cmd_handle}}}{net_telnet}}{blksize},0;
-      #alarm(0);
-      #return $output;
-   } return ' ';
+      my $prompt=$self->prompt();
+      $save=&Rem_Command::display($output,$prompt,$save)
+         if $display;
+      print $Net::FullAuto::FA_Core::LOG $output
+         if $Net::FullAuto::FA_Core::log &&
+         -1<index $Net::FullAuto::FA_Core::LOG,'*';
+      return $output unless wantarray;
+      return $output,'' unless $save;
+      return $output,$save;
+   } return '' unless wantarray;
+   return '','';
 
 }
 
@@ -2604,18 +2619,16 @@ sub cmd_raw
 
    my $self=$_[0];
    my $cmd=$_[1];
-   my $display=(grep { /__display__/ } @_)?1:0;
-   $self->{_cmd_handle}->print($cmd);
-   my $prompt=substr($self->{_cmd_handle}->prompt(),1,-1);
+   my $display=(grep { /__display__/ } @_)?'__display__':'';
+   $self->print($cmd);
+   my $prompt=$self->prompt();
    my $alloutput='';
    my $save='';
    while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($self);
+      my $output='';
+      ($output,$save)=fetch($self,$save);
       $alloutput.=$output;
       last if $output=~/$prompt/;
-      print $output if $display;
-      $save=&Rem_Command::display($output,$prompt,$save)
-         if $display;
    }
    return $alloutput;
 
@@ -31038,7 +31051,7 @@ sub cmd_raw
 sub display
 {
    #print "DISPLAY_CALLER=",caller,"\n";sleep 1;
-   select(undef,undef,undef,0.50);
+   select(undef,undef,undef,0.50) if defined $_[4];
    my $line=$_[0];
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
@@ -31050,6 +31063,7 @@ sub display
          (-1<index $line,'Kre') ||
          (-1<index $line,'KRe') ||
          (-1<index $line,'KUp'))) {
+      select(undef,undef,undef,0.50);
       if ($line=~/\[K?$/s) {
          $save.=$line;
          return $save;
@@ -31062,6 +31076,7 @@ sub display
          $line=~s/\)remote/\)\nremote/sg;
       }
    } elsif ($save eq '[K') {
+      select(undef,undef,undef,0.50);
       $line=$save.$line;
       $line=~s/\[K/\n/gs;
       if (-1<index $line,'remote: T') {

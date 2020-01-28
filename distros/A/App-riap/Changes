@@ -1,3 +1,12 @@
+0.381   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Move 'as' to second argument of format_completion (Complete::Bash
+          0.333).
+
+	- Remove deprecated completion answer property 'esc_mode'
+          (Complete 0.202).
+
+
 0.380   2019-08-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Update dependencies (esp. renamed module Data::Clean::JSON ->

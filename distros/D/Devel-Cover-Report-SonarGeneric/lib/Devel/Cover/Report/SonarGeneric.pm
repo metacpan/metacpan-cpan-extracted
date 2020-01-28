@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Path::Tiny qw(path);
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 sub report {
     my ($pkg, $db, $options) = @_;
@@ -29,8 +29,8 @@ sub report {
                 $covered |= $scov || $sunc;
             }
             my $covtxt = $covered > 0 ? 'true' : 'false';
-            my $binfo = $br->location($lnr) // [];
-            my $cinfo = $cn->location($lnr) // [];
+            my $binfo = defined($br) ? $br->location($lnr) // [] : [];
+            my $cinfo = defined($cn) ? $cn->location($lnr) // [] : [];
             my $btot = my $bcov = 0;
             for my $b ( @$binfo, @$cinfo ) {
                 $btot += $b->total;

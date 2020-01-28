@@ -1,5 +1,11 @@
 Revision history for Dir-Manifest
 
+0.6.1       2020-01-28
+    - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
+    POD documentation (see:
+    https://metacpan.org/changes/distribution/Pod-Weaver-PluginBundle-SHLOMIF#L3
+    )
+
 0.6.0       2020-01-06
     - Add the ->dwim_new() constructor.
 

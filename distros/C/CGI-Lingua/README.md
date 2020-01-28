@@ -4,7 +4,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.60
+Version 0.61
 
 # SYNOPSIS
 
@@ -176,6 +176,13 @@ Returns a [Locale::Object::Country](https://metacpan.org/pod/Locale%3A%3AObject%
 To be clear, if you're in the US and request the language in Spanish,
 and the site supports it, language() will return 'Spanish', and locale() will
 try to return the Locale::Object::Country for the US.
+
+## timezone
+
+Returns the timezone of the web client.
+
+If [Geo::IP](https://metacpan.org/pod/Geo%3A%3AIP) is installed,
+CGI::Lingua will make use of that, otherwise it will use ip-api.com
 
 # AUTHOR
 

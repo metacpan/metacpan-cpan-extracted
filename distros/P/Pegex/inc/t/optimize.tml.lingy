@@ -4,8 +4,4 @@
       1,
       1,
       "[SKIP] Skipping this test for now. Might need a %Skip in TestML."]],
-  "data": [
-    { "label": "Question Mark Expansion",
-      "point": {
-        "grammar": "a: /(:foo)/\n",
-        "yaml": "a:\n  .rgx: /(?:foo)/\n"}}]}
+  "data": []}

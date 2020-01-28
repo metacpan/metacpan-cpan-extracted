@@ -64,7 +64,7 @@ push @subwins, $win->make_sub( 6, 40, 2, 15 );
 $subwins[-1]->pen->chattr( fg => 3 );
 $subwins[-1]->bind_event( expose => \&fillwin );
 
-$tickit->later( sub {
+$tickit->watch_later( sub {
       $rootwin->expose;
 } );
 

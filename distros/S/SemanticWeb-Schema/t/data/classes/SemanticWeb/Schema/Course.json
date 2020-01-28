@@ -31,8 +31,8 @@
          "rdfs:label" : "educationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:Course"
+            "schema:Course",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
@@ -47,6 +47,22 @@
          "schema:domainIncludes" : "schema:Course",
          "schema:rangeIncludes" : "schema:CourseInstance"
       },
+      "schema:numberOfCredits" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of credits or units awarded by a Course or required to complete an EducationalOccupationalProgram.",
+         "rdfs:label" : "numberOfCredits",
+         "schema:category" : "issue-2419",
+         "schema:domainIncludes" : [
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Integer",
+            "schema:StructuredValue"
+         ]
+      },
       "schema:occupationalCredentialAwarded" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
@@ -59,9 +75,9 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:EducationalOccupationalCredential",
-            "schema:URL",
-            "schema:Text"
+            "schema:URL"
          ]
       }
    }

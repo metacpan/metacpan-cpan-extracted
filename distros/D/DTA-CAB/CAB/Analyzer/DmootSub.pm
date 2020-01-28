@@ -92,27 +92,27 @@ sub analyzeSentences {
   #$asub->ensureLoaded();
 
   ##-- get dmoot target types
-  my $dmkey = $asub->{dmootLabel};
+  my $dmkey      = $asub->{dmootLabel};
   my $standalone = $asub->{standalone};
-  my $dmtypes = {};   ##-- $dmtypes:  {$dmootTag => {text=>$dmootTag, morph=>\@dmootMorph}, ... } ##-- analyzed types
-  my $udmtypes = {};  ##-- $udmtypes: {$dmootTag => {text=>$dmootTag, morph=>undef, ...}}         ##-- un-analyzed types
+  my $dmtypes = {};   ##-- $dmtypes:  {$tokText => {text=>$dmootTag, morph=>\@dmootMorph}, ... } ##-- analyzed types
+  my $udmtypes = {};  ##-- $udmtypes: {$tokText => {text=>$dmootTag, morph=>undef, ...}}         ##-- un-analyzed types
   my $nil      = [];
   my ($tok,$txt,$dm,$dmtag,$dmtyp);
  TOK:
   foreach $tok (map {@{$_->{tokens}}} @{$doc->{body}}) {
     next if (!defined($dm=$tok->{$dmkey}));
-    $dmtag = $dm->{tag};
+    $dmtag  = $dm->{tag};
 
     ##-- check for existing analyses
-    $txt = $tok->{xlit} ? $tok->{xlit}{latin1Text} : $tok->{text};
+    $txt  = $tok->{xlit} ? $tok->{xlit}{latin1Text} : $tok->{text};
     if (($tok->{toka} && @{$tok->{toka}}) || ($tok->{tokpp} && @{$tok->{tokpp}})) {
       ##-- existing analyses: toka|tokpp
       $dm->{morph} = [ map { {hi=>$_,w=>0} } @{$tok->{toka} // $tok->{tokpp} // $nil} ];
       $dm->{tag}   = $tok->{xlit} && $tok->{xlit}{isLatinExt} ? $tok->{xlit}{latin1Text} : $tok->{text}; ##-- force literal text for tokenizer-analyzed tokens
     }
     elsif (!$standalone) {
-      $dmtyp = $dmtypes->{$dmtag};
-      $dmtyp = $dmtypes->{$dmtag} = { text=>$dmtag } if (!defined($dmtyp));
+      #$dmtyp = $dmtypes->{$dmtag} = { text=>$dmtag } if (!defined($dmtyp=$dmtypes->{$txt}));
+      $dmtyp = $dmtypes->{$txt} = { text=>$dmtag } if (!defined($dmtyp=$dmtypes->{$txt}));
       if ($dmtyp->{morph} && @{$dmtyp->{morph}}) {
 	$dm->{morph} = $dmtyp->{morph} if (!$dm->{morph} || !@{$dm->{morph}});
 	next;
@@ -133,7 +133,7 @@ sub analyzeSentences {
 	}
       }
       ##-- oops... might need to re-analyze
-      $udmtypes->{$dmtag} = $dmtyp if (!$dmtyp->{morph} || !@{$dmtyp->{morph}});
+      $udmtypes->{$txt} = $dmtyp if (!$dmtyp->{morph} || !@{$dmtyp->{morph}});
     }
   }
 
@@ -156,7 +156,10 @@ sub analyzeSentences {
     foreach $tok (map {@{$_->{tokens}}} @{$doc->{body}}) {
       next if (!defined($dm=$tok->{$dmkey})
 	       || !defined($dmtag=$dm->{tag})
-	       || !defined($dmtyp=$udmtypes->{$dmtag}));
+               || !defined($txt=$tok->{xlit} ? $tok->{xlit}{latin1Text} : $tok->{text})
+	       #|| !defined($dmtyp=$udmtypes->{$dmtag})
+               || !defined($dmtyp=$udmtypes->{$txt})
+              );
       @$dm{keys %$dmtyp} = values %$dmtyp;
       $dm->{morph} = [@{$dm->{morph}||[]}, @{$dm->{mlatin}}] if ($dm->{mlatin}); ##-- hack: adopt 'mlatin' into 'morph'
     }

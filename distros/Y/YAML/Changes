@@ -1,3 +1,7 @@
+1.30 Mon 27 Jan 2020 11:09:46 PM CET
+ - Breaking Change: Set $YAML::LoadBlessed default to false to make it more
+   secure
+
 1.29 Sat 11 May 2019 10:26:54 AM CEST
  - Fix regex for alias to match the one for anchors (PR#214 TINITA)
 

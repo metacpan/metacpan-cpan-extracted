@@ -5,5 +5,32 @@
       "rdfs:label" : "ApartmentComplex",
       "rdfs:subClassOf" : "schema:Residence"
    },
-   "properties" : {}
+   "properties" : {
+      "schema:numberOfAccommodationUnits" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the total (available plus unavailable) number of accommodation units in an <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a>, or the number of accommodation units for a specific <a class=\"localLink\" href=\"http://schema.org/FloorPlan\">FloorPlan</a> (within its specific <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a>). See also <a class=\"localLink\" href=\"http://schema.org/numberOfAvailableAccommodationUnits\">numberOfAvailableAccommodationUnits</a>.",
+         "rdfs:label" : "numberOfAccommodationUnits",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:FloorPlan",
+            "schema:ApartmentComplex"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:numberOfAvailableAccommodationUnits" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the number of available accommodation units in an <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a>, or the number of accommodation units for a specific <a class=\"localLink\" href=\"http://schema.org/FloorPlan\">FloorPlan</a> (within its specific <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a>). See also <a class=\"localLink\" href=\"http://schema.org/numberOfAccommodationUnits\">numberOfAccommodationUnits</a>.",
+         "rdfs:label" : "numberOfAvailableAccommodationUnits",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:FloorPlan",
+            "schema:ApartmentComplex"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      }
+   }
 }

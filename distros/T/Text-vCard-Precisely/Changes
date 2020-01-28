@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.17 2020-01-22T07:11:05Z
+  - adupted with some environment they have no Text::Diff
+
 0.16 2020-01-20T11:49:06Z
   - failing to install for Windows is fixed
 

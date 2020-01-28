@@ -22,9 +22,10 @@ name: IP-Random
 provides:
   IP::Random:
     file: lib/IP/Random.pm
-    version: '1.008'
+    version: '1.200230'
 requires:
   Carp: '0'
+  Exporter: '0'
   List::Util: '1.50'
   Socket: '0'
   feature: '0'
@@ -34,8 +35,8 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/IP-Random/issues
   repository: git://github.com/jmaslak/IP-Random.git
-version: '1.008'
+version: '1.200230'
 x_contributor_covenant:
   version: 0.02
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

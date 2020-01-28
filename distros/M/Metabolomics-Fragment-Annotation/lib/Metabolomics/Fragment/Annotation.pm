@@ -54,7 +54,7 @@ Version 0.2
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 
 =head1 SYNOPSIS
@@ -508,7 +508,7 @@ sub _computeMzDeltaInMmu {
 sub _computeMzDeltaInPpm {
     ## Retrieve Values
     my ( $calcMz, $mzDeltaMmu ) = @_;
-    my ( $mzDeltaPpm ) = ( 0 ) ;
+    my ( $mzDeltaPpm, $mzDeltaPpmRounded ) = ( undef, undef ) ;
     
 #    print "$calcMz -> $mzDeltaMmu\n" ;
     
@@ -518,14 +518,14 @@ sub _computeMzDeltaInPpm {
 #    	print "\t$mzDeltaPpm\n";
     	
     	my $oUtils = Metabolomics::Utils->new() ;
-    	my $mzDeltaPpm = $oUtils->roundFloat($mzDeltaPpm, 0) ;
+    	$mzDeltaPpmRounded = $oUtils->roundFloat($mzDeltaPpm, 0) ;
     	
     }
     else {
     	carp "[ERROR Given masses are null\n" ;
     }
     
-    return ($mzDeltaPpm) ;
+    return ($mzDeltaPpmRounded) ;
 }
 ### END of SUB
 

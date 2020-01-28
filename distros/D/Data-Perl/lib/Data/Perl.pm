@@ -1,5 +1,5 @@
 package Data::Perl;
-$Data::Perl::VERSION = '0.002009';
+$Data::Perl::VERSION = '0.002011';
 # ABSTRACT: Base classes wrapping fundamental Perl data types.
 
 BEGIN {
@@ -44,7 +44,7 @@ Data::Perl - Base classes wrapping fundamental Perl data types.
 
 =head1 VERSION
 
-version 0.002009
+version 0.002011
 
 =head1 SYNOPSIS
 
@@ -164,9 +164,41 @@ much of this work is based.
 
 Matthew Phillips <mattp@cpan.org>
 
+=head1 MAINTAINER
+
+Toby Inkster <tobyink@cpan.org> since version 0.002010.
+
+=head1 CONTRIBUTORS
+
+=for stopwords Graham Knop Jon Portnoy kristof.pap@gmail.com Matt Phillips Toby Inkster
+
+=over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=item *
+
+kristof.pap@gmail.com <kristof.pap@gmail.com>
+
+=item *
+
+Matt Phillips <mattp@cpan.org>
+
+=item *
+
+Toby Inkster <tobyink@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Matthew Phillips <mattp@cpan.org>.
+This software is copyright (c) 2020 by Matthew Phillips <mattp@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

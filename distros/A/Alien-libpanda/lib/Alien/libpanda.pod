@@ -1,0 +1,17 @@
+=head1 NAME
+
+Alien::libpanda - panda::lib C++ library (alien).
+
+=head1 DESCRIPTION
+
+This library is intended to use only from XS modules.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

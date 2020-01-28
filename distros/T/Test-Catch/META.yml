@@ -3,15 +3,15 @@ abstract: 'Run C++ catch tests from perl test file'
 author:
   - unknown
 build_requires:
-  CPP::catch: v1.0.8
+  Alien::catch: v1.1.0
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::catch: v1.0.8
+  Alien::catch: v1.1.0
   XS::Install: v1.2.12
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,9 @@ no_index:
     - t
     - inc
 requires:
-  CPP::catch: v1.0.8
+  Alien::catch: v1.1.0
   Test::More: '1.302015'
   Test::Simple: '1.302096'
   XS::Install: v1.2.12
-version: v1.0.10
+version: v1.0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

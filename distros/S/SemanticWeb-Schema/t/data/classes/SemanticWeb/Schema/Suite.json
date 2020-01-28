@@ -17,9 +17,9 @@
             "schema:Suite"
          ],
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:BedType",
-            "schema:BedDetails",
-            "schema:Text"
+            "schema:BedDetails"
          ]
       },
       "schema:numberOfRooms" : {
@@ -29,15 +29,16 @@
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
             "schema:Suite",
-            "schema:LodgingBusiness",
-            "schema:House",
+            "schema:Accommodation",
             "schema:Apartment",
+            "schema:House",
+            "schema:LodgingBusiness",
             "schema:SingleFamilyResidence",
-            "schema:Accommodation"
+            "schema:FloorPlan"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Number"
          ]
       },
       "schema:occupancy" : {
@@ -46,10 +47,10 @@
          "rdfs:comment" : "The allowed total occupancy for the accommodation in persons (including infants etc). For individual accommodations, this is not necessarily the legal maximum but defines the permitted usage as per the contractual agreement (e.g. a double room used by a single person).\nTypical unit code(s): C62 for person",
          "rdfs:label" : "occupancy",
          "schema:domainIncludes" : [
-            "schema:Suite",
-            "schema:SingleFamilyResidence",
             "schema:Apartment",
-            "schema:HotelRoom"
+            "schema:Suite",
+            "schema:HotelRoom",
+            "schema:SingleFamilyResidence"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       }

@@ -4,7 +4,7 @@
 # (04_splice.t checks its effect on the file)
 #
 
-my $file = "tf$$.txt";
+my $file = "tf11-$$.txt";
 my $data = "rec0blahrec1blahrec2blah";
 
 print "1..50\n";
@@ -154,7 +154,7 @@ check_result(0..3);
 
 sub init_file {
   my $data = shift;
-  open F, "> $file" or die $!;
+  open F, '>', $file or die $!;
   binmode F;
   print F $data;
   close F;

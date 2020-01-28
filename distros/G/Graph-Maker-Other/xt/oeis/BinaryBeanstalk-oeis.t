@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017, 2018 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,8 +20,9 @@
 
 use 5.004;
 use strict;
+use Memoize;
 use Test;
-plan tests => 42;
+plan tests => 51;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -39,6 +40,165 @@ require Graph::Maker::BinaryBeanstalk;
 #
 # number of runs binary beanstalk A255327=size of subtree, A255056=trunk
 # parent = A236840(vertex)   n - number of runs in n
+
+
+#------------------------------------------------------------------------------
+
+sub round_up_pow2 {
+  my ($n) = @_;
+  my $p = 1;
+  while ($p < $n) { $p <<= 1; }
+  return $p;
+}
+sub n_is_trunk {
+  my ($n) = @_;
+  return n_is_descendent_of(2*round_up_pow2($n)-1, $n);
+}
+sub n_is_descendent_of {
+  my ($n, $ancestor) = @_;
+  for (;;) {
+    if ($n == $ancestor) { return 1; }
+    if ($n < $ancestor || $n == 0) { return 0; }
+    $n = n_to_parent($n);
+  }
+}
+sub depth_to_trunk {
+  my ($depth) = @_;
+  my $n = depth_to_n($depth);
+  while (! n_is_trunk($n)) { $n++; }
+  return $n;
+}
+
+sub depth_to_width {
+  my ($depth) = @_;
+  return depth_to_n_end($depth) - depth_to_n($depth) + 1;
+}
+
+{
+  my @n_to_depth = (0);
+  sub n_to_depth {
+    my ($n) = @_;
+    $n >= 0 or die;
+    return ($n_to_depth[$n] //= do {
+      my $extra = 0;
+      while (! defined $n_to_depth[$n]) {
+        $n = n_to_parent($n);
+        $extra++;
+      }
+      $n_to_depth[$n] + $extra;
+    });
+  }
+}
+
+{
+  my @depth_to_n = (0);
+  sub depth_to_n {
+    my ($depth) = @_;
+    $depth >= 0 or die;
+    while ($#depth_to_n < $depth) {
+      my $target_depth = $#depth_to_n + 1;
+      for (my $n = $depth_to_n[$#depth_to_n]; ; $n++) {
+        if (n_to_depth($n) == $target_depth) {
+          $depth_to_n[$target_depth] = $n;
+          last;
+        }
+      }
+    }
+    return $depth_to_n[$depth];
+  }
+}
+
+sub depth_to_n_end {
+  my ($depth) = @_;
+  $depth >= 0 or die;
+  return depth_to_n($depth+1) - 1;
+}
+
+sub depth_to_n_list {
+  my ($depth) = @_;
+  return depth_to_n($depth) .. depth_to_n_end($depth);
+}
+
+sub depth_to_childful_list {
+  my ($depth) = @_;
+  my $first_n = depth_to_n($depth);
+  my $last_n  = depth_to_n_end($depth);
+  my $width = $last_n - $first_n + 1;
+  my @childful = (0) x $width;
+  foreach my $n (depth_to_n($depth+1) .. depth_to_n_end($depth+1)) {
+    my $parent = n_to_parent($n);
+    ($first_n <= $parent && $parent <= $last_n) or die;
+    $childful[$parent - $first_n] = 1;
+  }
+  return @childful;
+}
+ok (join('',depth_to_childful_list(36)), '1101');
+
+sub is_contiguous_1s {
+  my $seen_10 = 0;
+  my $prev = 0;
+  foreach my $x (@_) {
+    if ($x && $seen_10) { return 0; }
+    if ($prev == 1 && $x == 0) { $seen_10 = 1; }
+    $prev = $x;
+  }
+  return 1;
+}
+ok (is_contiguous_1s(), 1);
+ok (is_contiguous_1s(0), 1);
+ok (is_contiguous_1s(0,1), 1);
+ok (is_contiguous_1s(1,1,1), 1);
+ok (is_contiguous_1s(0,1,1,1), 1);
+ok (is_contiguous_1s(0,1,1,1,0,0), 1);
+ok (is_contiguous_1s(0,1,1,1,0,1), 0);
+ok (is_contiguous_1s(1,0,1), 0);
+
+
+
+#------------------------------------------------------------------------------
+# first vertex of row is childful
+# not in OEIS: 1,1,0,1,0,1,1,0,1,1,0,0,0,1,1,0,0,0,0,0,1,0,1,1,0,0,0,0,0,1
+#
+# last vertex of row is childful
+# not in OEIS: 1,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,0,0,0,1,0,1,1,0,1,0,0,0,1
+# not A260397 partial middle match
+
+# MyOEIS::compare_values
+#   (anum => 'A000027',
+#    max_count => 40,
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $depth = 0; @got < $count; $depth++) {
+#        my @childful = depth_to_childful_list($depth);
+#        push @got, $childful[-1];
+#      }
+#      return \@got;
+#    });
+
+
+#------------------------------------------------------------------------------
+# depths where non-contiguous childful vertices
+#
+# not in OEIS: 36,53,61,62,63,64,65,66,67,83,91,92,93,94,95,96,97,104,105,106
+# not in OEIS: 37,54,62,63,64,65,66,67,68,84,92,93,94,95,96,97,98,105,106,107
+# not in OEIS: 35,52,60,61,62,63,64,65,66,82,90,91,92,93,94,95,96,103,104,105
+
+# MyOEIS::compare_values
+#   (anum => 'A000027',
+#    max_count => 20,
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      for (my $depth = 0; @got < $count; $depth++) {
+#        my @childful = depth_to_childful_list($depth);
+#        if (! is_contiguous_1s(@childful)) {
+#          push @got, $depth;
+#        }
+#        print join('',@childful),"\n";
+#      }
+#      return \@got;
+#    });
 
 
 #------------------------------------------------------------------------------
@@ -454,16 +614,6 @@ MyOEIS::compare_values
      return \@got;
    });
 
-sub n_to_depth {
-  my ($n) = @_;
-  my $depth = 0;
-  while ($n > 0) {
-    $n = n_to_parent($n);
-    $depth++;
-  }
-  return $depth;
-}
-
 #------------------------------------------------------------------------------
 # A213728  trunk n mod 2, flip 0<->1
 MyOEIS::compare_values
@@ -744,14 +894,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-sub depth_to_n {
-  my ($depth) = @_;
-  for (my $n = 0; ; $n++) {
-    if (n_to_depth($n) == $depth) {
-      return $n;
-    }
-  }
-}
 
 # A173601 first vertex in row, num vertices of preceding rows
 MyOEIS::compare_values
@@ -764,14 +906,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-sub depth_to_n_end {
-  my ($depth) = @_;
-  for (my $n = 0; ; $n++) {
-    if (n_to_depth($n) == $depth+1) {
-      return $n-1;
-    }
-  }
-}
 
 # A086876 row width
 MyOEIS::compare_values
@@ -798,38 +932,6 @@ MyOEIS::compare_values
      }
      return \@got;
    });
-
-#------------------------------------------------------------------------------
-
-sub round_up_pow2 {
-  my ($n) = @_;
-  my $p = 1;
-  while ($p < $n) { $p <<= 1; }
-  return $p;
-}
-sub n_is_trunk {
-  my ($n) = @_;
-  return n_is_descendent_of(2*round_up_pow2($n)-1, $n);
-}
-sub n_is_descendent_of {
-  my ($n, $ancestor) = @_;
-  for (;;) {
-    if ($n == $ancestor) { return 1; }
-    if ($n < $ancestor || $n == 0) { return 0; }
-    $n = n_to_parent($n);
-  }
-}
-sub depth_to_trunk {
-  my ($depth) = @_;
-  my $n = depth_to_n($depth);
-  while (! n_is_trunk($n)) { $n++; }
-  return $n;
-}
-
-sub depth_to_width {
-  my ($depth) = @_;
-  return depth_to_n_end($depth) - depth_to_n($depth) + 1;
-}
 
 #------------------------------------------------------------------------------
 exit 0;

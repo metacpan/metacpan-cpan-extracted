@@ -4,6 +4,10 @@ package OpenTracing::Interface::Tracer;
 use strict;
 use warnings;
 
+
+our $VERSION = '0.10';
+
+
 use Role::MethodReturns;
 
 use Types::Standard qw/ArrayRef Bool Dict HashRef Optional Str Undef/;

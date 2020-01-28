@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -14,7 +14,8 @@ use Sub::HandlesVia::Handler qw( handler );
 use Types::Standard qw( HashRef ArrayRef Optional Str CodeRef Item Any Ref Defined );
 
 our @METHODS = qw( all accessor clear count defined delete elements exists get
-	is_empty keys kv set shallow_clone values sorted_keys );
+	is_empty keys kv set shallow_clone values sorted_keys
+	for_each_pair for_each_key for_each_value );
 
 sub _type_inspector {
 	my ($me, $type) = @_;
@@ -184,7 +185,7 @@ sub shallow_clone {
 sub _old_set {
 	my $me = CORE::shift;
 	handler
-		name      => 'Array:set',
+		name      => 'Hash:set',
 		args      => 2,
 		signature => [Str, Any],
 		usage     => '$key, $value',
@@ -196,7 +197,7 @@ sub _old_set {
 sub set {
 	my $me = CORE::shift;
 	handler
-		name      => 'Array:set',
+		name      => 'Hash:set',
 		min_args  => 2,
 		usage     => '$key, $value, ...',
 		template  => (
@@ -255,7 +256,7 @@ sub set {
 
 sub accessor {
 	handler
-		name      => 'Array:accessor',
+		name      => 'Hash:accessor',
 		min_args  => 1,
 		max_args  => 2,
 		signature => [Str, Optional[Any]],
@@ -263,6 +264,33 @@ sub accessor {
 		template  => 'if (#ARG == 1) { ($GET)->{ $ARG[1] } } else { my %shv_tmp = %{$GET}; $shv_tmp{$ARG[1]} = $ARG[2]; «\\%shv_tmp» }',
 		lvalue_template => '(#ARG == 1) ? ($GET)->{ $ARG[1] } : (($GET)->{ $ARG[1] } = $ARG[2])',
 		additional_validation => $additional_validation_for_set_and_insert,
+}
+
+sub for_each_pair {
+	handler
+		name      => 'Hash:for_each_pair',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'while (my ($shv_key,$shv_value)=each %{$GET}) { &{$ARG}($shv_key,$shv_value) }; $SELF',
+}
+
+sub for_each_key {
+	handler
+		name      => 'Hash:for_each_key',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'for my $shv_key (keys %{$GET}) { &{$ARG}($shv_key) }; $SELF',
+}
+
+sub for_each_value {
+	handler
+		name      => 'Hash:for_each_value',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'for my $shv_value (values %{$GET}) { &{$ARG}($shv_value) }; $SELF',
 }
 
 1;

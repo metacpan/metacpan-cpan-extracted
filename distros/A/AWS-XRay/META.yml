@@ -27,7 +27,7 @@ no_index:
 provides:
   AWS::XRay:
     file: lib/AWS/XRay.pm
-    version: '0.09'
+    version: '0.10'
   AWS::XRay::Buffer:
     file: lib/AWS/XRay/Buffer.pm
   AWS::XRay::Plugin::EC2:
@@ -49,12 +49,13 @@ resources:
   bugtracker: https://github.com/fujiwara/AWS-XRay/issues
   homepage: https://github.com/fujiwara/AWS-XRay
   repository: git://github.com/fujiwara/AWS-XRay.git
-version: '0.09'
+version: '0.10'
 x_authority: cpan:FUJIWARA
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'moznion <moznion@gmail.com>'
+  - 'mutsutoshi.yoshimoto <mutsutoshi.yoshimoto@20202759n.guest.mixi.co.jp>'
   - 'papix <mail@papix.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

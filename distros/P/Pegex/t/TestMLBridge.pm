@@ -3,13 +3,14 @@ use strict; use warnings;
 package TestMLBridge;
 use base 'TestML::Bridge';
 
+use lib 'lib';  # Avoid using testml/ext/perl5/Pegex*
 use Pegex;
 use Pegex::Compiler;
 use Pegex::Bootstrap;
 use Pegex::Tree;
 use Pegex::Tree::Wrap;
 use TestAST;
-use YAML::XS;
+use YAML::PP;
 
 sub compile {
     my ($self, $grammar) = @_;
@@ -44,7 +45,12 @@ sub compress {
 sub yaml {
     my ($self, $data) = @_;
     my $tree = $data;
-    return YAML::XS::Dump($tree);
+    my $yaml = YAML::PP->new(schema => ['Core', 'Perl'])
+                       ->dump_string($tree);
+
+    $yaml =~ s/\n *(\[\]\n)/ $1/g;      # Work around YAML::PP formatting issue
+
+    return $yaml;
 }
 
 sub clean {

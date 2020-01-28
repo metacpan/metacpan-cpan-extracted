@@ -1,38 +1,51 @@
 package Dash;
 
-use strict;
-use warnings;
+use Moo;
+use strictures 2;
 use 5.020;
 
-our $VERSION = '0.06';    # VERSION
+our $VERSION = '0.10';    # VERSION
 
 # ABSTRACT: Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 # TODO Enable signatures?
 
-use Mojo::Base 'Mojolicious';
 use JSON;
 use Scalar::Util;
 use Browser::Open;
-use File::ShareDir;
 use Path::Tiny;
-use Try::Tiny;
 use Dash::Renderer;
+use Dash::Config;
 use Dash::Exceptions::NoLayoutException;
+use Dash::Exceptions::PreventUpdate;
+use Dash::Backend::Mojolicious::App;
+use namespace::clean;
 
 # TODO Add ci badges
 
-has app_name => __PACKAGE__;
+has app_name => ( is      => 'ro',
+                  default => __PACKAGE__ );
 
-has external_stylesheets => sub { [] };
+has external_stylesheets => ( is      => 'rw',
+                              default => sub { [] } );
 
-has _layout => sub { {} };
+has _layout => ( is      => 'rw',
+                 default => sub { {} } );
 
-has _callbacks => sub { {} };
+has _callbacks => ( is      => 'rw',
+                    default => sub { {} } );
 
-has '_rendered_scripts' => "";
+has _rendered_scripts => ( is      => 'rw',
+                           default => "" );
 
-has '_rendered_external_stylesheets' => "";
+has _rendered_external_stylesheets => ( is      => 'rw',
+                                        default => "" );
+
+has backend => ( is      => 'rw',
+                 default => sub { Dash::Backend::Mojolicious::App->new( dash_app => shift ) } );
+
+has config => ( is      => 'rw',
+                default => sub { Dash::Config->new() } );
 
 sub layout {
     my $self   = shift;
@@ -53,7 +66,7 @@ sub layout {
 
 sub callback {
     my $self     = shift;
-    my %callback = @_;
+    my %callback = $self->_process_callback_arguments(@_);
 
     # TODO check_callback
     # TODO Callback map
@@ -62,6 +75,107 @@ sub callback {
     my $callbacks   = $self->_callbacks;
     $callbacks->{$callback_id} = \%callback;
     return $self;
+}
+
+my $no_update;
+my $internal_no_update = bless( \$no_update, 'Dash::Internal::NoUpdate' );
+
+sub no_update {
+    return $internal_no_update;
+}
+
+sub _process_callback_arguments {
+    my $self = shift;
+
+    my %callback;
+
+    # 1. all refs: 1 blessed, 1 array, 1 code or 2 array, 1 code
+    #    Hash with keys Output, Inputs, callback
+    # 2.     Values content:  hashref or arrayref[hashref], arrayref[hashref], coderef
+    # 3.     Values content:  blessed output or arrayref[blessed], arrayref[blessed], coderef
+
+    if ( scalar @_ < 5 ) {    # Unamed arguments, put names
+        my ( $output_index, $input_index, $state_index, $callback_index );
+
+        my $index = 0;
+        for my $argument (@_) {
+            my $type = ref $argument;
+            if ( $type eq 'CODE' ) {
+                $callback_index = $index;
+            } elsif ( Scalar::Util::blessed $argument) {
+                if ( $argument->isa('Dash::Dependencies::Output') ) {
+                    $output_index = $index;
+                }
+            } elsif ( $type eq 'ARRAY' ) {
+                if ( scalar @$argument > 0 ) {
+                    my $first_element = $argument->[0];
+                    if ( Scalar::Util::blessed $first_element) {
+                        if ( $first_element->isa('Dash::Dependencies::Output') ) {
+                            $output_index = $index;
+                        } elsif ( $first_element->isa('Dash::Dependencies::Input') ) {
+                            $input_index = $index;
+                        } elsif ( $first_element->isa('Dash::Dependencies::State') ) {
+                            $state_index = $index;
+                        }
+                    }
+                } else {
+                    die "Can't use empty arrayrefs as arguments";
+                }
+            } elsif ( $type eq 'SCALAR' ) {
+                die
+                  "Can't mix scalarref arguments with objects when not using named paremeters. Please use named parameters for all arguments or classes for all arguments";
+            } elsif ( $type eq 'HASH' ) {
+                die
+                  "Can't mix hashref arguments with objects when not using named parameters. Please use named parameters for all arguments or classes for all arguments";
+            } elsif ( $type eq '' ) {
+                die
+                  "Can't mix scalar arguments with objects when not using named parameters. Please use named parameters for all arguments or classes for all arguments";
+            }
+            $index++;
+        }
+        if ( !defined $output_index ) {
+            die "Can't find callback output";
+        }
+        if ( !defined $input_index ) {
+            die "Can't find callback inputs";
+        }
+        if ( !defined $callback_index ) {
+            die "Can't find callback function";
+        }
+
+        $callback{Output}   = $_[$output_index];
+        $callback{Inputs}   = $_[$input_index];
+        $callback{callback} = $_[$callback_index];
+        if ( defined $state_index ) {
+            $callback{State} = $_[$state_index];
+        }
+    } else {    # Named arguments
+                # TODO check keys ¿Params::Validate or similar?
+        %callback = @_;
+    }
+
+    # Convert Output & input to hashrefs
+    for my $key ( keys %callback ) {
+        my $value = $callback{$key};
+
+        if ( ref $value eq 'ARRAY' ) {
+            my @hashes;
+            for my $dependency (@$value) {
+                if ( Scalar::Util::blessed $dependency) {
+                    my %dependency_hash = %$dependency;
+                    push @hashes, \%dependency_hash;
+                } else {
+                    push @hashes, $dependency;
+                }
+            }
+            $callback{$key} = \@hashes;
+        } elsif ( Scalar::Util::blessed $value) {
+            my %dependency_hash = %$value;
+            $callback{$key} = \%dependency_hash;
+        }
+    }
+
+    return %callback;
 }
 
 sub _create_callback_id {
@@ -75,84 +189,6 @@ sub _create_callback_id {
     return $output->{component_id} . "." . $output->{component_property};
 }
 
-sub startup {
-    my $self = shift;
-
-    my $renderer = $self->renderer;
-    push @{ $renderer->classes }, __PACKAGE__;
-
-    my $r = $self->routes;
-    $r->get(
-        '/' => sub {
-            my $c = shift;
-            $c->stash( stylesheets          => $self->_rendered_stylesheets,
-                       external_stylesheets => $self->_rendered_external_stylesheets,
-                       scripts              => $self->_rendered_scripts,
-                       title                => $self->app_name
-            );
-            $c->render( template => 'index' );
-        }
-    );
-
-    my $dist_name = 'Dash';
-    $r->get(
-        '/_dash-component-suites/:namespace/*asset' => sub {
-
-            # TODO Component registry to find assets file in other dists
-            my $c    = shift;
-            my $file = $self->_filename_from_file_with_fingerprint( $c->stash('asset') );
-
-            $c->reply->file(
-                       File::ShareDir::dist_file( $dist_name,
-                                                  Path::Tiny::path( 'assets', $c->stash('namespace'), $file )->canonpath
-                       )
-            );
-        }
-    );
-
-    $r->get(
-        '/_favicon.ico' => sub {
-            my $c = shift;
-            $c->reply->file( File::ShareDir::dist_file( $dist_name, 'favicon.ico' ) );
-        }
-    );
-
-    $r->get(
-        '/_dash-layout' => sub {
-            my $c = shift;
-            $c->render( json => $self->layout() );
-        }
-    );
-
-    $r->get(
-        '/_dash-dependencies' => sub {
-            my $c            = shift;
-            my $dependencies = $self->_dependencies();
-            $c->render( json => $dependencies );
-        }
-    );
-
-    $r->post(
-        '/_dash-update-component' => sub {
-            my $c = shift;
-
-            my $request = $c->req->json;
-            try {
-                my $content = $self->_update_component($request);
-                $c->render( json => $content );
-            } catch {
-                if ( Scalar::Util::blessed $_ && $_->isa('Dash::Exceptions::PreventUpdate') ) {
-                    $c->render( status => 204, json => '' );
-                } else {
-                    die $_;
-                }
-            };
-        }
-    );
-
-    return $self;
-}
-
 sub run_server {
     my $self = shift;
 
@@ -164,9 +200,9 @@ sub run_server {
     # TODO Open browser optional
     if ( not caller(1) ) {
         Browser::Open::open_browser('http://127.0.0.1:8080');
-        $self->start( 'daemon', '-l', 'http://*:8080' );
+        $self->backend->start( 'daemon', '-l', 'http://*:8080' );
     }
-    return $self;
+    return $self->backend;
 }
 
 sub _dependencies {
@@ -219,12 +255,14 @@ sub _update_component {
         } elsif ( scalar @$callbacks == 1 ) {
             my $callback           = $callbacks->[0];
             my @callback_arguments = ();
+            my $callback_context   = {};
             for my $callback_input ( @{ $callback->{Inputs} } ) {
                 my ( $component_id, $component_property ) = @{$callback_input}{qw(component_id component_property)};
                 for my $change_input ( @{ $request->{inputs} } ) {
                     my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
                     if ( $component_id eq $id && $component_property eq $property ) {
                         push @callback_arguments, $value;
+                        $callback_context->{inputs}{ $id . "." . $property } = $value;
                         last;
                     }
                 }
@@ -235,25 +273,47 @@ sub _update_component {
                     my ( $id, $property, $value ) = @{$change_input}{qw(id property value)};
                     if ( $component_id eq $id && $component_property eq $property ) {
                         push @callback_arguments, $value;
+                        $callback_context->{states}{ $id . "." . $property } = $value;
                         last;
                     }
                 }
             }
+
+            $callback_context->{triggered} = [];
+            for my $triggered_input ( @{ $request->{changedPropIds} } ) {
+                push @{ $callback_context->{triggered} },
+                  { prop_id => $triggered_input,
+                    value   => $callback_context->{inputs}{$triggered_input}
+                  };
+            }
+            push @callback_arguments, $callback_context;
+
             my $output_type = ref $callback->{Output};
             if ( $output_type eq 'ARRAY' ) {
                 my @return_value  = $callback->{callback}(@callback_arguments);
                 my $props_updated = {};
                 my $index_output  = 0;
+                my $some_updated  = 0;
                 for my $output ( @{ $callback->{'Output'} } ) {
-                    $props_updated->{ $output->{component_id} } =
-                      { $output->{component_property} => $return_value[$index_output] };
-                    $index_output++;
+                    my $output_value = $return_value[ $index_output++ ];
+                    if ( !( Scalar::Util::blessed($output_value) && $output_value->isa('Dash::Internal::NoUpdate') ) ) {
+                        $props_updated->{ $output->{component_id} } =
+                          { $output->{component_property} => $output_value };
+                        $some_updated = 1;
+                    }
                 }
-                return { response => $props_updated, multi => JSON::true };
+                if ($some_updated) {
+                    return { response => $props_updated, multi => JSON::true };
+                } else {
+                    Dash::Exceptions::PreventUpdate->throw;
+                }
             } elsif ( $output_type eq 'HASH' ) {
-                my $updated_value    = $callback->{callback}(@callback_arguments);
+                my $updated_value = $callback->{callback}(@callback_arguments);
+                if ( Scalar::Util::blessed($updated_value) && $updated_value->isa('Dash::Internal::NoUpdate') ) {
+                    Dash::Exceptions::PreventUpdate->throw;
+                }
                 my $updated_property = ( split( /\./, $request->{output} ) )[-1];
-                my $props_updated    = { $updated_property => $updated_value };
+                my $props_updated = { $updated_property => $updated_value };
                 return { response => { props => $props_updated } };
             } else {
                 die 'Callback not supported';
@@ -304,8 +364,9 @@ sub _render_and_cache_scripts {
 }
 
 sub _render_dash_config {
-    return
-      '<script id="_dash-config" type="application/json">{"url_base_pathname": null, "requests_pathname_prefix": "/", "ui": false, "props_check": false, "show_undo_redo": false}</script>';
+    my $self = shift;
+    my $json = JSON->new->utf8->allow_blessed->convert_blessed;
+    return '<script id="_dash-config" type="application/json">' . $json->encode( $self->config ) . '</script>';
 }
 
 sub _dash_renderer_js_dependencies {
@@ -498,6 +559,8 @@ sub _filename_from_file_with_fingerprint {
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -508,13 +571,14 @@ Dash - Analytical Web Apps in Perl (Port of Plotly's Dash to Perl)
 
 =head1 VERSION
 
-version 0.06
+version 0.10
 
 =head1 SYNOPSIS
 
  use Dash;
  use aliased 'Dash::Html::Components' => 'html';
  use aliased 'Dash::Core::Components' => 'dcc';
+ use aliased 'Dash::Dependencies' => 'deps';
  
  my $external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'];
  
@@ -524,16 +588,16 @@ version 0.06
  );
  
  $app->layout(
-     html->Div(children => [
+     html->Div([
          dcc->Input(id => 'my-id', value => 'initial value', type => 'text'),
          html->Div(id => 'my-div')
      ])
  );
  
  $app->callback(
-     Output => {component_id => 'my-div', component_property => 'children'},
-     Inputs => [{component_id=>'my-id', component_property=> 'value'}],
-     callback => sub {
+     deps->Output('my-div', 'children'),
+     [deps->Input('my-id', 'value')],
+     sub {
          my $input_value = shift;
          return "You've entered '$input_value'";
      }
@@ -583,30 +647,61 @@ version 0.06
 
 =head1 DESCRIPTION
 
-This package is a port of L<Plotly's Dash|https://dash.plot.ly/> to Perl. As
-the official Dash doc says: I<Dash is a productive Python framework for building web applications>. 
-So this Perl package is a humble atempt to ease the task of building data visualization web apps in Perl.
+This package is a port of L<Plotly's Dash|https://dash.plot.ly/> to Perl.
 
-The ultimate goal of course is to support everything that the Python version supports.
+Dash makes building analytical web applications very easy. No JavaScript required.
 
-The use will follow, as close as possible, the Python version of Dash so the Python doc can be used with
-minor changes:
+It's a great way to put a nice interactive web interface to your data analysis application 
+without having to make a javascript interface and without having to setup servers or web frameworks.
+The typical use case is you just have new data to your ML/AI model and you want to explore
+diferent ways of training or just visualize the results of different parameter configurations.
+
+=head1 Basics
+
+The main parts of a Dash App are:
 
 =over 4
 
-=item * Use of -> (arrow operator) instead of .
+=item Layout
 
-=item * Main package and class for apps is Dash
+Declarative part of the app where you specify the view. This layout is composed of components arranged in a hierarchy, just like html. 
+This components are available as component suites (for example: L<Dash::Html::Components>, L<Dash::Core::Components>, ...) 
+and they can be simple html elements (for example L<Dash::Html::Components::H1>) or as complex as you want like
+L<Dash::Core::Components::Graph> that is a charting component based on L<Plotly.js|https://plot.ly/javascript/>.
+Most of the time you'll be using Dash Components already built and ready to use.
 
-=item * Component suites will use Perl package convention, I mean: dash_html_components will be Dash::Html::Components, although for new component suites you could use whatever package name you like
+=item Callbacks
 
-=item * Instead of decorators we'll use plain old callbacks
-
-=item * Instead of Flask we'll be using L<Mojolicious> (Maybe in the future L<Dancer2>)
+This is the Perl code that gets executed when some component changes 
+and the result of this execution another component (or components) gets updated.
+Every callback declares a set of inputs, a set of outputs and optionally a set of "state" inputs. 
+All inputs, outputs and "state" inputs are known as callback dependencies. Every dependency is related to 
+some property of some component, so the inputs determine that if a property of a component declared as input
+in a callback will trigger that callback, and the output returned by the callback will update the property of
+the component declared as output.
 
 =back
 
-In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash> or directly in L<repository|https://github.com/pablrod/perl-Dash/tree/master/examples>. The full Dash tutorial is ported to Perl in those examples folder.
+So to make a Dash app you just need to setup the layout and the callbacks. The basic skeleton will be:
+
+    my $app = Dash->new(app_name => 'My Perl Dash App'); 
+    $app->layout(...);
+    $app->callback(...);
+    $app->run_server();
+
+In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash>
+
+=head1 Layout
+
+The layout is the declarative part of the app and its the DOM of our app. The root element can be any component,
+and after the root element is done the rest are "children" of this root component, that is they are the value of
+the children property of the parent component and children can be one "thing" (text, component, whatever as long as can be converted to JSON)
+or an arrayref of "things". So the components can be composed as much as you want. For example:
+
+    $app->layout(html->Div(children => [
+            html->H1(children => 'Making Perl Dash Apps'),
+            html->Img(src => 'https://raw.githubusercontent.com/kraih/perl-raptor/master/example.png' )
+        ]));
 
 =head2 Components
 
@@ -614,9 +709,9 @@ This package ships the following component suites and are ready to use:
 
 =over 4
 
-=item * L<Dash Core Components|https://dash.plot.ly/dash-core-components> as Dash::Core::Components
+=item * L<Dash Core Components|https://dash.plot.ly/dash-core-components> as Dash::Core::Components. Main components for interactive analytical web apps: forms and charting
 
-=item * L<Dash Html Components|https://dash.plot.ly/dash-html-components> as Dash::Html::Components
+=item * L<Dash Html Components|https://dash.plot.ly/dash-html-components> as Dash::Html::Components. Basically the html elements.
 
 =item * L<Dash DataTable|https://dash.plot.ly/datatable> as Dash::Table
 
@@ -636,30 +731,189 @@ But with every component suite could be a lot of components. So to ease the task
 
 =head4 Factory methods
 
-Every component suite has a factory method for every component. For example L<Dash::Html::Components> has the factory method Div to load and build a L<Dash::Html::Components::Div> component:
+Every component suite has a factory method for every component. And using this factory methods children keyword is optional as long as the children is the first element.
+For example L<Dash::Html::Components> has the factory method Div to load and build a L<Dash::Html::Components::Div> component:
 
     use Dash::Html::Components;
     ...
     $app->layout(Dash::Html::Components->Div(id => 'my-div', children => 'This is a simple div'));
+    # same as
+    $app->layout(Dash::Html::Components->Div('This is a simple div', id => 'my-div');
 
 But this factory methods are meant to be aliased so this gets less verbose:
 
     use aliased 'Dash::Html::Components' => 'html';
     ...
     $app->layout(html->Div(id => 'my-div', children => 'This is a simple div'));
+    # same as
+    $app->layout(html->Div('This is a simple div', id => 'my-div'));
 
 =head4 Functions
 
 Many modules use the L<Exporter> & friends to reduce typing. If you like that way every component suite gets a Functions package to import all this functions
-to your namespace.
+to your namespace. Using this functions also allows for ommiting the children keyword if the children is the first element.
 
 So for example for L<Dash::Html::Components> there is a package L<Dash::Html::ComponentsFunctions> with one factory function to load and build the component with the same name:
 
     use Dash::Html::ComponentsFunctions;
     ...
     $app->layout(Div(id => 'my-div', children => 'This is a simple div'));
+    # same as
+    $app->layout(Div('This is a simple div', id => 'my-div'));
 
-=head3 I want more components
+=head1 Callbacks
+
+Callbacks are the reactive part of the web app. They listen to changes in properties of components and get fired by those changes.
+The output of the callbacks can update properties for other componentes (or different properties for the same components) and
+potentially firing other callbacks. So your app is "reacting" to changes. These properties that fire changes and the properties 
+that get updated are dependencies of the callback, they are the "links" between components and callbacks.
+
+Every component that is expected to fire a callback must have a unique id property.
+
+To define a callback is necessary at least:
+
+=over 4
+
+=item Inputs
+
+The component property (or components properties) which fire the callback on every change. The values of this properties are inputs for the callbacks
+
+=item Output
+
+The component (or components) whose property (or properties) get updated
+
+=item callback
+
+The code that gets executed
+
+=back
+
+A minimun callback will be:
+
+    $app->callback(
+        Output => {component_id => 'my-div', component_property => 'children'},
+        Inputs => [{component_id=>'my-id', component_property=> 'value'}],
+        callback => sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+=head2 Dependencies
+
+Dependencies "link" components and callbacks. Every callback dependency has the following attributes:
+
+=over 4
+
+=item component_id
+
+Value of the id property for the component
+
+=item component_property
+
+Name of the property
+
+=back
+
+=head3 Inputs
+
+A callback can have one or more inputs and for every input declared for a callback the value
+of the property will be a parameter for the callback in the same order as the input dependencies are declared.
+
+=head3 Outputs
+
+A callback can have one or more output dependencies. When there is only one
+output the value returned by the callback updates the value of the property of the component.
+In the second case the output of the callback has to be a list
+in the list returned will be mapped one by one to the outputs in the same order as the output dependencies are declared.
+
+=head3 State
+
+Apart from Inputs, a callback could need the value of other properties of other components but without 
+firing the callback. State dependencies are for this case. So for every state dependency declared for a callback
+the value os the property will be a parameter for the callback in the same order the state dependencies are declared
+but after all inputs. 
+
+=head3 Dependencies using objects
+
+Dependencies can be declared using just a hash reference but the preferred way is using the classes and factory methods and functions as with the components.
+
+Using objects:
+
+    use Dash::Dependencies::Input;
+    use Dash::Dependencies::Output;
+    ...
+    $app->callback(
+        Output => Dash::Dependencies::Output->new(component_id => 'my-div', component_property => 'children'),
+        Inputs => [Dash::Dependencies::Input->new(component_id=>'my-id', component_property=> 'value')],
+        callback => sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+Using objects allows to omit the keyword arguments:
+
+    use Dash::Dependencies::Input;
+    use Dash::Dependencies::Output;
+    ...
+    $app->callback(
+        Dash::Dependencies::Output->new(component_id => 'my-div', component_property => 'children'),
+        [Dash::Dependencies::Input->new(component_id=>'my-id', component_property=> 'value')],
+        sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+There are also factory methods to use this dependencies, which allows to omit the keyword arguments:
+
+    use Dash::Dependencies;
+    ...
+    $app->callback(
+        Dash::Dependencies->Output('my-div', 'children'),
+        [Dash::Dependencies->Input(component_id=>'my-id', component_property=> 'value')],
+        sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+This can be aliased
+
+    use aliased 'Dash::Dependencies' => 'deps';
+    ...
+    $app->callback(
+        deps->Output(component_id => 'my-div', component_property => 'children'),
+        [deps->Input('my-id', 'value')],
+        sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+But if you prefer using just functions in you namespace:
+
+    use Dash::DependenciesFunctions;
+    ...
+    $app->callback(
+        Output('my-div', 'children'),
+        [Input(component_id=>'my-id', component_property=> 'value')],
+        sub {
+            my $input_value = shift;
+            return "You've entered '$input_value'";
+        }
+    );
+
+=head1 Running App
+
+The last step is running the app. Just call: 
+
+    $app->run_server();
+
+And it will start a server on port 8080 and open a browser to start using your app!
+
+=head1 Making new components
 
 There are L<a lot of components... for Python|https://github.com/ucg8j/awesome-dash#component-libraries>. So if you want to contribute I'll be glad to help.
 
@@ -667,7 +921,7 @@ Meanwhile you can build your own component. I'll make a better guide and an auto
 
 =over 4
 
-=item * For every component must be a Perl class inheriting from L<Dash::BaseComponent>, overloaded the hash dereferencing %{} with the props that the React component has, and with this methods:
+=item * For every component must be a Perl class inheriting from L<Dash::BaseComponent>, overloading the hash dereferencing %{} with the props that the React component has (check L<Dash::BaseComponent> TO_JSON method), and with this methods:
 
 =over 4
 
@@ -689,17 +943,45 @@ Css dependencies for the component
 
 Optionally the component suite will have the Functions package and the factory methods for ease of using.
 
-As mentioned early, I'll make an automated builder but contributions are more than welcome!!
+Then you just have to publish the component suite as a Perl package. For new component suites you could use whatever package name you like, but if you want to use Dash:: namespace please use Dash::Components:: to avoid future collisions with further development. Besides this will make easier to find more components.
 
-Making a component for Dash that is not React based is a little bit difficult so please first get the javascript part React based and integrating it with Perl, R or Python will be easy.
+As mentioned early, I'll make an automated builder but contributions are more than welcome!! In the meantime please check L<CONTRIBUTING.md|https://github.com/pablrod/perl-Dash/blob/CONTRIBUTING.md>
 
-=head1 Missing parts
+Making a component for Dash that is not React based is a little bit difficult so please first get the javascript part React based and after that, integrating it with Perl, R or Python will be easy.
+
+=head1 STATUS
+
+At this moment this library is experimental and still under active
+development and the API is going to change!
+
+The ultimate goal of course is to support everything that the Python and R versions supports.
+
+The use will follow the Python version of Dash, as close as possible, so the Python doc can be used with
+minor changes:
+
+=over 4
+
+=item * Use of -> (arrow operator) instead of .
+
+=item * Main package and class for apps is Dash
+
+=item * Component suites will use Perl package convention, I mean: dash_html_components will be Dash::Html::Components
+
+=item * Instead of decorators we'll use plain old callbacks
+
+=item * Callback context is available as the last parameter of the callback but without the response part
+
+=item * Instead of Flask we'll be using L<Mojolicious> (Maybe in the future L<Dancer2>)
+
+=back
+
+In the SYNOPSIS you can get a taste of how this works and also in L<the examples folder of the distribution|https://metacpan.org/release/Dash> or directly in L<repository|https://github.com/pablrod/perl-Dash/tree/master/examples>. The full Dash tutorial is ported to Perl in those examples folder.
+
+=head2 Missing parts
 
 Right now there are a lot of parts missing:
 
 =over 4
-
-=item * Callback context
 
 =item * Prefix mount
 
@@ -719,16 +1001,9 @@ Right now there are a lot of parts missing:
 
 And many more, but you could use it right now to make great apps! (If you need some inspiration... just check L<https://dash-gallery.plotly.host/Portal/>)
 
-=head1 STATUS
+=head2 Security
 
-At this moment this library is experimental and still under active
-development and the API is going to change!
-
-The intent of this release is to try, test and learn how to improve it.
-
-Security warning: this module is not tested for security so test yourself if you are going to run the app server in a public facing server.
-
-If you want to help, just get in contact! Every contribution is welcome!
+B<Warning>: this module is not tested for security so test yourself if you are going to run the app server in a public facing server.
 
 =head1 DISCLAIMER
 
@@ -768,38 +1043,3 @@ This is free software, licensed under:
   The MIT (X11) License
 
 =cut
-
-__DATA__
-
-@@ index.html.ep
-% layout 'default';
-% title 'Renderer';
-<div id="react-entry-point">
-    <div class="_dash-loading">
-        Loading...
-    </div>
-</div>
-
-        <footer>
-            <%== $scripts %>
-        </footer>
-
-
-@@ layouts/default.html.ep
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta charset="UTF-8">
-        <title><%= $title %></title>
-        <link rel="icon" type="image/x-icon" href="/_favicon.ico?v=1.7.0">
-        <%== $stylesheets %>
-        <%== $external_stylesheets %>
-    </head>
-    <body>
-        
-  <%= content %>
-    </body>
-</html>
-
-

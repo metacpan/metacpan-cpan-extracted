@@ -1,5 +1,5 @@
 package Util::Medley::String;
-$Util::Medley::String::VERSION = '0.023';
+$Util::Medley::String::VERSION = '0.024';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -14,7 +14,7 @@ Util::Medley::String - utility methods for working with strings
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

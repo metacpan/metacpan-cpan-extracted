@@ -1,0 +1,40 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '7.1101'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::MOP' => '0',
+                                      'DateTime' => '0',
+                                      'Devel::Size' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'Perl::Tidy' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Pod::Coverage::TrustPod' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '0',
+                                   'Test::Pod::Coverage' => '0',
+                                   'Test::Vars' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

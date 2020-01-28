@@ -33,6 +33,7 @@
 # 25-DEC-2019   B. Ulmann   Added auto-setup functionality
 # 15-JAN-2020   B. Ulmann   Fixed a bug in setup which caused source and destination to be swapped in an error message
 # 16-JAN-2020   B. Ulmann   The first call to set_pt after setup() had no effect althought the correct response was received...
+# 27-JAN-2020   B. Ulmann   setup() can now be called without requiring an XBAR-configuration. Added 3d-plot capability.
 
 package IO::HyCon;
 
@@ -78,7 +79,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use YAML qw(LoadFile);
 use Carp qw(confess cluck carp);
@@ -893,6 +894,8 @@ sub store_data {
     my ($self, %rest) = @_;
 
     my $data = defined($rest{data}) ? $rest{data} : $self->{data};
+    my $type = defined($rest{type}) ? uc($rest{type}) : undef; # Implicit upper case!
+
     confess 'No data to store!' if !defined($data) or @$data == 0;
 
     my ($filename, $handle);
@@ -904,11 +907,19 @@ sub store_data {
         $filename = $handle; # It's a kind of magic :-)
     }
 
-    for my $tupel (@$data) {
-        if (ref($tupel) eq 'ARRAY') {
-            print $handle join("\t", @$tupel), "\n";
-        } else {
-            print $handle "$tupel\n";
+    if (defined($type) and $type eq '3D') {
+        for my $i (0 .. scalar(@{$data->[0]}) - 1) {
+            my $y = 0;
+            print $handle $y++, "\t$i\t$_->[$i]\n" for @$data;
+            print $handle "\n\n";
+        }
+    } else {
+        for my $tupel (@$data) {
+            if (ref($tupel) eq 'ARRAY') {
+                print $handle join("\t", @$tupel), "\n";
+            } else {
+                print $handle "$tupel\n";
+            }
         }
     }
 
@@ -929,24 +940,38 @@ If the data set to be plotted contains two element tuples, a phase space plot ca
 
 plot(type => phase);
 
+Alternatively, a 3D-plot can be created by specifying
+
+plot(type => 3d);
+
+This is useful when partial differential equations are solved with a discretized space.
+
 =cut
 
 sub plot {
     my ($self, %rest) = @_;
 
     my $data = defined($rest{data}) ? $rest{data} : $self->{data};
+    my $type = defined($rest{type}) ? uc($rest{type}) : undef; # Implicit upper case!
+
     confess 'Nothing to plot - no data!' if !defined($data) or @$data == 0;
     my $columns = ref($data->[0]) eq 'ARRAY' ? @{$data->[0]} : 1;
-    my $data_file = $self->store_data(data => $data);
+    my $data_file = $self->store_data(data => $data, type => $type);
 
     # Now create a control file for gnuplot
-    confess "Data contains $columns-tuples which is not compatible with the option 'phase'!" 
-        if defined($rest{type}) and $rest{type} eq 'phase' and $columns != 2;
-
     my $handle = File::Temp->new(UNLINK => 0, SUFFIX => '.dat');
     my $control_file = $handle; # Magic, again...
-    if (defined($rest{type}) and $rest{type} eq 'phase') {
+
+    confess "Data contains $columns-tuples which is not compatible with the option 'phase'!" 
+        if defined($type) and $type eq 'PHASE' and $columns != 2;
+
+    confess "Data requires at least 2-tupes when used for a 3D-plot!"
+        if defined($type) and $type eq '3D' and $columns < 2;
+
+    if (defined($type) and $type eq 'PHASE') {
         print $handle "plot '$data_file' using 1:2 with lines title 'phase'\n";
+    } elsif (defined($type) and $type eq '3D') {
+        print $handle "splot '$data_file' with lines title ''\n";
     } else {
         print $handle 'plot ', join(', ', map{ "'$data_file' using $_ with lines title '$_'" }(1 .. $columns)), "\n";
     }
@@ -995,7 +1020,7 @@ sub setup {
     $self->set_ro_group(@{$self->{problem}{'ro-group'}}) if defined ($self->{problem}{'ro-group'});
 
     # Derive the required XBAR setup:
-    if (defined($self->{problem})) {
+    if (defined($self->{problem}) and defined($xbar_address)) {
         confess 'XBAR configuration not found!' unless defined($self->{xbar});
         confess 'No circuit description found!' unless defined($self->{problem}{circuit});
 

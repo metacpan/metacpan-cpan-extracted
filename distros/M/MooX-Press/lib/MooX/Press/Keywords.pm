@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press::Keywords;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.026';
+our $VERSION   = '0.032';
 
 use Type::Library -base;
 use Type::Utils ();
@@ -40,10 +40,6 @@ sub confess {
 }
 
 $EXPORT_TAGS{ 'util' } = [qw/ blessed confess /];
-
-use Try::Tiny;
-
-$EXPORT_TAGS{ 'try' } = [qw/ try catch finally /];
 
 push @EXPORT_OK, map @{$EXPORT_TAGS{$_}}, keys(%EXPORT_TAGS);
 
@@ -129,10 +125,6 @@ C<blessed> from L<Scalar::Util>.
 =item *
 
 C<confess> from L<Carp>.
-
-=item *
-
-L<Try::Tiny>.
 
 =back
 

@@ -14,7 +14,9 @@ extends 'Mail::Qmail::Filter';
 
 has 'allowed_addresses' => coerce => \&addresses_to_hash, required => 1;
 has 'lowercase_from';    # ignored; only for backwards compatibility
-has 'reject_text' => sub { "<$_[0]> not allowed as RFC5322.From" };
+has 'reject_text' => sub {
+    sub { "<$_[0]> not allowed as RFC5322.From" }
+};
 
 sub filter {
     my $self                = shift;

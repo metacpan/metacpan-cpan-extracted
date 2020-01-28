@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => 'Net::Whois::RIPE',
     AUTHOR           => 'Luis Motta Campos <lmc@cpan.org>',
+    LICENSE          => 'perl',
     VERSION_FROM     => 'lib/Net/Whois/RIPE.pm',
     ABSTRACT_FROM    => 'lib/Net/Whois/RIPE.pm',
     MIN_PERL_VERSION => 5.006,

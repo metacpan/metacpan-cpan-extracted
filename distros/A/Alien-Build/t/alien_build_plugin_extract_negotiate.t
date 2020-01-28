@@ -1,9 +1,11 @@
-use Test2::Require::Module 'Archive::Tar' => 0;
 use Test2::V0 -no_srand => 1;
 use Test::Alien::Build;
 use Alien::Build::Plugin::Extract::Negotiate;
 use Capture::Tiny qw( capture_merged );
 use Path::Tiny qw( path );
+
+eval { require Archive::Tar; };
+skip_all 'test requires Archive::Tar' if $@;
 
 subtest basic => sub {
 
@@ -65,8 +67,7 @@ subtest 'picks' => sub {
 
     my %available;
 
-    my $mock = Test2::Mock->new(
-      class => 'Alien::Build::Plugin::Extract::ArchiveTar',
+    my $mock = mock 'Alien::Build::Plugin::Extract::ArchiveTar' => (
       override => [
         available => sub {
           my(undef, $format) = @_;
@@ -102,8 +103,7 @@ subtest 'picks' => sub {
     my $have_archive_zip = 0;
     my $have_info_zip    = 0;
 
-    my $mock1 = Test2::Mock->new(
-      class => 'Alien::Build::Plugin::Extract::ArchiveZip',
+    my $mock1 = mock 'Alien::Build::Plugin::Extract::ArchiveZip' => (
       override => [
         available => sub {
           my(undef, $format) = @_;
@@ -113,8 +113,7 @@ subtest 'picks' => sub {
     );
 
 
-    my $mock2 = Test2::Mock->new(
-      class => 'Alien::Build::Plugin::Extract::CommandLine',
+    my $mock2 = mock 'Alien::Build::Plugin::Extract::CommandLine' => (
       override => [
         available => sub {
           my(undef, $format) = @_;

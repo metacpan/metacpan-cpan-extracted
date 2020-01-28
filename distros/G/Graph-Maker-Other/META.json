@@ -55,99 +55,107 @@
    "provides" : {
       "Graph::Maker::Beineke" : {
          "file" : "lib/Graph/Maker/Beineke.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::BiStar" : {
          "file" : "lib/Graph/Maker/BiStar.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::BinaryBeanstalk" : {
          "file" : "lib/Graph/Maker/BinaryBeanstalk.pm",
-         "version" : "14"
+         "version" : "15"
+      },
+      "Graph::Maker::BinomialBoth" : {
+         "file" : "lib/Graph/Maker/BinomialBoth.pm",
+         "version" : "15"
       },
       "Graph::Maker::BinomialTree" : {
          "file" : "lib/Graph/Maker/BinomialTree.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::BulgarianSolitaire" : {
          "file" : "lib/Graph/Maker/BulgarianSolitaire.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Catalans" : {
          "file" : "lib/Graph/Maker/Catalans.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Circulant" : {
          "file" : "lib/Graph/Maker/Circulant.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Crown" : {
          "file" : "lib/Graph/Maker/Crown.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::ExcessConfigurations" : {
          "file" : "lib/Graph/Maker/ExcessConfigurations.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::FibonacciTree" : {
          "file" : "lib/Graph/Maker/FibonacciTree.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::GosperIsland" : {
          "file" : "lib/Graph/Maker/GosperIsland.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Hanoi" : {
          "file" : "lib/Graph/Maker/Hanoi.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::HexGrid" : {
          "file" : "lib/Graph/Maker/HexGrid.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Johnson" : {
          "file" : "lib/Graph/Maker/Johnson.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Keller" : {
          "file" : "lib/Graph/Maker/Keller.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Kneser" : {
          "file" : "lib/Graph/Maker/Kneser.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::KnightGrid" : {
          "file" : "lib/Graph/Maker/KnightGrid.pm",
-         "version" : "14"
+         "version" : "15"
+      },
+      "Graph::Maker::MostMaximumMatchingsTree" : {
+         "file" : "lib/Graph/Maker/MostMaximumMatchingsTree.pm",
+         "version" : "15"
       },
       "Graph::Maker::NoughtsAndCrosses" : {
          "file" : "lib/Graph/Maker/NoughtsAndCrosses.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Other" : {
          "file" : "META.yml",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::Petersen" : {
          "file" : "lib/Graph/Maker/Petersen.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::QuartetTree" : {
          "file" : "lib/Graph/Maker/QuartetTree.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::RookGrid" : {
          "file" : "lib/Graph/Maker/RookGrid.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::TwinAlternateAreaTree" : {
          "file" : "lib/Graph/Maker/TwinAlternateAreaTree.pm",
-         "version" : "14"
+         "version" : "15"
       },
       "Graph::Maker::TwindragonAreaTree" : {
          "file" : "lib/Graph/Maker/TwindragonAreaTree.pm",
-         "version" : "14"
+         "version" : "15"
       }
    },
    "release_status" : "stable",
@@ -157,6 +165,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : 14,
+   "version" : 15,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

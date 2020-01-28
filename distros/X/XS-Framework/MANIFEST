@@ -88,6 +88,7 @@ src/xs/typemap.h
 src/xs/typemap/auto.h
 src/xs/typemap/base.h
 src/xs/typemap/containers.h
+src/xs/typemap/error.cc
 src/xs/typemap/error.h
 src/xs/typemap/numeric.h
 src/xs/typemap/object.cc

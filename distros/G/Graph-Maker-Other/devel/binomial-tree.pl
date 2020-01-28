@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017, 2019 Kevin Ryde
+# Copyright 2015, 2017, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,7 +31,47 @@ $|=1;
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  # BinomialTree by n
 
+  # n=0 empty
+  # n=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1310  single vertex
+  # n=2 https://hog.grinvin.org/ViewGraphInfo.action?id=19655  path-2
+  # n=3 hog not  path-3
+  # n=4 https://hog.grinvin.org/ViewGraphInfo.action?id=594    path-4
+  # n=5 https://hog.grinvin.org/ViewGraphInfo.action?id=30     fork
+  # n=6 https://hog.grinvin.org/ViewGraphInfo.action?id=496    E graph
+  # n=7 https://hog.grinvin.org/ViewGraphInfo.action?id=714   (Graphedron)
+  # n=8 https://hog.grinvin.org/ViewGraphInfo.action?id=700
+  # n=9 not
+  # n=10 not
+  # n=11 not
+  # n=12 not
+  # n=13 not
+  # n=14 not
+  # n=15 not
+  # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=28507   order 4
+  # n=32 https://hog.grinvin.org/ViewGraphInfo.action?id=21088   order 5
+  # n=64 https://hog.grinvin.org/ViewGraphInfo.action?id=33543
+  # n=128 https://hog.grinvin.org/ViewGraphInfo.action?id=33545
+
+  my @graphs;
+  foreach my $N (
+                 9 .. 16,
+                 64, 128,
+                ) {
+    my $graph = Graph::Maker->new('binomial_tree',
+                                  N => $N,
+                                  undirected => 1,
+                                  coordinate_type => 'across',
+                                 );
+    print $graph->get_graph_attribute ('name'),"\n";
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  MyGraphs::hog_upload_html($graphs[0]);
+  exit 0;
+}
 {
   # BinomialTree by n properties
   # total depths
@@ -353,45 +393,7 @@ use Smart::Comments;
 }
 
 
-{
-  # BinomialTree by n
 
-  # n=0 empty
-  # n=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1310  single vertex
-  # n=2 https://hog.grinvin.org/ViewGraphInfo.action?id=19655  path-2
-  # n=3 hog not  path-3
-  # n=4 https://hog.grinvin.org/ViewGraphInfo.action?id=594    path-4
-  # n=5 https://hog.grinvin.org/ViewGraphInfo.action?id=30     fork
-  # n=6 https://hog.grinvin.org/ViewGraphInfo.action?id=496    E graph
-  # n=7 https://hog.grinvin.org/ViewGraphInfo.action?id=714   (Graphedron)
-  # n=8 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  # n=9 not
-  # n=10 not
-  # n=11 not
-  # n=12 not
-  # n=13 not
-  # n=14 not
-  # n=15 not
-  # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=28507   order 4
-  # n=32 https://hog.grinvin.org/ViewGraphInfo.action?id=21088   order 5
-  # n=64 https://hog.grinvin.org/ViewGraphInfo.action?id=33543
-  # n=128 https://hog.grinvin.org/ViewGraphInfo.action?id=33545
-
-  my @graphs;
-  foreach my $N (
-                # 0 .. 16
-                 64, 128
-                ) {
-    my $graph = Graph::Maker->new('binomial_tree',
-                                  N => $N,
-                                  undirected => 1,
-                                 );
-    print $graph->get_graph_attribute ('name'),"\n";
-    push @graphs, $graph;
-  }
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 {
   # BinomialTree forms ascii prints
 
@@ -441,4 +443,3 @@ use Smart::Comments;
   }
   exit 0;
 }
-

@@ -1,0 +1,396 @@
+NAME
+    Sub::MultiMethod - yet another implementation of multimethods
+
+SYNOPSIS
+    How to generate JSON (albeit with very naive string quoting) using
+    multimethods:
+
+      use v5.12;
+      use strict;
+      use warnings;
+  
+      package My::JSON {
+        use Moo;
+        use Sub::MultiMethod qw(multimethod);
+        use Types::Standard -types;
+    
+        multimethod stringify => (
+          signature => [ Undef ],
+          code      => sub {
+            my ($self, $undef) = (shift, @_);
+            'null';
+          },
+        );
+    
+        multimethod stringify => (
+          signature => [ ScalarRef[Bool] ],
+          code      => sub {
+            my ($self, $bool) = (shift, @_);
+            $$bool ? 'true' : 'false';
+          },
+        );
+    
+        multimethod stringify => (
+          alias     => "stringify_str",
+          signature => [ Str ],
+          code      => sub {
+            my ($self, $str) = (shift, @_);
+            sprintf(q<"%s">, quotemeta($str));
+          },
+        );
+    
+        multimethod stringify => (
+          signature => [ Num ],
+          code      => sub {
+            my ($self, $n) = (shift, @_);
+            $n;
+          },
+        );
+    
+        multimethod stringify => (
+          signature => [ ArrayRef ],
+          code      => sub {
+            my ($self, $arr) = (shift, @_);
+            sprintf(
+              q<[%s]>,
+              join(q<,>, map($self->stringify($_), @$arr))
+            );
+          },
+        );
+    
+        multimethod stringify => (
+          signature => [ HashRef ],
+          code      => sub {
+            my ($self, $hash) = (shift, @_);
+            sprintf(
+              q<{%s}>,
+              join(
+                q<,>,
+                map sprintf(
+                  q<%s:%s>,
+                  $self->stringify_str($_),
+                  $self->stringify($hash->{$_})
+                ), sort keys %$hash,
+              )
+            );
+          },
+        );
+      }
+  
+      my $json = My::JSON->new;
+  
+      say $json->stringify({
+        foo => 123,
+        bar => [1,2,3],
+        baz => \1,
+        quux => { xyzzy => 666 },
+      });
+
+DESCRIPTION
+    Sub::Multimethods focusses on implementing the dispatching of multimethods
+    well and is less concerned with providing a nice syntax for setting them
+    up. That said, the syntax provided is inspired by Moose's `has` keyword
+    and hopefully not entirely horrible.
+
+    Sub::MultiMethods has much smarter dispatching than Kavorka, but the
+    tradeoff is that this is a little slower. Overall, for the JSON example in
+    the SYNOPSIS, Kavorka is about twice as fast. (But with Kavorka, it would
+    quote the numbers in the output because numbers are a type of string, and
+    that was declared first!)
+
+  `multimethod $name => %spec`
+    The following options are supported in the specification for the
+    multimethod.
+
+    `named` *(Bool)*
+        Optional, defaults to false.
+
+        Indicates whether this candidate uses named parameters. The default is
+        positional parameters.
+
+    `signature` *(ArrayRef|CodeRef)*
+        Required.
+
+        For positional parameters, an ordered list of type constraints
+        suitable for passing to `compile` from Type::Params.
+
+          signature => [ Str, RegexpRef, Optional[FileHandle] ],
+
+        For named parameters, a list suitable for passing to
+        `compile_named_oo`.
+
+          signature => [
+            prefix  => Str,
+            match   => RegexpRef,
+            output  => FileHandle, { default => sub { \*STDOUT } },
+          ],
+
+        Sub::MultiMethods is designed to handle multi *methods*, so $self at
+        the start of all signatures is implied.
+
+        `signature` *may* be a coderef instead, which should die if it gets
+        passed a @_ that it cannot handle, or return @_ (perhaps after some
+        processing) if it is successful. Using coderef signatures may make
+        deciding which candidate to dispatch to more difficult though, in
+        cases where more than one candidate matches the given parameters.
+
+    `code` *(CodeRef)*
+        Required.
+
+        The sub to dispatch to. It will receive parameters in @_ as you would
+        expect, but these parameters have been passed through the signature
+        already, so will have had defaults and coercions applied.
+
+        An example for positional parameters:
+
+          code => sub {
+            my ($self, $prefix, $match, $output) = (shift, @_);
+            print {$output} $prefix;
+            ...;
+          },
+
+        An example for named parameters:
+
+          code => sub {
+            my ($self, $arg) = (shift, @_);
+            print {$arg->output} $arg->prefix;
+            ...;
+          },
+
+        Note that $arg is an object with methods for each named parameter.
+
+    `alias` *(Str|ArrayRef[Str])*
+        Optional.
+
+        Installs an alias for the candidate, bypassing multimethod dispatch.
+        (But not bypassing the checks, coercions, and defaults in the
+        signature!)
+
+    `method` *(Int)*
+        Optional, defaults to 1.
+
+        Indicates whether the multimethod should be treated as a method (i.e.
+        with an implied $self). Defaults to true, but `method => 0` can be
+        given if you want multifuncs with no invocant.
+
+        Multisubs where some candidates are methods and others are non-methods
+        are not currently supported! (And probably never will be.)
+
+        (Yes, this is technically an integer rather than a boolean. This
+        allows for subs to have, say, two logical invocants. This is mostly
+        untested though.)
+
+    `score` *(Int)*
+        Optional.
+
+        Overrides the constrainedness score calculated as described in the
+        dispatch technique. Most scores calculated that way will typically
+        between 0 and 100. Setting a score manually to something very high
+        (e.g. 9999) will pretty much guarantee that it gets chosen over other
+        candidates when multiple signatures match. Setting it to something low
+        (e.g. -1) will mean it gets avoided.
+
+    `no_dispatcher` *(Bool)*
+        Optional. Defaults to true in roles, false otherwise.
+
+        If set to true, Sub::MultiMethods will register the candidate method
+        but won't install a dispatcher. You should mostly not worry about this
+        and accept the default.
+
+  Dispatch Technique
+    When a multimethod is called, a list of packages to inspect for candidates
+    is obtained by crawling @ISA. (For multifuncs, @ISA is ignored.)
+
+    All candidates for the invoking class and all parent classes are
+    considered.
+
+    If any parent class includes a mono-method (i.e. not a multimethod) of the
+    same name as this multimethod, then it is considered to have override any
+    candidates further along the @ISA chain. (With multiple inheritance, this
+    could get confusing though!) Those further candidates will not be
+    considered, however the mono-method will be considered to be a candidate,
+    albeit one with a very low score. (See scoring later.)
+
+    Any candidates where it is clear they will not match based on parameter
+    count will be discarded immediately.
+
+    After that, the signatures of each are tried. If they throw an error, that
+    candidate will be discarded.
+
+    If there are still multiple possible candidates, they will be sorted based
+    on how constrained they are.
+
+    To determine how constrained they are, every type constraint in their
+    signature is assigned a score. Any is 0. Defined inherits from Any, so has
+    score 1. Value inherits from Defined, so has score 2. Etc. Some types
+    inherit from a parent but without further constraining the parent. (For
+    example, Item inherits from Any but doesn't place any additional
+    constraints on values.) In these cases, the child type has the same score
+    as its parent. All these scores are added together to get a single score
+    for the candidate. For candidates where the signature is a coderef, this
+    is essentially a zero score for the signature unless one was specified
+    explicitly.
+
+    If multiple candidates are equally constrained, child class candidates
+    beat parent class candidates; class candidates beat role candidates; and
+    the candidate that was declared earlier wins.
+
+    After this, there should be one preferred candidate or none. If there is
+    none, an error occurs. If there is one, that candidate is dispatched to
+    using `goto` so there is no trace of Sub::MultiMethod in `caller`. It gets
+    passed the result from checking the signature earlier as @_.
+
+  Roles
+      use v5.12;
+      use strict;
+      use warnings;
+  
+      package My::RoleA {
+        use Moo::Role;
+        use Sub::MultiMethod -role, qw(multimethod);
+        use Types::Standard -types;
+    
+        multimethod foo => (
+          signature  => [ HashRef ],
+          code       => sub { return "A" },
+          alias      => "foo_a",
+        );
+      }
+  
+      package My::RoleB {
+        use Moo::Role;
+        use Sub::MultiMethod -role, qw(multimethod);
+        use Types::Standard -types;
+    
+        multimethod foo => (
+          signature  => [ ArrayRef ],
+          code       => sub { return "B" },
+        );
+      }
+  
+      package My::Class {
+        use Moo;
+        use Sub::MultiMethod qw(multimethod multimethods_from_roles);
+        use Types::Standard -types;
+    
+        with qw( My::RoleA My::RoleB );
+    
+        multimethods_from_roles qw( My::RoleA My::RoleB );
+    
+        multimethod foo => (
+          signature  => [ HashRef ],
+          code       => sub { return "C" },
+        );
+      }
+  
+      my $obj = My::Class->new;
+  
+      say $obj->foo_a;        # A
+      say $obj->foo( [] );    # B
+      say $obj->foo( {} );    # C
+
+    Sub::MultiMethods doesn't try to be clever about detecting whether your
+    package is a role or a class. If you want to use it in a role, simply do:
+
+        use Sub::MultiMethod -role, qw(multimethod);
+
+    The only difference this makes is that the exported `multimethod` function
+    will default to `no_dispatcher => 1`, so any multimethods you define in
+    the role won't be seen by Moose/Mouse/Moo/Role::Tiny as part of the role's
+    API, and won't be installed with the `with` keyword.
+
+    Sub::MultiMethods doesn't try to detect what roles your class has
+    consumed, so in classes that consume roles with multimethods, do this:
+
+        use Sub::MultiMethod qw(multimethods_from_roles);
+    
+        multimethods_from_roles qw( My::RoleA My::RoleB );
+
+    The list of roles should generally be the same as from `with`. This
+    function only copies multimethods across from roles; it does not copy
+    their aliases. However, `with` should find and copy the aliases.
+
+    All other things being equal, candidates defined in classes should beat
+    candidates imported from roles.
+
+  API
+    Sub::MultiMethod avoids cute syntax hacks because those can be added by
+    third party modules. It provides an API for these modules:
+
+    `Sub::MultiMethod->install_candidate($target, $sub_name, %spec)`
+        $target is the class (package) name being installed into.
+
+        $sub_name is the name of the method.
+
+        %spec is the multimethod spec.
+
+    `Sub::MultiMethod->install_dispatcher($target, $sub_name, $is_method)`
+        $target is the class (package) name being installed into.
+
+        $sub_name is the name of the method.
+
+        $is_method is an integer/boolean.
+
+        This rarely needs to be manually called as `install_candidate` will do
+        it automatically.
+
+    `Sub::MultiMethod->copy_package_candidates(@sources => $target)`
+        @sources is the list of packages to copy candidates from.
+
+        $target is the class (package) name being installed into.
+
+        Useful if @sources are a bunch of roles (like Role::Tiny).
+
+    `Sub::MultiMethod->install_missing_dispatchers($target)`
+        Should usually be called after `copy_package_candidates`.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>.
+
+SEE ALSO
+    Class::Multimethods - uses Perl classes and ref types to dispatch. No
+    syntax hacks but the fairly nice syntax shown in the pod relies on `use
+    strict` being switched off! Need to quote a few more things otherwise.
+
+    Class::Multimethods::Pure - similar to Class::Multimethods but with a more
+    complex type system and a more complex dispatch method.
+
+    Logic - a full declarative programming framework. Overkill if all you want
+    is multimethods. Uses source filters.
+
+    Dios - object oriented programming framework including multimethods.
+    Includes a full type system and Keyword::Declare-based syntax. Pretty
+    sensible dispatch technique which is almost identical to Sub::MultiMethod.
+    Much much slower though, at both compile time and runtime.
+
+    MooseX::MultiMethods - uses Moose type system and Devel::Declare-based
+    syntax. Not entirely sure what the dispatching method is.
+
+    Kavorka - I wrote this, so I'm allowed to be critical. Type::Tiny-based
+    type system. Very naive dispatching; just dispatches to the first declared
+    candidate that can handle it rather than trying to find the "best". It is
+    fast though.
+
+    Sub::Multi::Tiny - uses Perl attributes to declare candidates to be
+    dispatched to. Pluggable dispatching, but by default uses argument count.
+
+    Sub::Multi - syntax wrapper around Class::Multimethods::Pure?
+
+    Sub::SmartMatch - kind of abandoned and smartmatch is generally seen as
+    teh evilz these days.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -11,7 +11,7 @@
 # (Because we inserted $data at the beginning) we copy as much as possible
 # and return a string containing the remainder.
 
-my $file = "tf$$.txt";
+my $file = "tf27-$$.txt";
 $| = 1;
 
 print "1..203\n";
@@ -179,7 +179,7 @@ sub try {
   my ($s, $len, $newlen) = @_;
   my $e = $s + $len;
 
-  open F, "> $file" or die "Couldn't open file $file: $!";
+  open F, '>', $file or die "Couldn't open file $file: $!";
   binmode F;
 
   print F $oldfile;
@@ -197,7 +197,7 @@ sub try {
   my $actual_return = $o->_iwrite($newdata, $s, $e);
   undef $o; untie @lines;
 
-  open F, "< $file" or die "Couldn't open file $file: $!";
+  open F, '<', $file or die "Couldn't open file $file: $!";
   binmode F;
   my $actual;
   { local $/;

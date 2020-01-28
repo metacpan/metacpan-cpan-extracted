@@ -1,6 +1,6 @@
 package Tapper::CLI::Host;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::Host::VERSION = '5.0.5';
+$Tapper::CLI::Host::VERSION = '5.0.6';
 use 5.010;
 
 use warnings;
@@ -752,7 +752,8 @@ sub ar_get_host_update_parameters {
         [ 'delboundqueue:s@'    , q#delete queue from this host's bindings, empty string means 'all bindings'#,             ],
         [ 'adddeniedqueue=s@'   , 'mark host as denied for a specific queue',                                               ],
         [ 'deldeniedqueue:s@'   , 'remove denied queue for host',                                                           ],
-        [ 'active|a=i'          , 'set active flag to this value, possible values 0 (inactive) and 1 (active)',              ],
+        [ 'active|a=i'          , 'set active flag to this value, possible values 0 (inactive) and 1 (active)',             ],
+        [ 'free=i'              , 'set free flag; possible values: 0=not-free, 1=free; setting free=1 fails when a testrun runs there', ],
         [ 'verbose|v'           , 'some more informational output',                                                         ],
         [ 'help|?'              , 'Print this help message and exit.',                                                      ],
     ];
@@ -800,6 +801,18 @@ sub b_host_update {
         if ( defined $hr_options->{comment} && $hr_options->{comment} ne $or_host->comment ) {
             $b_update = 1;
             $or_host->comment( $hr_options->{comment} );
+        }
+        if ( defined $hr_options->{free} ) {
+            $b_update = 1;
+            if ($hr_options->{free} == 1 and
+                not $or_host->free and
+                Tapper::Model::model('TestrunDB')->resultset('TestrunScheduling')->search({host_id => $or_host->id, status => 'running'})->count)
+            {
+                die "error: cannot free a used host (id=".$or_host->id.")\n";
+            }
+            else {
+                $or_host->free( $hr_options->{free} );
+            }
         }
         for my $s_type (qw/ bound denied /) {
             if ( $hr_options->{"add${s_type}queue"} ) {
@@ -985,7 +998,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

@@ -13,5 +13,4 @@ all_pod_files_spelling_ok();
 __DATA__
 MERCHANTABILITY
 Muey
-
-ADD MORE HERE
+perl’s

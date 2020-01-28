@@ -3,22 +3,22 @@ abstract: 'extremely fast Date framework with timezones, microseconds, relative 
 author:
   - unknown
 build_requires:
-  CPP::catch: v1.0.8
-  CPP::panda::lib: v1.3.4
+  CPP::catch: v1.0.9
+  CPP::panda::lib: v1.3.5
   Export::XS: v3.0.1
   Test::Catch: v1.0.10
   Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::Framework: v1.2.2
+  XS::Framework: v1.2.3
   next::XS: v1.0.7
 configure_requires:
-  CPP::catch: v1.0.8
-  CPP::panda::lib: v1.3.4
+  CPP::catch: v1.0.9
+  CPP::panda::lib: v1.3.5
   Export::XS: v3.0.1
   Test::Catch: v1.0.10
-  XS::Framework: v1.2.2
+  XS::Framework: v1.2.3
   XS::Install: v1.2.12
   next::XS: v1.0.7
 dynamic_config: 1
@@ -33,10 +33,10 @@ no_index:
     - t
     - inc
 requires:
-  CPP::panda::lib: v1.3.4
+  CPP::panda::lib: v1.3.5
   Export::XS: v3.0.1
-  XS::Framework: v1.2.2
+  XS::Framework: v1.2.3
   XS::Install: v1.2.12
   next::XS: v1.0.7
-version: v5.0.0
+version: v5.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

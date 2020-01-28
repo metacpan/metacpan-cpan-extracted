@@ -1,5 +1,8 @@
 Revision history for Perl6-Build
 
+0.102  2020-01-24 22:54:03 JST
+  - Update rakudo-star url
+
 0.101  2019-09-20 22:10:21 JST
   - Use https://rakudo.org (#2)
 

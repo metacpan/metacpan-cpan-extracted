@@ -50,6 +50,6 @@
          "url" : "https://github.com/toddr/CDB_File"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

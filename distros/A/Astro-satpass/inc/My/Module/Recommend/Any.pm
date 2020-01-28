@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 our @EXPORT_OK = qw{ __any };
 
@@ -38,7 +38,7 @@ sub new {
 sub check {
     my ( $self ) = @_;
     my @missing;
-    foreach my $m ( $self->modules() ) {
+    foreach my $m ( @{ $self->{modules} } ) {
 	$self->__is_module_available( $m )
 	    and return;
 	push @missing, $m;
@@ -64,6 +64,8 @@ sub modules {
 	@{ $self->{modules} }
     );
 }
+
+*test_without = \&modules;
 
 sub recommend {
     my ( $self ) = @_;
@@ -163,6 +165,13 @@ of missing modules in scalar context.
 
 This method just returns the names of the modules with which the object
 was initialized.
+
+=head2 test_without
+
+ say 'Test without: ', join ', ', $rec->test_without();
+
+This method returns the names of the modules to test without. At this
+level of the hierarchy it is a synonym for L<modules()|/modules>.
 
 =head2 recommend
 

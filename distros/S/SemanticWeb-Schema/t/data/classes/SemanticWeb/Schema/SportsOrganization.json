@@ -7,10 +7,16 @@
    },
    "properties" : {
       "schema:sport" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1951",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A type of sport (e.g. Baseball).",
          "rdfs:label" : "sport",
-         "schema:domainIncludes" : "schema:SportsOrganization",
+         "schema:category" : "issue-1951",
+         "schema:domainIncludes" : [
+            "schema:SportsOrganization",
+            "schema:SportsEvent"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:URL",
             "schema:Text"

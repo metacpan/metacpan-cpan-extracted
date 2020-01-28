@@ -1,9 +1,9 @@
 package Complete::Bash;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-22'; # DATE
+our $DATE = '2020-01-28'; # DATE
 our $DIST = 'Complete-Bash'; # DIST
-our $VERSION = '0.332'; # VERSION
+our $VERSION = '0.334'; # VERSION
 
 use 5.010001;
 use strict;
@@ -438,43 +438,6 @@ with some options.
 This function accepts completion answer structure as described in the `Complete`
 POD. Aside from `words`, this function also recognizes these keys:
 
-* `as` (str): Either `string` (the default) or `array` (to return array of lines
-  instead of the lines joined together). Returning array is useful if you are
-  doing completion inside `Term::ReadLine`, for example, where the library
-  expects an array.
-
-* `esc_mode` (str): Escaping mode for entries. Either `default` (most
-  nonalphanumeric characters will be escaped), `shellvar` (like `default`, but
-  dollar sign `$` will not be escaped, convenient when completing environment
-  variables for example), `filename` (currently equals to `default`), `option`
-  (currently equals to `default`), or `none` (no escaping will be done).
-
-* `path_sep` (str): If set, will enable "path mode", useful for
-  completing/drilling-down path. Below is the description of "path mode".
-
-  In shell, when completing filename (e.g. `foo`) and there is only a single
-  possible completion (e.g. `foo` or `foo.txt`), the shell will display the
-  completion in the buffer and automatically add a space so the user can move to
-  the next argument. This is also true when completing other values like
-  variables or program names.
-
-  However, when completing directory (e.g. `/et` or `Downloads`) and there is
-  solely a single completion possible and it is a directory (e.g. `/etc` or
-  `Downloads`), the shell automatically adds the path separator character
-  instead (`/etc/` or `Downloads/`). The user can press Tab again to complete
-  for files/directories inside that directory, and so on. This is obviously more
-  convenient compared to when shell adds a space instead.
-
-  The `path_sep` option, when set, will employ a trick to mimic this behaviour.
-  The trick is, if you have a completion array of `['foo/']`, it will be changed
-  to `['foo/', 'foo/ ']` (the second element is the first element with added
-  space at the end) to prevent bash from adding a space automatically.
-
-  Path mode is not restricted to completing filesystem paths. Anything path-like
-  can use it. For example when you are completing Java or Perl module name (e.g.
-  `com.company.product.whatever` or `File::Spec::Unix`) you can use this mode
-  (with `path_sep` appropriately set to, e.g. `.` or `::`).
-
 _
     args_as => 'array',
     args => {
@@ -496,6 +459,21 @@ _
             description => <<'_',
 
 Known options:
+
+* as
+
+  Either `string` (the default) or `array` (to return array of lines instead of
+  the lines joined together). Returning array is useful if you are doing
+  completion inside `Term::ReadLine`, for example, where the library expects an
+  array.
+
+* esc_mode
+
+  Escaping mode for entries. Either `default` (most nonalphanumeric characters
+  will be escaped), `shellvar` (like `default`, but dollar sign `$` will also be
+  escaped, convenient when completing environment variables for example),
+  `filename` (currently equals to `default`), `option` (currently equals to
+  `default`), or `none` (no escaping will be done).
 
 * word
 
@@ -548,9 +526,10 @@ sub format_completion {
 
     $hcomp = {words=>$hcomp} unless ref($hcomp) eq 'HASH';
     my $words    = $hcomp->{words};
-    my $as       = $hcomp->{as} // 'string';
+    my $as       = $opts->{as} // 'string';
     # 'escmode' key is deprecated (Complete 0.11-) and will be removed later
-    my $esc_mode = $hcomp->{esc_mode} // $hcomp->{escmode} // $ENV{COMPLETE_BASH_DEFAULT_ESC_MODE} // 'default';
+    my $esc_mode = $opts->{esc_mode} // $ENV{COMPLETE_BASH_DEFAULT_ESC_MODE} //
+        'default';
     my $path_sep = $hcomp->{path_sep};
 
     # we keep the original words (before formatted with summaries) when we want
@@ -584,15 +563,29 @@ sub format_completion {
     }
 
   WORKAROUND_PREVENT_BASH_FROM_INSERTING_SPACE:
-    if (defined($path_sep) && @$words == 1) {
-        my $re = qr/\Q$path_sep\E\z/;
-        my $word;
-        if (ref($words->[0]) eq 'HASH') {
-            $words = [$words->[0], {word=>"$words->[0] "}] if
-                $words->[0]{word} =~ $re;
-        } else {
-            $words = [$words->[0], "$words->[0] "]
-                if $words->[0] =~ $re;
+    {
+        last unless @$words == 1;
+        if (defined $path_sep) {
+            my $re = qr/\Q$path_sep\E\z/;
+            my $word;
+            if (ref $words->[0] eq 'HASH') {
+                $words = [$words->[0], {word=>"$words->[0]{word} "}] if
+                    $words->[0]{word} =~ $re;
+            } else {
+                $words = [$words->[0], "$words->[0] "]
+                    if $words->[0] =~ $re;
+            }
+            last;
+        }
+
+        if ($hcomp->{is_partial} ||
+                ref $words->[0] eq 'HASH' && $words->[0]{is_partial}) {
+            if (ref $words->[0] eq 'HASH') {
+                $words = [$words->[0], {word=>"$words->[0]{word} "}];
+            } else {
+                $words = [$words->[0], "$words->[0] "];
+            }
+            last;
         }
     }
 
@@ -629,13 +622,13 @@ sub format_completion {
         my $word    = ref($entry) eq 'HASH' ? $entry->{word}    : $entry;
         my $summary = (ref($entry) eq 'HASH' ? $entry->{summary} : undef) // '';
         if ($esc_mode eq 'shellvar') {
-            # don't escape $
-            $word =~ s!([^A-Za-z0-9,+._/\$~-])!\\$1!g;
+            # escape $ also
+            $word =~ s!([^A-Za-z0-9,+._/:~-])!\\$1!g;
         } elsif ($esc_mode eq 'none') {
             # no escaping
         } else {
             # default
-            $word =~ s!([^A-Za-z0-9,+._/:~-])!\\$1!g;
+            $word =~ s!([^A-Za-z0-9,+._/:\$~-])!\\$1!g;
         }
         push @words, $word;
         push @summaries, $summary;
@@ -764,7 +757,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.332 of Complete::Bash (from Perl distribution Complete-Bash), released on 2019-12-22.
+This document describes version 0.334 of Complete::Bash (from Perl distribution Complete-Bash), released on 2020-01-28.
 
 =head1 DESCRIPTION
 
@@ -842,47 +835,6 @@ with some options.
 This function accepts completion answer structure as described in the C<Complete>
 POD. Aside from C<words>, this function also recognizes these keys:
 
-=over
-
-=item * C<as> (str): Either C<string> (the default) or C<array> (to return array of lines
-instead of the lines joined together). Returning array is useful if you are
-doing completion inside C<Term::ReadLine>, for example, where the library
-expects an array.
-
-=item * C<esc_mode> (str): Escaping mode for entries. Either C<default> (most
-nonalphanumeric characters will be escaped), C<shellvar> (like C<default>, but
-dollar sign C<$> will not be escaped, convenient when completing environment
-variables for example), C<filename> (currently equals to C<default>), C<option>
-(currently equals to C<default>), or C<none> (no escaping will be done).
-
-=item * C<path_sep> (str): If set, will enable "path mode", useful for
-completing/drilling-down path. Below is the description of "path mode".
-
-In shell, when completing filename (e.g. C<foo>) and there is only a single
-possible completion (e.g. C<foo> or C<foo.txt>), the shell will display the
-completion in the buffer and automatically add a space so the user can move to
-the next argument. This is also true when completing other values like
-variables or program names.
-
-However, when completing directory (e.g. C</et> or C<Downloads>) and there is
-solely a single completion possible and it is a directory (e.g. C</etc> or
-C<Downloads>), the shell automatically adds the path separator character
-instead (C</etc/> or C<Downloads/>). The user can press Tab again to complete
-for files/directories inside that directory, and so on. This is obviously more
-convenient compared to when shell adds a space instead.
-
-The C<path_sep> option, when set, will employ a trick to mimic this behaviour.
-The trick is, if you have a completion array of C<['foo/']>, it will be changed
-to C<['foo/', 'foo/ ']> (the second element is the first element with added
-space at the end) to prevent bash from adding a space automatically.
-
-Path mode is not restricted to completing filesystem paths. Anything path-like
-can use it. For example when you are completing Java or Perl module name (e.g.
-C<com.company.product.whatever> or C<File::Spec::Unix>) you can use this mode
-(with C<path_sep> appropriately set to, e.g. C<.> or C<::>).
-
-=back
-
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
@@ -902,6 +854,21 @@ Specify options.
 Known options:
 
 =over
+
+=item * as
+
+Either C<string> (the default) or C<array> (to return array of lines instead of
+the lines joined together). Returning array is useful if you are doing
+completion inside C<Term::ReadLine>, for example, where the library expects an
+array.
+
+=item * esc_mode
+
+Escaping mode for entries. Either C<default> (most nonalphanumeric characters
+will be escaped), C<shellvar> (like C<default>, but dollar sign C<$> will also be
+escaped, convenient when completing environment variables for example),
+C<filename> (currently equals to C<default>), C<option> (currently equals to
+C<default>), or C<none> (no escaping will be done).
 
 =item * word
 
@@ -1167,7 +1134,7 @@ Return value:  (any)
 
 =head2 COMPLETE_BASH_DEFAULT_ESC_MODE
 
-Str.
+Str. To provide default for the C<esc_mode> option in L</format_completion>.
 
 =head2 COMPLETE_BASH_FZF
 
@@ -1259,7 +1226,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

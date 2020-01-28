@@ -1,7 +1,7 @@
 package App::rimetadb;
 
-our $DATE = '2019-10-15'; # DATE
-our $VERSION = '0.223'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $VERSION = '0.224'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1033,7 +1033,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.223 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-10-15.
+This document describes version 0.224 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-11-26.
 
 =head1 SYNOPSIS
 

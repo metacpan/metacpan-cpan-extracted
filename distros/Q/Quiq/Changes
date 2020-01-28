@@ -1,3 +1,69 @@
+1.171 2020-01-25
+================
+
+[Quiq::Cascm]
+* edit() - Temporäre Datei von . auf ~/tmp umgestellt
+* package() - Pfadkorrektur
+
+[Quiq::Database::Connection]
+* runCount() - hinzugefügt
+
+[Quiq::Html::Form::Layout]
+* Behandlung von Hidden-Widgets korrigiert
+
+[Quiq::Html::Widget]
+* Attribut undefIf dokumentiert
+
+[Quiq::Html::Widget::Button]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::CheckBox]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::CheckBoxBar]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::FileUpload]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::Hidden]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::RadioButton]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::RadioButtonBar]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::ReadOnly]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::SelectMenu]
+* Attribut undefIf hinzugefügt
+* Attribut readOnly hinzugefügt
+
+[Quiq::Html::Widget::SelectMenuColor]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::TextArea]
+* Attribut undefIf hinzugefügt
+
+[Quiq::Html::Widget::TextField]
+* Attribut undefIf hinzugefügt
+* Attribut readOnly hinzugefügt
+
+[Quiq::Html::List]
+* Einrückung für <dd>-Tag hinzugefügt
+
+[Quiq::JQuery::ContextMenu::Ajax]
+* Übermittlung der Item-Definitionen auf Array umgestellt
+
+[Quiq::PlotlyJs::Reference]
+* Doku bearbeitet
+
+[Quiq::Url]
+* Doku bearbeitet
+
 1.170 2020-01-18
 ================
 

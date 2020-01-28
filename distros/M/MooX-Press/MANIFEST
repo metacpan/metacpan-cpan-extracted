@@ -27,3 +27,7 @@ t/14enum.t
 t/15requires.t
 t/16classgenerators.t
 t/17rolegenerators.t
+t/18handlesvia.t
+t/19smooth.t
+t/20moosex.t
+t/21coderef.t

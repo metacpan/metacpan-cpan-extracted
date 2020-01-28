@@ -5,11 +5,14 @@ META.json
 README.md
 cpanfile
 lib/Text/VisualPrintf.pm
+lib/Text/VisualPrintf/IO.pm
 minil.toml
 t/00_compile.t
 t/01_simple.t
 t/02_multi.t
 t/03_special.t
 t/04_combined.t
+t/05_filehandle.t
+t/06_io.t
 META.yml
 MANIFEST

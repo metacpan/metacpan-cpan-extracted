@@ -1,3 +1,11 @@
+0.10 2020-01-26 15:00:00+0000
+  -Support no_update for outputs not updated in a callback
+0.09 2020-01-23 22:00:00+0000
+  -Support callback context
+0.08 2020-01-22 22:00:00+0000
+  -Support for using children without name when it's the first parameter
+0.07 2020-01-21 22:00:00+0000
+  -Support for creating dependencies with objects and support for aliased & imported functions (same as components)
 0.06 2020-01-19 22:00:00+0000
   -Support PreventUpdate
   -Support multiple outputs

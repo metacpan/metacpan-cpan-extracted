@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 335;
+plan tests => 757;
 
 require Graph::Maker::BinomialTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::BinomialTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BinomialTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BinomialTree->VERSION($want_version); 1 }, 1,
@@ -129,6 +129,39 @@ sub Graph_height {
   my ($graph, $root) = @_;
   if (scalar($graph->vertices) == 1) { return 1; }
   return ($graph->vertex_eccentricity($root) || 0) + 1;
+}
+
+
+#------------------------------------------------------------------------------
+# direction_type
+
+foreach my $N (0 .. 20) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                direction_type => 'bigger');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from < $to, 1);
+  }
+
+  my $graph2 = Graph::Maker->new('binomial_tree',
+                                 N => $N,
+                                 direction_type => 'child');
+  ok ($graph->eq($graph2)?1:0, 1);
+}
+foreach my $N (0 .. 20) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                direction_type => 'smaller');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from > $to, 1);
+  }
+
+  my $graph2 = Graph::Maker->new('binomial_tree',
+                                 N => $N,
+                                 direction_type => 'parent');
+  ok ($graph->eq($graph2)?1:0, 1);
 }
 
 

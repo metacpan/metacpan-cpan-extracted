@@ -1,7 +1,7 @@
 package DBG;
-$DBG::VERSION = '0.004';
 # ABSTRACT: A collection of debugging functions
-
+use version;
+our $VERSION = 'v0.4.1'; # VERSION
 
 use v5.10;
 use strict;
@@ -378,12 +378,12 @@ sub _flt {
     my $i = shift;
     return "$i" if blessed $i;
     for ( ref $i ) {
-        when ('HASH') {
+        if ($_ eq 'HASH') {
             my %h = %$i;
             $_ = _flt($_) for values %h;
             return \%h;
         }
-        when ('ARRAY') {
+        elsif ($_ eq 'ARRAY') {
             return [ map { _flt($_) } @$i ];
         }
     }
@@ -404,7 +404,7 @@ DBG - A collection of debugging functions
 
 =head1 VERSION
 
-version 0.004
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -778,25 +778,16 @@ for screening it out:
   }
   exit 0;
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
+=head1 AUTHOR
 
 Grant Street Group <developers@grantstreet.com>
 
-=item *
-
-David F. Houghton <dfhoughton@gmail.com>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Grant Street Group.
+This software is Copyright (c) 2014 - 2020 by Grant Street Group.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

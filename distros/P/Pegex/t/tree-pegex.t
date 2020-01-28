@@ -11,7 +11,6 @@ parse-to-tree-test(*grammar, *input).yaml.clean == *ast
   :"+ - TestAST"
 
 
-
 === Part of Pegex Grammar
 --- grammar(#)
 # This is the Pegex grammar for Pegex grammars!

@@ -1,14 +1,17 @@
-%TestML 0.1.0
+#!/usr/bin/env testml
+
 
 # Make sure the JSONY parses to what we expect:
-*jsony.jsony_load.yaml == *json.json_decode.yaml
+*jsony.jsony-load.yaml == *json.json-decode.yaml
 
 # Make sure JSONY parses the JSON form the same as a JSON parser:
-*json.jsony_load.yaml == *json.json_decode.yaml
+*json.jsony-load.yaml == *json.json-decode.yaml
+
 
 === String splitting 1
 --- jsony: foo bar baz
 --- json: [ "foo", "bar", "baz" ]
+
 
 === String splitting 2
 --- jsony
@@ -16,17 +19,21 @@ foo bar
 baz
 --- json: [ "foo", "bar", "baz" ]
 
+
 === String splitting 3
 --- jsony: foo "bar baz"
 --- json: [ "foo", "bar baz" ]
+
 
 === Number conversion
 --- jsony: foo 3 bar
 --- json: [ "foo", 3, "bar" ]
 
+
 === Specials
 --- jsony: one true two false three null
 --- json: [ "one", true, "two", false, "three", null ]
+
 
 === Object 1
 --- jsony
@@ -36,6 +43,7 @@ baz
   "foo": "bar",
   "baz": 1
 }
+
 
 === Object 2
 --- jsony
@@ -57,11 +65,13 @@ plugin Frobnicator {
   }
 ]
 
+
 === Log line example
 --- jsony
 2012-09-10T17:00:34 /users/bob/edit { user admin }
 --- json
 [ "2012-09-10T17:00:34", "/users/bob/edit", { "user": "admin" } ]
+
 
 === Config file example
 --- jsony
@@ -81,6 +91,7 @@ allow hosts [ jules sherlock kitty ]
   "dsn", "dbi:SQLite:filename=my.db",
   "allow", "hosts", [ "jules", "sherlock", "kitty" ]
 ]
+
 
 === activitystrea.ms example
 --- jsony
@@ -137,10 +148,11 @@ published 2011-02-10T15:04:55Z
   }
 }
 
+
 === Comments
---- jsony
+--- jsony(#)
 foo bar     # comment
-\# Comment
+# Comment
 url http://xyz.com#not_comment
 --- json
 [
@@ -150,11 +162,13 @@ url http://xyz.com#not_comment
     "http://xyz.com#not_comment"
 ]
 
+
 === Top Level Mapping
 --- jsony
 foo: bar
 baz: 42
 --- json: {"foo": "bar", "baz": 42}
+
 
 === Top Level Sequence
 --- jsony
@@ -162,15 +176,17 @@ baz: 42
 - foo bar
 --- json: [["foo", "bar"],["foo", "bar"]]
 
+
 === Terminal comment
---- jsony
+--- jsony(#)
 abcd: goldfish
-\# Terminal Comment w/ newline
+# Terminal Comment w/ newline
 --- json: {"abcd": "goldfish"}
 
+
 === Terminal comment w/ no final newline (Issue 3)
---- jsony
+--- jsony(#)
 abcd: goldfish
-\# Terminal Comment w/o newline|
+# Terminal Comment w/o newline|
 --- json: {"abcd": "goldfish"}
 

@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.60
+Version 0.61
 
 =cut
 
@@ -578,7 +578,7 @@ sub _find_language {
 						} else {
 							$self->{_sublanguage} = $language_name;
 							if($self->{_logger}) {
-								$self->{_logger}->debug('variety name ' . $self->{_sublanguage});
+								$self->{_logger}->debug('variety name ', $self->{_sublanguage});
 							}
 							if($self->{_cache} && !defined($from_cache)) {
 								if($self->{_logger}) {
@@ -833,7 +833,7 @@ sub country {
 	# again.
 	if($self->{_country}) {
 		if($self->{_logger}) {
-			$self->{_logger}->trace('quick return: ' . $self->{_country});
+			$self->{_logger}->trace('quick return: ', $self->{_country});
 		}
 		return $self->{_country};
 	}
@@ -1018,7 +1018,7 @@ sub country {
 			unless ($@) {
 				$self->{_country} = $iana->country();
 				if($self->{_logger}) {
-					$self->{_logger}->debug("IANA reports $ip as " . $self->{_country});
+					$self->{_logger}->debug("IANA reports $ip as ", $self->{_country});
 				}
 			}
 		}
@@ -1155,6 +1155,64 @@ sub locale {
 	return ();	# returns undef
 }
 
+=head2 timezone
+
+Returns the timezone of the web client.
+
+If L<Geo::IP> is installed,
+CGI::Lingua will make use of that, otherwise it will use ip-api.com
+
+=cut
+
+sub timezone {
+	my $self = shift;
+
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entered timezone');
+	}
+	if($self->{_timezone}) {
+		if($self->{_logger}) {
+			$self->{_logger}->trace('quick return: ', $self->{_timezone});
+		}
+		return $self->{_timezone};
+	}
+
+	if($self->{_have_geoip} == -1) {
+		if(($^O eq 'MSWin32') || (-r '/usr/local/share/GeoIP/GeoIP.dat')) {
+			if(eval { require Geo::IP; }) {
+				Geo::IP->import();
+				$self->{_have_geoip} = 1;
+				# GEOIP_STANDARD = 0, can't use that because you'll
+				# get a syntax error
+				$self->{_geoip} = Geo::IP->new(0);
+			} else {
+				$self->{_have_geoip} = 0;
+			}
+		} else {
+			$self->{_have_geoip} = 0;
+		}
+	}
+	my $ip = $ENV{'REMOTE_ADDR'};
+	if($self->{_have_geoip} == 1) {
+		$self->{_timezone} = $self->{_geoip}->time_zone($ip);
+	}
+	if((!$self->{_timezone}) &&
+	   (eval { require LWP::Simple; require JSON::Parse } )) {
+		if($self->{_logger}) {
+			$self->{_logger}->debug("Look up $ip on ip-api.com");
+		}
+
+		LWP::Simple->import();
+		JSON::Parse->import();
+
+		if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
+			$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+		}
+	}
+
+	return $self->{_timezone};
+}
+
 # Wrapper to Locale::Language::code2language which makes use of the cache
 sub _code2language
 {
@@ -1163,7 +1221,7 @@ sub _code2language
 	return unless($code);
 	if($self->{_logger}) {
 		if(defined($self->{_country})) {
-			$self->{_logger}->trace("_code2language $code, country " . $self->{_country});
+			$self->{_logger}->trace("_code2language $code, country ", $self->{_country});
 		} else {
 			$self->{_logger}->trace("_code2language $code");
 		}
@@ -1192,7 +1250,7 @@ sub _code2country
 	return unless($code);
 	if($self->{_logger}) {
 		if($self->{_country}) {
-			$self->{_logger}->trace("_code2country $code, country " . $self->{_country});
+			$self->{_logger}->trace("_code2country $code, country ", $self->{_country});
 		} else {
 			$self->{_logger}->trace("_code2country $code");
 		}
@@ -1254,7 +1312,6 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Lingua>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SEE ALSO
 
 L<Locale::Country>
@@ -1284,7 +1341,6 @@ L<http://cpanratings.perl.org/d/CGI-Lingua>
 L<http://search.cpan.org/dist/CGI-Lingua/>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

@@ -1,0 +1,41 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*command","*output"],
+      ["==",
+        [".",
+          ["*","command"],
+          ["run"]],
+        ["*","output"],
+        "+ '{*command}' output is correct"]],
+    ["%<>",["*command","*match"],
+      ["~~",
+        [".",
+          ["*","command"],
+          ["run"]],
+        ["*","match"],
+        "+ '{*command}' output matches '{Want}'"]]],
+  "data": [
+    { "label": "Test 1",
+      "point": {
+        "command": "pegex",
+        "output": "pegex <command> [<options>] [<input-file>]\n\nCommands:\n\n   compile: Compile a Pegex grammar to some format\n   version: Show Pegex version\n      help: Show help\n\nOptions:\n   -t,--to=:     Output type: yaml, json, perl\n   -b, --boot:   Use the Pegex Bootstrap compiler\n   -r, --rules=: List of starting rules\n\n"}},
+    { "label": "Test 2",
+      "point": {
+        "command": "pegex help",
+        "output": "pegex <command> [<options>] [<input-file>]\n\nCommands:\n\n   compile: Compile a Pegex grammar to some format\n   version: Show Pegex version\n      help: Show help\n\nOptions:\n   -t,--to=:     Output type: yaml, json, perl\n   -b, --boot:   Use the Pegex Bootstrap compiler\n   -r, --rules=: List of starting rules\n\n"}},
+    { "label": "Test 3",
+      "point": {
+        "command": "pegex version",
+        "match": [["The 'pegex' compiler command v0.","Using the Perl Pegex module v0."]]}},
+    { "label": "Test 4",
+      "point": {
+        "command": "echo 'hash: BANG' | pegex compile --to=yaml",
+        "output": "---\n+toprule: hash\nBANG:\n  .rgx: '!'\nhash:\n  .ref: BANG\n"}},
+    { "label": "Test 5",
+      "point": {
+        "command": "echo 'hash: BANG' | pegex compile --to=json",
+        "output": "{\n   \"+toprule\" : \"hash\",\n   \"BANG\" : {\n      \".rgx\" : \"!\"\n   },\n   \"hash\" : {\n      \".ref\" : \"BANG\"\n   }\n}\n"}},
+    { "label": "Test 6",
+      "point": {
+        "command": "echo 'hash: BANG' | pegex compile --to=perl",
+        "output": "{\n  '+toprule' => 'hash',\n  'BANG' => {\n    '.rgx' => qr/\\G!/\n  },\n  'hash' => {\n    '.ref' => 'BANG'\n  }\n}\n"}}]}

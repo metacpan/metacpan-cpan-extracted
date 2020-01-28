@@ -1,4 +1,4 @@
-# Copyright 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -19,10 +19,11 @@
 package Graph::Maker::BinaryBeanstalk;
 use 5.004;
 use strict;
+use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 
@@ -34,20 +35,36 @@ sub _default_graph_maker {
   require Graph;
   Graph->new(@_);
 }
+sub _make_graph {
+  my ($self, %params) = @_;
+  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
+  return $graph_maker->(%params);
+}
+sub _add_edge_reverse {
+  my ($graph, $u, $v) = @_;
+  $graph->add_edge($v,$u);    # reverse
+}
+my %add_edge_method = (smaller => \&_add_edge_reverse,
+                       parent  => \&_add_edge_reverse,
+                       bigger  => 'add_edge',
+                       child   => 'add_edge',
+                       both    => 'add_cycle');
+
 sub init {
   my ($self, %params) = @_;
 
-  my $height = delete($params{'height'});
-  my $N      = delete($params{'N'});
-  my $graph_maker = delete($params{'graph_maker'}) || \&_default_graph_maker;
-
-  my $graph = $graph_maker->(%params);
+  my $height          = delete($params{'height'});
+  my $N               = delete($params{'N'});
+  my $direction_type  = delete($params{'direction_type'}) || 'both';
+  my $graph = $self->_make_graph(%params);
 
   if ((defined $height && $height > 0)
       || (defined $N && $N > 0)) {
     $graph->add_vertex(0);
 
-    my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
+    my $add_edge = ($graph->is_undirected ? 'add_edge'
+                    : $add_edge_method{$direction_type}
+                    || croak "Unrecognised direction_type ",$direction_type);
     my $row_start = 0;
     my $v = 1;
     my $h = 1;
@@ -60,13 +77,13 @@ sub init {
         $h++;
         if (defined $height && $h > $height) {
           # stop for height limit
-          $graph->set_graph_attribute(name=>"Binary Beanstalk height $height");
+          $graph->set_graph_attribute(name=>"Binary Beanstalk, Height $height");
           last;
         }
       }
       if (defined $N && $v >= $N) {
         # stop for N limit
-        $graph->set_graph_attribute (name => "Binary Beanstalk $N Vertices");
+        $graph->set_graph_attribute (name => "Binary Beanstalk, $N Vertices");
         last;
       }
 
@@ -74,7 +91,7 @@ sub init {
       $v++;
     }
   } else {
-    $graph->set_graph_attribute (name => "Binary Beanstalk empty");
+    $graph->set_graph_attribute (name => "Binary Beanstalk, Empty");
   }
   return $graph;
 }
@@ -96,7 +113,7 @@ __END__
 
 __END__
 
-=for stopwords Ryde OEIS undirected
+=for stopwords Ryde OEIS undirected childful
 
 =head1 NAME
 
@@ -130,22 +147,25 @@ beanstalk per OEIS A179016 etc.
       / \    / \
     12  13  14  15
 
+Vertices are integers starting at root 0.  Vertex n has
+
+    parent(n) = n - CountOneBits(n)
+              = 0,0,1,1,3,3,4,4,7,7,8,8,,... (A011371)
+
+For example 9 = 1001 binary has 2 1-bits so parent 9-2=7.
+
 =cut
 
 # GP-DEFINE  parent(n) = n - hammingweight(n);
 # GP-Test  vector(16,n,n--; parent(n)) == \
 # GP-Test    [0,0,1,1,3,3,4,4,7,7,8,8,10,10,11,11]  /* parent each */
+# GP-Test  vector(12,n,n--; parent(n)) == [0,0,1,1,3,3,4,4,7,7,8,8]
+# GP-Test  parent(9) == 7
 
 =pod
 
-Vertices are integers starting at root 0.  Vertex n has
-
-    parent(n) = n - CountOneBits(n)
-
-For example 9 = 1001 binary has 2 1-bits so parent 9-2=7.
-
-Other than the root 0, each vertex has either 0 or 2 children, hence
-"binary" beanstalk.  There are 2 children since if even n has parent
+Other than the root 0, each vertex has 0 or 2 children, hence "binary"
+beanstalk.  There are 2 children (not 1) since if even n has parent
 n-CountOneBits(n)=p then the next vertex n+1 is same
 
     parent(n+1) = n+1 - CountOneBits(n+1)
@@ -177,9 +197,9 @@ This also means parent p is always increasing, and therefore the vertices in
 a given row are contiguous integers.  That's so of the single vertex row 1
 and thereafter remains so by parent number increasing.
 
-The vertices in a given row which have children are not always contiguous.
-The first gap occurs at depth 36 where the vertices 116,117,119 have
-children and 118 does not.
+The childful vertices in a given row (those which have children) are not
+always contiguous.  The first gap occurs at depth 36 where the vertices
+116,117,119 have children and 118 does not.
 
            /-----^------\
           112          113
@@ -207,6 +227,18 @@ C<height> or C<N> comes first.  Since vertex numbers in a row are
 contiguous, specifying height is equivalent to an N = first vertex number of
 the row after = 1, 2, 4, 6, 8, ... (OEIS A213708).
 
+The default is a directed graph with edges both ways between vertices (like
+most C<Graph::Maker> directed graphs).  This is parameter C<direction_type
+=E<gt> 'both'>.
+
+Optional C<direction_type =E<gt> 'bigger'> or C<'child'> gives edges
+directed to the bigger vertex number, so from smaller to bigger.  This means
+parent down to child.
+
+Option C<direction_type =E<gt> 'smaller'> or C<'parent'> gives edges
+directed to the smaller vertex number, so from bigger to smaller.  This is
+from child up to parent.
+
 =head1 FUNCTIONS
 
 =over
@@ -215,17 +247,18 @@ the row after = 1, 2, 4, 6, 8, ... (OEIS A213708).
 
 The key/value parameters are
 
-    height  =>  integer
-    N       =>  integer
+    height      => integer
+    N           => integer
+    direction_type => string, "both" (default), 
+                        "bigger", "smaller", "parent, "child"
     graph_maker => subr(key=>value) constructor, default Graph->new
 
 Other parameters are passed to the constructor, either C<graph_maker> or
 C<Graph-E<gt>new()>.
 
-Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
-then edges are added both up and down between each parent and child.  Option
-C<undirected =E<gt> 1> creates an undirected graph and for it there is a
-single edge between parent and child.
+If the graph is directed (the default) then edges are added as described in
+L</Options> above.  Option C<undirected =E<gt> 1> is an undirected graph and
+for it there is always a single edge between parent and child.
 
 =back
 
@@ -235,25 +268,19 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item height=1 (N=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (singleton)
-
-=item height=2 (N=2), L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
-
-=item N=3, <https://hog.grinvin.org/ViewGraphInfo.action?id=32234> path-3
-
-=item height=3 (N=4), L<https://hog.grinvin.org/ViewGraphInfo.action?id=500>  (claw)
-
-=item N=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=30>  (fork)
-
-=item height=4 (N=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=334>  (H graph)
-
-=item N=7, L<https://hog.grinvin.org/ViewGraphInfo.action?id=714>
-
-=item height=5 (N=8), L<https://hog.grinvin.org/ViewGraphInfo.action?id=502>
-
-=item N=13, L<https://hog.grinvin.org/ViewGraphInfo.action?id=60>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
 
 =back
+
+    1310       N=1 (height=1), singleton
+    19655      N=2 (height=2), path-2
+    32234      N=3,            path-3
+    500        N=4 (height=3), star-4, claw
+    30         N=5,            fork
+    334        N=6 (height=4), H graph
+    714        N=7
+    502        N=8 (height=5)
+    60         N=13
 
 =head1 OEIS
 
@@ -315,9 +342,13 @@ L<http://oeis.org/A179016> (etc)
 L<Graph::Maker>,
 L<Graph::Maker::BinomialTree>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

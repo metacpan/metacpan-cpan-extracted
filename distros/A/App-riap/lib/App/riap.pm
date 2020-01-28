@@ -1,7 +1,7 @@
 package App::riap;
 
-our $DATE = '2019-08-21'; # DATE
-our $VERSION = '0.380'; # VERSION
+our $DATE = '2020-01-28'; # DATE
+our $VERSION = '0.381'; # VERSION
 
 use 5.010001;
 use strict;
@@ -542,13 +542,14 @@ sub comp_ {
     }
     #use Data::Dump; dd \@res;
 
-    my $comp = Complete::Bash::format_completion({
-        path_sep => '/',
-        as       => 'array',
-        esc_mode => 'default',
-        words    => Complete::Util::complete_array_elem(
-            array=>\@res, word=>$word0),
-    });
+    my $comp = Complete::Bash::format_completion(
+        {
+            path_sep => '/',
+            words    => Complete::Util::complete_array_elem(
+                array=>\@res, word=>$word0),
+        },
+        {as => 'array'},
+    );
     if ($self->setting("debug_completion")) {
         say "DEBUG: Completion (1): ".join(", ", @$comp);
     }
@@ -638,13 +639,14 @@ sub catch_comp {
         riap_client     => $self->{_pa},
     );
     $res = _hashify_compres($res);
-    @{ Complete::Bash::format_completion({
-        path_sep => '/',
-        as       => 'array',
-        esc_mode => 'default',
-        words    => Complete::Util::complete_array_elem(
-            array=>$res->{words}, word=>$word),
-    })};
+    @{ Complete::Bash::format_completion(
+        {
+            path_sep => '/',
+            words    => Complete::Util::complete_array_elem(
+                array=>$res->{words}, word=>$word),
+        },
+        {as => 'array'},
+    ) };
 }
 
 sub _hashify_compres {
@@ -711,13 +713,14 @@ sub _install_cmds {
                 $res->{words} = [ grep { !/^[.-]/ } @{ $res->{words} } ];
             }
 
-            my $comp = Complete::Bash::format_completion({
-                path_sep => '/',
-                as       => 'array',
-                esc_mode => 'default',
-                words    => Complete::Util::complete_array_elem(
-                    array=>$res->{words}, word=>$word),
-            });
+            my $comp = Complete::Bash::format_completion(
+                {
+                    path_sep => '/',
+                    words    => Complete::Util::complete_array_elem(
+                        array=>$res->{words}, word=>$word),
+                },
+                {as => 'array'},
+            );
             if ($self->setting('debug_completion')) {
                 say "DEBUG: Completion (2): ".join(", ", @$comp);
             }
@@ -747,7 +750,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.380
+version 0.381
 
 =head1 SYNOPSIS
 
@@ -777,7 +780,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

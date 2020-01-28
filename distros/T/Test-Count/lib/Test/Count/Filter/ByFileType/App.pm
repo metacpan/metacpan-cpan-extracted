@@ -1,5 +1,5 @@
 package Test::Count::Filter::ByFileType::App;
-$Test::Count::Filter::ByFileType::App::VERSION = '0.1101';
+$Test::Count::Filter::ByFileType::App::VERSION = '0.1102';
 use strict;
 use warnings;
 
@@ -54,9 +54,14 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+Test::Count::Filter::ByFileType::App - a standalone command line application
+that filters according to the filetype.
+
 =head1 VERSION
 
-version 0.1101
+version 0.1102
 
 =head1 SYNOPSIS
 
@@ -65,11 +70,6 @@ version 0.1101
 
     # To filter Perl 5 code
     $ perl -MTest::Count::Filter::ByFileType::App -e 'run()'
-
-=head1 NAME
-
-Test::Count::Filter::ByFileType::App - a standalone command line application
-that filters according to the filetype.
 
 =head1 FUNCTIONS
 

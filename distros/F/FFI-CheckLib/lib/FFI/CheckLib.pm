@@ -22,7 +22,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 
 our $system_path = [];
@@ -42,6 +42,7 @@ else
 {
   $system_path = eval {
     require DynaLoader;
+    no warnings 'once';
     \@DynaLoader::dl_library_path;
   };
   die $@ if $@;
@@ -162,20 +163,18 @@ sub find_lib
 
   foreach my $alien (@{ $args{alien} })
   {
+    unless($alien =~ /^([A-Za-z_][A-Za-z_0-9]*)(::[A-Za-z_][A-Za-z_0-9]*)*$/)
+    {
+        croak "Doesn't appear to be a valid Alien name $alien";
+    }
     unless(eval { $alien->can('dynamic_libs') })
     {
-      if($alien =~ /^([A-Za-z_][A-Za-z_0-9]*)(::[A-Za-z_][A-Za-z_0-9]*)*$/)
+      my $pm = "$alien.pm";
+      $pm =~ s/::/\//g;
+      require $pm;
+      unless(eval { $alien->can('dynamic_libs') })
       {
-        require Module::Load;
-        Module::Load::load($alien);
-        unless(eval { $alien->can('dynamic_libs') })
-        {
-          croak "Alien $alien doesn't provide a dynamic_libs method";
-        }
-      }
-      else
-      {
-        croak "Doesn't appear to be a valid Alien name $alien";
+        croak "Alien $alien doesn't provide a dynamic_libs method";
       }
     }
     push @path, [$alien->dynamic_libs];
@@ -402,7 +401,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
@@ -492,12 +491,12 @@ Example:
    lib => 'foo',
    verify => sub {
      my($name, $libpath) = @_;
-     
+ 
      my $ffi = FFI::Platypus->new;
      $ffi->lib($libpath);
-     
+ 
      my $f = $ffi->function('foo_version', [] => 'int');
-     
+ 
      return $f->call() >= 500; # we accept version 500 or better
    },
  );

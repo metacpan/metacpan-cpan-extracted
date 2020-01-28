@@ -2,9 +2,9 @@
 
 package Date::strftimeq;
 
-our $DATE = '2019-11-20'; # DATE
+our $DATE = '2019-12-24'; # DATE
 our $DIST = 'Date-strftimeq'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -85,16 +85,16 @@ Date::strftimeq - POSIX::strftime() with support for embedded perl code in %(...
 
 =head1 VERSION
 
-This document describes version 0.001 of Date::strftimeq (from Perl distribution Date-strftimeq), released on 2019-11-20.
+This document describes version 0.002 of Date::strftimeq (from Perl distribution Date-strftimeq), released on 2019-12-24.
 
 =head1 SYNOPSIS
 
  use Date::strftimeq; # by default exports strftimeq()
 
  my @time = localtime();
- print strftimeq '<%Y-%m-%d>', @time; # <2019-11-19>
- print strftimeq '<%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 0 ? "sun":"" )q>', @time; # <2019-11-19>
- print strftimeq '<%Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 2 ? "tue":"" )q>', @time; # <2019-11-19tue>
+ print strftimeq '<%-6Y-%m-%d>', @time; # <  2019-11-19>
+ print strftimeq '<%-6Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 0 ? "sun":"" )q>', @time; # <  2019-11-19>
+ print strftimeq '<%-6Y-%m-%d%( require Date::DayOfWeek; Date::DayOfWeek::dayofweek($_[3], $_[4]+1, $_[5]+1900) == 2 ? "tue":"" )q>', @time; # <  2019-11-19tue>
 
 =head1 DESCRIPTION
 
@@ -131,6 +131,8 @@ feature.
 =head1 SEE ALSO
 
 L<POSIX>'s C<strftime()>
+
+L<DateTimeX::strftimeq>
 
 =head1 AUTHOR
 

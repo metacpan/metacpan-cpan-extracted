@@ -11,21 +11,21 @@ use Env qw( @PATH );
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'dinosaur' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'dinosaur' );
   is $path, $path2, 'scalar context';
 };
 
 subtest 'find_lib (fail)' => sub {
   my @path = find_lib( lib => 'foobar' );
-  
+
   ok @path == 0, 'libfoobar not found';
 };
 
 subtest 'find_lib (good) with lib and version' => sub {
   my($path) = find_lib( lib => 'apatosaurus' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'apatosaurus' );
   is $path, $path2, 'scalar context';
 };
@@ -34,7 +34,7 @@ subtest 'in sync with $ENV{PATH}' => sub {
 
   local $ENV{PATH} = $ENV{PATH};
   @PATH = qw( foo bar baz );
-  
+
   is(
     $FFI::CheckLib::system_path,
     [qw( foo bar baz )],
@@ -45,28 +45,28 @@ subtest 'in sync with $ENV{PATH}' => sub {
 subtest 'lib with name like libname-1-2-3.dll' => sub {
   my($path) = find_lib( lib => 'maiasaura' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'maiasaura' );
   is $path, $path2, 'scalar context';
-    
+
 };
 
 subtest 'lib with name like name-1-2-3.dll' => sub {
   my($path) = find_lib( lib => 'dromornis_planei' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'dromornis_planei' );
   is $path, $path2, 'scalar context';
-    
+
 };
 
 subtest 'lib with name like libname-1-2___.dll' => sub {
   my($path) = find_lib( lib => 'thylacaleo_carnifex' );
   ok -r $path, "path = $path is readable";
-  
+
   my $path2 = find_lib( lib => 'thylacaleo_carnifex' );
   is $path, $path2, 'scalar context';
-    
+
 };
 
 
@@ -86,7 +86,7 @@ subtest '_cmp' => sub {
       @_
     ];
   };
-  
+
   is(
     $process->(qw( foo-1.dll bar-2.dll baz-0.dll )),
     [

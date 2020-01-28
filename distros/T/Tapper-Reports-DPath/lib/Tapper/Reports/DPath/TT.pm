@@ -2,7 +2,7 @@
 package Tapper::Reports::DPath::TT;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Mix DPath into Template-Toolkit templates
-$Tapper::Reports::DPath::TT::VERSION = '5.0.2';
+$Tapper::Reports::DPath::TT::VERSION = '5.0.4';
 use 5.010;
         use Moose;
         use Template;
@@ -12,7 +12,7 @@ use 5.010;
         use Template::Stash;
 
         # modules needed inside the TT template for vmethods
-        use Tapper::Reports::DPath 'reportdata';
+        use Tapper::Reports::DPath 'reportdata', 'testrundata', 'testplandata';
         use Tapper::Model 'model';
         use Data::Dumper;
         use Data::DPath 'dpath';
@@ -35,10 +35,13 @@ use 5.010;
                                        $self->include_path ? (INCLUDE_PATH => $self->include_path) : (),
                                       });
                 $Template::Stash::SCALAR_OPS->{reportdata} = sub { reportdata($_[0]) };
+                $Template::Stash::SCALAR_OPS->{testrundata} = sub { testrundata($_[0]) };
+                $Template::Stash::SCALAR_OPS->{testrundata_nohost} = sub { testrundata($_[0], 1) }; # nohost=1
+                $Template::Stash::SCALAR_OPS->{testplandata} = sub { testplandata($_[0]) };
                 $Template::Stash::SCALAR_OPS->{dpath_match}= sub { my ($path, $data) = @_; dpath($path)->match($data); };
                 $Template::Stash::LIST_OPS->{to_json}      = sub { JSON->new->pretty->encode(unbless $_[0]) };
                 $Template::Stash::LIST_OPS->{to_yaml}      = sub { YAML::XS::Dump(unbless $_[0])    };
-                $Template::Stash::LIST_OPS->{Dumper}       = sub { Dumper @_ };
+                $Template::Stash::LIST_OPS->{Dumper}       = sub { $Data::Dumper::Sortkeys = 1; Dumper @_ };
                 return $tt;
         }
 
@@ -75,6 +78,8 @@ use 5.010;
 
                 local $Tapper::Reports::DPath::puresqlabstract = $self->puresqlabstract;
                 if(not $tt->process(\$template, {reportdata => \&reportdata,
+                                                 testrundata => \&testrundata,
+                                                 testplandata => \&testplandata,
                                                  testrundb_hostnames => \&testrundb_hostnames,
                                                  defined $self->substitutes ? ( %{$self->substitutes} ) : (),
                                                 }, \$outbuf)) {
@@ -153,7 +158,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

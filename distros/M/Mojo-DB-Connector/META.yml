@@ -1,0 +1,55 @@
+---
+abstract: 'Create and cache DB connections using common connection info'
+author:
+  - 'Adam Hopkins'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-DB-Connector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::DB::Connector:
+    file: lib/Mojo/DB/Connector.pm
+    version: '0.05'
+  Mojo::DB::Connector::Base:
+    file: lib/Mojo/DB/Connector/Base.pm
+  Mojo::DB::Connector::Role::Cache:
+    file: lib/Mojo/DB/Connector/Role/Cache.pm
+  Mojo::DB::Connector::Role::ResultsRoles:
+    file: lib/Mojo/DB/Connector/Role/ResultsRoles.pm
+recommends:
+  Mojo::DB::Role::ResultsRoles: '0'
+  Mojo::Pg: '0'
+  Mojo::mysql: '0'
+requires:
+  Class::Method::Modifiers: '0'
+  List::Util: '0'
+  Mojolicious: '0'
+  Role::Tiny: '2.000001'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/srchulo/Mojo-DB-Connector/issues
+  homepage: https://github.com/srchulo/Mojo-DB-Connector
+  repository: git://github.com/srchulo/Mojo-DB-Connector.git
+version: '0.05'
+x_contributors:
+  - 'Adam Hopkins <violapiratejunky@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

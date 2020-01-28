@@ -7,6 +7,38 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.40	2020-01-28
+
+ [ Bug Fixes ]
+ - drop bogus small optimization.
+ - resolve SPDX keyword for AFPL.
+ - step-wise grant: capture non-versioned grant.
+ - step-wise grant: skip type:group license names.
+ - strip fortran comment also on otherwise empty line.
+
+ [ Test Suite ]
+ - update author tests for added Trove captions since
+   Regexp::Pattern::License v3.1.100.
+ - update author tests for improved trait licensed_under since
+   Regexp::Pattern::License v3.1.100.
+
+ [ Other ]
+ - fix: step-wise grant: capture traits before mangling version.
+ - improve custom-matching versioned apache grants.
+ - improve logging.
+ - optimization: step-wise grant: scan for name only directly after
+   licensed_under.
+ - step-wise grant: detect type:singleversion license names.
+ - step-wise grants: track trait license_label (in addition to
+   licensed_under).
+ - step-wise grants: track trait license_label_trove (in addition to
+   track_label licensed_under).
+ - streamline detection of well-formed licenses.
+ - tests: update author testsuite.
+ - track identified areas of strings and skip further parsing; require
+   Array::IntSpan.
+ - use nsort_by to sort matches; require List::SomeUtils (not List::Util).
+
 v3.0.39	2020-01-04
 
  - Improve detection of CC licenses.

@@ -56,6 +56,6 @@
          "url" : "https://github.com/fany/Mail-Qmail-Filter.git"
       }
    },
-   "version" : "1.1",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

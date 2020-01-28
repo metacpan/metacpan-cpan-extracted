@@ -9,14 +9,17 @@ use DiaColloDB::Utils qw(:list :math :si);
 use strict;
 
 ##-- try to use threads
-our ($HAVE_FORKS);
+our ($HAVE_THREADS);
 BEGIN {
-  $HAVE_FORKS = ($^P ? 0 ##-- disable forks if running under debugger
-		 #: eval "use threads; 1" ##-- segfaults on join()ing 2nd thread (possibly bogus destruction)
-		 : eval "use forks; 1"    ##-- forks module works basically as expected
-		);
+  $HAVE_THREADS = ($^P ? 0 ##-- disable threads if running under debugger
+                   : ($INC{'threads.pm'} ? 1    ##-- try to avoid "Attempt to reload threads.pm aborted." on perl 5.31.7 (cpantesters)
+                      : eval "use threads; 1"   ##-- this causes segfaults when join()ing 2nd thread (bogus destruction) for DDC::XS < v0.23
+                      #: eval "use forks; 1"    ##-- forks module works basically as expected
+                     ))
+    if (!defined($HAVE_THREADS));
   $@ = '';
 }
+
 
 ##==============================================================================
 ## Globals & Constants
@@ -57,7 +60,7 @@ sub defaults {
 	  fudge=>10,
 	  logFudge => 'debug',
 	  logThread => 'none',
-	  fork => $HAVE_FORKS,
+	  fork => $HAVE_THREADS,
 	  lazy => 1,
 	  extend => 1,
 	 );
@@ -105,8 +108,8 @@ sub open_list {
   @$cli{qw(url urls)} = ($url,$curls);
 
   ##-- sanity check(s)
-  if ($cli->{fork} && !$HAVE_FORKS) {
-    $cli->warn("fork-mode requested, but 'forks' module unavailable");
+  if ($cli->{fork} && !$HAVE_THREADS) {
+    $cli->warn("fork-mode requested, but 'threads' module unavailable");
     $cli->{fork} = 0;
   }
 
@@ -195,9 +198,10 @@ sub headerKeys {
 sub subcall {
   my ($cli,$code,@args) = @_;
   my ($i,@results);
-  if ($HAVE_FORKS && $cli->{fork}) {
+  if ($HAVE_THREADS && $cli->{fork}) {
     ##-- threaded call
-    #PDL::no_clone_skip_warning() if (UNIVERSAL::can('PDL','no_clone_skip_warning')); ##-- ithreads warning
+    PDL::no_clone_skip_warning() if (UNIVERSAL::can('PDL','no_clone_skip_warning')); ##-- ithreads warning
+
     my (@thrs);
     for ($i=0; $i <= $#{$cli->{urls}}; ++$i) {
       $cli->vlog($cli->{logThread}, "subcall(): spawning thread for subclient[$i]");

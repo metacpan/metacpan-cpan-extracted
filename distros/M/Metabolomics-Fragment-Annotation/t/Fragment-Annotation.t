@@ -17,7 +17,7 @@ use Metabolomics::Banks::BloodExposome qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
 use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 
-use Test::More tests => 18 ;
+use Test::More tests => 20 ;
 use Data::Dumper ;
 
 
@@ -216,7 +216,7 @@ BEGIN {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '358.0924 ',
                                                  '_ID_' => undef,
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
-                                                 '_PPM_ERROR_' => '111.703012965369',
+                                                 '_PPM_ERROR_' => '112',
                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_ANNOTATION_TYPE_' => 'adduct',
@@ -328,7 +328,7 @@ BEGIN {
                                                  '_ID_' => 'CON00004',
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '102.0549554',
-                                                 '_PPM_ERROR_' => '0.0979864278998716',
+                                                 '_PPM_ERROR_' => '0',
                                                  '_ANNOTATION_ONLY_IN_' => undef,
                                                  '_ANNOTATION_TYPE_' => 'Solvent',
                                                  '_ANNOTATION_IN_POS_MODE_' => '[M+H]+',
@@ -642,7 +642,7 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs002787+.tsv',
 		3, 
-		0.002,
+		0.05,
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		298.11460,
 		$modulePath.'/_template.tabular',
@@ -650,6 +650,20 @@ BEGIN {
 		$modulePath.'/pfs002787__ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with a positively charged methylguanosine');
 		
+#########################	
+	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with with a dipeptide (PRO-LEU)e**\n" ; $current_test++;
+	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
+		$modulePath.'/pfs003129.tsv',
+		3, 
+		0.05,
+		$modulePath.'/MS_fragments-adducts-isotopes.txt',
+		228.14739251,
+		$modulePath.'/_template.tabular',
+		$modulePath.'/pfs003129__ANNOTATED__.TSV'),
+		$modulePath.'/pfs003129__ANNOTATED__.TSV',
+		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with a dipeptide (PRO-LEU)');
+		
+
 #########################	
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with L-prolyl-L-glycine (CEA)**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
@@ -712,6 +726,22 @@ BEGIN {
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis **\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis_TEST(
 		# my ($expFile, $col, $delta, $source, $ionMode, $template, $tabular)
+		$modulePath.'/in_test01_pos.tabular',
+		2, 
+		5,
+		$modulePath.'/BloodExposome_v1_0_part.txt',
+		'POSITIVE',
+		$modulePath.'/_template.tabular',
+		$modulePath.'/in_test01_pos__BLOODEXP_ANNOTATED__.TSV'),
+		$modulePath.'/in_test01_pos__BLOODEXP_ANNOTATED__.TSV',
+		'Method \'fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis\' works with a bank and tabular template');
+
+
+#########################	
+
+	print "\n** Test $current_test fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis **\n" ; $current_test++;
+	is_deeply( fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis_TEST(
+		# my ($expFile, $col, $delta, $source, $ionMode, $template, $tabular)
 		$modulePath.'/in_test02_pos.tabular',
 		2, 
 		5,
@@ -721,7 +751,6 @@ BEGIN {
 		$modulePath.'/in_test02_pos__BLOODEXP_ANNOTATED__.TSV'),
 		$modulePath.'/in_test02_pos__BLOODEXP_ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_TheoBloodExposomeBank_FromDataAnalysis\' works with a bank and tabular template');
-
 
 ## #################################################################################################################################
 ##

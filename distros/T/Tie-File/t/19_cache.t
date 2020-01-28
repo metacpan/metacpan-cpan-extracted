@@ -4,7 +4,7 @@
 #
 
 $|=1;
-my $file = "tf$$.txt";
+my $file = "tf19-$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = join $:, "rec0" .. "rec9", "";
 my $V = $ENV{INTEGRITY};        # Verbose integrity checking?
@@ -15,7 +15,7 @@ my $N = 1;
 use Tie::File;
 print "ok $N\n"; $N++;
 
-open F, "> $file" or die $!;
+open F, '>', $file or die $!;
 binmode F;
 print F $data;
 close F;
@@ -169,7 +169,7 @@ check();
 
 sub init_file {
   my $data = shift;
-  open F, "> $file" or die $!;
+  open F, '>', $file or die $!;
   binmode F;
   print F $data;
   close F;

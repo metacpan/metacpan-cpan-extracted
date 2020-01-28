@@ -1,3 +1,7 @@
+1.15 2020-01-28T06:19:54Z
+
+    - Fix tests on win32 GH#4 (@charsbar++)
+
 1.14 2019-10-17T17:51:40Z
 
     - Added missing prereq Class::Accessor::Fast as suggested by CPANTS. GH#1 (@manwar++)

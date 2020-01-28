@@ -17,11 +17,12 @@ our @ISA = qw(Tie::File::Indexed::JSON DiaColloDB::Temp);
 
 ## $tied = TIEARRAY($classname, $filename, %opts)
 ##  + honors 'UNLINK' option in %opts to auto-unlink $filename on object destruction
+##  + honors 'APPEND' option in %opts to append to a pre-existing file
 sub TIEARRAY {
   my ($that,$file,%opts) = @_;
   return $that->SUPER::TIEARRAY($file,
 				#%opts,
-				mode=>'rw',
+				mode=>('rw'.($opts{APPEND} ? 'a' : '')),
 				temp=>(!exists($opts{UNLINK}) || $opts{UNLINK}),
 				(map {exists($opts{$_}) ? ($_=>$opts{$_}) : qw()} qw(pack_o pack_l)),
 			       );

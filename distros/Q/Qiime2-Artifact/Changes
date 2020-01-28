@@ -1,0 +1,15 @@
+0.10.5	2020-01-24
+	* POD and tests updates
+	* Improved check on unzip binary presence
+
+0.10.3	2020-01-24
+	* Upgraded ancestors
+
+0.10.2	2020-01-23
+	* Renamed module to Qiime2::Artifact
+
+0.10.1	2020-01-23
+	* Update dist.ini configuration
+
+0.10.0	2020-01-23
+	* Pre-release

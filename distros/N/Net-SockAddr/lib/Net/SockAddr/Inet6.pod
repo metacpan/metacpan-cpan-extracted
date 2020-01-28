@@ -1,0 +1,52 @@
+=head1 NAME
+
+Net::SockAddr::Inet6 - IPv6 sockaddr
+
+=head1 SYNOPSIS & DESCRIPTION
+
+See L<Net::SockAddr>
+    
+=head1 METHODS
+
+=head4 new($ip, $port, [$scope_id], [$flowinfo]) [CLASS METHOD]
+
+Creates object from ip in human-readable form and port. Dies if C<$ip> is not a valid IPv6 address.
+Optionally receives IPv6 scope id (unsigned integer) and flowinfo (unsigned integer).
+
+Supports ip addresses in form C<address%scope_id>, for example '::1%eth0', in which case it is used and argument C<$scope_id> is ignored.
+On C<Windows>, scope id after '%' must be a number. On other systems it can be an interface name and translated via C<if_nametoindex()>.
+
+=head4 from_addr($addr, $port, [$scope_id], [$flowinfo]) [CLASS METHOD]
+
+Creates object from binary IPv6 address (16-byte string) and port.
+Optionally receives IPv6 scope id (unsigned integer) and flowinfo (unsigned integer).
+
+=head4 ip()
+
+Returns ip in human-readable form
+
+=head4 port()
+
+Returns port
+
+=head4 addr()
+
+Returns ip in binary form (16-byte string)
+
+=head4 scope_id()
+
+Returns IPv6 scope id (if any) or 0
+
+=head4 flowinfo()
+
+Returns IPv6 flow info (if any) or 0
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

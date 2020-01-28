@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -14,10 +14,10 @@ use Sub::HandlesVia::Handler qw( handler );
 use Types::Standard qw( ArrayRef Optional Str CodeRef Int Item Any Ref Defined FileHandle );
 
 our @METHODS = qw( count is_empty all elements flatten get pop push shift
-	unshift clear first first_index reduce set accessor natatime
+	unshift clear first first_index reduce set accessor natatime any
 	shallow_clone map grep sort reverse sort_in_place splice shuffle
 	shuffle_in_place uniq uniq_in_place delete insert flatten flatten_deep
-	join print );
+	join print head tail apply pick_random for_each for_each_pair );
 
 sub _type_inspector {
 	my ($me, $type) = @_;
@@ -212,6 +212,16 @@ sub first {
 		signature => [CodeRef],
 		usage     => '$coderef',
 		template  => '&List::Util::first($ARG, @{$GET})',
+}
+
+sub any {
+	require List::Util;
+	handler
+		name      => 'Array:any',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => '&List::Util::any($ARG, @{$GET})',
 }
 
 sub first_index {
@@ -524,6 +534,62 @@ sub print {
 		signature => [Optional[FileHandle], Optional[Str]],
 		usage     => '$fh?, $with?',
 		template  => 'my $shv_param_with = (#ARG>1) ? $ARG[2] : q[,]; print {$ARG[1]||*STDOUT} join($shv_param_with, @{$GET})',
+}
+
+sub head {
+	handler
+		name      => 'Array:head',
+		args      => 1,
+		signature => [Int],
+		usage     => '$count',
+		template  => 'my $shv_count=$ARG; $shv_count=@{$GET} if $shv_count>@{$GET}; $shv_count=@{$GET}+$shv_count if $shv_count<0; (@{$GET})[0..($shv_count-1)]',
+}
+
+sub tail {
+	handler
+		name      => 'Array:tail',
+		args      => 1,
+		signature => [Int],
+		usage     => '$count',
+		template  => 'my $shv_count=$ARG; $shv_count=@{$GET} if $shv_count>@{$GET}; $shv_count=@{$GET}+$shv_count if $shv_count<0; my $shv_start = scalar(@{$GET})-$shv_count; my $shv_end = scalar(@{$GET})-1; (@{$GET})[$shv_start..$shv_end]',
+}
+
+sub apply {
+	handler
+		name      => 'Array:apply',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'my @shv_tmp = @{$GET}; &{$ARG} foreach @shv_tmp; wantarray ? @shv_tmp : $shv_tmp[-1]',
+}
+
+sub pick_random {
+	require List::Util;
+	handler
+		name      => 'Array:pick_random',
+		min_args  => 0,
+		max_args  => 1,
+		signature => [Optional[Int]],
+		usage     => '$coderef',
+		template  => 'my @shv_tmp = List::Util::shuffle(@{$GET}); my $shv_count = $ARG; $shv_count=@{$GET} if $shv_count > @{$GET}; $shv_count=@{$GET}+$shv_count if $shv_count<0; if (wantarray and #ARG) { @shv_tmp[0..$shv_count-1] } elsif (#ARG) { [@shv_tmp[0..$shv_count-1]] } else { $shv_tmp[0] }',
+}
+
+sub for_each {
+	handler
+		name      => 'Array:for_each',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'foreach my $shv_index (0 .. $#{$GET}) { &{$ARG}(($GET)->[$shv_index], $shv_index) }; $SELF',
+}
+
+sub for_each_pair {
+	handler
+		name      => 'Array:for_each_pair',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'for (my $shv_index=0; $shv_index<@{$GET}; $shv_index+=2) { &{$ARG}(($GET)->[$shv_index], ($GET)->[$shv_index+1]) }; $SELF',
 }
 
 1;

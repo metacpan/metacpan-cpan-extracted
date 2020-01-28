@@ -8,7 +8,7 @@ IP::Random - Generate IP Addresses Randomly
 
 =head1 VERSION
 
-version 1.008
+version 1.200230
 
 =head1 SYNOPSIS
 

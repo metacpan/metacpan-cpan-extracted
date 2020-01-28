@@ -242,56 +242,6 @@ DESCRIPTION
     Now the employee class will be named `MyApp::Person::Employee` instead of
     the usual `MyApp::Employee`.
 
-   Parameterizable classes
-      package MyApp {
-        use MooX::Pression;
-    
-        class Animal {
-          has name;
-        }
-    
-        class Species ( Str $common_name, Str $binomial ) {
-          extends Animal;
-          constant common_name  = $common_name;
-          constant binomial     = $binomial;
-        }
-    
-        class Dog {
-          extends Species('dog', 'Canis familiaris');
-          method bark () {
-            say "woof!";
-          }
-        }
-      }
-
-    Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
-    instances of it. It's like a template for generating classes. Then
-    "MyApp::Dog" generates a class from the template and inherits from that.
-
-      my $Cat = MyApp->generate_species('cat', 'Felis catus');
-      my $mog = $Cat->new(name => 'Mog');
-  
-      $mog->isa('MyApp::Animal');         # true
-      $mog->isa('MyApp::Species');        # false!!!
-      $mog->isa($Cat);                    # true
-
-    Because there are never any instances of "MyApp::Species", it doesn't make
-    sense to have a Species type constraint. Instead there are SpeciesClass
-    and SpeciesInstance type constraints.
-
-      use MyApp::Types -is;
-  
-      my $lassie = MyApp->new_dog;
-  
-      is_Animal( $lassie );               # true
-      is_Dog( $lassie );                  # true
-      is_SpeciesInstance( $lassie );      # true
-      is_SpeciesClass( ref($lassie) );    # true
-
-    Subclasses cannot be nested inside parameterizable classes. It should
-    theoretically be possible to nest parameterizable classes within regular
-    classes, but this isn't implemented yet.
-
    `role`
     Define a very basic role:
 
@@ -308,37 +258,41 @@ DESCRIPTION
     Roles cannot be nested within each other, nor can roles be nested in
     classes, nor classes in roles.
 
-   Parameterizable roles
-    Often it makes more sense to parameterize roles than classes.
+   `toolkit`
+    Use a different toolkit instead of Moo.
 
-      package MyApp {
-        use MooX::Pression;
-    
-        class Animal {
-          has name;
-        }
-    
-        role Species ( Str $common_name, Str $binomial ) {
-          constant common_name  = $common_name;
-          constant binomial     = $binomial;
-        }
-    
-        class Dog {
-          extends Animal;
-          with Species('dog', 'Canis familiaris'), GoodBoi?;
-          method bark () {
-            say "woof!";
-          }
-        }
+      # use Mouse
+      class Foo {
+        toolkit Mouse;
+      }
+  
+      # use Moose
+      # use MooseX::Aliases
+      # use MooseX::StrictConstructor
+      class Bar {
+        toolkit Moose ( Aliases, StrictConstructor );
       }
 
-   `type_name`
-      class Homo::Sapiens {
-        type_name Human;
+    You can of course specify you want to use Moo:
+
+      class Baz {
+        toolkit Moo;
       }
 
-    The class will still be called MyApp::Homo::Sapiens but the type in the
-    type library will be called Human instead of Homo_Sapiens.
+    Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor
+    will.
+
+    It is possible to set a default toolkit when you import MooX::Pression.
+
+      use MooX::Pression (
+        ...,
+        toolkit => 'Moose',
+      );
+
+      use MooX::Pression (
+        ...,
+        toolkit => 'Mouse',
+      );
 
    `extends`
     Defines a parent class. Only for use within `class` blocks.
@@ -520,7 +474,7 @@ DESCRIPTION
       }
 
     MooX::Pression integrates support for MooX::Enumeration (and
-    MooseX::Enumeration).
+    MooseX::Enumeration, but MouseX::Enumeration doesn't exist).
 
       class Person {
         ...;
@@ -543,6 +497,29 @@ DESCRIPTION
     Checking `$bob->status eq 'alvie'` is prone to typos, but
     `$bob->status_is_alvie` will cause a runtime error because the method is
     not defined.
+
+    MooX::Pression also integrates support for Sub::HandlesVia allowing you to
+    delegate certain methods to unblessed references and non-reference values.
+    For example:
+
+      class Person {
+        has age (
+          type         => 'Int',
+          default      => 0,
+          handles_via  => 'Counter',
+          handles      => {
+            birthday => 'inc',   # increment age
+          },
+        );
+        after birthday {
+          if ($self->age < 30) {
+            say "yay!";
+          }
+          else {
+            say "urgh!";
+          }
+        }
+      }
 
     It is possible to add hints to the attribute name as a shortcut for common
     specifications.
@@ -751,6 +728,55 @@ DESCRIPTION
     but it is a signature showing that the method expects no arguments (other
     than the invocant of course).
 
+   Optimizing Methods
+    For a slight compiled-time penalty, you can improve the speed which
+    methods run at using the `:optimize` attribute:
+
+      method foo :optimize (...) {
+        ...;
+      }
+
+    Optimized methods must not close over any lexical (`my` or `our`)
+    variables; they can only access the variables declared in their,
+    signature, $self, $class, @_, and globals.
+
+   Anonymous Methods
+    It *is* possible to use `method` without a name to return an anonymous
+    method (coderef):
+
+      use MooX::Pression prefix => 'MyApp';
+  
+      class MyClass {
+        method get_method ($foo) {
+          method ($bar) {
+            return $foo . $bar;
+          }
+        }
+      }
+  
+      my $obj   = MyApp->new_myclass;
+      my $anon  = $obj->get_method("FOO");
+      say ref($anon);                       # CODE
+      say $obj->$anon("BAR");               # FOOBAR
+
+    Note that while $anon is a coderef, it is still a method, and still
+    expects to be passed an object as $self.
+
+    Due to limitations with Keyword::Declare and Keyword::Simple, keywords are
+    always complete statements, so `method ...` has an implicit semicolon
+    before and after it. This means that this won't work:
+
+      my $x = method { ... };
+
+    Because it gets treated as:
+
+      my $x = ;
+      method { ... };
+
+    A workaround is to wrap it in a `do { ... }` block.
+
+      my $x = do { method { ... } };
+
    require
     Indicates that a role requires classes to fulfil certain methods.
 
@@ -794,6 +820,8 @@ DESCRIPTION
         say "Speak now or forever hold your peace!";
       }
 
+    The `:optimize` attribute is supported for `before`.
+
    `after`
     There's not much to say about `after`. It's just like `before`.
 
@@ -808,6 +836,8 @@ DESCRIPTION
       after marry ( $partner, $date? ) {
         say "You may kiss the bride!";
       }
+
+    The `:optimize` attribute is supported for `after`.
 
    `around`
     The `around` method modifier is somewhat more interesting.
@@ -836,6 +866,8 @@ DESCRIPTION
         say "You may kiss the bride!";
         return $return;
       }
+
+    The `:optimize` attribute is supported for `around`.
 
    `factory`
     The `factory` keyword is used to define alternative constructors for your
@@ -935,6 +967,38 @@ DESCRIPTION
     `factory new_person` with no `via` or method body is basically like saying
     `via new`.
 
+    The `:optimize` attribute is supported for `factory`.
+
+   Implementing a singleton
+    Factories make it pretty easy to implement a singleton.
+
+      class AppConfig {
+        ...;
+    
+        factory get_appconfig () {
+          state $config = $class->new();
+        }
+      }
+
+    Now `MyApp->get_appconfig` will always return the same AppConfig object.
+    Because any explicit use of the `factory` keyword in a class definition
+    suppresses the automatic creation of a factory method for the class, there
+    will be no `MyApp->new_appconfig` method for creating new objects of that
+    class.
+
+    (People can still manually call `MyApp::AppConfig->new` to get a new
+    AppConfig object, but remember MooX::Pression discourages calling
+    constructors directly, and encourages you to use the factory package for
+    instantiating objects!)
+
+   `type_name`
+      class Homo::Sapiens {
+        type_name Human;
+      }
+
+    The class will still be called MyApp::Homo::Sapiens but the type in the
+    type library will be called Human instead of Homo_Sapiens.
+
    `coerce`
       class Person {
         has name   ( type => Str, required => true );
@@ -984,6 +1048,8 @@ DESCRIPTION
         $class->new(name => $_);
       }
 
+    The `:optimize` attribute is not currently supported for `coerce`.
+
    `version`
       class Person {
         version 1.0;
@@ -1021,6 +1087,68 @@ DESCRIPTION
     classes. If a parent class is specified via `extends`, `authority` will
     not be inherited.
 
+  Helper Subs
+    Earlier it was stated that `sub` cannot be used to define methods in
+    classes and roles. This is true, but that doesn't mean that it has no use.
+
+      package MyApp {
+        use MooX::Pression;
+    
+        sub helper_function { ... }
+    
+        class Foo {
+          method foo {
+            ...;
+            helper_function(...);
+            ...;
+          }
+        }
+    
+        class Bar {
+          sub other_helper { ... }
+          method bar {
+            ...;
+            helper_function(...);
+            other_helper(...);
+            ...;
+          }
+        }
+      }
+
+    The subs defined by `sub` end up in the "MyApp" package, not "MyApp::Foo"
+    or "MyApp::Bar". They can be called by any of the classes and roles
+    defined in MyApp. This makes them suitable for helper subs like logging,
+    List::Util/Scalar::Util sorts of functions, and so on.
+
+      package MyApp {
+        use MooX::Pression;
+    
+        use List::Util qw( any all first reduce );
+        # the above functions are now available within
+        # all of MyApp's classes and roles, but won't
+        # pollute any of their namespaces.
+    
+        use namespace::clean;
+        # And now they won't even pollute MyApp's namespace.
+        # Though I'm pretty sure this will also stop them
+        # from working in any methods that used ":optimize".
+    
+        class Foo { ... } 
+        role Bar { ... } 
+        role Baz { ... } 
+      }
+
+    `sub` is also usually your best option for those tiny little coderefs that
+    need to be defined here and there:
+
+      has foo (
+        is       => lazy,
+        type     => ArrayRef[Str],
+        builder  => sub {  []  },
+      );
+
+    Though consider using Sub::Quote if you're using Moo.
+
   Utilities
     MooX::Pression also exports constants `true` and `false` into your
     namespace. These show clearer boolean intent in code than using 1 and 0.
@@ -1038,29 +1166,180 @@ DESCRIPTION
         }
       }
 
-    And MooX::Pression exports everything from Try::Tiny because it's cool.
-    (This might be replaced with another `try` module in the future?)
+    MooX::Pression turns on strict, warnings, and the following modern Perl
+    features:
+
+      # Perl 5.14 and Perl 5.16
+      say state unicode_strings
+  
+      # Perl 5.18 or above
+      say state unicode_strings unicode_eval evalbytes current_sub fc
+
+    If you're wondering why not other features, it's because I didn't want to
+    enable any that are currently classed as experimental, nor any that
+    require a version of Perl above 5.18. The `switch` feature is mostly seen
+    as a failed experiment these days, and `lexical_subs` cannot be called as
+    methods so are less useful in object-oriented code.
+
+    You can, of course, turn on extra features yourself.
+
+      package MyApp {
+        use MooX::Pression;
+        use feature qw( lexical_subs postderef );
+    
+        ...;
+      }
+
+    And MooX::Pression exports Syntax::Keyword::Try for you. Useful to have.
 
     And last but not least, it exports all the types, `is_*` functions, and
     `assert_*` functions from Types::Standard, Types::Common::String, and
     Types::Common::Numeric.
 
-  MooseX::Pression or MouseX::Pression?
-      use MooX::Pression (
-        ...,
-        toolkit => 'Moose',
-      );
+  Anonymous Classes and Roles
+   Anonymous classes
+    It is possible to make anonymous classes:
 
-      use MooX::Pression (
-        ...,
-        toolkit => 'Mouse',
-      );
+      my $class  = do { class; };
+      my $object = $class->new;
 
-    The ability to choose a toolkit on a package-by-package basis is not
-    currently supported. (Though it's implemented in MooX::Press.)
+    The `do { ... }` block is necessary because of a limitation in
+    Keyword::Declare and Keyword::Simple, where any keywords they define must
+    be complete statements.
 
-    The `handles => 1` and `handles => 2` features for enum attributes are not
-    supported with Mouse.
+    Anonymous classes can have methods and attributes and so on:
+
+      my $class = do { class {
+        has foo (type => Int);
+        has bar (type => Int);
+      }};
+  
+      my $object = $class->new(foo => 1, bar => 2);
+
+    Anonymous classes *do not* implicitly inherit from their parent like named
+    nested classes do. Named classes nested inside anonymous classes *do not*
+    implicitly inherit from the anonymous class.
+
+    Having one anonymous class inherit from another can be done though:
+
+      my $base     = do { class; }
+      my $derived  = do { class {
+        extends {"::$k1"};
+      }};
+
+    This works because `extends` accepts a block which returns a string for
+    the package name, and the string needs to begin with "::" to avoid the
+    auto prefix mechanism.
+
+   Anonymous roles
+    Anonymous roles work in much the same way.
+
+  Parameterizable Classes and Roles
+   Parameterizable classes
+      package MyApp {
+        use MooX::Pression;
+    
+        class Animal {
+          has name;
+        }
+    
+        class Species ( Str $common_name, Str $binomial ) {
+          extends Animal;
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          extends Species('dog', 'Canis familiaris');
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
+    instances of it. It's like a template for generating classes. Then
+    "MyApp::Dog" generates a class from the template and inherits from that.
+
+      my $Cat = MyApp->generate_species('cat', 'Felis catus');
+      my $mog = $Cat->new(name => 'Mog');
+  
+      $mog->isa('MyApp::Animal');         # true
+      $mog->isa('MyApp::Species');        # false!!!
+      $mog->isa($Cat);                    # true
+
+    Because there are never any instances of "MyApp::Species", it doesn't make
+    sense to have a Species type constraint. Instead there are SpeciesClass
+    and SpeciesInstance type constraints.
+
+      use MyApp::Types -is;
+  
+      my $lassie = MyApp->new_dog;
+  
+      is_Animal( $lassie );               # true
+      is_Dog( $lassie );                  # true
+      is_SpeciesInstance( $lassie );      # true
+      is_SpeciesClass( ref($lassie) );    # true
+
+    Subclasses cannot be nested inside parameterizable classes, but
+    parameterizable classes can be nested inside regular classes, in which
+    case the classes they generate will inherit from the outer class.
+
+      package MyApp {
+        use MooX::Pression;
+    
+        class Animal {
+          has name;
+          class Species ( Str $common_name, Str $binomial ) {
+            constant common_name  = $common_name;
+            constant binomial     = $binomial;
+          }
+        }
+    
+        class Dog {
+          extends Species('dog', 'Canis familiaris');
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Anonymous parameterizable classes are possible:
+
+      my $generator = do { class ($footype, $bartype) {
+        has foo (type => $footype);
+        has bar (type => $bartype);
+      };
+  
+      my $class = $generator->generate_package(Int, Num);
+  
+      my $object = $class->new(foo => 42, bar => 4.2);
+
+   Parameterizable roles
+    Often it makes more sense to parameterize roles than classes.
+
+      package MyApp {
+        use MooX::Pression;
+    
+        class Animal {
+          has name;
+        }
+    
+        role Species ( Str $common_name, Str $binomial ) {
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          extends Animal;
+          with Species('dog', 'Canis familiaris'), GoodBoi?;
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Anonymous parameterizable roles are possible.
 
   MooX::Pression vs Moops
     MooX::Pression has fewer dependencies than Moops, and crucially doesn't
@@ -1068,6 +1347,8 @@ DESCRIPTION
     MooX::Pression uses Damian Conway's excellent Keyword::Declare (which in
     turn uses PPR) to handle most parsing needs, so parsing should be more
     predictable.
+
+    Moops is faster though.
 
     Here are a few key syntax and feature differences.
 
@@ -1277,10 +1558,9 @@ DESCRIPTION
         constant PI = 3.2;
       }
 
-  Future Directions
-    Something like MooX::HandlesVia or Moose native traits would be good.
-    MooX::HandlesVia doesn't work well for non-reference values though.
-    MooX::Enumeration proves that it's possible to do!
+   Parameterizable classes and roles
+    These were always on my todo list for Moops; I doubt they'll ever be done.
+    They work nicely in MooX::Pression though.
 
 BUGS
     Please report any bugs to

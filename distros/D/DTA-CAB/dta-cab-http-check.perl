@@ -8,6 +8,7 @@
 use File::Basename qw(basename dirname);
 use Monitoring::Plugin;
 use LWP::UserAgent;
+use URI;
 use URI::Escape qw(uri_escape_utf8);
 use JSON;
 use Time::HiRes qw(gettimeofday tv_interval);
@@ -17,10 +18,10 @@ use strict;
 
 ##======================================================================
 ## Version
-our $VERSION = 0.02;
+our $VERSION = 0.05;
 our $SVNID   = q(
   $HeadURL: svn+ssh://odo.dwds.de/home/svn/dev/DTA-CAB/trunk/dta-cab-http-check.perl $
-  $Id: dta-cab-http-check.perl 29526 2019-02-12 12:21:44Z moocow $
+  $Id: dta-cab-http-check.perl 31044 2019-11-25 13:51:49Z moocow $
 );
 
 ##======================================================================
@@ -104,21 +105,36 @@ sub vmsg {
 
 $mp->plugin_die("no server URL specified") if (!@ARGV);
 my $url    = shift(@ARGV);
-my ($geturl);
+my $geturl = $url;
 if ($qmode eq 'status' && $url !~ /\bstatus\b/) {
-  $geturl = "$url/status?f=json";
+  $geturl .= ($url =~ m{/$} ? '' : '/') . "status?f=json";
 }
 elsif ($qmode eq 'query') {
-  $geturl  = "$url/query" if ($url !~ /\bquery\b/);
+  $geturl .= ($url =~ m{/$} ? '' : '/') . "query" if ($url !~ /\bquery\b/);
   $geturl .= ($url =~ /\?/ ? '&' : '?');
   my $qstr = $query;
   utf8::decode($qstr) if (!utf8::is_utf8($qstr));
   $geturl .= "qd=".uri_escape_utf8("$qstr\n");
 }
 
+##-- check for http-over-unix
+if ($geturl =~ m{^(.+?)\+unix:(?://)?(.+?)[/\|]/(.*)$}i) {
+  ##-- http+unix syntax
+  my ($scheme,$sockpath,$uripath) = ($1,$2,$3);
+  $geturl = "${scheme}:${sockpath}//${uripath}";
+}
+elsif ($geturl =~ m{^unix:(?://)?(.+?)(?:\||\%7C)(.*)$}i) {
+  ##-- apache mod_proxy syntax
+  my ($sockpath,$uristr) = ($1,$2);
+  my $uri = URI->new($uristr)->as_string;
+  $uri =~ s{//+}{${sockpath}//};
+  $geturl = "$uri";
+}
+my $geturi = URI->new($geturl);
+
 ##-- sanitize thresholds
-$time_crit = $timeout    if ($timeout   < $time_crit);
-$time_warn = $time_crit  if ($time_crit < $time_warn);
+$time_crit = $timeout    if ($time_crit>0 && $timeout   < $time_crit);
+$time_warn = $time_crit  if ($time_crit>0 && $time_crit < $time_warn);
 
 ##-- debug output
 vmsg($vl_debug, "set url = $url");
@@ -128,16 +144,56 @@ vmsg($vl_debug, "set time_warn = ", $time_warn);
 vmsg($vl_debug, "set time_crit = ", $time_crit);
 
 
-##-- query server
+##-- setup user agent
 my $ua = LWP::UserAgent->new(
 			     ssl_opts => {SSL_verify_mode=>'SSL_VERIFY_NONE'}, ##-- avoid "certificate verify failed" errors
 			    )
   or die("$prog: failed to create user agent for URL $url: $!");
-$ua->timeout($timeout);
 
+$ua->timeout($timeout);
 my $t0  = [gettimeofday];
-my $rsp = $ua->get($geturl)
-  or die("failed to retrieve URL $geturl");
+my ($rsp);
+if ($geturi->path =~ m{[^/]//}) {
+  ##-- http-over-unix; adapated from CAB::Client::HTTP::urequest_unix()
+
+  ##-- setup LWP::Protocol::http::SocketUnixAlt handlers
+  require LWP::Protocol::http::SocketUnixAlt;
+  my $http_impl = LWP::Protocol::implementor("http");
+  LWP::Protocol::implementor('http' => 'LWP::Protocol::http::SocketUnixAlt');
+
+  ##-- suppress irritating warnings from LWP::Protocol::http via LWP::Protocol::http::SocketUnixAlt
+  my $sigwarn  = $SIG{__WARN__};
+  local $SIG{__WARN__} = sub {
+    return if ($_[0] =~ m{Use of uninitialized value \$hhost.*LWP/Protocol/http\.pm});
+    $sigwarn ? $sigwarn->(@_) : warn(@_);
+  };
+
+  ##-- UNIX-sockets don't like 'timeout' parameter: use alarm()
+  $SIG{ALRM} = sub {
+    die("timeout exceeded");
+  };
+  alarm($timeout);
+
+  ##-- guts
+  eval {
+    $rsp = $ua->get($geturl)
+      or die("failed to retrieve http-over-UNIX URL $geturl");
+  };
+
+  ##-- check for timeouts
+  my $err = $@ // '';
+  alarm(0);
+  if (!$rsp && $err =~ /\btimeout exceeded\b/) {
+    $rsp = HTTP::Response->new(500, "UNIX socket timeout");
+  }
+
+  ##-- reset handlers
+  LWP::Protocol::implementor('http' => $http_impl);
+} else {
+  $rsp = $ua->get($geturl)
+    or die("failed to retrieve URL $geturl");
+}
+
 my $time  = sprintf("%.3f", tv_interval($t0));
 
 ##-- parse response & add perforamance data
@@ -172,7 +228,9 @@ if ($rsp->is_success) {
     }
 
     ##-- get return message
-    $msg = "$url - ${time}s ${memMB}MB";
+    my $st_ver = $status->{version}//'?';
+    $st_ver   =~ s/\|.*$//;
+    $msg = "$url - ${time}s ${memMB}MB $st_ver";
   }
   elsif ($qmode eq 'query') {
     ##-- query check
@@ -189,14 +247,21 @@ if ($rsp->is_success) {
     $msg = "$url - ${time}s";
   }
 }
+elsif ($time_crit<=0 && $rsp->message =~ /\b(?:timeout|resource temporarily unavailable)\b/i) {
+  ##-- treat timeouts as warnings
+  $rc = WARNING;
+  $msg = "$url - TIMEOUT - ".$rsp->status_line." - ${time}s";
+}
 else {
+  ##-- anything else is CRITICAL
   $rc = CRITICAL;
-  $msg = "$url - ERROR - ".$rsp->status_line;
+  $msg = "$url - ERROR - ".$rsp->status_line." - ${time}s";
 }
 
 ##-- check threshholds
-my $time_rc = $mp->check_threshold(check=>$time, warning=>$time_warn, critical=>$time_crit);
-$rc         = $time_rc if ($time_rc > $rc);
+my $thresh_crit = $time_crit > 0 ? $time_crit : undef;
+my $time_rc     = $mp->check_threshold(check=>$time, warning=>$time_warn, critical=>$thresh_crit);
+$rc             = $time_rc if ($time_rc > $rc);
 
 ##-- final exit
 $mp->plugin_exit($rc, "$msg");
@@ -219,9 +284,18 @@ dta-cab-http-check.perl - DTA::CAB http-server monitoring plugin for nagios/icin
   -t, -timeout SECS       # set probe query timeout (default=60)
   -w, -time-warn SECS     # set response time threshold for 'warning' state (default=10)
   -c, -time-crit SECS     # set response time threshold for 'critical' state (default=60)
+                          #     (-c=0: treat timeouts as WARNING states)
   -s, -status             # perform a 'status' query SERVER_URL/status?f=json (default)
   -q, -query QSTR         # perform a default query on SERVER_URL/query?qd=QSTR
   -v, -verbose            # increase verbosity level
+
+ Arguments:
+  SERVER_URL              # url to check
+
+ Examples:
+   dta-cab-http-check.perl http://kaskade.dwds.de:9099
+   dta-cab-http-check.perl http+unix:/tmp/cab/dstar-http-9096.sock//
+
 
 =cut
 

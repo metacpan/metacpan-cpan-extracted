@@ -1,6 +1,10 @@
+# NAME
+
+Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
+
 # VERSION
 
-version 0.6.0
+version 0.6.1
 
 # SYNOPSIS
 
@@ -36,10 +40,6 @@ put each in a separate file in a directory, create a manifest file listing all v
 filenames/key and then say something like
 `my $text = $dir->text("deal24solution.txt", {lf => 1})`. And hopefully it will
 be done securely and reliably.
-
-# NAME
-
-Dir::Manifest - treat a directory and a manifest file as a hash/dictionary of keys to texts or blobs
 
 # METHODS
 

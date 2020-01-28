@@ -2,6 +2,7 @@
 
 
 parse-input(*grammar, *input).Catch.Msg ~~ *error
+ :"Test error message: +"
 
 
 === Error fails at furthest match

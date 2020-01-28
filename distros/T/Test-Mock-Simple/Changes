@@ -1,5 +1,13 @@
 Revision history for Perl extension Test::Mock::Simple.
 
+0.10 Sat Jan 25 16:50:00 2019
+    - added module_location
+      This change fixes an old bug report that I didn't think could be solved.
+      https://rt.cpan.org/Public/Bug/Display.html?id=95826
+      (Better late than never!)
+      This allows you to tell Test::Mock::Simple where to find the modules if
+      the namespace does not translate into the file that it is located in.
+
 0.09 Mon Apr  6 14:16:00 2015
     - add no_load option
 

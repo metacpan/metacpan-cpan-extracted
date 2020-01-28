@@ -1,5 +1,12 @@
 Revision history for Perl extension Text-VisualPrintf
 
+2.04 2020-01-24T04:04:12Z
+
+    - Fix incorrect use of printf() in VisualPrintf::printf.
+    - Implement Text::VisualPrintf::IO.
+    - Add tests.
+    - use open IO => ':utf8', ':std';
+
 2.03 2017-11-22T16:25:24Z
 
     Now Text::VisualWidth::PP supports unicode combined text.

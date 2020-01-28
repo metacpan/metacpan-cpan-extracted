@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has accepted_payment_method => (
@@ -298,7 +298,7 @@ SemanticWeb::Schema::Demand - A demand entity represents the public
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
@@ -811,15 +811,30 @@ A predicate for the L</item_condition> attribute.
 
 C<itemOffered>
 
-The item being offered.
+=for html <p>An item being offered (or demanded). The transactional nature of the
+offer or demand is documented using <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a>, e.g. sell,
+lease etc. While several common expected types are listed explicitly in
+this definition, others can be used. Using a second type, such as Product
+or a subtype of Product, can clarify the nature of the offer.<p>
 
 A item_offered should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::AggregateOffer']>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Event']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MenuItem']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Trip']>
 
 =back
 
@@ -996,7 +1011,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

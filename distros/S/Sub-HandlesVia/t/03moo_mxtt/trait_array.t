@@ -770,7 +770,7 @@ sub run_tests {
 
         like( exception { $obj->natatime_curried( {} ) }, qr/did not pass type constraint/, 'throws an error when passing a non code ref to natatime_curried' );
 
-        if ( $class->meta->get_attribute('_values')->is_lazy ) {
+        if ( $class->class_is_lazy ) {
             my $obj = $class->new;
 
             is( $obj->count, 2, 'count is 2 (lazy init)' );

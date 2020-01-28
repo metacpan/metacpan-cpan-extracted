@@ -7,7 +7,7 @@ use lib qw{ inc };
 
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Star;
-use Astro::Coord::ECI::Utils qw{ :time deg2rad PI };
+use Astro::Coord::ECI::Utils qw{ :greg_time deg2rad PI };
 use My::Module::Test qw{ tolerance };
 use POSIX qw{strftime floor};
 use Test::More 0.88;
@@ -28,7 +28,7 @@ my $star = Astro::Coord::ECI::Star->new (name => 'Theta Persei')->
 	-.0895 / 3600 / 180 * PI / SECSPERYEAR,	# motion in decl - radians/sec
 	0,					# recession vel - km/sec
 	);
-my $time = time_gm( 0, 0, 12, 13, 10, 2028 ) + .19 * 86400;
+my $time = greg_time_gm( 0, 0, 12, 13, 10, 2028 ) + .19 * 86400;
 my ( $alpha, $delta ) = $star->dynamical( $time )->equatorial();
 
 my $tolerance = 2e-5;

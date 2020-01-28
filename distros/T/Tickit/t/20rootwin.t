@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Identity;
 use Test::Refcount;
 
 use Tickit::Test;

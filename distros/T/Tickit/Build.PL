@@ -8,7 +8,7 @@ my $build = Module::Build::Using::PkgConfig->new(
    requires => {
       'Exporter' => '5.57',
       'perl' => '5.010', # //
-      'Struct::Dumb' => 0,
+      'Struct::Dumb' => '0.04',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
@@ -17,7 +17,6 @@ my $build = Module::Build::Using::PkgConfig->new(
       'Test::Builder::Tester' => 0,
       'Test::Fatal' => 0,
       'Test::HexString' => 0,
-      'Test::Identity' => 0,
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },
@@ -27,9 +26,9 @@ my $build = Module::Build::Using::PkgConfig->new(
 );
 
 $build->use_pkgconfig( "tickit",
-   atleast_version => "0.3",
+   atleast_version => "0.3.4",
    alien         => "Alien::libtickit",
-   alien_version => "0.04",
+   alien_version => "0.08",
 );
 
 $build->create_build_script;

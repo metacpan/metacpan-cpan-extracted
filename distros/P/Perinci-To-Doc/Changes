@@ -1,3 +1,16 @@
+0.869   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to shift self.
+
+
+0.868   2020-01-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Also observe the 'hidden' tag for function metadata (in addition
+	  to function argument metadata).
+
+	- Use String::PodQuote to quote summary when added into POD.
+
+
 0.867   2019-07-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix indentation of first argument.

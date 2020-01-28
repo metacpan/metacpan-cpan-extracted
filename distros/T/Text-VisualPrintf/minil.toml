@@ -1,5 +1,5 @@
 name = "Text-VisualPrintf"
-# badges = ["travis"]
+badges = ['travis-ci.com', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

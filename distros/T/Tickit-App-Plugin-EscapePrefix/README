@@ -1,0 +1,54 @@
+NAME
+
+    Tickit::App::Plugin::EscapePrefix - Tickit application plugin for
+    Escape-prefixed shortcut keys
+
+SYNOPSIS
+
+       use Tickit;
+       use Tickit::App::Plugin::EscapePrefix;
+    
+       my $tickit = Tickit->new;
+    
+       Tickit::App::Plugin::EscapePrefix->apply( $tickit );
+    
+       ...
+    
+       $tickit->run;
+
+DESCRIPTION
+
+    This package applies code to a Tickit instance to let it handle <Escape
+    >-prefixed shortcut keys, by converting them into the equivalent
+    <M-...> modified keys instead.
+
+    Once applied using the "apply" method, the plugin will consume any
+    plain <Escape> keys typed at the terminal. If another key arrives soon
+    afterwards, this key will be consumed and instead a new keypress event
+    emitted that adds the "meta" modifier to it. For example, typing
+    <Escape> <a> will instead emit the modified key <M-a> to the
+    application. If no subsequent key arrives after a timeout of 3 seconds
+    then the modification will not apply.
+
+    While the plugin is still pending anothey keypress to modify, a small
+    indicator window will appear in the bottom left of the display, showing
+    ESC- in a reverse-video style, to remind the user the keypress is
+    pending.
+
+METHODS
+
+ apply
+
+       Tickit::App::Plugin::EscapePrefix->apply( $tickit )
+
+    Applies the plugin code to the given toplevel Tickit instance.
+
+TODO
+
+      Much configuration - timeout; style, text and position of indicator
+      window
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

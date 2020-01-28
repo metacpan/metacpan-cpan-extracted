@@ -1,0 +1,42 @@
+# -*-n3-*-
+
+@prefix :			<http://usefulinc.com/ns/doap#> .
+@prefix dc:			<http://purl.org/dc/terms/> .
+@prefix dcs:		<http://ontologi.es/doap-changeset#> .
+@prefix foaf:		<http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms:	<http://purl.org/dc/terms/> .
+@prefix doap:		<http://usefulinc.com/ns/doap#> .
+@prefix my:			<http://purl.org/NET/cpan-uri/dist/AtteanX-Parser-JSONLD/> .
+
+<>
+	dc:title			"Chagnes for AtteanX::Parser::JSONLD" ;
+	dc:subject			my:project ;
+	dc:creator			my:developer ;
+	dc:description		"Changes for AtteanX::Parser::JSONLD" ;
+	.
+
+my:project
+	a 						:Project ;
+	:name					"AtteanX::Parser::JSONLD" ;
+	:shortdesc				"JSON-LD Parser for Attean" ;
+	:programming-language	"Perl" ;
+	:created				"2020-01-06"^^xsd:date ;
+	:maintainer				my:developer ;
+	:homepage				<http://search.cpan.org/dist/AtteanX-Parser-JSONLD/> ;
+	:bug-database			<https://github.com/kasei/atteanx-parser-jsonld/issues> ;
+	doap:download-page		<http://search.cpan.org/dist/AtteanX-Parser-JSONLD/> ;
+	doap:download-mirror	<http://kasei.us/code/files/> ;
+	:release				my:v_0-001 ;
+	.
+
+my:v_0-001
+	a					:Version ;
+	dc:issued			"2020-01-26"^^xsd:date ;
+	:revision			"0.001" ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "First release." ]
+	]
+	.

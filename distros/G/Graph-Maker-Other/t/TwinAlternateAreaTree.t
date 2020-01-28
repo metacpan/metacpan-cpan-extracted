@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 99;
+plan tests => 593;
 
 require Graph::Maker::TwinAlternateAreaTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::TwinAlternateAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwinAlternateAreaTree->VERSION,  $want_version,
@@ -47,6 +47,30 @@ require Graph::Maker::TwinAlternateAreaTree;
   ok (! eval { Graph::Maker::TwinAlternateAreaTree->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# direction_type
+
+foreach my $level (0 .. 7) {
+  my $graph = Graph::Maker->new('twin_alternate_area_tree',
+                                level => $level,
+                                direction_type => 'bigger');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from < $to, 1,
+        "bigger edge $from to $to");
+  }
+}
+foreach my $level (0 .. 7) {
+  my $graph = Graph::Maker->new('twin_alternate_area_tree',
+                                level => $level,
+                                direction_type => 'smaller');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from > $to, 1);
+  }
+}
+
 
 #------------------------------------------------------------------------------
 

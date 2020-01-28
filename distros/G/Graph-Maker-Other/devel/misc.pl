@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,6 +32,85 @@ $|=1;
 use Smart::Comments;
 
 
+
+{
+  # Free Trees Corresponding to Hypertrees
+  # leaves in same bipartite half
+  my @graphs = (
+                # star 7
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=622
+                [0, 1, 1, 1, 1, 1, 1],
+
+                # path 7
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=478
+                [0, 1, 2, 3, 1, 5, 6],
+
+                # centre and centroid disjoint
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=792
+                [0, 1, 2, 2, 2, 1, 6],
+
+                # integral tree
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=816
+                [0, 1, 2, 1, 4, 1, 6],
+
+                # most maximum matchings Heuberger and Wagner
+                # https://hog.grinvin.org/ViewGraphInfo.action?id=498
+                [0, 1, 2, 2, 1, 5, 5],
+               );
+  @graphs = map { MyGraphs::Graph_from_vpar([undef,@$_]) } @graphs;
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
+{
+  # Knuth 4A 7.2.1.6 example (2)
+  # https://hog.grinvin.org/ViewGraphInfo.action?id=34219
+
+  require Graph;
+  my $graph = Graph->new (undirected => 1);
+  $graph->set_graph_attribute (flow => 'south');
+  $graph->add_path ('12','21');
+  $graph->add_path ('3f','44','53');
+  $graph->add_path ('3f','6a','78','85');
+  $graph->add_path ('78','97','a6');
+  $graph->add_path ('6a','b9');
+  $graph->add_path ('3f','ce','db');
+  $graph->add_path ('ce','ed','fc');
+
+  MyGraphs::Graph_set_xy_points($graph,
+                                '3f' => [0,0],
+                                '44' => [-2,-1], '53' => [-2,-2],
+
+                                '6a' => [0,-1],
+                                '78' => [-.25, -2],
+                                'b9' => [.75, -2],
+                                '85' => [-.5, -3],
+                                '97' => [.5, -3],
+                                'a6' => [.5, -4],
+
+                                'ce' => [2,-1],
+                                'db' => [1.75, -2],
+                                'ed' => [2.75, -2],
+                                'fc' => [2.75, -3],
+
+                                '12' => [-3.5,0],
+                                '21' => [-3.5,-1],
+                               );
+
+  {
+    # vpar_from_balanced_binary(fromdigits([1,1,0,0, 1,1,1,0,0,1,1,1,0,1,1,0,0,0,1,0,0,1,1,0,1,1,0,0,0,0],2))
+    my $vpar = [undef, 0, 1, 0, 3, 4, 3, 6, 7, 7, 9, 6, 3, 12, 12, 14];
+    my $vpar_graph = MyGraphs::Graph_from_vpar ($vpar);
+    # MyGraphs::Graph_view($vpar_graph);
+    MyGraphs::Graph_is_isomorphic($graph,$vpar_graph) or die "different";
+    die if $graph eq $vpar_graph;
+  }
+
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+  MyGraphs::hog_upload_html($graph);
+  exit 0;
+}
 {
   require Graph;
   my $graph = Graph->new (undirected => 1, countedged=>1);
@@ -290,42 +369,7 @@ use Smart::Comments;
   exit 0;
 }
 
-{
-  # Knuth 4A 7.2.1.6 example
 
-  require Graph;
-  my $graph = Graph->new;
-  $graph->set_graph_attribute (flow => 'south');
-  $graph->add_path ('12','21');
-  $graph->add_path ('3f','44','53');
-  $graph->add_path ('3f','6a','78','85');
-  $graph->add_path ('78','97','a6');
-  $graph->add_path ('6a','b9');
-  $graph->add_path ('3f','ce','db');
-  $graph->add_path ('ce','ed','fc');
-
-  $graph->set_vertex_attribute('3f', x => 0);
-  $graph->set_vertex_attribute('3f', y=> 0);
-  $graph->set_vertex_attribute('44', x => -2);
-  $graph->set_vertex_attribute('44', y => -1);
-  $graph->set_vertex_attribute('6a', x => 0);
-  $graph->set_vertex_attribute('6a', y=> -1);
-  $graph->set_vertex_attribute('ce', x => 2);
-  $graph->set_vertex_attribute('ce', y=> -1);
-
-  {
-    # vpar_from_balanced_binary(fromdigits([1,1,0,0, 1,1,1,0,0,1,1,1,0,1,1,0,0,0,1,0,0,1,1,0,1,1,0,0,0,0],2))
-    my $vpar = [undef, 0, 1, 0, 3, 4, 3, 6, 7, 7, 9, 6, 3, 12, 12, 14];
-    my $vpar_graph = MyGraphs::Graph_from_vpar ($vpar);
-    # MyGraphs::Graph_view($vpar_graph);
-    MyGraphs::Graph_is_isomorphic($graph,$vpar_graph) or die "different";
-    die if $graph eq $vpar_graph;
-  }
-
-  # MyGraphs::Graph_view($graph);
-  MyGraphs::hog_searches_html($graph);
-  exit 0;
-}
 
 {
   # Gratzer, "General Lattice Theory", pages 16-17 exercise 15.
@@ -518,20 +562,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-
-{
-  # Brouwer integral trees
-  # n=31 HOG not
-  # three of
-
-  my $graph = MyGraphs::Graph_from_graph6_str(':^_`aaa_efehej_lmlolq_ssss_xxxx_');
-  MyGraphs::Graph_view($graph);
-
-  MyGraphs::hog_searches_html($graph);
-  exit 0;
-}
-
-
 
 {
   # Kreweras Lattice
@@ -1309,122 +1339,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-{
-  # Henry Ernest Dudeney, "Amusements in Mathematics", 1917, puzzle 243
-  # "Visiting the Towns", page 70.
-  # http://www.gutenberg.org/ebooks/16713
-  # Image https://www.gutenberg.org/files/16713/16713-h/images/q243.png
-  #
-  # https://hog.grinvin.org/ViewGraphInfo.action?id=32239
-
-  require Graph;
-  my $graph = Graph->new(undirected => 1);
-  $graph->add_edge('01',12); $graph->add_edge('01','09');
-  $graph->add_edge('02',13); $graph->add_edge('02',10);
-  $graph->add_edge('03','07');  $graph->add_edge('03',12);
-  $graph->add_edge('03',14); $graph->add_edge('03',11);
-  $graph->add_edge('04','08');  $graph->add_edge('04',13); $graph->add_edge('04',15);
-  $graph->add_edge('05','09');  $graph->add_edge('05',14);
-  $graph->add_edge('06',10); $graph->add_edge('06',15);
-
-  $graph->add_edge('07',13);
-  $graph->add_edge('08',14);
-  $graph->add_edge('09',15); $graph->add_edge('09',16);
-  $graph->add_edge(10,12);
-  $graph->add_edge(11,13); $graph->add_edge(11,16);
-  $graph->add_edge(12,16);
-  $graph->vertices == 16 or die;
-
-  foreach my $i (1..6) {
-    $graph->set_vertex_attribute ("0$i", 'xy', "$i,2");
-  }
-  foreach my $i (7..9) {
-    $graph->set_vertex_attribute ("0$i", 'xy', ($i-6).",1");
-  }
-  foreach my $i (10..11) {
-    $graph->set_vertex_attribute ($i, 'xy', ($i-6).",1");
-  }
-  foreach my $i (12..15) {
-    $graph->set_vertex_attribute ($i, 'xy', ($i-10).",0");
-  }
-  $graph->set_vertex_attribute (16, 'xy', "4,-1");
-
-  {
-    my @degrees = map {$graph->degree($_)} sort $graph->vertices;
-    join(',',@degrees) eq '2,2,4,3,2,2,2,2,4,3,3,4,4,3,3,3' or die;
-  }
-  foreach my $i (1..6) {
-    $graph->set_vertex_attribute ("0$i", 'xy', "$i,2");
-  }
-
-  # MyGraphs::Graph_view($graph);
-  # foreach my $v ($graph->vertices) {
-  #   $graph->delete_vertex_attribute($v,'xy');
-  # }
-  # MyGraphs::Graph_view($graph);
-
-  MyGraphs::Graph_print_dreadnaut($graph);
-  MyGraphs::hog_searches_html($graph);
-  # MyGraphs::Graph_print_tikz($graph);
-
-  require IPC::Run;
-  my $g6str = MyGraphs::Graph_to_graph6_str($graph);
-  IPC::Run::run (['nauty-hamheuristic', '-v'],
-                 '<', \$g6str);
-
-  MyGraphs::Graph_is_Hamiltonian($graph, type=>'cycle', start => '01',
-                                 verbose=>1, all=>1);
-  exit 0;
-}
-{
-  # Henry Ernest Dudeney, "Amusements in Mathematics", 1917, puzzle 248 "The
-  # Cyclists' Tour", page 71.
-  # http://www.gutenberg.org/ebooks/16713
-  # Image https://www.gutenberg.org/files/16713/16713-h/images/q248.png
-  #
-  # https://hog.grinvin.org/ViewGraphInfo.action?id=32237
-
-  require Graph;
-  my $graph = Graph->new(undirected => 1);
-  $graph->add_path('O','N'); $graph->add_path('O','W');
-  $graph->add_path('N','A'); $graph->add_path('N','star');
-  $graph->add_path('star','Y');
-  $graph->add_edge('Y','I'); $graph->add_edge('Y','A');
-  $graph->add_edge('M','I'); $graph->add_edge('M','S');
-  $graph->add_edge('M','R'); $graph->add_edge('M','A');
-  $graph->add_edge('S','U');
-  $graph->add_edge('I','E');
-  $graph->add_edge('A','W');
-  $graph->add_path('E','R');
-  $graph->add_path('R','U');
-
-  my @Hamiltonian = ('N','O', 'W','A','Y', 'I','M', 'S','U','R','E');
-  foreach my $i (0 .. $#Hamiltonian-1) {
-    $graph->has_edge($Hamiltonian[$i], $Hamiltonian[$i+1])
-      or die "Not $Hamiltonian[$i], $Hamiltonian[$i-1]";;
-  }
-
-  # MyGraphs::Graph_view($graph);
-  MyGraphs::hog_searches_html($graph);
-  # MyGraphs::Graph_print_tikz($graph);
-
-  {
-    my $grid = Graph->new(undirected => 1);
-    $grid->add_path('star','Y','I','E', 'R','M','A','N', 'star');
-    $grid->add_path('N','O','W','A','Y','I','M','S','U','R','E');
-    MyGraphs::Graph_is_isomorphic($graph,$grid) or die;
-  }
-
-  require IPC::Run;
-  my $g6str = MyGraphs::Graph_to_graph6_str($graph);
-  IPC::Run::run (['nauty-hamheuristic', '-v'],
-                 '<', \$g6str);
-
-  print "Hamiltonian cycle:\n";
-  MyGraphs::Graph_is_Hamiltonian($graph, type=>'cycle', start => 'star',
-                                 verbose=>1, all=>1);
-  exit 0;
-}
 
 {
   # path-3
@@ -1531,32 +1445,6 @@ use Smart::Comments;
       );
   exit 0;
 }
-{
-  # Bulgarian Solitaire, all n
-  MyGraphs::hog_searches_html
-      (
-       '>>sparse6<<:@',      # n=1 singleton
-       '>>sparse6<<:Ab',     # n=2 2-cycle
-       '>>sparse6<<:Bc',     # n=3 path-3
-       '>>sparse6<<:DaXIN',  # n=4 3-cycle and hanging path-2 
-       ':FaYgxb',            # n=5
-
-       # n=6 tree
-       '>>sparse6<<:J`E_xRcYcW^',
-
-       ':N`E_xTeY\RwdQKN',
-       ':U_`dBaebcFcfgGhJnBMeiad`_',
-       ':]_`dBaehBcFgcghImiNjcfPhlqbekad`_',  # n=9
-       ':i_OWoMDFd?w_aJHaQXOqZPdrIcuJHddY@YdWn@BkaTNjow{yDE_oN',
-
-       # n=10 tree
-       ':i_OWoMDFd?w_aJHaQXOqZPdrIcuJHddY@YdWn@BkaTNjow{yDE_oN',
-       
-       # n=15
-       ':~?Ao_C@`?B_SH`wB__I_kE_{J`cL`sZ?cJ`wPakWbK]aCacoPaOba[cckkAcedwTaofa{gbCXDKYDSD`cQaojbKYb{cd?kdSmdgpeSmEcyf{nGTBg{oeLIeTNEXJhcselS?sLa[VbHLcCddChHsme@Ne[zf|@IDEILGhtWiPZjl`ktRloF`sRapjbC_c`kc{ld{yLk}gDDhlVjT_mDroWF`iAaSTb{bcskfK|gdUjLno[E`cPac]cSjfC{ilm_kJaC\cKvicC`SNbcu_[Hb[A`C@_F',
-      );
-  exit 0;
-}
 
 {
   # Holton, tree stable but not completely semi-stable
@@ -1591,7 +1479,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-
 
 {
   # Sharma auts equal but different stable
@@ -1731,11 +1618,6 @@ use Smart::Comments;
   exit 0;
 }
 
-
-
-
-
-
 {
   # vpar_to_GraphViz2
   my $graphviz2 = MyGraphs::vpar_to_GraphViz2([undef, 12,1,1,1,9, 3,6,7,4,4,4,0,0,0]);
@@ -1773,9 +1655,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html($graph);
   exit 0;
 }
-
-
-
 
 {
   # Preorder Trees N=5 Depths Differing One Place
@@ -2228,9 +2107,6 @@ use Smart::Comments;
   exit 0;
 }
 
-
-
-
 {
   # Free Tree Most Generators in a Minimum Set
   # WRONG
@@ -2276,8 +2152,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-
-
 
 {
   # Automorphisms C3
@@ -2376,8 +2250,6 @@ use Smart::Comments;
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-
-
 
 {
   # disjoint domnum most ways n=12
@@ -2509,55 +2381,7 @@ use Smart::Comments;
 
 
 
-{
-  # matchnum in most ways
 
-  # HOG got E?NO  n=6
-  # HOG got E?Bw  n=6
-  # HOG got F?AZO  n=7
-  # HOG got H???C\q  n=9
-  # HOG got I???BGY`_  n=10
-
-  # n=6 matchnum 2 ways 5     6-star
-  # n=6 matchnum 1 ways 5    *--*--*--*--*
-  # .                                  \-*
-
-  # n=7 matchnum 2 ways 8    *--*--*--*--*
-  # .                        *-/       \-*
-  # GP-Test  3*3 - 1 == 8
-  # GP-Test  2*3 + 2 == 8
-
-  # n=9 matchnum 2 ways 15   *-\       /-*
-  # .                        *--*--*--*--*
-  # .                        *-/       \-*
-  # GP-Test  3*4 + 3 == 15
-
-  # n=10 matchnum 3 ways 21  *--*--*--*--*--*--*
-  # .                           |     |     |
-  # .                           *     *     *
-  # GP-Test  2*2*3 + 2*1*2 + 1*1*3 + 1*1*2 == 21
-
-  my @strs = qw(
-                 :Ccf
-                 :DaGb
-                 :EaXbN
-                 :EaGaN
-                 :FaXbK
-                 :GaXeLv
-                 :H`EKWTjV
-                 :I`ESgTlYF
-                 :J`ESgTlYCN
-                 :K`EShOl]{G^
-               :L`EShOl]|wO
-             :M`ESgTlYE\Y`
-             :N`ESxpbBE\Ypb
-             :O`ESxrbEE\ZvfN
-             :P_`aa_dee_hii_lmm
-              );
-  my @graphs = map {MyGraphs::Graph_from_graph6_str($_)} @strs;
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 
 {
   # Lowenstein, no disjoint minimum dominating sets though no one vertex
@@ -3416,10 +3240,6 @@ use Smart::Comments;
   }
 }
 
-
-
-
-
 {
   # Jou and Lin, "Independence Numbers in Trees", Open Journal of Discrete
   # Mathematics, volume 5, 2015, pages 27-31,
@@ -3616,9 +3436,6 @@ use Smart::Comments;
   exit 0;
 }
 
-
-
-
 {
   # maximum induced claws
 
@@ -3806,8 +3623,6 @@ use Smart::Comments;
   }
   exit 0;
 }
-
-
 
 {
   # subgraph relations among all graphs to N vertices -- graph drawing

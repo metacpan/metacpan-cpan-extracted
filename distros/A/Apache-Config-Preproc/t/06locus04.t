@@ -18,13 +18,13 @@ ServerRoot "$server_root"
 EndStatement true
 Use X bar
 !=
-# {{$server_root/httpd.conf}}:1
+# $server_root/httpd.conf:1
 # Start of file
-# {{$server_root/httpd.conf}}:2
+# $server_root/httpd.conf:2
 ServerRoot "$server_root"
-# {{$server_root/httpd.conf}}:6
+# $server_root/httpd.conf:6
 EndStatement true
-# {{$server_root/httpd.conf}}:4
+# $server_root/httpd.conf:4
 Foo bar
 !$
 

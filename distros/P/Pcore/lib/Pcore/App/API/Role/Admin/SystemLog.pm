@@ -4,39 +4,35 @@ use Pcore -role, -sql;
 
 with qw[Pcore::App::API::Role::Read];
 
-sub API_read ( $self, $auth, $args ) {
-    state $total_sql = 'SELECT COUNT(*) AS "total" FROM "system_log"';
-    state $main_sql  = 'SELECT * FROM "system_log"';
+has max_limit        => 100;
+has default_order_by => sub { [ [ 'created', 'DESC' ] ] };
 
-    my $where;
+sub API_read ( $self, $auth, $args ) {
+    my $where = WHERE;
 
     # get by id
     if ( exists $args->{id} ) {
-        $where = WHERE [ '"id" = ', \$args->{id} ];
+        $where &= WHERE [ '"id" = ', \$args->{id} ];
     }
 
     # get all matched rows
     else {
 
-        # default sort
-        $args->{sort} = [ [ 'created', 'DESC' ] ] if !$args->{sort};
-
         # filter search
-        my $where1 = WHERE do {
-            if ( my $search = delete $args->{filter}->{search} ) {
-                my $val = "%$search->[1]%";
+        if ( my $search = delete $args->{where}->{search} ) {
+            my $val = "%$search->[1]%";
 
-                [ '"title" ILIKE', \$val ];
-            }
-            else {
-                undef;
-            }
-        };
+            $where &= WHERE [ '"title" ILIKE', \$val ];
+        }
 
-        $where = $where1 & WHERE [ $args->{filter} ];
+        $where &= WHERE [ $args->{where} ];
     }
 
-    return $self->_read( $args, $total_sql, $main_sql, $where, 100 );
+    my $total_query = [ 'SELECT COUNT(*) AS "total" FROM "system_log"', $where ];
+
+    my $main_query = [ 'SELECT * FROM "system_log"', $where ];
+
+    return $self->_read( $total_query, $main_query, $args );
 }
 
 sub API_delete ( $self, $auth, $args ) {

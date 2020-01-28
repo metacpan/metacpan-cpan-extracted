@@ -26,6 +26,7 @@ src/panda/date/parse-relative.cc
 src/panda/date/parse-relative.rl
 src/panda/time.h
 src/panda/time/format.h
+src/panda/time/os/solaris.icc
 src/panda/time/os/unix.icc
 src/panda/time/os/vms.icc
 src/panda/time/os/win.icc

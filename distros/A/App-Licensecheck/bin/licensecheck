@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use utf8;
-use open ':locale';
+use open qw(:locale);
 use strictures 2;
 use autodie;
 
@@ -14,7 +14,7 @@ use Pod::Constants
 	sub { ($COPYRIGHT) = s/C<< (.*) >>/$1/gr; $COPYRIGHT =~ s/Â©/©/g };
 use Path::Tiny;
 use String::Escape qw(unbackslash);
-use List::Util 1.45 qw(uniq uniqstr);
+use List::SomeUtils qw(uniq);
 use Sort::Key::Multi 1.25 qw(rs_keysort rus_keysort);
 use Log::Any::Adapter;
 Log::Any::Adapter->set('Screen');
@@ -27,11 +27,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.39
+Version v3.0.40
 
 =cut
 
-our $VERSION = version->declare("v3.0.39");
+our $VERSION = version->declare('v3.0.40');
 
 my $progname = path($0)->basename;
 
@@ -175,15 +175,15 @@ foreach my $file ( $app->find(@ARGV) ) {
 	}
 	elsif ( $opt->machine ) {
 		print "$file\t$license";
-		print "\t" . ( join( " / ", @copyrights ) or "*No copyright*" )
+		print "\t" . ( join( " / ", @copyrights ) or '*No copyright*' )
 			if $opt->copyright;
 		print "\n";
 	}
 	else {
 		print "$file: ";
-		print "*No copyright* " unless @copyrights;
+		print '*No copyright* ' unless @copyrights;
 		print $license . "\n";
-		print "  [Copyright: " . join( " / ", @copyrights ) . "]\n"
+		print '  [Copyright: ' . join( ' / ', @copyrights ) . "]\n"
 			if @copyrights and $opt->copyright;
 		print "\n" if $opt->copyright;
 	}
@@ -203,16 +203,15 @@ HEADER
 		keys %patternfiles
 		)
 	{
-		my @ownerlines_unique
-			= uniqstr sort @{ $patternownerlines{$pattern} };
+		my @ownerlines_unique = uniq sort @{ $patternownerlines{$pattern} };
 		@ownerlines_unique = ('NONE') unless (@ownerlines_unique);
-		print "Files: ",
+		print 'Files: ',
 			join(
 			unbackslash( $opt->list_delimiter, ),
 			sort @{ $patternfiles{$pattern} }
 			),
 			"\n";
-		print "Copyright: ",
+		print 'Copyright: ',
 			join(
 			unbackslash( $opt->rfc822_delimiter, ),
 			@ownerlines_unique

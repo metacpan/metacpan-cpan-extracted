@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "IP::Random",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Exporter" => 0,
     "List::Util" => "1.50",
     "Socket" => 0,
     "feature" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.008",
+  "VERSION" => "1.200230",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "List::Util" => "1.50",

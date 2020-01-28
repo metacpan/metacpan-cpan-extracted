@@ -30,6 +30,7 @@ ok($name, File::Spec->catfile('subdir','a~'));
 fileok('a', $name);
 
 ok(open(FH, '>', File::Spec->catfile('subdir','a.~1~')));
+close FH;
 $name = backup_copy_auto('a', dir => 'subdir');
 ok($name, File::Spec->catfile('subdir','a.~2~'));
 fileok('a', $name);

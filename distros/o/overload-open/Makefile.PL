@@ -53,5 +53,14 @@ if ( !eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   if !eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-WriteMakefile(%WriteMakefileArgs);
+my $rtrn = WriteMakefile(%WriteMakefileArgs);
+if (-f 'Makefile') {
+  local $/ = undef;
+  open my $fh, '<', 'Makefile';
+  my $string = <$fh>;
+  $string =~ s/TEST_VERBOSE=0/TEST_VERBOSE=1/;
+  close $fh;
+  open my $fh2, '>', 'Makefile';
+  print { $fh2 } $string;
+  close $fh2;
+}

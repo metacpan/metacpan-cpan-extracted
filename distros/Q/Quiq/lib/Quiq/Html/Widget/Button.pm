@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 # -----------------------------------------------------------------------------
 
@@ -63,6 +63,10 @@ Tooltip-Text.
 
 Button-Typ:  'button', 'submit' oder 'reset'.
 
+=item undefIf => $bool (Default: 0)
+
+Wenn wahr, liefere C<undef> als Widget-Code.
+
 =item value => $value (Default: undef)
 
 Wert, der gesendet wird.
@@ -100,6 +104,7 @@ sub new {
         style => undef,
         title => undef,
         type => 'button',
+        undefIf => 0,
         value => undef,
     );
     $self->set(@_);
@@ -131,8 +136,14 @@ sub html {
     # Attribute
 
     my ($class,$content,$disabled,$hidden,$id,$name,$onClick,$style,
-        $title,$type,$value) = $self->get(qw/class content disabled hidden id
-        name onClick style title type value/);
+        $title,$type,$undefIf,$value) = $self->get(qw/class content disabled
+        hidden id name onClick style title type undefIf value/);
+
+    # Generierung
+
+    if ($undefIf) {
+        return undef;
+    }
 
     if ($hidden) {
         return '';
@@ -156,7 +167,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

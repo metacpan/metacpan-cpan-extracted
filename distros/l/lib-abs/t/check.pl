@@ -48,7 +48,7 @@ diaginc();
 my @dirs = qw(foo bar);
 my @adirs = map "$FindBin::Bin/$_",@dirs;
 #printf "%o\n", umask(0);
-mkdir($_, 0755) or warn "mkdir $_: $!" for @adirs;
+mkdir($_, 0755) or $!{EEXIST} or warn "mkdir $_: $!" for @adirs;
 chmod 0755, @adirs or warn "chmod $_: $!"; # do chmod (on some versions mkdir with mode ignore mode)
 
 -e $_ or warn "$_ absent" for @adirs;

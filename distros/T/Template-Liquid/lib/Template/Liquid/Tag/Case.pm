@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Case;
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 use base 'Template::Liquid::Tag::If';
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
@@ -12,10 +12,8 @@ sub new {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
                    type    => 'Syntax',
@@ -51,10 +49,8 @@ sub push_block {
                                    fatal   => 1
         }
         if !defined $args->{'template'};
-    raise Template::Liquid::Error {type    => 'Context',
-                                   message => 'Missing parent argument',
-                                   fatal   => 1
-        }
+    raise Template::Liquid::Error {type => 'Context',
+                             message => 'Missing parent argument', fatal => 1}
         if !defined $args->{'parent'};
     raise Template::Liquid::Error {
                    type    => 'Syntax',
@@ -64,7 +60,7 @@ sub push_block {
         if !defined $args->{'attrs'} && $args->{'tag_name'} eq 'when';
     if ($args->{'tag_name'} eq 'when') {
         $args->{'attrs'} = join ' or ',
-            map { sprintf '%s == %s', $_, $args->{'parent'}{'value'} }
+            map  { sprintf '%s == %s', $_, $args->{'parent'}{'value'} }
             grep { defined $_ }
             $args->{'attrs'} =~ m[(${Template::Liquid::Utility::Expression})
                         (?:(?:\s+or\s+|\s*\,\s*)
@@ -84,8 +80,9 @@ sub push_block {
     ${$s->{'blocks'}[-1]}{'nodelist'} = $s->{'nodelist'}
         if scalar @{$s->{'blocks'}};
     $s->{'nodelist'} = [];    # Unline {%if%}, we *always* empty the
-         # nodelist. This way, we ignore nodes that come before the first
-         # when/else block just like Liquid
+
+    # nodelist. This way, we ignore nodes that come before the first
+    # when/else block just like Liquid
     push @{$s->{'blocks'}}, $block;
     shift @{$s->{'blocks'}}    # S::D->parse() pushes a dead first block
         if $s->{'first_block'}++ == 0;
@@ -103,8 +100,8 @@ Template::Liquid::Tag::Case - Switch Statement Construct
 
 =head1 Description
 
-If you need more conditions, you can use the C<case> tag. Note that, stuff
-that comes before the first C<when> or C<else> is ignored. ...just as it is in
+If you need more conditions, you can use the C<case> tag. Note that, stuff that
+comes before the first C<when> or C<else> is ignored. ...just as it is in
 Liquid.
 
 =head1 Synopsis
@@ -146,9 +143,9 @@ the terms of The Artistic License 2.0.  See the F<LICENSE> file included with
 this distribution or http://www.perlfoundation.org/artistic_license_2_0.  For
 clarification, see http://www.perlfoundation.org/artistic_2_0_notes.
 
-When separated from the distribution, all original POD documentation is
-covered by the Creative Commons Attribution-Share Alike 3.0 License.  See
-http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For
-clarification, see http://creativecommons.org/licenses/by-sa/3.0/us/.
+When separated from the distribution, all original POD documentation is covered
+by the Creative Commons Attribution-Share Alike 3.0 License.  See
+http://creativecommons.org/licenses/by-sa/3.0/us/legalcode.  For clarification,
+see http://creativecommons.org/licenses/by-sa/3.0/us/.
 
 =cut

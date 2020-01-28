@@ -23,8 +23,8 @@
          "rdfs:comment" : "A possible treatment to address this condition, sign or symptom.",
          "rdfs:label" : "possibleTreatment",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:MedicalSignOrSymptom"
+            "schema:MedicalSignOrSymptom",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalTherapy"

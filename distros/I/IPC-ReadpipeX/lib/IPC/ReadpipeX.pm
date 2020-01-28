@@ -5,7 +5,7 @@ use warnings;
 use Carp 'croak';
 use Exporter 'import';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 our @EXPORT = 'readpipex';
 
@@ -28,6 +28,7 @@ IPC::ReadpipeX - List form of readpipe/qx/backticks for capturing output
 
   use IPC::ReadpipeX;
 
+  my $path = '/file path/with$shell/characters&';
   my @entries = readpipex 'ls', '-l', $path;
   if ($?) {
     my $exit = $? >> 8;
@@ -61,7 +62,10 @@ C<readpipex> is exported by default.
 Runs the given command, capturing STDOUT and returning it as a single string in
 scalar context, or an array of lines in list context. If more than one argument
 is passed, the command will be executed directly rather than via the shell, as
-in L<system|perlfunc/"system"> and L<exec|perlfunc/"exec">.
+in L<system|perlfunc/"system"> and L<exec|perlfunc/"exec">. The command and
+each argument will be passed directly to the L<execvp(3)> system call, so the
+program will receive the arguments exactly as passed, without first
+interpreting shell metacharacters.
 
 Errors forking or running the command will raise an exception, and
 L<$!|perlvar/"$!"> will be set to the error code. The exit status of the
@@ -78,6 +82,10 @@ The code of this function can easily be copy-pasted and is shown below.
     return wantarray ? @output : $output[0];
   }
 
+The above code snippet may be considered to be licensed under
+L<The Unlicense|https://choosealicense.com/licenses/unlicense/>
+for the purpose of copying without attribution or warranty.
+
 =head1 CAVEATS
 
 =over
@@ -85,6 +93,10 @@ The code of this function can easily be copy-pasted and is shown below.
 =item *
 
 Behavior when passing no arguments is unspecified.
+
+=item *
+
+The shell can still be invoked if only one argument is passed.
 
 =item *
 

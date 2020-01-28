@@ -1,6 +1,7 @@
 package SReview::Map;
 
 use Moose;
+use Carp;
 
 has 'input' => (
 	required => 1,
@@ -46,6 +47,22 @@ sub arguments($$) {
 		} else {
 			...
 		}
+	} elsif($self->type eq "astream") {
+		my $choice = $self->choice;
+		if($choice > $self->input->astream_count) {
+			croak("Invalid audio stream, not supported by input video");
+		}
+		if($choice == -1) {
+			my $ids = $self->input->astream_ids;
+			my $id1 = $ids->[0];
+			my $id2 = $ids->[1];
+			return ('-filter_complex', "[$index:$id1][$index:$id2]amix=inputs=2:duration=first");
+		}
+		return ('-map', "$index:a:$choice");
+	} elsif($self->type eq "allcopy") {
+		return ('-map', '0');
+	} else {
+		...
 	}
 }
 

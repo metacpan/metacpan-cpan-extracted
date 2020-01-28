@@ -16,7 +16,7 @@ name: Text-Hspell
 provides:
   Text::Hspell:
     file: lib/Text/Hspell.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   DynaLoader: '0'
   Encode: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/shlomif/Text-Hspell/issues
   homepage: http://metacpan.org/release/Text-Hspell
   repository: git://github.com/shlomif/Text-Hspell.git
-version: 0.2.1
+version: 0.2.2
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -209,6 +209,10 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@SHLOMIF/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version

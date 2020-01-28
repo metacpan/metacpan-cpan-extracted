@@ -1,7 +1,7 @@
-%TestML 0.1.0
+#!/usr/bin/env testml
 
 # Make sure these strings do not parse as JSONY.
-*jsony.jsony_load.Catch.OK
+*jsony.jsony-load.Catch.Type == 'error'
 
 === Comma in bareword
 --- jsony: { url: http://foo.com,2012 }

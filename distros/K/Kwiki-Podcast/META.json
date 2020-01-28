@@ -27,6 +27,7 @@
       "runtime" : {
          "requires" : {
             "Kwiki" : "0",
+            "URI" : "0",
             "XML::RSS" : "0",
             "mixin" : "0"
          }
@@ -41,7 +42,7 @@
    "provides" : {
       "Kwiki::Podcast" : {
          "file" : "lib/Kwiki/Podcast.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -52,7 +53,7 @@
          "web" : "https://github.com/gugod/Kwiki-Podcast"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : "1"

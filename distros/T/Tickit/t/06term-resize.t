@@ -10,7 +10,6 @@ BEGIN {
 }
 
 use Test::More;
-use Test::Identity;
 
 use Tickit::Term;
 
@@ -24,7 +23,7 @@ $term->set_size( 25, 80 );
    my ( $lines, $cols );
    my $id = $term->bind_event( resize => sub {
       my ( undef, $ev, $info ) = @_;
-      identical( $_[0], $term, '$_[0] is term for resize event' );
+      cmp_ok( $_[0], '==', $term, '$_[0] is term for resize event' );
       is( $ev, "resize", '$ev is resize for resize event' );
       $lines = $info->lines;
       $cols  = $info->cols;

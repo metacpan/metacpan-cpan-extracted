@@ -18,6 +18,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Exporter' => '0',
                                       'List::Util' => '1.50',
                                       'Socket' => '0',
                                       'feature' => '0',

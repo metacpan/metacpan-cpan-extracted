@@ -11,12 +11,12 @@ our $URL = 'https://rakudo.org';
 
 sub available {
     my $class = shift;
-    my $url = sprintf "%s/%s", $URL, "files/star";
+    my $url = sprintf "%s/%s", $URL, "downloads/star";
     my $res = Perl6::Build::Helper->HTTP(timeout => 10)->get($url);
     if (!$res->{success}) {
         my $msg = $res->{status} == 599 ? "\n$res->{content}" : "";
         chomp $msg;
-        die "$res->{status} $res->{reason}, $URL$msg\n";
+        die "$res->{status} $res->{reason}, $url$msg\n";
     }
     my %available = map { $_ => 1 }
         $res->{content} =~ m{/dl/star/(rakudo-star-\d+\.\d+)\.tar\.gz}g;

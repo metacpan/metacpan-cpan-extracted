@@ -1,5 +1,8 @@
 Revision history for Perl extension AWS-XRay
 
+0.10 2020-01-23T00:28:43Z
+    - Fix Bareword (#13 @negachov)
+
 0.09 2019-08-20T22:01:55Z
     - Support AWS Lambda (#10 @shogo82148)
     - Add EC2 plugin (#6 @papix)

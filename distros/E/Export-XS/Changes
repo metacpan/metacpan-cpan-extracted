@@ -1,3 +1,5 @@
+3.0.2  24.01.2020
+        - get rid of __cxa_thread_call_dtors warning of FreeBSD
 3.0.1  17.01.2020
         - fix compilation warning for clang
 3.0.0  03.08.2019

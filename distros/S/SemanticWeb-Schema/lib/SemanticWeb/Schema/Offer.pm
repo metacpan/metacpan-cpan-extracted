@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v5.0.1';
+our $VERSION = 'v6.0.0';
 
 
 has accepted_payment_method => (
@@ -242,6 +242,14 @@ has item_offered => (
 
 
 
+has lease_length => (
+    is        => 'rw',
+    predicate => '_has_lease_length',
+    json_ld   => 'leaseLength',
+);
+
+
+
 has mpn => (
     is        => 'rw',
     predicate => '_has_mpn',
@@ -370,14 +378,19 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v5.0.1
+version v6.0.0
 
 =head1 DESCRIPTION
 
 =for html <p>An offer to transfer some rights to an item or to provide a service â
 for example, an offer to sell tickets to an event, to rent the DVD of a
 movie, to stream a TV show over the internet, to repair a motorcycle, or to
-loan a book.<br/><br/> For <a
+loan a book.<br/><br/> Note: As the <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a> property,
+which identifies the form of offer (e.g. sell, lease, repair, dispose),
+defaults to http://purl.org/goodrelations/v1#Sell; an Offer without a
+defined businessFunction value can be assumed to be an offer to
+sell.<br/><br/> For <a
 href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GTIN</a>-related
 fields, see <a
 href="http://www.gs1.org/barcodes/support/check_digit_calculator">Check
@@ -949,21 +962,59 @@ A predicate for the L</item_condition> attribute.
 
 C<itemOffered>
 
-The item being offered.
+=for html <p>An item being offered (or demanded). The transactional nature of the
+offer or demand is documented using <a class="localLink"
+href="http://schema.org/businessFunction">businessFunction</a>, e.g. sell,
+lease etc. While several common expected types are listed explicitly in
+this definition, others can be used. Using a second type, such as Product
+or a subtype of Product, can clarify the nature of the offer.<p>
 
 A item_offered should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::AggregateOffer']>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Event']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MenuItem']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Trip']>
 
 =back
 
 =head2 C<_has_item_offered>
 
 A predicate for the L</item_offered> attribute.
+
+=head2 C<lease_length>
+
+C<leaseLength>
+
+=for html <p>Length of the lease for some <a class="localLink"
+href="http://schema.org/Accommodation">Accommodation</a>, either particular
+to some <a class="localLink" href="http://schema.org/Offer">Offer</a> or in
+some cases intrinsic to the property.<p>
+
+A lease_length should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<_has_lease_length>
+
+A predicate for the L</lease_length> attribute.
 
 =head2 C<mpn>
 
@@ -1271,7 +1322,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

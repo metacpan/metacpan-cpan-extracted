@@ -25,7 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "CPP::catch" : "v1.0.8",
+            "CPP::catch" : "v1.0.9",
             "Test::Catch" : "v1.0.10",
             "XS::Install" : "v1.2.12"
          }
@@ -38,7 +38,7 @@
       },
       "test" : {
          "requires" : {
-            "CPP::catch" : "v1.0.8",
+            "CPP::catch" : "v1.0.9",
             "Test::Catch" : "v1.0.10",
             "Test::Deep" : "0",
             "Test::More" : "0",
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.3.4",
+   "version" : "v1.3.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

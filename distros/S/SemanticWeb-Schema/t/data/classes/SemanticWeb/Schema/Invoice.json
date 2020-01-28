@@ -32,8 +32,8 @@
             "schema:Service"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:category" : {
@@ -44,15 +44,16 @@
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:PhysicalActivity",
-            "schema:Offer",
             "schema:Product",
+            "schema:Recommendation",
+            "schema:PhysicalActivity",
+            "schema:ActionAccessSpecification",
             "schema:Invoice",
-            "schema:ActionAccessSpecification"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
             "schema:PhysicalActivityCategory",
+            "schema:Text",
             "schema:Thing"
          ]
       },
@@ -62,8 +63,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -72,8 +73,8 @@
          "rdfs:comment" : "Party placing the order or paying the invoice.",
          "rdfs:label" : "customer",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -86,8 +87,8 @@
          "rdfs:label" : "minimumPaymentDue",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:PriceSpecification",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:PriceSpecification"
          ]
       },
       "schema:paymentDue" : {
@@ -119,8 +120,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -129,8 +130,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -140,8 +141,8 @@
          "rdfs:label" : "paymentStatus",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PaymentStatusType"
+            "schema:PaymentStatusType",
+            "schema:Text"
          ]
       },
       "schema:provider" : {
@@ -151,17 +152,17 @@
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:CreativeWork",
-            "schema:Service",
-            "schema:Reservation",
             "schema:Invoice",
+            "schema:ParcelDelivery",
             "schema:Trip",
-            "schema:ParcelDelivery"
+            "schema:EducationalOccupationalProgram",
+            "schema:Service",
+            "schema:CreativeWork",
+            "schema:Reservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:referencesOrder" : {

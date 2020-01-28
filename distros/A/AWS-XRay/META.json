@@ -62,7 +62,7 @@
    "provides" : {
       "AWS::XRay" : {
          "file" : "lib/AWS/XRay.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "AWS::XRay::Buffer" : {
          "file" : "lib/AWS/XRay/Buffer.pm"
@@ -88,12 +88,13 @@
          "web" : "https://github.com/fujiwara/AWS-XRay"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_authority" : "cpan:FUJIWARA",
    "x_contributors" : [
       "Ichinose Shogo <shogo82148@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "moznion <moznion@gmail.com>",
+      "mutsutoshi.yoshimoto <mutsutoshi.yoshimoto@20202759n.guest.mixi.co.jp>",
       "papix <mail@papix.net>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02",

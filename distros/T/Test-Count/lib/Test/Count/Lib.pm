@@ -1,5 +1,5 @@
 package Test::Count::Lib;
-$Test::Count::Lib::VERSION = '0.1101';
+$Test::Count::Lib::VERSION = '0.1102';
 use strict;
 use warnings;
 
@@ -19,13 +19,13 @@ __END__
 
 =encoding UTF-8
 
-=head1 VERSION
-
-version 0.1101
-
 =head1 NAME
 
 Test::Count::Lib - various commonly used routines.
+
+=head1 VERSION
+
+version 0.1102
 
 =head1 FUNCTIONS
 

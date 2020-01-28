@@ -1,8 +1,4 @@
-.project
-.releaserc
 Changes
-Dockerfile
-ignore.txt
 lib/Metabolomics/Banks.pm
 lib/Metabolomics/Banks/AbInitioFragments.pm
 lib/Metabolomics/Banks/BloodExposome.pm
@@ -13,21 +9,21 @@ lib/Metabolomics/Utils.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+metabolomics-references/BloodExposome_v1_0.txt
 metabolomics-references/MaConDa__v1_0.xml
 metabolomics-references/MaConDa__v1_0__extensive.xml
 metabolomics-references/MS_fragments-adducts-isotopes.txt
 MYMETA.json
 MYMETA.yml
 README
-t/00-load.t
-t/_template.tabular
 t/Banks.t
+t/Fragment-Annotation.t
+t/_template.tabular
 t/BloodExposome_v1_0_part.txt
 t/Cmpd_4.4-Methylguanosine-298.1146.TSV
 t/Cmpd_4.4-Methylguanosine-298.1146__ANNOTATED__.TSV
 t/cpd-val-pro.TSV
 t/cpd-val-pro__ANNOTATED__.TSV
-t/Fragment-Annotation.t
 t/in_test01_pos.tabular
 t/in_test01_pos__ANNOTATED__.TSV
 t/in_test01_pos__BLOODEXP_ANNOTATED__.TSV
@@ -40,7 +36,6 @@ t/M118.0861T1.13_pos.txt
 t/M121.0682T0.75_pos.txt
 t/MaConDa__v1_0.xml
 t/MaConDa__v1_0__extensive.xml
-t/manifest.t
 t/MS_fragments-adducts-isotopes-test.txt
 t/MS_fragments-adducts-isotopes.txt
 t/out_test01.tabular
@@ -50,9 +45,8 @@ t/pfs003731.tsv
 t/pfs003731__ANNOTATED__.TSV
 t/pfs007110.tsv
 t/pfs007110__ANNOTATED__.TSV
-t/pod-coverage.t
-t/pod.t
-t/test.tabular
-xt/boilerplate.t
+t/pfs003129.tsv
+t/pfs003129__ANNOTATED__.TSV
+
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,7 +7,7 @@
 #
 # These tests (Win32 only) make sure that the file had \r\n as it should.
 
-my $file = "tf$$.txt";
+my $file = "tf21-$$.txt";
 
 unless ($^O =~ /^(MSWin32|dos)$/) {
   print "1..0\n";
@@ -31,7 +31,7 @@ my $n;
 @a = qw(fish dog carrot);
 undef $o;
 untie @a;
-open F, "< $file" or die "Couldn't open file $file: $!";
+open F, '<', $file or die "Couldn't open file $file: $!";
 binmode F;
 my $a = do {local $/ ; <F> };
 my $x = "fish\r\ndog\r\ncarrot\r\n" ;

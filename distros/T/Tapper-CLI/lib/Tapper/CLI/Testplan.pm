@@ -1,7 +1,7 @@
 package Tapper::CLI::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Handle testplans
-$Tapper::CLI::Testplan::VERSION = '5.0.5';
+$Tapper::CLI::Testplan::VERSION = '5.0.6';
 use 5.010;
 use warnings;
 use strict;
@@ -166,7 +166,16 @@ sub testplannew
         if ($opt->{dryrun}) {
                 return  $cmd->apply_macro($opt->{file}, $opt->{substitutes}, $opt->{include});
         }
-        return $cmd->testplannew($opt);
+
+        my $answer = $cmd->testplannew($opt);
+        # Format:
+        #   TESTPLANID: TESTRUNID TESTRUNID TESTRUNID
+        my $output =
+          $answer->{testplan_id}
+          . ': '
+          . join(' ', @{$answer->{testrun_ids} || []});
+
+        return $output;
 }
 
 
@@ -232,7 +241,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

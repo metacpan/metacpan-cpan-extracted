@@ -3,7 +3,7 @@
 # Regular read-write tests with caching disabled
 # (Same as 01_gen.t)
 #
-my $file = "tf$$.txt";
+my $file = "tf25-$$.txt";
 
 print "1..68\n";
 
@@ -91,7 +91,7 @@ sub check_contents {
   my $x = join $:, @c, '';
   local *FH = $o->{fh};
   seek FH, 0, SEEK_SET;
-#  my $open = open FH, "< $file";
+#  my $open = open FH, '<', $file;
   my $a;
   { local $/; $a = <FH> }
   $a = "" unless defined $a;

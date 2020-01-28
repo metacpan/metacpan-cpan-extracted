@@ -1,4 +1,4 @@
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 14;
+$VERSION = 15;
 @ISA = ('Graph::Maker');
 
 
@@ -143,9 +143,13 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
 
 L<Graph::Maker>
 
+=head1 HOME PAGE
+
+L<http://user42.tuxfamily.org/graph-maker/index.html>
+
 =head1 LICENSE
 
-Copyright 2018, 2019 Kevin Ryde
+Copyright 2018, 2019, 2020 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

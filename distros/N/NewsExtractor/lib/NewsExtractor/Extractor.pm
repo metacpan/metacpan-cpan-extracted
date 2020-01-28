@@ -10,6 +10,10 @@ use NewsExtractor::CSSExtractor;
 use NewsExtractor::JSONLDExtractor;
 use NewsExtractor::GenericExtractor;
 use NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_allnews_tw;
+use NewsExtractor::SiteSpecificExtractor::www_peopo_org;
+use NewsExtractor::SiteSpecificExtractor::www_ntdtv_com;
+use NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw;
 
 has extractor => (
     required => 0,
@@ -24,10 +28,22 @@ has extractor => (
 
 use constant {
     SiteSpecificExtractorByHost => {
+        'www.allnews.tw' => 'NewsExtractor::SiteSpecificExtractor::www_allnews_tw',
         'www.rvn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw',
         'www.chinatimes.com' => 'NewsExtractor::JSONLDExtractor',
+        'video.udn.com' => 'NewsExtractor::JSONLDExtractor',
+        'www.ctwant.com' => 'NewsExtractor::JSONLDExtractor',
+        'www.peopo.org' => 'NewsExtractor::SiteSpecificExtractor::www_peopo_org',
+        'www.ntdtv.com' => 'NewsExtractor::SiteSpecificExtractor::www_ntdtv_com',
+        'www.ksnews.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw',
     },
     CSSRuleSetByHost => {
+        'www.nownews.com' => {
+            headline   => 'h1.entry-title',
+            dateline   => 'span.td-post-date:nth-child(2) > time:nth-child(1)',
+            journalist => '.td-post-author-name',
+            content_text => '.td-post-content > span[itemprop=articleBody]',
+        },
         'www.epochtimes.com' => {
             headline     => 'h1.title',
             dateline     => 'header[role=heading] time[datetime]',

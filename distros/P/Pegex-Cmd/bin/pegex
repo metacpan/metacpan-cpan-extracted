@@ -2,7 +2,7 @@
 
 use Pegex::Cmd;
 
-Pegex::Cmd->run();
+Pegex::Cmd->new->run(@ARGV);
 
 =head1 pegex
 

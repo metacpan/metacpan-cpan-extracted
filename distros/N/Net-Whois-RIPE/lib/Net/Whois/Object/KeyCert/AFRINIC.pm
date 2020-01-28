@@ -1,5 +1,7 @@
 package Net::Whois::Object::KeyCert::AFRINIC;
 
+use strict;
+use warnings;
 use base qw/Net::Whois::Object/;
 
 # whois -t key-cert -h whois.afrinic.net

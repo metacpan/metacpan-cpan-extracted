@@ -49,16 +49,16 @@
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
             "schema:LocationFeatureSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:PriceSpecification",
             "schema:Permit",
-            "schema:Demand",
+            "schema:MonetaryAmount",
             "schema:Offer",
-            "schema:MonetaryAmount"
+            "schema:Demand",
+            "schema:OpeningHoursSpecification",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:validIn" : {

@@ -123,7 +123,7 @@ BEGIN {
     eval {
 	require Test::Without::Module;
 	Test::Without::Module->import(
-	    My::Module::Recommend->optionals() );
+	    My::Module::Recommend->test_without() );
 	1;
     } or plan skip_all => 'Test::Without::Module not available';
 }
@@ -167,6 +167,10 @@ later, this software will make use of them when it finds them.
 EOD
 
     return;
+}
+
+sub test_without {
+    return ( map { $_->test_without() } @optionals );
 }
 
 1;
@@ -223,6 +227,13 @@ This static method examines the current Perl to see which optional
 modules are installed. If any are not installed, a message is printed to
 standard error explaining the benefits to be gained from installing the
 module, and any possible problems with installing it.
+
+=head2 test_without
+
+ say for My::Module::Recommend->test_without();
+
+This static method simply returns the names of the modules to be tested
+without.
 
 =head1 SUPPORT
 

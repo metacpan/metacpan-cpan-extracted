@@ -1,9 +1,9 @@
 package Complete::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-13'; # DATE
+our $DATE = '2020-01-28'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.611'; # VERSION
 
 use 5.010001;
 use strict;
@@ -713,8 +713,7 @@ sub complete_comma_sep {
     {
         last unless @$cae_res == 1;
         last if @$remaining_elems <= 1;
-        $cae_res->[0] .= $sep;
-        ununiquify_answer(answer => $cae_res);
+        $cae_res = [{word=>"$cae_res->[0]$sep", is_partial=>1}];
     }
     $cae_res;
 }
@@ -886,6 +885,7 @@ _
     result => {
         schema => 'undef',
     },
+    tags => ['hidden'],
 };
 sub ununiquify_answer {
     my %args = @_;
@@ -914,7 +914,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.608 of Complete::Util (from Perl distribution Complete-Util), released on 2020-01-13.
+This document describes version 0.611 of Complete::Util (from Perl distribution Complete-Util), released on 2020-01-28.
 
 =head1 DESCRIPTION
 
@@ -960,6 +960,7 @@ Arguments ('*' denotes required arguments):
 
 Completion answer structure.
 
+
 =back
 
 Return value:  (int)
@@ -988,6 +989,7 @@ Arguments ('*' denotes required arguments):
 
 Completion answer structure.
 
+
 =back
 
 Return value:  (int)
@@ -1014,6 +1016,7 @@ Arguments ('*' denotes required arguments):
 =item * B<$answer>* => I<array|hash>
 
 Completion answer structure.
+
 
 =back
 
@@ -1049,6 +1052,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$answers>* => I<array[hash|array]>
+
 
 =back
 
@@ -1127,6 +1131,7 @@ completed unambiguously into C<unmount>.
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
+
 
 =back
 
@@ -1225,6 +1230,7 @@ elements.
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
@@ -1254,6 +1260,7 @@ Arguments ('*' denotes required arguments):
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
+
 
 =back
 
@@ -1289,6 +1296,7 @@ Completion answer structure.
 
 Metadata (extra keys) for the hash.
 
+
 =back
 
 Return value:  (hash)
@@ -1301,7 +1309,7 @@ Usage:
 
  modify_answer(%args) -> undef
 
-Modify answer (add prefix/suffix, etc).
+Modify answer (add prefixE<sol>suffix, etc).
 
 This function is not exported by default, but exportable.
 
@@ -1315,34 +1323,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<suffix> => I<str>
 
-=back
-
-Return value:  (undef)
-
-
-
-=head2 ununiquify_answer
-
-Usage:
-
- ununiquify_answer(%args) -> undef
-
-If answer contains only one item, make it two.
-
-For example, if answer is C<["a"]>, then will make answer become C<["a","a "]>.
-This will prevent shell from automatically adding space.
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<answer>* => I<hash|array>
 
 =back
 
 Return value:  (undef)
+
+=for Pod::Coverage ^(ununiquify_answer)$
 
 =head1 FAQ
 

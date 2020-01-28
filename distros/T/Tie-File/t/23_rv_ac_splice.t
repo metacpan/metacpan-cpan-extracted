@@ -4,7 +4,7 @@
 # (07_rv_splice.t checks it aith autochomping off)
 #
 
-my $file = "tf$$.txt";
+my $file = "tf23-$$.txt";
 $: = Tie::File::_default_recsep();
 my $data = "rec0$:rec1$:rec2$:";
 
@@ -155,7 +155,7 @@ check_result(0..3);
 
 sub init_file {
   my $data = shift;
-  open F, "> $file" or die $!;
+  open F, '>', $file or die $!;
   binmode F;
   print F $data;
   close F;

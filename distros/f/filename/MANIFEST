@@ -8,6 +8,7 @@ Makefile.PL
 lib/filename.pm
 lib/pm.pm
 t/00-basic.t
+t/01-refs.t
 t/Testing-empty-string.pm
 t/Testing-empty.pm
 t/Testing-errno.pm

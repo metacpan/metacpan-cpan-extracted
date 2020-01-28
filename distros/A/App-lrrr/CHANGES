@@ -1,9 +1,49 @@
 ==================================================
-Changes from 2018-12-10 00:00:00 +0000 to present.
+Changes from 2018-12-19 00:00:00 +0000 to present.
 ==================================================
 
 -------------------------------------------
-version v0.0.2 at 2019-12-10 18:34:43 +0000
+version v0.0.3 at 2019-12-19 19:31:30 +0000
+-------------------------------------------
+
+  Change: ca1477c7a2bfc1cf9bca49b7934d24c58440e82f
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 22:49:57 +0000
+
+    spelling mistake 
+
+  Change: fc127a6229125b7bde2865074b2614d09f9b44a0
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 22:18:56 +0000
+
+    added docs 
+
+  Change: 895a24a90b640f0fb61e0d42f41786b4a5e78281
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 22:16:05 +0000
+
+    process comma seperated watch dirs 
+
+  Change: 8a173da5a229b197686d6e4179156507265f1dc3
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 21:01:28 +0000
+
+    allow comman to take flags 
+
+  Change: 9377f466b869a44f8ada2f8a9b107d09c81f0c11
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 20:50:42 +0000
+
+    basic support for working --watch flag 
+
+  Change: bffe8703d16f7185c90cb75ee1413bd29b95d4b3
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2019-12-12 20:40:16 +0000
+
+    added -b flag to match morbo 
+
+-------------------------------------------
+version v0.0.2 at 2019-12-04 18:00:29 +0000
 -------------------------------------------
 
   Change: c9be7c9fe98a45c84a0efd92029edb787572c1f0

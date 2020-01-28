@@ -2,7 +2,7 @@
    "class" : {
       "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1457",
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A schedule defines a repeating time period used to describe a regularly occurring <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a>. At a minimum a schedule will specify <a class=\"localLink\" href=\"http://schema.org/repeatFrequency\">repeatFrequency</a> which describes the interval between occurences of the event. Additional information can be provided to specify the schedule more precisely. \n      This includes identifying the day(s) of the week or month when the recurring event will take place, in addition to its start and end time. Schedules may also\n      have start and end dates to indicate when they are active, e.g. to define a limited calendar of events.",
+      "rdfs:comment" : "A schedule defines a repeating time period used to describe a regularly occurring <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a>. At a minimum a schedule will specify <a class=\"localLink\" href=\"http://schema.org/repeatFrequency\">repeatFrequency</a> which describes the interval between occurences of the event. Additional information can be provided to specify the schedule more precisely.\n      This includes identifying the day(s) of the week or month when the recurring event will take place, in addition to its start and end time. Schedules may also\n      have start and end dates to indicate when they are active, e.g. to define a limited calendar of events.",
       "rdfs:label" : "Schedule",
       "rdfs:subClassOf" : "schema:Intangible",
       "schema:category" : "issue-1457",
@@ -12,12 +12,15 @@
       "schema:byDay" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1457",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Defines the day(s) of the week on which a recurring <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a> takes place",
+         "rdfs:comment" : "Defines the day(s) of the week on which a recurring <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a> takes place. May be specified using either <a class=\"localLink\" href=\"http://schema.org/DayOfWeek\">DayOfWeek</a>, or alternatively <a class=\"localLink\" href=\"http://schema.org/Text\">Text</a> conforming to iCal's syntax for byDay recurrence rules",
          "rdfs:label" : "byDay",
          "schema:category" : "issue-1457",
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:DayOfWeek"
+         "schema:rangeIncludes" : [
+            "schema:DayOfWeek",
+            "schema:Text"
+         ]
       },
       "schema:byMonth" : {
          "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1457",
@@ -39,14 +42,28 @@
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : "schema:Integer"
       },
-      "schema:eventSchedule" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1457",
+      "schema:duration" : {
+         "dc:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1457",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
+         ],
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Associates an <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a> with a <a class=\"localLink\" href=\"http://schema.org/Schedule\">Schedule</a>. There are circumstances where it is preferable to share a schedule for a series of\n      repeating events rather than data on the individual events themselves. For example, a website or application might prefer to publish a schedule for a weekly\n      gym class rather than provide data on every event. A schedule could be processed by applications to add forthcoming events to a calendar. An <a class=\"localLink\" href=\"http://schema.org/Event\">Event</a> that\n      is associated with a <a class=\"localLink\" href=\"http://schema.org/Schedule\">Schedule</a> using this property should not have <a class=\"localLink\" href=\"http://schema.org/startDate\">startDate</a> or <a class=\"localLink\" href=\"http://schema.org/endDate\">endDate</a> properties. These are instead defined within the associated\n      <a class=\"localLink\" href=\"http://schema.org/Schedule\">Schedule</a>, this avoids any ambiguity for clients using the data. The propery might have repeated values to specify different schedules, e.g. for different months\n      or seasons.",
-         "rdfs:label" : "eventSchedule",
-         "schema:category" : "issue-1457",
-         "schema:domainIncludes" : "schema:Schedule",
-         "schema:isPartOf" : "http:pending.schema.org",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:category" : [
+            "issue-1698",
+            "issue-1457"
+         ],
+         "schema:domainIncludes" : [
+            "schema:MusicRecording",
+            "schema:MusicRelease",
+            "schema:Event",
+            "schema:Schedule",
+            "schema:QuantitativeValueDistribution",
+            "schema:Audiobook",
+            "schema:Movie",
+            "schema:MediaObject"
+         ],
          "schema:rangeIncludes" : "schema:Duration"
       },
       "schema:exceptDate" : {
@@ -58,8 +75,8 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:repeatCount" : {
@@ -82,9 +99,19 @@
          "schema:domainIncludes" : "schema:Schedule",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Duration",
-            "schema:Text"
+            "schema:Text",
+            "schema:Duration"
          ]
+      },
+      "schema:scheduleTimezone" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1457",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the timezone for which the time(s) indicated in the <a class=\"localLink\" href=\"http://schema.org/Schedule\">Schedule</a> are given. The value provided should be among those listed in the IANA Time Zone Database.",
+         "rdfs:label" : "scheduleTimezone",
+         "schema:category" : "issue-1457",
+         "schema:domainIncludes" : "schema:Schedule",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
       }
    }
 }

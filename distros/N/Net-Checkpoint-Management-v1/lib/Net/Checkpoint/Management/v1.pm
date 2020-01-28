@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001003';
+$Net::Checkpoint::Management::v1::VERSION = '0.001004';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -9,7 +9,6 @@ use Types::Standard qw( ArrayRef Str );
 use Carp::Clan qw(^Net::Checkpoint::Management::v1);
 use Clone qw( clone );
 use Net::Checkpoint::Management::v1::Role::ObjectMethods;
-use Data::Dumper::Concise;
 
 no warnings "experimental::signatures";
 
@@ -43,9 +42,12 @@ has 'api_version' => (
 with 'Net::Checkpoint::Management::v1::Role::REST::Client';
 
 sub _error_handler ($self, $data) {
-    my $error_message = (exists $data->{errors} && exists $data->{errors}->[0]
-        && exists $data->{errors}->[0]->{message})
-        ? $data->{errors}->[0]->{message}
+    my $error_message = (
+        exists $data->{'blocking-errors'}
+        && ref $data->{'blocking-errors'} eq 'ARRAY'
+        && exists $data->{'blocking-errors'}->[0]
+        && exists $data->{'blocking-errors'}->[0]->{message})
+        ? $data->{'blocking-errors'}->[0]->{message}
         : $data->{message};
     croak($error_message);
 }
@@ -117,11 +119,8 @@ sub _get ($self, $url, $query_params = {}) {
     return $data;
 }
 
-sub _update ($self, $url, $object, $object_data) {
-    my $updated_data = clone($object);
-    $updated_data = { %$updated_data, %$object_data };
-
-    my $res = $self->post($url, $updated_data);
+sub _update ($self, $url, $object_data) {
+    my $res = $self->post($url, $object_data);
     my $code = $res->code;
     my $data = $res->data;
     $self->_error_handler($data)
@@ -150,6 +149,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-package',
         delete   => 'delete-package',
         list_key => 'packages',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'accessrules',
@@ -160,6 +160,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-access-rule',
         delete   => 'delete-access-rule',
         list_key => 'rulebase',
+        id_keys  => ['uid', 'name', 'rule-number'],
     },
     {
         object   => 'networks',
@@ -170,6 +171,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-network',
         delete   => 'delete-network',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'hosts',
@@ -180,6 +182,18 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-host',
         delete   => 'delete-host',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
+    },
+    {
+        object   => 'access_roles',
+        singular => 'access_role',
+        create   => 'add-access-role',
+        list     => 'show-access-roles',
+        get      => 'show-access-role',
+        update   => 'set-access-role',
+        delete   => 'delete-access-role',
+        list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'services_tcp',
@@ -190,6 +204,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-tcp',
         delete   => 'delete-service-tcp',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'services_udp',
@@ -200,6 +215,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-udp',
         delete   => 'delete-service-udp',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'services_icmp',
@@ -210,6 +226,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-icmp',
         delete   => 'delete-service-icmp',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'services_icmpv6',
@@ -220,6 +237,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-icmp6',
         delete   => 'delete-service-icmp6',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'services_other',
@@ -230,6 +248,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-other',
         delete   => 'delete-service-other',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'service_groups',
@@ -240,6 +259,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         update   => 'set-service-group',
         delete   => 'delete-service-group',
         list_key => 'objects',
+        id_keys  => [qw( uid name )],
     },
     {
         object   => 'sessions',
@@ -313,14 +333,13 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001003
+version 0.001004
 
 =head1 SYNOPSIS
 
     use strict;
     use warnings;
     use Net::Checkpoint::Management::v1;
-    use Data::Dumper::Concise;
 
     my $cpmgmt = Net::Checkpoint::Management::v1->new(
         server      => 'https://cpmgmt.example.com',
@@ -376,7 +395,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Alexander Hartmaier.
+This software is copyright (c) 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

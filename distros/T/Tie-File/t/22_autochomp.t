@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-my $file = "tf$$.txt";
+my $file = "tf22-$$.txt";
 $: = Tie::File::_default_recsep();
 
 print "1..71\n";
@@ -105,7 +105,7 @@ sub check_contents {
   my $x = join $:, @c, '';
   local *FH = $o->{fh};
   seek FH, 0, SEEK_SET;
-#  my $open = open FH, "< $file";
+#  my $open = open FH, '<', $file;
   my $a;
   { local $/; $a = <FH> }
   $a = "" unless defined $a;

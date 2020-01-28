@@ -94,31 +94,18 @@ OP * overload_allopen(char *opname, char *global, OP* (*real_pp_func)(pTHX)) {
         return real_pp_func(aTHXR);
     }
     SV **sp = PL_stack_sp;
-    /* DON'T call dMARK... it has unintended side effects.
-     * it actually calls POPMARK! sad! This causes total breakage everywhere */
-
-    /* This is copied from pp_ctl.c It fixes things on freebsd 13, and also
-     * under certain circumstances under Linux. I don't know why it's actually
-     * needed. But apparently you need to POPMARK but only in certain cases */
-    if (PL_markstack_ptr[-1] > TOPMARK) {
-        POPMARK;
-    }
-    /* Initialize mark ourselves. (removed for now, but in case we need mark again
-     * I am leaving this part in */
-    /* SV **mark = PL_stack_base + *PL_markstack_ptr; */
-    ssize_t myitems = (ssize_t)(sp - (PL_stack_base + *PL_markstack_ptr));
     ENTER;
         /* Save the temporaries stack */
         SAVETMPS;
             /* sp (stack pointer) is used by some macros we call below. mysp is *ours* */
             /* Save the stack pointer location */
             SV **mysp = PL_stack_sp;
-            /*assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow"); */
             /* Save the number of items (number of arguments) */
-            if (myitems < 0)
-                DIE(aTHXR_ "panic: overload::open internal error. This should not happen.");
-
             PUSHMARK(sp);
+                ssize_t myitems = *PL_markstack_ptr;
+                if (myitems < 0) {
+                    DIE(aTHXR_ "panic: overload::open internal error. This should not happen.");
+                }
                 EXTEND(sp, myitems);
                 ssize_t c;
                 for ( c = 0; c < myitems; c++) {
@@ -166,9 +153,11 @@ _test_xs_function(...)
 void
 _install_open()
     CODE:
+        MUTEX_INIT(&OP_OPEN_replace_mutex);
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_open, OP_OPEN, Perl_pp_overload_open, OP_OPEN_replace_mutex);
 
 void
 _install_sysopen()
     CODE:
+        MUTEX_INIT(&OP_SYSOPEN_replace_mutex);
         SAVE_AND_REPLACE_PP_IF_UNSET(real_pp_sysopen, OP_SYSOPEN, Perl_pp_overload_sysopen, OP_SYSOPEN_replace_mutex);

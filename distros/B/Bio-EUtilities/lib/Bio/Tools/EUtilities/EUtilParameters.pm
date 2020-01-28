@@ -1,6 +1,5 @@
 package Bio::Tools::EUtilities::EUtilParameters;
-our $AUTHORITY = 'cpan:BIOPERLML';
-$Bio::Tools::EUtilities::EUtilParameters::VERSION = '1.75';
+$Bio::Tools::EUtilities::EUtilParameters::VERSION = '1.76';
 use utf8;
 use strict;
 use warnings;
@@ -24,48 +23,48 @@ my %MODE = (
     'einfo'     => {
         'mode'     => ['GET'],
         'location' => 'einfo.fcgi',
-        'params'   => [qw(db tool email)],
+        'params'   => [qw(db tool email api_key)],
                    },
     'epost'     => {
         'mode'     => ['POST','GET'],
         'location' => 'epost.fcgi',
-        'params'   => [qw(db retmode id tool email idtype WebEnv query_key)],
+        'params'   => [qw(db retmode id tool email api_key idtype WebEnv query_key)],
                    },
     'efetch'    => {
         'mode'     => ['GET','POST'],
         'location' => 'efetch.fcgi',
         'params'   => [qw(db retmode id retmax retstart rettype strand seq_start
-                       seq_stop complexity report tool email idtype WebEnv query_key)],
+                       seq_stop complexity report tool email api_key idtype WebEnv query_key)],
                    },
     'esearch'   => {
         'mode'     => ['GET','POST'],
         'location' => 'esearch.fcgi',
         'params'   => [qw(db retmode usehistory term field reldate mindate
-                       maxdate datetype retmax retstart rettype sort tool email idtype
+                       maxdate datetype retmax retstart rettype sort tool email api_key idtype
                        WebEnv query_key)],
                    },
     'esummary'  => {
         'mode'     => ['GET','POST'],
         'location' => 'esummary.fcgi',
-        'params'   => [qw(db retmode id retmax retstart rettype tool email idtype
+        'params'   => [qw(db retmode id retmax retstart rettype tool email api_key idtype
                        version WebEnv query_key)],
                    },
     'elink'     => {
         'mode'     => ['GET','POST'],
         'location' => 'elink.fcgi',
         'params'   => [qw(db retmode id reldate mindate maxdate datetype term
-                    dbfrom holding cmd version tool email idtype linkname WebEnv
+                    dbfrom holding cmd version tool email api_key idtype linkname WebEnv
                     query_key)],
                    },
     'egquery'   => {
         'mode'     => ['GET','POST'],
         'location' => 'egquery.fcgi',
-        'params'   => [qw(term retmode tool email)],
+        'params'   => [qw(term retmode tool email api_key)],
                    },
     'espell'    => {
         'mode'     => ['GET','POST'],
         'location' => 'espell.fcgi',
-        'params'   => [qw(db retmode term tool email )],
+        'params'   => [qw(db retmode term tool email api_key )],
                    }
 );
 
@@ -74,7 +73,7 @@ my @PARAMS;
 # generate getter/setters (will move this into individual ones at some point)
 
 BEGIN {
-    @PARAMS = qw(db id email retmode rettype usehistory term field tool
+    @PARAMS = qw(db id email api_key retmode rettype usehistory term field tool
     reldate mindate maxdate datetype retstart retmax sort seq_start seq_stop
     strand complexity report dbfrom cmd holding version linkname WebEnv
     query_key idtype);
@@ -409,7 +408,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -417,7 +416,7 @@ Bio::Tools::EUtilities::EUtilParameters - Manipulation of NCBI eutil-based param
 
 =head1 VERSION
 
-version 1.75
+version 1.76
 
 =head1 SYNOPSIS
 
@@ -426,6 +425,7 @@ version 1.75
  my @params = (-eutil => 'efetch',
               db => 'nucleotide',
               id => \@ids,
+              api_key => 'mYApiKeyFrOMNCBI',
               email => 'me@foo.bar',
               retmode => 'xml');
 
@@ -506,7 +506,7 @@ passing, though these should be easily added in the future when necessary.
 =head2 carryover
 
  Title    : carryover
- Usage    : $obj->carryover(qw(email tool db))
+ Usage    : $obj->carryover(qw(email api_key tool db))
  Function : Carries over the designated parameters when using reset_parameters()
  Returns  : a list of carried-over parameters
  Args     : An array reference of parameters to carry over, followed optionally
@@ -566,7 +566,7 @@ passing, though these should be easily added in the future when necessary.
            originally set as an array ref are returned based on whether the
            '-join_id' flag is set (default is the same array ref).
  Args    : -type : the eutil name (Default: returns all).  Use of '-list'
-                    supercedes this
+                    supersedes this
            -list : array ref of specific parameters
            -join_ids : Boolean; join IDs based on correspondence (Default: no join)
 
@@ -666,14 +666,13 @@ User feedback is an integral part of the evolution of this and other
 Bioperl modules. Send your comments and suggestions preferably to
 the Bioperl mailing list.  Your participation is much appreciated.
 
-  bioperl-l@bioperl.org                  - General discussion
-  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+  bioperl-l@bioperl.org               - General discussion
+  https://bioperl.org/Support.html    - About the mailing lists
 
 =head2 Support
 
 Please direct usage questions or support issues to the mailing list:
 I<bioperl-l@bioperl.org>
-
 rather than to the module maintainer directly. Many experienced and
 reponsive experts will be able look at the problem and quickly
 address it. Please include a thorough description of the problem
@@ -685,7 +684,7 @@ Report bugs to the Bioperl bug tracking system to help us keep track
 of the bugs and their resolution. Bug reports can be submitted via the
 web:
 
-  https://github.com/bioperl/%%7Bdist%7D
+  https://github.com/bioperl/bio-eutilities/issues
 
 =head1 AUTHOR
 

@@ -41,9 +41,14 @@ use MooX::Press (
 			},
 			can => {
 				'my_method' => {
+					optimize  => true,
 					signature => [ 'a' => 'SomeType', 'b' => 'Optional[SomeType]', c => 'Stringo' ],
 					named     => true,
 					code      => sub { my ($self, $args) = @_; uc($args->c) },
+				},
+				'my_method2' => {
+					signature => sub { map int($_), @_ },
+					code      => q{sub { my $self = shift; [@_] }},
 				},
 			},
 			factory => [
@@ -80,6 +85,11 @@ $e = exception {
 	is($obj->my_method(a => MyApp->new_someclass, b => MyApp->new_otherclass, c => 'Boop'), 'BOOP', 'this should not really happen');
 };
 like($e, qr/did not pass type constraint/);
+
+is_deeply(
+	$obj->my_method2(1.1, 2.2, 3.3),
+	[1, 2, 3],
+);
 
 $obj = MyApp->xyzzy(3, MyApp->new_someclass);
 is($x, 3);

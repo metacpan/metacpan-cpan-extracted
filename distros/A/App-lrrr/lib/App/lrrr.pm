@@ -1,7 +1,7 @@
 package App::lrrr;
 # ABSTRACT: Little Restart Runner (Really)
 use version;
-our $VERSION = 'v0.0.2'; # VERSION
+our $VERSION = 'v0.0.3'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -40,7 +40,7 @@ App::lrrr - Little Restart Runner (Really)
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.3
 
 =head1 SYNOPSIS
 
@@ -77,13 +77,21 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords Doug Bell Steven Arnott
+=for stopwords Doug Bell LapVeesh Steven Arnott
 
 =over 4
 
 =item *
 
 Doug Bell <doug.bell@grantstreet.com>
+
+=item *
+
+Doug Bell <preaction@users.noreply.github.com>
+
+=item *
+
+LapVeesh <rabbiveesh@gmail.com>
 
 =item *
 

@@ -5,44 +5,13 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Plain;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.011';
 
-use Type::Params qw(compile_named_oo);
-use Types::Standard qw( HashRef Str CodeRef ArrayRef );
+use Sub::HandlesVia::Toolkit;
+our @ISA = 'Sub::HandlesVia::Toolkit';
 
-my $sig;
-sub delegations {
-	$sig ||= compile_named_oo(
-		target      => Str,
-		attribute   => ArrayRef->of(Str|CodeRef)->plus_coercions(Str|CodeRef, '[$_]'),
-		handles_via => ArrayRef->of(Str)->plus_coercions(Str, '[$_]'),
-		handles     => HashRef->plus_coercions(ArrayRef, '+{map(+($_,$_),@$_)}'),
-	);
-	
-	my $me = shift;
-	my $arg = &$sig;
-
-	my $callbacks = $me->_make_callbacks($arg->attribute);
-	
-	use Sub::HandlesVia::Handler;
-	my %handles = %{ $arg->handles };
-	for my $h (sort keys %handles) {
-		my $handler = Sub::HandlesVia::Handler->lookup($handles{$h}, $arg->handles_via);
-#		warn $handler->code_as_string(
-#			%$callbacks,
-#			target      => $arg->target,
-#			method_name => $h,
-#		);
-		$handler->install_method(
-			%$callbacks,
-			target      => $arg->target,
-			method_name => $h,
-		);
-	}
-}
-
-sub _make_callbacks {
-	my ($me, $attr) = (shift, @_);
+sub make_callbacks {
+	my ($me, $target, $attr) = (shift, @_);
 	
 	my ($get_slot, $set_slot) = @$attr;
 	$set_slot = $get_slot if @$attr < 2;
@@ -128,3 +97,4 @@ sub _make_callbacks {
 }
 
 1;
+

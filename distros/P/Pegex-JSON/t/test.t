@@ -80,7 +80,7 @@ xyz:
 - 0
 - ''
 - 0
-- ~
+- null
 
 === Numbers
 --- json
@@ -132,5 +132,5 @@ true
 --- json
 null
 --- yaml
-~
+null
 

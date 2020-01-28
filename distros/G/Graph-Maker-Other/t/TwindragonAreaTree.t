@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 80;
+plan tests => 574;
 
 
 require Graph::Maker::TwindragonAreaTree;
@@ -37,7 +37,7 @@ require Graph::Maker::TwindragonAreaTree;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 14;
+  my $want_version = 15;
   ok ($Graph::Maker::TwindragonAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwindragonAreaTree->VERSION,  $want_version,
@@ -48,6 +48,30 @@ require Graph::Maker::TwindragonAreaTree;
   ok (! eval { Graph::Maker::TwindragonAreaTree->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# direction_type
+
+foreach my $level (0 .. 7) {
+  my $graph = Graph::Maker->new('twindragon_area_tree',
+                                level => $level,
+                                direction_type => 'bigger');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from < $to, 1,
+        "bigger edge $from to $to");
+  }
+}
+foreach my $level (0 .. 7) {
+  my $graph = Graph::Maker->new('twindragon_area_tree',
+                                level => $level,
+                                direction_type => 'smaller');
+  foreach my $edge ($graph->edges) {
+    my ($from,$to) = @$edge;
+    ok ($from > $to, 1);
+  }
+}
+
 
 #------------------------------------------------------------------------------
 

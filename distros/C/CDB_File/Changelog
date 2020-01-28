@@ -1,0 +1,145 @@
+Revision history for Perl extension CDB_File.
+
+1.01 - Todd Rinaldo <toddr@cpan.org> 2020-01-27
+    - Fix MANIFEST so Changelog is shpped.
+    - Address file descriptor leak in CDB_File.
+
+1.00 - Todd Rinaldo <toddr@cpan.org> 2020-01-19
+    - Enable github actions for automated testing
+    - Switch to github issues.
+
+0.99 - J. Nick Koston <bdraco@cpan.org> 2016-07-16
+    - Add a fetch_all function for 1:1 hash mapping
+
+0.98 - Todd Rinaldo <toddr@cpan.org> 2015-06-30
+    - Replace use vars with our (deprecated since 5.6.0)
+    - Switch from Dynaloader to XSLoader as it's known to be a lower memory profile module.
+
+0.97_01 - Todd Rinaldo <toddr@cpan.org> 2011-04-05
+    - Put ppport.h back in with an updated version.
+    - ppport.h warnings now indicate that the module is not perl 5.6 compatible,
+      but the test suite continues to succeed there. p5p suggests dropping support
+      for 5.6
+
+0.97 - Todd Rinaldo <toddr@cpan.org> 2011-04-05
+    - CPAN testers looks relativley clean. Publishing a stable version.
+
+0.96_02 - Todd Rinaldo <toddr@cpan.org> 2011-04-03
+    - Perl 5.6 doesn't warn about $x{undef}. Skip this test for 5.6
+
+0.96_01 - Todd Rinaldo <toddr@cpan.org> 2011-04-01
+    - Remove ppport.h from distro on reccommendation from ppport.h
+    - Remove C99 style code from CDB_File to allow GCC 2.95 compilers to work
+    - Modernize Makefile.PL and require Test::More
+    - Update tests to use Test::More
+    - Fix makefile - {'d_mmap'}  isn't always defined
+    - Cleanup temp files during testing
+    - Untie before file removal so windows doesn't block the removal
+
+0.96
+    - Fix for compiling under stricter compilers
+
+0.95
+    - Support passing multiple key/value pairs to ->insert() for performance
+      when building CDBs.
+
+0.94
+    - Made work on perl 5.8.1
+    - Added some notes about performance
+
+0.93
+    - Switched to allocating memory on the heap. I have no idea how the
+      previous scheme worked at all. It should have fallen over everywhere.
+    - Fixed a bug where you re-tie the same hash and CDB_File complains
+      about calling NEXT before calling FIRST.
+
+0.92
+	- Fixed major set of leaks in both memory and filehandles
+	- Change of ownership to Matt Sergeant
+
+0.91 2001-12-18
+	- fix memory leak (thanks MJP)
+	- document and test that multi_get returns ref to empty hash
+	- beta release
+
+0.86 2001-05-25
+	- add handle, datalen, and datapos methods for low level access
+	- simplify multi_get, and remove a memory leak
+ 	- document need to destroy extra references
+	- open files in binary mode (thanks IW)
+	- use mmap() (thanks RDW)
+	- beta release
+
+0.85 2001-02-06
+	- multi_get now works during each (thanks MdlR)
+	- move multi_get to CDB_File.xs, remove dumb O(n*n), and fix bug
+	- don't make the database files read-only (thanks FL)
+	- beta release
+
+0.84 2000-11-21
+	- backwards compatibility with perl-5.005 (thanks BD)
+	- EPROTO not available everywhere (thanks BD); EFTYPE preferred
+	- beta release
+
+0.83 2000-11-03
+	- fix stupid typo
+	- beta release
+
+0.82 2000-05-30
+	- fix bug in `each', introduced in 0.81
+	- beta release
+
+0.81 2000-05-12
+	- port to perl 5.6.0
+	- cdb code derived from cdb-0.75
+	- cdb code incorporated into CDB_File.xs
+	- multi_get works even for non-adjacent keys
+	- fetching values in order from previously obtained keys array works
+	- use perlapio
+
+0.8 1999-09-08
+	- fix bug with undefined keys / values (thanks CMC, JPB)
+	- beta release
+
+0.7 1997-10-20
+	- use Perl's Strerror instead of strerror
+	- fix bogus warning in multi_get (thanks MdlR)
+	- fix bug with empty values (thanks RDM)
+	- don't fail test 6 if run as root (thanks MP, JB)
+	- alpha release
+
+0.6 1997-03-25
+	- fix unsigned off_t bug
+	- fix version number confusion
+	- propagate Perl's idea of CC and LD to cdb (thanks IP, SB)
+	- use safe cdb_bread() in preference to read() (thanks MdlR)
+	- object is now a scalar again, containing struct cdbobj
+	- support repeated keys (thanks MdlR)
+	- split create into new, insert, finish
+	- optimize FETCH and NEXTKEY
+	- support building as a static extension
+	- PERLIO_NOT_STDIO so it works with useperlio defined (thanks AK, NMS)
+	- add multi_get method (thanks MdlR)
+	- fix some core dumps (thanks MdlR)
+	- make cdb object read only (thanks MdlR)
+	- alpha release
+
+0.5 1997-02-12
+	- fix order of @ISA, so imports work
+	- alpha release
+
+0.4 1997-02-06
+	- iteration (FIRSTKEY, NEXTKEY) added
+	- "pre-alpha" release
+
+0.3 1997-01-28
+	- no longer dependent on cdbmake
+	- CDB_File::cdbm removed
+	- temporary file name no longer optional
+	- "pre-alpha" release
+
+0.2 1997-01-14
+	- first "pre-alpha" release
+
+0.1 1997-01-08
+	- original version; created by h2xs 1.16

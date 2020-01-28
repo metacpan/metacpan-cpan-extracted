@@ -12,10 +12,10 @@
          "rdfs:label" : "deliveryMethod",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:TrackAction",
+            "schema:ReceiveAction",
             "schema:SendAction",
             "schema:OrderAction",
-            "schema:ReceiveAction"
+            "schema:TrackAction"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       }

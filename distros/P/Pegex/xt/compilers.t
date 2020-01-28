@@ -10,7 +10,7 @@ use TestDevelPegex;
 use Pegex::Bootstrap;
 use Pegex::Compiler;
 
-use YAML::XS;
+use YAML::PP;
 
 for my $grammar (test_grammar_paths) {
     my $expected = eval {
@@ -22,3 +22,5 @@ for my $grammar (test_grammar_paths) {
     is $got, $expected,
         "Bootstrap compile matches normal compile for $grammar";
 }
+
+pass "Pass one test";

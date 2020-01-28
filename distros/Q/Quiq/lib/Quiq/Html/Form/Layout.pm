@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.170';
+our $VERSION = '1.171';
 
 use Quiq::Html::Widget::Hidden;
 use Quiq::Template;
@@ -224,7 +224,11 @@ sub html {
     my @keyVal;
     for my $w (@$widgetA) {
         if ($w->hidden) {
-            $hidden .= $w->html($h);
+            # $hidden .= $w->html($h);
+            $hidden .= Quiq::Html::Widget::Hidden->html($h,
+                name => $w->name,
+                value => $w->value,
+            );
             next;
         }
         push @keyVal,sprintf('__%s__',uc $w->name),$w->html($h);
@@ -249,7 +253,7 @@ sub html {
 
 =head1 VERSION
 
-1.170
+1.171
 
 =head1 AUTHOR
 

@@ -128,6 +128,9 @@ sub is_licensed_like_scancode ($$;$$)
 
 	my ( $detected, $detected_copyright ) = $app->parse($file);
 
+	# TODO: Report SPDX bug: Missing versioning
+	$detected =~ s/Aladdin\K-8//g;
+
 	# TODO: support SPDX identifiers (not Debian)
 	$detected =~ s/-clause\b/-Clause/g;
 

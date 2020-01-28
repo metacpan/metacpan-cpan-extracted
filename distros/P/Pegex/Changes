@@ -1,3 +1,11 @@
+0.74 Wed Jan 22 14:57:47 PST 2020
+ - Fix YAML::PP and float interaction for older perls
+
+0.73 Wed Jan 22 12:03:38 PST 2020
+ - Make ./ rule / same as .(/ rule /)
+ - Use YAML::PP and JSON::PP
+ - No XS dependencies
+
 0.72 Sun Jan  5 14:03:42 PST 2020
  - Apply https://github.com/ingydotnet/pegex-pm/pull/75 (for real) Fix
    P::P::Grammar title - not "::Name" @mohawk2++
