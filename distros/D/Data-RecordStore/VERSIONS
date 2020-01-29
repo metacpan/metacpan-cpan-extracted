@@ -1,4 +1,7 @@
-6.04 - remove  'bin/record_store_convert~' from the build.
+6.05 - clean up, removing old files that were confusing tests.
+6.04 - allow call to lock for already locked things
+       remove typo from perl version
+6.03 - remove  'bin/record_store_convert~' from the build.
 5.04 - cleanup and increase code coverage.
 5.03 - changed the open_store interface to either take a single
        directory or take options, which now include :

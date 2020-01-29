@@ -12,17 +12,13 @@
 <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-requirement [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
 		doap-deps:on "Acme::MetaSyntactic 1.000"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Acme::MetaSyntactic::haddock 0"^^doap-deps:CpanId;
-	], [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "PPI 1.215"^^doap-deps:CpanId ], [
-		doap-deps:on "Perl::Critic::Utils 1.118"^^doap-deps:CpanId;
-	], [
-		doap-deps:on "Types::Standard 0.001"^^doap-deps:CpanId;
-	], [
-		doap-deps:on "namespace::sweep 0.006"^^doap-deps:CpanId;
-	], [ doap-deps:on "Type::Utils 0.001"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Moo 2.000000"^^doap-deps:CpanId ], [ doap-deps:on "PPI 1.215"^^doap-deps:CpanId ], [ doap-deps:on "PPIx::Utils"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 1.004"^^doap-deps:CpanId;
+	], [ doap-deps:on "Type::Utils 1.004"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic>;
 	doap:created         "2013-05-15"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -32,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Acme-PPIx-MetaSyntactic";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-003>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-004>;
 	doap:repository      [
 		a doap:HgRepository;
 		doap:browse <https://bitbucket.org/tobyink/p5-acme-ppix-metasyntactic>;
@@ -75,6 +71,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-PPIx-MetaSyntactic-0.003.tar.gz>;
 	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Acme-PPIx-MetaSyntactic-0.004"^^xsd:string;
+	dc:issued            "2020-01-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for document trigger getting called too early for theme attribute to have been initialized.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use PPIx::Utils instead of Perl::Critic::Utils.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "General modernization, minor cleanups, etc.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-PPIx-MetaSyntactic-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

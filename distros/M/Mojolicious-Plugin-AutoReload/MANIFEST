@@ -9,6 +9,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+eg/myapp.pl
 lib/Mojolicious/Plugin/AutoReload.pm
 t/00-compile.t
 t/00-report-prereqs.dd

@@ -33,6 +33,19 @@ subtest new => sub {
     ok $ajv, 'object successfully created for valid ajv_src';
 };
 
+subtest compile => sub {
+    my $ajv = Data::JSONSchema::Ajv->new();
+    
+    open my $fh, ">&STDERR";
+    close STDERR; # this test produces some garbage to stderr;
+    my $validator = eval { $ajv->compile("my first schema") };
+    open STDERR, ">&" . fileno($fh);
+    ok !$validator, "can't compile invalid schema";
+    
+    $validator = eval { $ajv->compile({ type => 'integer', minimum => 1, maximum => 1000 }) };
+    ok $validator, 'valid schema compiled successfully';
+};
+
 subtest make_validator => sub {
     my $ajv = Data::JSONSchema::Ajv->new();
     
@@ -51,6 +64,42 @@ subtest make_validator => sub {
     isa_ok $validator, 'Data::JSONSchema::Ajv::Validator';
 };
 
+subtest get_validator => sub {
+    my $ajv = Data::JSONSchema::Ajv->new();
+    
+    $ajv->compile({
+        '$id' => "Schema_one", 
+        token => {
+        type => "string",
+        minLength => 5
+        },
+        login => {
+            params => [
+                {type => "boolean"},
+                {type => "string"}
+            ],
+            returns => { type => "number" }
+        }
+    });
+    
+    $ajv->make_validator({
+        '$id' => "Schema_two", 
+        type => "string",
+        minLength => 5
+    });
+    
+    my $validator = eval { $ajv->get_validator('Schema_one#/login/returns') };
+    ok $validator, 'got validator from schema compiled with compile()';
+    isa_ok $validator, 'Data::JSONSchema::Ajv::Validator';
+    
+    $validator = eval { $ajv->get_validator('Schema_two') };
+    ok $validator, 'got validator from schema compiled with make_validator()';
+    isa_ok $validator, 'Data::JSONSchema::Ajv::Validator';
+    
+    $validator = eval { $ajv->get_validator('Schema_three') };
+    ok !$validator, "can't get validator from unknown schema";
+};
+
 subtest validate => sub {
     my $ajv = Data::JSONSchema::Ajv->new();
     my $validator = $ajv->make_validator({ type => 'integer', minimum => 1, maximum => 1000 });
@@ -65,11 +114,12 @@ subtest validate => sub {
     ok !$errors, 'can validate scalars passed by reference';
     
     $ajv = Data::JSONSchema::Ajv->new({ coerceTypes => $JSON::PP::true });
-    $validator = $ajv->make_validator({ type => 'object', properties => {
+    $ajv->compile({ '$id' => 'rr', type => 'object', properties => {
         rectype  => {type => 'string'},
         prio     => {type => 'integer'},
         can_edit => {type => 'boolean'} } 
     });
+    $validator = $ajv->get_validator('rr');
     
     my $data = { rectype => 'A', prio => '1', can_edit => 'true' };
     my $copy = { %$data };

@@ -1,3 +1,5 @@
+2.12 - make build depend on version 6.04 of Data::RecordStore
+
 2.11 - fix test.
 
 2.05 - moved locking to Data::RecordStore.

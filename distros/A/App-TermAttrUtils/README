@@ -3,8 +3,8 @@ NAME
     attributes
 
 VERSION
-    This document describes version 0.004 of App::TermAttrUtils (from Perl
-    distribution App-TermAttrUtils), released on 2019-10-03.
+    This document describes version 0.005 of App::TermAttrUtils (from Perl
+    distribution App-TermAttrUtils), released on 2019-11-26.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related
@@ -14,6 +14,10 @@ DESCRIPTION
     *   term-attrs
 
     *   term-detect-software
+
+    *   term-encoding
+
+    *   term-size
 
     *   term-terminfo
 

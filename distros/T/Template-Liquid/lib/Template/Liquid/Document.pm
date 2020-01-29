@@ -1,8 +1,9 @@
 package Template::Liquid::Document;
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
 require Template::Liquid::Variable;
 require Template::Liquid::Utility;
 use strict;
+use warnings;
 #
 sub new {
     my ($class, $args) = @_;

@@ -78,7 +78,9 @@ Amazon::PAApi5::Payload - Handle request body
 
 Amazon::PAApi5::Payload handles request body
 
-<https://webservices.amazon.com/paapi5/documentation/api-reference.html>
+See B<example/> directory of this module.
+
+L<https://webservices.amazon.com/paapi5/documentation/api-reference.html>
 
 
 =head1 METHODS

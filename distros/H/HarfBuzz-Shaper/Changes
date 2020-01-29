@@ -1,5 +1,9 @@
 Revision history for HarfBuzz::Shaper.
 
+0.017
+
+    - Add INSTALL document.
+
 0.016 Mon Jan 27 08:47:55
 
     - Raise requirement for the harfbuzz library to version 1.7.7.

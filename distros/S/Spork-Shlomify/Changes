@@ -1,5 +1,10 @@
 Revision history for Spork-Shlomify
 
+0.0402  2020-01-29
+    - Place the POD of lib/Spork/Shlomify/Slides/FromSpork.pm after '__END__'
+    instead of under '__DATA__'.
+        - It was the wrong designator for it.
+
 0.0401  2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

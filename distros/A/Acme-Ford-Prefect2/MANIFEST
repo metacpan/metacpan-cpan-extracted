@@ -11,7 +11,9 @@ README
 dist.ini
 inc/mymm.pl
 lib/Acme/Ford/Prefect2.pm
-maint/travis-install-mods
+maint/cip-before-install
+maint/cip-before-install-inside
+maint/release
 t/00_diag.t
 t/acme_ford_prefect2.t
 xt/author/eol.t

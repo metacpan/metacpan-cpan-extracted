@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -ex
+
+cip exec mkdir -p /home/cip/tmp
+cip sudo apt-get update
+cip sudo apt-get -y install libffi-dev
+cip sudo bash -c 'curl https://alienfile.org/travis/install-system-dontpanic.sh | bash -x'
+cip sudo chown -R cip.cip /home/cip/dzil
+cip exec ./maint/cip-before-install-inside
+cip exec bash -c 'env ALIEN_INSTALL_TYPE=system cpanm -n FFI::Platypus'

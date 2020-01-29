@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2020-01-28
+
+ [ Bug Fixes ]
+ - Fix bug in aliases where the signature checker could end up as a hashref
+   instead of a coderef.
+
 0.002	2020-01-28
 
  [ Packaging ]

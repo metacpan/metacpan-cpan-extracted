@@ -1,5 +1,11 @@
 Revision history for Music-Cadence
 
+0.1401 2020-01-29 11:19:49
+    - Correctly handle and test supported formats for the picardy cadence.
+
+0.1400 2020-01-29 08:53:03
+    - Add the "Picardy third" cadence.
+
 0.1309 2019-10-02 10:04:07
     - Just check that we die, instead of the M::TR error message. thrig++
 

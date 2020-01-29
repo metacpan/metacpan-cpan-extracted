@@ -37,7 +37,7 @@
    "provides" : {
       "Qiime2::Artifact" : {
          "file" : "lib/Qiime2/Artifact.pm",
-         "version" : "v0.10.5"
+         "version" : "v0.10.6"
       }
    },
    "release_status" : "stable",
@@ -46,7 +46,7 @@
          "url" : "https://github.com/telatin/qiime2tools"
       }
    },
-   "version" : "0.10.5",
+   "version" : "0.10.6",
    "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }

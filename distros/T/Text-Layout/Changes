@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.015	2020-01-29
+
+	Add font attributes in registration.
+
 0.014.1	2020-01-26
 
 0.014	2020-01-23

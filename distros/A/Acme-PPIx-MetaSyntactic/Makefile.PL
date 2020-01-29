@@ -7,7 +7,7 @@ my $meta = {
   "abstract"           => "rename functions and variables in a PPI::Document using Acme::MetaSyntactic",
   "author"             => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config"     => 0,
-  "generated_by"       => "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"           => [],
   "license"            => ["perl_5"],
   "meta-spec"          => {
@@ -22,17 +22,17 @@ my $meta = {
                                            requires => {
                                              "Acme::MetaSyntactic" => "1.000",
                                              "Acme::MetaSyntactic::haddock" => 0,
-                                             "Moo" => "1.002000",
-                                             "namespace::sweep" => 0.006,
-                                             "Perl::Critic::Utils" => 1.118,
+                                             "Moo" => "2.000000",
+                                             "perl" => 5.008,
                                              "PPI" => 1.215,
-                                             "Type::Utils" => 0.001,
-                                             "Types::Standard" => 0.001,
+                                             "PPIx::Utils" => 0,
+                                             "Type::Utils" => 1.004,
+                                             "Types::Standard" => 1.004,
                                            },
                                          },
                           },
   "provides"           => {
-                            "Acme::PPIx::MetaSyntactic" => { file => "lib/Acme/PPIx/MetaSyntactic.pm", version => 0.003 },
+                            "Acme::PPIx::MetaSyntactic" => { file => "lib/Acme/PPIx/MetaSyntactic.pm", version => 0.004 },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -45,9 +45,9 @@ my $meta = {
                                               type => "hg",
                                               web  => "https://bitbucket.org/tobyink/p5-acme-ppix-metasyntactic",
                                             },
-                            X_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project",
+                            x_identifier => "http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project",
                           },
-  "version"            => 0.003,
+  "version"            => 0.004,
   "x_provides_scripts" => { "perl-metasyntactic" => { file => "bin/perl-metasyntactic" } },
 };
 

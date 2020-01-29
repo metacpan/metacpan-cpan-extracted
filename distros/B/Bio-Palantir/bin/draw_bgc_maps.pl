@@ -35,11 +35,14 @@ for my $cluster ($root->all_clusters) {
 
     my %selection_for = (
         antismash => [$cluster],
-        palantir  => [ClusterPlus->new( _cluster => $cluster )],
+        palantir  => [ClusterPlus->new( _cluster => $cluster,
+                        module_delineation => $ARGV_module_delineation)],
         all       => [
                        $cluster, 
-                       ClusterPlus->new( _cluster => $cluster),
-                       ClusterPlus->new( _cluster => $cluster, from_seq => 1),
+                       ClusterPlus->new( _cluster => $cluster,
+                        module_delineation => $ARGV_module_delineation),
+                       ClusterPlus->new( _cluster => $cluster, from_seq => 1,
+                        module_delineation => $ARGV_module_delineation),
                      ],
     );
 
@@ -396,7 +399,7 @@ draw_bgc_maps.pl - This script draws NRPS/PKS BGC clusters maps in PNG
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 NAME
 
@@ -447,10 +450,11 @@ Label to use for the mapping of domains: symbol, function, subtype
 =item --module-delineation [=] <str>
 
 Method for delineating the modules. Modules can either be cut on condensation
-(C and KS) or selection domains (A and AT) [default: selection].
+(C and KS) or substrate-selection domains (A and AT) 
+[default: 'substrate-selection'].
 
-=for Euclid: str.type: /condensation|selection/
-    str.default: 'selection'
+=for Euclid: str.type: /condensation|substrate\-selection/
+    str.default: 'substrate-selection'
 
 =item --verbose
 

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@wdlabs.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -21,13 +21,13 @@
       },
       "configure" : {
          "requires" : {
-            "Acme::Alien::DontPanic" : "0.044",
+            "Acme::Alien::DontPanic" : "1.96",
             "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
-            "Acme::Alien::DontPanic" : "0.042",
+            "Acme::Alien::DontPanic" : "1.96",
             "FFI::CheckLib" : "0.15",
             "FFI::Platypus" : "0.47",
             "perl" : "5.008001"
@@ -42,7 +42,7 @@
    "provides" : {
       "Acme::Ford::Prefect::FFI" : {
          "file" : "lib/Acme/Ford/Prefect/FFI.pm",
-         "version" : "0.30"
+         "version" : "1.96"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.30",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.96",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

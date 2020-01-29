@@ -1,7 +1,7 @@
 package Dancer::Test;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Test helpers to test a Dancer application
-$Dancer::Test::VERSION = '1.3512';
+$Dancer::Test::VERSION = '1.3513';
 # test helpers for Dancer apps
 
 use strict;
@@ -468,7 +468,7 @@ Dancer::Test - Test helpers to test a Dancer application
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 SYNOPSIS
 

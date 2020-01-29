@@ -23,5 +23,5 @@ requires:
   Types::Common::Numeric: '0'
   Types::Interface: '0'
   Types::Standard: '0'
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,8 +3,8 @@ NAME
     module(s)
 
 VERSION
-    This document describes version 0.001 of App::ProveDeps (from Perl
-    distribution App-ProveDeps), released on 2017-08-14.
+    This document describes version 0.004 of App::ProveDeps (from Perl
+    distribution App-ProveDeps), released on 2020-01-29.
 
 SYNOPSIS
     See the included script prove-deps.
@@ -13,7 +13,7 @@ FUNCTIONS
   prove_deps
     Usage:
 
-     prove_deps(%args) -> [status, msg, result, meta]
+     prove_deps(%args) -> [status, msg, payload, meta]
 
     Prove all distributions depending on specified module(s).
 
@@ -30,6 +30,25 @@ FUNCTIONS
     Log::ger then search the distributions in the distribution directories,
     "cd" to each and run "prove" in it.
 
+    How distribution directory is searched: first, the exact name
+    ("My-Perl-Dist") is searched. If not found, then the name with different
+    case (e.g. "my-perl-dist") is searched. If not found, a suffix match
+    (e.g. "p5-My-Perl-Dist" or "cpan-My-Perl-Dist") is searched. If not
+    found, a prefix match (e.g. "My-Perl-Dist-perl") is searched.
+
+    If not found, when "--download" option is set to true, "prove-deps" will
+    try to download the distribution tarball from local CPAN mirror and
+    extract it to a temporary directory.
+
+    When a dependent distribution cannot be found or downloaded/extracted,
+    this counts as a 412 error (Precondition Failed).
+
+    When a distribution's test fails, this counts as a 500 error (Error).
+    Otherwise, the status is 200 (OK).
+
+    "prove-deps" will return status 200 (OK) with the status of each dist.
+    It will exit 0 if all distros are successful, otherwise it will exit 1.
+
     This function is not exported.
 
     This function supports dry-run operation.
@@ -40,21 +59,38 @@ FUNCTIONS
 
         Where to find the distributions.
 
+    *   download => *bool* (default: 1)
+
+        Whether to try download/extract distribution from local CPAN mirror
+        (when not found in dist_dirs).
+
     *   exclude_dist_pattern => *re*
+
+        Distribution name pattern to skip.
 
     *   exclude_dists => *array[perl::distname]*
 
+        Distributions to skip.
+
     *   include_dist_pattern => *re*
+
+        If specified, only include distributions with this pattern.
 
     *   include_dists => *array[perl::distname]*
 
+        If specified, only include these distributions.
+
     *   modules* => *array[perl::modname]*
+
+        Module names to find dependents of.
 
     *   phases => *array[str]*
 
         Only select dists that depend in these phases.
 
     *   prove_opts => *array[str]* (default: ["-l"])
+
+        Options to pass to the prove command.
 
     *   rels => *array[str]*
 
@@ -71,14 +107,11 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
     Return value: (any)
-
-TODO
-    Download distributions.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -104,7 +137,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

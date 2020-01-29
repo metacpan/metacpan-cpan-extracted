@@ -1,7 +1,7 @@
 package Complete::Bash::History;
 
-our $DATE = '2016-02-03'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2020-01-29'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,9 +27,9 @@ $SPEC{parse_options} = {
         'more or less like Getopt::Long',
     description => <<'_',
 
-Parse command-line into words using `Complete::Bash`'s `parse_cmdline()` then
+Parse command-line into words using <pm:Complete::Bash>'s `parse_cmdline()` then
 separate options and arguments. Since this routine does not accept
-`Getopt::Long` (this routine is meant to be a generic option parsing of
+<pm:Getopt::Long> (this routine is meant to be a generic option parsing of
 command-lines), it uses a few simple rules to server the common cases:
 
 * After `--`, the rest of the words are arguments (just like Getopt::Long).
@@ -91,7 +91,7 @@ sub parse_options {
     if ($args{words}) {
         ($words, $cword) = ($args{words}, $args{cword});
     } else {
-        ($words, $cword) = @{parse_cmdline($args{cmdline}, $args{point})};
+        ($words, $cword) = @{parse_cmdline($args{cmdline}, $args{point}, {truncate_current_word=>1})};
     }
 
     ($words, $cword) = @{join_wordbreak_words($words, $cword)};
@@ -365,7 +365,7 @@ Complete::Bash::History - Parse command-line for options and arguments, more or 
 
 =head1 VERSION
 
-This document describes version 0.05 of Complete::Bash::History (from Perl distribution Complete-Bash-History), released on 2016-02-03.
+This document describes version 0.060 of Complete::Bash::History (from Perl distribution Complete-Bash-History), released on 2020-01-29.
 
 =head1 SYNOPSIS
 
@@ -374,7 +374,11 @@ This document describes version 0.05 of Complete::Bash::History (from Perl distr
 =head1 FUNCTIONS
 
 
-=head2 complete_cmdline_from_hist(%args) -> any
+=head2 complete_cmdline_from_hist
+
+Usage:
+
+ complete_cmdline_from_hist(%args) -> any
 
 Complete command line from recent entries in bash history.
 
@@ -440,18 +444,24 @@ If file does not exist or unreadable, will return empty completion answer.
 
 Command line, defaults to COMP_POINT.
 
+
 =back
 
 Return value:  (any)
 
 
-=head2 parse_options(%args) -> [status, msg, result, meta]
+
+=head2 parse_options
+
+Usage:
+
+ parse_options(%args) -> [status, msg, payload, meta]
 
 Parse command-line for options and arguments, more or less like Getopt::Long.
 
-Parse command-line into words using C<Complete::Bash>'s C<parse_cmdline()> then
+Parse command-line into words using L<Complete::Bash>'s C<parse_cmdline()> then
 separate options and arguments. Since this routine does not accept
-C<Getopt::Long> (this routine is meant to be a generic option parsing of
+L<Getopt::Long> (this routine is meant to be a generic option parsing of
 command-lines), it uses a few simple rules to server the common cases:
 
 =over
@@ -473,7 +483,7 @@ argument. Otherwise, the next word is assumed to be this option's value.
 
 =back
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -492,7 +502,7 @@ second element) here to avoid calling C<parse_cmdline()> twice.
 
 =item * B<point> => I<int>
 
-Point/position to complete in command-line, defaults to COMP_POINT.
+PointE<sol>position to complete in command-line, defaults to COMP_POINT.
 
 =item * B<words> => I<array[str]>
 
@@ -501,6 +511,7 @@ Alternative to passing `cmdline` and `point`.
 If you already did a C<parse_cmdline()>, you can pass the words result (the first
 element) here to avoid calling C<parse_cmdline()> twice.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -508,7 +519,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -536,7 +547,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -42,6 +42,8 @@ requires:
   Time::HiRes: '0'
   XML::LibXML: '1.70'
   perl: '5.01'
+  threads: '0'
+  threads::shared: '0'
 resources: {}
-version: v0.12.013
+version: v0.12.014
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

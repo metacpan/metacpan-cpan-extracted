@@ -148,6 +148,9 @@ if( $Config{ivsize} == 8 && $Config{nvsize} == 8 ) {
     push @correct, ($p_53 * 1024, $p_53 * 2048, ($p_53 - 200) * 2048);
 }
 
+#my @x = uniqnum(@in);
+#warn "\n\n @in\n\n @x\n\n @correct\n\n";
+
 is_deeply( [ uniqnum @in],
            [ @correct],
            'uniqnum correctly compares UV/IVs that don\'t overflow NVs' );

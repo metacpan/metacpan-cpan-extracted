@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication 2.20191221;
 use base 'Mail::Milter::Authentication::Handler';
-our $VERSION = '2.20200102'; # VERSION
+our $VERSION = '2.20200129'; # VERSION
 # ABSTRACT: BIMI handler for authentication milter
 
 use English qw{ -no_match_vars };

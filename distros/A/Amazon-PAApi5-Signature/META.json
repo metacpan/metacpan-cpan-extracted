@@ -51,7 +51,7 @@
       },
       "Amazon::PAApi5::Signature" : {
          "file" : "lib/Amazon/PAApi5/Signature.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "http://github.com/bayashi/Amazon-PAApi5-Signature"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

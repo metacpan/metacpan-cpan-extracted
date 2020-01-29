@@ -2,9 +2,7 @@
 
 OpenTracing::Role - common attributes and methods for OpenTracing
 
-=head1 VERSION
 
-0.04
 
 =head1 DESCRIPTION
 
@@ -18,6 +16,8 @@ need the deeper voodoo magic inside Opentracing.
 =head1 AUTHOR
 
 Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
 
 =head1 COPYRIGHT AND LICENSE
 

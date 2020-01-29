@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Alien::catch: v1.1.0
   Test::Catch: v1.0.11
-  XS::Install: v1.2.12
+  XS::Install: v1.2.13
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -24,7 +24,7 @@ no_index:
     - t
     - inc
 requires:
-  XS::Install: v1.2.12
+  XS::Install: v1.2.13
   perl: '5.012000'
-version: v1.3.7
+version: v1.3.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

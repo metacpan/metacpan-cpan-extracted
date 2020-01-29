@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.4.0
+    version: v0.5.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -36,6 +36,8 @@ provides:
     file: lib/NewsExtractor/JSONLDExtractor.pm
   NewsExtractor::SiteSpecificExtractor:
     file: lib/NewsExtractor/SiteSpecificExtractor.pm
+  NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_allnews_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw:
@@ -66,7 +68,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.4.0
+version: v0.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

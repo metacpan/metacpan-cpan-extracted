@@ -12,6 +12,8 @@ free to (ab)use it for other purposes.
 
 INSTALLATION
 
+Please read document INSTALL first.
+
 To install this module type the following:
 
    perl Makefile.PL
@@ -30,7 +32,7 @@ files are required, in particular include file
 -lharfbuzz.
 
 Unfortunately, there is currently no decent method to require external
-libraries...
+libraries... See document INSTALL for more details.
 
 SUPPORT AND DOCUMENTATION
 

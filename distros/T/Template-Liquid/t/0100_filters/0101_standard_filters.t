@@ -55,6 +55,10 @@ is( Template::Liquid->parse(q[{{'This is a QUICK test.'|upcase }}])->render(),
     q[{{'This is a QUICK test.'|upcase }} => THIS IS A QUICK TEST.]
 );
 
+# string first
+is(Template::Liquid->parse(q[{{ str | first}}])->render(str => 'string'),
+    's', '{{ str | first }} => s');
+
 # string last
 is(Template::Liquid->parse(q[{{ str | last}}])->render(str => 'string'),
     'g', '{{ str | last }} => g');

@@ -51,7 +51,7 @@
    "provides" : {
       "Mojolicious::Plugin::AutoReload" : {
          "file" : "lib/Mojolicious/Plugin/AutoReload.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/preaction/Mojolicious-Plugin-AutoReload"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Robert DeRose <RobertDeRose@users.noreply.github.com>",

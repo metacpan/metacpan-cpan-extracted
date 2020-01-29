@@ -20,7 +20,7 @@ my $builder = Module::Build->new(
         't/upgrade.t',
     ],
     requires => {
-        'perl' => 'v5.9.4',
+        'perl' => '5.9.4',
         'File::Copy::Recursive' => '0.44',
         'YAML' =>  0,    
     },

@@ -1,59 +1,55 @@
+use 5.008;
+use strict;
+use warnings;
+
 package Acme::PPIx::MetaSyntactic;
 
-use 5.010001;
-use Moo;
-use namespace::sweep;
-no warnings qw( void once uninitialized numeric );
+use Moo 2;
+no warnings qw(uninitialized once numeric);
 
 BEGIN {
 	$Acme::PPIx::MetaSyntactic::AUTHORITY = 'cpan:TOBYINK';
-	$Acme::PPIx::MetaSyntactic::VERSION   = '0.003';
+	$Acme::PPIx::MetaSyntactic::VERSION   = '0.004';
 }
 
 use Acme::MetaSyntactic;
-use Perl::Critic::Utils qw( is_perl_builtin is_function_call );
+use PPIx::Utils qw( is_perl_builtin is_function_call );
 use PPI;
 
 use Types::Standard -types;
-use Type::Utils;
 
-my $Document      = class_type Document      => { class => "PPI::Document" };
-my $MetaSyntactic = class_type MetaSyntactic => { class => "Acme::MetaSyntactic" };
-my $TruthTable    = declare TruthTable       => as Map[Str, Bool];
+my $Document      = (InstanceOf["PPI::Document"])->plus_coercions(
+	ScalarRef[Str], q { "PPI::Document"->new($_) },
+	Str,            q { "PPI::Document"->new($_) },
+	FileHandle,     q { do { local $/; my $c = <$_>; "PPI::Document"->new(\$c) } },
+	ArrayRef[Str],  q { do { my $c = join "\n", map { chomp(my $l = $_); $l } @$_; "PPI::Document"->new(\$c) } },
+);
 
-coerce $Document,
-	from ScalarRef[Str], q { "PPI::Document"->new($_) },
-	from Str,            q { "PPI::Document"->new($_) },
-	from FileHandle,     q { do { local $/; my $c = <$_>; "PPI::Document"->new(\$c) } },
-	from ArrayRef[Str],  q { do { my $c = join "\n", map { chomp(my $l = $_); $l } @$_; "PPI::Document"->new(\$c) } },
-;
+my $MetaSyntactic = (InstanceOf["Acme::MetaSyntactic"])->plus_coercions(
+	Str,            q { "Acme::MetaSyntactic"->new($_) },
+);
 
-coerce $MetaSyntactic,
-	from Str,            q { "Acme::MetaSyntactic"->new($_) },
-;
-
-coerce $TruthTable,
-	from ArrayRef[Str],  q { +{ map +($_, 1), @$_ } },
-;
+my $TruthTable    = (Map[Str, Bool])->plus_coercions(
+	ArrayRef[Str],  q { +{ map +($_, 1), @$_ } },
+);
 
 has document => (
 	is       => "ro",
 	isa      => $Document,
-	coerce   => $Document->coercion,
+	coerce   => 1,
 	required => 1,
-	trigger  => 1,
 );
 
 has theme => (
 	is       => "lazy",
 	isa      => $MetaSyntactic,
-	coerce   => $MetaSyntactic->coercion,
+	coerce   => 1,
 );
 
 has local_subs => (
 	is       => "lazy",
 	isa      => $TruthTable,
-	coerce   => $TruthTable->coercion,
+	coerce   => 1,
 );
 
 has names => (
@@ -64,7 +60,7 @@ has names => (
 has already_used => (
 	is       => "lazy",
 	isa      => $TruthTable,
-	coerce   => $TruthTable->coercion,
+	coerce   => 1,
 	init_arg => undef,
 );
 
@@ -82,7 +78,7 @@ sub _get_name
 sub _build_theme
 {
 	my $self = shift;
-	return $MetaSyntactic->new("haddock");
+	"haddock";
 }
 
 sub _build_local_subs
@@ -113,7 +109,7 @@ sub _build_already_used
 	};
 }
 
-sub _trigger_document
+sub BUILD
 {
 	my $self = shift;
 	$self->_relabel_subs;

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish"
   ],
   "dist_name" => "Spork-Shlomify",
-  "dist_version" => "0.0401",
+  "dist_version" => "0.0402",
   "license" => "mit",
   "module_name" => "Spork::Shlomify",
   "recursive_test_files" => 1,

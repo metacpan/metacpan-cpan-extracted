@@ -27,6 +27,7 @@ sub _hb_init {
 
 sub _hb_font_check {
     my ( $f ) = @_;
+    return if $f->{_hb_checked}++;
 #    use DDumper; DDumper($f);
     if ( $f->get_shaping ) {
 	my $fn = $f->to_string;
@@ -140,7 +141,7 @@ sub bbox {
 	}
 
 	my ( $d0, $a0 );
-	if ( 1 ) {
+	if ( !$f->get_interline ) {
 	    # Use descender/ascender.
 	    # Quite accurate, although there are some fonts that do
 	    # not include accents on capitals in the ascender.

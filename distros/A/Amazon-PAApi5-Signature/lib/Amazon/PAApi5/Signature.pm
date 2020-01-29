@@ -26,7 +26,7 @@ use Class::Accessor::Lite (
     /],
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my $class      = shift;
@@ -221,6 +221,8 @@ Amazon::PAApi5::Signature - Amazon Product Advertising API(PA-API) 5.0 Helper
     my $res = $ua->post($sig->req_url, Content => $sig->payload);
 
     warn Dumper($res->status_line, $res->content);
+
+See B<example/> directory of this module.
 
 
 =head1 DESCRIPTION

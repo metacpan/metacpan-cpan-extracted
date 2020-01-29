@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Fillable;
 # ABSTRACT: Fillable Moose role for the construction of DomainPlus object arrays and Exploratory methods
-$Bio::Palantir::Roles::Fillable::VERSION = '0.200150';
+$Bio::Palantir::Roles::Fillable::VERSION = '0.200290';
 use Moose::Role;
 
 use autodie;
@@ -68,23 +68,23 @@ my %ADJUSTMENT_FOR = (      # length column useless: this information can be obt
     'NRPS-COM_Cterm'     => { start => 0,  end => 0  , length => 21  },
     'NRPS-COM_Nterm'     => { start => 0,  end => 0  , length => 33  },
     oMT                  => { start => 0,  end => 0  , length => 280 },
-    PCP                  => { start => 0,  end => 0  , length => 70  },
-    'PP-binding'         => { start => 0,  end => 0  , length => 70  },
+    PCP                  => { start => 15, end => 0  , length => 70  },
+    'PP-binding'         => { start => 15, end => 0  , length => 70  },
     PCP_fungi            => { start => 0,  end => 0  , length => 86  },
     PS                   => { start => 0,  end => 0  , length => 214 },
     TD                   => { start => 0,  end => 0  , length => 242 },
     Thioesterase         => { start => 0,  end => 0  , length => 229 },
     # PKS
-    PKS_KS               => { start => 8,  end => 0, length => 426 },
-    PKS_KR               => { start => 0,  end => 0, length => 185 },
-    PKS_ER               => { start => 0,  end => 0, length => 313 },
-    PKS_DH               => { start => 0,  end => 0, length => 166 },
-    PKS_DH2              => { start => 0,  end => 0, length => 233 },
-    PKS_DHt              => { start => 0,  end => 0, length => 236 },
+    PKS_KS               => { start => 8,  end => 0, length => 426   },
+    PKS_KR               => { start => 0,  end => 0, length => 185   },
+    PKS_ER               => { start => 0,  end => 0, length => 313   },
+    PKS_DH               => { start => 0,  end => 0, length => 166   },
+    PKS_DH2              => { start => 0,  end => 0, length => 233   },
+    PKS_DHt              => { start => 0,  end => 0, length => 236   },
     PKS_AT               => { start => 114, end => 22, length => 298 },
-    Polyketide_cyc       => { start => 0,  end => 0, length => 130 },
-    Polyketide_cyc2      => { start => 0,  end => 0, length => 139 },
-    PKS_Docking_Nterm    => { start => 0,  end => 0, length => 28 },
+    Polyketide_cyc       => { start => 0,  end => 0, length => 130   },
+    Polyketide_cyc2      => { start => 0,  end => 0, length => 139   },
+    PKS_Docking_Nterm    => { start => 0,  end => 0, length => 28    },
     PKS_Docking_Cterm    => { start => 0,  end => 0, length => 73 },
     CAL_domain           => { start => 0,  end => 0, length => 465 },
     'Trans-AT_docking'   => { start => 0,  end => 0, length => 155 },
@@ -546,7 +546,7 @@ Bio::Palantir::Roles::Fillable - Fillable Moose role for the construction of Dom
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 SYNOPSIS
 

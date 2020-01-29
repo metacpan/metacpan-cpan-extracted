@@ -108,7 +108,7 @@ The span itself, for chaining purposes.
 
 
 
-=head2 finish( undef | $epoch )
+=head2 finish( <none> | undef | $epoch )
 
 Sets the end timestamp and finalizes Span state.
 
@@ -136,6 +136,11 @@ none
 
 An explicit finish timestamp for the Span; if omitted, the current walltime is
 used implicitly.
+
+Note: Because the way these roles are designed, if the method has been called
+with no arguments at all, the next method, the one this is being wrapped around,
+will get called with 1 single argument, C<undef>. For most cases, this is okay,
+unless an implementationwould count the number of arguments.
 
 =back
 

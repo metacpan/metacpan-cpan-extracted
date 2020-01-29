@@ -1,5 +1,5 @@
 package Spork::Shlomify::Formatter;
-$Spork::Shlomify::Formatter::VERSION = '0.0401';
+$Spork::Shlomify::Formatter::VERSION = '0.0402';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Spork::Shlomif::Formatter - the formatting class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 AUTHOR
 

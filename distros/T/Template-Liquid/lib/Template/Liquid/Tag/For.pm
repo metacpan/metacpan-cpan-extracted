@@ -1,12 +1,12 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
+use strict;
+use warnings;
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
 use base 'Template::Liquid::Tag::If';
 my $Help_String = 'TODO';
 sub import { Template::Liquid::register_tag('for') }
-use strict;
-use warnings;
 
 sub new {
     my ($class, $args) = @_;

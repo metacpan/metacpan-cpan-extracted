@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -34,24 +34,23 @@
          "requires" : {
             "Acme::MetaSyntactic" : "1.000",
             "Acme::MetaSyntactic::haddock" : "0",
-            "Moo" : "1.002000",
+            "Moo" : "2.000000",
             "PPI" : "1.215",
-            "Perl::Critic::Utils" : "1.118",
-            "Type::Utils" : "0.001",
-            "Types::Standard" : "0.001",
-            "namespace::sweep" : "0.006"
+            "PPIx::Utils" : "0",
+            "Type::Utils" : "1.004",
+            "Types::Standard" : "1.004",
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "Acme::PPIx::MetaSyntactic" : {
          "file" : "lib/Acme/PPIx/MetaSyntactic.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project",
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Acme-PPIx-MetaSyntactic"
       },
@@ -62,12 +61,14 @@
       "repository" : {
          "type" : "hg",
          "web" : "https://bitbucket.org/tobyink/p5-acme-ppix-metasyntactic"
-      }
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Acme-PPIx-MetaSyntactic/project"
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_provides_scripts" : {
       "perl-metasyntactic" : {
          "file" : "bin/perl-metasyntactic"
       }
-   }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

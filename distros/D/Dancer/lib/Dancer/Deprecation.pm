@@ -1,7 +1,7 @@
 package Dancer::Deprecation;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: handle deprecation messages
-$Dancer::Deprecation::VERSION = '1.3512';
+$Dancer::Deprecation::VERSION = '1.3513';
 use strict;
 use warnings;
 use Carp;
@@ -46,7 +46,7 @@ Dancer::Deprecation - handle deprecation messages
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 SYNOPSIS
 

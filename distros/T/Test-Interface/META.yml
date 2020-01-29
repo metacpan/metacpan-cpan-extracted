@@ -3,10 +3,14 @@ abstract: 'Test if a class implements an interface'
 author:
   - 'Theo van Hoesel <tvanhoesel@perceptyx.com'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Class::Method::Modifiers: '0'
+  ExtUtils::MakeMaker::CPANfile: '0'
+  Role::Tiny: '0'
+  Test::Builder::Tester: '0'
+  Test::Most: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -17,5 +21,8 @@ no_index:
   directory:
     - t
     - inc
-version: '0.01'
+requires:
+  Role::Inspector: '0'
+  Test::Builder: '0'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

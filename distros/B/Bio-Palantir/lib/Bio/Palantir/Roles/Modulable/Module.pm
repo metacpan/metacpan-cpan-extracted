@@ -1,6 +1,5 @@
 package Bio::Palantir::Roles::Modulable::Module;
-# ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.200150';
+$Bio::Palantir::Roles::Modulable::Module::VERSION = '0.200290';
 use Moose;
 use namespace::autoclean;
 
@@ -126,11 +125,11 @@ __END__
 
 =head1 NAME
 
-Bio::Palantir::Roles::Modulable::Module - BiosynML DTD-derived internal class
+Bio::Palantir::Roles::Modulable::Module
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 SYNOPSIS
 
@@ -196,7 +195,7 @@ This method does not accept any arguments.
 
 Returns a array of sorted domains by increasing start coordinate (by default, the list of domains should be built in the right order, so it is a security here).
 
-    # $module is a Bio::FastParsers::Biosynml::Module
+    # $module is a Bio::Palantir::Roles::Modulable::Module
 	my @sorted_domains = $module->sort_domains;
 
 This method does not accept any arguments.
@@ -205,21 +204,21 @@ This method does not accept any arguments.
 
 Returns the size of the module.
 
-    # $module is a Bio::FastParsers::Biosynml::Module
+    # $module is a Bio::Palantir::Roles::Modulable::Module
 	my $size = $module->size;
 
 =head2 genomic_dna_begin
 
 Returns the begin of the genomic DNA coordinate of the module.
 
-    # $module is a Bio::FastParsers::Biosynml::Module
+    # $module is a Bio::Palantir::Roles::Modulable::Module
 	my $genomic_dna_begin = $module->genomic_dna_begin;
 
 =head2 genomic_dna_end
 
 Returns the end of the genomic DNA coordinate of the module.
 
-    # $module is a Bio::FastParsers::Biosynml::Module
+    # $module is a Bio::Palantir::Roles::Modulable::Module
 	my $genomic_dna_end = $module->genomic_dna_end;
 
 =head2 get_domain_functions

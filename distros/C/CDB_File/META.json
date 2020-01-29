@@ -22,7 +22,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "B::COW" : "0",
+            "Devel::Peek" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0"
          }
       },
@@ -34,6 +37,9 @@
       "runtime" : {
          "recommends" : {},
          "requires" : {
+            "B::COW" : "0",
+            "Devel::Peek" : "0",
+            "File::Temp" : "0",
             "Test::More" : "0"
          }
       }
@@ -50,6 +56,6 @@
          "url" : "https://github.com/toddr/CDB_File"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

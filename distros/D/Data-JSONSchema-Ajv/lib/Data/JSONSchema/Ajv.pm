@@ -13,7 +13,7 @@ Data::JSONSchema::Ajv - JSON Schema Validator wrapping Ajv
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 
@@ -115,6 +115,46 @@ No support for multiple schemas at this time. Default is C<07>.
 
 Compiles your schema using C<Ajv> and return a
 C<Data::JSONSchema::Ajv::Validator> object, documented immediately below.
+
+=head2 compile
+
+    $ajv->compile( $hashref_schema OR $json_string );
+
+Same as C<make_validator>, but doesn't return validator object. You can get validator later
+using C<get_validator> (see below).
+
+=head2 get_validator
+
+    $ajv->get_validator($schema_path);
+
+You can get validator from schema previously compiled with C<compile> or C<make_validator>. You
+can even get validator from the part of compiled schema:
+
+    # You can compile many schemas in one ajv instance
+    $ajv->compile({
+        '$id' => "Schema_one", 
+        token => {
+        type => "string",
+        minLength => 5
+        },
+        login => {
+            params => [
+                {type => "boolean"},
+                {type => "string"}
+            ],
+            returns => { type => "number" }
+        }
+    });
+
+    $ajv->compile({
+        '$id' => "Schema_two", 
+        type => "string",
+        minLength => 5
+    });
+
+    # and then get validators using schema id and path to needed subschema
+    $validator_one = $ajv->get_validator('Schema_one#/login/returns');
+    $validator_two = $ajv->get_validator('Schema_two');
 
 =head2 duktape
 
@@ -236,8 +276,8 @@ package Data::JSONSchema::Ajv {
 
         return $self;
     }
-
-    sub make_validator {
+    
+    sub compile {
         my ( $self, $schema ) = @_;
 
         my $counter        = $self->{'_counter'}++;
@@ -257,16 +297,40 @@ package Data::JSONSchema::Ajv {
         $self->{'_context'}->typeof($validator_name) ne 'undefined'
             or die "Can't compile schema passed";
 
+        return $validator_name;
+    }
+
+    sub make_validator {
+        my ( $self, $schema ) = @_;
+
+        my $validator_name = $self->compile($schema);
+
+        return bless [ $self => $validator_name ],
+            'Data::JSONSchema::Ajv::Validator';
+    }
+    
+    sub get_validator {
+        my ( $self, $pointer ) = @_;
+        
+        my $counter        = $self->{'_counter'}++;
+        my $validator_name = "validator_$counter";
+        
+        $self->{'_context'}
+                ->eval("var $validator_name = ajv.getSchema('$pointer');");
+        
+        $self->{'_context'}->typeof($validator_name) ne 'undefined'
+            or die "Can't find such validator";
+        
         return bless [ $self => $validator_name ],
             'Data::JSONSchema::Ajv::Validator';
     }
 
     sub duktape { my $self = shift; return $self->{'_context'}; }
 }
-$Data::JSONSchema::Ajv::VERSION = '0.08';;
+$Data::JSONSchema::Ajv::VERSION = '0.09';;
 
 package Data::JSONSchema::Ajv::Validator {
-$Data::JSONSchema::Ajv::Validator::VERSION = '0.08';
+$Data::JSONSchema::Ajv::Validator::VERSION = '0.09';
 use strict;
     use warnings;
 

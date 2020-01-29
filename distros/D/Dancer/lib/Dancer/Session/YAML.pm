@@ -1,7 +1,7 @@
 package Dancer::Session::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: YAML-file-based session backend for Dancer
-$Dancer::Session::YAML::VERSION = '1.3512';
+$Dancer::Session::YAML::VERSION = '1.3513';
 use strict;
 use warnings;
 use Carp;
@@ -75,7 +75,7 @@ sub retrieve {
     my $content = YAML::LoadFile($fh);
     close $fh or die "Can't close '$session_file': $!\n";
 
-    return $content;
+    return bless $content => ref($class) || $class;
 }
 
 # instance
@@ -123,7 +123,7 @@ Dancer::Session::YAML - YAML-file-based session backend for Dancer
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 DESCRIPTION
 

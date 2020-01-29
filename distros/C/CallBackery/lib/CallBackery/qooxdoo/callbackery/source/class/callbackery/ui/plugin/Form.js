@@ -29,7 +29,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         this._populate();
         this._addValidation();
         this.addListener('appear',this._loadData,this);
-        this._action.addListener('actionResponse',function(e){
+        this._actionResponseHandler = this._action.addListener('actionResponse',function(e){
             var data = e.getData();
             switch(data.action){
                 case 'reload':
@@ -67,6 +67,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         _action: null,
         _cfg: null,
         _loading: null,
+        _actionResponseHandler : null,
         _getParentFormData: null,
         _hasTrigger: null,
         _reConfFormInProgress: null,
@@ -158,6 +159,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         },
         _reconfForm: function(triggerField){
             if (this._reConfFormInProgress) return;
+            if (!this._form) return;
 
             var that = this;
             var rpc = callbackery.data.Server.getInstance();
@@ -173,6 +175,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             });
         },
         _reConfFormHandler: function(formCfg){
+            if (! this._form) return;
+
             formCfg.forEach(function(s){
                 if (!s.key){
                     return;
@@ -180,9 +184,11 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 if (s.widget == 'selectBox' || s.widget == 'comboBox'){
                     this._form.setSelectBoxData(s.key,s.cfg.structure);
                 }
-                if (s.set){
+                if (s.set) {
+                    if ('value' in s.set){
+                        delete s.set.value; // do NOT change the value of anything.
+                    }
                     var ctrl = this._form.getControl(s.key);
-                    delete s.set.value; // do NOT change the value of anything.
                     ctrl.set(s.set);
                 }
             },this);
@@ -190,6 +196,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         },
         _loadDataReadOnly: function(){
             // this.setEnabled(false);
+            if (!this._form) return;
+
             var that = this;
             var rpc = callbackery.data.Server.getInstance();
             if (this._loading > 0){
@@ -202,18 +210,22 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             }
             rpc.callAsync(function(data,exc){
                 if (!exc){
-                    var statusData = {};
-                    that._cfg.form.forEach(function(item){
-                        if (item.set && item.set.readOnly && data){
-                            statusData[item.key] = data[item.key];
-                        }
-                    });
-                    that._form.setData(statusData,true);
+                    if (that._form) {
+                        var statusData = {};
+                        that._cfg.form.forEach(function(item){
+                            if (item.set && item.set.readOnly && data){
+                                statusData[item.key] = data[item.key];
+                            }
+                        });
+                        that._form.setData(statusData,true);
+                    }
                 }
                 that._loading--;
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         },
         _loadData: function(){
+            if (!this._form) return;
+
             var that = this;
             var rpc = callbackery.data.Server.getInstance();
             this._loading++;
@@ -225,9 +237,11 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             busy.show(this.tr('Loading Form Data'));
             rpc.callAsync(function(data,exc){
                 if (!exc){
-                    that._form.setData(data,true);
-                    if (that._hasTrigger) {
-                        that._reconfForm();
+                    if (that._form) {
+                        that._form.setData(data,true);
+                        if (that._hasTrigger) {
+                            that._reconfForm();
+                        }
                     }
                 }
                 else {
@@ -238,6 +252,14 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 busy.hide();
                 that._loading--;
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
+        }
+    },
+    destruct : function() {
+        // cleanup; setting _form=null will abort _reconfFormHandler()
+        this._form.destroy();
+        this._form = null;
+        if (this._actionResponseHandler) {
+            this.removeListenerById(this._actionResponseHandler);
         }
     }
 });

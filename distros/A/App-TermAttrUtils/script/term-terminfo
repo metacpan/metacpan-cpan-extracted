@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-03'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -66,7 +66,7 @@ term-terminfo - List terminal capabilities using Term::Terminfo
 
 =head1 VERSION
 
-This document describes version 0.004 of term-terminfo (from Perl distribution App-TermAttrUtils), released on 2019-10-03.
+This document describes version 0.005 of term-terminfo (from Perl distribution App-TermAttrUtils), released on 2019-11-26.
 
 =head1 SYNOPSIS
 

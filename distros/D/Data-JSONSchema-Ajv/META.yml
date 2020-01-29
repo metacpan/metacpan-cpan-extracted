@@ -19,5 +19,5 @@ requires:
   Path::Tiny: '0.104'
   Test::More: '0'
   perl: v5.14.0
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.73'

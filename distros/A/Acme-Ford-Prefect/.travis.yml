@@ -1,33 +1,48 @@
-language: perl
+language: minimal
+dist: xenial
+services:
+  - docker
+
+before_install:
+  - curl https://raw.githubusercontent.com/plicease/cip/master/bin/travis-bootstrap | bash
+  - cip before-install
 
 install:
-  - curl https://alienfile.org/travis/install-system-dontpanic.sh | bash -
-  - curl https://alienfile.org/travis/install-system-acme-alien-dontpanic.sh | bash -
-  - cpanm --installdeps -n .
-
-perl:
-  - "5.8"
-  - "5.10"
-  - "5.12"
-  - "5.14"
-  - "5.16"
-  - "5.18"
-  - "5.20"
-  - "5.22"
-  - "5.24"
+  - cip diag
+  - cip install
 
 script:
-  - perl Build.PL
-  - ./Build
-  - ./Build test verbose=1
+  - cip script
 
-env:
-  global:
-    - PATH=$PATH:$HOME/opt/dontpanic/current/bin
-    - LD_LIBRARY_PATH=$HOME/opt/dontpanic/current/lib
-    - PKG_CONFIG_PATH=$HOME/opt/dontpanic/current/lib/pkgconfig
-  matrix:
-    - ALIEN_INSTALL_TYPE=share
-    - ALIEN_INSTALL_TYPE=system
+jobs:
+  include:
+    - env: CIP_TAG=5.31 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.31 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.30 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.30 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.28 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.28 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.26 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.26 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.24 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.24 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.22 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.22 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.20 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.20 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.18 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.18 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.16 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.16 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.14 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.14 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.12 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.12 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.10 CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.10 CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.8  CIP_ENV='ALIEN_INSTALL_TYPE=share  TMPDIR=/home/cip/tmp'
+    - env: CIP_TAG=5.8  CIP_ENV='ALIEN_INSTALL_TYPE=system TMPDIR=/home/cip/tmp'
 
-  
+cache:
+  directories:
+    - "$HOME/.cip"

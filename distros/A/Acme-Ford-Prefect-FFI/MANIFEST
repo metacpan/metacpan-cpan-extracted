@@ -4,6 +4,8 @@ Build.PL
 Changes
 lib/Acme/Ford/Prefect/FFI.pm
 LICENSE
+maint/cip-before-install
+maint/cip-before-install-inside
 maint/releaseprep
 MANIFEST			This list of files
 META.json

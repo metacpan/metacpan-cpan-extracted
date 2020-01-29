@@ -1,7 +1,9 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
+use strict;
+use warnings;
 
 # Makes life easy
 use overload 'bool' => \&is_true, fallback => 1;

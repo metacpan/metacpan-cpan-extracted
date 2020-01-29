@@ -1,7 +1,7 @@
 package Dancer::App;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Base application class for Dancer.
-$Dancer::App::VERSION = '1.3512';
+$Dancer::App::VERSION = '1.3513';
 use strict;
 use warnings;
 use Carp;
@@ -257,7 +257,7 @@ Dancer::App - Base application class for Dancer.
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 AUTHOR
 

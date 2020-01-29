@@ -6,7 +6,7 @@ use XSLoader ();
 use Exporter ();
 
 our @ISA       = qw(XSLoader Exporter);
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 our @EXPORT_OK = qw(create);
 
 =head1 NAME
@@ -24,7 +24,7 @@ CDB_File - Perl extension for access to cdb databases
     undef $c;
     untie %h;
 
-    $t = new CDB_File ('t.cdb', "t.$$") or die ...;
+    $t = CDB_File->new('t.cdb', "t.$$") or die ...;
     $t->insert('key', 'value');
     $t->finish;
 
@@ -352,7 +352,7 @@ sub STORE {
 sub create(\%$$) {
     my ( $RHdata, $fn, $fntemp ) = @_;
 
-    my $cdb = new CDB_File( $fn, $fntemp ) or return undef;
+    my $cdb = CDB_File->new( $fn, $fntemp ) or return undef;
     my ( $k, $v );
     $cdb->insert(%$RHdata);
     $cdb->finish;

@@ -19,7 +19,7 @@ use Errno qw(ENOENT);
 
 
 use Carp;
-$SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
+$SIG{ __DIE__ } = sub { Carp::confess( @_ ) }; 
 
 my $is_root = `whoami` =~ /root/;
 
@@ -31,7 +31,6 @@ my $factory = Factory->new;
 
 test_transactions();
 
-test_big();
 test_use();
 
 test_init();

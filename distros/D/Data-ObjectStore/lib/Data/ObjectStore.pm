@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Data::RecordStore;
 use Data::ObjectStore::Cache;
 
-$VERSION = '2.11';
+$VERSION = '2.12';
 
 our $DEBUG = 0;
 our $UPGRADING;
@@ -2075,10 +2075,10 @@ Unlocks all names locked by this thread
 
 =head1 COPYRIGHT AND LICENSE
 
-       Copyright (c) 2012 - 2019 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
+       Copyright (c) 2012 - 2020 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.10  (Aug, 2019))
+       Version 2.12  (Jan, 2020))
 
 =cut

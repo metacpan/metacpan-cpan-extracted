@@ -5,7 +5,7 @@
       "Joel A. Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -23,13 +23,13 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "1.03",
+            "Alien::Base::ModuleBuild" : "1.08",
             "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "1.41",
+            "Alien::Base" : "1.96",
             "perl" : "5.008001"
          }
       },
@@ -47,7 +47,7 @@
    "provides" : {
       "Acme::Alien::DontPanic" : {
          "file" : "lib/Acme/Alien/DontPanic.pm",
-         "version" : "1.03"
+         "version" : "1.96"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.96",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

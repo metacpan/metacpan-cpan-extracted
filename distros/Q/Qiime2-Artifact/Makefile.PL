@@ -5,6 +5,7 @@ use warnings;
 # inserted by Dist::Zilla::Plugin::CheckBin 0.008
 use Devel::CheckBin;
 check_bin('unzip');
+check_bin('which');
 
 use 5.018;
 
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "FindBin" => "1.3",
     "YAML::PP" => "0.018"
   },
-  "VERSION" => "0.10.5",
+  "VERSION" => "0.10.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

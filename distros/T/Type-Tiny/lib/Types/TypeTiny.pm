@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.008003';
+our $VERSION   = '1.008004';
 
 $VERSION =~ tr/_//d;
 
@@ -284,7 +284,13 @@ sub _TypeTinyFromMoose
 			_TypeTinyFromMoose($paramd);
 		};
 	}
-
+	
+	# Cowardly refuse to inline types that need to close over stuff
+	if ($opts{inlined}) {
+		my %env = %{ $t->inline_environment || {} };
+		delete($opts{inlined}) if keys %env;
+	}
+	
 	require Type::Tiny;
 	my $new = 'Type::Tiny'->new(%opts);
 	$ttt_cache{ refaddr($t) } = $new;

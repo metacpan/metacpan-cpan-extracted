@@ -23,12 +23,12 @@ no_index:
 provides:
   Text::Layout:
     file: lib/Text/Layout.pm
-    version: v0.14.1
+    version: '0.015'
 requires:
   ExtUtils::MakeMaker: '6.46'
   Test::More: '0'
   perl: '5.010001'
 resources:
   repository: https://github.com/sciurius/perl-Text-Layout.git
-version: v0.014.1
+version: '0.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

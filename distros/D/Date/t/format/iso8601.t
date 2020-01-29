@@ -92,6 +92,19 @@ subtest 'parse' => sub {
         $d = date("2014-W01-2");
         ok($d->error);
     };
+    
+    subtest 'loyality for wrong delimiters in offset' => sub {
+        subtest 'no delimiter in non-void variant' => sub {
+            my $d = date("2017-08-28T13:49:35+0100");
+            is($d->epoch, 1503924575);
+            is($d->tzabbr, "+01:00");
+        };
+        subtest 'delimiter in void variant' => sub {
+            my $d = date("20170828T134935+01:00");
+            is($d->epoch, 1503924575);
+            is($d->tzabbr, "+01:00");
+        };
+    };
 };
 
 subtest 'stringify' => sub {

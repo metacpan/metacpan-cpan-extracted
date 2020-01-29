@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.014.1";
+our $VERSION = "0.015";
 
 use Text::Layout::FontDescriptor;
 
@@ -101,6 +101,8 @@ For convenience, style combinations like "bolditalic" are allowed.
 
 sub register_font {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+    my $atts;
+    $atts = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
     my ( $font, $family, $style, $weight ) = @_;
 
     if ( $style && !$weight && $style =~ s/^bold//i ) {
@@ -132,6 +134,10 @@ sub register_font {
     foreach ( split(/\s*,\s*/, $family) ) {
 	$fonts{lc $_}->{$style}->{$weight}->{loader} = $loader;
 	$fonts{lc $_}->{$style}->{$weight}->{loader_data} = $ff;
+	next unless $atts;
+	while ( my($k,$v) = each %$atts ) {
+	    $fonts{lc $_}->{$style}->{$weight}->{$k} = $v;
+	}
     }
 
 }
@@ -265,7 +271,9 @@ On Linux, fallback using fontconfig.
 
 sub find_font {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
-    my ( $family, $style, $weight, $atts ) = @_;
+    my $atts;
+    $atts = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
+    my ( $family, $style, $weight ) = @_;
 
     my $try = sub {
       if ( $fonts{$family}
@@ -277,7 +285,10 @@ sub find_font {
 	      ( font   => $ff,
 		family => $family,
 		style  => $style,
-		weight => $weight );
+		weight => $weight,
+		shaping => $fonts{$family}->{$style}->{$weight}->{shaping},
+		interline => $fonts{$family}->{$style}->{$weight}->{interline},
+	      );
 	}
 	elsif ( $ff = $fonts{$family}->{$style}->{$weight}->{loader_data} ) {
 	    return Text::Layout::FontDescriptor->new
@@ -286,7 +297,10 @@ sub find_font {
 		cache  => $fonts{$family}->{$style}->{$weight},
 		family => $family,
 		style  => $style,
-		weight => $weight );
+		weight => $weight,
+		shaping => $fonts{$family}->{$style}->{$weight}->{shaping},
+		interline => $fonts{$family}->{$style}->{$weight}->{interline},
+	     );
 	}
 	else {
 	    return;
@@ -537,10 +551,12 @@ sub _dump {
 	    foreach my $weight ( qw( normal bold ) ) {
 		my $f = $fonts{$family}{$style}{$weight};
 		next unless $f;
-		printf STDERR ( "%-13s %s%s%s %s\n",
+		printf STDERR ( "%-13s %s%s%s%s%s %s\n",
 				$family,
 				$style eq 'normal' ? "-" : "i",
 				$weight eq 'normal' ? "-" : "b",
+				$f->{shaping} ? "s" : "-",
+				$f->{interline} ? "l" : "-",
 				$f->{font} ? "+" : " ",
 				$f->{loader_data},
 			      );

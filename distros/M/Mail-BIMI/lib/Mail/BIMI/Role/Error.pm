@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Error;
 # ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200107'; # VERSION
+our $VERSION = '1.20200129'; # VERSION
 use 5.20.0;
 use Moo::Role;
 use Types::Standard qw{Str HashRef ArrayRef};

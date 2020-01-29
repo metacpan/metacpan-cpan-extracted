@@ -61,7 +61,7 @@ unless (@build) {
     @build = (
         CONFIGURE_REQUIRES => {
             'Alien::Base::Wrapper' => '0',
-            'Alien::TidyHTML5'     => '0',
+            'Alien::TidyHTML5'     => 'v0.3.0',
         },
     );
 
@@ -73,7 +73,7 @@ my $parms = {
     CONFIGURE_REQUIRES => {
         'Devel::CheckLib'      => 0,
         'Alien::Base::Wrapper' => 0,
-        'Alien::TidyHTML5'     => 0,
+        'Alien::TidyHTML5'     => 'v0.3.0',
     },
     NAME                => 'HTML::T5',
     AUTHOR              => 'Andy Lester <andy@petdance.com>',

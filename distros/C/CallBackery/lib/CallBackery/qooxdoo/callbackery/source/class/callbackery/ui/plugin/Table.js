@@ -71,9 +71,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
             if (defaultAction){
                 table.addListener('cellDbltap',defaultAction,this._action);
             }
-            var resizeBehavior = table.getTableColumnModel().getBehavior();
+            var tcm = table.getTableColumnModel();
+            var resizeBehavior = tcm.getBehavior();
             cfg.table.forEach(function(col,i){
-                var tcm = table.getTableColumnModel();
                 var cr;
                 switch (col.type) {
                     case 'boolean':
@@ -106,6 +106,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                 }
                 if (cr){
                     tcm.setDataCellRenderer(i, cr);
+                }
+                if ('visible' in col) {
+                    tcm.setColumnVisible(i, col.visible);
                 }
                 if (col.width != null){
                     resizeBehavior.setWidth(i, String(col.width));

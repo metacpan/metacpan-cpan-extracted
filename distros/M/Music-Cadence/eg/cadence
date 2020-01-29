@@ -28,7 +28,7 @@ for ( @scale ) {
 
 my @leaders = split /\s+/, $leads;
 
-my $score = MIDI::Util::setup_score( bpm => $bpm );
+my $score = MIDI::Util::setup_score( bpm => $bpm, octave => $octave );
 
 my $mc = Music::Cadence->new(
     key    => $note,

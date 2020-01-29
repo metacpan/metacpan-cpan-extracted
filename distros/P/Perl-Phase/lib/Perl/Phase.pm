@@ -3,7 +3,7 @@ package Perl::Phase;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__);
@@ -65,7 +65,7 @@ Perl::Phase - Check if you are currently in compile time or run time
 
 =head1 VERSION
 
-This document describes Perl::Phase version 0.02
+This document describes Perl::Phase version 0.03
 
 =head1 SYNOPSIS
 

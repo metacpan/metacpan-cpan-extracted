@@ -1,5 +1,9 @@
 Revision history for B-COW
 
+0.002     2020-01-29 12:13:52-07:00 America/Denver
+
+fix unit test error for 'uncow' strings
+
 0.001     2018-10-26 11:42:52-05:00 America/Chicago
 
 First version, this is a very alpha state

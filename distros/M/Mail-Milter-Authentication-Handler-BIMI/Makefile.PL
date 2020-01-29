@@ -16,15 +16,30 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Mail::Milter::Authentication::Handler::BIMI",
   "PREREQ_PM" => {
+    "Clone" => 0,
     "English" => 0,
-    "Mail::BIMI" => 0,
-    "Mail::Milter::Authentication" => 2,
-    "Sys::Syslog" => 0
+    "Mail::AuthenticationResults::Header::Comment" => 0,
+    "Mail::AuthenticationResults::Header::Entry" => 0,
+    "Mail::AuthenticationResults::Header::SubEntry" => 0,
+    "Mail::BIMI" => "1.20190210",
+    "Mail::Milter::Authentication" => "2.20191221",
+    "Mail::Milter::Authentication::Handler" => 0,
+    "Sys::Syslog" => 0,
+    "base" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Mail::DKIM::ARC::Signer" => 0,
+    "Mail::DKIM::PrivateKey" => 0,
+    "Mail::DKIM::Signer" => 0,
+    "Mail::Milter::Authentication::Constants" => 0,
+    "Mail::Milter::Authentication::Tester::HandlerTester" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0,
+    "lib" => 0
   },
-  "VERSION" => "2.20200102",
+  "VERSION" => "2.20200129",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,11 +47,26 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "English" => 0,
-  "Mail::BIMI" => 0,
-  "Mail::Milter::Authentication" => 2,
+  "Mail::AuthenticationResults::Header::Comment" => 0,
+  "Mail::AuthenticationResults::Header::Entry" => 0,
+  "Mail::AuthenticationResults::Header::SubEntry" => 0,
+  "Mail::BIMI" => "1.20190210",
+  "Mail::DKIM::ARC::Signer" => 0,
+  "Mail::DKIM::PrivateKey" => 0,
+  "Mail::DKIM::Signer" => 0,
+  "Mail::Milter::Authentication" => "2.20191221",
+  "Mail::Milter::Authentication::Constants" => 0,
+  "Mail::Milter::Authentication::Handler" => 0,
+  "Mail::Milter::Authentication::Tester::HandlerTester" => 0,
   "Sys::Syslog" => 0,
-  "Test::More" => 0
+  "Test::Exception" => 0,
+  "Test::More" => 0,
+  "base" => 0,
+  "lib" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

@@ -1,5 +1,11 @@
-DESCRIPTION
+NAME
+    Complete::Fish - Completion module for fish shell
 
+VERSION
+    This document describes version 0.060 of Complete::Fish (from Perl
+    distribution Complete-Fish), released on 2020-01-29.
+
+DESCRIPTION
     fish allows completion of option arguments to come from an external
     command, e.g.:
 
@@ -7,7 +13,7 @@ DESCRIPTION
 
     The command is supposed to return completion entries one in a separate
     line. Description for each entry can be added, prefixed with a tab
-    character. The provided function format_completion() accept a
+    character. The provided function "format_completion()" accept a
     completion answer structure and format it for fish. Example:
 
      format_completion(["a", "b", {word=>"c", description=>"Another letter"}])
@@ -18,11 +24,60 @@ DESCRIPTION
      b
      c       Another letter
 
-SEE ALSO
+FUNCTIONS
+  format_completion
+    Usage:
 
+     format_completion($completion) -> str|array
+
+    Format completion for output (for shell).
+
+    fish accepts completion reply in the form of one entry per line to
+    STDOUT. Description can be added to each entry, prefixed by tab
+    character.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $completion* => *hash|array*
+
+        Completion answer structure.
+
+        Either an array or hash, as described in "Complete".
+
+    Return value: Formatted string (or array, if `as` key is set to `array`)
+    (str|array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Fish>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Fish>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Fish>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Complete
 
     Complete::Bash
 
     Fish manual.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

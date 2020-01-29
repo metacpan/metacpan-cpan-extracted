@@ -13,6 +13,7 @@ README.md
 t/01main.t
 t/02last.t
 t/03fetchall.t
+t/cow.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

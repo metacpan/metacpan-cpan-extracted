@@ -1,5 +1,5 @@
 package Spork::Shlomify::Slides;
-$Spork::Shlomify::Slides::VERSION = '0.0401';
+$Spork::Shlomify::Slides::VERSION = '0.0402';
 use strict;
 use warnings;
 use Spork;
@@ -59,7 +59,7 @@ Spork::Shlomif::Slides - the slides generation class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 FUNCTIONS
 

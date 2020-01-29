@@ -1,7 +1,7 @@
 package Dancer::Logger::Note;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Test::More note() logging engine for Dancer
-$Dancer::Logger::Note::VERSION = '1.3512';
+$Dancer::Logger::Note::VERSION = '1.3513';
 use strict;
 use warnings;
 use base 'Dancer::Logger::Abstract';
@@ -34,7 +34,7 @@ Dancer::Logger::Note - Test::More note() logging engine for Dancer
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 SYNOPSIS
 

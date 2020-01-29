@@ -6,7 +6,7 @@ WriteMakefile
   'NAME' => 'Data::ObjectStore',
   'VERSION_FROM' => 'lib/Data/ObjectStore.pm',
   'PREREQ_PM' => {
-                   'Data::RecordStore' => '5.03',
+                   'Data::RecordStore' => '6.04',
                    'Module::Build' => '0.4',
                    'Test::More' => 0
                  },

@@ -30,4 +30,4 @@ resources:
     - phase
   bugtracker: https://github.com/drmuey/p5-Perl-Phase/issues
   repository: https://github.com/drmuey/p5-Perl-Phase.git
-version: '0.02'
+version: '0.03'

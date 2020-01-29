@@ -1,5 +1,5 @@
 package Spork::Shlomify::Slides::FromSpork;
-$Spork::Shlomify::Slides::FromSpork::VERSION = '0.0401';
+$Spork::Shlomify::Slides::FromSpork::VERSION = '0.0402';
 use Spork -Base;
 use mixin 'Spoon::Installer';
 require CGI;
@@ -163,9 +163,30 @@ sub lwp_download {
 
 =encoding UTF-8
 
+=head1 NAME
+
+Spork::Slides - Slide Presentations (Only Really Kwiki)
+
 =head1 VERSION
 
-version 0.0401
+version 0.0402
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Brian Ingerson <INGY@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, 2005. Brian Ingerson. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -283,30 +304,8 @@ This is free software, licensed under:
 
 =cut
 
-__DATA__
+__END__
 
-=head1 NAME
-
-Spork::Slides - Slide Presentations (Only Really Kwiki)
-
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
-=head1 AUTHOR
-
-Brian Ingerson <INGY@cpan.org>
-
-=head1 COPYRIGHT
-
-Copyright (c) 2004, 2005. Brian Ingerson. All rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-See http://www.perl.com/perl/misc/Artistic.html
-
-=cut
 
 __Spork.slides__
 ----

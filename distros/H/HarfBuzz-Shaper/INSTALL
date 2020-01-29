@@ -1,0 +1,45 @@
+Introduction
+------------
+
+HarfBuzz::Shaper is a Perl module that interfaces with the native
+harfbuzz library. It uses the XS facility to bridge between Perl and
+native C code.
+
+To build this module, you must therefore have a C-compiler and the
+harfbuzz libraries installed.
+
+Linux
+-----
+
+On Linux you need to install the following packages:
+
+    harfbuzz
+
+Often the development parts of the harfbuzz library are in a separate
+package. So if there is a package named harfbuzz-devel you need to
+install that as well.
+
+Microsoft Windows
+-----------------
+
+The preferred Perl software for MSWindows is Strawberry Perl. It can
+be downloaded from https://strawberryperl.com. It includes C-compiler
+and other development tools.
+
+As of version 5.30, this package also contains the harfbuzz library.
+So if you install this, or a newer, version of Strawberry Perl you are
+all set to go.
+
+If you have an older version of Strawberry Perl you need to add the
+harfbuzz library and some other dependent libraries. The easiest way
+to do this is
+
+ - download
+https://github.com/sciurius/perl-HarfBuzz-Shaper/releases/download/R0.016/harfbuzz-msw64-strawberry.zip
+- on the PC, go to the Strawberry Perl folder. Usually, this is
+C:\Strawberry.
+- unpack the contents of the downloaded zip into this folder
+**overwriting existing files**. It will replace a number of files in
+the C subfolder.
+
+Now you can build HarfBuzz::Shaper as usual.

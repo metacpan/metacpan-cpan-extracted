@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Domainable;
 # ABSTRACT: Domainable Moose role for Domain and DomainPlus objects
-$Bio::Palantir::Roles::Domainable::VERSION = '0.200150';
+$Bio::Palantir::Roles::Domainable::VERSION = '0.200290';
 use Moose::Role;
 
 use autodie;
@@ -51,6 +51,12 @@ has 'symbol' => (
             : $name
         ;  # no need to reappoint domains like cMT, oMT, B, Hal,... 
         
+        # KS domain 
+        $symbol = $symbol =~ m/^KS/xms
+            ? 'KS'
+            : $symbol
+        ;
+
         return $symbol;
     },
 );
@@ -69,11 +75,12 @@ has 'class' => (
             if $name eq 'NA';
 
         my $class = 
-            $name =~ m/^A$ | AMP-binding | A-OX | Minowa | Khayatt | CAL | AT/xms
+            $name =~ m/^A$ | AMP-binding | A-OX | Minowa | Khayatt | CAL | ACL
+                | AT$ | ^Trans\-AT/xms
             ? 'substrate-selection'
             : $name =~ m/PCP | ACP$ | ACP_beta | PP-binding/xms
             ? 'carrier-protein'
-            : $name =~ m/^C$ | Condensation | ^X$ | Cglyc | ^KS$ | _KS
+            : $name =~ m/^C$ | Condensation | ^X$ | Cglyc | ^KS | _KS
                 | Heterocyclization | ^H$/xms
             ? 'condensation'
             : $name =~ m/Thioesterase | TE | Red | TD | Cter | NAD/xms
@@ -99,7 +106,7 @@ Bio::Palantir::Roles::Domainable - Domainable Moose role for Domain and DomainPl
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ Dancer::Policy - Dancer core and community policy and standards of conduct
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 DESCRIPTION
 

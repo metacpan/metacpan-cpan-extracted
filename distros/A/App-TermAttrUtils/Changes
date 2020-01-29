@@ -1,3 +1,8 @@
+0.005   2019-11-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Add two simple scripts: term-size, term-encoding.
+
+
 0.004   2019-10-03  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

@@ -469,6 +469,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Gil Magno</foaf:name>
+      <foaf:mbox rdf:resource="mailto:gilmagno@gilmagno.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Gonzalo Barco</foaf:name>
       <foaf:mbox rdf:resource="mailto:gbarcouy@gmail.com" />
     </foaf:Person>
@@ -2121,6 +2127,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3511</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2019-03-29T11:16:08+00:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3512</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2019-03-31T20:10:08+01:00</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

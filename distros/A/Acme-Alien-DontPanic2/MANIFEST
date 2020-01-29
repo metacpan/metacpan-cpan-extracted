@@ -10,7 +10,9 @@ README
 alienfile
 dist.ini
 lib/Acme/Alien/DontPanic2.pm
-maint/travis-install-mods
+maint/cip-before-install
+maint/cip-before-install-inside
+maint/release
 t/00_diag.t
 t/acme_alien_dontpanic2.t
 t/acme_alien_dontpanic2__ffi.t

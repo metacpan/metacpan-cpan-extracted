@@ -12,9 +12,6 @@ use Acme::Alien::DontPanic;
 
 my $dontpanic = Acme::Alien::DontPanic->new;
 
-my $cflags = $dontpanic->cflags;
-my $libs   = $dontpanic->libs;
-
 my $builder = Module::Build->new(
     module_name       => 'Acme::Ford::Prefect::FFI',
     dist_abstract     => 'FFI test for Alien::Base',
@@ -22,7 +19,7 @@ my $builder = Module::Build->new(
     license           => 'perl',
     configure_requires => {
       'Module::Build' => '0.38',
-      'Acme::Alien::DontPanic' => '0.044',
+      'Acme::Alien::DontPanic' => '1.96',
     },
     build_requires    => {
       'ExtUtils::CBuilder' => 0,
@@ -30,7 +27,7 @@ my $builder = Module::Build->new(
     requires          => {
       'perl'                   => '5.008001',
       'FFI::Platypus'          => '0.47',
-      'Acme::Alien::DontPanic' => '0.042',
+      'Acme::Alien::DontPanic' => '1.96',
       'FFI::CheckLib'          => '0.15',
     },
     test_requires => {

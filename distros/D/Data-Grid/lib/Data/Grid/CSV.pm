@@ -20,7 +20,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head2 new
 
@@ -37,6 +37,23 @@ around BUILDARGS => sub {
     # normalize the params
     my $p = (@rest && ref $rest[0] eq 'HASH') ? $rest[0] : { @rest };
     my $o = $p->{options} || { binary => 1 };
+
+    unless ($o->{sep_char} || $o->{sep}) {
+        my $fh = $p->{fh};
+        my ($commas, $tabs, $i) = (0, 0, 0);
+
+        # we need to detect the damn thing; scan up to 10 lines
+        seek $fh, 0, 0;
+
+        while ($i++ < 10 && (my $line = <$fh>)) {
+            # goatse operator will squash to a count
+            $commas += () = $line =~ /,/g;
+            $tabs   += () = $line =~ /\t/g;
+        }
+        seek $fh, 0, 0;
+
+        $o->{sep_char} = $commas > $tabs ? ',' : "\t";
+    }
 
     # instantiate the csv driver
     $p->{_csv} = Text::CSV->new($o) or die $!;
@@ -176,7 +193,7 @@ sub cells {
     my ($self, $flatten) = @_;
 
     my $class = $self->parent->parent->cell_class;
-    my @cells = @{$self->proxy};
+    my @cells = @{$self->proxy || [] };
 
     @cells = map { $class->new($self, $_, $cells[$_]) } (0..$#cells);
 

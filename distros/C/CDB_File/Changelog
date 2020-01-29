@@ -1,5 +1,13 @@
 Revision history for Perl extension CDB_File.
 
+1.02 - Todd Rinaldo <toddr@cpan.org> 2020-01-29
+    - Invoke new as a class method in docs and practice.
+    - Add support for COW PVs when returning key values. This will hopefully
+      deduplicate returned strings where possible.
+    - Adjust tests to skip exists tests on 5.8.1, not 5.6.2
+    - Optimize cdb_hashadd as a inline macro
+    - Croak if atomic re-write from the temp to the final file fails.
+
 1.01 - Todd Rinaldo <toddr@cpan.org> 2020-01-27
     - Fix MANIFEST so Changelog is shpped.
     - Address file descriptor leak in CDB_File.

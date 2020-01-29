@@ -1,6 +1,5 @@
 use ExtUtils::MakeMaker;
 #<? read_starfish_conf() !>
-# $Id: Makefile.PL 319 2011-02-22 14:08:54Z vlado $
 
 my $module = 'AI::NaiveBayes1';
 my $name   = 'NaiveBayes1.pm';
@@ -22,7 +21,7 @@ WriteMakefile
    (ABSTRACT_FROM => $name, # retrieve abstract from module
    # <? echo "   AUTHOR => 'Vlado Keselj $VladoURL')" !>
    #+
-   AUTHOR => 'Vlado Keselj http://web.cs.dal.ca/~vlado')
+      AUTHOR => 'Vlado Keselj http://web.cs.dal.ca/~vlado')
    #-
    : ()
    ),

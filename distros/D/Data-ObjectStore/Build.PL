@@ -18,8 +18,8 @@ my $builder = Module::Build->new(
                             't/cache.t',
                         ],
     requires => {
-        'perl'              => 'v5.16',
-        'Data::RecordStore' => 5.03,
+        'perl'              => '5.16.0',
+        'Data::RecordStore' => 6.04,
     },
     );
 

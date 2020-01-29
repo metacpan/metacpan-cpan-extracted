@@ -8,14 +8,14 @@ use Devel::CheckLib;
 
 unless ( check_lib( lib => "harfbuzz",
 		    header => "harfbuzz/hb.h",
-		    debug => 1,
 		    function => <<EOF )
 /* Need at least 1.7.7 */
 hb_blob_create_from_file("");
 return 0;
 EOF
        ) {
-    warn("HarfBuzz::Shaper needs the harfbuzz library, version 1.7.7 or later.\nPlease install it first.\n");
+    warn("HarfBuzz::Shaper needs the harfbuzz library, version 1.7.7 or later.\n",
+	 "Please install it first. See file INSTALL for details.\n");
     exit(0);
 }
 

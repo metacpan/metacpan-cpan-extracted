@@ -1,11 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         AI-NaiveBayes1
-version:      2.006
-version_from: NaiveBayes1.pm
-installdirs:  site
+---
+abstract: 'Naive Bayes Classification'
+author:
+  - 'Vlado Keselj http://web.cs.dal.ca/~vlado'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AI-NaiveBayes1
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    YAML:                          0.0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  YAML: '0.0'
+version: '2.007'

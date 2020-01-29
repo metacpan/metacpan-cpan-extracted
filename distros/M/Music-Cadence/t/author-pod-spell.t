@@ -22,6 +22,7 @@ Boggs
 Cadence
 Gene
 Music
-foo
+Picardy
 gene
 lib
+picardy

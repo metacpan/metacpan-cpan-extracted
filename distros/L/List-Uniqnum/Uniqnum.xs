@@ -32,6 +32,17 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
     SV **args = &PL_stack_base[ax];
     HV *seen;
 
+    SV *keysv;
+    SV *arg;
+    NV nv_arg;
+
+#ifdef HV_FETCH_EMPTY_HE
+        HE* he;
+#endif
+#ifdef WIN32_PERL_NO_ANSI
+        char buffer[32];
+#endif
+
     if(items == 0 || (items == 1 && !SvGAMAGIC(args[0]) && SvOK(args[0]))) {
         /* Optimise for the case of the empty list or a defined nonmagic
          * singleton. Leave a singleton magical||undef for the regular case */
@@ -44,17 +55,10 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 
     /* uniqnum */
     /* A temporary buffer for number stringification */
-    SV *keysv = sv_newmortal();
+    keysv = sv_newmortal();
 
     for(index = 0 ; index < items ; index++) {
-        SV *arg = args[index];
-        NV nv_arg;
-#ifdef HV_FETCH_EMPTY_HE
-        HE* he;
-#endif
-#ifdef WIN32_PERL_NO_ANSI
-        char buffer[32];
-#endif
+        arg = args[index];
 
         if(SvGAMAGIC(arg))
             /* clone the value so we don't invoke magic again */

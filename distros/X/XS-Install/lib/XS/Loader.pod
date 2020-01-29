@@ -38,24 +38,10 @@ If any of these have changed their versions, croaks.
 However if you don't set $flags, and someone uses your XS module's C API, and someone's module neither use XS::Install nor link
 against your SO/DLL explicitly, it won't work. So it is recommended to set $flags = 0x01.
 
-=head4 load_tests($module)
+=head4 load_noboot($module)
 
-Tries to load C<blib/ctest.so> (or <blib/ctest.dll>) file and exectute it's boostrap section.
-
-The C<ctest.so> is created for you if the C<Makefile.PL> has the following:
-
-	use XS::Install;
-
-	write_makefile(
-		...
-		test             => {
-			SRC                  => 't',
-			RECURSIVE_TEST_FILES => 1,
-		},
-		...
-	);
-
-If you don't provide C<$module> it will be detected as caller.
+Same as C<load/bootstrap> but does not call XS boot section, only loads shared library.
+Useful for modules that do not provide any perl API (pure C/C++ library).
 
 =head1 AUTHOR
 

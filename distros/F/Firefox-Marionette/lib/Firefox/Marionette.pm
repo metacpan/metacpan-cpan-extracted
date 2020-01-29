@@ -41,7 +41,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -4892,7 +4892,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =head1 SYNOPSIS
 
@@ -5031,7 +5031,17 @@ accepts a L<element|Firefox::Marionette::Element> as the first parameter and cle
 
 =head2 click
 
-accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and sends a 'click' to it.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  The L<click|Firefox::Marionette#click> method is also used to choose an option in a select dropdown.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(visible => 1)->go('https://ebay.com');
+    my $select = $firefox->find_tag('select');
+    foreach my $option ($select->find_tag('option')) {
+        if ($option->property('value') == 58058) { # Computers/Tablets & Networking
+            $option->click();
+        }
+    }
 
 =head2 close_current_chrome_window_handle
 
@@ -5536,7 +5546,7 @@ returns a list of all the recognised names for paper sizes, such as A4 or LEGAL.
 
 =head2 pdf
 
-returns a L<File::Temp|File::Temp> object containing a PDF.
+returns a L<File::Temp|File::Temp> object containing a PDF encoded version of the current page for printing.
 
 accepts a optional hash as the first parameter with the following allowed keys;
 
@@ -5565,9 +5575,9 @@ accepts a optional hash as the first parameter with the following allowed keys;
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     my $handle = $firefox->pdf();
     foreach my $paper_size ($firefox->paper_sizes()) {
-	    $handle = $firefox->pdf(size => $paper_size, landscape => 1);
+	    $handle = $firefox->pdf(size => $paper_size, landscape => 1, margin => { top => 0.5, left => 1.5 });
             ...
-	    $handle = $firefox->pdf(page => { width => 21, height => 27 });
+	    print $firefox->pdf(page => { width => 21, height => 27 }, raw => 1);
             ...
     }
 

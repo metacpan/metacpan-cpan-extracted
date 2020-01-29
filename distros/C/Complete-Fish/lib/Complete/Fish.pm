@@ -1,7 +1,7 @@
 package Complete::Fish;
 
-our $DATE = '2016-10-21'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2020-01-29'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -59,14 +59,12 @@ sub format_completion {
 
     # we currently use Complete::Bash's rule because i haven't done a read up on
     # how exactly fish escaping rules are.
-    if (ref($comp) eq 'HASH') {
+    if (ref $comp eq 'HASH') {
         $as = $comp->{as} // 'string';
-        $entries = Complete::Bash::format_completion({%$comp, as=>'array'});
+        $entries = Complete::Bash::format_completion({%$comp}, {as=>'array'});
     } else {
         $as = 'string';
-        $entries = Complete::Bash::format_completion({
-            words=>$comp, as=>'array',
-        });
+        $entries = Complete::Bash::format_completion({words=>$comp}, {as=>'array'});
     }
 
     # insert description
@@ -103,7 +101,7 @@ Complete::Fish - Completion module for fish shell
 
 =head1 VERSION
 
-This document describes version 0.05 of Complete::Fish (from Perl distribution Complete-Fish), released on 2016-10-21.
+This document describes version 0.060 of Complete::Fish (from Perl distribution Complete-Fish), released on 2020-01-29.
 
 =head1 DESCRIPTION
 
@@ -128,7 +126,11 @@ will result in:
 =head1 FUNCTIONS
 
 
-=head2 format_completion($completion) -> str|array
+=head2 format_completion
+
+Usage:
+
+ format_completion($completion) -> str|array
 
 Format completion for output (for shell).
 
@@ -146,6 +148,7 @@ Arguments ('*' denotes required arguments):
 Completion answer structure.
 
 Either an array or hash, as described in C<Complete>.
+
 
 =back
 
@@ -181,7 +184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

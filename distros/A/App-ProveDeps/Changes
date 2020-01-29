@@ -1,3 +1,27 @@
-0.001   2017-08-14 (PERLANCAR)
+0.004   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to implement {in,ex}clude_dist{s,_pattern}.
+
+	- Implement --download.
+
+	- [Incompatible change] OK for the last time :-/ Return 200 for all
+	  condition, but exit code is non-zero (1) if there are dists that fail.
+
+
+0.003   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [Incompatible change] Return 412 status instead of 500 when we
+	  can't use lcpan.
+
+
+0.002   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [Incompatible change] Return 500 status instead of 200 if some
+	  dists fail.
+
+	- [doc] Document how distro dir is searched.
+
+
+0.001   2017-08-14  Released-By: PERLANCAR
 
         - First release.

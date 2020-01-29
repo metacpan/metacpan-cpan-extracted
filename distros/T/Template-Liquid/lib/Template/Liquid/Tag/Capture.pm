@@ -1,5 +1,7 @@
 package Template::Liquid::Tag::Capture;
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
+use strict;
+use warnings;
 require Template::Liquid::Error;
 require Template::Liquid::Utility;
 BEGIN { use base 'Template::Liquid::Tag'; }

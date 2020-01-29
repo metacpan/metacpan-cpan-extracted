@@ -61,7 +61,6 @@ WriteMakefile
 				runtime => {
 					    recommends => {
 							   'DDC::XS' => 0.23,
-							   #'forks'   => 0.36, ##-- pseudo-threads for list-clients
                                                            #'threads'  => 2.07, ##-- core
 							   %pdl_deps
 							  },
@@ -94,6 +93,8 @@ WriteMakefile
 		    'Time::HiRes' => 0,		    ##-- for runtime profiling
 		    'XML::LibXML' => '1.70',	    ##-- for XML-based input formats (TCF, TEI)
 		    'Test::More' => 0,
+                    'threads' => 0,                 ##-- 2.07
+                    'threads::shared' => 0,         ##-- 1.51
 		    ##
 		    ##-- for (term x document) models (TDF, formerly "Vsem")
 		    #%pdl_deps,

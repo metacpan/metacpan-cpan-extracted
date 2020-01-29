@@ -14,7 +14,6 @@ WriteMakefile
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
                    'bin/record_store_convert',
-                   'bin/record_store_convert~',
                    'bin/recordstore_explorer'
                  ],
   'PL_FILES' => {}

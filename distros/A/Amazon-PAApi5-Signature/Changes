@@ -1,4 +1,8 @@
 Revision history for Perl extension Amazon::PAApi5::Signature
 
+0.02    Thu Jan 30 02:35:05 JST 2020
+        - Improve POD
+        - Add example script of US region
+
 0.01    Mon Dec  2 00:47:49 JST 2019
         - original version

@@ -1,28 +1,39 @@
+0.09  - 29-Jan-2020
+- compile() method added
+- get_validator() method added
+
 0.08  - 28-May-2019
 - Fix bug where very big data structure can't be validated because of JavaScript::Duktape::XS internal error
+
 0.07  - 27-May-2019
 - Allow to specify ajv source code with `ajv_src' option (#gh3)
 - Ability to get modified data after validation (#gh3)
 - Changed minimum Perl version to 5.14
+
 0.06  - 08-Mar-2019
 - Bumped Ajv to 6.8.1
 - Changed min version Perl back to 5.18 re
     https://github.com/pjlsergeant/p5-data-jsonschema-ajv/issues/2
 - Bumped minimum JavaScript-Duktape-XS to get access to fixes from
     https://github.com/gonzus/JavaScript-Duktape-XS/issues/17
+
 0.05  - 29-May-2018
 - Using Ajv 6.5.0
 - Support drafts 04, 06, 07
 - Make converting to/from Javascript much less hacky
 - Removed the nasty old test-suite and just copy-pasted the official one
+
 0.04  - 21-Apr-2018
 - Forced use to above Perl 5.20 ... 5.18 has some odd number issues, and
   also JavaScript::Duktape::XS is 5.18 and above anyway
+
 0.03  - 28-Mar-2018
 - Used JavaScript::Duktape::XS instead, as it's much faster, and no inline C
 - Upgraded to Ajv 4.11.8
+
 0.02  - 06-Oct-2016
 - Bumped required JavaScript::Duktape version:
     http://www.cpantesters.org/cpan/report/d119e0ea-89f0-11e6-bfb8-d6a6247258b5
+
 0.01  - 04-Oct-2016
 - Initial release

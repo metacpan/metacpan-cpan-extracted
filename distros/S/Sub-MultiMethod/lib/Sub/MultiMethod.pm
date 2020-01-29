@@ -5,7 +5,7 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use B ();
 use Exporter::Shiny qw( multimethod multimethods_from_roles );
@@ -103,15 +103,28 @@ sub install_candidate {
 	if ($spec{alias}) {
 		$spec{alias} = [$spec{alias}] unless ref $spec{alias};
 		my @aliases = @{$spec{alias}};
-		my $sig     =   $spec{signature};
-		my $next    =   $spec{code};
+		my $next    =   $spec{code} or die "NO CODE???";
+		
+		my ($check, @sig);
+		if (CodeRef->check($spec{signature})) {
+			$check = $spec{signature};
+		}
+		else {
+			@sig = @{$spec{signature}};
+			if (HashRef->check($sig[0]) and not $sig[0]{slurpy}) {
+				my %new_opts = %{$sig[0]};
+				delete $new_opts{want_source};
+				delete $new_opts{want_details};
+				$sig[0] = \%new_opts;
+			}
+		}
+		
 		my $code = sprintf(
 			q{
 				package %s;
-				my $check;
 				sub {
 					my @invocants = splice(@_, 0, %d);
-					$check ||= %s(@$sig);
+					$check ||= %s(@sig);
 					@_ = (@invocants, &$check);
 					goto $next;
 				}

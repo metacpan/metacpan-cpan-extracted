@@ -1,2 +1,4 @@
 
 0.01 - first release
+
+0.02 - fix scoping issue that prevented compilation with some (all ?) Microsoft compilers

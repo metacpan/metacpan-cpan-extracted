@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -279,7 +279,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =head1 SYNOPSIS
 
@@ -312,7 +312,17 @@ returns the L<browser|Firefox::Marionette> connected with the L<element|Firefox:
 
 =head2 click
 
-sends a 'click' to the L<element|Firefox::Marionette::Element>.  The browser will wait for any page load to complete or the session's L<page timeout|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning.
+sends a 'click' to the L<element|Firefox::Marionette::Element>.  The browser will wait for any page load to complete or the session's L<page_load|Firefox::Marionette::Timeouts#page_load> duration to elapse before returning, which, by default is 5 minutes.  The L<click|Firefox::Marionette::Element#click> method is also used to choose an option in a select dropdown.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(visible => 1)->go('https://ebay.com');
+    my $select = $firefox->find_tag('select');
+    foreach my $option ($select->find_tag('option')) {
+        if ($option->property('value') == 58058) { # Computers/Tablets & Networking
+            $option->click();
+        }
+    }
 
 =head2 clear
 

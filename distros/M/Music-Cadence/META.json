@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/Music-Cadence"
       }
    },
-   "version" : "0.1309",
+   "version" : "0.1401",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -297,7 +297,8 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
-                     "foo"
+                     "Picardy",
+                     "picardy"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }
@@ -465,6 +466,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

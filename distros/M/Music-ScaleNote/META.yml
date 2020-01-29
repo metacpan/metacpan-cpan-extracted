@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ScaleNote
   repository: https://github.com/ology/Music-ScaleNote.git
-version: '0.0507'
+version: '0.0600'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

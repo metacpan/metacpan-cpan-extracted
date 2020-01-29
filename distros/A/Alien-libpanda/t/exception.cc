@@ -4,9 +4,9 @@
 #include <regex>
 #include <cxxabi.h>
 #include <iostream>
+
 #if defined(__unix__)
-  #include <execinfo.h>
-#endif
+#include <execinfo.h>
 
 using namespace panda;
 
@@ -219,3 +219,5 @@ TEST_CASE("panda::exception with string", "[exception]") {
     }
     REQUIRE(was_catch);
 }
+
+#endif

@@ -1,5 +1,11 @@
 Revision history for HTML-T5
 
+0.007  2020-01-29
+    - Update the minimal required version of Alien::TidyHTML5 to v0.3.0
+    to get libtidy5.6.0 which is required for passing tests.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=128549
+        - Thanks to SREZIC for the report.
+
 0.006  2019-08-30
     - Fix t/opt-00.t in recent libtidy.
 
@@ -24,4 +30,4 @@ Revision history for HTML-T5
 
 0.001  2018-09-20
     - First version, released on an unsuspecting world
-        - Forked from HTML::Tid5 - thanks!
+        - Forked from HTML::Tidy5 - thanks!

@@ -1,5 +1,8 @@
 Revision history for Music-ScaleNote
 
+0.0600 2020-01-29 12:33:12
+    - Add the ->step method to compute halfstep notes.
+
 0.0507 2019-09-01 14:47:22
     - Improve documentation.
     - Add a scale_note not defined test case.

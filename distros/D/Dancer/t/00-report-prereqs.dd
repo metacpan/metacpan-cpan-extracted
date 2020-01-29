@@ -84,7 +84,6 @@ do { my $x = {
                                    'Plack::Builder' => '0',
                                    'Test::More' => '0',
                                    'Test::NoWarnings' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006',
                                    'utf8' => '0'
                                  }

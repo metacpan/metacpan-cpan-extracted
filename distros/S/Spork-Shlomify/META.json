@@ -60,23 +60,23 @@
    "provides" : {
       "Spork::Shlomify" : {
          "file" : "lib/Spork/Shlomify.pm",
-         "version" : "0.0401"
+         "version" : "0.0402"
       },
       "Spork::Shlomify::Config" : {
          "file" : "lib/Spork/Shlomify/Config.pm",
-         "version" : "0.0401"
+         "version" : "0.0402"
       },
       "Spork::Shlomify::Formatter" : {
          "file" : "lib/Spork/Shlomify/Formatter.pm",
-         "version" : "0.0401"
+         "version" : "0.0402"
       },
       "Spork::Shlomify::Slides" : {
          "file" : "lib/Spork/Shlomify/Slides.pm",
-         "version" : "0.0401"
+         "version" : "0.0402"
       },
       "Spork::Shlomify::Slides::FromSpork" : {
          "file" : "lib/Spork/Shlomify/Slides/FromSpork.pm",
-         "version" : "0.0401"
+         "version" : "0.0402"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/shlomif/Spork-Shlomify"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0402",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"

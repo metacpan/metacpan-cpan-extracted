@@ -83,3 +83,8 @@ Revision history for Perl extension AI::NaiveBayes1.
 2.006  Tue Mar 15 06:17:04 ADT 2011
 	- reduced precision in \d{4}.\d+ to \d{4}.\d{10} avoid testing
 	problems on different platforms
+
+2.007  Wed Jan 29 05:58:37 AST 2020
+	- documentation update
+	- fixed bug: import_from_YAML and import_from_YAML_file now
+	  return bless-ed references (they did not return before)

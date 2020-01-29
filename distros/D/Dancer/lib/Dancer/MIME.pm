@@ -1,7 +1,7 @@
 package Dancer::MIME;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: Singleton object to handle MimeTypes
-$Dancer::MIME::VERSION = '1.3512';
+$Dancer::MIME::VERSION = '1.3513';
 use strict;
 use warnings;
 use base 'Dancer::Object::Singleton';
@@ -80,7 +80,7 @@ Dancer::MIME - Singleton object to handle MimeTypes
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 SYNOPSIS
 

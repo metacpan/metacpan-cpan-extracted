@@ -13,5 +13,13 @@ Makefile.PL
 MANIFEST
 README.md
 t/00_use_ok.t
+t/Scope/01_interface_ok.t
+t/ScopeManager/01_interface_ok.t
+t/Span/01_interface_ok.t
+t/Span/02_constructor_new.t
+t/Span/12_finish.t
+t/SpanContext/01_interface_ok.t
+t/Tracer/01_interface_ok.t
+t/Tracer/13_start_active_span.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -99,6 +99,10 @@ sub new {
 Explicit way to set the font (and, optionally, the size) used for
 shaping.
 
+The font must be a TrueType or OpenType font. Font information is
+cached internally, after the first call subsequent calls with the same
+font filename are very fast.
+
 =cut
 
 sub set_font {
@@ -121,6 +125,10 @@ sub set_font {
 
 Explicit way to set the font size used for shaping.
 
+Note that the font size will in general affect details of the
+appearance, A 5 point fontsize magnified 10 times is not identical to
+50 point font size.
+
 =cut
 
 sub set_size {
@@ -133,7 +141,7 @@ sub set_size {
 
 =head2 $hb->set_text( I<text> [ , ... ] )
 
-Set the text to shape. Multiple arguments are concacenated.
+Set the text to shape. Multiple arguments are concatenated.
 
 Note that the text must be Perl strings.
 
@@ -150,7 +158,19 @@ sub set_text {
 =head2 $info = $hb->shaper()
 
 Performs the shaping. Upon completion an array of hashes is returned
-as described above.
+with one element for each glyph to be rendered.
+
+The hash contains the following items:
+
+    ax:   horizontal advance
+    ay:   vertical advance
+    dx:   horizontal offset
+    dy:   vertical offset
+    g:    glyph index in font (CId)
+    name: glyph name
+
+Note that the number of glyphs does not necessarily match the number
+of input characters!
 
 =cut
 

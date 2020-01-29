@@ -1,3 +1,5 @@
+1.2.13   28.01.2020
+           - update docs
 1.2.12   30.12.2019
            - continue if optional data write failed
            - omit fill paths for .so-file dependencies during linking (*nix)

@@ -127,11 +127,11 @@
         ((year "/" month "/" day) | (year "-" month "-" day)) (" " hour ":" min (":" smks)? tzd?)?
     ) %{ format |= InputFormat::iso; };
 
-    iso8601_tzd_void = (tzoff_sign tzoff_hour tzoff_min?) | tzgmt;
-    iso8601_void     = year     month      day ( "T" hour     (min      smks?)?  iso8601_tzd_void? )?;
-    iso8601_std      = year "-" month ("-" day ( "T" hour (":" min (":" smks)?)? tzd?              )?)?;
-    iso8601_week     = year "-W" nn %week ("-" digit $wday)?;
-    iso8601          = (iso8601_std | iso8601_void | iso8601_week) %{ format |= InputFormat::iso8601; };
+    iso8601_tzd  = tzd | ((tzoff_sign tzoff_hour tzoff_min?) | tzgmt);
+    iso8601_void = year     month      day ( "T" hour     (min      smks?)?  iso8601_tzd? )?;
+    iso8601_std  = year "-" month ("-" day ( "T" hour (":" min (":" smks)?)? iso8601_tzd? )?)?;
+    iso8601_week = year "-W" nn %week ("-" digit $wday)?;
+    iso8601      = (iso8601_std | iso8601_void | iso8601_week) %{ format |= InputFormat::iso8601; };
     
     rfc1123_zone = ("Z" | "UT" | "GMT") %tzgmt |
                    ("EST" | "EDT")      %{ TZRULE("EST5EDT"); } |

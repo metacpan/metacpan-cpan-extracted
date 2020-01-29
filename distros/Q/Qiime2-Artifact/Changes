@@ -1,6 +1,12 @@
+0.10.6	2020-01-28
+  * API documentation on github (https://github.com/telatin/qiime2tools/wiki)
+	* Skipping tests when 'unzip' is not found
+	* test 11_provenance.t will check the "imported" attribute
+	* tests with bad artifacts
+
 0.10.5	2020-01-24
 	* POD and tests updates
-	* Improved check on unzip binary presence
+	* check on unzip binary presence thows differen errors (absence, invalid pattern/version)
 
 0.10.3	2020-01-24
 	* Upgraded ancestors

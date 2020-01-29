@@ -9,7 +9,7 @@ use PDL;
 use Config;
 use strict;
 
-our $VERSION = '0.12.013';
+our $VERSION = '0.12.014';
 pp_setversion($VERSION);
 
 #$::PP_VERBOSE=1; ##-- PDL::PP debugging

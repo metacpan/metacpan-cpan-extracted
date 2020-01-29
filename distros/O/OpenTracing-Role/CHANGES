@@ -2,13 +2,26 @@ CHANGE LOG
 ==========
 
 
+2020-10-29 - v0.06
+------------------
+
+### Added
+    - several test to check with Test::Interface that Roles are OT compliant
+
+### Fixed
+    - bug with non dereferencing options
+    - bug with missing `gettimeofday` from `Time::HiRes`
+
+
 2020-01-15 - v0.05
+------------------
 
 ### Changed
     - use option `finish_span_on_close` instead of optional boolean
 
 
 2020-01-14 - v0.04
+------------------
 
 ### Added
     - OpenTracing::Role.pm, to satisfy PAUSE indexer

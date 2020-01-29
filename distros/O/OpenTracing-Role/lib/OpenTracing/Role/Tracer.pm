@@ -102,7 +102,7 @@ sub start_active_span {
             : !undef
     ; # use 'truthness' of param if provided, or set to 'true' otherwise
     
-    my $span = $self->start_span( $operation_name => $opts );
+    my $span = $self->start_span( $operation_name => %$opts );
     
     my $scope_manager = $self->get_scope_manager();
     
@@ -131,7 +131,11 @@ sub start_span {
     
 #   $child_of->does(') ?
     
-    my $context = defined $child_of && $child_of->does('OpenTracing::Role::SpanContext') ?
+    my $context =
+        defined $child_of
+        && 
+        $child_of->does('OpenTracing::Interface::SpanContext')
+        ?
         $child_of : $self->get_active_span_context();
     
     my $span = $self->build_span(

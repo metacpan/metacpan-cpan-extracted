@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Path::Tiny qw( path );
+use Alien::Build;
+use Alien::Base::Wrapper ();
+use Acme::Alien::DontPanic2 ();
+
+{
+  my @lines = path('dist.ini')->lines;
+
+  for(@lines)
+  {
+    if(/^version\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Build->VERSION . '00';
+      s/$old/$new/;
+      print " version $old -> $new\n";
+      if($old eq $new)
+      {
+        die "seems to be the same version";
+      }
+    }
+    elsif(/^Alien::Base::Wrapper\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Base::Wrapper->VERSION;
+      print " abw     $old -> $new\n";
+      s/$old/$new/;
+    }
+    elsif(/^Acme::Alien::DontPanic2\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Acme::Alien::DontPanic2->VERSION;
+      print " acme    $old   -> $new\n";
+      s/$old/$new/;
+    }
+  }
+
+  path('dist.ini')->spew(@lines);
+}
+
+{
+  my @lines = path('Changes')->lines;
+
+  my $title = shift @lines;
+  my $blank = shift @lines;
+  my $next  = shift @lines;
+
+  unshift @lines, $title, $blank, $next,
+    "  - Require Acme::Alien::DontPanic2 @{[ Acme::Alien::DontPanic2->VERSION ]} (Alien::Build @{[ Alien::Build->VERSION ]})\n";
+
+  path('Changes')->spew(@lines);
+}
+
+system 'git', 'diff';
+
+print "does that look right? ";
+
+my $input = <STDIN>;
+
+die 'not right apparently' unless $input =~ /^y/i;
+
+system 'dzil', 'release' or die;
+system 'cpanm', "Acme-Alien-DontPanic2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz" or die;

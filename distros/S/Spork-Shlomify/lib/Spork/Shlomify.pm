@@ -1,5 +1,5 @@
 package Spork::Shlomify;
-$Spork::Shlomify::VERSION = '0.0401';
+$Spork::Shlomify::VERSION = '0.0402';
 use warnings;
 use strict;
 
@@ -24,7 +24,7 @@ Spork::Shlomify - An improved Spork.
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 SYNOPSIS
 

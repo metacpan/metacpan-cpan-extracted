@@ -2,6 +2,8 @@
 Build.PL
 Changes
 lib/Acme/Alien/DontPanic.pm
+maint/cip-before-install
+maint/cip-before-install-inside
 maint/releaseprep
 MANIFEST			This list of files
 META.json
@@ -9,3 +11,4 @@ META.yml
 README
 t/acme_alien_dontpanic.t
 t/acme_alien_dontpanic_install_files.t
+t/diag.t

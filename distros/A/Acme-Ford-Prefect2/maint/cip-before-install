@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -ex
+
+cip exec mkdir -p /home/cip/tmp
+cip sudo bash -c 'curl https://alienfile.org/travis/install-system-dontpanic.sh | bash -x'
+cip sudo chown -R cip.cip /home/cip/dzil
+cip exec ./maint/cip-before-install-inside

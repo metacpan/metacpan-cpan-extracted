@@ -1,7 +1,7 @@
 package Dancer::Session;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: session engine for the Dancer framework
-$Dancer::Session::VERSION = '1.3512';
+$Dancer::Session::VERSION = '1.3513';
 use strict;
 use warnings;
 
@@ -89,7 +89,7 @@ Dancer::Session - session engine for the Dancer framework
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 DESCRIPTION
 

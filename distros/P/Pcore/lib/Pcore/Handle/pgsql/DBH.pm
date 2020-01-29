@@ -468,6 +468,12 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
                     $col = from_json $col;
                 }
 
+                elsif ( looks_like_number $col) {
+                    no warnings;    ## no critic qw[TestingAndDebugging::ProhibitNoWarnings]
+
+                    0+ $col;
+                }
+
                 # decode text value
                 else {
                     utf8::decode $col;
@@ -995,13 +1001,13 @@ sub encode_json ( $self, $var ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 536                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
+## |    3 | 542                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (31)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 637, 915             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 643, 921             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 768, 915             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 774, 921             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 807                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 813                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

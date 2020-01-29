@@ -1,5 +1,5 @@
-use strict; use warnings;
 BEGIN {
+  use strict; use warnings;
   unless(eval q{ use 5.006; 1}) {
     print "Perl 5.006 or better required\n";
     exit;
@@ -15,7 +15,7 @@ use lib qw{inc}; use Alien::Build::MB;
 
 my %module_build_args = (
   "build_requires" => {
-    "Alien::Build" => "1.41",
+    "Alien::Build" => "1.96",
     "Alien::Build::MB" => "0.05",
     "Module::Build" => "0.28"
   },
@@ -31,7 +31,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic2",
-  "dist_version" => "1.4100",
+  "dist_version" => "1.9600",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic2",
   "recursive_test_files" => 1,
@@ -48,7 +48,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Alien::Build" => "1.41",
+  "Alien::Build" => "1.96",
   "Alien::Build::MB" => "0.05",
   "Module::Build" => "0.28",
   "Test2::V0" => "0.000060",

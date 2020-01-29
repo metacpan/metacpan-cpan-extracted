@@ -22,7 +22,7 @@ term-detect-software - Detect terminal software using Term::Detect::Software
 
 =head1 VERSION
 
-This document describes version 0.004 of term-detect-software (from Perl distribution App-TermAttrUtils), released on 2019-10-03.
+This document describes version 0.005 of term-detect-software (from Perl distribution App-TermAttrUtils), released on 2019-11-26.
 
 =head1 SYNOPSIS
 

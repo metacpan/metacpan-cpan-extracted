@@ -1,7 +1,7 @@
 package Dancer::GetOpt;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Process command-line options for Dancer scripts
-$Dancer::GetOpt::VERSION = '1.3512';
+$Dancer::GetOpt::VERSION = '1.3513';
 use strict;
 use warnings;
 
@@ -95,7 +95,7 @@ Dancer::GetOpt - Process command-line options for Dancer scripts
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 AUTHOR
 

@@ -23,7 +23,7 @@ use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // DEBUG >= 2;
 use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
-our $VERSION = '3.17';
+our $VERSION = '3.18';
 our $YAML_LOADER = eval q[use YAML::XS 0.67; YAML::XS->can('Load')];  # internal
 our @EXPORT_OK   = qw(joi validate_json);
 
@@ -635,6 +635,13 @@ sub _validate {
     return @errors if @errors;
   }
 
+  if (exists $schema->{const}) {
+    push @errors,
+      $self->_validate_type_const($to_json ? $$to_json : $_[1], $path, $schema);
+    $self->_report_errors($path, 'enum', \@errors) if REPORT;
+    return @errors if @errors;
+  }
+
   if ($schema->{enum}) {
     push @errors,
       $self->_validate_type_enum($to_json ? $$to_json : $_[1], $path, $schema);
@@ -1108,7 +1115,7 @@ sub _guess_schema_type {
   return _guessed_right(number => $_[1])
     if defined $_[0]->{maximum}
     or defined $_[0]->{minimum};
-  return 'const' if $_[0]->{const};
+  return 'const' if exists $_[0]->{const};
   return undef;
 }
 
@@ -1544,6 +1551,8 @@ Jan Henning Thorsen - C<jhthorsen@cpan.org>
 Daniel Böhmer - C<post@daniel-boehmer.de>
 
 Ed J - C<mohawk2@users.noreply.github.com>
+
+Karen Etheridge - C<ether@cpan.org>
 
 Kevin Goess - C<cpan@goess.org>
 

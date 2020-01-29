@@ -34,7 +34,7 @@ L<OpenTracing::Interface>.
 
 has span => (
     is => 'ro',
-    isa => ObjectDoesInterface['OpenTracing::Role::Span'],
+    isa => ObjectDoesInterface['OpenTracing::Interface::Span'],
     reader => 'get_span',
 );
 

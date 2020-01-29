@@ -61,12 +61,14 @@
             "Tie::File::Indexed" : "0.08",
             "Time::HiRes" : "0",
             "XML::LibXML" : "1.70",
-            "perl" : "5.01"
+            "perl" : "5.01",
+            "threads" : "0",
+            "threads::shared" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.12.013",
+   "version" : "v0.12.014",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

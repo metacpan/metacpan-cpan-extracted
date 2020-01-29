@@ -5,3 +5,9 @@
 ^.gitignore
 ^.perltidyrc
 ^Makefile$
+^blib
+^pm_to_blib
+^.*\.bs
+^CDB_File.c
+^.*\.o
+cpanfile

@@ -1,6 +1,11 @@
-Revision history for Complete-Bash-History
+0.060   2020-01-29  Released-By: PERLANCAR; Urgency: medium
 
-0.05    2016-02-03 (PERLANCAR)
+	- No functional changes.
+
+	- [test] Update tests.
+
+
+0.05    2016-02-03  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.27.
 
@@ -11,7 +16,7 @@ Revision history for Complete-Bash-History
 	- Observe HISTFILE before defaulting to HOME/.bash_history.
 
 
-0.04    2015-09-09 (PERLANCAR)
+0.04    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -20,7 +25,7 @@ Revision history for Complete-Bash-History
 	  requirement.
 
 
-0.03    2015-09-03 (PERLANCAR)
+0.03    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -29,13 +34,13 @@ Revision history for Complete-Bash-History
 	  requirement.
 
 
-0.02    2015-01-03 (PERLANCAR)
+0.02    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.01    2014-11-30 (PERLANCAR)
+0.01    2014-11-30  Released-By: PERLANCAR
 
         - First release.

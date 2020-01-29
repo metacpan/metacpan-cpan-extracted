@@ -22,6 +22,7 @@ use Moo::Role;
 use MooX::HandlesVia;
 
 use Carp;
+use Time::HiRes qw/gettimeofday/;
 use Types::Standard qw/HashRef Num Object Str Value/;
 use Types::Interface qw/ObjectDoesInterface/;
 
@@ -81,7 +82,7 @@ has tags => (
 
 has context => (
     is              => 'ro',
-    isa             => ObjectDoesInterface['OpenTracing::Role::SpanContext'],
+    isa             => ObjectDoesInterface['OpenTracing::Interface::SpanContext'],
     reader          => 'get_context',
 #   writer          => '_set_context',
     required        => 1, # either from Span->get_context or SpanContext self

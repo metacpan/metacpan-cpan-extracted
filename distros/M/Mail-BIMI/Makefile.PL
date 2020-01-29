@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,20 +14,33 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mail-BIMI",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Mail::BIMI",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::Dumper" => 0,
     "English" => 0,
     "Mail::AuthenticationResults" => 0,
+    "Mail::AuthenticationResults::Header::Comment" => 0,
+    "Mail::AuthenticationResults::Header::Entry" => 0,
+    "Mail::AuthenticationResults::Header::SubEntry" => 0,
     "Mail::DMARC" => 0,
     "Mail::DMARC::PurePerl" => 0,
-    "Net::DNS::Resolver" => 0
+    "Moo" => 0,
+    "Moo::Role" => 0,
+    "Net::DNS::Resolver" => 0,
+    "Type::Utils" => 0,
+    "Types::Standard" => 0,
+    "feature" => 0,
+    "open" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::More" => 0,
+    "lib" => 0
   },
-  "VERSION" => "1.20200107",
+  "VERSION" => "1.20200129",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,10 +52,22 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "English" => 0,
   "Mail::AuthenticationResults" => 0,
+  "Mail::AuthenticationResults::Header::Comment" => 0,
+  "Mail::AuthenticationResults::Header::Entry" => 0,
+  "Mail::AuthenticationResults::Header::SubEntry" => 0,
   "Mail::DMARC" => 0,
   "Mail::DMARC::PurePerl" => 0,
+  "Moo" => 0,
+  "Moo::Role" => 0,
   "Net::DNS::Resolver" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "Type::Utils" => 0,
+  "Types::Standard" => 0,
+  "feature" => 0,
+  "lib" => 0,
+  "open" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

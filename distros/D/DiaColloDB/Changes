@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.014 Wed, 29 Jan 2020 09:40:17 +0100 moocow
+	* yet another attempt to avoid "Attempt to reload XYZ.pm aborted." errors from cpantesters
+	* require 'threads' in Makefile.PL PREREQ_PM, don't try to be clever about loading it at runtime
+
 v0.12.013 Tue, 28 Jan 2020 08:49:33 +0100 moocow
 	* try to avoid "Attempt to reload XYZ.pm aborted." errors from cpantesters
 	  (http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad)

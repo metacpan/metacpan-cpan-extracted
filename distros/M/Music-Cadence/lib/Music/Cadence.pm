@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1309';
+our $VERSION = '0.1401';
 
 use Moo;
 use Music::Chord::Note;
@@ -46,6 +46,12 @@ has seven => (
 );
 
 
+has picardy => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+
 sub cadence {
     my ( $self, %args ) = @_;
 
@@ -54,6 +60,7 @@ sub cadence {
     my $key       = $args{key} || $self->key;
     my $scale     = $args{scale} || $self->scale;
     my $octave    = $args{octave} // $self->octave;
+    my $picardy   = $args{picardy} || $self->picardy;
     my $type      = $args{type} || 'perfect';
     my $leading   = $args{leading} || 1;
     my $variation = $args{variation} || 1;
@@ -148,6 +155,19 @@ sub cadence {
     }
     else {
         die 'unknown cadence';
+    }
+
+    if ( $picardy ) {
+        if ( $self->format eq 'midinum' ) {
+            $cadence->[1][1]++;
+        }
+        else {
+            my $note = Music::Note->new( $cadence->[1][1], $self->format );
+            my $num  = $note->format('midinum');
+            $num++;
+            $note = Music::Note->new( $num, 'midinum' );
+            $cadence->[1][1] = $note->format( $self->format );
+        }
     }
 
     return $cadence;
@@ -260,7 +280,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1309
+version 0.1401
 
 =head1 SYNOPSIS
 
@@ -387,6 +407,15 @@ If set, use seventh chords of four notes instead of diatonic triads.
 
 Default: C<0>
 
+=head2 picardy
+
+If set, use the "Picardy third" for the final chord.
+
+This effectively raises the second note of the final chord by one
+half-step.
+
+Default: C<0>
+
 =head1 METHODS
 
 =head2 new
@@ -394,11 +423,12 @@ Default: C<0>
   $mc = Music::Cadence->new;  # Use defaults
 
   $mc = Music::Cadence->new(  # Override defaults
-    key    => $key,
-    scale  => $scale,
-    octave => $octave,
-    format => $format,
-    seven  => $seven,
+    key     => $key,
+    scale   => $scale,
+    octave  => $octave,
+    format  => $format,
+    seven   => $seven,
+    picardy => $picardy,
   );
 
 Create a new C<Music::Cadence> object.
@@ -411,6 +441,7 @@ Create a new C<Music::Cadence> object.
     key       => $key,        # See above
     scale     => $scale,      # "
     octave    => $octave,     # "
+    picardy   => $picardy,    # "
     type      => $type,       # Default: perfect
     leading   => $leading,    # Default: 1
     variation => $variation,  # Default: 1

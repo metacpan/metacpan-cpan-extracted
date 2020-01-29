@@ -13,7 +13,10 @@ WriteMakefile(
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     ( ( $Config{'d_mmap'} && $Config{'d_mmap'} eq 'define' ) ? ( 'DEFINE' => '-DHASMMAP' ) : () ),
     PREREQ_PM => {
-        'Test::More' => 0,    # For testing
+        'Test::More'  => 0,    # For testing
+        'B::COW'      => 0,    # For testing
+        'File::Temp'  => 0,    # For testing
+        'Devel::Peek' => 0,    # For testing
     },
     dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'CDB_File-*' },
@@ -21,6 +24,9 @@ WriteMakefile(
         recommends     => {},
         build_requires => {
             'Test::More' => 0,    # For testing
+            'B::COW'      => 0,    # For testing
+            'File::Temp'  => 0,    # For testing
+            'Devel::Peek' => 0,    # For testing
         },
         resources => {
             license  => 'http://dev.perl.org/licenses/',

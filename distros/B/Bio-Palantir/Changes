@@ -1,3 +1,14 @@
+0.200290  2020-01-29 16:10:33+01:00 Europe/Brussels
+	- Addition
+	  - Roles::Modulable::Component: added a new class for handling the old module delineation algorithm
+	- Changes
+	  - Roles::Modulable: implemented a new algorithm for the module delineation
+	  - Roles::Domainable: modified symbol and class regexes for handling antiSMASH v5.1 nomenclature
+	  - binaries: changed default value 'selection' to 'substrate-selection' for --module-delineation option
+	- Fixes
+	  - bin::export_bgc_sql_tables: fixed a bug in the output writing occuring when performing consecutive analyses
+	  - bin::extract_bgc_sequences: updated the calling of module coordinates
+
 0.200150  2020-01-15 22:07:36+01:00 Europe/Brussels
 	- Additions
 	  - Parser & Roles: implemented the extraction of antiSMASH v5.1 modules

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.014.1";
+our $VERSION = "0.015";
 
 =head1 NAME
 
@@ -104,9 +104,7 @@ sub get_font {
 
 =item get_weight
 
-=item get_shaping
-
-Accessors to the font family, style, weight and shaping.
+Accessors to the font family, style, and weight.
 
 Readonly.
 
@@ -129,16 +127,6 @@ sub get_weight {
     $self->{weight};
 }
 
-sub get_size {
-    my ( $self ) = @_;
-    $self->{size};
-}
-
-sub get_shaping {
-    my ( $self ) = @_;
-    $self->{shaping};
-}
-
 =over
 
 =item set_size
@@ -156,19 +144,33 @@ sub set_size {
     $self->{size} = $size;
 }
 
-=over
+sub get_size {
+    my ( $self ) = @_;
+    $self->{size};
+}
 
-=item set_shaping
-
-Sets/gets the shaping property of the font.
-
-=back
-
-=cut
+# Not documented -- internal use only.
 
 sub set_shaping {
     my ( $self, $sh ) = @_;
     $self->{shaping} = $sh // 1;
+}
+
+sub get_shaping {
+    my ( $self ) = @_;
+    $self->{shaping};
+}
+
+# Not documented -- internal use only.
+
+sub set_interline {
+    my ( $self, $sh ) = @_;
+    $self->{interline} = $sh // 1;
+}
+
+sub get_interline {
+    my ( $self ) = @_;
+    $self->{interline};
 }
 
 =over

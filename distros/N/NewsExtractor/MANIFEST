@@ -22,6 +22,7 @@ lib/NewsExtractor/Extractor.pm
 lib/NewsExtractor/GenericExtractor.pm
 lib/NewsExtractor/JSONLDExtractor.pm
 lib/NewsExtractor/SiteSpecificExtractor.pm
+lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm

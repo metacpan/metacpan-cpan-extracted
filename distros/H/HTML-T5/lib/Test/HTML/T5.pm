@@ -7,7 +7,7 @@ use strict;
 use Test::Builder;
 use Exporter;
 
-use HTML::T5;
+use HTML::T5 ();
 
 use parent 'Exporter';
 
@@ -24,11 +24,11 @@ Test::HTML::T5 - Test::More-style wrapper around HTML::T5
 
 =head1 VERSION
 
-Version 0.006
+Version 0.007
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 my $TB = Test::Builder->new;
 

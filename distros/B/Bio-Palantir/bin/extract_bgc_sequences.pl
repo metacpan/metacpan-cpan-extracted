@@ -22,7 +22,7 @@ if (@ARGV_types) {
 # report parsing
 my $report = Parser->new(
     file => $ARGV_report_file,
-    module_delineation => $module_delineation,
+    module_delineation => $ARGV_module_delineation,
 );
 
 my $root = $report->root;
@@ -31,7 +31,9 @@ my $prefix = $ARGV_prefix ? $ARGV_prefix . '@' : '';
 
 my @clusters
     = $ARGV_annotation eq 'palantir'
-    ? map { ClusterPlus->new( _cluster => $_ ) } $root->all_clusters
+    ? map { ClusterPlus->new(
+        _cluster => $_,
+        module_delineation => $ARGV_module_delineation) } $root->all_clusters
     : $root->all_clusters
 ;
 
@@ -104,8 +106,10 @@ for my $cluster (@clusters) {
             my $domain_set = @domains ? join '-', @domains : 'no_domain';
 
             say {$out} '>' . $prefix . 'Cluster' . $cluster->rank .
-                '_' . 'Module' . $module->rank . '|' . $module->begin .
-                '-' . $module->end . '|' . $domain_set;
+                '_' . 'Module' . $module->rank . '|'
+                . $module->genomic_prot_begin . '-' . $module->genomic_prot_end
+                . '|' . $domain_set
+            ;
 
             say {$out} $module->protein_sequence;
         }
@@ -122,7 +126,7 @@ extract_bgc_sequences.pl - Extracts protein sequences for different BGC scales i
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 NAME
 
@@ -162,10 +166,11 @@ or antismash [default: palantir]
 =item --module-delineation [=] <str>
 
 Method for delineating the modules. Modules can either be cut on condensation
-(C and KS) or selection domains (A and AT) [default: selection].
+(C and KS) or substrate-selection domains (A and AT)
+[default: 'substrate-selection'].
 
-=for Euclid: str.type: /condensation|selection/
-    str.default: 'selection'
+=for Euclid: str.type: /condensation|substrate\-selection/
+    str.default: 'substrate-selection'
 
 =item --types [=] <str>...
 

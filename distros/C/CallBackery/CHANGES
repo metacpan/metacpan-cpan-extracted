@@ -1,3 +1,8 @@
+0.27.0 2020-01-29 14:58:18 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - stabilized reconf behavior in frontend (@zaucker)
+ - added visible property to table column descriptions (@zaucker)
+
 0.26.3 2020-01-23 11:09:05 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - add 'copySuccessMsg' and 'copyFailMsg' options to field config

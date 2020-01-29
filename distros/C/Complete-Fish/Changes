@@ -1,13 +1,17 @@
-Revision history for Complete-Fish
+0.060   2020-01-29  Released-By: PERLANCAR; Urgency: high
 
-0.05    2016-10-21 (PERLANCAR)
+	- Adjust to Complete::Bash 0.333 ('as' moved to option/second
+	  argument) [RT#131586].
+
+
+0.05    2016-10-21  Released-By: PERLANCAR
 
         - [Removed] Remove parse_cmdline() because this function has no use.
           fish does not offer COMP_LINE or COMMAND_LINE mechanism like in bash
           or tcsh.
 
 
-0.04    2015-09-09 (PERLANCAR)
+0.04    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -16,22 +20,22 @@ Revision history for Complete-Fish
 	  requirement.
 
 
-0.03    2014-11-29 (PERLANCAR)
+0.03    2014-11-29  Released-By: PERLANCAR
 
         - Add parse_cmdline().
 
 
-0.02    2014-11-29 (PERLANCAR)
+0.02    2014-11-29  Released-By: PERLANCAR
 
 	- [ux] Insert empty description so fish doesn't show summary from
 	  'complete -d' for every item, I think this is the nicer default.
 
 
-0.01    2014-11-29 (PERLANCAR)
+0.01    2014-11-29  Released-By: PERLANCAR
 
         - First version with implementation.
 
 
-0.00    2014-07-02 (SHARYANTO)
+0.00    2014-07-02  Released-By: SHARYANTO
 
         - First release, not implemented yet.

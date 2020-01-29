@@ -9,15 +9,31 @@ use DiaColloDB::Utils qw(:list :math :si);
 use strict;
 
 ##-- try to use threads
-our ($HAVE_THREADS);
+## + weird cpantesters errors for DiaColloDB v0.12.01[23], e.g.
+##   - http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad
+##   - http://www.cpantesters.org/cpan/report/acb1841c-41b5-11ea-81ed-d3b978f58c5e
+## + error: "Attempt to reload DiaColloDB.pm aborted." on perl v5.31.7 during make test
+## + perldiag says:
+##    Attempt to reload %s aborted.
+##               (F) You tried to load a file with "use" or "require" that failed to
+##               compile once already.  Perl will not try to compile this file again
+##               unless you delete its entry from %INC.  See "require" in perlfunc
+##               and "%INC" in perlvar.
+## + DiaColloDB 0.12.013 - tried checking $INC{'threads.pm'} here -> no joy
+## + DiaColloDB 0.12.014 - always 'use threads' (added to PREREQ_PM), just set WANT_THREADS for debugging
+## + see also https://www.perlmonks.org/?node_id=1029344 for runtime workaround
+
+our ($WANT_THREADS);
 BEGIN {
-  $HAVE_THREADS = ($^P ? 0 ##-- disable threads if running under debugger
-                   : ($INC{'threads.pm'} ? 1    ##-- try to avoid "Attempt to reload threads.pm aborted." on perl 5.31.7 (cpantesters)
-                      : eval "use threads; 1"   ##-- this causes segfaults when join()ing 2nd thread (bogus destruction) for DDC::XS < v0.23
-                      #: eval "use forks; 1"    ##-- forks module works basically as expected
-                     ))
-    if (!defined($HAVE_THREADS));
-  $@ = '';
+  $WANT_THREADS = 0 if ($^P); ##-- disable threads if running under debugger
+
+#  $WANT_THREADS = ($^P ? 0 ##-- disable threads if running under debugger
+#                   : ($INC{'threads.pm'} ? 1    ##-- try to avoid "Attempt to reload threads.pm aborted." on perl 5.31.7 (cpantesters)
+#                      : eval "use threads; 1"   ##-- this causes segfaults when join()ing 2nd thread (bogus destruction) for DDC::XS < v0.23
+#                      #: eval "use forks; 1"    ##-- forks module works basically as expected
+#                     ))
+#    if (!defined($WANT_THREADS));
+#  $@ = '';
 }
 
 
@@ -60,7 +76,7 @@ sub defaults {
 	  fudge=>10,
 	  logFudge => 'debug',
 	  logThread => 'none',
-	  fork => $HAVE_THREADS,
+	  fork => $WANT_THREADS,
 	  lazy => 1,
 	  extend => 1,
 	 );
@@ -108,7 +124,7 @@ sub open_list {
   @$cli{qw(url urls)} = ($url,$curls);
 
   ##-- sanity check(s)
-  if ($cli->{fork} && !$HAVE_THREADS) {
+  if ($cli->{fork} && !$WANT_THREADS) {
     $cli->warn("fork-mode requested, but 'threads' module unavailable");
     $cli->{fork} = 0;
   }
@@ -198,7 +214,7 @@ sub headerKeys {
 sub subcall {
   my ($cli,$code,@args) = @_;
   my ($i,@results);
-  if ($HAVE_THREADS && $cli->{fork}) {
+  if ($WANT_THREADS && $cli->{fork}) {
     ##-- threaded call
     PDL::no_clone_skip_warning() if (UNIVERSAL::can('PDL','no_clone_skip_warning')); ##-- ithreads warning
 

@@ -17,7 +17,11 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     # open and parse antiSMASH report in XML format
     my $infile = file('xtest', 'Refiner_nrps_biosynML.xml');  # Aphanomyces astaci prot report
     
-    ok my $report = Bio::Palantir::Refiner->new( file => $infile ), 'Refiner constructor';
+    ok my $report = Bio::Palantir::Refiner->new(
+            file => $infile,
+            module_delineation => 'condensation'
+        ), 'Refiner constructor'
+    ;
 
     my @nrps_clusters = grep { $_->type eq 'nrps' } $report->all_clusters;
     
@@ -54,49 +58,80 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     # elongate coordinates - handle_overlaps - refine_coordinates
     cmp_deeply \@domain_sizes, @expected_domain_sizes,
-        'got expected elongated sizes for NRPS DomainPlus objects - Coordinates methods test';
+        'got expected elongated sizes for NRPS DomainPlus objects'
+        . ' - Coordinates methods test';
 
     cmp_deeply \@domain_subtypes, @expected_domain_subtypes,
-        'got expected subtypes for NRPS DomainPlus objects - Subtyping method test';
+        'got expected subtypes for NRPS DomainPlus objects'
+        . ' - Subtyping method test';
 
     cmp_deeply \@domain_evalues, @expected_domain_evalues,
-        'got expected (appropriate) evalues for DomainPlus objects - Hmmer report parsing test';
+        'got expected (appropriate) evalues for DomainPlus objects'
+        . ' - Hmmer report parsing test';
 
     # Test for domain subtyping method
     cmp_deeply \@domain_bitscores, @expected_domain_bitscores,
-        'got expected (appropriate) bitscores for DomainPlus objects - Hmmer report parsing test';
+        'got expected (appropriate) bitscores for DomainPlus objects'
+        . ' - Hmmer report parsing test';
 
+
+    my @expected_components = [
+        'A-PCP', 'C-A-PCP-C',
+    ];
+
+    # test for Components building in Modulable role
+    my @components;
+    for my $component ($ClusterPlus1->all_components) {
+        push @components, join '-', map { $_->function } $component->all_domains;
+    }
 
     my @expected_modules = [
         'A-PCP', 'C-A-PCP-C',
     ];
-
-    # test for Modules building in Modulable role
+    
     my @modules;
-    for my $module ($ClusterPlus1->all_modules) {
-        push @modules, join '-', map { $_->function } $module->all_domains;
+    for my $module($ClusterPlus1->all_modules) {
+        push @modules, join '-', map {$_->function } $module->all_domains;
+    }
+
+    my $report2 = Bio::Palantir::Refiner->new( 
+        file => $infile , 
+        module_delineation => 'substrate-selection',
+    );
+    my @nrps_clusters2 = grep { $_->type eq 'nrps' } $report2->all_clusters;
+    
+    my @expected_components2 = [
+        'A-PCP-C', 'A-PCP-C',
+    ];
+    
+    my @components2;
+    for my $module ($nrps_clusters2[2]->all_components) {
+        push @components2, join '-', map { $_->function } $module->all_domains;
     }
 
     my @expected_modules2 = [
-        'A-PCP-C', 'A-PCP-C',
+        'A-PCP-C', 'A-PCP-C',        
     ];
-    my $report2 = Bio::Palantir::Refiner->new( 
-        file => $infile , 
-        module_delineation => 'selection',
-    );
-
-    my @nrps_clusters2 = grep { $_->type eq 'nrps' } $report2->all_clusters;
-    
     my @modules2;
-    for my $module ($nrps_clusters2[2]->all_modules) {
-        push @modules2, join '-', map { $_->function } $module->all_domains;
+    for my $module($nrps_clusters2[2]->all_modules) {
+        push @modules2, join '-', map {$_->function } $module->all_domains;
     }
     
+    cmp_deeply \@components, @expected_components,
+        'got expected domain architecture for NRPS Component objects'
+        . ' - \'condensation\' component delineation (Modulable build method) test';
+    
+    cmp_deeply \@components2, @expected_components2,
+        'got expected domain architecture for NRPS Component objects'
+        . ' - \'selection\' component delineation (Modulable build method) test';
+    
     cmp_deeply \@modules, @expected_modules,
-        'got expected domain architecture for NRPS Module objects - \'condensation\' module delineation (Modulable build method) test';
+        'got expected domain architecture for NRPS Module objects'
+        . ' - \'condensation\' component delineation (Modulable build method) test';
     
     cmp_deeply \@modules2, @expected_modules2,
-        'got expected domain architecture for NRPS Module objects - \'selection\' module delineation (Modulable build method) test';
+        'got expected domain architecture for NRPS Module objects'
+        . ' - \'selection\' component delineation (Modulable build method) test';
 
     # TODO find a better example: here additional detection of a 900aa domain in the gene following the cluster...
     # Test additional domain detection
@@ -107,7 +142,6 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
         'C', 'A', 'A', 'PCP', 'C', 
         'A', 'C', 'A', 'PCP',
     ];
-
 
     my @expected_domain_classes = [
         'substrate-selection', 'carrier-protein', 'condensation', 
@@ -134,16 +168,20 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     }
 
     cmp_ok $domain_n, '==', 14,
-        'got expected number of predicted domains - Filling gaps method test';
+        'got expected number of predicted domains'
+        . ' - Filling gaps method test';
 
     cmp_deeply \@domain_symbols, @expected_domain_symbols,
-        'got expected domain symbols for NRPS DomainPlus objects - Domainable symbol method test';
+        'got expected domain symbols for NRPS DomainPlus objects'
+        . ' - Domainable symbol method test';
 
     cmp_deeply \@domain_classes, @expected_domain_classes,
-        'got expected domain classes for NRPS DomainPlus objects - GenePlus _get_class method test';
+        'got expected domain classes for NRPS DomainPlus objects'
+        . ' - GenePlus _get_class method test';
     
     cmp_deeply \@domain_coordinates, @expected_domain_coordinates,
-        'got expected domain coordinates for NRPS DomainPlus objects - Fillable role method test';
+        'got expected domain coordinates for NRPS DomainPlus objects'
+        . ' - Fillable role method test';
 
 }
 
@@ -151,7 +189,8 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
 
     # open and parse antiSMASH report in XML format
     my $infile = file('xtest', 'Refiner_pks_biosynML.xml');  # Aphanomyces astaci prot report
-    ok my $report = Bio::Palantir::Parser->new( file => $infile ), 'Biosynml constructor';
+    ok my $report = Bio::Palantir::Parser->new( file => $infile ),
+        'Biosynml constructor';
     
     # get main container
     my $root = $report->root;
@@ -180,28 +219,32 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     
     # elongate coordinates - handle_overlaps - refine_coordinates
     cmp_deeply \@domain_sizes, @expected_domain_sizes,
-        'got expected elongated sizes for PKS DomainPlus objects - Coordinates methods test';
+        'got expected elongated sizes for PKS DomainPlus objects' 
+        . ' - Coordinates methods test';
 
     cmp_deeply \@domain_subtypes, @expected_domain_subtypes,
-        'got expected subtypes for PKS DomainPlus objects - Subtyping method test';
+        'got expected subtypes for PKS DomainPlus objects'
+        . ' - Subtyping method test';
 
 
-    my @expected_modules = ['KS-AT-DH-MT-ER-KR'];
+    my @expected_components = ['KS-AT-DH-MT-ER-KR'];
 
-    my @expected_module_coordinates = [2, 2246];
+    my @expected_component_coordinates = [2, 2246];
 
     # test for Modules building in Modulable role
-    my (@modules, @module_coordinates);
-    for my $module ($ClusterPlus->all_modules) {
-        push @modules, join '-',  @{ $module->get_domain_functions };
-        push @module_coordinates, @{ $module->genomic_prot_coordinates };
+    my (@components, @component_coordinates);
+    for my $component ($ClusterPlus->all_components) {
+        push @components, join '-',  @{ $component->get_domain_functions };
+        push @component_coordinates, @{ $component->genomic_prot_coordinates };
     }
 
-    cmp_deeply \@modules, @expected_modules,
-        'got expected domain architecture for PKS Module objects - Modulable build and get_domain_functions methods test';
+    cmp_deeply \@components, @expected_components,
+        'got expected domain architecture for PKS Component objects'
+        . ' - Modulable build and get_domain_functions methods test';
 
-    cmp_deeply \@module_coordinates, @expected_module_coordinates,
-        'got expected module coordinates for PKS Module objects - Modulable build method test';
+    cmp_deeply \@component_coordinates, @expected_component_coordinates,
+        'got expected module coordinates for PKS Component objects'
+        . ' - Modulable build method test';
 
     my @expected_domain_symbols = [
         'KS', 'AT', 'DH', 'MT', 'ER', 'KR',
@@ -220,10 +263,12 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     }
 
     cmp_deeply \@domain_symbols, @expected_domain_symbols,
-        'got expected domain symbols for PKS DomainPlus objects - Domainable symbol method test';
+        'got expected domain symbols for PKS DomainPlus objects'
+        . ' - Domainable symbol method test';
 
     cmp_deeply \@domain_classes, @expected_domain_classes,
-        'got expected domain classes for PKS DomainPlus objects - GenePlus _get_class method test';
+        'got expected domain classes for PKS DomainPlus objects'
+        . ' - GenePlus _get_class method test';
 
 }
 
@@ -233,7 +278,9 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     my $infile = file('xtest', 'Refiner_pks_regions.js');  # cyano GCF_000317025.1
     
     # get main container
-    ok my $report = Bio::Palantir::Parser->new( file => $infile ), 'JS constructor';
+    ok my $report = Bio::Palantir::Parser->new( file => $infile ),
+        'JS constructor';
+
     my $root = $report->root;
     my $ClusterPlus = $class->new( _cluster => $root->all_clusters ); 
 
@@ -258,10 +305,12 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     }
 
     cmp_deeply \@exploratory_domain_symbols, @expected_exploratory_domain_symbols,
-        'got expected exploratory domain symbols for PKS DomainPlus objects - Fillable _detect_domains filter & Domainable symbol method test';
+        'got expected exploratory domain symbols for PKS DomainPlus objects'
+        . ' - Fillable _detect_domains filter & Domainable symbol method test';
 
     cmp_deeply \@exploratory_domain_coordinates, @expected_exploratory_domain_coordinates,
-        'got expected exploratory domain coordinates for PKS DomainPlus objects - Fillable _detect_domains coordinates method';
+        'got expected exploratory domain coordinates for PKS DomainPlus objects'
+        . ' - Fillable _detect_domains coordinates method';
 
 }
 

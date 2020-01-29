@@ -185,7 +185,7 @@ while ( my ( $k, $v ) = each %h ) {
     my $x;
     ok( !defined $h{$x} );
   SKIP: {
-        skip 'Perl 5.6 does not warn about $x{undef}', 1 unless $] > 5.007;
+        skip 'Perl 5.8.2 and below do not warn about $x{undef}', 1 unless $] > 5.008003;
         ok($warned);
     }
 

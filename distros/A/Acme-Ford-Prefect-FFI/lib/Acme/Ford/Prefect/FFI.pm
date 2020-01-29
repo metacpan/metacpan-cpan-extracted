@@ -45,7 +45,7 @@ it under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '1.96';
 
 our($dll) = Acme::Alien::DontPanic->dynamic_libs;
 die "no dll found for libdontpanic" unless $dll;

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0507';
+our $VERSION = '0.0600';
 
 use Carp;
 use List::Util qw( first );
@@ -114,6 +114,24 @@ sub get_offset {
     return $note;
 }
 
+
+sub step {
+    my ( $self, %args ) = @_;
+
+    my $name  = $args{note_name};
+    my $steps = $args{steps} || 1;
+
+    croak 'note_name not provided'
+        unless $name;
+
+    my $note = Music::Note->new( $name, $self->note_format );
+    my $num  = $note->format('midinum');
+    $num += $steps;
+    $note = Music::Note->new( $num, 'midinum' );
+
+    return $note;
+}
+
 1;
 
 __END__
@@ -128,7 +146,7 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0507
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -157,6 +175,12 @@ version 0.0507
   );
   print $note->format('midinum'), "\n"; # 59
 
+  $note = $msn->step(
+    note_name => 'D3',
+    steps     => -1,
+  );
+  print $note->format('ISO'), "\n"; # Db3
+
 =head1 DESCRIPTION
 
 A C<Music::ScaleNote> object manipulates the position of a note in a
@@ -171,6 +195,9 @@ So for scale C<C D# F G A#> (C pentatonic minor), note name C<C4>
 the note C<D#4> is returned.
 
 For an offset of C<-1>, the note C<A#3> is returned.
+
+This module also provides a C<step> method that returns the new note a
+given number of half-B<steps> away from a given B<note_name>.
 
 =head1 ATTRIBUTES
 
@@ -236,10 +263,10 @@ Create a new C<Music::ScaleNote> object.
 
 =head2 get_offset
 
-  $note = $msn->get_offset( note_name => $note );
+  $note = $msn->get_offset( note_name => $note_name );
 
   $note = $msn->get_offset(  # Override defaults
-    note_name   => $note,
+    note_name   => $note_name,
     note_format => $format,
     offset      => $integer,
   );
@@ -259,6 +286,20 @@ octave), and the B<format> is C<ISO>, the octave returned will be C<4>
 by default.  For B<format> of C<midinum> and the B<note_name> being a
 letter, a nonsensical result will be returned.  This mixing up of
 format and note name is B<not> how to use this module.
+
+=head2 step
+
+  $note = $msn->step( note_name => $note_name );
+
+  $note = $msn->step(
+    note_name => $note_name,
+    steps     => $halfsteps,
+  );
+
+Return a new L<Music::Note> object based on the required B<note_name>
+and number of half-B<steps> - either a positive or negative integer.
+
+Default steps: 1
 
 =head1 SEE ALSO
 

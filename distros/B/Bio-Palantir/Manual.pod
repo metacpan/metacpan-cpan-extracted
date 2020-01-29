@@ -172,6 +172,10 @@ Here is an example of a more specific command line:
 Furthermore, if you are only interested in antiSMASH annotation, you can use 
 C<--annotation=antismash> option. 
 
+You can choose the cutting mode applied for the delineation of modules with
+the C<--module-delineation> option. Two modes are available: condensation and
+substrate-selection (default: substrate-selection).
+
 Finally, for adding information into the sequence IDs of the FASTA file, 
 you can use C<--prefix>. For instance, C<--prefix=strain1> will give sequence
 IDs such as ">Strain1@Cluster...".
@@ -198,8 +202,8 @@ N.B.: this script does not work for antiSMASH 5.
 C<--filetype> option allows the user to choose between PDF and Word docx output
 (values: pdf or docx, default: pdf).
 
-C<--types> and C<--outfile> options are available and work as explained in
-the F<extract_bgc_sequences.pl> section.
+C<--types> and C<--outfile> options are available and
+work as explained in the F<extract_bgc_sequences.pl> section.
 
 
 =head3 F<export_bgc_sql_tables.pl> - (3) SQL tables generation
@@ -227,6 +231,8 @@ C<--infiles> option allows the user to specify multiple reports at once.
 
 Several options are available:
 
+C<--module-delineation>: Cutting modes: condensation and substrate-selection
+(default: substrate-selection).
 C<--db-name>: database name (default: bgc_db).
 C<--cpu>: number of cpus to use (default: 1).
 
@@ -324,6 +330,8 @@ The label contains the prediction E-value in Palantir annotations).
 
 More options:
 
+C<--module-delineation>: Cutting modes: condensation and substrate-selection
+(default: substrate-selection).
 C<--verbose>: prints additionnal information concerning domains (function, 
 coordinates and sequences).
 C<--outdir>: directory name where PNG files will be generated (default: ./png/).

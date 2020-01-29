@@ -48,7 +48,7 @@
    "provides" : {
       "Text::Layout" : {
          "file" : "lib/Text/Layout.pm",
-         "version" : "v0.14.1"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/sciurius/perl-Text-Layout"
       }
    },
-   "version" : "v0.014.1",
+   "version" : "0.015",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

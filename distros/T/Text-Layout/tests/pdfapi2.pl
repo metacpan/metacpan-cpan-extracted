@@ -27,7 +27,7 @@ my $PANGO_SCALE;
 
 sub main {
     # Select a font.
-    my $font = Text::Layout::FontConfig->from_string("Serif 60");
+    my $font = Text::Layout::FontConfig->from_string("Sanss 60");
     $layout->set_font_description($font);
 
     # Start...
@@ -83,8 +83,7 @@ sub main {
     $y -= 100;
 
     # This will only work properly with the HarfBuzz driver.
-    $font = Text::Layout::FontConfig->from_filename("/usr/share/fonts/lohit-devanagari/Lohit-Devanagari.ttf");
-    $font->set_shaping;
+    $font = Text::Layout::FontConfig->from_string("Deva 60");
     $layout->set_font_description($font);
     $layout->set_width( 595 * $PANGO_SCALE );
     $layout->set_alignment("right");
@@ -187,6 +186,14 @@ sub setup_fonts {
     $fd->register_font( "DejaVuSans-Oblique.ttf",     "Sans", "Italic"     );
     $fd->register_font( "DejaVuSans-BoldOblique.ttf", "Sans", "BoldItalic" );
 
+    # Add Devanagari. Requires shaping.
+    $fd->register_font( "lohit-devanagari/Lohit-Devanagari.ttf",
+			"Deva", "", "", { shaping => 1 } );
+
+    my $o = { interline => 1 };
+    $fd->register_font( "Helvetica", "Sanss", "", "", $o );
+    $fd->register_font( "HelveticaOblique", "Sanss", "Italic", "", $o );
+    $fd->register_font( "HelveticaBold", "Sanss", "Bold", "", $o );
 }
 
 ################ Main entry point ################

@@ -7,7 +7,7 @@
 package DiaColloDB::Upgrade;
 
 # "Attempt to reload DiaColloDB.pm aborted." on perl v5.31.7 (http://www.cpantesters.org/cpan/report/b8caf29a-4121-11ea-9d04-93d2cf6284ad)
-#  - may be due to 'eval "use threads";' in Client/list.pm
+#  - maybe due to 'eval "use threads";' in Client/list.pm?  --> nope, no joy
 #use DiaColloDB;
 
 use DiaColloDB::Upgrade::Base;

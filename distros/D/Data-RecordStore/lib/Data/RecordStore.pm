@@ -64,7 +64,7 @@ use Data::RecordStore::Transaction;
 
 use vars qw($VERSION);
 
-$VERSION = '6.03';
+$VERSION = '6.05';
 my $SILO_VERSION = '6.00';
 
 use constant {
@@ -359,15 +359,18 @@ sub delete_record {
 # they are locked in order to prevent deadlocks.
 sub lock {
     my( $self, @locknames ) = @_;
-    if( @{$self->[LOCKS]} ) {
+
+    my( %previously_locked ) = ( map { $_ => 1 } @{$self->[LOCKS]} );
+
+    if( @{$self->[LOCKS]} && grep { ! $previously_locked{$_} } @locknames ) {
         die "Data::RecordStore->lock cannot be called twice in a row without unlocking between";
     }
     my $fhs = [];
-    my %seen;
+
     my $failed;
 
     for my $name (sort @locknames) {
-        next if $seen{$name}++;
+        next if $previously_locked{$name}++;
         my $lockfile = "$self->[DIRECTORY]/user_locks/$name";
         my $fh;
         if( -e $lockfile ) {
@@ -793,7 +796,7 @@ the given directory, if any.
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 6.03  (Jan, 2020))
+       Version 6.05  (Jan, 2020))
 
 =cut
 

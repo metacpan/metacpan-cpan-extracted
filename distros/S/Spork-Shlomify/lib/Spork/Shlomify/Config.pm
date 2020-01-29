@@ -1,5 +1,5 @@
 package Spork::Shlomify::Config;
-$Spork::Shlomify::Config::VERSION = '0.0401';
+$Spork::Shlomify::Config::VERSION = '0.0402';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Spork::Shlomif::Config - the configuration class for Spork::Shlomify
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 FUNCTIONS
 

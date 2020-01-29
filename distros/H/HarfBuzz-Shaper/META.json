@@ -46,7 +46,7 @@
    "provides" : {
       "HarfBuzz::Shaper" : {
          "file" : "lib/HarfBuzz/Shaper.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/sciurius/perl-HarfBuzz-Shaper"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

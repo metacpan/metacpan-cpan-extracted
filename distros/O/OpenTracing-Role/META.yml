@@ -4,6 +4,8 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Sub::Override: '0'
+  Test::Interface: '0'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
@@ -22,10 +24,11 @@ requires:
   Carp: '0'
   Moo::Role: '0'
   MooX::HandlesVia: '0'
-  OpenTracing::Interface: '0'
+  OpenTracing::Interface: '0.11'
   Sub::Trigger::Lock: '0'
+  Time::HiRes: '0'
   Try::Tiny: '0'
   Types::Interface: '0'
   Types::Standard: '0'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

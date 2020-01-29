@@ -12,27 +12,39 @@ use YAML::PP;
 use Capture::Tiny ':all';
 use File::Basename;
 
-$Qiime2::Artifact::VERSION = '0.10.5';
+$Qiime2::Artifact::VERSION = '0.10.6';
 
 sub crash($);
 
 sub new {
-    # Instantiate object
     my ($class, $args) = @_;
+
+    # Check for misspelled parameters
+    my %accepted_args = (
+      'filename' => 'Path to the artifact',
+      'unzip'    => 'Path to the unzip program (default: search in PATH)',
+      'debug'    => 'Enable debug mode (not implemented)',
+      'verbose'  => 'Enable verbose mode (not implemented)'
+    );
+    for my $parameter (keys %{ $args }) {
+      crash("Parameter <$parameter> is not a valid Qiime2::Artifact->new() attribute.\nValid options: " .
+        join(', ', sort keys %accepted_args)) if (not $accepted_args{$parameter});
+    }
+
+
 
     my $abs_path = Cwd::abs_path($args->{filename});
    	my $unzip_path = $args->{unzip} // 'unzip';
+    chomp($unzip_path);
 
    	# Check supplied filename (abs_path uses the filesystem and return undef if file not found)
     crash "Filename not found: $args->{filename}" unless defined $abs_path;
     # Check unzip
-    crash "UnZip not found as <$unzip_path>.\n" unless _check_output($unzip_path, 'UnZip 6.00');
+    crash "UnZip not found as <$unzip_path>.\n" unless _check_unzip($unzip_path);
 
     my $self = {
 
         filename_arg  => $args->{filename},
-
-
         debug         => $args->{debug} // 0,
         verbose       => $args->{verbose} // 0,
         filename      => $abs_path,
@@ -66,9 +78,11 @@ sub _read_artifact {
 	if (not defined $self->{filename}) {
 		crash "_read_artifact: filename not defined $self";
 	}
+  if (not defined $self->{unzip_path}) {
+		crash "_read_artifact: <unzip> path not defined $self";
+	}  # Read files content in the artifact
+  my $artifact_raw = _run( [$self->{unzip_path}, '-t', $self->{filename}] );
 
-  # Read files content in the artifact
-  my $artifact_raw = _run( qq(unzip -t "$self->{filename}" ));
       if ($artifact_raw->{status} != 0) {
         # Unzip -t failed: not a zip file
         crash("$self->{filename} is not a ZIP file");
@@ -130,8 +144,8 @@ sub _read_artifact {
 
 
   $self->{ancestry} = _getAncestry($self);
-
-  $self->{version} = 'Unknown';$self->{version} = 'archive';
+  $self->{version} = 'Unknown';
+  $self->{version} = 'archive';
 
   my $root_version = _getArtifactText($self, $self->{id}.'/VERSION');
   $self->{version} = $1 if ($root_version=~/framework:\s*\"?(.+)\"?/);
@@ -205,7 +219,7 @@ sub _tree {
   my $last_array = $self->{ancestry}[-1];
   return 0 unless ( ${ $last_array}[0] );
 
-  say ">>> @{$self->{ancestry}[-1]}";
+
   foreach my $item (@{$self->{ancestry}[-1]}) {
     if (defined $self->{parents}->{$item}->{from}) {
       push @{$self->{ancestry}}, $self->{parents}->{$item}->{from};
@@ -217,21 +231,46 @@ sub _tree {
   return 0;
 }
 
-sub _check_output {
-  # check if a command has a string in the output
-  my ($cmd, $pattern) = @_;
-  my $output = _run($cmd);
+sub _check_unzip {
+  my ($cmd_list, $pattern) = ([$_[0]], 'UnZip 6.00');
+  if ($^O eq 'linux' or $^O eq 'darwin') {
+    # check if a command has a string in the output
+    my $output = _run($cmd_list);
 
-  if ($output->{status} != 0) {
-      crash("Unable to test <$cmd>, execution returned $output->{status}");
-  }
+    if ($output->{status} != 0) {
+        crash("Unable to test <$$cmd_list[0]>, execution returned $output->{status}.\n".
+        "Under Linux and macOS $$cmd_list[0] is expected to print its help when invoked.\n");
+    }
 
-  if ($output->{stdout} =~/$pattern/) {
-    return 1;
-  } elsif ($output->{stderr} =~/$pattern/) {
-    return 2;
+    if ($output->{stdout} =~/$pattern/) {
+      # Pattern found in STDOUT invoking the command
+      return 1;
+    } elsif ($output->{stderr} =~/$pattern/) {
+      # Pattern found in STDERR invoking the command
+      return 2;
+    } else {
+      # Pattern NOT found
+      return 0;
+    }
   } else {
-    return 0;
+    if (-e "$$cmd_list[0]") {
+      return 3;
+    } else {
+      # First try to check for Linux-like UnZip
+      my $output = _run($cmd_list);
+      return 1 if ($output->{stdout} =~/$pattern/);
+      return 2 if ($output->{stderr} =~/$pattern/);
+
+      # Try at least checking if unzip if installed
+      system(['which', $$cmd_list[0]]);
+      if ($?) {
+        crash("Trying under non Linux/MacOS: <which $$cmd_list[0]> returned $?.\n".
+        "#Debug: $output->{stdout}\n#Debug: $output->{stderr}\n");
+      } else {
+        # Binary is present, non tested for Version
+        return 10;
+      }
+    }
   }
 }
 
@@ -265,25 +304,27 @@ sub _get_parent {
 
 sub _getArtifactText {
   my ($self, $file) = @_;
-  my $command = qq(unzip -p "$self->{filename}" "$file" );
-  my $out = _run($command);
+  my @command_list = ($self->{unzip_path}, '-p', $self->{filename}, $file);
+
+  my $out = _run(\@command_list);
 
 
   return $out->{stdout};
 }
 
 sub _run {
-  my ($command, $opt) = @_;
-  return 0 unless defined $command;
+  my ($command_list, $opt) = @_;
+
+  return 0 unless defined ${ $command_list }[0];
 
   # Perpare output data
   my $out = undef;
 
   my ($STDOUT, $STDERR, $OK) = capture {
-    system($command);
+    system(@{ $command_list });
   };
 
-  $out->{cmd} = $command;
+  $out->{cmd} = join(' ', @{ $command_list });
   $out->{status} = $OK;
   $out->{stdout} = $STDOUT;
   $out->{stderr} = $STDERR;
@@ -340,7 +381,12 @@ Qiime2::Artifact - A parser for Qiime2 artifact files
 
 =head1 VERSION
 
-version 0.10.5
+version 0.10.6
+
+=head1 Wiki
+
+This module is a work-in-progress and the documentation of the API can
+be found in the GitHub wiki: L<https://github.com/telatin/qiime2tools/wiki/Qiime2::Artifact-API-documentation>.
 
 =head1 Synopsis
 
@@ -358,7 +404,23 @@ version 0.10.5
 
 =item B<new()>
 
-Load artifact from file. Parameters are: I<filename> (required).
+Load artifact from file. Parameters are:
+
+=over 4
+
+=item I<filename> (path, required)
+
+Path to the artifact file to be imported (typical extensions are qza and qzv, but they are not enforced)
+
+=item I<unzip> (path)
+
+To specify the absolute path to C<unzip> binary. By default system unzip will be used.
+
+=item I<verbose> (bool)
+
+Enable verbose reporting (for developers)
+
+=back
 
 =back
 
@@ -366,70 +428,7 @@ Load artifact from file. Parameters are: I<filename> (required).
 
 =over 4
 
-=item B<id> I<(string)>
-
-Artifact ID (example: C<cfdc04fb-9c26-40c1-a03b-88f79e5735f1>)
-
-=item B<version> I<(string)>
-
-Artifact ID (example: C<2019.10.0>), from the VERSION file
-
-=item B<archive> I<(int)>
-
-Artifact archive version, from the VERSION file
-
-=item B<filename> I<(string)>
-
-Full path of the input artifact.
-
-=item B<visualizazion> I<(bool)>
-
-Whether the artifact looks like a visualization artifact.
-True (1) if the data contains C<index.html>.
-
-=item B<data> I<(array)>
-
-list of the files included in the 'data' directory
-
-=item B<ancestry> I<(array of array)>
-
-A list of levels of ancestry, each containing a list of Artifact IDs.
-The first element is a list with the Artifact self ID. The last should contain the source artifact.
-See also B<parents>.
-Example:
-
-  "ancestry" : [
-      [
-         "cfdc04fb-9c26-40c1-a03b-88f79e5735f1"
-      ],
-      [
-         "96a220d6-107a-43c8-8d81-93ac4d111e3e",
-         "3575de92-f7e7-4808-b0fa-b1a621ab984e"
-      ],
-      [
-         "39771507-f226-4e18-aa30-cde40c3ea247"
-      ]
-   ],
-
-=item B<parents> I<Hash>
-
-Hash with all the provenance artifacts. Each parent has as key an Artifact ID, having as attributes:
-
-=over 4
-
-=item B<from>
-
-List of artifact IDs originating the parent.
-
-=item B<metadata>
-
-Hash with C<key>, C<format>, C<uuid>.
-
-=item B<action>
-
-Structure containing C<citations>, C<parameters>, C<inputs> and other attributes.
-
-=back
+See L<https://github.com/telatin/qiime2tools/wiki> for API documentation
 
 =back
 

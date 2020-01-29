@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -77,29 +77,41 @@ use Mojo::Util qw( unindent trim );
 
 sub register {
     my ( $self, $app, $config ) = @_;
+    # This number changes every time the server restarts, so a client
+    # that hasn't tried pinging in a while can be told to reload.
+    # Need to srand because Morbo forks, otherwise we will always get
+    # the same nonce.
+    my $nonce = srand && int rand( 2**16 );
 
     if ( $app->mode eq 'development' ) {
-        $app->routes->get( '/auto_reload' => sub {
+        $app->routes->websocket( '/auto_reload' => sub {
             my ( $c ) = @_;
-            if ( $c->param( 'restart' ) ) {
-                return $c->rendered( 204 );
+            # Start the websocket
+            $c->inactivity_timeout( 60 );
+            my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
+            $c->on( finish => sub {
+                Mojo::IOLoop->remove( $timer_id );
+            } );
+        } );
+
+        $app->hook( around_dispatch => sub {
+            # Using a around_dispatch hook allows us to avoid logging
+            # anything or doing anything when polling. This way we can
+            # poll faster without making debugging harder.
+            my ( $next, $c ) = @_;
+            return $next->() if $c->req->url->path ne '/auto_reload'
+                || $c->req->is_handshake;
+            # Prevent Mojolicious from doing anything else with this
+            # request.
+            $c->stash( 'mojo.finished', 1 );
+            $c->render_later;
+            # Client is just looking for a response, but validate their
+            # nonce first.
+            if ( !$c->param( 'nonce' ) || $c->param( 'nonce' ) ne $nonce ) {
+                return $c->rendered( 205 );
             }
-            if ( $ENV{PLACK_ENV} ) {
-                # Blocking long-polling
-                $c->inactivity_timeout( 300 );
-                $c->render_later;
-                sleep 240;
-                $c->rendered( 204 );
-                return;
-            }
-            else {
-                $c->inactivity_timeout( 60 );
-                my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
-                $c->on( finish => sub {
-                    Mojo::IOLoop->remove( $timer_id );
-                } );
-            }
-        } )->name( 'auto_reload' );
+            return $c->rendered( 204 );
+        } );
 
         $app->hook(after_render => sub {
             my ( $c, $output, $format ) = @_;
@@ -142,11 +154,24 @@ sub register {
                     }
                 }
 
-                .auto-reload-alert {
+                .auto-reload-modal {
                     position: fixed;
-                    top: 1.5em;
-                    right: 1.5em;
-                    background: rgba( 255, 255, 255, 128 );
+                    top: 0;
+                    left: 0;
+                    height: 100vh;
+                    width: 100vw;
+                    margin: 0;
+                    padding: 0;
+                    border: none;
+                    /* I would prefer a blur effect, but this is as good as I can get */
+                    background: rgba( 255, 255, 255, 0.7 );
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .auto-reload-alert {
+                    background: rgba( 255, 255, 255, 0.5 );
                     padding: 1.25rem 1.75rem;
                     border-radius: .25rem;
                     border: 2px solid grey;
@@ -172,7 +197,7 @@ sub register {
                 <script>
                     var autoReloadUrl = "$auto_reload_end_point";
                     var mechanism = "$mechanism";
-                    var restartTries = 1;
+                    var nonce = "$nonce";
 
                     function openWebsocket() {
                         // If we lose our websocket connection, the web server must
@@ -199,15 +224,18 @@ sub register {
                         setInterval( function () { autoReloadWs.send( "ping" ) }, 30000 );
                     }
 
-                    // If opening a websocket doesn't work, try long polling!
+                    // If opening a websocket doesn't work, try polling!
+                    var POLL_INTERVAL = 2000;
+                    var RESTART_INTERVAL = 100;
+                    var pollTimer;
                     function runPoller() {
                         var request = new XMLHttpRequest();
-                        request.timeout = 300000;
-                        request.open('GET', autoReloadUrl, true);
+                        request.timeout = POLL_INTERVAL;
+                        request.open('GET', autoReloadUrl + '?nonce=' + nonce, true);
                         request.onreadystatechange = function () {
                             if (request.readyState == XMLHttpRequest.DONE ) {
                                 if ( request.status == 204 /* NO CONTENT */ ) {
-                                    runPoller();
+                                    pollTimer = setTimeout( runPoller, POLL_INTERVAL );
                                 }
                                 else {
                                     waitForRestart();
@@ -218,11 +246,36 @@ sub register {
                     }
 
                     function autoReload() {
-                        // Wait a few seconds then force a reload from the server
-                        setTimeout( function () { location.reload(true); }, 1000 );
+                        location.reload(true);
                     }
 
+                    // Start/stop the poller when we are not the active page to reduce
+                    // the number of requests we're sending
+                    if ( "visibilityState" in document ) {
+                        document.addEventListener( 'visibilitychange', function () {
+                            clearTimeout( pollTimer );
+                            pollTimer = null;
+                            if ( document.visibilityState == "visible" ) {
+                                pollTimer = setTimeout( runPoller, 0 );
+                            }
+                        } );
+                    }
+                    else {
+                        window.addEventListener( 'blur', function () {
+                            clearTimeout( pollTimer );
+                            pollTimer = null;
+                        } );
+                        window.addEventListener( 'focus', function () {
+                            pollTimer = setTimeout( runPoller, 0 );
+                        } );
+                    }
+
+                    var restartTimer;
                     function waitForRestart() {
+                        var startTime = new Date();
+                        var modal = document.createElement( 'div' );
+                        modal.className = 'auto-reload-modal';
+
                         var alert = document.createElement( 'div' );
                         alert.className = 'auto-reload-alert';
                         // Spinner from Bootstrap
@@ -232,34 +285,70 @@ sub register {
 
                         var textSpan = document.createElement( 'span' );
                         textSpan.className = 'auto-reload-text';
-                        textSpan.appendChild( document.createTextNode( 'Restarting... ' + restartTries ) );
+                        textSpan.appendChild( document.createTextNode( 'Waiting for Restart...' ) );
                         alert.appendChild( textSpan );
-                        document.body.appendChild( alert );
+
+                        var buttonBar = document.createElement( 'div' );
+
+                        var reloadBtn = document.createElement( 'button' );
+                        reloadBtn.className = 'btn btn-primary';
+                        reloadBtn.appendChild( document.createTextNode( 'Reload' ) );
+                        reloadBtn.addEventListener( 'click', autoReload );
+                        buttonBar.appendChild( reloadBtn );
+
+                        var stopBtn = document.createElement( 'button' );
+                        stopBtn.className = 'btn btn-secondary';
+                        stopBtn.appendChild( document.createTextNode( 'Cancel' ) );
+                        stopBtn.addEventListener( 'click', function () {
+                            clearTimeout( restartTimer );
+                            document.body.removeChild( modal );
+                        } );
+                        buttonBar.appendChild( stopBtn );
+                        alert.appendChild( buttonBar );
+
+                        var warnDiv = document.createElement( 'div' );
+                        warnDiv.style.visibility = 'hidden';
+                        warnDiv.appendChild(
+                            document.createTextNode(
+                                'Server is taking a long time to restart. Is something wrong?'
+                            )
+                        );
+                        alert.appendChild( warnDiv );
+
+                        modal.appendChild( alert );
+                        document.body.appendChild( modal );
 
                         var tryRequest = function () {
-                            textSpan.removeChild( textSpan.lastChild );
-                            textSpan.appendChild( document.createTextNode( 'Restarting... ' + ++restartTries ) );
+                            var now = new Date();
+                            if ( now - startTime > 5000 ) {
+                                warnDiv.style.visibility = 'visible';
+                            }
 
                             var request = new XMLHttpRequest();
-                            request.timeout = 500;
-                            request.open('GET', autoReloadUrl + '?restart=1', true);
+                            request.timeout = RESTART_INTERVAL;
+                            request.open('GET', autoReloadUrl, true);
                             request.onreadystatechange = function () {
                                 if (request.readyState == XMLHttpRequest.DONE ) {
-                                    if ( request.status == 204 /* NO CONTENT */ ) {
+                                    if ( request.status == 205 /* RESET CONTENT */ ) {
                                         autoReload();
                                     }
                                 }
                             };
                             request.send();
                         };
-                        setInterval( tryRequest, 1000 );
+                        restartTimer = setInterval( tryRequest, RESTART_INTERVAL );
                     }
+                    window.addEventListener( 'beforeunload', function () {
+                        if ( restartTimer ) {
+                            clearTimeout( restartTimer );
+                        }
+                    });
 
                     if ( mechanism == 'websocket' ) {
                         openWebsocket();
                     }
                     else {
-                        runPoller();
+                        pollTimer = setTimeout( runPoller, POLL_INTERVAL );
                     }
                 </script>
 ENDHTML
@@ -280,7 +369,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -1,15 +1,12 @@
-# (c) 2003-11 Vlado Keselj http://web.cs.dal.ca/~vlado
-#
-# $Id: NaiveBayes1.pm 343 2011-03-08 10:52:34Z vlado $
+# (c) 2003-20 Vlado Keselj http://web.cs.dal.ca/~vlado
 
 package AI::NaiveBayes1;
 use strict;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT = qw(new);
-use vars qw($Version $Revision);
-$Version = $VERSION = '2.006';
-($Revision = substr(q$Revision: 343 $, 10)) =~ s/\s+$//;
+use vars qw($Version);
+$Version = $VERSION = '2.007';
 
 use vars @EXPORT_OK;
 
@@ -40,14 +37,14 @@ sub import_from_YAML {
     my $package = shift;
     my $yaml = shift;
     my $self = YAML::Load($yaml);
-    return $self;
+    return bless $self, $package;
 }
 
 sub import_from_YAML_file {
     my $package = shift;
     my $yamlf = shift;
     my $self = YAML::LoadFile($yamlf);
-    return $self;
+    return bless $self, $package;
 }
 
 # assume that the last header count means counts
@@ -787,7 +784,7 @@ and Andrew Brian Clegg.
 
 =head1 AUTHOR
 
-Copyright 2003-11 Vlado Keselj http://web.cs.dal.ca/~vlado.
+Copyright 2003-20 Vlado Keselj http://web.cs.dal.ca/~vlado.
 In 2004 Yung-chung Lin provided implementation of the Gaussian model for
 continous variables.
 

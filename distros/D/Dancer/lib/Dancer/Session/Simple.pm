@@ -1,7 +1,7 @@
 package Dancer::Session::Simple;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: in-memory session backend for Dancer
-$Dancer::Session::Simple::VERSION = '1.3512';
+$Dancer::Session::Simple::VERSION = '1.3513';
 use strict;
 use warnings;
 use base 'Dancer::Session::Abstract';
@@ -51,7 +51,7 @@ Dancer::Session::Simple - in-memory session backend for Dancer
 
 =head1 VERSION
 
-version 1.3512
+version 1.3513
 
 =head1 DESCRIPTION
 

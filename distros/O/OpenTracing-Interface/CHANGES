@@ -2,6 +2,12 @@ CHANGE LOG
 ==========
 
 
+2020-01-29 v0.11
+----------------
+
+set 'default value' for type constraints `Maybe[SomeType]` with `undef`
+
+
 2020-01-22 v0.10
 ----------------
 

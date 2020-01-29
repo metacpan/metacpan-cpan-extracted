@@ -378,7 +378,7 @@ my $db_dir = $ARGV_db_name . '_tables/';
 mkdir $db_dir unless -d $db_dir;
 
 for my $table (keys %table_for) {
-    open my $out, '>>', $db_dir . $table;
+    open my $out, '>', $db_dir . $table;
     for (@{ $table_for{$table} }) { say {$out} $_};
 }
 
@@ -747,7 +747,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.200150
+version 0.200290
 
 =head1 NAME
 
@@ -836,10 +836,11 @@ Name of your database [default: bgc_db].
 =item --module-delineation [=] <str>
 
 Method for delineating the modules. Modules can either be cut on condensation
-(C and KS) or selection domains (A and AT) [default: selection].
+(C and KS) or substrate-selection domains (A and AT)
+[default: 'substrate-selection'].
 
-=for Euclid: str.type: /condensation|selection/
-    str.default: 'selection'
+=for Euclid: str.type: /condensation|substrate\-selection/
+    str.default: 'substrate-selection'
 
 =item --gap-filling [=] <bool>
 

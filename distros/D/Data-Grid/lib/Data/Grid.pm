@@ -22,7 +22,7 @@ use Types::Standard qw(slurpy Optional ClassName Any Bool
 # store it this way then flip it around
 
 my %MAP = (
-    CSV   => [qw(text/plain text/csv)],
+    CSV   => [qw(text/plain text/csv text/tab-separated-values)],
     Excel => [qw(application/x-ole-storage application/vnd.ms-excel
                  application/msword application/excel)],
     'Excel::XLSX' => [
@@ -37,11 +37,11 @@ Data::Grid - Incremental read access to grid-based data
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 

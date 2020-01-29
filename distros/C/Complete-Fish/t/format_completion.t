@@ -3,10 +3,9 @@
 use 5.010;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Test::More 0.98;
 
 use Complete::Fish qw(format_completion);
-use Test::More;
 
 subtest "accepts array of str" => sub {
     is(format_completion([qw/a b c/]), "a\t\nb\t\nc\t\n");

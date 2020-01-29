@@ -27,12 +27,12 @@
          "requires" : {
             "Alien::catch" : "v1.1.0",
             "Test::Catch" : "v1.0.11",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.12",
+            "XS::Install" : "v1.2.13",
             "perl" : "5.012000"
          }
       },
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.3.7",
+   "version" : "v1.3.8",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

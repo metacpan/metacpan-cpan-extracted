@@ -36,26 +36,13 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "6.03"
+         "version" : "6.05"
       },
       "Data::RecordStore::Converter" : {
          "file" : "lib/Data/RecordStore/Converter.pm"
       },
-      "Data::RecordStore::New" : {
-         "file" : "lib/Data/RecordStore/New.pm"
-      },
       "Data::RecordStore::PopSilo" : {
          "file" : "lib/Data/RecordStore/PopSilo.pm"
-      },
-      "Data::RecordStore::REST" : {
-         "file" : "lib/Data/RecordStore/REST.pm"
-      },
-      "Data::RecordStore::SQL" : {
-         "file" : "lib/Data/RecordStore/SQL.pm",
-         "version" : "0.1"
-      },
-      "Data::RecordStore::Shard" : {
-         "file" : "lib/Data/RecordStore/Shard.pm"
       },
       "Data::RecordStore::Silo" : {
          "file" : "lib/Data/RecordStore/Silo.pm",
@@ -106,6 +93,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "6.03",
+   "version" : "6.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }
