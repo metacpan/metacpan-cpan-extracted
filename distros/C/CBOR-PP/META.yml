@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-CBOR-PP/issues
   repository: git://github.com/FGasper/p5-CBOR-PP.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

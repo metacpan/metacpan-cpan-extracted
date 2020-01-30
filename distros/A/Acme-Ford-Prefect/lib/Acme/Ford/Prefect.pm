@@ -3,9 +3,9 @@ package Acme::Ford::Prefect;
 use strict;
 use warnings;
 
-use Acme::Alien::DontPanic;
+# ABSTRACT: Test Module for Alien::Base
+our $VERSION = '1.9800'; # VERSION
 
-our $VERSION = '1.96';
 require DynaLoader;
 our @ISA = 'DynaLoader';
 __PACKAGE__->bootstrap($VERSION);
@@ -13,9 +13,19 @@ $VERSION = eval $VERSION;
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Acme::Ford::Prefect - Test Module for Alien::Base
+
+=head1 VERSION
+
+version 1.9800
 
 =head1 SYNOPSIS
 
@@ -34,9 +44,17 @@ L<Alien::Base> comprises base classes to help in the construction of C<Alien::> 
 
 This module is a toy module to test the efficacy of the L<Alien::Base> system. This module depends on another toy module L<Acme::Alien::DontPanic>, which provides the needed the F<libdontpanic> library to be able to tell us the C<answer>.
 
+=head1 FUNCTIONS
+
+=head2 answer
+
+ my $answer = Acme::Ford::Prefect::answer();
+
+Returns the answer to life the universe and everything.  Not exported.
+
 =head1 SEE ALSO
 
-=over 
+=over
 
 =item * 
 
@@ -52,22 +70,25 @@ L<Acme::Alien::DontPanic>
 
 =back
 
-=head1 SOURCE REPOSITORY
+=head1 AUTHORS
 
-L<http://github.com/Perl5-Alien/Acme-Ford-Prefect>
+=over 4
 
-=head1 AUTHOR
+=item *
 
-Original author: Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+Graham Ollis <plicease@cpan.org>
 
-Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+=item *
+
+Joel Berger
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Joel Berger
+This software is copyright (c) 2012-2020 by Joel Berger.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

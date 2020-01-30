@@ -1,0 +1,12 @@
+Changes
+lib/XS/catch.pm
+lib/XS/catch.pod
+Makefile.PL
+MANIFEST			This list of files
+src/catch.hpp
+src/catch_reporter_automake.hpp
+src/catch_reporter_tap.hpp
+src/catch_reporter_teamcity.hpp
+t/stub.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

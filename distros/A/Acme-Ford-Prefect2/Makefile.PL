@@ -16,11 +16,11 @@ my %WriteMakefileArgs = (
   "ABSTRACT"       => "Test Module for Alien::Base + Alien::Build",
   "AUTHOR"         => "Graham Ollis <plicease\@cpan.org>, Joel A Berger <joel.a.berger\@gmail.com>",
   "BUILD_REQUIRES" => {
-    "Acme::Alien::DontPanic2" => "1.9600"
+    "Acme::Alien::DontPanic2" => "1.9800"
   },
   "CONFIGURE_REQUIRES" => {
-    "Acme::Alien::DontPanic2" => "1.9600",
-    "Alien::Base::Wrapper"    => "1.96",
+    "Acme::Alien::DontPanic2" => "1.9800",
+    "Alien::Base::Wrapper"    => "1.98",
     "ExtUtils::MakeMaker"     => "6.64"
   },
   "DISTNAME"         => "Acme-Ford-Prefect2",
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper"         => 0,
     "Test2::V0"            => "0.000060"
   },
-  "VERSION" => "1.9600",
+  "VERSION" => "1.9800",
   "test"    => {
     "TESTS" => "t/*.t"
   }

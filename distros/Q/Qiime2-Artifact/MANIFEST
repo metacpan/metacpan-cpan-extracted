@@ -10,14 +10,8 @@ README
 README.md
 data/bad_artifact.zip
 data/non_artifact.zip
-data/reads/Control_R1.fq
-data/reads/Control_R2.fq
-data/reads/Sample1_R1.fq
-data/reads/Sample1_R2.fq
-data/reads/Sample2_R1.fq
-data/reads/Sample2_R2.fq
-data/reads/Sample3_R1.fq
-data/reads/Sample3_R2.fq
+data/reads.qza
+data/reads.qzv
 data/sample_metadata.tsv
 data/table.qza
 data/tree-derived.qza
@@ -37,6 +31,8 @@ t/11_not_an_artifact.t
 t/12_basic_attributes.t
 t/13_provenance.t
 t/14_unzip_path.t
+t/14_verbose_debug.t
+t/15_viz.t
 t/release-00-pod.t
 t/release-03-minimum-standards.t
 t/release-05-changes.t

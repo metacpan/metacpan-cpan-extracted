@@ -19,4 +19,6 @@ SKIP: {
 	ok($artifact->{loaded} == 1, 'Artifact was loaded');
 }
 
+
+
 done_testing();

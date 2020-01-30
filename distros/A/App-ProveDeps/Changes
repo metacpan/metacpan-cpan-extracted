@@ -1,3 +1,15 @@
+0.005   2020-01-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix Rinci metadata which prevented --include-dist and
+          --exclude-dist to work.
+
+	- [doc] Add a more thorough example with sample outputs.
+
+	- [ux] Give default phase=runtime instead of all and rel=requires
+	  instead of all, as this is in most case is the only relevant
+	  combination.
+
+
 0.004   2020-01-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to implement {in,ex}clude_dist{s,_pattern}.

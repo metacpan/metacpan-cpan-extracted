@@ -4,7 +4,7 @@ use warnings;
 
 use Importer;
 
-our $VERSION = '0.000127';
+our $VERSION = '0.000128';
 
 use Carp qw/croak/;
 
@@ -299,6 +299,13 @@ not provide a target then C<$CLASS> and C<CLASS()> will not be imported.
 
     print $CLASS;  # My::Class
     print CLASS(); # My::Class
+
+Or you can specify names:
+
+    use Test2::V0 -target => { pkg => 'Some::Package' };
+
+    pkg()->xxx; # Call 'xxx' on Some::Package
+    $pkg->xxx;  # Same
 
 =over 4
 

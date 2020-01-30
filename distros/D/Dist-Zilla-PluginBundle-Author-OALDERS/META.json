@@ -164,10 +164,10 @@
          "web" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders"
       }
    },
-   "version" : "0.000025",
+   "version" : "0.000026",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -215,9 +215,9 @@
             "version" : "0.055"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
-            "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.83"
+            "class" : "Dist::Zilla::Plugin::OALDERS::TidyAll",
+            "name" : "@Author::OALDERS/OALDERS::TidyAll",
+            "version" : "0.000026"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -288,7 +288,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -598,7 +598,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -609,7 +609,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -733,7 +733,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -750,12 +750,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000025",
+                  "tag" : "v0.000026",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -805,7 +805,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -825,7 +825,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.24.1",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -934,8 +934,8 @@
       "Karen Etheridge <ether@cpan.org>",
       "Olaf Alders <olaf@wundersolutions.com>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14",
    "x_static_install" : 1
 }
 

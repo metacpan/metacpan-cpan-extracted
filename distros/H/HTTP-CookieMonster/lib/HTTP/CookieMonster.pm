@@ -1,13 +1,11 @@
+package HTTP::CookieMonster;
+our $VERSION = '0.10';
 use strict;
 use warnings;
 
-package HTTP::CookieMonster;
-$HTTP::CookieMonster::VERSION = '0.09';
-$HTTP::CookieMonster::VERSION = '0.09';
-
 use 5.006;
 
-use Moo;
+use Moo 1.000003;
 use Carp qw( croak );
 use HTTP::Cookies;
 use HTTP::CookieMonster::Cookie;
@@ -22,9 +20,8 @@ has 'cookie_jar' => (
     is       => 'ro',
     isa      => sub {
         croak 'HTTP::Cookies object expected'
-            if !$_[0]->$_isa( 'HTTP::Cookies' );
-        }
-
+            if !$_[0]->$_isa('HTTP::Cookies');
+    },
 );
 
 sub BUILDARGS {
@@ -56,9 +53,9 @@ sub all_cookies {
 sub cookies {
     my ( $cookie_jar, $name ) = @_;
     croak 'This function is not part of the OO interface'
-        if $cookie_jar->$_isa( 'HTTP::CookieMonster' );
+        if $cookie_jar->$_isa('HTTP::CookieMonster');
 
-    my $monster = HTTP::CookieMonster->new( $cookie_jar );
+    my $monster = HTTP::CookieMonster->new($cookie_jar);
 
     if ( !$name ) {
         if ( !wantarray ) {
@@ -68,7 +65,7 @@ sub cookies {
         return @{ $monster->all_cookies };
     }
 
-    return $monster->get_cookie( $name );
+    return $monster->get_cookie($name);
 }
 
 sub get_cookie {
@@ -91,7 +88,11 @@ sub set_cookie {
     my $self   = shift;
     my $cookie = shift;
 
-    if ( !$cookie->$_isa( 'HTTP::CookieMonster::Cookie' ) ) {
+    if ( !$cookie ) {
+        croak 'Missing cookie, an HTTP::CookieMonster::Cookie object';
+    }
+
+    if ( !$cookie->$_isa('HTTP::CookieMonster::Cookie') ) {
         croak "$cookie is not a HTTP::CookieMonster::Cookie object";
     }
 
@@ -109,13 +110,13 @@ sub delete_cookie {
     my $self   = shift;
     my $cookie = shift;
 
-    if ( !$cookie->$_isa( 'HTTP::CookieMonster::Cookie' ) ) {
+    if ( !$cookie->$_isa('HTTP::CookieMonster::Cookie') ) {
         croak "$cookie is not a HTTP::CookieMonster::Cookie object";
     }
 
-    $cookie->expires( -1 );
+    $cookie->expires(-1);
 
-    return $self->set_cookie( $cookie );
+    return $self->set_cookie($cookie);
 }
 
 sub _check_cookies {
@@ -156,7 +157,7 @@ HTTP::CookieMonster - Easy read/write access to your jar of HTTP::Cookies
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

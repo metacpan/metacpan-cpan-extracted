@@ -1,5 +1,19 @@
 Revision history for Music-ScaleNote
 
+0.0703 2020-01-29 22:49:27
+    - Call print, not warn when verbose.
+
+0.0702 2020-01-29 22:26:57
+    - Fix crucial SYNOPSIS typo. :(
+    - Add a test for said typo.
+
+0.0701 2020-01-29 22:13:22
+    - Add verbose warns to the ->step method.
+    - Make the test slightly more rigorous.
+
+0.0700 2020-01-29 20:53:39
+    - Add functionality to convert a sharp note to its flat enharmonic equivalent.
+
 0.0600 2020-01-29 12:33:12
     - Add the ->step method to compute halfstep notes.
 

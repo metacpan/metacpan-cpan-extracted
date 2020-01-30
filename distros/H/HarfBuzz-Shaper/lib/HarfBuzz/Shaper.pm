@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -210,11 +210,6 @@ __END__
 L<Text::Layout>
 
 HarfBuzz website and documentation: L<https://harfbuzz.github.io/index.html>.
-
-=head1 DEPENDENCIES
-
-This module requires the HarfBuzz library to be installed on your
-system.
 
 =head1 BUGS AND DEFICIENCIES
 

@@ -1,4 +1,8 @@
-Revision history for Perl module Acme::Alien::DontPanic.
+Revision history for Perl Acme-Alien-DontPanic
+
+1.9800    2020-01-30 07:59:10 -0700
+  - Require Alien::Build 1.98 Alien::Base::ModuleBuild 1.10
+  - Switched to Dist::Zilla for speedy releases.
 
 1.96 2020-01-28 23:35:59 -0700
   - Require Alien::Base::ModuleBuild 1.08

@@ -23,7 +23,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/maettu/RT-Extension-BecomeUser
-version: '0.04'
+version: '1.01'
 x_module_install_rtx_version: '0.38'
 x_requires_rt: 4.0.0
 x_rt_too_new: 4.6.0

@@ -1,3 +1,9 @@
+# ABSTRACT: Authoring an C<Alien::> module using Alien::Base::ModuleBuild
+# PODNAME: Alien::Base::ModuleBuild::Authoring
+# VERSION
+
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -5,6 +11,10 @@
 =head1 NAME
 
 Alien::Base::ModuleBuild::Authoring - Authoring an C<Alien::> module using Alien::Base::ModuleBuild
+
+=head1 VERSION
+
+version 1.10
 
 =head1 DESCRIPTION
 
@@ -31,7 +41,7 @@ The L<Alien::Base> ecosystem is made up of several elements. Some of these eleme
 
 =head2 Alien::Base::ModuleBuild
 
-L<Alien::Base::ModuleBuild> provides a base class, utility methods and configuration handling for the build/install phase of the library. It is itself a subclass of L<Module::Build>, which is what supports the building and installing of the surrouning C<Alien::> module. C<Alien::MyLibrary>'s F<Build.PL> file will use L<Alien::Base::ModuleBuild> to create its builder object.
+L<Alien::Base::ModuleBuild> provides a base class, utility methods and configuration handling for the build/install phase of the library. It is itself a subclass of L<Module::Build>, which is what supports the building and installing of the surrounding C<Alien::> module. C<Alien::MyLibrary>'s F<Build.PL> file will use L<Alien::Base::ModuleBuild> to create its builder object.
 
  # file: Alien-MyLibrary/Build.PL
  use Alien::Base::ModuleBuild;
@@ -40,7 +50,7 @@ L<Alien::Base::ModuleBuild> provides a base class, utility methods and configura
 
 This is just like you would do for L<Module::Build>, except that there will be a few additional configuration parameters (see L<Alien::Base::ModuleBuild::API>).
 
-L<Alien::Base::ModuleBuild> adds the additional build actions C<alien_code> and C<alien_install>. These actions need never be run directly, the usual C<build> action (usually seen as C<./Build>) and C<install> (C<./Build install>) will call them for you. The C<alien_code> action is responsible for finding, downloading, extracting and building the external libary (the commands specified in builder parameter C<alien_build_commands>). The C<alien_install> action is responsible for installing the library into its final destination.
+L<Alien::Base::ModuleBuild> adds the additional build actions C<alien_code> and C<alien_install>. These actions need never be run directly, the usual C<build> action (usually seen as C<./Build>) and C<install> (C<./Build install>) will call them for you. The C<alien_code> action is responsible for finding, downloading, extracting and building the external library (the commands specified in builder parameter C<alien_build_commands>). The C<alien_install> action is responsible for installing the library into its final destination.
 
 The C<./Build test> command will invoke any library tests specified in C<alien_test_commands>, though none are defined by default. Finally C<./Build install> will invoke whatever C<alien_install_commands> were specified.
 
@@ -118,17 +128,13 @@ L<Alien::LibYAML> -- Builds and installs F<libyaml>, acquiring the library archi
 
 =item *
 
-L<Alien::GSL> -- Builds and installs F<libgsl>, aquiring the library source archive via C<Alien::Base::Repository::FTP>.
+L<Alien::GSL> -- Builds and installs F<libgsl>, acquiring the library source archive via C<Alien::Base::Repository::FTP>.
 
 =item *
 
 L<Alien::gmake> -- Builds and installs GNU make.  Rather than being a library, this is a tool used to build other tools and libraries.  It is useful for other Alien modules that require the GNU version of make.  It also demonstrates the use of L<Alien::Base> for providing tools rather than libraries.
 
 =back
-
-=head1 AUTHOR
-
-Joel Berger <joel.a.berger@gmail.com>
 
 =head1 SEE ALSO
 
@@ -152,21 +158,51 @@ L<Alien::Base::FAQ>
 
 =back
 
-=head1 SOURCE REPOSITORY
-
-L<http://github.com/Perl5-Alien/Alien-Base-ModuleBuild>
-
 =head1 AUTHOR
 
-Original author: Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+Original author: Joel A Berger E<lt>joel.a.berger@gmail.comE<gt>
 
-Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt> and the L<Alien::Base> team
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Graham Ollis (plicease)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Petr Pisar (ppisar)
+
+Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017 by Joel Berger
+This software is copyright (c) 2012-2020 by Joel A Berger.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

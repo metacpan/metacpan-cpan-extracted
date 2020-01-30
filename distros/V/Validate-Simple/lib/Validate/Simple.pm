@@ -3,7 +3,7 @@ package Validate::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = 'v0.2.1';
 
 use Carp;
 
@@ -427,7 +427,7 @@ sub validate_value {
     # Check min length
     if ( exists $spec->{min_length} ) {
         if ( $spec->{min_length} > length( $value // '' ) ) {
-            $self->_error( 'length(' . ( $value // '[undef]') . " > $spec->{min_length} returns false" );
+            $self->_error( "length('" . ( $value // '[undef]') . "') > $spec->{min_length} returns false" );
             return;
         }
     }
@@ -435,7 +435,7 @@ sub validate_value {
     # Check max length
     if ( exists $spec->{max_length} ) {
         if ( $spec->{max_length} < length( $value // '' ) ) {
-            $self->_error( 'length(' . ( $value // '[undef]') . " < $spec->{max_length} returns false" );
+            $self->_error( "length('" . ( $value // '[undef]') . "') < $spec->{max_length} returns false" );
             return;
         }
     }
@@ -573,7 +573,7 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
         gender => {
             type   => 'enum',
             values => [
-                'mail',
+                'male',
                 'femaile',
                 'id_rather_not_to_say',
             ],
@@ -593,14 +593,19 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
         },
         score => {
             type => 'hash',
-            of   => 'non_negative_int',
+            of   => {
+                type => 'non_negative_int',
+            },
         },
         monthly_score => {
             type => 'hash',
             of   => {
                 type => 'hash',
                 of   => {
-                    type     => 'arrray',
+                    type     => 'array',
+                    of => {
+                        type => 'non_negative_int',
+                    },
                     callback => sub {
                         @{ $_[0] } < 12;
                     },
@@ -611,7 +616,7 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
 
     my $vs1 = Validate::Simple->new( $specs );
     my $is_valid1 = $vs1->validate( $params );
-    print join "\n", $$vs1->errors()
+    print join "\n", $vs1->errors()
         if !$is_valid1;
 
     # Or
@@ -641,7 +646,7 @@ hashref. The keys repeat parameters names, the values define criterias.
 
 For example:
 
-    my $spec = {
+    my $specs = {
         username => {
             type       => 'string',
             required   => 1,
@@ -709,7 +714,7 @@ to be undefined, you need to explicitly set this key to true.
 For example, if you allow the value of the param to be literally
 anything, you can do the following:
 
-    my $spec = {
+    my $specs = {
         whatever => {
             type  => 'any',
             undef => 1,
@@ -726,7 +731,7 @@ receive the value as a first parameter and returns true or false.
 For example, if you need to check whether a value is an even positive
 integer, you can do the following:
 
-    my $spec = {
+    my $specs = {
         even_positive => {
             type     => "positive_int",
             callback => sub { !( $_[0] % 2 ) },
@@ -771,7 +776,7 @@ Less than or equal to.
 
 For example, the following spec checks whether it's a valid month number:
 
-    my $spec = {
+    my $specs = {
         month => {
             type => 'positive_int',
             le   => 12,
@@ -840,7 +845,7 @@ C<max_length> and C<min_length>. Either key must be a positive integer.
 The list types B<must> have the key C<of>, which contains a spec of all
 list values. For example:
 
-    my $spec = {
+    my $specs = {
         ids => {
             type => 'array',
             of   => {
@@ -878,7 +883,7 @@ The value is one of the predefined list.
 Enum type always contains a string. The list of predefined strings is
 provided in the C<values> key, which is B<required> for enums:
 
-    my $spec = {
+    my $specs = {
         data_types => {
             type   => 'enum',
             values => [

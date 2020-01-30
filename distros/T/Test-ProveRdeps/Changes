@@ -1,0 +1,8 @@
+0.002   2020-01-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist/module Test::ProveDeps -> Test::ProveRdeps.
+
+
+0.001   2020-01-29  Released-By: PERLANCAR
+
+        - First release, experimental.

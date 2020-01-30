@@ -2,11 +2,8 @@ package Alien::Base::ModuleBuild;
 
 use strict;
 use warnings;
-
-our $VERSION = '1.08';
-
+use 5.008001;
 use parent 'Module::Build';
-
 use Capture::Tiny 0.17 qw/capture tee/;
 use File::chdir;
 use File::Spec;
@@ -16,7 +13,7 @@ no warnings;
 use Archive::Extract;
 use warnings;
 use Sort::Versions;
-use List::Util qw/uniq/;
+use List::Util qw( uniq any );
 use ExtUtils::Installed;
 use File::Copy qw/move/;
 use Env qw( @PATH );
@@ -25,14 +22,15 @@ use Shell::Config::Generate;
 use File::Path qw/mkpath/;
 use Config;
 use Text::ParseWords qw( shellwords );
-
 use Alien::Base::PkgConfig;
 use Alien::Base::ModuleBuild::Cabinet;
 use Alien::Base::ModuleBuild::Repository;
-
 use Alien::Base::ModuleBuild::Repository::HTTP;
 use Alien::Base::ModuleBuild::Repository::FTP;
 use Alien::Base::ModuleBuild::Repository::Local;
+
+# ABSTRACT: A Module::Build subclass for building Alien:: modules and their libraries
+our $VERSION = '1.10'; # VERSION
 
 # setup protocol specific classes
 # Alien:: author can override these defaults using alien_repository_class property
@@ -231,7 +229,7 @@ sub new {
   $self->config_data( 'inline_auto_include' => $self->alien_inline_auto_include );
 
   if($Force || !$self->alien_check_installed_version) {
-    if (grep /(?<!\%)\%c/, map { ref($_) ? @{$_} : $_ } @{ $self->alien_build_commands }) {
+    if (any { /(?<!\%)\%c/ } map { ref($_) ? @{$_} : $_ } @{ $self->alien_build_commands }) {
       $self->config_data( 'autoconf' => 1 );
     }
 
@@ -275,7 +273,7 @@ sub new {
 
   $self->config_data( 'finished_installing' => 0 );
 
-  if(grep /(?<!\%)\%p/, map { ref($_) ? @{$_} : $_ } @{ $self->alien_build_commands }) {
+  if(any { /(?<!\%)\%p/ } map { ref($_) ? @{$_} : $_ } @{ $self->alien_build_commands }) {
     carp "%p is deprecated, See https://metacpan.org/pod/Alien::Base::ModuleBuild::API#p";
   }
 
@@ -491,7 +489,7 @@ sub ACTION_alien_code {
     $version = $self->alien_check_built_version
   }
 
-  if (! $version and ! $pc_version) {
+  if (! $version && ! $pc_version) {
     print STDERR "If you are the author of this Alien dist, you may need to provide a an\n";
     print STDERR "alien_check_built_version method for your Alien::Base::ModuleBuild\n";
     print STDERR "class.  See:\n";
@@ -786,13 +784,16 @@ sub _alien_bin_require {
 
   unless(eval { $mod->can('new') })
   {
-    eval '# line '. __LINE__ . ' "' . __FILE__ . qq{\n use $mod $version () }; # should also work for version = 0
-    die $@ if $@;
+    my $pm = "$mod.pm";
+    $pm =~ s/::/\//g;
+    require $pm;
+    $mod->VERSION($version) if $version;
   }
 
   if($mod->can('alien_helper')) {
     my $helpers = $mod->alien_helper;
-    while(my($k,$v) = each %$helpers) {
+    foreach my $k (keys %$helpers) {
+      my $v = $helpers->{$k};
       next if defined $self->alien_helper->{$k};
       $self->alien_helper->{$k} = $v;
     }
@@ -959,7 +960,7 @@ sub do_system {
   # restore wd
   $CWD = $initial_cwd;
 
-  return wantarray ? %return : $return{success};
+  return wantarray ? %return : $return{success};  ## no critic (Policy::Freenode::Wantarray)
 }
 
 sub _alien_execute_helper {
@@ -970,7 +971,7 @@ sub _alien_execute_helper {
   if(ref($code) ne 'CODE') {
     my $perl = $code;
     $code = sub {
-      my $value = eval $perl;
+      my $value = eval $perl; ## no critic (Policy::BuiltinFunctions::ProhibitStringyEval)
       die $@ if $@;
       $value;
     };
@@ -1144,7 +1145,7 @@ sub alien_find_lib_paths {
 
   my $libs = $self->alien_provides_libs;
   my @libs;
-  @libs = grep { s/^-l// } split /\s+/, $libs if $libs;
+  @libs = map { my $f = $_; $f =~ s/^-l//; $f } grep { /^-l/ } split /\s+/, $libs if $libs;
 
   my (@lib_files, @lib_paths, @inc_paths);
 
@@ -1170,10 +1171,10 @@ sub alien_find_lib_paths {
       $file =~ s/^lib//;
 
       if (@libs) {
-        next unless grep { $file eq $_ } @libs;
+        next unless any { $file eq $_ } @libs;
       }
 
-      next if grep { $file eq $_ } @lib_files;
+      next if any { $file eq $_ } @lib_files;
 
       push @lib_files, $file;
       push @lib_paths, $path;
@@ -1258,7 +1259,7 @@ sub _rscan_destdir {
   my $destdir = $self->destdir;
   $dir = _catdir($destdir, $dir) if defined $destdir;
   my $files = $self->rscan_dir($dir, $pattern);
-  $files = [ map { s/^$destdir//; $_ } @$files ] if defined $destdir;
+  $files = [ map { my $dir = $_; $dir =~ s/^$destdir//; $dir } @$files ] if defined $destdir;
   $files;
 }
 
@@ -1276,9 +1277,6 @@ sub _catdir {
 
 1;
 
-__END__
-__POD__
-
 =pod
 
 =encoding UTF-8
@@ -1286,6 +1284,10 @@ __POD__
 =head1 NAME
 
 Alien::Base::ModuleBuild - A Module::Build subclass for building Alien:: modules and their libraries
+
+=head1 VERSION
+
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -1431,6 +1433,18 @@ INTERPOLATION>.
 Returns a set of key value pairs including C<stdout>, C<stderr>,
 C<success> and C<command>.
 
+=head2 alien_do_commands
+
+ $amb->alien_do_commands($phase);
+
+Executes the commands for the given phase.
+
+=head2 alien_interpolate
+
+ my $string = $amb->alien_interpolate($string);
+
+Takes the input string and interpolates the results.
+
 =head1 GUIDE TO DOCUMENTATION
 
 The documentation for C<Module::Build> is broken up into sections:
@@ -1512,53 +1526,7 @@ For example, C<ALIEN_OPENSSL_REPO_FTP_HOST=ftp.example.com>.
 
 =back
 
-=head1 SOURCE REPOSITORY
-
-L<http://github.com/Perl5-Alien/Alien-Base-ModuleBuild>
-
-=head1 AUTHOR
-
-Original author: Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
-
-Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt> and the L<Alien::Base> team
-
-=head1 CONTRIBUTORS
-
-=over
-
-=item David Mertens (run4flat)
-
-=item Mark Nunberg (mordy, mnunberg)
-
-=item Christian Walde (Mithaldu)
-
-=item Brian Wightman (MidLifeXis)
-
-=item Graham Ollis (plicease)
-
-=item Zaki Mughal (zmughal)
-
-=item mohawk2
-
-=item Vikas N Kumar (vikasnkumar)
-
-=item Flavio Poletti (polettix)
-
-=item Salvador Fandiño (salva)
-
-=item Gianni Ceccarelli (dakkar)
-
-=item Pavel Shaydo (zwon, trinitum)
-
-=item Kang-min Liu (劉康民, gugod)
-
-=item Nicholas Shipp (nshp)
-
-=item Petr Pisar (ppisar)
-
-=item Alberto Simões (ambs)
-
-=back
+=head1 THANKS
 
 Thanks also to
 
@@ -1566,7 +1534,7 @@ Thanks also to
 
 =item Christian Walde (Mithaldu)
 
-For productive conversations about component interoperablility.
+For productive conversations about component interoperability.
 
 =item kmx
 
@@ -1582,12 +1550,56 @@ For graciously teaching me about rpath and dynamic loading,
 
 =back
 
+=head1 AUTHOR
+
+Original author: Joel A Berger E<lt>joel.a.berger@gmail.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Graham Ollis (plicease)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Petr Pisar (ppisar)
+
+Alberto Simões (ambs)
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017 by Joel Berger
+This software is copyright (c) 2012-2020 by Joel A Berger.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+__POD__
+
 

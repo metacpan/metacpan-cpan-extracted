@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local directory
-our $VERSION = '1.96'; # VERSION
+our $VERSION = '1.98'; # VERSION
 
 
 has root => undef;
@@ -91,7 +91,7 @@ Alien::Build::Plugin::Fetch::LocalDir - Plugin for fetching a local directory
 
 =head1 VERSION
 
-version 1.96
+version 1.98
 
 =head1 SYNOPSIS
 

@@ -173,13 +173,9 @@ EOF
 
 subtest 'alien_bin_requires' => sub {
 
-  my $bin = $abmb_root->child('corpus/alien_base_modulebuild/bin')->stringify;
-
   local $CWD = _new_temp();
 
-  note "bin = $bin";
-
-  eval q{
+  {
     package Alien::Libfoo;
 
     our $VERSION = '1.00';
@@ -192,10 +188,13 @@ subtest 'alien_bin_requires' => sub {
 
     $INC{'Alien/ToolFoo.pm'} = __FILE__;
 
+    our $bin = $abmb_root->child('corpus/alien_base_modulebuild/bin')->stringify;
+    Test2::V0::note("bin = $bin");
+
     sub bin_dir {
       ($bin)
     }
-  };
+  }
 
   my $builder = builder(
     alien_name => 'foobarbazfakething',
@@ -254,7 +253,7 @@ EOF
   );
   close $fh;
 
-  eval q{
+  {
     package My::ModuleBuild1;
 
     use base qw( Alien::Base::ModuleBuild );
@@ -265,8 +264,7 @@ EOF
       close $fh;
       $txt =~ /version = ([0-9.]+)/ ? $1 : ();
     }
-  };
-  die $@ if $@;
+  }
 
   local $mb_class = 'My::ModuleBuild1';
 
@@ -311,7 +309,7 @@ EOF
   );
   close $fh;
 
-  eval q{
+  {
     package My::ModuleBuild2;
 
     use base qw( Alien::Base::ModuleBuild );
@@ -322,8 +320,7 @@ EOF
       close $fh;
       $txt =~ /version = ([0-9.]+)/ ? $1 : ();
     }
-  };
-  die $@ if $@;
+  }
 
   local $mb_class = 'My::ModuleBuild2';
 

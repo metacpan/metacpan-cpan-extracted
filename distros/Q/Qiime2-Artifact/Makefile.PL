@@ -7,7 +7,7 @@ use Devel::CheckBin;
 check_bin('unzip');
 check_bin('which');
 
-use 5.018;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -20,16 +20,20 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Qiime2-Artifact",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Qiime2::Artifact",
   "PREREQ_PM" => {
     "Capture::Tiny" => "0.48",
     "Carp" => "1.2",
+    "Cwd" => "3.31",
     "Data::Dumper" => "2.1",
+    "File::Basename" => "2.82",
     "FindBin" => "1.3",
-    "YAML::PP" => "0.018"
+    "Term::ANSIColor" => "3.00",
+    "YAML::PP" => "0.018",
+    "autodie" => "2.10"
   },
-  "VERSION" => "0.10.6",
+  "VERSION" => "0.10.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +43,13 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => "0.48",
   "Carp" => "1.2",
+  "Cwd" => "3.31",
   "Data::Dumper" => "2.1",
+  "File::Basename" => "2.82",
   "FindBin" => "1.3",
-  "YAML::PP" => "0.018"
+  "Term::ANSIColor" => "3.00",
+  "YAML::PP" => "0.018",
+  "autodie" => "2.10"
 );
 
 

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.015";
+our $VERSION = "0.016";
 
 use Text::Layout::FontDescriptor;
 
@@ -23,11 +23,11 @@ Text::Layout::FontConfig - Pango style font description for Text::Layout
 Font descriptors are strings that identify the characteristics of the
 desired font. For example, C<Sans Italic 20>.
 
-The PDF context deals with fysical fonts, e.g. built-in fonts like
+The PDF context deals with physical fonts, e.g. built-in fonts like
 C<Times-Bold> and fonts loaded from font files like
 C</usr/share/fonts/dejavu/DejaVuSans.ttf>.
 
-To map font descriptions to fysical fonts, these fonts must be
+To map font descriptions to physical fonts, these fonts must be
 registered. This defines a font family, style, and weight for the
 font.
 
@@ -78,7 +78,7 @@ sub new {
 
 =over
 
-=item register_fonts( $font, $family, $style, $weight )
+=item register_fonts( $font, $family, $style [ , $weight ] [ , $props ] )
 
 Registers a font fmaily, style and weight for the given font.
 
@@ -95,14 +95,34 @@ $weight is the font weight, like C<normal>, or C<bold>.
 
 For convenience, style combinations like "bolditalic" are allowed.
 
+A final hash reference can be passed to specify additional properties
+for this font. Recognized properties are:
+
+=over
+
+=item *
+
+C<shaping> - If set to a true value, this font will require text
+shaping. This is required for fonts that deal with complex glyph
+rendering and ligature handling like Devanagari.
+
+Text shaping requires module L<HarfBuzz::Shaper>.
+
+=item *
+
+C<interline> - If set to a true value, an alternative way to determine
+glyph height is used. This may improve results for some fonts.
+
+=back
+
 =back
 
 =cut
 
 sub register_font {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
-    my $atts;
-    $atts = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
+    my $props;
+    $props = pop(@_) if UNIVERSAL::isa( $_[-1], 'HASH' );
     my ( $font, $family, $style, $weight ) = @_;
 
     if ( $style && !$weight && $style =~ s/^bold//i ) {
@@ -134,8 +154,8 @@ sub register_font {
     foreach ( split(/\s*,\s*/, $family) ) {
 	$fonts{lc $_}->{$style}->{$weight}->{loader} = $loader;
 	$fonts{lc $_}->{$style}->{$weight}->{loader_data} = $ff;
-	next unless $atts;
-	while ( my($k,$v) = each %$atts ) {
+	next unless $props;
+	while ( my($k,$v) = each %$props ) {
 	    $fonts{lc $_}->{$style}->{$weight}->{$k} = $v;
 	}
     }
@@ -350,6 +370,8 @@ sub from_string {
     $res;
 }
 
+=over
+
 =item parse( $description )
 
 Parses a Pango-style font description and returns a hash ref with keys
@@ -536,12 +558,12 @@ You can find documentation for this module with the perldoc command.
 
   perldoc Text::Layout::FontConfig
 
-Please report any bugs or feature requests using the issue tracker on
-GitHub.
+Please report any bugs or feature requests using the issue tracker for
+Text::Layout on GitHub.
 
 =head1 LICENSE
 
-See L<Text::Layout>.
+See L<Text::Layout>, L<Text::Layout::FontDescriptor>, L<HarfBuzz::Shaper>.
 
 =cut
 

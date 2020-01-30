@@ -1,5 +1,9 @@
 Revision history for Test2-Plugin-FauxHomeDir
 
+0.06      2020-01-30 10:44:08 -0700
+  - Test fixes for Windows Perl 5.14 and earlier which come bundled with
+    a File::Glob that cannot handle ~ (gh#1, gh#5)
+
 0.05      2019-05-24 10:12:14 -0400
   - Patch the patched File::HomeDir that is patched by Portable Strawberry Perl on windows
     (gh#2, gh#4)

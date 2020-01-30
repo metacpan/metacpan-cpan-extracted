@@ -3,6 +3,7 @@ html/BecomeUser.html
 html/BecomeOriginalUser.html                             
 html/Callbacks/RT-Extension-BecomeUser/Elements/CollectionList/AddColumns
 html/Callbacks/RT-Extension-BecomeUser/Admin/Users/Modify.html/LeftColumnBottom 
+html/Callbacks/RT-Extension-BecomeUser/autohandler/Auth
 inc/YAML/Tiny.pm           
 inc/Module/Install/Makefile.pm                           
 inc/Module/Install/Base.pm 

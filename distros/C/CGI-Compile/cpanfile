@@ -1,5 +1,6 @@
 requires 'perl', '5.008001';
 requires 'File::pushd';
+requires 'Sub::Name';
 
 on configure => sub {
     requires 'Module::Build::Tiny';
@@ -13,6 +14,7 @@ on test => sub {
     requires 'Try::Tiny';
     requires 'CGI';
     requires 'Switch';
+    requires 'Sub::Identify';
 };
 
 on develop => sub {

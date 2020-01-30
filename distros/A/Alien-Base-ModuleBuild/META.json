@@ -2,10 +2,10 @@
    "abstract" : "A Module::Build subclass for building Alien:: modules and their libraries",
    "author" : [
       "Graham Ollis <plicease@cpan.org>",
-      "Joel A. Berger <joel.a.berger@gmail.com>"
+      "Joel A Berger <joel.a.berger@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,99 +14,103 @@
       "version" : 2
    },
    "name" : "Alien-Base-ModuleBuild",
-   "no_index" : {
-      "directory" : [
-         "t"
-      ],
-      "file" : [
-         "README.pod"
-      ]
-   },
    "prereqs" : {
-      "configure" : {
+      "build" : {
          "requires" : {
             "Module::Build" : "0.4004"
          }
       },
-      "runtime" : {
-         "recommends" : {
-            "HTML::LinkExtor" : "0"
-         },
+      "configure" : {
          "requires" : {
+            "Module::Build" : "0.4004",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
             "Alien::Base::PkgConfig" : "1.20",
             "Archive::Extract" : "0",
             "Archive::Tar" : "1.40",
             "Capture::Tiny" : "0.17",
             "File::chdir" : "0.1005",
             "HTTP::Tiny" : "0.044",
-            "JSON::PP" : "0",
-            "List::Util" : "1.45",
             "Module::Build" : "0.4004",
             "Path::Tiny" : "0.077",
             "Shell::Config::Generate" : "0",
             "Shell::Guess" : "0",
             "Sort::Versions" : "0",
-            "Text::ParseWords" : "3.26",
             "URI" : "0",
             "parent" : "0",
-            "perl" : "v5.8.1"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::Require::Module" : "0.000071",
-            "Test2::V0" : "0.000071"
+            "Acme::Alien::DontPanic" : "0",
+            "Test2::Mock" : "0.000060",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::V0" : "0.000060",
+            "URI::file" : "0",
+            "perl" : "5.008001"
          }
-      }
-   },
-   "provides" : {
-      "Alien::Base::ModuleBuild" : {
-         "file" : "lib/Alien/Base/ModuleBuild.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Cabinet" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Cabinet.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::File" : {
-         "file" : "lib/Alien/Base/ModuleBuild/File.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Repository" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Repository.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Repository::FTP" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Repository/FTP.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Repository::HTTP" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Repository/HTTP.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Repository::Local" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Repository/Local.pm",
-         "version" : "1.08"
-      },
-      "Alien::Base::ModuleBuild::Utils" : {
-         "file" : "lib/Alien/Base/ModuleBuild/Utils.pm",
-         "version" : "1.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues"
+         "web" : "https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://metacpan.org/pod/Alien::Base::ModuleBuild",
       "repository" : {
-         "url" : "http://github.com/Perl5-Alien/Alien-Base-ModuleBuild"
+         "type" : "git",
+         "url" : "git://github.com/Perl5-Alien/Alien-Base-ModuleBuild.git",
+         "web" : "https://github.com/Perl5-Alien/Alien-Base-ModuleBuild"
       },
-      "x_IRC" : "irc://irc.perl.org/#native",
-      "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.08",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.10",
+   "x_contributors" : [
+      "Joel A Berger <joel.a.berger@gmail.com>",
+      "Graham Ollis <plicease@cpan.org>",
+      "David Mertens (run4flat)",
+      "Mark Nunberg (mordy, mnunberg)",
+      "Christian Walde (Mithaldu)",
+      "Brian Wightman (MidLifeXis)",
+      "Graham Ollis (plicease)",
+      "Zaki Mughal (zmughal)",
+      "mohawk2",
+      "Vikas N Kumar (vikasnkumar)",
+      "Flavio Poletti (polettix)",
+      "Salvador Fandi\u00f1o (salva)",
+      "Gianni Ceccarelli (dakkar)",
+      "Pavel Shaydo (zwon, trinitum)",
+      "Kang-min Liu (\u5289\u5eb7\u6c11, gugod)",
+      "Nicholas Shipp (nshp)",
+      "Petr Pisar (ppisar)",
+      "Alberto Sim\u00f5es (ambs)"
+   ],
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
+   "x_use_unsafe_inc" : 0
 }
+

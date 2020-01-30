@@ -3,6 +3,7 @@
 if (exists $session{RT_Extension_BecomeUser_OriginalUser}){
     $session{CurrentUser} = $session{RT_Extension_BecomeUser_OriginalUser};
     undef $session{RT_Extension_BecomeUser_OriginalUser};
+    undef $session{RT_Extension_BecomeUser_NewUser};
 }
 </%INIT>
 <h1>you are now back at your original account with id <%$session{CurrentUser}->id %></h1>

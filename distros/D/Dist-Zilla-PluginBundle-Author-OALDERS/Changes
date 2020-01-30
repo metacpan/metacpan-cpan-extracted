@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000026  2020-01-30 16:00:50Z
+    - Remove last reference to MAXMIND::TidyAll
+
 0.000025  2020-01-14 15:54:42Z
     - Copy Dist::Zilla::Plugin::MAXMIND::TidyAll into
       Dist::Zilla::Plugin::OALDERS::TidyAll

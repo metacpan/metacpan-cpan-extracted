@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ScaleNote
   repository: https://github.com/ology/Music-ScaleNote.git
-version: '0.0600'
+version: '0.0703'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -214,6 +214,7 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - enharmonic
             - isobase
             - pentatonic
           wordlist: Pod::Wordlist

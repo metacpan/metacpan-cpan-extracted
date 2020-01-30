@@ -131,7 +131,7 @@ my %WriteMakefileArgs = (
     "Test2::API" => "1.302096",
     "Test2::V0"  => "0.000060"
   },
-  "VERSION" => "1.96",
+  "VERSION" => "1.98",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -153,17 +153,17 @@ my %FallbackPrereqs = (
   "Text::ParseWords"    => "3.26"
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 if ( !do { require File::Which; ( $ENV{PKG_CONFIG} && File::Which::which( $ENV{PKG_CONFIG} ) ) || File::Which::which('pkgconf') || File::Which::which('pkg-config') } ) {
   requires( 'PkgConfig' => '0.14026' );    # for static cflags support
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 if ( do { use Config; ( $^O eq 'solaris' && $Config{ptrsize} == 8 ) || $^O eq 'MSWin32' } ) {
   requires( 'PkgConfig' => '0.14026' );    # for using the wrong libraries support
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 $WriteMakefileArgs{clean} = { FILES => ".tmp" };
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -177,7 +177,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
 sub _add_prereq {
   my ( $mm_key, $module, $version_or_range ) = @_;
   $version_or_range ||= 0;
@@ -185,7 +185,7 @@ sub _add_prereq {
     if exists $WriteMakefileArgs{$mm_key}{$module}
     and $WriteMakefileArgs{$mm_key}{$module} ne '0'
     and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
     and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

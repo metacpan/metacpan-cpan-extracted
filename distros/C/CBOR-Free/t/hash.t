@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Test::FailWarnings;
+use Test::Exception;
 
 use parent qw( Test::Class::Tiny );
 
@@ -77,7 +78,7 @@ sub T6_canonical {
 
 #----------------------------------------------------------------------
 
-sub T1_text_key {
+sub T2_text_key {
     my $hash_w_text_key = { "\x{100}" => '123' };
     my $cbor = CBOR::Free::encode($hash_w_text_key);
 
@@ -86,6 +87,35 @@ sub T1_text_key {
         "\xa1\x62\xc4\x80C123",
         'hash w/ text key encoded as expected',
     ) or diag explain sprintf('%v.02x', $cbor);
+
+    my $decoded = CBOR::Free::decode("$cbor");
+
+    is(
+        ord( (keys %$decoded)[0] ),
+        256,
+        'decoded map’s key is decoded correctly',
+    );
+}
+
+sub T4_invalid_text_key {
+    my $cbor = "\xa1\x63\0\xff\x80C123";
+
+    throws_ok(
+        sub { CBOR::Free::decode("$cbor") },
+        'CBOR::Free::X::InvalidUTF8',
+        'die() on normal attempt to decode invalid-UTF8 text map key',
+    );
+
+    my $str = "$@";
+    like($str, qr<\\x00\\xff\\x80(?!=C)>, 'string is hex-escaped as part of error' );
+
+    require CBOR::Free::Decoder;
+    my $decoder = CBOR::Free::Decoder->new();
+    $decoder->naive_utf8();
+    my $dec_hr = $decoder->decode("$cbor");
+
+    ok( utf8::is_utf8( (keys %$dec_hr)[0] ), 'UTF8 flag is set on invalid hash key' );
+    ok( !utf8::valid( (keys %$dec_hr)[0] ), '… but the actual value is invalid UTF-8' );
 }
 
 #----------------------------------------------------------------------

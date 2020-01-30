@@ -5,6 +5,7 @@ author:
 build_requires:
   CGI: '0'
   Capture::Tiny: '0'
+  Sub::Identify: '0'
   Switch: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
@@ -29,12 +30,13 @@ no_index:
     - xt
 requires:
   File::pushd: '0'
+  Sub::Name: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/miyagawa/CGI-Compile/issues
   homepage: https://github.com/miyagawa/CGI-Compile
   repository: https://github.com/miyagawa/CGI-Compile.git
-version: '0.23'
+version: '0.24'
 x_contributors:
   - 'Hans Dieter Pearcey <hdp@cpan.org>'
   - 'Jörn Reder <jreder@dimedis.de>'

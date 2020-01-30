@@ -3,7 +3,7 @@ package CGI::Compile;
 use strict;
 use 5.008_001;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Cwd;
 use File::Basename;
@@ -12,6 +12,7 @@ use File::pushd;
 use File::Temp;
 use File::Spec;
 use File::Path;
+use Sub::Name 'subname';
 
 our $RETURN_EXIT_VAL = undef;
 
@@ -53,21 +54,33 @@ BEGIN {
     die $@ if $@;
 }
 
+my %anon;
+
 sub compile {
     my($class, $script, $package) = @_;
 
     my $self = ref $class ? $class : $class->new;
 
-    my($code, $path, $dir);
+    my($code, $path, $dir, $subname);
+
     if (ref $script eq 'SCALAR') {
-        $code = $$script;
+        $code      = $$script;
+
+        $package ||= (caller)[0];
+
+        $subname   = '__CGI' . $anon{$package}++ . '__';
     } else {
         $code = $self->_read_source($script);
+
         $path = Cwd::abs_path($script);
         $dir  = File::Basename::dirname($path);
-    }
 
-    $package ||= $self->_build_package($path || $script);
+        my $genned_package;
+
+        ($genned_package, $subname) = $self->_build_subname($path || $script);
+
+        $package ||= $genned_package;
+    }
 
     my $warnings = $code =~ /^#!.*\s-w\b/ ? 1 : 0;
     $code =~ s/^__END__\r?\n.*//ms;
@@ -77,7 +90,7 @@ sub compile {
     # TODO handle nph and command line switches?
     my $eval = join '',
         "package $package;",
-        "sub {",
+        'sub {',
         'local $CGI::Compile::USE_REAL_EXIT = 0;',
         "\nCGI::initialize_globals() if defined &CGI::initialize_globals;",
         'local ($0, $CGI::Compile::_dir, *DATA);',
@@ -119,7 +132,6 @@ sub compile {
         },
         '};';
 
-
     my $sub = do {
         no warnings 'uninitialized'; # for 5.8
         # NOTE: this is a workaround to fix a problem in Perl 5.10
@@ -131,7 +143,7 @@ sub compile {
 
         die "Could not compile $script: $exception" if $exception;
 
-        sub {
+        subname "${package}::$subname", sub {
             my @args = @_;
             # this is necessary for MSWin32
             my $orig_warn = $SIG{__WARN__} || sub { warn(@_) };
@@ -150,21 +162,24 @@ sub _read_source {
     return do { local $/; <$fh> };
 }
 
-sub _build_package {
+sub _build_subname {
     my($self, $path) = @_;
 
     my ($volume, $dirs, $file) = File::Spec::Functions::splitpath($path);
     my @dirs = File::Spec::Functions::splitdir($dirs);
-    my $package = join '_', grep { defined && length } $volume, @dirs, $file;
+
+    my $package = join '_', grep { defined && length } $volume, @dirs;
+    my $name    = $file;
 
     # Escape everything into valid perl identifiers
-    $package =~ s/([^A-Za-z0-9_])/sprintf("_%2x", unpack("C", $1))/eg;
+    s/([^A-Za-z0-9_])/sprintf("_%2x", unpack("C", $1))/eg for $package, $name;
 
-    # make sure that the sub-package doesn't start with a digit
-    $package =~ s/^(\d)/_$1/;
+    # make sure the identifiers don't start with a digit
+    s/^(\d)/_$1/ for $package, $name;
 
-    $package = $self->{namespace_root} . "::$package";
-    return $package;
+    $package = $self->{namespace_root} . ($package ? "::$package" : '');
+
+    return ($package, $name);
 }
 
 # define tmp_dir value later on first usage, otherwise all children
@@ -446,10 +461,11 @@ The contents of the file as a scalar string.
 
 =back
 
-=head2 _build_package
+=head2 _build_subname
 
-Creates a package name into which the CGI coderef will be compiled into,
-prepended with C<$self->{namespace_root}>.
+Creates a package name and coderef name into which the CGI coderef will be
+compiled into. The package name will be prepended with
+C<$self->{namespace_root}>.
 
 Parameters:
 
@@ -469,6 +485,15 @@ Returns:
 =item * C<$package>
 
 The generated package name.
+
+=back
+
+=over 4
+
+=item * C<$subname>
+
+The generated coderef name, based on the file name (without directory) of the
+CGI file path.
 
 =back
 
@@ -508,13 +533,19 @@ Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
 
 =head1 CONTRIBUTORS
 
-Rafael Kitover E<lt>rkitover@cpan.orgE<gt>
+Rafael Kitover E<lt>rkitover@gmail.comE<gt>
 
 Hans Dieter Pearcey E<lt>hdp@cpan.orgE<gt>
 
 kocoureasy E<lt>igor.bujna@post.czE<gt>
 
 Torsten Förtsch E<lt>torsten.foertsch@gmx.netE<gt>
+
+Jörn Reder E<lt>jreder@dimedis.deE<gt>
+
+Pavel Mateja E<lt>pavel@verotel.czE<gt>
+
+lestrrat E<lt>lestrrat+github@gmail.comE<gt>
 
 =head1 COPYRIGHT & LICENSE
 

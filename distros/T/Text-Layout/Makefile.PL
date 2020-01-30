@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.015";
+my $version = "0.016";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -40,6 +40,12 @@ WriteMakefile(
      provides => {
 	 "Text::Layout"
 		  => { file => "lib/Text/Layout.pm",
+		       version => $version },
+	 "Text::Layout::FontConfig"
+		  => { file => "lib/Text/Layout/FontConfig.pm",
+		       version => $version },
+	 "Text::Layout::FontDescriptor"
+		  => { file => "lib/Text/Layout/FontDescriptor.pm",
 		       version => $version },
      },
 

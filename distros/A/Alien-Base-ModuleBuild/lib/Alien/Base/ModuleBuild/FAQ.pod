@@ -1,3 +1,9 @@
+# ABSTRACT: Frequently Asked Questions about Alien::Base::ModuleBuild
+# PODNAME: Alien::Base::ModuleBuild::FAQ
+# VERSION
+
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -5,6 +11,10 @@
 =head1 NAME
 
 Alien::Base::ModuleBuild::FAQ - Frequently Asked Questions about Alien::Base::ModuleBuild
+
+=head1 VERSION
+
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -139,7 +149,7 @@ For a fully implemented example, see L<Alien::Libbz2>.
 
 There are many ways to test Alien modules before (or after) they are installed, but instead
 of rolling your own, consider using L<Test::Alien> which is light on dependencies and will
-test your module very closely to the way that it will actaully be used.  That is to say by
+test your module very closely to the way that it will actually be used.  That is to say by
 building a mini XS or FFI extension and using it.  It even has tests for tool oriented Alien
 distributions (like L<Alien::gmake> and L<Alien::patch>).  Here is a short example, there
 are many others included with the L<Test::Alien> documentation:
@@ -240,7 +250,7 @@ patching (modules in inc can be used during build/test but won't be installed):
 
 By default L<Alien::Base::ModuleBuild> assumes a package with an autoconf style C<configure> script.  The 
 default is
- 
+
  # Build.PL
  use Alien::Base::ModuleBuild;
  Alien::Base::ModuleBuild->new(
@@ -307,7 +317,6 @@ install it for you.  You can use this from your C<Build.PL> with the C<alien_bin
    ...
  )->create_build_script;
 
-
 =head3 vanilla Makefiles?
 
 If you want to use the same C<make> as Perl, you can use L<Config>:
@@ -326,10 +335,10 @@ If you want to use the same C<make> as Perl, you can use L<Config>:
    ...
  )->create_build_script;
 
-=head3 Gnu Makefiles?
+=head3 GNU Makefiles?
 
 Some packages require GNU Make's unique syntax.  Perl's L<Config> provides an entry for C<gmake>, but it is 
-frequently wrong.  Do not depend on it.  Instead you can ues L<Alien::gmake> to provide a real GNU Make (either 
+frequently wrong.  Do not depend on it.  Instead you can use L<Alien::gmake> to provide a real GNU Make (either 
 from the operating system, or built from source):
 
  # Build.PL
@@ -366,7 +375,7 @@ identical environment used by the build process in order to troubleshoot the bui
 =head2 Can/Should I write a tool oriented Alien module using C<Alien::Base> that provides executables instead of a library?
 
 Certainly.  The original intent was to provide libraries, but tools are also quite doable using the 
-C<Alien::Base> toolset.  A simple minded example of this which is fairly easy to replicate is L<Alien::m4>.
+C<Alien::Base> tool set.  A simple minded example of this which is fairly easy to replicate is L<Alien::m4>.
 
 In general, this means specifying a subclass in your C<Build.PL> and bundling it in your distribution C<inc> directory.
 
@@ -526,7 +535,7 @@ project's GitHub issue tracker.
 L<https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues>
 
 =back
- 
+
 =head1 SEE ALSO
 
 =over
@@ -547,15 +556,49 @@ L<Alien::Base::ModuleBuild::API>
 
 =head1 AUTHOR
 
-Original author: Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+Original author: Joel A Berger E<lt>joel.a.berger@gmail.comE<gt>
 
-Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt> and the L<Alien::Base> team
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Graham Ollis (plicease)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Petr Pisar (ppisar)
+
+Alberto Simões (ambs)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017 by Joel Berger
+This software is copyright (c) 2012-2020 by Joel A Berger.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

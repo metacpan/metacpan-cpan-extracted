@@ -1,39 +1,35 @@
 ---
-abstract: 'Test Module for Alien::Base'
+abstract: 'Test Module for Alien::Base::ModuleBuild'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
-  - 'Joel A. Berger <joel.a.berger@gmail.com>'
+  - 'Joel A Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Capture::Tiny: '0'
-  ExtUtils::CBuilder: '0'
-  IO::Socket::SSL: '1.56'
-  Net::SSLeay: '1.49'
-  Test2: '1.302015'
-  Test2::Suite: '0.000030'
-  Test2::V0: '0'
+  Test2::V0: '0.000060'
   Test::Alien: '0.05'
+  Test::Alien::Diag: '0'
+  perl: '5.006'
 configure_requires:
-  Alien::Base::ModuleBuild: '1.08'
-  Module::Build: '0.38'
+  Alien::Base::ModuleBuild: '1.10'
+  Alien::Build: '1.98'
+  File::ShareDir: '1.03'
+  perl: '5.006'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Acme-Alien-DontPanic
-provides:
-  Acme::Alien::DontPanic:
-    file: lib/Acme/Alien/DontPanic.pm
-    version: '1.96'
 requires:
-  Alien::Base: '1.96'
-  perl: '5.008001'
+  Alien::Base: '1.98'
+  File::ShareDir: '1.03'
+  perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#native
-  MailingList: https://groups.google.com/forum/#!forum/perl5-alien
-  bugtracker: http://github.com/Perl5-Alien/Acme-Alien-DontPanic/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/Perl5-Alien/Acme-Alien-DontPanic
-version: '1.96'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/Perl5-Alien/Acme-Alien-DontPanic/issues
+  homepage: https://metacpan.org/pod/Acme::Alien::DontPanic
+  repository: git://github.com/Perl5-Alien/Acme-Alien-DontPanic.git
+version: '1.9800'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.015";
+our $VERSION = "0.016";
 
 =head1 NAME
 
@@ -215,8 +215,7 @@ You can find documentation for this module with the perldoc command.
 
   perldoc Text::Layout::FontDescriptor
 
-Please report any bugs or feature requests using the issue tracker on
-GitHub.
+Please report any bugs or feature requests using the issue tracker for Text::Layout on GitHub.
 
 =head1 LICENSE
 

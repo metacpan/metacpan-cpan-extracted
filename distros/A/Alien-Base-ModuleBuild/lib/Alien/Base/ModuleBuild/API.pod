@@ -1,11 +1,21 @@
+# ABSTRACT: API Reference for Alien:: Authors
+# VERSION
+# PODNAME: Alien::Base::ModuleBuild::API
+
+__END__
+
 =pod
 
 =encoding UTF-8
 
 =head1 NAME
- 
+
 Alien::Base::ModuleBuild::API - API Reference for Alien:: Authors
- 
+
+=head1 VERSION
+
+version 1.10
+
 =head1 DESCRIPTION
 
 B<NOTE>: Please consider for new development of L<Alien>s that you use
@@ -371,7 +381,7 @@ A command to run to check the version of the library installed on the system. Th
 
 A few global variables are used to set gross behavior. For each pair of variables, if both are set, the environment variable takes precedence.
 
-=over 
+=over
 
 =item $ENV{ALIEN_ARCH}
 
@@ -379,7 +389,7 @@ A few global variables are used to set gross behavior. For each pair of variable
 
 Setting this changes the default for alien_arch above.  If the module specifies its own alien_arch in its C<Build.PL> file then it will override this setting.  Typically installing into an architecture specific directory is what you
 want to do, since most L<Alien::Base> based distributions provide architecture specific binary code, so you should consider carefully before installing modules with this environment variable set to 0.  This may be useful for
-integrators creating a single non-architecture specific RPM, .dep or similar package.  In this case the integrator should ensure that the Alien package be installed with a system install_type and use the system package.
+integrators creating a single non-architecture specific RPM, .deb or similar package.  In this case the integrator should ensure that the Alien package be installed with a system install_type and use the system package.
 
 =item $ENV{ALIEN_BLIB}
 
@@ -435,7 +445,7 @@ Holder for the full path to the extracted source of the library. This is used to
 
 =head2 COMMAND INTERPOLATION
 
-Before L<Alien::Base::ModuleBuild> executes system commands, it replaces a few special escape sequences with useful data. This is needed especially for referencing the full path to the C<alien_share_dir> before this path is known. The availble sequences are:
+Before L<Alien::Base::ModuleBuild> executes system commands, it replaces a few special escape sequences with useful data. This is needed especially for referencing the full path to the C<alien_share_dir> before this path is known. The available sequences are:
 
 =over
 
@@ -473,7 +483,7 @@ If you are trying to invoke the autoconf configure script, use C<%c> instead.  T
 
 =item Some other script
 
-Invoke the interpreter directly.  For example, if you have a python script use "python foo.py", if you have a Perl script use "%X foo.pl", if you have an sh script use "sh foo.sh".  These are all portable.
+Invoke the interpreter directly.  For example, if you have a Python script use C<python foo.py>, if you have a Perl script use "%X foo.pl", if you have an sh script use "sh foo.sh".  These are all portable.
 For sh, be sure to set the C<alien_msys> property so that it will work on Windows.
 
 =back
@@ -511,12 +521,6 @@ A literal C<%>.
 
 =back
 
-=head1 AUTHOR
-
-Original author: Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
-
-Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt> and the L<Alien::Base> team
-
 =head1 SEE ALSO
 
 =over
@@ -527,11 +531,51 @@ L<Module::Build::API>
 
 =back
 
+=head1 AUTHOR
+
+Original author: Joel A Berger E<lt>joel.a.berger@gmail.comE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+David Mertens (run4flat)
+
+Mark Nunberg (mordy, mnunberg)
+
+Christian Walde (Mithaldu)
+
+Brian Wightman (MidLifeXis)
+
+Graham Ollis (plicease)
+
+Zaki Mughal (zmughal)
+
+mohawk2
+
+Vikas N Kumar (vikasnkumar)
+
+Flavio Poletti (polettix)
+
+Salvador Fandiño (salva)
+
+Gianni Ceccarelli (dakkar)
+
+Pavel Shaydo (zwon, trinitum)
+
+Kang-min Liu (劉康民, gugod)
+
+Nicholas Shipp (nshp)
+
+Petr Pisar (ppisar)
+
+Alberto Simões (ambs)
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2017 by Joel Berger
+This software is copyright (c) 2012-2020 by Joel A Berger.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

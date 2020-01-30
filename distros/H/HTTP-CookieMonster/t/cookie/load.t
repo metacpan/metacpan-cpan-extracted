@@ -21,9 +21,9 @@ my $cookie = HTTP::CookieMonster::Cookie->new(
     hash      => {},
 );
 
-isa_ok( $cookie, "HTTP::CookieMonster::Cookie" );
+isa_ok( $cookie, 'HTTP::CookieMonster::Cookie' );
 
-diag "val: " . $cookie->val;
-diag "key: " . $cookie->key;
+diag 'val: ' . $cookie->val;
+diag 'key: ' . $cookie->key;
 
 done_testing();

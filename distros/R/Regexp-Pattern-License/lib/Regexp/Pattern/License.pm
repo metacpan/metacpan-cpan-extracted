@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.100
+Version v3.1.101
 
 =cut
 
-our $VERSION = version->declare("v3.1.100");
+our $VERSION = version->declare("v3.1.101");
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ my $SD = '[ -]';         # space or dash
 
 my @_re = (
 	[ qr/\Q$BB/, '(?:\W{0,5}\S{0,2}\W{0,3})' ],
-	[ qr/\Q$C/,  '(?:©|\(c\))' ],
+	[ qr/\Q$C/,  '(?:©|\([Cc]\))' ],
 	[ qr/\Q$CQ/, '(?::\W{0,2})' ],
 	[ qr/\Q$D/,  '[–-]' ],
 	[ qr/\Q$DD/, '(?: [–—-]{1,2} )' ],
@@ -73,8 +73,42 @@ while ( my ( $key, $val ) = each %Regexp::Pattern::License::Parts::RE ) {
 
 my $the = '(?:[Tt]he )';
 
+my $cc_no_law_firm
+	= "CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES$F ";
+my $cc_dist_no_rel
+	= "DISTRIBUTION OF THIS LICENSE DOES NOT CREATE AN ATTORNEY${D}CLIENT RELATIONSHIP$F ";
+my $cc_dist_no_rel_draft
+	= "DISTRIBUTION OF THIS DRAFT LICENSE DOES NOT CREATE AN ATTORNEY${D}CLIENT RELATIONSHIP$F ";
+my $cc_dist_no_rel_doc
+	= "DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY${D}CLIENT RELATIONSHIP$F ";
+my $cc_info_asis_discl
+	= "CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN $Q?AS${D}IS$Q? BASIS$F "
+	. "CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE INFORMATION PROVIDED, "
+	. "AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM ITS USE$F";
+my $cc_info_asis_discl_doc
+	= "CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN $Q?AS${D}IS$Q? BASIS$F "
+	. "CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER, "
+	. "AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER$F";
+my $cc_work_protected
+	= "THE WORK \\(?AS DEFINED BELOW\\)? IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE \\(?$Q?CCPL$Q? OR $Q?LICENSE$Q?\\)?$F "
+	. "THE WORK IS PROTECTED BY COPYRIGHT AND\/OR OTHER APPLICABLE LAW$F ";
+my $cc_auth_lic_prohib
+	= "ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE IS PROHIBITED$F$EE?";
+my $cc_auth_lic_copylaw_prohib
+	= "ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED$F$EE?";
+my $laws_confer
+	= 'The laws of most jurisdictions throughout the world automatically confer';
+
+my $cc_intro_1
+	= "(?:(?:\\S+ )?$cc_no_law_firm$cc_dist_no_rel_draft$cc_info_asis_discl(?: \\S+)?$EE)?License$EE$cc_work_protected$cc_auth_lic_prohib";
+my $cc_intro
+	= "(?:(?:\\S+ )?$cc_no_law_firm$cc_dist_no_rel$cc_info_asis_discl(?: \\S+)?$EE)?License$EE$cc_work_protected$cc_auth_lic_copylaw_prohib";
+my $cc_intro_cc0
+	= "(?:(?:\\S+ )?$cc_no_law_firm$cc_dist_no_rel_doc$cc_info_asis_discl_doc(?: \\S+)?$EE)?Statement of Purpose$EE$laws_confer";
+
 my $cc_by_exercising_you_accept_this
-	= "By exercising the Licensed Rights \\(defined below\\), You accept and agree to be bound by the terms and conditions of this ";
+	= "(?:By exercising the Licensed Rights \\(?defined below\\)?, You accept and agree to be bound by the terms and conditions of this "
+	. "|BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS )";
 my $gnu    = '(?:GNU )';
 my $gpl    = '(?:General Public Licen[cs]e|GENERAL PUBLIC LICEN[CS]E)';
 my $fsf    = "(?:$the?Free Software Foundation)";
@@ -775,7 +809,40 @@ $RE{bsl_1} = {
 
 =item * cc_by
 
+=item * cc_by_1
+
+=item * cc_by_2
+
+=item * cc_by_2_5
+
+=item * cc_by_3
+
+=item * cc_by_4
+
 =cut
+
+my $if_dist_work_or_works_keep_intact_notices
+	= "If you distribute, publicly display, publicly perform, or publicly digitally perform the Work or any Derivative Works or Collective Works, You must keep intact all copyright notices for the Work and";
+my $if_dist_work_or_collections_keep_intact_notices
+	= "If You Distribute, or Publicly Perform the Work or any Adaptations or Collections, You must, unless a request has been made pursuant to Section 4\\(a\\), keep intact all copyright notices for the Work and";
+my $credit_author_if_supplied
+	= " give the Original Author credit reasonable to the medium or means You are utilizing by conveying the name \\(or pseudonym if applicable\\) of the Original Author if supplied;";
+my $credit_author_or_designated_party
+	= " provide, reasonable to the medium or means You are utilizing:?"
+	. " \\(i\\) the name of the Original Author \\(or pseudonym, if applicable\\) if supplied, and/or"
+	. " \\(ii\\) if the Original Author and/or Licensor designate another party or parties"
+	. " \\(e\\.g\\. a sponsor institute, publishing entity, journal\\)"
+	. " for attribution in Licensor'?s copyright notice, terms of service or by other reasonable means,"
+	. " the name of such party or parties;";
+
+#" if the Original Author and/or Licensor designate another party or parties \\(e\\.g\\., a sponsor institute, publishing entity, journal\\) for attribution \\(\"Attribution Parties\"\\) in Licensor'?s copyright notice, terms of service or by other reasonable means, the name of such party or parties;";
+#" \\(ii\\) the title of the Work if supplied;";
+my $to_extend_URI
+	= " to the extent reasonably practicable, the Uniform Resource Identifier, if any, that Licensor specifies to be associated with the Work,"
+	. " unless such URI does not refer to the copyright notice or licensing information for the Work; and";
+
+#    " (iii) to the extent reasonably practicable, the URI, if any, that Licensor specifies to be associated with the Work, unless such URI does not refer to the copyright notice or licensing information for the Work; and"
+#" (iv) , consistent with Section 3(b), in the case of an Adaptation, a credit identifying the use of the Work in the Adaptation (e.g., "French translation of the Work by Original Author," or "Screenplay based on original Work by Original Author"). The credit required by this Section 4 (b) may be implemented in any reasonable manner; provided, however, that in the case of a Adaptation or Collection, at a minimum such credit will appear, if a credit for all contributing authors of the Adaptation or Collection appears, then as part of these credits and in a manner at least as prominent as the credits for the other contributing authors. For the avoidance of doubt, You may only use the credit required by this Section for the purpose of attribution in the manner set out above and, by exercising Your rights under this License, You may not implicitly or explicitly assert or imply any connection with, sponsorship or endorsement by the Original Author, Licensor and/or Attribution Parties, as appropriate, of You or Your use of the Work, without the separate, express prior written permission of the Original Author, Licensor and/or Attribution Parties.
 
 $RE{cc_by} = {
 	name              => 'CC-BY',
@@ -786,7 +853,92 @@ $RE{cc_by} = {
 	'pat.alt.subject.name' => "(?:$P{cc}$SD(?:$P{cc_by}|BY|$P{cc_url}by))",
 };
 
+$RE{cc_by_1} = {
+	name    => 'CC-BY-1.0',
+	caption => 'Creative Commons Attribution 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' => 'Creative Commons Attribution 1.0',
+	iri  => 'https://creativecommons.org/licenses/by/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by' ],
+
+	'pat.alt.subject.license.multisection' => "as requested$F$E$BB?"
+		. $if_dist_work_or_works_keep_intact_notices
+		. $credit_author_if_supplied
+		. " the title of the Work if supplied;"
+		. " in the case of a Derivative",
+};
+
+$RE{cc_by_2} = {
+	name    => 'CC-BY-2.0',
+	caption => 'Creative Commons Attribution 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' => 'Creative Commons Attribution 2.0',
+	iri  => 'https://creativecommons.org/licenses/by/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by' ],
+
+	'pat.alt.subject.license.multisection' => "as requested$F$E$BB?"
+		. $if_dist_work_or_works_keep_intact_notices
+		. $credit_author_if_supplied
+		. " the title of the Work if supplied;"
+		. $to_extend_URI
+		. " in the case of a Derivative",
+};
+
+$RE{cc_by_2_5} = {
+	name    => 'CC-BY-2.5',
+	caption => 'Creative Commons Attribution 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' => 'Creative Commons Attribution 2.5',
+	iri  => 'https://creativecommons.org/licenses/by/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by' ],
+
+	'pat.alt.subject.license.multisection' => "as requested$F$E$BB?"
+		. $if_dist_work_or_works_keep_intact_notices
+		. $credit_author_or_designated_party
+		. " the title of the Work if supplied;"
+		. $to_extend_URI
+		. " in the case of a Derivative",
+};
+
+$RE{cc_by_3} = {
+	name    => 'CC-BY-3.0',
+	caption => 'Creative Commons Attribution 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution 3.0 Unported',
+	'caption.alt.org.tldr.version.cc_by_3' =>
+		'Creative Commons Attribution 3.0 Unported (CC-BY)',
+	iri  => 'https://creativecommons.org/licenses/by/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by' ],
+
+	'pat.alt.subject.license.multisection' => "as requested$F$E$BB?"
+		. $if_dist_work_or_collections_keep_intact_notices
+
+#              . $credit_author_or_designated_party
+#              . " the title of the Work if supplied;"
+#              . " to the extent reasonably practicable, the Uniform Resource Identifier, if any, that Licensor specifies to be associated with the Work, unless such URI does not refer to the copyright notice or licensing information for the Work; and"
+#              . " in the case of a Derivative",
+};
+
+$RE{cc_by_4} = {
+	name                           => 'CC-BY-4.0',
+	'name.alt.org.tldr.path.short' => 'ccby4',
+	caption => 'Creative Commons Attribution 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution 4.0 International',
+	'caption.alt.org.tldr' =>
+		'Creative Commons Attribution 4.0 International (CC BY 4.0)',
+	iri  => 'https://creativecommons.org/licenses/by/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by' ],
+};
+
 =item * cc_by_nc
+
+=item * cc_by_nc_1
+
+=item * cc_by_nc_2
+
+=item * cc_by_nc_2_5
+
+=item * cc_by_nc_3
+
+=item * cc_by_nc_4
 
 =cut
 
@@ -800,7 +952,72 @@ $RE{cc_by_nc} = {
 		"(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nc}|BY${SD}NC|$P{cc_url}by-nc))",
 };
 
+$RE{cc_by_nc_1} = {
+	name => 'CC-BY-NC-1.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial 1.0',
+	iri  => 'https://creativecommons.org/licenses/by-nc/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc' ],
+};
+
+$RE{cc_by_nc_2} = {
+	name                => 'CC-BY-NC-2.0',
+	'name.alt.org.tldr' => 'creative-commons-public-license-(ccpl)',
+	caption =>
+		'Creative Commons Attribution-NonCommercial 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial 2.0',
+	'caption.alt.org.tldr' =>
+		'Creative Commons Attribution-NonCommercial 2.0 Generic (CC BY-NC 2.0)',
+	iri  => 'https://creativecommons.org/licenses/by-nc/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc' ],
+};
+
+$RE{cc_by_nc_2_5} = {
+	name => 'CC-BY-NC-2.5',
+	caption =>
+		'Creative Commons Attribution-NonCommercial 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial 2.5',
+	iri  => 'https://creativecommons.org/licenses/by-nc/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc' ],
+};
+
+$RE{cc_by_nc_3} = {
+	name => 'CC-BY-NC-3.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial 3.0 Unported',
+	iri  => 'https://creativecommons.org/licenses/by-nc/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc' ],
+};
+
+$RE{cc_by_nc_4} = {
+	name => 'CC-BY-NC-4.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial 4.0 International',
+	'caption.alt.org.tldr' =>
+		'Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)',
+	iri  => 'https://creativecommons.org/licenses/by-nc/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc' ],
+};
+
 =item * cc_by_nc_nd
+
+=item * cc_by_nc_nd_1
+
+=item * cc_by_nc_nd_2
+
+=item * cc_by_nc_nd_2_5
+
+=item * cc_by_nc_nd_3
+
+=item * cc_by_nc_nd_4
 
 =cut
 
@@ -815,7 +1032,67 @@ $RE{cc_by_nc_nd} = {
 		"(?:$P{cc}$SD(?:$P{cc_by}$SD(?:$P{cc_nc}$SD$P{cc_nd}|$P{cc_nd}$SD$P{cc_nc})|BY${SD}NC${SD}ND|$P{cc_url}by-nc-nd))",
 };
 
+$RE{cc_by_nc_nd_1} = {
+	name => 'CC-BY-NC-ND-1.0',
+	caption =>
+		'Creative Commons Attribution-NoDerivs-NonCommercial 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivs-NonCommercial 1.0',
+	iri  => 'https://creativecommons.org/licenses/by-nd-nc/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_nd' ],
+};
+
+$RE{cc_by_nc_nd_2} = {
+	name => 'CC-BY-NC-ND-2.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.0',
+	iri  => 'https://creativecommons.org/licenses/by-nc-nd/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_nd' ],
+};
+
+$RE{cc_by_nc_nd_2_5} = {
+	name => 'CC-BY-NC-ND-2.5',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.5',
+	iri  => 'https://creativecommons.org/licenses/by-nc-nd/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_nd' ],
+};
+
+$RE{cc_by_nc_nd_3} = {
+	name => 'CC-BY-NC-ND-3.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported',
+	iri  => 'https://creativecommons.org/licenses/by-nc-nd/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_nd' ],
+};
+
+$RE{cc_by_nc_nd_4} = {
+	name => 'CC-BY-NC-ND-4.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International',
+	iri  => 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_nd' ],
+};
+
 =item * cc_by_nc_sa
+
+=item * cc_by_nc_sa_1
+
+=item * cc_by_nc_sa_2
+
+=item * cc_by_nc_sa_2_5
+
+=item * cc_by_nc_sa_3
+
+=item * cc_by_nc_sa_4
 
 =cut
 
@@ -830,7 +1107,69 @@ $RE{cc_by_nc_sa} = {
 		"(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nc}$SD$P{cc_sa}|BY${SD}NC${SD}SA|$P{cc_url}by-nc-sa))",
 };
 
+$RE{cc_by_nc_sa_1} = {
+	name => 'CC-BY-NC-SA-1.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 1.0',
+	iri  => 'https://creativecommons.org/licenses/by-nc-sa/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_sa' ],
+};
+
+$RE{cc_by_nc_sa_2} = {
+	name => 'CC-BY-NC-SA-2.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.0',
+	iri  => 'https://creativecommons.org/licenses/by-nc-sa/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_sa' ],
+};
+
+$RE{cc_by_nc_sa_2_5} = {
+	name => 'CC-BY-NC-SA-2.5',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.5',
+	iri  => 'https://creativecommons.org/licenses/by-nc-sa/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_sa' ],
+};
+
+$RE{cc_by_nc_sa_3} = {
+	name => 'CC-BY-NC-SA-3.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported',
+	iri  => 'https://creativecommons.org/licenses/by-nc-sa/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_sa' ],
+};
+
+$RE{cc_by_nc_sa_4} = {
+	name => 'CC-BY-NC-SA-4.0',
+	caption =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International',
+	'caption.alt.org.tldr' =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
+	iri  => 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nc_sa' ],
+};
+
 =item * cc_by_nd
+
+=item * cc_by_nd_1
+
+=item * cc_by_nd_2
+
+=item * cc_by_nd_2_5
+
+=item * cc_by_nd_3
+
+=item * cc_by_nd_4
 
 =cut
 
@@ -844,7 +1183,65 @@ $RE{cc_by_nd} = {
 		"(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nd}|BY${SD}ND|$P{cc_url}by-nd))",
 };
 
+$RE{cc_by_nd_1} = {
+	name    => 'CC-BY-ND-1.0',
+	caption => 'Creative Commons Attribution-NoDerivs 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivs 1.0',
+	iri  => 'https://creativecommons.org/licenses/by-nd/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nd' ],
+};
+
+$RE{cc_by_nd_2} = {
+	name    => 'CC-BY-ND-2.0',
+	caption => 'Creative Commons Attribution-NoDerivs 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivs 2.0',
+	iri  => 'https://creativecommons.org/licenses/by-nd/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nd' ],
+};
+
+$RE{cc_by_nd_2_5} = {
+	name    => 'CC-BY-ND-2.5',
+	caption => 'Creative Commons Attribution-NoDerivs 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivs 2.5',
+	iri  => 'https://creativecommons.org/licenses/by-nd/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nd' ],
+};
+
+$RE{cc_by_nd_3} = {
+	name    => 'CC-BY-ND-3.0',
+	caption => 'Creative Commons Attribution-NoDerivs 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivs 3.0 Unported',
+	iri  => 'https://creativecommons.org/licenses/by-nd/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nd' ],
+};
+
+$RE{cc_by_nd_4} = {
+	name => 'CC-BY-ND-4.0',
+	caption =>
+		'Creative Commons Attribution-NoDerivatives 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-NoDerivatives 4.0 International',
+	'caption.alt.org.tldr' =>
+		'Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)',
+	iri  => 'https://creativecommons.org/licenses/by-nd/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_nd' ],
+};
+
 =item * cc_by_sa
+
+=item * cc_by_sa_1
+
+=item * cc_by_sa_2
+
+=item * cc_by_sa_2_5
+
+=item * cc_by_sa_3
+
+=item * cc_by_sa_4
 
 =cut
 
@@ -858,7 +1255,57 @@ $RE{cc_by_sa} = {
 		"(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_sa}|BY${SD}SA|$P{cc_url}by-sa))",
 };
 
+$RE{cc_by_sa_1} = {
+	name    => 'CC-BY-SA-1.0',
+	caption => 'Creative Commons Attribution-ShareAlike 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-ShareAlike 1.0',
+	iri  => 'https://creativecommons.org/licenses/by-sa/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_sa' ],
+};
+
+$RE{cc_by_sa_2} = {
+	name    => 'CC-BY-SA-2.0',
+	caption => 'Creative Commons Attribution-ShareAlike 2.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-ShareAlike 2.0',
+	iri  => 'https://creativecommons.org/licenses/by-sa/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_sa' ],
+};
+
+$RE{cc_by_sa_2_5} = {
+	name    => 'CC-BY-SA-2.5',
+	caption => 'Creative Commons Attribution-ShareAlike 2.5 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-ShareAlike 2.5',
+	iri  => 'https://creativecommons.org/licenses/by-sa/2.5/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_sa' ],
+};
+
+$RE{cc_by_sa_3} = {
+	name    => 'CC-BY-SA-3.0',
+	caption => 'Creative Commons Attribution-ShareAlike 3.0 Unported License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-ShareAlike 3.0 Unported',
+	iri  => 'https://creativecommons.org/licenses/by-sa/3.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_sa' ],
+};
+
+$RE{cc_by_sa_4} = {
+	name => 'CC-BY-SA-4.0',
+	caption =>
+		'Creative Commons Attribution-ShareAlike 4.0 International License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons Attribution-ShareAlike 4.0 International',
+	'caption.alt.org.tldr' =>
+		' Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)',
+	iri  => 'https://creativecommons.org/licenses/by-sa/4.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_by_sa' ],
+};
+
 =item * cc_cc0
+
+=item * cc_cc0_1
 
 =cut
 
@@ -878,6 +1325,87 @@ $RE{cc_cc0} = {
 		'has waived all copyright and related or neighboring rights',
 };
 
+$RE{cc_cc0_1} = {
+	name                           => 'CC0-1.0',
+	'name.alt.org.spdx'            => 'CC0-1.0',
+	'name.alt.org.tldr.path.short' => 'cc0-1.0',
+	caption => 'Creative Commons CC0 Universal 1.0 Public Domain Dedication',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons CC0 1.0 Universal',
+	'caption.alt.org.tldr' => 'Creative Commons CC0 1.0 Universal (CC-0)',
+	iri => 'https://creativecommons.org/publicdomain/zero/1.0/',
+	'iri.alt.org.wikipedia' =>
+		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
+	tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
+
+	'pat.alt.subject.grant.scope.line.scope.sentence' =>
+		'has waived all copyright and related or neighboring rights',
+};
+
+=item * cc_nc
+
+=item * cc_nc_1
+
+=cut
+
+$RE{cc_nc} = {
+	name              => 'CC-NC',
+	'name.alt.org.cc' => 'nc',
+	caption           => 'Creative Commons NonCommercial Public License',
+	tags              => [ 'family:cc', 'type:versioned:decimal' ],
+};
+
+$RE{cc_nc_1} = {
+	name    => 'CC-NC-1.0',
+	caption => 'Creative Commons NonCommercial 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' =>
+		'Creative Commons NonCommercial 1.0',
+	iri  => 'https://creativecommons.org/licenses/nc/2.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_nc' ],
+};
+
+=item * cc_nd
+
+=item * cc_nd_1
+
+=cut
+
+$RE{cc_nd} = {
+	name              => 'CC-ND',
+	'name.alt.org.cc' => 'nd',
+	caption           => 'Creative Commons NoDerivs Public License',
+	tags              => [ 'family:cc', 'type:versioned:decimal' ],
+};
+
+$RE{cc_nd_1} = {
+	name    => 'CC-ND-1.0',
+	caption => 'Creative Commons NoDerivs 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' => 'Creative Commons NoDerivs 1.0',
+	iri  => 'https://creativecommons.org/licenses/nd/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_nd' ],
+};
+
+=item * cc_sa
+
+=item * cc_sa_1
+
+=cut
+
+$RE{cc_sa} = {
+	name              => 'CC-SA',
+	'name.alt.org.cc' => 'sa',
+	caption           => 'Creative Commons ShareAlike Public License',
+	tags              => [ 'family:cc', 'type:versioned:decimal' ],
+};
+
+$RE{cc_sa_1} = {
+	name    => 'CC-SA-1.0',
+	caption => 'Creative Commons ShareAlike 1.0 Generic License',
+	'caption.alt.org.cc.legal.license' => 'Creative Commons ShareAlike 1.0',
+	iri  => 'https://creativecommons.org/licenses/sa/1.0/',
+	tags => [ 'family:cc', 'type:singleversion:cc_sa' ],
+};
+
 =item * cc_sp
 
 =cut
@@ -894,6 +1422,10 @@ $RE{cc_sp} = {
 
 =item * cddl
 
+=item * cddl_1
+
+=item * cddl_1_1
+
 =cut
 
 $RE{cddl} = {
@@ -909,6 +1441,24 @@ $RE{cddl} = {
 		"$the?COMMON DEVELOPMENT AND DISTRIBUTION LICENSE(?: \\(CDDL\\))?",
 		"${the}CDDL\\b",
 	],
+};
+
+$RE{cddl_1} = {
+	name    => 'CDDL-1.0',
+	caption => 'Common Development and Distribution License 1.0',
+	tags    => ['type:singleversion:cddl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"Sun Microsystems, Inc$F is the initial license steward",
+};
+
+$RE{cddl_1_1} = {
+	name    => 'CDDL-1.1',
+	caption => 'Common Development and Distribution License 1.1',
+	tags    => ['type:singleversion:cddl'],
+
+	'pat.alt.subject.license.scope.line.scope.paragraph' =>
+		'Oracle is the initial license steward',
 };
 
 =item * cecill
@@ -1186,6 +1736,41 @@ $RE{cecill_c_1} = {
 		"Logiciel modifi[é] ou non;$EE${BB}[à] faire en sorte que",
 };
 
+=item * cpl
+
+=item * cpl_1
+
+=cut
+
+$RE{cpl} = {
+	name                        => 'CPL',
+	'name.alt.org.wikidata'     => 'Q2477807',
+	caption                     => 'Common Public License',
+	'caption.alt.org.wikipedia' => 'Common Public License',
+	'caption.alt.misc.british'  => 'Common Public Licence',
+	description                 => <<'END',
+Origin: IBM Public License (IPL)
+END
+	tags => ['type:versioned:decimal'],
+};
+
+$RE{cpl_1} = {
+	name                     => 'CPL-1.0',
+	caption                  => 'Common Public License 1.0',
+	'caption.alt.misc.legal' => 'Common Public License Version 1.0',
+	tags                     => ['type:singleversion:cpl'],
+
+	'pat.alt.subject.license.scope.sentence' =>
+		"IBM is the initial Agreement Steward",
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"(?:Common Public License Version 1\\.0${EE})?"
+		. "THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS COMMON PUBLIC LICENSE \\(${Q}AGREEMENT$Q\\)$F$E"
+		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT${Q}S ACCEPTANCE OF THIS AGREEMENT$F(?: |$EE)"
+		. "$BB$EE?DEFINITIONS$EE"
+		. "${Q}Contribution${Q} means$CQ?$EE"
+		. "${BB}in the case of the initial Contributor, the initial code",
+};
+
 =item * cube
 
 =cut
@@ -1236,6 +1821,10 @@ $RE{dsdp} = {
 
 =item * epl
 
+=item * epl_1
+
+=item * epl_2
+
 =cut
 
 $RE{epl} = {
@@ -1244,12 +1833,53 @@ $RE{epl} = {
 	caption                     => 'Eclipse Public License',
 	'caption.alt.org.wikipedia' => 'Eclipse Public License',
 	'caption.alt.misc.british'  => 'Eclipse Public Licence',
-	tags                        => ['type:versioned:decimal'],
+	description                 => <<'END',
+Origin: Common Public License (CPL)
+END
+	tags => ['type:versioned:decimal'],
 
 	'_pat.alt.subject.name' => [
 		"$the?Eclipse Public Licen[cs]e(?: \\(EPL\\))?",
 		"${the}EPL\\b",
 	],
+
+# TODO: readd when children cover same region
+#	'pat.alt.subject.license.scope.sentence' =>
+#		"The Eclipse Foundation is the initial Agreement Steward",
+};
+
+$RE{epl_1} = {
+	name                     => 'EPL-1.0',
+	caption                  => 'Eclipse Public License 1.0',
+	'caption.alt.misc.legal' => 'Eclipse Public License - v 1.0',
+	tags                     => ['type:singleversion:epl'],
+
+	'pat.alt.subject.license.scope.sentence' =>
+		"Eclipse Public License $D v 1\\.0${EE}THE ACCOMPANYING",
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"(?:Eclipse Public License $D v 1\\.0${EE})?"
+		. "THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE \\(${Q}AGREEMENT$Q\\)$F$E"
+		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT${Q}S ACCEPTANCE OF THIS AGREEMENT$F(?: |$EE)"
+		. "$BB$EE?DEFINITIONS$EE"
+		. "${Q}Contribution${Q} means$CQ?$EE"
+		. "${BB}in the case of the initial Contributor, the initial code",
+};
+
+$RE{epl_2} = {
+	name                     => 'EPL-2.0',
+	caption                  => 'Eclipse Public License 2.0',
+	'caption.alt.misc.legal' => 'Eclipse Public License - v 2.0',
+	tags                     => ['type:singleversion:epl'],
+
+	'pat.alt.subject.license.scope.sentence' =>
+		"Eclipse Public License $D v 2\\.0${EE}THE ACCOMPANYING",
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"(?:Eclipse Public License $D v 1\\.0${EE})?"
+		. "THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE \\(${Q}AGREEMENT$Q\\)$F$E"
+		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT${Q}S ACCEPTANCE OF THIS AGREEMENT$F(?: |$EE)"
+		. "$BB$EE?DEFINITIONS$EE"
+		. "${Q}Contribution${Q} means$CQ?$EE"
+		. "${BB}in the case of the initial Contributor, the initial content",
 };
 
 =item * eurosym
@@ -1438,6 +2068,37 @@ $RE{icu} = {
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{note_copr_perm} of the Software and that $P{repro_copr_perm_appear_doc}$F$EE$P{asis_sw_warranty}(?:[^.]+$F$E){2}$P{nopromo_except}",
+};
+
+=item * ipl
+
+=item * ipl_1
+
+=cut
+
+$RE{ipl} = {
+	name                        => 'IPL',
+	'name.alt.org.wikidata'     => 'Q288745',
+	caption                     => 'IBM Public License',
+	'caption.alt.org.wikipedia' => 'IBM Public License',
+	'caption.alt.misc.british'  => 'IBM Public Licence',
+	tags                        => ['type:versioned:decimal'],
+};
+
+$RE{ipl_1} = {
+	name                     => 'IPL-1.0',
+	caption                  => 'IBM Public License 1.0',
+	'caption.alt.misc.legal' => 'IBM Public License Version 1.0',
+	tags                     => ['type:singleversion:ipl'],
+
+	'pat.alt.subject.license.scope.sentence' => 'UNDER THE TERMS OF THIS IBM',
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"(?:IBM Public License Version 1\\.0${EE})?"
+		. "THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS IBM PUBLIC LICENSE \\(${Q}AGREEMENT$Q\\)$F$E"
+		. "ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT${Q}S ACCEPTANCE OF THIS AGREEMENT$F$EE"
+		. "$BB$EE?DEFINITIONS$EE"
+		. "${Q}Contribution${Q} means$CQ?$EE"
+		. "${BB}in the case of International Business Machines Corporation \\(${Q}IBM$Q\\), the Original Program",
 };
 
 =item * json
@@ -1784,6 +2445,12 @@ $RE{mit_oldstyle_permission} = {
 
 =item * mpl
 
+=item * mpl_1
+
+=item * mpl_1_1
+
+=item * mpl_2
+
 =cut
 
 $RE{mpl} = {
@@ -1799,6 +2466,33 @@ $RE{mpl} = {
 		"$the?Mozilla Public Licen[cs]e(?: \\($Q?(?:https?:?//mozilla.org/)?MPL$Q?\\))?(?: (?:as )?published by $the\{0,2}Mozilla Foundation)?",
 		"${the}MPL\\b",
 	],
+};
+
+$RE{mpl_1} = {
+	name    => 'MPL-1.0',
+	caption => 'Mozilla Public License 1.0',
+	tags    => ['type:singleversion:mpl'],
+
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"MOZILLA PUBLIC LICENSE${E}Version 1\\.0$EE${BB}Definitions",
+};
+
+$RE{mpl_1_1} = {
+	name    => 'MPL-1.1',
+	caption => 'Mozilla Public License 1.1',
+	tags    => ['type:singleversion:mpl'],
+
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"Mozilla Public License Version 1\\.1$EE${BB}Definitions",
+};
+
+$RE{mpl_2} = {
+	name    => 'MPL-2.0',
+	caption => 'Mozilla Public License 2.0',
+	tags    => ['type:singleversion:mpl'],
+
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"Mozilla Public License Version 2\\.0$EE${BB}Definitions",
 };
 
 =item * ms_pl
@@ -1880,6 +2574,10 @@ $RE{ntp_disclaimer} = {
 
 =item * ofl
 
+=item * ofl_1
+
+=item * ofl_1_1
+
 =cut
 
 $RE{ofl} = {
@@ -1893,6 +2591,24 @@ $RE{ofl} = {
 		"$the?(?:SIL )?OPEN FONT LICEN[CS]E(?: \\(OFL\\))?",
 		"$the?(?:SIL )?[Oo]pen [Ff]ont [Ll]icen[cs]e(?: \\(OFL\\))?",
 	],
+};
+
+$RE{ofl_1} = {
+	name    => 'OFL-1.0',
+	caption => 'SIL Open Font License 1.0',
+	tags    => ['type:singleversion:ofl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"${Q}Font Software${Q} refers to any and all of the following",
+};
+
+$RE{ofl_1_1} = {
+	name    => 'OFL-1.1',
+	caption => 'SIL Open Font License 1.1',
+	tags    => ['type:singleversion:ofl'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"${Q}Font Software${Q} refers to the set of files released",
 };
 
 =item * openssl
@@ -2085,6 +2801,12 @@ $RE{rpsl_1} = {
 
 =item * sgi_b
 
+=item * sgi_b_1
+
+=item * sgi_b_1_1
+
+=item * sgi_b_2
+
 =cut
 
 $RE{sgi_b} = {
@@ -2099,6 +2821,43 @@ $RE{sgi_b} = {
 		'(?:SGI )?FreeB\b',
 		"${the}SGI${D}B\\b",
 	],
+};
+
+$RE{sgi_b_1} = {
+	name    => 'SGI-B-1.0',
+	caption => 'SGI Free Software License B v1.0',
+	tags    => ['type:singleversion:sgi_b'],
+
+	'pat.alt.subject.license.scope.line.scope.paragraph' =>
+		"License Grant$F Subject to the provisions",
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.0 1\\/25\\/2000\\)$EE${BB}Definitions$F",
+};
+
+$RE{sgi_b_1_1} = {
+	name    => 'SGI-B-1.1',
+	caption => 'SGI Free Software License B v1.1',
+	tags    => ['type:singleversion:sgi_b'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'SGI License Grant',
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.1 02\\/22\\/2000\\)$EE${BB}Definitions$F",
+};
+
+$RE{sgi_b_2} = {
+	name    => 'SGI-B-2.0',
+	caption => 'SGI Free Software License B v2.0',
+	tags    => ['type:singleversion:sgi_b'],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'The above copyright notice including the dates of first publication',
+	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
+		"SGI FREE SOFTWARE LICENSE B${EE}"
+		. "\\(Version 2\\.0, Sept\\. 18, 2008\\) "
+		. "Copyright $C \\[dates of first publication\\] Silicon Graphics, Inc\\. "
+		. "All Rights Reserved$F$EE"
+		. $P{perm_granted},
 };
 
 =item * unicode_strict
@@ -3013,11 +3772,28 @@ for my $id (@_OBJECTS) {
 			{'pat.alt.subject.trait.scope.line.scope.sentence'} . $pat;
 	}
 
-	# synthesize subject pattern license from metadata caption
-	$RE{$id}{'pat.alt.subject.license.scope.sentence'}
-		||= $cc_by_exercising_you_accept_this
-		. $RE{$id}{'caption.alt.org.cc.legal.license'}
-		if ( $RE{$id}{'caption.alt.org.cc.legal.license'} );
+	# synthesize CC subject pattern license from metadata caption
+	if ( $id eq 'cc_cc0_1' ) {
+		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
+			||= "(?:$RE{$id}{'caption.alt.org.cc.legal.license'})?"
+			. "$EE$cc_intro_cc0";
+	}
+	elsif ( $id =~ /^cc.*_1$/ ) {
+		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
+			||= $RE{$id}{'caption.alt.org.cc.legal.license'}
+			. "$EE$cc_intro_1";
+	}
+	elsif ( $id =~ /^cc.*_(?:2|2_5|3)$/ ) {
+		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
+			||= $RE{$id}{'caption.alt.org.cc.legal.license'} . "$EE$cc_intro";
+	}
+	elsif ( $id =~ /^cc.*_4$/ ) {
+		$RE{$id}{'pat.alt.subject.license.scope.sentence.synth.cc'}
+			||= $RE{$id}{'caption.alt.org.cc.legal.license'}
+			. "(?: Public License)?$EE"
+			. $cc_by_exercising_you_accept_this
+			. $RE{$id}{'caption.alt.org.cc.legal.license'};
+	}
 
 	# resolve subject patterns from subpatterns
 	for my $subject (@_SUBJECTSTACK) {

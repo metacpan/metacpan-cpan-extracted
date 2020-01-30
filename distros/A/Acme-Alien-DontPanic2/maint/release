@@ -41,7 +41,7 @@ use Alien::Build ();
   my $next  = shift @lines;
 
   unshift @lines, $title, $blank, $next,
-    "Require Alien::Build @{[ Alien::Build->VERSION ]}\n";
+    "  - Require Alien::Build @{[ Alien::Build->VERSION ]}\n";
 
   path('Changes')->spew(@lines);
 }
@@ -54,4 +54,12 @@ my $input = <STDIN>;
 
 die 'not right apparently' unless $input =~ /^y/i;
 
-exec 'dzil', 'release';
+sub run
+{
+  print "+@_\n";
+  system @_;
+  die if $?;
+}
+
+run 'dzil', 'release';
+run 'cpanm', "Acme-Alien-DontPanic2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz";

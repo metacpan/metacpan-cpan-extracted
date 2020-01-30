@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.100
+    Version v3.1.101
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -79,21 +79,99 @@ PATTERNS
 
     *   cc_by
 
+    *   cc_by_1
+
+    *   cc_by_2
+
+    *   cc_by_2_5
+
+    *   cc_by_3
+
+    *   cc_by_4
+
     *   cc_by_nc
+
+    *   cc_by_nc_1
+
+    *   cc_by_nc_2
+
+    *   cc_by_nc_2_5
+
+    *   cc_by_nc_3
+
+    *   cc_by_nc_4
 
     *   cc_by_nc_nd
 
+    *   cc_by_nc_nd_1
+
+    *   cc_by_nc_nd_2
+
+    *   cc_by_nc_nd_2_5
+
+    *   cc_by_nc_nd_3
+
+    *   cc_by_nc_nd_4
+
     *   cc_by_nc_sa
+
+    *   cc_by_nc_sa_1
+
+    *   cc_by_nc_sa_2
+
+    *   cc_by_nc_sa_2_5
+
+    *   cc_by_nc_sa_3
+
+    *   cc_by_nc_sa_4
 
     *   cc_by_nd
 
+    *   cc_by_nd_1
+
+    *   cc_by_nd_2
+
+    *   cc_by_nd_2_5
+
+    *   cc_by_nd_3
+
+    *   cc_by_nd_4
+
     *   cc_by_sa
 
+    *   cc_by_sa_1
+
+    *   cc_by_sa_2
+
+    *   cc_by_sa_2_5
+
+    *   cc_by_sa_3
+
+    *   cc_by_sa_4
+
     *   cc_cc0
+
+    *   cc_cc0_1
+
+    *   cc_nc
+
+    *   cc_nc_1
+
+    *   cc_nd
+
+    *   cc_nd_1
+
+    *   cc_sa
+
+    *   cc_sa_1
 
     *   cc_sp
 
     *   cddl
+
+    *   cddl_1
+
+    *   cddl_1_1
 
     *   cecill
 
@@ -113,6 +191,10 @@ PATTERNS
 
     *   cecill_c_1
 
+    *   cpl
+
+    *   cpl_1
+
     *   cube
 
     *   curl
@@ -120,6 +202,10 @@ PATTERNS
     *   dsdp
 
     *   epl
+
+    *   epl_1
+
+    *   epl_2
 
     *   eurosym
 
@@ -140,6 +226,10 @@ PATTERNS
     *   isc
 
     *   icu
+
+    *   ipl
+
+    *   ipl_1
 
     *   json
 
@@ -179,6 +269,12 @@ PATTERNS
 
     *   mpl
 
+    *   mpl_1
+
+    *   mpl_1_1
+
+    *   mpl_2
+
     *   ms_pl
 
     *   ms_rl
@@ -188,6 +284,10 @@ PATTERNS
     *   ntp_disclaimer
 
     *   ofl
+
+    *   ofl_1
+
+    *   ofl_1_1
 
     *   openssl
 
@@ -206,6 +306,12 @@ PATTERNS
     *   rpsl_1
 
     *   sgi_b
+
+    *   sgi_b_1
+
+    *   sgi_b_1_1
+
+    *   sgi_b_2
 
     *   unicode_strict
 

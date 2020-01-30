@@ -9,5 +9,6 @@ minil.toml
 t/00_compile.t
 t/01_get_client_ip.t
 t/02_ignore_ip.t
+t/03_ignore_ip_private.t
 META.yml
 MANIFEST

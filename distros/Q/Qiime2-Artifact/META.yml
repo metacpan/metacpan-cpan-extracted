@@ -16,18 +16,22 @@ name: Qiime2-Artifact
 provides:
   Qiime2::Artifact:
     file: lib/Qiime2/Artifact.pm
-    version: v0.10.6
+    version: v0.10.7
 recommends:
   File::Which: '0'
 requires:
   Capture::Tiny: '0.48'
   Carp: '1.2'
+  Cwd: '3.31'
   Data::Dumper: '2.1'
+  File::Basename: '2.82'
   FindBin: '1.3'
+  Term::ANSIColor: '3.00'
   YAML::PP: '0.018'
-  perl: '5.018'
+  autodie: '2.10'
+  perl: '5.014'
 resources:
   repository: https://github.com/telatin/qiime2tools
-version: 0.10.6
+version: 0.10.7
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

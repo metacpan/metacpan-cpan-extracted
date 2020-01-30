@@ -1,3 +1,4 @@
+.perltidyrc
 Changes
 examples/blog/blog.conf
 examples/blog/lib/Blog.pm

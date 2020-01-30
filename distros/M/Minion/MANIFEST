@@ -18,6 +18,7 @@ lib/Minion/Backend/resources/migrations/pg.sql
 lib/Minion/Command/minion.pm
 lib/Minion/Command/minion/job.pm
 lib/Minion/Command/minion/worker.pm
+lib/Minion/Iterator.pm
 lib/Minion/Job.pm
 lib/Minion/Worker.pm
 lib/Mojolicious/Plugin/Minion.pm

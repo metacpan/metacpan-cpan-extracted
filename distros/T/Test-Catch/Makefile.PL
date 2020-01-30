@@ -3,8 +3,8 @@ use XS::Install;
 
 my %params = (
     NAME      => 'Test::Catch',
-    BIN_DEPS  => 'Alien::catch',
-    BIN_SHARE => {PASSTHROUGH => 'Alien::catch'},
+    BIN_DEPS  => 'XS::libcatch',
+    BIN_SHARE => {PASSTHROUGH => 'XS::libcatch'},
     CPLUS     => 11,
     CCFLAGS   => '-Wall -Wextra',
     test      => {SRC => 't'},

@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Test::Alien::Diag qw( alien_diag );
 use Acme::Alien::DontPanic;
 

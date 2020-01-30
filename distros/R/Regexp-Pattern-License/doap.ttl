@@ -57,6 +57,27 @@
 			a doap-changeset:Change;
 			rdfs:label "Tidy code: Drop noop code.";
 		], [
+			a doap-changeset:Regression;
+			rdfs:label "Drop too exotic licensing phrase, and corresponding test case.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Introduce new modules: Pattern::License Pattern::License::Parts.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Regexp::Pattern::License for shortname resolving (with internal list as fallback until phased out).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Add license patterns mit_new mit_new_materials mit_old mit_unspecified postgresql, and group pattern mit to Regexp::Pattern::License.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix detect licenses mit_old mit_unspecified (was misdetected as mit_new).";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add new license patterns curl dsdp mit_oldstyle mit_oldstyle_disclaimer mit_oldstyle_permission ntp ntp_disclaimer.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Add license patterns bsd_2_clause bsd_3_clause bsd_4_clause to Regexp::Pattern::License.";
+		], [
 			a doap-changeset:Change;
 			rdfs:label "Emulate Regexp::Common -keep syntax to capture version number.";
 		], [
@@ -86,9 +107,6 @@
 		], [
 			a doap-changeset:Bugfix;
 			rdfs:label "Fix avoid detection of GPL/LGPL fulltext (rarely if ever used as grant).";
-		], [
-			a doap-changeset:Regression;
-			rdfs:label "Drop too exotic licensing phrase, and corresponding test case.";
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Add license patterns gpl lgpl to Regexp::Pattern::License.";
@@ -121,9 +139,6 @@
 			rdfs:label "Add license patterns fsfap fsful fsfullr to Regexp::Pattern::License.";
 		], [
 			a doap-changeset:Addition;
-			rdfs:label "Introduce new modules: Pattern::License Pattern::License::Parts.";
-		], [
-			a doap-changeset:Addition;
 			rdfs:label "Add new trait patterns fsf_unlimited fsf_unlimited_retention.";
 		], [
 			a doap-changeset:Change;
@@ -154,9 +169,6 @@
 			rdfs:label "Add new license pattern ms_rl.";
 		], [
 			a doap-changeset:Change;
-			rdfs:label "Use Regexp::Pattern::License for shortname resolving (with internal list as fallback until phased out).";
-		], [
-			a doap-changeset:Change;
 			rdfs:label "Add license patterns cddl cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1 cecill_b cecill_c epl to Regexp::Pattern::License.";
 		], [
 			a doap-changeset:Change;
@@ -173,18 +185,6 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "Improve detection of license GPL.";
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Add license patterns mit_new mit_new_materials mit_old mit_unspecified postgresql, and group pattern mit to Regexp::Pattern::License.";
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix detect licenses mit_old mit_unspecified (was misdetected as mit_new).";
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add new license patterns curl dsdp mit_oldstyle mit_oldstyle_disclaimer mit_oldstyle_permission ntp ntp_disclaimer.";
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Add license patterns bsd_2_clause bsd_3_clause bsd_4_clause to Regexp::Pattern::License.";
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
@@ -374,7 +374,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-100>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-95>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-96>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-97>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-98>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-99>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-100>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-101>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-91>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-92>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-93>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-94>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-95>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-96>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-97>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-98>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-99>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://salsa.debian.org/build-common-team/regexp-pattern-license.git>;
@@ -452,7 +452,13 @@
 			rdfs:label "relax trait pattern licensed_under to cover more phrases";
 		], [
 			a doap-changeset:Change;
-			rdfs:label "add Trove captions; add trait object license_label_trove; synthesize subject pattern grant from Trove caption";
+			rdfs:label "add Trove captions";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "add trait object license_label_trove";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "synthesize subject pattern grant from Trove caption";
 		], [
 			a doap-changeset:Documentation;
 			rdfs:label "update TODO";
@@ -479,6 +485,65 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.100.tar.gz>;
 	doap:revision        "v3.1.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-101>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.101"^^xsd:string;
+	dc:issued            "2020-01-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cpl cpl_1 epl_1 epl_2 ipl ipl_1";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "add description for object epl";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "relax to match copyright sign as uppercase (C)";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects sgi_b_1 sgi_b_1_1 sgi_b_2";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects ofl_1 ofl_1_1";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects mpl_1 mpl_1_1 mpl_2";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cddl_1 cddl_1_1";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_1 cc_by_2 cc_by_2_5 cc_by_3 cc_by_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_nc_1 cc_by_nc_2 cc_by_nc_2_5 cc_by_nc_3 cc_by_nc_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_nc_nd_1 cc_by_nc_nd_2 cc_by_nc_nd_2_5 cc_by_nc_nd_3 cc_by_nc_nd_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_nc_sa_1 cc_by_nc_sa_2 cc_by_nc_sa_2_5 cc_by_nc_sa_3 cc_by_nc_sa_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_nd_1 cc_by_nd_2 cc_by_nd_2_5 cc_by_nd_3 cc_by_nd_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_by_sa_1 cc_by_sa_2 cc_by_sa_2_5 cc_by_sa_3 cc_by_sa_4";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add object cc_cc0_1";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "add objects cc_nc cc_nc_1 cc_nd cc_nd_1 cc_sa cc_sa_1";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "synthesize more CC subject patterns";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.101.tar.gz>;
+	doap:revision        "v3.1.101"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-90>
 	a                    doap:Version;

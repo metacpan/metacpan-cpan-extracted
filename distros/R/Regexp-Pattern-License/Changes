@@ -7,6 +7,33 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.101	2020-01-30
+
+ [ Documentation ]
+ - add description for object epl
+
+ [ Other ]
+ - Added: add object cc_cc0_1
+ - Added: add objects cc_by_1 cc_by_2 cc_by_2_5 cc_by_3 cc_by_4
+ - Added: add objects cc_by_nc_1 cc_by_nc_2 cc_by_nc_2_5 cc_by_nc_3
+   cc_by_nc_4
+ - Added: add objects cc_by_nc_nd_1 cc_by_nc_nd_2 cc_by_nc_nd_2_5
+   cc_by_nc_nd_3 cc_by_nc_nd_4
+ - Added: add objects cc_by_nc_sa_1 cc_by_nc_sa_2 cc_by_nc_sa_2_5
+   cc_by_nc_sa_3 cc_by_nc_sa_4
+ - Added: add objects cc_by_nd_1 cc_by_nd_2 cc_by_nd_2_5 cc_by_nd_3
+   cc_by_nd_4
+ - Added: add objects cc_by_sa_1 cc_by_sa_2 cc_by_sa_2_5 cc_by_sa_3
+   cc_by_sa_4
+ - Added: add objects cc_nc cc_nc_1 cc_nd cc_nd_1 cc_sa cc_sa_1
+ - Added: add objects cddl_1 cddl_1_1
+ - Added: add objects cpl cpl_1 epl_1 epl_2 ipl ipl_1
+ - Added: add objects mpl_1 mpl_1_1 mpl_2
+ - Added: add objects ofl_1 ofl_1_1
+ - Added: add objects sgi_b_1 sgi_b_1_1 sgi_b_2
+ - relax to match copyright sign as uppercase (C)
+ - synthesize more CC subject patterns
+
 v3.1.100	2020-01-28
 
  [ REGRESSIONS ]
@@ -24,10 +51,10 @@ v3.1.100	2020-01-28
  - test actually used name pattern for adobe_2006 object
 
  [ Other ]
- - add Trove captions; add trait object license_label_trove; synthesize
-   subject pattern grant from Trove caption
+ - add Trove captions
  - add tag license:contains:* for license objects apache_1 apache_1_1
    bsd_3_clause bsd_4_clause dsdp
+ - add trait object license_label_trove
  - extend subject license patterns for license objects apache_1 apache_1_1
    apache_2 bsd_2_clause bsd_3_clause bsd_4_clause dsdp
  - relax leading bullet to be optional (might be misdetected as comment
@@ -37,6 +64,7 @@ v3.1.100	2020-01-28
  - relax trait pattern licensed_under to cover more phrases
  - relax trait pattern licensed_under to cover more phrases
  - relax trait pattern licensed_under to cover more phrases
+ - synthesize subject pattern grant from Trove caption
  - tighten trait object version_number to cover only single-digit segment
 
 v3.1.99	2020-01-05

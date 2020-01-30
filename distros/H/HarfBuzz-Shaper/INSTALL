@@ -11,13 +11,16 @@ harfbuzz libraries installed.
 Linux
 -----
 
-On Linux you need to install the following packages:
+For best results install the following packages:
 
     harfbuzz
 
 Often the development parts of the harfbuzz library are in a separate
 package. So if there is a package named harfbuzz-devel you need to
 install that as well.
+
+If there is no harfbuzz library available on your distribution,
+HarfBuzz::Shaper will build its own version of the harfbuzz library.
 
 Microsoft Windows
 -----------------
@@ -30,16 +33,5 @@ As of version 5.30, this package also contains the harfbuzz library.
 So if you install this, or a newer, version of Strawberry Perl you are
 all set to go.
 
-If you have an older version of Strawberry Perl you need to add the
-harfbuzz library and some other dependent libraries. The easiest way
-to do this is
-
- - download
-https://github.com/sciurius/perl-HarfBuzz-Shaper/releases/download/R0.016/harfbuzz-msw64-strawberry.zip
-- on the PC, go to the Strawberry Perl folder. Usually, this is
-C:\Strawberry.
-- unpack the contents of the downloaded zip into this folder
-**overwriting existing files**. It will replace a number of files in
-the C subfolder.
-
-Now you can build HarfBuzz::Shaper as usual.
+For older (and maybe other) Perl installs HarfBuzz::Shaper will try to
+build its own version of the harfbuzz library.

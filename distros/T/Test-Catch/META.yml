@@ -3,13 +3,13 @@ abstract: 'Run C++ catch tests from perl test file'
 author:
   - unknown
 build_requires:
-  Alien::catch: v1.1.0
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
+  XS::libcatch: v1.1.0
 configure_requires:
-  Alien::catch: v1.1.0
-  XS::Install: v1.2.12
+  XS::Install: v1.2.13
+  XS::libcatch: v1.1.0
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -22,9 +22,9 @@ no_index:
     - t
     - inc
 requires:
-  Alien::catch: v1.1.0
   Test::More: '1.302015'
   Test::Simple: '1.302096'
-  XS::Install: v1.2.12
-version: v1.0.11
+  XS::Install: v1.2.13
+  XS::libcatch: v1.1.0
+version: v1.0.13
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

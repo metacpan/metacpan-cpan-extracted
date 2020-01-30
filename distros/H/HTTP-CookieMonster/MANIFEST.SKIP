@@ -1,0 +1,7 @@
+.build
+.git
+.gitignore
+.perlcriticrc
+MANIFEST.SKIP
+local
+t/blog.t

@@ -1,4 +1,7 @@
-Revision history for Perl module Alien::Base.
+Revision history for Perl module Acme-Ford-Prefect
+
+1.9800    2020-01-30 08:06:02 -0700
+  - Require Acme::Alien::DontPanic 1.9800 (Alien::Build 1.98)
 
 1.96 2020-01-28 23:45:24 -0700
   - Require Acme::Alien::DontPanic 1.96 (Alien::Base::ModuleBuild 1.08 Alien::Base 1.96)

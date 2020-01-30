@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 101;
+use MyTest tests => 152;
 
 license_covered(
 	'adobe_2006',
@@ -194,6 +194,7 @@ license_covered(
 
 8. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
+	TODO => [qw(iri_iri subject_license)]
 );
 
 license_covered(
@@ -209,7 +210,7 @@ Such use shall not be construed as a distribution of this Package.
 
 9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
-	TODO => [qw(not_iri_name)]
+	TODO => [qw(subject_license not_iri_name)]
 );
 
 license_covered(
@@ -241,6 +242,7 @@ Such use shall not be construed as a distribution of this Package.
 
 9. The name of the Copyright Holder may not be used to endorse or promote products derived from this software without specific prior written permission.
 EOF
+	TODO => [qw(name_name subject_license)]
 );
 
 license_covered(
@@ -349,42 +351,385 @@ EOF
 license_covered(
 	'cc_by',
 	name => 'Creative Commons Attribution 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_1',
+	name  => 'Creative Commons Attribution 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_2',
+	name  => 'Creative Commons Attribution 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_2_5',
+	name  => 'Creative Commons Attribution 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_3',
+	name  => 'Creative Commons Attribution 3.0 Unported License',
+	iri   => 'https://creativecommons.org/licenses/by/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_4',
+	name  => 'Creative Commons Attribution 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
 	'cc_by_nc',
 	name =>
 		'Creative Commons Attribution-NonCommercial 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_nc_1',
+	name  => 'Creative Commons Attribution-NonCommercial 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_2',
+	name  => 'Creative Commons Attribution-NonCommercial 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_2_5',
+	name  => 'Creative Commons Attribution-NonCommercial 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_3',
+	name => 'Creative Commons Attribution-NonCommercial 3.0 Unported License',
+	iri  => 'https://creativecommons.org/licenses/by-nc/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_4',
+	name =>
+		'Creative Commons Attribution-NonCommercial 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by-nc/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
 	'cc_by_nc_nd',
 	name =>
 		'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_nc_nd_1',
+	name =>
+		'Creative Commons Attribution-NoDerivs-NonCommercial 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nd-nc/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivs-NonCommercial 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd-nc/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(iri_iri)]
+);
+
+license_covered(
+	'cc_by_nc_nd_2',
+	name =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-nd/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_nd_2_5',
+	name =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-nd/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_nd_3',
+	name =>
+		'Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-nd/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_nd_4',
+	name =>
+		'Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
 	'cc_by_nc_sa',
 	name =>
 		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_nc_sa_1',
+	name =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-sa/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_sa_2',
+	name =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-sa/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_sa_2_5',
+	name =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-sa/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_sa_3',
+	name =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-sa/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nc_sa_4',
+	name =>
+		'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
 	'cc_by_nd',
 	name =>
 		'Creative Commons Attribution-NoDerivatives 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_nd_1',
+	name  => 'Creative Commons Attribution-NoDerivs 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nd/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivs 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nd_2',
+	name  => 'Creative Commons Attribution-NoDerivs 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nd/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivs 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nd_2_5',
+	name  => 'Creative Commons Attribution-NoDerivs 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-nd/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivs 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nd_3',
+	name  => 'Creative Commons Attribution-NoDerivs 3.0 Unported License',
+	iri   => 'https://creativecommons.org/licenses/by-nd/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivs 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_nd_4',
+	name =>
+		'Creative Commons Attribution-NoDerivatives 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by-nd/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-NoDerivatives 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
 	'cc_by_sa',
 	name =>
 		'Creative Commons Attribution-ShareAlike 4.0 International Public License',
-	TODO => [qw(subject_license subject_iri)]
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cc_by_sa_1',
+	name  => 'Creative Commons Attribution-ShareAlike 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-sa/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-ShareAlike 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_sa_2',
+	name  => 'Creative Commons Attribution-ShareAlike 2.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-sa/2.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-ShareAlike 2.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_sa_2_5',
+	name  => 'Creative Commons Attribution-ShareAlike 2.5 Generic License',
+	iri   => 'https://creativecommons.org/licenses/by-sa/2.5/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-ShareAlike 2.5 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/2.5/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_sa_3',
+	name  => 'Creative Commons Attribution-ShareAlike 3.0 Unported License',
+	iri   => 'https://creativecommons.org/licenses/by-sa/3.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_by_sa_4',
+	name =>
+		'Creative Commons Attribution-ShareAlike 4.0 International License',
+	iri   => 'https://creativecommons.org/licenses/by-sa/4.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons Attribution-ShareAlike 4.0 International License.
+To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
 );
 
 license_covered(
@@ -398,6 +743,67 @@ license_covered(
 );
 
 license_covered(
+	'cc_cc0_1',
+	name => 'Creative Commons Zero 1.0 Universal',
+	iri =>
+		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
+	grant =>
+		'To the extent possible under law, the person who associated CC0 with this work has waived all copyright and related or neighboring rights to this work',
+	TODO => [qw(name_name subject_license)]
+);
+
+license_covered(
+	'cc_nc',
+	name => 'Creative Commons NonCommercial 1.0 Generic Public License',
+	TODO => [qw(iri_iri subject_license)]
+);
+
+license_covered(
+	'cc_nc_1',
+	name  => 'Creative Commons NonCommercial 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/nc/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons NonCommercial 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/nc/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(iri_iri)]
+);
+
+license_covered(
+	'cc_nd',
+	name => 'Creative Commons NoDerivs 1.0 Generic Public License',
+	TODO => [qw(iri_iri subject_license)]
+);
+
+license_covered(
+	'cc_nd_1',
+	name  => 'Creative Commons NoDerivs 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/nd/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons NoDerivs 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/nd/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
+	'cc_sa',
+	name => 'Creative Commons ShareAlike 1.0 Generic Public License',
+	TODO => [qw(iri_iri subject_license)]
+);
+
+license_covered(
+	'cc_sa_1',
+	name  => 'Creative Commons ShareAlike 1.0 Generic License',
+	iri   => 'https://creativecommons.org/licenses/sa/1.0/',
+	grant => <<EOF,
+This work is licensed under the Creative Commons ShareAlike 1.0 Generic License.
+To view a copy of this license, visit http://creativecommons.org/licenses/sa/1.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+EOF
+	TODO => [qw(not_grant_iri)]
+);
+
+license_covered(
 	'cc_sp',
 	name => 'Creative Commons Sampling Plus 1.0',
 	TODO => [qw(subject_iri subject_license)]
@@ -406,11 +812,33 @@ license_covered(
 license_covered(
 	'cddl',
 	name => 'Common Development and Distribution License',
-	text => <<EOF,
-COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL)
-Version 1.0
-EOF
 	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'cddl_1',
+	name => 'Common Development and Distribution License 1.0',
+	text => <<EOF,
+4. Versions of the License.
+
+4.1. New Versions.
+
+Sun Microsystems, Inc. is the initial license steward and may publish revised and/or new versions
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'cddl_1_1',
+	name => 'Common Development and Distribution License 1.1',
+	text => <<EOF,
+4. Versions of the License.
+
+4.1. New Versions.
+
+Oracle is the initial license steward and may publish revised and/or new versions
+EOF
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -544,6 +972,29 @@ EOF
 );
 
 license_covered(
+	'cpl',
+	name => 'Common Public License',
+	TODO => [qw(not_iri_name subject_license)]
+);
+
+license_covered(
+	'cpl_1',
+	name => 'Common Public License 1.0',
+	text => <<EOF,
+Common Public License Version 1.0
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS COMMON PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT. 1.
+
+DEFINITIONS
+
+"Contribution" means:
+
+a) in the case of the initial Contributor, the initial code and documentation distributed under this Agreement, and
+EOF
+	TODO => [qw(not_iri_name subject_iri)]
+);
+
+license_covered(
 	'cube',
 	name => 'Cube License',
 	text => <<EOF,
@@ -581,6 +1032,40 @@ license_covered(
 Eclipse Public License - v 1.0
 EOF
 	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'epl_1',
+	name => 'Eclipse Public License 1.0',
+	text => <<EOF,
+Eclipse Public License - v 1.0
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
+
+1. DEFINITIONS
+
+"Contribution" means:
+
+a) in the case of the initial Contributor, the initial code and documentation distributed under this Agreement, and
+EOF
+	TODO => [qw(not_iri_name subject_iri)]
+);
+
+license_covered(
+	'epl_2',
+	name => 'Eclipse Public License 2.0',
+	text => <<EOF,
+Eclipse Public License - v 2.0
+
+THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE ("AGREEMENT"). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE OF THIS AGREEMENT.
+
+1. DEFINITIONS
+
+"Contribution" means:
+
+a) in the case of the initial Contributor, the initial content Distributed
+EOF
+	TODO => [qw(not_iri_name subject_iri)]
 );
 
 license_covered(
@@ -837,6 +1322,41 @@ EOF
 );
 
 license_covered(
+	'mpl_1',
+	name => 'Mozilla Public License 1.0',
+	text => <<EOF,
+MOZILLA PUBLIC LICENSE
+
+Version 1.0
+
+1. Definitions.
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'mpl_1_1',
+	name => 'Mozilla Public License 1.1',
+	text => <<EOF,
+Mozilla Public License Version 1.1
+
+1. Definitions.
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'mpl_2',
+	name => 'Mozilla Public License 2.0',
+	text => <<EOF,
+Mozilla Public License Version 2.0
+
+1. Definitions
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
 	'ms_pl',
 	name => 'Microsoft Public License',
 	iri =>
@@ -876,12 +1396,49 @@ license_covered(
 	'ofl',
 	name => 'SIL Open Font License',
 	iri  => 'http://scripts.sil.org/OFL',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'ofl_1',
+	name => 'SIL Open Font License 1.0',
 	text => <<EOF,
 SIL OPEN FONT LICENSE
 
 Version 1.0 - 22 November 2005
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of cooperative font projects, to support the font creation efforts of academic and linguistic communities, and to provide an open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and sold with any software provided that the font names of derivative works are changed. The fonts and derivatives, however, cannot be released under any other type of license.
+
+DEFINITIONS
+
+"Font Software" refers to any and all of the following:
 EOF
-	TODO => [qw(subject_license)]
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'ofl_1_1',
+	name => 'SIL Open Font License 1.1',
+	text => <<EOF,
+SIL OPEN FONT LICENSE
+
+Version 1.1 - 26 February 2007
+
+PREAMBLE
+
+The goals of the Open Font License (OFL) are to stimulate worldwide development of collaborative font projects, to support the font creation efforts of academic and linguistic communities, and to provide a free and open framework in which fonts may be shared and improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and redistributed freely as long as they are not sold by themselves. The fonts, including any derivative works, can be bundled, embedded, redistributed and/or sold with any software provided that any reserved names are not used by derivative works. The fonts and derivatives, however, cannot be released under any other type of license. The requirement for fonts to remain under this license does not apply to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+
+"Font Software" refers to the set of files released by the Copyright Holder(s) under this license and clearly marked as such. This may include source files, build scripts and documentation.
+EOF
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(
@@ -959,6 +1516,45 @@ license_covered(
 	name => 'SGI Free Software License B',
 	iri  => 'https://www.sgi.com/projects/FreeB/',
 	TODO => [qw(subject_license not_iri_name)]
+);
+
+license_covered(
+	'sgi_b_1',
+	name => 'SGI Free Software License B v1.0',
+	text => <<EOF,
+SGI FREE SOFTWARE LICENSE B
+
+(Version 1.0 1/25/2000)
+
+1. Definitions.
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'sgi_b_1_1',
+	name => 'SGI Free Software License B v1.1',
+	text => <<EOF,
+SGI FREE SOFTWARE LICENSE B
+
+(Version 1.1 02/22/2000)
+
+1. Definitions.
+EOF
+	TODO => [qw(subject_iri)]
+);
+
+license_covered(
+	'sgi_b_2',
+	name => 'SGI Free Software License B v2.0',
+	text => <<EOF,
+SGI FREE SOFTWARE LICENSE B
+
+(Version 2.0, Sept. 18, 2008) Copyright (C) [dates of first publication] Silicon Graphics, Inc. All Rights Reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+EOF
+	TODO => [qw(subject_iri)]
 );
 
 license_covered(

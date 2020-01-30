@@ -2,7 +2,7 @@ package Devel::Cover::Report::Coveralls;
 use strict;
 use warnings;
 use 5.008005;
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 our $CONFIG_FILE = '.coveralls.yml';
 our $API_ENDPOINT = 'https://coveralls.io/api/v1/jobs';
@@ -60,6 +60,10 @@ sub get_git_info {
     my ($branch,) = grep { /^\* / } split( "\n", `git branch` );
     $branch =~ s/^\* //;
     $git->{branch} = $branch;
+
+    if ($ENV{GITHUB_REF} && $ENV{GITHUB_REF} =~ m![^/]+/[^/]+/(.+)$!) {
+        $git->{branch} = $1;
+    }
 
     return $git;
 }

@@ -1,3 +1,8 @@
+0.6.1 2020-01-30
+
+    - Fixing the build system to create source-only tarballs, and to
+      build the parser via 'perl Makefile.PL && make'.
+
 0.6.0 2019-12-12
 
     - Changing the syntax of 'LENGTH' comparison as per

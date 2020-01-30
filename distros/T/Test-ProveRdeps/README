@@ -1,0 +1,46 @@
+NAME
+    Test::ProveRdeps - Test using App::ProveRdeps
+
+VERSION
+    This document describes version 0.002 of Test::ProveRdeps (from Perl
+    distribution Test-ProveRdeps), released on 2020-01-30.
+
+SYNOPSIS
+     use Test::ProveRdeps tests=>1;
+     all_rdeps_ok(
+         modules => ["Foo::Bar"],
+         # other options will be passed to App::ProveRdeps::prove_rdeps()
+     );
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+FUNCTIONS
+  all_rdeps_ok
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-ProveRdeps>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-ProveDeps>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-ProveRdeps>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::ProveRdeps and prove-rdeps.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -88,11 +88,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.40
+Version v3.0.41
 
 =cut
 
-our $VERSION = version->declare('v3.0.40');
+our $VERSION = version->declare('v3.0.41');
 
 =head1 SYNOPSIS
 
@@ -581,12 +581,13 @@ sub parse_license
 	my %match;
 	my ( %grant, %license );
 
-  # @spdx_license contains identifiers from https://spdx.org/licenses/
+  # %expressions contains DEP-5 or SPDX identifiers
   # it would be more efficient to store license info only in this
   # array and then convert it to legacy formulation, but there are
   # corner case (like extrainfo) that would not fit. So the old storage scheme
-  # is kept with the new (spdx/dep-5) scheme to keep backward compat.
-	my @spdx_license;
+  # is kept with the new (SPDX/DEP-5) scheme to keep backward compat.
+	my %expressions;
+
 	my $spdx_extra;
 	my $gen_spdx = sub {
 		my @ret
@@ -642,7 +643,7 @@ sub parse_license
 			'collected license expression: %s [%s]',
 			$expr, $file
 		);
-		push @spdx_license, $expr;
+		push @{ $expressions{$expr} }, 'unknown';
 		$license = join( ' ', $L{caption}{$legacy} || $legacy, $license );
 	};
 
@@ -739,8 +740,11 @@ sub parse_license
 
 		# pick longest matched license name
 		my @names = nsort_by { $match{$_}{name}{$pos_name} }
-		grep { $match{$_}{name}{$pos_name} } (
-			@L_type_combo,
+		grep {
+					$match{$_}
+				and $match{$_}{name}
+				and $match{$_}{name}{$pos_name}
+		} ( @L_type_combo,
 			@L_type_unversioned,
 			@L_type_versioned,
 			@L_type_singleversion,
@@ -955,7 +959,7 @@ sub parse_license
 					'collected license expression: %s [%s]',
 					$expr, $file
 				);
-				push @spdx_license, $expr;
+				push @{ $expressions{$expr} }, 'local lgpl #5';
 			}
 
 			# LGPL, version last
@@ -986,7 +990,7 @@ sub parse_license
 					'collected license expression: %s [%s]',
 					[@expr], $file
 				);
-				push @spdx_license, @expr;
+				push @{ $expressions{$_} }, 'local agpl #1' for (@expr);
 			}
 
 			# exclude CeCILL-2.1 license
@@ -1097,7 +1101,7 @@ sub parse_license
 						'collected license expression: %s [%s]',
 						$expr, $file
 					);
-					push @spdx_license, $expr;
+					push @{ $expressions{$expr} }, 'local gpl #7';
 				}
 			}
 			when ( $L{re_grant_license}{local}{gpl}{9} ) {
@@ -1127,7 +1131,7 @@ sub parse_license
 					'collected license expression: %s [%s]',
 					$expr, $file
 				);
-				push @spdx_license, $expr;
+				push @{ $expressions{$expr} }, 'local cc #1';
 			}
 			when ( $L{re_grant_license}{local}{cc}{2}{$id} ) {
 				$self->log->tracef(
@@ -1250,7 +1254,7 @@ sub parse_license
 				'collected license expression: %s [%s]',
 				$expr, $file
 			);
-			push @spdx_license, $expr;
+			push @{ $expressions{$expr} }, 'local fsful #1';
 		}
 	}
 	$self->log->tracef( 'flagged license object: fsful [%s]', $file );
@@ -1271,7 +1275,7 @@ sub parse_license
 				'collected license expression: %s [%s]',
 				$expr, $file
 			);
-			push @spdx_license, $expr;
+			push @{ $expressions{$expr} }, 'local fsfullr #1';
 		}
 	}
 	$self->log->tracef( 'flagged license object: %s [%s]', 'fsfullr', $file );
@@ -1429,7 +1433,7 @@ sub parse_license
 
 	# Remove trailing spaces.
 	$license =~ s/$L{re_grant_license}{local}{trailing_space}//;
-	my $expr = join( ' and/or ', sort @spdx_license );
+	my $expr = join( ' and/or ', sort keys %expressions );
 	$self->log->infof(
 		'resolved license expression: %s [%s]', $expr,
 		$file

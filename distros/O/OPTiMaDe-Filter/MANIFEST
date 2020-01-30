@@ -7,7 +7,6 @@ lib/OPTiMaDe/Filter/Comparison.pm
 lib/OPTiMaDe/Filter/Known.pm
 lib/OPTiMaDe/Filter/ListComparison.pm
 lib/OPTiMaDe/Filter/Negation.pm
-lib/OPTiMaDe/Filter/Parser.pm
 lib/OPTiMaDe/Filter/Property.pm
 lib/OPTiMaDe/Filter/Zip.pm
 Makefile.PL

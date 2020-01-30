@@ -1,5 +1,8 @@
 Revision history for RT-Extension-BecomeUser
 
+1.01
+ - Persist through re-auth. Thanks @btb for the fix
+
 1.00
 
  - Initial version

@@ -1,0 +1,197 @@
+NAME
+    App::ProveRdeps - Prove all distributions depending on specified
+    module(s)
+
+VERSION
+    This document describes version 0.006 of App::ProveRdeps (from Perl
+    distribution App-ProveRdeps), released on 2020-01-30.
+
+SYNOPSIS
+    See the included script prove-rdeps.
+
+FUNCTIONS
+  prove_rdeps
+    Usage:
+
+     prove_rdeps(%args) -> [status, msg, payload, meta]
+
+    Prove all distributions depending on specified module(s).
+
+    To use this utility, first create "~/.config/prove-rdeps.conf":
+
+     dist_dirs = ~/repos
+     dist_dirs = ~/repos-other
+
+    The above tells *prove-rdeps* where to look for Perl distributions.
+    Then:
+
+     % prove-rdeps Regexp::Pattern
+
+    This will search local CPAN mirror for all distributions that depend on
+    Log::ger (by default for phase=runtime and rel=requires), then search
+    the distributions in the distribution directories (or download them from
+    local CPAN mirror), "cd" to each and run "prove" in it.
+
+    You can run with "--dry-run" ("-n") option first to not actually run
+    "prove" but just see what distributions will get tested. An example
+    output:
+
+     % prove-rdeps Regexp::Pattern -n
+     prove-rdeps: Found dep: Acme-DependOnEverything (runtime requires)
+     prove-rdeps: Found dep: App-BlockWebFlooders (runtime requires)
+     prove-rdeps: Found dep: App-Licensecheck (runtime requires)
+     prove-rdeps: Found dep: Pod-Weaver-Plugin-Regexp-Pattern (develop x_spec)
+     prove-rdeps: Dep Pod-Weaver-Plugin-Regexp-Pattern skipped (phase not included)
+     ...
+     prove-rdeps: [DRY] [1/8] Running prove for dist 'Acme-DependOnEverything' in '/tmp/BP3l0kiuZH/Acme-DependOnEverything-0.06' ...
+     prove-rdeps: [DRY] [2/8] Running prove for dist 'App-BlockWebFlooders' in '/home/u1/repos/perl-App-BlockWebFlooders' ...
+     prove-rdeps: [DRY] [3/8] Running prove for dist 'App-Licensecheck' in '/tmp/pw1hBzUIaZ/App-Licensecheck-v3.0.40' ...
+     prove-rdeps: [DRY] [4/8] Running prove for dist 'App-RegexpPatternUtils' in '/home/u1/repos/perl-App-RegexpPatternUtils' ...
+     prove-rdeps: [DRY] [5/8] Running prove for dist 'Bencher-Scenarios-RegexpPattern' in '/home/u1/repos/perl-Bencher-Scenarios-RegexpPattern' ...
+     prove-rdeps: [DRY] [6/8] Running prove for dist 'Regexp-Common-RegexpPattern' in '/home/u1/repos/perl-Regexp-Common-RegexpPattern' ...
+     prove-rdeps: [DRY] [7/8] Running prove for dist 'Release-Util-Git' in '/home/u1/repos/perl-Release-Util-Git' ...
+     prove-rdeps: [DRY] [8/8] Running prove for dist 'Test-Regexp-Pattern' in '/home/u1/repos/perl-Test-Regexp-Pattern' ...
+
+    The above example shows that I have the distribution directories locally
+    on my "~/repos", except for "Acme-DependOnEverything" and
+    "App-Licensecheck", which *prove-rdeps* downloads and extracts from
+    local CPAN mirror and puts into temporary directories.
+
+    If we reinvoke the above command without the "-n", *prove-rdeps* will
+    actually run "prove" on each directory and provide a summary at the end.
+    Example output:
+
+     % prove-rdeps Regexp::Pattern
+     ...
+     +-----------------------------+-----------------------------------+--------+
+     | dist                        | reason                            | status |
+     +-----------------------------+-----------------------------------+--------+
+     | Acme-DependOnEverything     | Test failed (Failed 1/1 subtests) | 500    |
+     | App-Licensecheck            | Test failed (No subtests run)     | 500    |
+     | Regexp-Common-RegexpPattern | Non-zero exit code (2)            | 500    |
+     +-----------------------------+-----------------------------------+--------+
+
+    The above example shows that three distributions failed testing. You can
+    scroll up for the detailed "prove" output to see why they failed, fix
+    things, and re-run. To skip some dists from being tested, use
+    "--exclude-dist":
+
+     % prove-rdeps Regexp::Pattern --exclude-dist Acme-DependOnEverything
+
+    Or you can also put these lines in the configuration file:
+
+     exclude_dists = Acme-DependOnEverything
+     exclude_dists = Regexp-Common-RegexpPattern
+
+    How distribution directory is searched: first, the exact name
+    ("My-Perl-Dist") is searched. If not found, then the name with different
+    case (e.g. "my-perl-dist") is searched. If not found, a suffix match
+    (e.g. "p5-My-Perl-Dist" or "cpan-My-Perl-Dist") is searched. If not
+    found, a prefix match (e.g. "My-Perl-Dist-perl") is searched. If not
+    found, *prove-rdeps* will try to download the distribution tarball from
+    local CPAN mirror and extract it to a temporary directory. If
+    "--no-dowload" is given, the *prove-deps* will not download from local
+    CPAN mirror and give up for that distribution.
+
+    When a dependent distribution cannot be found or downloaded/extracted,
+    this counts as a 412 error (Precondition Failed).
+
+    When a distribution's test fails, this counts as a 500 error (Error).
+    Otherwise, the status is 200 (OK).
+
+    *prove-deps* will return status 200 (OK) with the status of each dist.
+    It will exit 0 if all distros are successful, otherwise it will exit 1.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dist_dirs* => *array[dirname]*
+
+        Where to find the distributions.
+
+    *   download => *bool* (default: 1)
+
+        Whether to try download/extract distribution from local CPAN mirror
+        (when not found in dist_dirs).
+
+    *   exclude_dist_pattern => *re*
+
+        Distribution name pattern to skip.
+
+    *   exclude_dists => *array[perl::distname]*
+
+        Distributions to skip.
+
+    *   include_dist_pattern => *re*
+
+        If specified, only include distributions with this pattern.
+
+    *   include_dists => *array[perl::distname]*
+
+        If specified, only include these distributions.
+
+    *   modules* => *array[perl::modname]*
+
+        Module names to find dependents of.
+
+    *   phases => *array[str]* (default: ["runtime"])
+
+        Only select dists that depend in these phases.
+
+    *   prove_opts => *array[str]* (default: ["-l"])
+
+        Options to pass to the prove command.
+
+    *   rels => *array[str]* (default: ["requires"])
+
+        Only select dists that depend using these relationships.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ProveRdeps>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ProveDeps>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ProveRdeps>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    prove
+
+    App::lcpan
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

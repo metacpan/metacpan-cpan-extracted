@@ -1,0 +1,7 @@
+<%init>
+if ($session{RT_Extension_BecomeUser_NewUser}){
+    if ($session{CurrentUser}->Id != $session{RT_Extension_BecomeUser_NewUser}->Id){
+        $session{CurrentUser} = $session{RT_Extension_BecomeUser_NewUser};
+    }
+}
+</%init>

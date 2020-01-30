@@ -2,12 +2,12 @@
 
 if ( $session{CurrentUser}->HasRight(
         Right => 'SuperUser', Object => $RT::System)
-            or 
+            or
       $session{CurrentUser}->HasRight(
           Right => 'BecomeUser', Object => $RT::System
       )
 ){
-    # refuse to become super users 
+    # refuse to become super users
     my $u = RT::CurrentUser->new(RT->SystemUser);
     $u->Load($id);
     if ($u->HasRight(Right => 'SuperUser', Object => $RT::System)){
@@ -15,7 +15,7 @@ if ( $session{CurrentUser}->HasRight(
     }
     else {
         $session{RT_Extension_BecomeUser_OriginalUser} = $session{CurrentUser};
-        $session{CurrentUser} = $u;
+        $session{RT_Extension_BecomeUser_NewUser} = $session{CurrentUser} = $u;
         $session{CurrentUser}->_BuildTableAttributes;
 
         $m->out("<h1>you are now user ".$session{CurrentUser}->Name." (id: $id )</h1>");

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0703';
 
 use Carp;
 use List::Util qw( first );
@@ -40,6 +40,12 @@ has offset => (
 );
 
 
+has flat => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+
 has verbose => (
     is      => 'ro',
     default => sub { 0 },
@@ -52,6 +58,7 @@ sub get_offset {
     my $name   = $args{note_name};
     my $format = $args{note_format} || $self->note_format;
     my $offset = $args{offset} || $self->offset;
+    my $flat   = $args{flat} || $self->flat;
 
     croak 'note_name, note_format or offset not provided'
         unless $name || $format || $offset;
@@ -66,12 +73,12 @@ sub get_offset {
         $equiv->en_eq( $note->format('isobase') =~ /b/ ? 'sharp' : 'flat' );
     }
 
-    warn sprintf "Given note: %s, ISO: %s/%s, Offset: %d\n",
+    printf "Given note: %s, ISO: %s/%s, Offset: %d\n",
         $name, $note->format('ISO'), ( $equiv ? $equiv->format('ISO') : '' ), $offset
         if $self->verbose;
 
     my @scale = get_scale_notes( $self->scale_note, $self->scale_name );
-    warn "\tScale: @scale\n"
+    print "\tScale: @scale\n"
         if $self->verbose;
 
     if ( $offset < 0 ) {
@@ -87,7 +94,7 @@ sub get_offset {
     } 0 .. $#scale;
 
     if ( defined $posn ) {
-        warn sprintf "\tPosition: %d\n", $posn
+        printf "\tPosition: %d\n", $posn
             if $self->verbose;
         $offset += $posn;
     }
@@ -107,7 +114,11 @@ sub get_offset {
 
     $note = Music::Note->new( $scale[ $offset % @scale ] . $octave, 'ISO' );
 
-    warn sprintf "\tNew offset: %d, octave: %d, ISO: %s, Formatted: %s\n",
+    if ( $flat && $note->format('isobase') =~ /#/ ) {
+        $note->en_eq('flat');
+    }
+
+    printf "\tNew offset: %d, octave: %d, ISO: %s, Formatted: %s\n",
         $offset, $octave, $note->format('ISO'), $note->format($format)
         if $self->verbose;
 
@@ -120,14 +131,28 @@ sub step {
 
     my $name  = $args{note_name};
     my $steps = $args{steps} || 1;
+    my $flat  = $args{flat} || $self->flat;
 
     croak 'note_name not provided'
         unless $name;
 
     my $note = Music::Note->new( $name, $self->note_format );
     my $num  = $note->format('midinum');
+
+    printf "Given note: %s, ISO: %s, Formatted: %d\n",
+        $name, $note->format('ISO'), $num
+        if $self->verbose;
+
     $num += $steps;
     $note = Music::Note->new( $num, 'midinum' );
+
+    if ( $flat && $note->format('isobase') =~ /#/ ) {
+        $note->en_eq('flat');
+    }
+
+    printf "\tNew steps: %d, ISO: %s, Formatted: %s\n",
+        $steps, $note->format('ISO'), $note->format( $self->note_format )
+        if $self->verbose;
 
     return $note;
 }
@@ -146,7 +171,7 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0600
+version 0.0703
 
 =head1 SYNOPSIS
 
@@ -173,11 +198,12 @@ version 0.0600
     note_format => 'midinum',
     offset      => -1,
   );
-  print $note->format('midinum'), "\n"; # 59
+  print $note->format('midinum'), "\n"; # 58
 
   $note = $msn->step(
     note_name => 'D3',
     steps     => -1,
+    flat      => 1,
   );
   print $note->format('ISO'), "\n"; # Db3
 
@@ -239,6 +265,13 @@ constructor, this is used in the B<get_offset> method.
 
 Default: C<1>
 
+=head2 flat
+
+Boolean indicating that we want a sharp resulting note flat instead.
+This exchanges a sharp note for its enharmonic equivalent flat.
+
+Default: C<0>
+
 =head2 verbose
 
 Show the progress of the B<get_offset> method.
@@ -257,6 +290,7 @@ Default: C<0>
     verbose     => $boolean,
     note_format => $format,
     offset      => $integer,
+    flat        => $flat,
   );
 
 Create a new C<Music::ScaleNote> object.
@@ -269,6 +303,7 @@ Create a new C<Music::ScaleNote> object.
     note_name   => $note_name,
     note_format => $format,
     offset      => $integer,
+    flat        => $flat,
   );
 
 Return a new L<Music::Note> object based on the required B<note_name>,
@@ -294,6 +329,7 @@ format and note name is B<not> how to use this module.
   $note = $msn->step(
     note_name => $note_name,
     steps     => $halfsteps,
+    flat      => $flat,
   );
 
 Return a new L<Music::Note> object based on the required B<note_name>

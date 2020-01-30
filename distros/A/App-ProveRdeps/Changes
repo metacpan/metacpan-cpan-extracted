@@ -1,0 +1,44 @@
+0.006   2020-01-30  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist/script prove-deps -> prove-rdeps.
+
+
+0.005   2020-01-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix Rinci metadata which prevented --include-dist and
+          --exclude-dist to work.
+
+	- [doc] Add a more thorough example with sample outputs.
+
+	- [ux] Give default phase=runtime instead of all and rel=requires
+	  instead of all, as this is in most case is the only relevant
+	  combination.
+
+
+0.004   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to implement {in,ex}clude_dist{s,_pattern}.
+
+	- Implement --download.
+
+	- [Incompatible change] OK for the last time :-/ Return 200 for all
+	  condition, but exit code is non-zero (1) if there are dists that fail.
+
+
+0.003   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [Incompatible change] Return 412 status instead of 500 when we
+	  can't use lcpan.
+
+
+0.002   2020-01-29  Released-By: PERLANCAR; Urgency: medium
+
+	- [Incompatible change] Return 500 status instead of 200 if some
+	  dists fail.
+
+	- [doc] Document how distro dir is searched.
+
+
+0.001   2017-08-14  Released-By: PERLANCAR
+
+        - First release.

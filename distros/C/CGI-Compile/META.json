@@ -45,6 +45,7 @@
       "runtime" : {
          "requires" : {
             "File::pushd" : "0",
+            "Sub::Name" : "0",
             "perl" : "5.008001"
          }
       },
@@ -52,6 +53,7 @@
          "requires" : {
             "CGI" : "0",
             "Capture::Tiny" : "0",
+            "Sub::Identify" : "0",
             "Switch" : "0",
             "Test::More" : "0",
             "Test::NoWarnings" : "0",
@@ -72,7 +74,7 @@
          "web" : "https://github.com/miyagawa/CGI-Compile"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Hans Dieter Pearcey <hdp@cpan.org>",
       "J\u00f6rn Reder <jreder@dimedis.de>",

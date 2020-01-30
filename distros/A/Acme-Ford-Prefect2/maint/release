@@ -63,5 +63,12 @@ my $input = <STDIN>;
 
 die 'not right apparently' unless $input =~ /^y/i;
 
-system 'dzil', 'release' or die;
-system 'cpanm', "Acme-Alien-DontPanic2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz" or die;
+sub run
+{
+  print "+@_\n";
+  system @_;
+  die if $?;
+}
+
+run 'dzil', 'release';
+run 'cpanm', "Acme-Alien-DontPanic2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz";

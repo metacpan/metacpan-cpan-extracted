@@ -25,28 +25,28 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13",
+            "XS::libcatch" : "v1.1.0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
             "Test::More" : "1.302015",
             "Test::Simple" : "1.302096",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13",
+            "XS::libcatch" : "v1.1.0"
          }
       },
       "test" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
             "Test::Deep" : "0",
             "Test::More" : "0",
-            "Test::Simple" : "0.96"
+            "Test::Simple" : "0.96",
+            "XS::libcatch" : "v1.1.0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.11",
+   "version" : "v1.0.13",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

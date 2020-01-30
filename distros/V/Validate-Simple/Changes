@@ -1,15 +1,12 @@
-Revision history for perl distributio Validate-Simple
+Revision history for perl distribution Validate-Simple
 
-0.02
+0.2.1 2020-01-30
 
- - Change version properly
-
-0.01.1 2020-01-01
-
- - Add Changes file
+ - Fix documentation
+ - Minor typos fixed
  - Fixed test
  - Fixed documentation
  
-0.01 2019-12-25
+0.1.0 2019-12-25
  
  - Initial release

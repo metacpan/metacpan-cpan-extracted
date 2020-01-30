@@ -6,6 +6,7 @@ WriteMakefile(
 		Parse::Yapp => 0,
 		Scalar::Util => 0,
 	},
+	depend => { pm_to_blib => 'lib/OPTiMaDe/Filter/Parser.pm' },
 );
 
 sub MY::postamble {

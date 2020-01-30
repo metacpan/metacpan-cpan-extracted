@@ -22,6 +22,7 @@ Boggs
 Gene
 Music
 ScaleNote
+enharmonic
 gene
 isobase
 lib

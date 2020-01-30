@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 45;
+use Test::Licensecheck tests => 47;
 
 # AFL
 license_is(
@@ -38,7 +38,7 @@ license_is(
 # CC-BY-SA
 license_is(
 	't/grant/CC-BY-SA_and_more/WMLA',
-	'CC-BY-SA-3.0 and/or GFDL-1.2'
+	[ 'UNKNOWN', 'CC-BY-SA-3.0 and/or GFDL-1.2' ]
 );
 license_is(
 	't/grant/CC-BY-SA_and_more/cewl.rb',
@@ -52,7 +52,7 @@ license_is(
 # EPL
 license_is(
 	't/grant/EPL_and_more/Base64Coder.java',
-	[   'AGPL-3+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
+	[   'UNKNOWN',
 		'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+'
 	]
 );
@@ -61,12 +61,12 @@ license_is(
 license_is( 't/grant/LGPL/Model.pm', 'LGPL-2.1' );
 license_is( 't/grant/LGPL/PKG-INFO', [ '', 'LGPL' ] );
 
-license_is( 't/grant/LGPL/criu.h',          'LGPL-2.1' );
-license_is( 't/grant/LGPL/dqblk_xfs.h',     'LGPL' );
-license_is( 't/grant/LGPL/exr.h',           'LGPL' );
-license_is( 't/grant/LGPL/gnome.h',         'LGPL-2.1' );
-license_is( 't/grant/LGPL/jitterbuf.h',     'LGPL' );
-license_is( 't/grant/LGPL/libotr.m4',       'LGPL-2.1' );
+license_is( 't/grant/LGPL/criu.h',      'LGPL-2.1' );
+license_is( 't/grant/LGPL/dqblk_xfs.h', 'LGPL' );
+license_is( 't/grant/LGPL/exr.h',       'LGPL' );
+license_is( 't/grant/LGPL/gnome.h',     'LGPL-2.1' );
+license_is( 't/grant/LGPL/jitterbuf.h', 'LGPL' );
+license_is( 't/grant/LGPL/libotr.m4', [ 'UNKNOWN', 'LGPL-2.1' ] );
 license_is( 't/grant/LGPL/pic.c',           'LGPL-3' );
 license_is( 't/grant/LGPL/strv.c',          'LGPL-2.1+' );
 license_is( 't/grant/LGPL/table.py',        'LGPL-2+' );
@@ -77,7 +77,7 @@ license_is(
 );
 license_is(
 	't/grant/LGPL_and_more/da.aff',
-	[ 'LGPL-2.1 or GPL-2.0 and/or MPL-1.1', 'GPL-2 or LGPL-2.1 or MPL-1.1' ]
+	[ 'UNKNOWN', 'GPL-2 or LGPL-2.1 or MPL-1.1' ]
 );
 
 # MPL

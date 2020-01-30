@@ -157,8 +157,7 @@ sub encode {
 
             if (utf8::is_utf8($_)) {
 
-                # Perl doesn’t seem to have a way to pack() a
-                # a UTF-8 string directly to bytes???
+                # We need our string to be in UTF-8.
                 utf8::encode(my $bytes = $_);
 
                 return pack('Ca*', 0x60 + length($bytes), $bytes) if (length() < 24);

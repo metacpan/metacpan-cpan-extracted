@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use ExtUtils::Installed;
 use File::Find;
 use Acme::Alien::DontPanic;

@@ -1,7 +1,7 @@
 package Qiime2::Artifact;
 #ABSTRACT: A parser for Qiime2 artifact files
 
-use 5.016;
+use 5.014;
 use warnings;
 use autodie;
 use Carp qw(confess);
@@ -12,9 +12,9 @@ use YAML::PP;
 use Capture::Tiny ':all';
 use File::Basename;
 
-$Qiime2::Artifact::VERSION = '0.10.6';
+$Qiime2::Artifact::VERSION = '0.10.7';
 
-sub crash($);
+sub _crash($ $);
 
 sub new {
     my ($class, $args) = @_;
@@ -27,7 +27,7 @@ sub new {
       'verbose'  => 'Enable verbose mode (not implemented)'
     );
     for my $parameter (keys %{ $args }) {
-      crash("Parameter <$parameter> is not a valid Qiime2::Artifact->new() attribute.\nValid options: " .
+      _crash(undef, "Parameter <$parameter> is not a valid Qiime2::Artifact->new() attribute.\nValid options: " .
         join(', ', sort keys %accepted_args)) if (not $accepted_args{$parameter});
     }
 
@@ -38,9 +38,9 @@ sub new {
     chomp($unzip_path);
 
    	# Check supplied filename (abs_path uses the filesystem and return undef if file not found)
-    crash "Filename not found: $args->{filename}" unless defined $abs_path;
+    _crash undef, "Filename not found: $args->{filename}" unless defined $abs_path;
     # Check unzip
-    crash "UnZip not found as <$unzip_path>.\n" unless _check_unzip($unzip_path);
+    _crash undef, "UnZip not found as <$unzip_path>.\n" unless _check_unzip($unzip_path);
 
     my $self = {
 
@@ -51,23 +51,18 @@ sub new {
         unzip_path    => $unzip_path,
     };
 
+
     my $object = bless $self, $class;
 
+    _verbose($self, "Loading $args->{filename}");
+    _debug($self, "Debug: $self->{debug}; Verbose: $self->{verbose}", $args);
 
     _read_artifact($object);
-
+    _debug($self, "$args->{filename} loaded");
 
     return $object;
 }
 
-sub id {
-	my ($self) = @_;
-  if (defined $self->{id}) {
-	   return $self->{id};
-  } else {
-    return 0;
-  }
-}
 
 sub _read_artifact {
 	my ($self) = @_;
@@ -76,16 +71,16 @@ sub _read_artifact {
   $self->{visualization} = 0  ;
 
 	if (not defined $self->{filename}) {
-		crash "_read_artifact: filename not defined $self";
+		_crash $self, "_read_artifact: filename not defined $self";
 	}
   if (not defined $self->{unzip_path}) {
-		crash "_read_artifact: <unzip> path not defined $self";
+		_crash $self, "_read_artifact: <unzip> path not defined $self";
 	}  # Read files content in the artifact
   my $artifact_raw = _run( [$self->{unzip_path}, '-t', $self->{filename}] );
 
       if ($artifact_raw->{status} != 0) {
         # Unzip -t failed: not a zip file
-        crash("$self->{filename} is not a ZIP file");
+        _crash $self, "$self->{filename} is not a ZIP file";
       }
 
   my $artifact_id;
@@ -99,7 +94,7 @@ sub _read_artifact {
     if ($line=~/testing:\s+(.+?)\s+OK/) {
         my ($id, $root, @path) = split /\//, $1;
 
-        crash "$self->{filename} is not a valid artifact:\n  \"{id}/directory/data\" structure expected, found:\n  \"$1\"" unless (defined $root);
+        _crash $self, "$self->{filename} is not a valid artifact:\n  \"{id}/directory/data\" structure expected, found:\n  \"$1\"" unless (defined $root);
         my $stripped_path = $root;
         $stripped_path.= '/' . join('/', @path) if ($path[0]);
         $artifact_files{$stripped_path} = $1;
@@ -107,7 +102,7 @@ sub _read_artifact {
         if (! defined $artifact_id) {
           $artifact_id = $id;
         } elsif ($artifact_id ne $id) {
-          crash "Artifact format error: Artifact $self->{filename} has multiple roots ($artifact_id but also $id).\n";
+          _crash $self, "Artifact format error: Artifact $self->{filename} has multiple roots ($artifact_id but also $id).\n";
         }
         if ($root eq 'data') {
           if (basename($stripped_path) eq 'index.html') {
@@ -129,13 +124,13 @@ sub _read_artifact {
   $self->{data} = \@artifact_data;
 
   if (not defined $self->{data}[0]) {
-    crash("No data found in artifact $self->{filename}");
+    _crash($self, "No data found in artifact $self->{filename}");
   }
   $self->{id} = $artifact_id;
   my $auto = _YAMLLoad( $self->_getArtifactText($self->{id} .'/provenance/action/action.yaml') , $self->{id} .'/provenance/action/action.yaml' );
   $self->{parents}->{self} = $auto->{action};
 
-  crash("No self parent") if (not defined $self->{parents}->{self});
+  _crash($self, "No self parent") if (not defined $self->{parents}->{self});
 
   for my $key (keys %artifact_parents) {    # key=fa0cb712-1940-4971-9e7c-a08581e948ed
     my $parent = $self->_get_parent($key);
@@ -158,11 +153,12 @@ sub _read_artifact {
 
 sub _getAncestry {
   my ($self) = @_;
-  my $output;
+  my @output;
   my %found = ();
 
   # Direct parents
-  $output->{objects}[0] = [ $self->{id} ];
+  #$output->{objects}[0] = [ $self->{id} ];
+  $output[0] = [ $self->{id} ];
 
   $self->{imported} = 0;
   if ($self->{parents}->{self}->{type} eq 'import' ) {
@@ -176,7 +172,7 @@ sub _getAncestry {
         for my $hash (@{ $self->{parents}->{self}->{parameters} }) {
           if (defined $hash->{input} ) {
             my ($id) = split /:/, $hash->{input};
-            push @{$output->{objects}[1]}, $id if (defined $id);
+            push @{$output[1]}, $id if (defined $id);
           }
         }
   }
@@ -184,7 +180,7 @@ sub _getAncestry {
   for my $input (@{$self->{parents}->{self}->{inputs}}) {
 
      for my $key (sort keys %{ $input }) {
-       push @{ $output->{objects}[1] }, $$input{ $key } if (defined $$input{ $key });
+       push @{ $output[1] }, $$input{ $key } if (defined $$input{ $key });
      }
   }
 
@@ -193,15 +189,15 @@ sub _getAncestry {
 
   while ($parents) {
     $parents = 0;
-    my $last_index = $#{ $output->{objects} };
-    for my $item ( @{ $output->{objects}[$last_index] } ) {
+    my $last_index = $#output;
+    for my $item ( @{ $output[$last_index] } ) {
 
 
       if ( defined $self->{parents}->{$item}->{from} ) {
         $parents++;
         foreach my $child ( @{ $self->{parents}->{$item}->{from} } ) {
           if (defined $child) {
-            push( @{ $output->{objects}[$last_index + 1 ] }, $child) if ($found{$child});
+            push( @{ $output[$last_index + 1 ] }, $child) if ($found{$child});
             $found{$child}++;
           }
         }
@@ -210,35 +206,20 @@ sub _getAncestry {
       }
     }
   }
-  return $output;
-}
-
-sub _tree {
-  my $self = $_[0];
-
-  my $last_array = $self->{ancestry}[-1];
-  return 0 unless ( ${ $last_array}[0] );
-
-
-  foreach my $item (@{$self->{ancestry}[-1]}) {
-    if (defined $self->{parents}->{$item}->{from}) {
-      push @{$self->{ancestry}}, $self->{parents}->{$item}->{from};
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-  return 0;
+  return \@output;
 }
 
 sub _check_unzip {
+
   my ($cmd_list, $pattern) = ([$_[0]], 'UnZip 6.00');
+
+  # uncoverable branch false
   if ($^O eq 'linux' or $^O eq 'darwin') {
     # check if a command has a string in the output
     my $output = _run($cmd_list);
 
     if ($output->{status} != 0) {
-        crash("Unable to test <$$cmd_list[0]>, execution returned $output->{status}.\n".
+        _crash(undef, "Unable to test <$$cmd_list[0]>, execution returned $output->{status}.\n".
         "Under Linux and macOS $$cmd_list[0] is expected to print its help when invoked.\n");
     }
 
@@ -257,14 +238,15 @@ sub _check_unzip {
       return 3;
     } else {
       # First try to check for Linux-like UnZip
+      $pattern = 'unzip';
       my $output = _run($cmd_list);
-      return 1 if ($output->{stdout} =~/$pattern/);
-      return 2 if ($output->{stderr} =~/$pattern/);
+      return 1 if ($output->{stdout} =~/$pattern/i);
+      return 2 if ($output->{stderr} =~/$pattern/i);
 
       # Try at least checking if unzip if installed
       system(['which', $$cmd_list[0]]);
       if ($?) {
-        crash("Trying under non Linux/MacOS: <which $$cmd_list[0]> returned $?.\n".
+        _crash(undef, "Trying under non Linux/MacOS: <which $$cmd_list[0]> returned $?.\n".
         "#Debug: $output->{stdout}\n#Debug: $output->{stderr}\n");
       } else {
         # Binary is present, non tested for Version
@@ -335,18 +317,37 @@ sub _run {
 }
 
 
-sub debug {
-  my ($self, $msg, $opt) = @_;
-  return 0 if not defined $self->{debug};
-  say STDERR GREEN, BOLD, '| ', RESET, $msg;
+sub get {
+  my ($self, $key) = @_;
+
+  if (defined $self->{$key}) {
+    return $self->{$key};
+  } else {
+    _crash($self, "<$key> is not an attribute of this Artifact");
+  }
+}
+sub _debug {
+  my ($self, $msg, $data, $opt) = @_;
+  return 0 if not defined $self->{debug} or  $self->{debug} == 0;
+  say STDERR GREEN, BOLD, '> ', $self->{debug}, ' ', RESET, $msg;
+  if (defined $data) {
+    say STDERR Dumper $data;
+  }
 }
 
+sub _verbose {
+  my ($self, $msg, $opt) = @_;
+  if ($self->{verbose} == 1 or $self->{debug} == 1) {
+    say STDERR '# Qiime2::Artifact # ', RESET, $msg;
+  }
+  return 0;
+}
 sub _YAMLLoad {
   my ($string, $info) = @_;
   my $ypp = YAML::PP->new;
 
   unless (length($string)) {
-    crash "YAML string empty: unexpected error";
+    _crash undef, "YAML string empty: unexpected error";
   }
 
   my $result = eval {
@@ -354,17 +355,23 @@ sub _YAMLLoad {
   };
 
   if ($@) {
-    crash "YAMLLoad failed on string $info:\n------------------------------------------------\n$string";
+    _crash undef, "YAMLLoad failed on string $info:\n------------------------------------------------\n$string";
   } else {
     return $result;
   }
 }
 
-sub crash($) {
-  chomp($_[0]);
-	print STDERR BOLD RED " [Qiime2::Reader ERROR]",RESET,"\n";
-	print STDERR RED " $_[0]\n ", '-' x 60, "\n", RESET;
-	confess();
+sub _crash($ $) {
+  my ($self, $msg) = @_;
+  chomp($msg);
+  $msg =~s/\n/\n /g;
+  if (! defined $self or ($self->{verbose} or $self->{debug}) ) {
+	   print STDERR BOLD RED " [Qiime2::Reader ERROR]",RESET,"\n";
+	   print STDERR RED " $msg\n ", '-' x 64, "\n", RESET;
+	   confess();
+  } else {
+     confess('[Qiime2::Artifact ERROR] ', $msg, "\n");
+  }
 }
 
 1;
@@ -381,12 +388,12 @@ Qiime2::Artifact - A parser for Qiime2 artifact files
 
 =head1 VERSION
 
-version 0.10.6
+version 0.10.7
 
 =head1 Wiki
 
 This module is a work-in-progress and the documentation of the API can
-be found in the GitHub wiki: L<https://github.com/telatin/qiime2tools/wiki/Qiime2::Artifact-API-documentation>.
+be found in the GitHub wiki: L<https://github.com/telatin/qiime2tools/wiki/>.
 
 =head1 Synopsis
 
@@ -422,13 +429,17 @@ Enable verbose reporting (for developers)
 
 =back
 
+=item B<get($key)>
+
+Return the $artifact->{$key}, and throws an error if the error is not found.
+
 =back
 
 =head1 Artifact object
 
 =over 4
 
-See L<https://github.com/telatin/qiime2tools/wiki> for API documentation
+See L<https://github.com/telatin/qiime2tools/wiki/Attributes> for API documentation
 
 =back
 

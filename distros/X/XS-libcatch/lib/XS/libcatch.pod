@@ -1,0 +1,38 @@
+=head1 NAME
+
+XS::libcatch - Catch test library for XS 
+
+=head1 SYNOPSIS
+
+in Makefile.PL
+
+    use XS::Install;
+    WriteMakefile(
+        ...makemaker args
+        BIN_DEPS => 'XS::libcatch',
+        ...
+    );
+    
+in your C test files
+
+    #include <catch.hpp>
+    ...
+    
+=head1 DESCRIPTION
+
+This module makes available L<catch|http://catch-lib.net> test library for XS modules.
+No perl interface. 
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

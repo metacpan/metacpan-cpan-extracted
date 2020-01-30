@@ -34,9 +34,17 @@ Specify IP list to be ignored with ArrayRef.
 
     plugin 'ClientIP', ignore => [qw(192.0.2.1 192.0.2.16/28)];
 
+## private
+
+Specify IP list which is handled as private IP address.
+This is a optional parameter.
+Default values are `[qw(127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16)]` as defined in RFC 1918.
+
+    plugin 'ClientIP', ignore => [qw(192.0.2.16/28)], private => [qw(10.0.0.0/8)];
+
 # LICENSE
 
-Copyright (C) Six Apart, Ltd. <sixapart@cpan.org>
+Copyright (C) Six Apart Ltd. <sixapart@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,44 +1,103 @@
 use Test2::V0 -no_srand => 1;
+use Config;
 
-# please keep in alpha order
-my @mods = qw(
+eval { require 'Test/More.pm' };
+
+# This .t file is generated.
+# make changes instead to dist.ini
+
+my %modules;
+my $post_diag;
+
+$modules{$_} = $_ for qw(
   Acme::Alien::DontPanic
-  Acme::Ford::Prefect
-  Acme::Ford::Prefect::FFI
-  Alien::Build
+  Alien::Base
+  Alien::Base::PkgConfig
   Archive::Extract
   Archive::Tar
   Capture::Tiny
-  File::Spec
-  File::Temp
   File::chdir
-  HTML::LinkExtor
   HTTP::Tiny
-  Inline
-  Inline::C
-  Inline::CPP
-  LWP::UserAgent
   Module::Build
-  Net::FTP
+  Path::Tiny
   Shell::Config::Generate
   Shell::Guess
   Sort::Versions
-  Test2::API
+  Test2::Mock
+  Test2::Require::Module
   Test2::V0
-  Text::ParseWords
   URI
+  URI::file
   parent
 );
 
-pass 'okay';
 
-diag '';
-diag sprintf "%25s %s", 'perl', $];
 
-foreach my $mod (@mods) {
-  my $version = eval qq{ no warnings; require $mod; \$$mod\::VERSION };
-  $version = 'undefined' unless defined $version;
-  diag sprintf "%25s %s", $mod, $version;
+my @modules = sort keys %modules;
+
+sub spacer ()
+{
+  diag '';
+  diag '';
+  diag '';
 }
 
+pass 'okay';
+
+my $max = 1;
+$max = $_ > $max ? $_ : $max for map { length $_ } @modules;
+our $format = "%-${max}s %s";
+
+spacer;
+
+my @keys = sort grep /(MOJO|PERL|\A(LC|HARNESS)_|\A(SHELL|LANG)\Z)/i, keys %ENV;
+
+if(@keys > 0)
+{
+  diag "$_=$ENV{$_}" for @keys;
+
+  if($ENV{PERL5LIB})
+  {
+    spacer;
+    diag "PERL5LIB path";
+    diag $_ for split $Config{path_sep}, $ENV{PERL5LIB};
+
+  }
+  elsif($ENV{PERLLIB})
+  {
+    spacer;
+    diag "PERLLIB path";
+    diag $_ for split $Config{path_sep}, $ENV{PERLLIB};
+  }
+
+  spacer;
+}
+
+diag sprintf $format, 'perl ', $];
+
+foreach my $module (sort @modules)
+{
+  my $pm = "$module.pm";
+  $pm =~ s{::}{/}g;
+  if(eval { require $pm; 1 })
+  {
+    my $ver = eval { $module->VERSION };
+    $ver = 'undef' unless defined $ver;
+    diag sprintf $format, $module, $ver;
+  }
+  else
+  {
+    diag sprintf $format, $module, '-';
+  }
+}
+
+if($post_diag)
+{
+  spacer;
+  $post_diag->();
+}
+
+spacer;
+
 done_testing;
+

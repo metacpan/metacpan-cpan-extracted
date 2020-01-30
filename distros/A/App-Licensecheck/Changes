@@ -7,6 +7,21 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.41	2020-01-30
+
+ [ Documentation ]
+ - clarify comment about identifiers being DEP-5 or SPDX (not only SPDX)
+
+ [ Test Suite ]
+ - testsuite: update tests for Regexp::Pattern::License v3.1.101 (many
+   improvements, few "regressions" especially related to dual-licensing due
+   to previously accidentally matching by name only)
+
+ [ Other ]
+ - merge duplicate detections of same license
+ - optimization: avoid accidentally flagging all objects for rescanning
+   when checking if rescanning can be skipped :-/
+
 v3.0.40	2020-01-28
 
  [ Bug Fixes ]

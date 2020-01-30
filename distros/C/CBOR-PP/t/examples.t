@@ -15,7 +15,7 @@ use CBOR::PP;
 
 my $is_64bit = eval { pack 'q' };
 
-my $long_double_yn = $Config::Config{'uselongdouble'};
+my $weird_double_yn = $Config::Config{'uselongdouble'} || $Config::Config{'usequadmath'};
 
 my @examples = (
     [ 0 => '00' ],
@@ -97,7 +97,7 @@ my @decode = (
     [ 100000 => 'fa47c35000' ],
 );
 
-if (!$long_double_yn) {
+if (!$weird_double_yn) {
     push @decode, (
         [ 1.1 => 'fb3ff199999999999a' ],
         [ $inf => 'fa7f800000' ],

@@ -1,32 +1,38 @@
 ---
-abstract: 'Part of the test framework for Alien::Base'
+abstract: 'Test Module for Alien::Base'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
-  - 'Joel Berger <joel.a.berger@gmail.com>'
+  - 'Joel Berger'
 build_requires:
-  ExtUtils::CBuilder: '0'
-  Test2::V0: '0'
+  Acme::Alien::DontPanic: '0'
+  ExtUtils::Installed: '0'
+  File::Find: '0'
+  Test2::V0: '0.000060'
+  Test::Alien::Diag: '0'
+  perl: '5.006'
 configure_requires:
-  Acme::Alien::DontPanic: '1.96'
-  Module::Build: '0.38'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+  Acme::Alien::DontPanic: '1.9800'
+  Alien::Base::Wrapper: '1.02'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Acme-Ford-Prefect
-provides:
-  Acme::Ford::Prefect:
-    file: lib/Acme/Ford/Prefect.pm
-    version: '1.96'
 requires:
-  perl: '5.008001'
+  DynaLoader: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#native
-  MailingList: https://groups.google.com/forum/#!forum/perl5-alien
-  bugtracker: http://github.com/Perl5-Alien/Acme-Ford-Prefect/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/Perl5-Alien/Acme-Ford-Prefect
-version: '1.96'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect/issues
+  homepage: https://metacpan.org/pod/Acme::Ford::Prefect
+  repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect.git
+version: '1.9800'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

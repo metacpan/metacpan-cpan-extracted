@@ -1,0 +1,36 @@
+=head1 NAME
+
+XS::boost::mini - C++ Boost library for XS.
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    write_makefile(
+        ...makemaker args
+        BIN_DEPS => 'XS::boost::mini',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+Makes boost available from XS modules. No perl interface.
+
+Includes libraries: 
+callable_traits compatibility config container container_hash conversion core crc disjoint_sets hof preprocessor integer io logic uuid
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Boost itself.
+
+=cut

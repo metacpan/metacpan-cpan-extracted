@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Path::Tiny qw( path );
+use Alien::Build ();
+use Alien::Base ();
+use Alien::Base::ModuleBuild ();
+
+{
+  my @lines = path('dist.ini')->lines;
+
+  for(@lines)
+  {
+    if(/^version\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Build->VERSION . '00';
+      s/$old/$new/;
+      print " version $old -> $new\n";
+      if($old eq $new)
+      {
+        die "seems to be the same version";
+      }
+    }
+    elsif(/^Alien::Build\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Build->VERSION;
+      print " ab      $old   -> $new\n";
+      s/$old/$new/;
+    }
+    elsif(/^Alien::Base\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Base->VERSION;
+      print " ab      $old   -> $new\n";
+      s/$old/$new/;
+    }
+    elsif(/^Alien::Base::ModuleBuild\s*=\s*(.*)\s*$/)
+    {
+      my $old = $1;
+      my $new = Alien::Base::ModuleBuild->VERSION;
+      print " ab      $old   -> $new\n";
+      s/$old/$new/;
+    }
+  }
+
+  path('dist.ini')->spew(@lines);
+}
+
+{
+  my @lines = path('Changes')->lines;
+
+  my $title = shift @lines;
+  my $blank = shift @lines;
+  my $next  = shift @lines;
+
+  unshift @lines, $title, $blank, $next,
+    "  - Require Alien::Build @{[ Alien::Build->VERSION ]} Alien::Base::ModuleBuild @{[ Alien::Base::ModuleBuild->VERSION ]}\n";
+
+  path('Changes')->spew(@lines);
+}
+
+system 'git', 'diff';
+
+print "does that look right? ";
+
+my $input = <STDIN>;
+
+die 'not right apparently' unless $input =~ /^y/i;
+
+system 'dzil', 'release' or die;
+system 'cpanm', "Acme-Alien-DontPanic-@{[ Alien::Build->VERSION . '00' ]}.tar.gz" or die;

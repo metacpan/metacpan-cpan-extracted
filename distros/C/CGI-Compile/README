@@ -220,10 +220,11 @@ PROTECTED METHODS
 
       The contents of the file as a scalar string.
 
- _build_package
+ _build_subname
 
-    Creates a package name into which the CGI coderef will be compiled
-    into, prepended with $self-{namespace_root}>.
+    Creates a package name and coderef name into which the CGI coderef will
+    be compiled into. The package name will be prepended with
+    $self-{namespace_root}>.
 
     Parameters:
 
@@ -237,6 +238,11 @@ PROTECTED METHODS
       * $package
 
       The generated package name.
+
+      * $subname
+
+      The generated coderef name, based on the file name (without
+      directory) of the CGI file path.
 
  _eval
 
@@ -267,13 +273,19 @@ AUTHOR
 
 CONTRIBUTORS
 
-    Rafael Kitover <rkitover@cpan.org>
+    Rafael Kitover <rkitover@gmail.com>
 
     Hans Dieter Pearcey <hdp@cpan.org>
 
     kocoureasy <igor.bujna@post.cz>
 
     Torsten Förtsch <torsten.foertsch@gmx.net>
+
+    Jörn Reder <jreder@dimedis.de>
+
+    Pavel Mateja <pavel@verotel.cz>
+
+    lestrrat <lestrrat+github@gmail.com>
 
 COPYRIGHT & LICENSE
 

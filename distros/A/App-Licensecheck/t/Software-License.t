@@ -14,7 +14,7 @@ my %LICENSES = (
 	'Artistic-1.0' => 'Artistic-1.0',
 	'Artistic-2.0' => 'Artistic-2.0',
 	BSD            => 'BSD-3-clause',
-	'CC0-1.0'      => 'UNKNOWN',
+	'CC0-1.0'      => 'CC0-1.0',
 
 #	Custom                                  => 'UNKNOWN',
 	'EUPL-1.1'             => 'UNKNOWN',

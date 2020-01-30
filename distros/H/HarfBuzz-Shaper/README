@@ -21,19 +21,6 @@ To install this module type the following:
    make test
    make install
 
-DEPENDENCIES
-
-This module requires the HarfBuzz library, version 1.6.0 or later, to
-be installed on the system.
-
-To build, the HarfBuzz development library and associated include
-files are required, in particular include file
-/usr/include/harfbuzz/hb.h and libharfbuzz (linked using
--lharfbuzz.
-
-Unfortunately, there is currently no decent method to require external
-libraries... See document INSTALL for more details.
-
 SUPPORT AND DOCUMENTATION
 
 Development of this module takes place on GitHub:

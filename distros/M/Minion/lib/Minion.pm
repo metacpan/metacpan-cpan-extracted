@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Config;
+use Minion::Iterator;
 use Minion::Job;
 use Minion::Worker;
 use Mojo::Date;
@@ -10,7 +11,7 @@ use Mojo::IOLoop;
 use Mojo::Loader 'load_class';
 use Mojo::Promise;
 use Mojo::Server;
-use Mojo::Util 'steady_time';
+use Mojo::Util qw(scope_guard steady_time);
 
 has
   app =>
@@ -22,7 +23,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '10.02';
+our $VERSION = '10.03';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -59,7 +60,7 @@ sub guard {
   my ($self, $name, $duration, $options) = @_;
   my $time = steady_time + $duration;
   return undef unless $self->lock($name, $duration, $options);
-  return Minion::_Guard->new(minion => $self, name => $name, time => $time);
+  return scope_guard sub { $self->unlock($name) if steady_time < $time };
 }
 
 sub history { shift->backend->history }
@@ -76,6 +77,8 @@ sub job {
     task    => $job->{task}
   );
 }
+
+sub jobs { shift->_iterator('jobs', @_) }
 
 sub lock { shift->backend->lock(@_) }
 
@@ -126,6 +129,8 @@ sub worker {
   return $worker;
 }
 
+sub workers { shift->_iterator('workers', @_) }
+
 sub _backoff { (shift()**4) + 15 }
 
 # Used by the job command and admin plugin
@@ -142,6 +147,12 @@ sub _delegate {
   return $self;
 }
 
+sub _iterator {
+  my ($self, $what, $options) = (shift, shift, shift // {});
+  return Minion::Iterator->new(minion => $self, options => $options,
+    what => $what);
+}
+
 sub _info { shift->backend->list_jobs(0, 1, {ids => [shift]})->{jobs}[0] }
 
 sub _result {
@@ -150,13 +161,6 @@ sub _result {
   if    ($job->{state} eq 'finished') { $promise->resolve($job) }
   elsif ($job->{state} eq 'failed')   { $promise->reject($job) }
 }
-
-package Minion::_Guard;
-use Mojo::Base -base;
-
-use Mojo::Util 'steady_time';
-
-sub DESTROY { $_[0]{minion}->unlock($_[0]{name}) if steady_time < $_[0]{time} }
 
 1;
 
@@ -586,6 +590,183 @@ return C<undef> if job does not exist.
   # Get job result
   my $result = $minion->job($id)->info->{result};
 
+=head2 jobs
+
+  my $jobs = $minion->jobs;
+  my $jobs = $minion->jobs({states => ['inactive']});
+
+Return L<Minion::Iterator> object to safely iterate through job information.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  # Iterate through jobs for two tasks
+  my $jobs = $minion->jobs({tasks => ['foo', 'bar']});
+  while (my $info = $jobs->next) {
+    say "$info->{id}: $info->{state}";
+  }
+
+  # Remove all failed jobs from a named queue
+  my $jobs = $minion->jobs({states => ['failed'], queues => ['unimportant']});
+  while (my $info = $jobs->next) {
+    $minion->job($info->{id})->remove;
+  }
+
+These options are currently available:
+
+=over 2
+
+=item ids
+
+  ids => ['23', '24']
+
+List only jobs with these ids.
+
+=item notes
+
+  notes => ['foo', 'bar']
+
+List only jobs with one of these notes. Note that this option is EXPERIMENTAL
+and might change without warning!
+
+=item queues
+
+  queues => ['important', 'unimportant']
+
+List only jobs in these queues.
+
+=item states
+
+  states => ['inactive', 'active']
+
+List only jobs in these states.
+
+=item tasks
+
+  tasks => ['foo', 'bar']
+
+List only jobs for these tasks.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item args
+
+  args => ['foo', 'bar']
+
+Job arguments.
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
+
+=item children
+
+  children => ['10026', '10027', '10028']
+
+Jobs depending on this job.
+
+=item created
+
+  created => 784111777
+
+Epoch time job was created.
+
+=item delayed
+
+  delayed => 784111777
+
+Epoch time job was delayed to.
+
+=item finished
+
+  finished => 784111777
+
+Epoch time job was finished.
+
+=item id
+
+  id => 10025
+
+Job id.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
+=item parents
+
+  parents => ['10023', '10024', '10025']
+
+Jobs this job depends on.
+
+=item priority
+
+  priority => 3
+
+Job priority.
+
+=item queue
+
+  queue => 'important'
+
+Queue name.
+
+=item result
+
+  result => 'All went well!'
+
+Job result.
+
+=item retried
+
+  retried => 784111777
+
+Epoch time job has been retried.
+
+=item retries
+
+  retries => 3
+
+Number of times job has been retried.
+
+=item started
+
+  started => 784111777
+
+Epoch time job was started.
+
+=item state
+
+  state => 'inactive'
+
+Current job state, usually C<active>, C<failed>, C<finished> or C<inactive>.
+
+=item task
+
+  task => 'foo'
+
+Task name.
+
+=item time
+
+  time => 78411177
+
+Server time.
+
+=item worker
+
+  worker => '154'
+
+Id of worker that is processing the job.
+
+=back
+
 =head2 lock
 
   my $bool = $minion->lock('foo', 3600);
@@ -860,6 +1041,80 @@ implement custom workers.
   } while keys %jobs;
   $worker->unregister;
 
+=head2 workers
+
+  my $workers = $minion->workers;
+  my $workers = $minion->workers({ids => [2, 3]});
+
+Return L<Minion::Iterator> object to safely iterate through worker information.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  # Iterate through workers
+  my $workers = $minion->workers;
+  while (my $info = $workers->next) {
+    say "$info->{id}: $info->{host}";
+  }
+
+These options are currently available:
+
+=over 2
+
+=item ids
+
+  ids => ['23', '24']
+
+List only workers with these ids.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item id
+
+  id => 22
+
+Worker id.
+
+=item host
+
+  host => 'localhost'
+
+Worker host.
+
+=item jobs
+
+  jobs => ['10023', '10024', '10025', '10029']
+
+Ids of jobs the worker is currently processing.
+
+=item notified
+
+  notified => 784111777
+
+Epoch time worker sent the last heartbeat.
+
+=item pid
+
+  pid => 12345
+
+Process id of worker.
+
+=item started
+
+  started => 784111777
+
+Epoch time worker was started.
+
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
+=back
+
 =head1 REFERENCE
 
 This is the class hierarchy of the L<Minion> distribution.
@@ -972,7 +1227,7 @@ Stefan Adams
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2019, Sebastian Riedel and others.
+Copyright (C) 2014-2020, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

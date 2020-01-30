@@ -1,8 +1,8 @@
+package HTTP::CookieMonster::Cookie;
+our $VERSION = '0.10';
 use strict;
 use warnings;
 
-package HTTP::CookieMonster::Cookie;
-$HTTP::CookieMonster::Cookie::VERSION = '0.09';
 use Moo;
 
 # in order of args required in $cookie_jar->scan callback
@@ -35,7 +35,7 @@ HTTP::CookieMonster::Cookie - Cookie representation used by HTTP::CookieMonster
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ version 0.09
     my $monster = HTTP::CookieMonster->new( cookie_jar => $mech->cookie_jar );
     $monster->set_cookie( $cookie );
 
-    $mech->get( $url );    # passes $cookie in request
+    $mech->get('https://example.com');    # passes $cookie in request
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ If you are creating a new cookie, you should escape the value first.
 =head1 SEE ALSO
 
 This is mainly useful for creating cookies to be used by L<LWP::UserAgent> and
-L<WWW::Mechanize classes>.  If you need to create cookies to set via headers,
+L<WWW::Mechanize> classes.  If you need to create cookies to set via headers,
 have a look at L<Cookie::Baker>.
 
 =head1 AUTHOR

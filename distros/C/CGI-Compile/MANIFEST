@@ -11,6 +11,7 @@ dist.ini
 lib/CGI/Compile.pm
 t/00_compile.t
 t/Exit.pm
+t/alarm.t
 t/args.cgi
 t/author-pod-syntax.t
 t/chained_exit.t
@@ -35,5 +36,6 @@ t/return-val.t
 t/source.t
 t/source_filter.t
 t/switch.cgi
+t/symbols.t
 t/warnings.cgi
 t/warnings.t

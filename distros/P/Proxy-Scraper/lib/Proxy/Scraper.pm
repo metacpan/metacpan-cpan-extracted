@@ -15,7 +15,7 @@ if($^O eq 'MSWin32'){
 our @ISA=qw(Exporter);
 our @EXPORT=qw(scrape_proxies);
 
-our $VERSION='2.1.3';
+our $VERSION='2.1.4';
 our $LIBRARY=__PACKAGE__;
 
 sub scrape_free_proxy_list{
