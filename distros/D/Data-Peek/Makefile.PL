@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2018 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2020 H.Merijn Brand
 
-require 5.008; # <- also see postamble at the bottom for META.yml
+require 5.008001; # <- also see postamble at the bottom for META.yml
 use strict;
 
 use ExtUtils::MakeMaker;
@@ -13,10 +13,10 @@ my %wm = (
     ABSTRACT     => "Extended/Modified debugging utilities",
     AUTHOR       => "H.Merijn Brand <h.merijn\@xs4all.nl>",
     VERSION_FROM => "Peek.pm",
-    PREREQ_PM	 => { "DynaLoader"	 => 0,
-		      "Data::Dumper"	 => 0,
-		      "Test::More"	 => 0.88,
-		      "Test::NoWarnings" => 0,
+    PREREQ_PM	 => { "DynaLoader"	=> 0,
+		      "Data::Dumper"	=> 0,
+		      "Test::More"	=> 0.90,
+		      "Test::Warnings"	=> 0,
 		      },
     clean        => { FILES => join " ", qw(
 			 Peek.c.gcov
@@ -114,10 +114,20 @@ sub postamble
 	'fixmeta:	distmeta',
 	'	perl sandbox/genMETA.pl',
 	'',
-	'tgzdist:	checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
+	'tgzdist:	doc checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
 	'	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
+	'',
+	'doc docs:		doc/Peek.md doc/Peek.html doc/Peek.man',
+	'doc/Peek.md:		Peek.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/Peek.html:	Peek.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/Peek.3:		Peek.pm',
+	'	pod2man       < $? > $@',
+	'doc/Peek.man:	doc/Peek.3',
+	'	nroff -mandoc < $? > $@',
 	'',
 	$min_vsn;
     } # postamble
@@ -151,7 +161,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 H.Merijn Brand
+Copyright (C) 2008-2020 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

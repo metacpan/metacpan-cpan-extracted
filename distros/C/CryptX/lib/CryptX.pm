@@ -2,7 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -58,13 +58,11 @@ sub _encode_json {
 
 =head1 NAME
 
-CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
+CryptX - Cryptographic toolkit
 
 =head1 DESCRIPTION
 
-Cryptography in CryptX is based on L<https://github.com/libtom/libtomcrypt>
-
-Available modules:
+Perl modules providing a cryptography based on L<LibTomCrypt|https://github.com/libtom/libtomcrypt> library.
 
 =over
 
@@ -110,7 +108,7 @@ L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::
 
 =item * Public key cryptography
 
-L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
+L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>, L<Crypt::PK::Ed25519>, L<Crypt::PK::X25519>
 
 =item * Cryptographically secure random number generators - see L<Crypt::PRNG> and related modules
 
@@ -132,6 +130,6 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013+ DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
+Copyright (c) 2013-2020 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
 
 =cut

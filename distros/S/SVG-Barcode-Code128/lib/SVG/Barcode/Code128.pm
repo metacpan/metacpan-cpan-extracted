@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_code128|;
 
 use Barcode::Code128;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant DEFAULTS => {
   lineheight => 30,
@@ -142,14 +142,15 @@ Getter and setter for the width of a single line. Default C<1>.
 
 Getter and setter for the size of the text a the bottom. C<0> hides the text. Default C<10>.
 
+=head1 AUTHOR & COPYRIGHT
+
+© 2019–2020 by Tekki (Rolf Stöckli).
+
+This program is free software, you can redistribute it and/or modify it under the terms of the
+Artistic License version 2.0.
+
 =head1 SEE ALSO
 
 L<SVG::Barcode>, L<Barcode::Code128>.
-
-=head1 AUTHOR & COPYRIGHT
-
-© 2019 by Tekki (Rolf Stöckli).
-
-This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 
 =cut

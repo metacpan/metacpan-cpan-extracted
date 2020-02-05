@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.013	2020-02-04
+
+ [ Test Suite ]
+ - Skip Moo tests on very old Moo.
+
+0.012	2020-02-02
+
+ - Added: Add missing methods from List::Util to Array. (These are mostly
+   untested, but probably don't have bugs as they are simple non-mutator
+   methods.)
+
 0.011	2020-01-27
 
  [ Documentation ]

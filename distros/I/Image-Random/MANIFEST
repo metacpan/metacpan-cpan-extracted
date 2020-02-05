@@ -1,6 +1,7 @@
 Changes
 examples/ex1.pl
 inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -16,11 +17,11 @@ META.yml
 Random.pm
 README
 SIGNATURE
-t/Image-Random/00-use.t
-t/Image-Random/01-version.t
-t/Image-Random/02-pod_coverage.t
-t/Image-Random/03-pod.t
-t/Image-Random/04-new.t
-t/Image-Random/05-create.t
-t/Image-Random/06-sizes.t
-t/Image-Random/07-type.t
+t/Image-Random/01-use.t
+t/Image-Random/02-version.t
+t/Image-Random/03-new.t
+t/Image-Random/04-create.t
+t/Image-Random/05-sizes.t
+t/Image-Random/06-type.t
+xt/Image-Random/01-pod_coverage.t
+xt/Image-Random/02-pod.t

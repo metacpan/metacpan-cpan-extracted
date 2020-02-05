@@ -44,6 +44,6 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/getsentry/perl-raven
-version: '1.11'
+version: '1.12'
 x_homepage: https://github.com/getsentry/perl-raven
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

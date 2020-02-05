@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,61 +17,61 @@ name: Group-Git
 provides:
   Group::Git:
     file: lib/Group/Git.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Bitbucket:
     file: lib/Group/Git/Bitbucket.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Branch:
     file: lib/Group/Git/Cmd/Branch.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Grep:
     file: lib/Group/Git/Cmd/Grep.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Help:
     file: lib/Group/Git/Cmd/Help.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::List:
     file: lib/Group/Git/Cmd/List.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Pull:
     file: lib/Group/Git/Cmd/Pull.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Sh:
     file: lib/Group/Git/Cmd/Sh.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::State:
     file: lib/Group/Git/Cmd/State.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Status:
     file: lib/Group/Git/Cmd/Status.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::TagList:
     file: lib/Group/Git/Cmd/TagList.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Cmd::Watch:
     file: lib/Group/Git/Cmd/Watch.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Github:
     file: lib/Group/Git/Github.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Gitosis:
     file: lib/Group/Git/Gitosis.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Repo:
     file: lib/Group/Git/Repo.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Stash:
     file: lib/Group/Git/Stash.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Taggers:
     file: lib/Group/Git/Taggers.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Taggers::Local:
     file: lib/Group/Git/Taggers/Local.pm
-    version: v0.7.2
+    version: v0.7.3
   Group::Git::Taggers::Remote:
     file: lib/Group/Git/Taggers/Remote.pm
-    version: v0.7.2
+    version: v0.7.3
 requires:
   Config::Any: '0'
   File::chdir: '0'
@@ -96,5 +96,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Group::Git
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/Group-Git.git
-version: v0.7.2
+version: v0.7.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,8 +22,8 @@ lib/Bitcoin/Crypto/Segwit.pm
 lib/Bitcoin/Crypto/Types.pm
 lib/Bitcoin/Crypto/Util.pm
 Makefile.PL
-MANIFEST
-README.md
+MANIFEST			This list of files
+README.pod
 t/Base58.t
 t/Bech32.t
 t/Config.t
@@ -34,7 +34,6 @@ t/ExtPrivateKey.t
 t/ExtPublicKey.t
 t/Helpers.t
 t/KeyDerivation.t
-t/KeyDeriviation.t
 t/Network.t
 t/PrivateKey.t
 t/PublicKey.t

@@ -11,7 +11,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.204';
+our $VERSION = '0.205';
 
 my $common_template = {
 
@@ -237,16 +237,107 @@ sub resume {
 
 #-------------------------------------------------------------------------------
 
-sub stop {
+sub reimport {
 
     my ( $self, %args ) = @_;
 
-    my $tmpl = { id => $common_template->{'id'}, };
+    my $tmpl = {
+        id         => $common_template->{'id'},
+        scan_vhost => {
+            remap  => 'scanningVirtualHosts',
+            filter => \&sc_filter_int_to_bool,
+            allow  => qr/\d/,
+        },
+        dhcp_tracking => {
+            remap  => 'dhcpTracking',
+            filter => \&sc_filter_int_to_bool,
+            allow  => qr/\d/,
+        },
+        classify_mitigated_age => { remap => 'classifyMitigatedAge' }
+    };
 
     my $params         = sc_check_params( $tmpl, \%args );
     my $scan_result_id = delete( $params->{'id'} );
 
-    $self->client->post("/scanResult/$scan_result_id/stop");
+    $self->client->post("/scanResult/$scan_result_id/import");
+    return 1;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub import {
+
+    my ( $self, %args ) = @_;
+
+    my $single_id_filter = sub {
+        return { 'id' => $_[0] };
+    };
+
+    my $tmpl = {
+        filename => {},
+        dhcp_tracking => {
+            remap  => 'dhcpTracking',
+            filter => \&sc_filter_int_to_bool,
+            allow  => qr/\d/,
+        },
+        classify_mitigated_age => { remap => 'classifyMitigatedAge' },
+        scan_vhost => {
+            remap => 'scanningVirtualHosts',
+            filter => \&sc_filter_int_to_bool,
+            allow  => qr/\d/,
+        },
+        repository => {
+            allow  => qr/\d+/,
+            errors => { allow => 'Invalid Repository ID' },
+            filter => \&$single_id_filter
+        },
+    };
+
+    my $params      = sc_check_params( $tmpl, \%args );
+    my $filename    = delete( $params->{'filename'} );
+    my $sc_filename = $self->client->upload($filename)->{'filename'};
+
+    $params->{'filename'} = $sc_filename;
+
+    $self->client->post("/scanResult/import", $params);
+    return 1;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub email {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = { id => $common_template->{'id'}, email => {} };
+
+    my $params         = sc_check_params( $tmpl, \%args );
+    my $scan_result_id = delete( $params->{'id'} );
+
+    $self->client->post( "/scanResult/$scan_result_id/import", $params );
+    return 1;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub stop {
+
+    my ( $self, %args ) = @_;
+
+    my $tmpl = {
+        id   => $common_template->{'id'},
+        type => {
+            allow => ['import']
+        }
+    };
+
+    my $params         = sc_check_params( $tmpl, \%args );
+    my $scan_result_id = delete( $params->{'id'} );
+
+    $self->client->post( "/scanResult/$scan_result_id/stop", $params );
     return 1;
 
 }
@@ -439,6 +530,44 @@ Params:
 =back
 
 
+=head2 import
+
+Imports the Scan Result associated with the uploaded file, identified by C<filename>.
+
+    $sc->import( filename => '/tmp/report.nessus', repository => 1 );
+
+Params:
+
+=over 4
+
+=item * C<filename> : Nessus report filename (I<required>)
+
+=item * C<repository> : Repository ID (I<required>)
+
+=item * C<scan_vhost> : Scan VirtualHost
+
+=item * C<classify_mitigated_age> : Classify Mitigated Age
+
+=item * C<dhcp_tracking>  DHCP Tracking
+
+=back
+
+
+=head2 reimport
+
+Re-imports the Scan Result associated with C<id>.
+
+    $sc->reimport( id => 1337 );
+
+Params:
+
+=over 4
+
+=item * C<id> : Scan result ID
+
+=back
+
+
 =head2 stop
 
 Stop a scan associated with C<id>.
@@ -452,6 +581,25 @@ Params:
 =over 4
 
 =item * C<id> : Scan result ID
+
+=item * C<type> : Stop type (values: C<import>)
+
+=back
+
+
+=head2 email
+
+Emails the Scan Result associated with C<id>.
+
+    $sc->email( id => 1337, email => 'john@example.org' );
+
+Params:
+
+=over 4
+
+=item * C<id> : Scan result ID
+
+=item * C<email> : Email address
 
 =back
 

@@ -4,7 +4,7 @@
       "Tim Bunce (dbi-users@perl.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
             "SQL::Statement" : "1.33"
          },
          "requires" : {
-            "perl" : "5.008"
+            "perl" : "5.008001"
          }
       }
    },
@@ -58,8 +58,8 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "1.642",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "1.643",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_suggests" : {
       "Clone" : 0.34,
       "DB_File" : 0,

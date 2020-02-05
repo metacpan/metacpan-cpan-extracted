@@ -35,7 +35,7 @@
    "provides" : {
       "Data::ObjectStore" : {
          "file" : "lib/Data/ObjectStore.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "Data::ObjectStore::Array" : {
          "file" : "lib/Data/ObjectStore.pm"
@@ -56,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.12",
+   "version" : "2.13",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

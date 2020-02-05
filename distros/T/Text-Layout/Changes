@@ -1,5 +1,10 @@
 Revision history for Text::Layout
 
+0.017	2020-02-03
+
+	Add helper routines for PDF::Builder.
+	Add test file for PDF::Builder.
+
 0.016	2020-01-30
 
 	Improve documentation for FontConfig and FontDescriptor.

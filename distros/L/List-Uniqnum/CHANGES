@@ -2,3 +2,7 @@
 0.01 - first release
 
 0.02 - fix scoping issue that prevented compilation with some (all ?) Microsoft compilers
+
+0.03 - fix uniqnum for MS compilers
+
+0.04 - provide more efficient version of uv_fits_double()

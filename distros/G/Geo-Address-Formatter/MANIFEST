@@ -25,6 +25,7 @@ address-formatting/conf/abbreviations/hu.yaml
 address-formatting/conf/abbreviations/it.yaml
 address-formatting/conf/abbreviations/nl.yaml
 address-formatting/conf/abbreviations/pt.yaml
+address-formatting/conf/abbreviations/ro.yaml
 address-formatting/conf/abbreviations/se.yaml
 address-formatting/conf/abbreviations/sk.yaml
 address-formatting/conf/abbreviations/tr.yaml

@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017 Sergey Poznyakoff
+   Copyright (C) 2017-2020 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the

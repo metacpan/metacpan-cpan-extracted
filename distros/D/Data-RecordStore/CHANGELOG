@@ -1,3 +1,7 @@
+
+
+version 6.06
+	fix typo in perl version in the META files.
 version 6.05
 	removed some old files that were confusing tests
 version 6.04

@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.18 2020-02-02T12:46:21Z
+  - gave up to validate phone numbers
+
 0.17 2020-01-22T07:11:05Z
   - adupted with some environment they have no Text::Diff
 

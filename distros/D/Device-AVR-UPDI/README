@@ -51,6 +51,14 @@ CONSTRUCTORS
          part => "ATtiny814"  | "attiny814"  | "t814"
          part => "ATmega4809" | "atmega4809" | "m4809"
 
+    baud => INT
+
+      Optional. Overrides the baud rate for communications. Defaults to
+      115200.
+
+      Lower numbers may be useful if communication is unreliable, for
+      example over a long cable or with high capacitance or noise.
+
     After construction, the link must be initialised by calling "init_link"
     before any of the command methods are used.
 

@@ -30,7 +30,12 @@ line_monitor(const char *ptr, size_t sz, void *closure)
 {
 	struct line_closure *lc = closure;
 
-	if (lc->len || ptr[sz-1] != '\n') {
+	if (sz == 0) {
+		if (lc->len) {
+			call_monitor(lc->cv, lc->str, lc->len);
+			lc->len = 0;
+		}			
+	} else if (lc->len || ptr[sz-1] != '\n') {
 		size_t newsz = lc->len + sz + 1;
 
 		if (newsz > lc->size) {
@@ -114,6 +119,62 @@ free_argv(struct capture *cp)
 	}
 }
 
+static void
+capture_set_output(struct capture *cp, SV *cb[2], int strno)
+{
+	SV *sv = cb[strno-1];
+
+	if (sv == &PL_sv_undef)
+		return;
+		
+	if (SvROK(sv)) {
+		sv = SvRV(sv);
+
+		// FIXME: Do we need SvGETMAGIC (sv);?
+		if (SvTYPE(sv) == SVt_PVCV) {
+			SvREFCNT_inc(sv);
+			cp->closure[strno-1].cv = sv;
+			cp->rc.rc_cap[strno].sc_linemon = line_monitor;
+			cp->rc.rc_cap[strno].sc_monarg = &cp->closure[strno-1];
+			cp->flags |= RCF_SC_TO_FLAG(RCF_SC_LINEMON, strno);
+		} else if (SvTYPE(sv) == SVt_PVGV) {
+			int fd;
+				
+			// FIXME: Check if sv is writable
+			SvREFCNT_inc(sv);
+			cp->closure[strno-1].cv = sv;
+			cp->rc.rc_cap[strno].sc_storfd = 
+				PerlIO_fileno(IoOFP(sv_2io(sv)));
+			cp->flags |= RCF_SC_TO_FLAG(RCF_SC_STORFD, strno);
+		} else {
+			static char *what[] = { "stdout", "stderr" };
+			croak("%s must be scalar, glob or code ref",
+			      what[strno-1]);
+		}
+	} else {
+		char *filename = SvPV_nolen(sv);
+		int fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, 0666);
+		if (fd == -1) {
+			croak("can't open file %s for writing: %s",
+			      filename, strerror(errno));
+		}
+		cp->rc.rc_cap[strno].sc_storfd = fd;
+		cp->flags |= RCF_SC_TO_FLAG(RCF_SC_STORFD, strno);
+		cp->closure[strno-1].fd = fd;
+	}
+}	
+
+static void
+capture_close_output(struct capture *cp, int strno)
+{
+	strno--;
+	free(cp->closure[strno].str);
+	if (cp->closure[strno].cv != &PL_sv_undef)
+		SvREFCNT_dec(cp->closure[strno].cv);
+	if (cp->closure[strno].fd != -1)
+		close(cp->closure[strno].fd);
+}
+
 struct capture *
 capture_new(SV *program, ARGV argv, unsigned timeout, SV *cb[2], SV *input)
 {
@@ -124,7 +185,8 @@ capture_new(SV *program, ARGV argv, unsigned timeout, SV *cb[2], SV *input)
 	if (!cp)
 		croak_nomem();
 	memset(cp, 0, sizeof *cp);
-
+	cp->closure[0].fd = cp->closure[1].fd = -1;
+	
 	cp->rc.rc_argv = argv;
 	
 	cp->program = program;
@@ -139,22 +201,8 @@ capture_new(SV *program, ARGV argv, unsigned timeout, SV *cb[2], SV *input)
 		cp->flags |= RCF_TIMEOUT;
 	}
 
-	cp->closure[0].cv = cb[0];
-	if (cb[0] != &PL_sv_undef) {
-		SvREFCNT_inc(cb[0]);
-		cp->rc.rc_cap[RUNCAP_STDOUT].sc_linemon = line_monitor;
-		cp->rc.rc_cap[RUNCAP_STDOUT].sc_monarg = &cp->closure[0];
-		cp->flags |= RCF_STDOUT_LINEMON;
-	}
-
-	cp->closure[1].cv = cb[1];
-	if (cb[1] != &PL_sv_undef) {
-		SvREFCNT_inc(cb[1]);
-		cp->closure[1].cv = cb[1];
-		cp->rc.rc_cap[RUNCAP_STDERR].sc_linemon = line_monitor;
-		cp->rc.rc_cap[RUNCAP_STDERR].sc_monarg = &cp->closure[1];
-		cp->flags |= RCF_STDERR_LINEMON;
-	}
+	capture_set_output(cp, cb, RUNCAP_STDOUT);
+	capture_set_output(cp, cb, RUNCAP_STDERR);
 
 	cp->input = &PL_sv_undef;
 	capture_set_input(cp, input);
@@ -174,14 +222,9 @@ capture_DESTROY(struct capture *cp)
 	 */
 	cp->rc.rc_cap[RUNCAP_STDIN].sc_base = NULL;
 	cp->rc.rc_cap[RUNCAP_STDIN].sc_fd = -1;
-	
-	free(cp->closure[0].str);
-	if (cp->closure[0].cv != &PL_sv_undef)
-		SvREFCNT_dec(cp->closure[0].cv);
 
-	free(cp->closure[1].str);
-	if (cp->closure[1].cv != &PL_sv_undef)
-		SvREFCNT_dec(cp->closure[1].cv);
+	capture_close_output(cp, RUNCAP_STDOUT);
+	capture_close_output(cp, RUNCAP_STDERR);
 
 	free_argv(cp);
 	runcap_free(&cp->rc);
@@ -256,27 +299,8 @@ capture_next_line(struct capture *cp, int fd)
 int
 capture_run(struct capture *cp)
 {
-	int res;
-	
 	if (!cp->rc.rc_argv)
-		croak("no command line given");
-	
-	res = runcap(&cp->rc, cp->flags);
-
-	if (cp->flags & RCF_STDOUT_LINEMON && cp->closure[0].len) {
-		call_monitor(cp->closure[0].cv,
-			     cp->closure[0].str,
-			     cp->closure[0].len);
-		cp->closure[0].len = 0;
-	}
-
-	if (cp->flags & RCF_STDERR_LINEMON && cp->closure[1].len) {
-		call_monitor(cp->closure[1].cv,
-			     cp->closure[1].str,
-			     cp->closure[1].len);
-		cp->closure[1].len = 0;
-	}
-
-	return res == 0;
+		croak("no command line given");	
+	return runcap(&cp->rc, cp->flags) == 0;
 }
 

@@ -15,6 +15,14 @@ use NewsExtractor::SiteSpecificExtractor::www_peopo_org;
 use NewsExtractor::SiteSpecificExtractor::www_ntdtv_com;
 use NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw;
 use NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com;
+use NewsExtractor::SiteSpecificExtractor::www_rti_org_tw;
+use NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_setn_com;
+use NewsExtractor::SiteSpecificExtractor::news_tnn_tw;
+use NewsExtractor::SiteSpecificExtractor::turnnewsapp_com;
+use NewsExtractor::SiteSpecificExtractor::UDN;
+use NewsExtractor::SiteSpecificExtractor::ETtoday;
 
 has extractor => (
     required => 0,
@@ -38,8 +46,27 @@ use constant {
         'www.ntdtv.com' => 'NewsExtractor::SiteSpecificExtractor::www_ntdtv_com',
         'www.ksnews.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw',
         'news.tvbs.com.tw' => 'NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw',
+        'stars.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
+        'money.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
+        'house.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
+        'www.taipeitimes.com' => 'NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com',
+        'www.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',
+        'star.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',
+        'house.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',
+        'health.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',
+        'www.rti.org.tw' => 'NewsExtractor::SiteSpecificExtractor::www_rti_org_tw',
+        'www.bcc.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw',
+        'www.setn.com' => 'NewsExtractor::SiteSpecificExtractor::www_setn_com',
+        'news.tnn.tw' => 'NewsExtractor::SiteSpecificExtractor::news_tnn_tw',
+        'turnnewsapp.com' => 'NewsExtractor::SiteSpecificExtractor::turnnewsapp_com',
     },
     CSSRuleSetByHost => {
+        'udn.com' => {
+            headline   => '#story_art_title',
+            dateline   => '.story_bady_info_author > span:nth-child(1)',
+            journalist => '.story_bady_info_author > a:nth-child(2)',
+            content_text => 'div#article_body',
+        },
         'www.nownews.com' => {
             headline   => 'h1.entry-title',
             dateline   => 'span.td-post-date:nth-child(2) > time:nth-child(1)',
@@ -57,6 +84,12 @@ use constant {
             dateline     => 'td.blog_title tr:nth-child(2) > td.blog',
             journalist   => 'td.blog_title tr:nth-child(1) > td.blog',
             content_text => 'td.new_t p',
+        },
+        'www.storm.mg' =>  {
+            headline     => 'h1#article_title',
+            dateline     => 'span#info_time',
+            journalist   => '#article_info_wrapper #author_block a.link_author > span.info_author',
+            content_text => 'div#article_inner_wrapper > article:nth-child(1)',
         }
     }
 };

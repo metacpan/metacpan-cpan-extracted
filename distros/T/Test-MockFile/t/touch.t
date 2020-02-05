@@ -13,21 +13,27 @@ use File::Temp qw/tempfile tempdir/;
 
 note "-------------- REAL MODE --------------";
 my $temp_dir = tempdir( CLEANUP => 1 );
+ok( -d $temp_dir, "$temp_dir is there" );
 $! = 0;
 is( unlink($temp_dir), 0, "unlink on a dir fails" );
 my $unlink_dir_errorno = $! + 0;
+SKIP: {
+    skip q{This docker container doesn't emit $! failures reliably.}, 1 if on_broken_docker();
+    ok( $unlink_dir_errorno, "unlink /dir is non-zero ($unlink_dir_errorno)" );
+}
 
 use Test::MockFile ();
 
 note "-------------- MOCK MODE --------------";
 my @mock;
 my $file = Test::MockFile->file( '/file', "" );
-my $dir = Test::MockFile->dir( '/dir', [] );
+my $dir  = Test::MockFile->dir( '/dir', [] );
 my $link = Test::MockFile->symlink( '/link', '/tonowhere' );
 
 is( $link->unlink, 1, "unlink /link works." );
 is( $link->exists, 0, "/link is now gone" );
-{
+SKIP: {
+    skip q{This docker container doesn't emit $! failures reliably.}, 2 if on_broken_docker();
     local $!;
     is( $dir->unlink, 0, "unlink /dir doesn't work." );
     is( $! + 0, $unlink_dir_errorno, "   ... and throws a \$\!" );
@@ -61,3 +67,9 @@ is( $file->atime, 1234, "atime is set to 1234." ) or diag $file->atime;
 
 done_testing();
 exit;
+
+sub on_broken_docker {
+    return 0 if $] > 5.019;
+    return 0 unless -f '/.dockerenv';
+    return 1;
+}

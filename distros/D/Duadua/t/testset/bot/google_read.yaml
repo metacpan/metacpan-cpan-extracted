@@ -1,0 +1,17 @@
+# https://support.google.com/webmasters/answer/9274005?hl=en
+- ua: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36 (compatible; Google-Read-Aloud; +https://support.google.com/webmasters/answer/1061943)'
+  name: Google-Read-Aloud
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+- ua: 'google-speakr'
+  name: google-speakr
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002002';
+our $VERSION = '0.002003';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -3253,6 +3253,8 @@ sub rxrx {
             say '';
             say '     m : Match current string against current pattern';
             say '';
+            say '     g : Exhaustively match against current pattern';
+            say '';
             say '     d : Deconstruct and explain the current regex';
             say '';
             say 'q or x : quit debugger and exit';
@@ -3264,9 +3266,15 @@ sub rxrx {
             $string =~ $regex;
         }
 
+        # Visualize the matches...
+        elsif ($input =~ /g/i) {
+            () = $string =~ /$regex/g;
+        }
+
         # Explain the regex...
         elsif ($input =~ /d/i) {
             _show_regex_description($next_regex_ID-1);
+            next INPUT;
         }
 
         # Redisplay the new regex and/or string...
@@ -3335,7 +3343,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002002
+This document describes Regexp::Debugger version 0.002003
 
 
 =head1 SYNOPSIS
@@ -3667,8 +3675,8 @@ C<'save_to'> option:
     save_to : filename_to_save_data_to.json
 
 Data saved in this way may be re-animated using the C<rxrx> utility,
-or by calling C<Regexp::Debugger::rxrx()> directly. (See: L<"Command-line
-debugging"> for details).
+or by calling C<Regexp::Debugger::rxrx()> directly. (See: L<"COMMAND-LINE
+DEBUGGING"> for details).
 
 
 =head2 Configuration API
@@ -3743,6 +3751,12 @@ against. The corresponding closing delimiter may be omitted.
 
 Any line beginning with C<m> causes the REPL to match the current regex
 against the current string, visualizing the match in the usual way.
+
+=item *
+
+Any line beginning with C<g> causes the REPL to exhaustively match the
+current regex against the current string (i.e. as if the regex had a /g flag),
+visualizing all the matches in the usual way.
 
 =item *
 

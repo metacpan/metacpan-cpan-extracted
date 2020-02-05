@@ -5,10 +5,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Storable: '0'
   Test::Fatal: '0'
   Test::More: '0'
-  WWW::Mechanize: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -42,10 +40,10 @@ resources:
   bugtracker: https://github.com/oalders/http-cookiemonster/issues
   homepage: https://github.com/oalders/http-cookiemonster
   repository: https://github.com/oalders/http-cookiemonster.git
-version: '0.10'
+version: '0.11'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -131,7 +129,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -483,7 +481,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.10
+          tag: v0.11
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -554,9 +552,9 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: test
+          phase: develop
           type: requires
-      name: TestRequires
+      name: DevelopRequires
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
@@ -607,6 +605,6 @@ x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

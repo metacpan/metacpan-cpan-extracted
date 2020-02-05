@@ -207,5 +207,19 @@ sub PDF::API2::Resource::CIDFont::TrueType::fontfilename {
     $self->fontfile->{' font'}->{' fname'};
 }
 
+################ Extensions to PDF::Builder ################
+
+sub PDF::Builder::Content::glyphByCId {
+    my ( $self, $cid ) = @_;
+    $self->add( sprintf("<%04x> Tj", $cid ) );
+    $self->{' font'}->fontfile->subsetByCId($cid);
+}
+
+# HarfBuzz requires a TT/OT font. Define the fontfilename method only
+# for classes that HarfBuzz can deal with.
+sub PDF::Builder::Resource::CIDFont::TrueType::fontfilename {
+    my ( $self ) = @_;
+    $self->fontfile->{' font'}->{' fname'};
+}
 
 1;

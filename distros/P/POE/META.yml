@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   POE::Test::Loops: '1.360'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,4 +37,5 @@ resources:
   homepage: http://poe.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rcaputo/poe
-version: '1.367'
+version: '1.368'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

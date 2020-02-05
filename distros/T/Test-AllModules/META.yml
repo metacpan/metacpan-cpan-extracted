@@ -17,7 +17,7 @@ name: Test-AllModules
 provides:
   Test::AllModules:
     file: lib/Test/AllModules.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   Module::Pluggable::Object: '0'
   Test::More: '0.88'
@@ -26,5 +26,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/Test-AllModules
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

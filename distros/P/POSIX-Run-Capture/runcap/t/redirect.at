@@ -1,0 +1,69 @@
+# Testcase for runcap - run program and capture its output -*- autotest -*-
+# Copyright (C) 2017-2020 Sergey Poznyakoff
+#
+# Runcap is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at your
+# option) any later version.
+#
+# Runcap is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Runcap. If not, see <http://www.gnu.org/licenses/>.
+
+AT_SETUP([redirect stdout])
+AT_KEYWORDS([redirect])
+AT_CHECK([set -e
+rt -S stdout -o file -- genout $INPUT
+cmp file $INPUT],
+[0],
+[res=0
+exit code: 0
+stdout: 71 lines, 4051 bytes
+stderr: 0 lines, 0 bytes
+])
+AT_CLEANUP
+
+AT_SETUP([redirect stdout with zero buffer size])
+AT_KEYWORDS([redirect])
+AT_CHECK([set -e
+rt -S stdout -s 0 -o file -- genout $INPUT
+cmp file $INPUT],
+[0],
+[res=0
+exit code: 0
+stdout: 0 lines, 0 bytes
+stderr: 0 lines, 0 bytes
+])
+AT_CLEANUP
+
+AT_SETUP([redirect stdout without capturing])
+AT_KEYWORDS([redirect])
+AT_CHECK([set -e
+rt -S stdout -N -o file -- genout $INPUT
+cmp file $INPUT],
+[0],
+[res=0
+exit code: 0
+stdout: 0 lines, 0 bytes
+stderr: 0 lines, 0 bytes
+])
+AT_CLEANUP
+
+
+AT_SETUP([redirect stderr])
+AT_KEYWORDS([redirect])
+AT_CHECK([set -e
+rt -S stderr -o file -- genout -e $INPUT
+cmp file $INPUT],
+[0],
+[res=0
+exit code: 0
+stdout: 0 lines, 0 bytes
+stderr: 71 lines, 4051 bytes
+])
+AT_CLEANUP
+

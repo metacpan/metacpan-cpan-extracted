@@ -47,6 +47,28 @@ This package uses type constraints from:
 
 [Data::Object::Library](https://metacpan.org/pod/Data::Object::Library)
 
+# SCENARIOS
+
+This package supports the following scenarios:
+
+## testauto
+
+    use Test::Auto;
+    use Test::More;
+
+    my $subtests = testauto 't/Test_Auto.t';
+
+    # automation
+
+    # $subtests->standard;
+
+    # ...
+
+    # done_testing;
+
+This package automatically exports the `testauto` function which uses the
+"current file" as the automated testing source.
+
 # ATTRIBUTES
 
 This package has the following attributes:
@@ -62,6 +84,23 @@ This attribute is read-only, accepts `(DataObject)` values, and is optional.
     file(Str)
 
 This attribute is read-only, accepts `(Str)` values, and is required.
+
+# FUNCTIONS
+
+This package implements the following functions:
+
+## testauto
+
+    testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+
+This function is exported automatically and returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto::Subtests)
+object for the test file given.
+
+- testauto example #1
+
+        # given: synopsis
+
+        my $subtests = testauto 't/Test_Auto.t';
 
 # METHODS
 
@@ -119,6 +158,11 @@ This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto
     =inherits
     =integrates
     =attributes
+
+    # [repeatable; optional]
+
+    =scenario $name
+    =example $name
 
     # [repeatable; optional]
 
@@ -241,6 +285,37 @@ are tested for loadability.
 
 The `integrates` block should contain a list of packages that are involved in
 the behavior of the main package. These packages are not automatically tested.
+
+## scenarios
+
+    =scenario export-path-make
+
+    quisque egestas diam in arcu cursus euismod quis viverra nibh
+
+    =example export-path-make
+
+    # given: synopsis
+
+    package main;
+
+    use Path::Find 'path_make';
+
+    path_make 'relpath/to/file';
+
+    =cut
+
+There are situation where a package can be configured in different ways,
+especially where it exists without functions, methods or routines for the
+purpose of configuring the environment. The scenario directive can be used to
+automate testing and documenting package usages and configurations.Describing a
+scenario requires two blocks, i.e. `scenario $name` and `example $name`. The
+`scenario` block should contain a description of the scenario and its purpose.
+The `example` block must exist when documenting a method and should contain
+valid Perl code and return a value. The block may contain a "magic" comment in
+the form of `given: synopsis` or `given: example-$number $name` which if
+present will include the given code example(s) with the evaluation of the
+current block. Each scenario is tested and must be recognized to exist by the
+main package.
 
 ## attributes
 

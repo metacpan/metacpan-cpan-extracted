@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/Tekki/svg-barcode-datamatrix/issues
   homepage: https://github.com/Tekki/svg-barcode-datamatrix
   repository: https://github.com/Tekki/svg-barcode-datamatrix.git
-version: '0.13'
+version: '0.14'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

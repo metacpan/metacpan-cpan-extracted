@@ -5,7 +5,7 @@ use Log::Any qw/$log/;
 use Carp qw/croak carp confess/;
 use Path::Tiny;
 
-our $VERSION = '0.0.48';
+our $VERSION = '0.0.49';
 
 sub _split_sql {
     my $input = shift;
@@ -135,7 +135,7 @@ sub run_file {
 
 sub run_dir {
     my $self = shift;
-    my $dir = path(shift) || confess 'deploy_dir($dir)';
+    my $dir  = path(shift) || confess 'deploy_dir($dir)';
 
     confess "directory not found: $dir" unless -d $dir;
     $log->debug("run_dir($dir)");
@@ -168,7 +168,7 @@ sub _setup_deploy {
 
 sub last_deploy_id {
     my $self = shift;
-    my $app = shift || 'default';
+    my $app  = shift || 'default';
 
     my $sth = $self->table_info( '%', '%', '_deploy' );
     return 0 unless ( @{ $sth->fetchall_arrayref } );
@@ -218,7 +218,8 @@ sub deploy_arrayref {
 
         if ( exists $cmd->{sql} ) {
             $log->debug("-- change #$count\n");
-            $self->do( $cmd->{sql} );
+            eval { $self->do( $cmd->{sql} ); };
+            die $cmd->{sql} . $@ if $@;
             $self->do( "
 UPDATE 
     _deploy
@@ -348,3 +349,115 @@ sub deployed_table_info {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+DBIx::ThinSQL::Deploy - Deployment support for DBIx::ThinSQL
+
+=head1 VERSION
+
+0.0.49 (2020-02-04) development release.
+
+=head1 SYNOPSIS
+
+    use DBIx::ThinSQL;
+    use DBIx::ThinSQL::Deploy;
+
+    my $db = DBIx::ThinSQL->connect('dbi:SQLite:dbname=test');
+
+    $db->deploy_sql($sql);
+    $db->deploy_arrayref($arrayref);
+    $db->deploy_file('statements.sql');
+    $db->deploy_dir('/location');
+
+=head1 DESCRIPTION
+
+B<DBIx::ThinSQL::Deploy> adds very simple forward-only (re-)deployment
+support to L<DBIx::ThinSQL>.  The approach is extremely simple, based
+on the number of statements already executed.  DBIx::ThinSQL::Deploy
+keeps track of what has been run through a table in your database
+called '_deploy'.
+
+B<You should only ever add new statements to your sources!>
+
+=head1 METHODS
+
+=over 4
+
+=item run_arrayref($arrayref)
+
+Runs each of the statements contained in $arrayref against the
+database.  $arrayref is an arrayref of hashrefs containing a single
+key/value pair.  The key must be either I<sql> or I<pl>. Returns a two
+item list: the first value is the old deploy ID, the second value is
+the new deploy id.
+
+=item run_sql($sql)
+
+Runs the statements in $sql against the database.
+
+=item run_file($file)
+
+Runs the contents of $file (which must end in F<.sql> or F<.pl>)
+against the database.
+
+=item run_dir($directory)
+
+Runs the SQL F<*.sql> or Perl F<*.pl> files found in $directory against
+the database.
+
+=item last_deploy_id( [$app] )
+
+Returns the count of all deployment statements for application $app (or
+'default') that have already been deployed.
+
+=item deploy_sql($sql, [$app])
+
+Deploys the statements in $sql which have not already been deployed for
+application $app (if given, 'default' otherwise).
+
+=item deploy_arrayref($arrayref, [$app])
+
+Deploys the statements in $arrayref which have not already been
+deployed for application $app (if given, 'default' otherwise).
+$arrayref is an arrayref of hashrefs containing a single key/value
+pair. The key must be either I<sql> or I<pl>. Returns a two item list:
+the first value is the old deploy ID, the second value is the new
+deploy id.
+
+=item deploy_file($file, [$app])
+
+Deploys the contents of $file (which must end in F<.sql> or F<.pl>)
+using deploy_arrayref().
+
+=item deploy_dir($directory, [$app])
+
+Loads the SQL F<*.sql> or Perl F<*.pl> files found in $directory and
+deploys them using deploy_arrayref().
+
+=item deployed_table_info([ $schema ])
+
+Returns a structure which you can save (any way you like) and use as
+the C<table_info> parameter to the C<new> method of L<DBIx::ThinSQL>.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIx::ThinSQL>
+
+=head1 AUTHOR
+
+Mark Lawrence E<lt>nomad@null.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2020 Mark Lawrence <nomad@null.net>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+

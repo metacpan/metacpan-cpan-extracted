@@ -1,14 +1,17 @@
 Revision history for perl distribution Mojo-File-Role-Digest
 
+0.04 2020-01-31T11:13:43+0100
+  - Return empty string if path isn't an existing file
+
 0.03 2019-12-12T06:32:45+0100
- - Set required Mojolicious version to 8.18
-   Error reported by Slaven Rezić (#3)
+  - Set required Mojolicious version to 8.18
+    Error reported by Slaven Rezić (#3)
 
 0.02 2019-12-10T06:17:16+0100
- - Improved pod
-   Contributor: Mohammad S Anwar (#1)
- - Set required Role::Tiny version to 2.1.4
-   Error reported by Slaven Rezić (#2)
+  - Improved pod
+    Contributor: Mohammad S Anwar (#1)
+  - Set required Role::Tiny version to 2.1.4
+    Error reported by Slaven Rezić (#2)
 
 0.01 2019-12-08T06:30:35+0100
- - First Release
+  - First Release

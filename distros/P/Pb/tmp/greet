@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+package Greet;
+use 5.14.0;
+use Moo;
+use CLI::Osprey;
+use Data::Printer;
+ 
+option target => (
+    is => 'ro',
+	format => 's',
+    default => "world",
+);
+ 
+subcommand hello => sub {
+#p @_;
+    my ($parent) = @_;
+    say "Hello ", $parent->target;
+};
+ 
+subcommand goodbye => sub {
+    my ($parent) = @_;
+    say "Goodbye ", $parent->target;
+};
+
+package main;
+Greet->new_with_options->run;

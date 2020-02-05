@@ -1,0 +1,58 @@
+NAME
+
+    Log::Any::Adapter::Sentry::Raven - Log::Any::Adapter for Sentry::Raven
+
+VERSION
+
+    version v0.0.1
+
+DESCRIPTION
+
+    This is a backend to Log::Any for Sentry::Raven.
+
+    It takes two arguments:
+
+    sentry (REQUIRED)
+
+      An instantiated Sentry::Raven object. Note that if you set any
+      sentry-specific context directly through the sentry object, it will
+      be picked up here eg.
+
+          $sentry->add_context( Sentry::Raven->request_context($url, %p) )
+
+      If Devel::StackTrace is installed, this will add a stack trace for
+      you (As of writing, Sentry::Raven requires it, so it will be).
+
+    log_level (OPTIONAL)
+
+      The minimum log_level to log. Defaults to trace (everything).
+
+    Any "Log context data" in Log::Any will be sent to Sentry as tags.
+
+SYNPOSIS
+
+        use Log::Any::Adapter;
+        Log::Any::Adapter->set('Sentry::Raven',
+            sentry => Sentry::Raven->new(
+                sentry_dsn  => $dsn,
+                environment => 'production',
+                ...
+            )
+        );
+
+SEE ALSO
+
+    Log::Any, Sentry::Raven
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

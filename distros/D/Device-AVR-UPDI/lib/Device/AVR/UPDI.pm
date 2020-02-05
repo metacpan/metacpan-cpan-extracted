@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 package Device::AVR::UPDI;
 
@@ -15,7 +15,7 @@ use Future::IO 0.03; # ->sysread_exactly
 
 use Struct::Dumb qw( readonly_struct );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant DEBUG => $ENV{UPDI_DEBUG};
 
@@ -115,6 +115,13 @@ Any of the following forms are accepted
    part => "ATtiny814"  | "attiny814"  | "t814"
    part => "ATmega4809" | "atmega4809" | "m4809"
 
+=item baud => INT
+
+Optional. Overrides the baud rate for communications. Defaults to 115200.
+
+Lower numbers may be useful if communication is unreliable, for example over a
+long cable or with high capacitance or noise.
+
 =back
 
 After construction, the link must be initialised by calling L</init_link>
@@ -135,13 +142,10 @@ sub new
 
    $fh->cfmakeraw();
 
-   # 115200baud, 8bits, Even parity, 2 stop
-   $fh->set_mode( "115200,8,e,2" );
+   my $baud = $args{baud} // 115200;
+   # 8bits, Even parity, 2 stop
+   $fh->set_mode( "$baud,8,e,2" );
    $fh->setflag_clocal( 1 );
-
-   # Opportunistically try to set an even faster baud rate. If it works, great;
-   # if not we'll just use 115200 instead
-   $fh->setbaud( 230400 );
 
    $fh->autoflush;
 
@@ -292,6 +296,9 @@ async sub _op_writeread
          Future::IO->sleep( 0.1 )
             ->then_fail( "Timed out waiting for $what\n" )
       );
+
+      die "Received different bytes while waiting to receive echo of command - is this a UPDI programmer?\n"
+         if substr( $buf, 0, length( $write ) ) ne substr( $write, 0, length $buf );
    }
 
    return substr( $buf, length( $write ) );
@@ -455,6 +462,9 @@ of the other commands.
 async sub init_link
 {
    my $self = shift;
+
+   # Sleep 100msec before sending BREAK in case of attached UPDI 12V pulse hardware
+   await Future::IO->sleep( 0.1 );
 
    await $self->_break;
 

@@ -2,7 +2,7 @@ package HTTP::UA::Parser;
 use strict;
 use warnings;
 use YAML::Tiny 'LoadFile';
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 my ($REGEX, $PATH, $PARSER);
 my $PACKAGE = __PACKAGE__;
 
@@ -13,7 +13,7 @@ sub new {
         $path = $op->{regex};
         $ua = $op->{ua};
     } else { $ua = $op; }
-    
+
     if (!$REGEX){
         if ($path){
             $REGEX ||= LoadFile( $path );
@@ -33,12 +33,12 @@ sub new {
             $REGEX = LoadFile( $regFile );
         }
     }
-    
+
     my $self = {
         user_agent => $ua || $ENV{HTTP_USER_AGENT},
         path => $PATH
     };
-    
+
     return bless($self,$class);
 }
 
@@ -90,7 +90,7 @@ sub makeParser {
 }
 
 sub _makeParsers {
-    
+
     my ($obj) = shift;
     my $regexp = $obj->{regex};
     my $famRep = $obj->{family_replacement};
@@ -98,7 +98,7 @@ sub _makeParsers {
     my $minorRep = $obj->{v2_replacement};
     my $patchRep = $obj->{v3_replacement};
     my $qr = HTTP::UA::Parser::Utils::regex($regexp);
-    
+
     my $parser = sub {
         my $str = shift;
         my @m = $str =~ $qr;
@@ -109,7 +109,7 @@ sub _makeParsers {
         my $patch = defined $patchRep ?  $patchRep : $m[3];
         return ($family, $major, $minor, $patch);
     };
-    
+
     return $parser;
 }
 
@@ -134,7 +134,7 @@ sub makeParser {
 }
 
 sub _makeParsers {
-    
+
     my ($obj) = shift;
     my $regexp = $obj->{regex};
     my $famRep = $obj->{os_replacement};
@@ -143,19 +143,19 @@ sub _makeParsers {
     my $patchRep = $obj->{os_v3_replacement};
     my $patchMinorRep = $obj->{os_v4_replacement};
     my $qr = HTTP::UA::Parser::Utils::regex($regexp);
-    
+
     my $parser = sub {
         my $str = shift;
         my @m = $str =~ $qr;
         if (!@m) { return undef; }
-        my $family = $famRep ? HTTP::UA::Parser::Utils::replace($famRep,qr/\$1/,$m[0]) : $m[0];
-        my $major = defined $majorRep ? $majorRep : $m[1];
-        my $minor = defined $minorRep ? $minorRep : $m[2];
-        my $patch = defined $patchRep ? $patchRep : $m[3];
-        my $patchMinor = defined $patchMinorRep ? $patchMinorRep : $m[4];
+        my $family = (defined $famRep ? HTTP::UA::Parser::Utils::multiReplace($famRep, \@m) : $m[0]) || 'Other';
+        my $major = defined $majorRep ? HTTP::UA::Parser::Utils::multiReplace($majorRep, \@m) : $m[1];
+        my $minor = defined $minorRep ? HTTP::UA::Parser::Utils::multiReplace($minorRep, \@m) : $m[2];
+        my $patch = defined $patchRep ? HTTP::UA::Parser::Utils::multiReplace($patchRep, \@m) : $m[3];
+        my $patchMinor = defined $patchMinorRep ? HTTP::UA::Parser::Utils::multiReplace($patchMinorRep, \@m) : $m[4];
         return ($family, $major, $minor, $patch, $patchMinor);
     };
-    
+
     return $parser;
 }
 
@@ -193,18 +193,18 @@ sub makeParser {
     my @parsers = map {
         $makeParser->($_);
     } @{$regexes};
-  
+
     my $parser = sub {
         my $ua = shift;
         my @obj;
         foreach my $parser (@parsers){
             @obj = $parser->($ua);
             return HTTP::UA::Parser::Device->new(@obj) if $obj[0];
-        }    
-    
+        }
+
         HTTP::UA::Parser::Device->new();
     };
-  
+
     return $parser;
 }
 
@@ -216,20 +216,20 @@ sub _makeParsers {
     my $brandRep = $obj->{brand_replacement};
     my $modelRep = $obj->{model_replacement};
     my $qr = HTTP::UA::Parser::Utils::regex($regexp, $regexp_flag);
-    
+
     my $parser = sub {
         my $str = shift;
         my @m = $str =~ $qr;
         if (!@m) { return undef; }
-        my $family = $deviceRep ? HTTP::UA::Parser::Utils::multiReplace($deviceRep, \@m) 
+        my $family = $deviceRep ? HTTP::UA::Parser::Utils::multiReplace($deviceRep, \@m)
                                 : ($m[0] eq "1" ? undef : $m[0]);
 
-        my $brand  = $brandRep  ? HTTP::UA::Parser::Utils::multiReplace($brandRep, \@m)  
+        my $brand  = $brandRep  ? HTTP::UA::Parser::Utils::multiReplace($brandRep, \@m)
                                 : undef;
 
-        my $model  = $modelRep  ? HTTP::UA::Parser::Utils::multiReplace($modelRep, \@m)  
+        my $model  = $modelRep  ? HTTP::UA::Parser::Utils::multiReplace($modelRep, \@m)
                                 : ($m[0] eq "1" ? undef : $m[0]);
-        
+
         return ($family, $brand, $model);
     };
     return $parser;
@@ -281,13 +281,22 @@ sub toString {
     return $self->family . $suffix;
 }
 
-sub family     {   shift->{family}     }
-sub major      {   shift->{major}      }
-sub minor      {   shift->{minor}      }
-sub patch      {   shift->{patch}      }
-sub patchMinor {   shift->{patchMinor} }
-sub brand      {   shift->{brand}      }
-sub model      {   shift->{model}      }
+sub toUndef {
+    my $val = shift;
+    if (defined $val && $val eq "") {
+        return undef;
+    }
+
+    return $val;
+}
+
+sub family     {   shift->{family}              }
+sub major      {   toUndef(shift->{major})      }
+sub minor      {   toUndef(shift->{minor})      }
+sub patch      {   toUndef(shift->{patch})      }
+sub patchMinor {   toUndef(shift->{patchMinor}) }
+sub brand      {   shift->{brand}               }
+sub model      {   shift->{model}               }
 
 ##=============================================================================
 ## Utils Package
@@ -300,7 +309,7 @@ sub makeParser {
     my @parsers = map {
         $makeParser->($_);
     } @{$regexes};
-    
+
     my $parser = sub {
         my $ua = shift;
         my @obj;
@@ -308,10 +317,10 @@ sub makeParser {
             @obj = $parser->($ua);
             return HTTP::UA::Parser::Base->new(@obj) if $obj[0];
         }
-        
+
         HTTP::UA::Parser::Base->new();
     };
-    
+
     return $parser;
 }
 
@@ -379,25 +388,25 @@ Perl port of the ua-parser project - L<https://github.com/ua-parser>
 
     use HTTP::UA::Parser;
     my $r = HTTP::UA::Parser->new();
-    
+
     print $r->ua->toString();         # -> "Safari 5.0.1"
     print $r->ua->toVersionString();  # -> "5.0.1"
     print $r->ua->family;             # -> "Safari"
     print $r->ua->major;              # -> "5"
     print $r->ua->minor;              # -> "0"
     print $r->ua->patch;              # -> "1"
-    
+
     print $r->os->toString();         # -> "iOS 5.1"
     print $r->os->toVersionString();  # -> "5.1"
     print $r->os->family              # -> "iOS"
     print $r->os->major;              # -> "5"
     print $r->os->minor;              # -> "1"
     print $r->os->patch;              # -> undef
-    
+
     print $r->device->family;         # -> "iPhone"
     print $r->device->brand;          # -> "Apple"
     print $r->device->model;          # -> "iPhone"
-    
+
 =head1 Methods
 
 =head2 new()
@@ -463,7 +472,7 @@ returns brand name of device
 returns model name of device
 
 =back
-    
+
 =head1 INSTALLATION
 
 From CPAN shell simply type
@@ -474,7 +483,7 @@ Or from your local download, unpack and:
 
     % perl Makefile.PL
     % make && make test
-    
+
 Then install:
 
     % make install
@@ -482,13 +491,13 @@ Then install:
 =head1 COMMAND LINE
 
 To update regexes.yaml file from command line
-    
+
     % ua_parser -u
 
 To parse some user agent from command line
 
     % ua_parser -p "some user agent"
-    
+
 Help usage
 
     % ua_parser -h

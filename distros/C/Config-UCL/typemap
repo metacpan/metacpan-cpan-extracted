@@ -1,0 +1,20 @@
+struct ucl_parser *             T_UCL_Parser
+const unsigned char *           T_PV
+ucl_emitter_t                   T_ENUM
+enum ucl_duplicate_strategy     T_ENUM
+enum ucl_parse_type             T_ENUM
+
+INPUT
+T_UCL_Parser
+	if (SvROK($arg) && sv_derived_from($arg, \"Config::UCL::Parser\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+
+OUTPUT
+T_UCL_Parser
+	sv_setref_pv($arg, \"Config::UCL::Parser\", (void*)$var);

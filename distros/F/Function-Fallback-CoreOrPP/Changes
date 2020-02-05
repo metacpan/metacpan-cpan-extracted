@@ -1,25 +1,33 @@
-0.08    2017-01-14 (PERLANCAR)
+0.090   2020-02-03  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update mention about Storable; it now handles Regexp objects
+	  since 3.08+.
+
+
+0.08    2017-01-14  Released-By: PERLANCAR
 
 	- unbless(): Support unblessing coderef.
 
 
-0.07    2016-01-16 (PERLANCAR)
+0.07    2016-01-16  Released-By: PERLANCAR
 
 	- Add clone_list().
 
 
-0.06    2014-09-16 (PERLANCAR)
+0.06    2014-09-16  Released-By: PERLANCAR
 
 	- Move non-core XS deps from requires to recommends [RT#98886,
 	  suggested by KENTNL].
 
 
-0.05    2014-04-10 (SHARYANTO)
+0.05    2014-04-10  Released-By: SHARYANTO
 
         - Add unbless().
 
 
-0.04    2014-04-10 (SHARYANTO)
+0.04    2014-04-10  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -27,7 +35,7 @@
           when building fatpacked app.
 
 
-0.03    2014-04-10 (SHARYANTO)
+0.03    2014-04-10  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -35,11 +43,11 @@
           Function::Fallback::CoreOrPP.
 
 
-0.02    2014-04-09 (SHARYANTO)
+0.02    2014-04-09  Released-By: SHARYANTO
 
         - Replace Storable::dclone with Clone::PP::clone.
 
 
-0.01    2014-04-07 (SHARYANTO)
+0.01    2014-04-07  Released-By: SHARYANTO
 
         - First release.

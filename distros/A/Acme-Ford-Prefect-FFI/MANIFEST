@@ -3,6 +3,7 @@ Changes
 INSTALL
 LICENSE
 MANIFEST
+MANIFEST.bak
 META.json
 META.yml
 Makefile.PL

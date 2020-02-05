@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.42 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.44 {
 
   use 5.014;
   use Moose;
@@ -25,6 +25,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.42 {
     upgrade
     preamble
     diag_preamble
+    workflow
 
     diag
     allow_dirty ) }
@@ -233,6 +234,8 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.42 {
         maybe travis_user   => $self->payload->{travis_user} // $self->payload->{github_user},
         maybe appveyor_user => $self->payload->{appveyor_user},
         maybe cirrus_user   => $self->payload->{cirrus_user},
+        maybe github_user   => $self->payload->{github_user},
+        maybe workflow      => $self->payload->{workflow},
       },
     ]);
 
@@ -304,7 +307,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.42
+version 2.44
 
 =head1 SYNOPSIS
 

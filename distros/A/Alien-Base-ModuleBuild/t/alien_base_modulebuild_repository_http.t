@@ -1,5 +1,4 @@
 use Test2::V0 -no_srand => 1;
-use Test2::Mock;
 use Alien::Base::ModuleBuild::Repository::HTTP;
 use Path::Tiny qw( path );
 use File::chdir;
@@ -8,8 +7,7 @@ use URI::file;
 
 my $index_path = path('corpus/alien_base_modulebuild_repository_http/index.html')->absolute->stringify;
 
-my $mock = Test2::Mock->new(
-  class    => 'HTTP::Tiny',
+my $mock = mock 'HTTP::Tiny' => (
   override => [
     get => sub {
       local $/ = undef;
@@ -208,8 +206,7 @@ subtest 'content disposition' => sub {
 
   my $content_disposition;
 
-  my $mock = Test2::Mock->new(
-    class => 'HTTP::Tiny',
+  my $mock = mock 'HTTP::Tiny' => (
     override => [
       mirror => sub {
         my $response = { success => 1 };

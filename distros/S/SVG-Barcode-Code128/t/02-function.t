@@ -19,20 +19,17 @@ note 'Functions';
 my @functions = qw|plot_code128|;
 can_ok $package, $_ for @functions;
 
-is_deeply \@SVG::Barcode::Code128::EXPORT_OK, \@functions,
-  'All functions exported';
+is_deeply \@SVG::Barcode::Code128::EXPORT_OK, \@functions, 'All functions exported';
 
 note 'Plot';
 my $plot = $package->can('plot_code128');
 my $text = 'Tekki';
 ok my $svg = $plot->($text), 'Plot code';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"), 'Content is correct';
 
-ok $svg = $plot->($text, foreground => 'red', lineheight=>20, textsize => 0),
+ok $svg = $plot->($text, foreground => 'red', lineheight => 20, textsize => 0),
   'Plot in red without text';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"), 'Content is correct';
 
 eval { $plot->() };
 like $@, qr/Too few arguments for subroutine/, 'Correct error for missing text';

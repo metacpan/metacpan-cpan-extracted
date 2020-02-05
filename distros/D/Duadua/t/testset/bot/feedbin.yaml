@@ -1,0 +1,8 @@
+- ua: 'Feedbin feed-id:1234567 - 1 subscribers 1'
+  name: 'Feedbin'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

@@ -1,6 +1,24 @@
+0.92	2020-01-31
+	* Downgrading requisite to perl 5.14
+
 0.90	2020-01-16
-  * FIXED: binary 'n50': Sorting tables did not work with -q (thousands separator)
+	* FIXED: binary 'n50': Sorting tables did not work with -q (thousands separator)
 	* FIXED: binary 'n50': Quotes added when using -q (thousands separator) and CSV format
+
+0.83	2019-08-20
+	* Moved 'n50' tests to xt/release
+
+0.82	2019-08-19
+	* Extending test suite on the 'n50' implementation
+	* Thousand separator: Fixed a bug in 'n50' where the feature was always on
+
+0.80	2019-08-18
+	* Only "bin/n50" has been updated
+	* NEW: Added -q for thousand separator (will cause adding quotes in --format csv) 
+	* Now also n50 migrated to JSON::PP, as Proch::N50 does since 0.04
+	* Prints a short usage if invoked without filenames
+	* Warning printed if using --format custom without --template
+	* Added aliases in --template for newline ({n} and \n) and tab ({t} and \t)
 
 0.80	2019-08-16
 	* NEW: binary 'n50': Added -q for thousand separator

@@ -1,0 +1,19 @@
+# https://www.feedly.com/fetcher.html
+- ua: 'Feedly/1.0 (+http://www.feedly.com/fetcher.html; 4 subscribers; like FeedFetcher-Google)'
+  name: 'Feedly'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+- ua: 'MetaFeedly/1.0 (http://www.feedly.com)'
+  name: 'Feedly'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use App::Pod::Example;
 
-# Version.
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Run.
 App::Pod::Example->new->run;
@@ -40,7 +37,7 @@ pod-example - Script to print or run of example from documentation.
 =item * C<-d flag>
 
  Turn debug (0/1).
- Default value is 1.
+ Default value is 0.
 
 =item * C<-e>
 
@@ -88,21 +85,21 @@ pod-example - Script to print or run of example from documentation.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-Pod-Example>
+L<https://github.com/michal-josef-spacek/App-Pod-Example>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

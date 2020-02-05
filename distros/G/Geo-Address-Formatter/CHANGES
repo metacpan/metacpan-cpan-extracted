@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.81   2019-02-03
+       - require YAML::LibYAML >= 0.81
+       - newest address-formatting templates
+    
 1.80   2019-12-18
        - Text::Hogan 2.03 or higher
        - cleanup of the dist.ini file

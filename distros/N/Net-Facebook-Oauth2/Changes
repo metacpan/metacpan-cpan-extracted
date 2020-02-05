@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Facebook::Oauth2.
 
+0.12
+    - update to Graph API v4.0
+
 0.11
     - update to Graph API v3.1
     - allow custom API version setting (GH#15)

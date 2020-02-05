@@ -1,0 +1,10 @@
+Revision history for Config-UCL
+
+0.03    2020-02-03T23:07:29+09
+    - bump up version number to 0.03
+
+0.02    2020-02-03T16:03:56+09
+    - option ucl_parser_register_variables is described in POD.
+
+0.01    2020-02-03T15:28:55+09
+    - initial version

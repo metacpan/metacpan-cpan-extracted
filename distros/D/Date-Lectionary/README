@@ -2,7 +2,7 @@ NAME
     Date::Lectionary - Readings for the Christian Lectionary
 
 VERSION
-    Version 1.20190120
+    Version 1.20200203
 
 SYNOPSIS
         use Time::Piece;
@@ -137,7 +137,7 @@ ACKNOWLEDGEMENTS
     Rosemary, and my sweet son, Oliver. But, above all, SOLI DEO GLORIA!
 
 LICENSE
-    Copyright 2016-2018 MICHAEL WAYNE ARNOLD
+    Copyright 2016-2020 MICHAEL WAYNE ARNOLD
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are

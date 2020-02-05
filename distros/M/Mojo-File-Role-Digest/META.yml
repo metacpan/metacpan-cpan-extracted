@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/Tekki/mojo-file-role-digest/issues
   homepage: https://github.com/Tekki/mojo-file-role-digest
   repository: https://github.com/Tekki/mojo-file-role-digest.git
-version: '0.03'
+version: '0.04'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Mongoose::Cursor;
-$Mongoose::Cursor::VERSION = '2.01';
+$Mongoose::Cursor::VERSION = '2.02';
 use Moose;
 extends 'MongoDB::Cursor';
 

@@ -1,5 +1,9 @@
 Revision history for perl distribution SVG-Barcode
 
+0.12 2020-01-31T17:07:16+0100
+  - Pod reorganized
+  - Code reformatted
+
 0.11 2019-05-28T17:44:36+0200
  - Add scale parameter
  - Improve docs

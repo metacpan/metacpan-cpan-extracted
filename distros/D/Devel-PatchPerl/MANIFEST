@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+aix.patch
 bin/patchperl
 dist.ini
 lib/Devel/PatchPerl.pm

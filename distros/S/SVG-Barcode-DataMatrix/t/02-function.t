@@ -19,24 +19,21 @@ note 'Functions';
 my @functions = qw|plot_datamatrix|;
 can_ok $package, $_ for @functions;
 
-is_deeply \@SVG::Barcode::DataMatrix::EXPORT_OK, \@functions,
-  'All functions exported';
+is_deeply \@SVG::Barcode::DataMatrix::EXPORT_OK, \@functions, 'All functions exported';
 
 note 'Plot';
 my $plot   = $package->can('plot_datamatrix');
 my $text   = 'Tekki';
 my %params = (width => 200, height => 200);
 ok my $svg = $plot->($text, %params), 'Plot Data Matrix';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_200x200_black.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_200x200_black.svg"), 'Content is correct';
 
 $params{foreground} = 'red';
 $params{size}       = '16x48';
 $params{width}      = 300;
 $params{height}     = 100;
 ok $svg = $plot->($text, %params), 'Plot with red unicode text';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_300x100_red.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_300x100_red.svg"), 'Content is correct';
 
 eval { $plot->() };
 like $@, qr/Too few arguments for subroutine/, 'Correct error for missing text';

@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1758 2019-10-14 13:17:11Z willem $
+# $Id: DSA.pm 1763 2020-02-02 21:48:03Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1758 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1763 $)[1];
 
 
 =head1 NAME
@@ -52,8 +52,8 @@ BEGIN { die 'DSA disabled or application has no "use Net::DNS::SEC"' unless DSA_
 
 
 my %parameters = (
-	3 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
-	6 => [sub { Net::DNS::SEC::libcrypto::EVP_sha1() }],
+	3 => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
+	6 => sub { Net::DNS::SEC::libcrypto::EVP_sha1() },
 	);
 
 sub _index { keys %parameters }
@@ -62,9 +62,8 @@ sub _index { keys %parameters }
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $algorithm = $private->algorithm;
-	my ($evpmd) = @{$parameters{$algorithm} || []};
-	die 'private key not DSA' unless $evpmd;
+	my $index = $private->algorithm;
+	my $evpmd = $parameters{$index} || die 'private key not DSA';
 
 	my ( $p, $q, $g, $x, $y ) = map decode_base64( $private->$_ ),
 			qw(prime subprime base private_value public_value);
@@ -85,9 +84,8 @@ sub sign {
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $algorithm = $keyrr->algorithm;
-	my ($evpmd) = @{$parameters{$algorithm} || []};
-	die 'public key not DSA' unless $evpmd;
+	my $index = $keyrr->algorithm;
+	my $evpmd = $parameters{$index} || die 'public key not DSA';
 
 	return unless $sigbin;
 

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V4;
 # ABSTRACT: V4 signatures
-$Net::Amazon::S3::Signature::V4::VERSION = '0.87';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.88';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
@@ -89,6 +89,12 @@ sub sign_request {
 sub sign_uri {
     my ($self, $request, $expires_at) = @_;
 
+    unless ($request->uri->query_param('x-amz-security-token')) {
+        my $aws_session_token = $self->http_request->s3->aws_session_token;
+        $request->uri->query_param('x-amz-security-token' => $aws_session_token)
+            if defined $aws_session_token;
+    }
+
     my $sign = $self->_sign;
     $self->_host_to_region_host( $sign, $request );
 
@@ -109,7 +115,7 @@ Net::Amazon::S3::Signature::V4 - V4 signatures
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 AUTHOR
 
@@ -117,7 +123,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

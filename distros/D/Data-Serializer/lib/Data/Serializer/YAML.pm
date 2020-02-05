@@ -4,9 +4,11 @@ BEGIN { @Data::Serializer::YAML::ISA = qw(Data::Serializer) }
 use warnings;
 use strict;
 use YAML;
+local $YAML::LoadBlessed = 0;
+
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub serialize {
     return Dump($_[1]);

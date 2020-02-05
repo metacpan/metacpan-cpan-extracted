@@ -39,7 +39,7 @@ requires:
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   DateTime::Duration: '0'
-  DateTime::Format::Strptime: '0'
+  DateTime::Format::Strftimeq: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.820'
   Sah::Schema::date::dow_num: '0'
@@ -55,14 +55,14 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-dateseq
   homepage: https://metacpan.org/release/App-dateseq
   repository: git://github.com/perlancar/perl-App-dateseq.git
-version: '0.098'
+version: '0.099'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: GenPericmdScript::dateseq
+      name: 'GenPericmdScript dateseq'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GatherDir

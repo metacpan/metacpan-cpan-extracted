@@ -3,18 +3,15 @@
 use strict;
 use warnings;
 
-my $ntests;
-BEGIN { $ntests = 33 };
-
-use Test::More tests => $ntests;
-#se Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 BEGIN {
     eval q{use Perl::Tidy};
     # Version is also checked in Peek.pm
     if ($@ || $Perl::Tidy::VERSION <= 20120714) {
 	diag "A usable Perl::Tidy is not available";
-	ok (1) for 1..$ntests;
+	done_testing;
 	exit 0;
 	}
     use_ok ("Data::Peek", ":tidy");
@@ -48,6 +45,8 @@ while (<DATA>) {
 	}
     }
 unlink "perltidy.LOG", "perltidy.ERR";
+
+done_testing;
 
 1;
 

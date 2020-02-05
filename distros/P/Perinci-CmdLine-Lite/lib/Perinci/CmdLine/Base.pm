@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2019-11-12'; # DATE
-our $VERSION = '1.825'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '1.826'; # VERSION
 
 use 5.010001;
 use strict;
@@ -111,6 +111,11 @@ has use_utf8 => (
     },
 );
 
+has use_locale => (
+    is=>'rw',
+    default => 0,
+);
+
 has default_dry_run => (
     is=>'rw',
     default => 0,
@@ -178,6 +183,18 @@ our %copts = (
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{format} = (-t STDOUT) ? 'json-pretty' : 'json';
+        },
+        tags => ['category:output'],
+    },
+
+    page_result => {
+        getopt  => "page-result:s",
+        summary => "Filter output through a pager",
+        usage   => "--page-result (or --page-result=PROGNAME)",
+        handler => sub {
+            my ($go, $val, $r) = @_;
+            $r->{page_result} = 1;
+            $r->{pager} = $val if length $val;
         },
         tags => ['category:output'],
     },
@@ -1178,6 +1195,12 @@ sub parse_cmdline_src {
     my $action = $r->{action};
     my $meta   = $r->{meta};
 
+    #if ($self->use_utf8) {
+    #    require open; open->import(":utf8");
+    #} elsif ($self->use_locale) {
+    #    require open; open->import(":locale");
+    #}
+
     my $url = $r->{subcommand_data}{url} // $self->{url} // '';
     my $is_network = $url =~ m!^(https?|riap[^:]+):!;
 
@@ -1357,9 +1380,9 @@ sub select_output_handle {
             $r->{viewer_temp_path} = $filename;
         }
 
-        if ($ENV{PAGE_RESULT} // $resmeta->{"cmdline.page_result"}) {
+        if ($r->{page_result} // $ENV{PAGE_RESULT} // $resmeta->{"cmdline.page_result"}) {
             require File::Which;
-            my $pager = $resmeta->{"cmdline.pager"} //
+            my $pager = $r->{pager} // $resmeta->{"cmdline.pager"} //
                 $ENV{PAGER};
             unless (defined $pager) {
                 $pager = "less -FRSX" if File::Which::which("less");
@@ -1740,7 +1763,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.825 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2019-11-12.
+This document describes version 1.826 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2020-01-31.
 
 =head1 DESCRIPTION
 
@@ -2017,6 +2040,10 @@ Program to use as external viewer.
 
 Set to temporary filename created to store the result to view to external viewer
 program.
+
+=item * page_result => bool
+
+=item * pager => str
 
 =back
 
@@ -2464,8 +2491,12 @@ subcommands.
 
 =item * C<use_utf8> (bool, optional)
 
-Whether to issue L<< binmode(STDOUT, ":utf8") >>. See L</"LOGGING"> for more
-details.
+Whether to issue C<< use open, ":utf8" >>. Alternative: C<use_locale>. Takes
+precedence over C<use_locale>.
+
+=item * C<use_locale> (bool, optional)
+
+Whether to issue C<< use open, ":locale" >>. Alternative: C<use_utf8>.
 
 =item * C<undo> (bool, optional)
 
@@ -2770,7 +2801,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

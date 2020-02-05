@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease 2.42 {
+package Dist::Zilla::Plugin::Author::Plicease 2.44 {
 
   use strict;
   use warnings;
@@ -48,15 +48,17 @@ Dist::Zilla::Plugin::Author::Plicease - Dist::Zilla plugins used by Plicease
 
 =head1 VERSION
 
-version 2.42
+version 2.44
 
 =head1 DESCRIPTION
 
-This distribution contains some miscellaneous plugins that I use
-that should probably not be of any use to anyone else.  Historically
-they were used and included by my bundle C<[@Author::Plicease]>, but
-I've separated them into their own distribution so they can be
-installed without the the full set of prereqs required by the bundle.
+The modules in this namespace contain some miscellaneous L<Dist::Zilla>
+plugins that I use to customize my personal L<Dist::Zilla> experience.
+Most likely you don't want or need to use them.  If you do run into
+one of my distributions my L<Dist::Zilla> bundle includes documentation
+that may be able to help:
+
+L<Dist::Zilla::PluginBundle::Author::Plicease>
 
 =head1 METHODS
 

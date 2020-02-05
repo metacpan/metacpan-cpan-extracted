@@ -25,15 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::cmake3" : "0.04",
-            "ExtUtils::MakeMaker" : "6.52",
-            "File::Path" : "0",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "test" : {
@@ -45,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v3.7.3.3",
+   "version" : "v3.7.3.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

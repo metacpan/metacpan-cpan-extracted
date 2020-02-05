@@ -1,0 +1,13 @@
+20200114.3   04.02.2020
+    - fix: let it builds on windows/Strawberry Perl
+    - fix: do not require libelf
+
+20200114.2   01.02.2020
+    - fix: add missing file generated_libdwarf.h.in
+
+20200114.1   30.01.2020
+    - improve Makefile.PL
+    - remove docs from distribution
+
+20200114.0   25.01.2020
+    - initial release with libdwarf tagged 20200114

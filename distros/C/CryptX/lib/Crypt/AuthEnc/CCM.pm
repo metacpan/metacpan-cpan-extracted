@@ -2,9 +2,9 @@ package Crypt::AuthEnc::CCM;
 
 use strict;
 use warnings;
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
-require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( ccm_encrypt_authenticate ccm_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();

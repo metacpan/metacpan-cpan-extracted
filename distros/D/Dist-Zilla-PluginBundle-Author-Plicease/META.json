@@ -34,6 +34,8 @@
       "develop" : {
          "requires" : {
             "Devel::Hide" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
             "Perl::Critic" : "0",
             "Test2::Require::Module" : "0.000060",
             "Test2::Tools::PerlCritic" : "0",
@@ -111,9 +113,9 @@
          "web" : "https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.42",
+   "version" : "2.44",
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
    "x_use_unsafe_inc" : 0
 }
 

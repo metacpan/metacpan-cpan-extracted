@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::AllModules
 
+0.17    Wed Feb  5 00:22:52 JST 2020
+        - Change installing phase for Win32.pm
+
 0.16    Mon Aug 26 06:16:11 JST 2019
         - Improve POD (Thanks, Mohammad S Anwar)
         - Fix CI config

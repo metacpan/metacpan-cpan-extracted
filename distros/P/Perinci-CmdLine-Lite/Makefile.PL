@@ -24,14 +24,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Perinci::CmdLine::Lite",
   "PREREQ_PM" => {
-    "Complete::Bash" => "0.322",
+    "Complete::Bash" => "0.333",
     "Complete::Fish" => "0.03",
     "Complete::Tcsh" => 0,
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.608",
     "Complete::Zsh" => 0,
     "Data::Clean::JSON" => "0.390",
     "Data::Dump" => 0,
-    "Data::Sah" => "0.902",
+    "Data::Sah" => "0.903",
     "Data::Sah::Util::Type" => "0.45",
     "Encode" => 0,
     "Fcntl" => 0,
@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.47",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.825",
+  "VERSION" => "1.826",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,14 +74,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Bash" => "0.322",
+  "Complete::Bash" => "0.333",
   "Complete::Fish" => "0.03",
   "Complete::Tcsh" => 0,
-  "Complete::Util" => "0.603",
+  "Complete::Util" => "0.608",
   "Complete::Zsh" => 0,
   "Data::Clean::JSON" => "0.390",
   "Data::Dump" => 0,
-  "Data::Sah" => "0.902",
+  "Data::Sah" => "0.903",
   "Data::Sah::Util::Type" => "0.45",
   "Encode" => 0,
   "Fcntl" => 0,

@@ -1,5 +1,5 @@
 package Mongoose::Role::Naming;
-$Mongoose::Role::Naming::VERSION = '2.01';
+$Mongoose::Role::Naming::VERSION = '2.02';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 

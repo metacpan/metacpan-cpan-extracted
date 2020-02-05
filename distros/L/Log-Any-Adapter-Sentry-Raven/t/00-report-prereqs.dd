@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '7.1101'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::StackTrace' => '0',
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Log::Any::Adapter::Base' => '0',
+                                      'Log::Any::Adapter::Util' => '0',
+                                      'Sentry::Raven' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Log::Any' => '0',
+                                   'Log::Any::Adapter' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::MockObject' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Needs' => '0',
+                                   'Test::Without::Module' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

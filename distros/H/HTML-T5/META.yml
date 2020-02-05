@@ -5,9 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  Alien::Base::Wrapper: '0'
+  Alien::Base::Wrapper: '2.02'
   Alien::TidyHTML5: v0.3.0
-  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -32,7 +32,7 @@ requires:
 resources:
   homepage: http://github.com/shlomif/html-tidy5
   license: http://www.opensource.org/licenses/artistic-license-2.0.php
-version: '0.007'
+version: '0.009'
 x_contributors:
   - 'Andy Lester <andy@petdance.com>'
   - 'Jonathan Rockway <jrockway@cpan.org>'

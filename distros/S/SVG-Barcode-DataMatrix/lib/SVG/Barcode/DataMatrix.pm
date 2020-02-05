@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_datamatrix|;
 
 use Barcode::DataMatrix;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use constant DEFAULTS => {
   dotsize       => 1,
@@ -153,18 +153,21 @@ Default C<0>.
     $datamatrix = $datamatrix->size($newvalue);
     $datamatrix = $datamatrix->size('');          # AUTO
 
-Getter and setter for the module size of the matrix.
-C<height x width>, one of C<AUTO>, C<10x10>, C<12x12>, C<14x14>, C<16x16>, C<18x18>, C<20x20>, C<22x22>, C<24x24>, C<26x26>, C<32x32>, C<36x36>, C<40x40>, C<44x44>, C<48x48>, C<52x52>, C<64x64>, C<72x72>, C<80x80>, C<88x88>, C<96x96>, C<104x104>, C<120x120>, C<132x132>, C<144x144>, C<8x18>, C<8x32>, C<12x26>, C<12x36>, C<16x36>, C<16x48>.
-Default C<AUTO>.
+Getter and setter for the module size of the matrix.  C<height x width>, one of C<AUTO>, C<10x10>,
+C<12x12>, C<14x14>, C<16x16>, C<18x18>, C<20x20>, C<22x22>, C<24x24>, C<26x26>, C<32x32>, C<36x36>,
+C<40x40>, C<44x44>, C<48x48>, C<52x52>, C<64x64>, C<72x72>, C<80x80>, C<88x88>, C<96x96>,
+C<104x104>, C<120x120>, C<132x132>, C<144x144>, C<8x18>, C<8x32>, C<12x26>, C<12x36>, C<16x36>,
+C<16x48>.  Default C<AUTO>.
+
+=head1 AUTHOR & COPYRIGHT
+
+© 2019–2020 by Tekki (Rolf Stöckli).
+
+This program is free software, you can redistribute it and/or modify it under the terms of the
+Artistic License version 2.0.
 
 =head1 SEE ALSO
 
 L<SVG::Barcode>, L<Barcode::DataMatrix>.
-
-=head1 AUTHOR & COPYRIGHT
-
-© 2019 by Tekki (Rolf Stöckli).
-
-This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 
 =cut

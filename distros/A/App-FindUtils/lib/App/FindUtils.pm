@@ -1,7 +1,7 @@
 package App::FindUtils;
 
-our $DATE = '2019-09-18'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-12-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -80,7 +80,7 @@ App::FindUtils - Utilities related to finding files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FindUtils (from Perl distribution App-FindUtils), released on 2019-09-18.
+This document describes version 0.003 of App::FindUtils (from Perl distribution App-FindUtils), released on 2019-12-04.
 
 =head1 DESCRIPTION
 
@@ -145,6 +145,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<uniq-files> from L<App::UniqFiles>
 
 =head1 AUTHOR
 

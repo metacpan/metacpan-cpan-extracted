@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.87",
+  "VERSION" => "0.88",
   "test" => {
     "TESTS" => "t/*.t"
   }

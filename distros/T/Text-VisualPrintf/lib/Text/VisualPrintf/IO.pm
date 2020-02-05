@@ -7,10 +7,20 @@ use warnings;
 use IO::Handle;
 use Text::VisualPrintf;
 
-no warnings 'once', 'redefine';
+our @EXPORT_OK = qw(printf vprintf);
 
-*IO::Handle::printf  = \&Text::VisualPrintf::printf;
-*IO::Handle::vprintf = \&Text::VisualPrintf::printf;
+sub import {
+    my $pkg = shift;
+    for my $func (@_) {
+	unless (grep { $func eq $_ } @EXPORT_OK) {
+            require Carp;
+            Carp::croak("\"$func\" is not exported");
+	}
+	no strict 'refs';
+	no warnings 'once', 'redefine';
+	*{"IO::Handle::$func"} = \&Text::VisualPrintf::printf;
+    }
+}
 
 1;
 
@@ -25,14 +35,15 @@ Text::VisualPrintf::IO - IO::Handle interface using Text::VisualPrintf
 =head1 SYNOPSIS
 
     use IO::Handle;
-    use Text::VisualPrintf::IO;
+    use Text::VisualPrintf::IO qw(printf vprintf);
 
-    FILEHANDLE->printf(FORMAR, LIST);
+    FILEHANDLE->printf(FORMAT, LIST);
 
 =head1 DESCRIPTION
 
-This module replace IO::Handle::printf by Text::VisualPrintf::printf
-funciton.  So you can use C<printf> method from IO::File or such.
+This module (re)define C<printf> and/or C<vprintf> method in
+C<IO::Handle> class as C<Text::VisualPrintf::printf> function.  So you
+can use these methods from C<IO::File> class or such.
 
 =head1 SEE ALSO
 

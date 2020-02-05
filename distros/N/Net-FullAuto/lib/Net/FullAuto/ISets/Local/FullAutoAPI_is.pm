@@ -77,6 +77,14 @@ my $configure_fullautoapi=sub {
    $c='aws ec2 authorize-security-group-ingress '.
       "--group-name $security_group --protocol ".
       'tcp --port 443 --cidr '.$cidr." 2>&1";
+   $c='aws ec2 authorize-security-group-ingress '.
+      "--group-name $security_group --protocol ".
+      'tcp --port 11211 --cidr '.$cidr." 2>&1";
+   ($hash,$output,$error)=run_aws_cmd($c);
+   $c='aws ec2 authorize-security-group-ingress '.
+      "--group-name $security_group --protocol ".
+      'tcp --port 3003 --cidr '.$cidr." 2>&1";
+   ($hash,$output,$error)=run_aws_cmd($c);
    ($hash,$output,$error)=run_aws_cmd($c);
    ($stdout,$stderr)=$handle->cmd($sudo."perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
@@ -1029,22 +1037,19 @@ END
       "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i '0,/index  index.html/{//d;}' $nginx_path/nginx/nginx.conf");
-   $ad="            root ${home_dir}FullAutoAPI/root;%NL%".
-       '            index  index.php  index.html index.htm;%NL%'.
-       '            try_files $uri $uri/ /index.php?$args;';
+   $ad='            include        fastcgi_params;%NL%'.
+       "            fastcgi_param  SCRIPT_NAME '';%NL%".
+       "            root ${home_dir}FullAutoAPI/root;%NL%".
+       '            fastcgi_param  PATH_INFO  $fastcgi_script_name;%NL%'.
+       '            fastcgi_pass   unix:/tmp/fullautoapi.socket;';
    $ad=<<END;
 sed -i '1,/location/ {/location/a\\\
 $ad
 }' $nginx_path/nginx/nginx.conf
 END
    $handle->cmd_raw($sudo.$ad);
-   $ad='%NL%        location ~ .php$ {'.
+   $ad='%NL%        location /static {'.
        "%NL%            root ${home_dir}FullAutoAPI/root;".
-       "%NL%            fastcgi_pass 127.0.0.1:9000;".
-       "%NL%            fastcgi_index index.php;".
-       "%NL%            fastcgi_param SCRIPT_FILENAME ".
-       '$document_root$fastcgi_script_name;'.
-       "%NL%            include fastcgi_params;".
        '%NL%        }%NL%';
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
@@ -1063,25 +1068,25 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/octet-stream/i$ad\' $nginx_path/nginx/nginx.conf");
    my $ngx="$nginx_path/nginx/nginx.conf";
-   $handle->cmd_raw(
+   $handle->cmd_raw($sudo.
        "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
    #($stdout,$stderr)=$handle->cmd($sudo.
    #    "sed -i \'s/^        listen       80/        listen       ".
    #    "\*:$avail_port ssl http2 default_server/\' ".
    #    $nginx_path."/nginx/nginx.conf");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i 's/SCRIPT_NAME/PATH_INFO/' ".
-       $nginx_path."/local/nginx/fastcgi_params");
-   $ad='# Catalyst requires setting PATH_INFO (instead of SCRIPT_NAME)'.
-       ' to \$fastcgi_script_name';
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'/PATH_INFO/i$ad\' $nginx_path/nginx/fastcgi_params");
-   $ad='fastcgi_param  SCRIPT_NAME        /;';
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'/PATH_INFO/a$ad\' $nginx_path/nginx/fastcgi_params");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-      "$nginx_path/nginx/fastcgi_params");
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #    "sed -i 's/SCRIPT_NAME/PATH_INFO/' ".
+   #    $nginx_path."/local/nginx/fastcgi_params");
+   #$ad='# Catalyst requires setting PATH_INFO (instead of SCRIPT_NAME)'.
+   #    ' to \$fastcgi_script_name';
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   "sed -i \'/PATH_INFO/i$ad\' $nginx_path/nginx/fastcgi_params");
+   #$ad='fastcgi_param  SCRIPT_NAME        /;';
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   "sed -i \'/PATH_INFO/a$ad\' $nginx_path/nginx/fastcgi_params");
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+   #   "$nginx_path/nginx/fastcgi_params");
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
    #          and replace these characters with thier HEX
@@ -1836,6 +1841,7 @@ END
       HTML::FormHandler
       Crypt::PassGen
       Catalyst::Controller::HTML::FormFu
+      HTML::FormHandler::Model::DBIC
       HTML::FormHandler::Model::DBIC
       CatalystX::OAuth2
       Task::Catalyst::Tutorial
@@ -3207,6 +3213,11 @@ ENDD
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v memcached.service /etc/systemd/system',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i \'s#bin#local/bin#\' ".
+         '/etc/systemd/system/memcached.service');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl daemon-reload');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v memcached.sysconfig /etc/sysconfig/memcached',
          '__display__');

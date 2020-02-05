@@ -1,2 +1,4 @@
+20200114.1   31.01.2020
+    - Deprecated in the sake of XS::libdwarf
 20200114.0   25.01.2020
     - initial release with libdwarf tagged 20200114

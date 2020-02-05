@@ -52,7 +52,7 @@
          "web" : "https://github.com/Tekki/mojo-base-tiny"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Sebastian Riedel <sri@cpan.org>",
       "William Lindley <wlindley+remove+this@wlindley.com>",

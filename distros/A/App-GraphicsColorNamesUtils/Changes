@@ -1,4 +1,9 @@
-0.003   2018-10-04 (PERLANCAR)
+0.004   2020-02-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [build] Rebuild to update Sah coerce rule module names.
+
+
+0.003   2018-10-04  Released-By: PERLANCAR
 
         - Add utilities: colorname2code, colorcode2name.
 
@@ -6,11 +11,11 @@
           because the tie interface breaks on me.
 
 
-0.002   2018-09-26 (PERLANCAR)
+0.002   2018-09-26  Released-By: PERLANCAR
 
 	- Add utility: show-color-swatch.
 
 
-0.001   2018-09-26 (PERLANCAR)
+0.001   2018-09-26  Released-By: PERLANCAR
 
         - First release.

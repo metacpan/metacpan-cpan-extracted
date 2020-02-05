@@ -5,7 +5,7 @@ use Data::Object 'Class';
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 has parser => (
   is => 'ro',
@@ -178,6 +178,32 @@ method synopsis($callback) {
 
   subtest "testing synopsis", fun () {
     my @results = $callback->($tryable->call('evaluator'));
+
+    ok scalar(@results), 'called ok';
+  };
+}
+
+method scenario($name, $callback) {
+  my $parser = $self->parser;
+
+  my @results;
+
+  my $example = $parser->scenarios($name, 'example');
+  my @content = $example ? @{$example->[0]} : ();
+
+  unshift @content,
+    (map $parser->render($_),
+      (map +(/# given:\s*(\w+)/g), @content));
+
+  my $tryable = $self->tryable(join "\n", @content);
+
+  subtest "testing scenario ($name)", fun () {
+    unless (@content) {
+      BAIL_OUT "unknown scenario $name";
+
+      return;
+    }
+    @results = $callback->($tryable->call('evaluator'));
 
     ok scalar(@results), 'called ok';
   };
@@ -572,6 +598,41 @@ routines.
   # given: synopsis
 
   $subtests->routines;
+
+=back
+
+=cut
+
+=head2 scenario
+
+  scenario(Str $name, CodeRef $callback) : Any
+
+This method finds and evaluates (using C<eval>) the documented scenario example
+and returns a L<Data::Object::Try> object. The C<try> object can be used to
+trap exceptions using the C<catch> method, and/or execute the code and return
+the result using the C<result> method.
+
+=over 4
+
+=item scenario example #1
+
+  package main;
+
+  use Test::Auto;
+
+  my $test = Test::Auto->new(
+    't/Test_Auto.t'
+  );
+
+  my $subtests = $test->subtests;
+
+  $subtests->scenario('testauto', sub {
+    my ($tryable) = @_;
+
+    ok my $result = $tryable->result, 'result ok';
+
+    $result;
+  });
 
 =back
 

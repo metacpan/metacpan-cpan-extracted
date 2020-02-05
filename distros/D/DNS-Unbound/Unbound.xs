@@ -211,6 +211,24 @@ _ub_ctx_add_ta_autr( struct ub_ctx *ctx, char *fname )
 #endif
 
 int
+_ub_ctx_resolvconf( struct ub_ctx *ctx, SV *fname_sv )
+    CODE:
+        char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
+
+        RETVAL = ub_ctx_resolvconf( ctx, fname );
+    OUTPUT:
+        RETVAL
+
+int
+_ub_ctx_hosts( struct ub_ctx *ctx, SV *fname_sv )
+    CODE:
+        char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
+
+        RETVAL = ub_ctx_hosts( ctx, fname );
+    OUTPUT:
+        RETVAL
+
+int
 _ub_ctx_add_ta_file( struct ub_ctx *ctx, char *fname )
     CODE:
         RETVAL = ub_ctx_add_ta_file( ctx, fname );

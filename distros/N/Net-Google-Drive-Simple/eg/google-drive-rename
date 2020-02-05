@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use strict;
+
+use Log::Log4perl qw(:easy);
+use Pod::Usage;
+use Data::Dumper::Concise;
+use Net::Google::Drive::Simple;
+
+my( $file_id, $new_name ) = @ARGV;
+
+if( ! defined $file_id ) {
+    pod2usage( "No Google Drive file ID given." );
+}
+
+if( ! $new_name ) {
+    pod2usage( "What name should the file or folder be renamed to?" );
+}
+
+Log::Log4perl->easy_init( $INFO );
+
+my $gd = Net::Google::Drive::Simple->new();
+
+$gd->rename ( $file_id, $new_name ) or
+    LOGDIE "Rename failed.\n";
+
+__END__
+
+=head1 NAME
+
+    google-drive-rename - Rename a file on Google Drive
+
+=head1 SYNOPSIS
+
+    file-rename file_ID new_name
+
+=head1 DESCRIPTION
+
+C<file-rename> renames a given file on Google Drive, by Drive file identifer
+
+=head1 EXAMPLES
+
+  $ file-rename 1PS1vDr8-d5ux3XXPoyPY83_yOuvZXuOt shopping_list.txt
+
+=head1 LEGALESE
+
+Copyright 2020 by Andy Bircumshaw all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2020, Andy Bircumshaw, Network Ned 

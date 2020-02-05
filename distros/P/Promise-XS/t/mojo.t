@@ -6,6 +6,9 @@ use Promise::XS;
 
 eval { require Mojo::IOLoop; 1 } or plan skip_all => $@;
 
+require Mojolicious;
+diag "Mojolicious $Mojolicious::VERSION";
+
 Promise::XS::use_event('Mojo::IOLoop');
 
 my $deferred = Promise::XS::deferred();

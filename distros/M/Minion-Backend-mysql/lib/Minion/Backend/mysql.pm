@@ -13,7 +13,7 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -142,6 +142,10 @@ sub list_jobs {
     push @where, 'id in (' . join( ',', ('?') x @$ids ) . ')';
     push @params, @$ids;
   }
+  if ( my $id = $options->{before} ) {
+    push @where, 'id < ?';
+    push @params, $id;
+  }
 
   my $where = @where ? 'WHERE ' . join( ' AND ', @where ) : '';
 
@@ -186,7 +190,7 @@ sub list_jobs {
   #; say Dumper $jobs;
 
   my $total = $db->query(
-    'SELECT COUNT(*) AS count FROM minion_jobs',
+    qq{SELECT COUNT(*) AS count FROM minion_jobs $where}, @params
   )->hash->{count};
 
   return {
@@ -215,6 +219,10 @@ sub list_workers {
     push @where, 'id in (' . join( ',', ('?') x @{$options->{ids}} ) . ')';
     push @params, @{ $options->{ids} };
   }
+  if ( my $id = $options->{before} ) {
+    push @where, 'id < ?';
+    push @params, $id;
+  }
 
   my $db = $self->mysql->db;
 
@@ -234,7 +242,7 @@ sub list_workers {
   } );
 
   my $total = $db->query(
-    'SELECT COUNT(*) AS count FROM minion_workers',
+    qq{SELECT COUNT(*) AS count FROM minion_workers $where}, @params
   )->hash->{count};
 
   return {
@@ -372,12 +380,21 @@ sub repair {
 }
 
 sub reset {
-    my $self = shift;
+  my ($self, $options) = (shift, shift // {});
 
-    my $mysql = $self->mysql;
-    $mysql->db->query("delete from minion_jobs");
-    $mysql->db->query("truncate table minion_locks");
-    $mysql->db->query("truncate table minion_workers");
+  my $db = $self->mysql->db;
+  if ( $options->{all} ) {
+    $db->query("delete from minion_jobs");
+    $db->query("ALTER TABLE minion_jobs AUTO_INCREMENT = 1");
+    $db->query("truncate table minion_locks");
+    $db->query("ALTER TABLE minion_locks AUTO_INCREMENT = 1");
+    $db->query("truncate table minion_workers");
+    $db->query("ALTER TABLE minion_workers AUTO_INCREMENT = 1");
+  }
+  elsif ( $options->{locks} ) {
+    $db->query("truncate table minion_locks");
+    $db->query("ALTER TABLE minion_locks AUTO_INCREMENT = 1");
+  }
 }
 
 sub lock {
@@ -1004,7 +1021,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 

@@ -32,8 +32,9 @@ sub is_valid {
                     $data->{$prop} = clone($default);
                     # in case default value applied, skip validation for default value
                     next;
-                } elsif ($definition->{required}) {
-                    # if required specified and default not exists, it's invalid
+                } elsif ($context->prims->is_boolean($definition->{required}) && $definition->{required}) {
+                    # if {required: true} specified and default not exists, it's invalid(draftv3).
+                    # if {required: [properties]} specified, just skip it(draftv4).
                     # TODO check definition. Is it valid existing "default" and "required" in same property???
                     $is_valid=0;
                     last;

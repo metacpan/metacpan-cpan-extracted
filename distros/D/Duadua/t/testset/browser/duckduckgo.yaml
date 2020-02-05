@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DuckDuckGo/7'
+  name: 'DuckDuckGo'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '7'

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,49 +12,49 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 7fa5b77a06500f429cb0225171b42974c24f4108 Changes
-SHA1 4872c39dcacfd2a125f095c6044559f297ffd2c2 Example.pm
-SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
-SHA1 3695c1fd0e9338208653e45ac1ba4002d3fb6633 MANIFEST
-SHA1 68346b0c9bed4bb62f9d12c0eb6512786cf347d8 META.yml
-SHA1 2f0be7dc7dd7e21bf4f9e8a83e1e57e11e9ec523 Makefile.PL
-SHA1 d9c92733e8e01e1a89a6738d20941a563eea72e0 README
-SHA1 232783dfc37dab190c1b9b88f4dd338066397085 bin/pod-example
-SHA1 84da266b4e7d27f29182c584e01e951b69d68f8e examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 7eff78547de63d5076055b8c9698533de737ffbd t/App-Pod-Example/01-use.t
-SHA1 d76d34db6eeb6008b46c897a4ce5ebac9d787412 t/App-Pod-Example/02-version.t
-SHA1 3c0233933060bd7568636c769510432ed5a3f560 t/App-Pod-Example/03-new.t
-SHA1 18aa48e40d69f37278ce3ddf6535605d6ace900b t/App-Pod-Example/04-run.t
-SHA1 329306ceda2d9e22d9778236ae518330d8887f46 t/modules/Ex1.pm
-SHA1 7dc815c7ebfac62c64a83cc2481f474256fa3d86 t/modules/Ex2.pm
-SHA1 333b6f79ef8b55a804555164f2e525bcd79c1d6e t/modules/Ex3.pm
-SHA1 5a1fa33168da5df3b07859f60382dd98d2f8d4ef t/modules/Ex4.pm
-SHA1 17b2801444a82ad10d9782fa60d982447966c1bf t/modules/Ex5.pm
-SHA1 e55ea413db900e47cfacbc0b5bfac7f9e5fce745 t/modules/Ex6.pm
-SHA1 ca74ffb178ac36b9b08e132fcb1c536b14396685 xt/App-Pod-Example/01-pod_coverage.t
-SHA1 7088d5c992a0d4dfc813cfaf44fa2cb2b969f03b xt/App-Pod-Example/02-pod.t
+SHA256 61c86c71c56714a2d43ea8c5e839fecfd086eefb0a12580cf5474bebff75a833 Changes
+SHA256 f4f9ef766092eee97374d81b8ecb8501b93ce53c5cef3bee6094d8b6830c1578 Example.pm
+SHA256 0ed14285b9b297d9a1db9f6515c0ad85608e60cc12362323475c8c10d8606d15 LICENSE
+SHA256 c7555121eb0cfc297199e9f6568c0ee0c3e89fc7c674448abab3d4b7047942ab MANIFEST
+SHA256 586762c9d99da7136d30b5041b6f7d56252be656fe9304ec1d4211a570375397 META.yml
+SHA256 05219a7b4239c8ea27a397dd2b923331b162de2d7204c2fdc4f6ba2debc76f95 Makefile.PL
+SHA256 21c70828f8fbe461a1a98d4f0ffcb676796ca04efdc73d21101859423e393b68 README
+SHA256 fb83d707669c17e14f9ae46c842dfd99a939d5bf9c00a37c65856ae6909221c8 bin/pod-example
+SHA256 8af642e92662bbca41729876a5fcb8419781205658650dadbba2d65e4c05e0ff examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 12caac429ed35d5cf8e9d9162a7340181839d6fc276b1de2d9e22de538039903 t/App-Pod-Example/01-use.t
+SHA256 166abaeb8065065b1c02ab20104faed99811c5e98132ff00a45f8d5c43b07ca7 t/App-Pod-Example/02-version.t
+SHA256 cd4fdb083f4f61df30c867a0d6c1ecb71a8d6414b267f3bec11e26990374618e t/App-Pod-Example/03-new.t
+SHA256 993195864f7a4544e91839d6dbb6dd2114faa0c02fdfdf47f0091e31d1c42410 t/App-Pod-Example/04-run.t
+SHA256 bef2cc0b490ae998ce977926d0dbc89256e4e36acfd1c55298232a82fe7a4c84 t/modules/Ex1.pm
+SHA256 f13e650bc1d82926f3adce870ab98756b6749fcc7cd7ddf0aac51160ae0f3e36 t/modules/Ex2.pm
+SHA256 044d9cb4633d970f6d61240e89f34ac4272cd03b15d494464960418b574735bf t/modules/Ex3.pm
+SHA256 1af2e38e295a84f5bf75f11ecf181dd37de3b3bad78d5dc8f0cb7bcead2f153f t/modules/Ex4.pm
+SHA256 85d22df508d8670faa88e5989cce9c2f8d3fd4f0fef16b03f9fc656487af6b0d t/modules/Ex5.pm
+SHA256 00ae50752d04d8f394c561d3a4f73537d0f9152a0b9b7deb5655f64287b6ce14 t/modules/Ex6.pm
+SHA256 aa7c23f11f3bf37d867f4f236c0b84b45e83b64c8b76ae4e2986cc8abaeb5aa8 xt/App-Pod-Example/01-pod_coverage.t
+SHA256 5e58f77b6ab5c88b6c79f1e14af307bbfcafc4fa5d163d6ecd9a365df9c22edd xt/App-Pod-Example/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWH5SsAAoJEJe+XXKaIuTl6BgIAK/AzinIQa4n2VksxkT76gdv
-QD+zmsV9xPpaKX7zV9YbhLm3RWR03iZ/wFZTD2S/aFc3Vc6tiJc9a69H7rBe73C0
-vWoOpBZbMEntqgWW9cOsAk+7bTCOk5HdGsWzJzM77dd+dzHQgOtE3Z/6JwGlxOTx
-8VV2MRim2RnFX+xYiix5cbMqgZ1pUFj/GqeSYF7wS3zwTM7khnElytfeVOvCYwQY
-ljz+hhoLddGUvKPvobRZR+E11VLPiiJiXPJp79kj7v1xtDFNXzCod1iUEJfZHg1G
-fcP1i9nV5490PR43OKUFTv78JClQ+rKNjVhDtMnFLsdMmC7kD9vLnvFGN28GA4Q=
-=gDXW
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl43NOsACgkQKyiOZjWe
+rHZCYwf+OUnbhBcmtcJ2n32f/pXgF/XperjgmQvV8o5eiH1X5nsqxDqa/PyPrkZz
+bHQTXGfltKxBKwtIL90H4A5JZCHSqEm4SOFmzsOLs8SAdRsJKUH+8GNFPmH7+08e
++lDkQ1B3nnAH5H3iB8Ltg5UJ47qXDTpYuGrkmCLSyoLHEPdCViX4RIbmlvQE3Fg1
+4ncR3FVNcqBblA79fPCk+bD3a8bULJSgdbCW0O/W+10hb8nFUgSlOZtb0A8UFnDQ
+FYDOP0RuhZYX2h9C0YIeho04UUNRER7iuBaejmFIo63gsfPX/LSEpTkSzLZuW6QO
+GWSkI6WJT8qkjjr9xs1AGrsEWLsq6A==
+=CBy9
 -----END PGP SIGNATURE-----

@@ -413,7 +413,8 @@ BR:
     address_template: |
         {{{attention}}}
         {{{house}}}
-        {{{road}}}, {{{house_number}}}
+        {{{road}}} {{{house_number}}}
+        {{#first}} {{{suburb}}} || {{{city_district}}} {{/first}}
         {{#first}} {{{city}}} || {{{town}}} || {{{state_district}}} || {{{village}}} {{/first}} - {{#first}} {{{state_code}}} || {{{state}}} {{/first}}
         {{{postcode}}}
         {{{country}}}
@@ -981,7 +982,7 @@ IQ:
     address_template: |
         {{{attention}}}
         {{{house}}}
-        {{{house_number}}} {{#first}} {{{neighbourhood}}} || {{{city_district}}} || {{{suburb}}} {{/first}}
+        {{{house_number}}} {{#first}} {{{city_district}}} || {{{neighbourhood}}} || {{{suburb}}} {{/first}}
         {{{road}}}         
         {{#first}} {{{city}}} || {{{town}}} || {{{state}}} || {{{village}}} {{/first}}
         {{{postcode}}}

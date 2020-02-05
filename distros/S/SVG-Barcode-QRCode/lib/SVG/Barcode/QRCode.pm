@@ -12,7 +12,7 @@ our @EXPORT_OK = qw|plot_qrcode|;
 
 use Text::QRCode;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant DEFAULTS => {
   dotsize => 1,
@@ -131,8 +131,8 @@ Getter and setter for the size of the dots. Default C<1>.
     $qrcode = $qrcode->level($newvalue);
     $qrcode = $qrcode->level('');          # M
 
-Getter and setter for the error correction level.
-One of one of C<L> (low), C<M> (medium), C<Q> (quartile), C<H> (high). Default C<M>.
+Getter and setter for the error correction level. One of one of C<L> (low), C<M> (medium), C<Q>
+(quartile), C<H> (high). Default C<M>.
 
 =head2 version
 
@@ -140,17 +140,18 @@ One of one of C<L> (low), C<M> (medium), C<Q> (quartile), C<H> (high). Default C
     $qrcode = $qrcode->version($newvalue);
     $qrcode = $qrcode->version('');          # 0
 
-Getter and setter for the symbol version.
-From C<1> to C<40>. C<0> will adapt the version to the required capacity. Default C<0>.
+Getter and setter for the symbol version. From C<1> to C<40>. C<0> will adapt the version to the
+required capacity. Default C<0>.
+
+=head1 AUTHOR & COPYRIGHT
+
+© 2019–2020 by Tekki (Rolf Stöckli).
+
+This program is free software, you can redistribute it and/or modify it under the terms of the
+Artistic License version 2.0.
 
 =head1 SEE ALSO
 
 L<SVG::Barcode>, L<Text::QRCode>.
-
-=head1 AUTHOR & COPYRIGHT
-
-© 2019 by Tekki (Rolf Stöckli).
-
-This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 
 =cut

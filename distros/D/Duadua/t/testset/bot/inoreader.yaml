@@ -1,0 +1,16 @@
+- ua: 'Mozilla/5.0 (compatible; inoreader.com-like FeedFetcher-Google)'
+  name: 'Inoreader'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: 'Mozilla/5.0 (compatible; inoreader.com; 1 subscribers)'
+  name: 'Inoreader'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false

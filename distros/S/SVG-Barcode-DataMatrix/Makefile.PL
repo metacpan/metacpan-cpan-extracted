@@ -8,6 +8,7 @@ my %WriteMakefileArgs = (
   ABSTRACT_FROM  => 'lib/SVG/Barcode/DataMatrix.pm',
   VERSION_FROM   => 'lib/SVG/Barcode/DataMatrix.pm',
   EXE_FILES      => [qw()],
+  OBJECT         => '',
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {

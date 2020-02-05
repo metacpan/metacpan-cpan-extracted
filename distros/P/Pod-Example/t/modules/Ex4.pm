@@ -1,6 +1,5 @@
 package Ex3;
 
-# Version.
 our $VERSION = 0.01;
 
 1;
@@ -9,7 +8,6 @@ our $VERSION = 0.01;
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
@@ -18,7 +16,6 @@ our $VERSION = 0.01;
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 

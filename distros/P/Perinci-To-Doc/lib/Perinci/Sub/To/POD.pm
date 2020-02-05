@@ -1,7 +1,7 @@
 package Perinci::Sub::To::POD;
 
-our $DATE = '2020-01-28'; # DATE
-our $VERSION = '0.869'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '0.870'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -228,8 +228,8 @@ sub after_gen_doc {
         }
         my @summary_lines;
         {
-            my $summary = $self->_podquote($eg->{summary}) //
-                "Example #$i".(defined($eg->{name}) ? " ($eg->{name})" :"");
+            my $summary = $self->_podquote($eg->{summary} //
+                "Example #$i".(defined($eg->{name}) ? " ($eg->{name})" :""));
             push @summary_lines, ("=item * $summary" . ":", "");
         }
 
@@ -440,7 +440,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.869 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-01-28.
+This document describes version 0.870 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2020-01-31.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1742 2019-04-16 13:12:26Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1763 2020-02-02 21:48:03Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -38,7 +38,7 @@ my %prerequisite = (
 my %optional;
 
 
-my @debris = qw(*.gcov *.gcda *.gcno);
+my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 
 my $inc = '';

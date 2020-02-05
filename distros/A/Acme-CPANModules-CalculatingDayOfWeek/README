@@ -1,0 +1,171 @@
+NAME
+    Acme::CPANModules::CalculatingDayOfWeek - Modules to calculate day of
+    week
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::CalculatingDayOfWeek (from Perl distribution
+    Acme-CPANModules-CalculatingDayOfWeek), released on 2019-11-20.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher --cpanmodules-module CalculatingDayOfWeek
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup --cpanmodules-module CalculatingDayOfWeek
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Modules to calculate day of week.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Date::DayOfWeek 1.22
+
+    Time::DayOfWeek 1.8
+
+    DateTime 1.39
+
+    Date::Calc 6.4
+
+    Time::Moment 0.38
+
+BENCHMARK PARTICIPANTS
+    *   Date::DayOfWeek::dayofweek (perl_code)
+
+        Function call template:
+
+         Date::DayOfWeek::dayofweek(<day>, <month>, <year>)
+
+    *   Time::DayOfWeek::DoW (perl_code)
+
+        Function call template:
+
+         Time::DayOfWeek::DoW(<year>, <month>, <day>)
+
+    *   DateTime (perl_code)
+
+        Code template:
+
+         DateTime->new(year=><year>, month=><month>, day=><day>)->day_of_week
+
+    *   Date::Calc::Day_of_Week (perl_code)
+
+        Function call template:
+
+         Date::Calc::Day_of_Week(<year>, <month>, <day>)
+
+    *   Time::Moment (perl_code)
+
+        Code template:
+
+         Time::Moment->new(year => <year>, month => <month>, day => <day>)->day_of_week
+
+BENCHMARK DATASETS
+    *   date1
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.24.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher --cpanmodules-module
+    CalculatingDayOfWeek"):
+
+     #table1#
+     {dataset=>"date1"}
+     +----------------------------+-----------+-----------+------------+---------+---------+
+     | participant                | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +----------------------------+-----------+-----------+------------+---------+---------+
+     | DateTime                   |     44000 | 23        |     1      | 5.3e-08 |      20 |
+     | Date::DayOfWeek::dayofweek |    630000 |  1.59     |    14.2    | 7.9e-10 |      22 |
+     | Date::Calc::Day_of_Week    |    753000 |  1.33     |    17      | 3.2e-10 |      35 |
+     | Time::DayOfWeek::DoW       |   1100000 |  0.89     |    25      | 1.2e-09 |      21 |
+     | Time::Moment               |   2974870 |  0.336149 |    67.0065 |   0     |      20 |
+     +----------------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher --cpanmodules-module
+    CalculatingDayOfWeek --module-startup"):
+
+     #table2#
+     +---------------------+-----------+------------------------+------------+-----------+---------+
+     | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
+     +---------------------+-----------+------------------------+------------+-----------+---------+
+     | DateTime            |      98   |                   95.3 |        1   |   0.00021 |      21 |
+     | Date::Calc          |      17   |                   14.3 |        5.7 | 2.5e-05   |      20 |
+     | Time::Moment        |       7   |                    4.3 |       14   | 1.3e-05   |      20 |
+     | Time::DayOfWeek     |       5.9 |                    3.2 |       17   | 2.3e-05   |      20 |
+     | Date::DayOfWeek     |       5.2 |                    2.5 |       19   | 8.3e-06   |      21 |
+     | perl -e1 (baseline) |       2.7 |                    0   |       36   |   7e-06   |      20 |
+     +---------------------+-----------+------------------------+------------+-----------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+INCLUDED MODULES
+    *   Date::DayOfWeek
+
+        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+
+    *   Time::DayOfWeek
+
+        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+
+        This module offers cryptic and confusing function names: "DoW"
+        returns 0-6, "Dow" returns 3-letter abbrev.
+
+    *   DateTime
+
+        Compared to Date::DayOfWeek and Time::DayOfWeek, DateTime is a
+        behemoth. But it provides a bunch of other functionalities as well.
+
+    *   Date::Calc
+
+        Date::Calc is a nice compromise when you want something that is more
+        lightweight and does not need to be as accurate as DateTime.
+
+    *   Time::Moment
+
+        Time::Moment is also a nice alternative to DateTime. Although it's
+        not as featureful as DateTime, it is significantly more lightweight.
+        Compared to Date::Calc, Time::Moment's API is closer to DateTime's.
+        Being an XS module, it's also faster.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CalculatingDayOfWeek>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CalculatingDayOfWeek
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Calc
+    ulatingDayOfWeek>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

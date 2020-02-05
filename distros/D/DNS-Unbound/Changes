@@ -1,5 +1,14 @@
 Revision history for Perl module DNS::Unbound
 
+0.18 Fri, 31 Jan 2020
+- Skip unreliable resolvconf test when installing the module.
+
+0.17 Fri, 31 Jan 2020
+- BREAKING CHANGE: DNSSEC functions (introduced in 0.15) now throw errors and
+  return $self.
+- Add hosts() and resolvconf() methods.
+- The Promise::ES6 async query implementation is now always loaded.
+
 0.16 Sun, 5 Jan 2020
 - Fix use with old libunbound versions.
 - (undocumented) experimental support for promise engines besides Promise::ES6

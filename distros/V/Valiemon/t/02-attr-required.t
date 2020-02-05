@@ -48,6 +48,49 @@ subtest 'validate required with object' => sub {
     is $error->position, '/required';
 };
 
+subtest 'nothing required with object' => sub {
+    my ($res, $error);
+    my $v = Valiemon->new({
+        type => 'object',
+        properties => {
+            name => { type => 'string' },
+            age  => { type => 'integer' },
+        },
+    });
+
+    ($res, $error) = $v->validate({});
+    ok $res;
+    is $error, undef;
+};
+
+subtest 'required with optional object' => sub {
+    my ($res, $error);
+    my $v = Valiemon->new({
+        type => 'object',
+        properties => {
+            opt => {
+                type => 'object',
+                required => [qw(req)],
+                properties => {
+                    req => {
+                        type => 'string'
+                    }
+                }
+            }
+        },
+    });
+
+    ($res, $error) = $v->validate({});
+    ok $res;
+    is $error, undef;
+    ($res, $error) = $v->validate({ opt => {} });
+    ok ! $res;
+    ok $error;
+    ($res, $error) = $v->validate({ opt => { req => "foo" } });
+    ok $res;
+    is $error, undef;
+};
+
 subtest 'detect schema error' => sub {
     {
         eval {

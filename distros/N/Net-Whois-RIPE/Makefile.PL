@@ -13,6 +13,7 @@ WriteMakefile(
     PREREQ_PM        => {
                    'Test::More'     => 0,
                    'Iterator'       => 0,
+                   'List::Util'     => 0,
     },
     META_MERGE => {
         recommends => {

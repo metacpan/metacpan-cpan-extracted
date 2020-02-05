@@ -1,0 +1,51 @@
+NAME
+    Tree::From::FS - Create a tree object from directory structure on the
+    filesystem
+
+VERSION
+    This document describes version 0.000 of Tree::From::FS (from Perl
+    distribution Tree-From-FS), released on 2020-02-04.
+
+SYNOPSIS
+DESCRIPTION
+    PLACEHOLDER. NOT YET IMPLEMENTED.
+
+FUNCTIONS
+  create_tree_from_dir($path) => obj
+    This module provides a convenience function to build a tree of objects
+    that mirrors a directory structure on the filesystem. Each node will
+    represent a file or a subdirectory.
+
+    The class can be any class that provides "parent" and "children"
+    methods. See Role::TinyCommons::Tree::Node for more details on the
+    requirement.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tree-From-FS>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Tree-FromFS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-From-FS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::TinyCommons::Tree
+
+    Other ways to create tree: Tree::From::Struct, Tree::From::Text,
+    Tree::From::TextLines, Tree::Create::Callback, Tree::Create::Size.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

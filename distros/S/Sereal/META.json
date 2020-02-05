@@ -1,7 +1,7 @@
 {
    "abstract" : "Fast, compact, powerful binary (de-)serialization",
    "author" : [
-      "Steffen Mueller <smueller@cpan.org>"
+      "Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Sereal::Decoder" : "4.008",
-            "Sereal::Encoder" : "4.008",
+            "Sereal::Decoder" : "4.011",
+            "Sereal::Encoder" : "4.011",
             "perl" : "5.008"
          }
       },
@@ -42,8 +42,8 @@
             "Data::Dumper" : "0",
             "File::Spec" : "0",
             "Scalar::Util" : "0",
-            "Sereal::Decoder" : "4.008",
-            "Sereal::Encoder" : "4.008",
+            "Sereal::Decoder" : "4.011",
+            "Sereal::Encoder" : "4.011",
             "Test::LongString" : "0",
             "Test::More" : "0.88",
             "Test::Warn" : "0"
@@ -60,6 +60,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "4.008",
+   "version" : "4.011",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

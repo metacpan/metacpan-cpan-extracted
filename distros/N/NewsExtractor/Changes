@@ -1,51 +1,67 @@
-v0.5.0
-        - Released at 2020-01-29T10:30:00+0900
-        - Improve the extraction of a few news site.
+v0.10.0 2020-02-04T09:01:00+0900
+  - Improve the extraction of turnnewsapp.com
+  - Improve coverage for various cases.
 
-v0.4.0
-        - Released at 2020-01-26T01:51:45+0900
-        - Improve the extraction of a few news site.
+v0.9.0 2020-02-04T01:21:00+0900
+  - Improve the extraction of news.tnn.tw
+  - Improve the extraction of www.setn.com
 
-v0.3.0
-        2020-01-26T01:51:45+0900
-        Improve the extraction of a few news site.
+v0.8.0 2020-02-03T09:52:00+0900
+  - Improve the extraction of www.rti.org.tw
+  - Improve the extraction of www.bcc.com.tw
 
-v0.2.0
-        2020-01-25T23:23:39+0900
-        Improve the extraction of a specific news site.
+v0.7.0 2020-02-02T10:28:00+0900
+  - Improve the extraction of www.taipeitimes.com
+  - Improve the extraction of udn.com
+  - Improve the extraction of money.udn.com
+  - Improve the extraction of stars.udn.com
+  - Improve the extraction of house.udn.com
 
-v0.1.1
-        2020-01-24T11:13:11+0900
-        Fix an fat-finger mistake.
+v0.6.0 2020-02-01T19:51:00+0900
+  - Reject the extracted journalist name if it happens to be one of the known newspaper name.
+  - Improve the extraction of https://www.storm.mg
 
-v0.1.0
-        2020-01-24T09:16:11+0900
-	Improve the extraction of a few news sites.
+v0.5.0 2020-01-29T10:30:00+0900
+  - Improve the extraction of a few news site.
 
-v0.0.9
-	Improve the recall of a specific news site.
+0.4.0 2020-01-26T01:51:45+0900
+  - Improve the extraction of a few news site.
 
-v0.0.8
-        2020-01-20T22:08:39+0900
-        Improve the extraction of journalist names on a few more news sites.
+0.3.0 2020-01-26T01:51:45+0900
+  - Improve the extraction of a few news site.
 
-v0.0.7
-        Remove a bunch of wastes.
+0.2.0 2020-01-25T23:23:39+0900
+  - Improve the extraction of a specific news site.
 
-v0.0.6
-        Handle "utf-8" charset correctly.
+0.1.1 2020-01-24T11:13:11+0900
+  - Fix an fat-finger mistake.
 
-v0.0.5
-	GenericExtractor can now extract directly from HTML file.
+0.1.0 2020-01-24T09:16:11+0900
+  - Improve the extraction of a few news sites.
 
-v0.0.4
-        Introduce JSONLD-based extractor.
+0.0.9
+  - Improve the recall of a specific news site.
 
-v0.0.3
-        Introduce CSS-based site-specific extractors.
+0.0.8 2020-01-20T22:08:39+0900
+  - Improve the extraction of journalist names on a few more news sites.
 
-v0.0.2
-	Improvements on error-handling.
+0.0.7
+  - Remove a bunch of wastes.
 
-v0.0.1
-	Inital Release
+0.0.6
+  - Handle "utf-8" charset correctly.
+
+0.0.5
+  - GenericExtractor can now extract directly from HTML file.
+
+0.0.4
+  - Introduce JSONLD-based extractor.
+
+0.0.3
+  - Introduce CSS-based site-specific extractors.
+
+0.0.2
+  - Improvements on error-handling.
+
+0.0.1
+  - Inital Release

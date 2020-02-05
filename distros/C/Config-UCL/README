@@ -1,0 +1,12 @@
+libucl-0.8.1 directory is expanded below.
+
+    https://codeload.github.com/vstakhov/libucl/tar.gz/0.8.1?dummy=/vstakhov-libucl-0.8.1_GH0.tar.gz
+
+    TIMESTAMP = 1542811208
+    SHA256 (vstakhov-libucl-0.8.1_GH0.tar.gz) = a6397e179672f0e8171a0f9a2cfc37e01432b357fd748b13f4394436689d24ef
+    SIZE (vstakhov-libucl-0.8.1_GH0.tar.gz) = 2028394
+
+The test file is used.
+
+    libucl-0.8.1/tests/basic/*.in
+    libucl-0.8.1/tests/schema/*.json

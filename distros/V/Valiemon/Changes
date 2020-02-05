@@ -1,5 +1,9 @@
 Revision history for Perl extension Valiemon
 
+0.05 2020-02-03T12:16:57Z
+    - skip required parameter of missing property
+      (hitode909, Windymelt)
+
 0.04 2016-04-19T07:59:27Z
     - accept many attributes
       (astj)

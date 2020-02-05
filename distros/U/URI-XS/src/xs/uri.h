@@ -26,7 +26,7 @@ namespace xs {
 
         static Sv create (const TYPE& var, const Sv& proto = Sv()) {
             auto ret = TypemapObject<panda::uri::URI*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref, DynamicCast>::create(var, proto);
-            xs::uri::data_attach(ret);
+            if (ret.defined()) xs::uri::data_attach(ret);
             return ret;
         }
     };

@@ -1,0 +1,33 @@
+---
+abstract: 'one line description'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-BayaC
+provides:
+  Acme::BayaC:
+    file: lib/Acme/BayaC.pm
+    version: '0.02'
+requires:
+  Carp: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/bayashi/Acme-BayaC/issues
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/bayashi/Acme-BayaC
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

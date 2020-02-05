@@ -1,6 +1,6 @@
 # @configure_input@                                     -*- shell-script -*-
 # Configurable variable values for runcap test suite.
-# Copyright (C) 2017 Sergey Poznyakoff
+# Copyright (C) 2017-2020 Sergey Poznyakoff
 
 PATH=@abs_builddir@:@abs_top_srcdir@:$top_srcdir:$srcdir:$PATH
 INPUT=@abs_srcdir@/INPUT

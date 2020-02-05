@@ -5,7 +5,7 @@ use warnings;
 
 use lib 't/lib';
 
-{ package Local::Dummy1; use Test::Requires 'Moo' };
+{ package Local::Dummy1; use Test::Requires { 'Moo' => '1.006' } };
 
 #use Moose ();
 #use Moose::Util::TypeConstraints;

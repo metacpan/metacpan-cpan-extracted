@@ -6,7 +6,7 @@ use Text::Balanced qw/extract_bracketed extract_delimited extract_multiple/;
 use parent 'Exporter';
 
 # ABSTRACT: Private utilities
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 our @EXPORT_OK = qw/find_anchor_targets pattern_has_capture_groups/;
 
@@ -63,7 +63,7 @@ Alien::Base::ModuleBuild::Utils - Private utilities
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 AUTHOR
 

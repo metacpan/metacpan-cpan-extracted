@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::DB::Connector:
     file: lib/Mojo/DB/Connector.pm
-    version: '0.05'
+    version: '0.07'
   Mojo::DB::Connector::Base:
     file: lib/Mojo/DB/Connector/Base.pm
   Mojo::DB::Connector::Role::Cache:
@@ -40,16 +40,16 @@ recommends:
   Mojo::mysql: '0'
 requires:
   Class::Method::Modifiers: '0'
-  List::Util: '0'
-  Mojolicious: '0'
+  List::Util: '1.42'
+  Mojolicious: '7.55'
   Role::Tiny: '2.000001'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/srchulo/Mojo-DB-Connector/issues
   homepage: https://github.com/srchulo/Mojo-DB-Connector
   repository: git://github.com/srchulo/Mojo-DB-Connector.git
-version: '0.05'
+version: '0.07'
 x_contributors:
-  - 'Adam Hopkins <violapiratejunky@gmail.com>'
+  - 'srchulo <violapiratejunky@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

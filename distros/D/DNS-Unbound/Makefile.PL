@@ -37,9 +37,12 @@ WriteMakefile(
     },
 
     TEST_REQUIRES => {
+        'Test::DescribeMe' => 0,
         'Test::More'            => 0,
         'Test::FailWarnings'    => 0,
         'Test::Exception' => 0,
+        'File::Temp' => 0,
+        'Net::DNS::Nameserver' => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

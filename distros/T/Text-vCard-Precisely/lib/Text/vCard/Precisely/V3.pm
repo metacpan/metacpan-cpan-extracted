@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use 5.8.9;
 
@@ -107,11 +107,6 @@ Mac OS X and iOS can't parse vCard4.0 with UTF-8 precisely. they cause some Moji
 
 Android 4.4.x can't parse vCard4.0
 
-
-=item
-
-I wanted to learn Moose, of course
-
 =back
 
 To handle an address book with several vCard entries in it, start with
@@ -202,9 +197,9 @@ Accepts a file name
 sub load_file {
     my ( $self, $filename ) = @_;
     open my $vcf, "<", $filename or croak "couldn't open vcf: $!";
-    my $data = $vf->parse($vcf)->{objects}[0];
+    my $data = $vf->parse($vcf)->{'objects'}[0];
     close $vcf;
-    croak "$filename is NOT a vCard file." unless $data->{type} eq 'VCARD';
+    croak "$filename is NOT a vCard file." unless $data->{'type'} eq 'VCARD';
 
     my $hashref = $self->_make_hashref($data);
     $self->load_hashref($hashref);
@@ -220,35 +215,35 @@ sub load_string {
     my ( $self, $str ) = @_;
     my @lines = split /\r\n/, $str;
     my $data = $vf->parse_lines(@lines);
-    my $hashref = $self->_make_hashref($data->{objects}[0]);
+    my $hashref = $self->_make_hashref($data->{'objects'}[0]);
     $self->load_hashref($hashref);
 }
 
 sub _make_hashref {
     my ( $self, $data ) = @_;
     my $hashref = {};
-    while( my( $name, $content ) = each %{$data->{properties}} ){
+    while( my( $name, $content ) = each %{$data->{'properties'}} ){
         next if $name eq 'VERSION';
         foreach my $node (@$content) {
             if( $name eq 'N' ){
-                my @names = split /(?<!\\);/, $node->{value};
+                my @names = split /(?<!\\);/, $node->{'value'};
                 $hashref->{$name} ||= \@names;
             }elsif( $name eq 'REV' ){
-                $hashref->{$name} ||= $node->{value};
+                $hashref->{$name} ||= $node->{'value'};
             }elsif( $name eq 'ADR' ){
                 my $ref = $self->_parse_param($node);
-                my @addesses = split /(?<!\\);/, $node->{value};
-                $ref->{pobox}       = $addesses[0];
-                $ref->{extended}    = $addesses[1];
-                $ref->{street}      = $addesses[2];
-                $ref->{city}        = $addesses[3];
-                $ref->{region}      = $addesses[4];
-                $ref->{post_code}   = $addesses[5];
-                $ref->{country}     = $addesses[6];
+                my @addesses = split /(?<!\\);/, $node->{'value'};
+                $ref->{'pobox'}     = $addesses[0];
+                $ref->{'extended'}  = $addesses[1];
+                $ref->{'street'}    = $addesses[2];
+                $ref->{'city'}      = $addesses[3];
+                $ref->{'region'}    = $addesses[4];
+                $ref->{'post_code'} = $addesses[5];
+                $ref->{'country'}   = $addesses[6];
                 push @{$hashref->{$name}}, $ref;
             }else{
                 my $ref = $self->_parse_param($node);
-                $ref->{content} = $node->{value};
+                $ref->{'content'} = $node->{'value'};
                 push @{$hashref->{$name}}, $ref;
             }
         }
@@ -259,8 +254,8 @@ sub _make_hashref {
 sub _parse_param {
     my ( $self, $content ) = @_;
     my $ref = {};
-    $ref->{types} = [split /,/, $content->{param}{TYPE}] if $content->{param}{TYPE};
-    $ref->{pref} = $content->{param}{PREF} if $content->{param}{PREF};
+    $ref->{'types'} = [split /,/, $content->{'param'}{'TYPE'}] if $content->{'param'}{'TYPE'};
+    $ref->{'pref'} = $content->{'param'}{'PREF'} if $content->{'param'}{'PREF'};
     return $ref;
 }
 
@@ -289,20 +284,19 @@ sub as_string {
     my ($self) = @_;
     my $str = $self->_header();
     $str .= $self->_make_types(@types);
-#    $str .= 'SORT-STRING:' . $self->sort_string . $cr if $self->sort_string;
-    $str .= 'BDAY:' . $self->bday . $cr if $self->bday;
-    $str .= 'UID:' . $self->uid . $cr if $self->uid;
+    $str .= 'BDAY:' . $self->bday() . $cr if $self->bday();
+    $str .= 'UID:' . $self->uid() . $cr if $self->uid();
     $str .= $self->_footer();
     $str = $self->_fold($str);
-    return decode( $self->encoding_out, $str ) unless $self->encoding_out eq 'none';
+    return decode( $self->encoding_out(), $str ) unless $self->encoding_out() eq 'none';
     return $str;
 }
 
 sub _header {
     my ($self) = @_;
     my $str = "BEGIN:VCARD" . $cr;
-    $str .= 'VERSION:' . $self->version . $cr;
-    $str .= 'PRODID:' . $self->prodid . $cr if $self->prodid;
+    $str .= 'VERSION:' . $self->version() . $cr;
+    $str .= 'PRODID:' . $self->prodid() . $cr if $self->prodid();
     return $str;
 }
 
@@ -316,17 +310,26 @@ sub _make_types {
         if ( ref $self->$method eq 'ARRAY' ) {
             foreach my $item ( @{ $self->$method } ){
                 if ( $item->isa('Text::vCard::Precisely::V3::Node') ){
-                    $str .= $item->as_string;
+                    $str .= $item->as_string();
                 }elsif($item) {
-                    $str .= uc($node) . ":" . $item->as_string . $cr;
+                    $str .= uc($node) . ":" . $item->as_string() . $cr;
                 }
             }
-        }elsif( $self->$method and $self->$method->isa('Text::vCard::Precisely::V3::Node::N') ){
-            $str .= $self->$method->as_string();
+        }elsif( $self->$method() and $self->$method()->isa('Text::vCard::Precisely::V3::Node::N') ){
+            $str .= $self->$method()->as_string();
         }elsif( $self->$method ){
-            $str .= $self->$method;
+            $str .= $self->$method();
         }
     }
+    return $str;
+}
+
+sub _footer {
+    my $self = shift;
+    my $str = '';
+    map { $str .= "TZ:" . $_->name() . $cr } @{ $self->tz() } if $self->tz();
+    $str .= 'REV:' . $self->rev() . $cr if $self->rev();
+    $str .= "END:VCARD";
     return $str;
 }
 
@@ -334,21 +337,12 @@ sub _fold {
     my $self = shift;
     my $str = shift or croak "Can't fold empty strings!";
     my $lf = Text::LineFold->new(   # line break with 75bytes
-    CharMax => 74,
-    Charset => $self->encoding_in,
-    OutputCharset => $self->encoding_out,
-    Newline => $cr,
+        CharMax => 74,
+        Charset => $self->encoding_in(),
+        OutputCharset => $self->encoding_out(),
+        Newline => $cr,
     );
     $str = $lf->fold( "", "  ", $str );
-    return $str;
-}
-
-sub _footer {
-    my $self = shift;
-    my $str = '';
-    map { $str .= "TZ:" . $_->name . $cr } @{ $self->tz || [] } if $self->tz;
-    $str .= 'REV:' . $self->rev . $cr if $self->rev;
-    $str .= "END:VCARD";
     return $str;
 }
 
@@ -364,7 +358,7 @@ sub as_file {
     croak "No filename was set!" unless $filename;
     
     my $file = path($filename);
-    $file->spew( {binmode => ":encoding(UTF-8)"}, $self->as_string );
+    $file->spew( {binmode => ":encoding(UTF-8)"}, $self->as_string() );
     return $file;
 }
 
@@ -396,7 +390,7 @@ coerce 'TimeStamp',
         return sprintf '%4d-%02d-%02dT%02d:%02d:%02dZ', $y + 1900, $M + 1, $d, $h, $m, $s
     },
     from 'ArrayRef[HashRef]',
-    via { $_->[0]{content} };
+    via { $_->[0]{'content'} };
 has rev => ( is => 'rw', isa => 'TimeStamp', coerce => 1 );
 
 =head2 name(), profile(), mailer(), agent(), class();
@@ -553,7 +547,7 @@ coerce 'URLs',
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [Text::vCard::Precisely::V3::Node::URL->new({
             name => $name,
-            content => $_->as_string,
+            content => $_->as_string(),
         })]
     },
     from 'ArrayRef[HashRef]',
@@ -575,14 +569,14 @@ coerce 'Photos',
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node::Image->new({
             name => $name,
-            media_type => $_->{media_type} || $_->{type},
-            content => $_->{content},
+            media_type => $_->{'media_type'} || $_->{'type'},
+            content => $_->{'content'},
         }) ] },
     from 'ArrayRef[HashRef]',
     via { [ map{
         if( ref $_->{types} eq 'ARRAY' ){
-            ( $_->{media_type} ) = @{$_->{types}};
-            delete $_->{types};
+            ( $_->{'media_type'} ) = @{$_->{'types'}};
+            delete $_->{'types'};
         }
         Text::vCard::Precisely::V3::Node::Image->new($_)
     } @$_ ] },
@@ -814,10 +808,6 @@ L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
 
 L<Text::vCard::Precisely::V4 on GitHub|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V4.pm>
 
-=item
-
-L<Text::vCard::Precisely::V4 on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely/V4.pm>
- 
 =back
 
 =head1 AUTHOR

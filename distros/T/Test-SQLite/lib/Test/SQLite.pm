@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0209';
+our $VERSION = '0.0210';
 
 use Moo;
 use strictures 2;
@@ -121,7 +121,7 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0209
+version 0.0210
 
 =head1 SYNOPSIS
 
@@ -148,8 +148,10 @@ version 0.0209
 C<Test::SQLite> is loosely inspired by L<Test::PostgreSQL> and
 L<Test::mysqld>, and creates a temporary db to use in tests.  Unlike
 those modules, it is limited to setup/teardown of the test db given a
-B<database> or B<schema> SQL file.  Also this module will return the
-database B<dbh> handle and B<dsn> connection string.
+B<database> or B<schema> SQL file.
+
+Also this module will return the database B<dbh> handle, B<dsn>
+connection string, and B<db_attrs> connection attributes.
 
 =head1 ATTRIBUTES
 
@@ -194,8 +196,12 @@ database given a B<database> or B<schema>.
 
 =head2 BUILD
 
-Ensure that we are given either a B<database> or a B<schema> and not
+Ensure that we are given either a B<database> or a B<schema>, and not
 both.
+
+=head1 TO DO
+
+Use in memory storage if not given a database or schema.
 
 =head1 SEE ALSO
 

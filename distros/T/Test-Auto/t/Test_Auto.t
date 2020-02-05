@@ -14,6 +14,8 @@ Test Automation, Docs Generation
 
 =includes
 
+function: testauto
+
 method: document
 method: parser
 method: subtests
@@ -43,6 +45,26 @@ This package aims to provide, a standard for documenting Perl 5 software
 projects, a framework writing tests, and automation for validating the tests,
 documentation, and usage examples.
 
+=scenario testauto
+
+This package automatically exports the C<testauto> function which uses the
+"current file" as the automated testing source.
+
+=example testauto
+
+  use Test::Auto;
+  use Test::More;
+
+  my $subtests = testauto 't/Test_Auto.t';
+
+  # automation
+
+  # $subtests->standard;
+
+  # ...
+
+  # done_testing;
+
 =headers
 
 +=head1 REASONING
@@ -65,6 +87,21 @@ Data::Object::Library
 
 file: ro, req, Str
 data: ro, opt, DataObject
+
+=function testauto
+
+This function is exported automatically and returns a L<Test::Auto::Subtests>
+object for the test file given.
+
+=signature testauto
+
+testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+
+=example-1 testauto
+
+  # given: synopsis
+
+  my $subtests = testauto 't/Test_Auto.t';
 
 =method document
 
@@ -126,6 +163,11 @@ subtests() : InstanceOf["Test::Auto::Subtests"]
   =inherits
   =integrates
   =attributes
+
+  # [repeatable; optional]
+
+  =scenario $name
+  =example $name
 
   # [repeatable; optional]
 
@@ -248,6 +290,38 @@ are tested for loadability.
 
 The C<integrates> block should contain a list of packages that are involved in
 the behavior of the main package. These packages are not automatically tested.
+
++=head2 scenarios
+
+  =scenario export-path-make
+
+  quisque egestas diam in arcu cursus euismod quis viverra nibh
+
+  =example export-path-make
+
+  # given: synopsis
+
+  package main;
+
+  use Path::Find 'path_make';
+
+  path_make 'relpath/to/file';
+
+  =cut
+
+
+There are situation where a package can be configured in different ways,
+especially where it exists without functions, methods or routines for the
+purpose of configuring the environment. The scenario directive can be used to
+automate testing and documenting package usages and configurations.Describing a
+scenario requires two blocks, i.e. C<scenario $name> and C<example $name>. The
+C<scenario> block should contain a description of the scenario and its purpose.
+The C<example> block must exist when documenting a method and should contain
+valid Perl code and return a value. The block may contain a "magic" comment in
+the form of C<given: synopsis> or C<given: example-$number $name> which if
+present will include the given code example(s) with the evaluation of the
+current block. Each scenario is tested and must be recognized to exist by the
+main package.
 
 +=head2 attributes
 
@@ -450,6 +524,19 @@ my $subs = $test->subtests->standard;
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
   is ref($result), 'Test::Auto', 'isa ok';
+
+  $result;
+});
+
+$subs->scenario('testauto', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subs->example(-1, 'testauto', 'function', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+  isa_ok $result, 'Test::Auto::Subtests';
 
   $result;
 });

@@ -1,3 +1,8 @@
+2.02      2020-02-03 15:45:40+01:00 Europe/Madrid
+
+    * Initialize namespaced dbs correctly on eager mode
+    * Changed priority when selecting a connection, prefer named by class from default ns before default from current ns as it feels more DWIM
+
 2.01      2019-10-29 14:23:42+01:00 Europe/Madrid
 
     * Initial support for multitenancy (namespaces)

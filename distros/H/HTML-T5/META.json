@@ -27,9 +27,9 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Base::Wrapper" : "0",
+            "Alien::Base::Wrapper" : "2.02",
             "Alien::TidyHTML5" : "v0.3.0",
-            "Devel::CheckLib" : "0"
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
@@ -53,7 +53,7 @@
          "http://www.opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_contributors" : [
       "Andy Lester <andy@petdance.com>",
       "Jonathan Rockway <jrockway@cpan.org>",

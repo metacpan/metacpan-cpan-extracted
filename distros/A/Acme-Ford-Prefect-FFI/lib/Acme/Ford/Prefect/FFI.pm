@@ -7,7 +7,7 @@ use Acme::Alien::DontPanic ();
 use FFI::Platypus::Declare;
 
 # ABSTRACT: FFI test module for Alien::Base
-our $VERSION = '1.9800'; # VERSION
+our $VERSION = '2.0000'; # VERSION
 
 
 our($dll) = Acme::Alien::DontPanic->dynamic_libs;
@@ -30,13 +30,13 @@ Acme::Ford::Prefect::FFI - FFI test module for Alien::Base
 
 =head1 VERSION
 
-version 1.9800
+version 2.0000
 
 =head1 SYNOPSIS
 
- use Acme::Ford::Prefect;
+ use Acme::Ford::Prefect::FFI;
  
- my $answer = Acme::Ford::Prefect::answer(); # == 42 of course
+ my $answer = Acme::Ford::Prefect::FFI::answer(); # == 42 of course
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ L<Acme::Alien::DontPanic> which provides the needed libdontpanic library to be a
 
 =head2 answer
 
- my $answer = Acme::Ford::Prefect::answer();
+ my $answer = Acme::Ford::Prefect::FFI::answer();
 
 Returns the answer to life the universe and everything.  Not exported.
 

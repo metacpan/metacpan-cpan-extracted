@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.05       2020-02-04
+    - Fix regex when "best" compression matches ord check equal to 57 (GH #6, thanks to @r3hp1c)
+
 2.04       2018-02-01
     - Document that the module breaks code that relies on ASI (GH #5)
 

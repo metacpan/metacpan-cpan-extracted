@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.016";
+my $version = "0.017";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -28,35 +28,39 @@ WriteMakefile(
    resources    => {
      repository => {
        type => 'git',
-	web  => 'https://github.com/sciurius/perl-Text-Layout',
-	url  => 'https://github.com/sciurius/perl-Text-Layout.git',
-      },
-      bugtracker => "https://github.com/sciurius/perl-Text-Layout/issues",
+       web  => 'https://github.com/sciurius/perl-Text-Layout',
+       url  => 'https://github.com/sciurius/perl-Text-Layout.git',
      },
-     'meta-spec' => {
-       version => '2',
-       url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+     bugtracker => {
+       web => "https://github.com/sciurius/perl-Text-Layout/issues",
      },
-     provides => {
-	 "Text::Layout"
-		  => { file => "lib/Text/Layout.pm",
-		       version => $version },
-	 "Text::Layout::FontConfig"
-		  => { file => "lib/Text/Layout/FontConfig.pm",
-		       version => $version },
-	 "Text::Layout::FontDescriptor"
-		  => { file => "lib/Text/Layout/FontDescriptor.pm",
-		       version => $version },
-     },
+   },
+   'meta-spec' => {
+     version => '2',
+     url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+   },
+   provides => {
+       "Text::Layout"
+		=> { file => "lib/Text/Layout.pm",
+		     version => $version },
+       "Text::Layout::FontConfig"
+		=> { file => "lib/Text/Layout/FontConfig.pm",
+		     version => $version },
+       "Text::Layout::FontDescriptor"
+		=> { file => "lib/Text/Layout/FontDescriptor.pm",
+		     version => $version },
+   },
 
-     no_index => {
-#         file => [
-#	    "lib/Text/Layout/Version.pm",
-#	 ],
-         directory => [
-	    "tests",
-	    "lib/Text/Layout",
+   no_index => {
+         file => [
+		  "lib/Text/Layout/Cairo.pm",
+		  "lib/Text/Layout/Markdown.pm",
+		  "lib/Text/Layout/Pango.pm",
+		  "lib/Text/Layout/PDFAPI2.pm",
 	 ],
-     },
+       directory => [
+	  "tests",
+       ],
+   },
  }
 );

@@ -1,0 +1,28 @@
+# https://api.slack.com/robots
+- ua: 'Slackbot-LinkExpanding 1.0 (+https://api.slack.com/robots)'
+  name: 'Slackbot Link Expanding'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+- ua: 'Slack-ImgProxy 0.19 (+https://api.slack.com/robots)'
+  name: 'Slack Imgproxy'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '0.19'
+- ua: 'Slackbot 1.0(+https://api.slack.com/robots)'
+  name: 'Slackbot'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2019-11-12'; # DATE
-our $VERSION = '1.825'; # VERSION
+our $DATE = '2020-01-31'; # DATE
+our $VERSION = '1.826'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -49,7 +49,7 @@ sub BUILD {
         };
     }
 
-    my $_t = sub {
+    my $_copy = sub {
         no warnings;
         my $co_name = shift;
         my $href = $Perinci::CmdLine::Base::copts{$co_name};
@@ -59,37 +59,38 @@ sub BUILD {
     if (!$self->{common_opts}) {
         my $copts = {};
 
-        $copts->{version}   = { $_t->('version'), };
-        $copts->{help}      = { $_t->('help'), };
+        $copts->{version}   = { $_copy->('version'), };
+        $copts->{help}      = { $_copy->('help'), };
 
         unless ($self->skip_format) {
             $copts->{format}    = {
-                $_t->('format'),
+                $_copy->('format'),
                 schema => ['str*' => in => $formats],
             };
-            $copts->{json}      = { $_t->('json'), };
-            $copts->{naked_res} = { $_t->('naked_res'), };
+            $copts->{json}        = { $_copy->('json'), };
+            $copts->{naked_res}   = { $_copy->('naked_res'), };
+            $copts->{page_result} = { $_copy->('page_result'), };
         }
         if ($self->subcommands) {
-            $copts->{subcommands} = { $_t->('subcommands'), };
+            $copts->{subcommands} = { $_copy->('subcommands'), };
         }
         if ($self->default_subcommand) {
-            $copts->{cmd} = { $_t->('cmd') };
+            $copts->{cmd} = { $_copy->('cmd') };
         }
         if ($self->read_config) {
-            $copts->{config_path}    = { $_t->('config_path') };
-            $copts->{no_config}      = { $_t->('no_config') };
-            $copts->{config_profile} = { $_t->('config_profile') };
+            $copts->{config_path}    = { $_copy->('config_path') };
+            $copts->{no_config}      = { $_copy->('no_config') };
+            $copts->{config_profile} = { $_copy->('config_profile') };
         }
         if ($self->read_env) {
-            $copts->{no_env} = { $_t->('no_env') };
+            $copts->{no_env} = { $_copy->('no_env') };
         }
         if ($self->log) {
-            $copts->{log_level} = { $_t->('log_level'), };
-            $copts->{trace}     = { $_t->('trace'), };
-            $copts->{debug}     = { $_t->('debug'), };
-            $copts->{verbose}   = { $_t->('verbose'), };
-            $copts->{quiet}     = { $_t->('quiet'), };
+            $copts->{log_level} = { $_copy->('log_level'), };
+            $copts->{trace}     = { $_copy->('trace'), };
+            $copts->{debug}     = { $_copy->('debug'), };
+            $copts->{verbose}   = { $_copy->('verbose'), };
+            $copts->{quiet}     = { $_copy->('quiet'), };
         }
         $self->{common_opts} = $copts;
     }
@@ -386,20 +387,26 @@ sub hook_display_result {
 
     my $handle = $r->{output_handle};
 
-    # set utf8 flag
-    my $utf8;
+    my $layer;
+  SELECT_LAYER:
     {
-        last if defined($utf8 = $ENV{UTF8});
         if ($resmeta->{'x.hint.result_binary'}) {
             # XXX only when format is text?
-            $utf8 = 0; last;
+            $layer = ":bytes"; last;
         }
-        if ($r->{subcommand_data}) {
-            last if defined($utf8 = $r->{subcommand_data}{use_utf8});
+
+        if ($ENV{UTF8} ||
+                defined($r->{subcommand_data} && $r->{subcommand_data}{use_utf8}) ||
+                $self->use_utf8) {
+            $layer = ":encoding(utf8)"; last;
         }
-        $utf8 = $self->use_utf8;
+
+        if ($self->use_locale) {
+            $layer = ":locale"; last;
+        }
+
     }
-    binmode($handle, ":encoding(utf8)") if $utf8;
+    binmode($handle, $layer) if $layer;
 
     $self->display_result($r);
 }
@@ -621,7 +628,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.825 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2019-11-12.
+This document describes version 1.826 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2020-01-31.
 
 =head1 SYNOPSIS
 
@@ -842,7 +849,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

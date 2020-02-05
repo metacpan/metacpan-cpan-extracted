@@ -1,4 +1,7 @@
 Revision history for perl distribution Print-Colored
 
+0.02 2020-01-31T08:19:08+0100
+  - New functions for password prompts
+
 0.01 2019-12-15T06:35:50+0100
- - Started project
+  - First Release

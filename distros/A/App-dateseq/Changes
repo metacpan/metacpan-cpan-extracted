@@ -1,7 +1,19 @@
-0.098   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+0.099   2019-11-29  Released-By: PERLANCAR; Urgency: high
 
-	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
-	  0.034+).
+        - Merge two releases 0.098 & 0.098.1.
+
+
+0.098.1 2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce 0.034+).
+	  UPDATE: Rename release from 0.098 -> 0.098.1, cancel release
+	  (duplicate version).
+
+
+0.098   2019-11-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Now use DateTime::Format::Strftimeq instead of
+	  DateTime::Format::Strptime, for ease of custom formatting.
 
 
 0.097   2019-07-22  Released-By: PERLANCAR; Urgency: medium

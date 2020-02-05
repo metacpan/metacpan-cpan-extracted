@@ -7,7 +7,9 @@
  */
 #include "dbdodbc.h"	/* Get SQL_* defs *before* loading DBIXS.h	*/
 
-#define NEED_DBIXS_VERSION 9
+#define NEED_DBIXS_VERSION 93
+
+#define PERL_NO_GET_CONTEXT
 
 #include <DBIXS.h>	/* from DBI. Load this after dbdodbc.h */
 

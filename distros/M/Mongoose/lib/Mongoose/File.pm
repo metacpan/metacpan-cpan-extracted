@@ -1,5 +1,5 @@
 package Mongoose::File;
-$Mongoose::File::VERSION = '2.01';
+$Mongoose::File::VERSION = '2.02';
 use Moose;
 
 has file_id => ( is => 'ro', isa => 'BSON::OID', required => 1 );

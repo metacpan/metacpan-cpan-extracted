@@ -20,7 +20,12 @@ my $test_count = 2 + $ClientTest::TEST_COUNT;
 plan tests => $test_count;
 
 SKIP: {
+    eval { require Mojolicious; 1 } or skip "Mojolicious isn’t available: $@", $test_count;
+    diag "Mojolicious version: $Mojolicious::VERSION";
+
     eval { require Mojo::IOLoop; 1 } or skip "Mojo::IOLoop isn’t available: $@", $test_count;
+    eval { require Mojo::Promise; 1 } or skip "Mojo::Promise isn’t available: $@", $test_count;
+    eval { my $p = Mojo::Promise->new( sub { } ); 1 } or skip "This Mojo::Promise isn’t ES6-compatible: $@", $test_count;
 
     require Net::Curl::Promiser::Mojo;
 

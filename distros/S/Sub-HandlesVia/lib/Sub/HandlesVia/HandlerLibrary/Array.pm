@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -17,7 +17,10 @@ our @METHODS = qw( count is_empty all elements flatten get pop push shift
 	unshift clear first first_index reduce set accessor natatime any
 	shallow_clone map grep sort reverse sort_in_place splice shuffle
 	shuffle_in_place uniq uniq_in_place delete insert flatten flatten_deep
-	join print head tail apply pick_random for_each for_each_pair );
+	join print head tail apply pick_random for_each for_each_pair
+	all_true not_all_true min minstr max maxstr sum product
+	reductions sample uniqnum uniqnum_in_place uniqstr uniqstr_in_place
+	pairs pairkeys pairvalues pairgrep pairfirst pairmap );
 
 sub _type_inspector {
 	my ($me, $type) = @_;
@@ -422,6 +425,40 @@ sub uniq_in_place {
 		additional_validation => 'no incoming values',
 }
 
+sub uniqnum {
+	require List::Util;
+	handler
+		name      => 'Array:uniqnum',
+		args      => 0,
+		template  => 'my @shv_return = List::Util::uniqnum(@{$GET}); wantarray ? @shv_return : \@shv_return',
+}
+
+sub uniqnum_in_place {
+	require List::Util;
+	handler
+		name      => 'Array:uniqnum_in_place',
+		args      => 0,
+		template  => 'my @shv_return = List::Util::uniqnum(@{$GET}); «\@shv_return»',
+		additional_validation => 'no incoming values',
+}
+
+sub uniqstr {
+	require List::Util;
+	handler
+		name      => 'Array:uniqstr',
+		args      => 0,
+		template  => 'my @shv_return = List::Util::uniqstr(@{$GET}); wantarray ? @shv_return : \@shv_return',
+}
+
+sub uniqstr_in_place {
+	require List::Util;
+	handler
+		name      => 'Array:uniqstr_in_place',
+		args      => 0,
+		template  => 'my @shv_return = List::Util::uniqstr(@{$GET}); «\@shv_return»',
+		additional_validation => 'no incoming values',
+}
+
 sub splice {
 	# luckily Int is fully inlinable because there's no way to
 	# add to %environment from here!!!
@@ -590,6 +627,148 @@ sub for_each_pair {
 		signature => [CodeRef],
 		usage     => '$coderef',
 		template  => 'for (my $shv_index=0; $shv_index<@{$GET}; $shv_index+=2) { &{$ARG}(($GET)->[$shv_index], ($GET)->[$shv_index+1]) }; $SELF',
+}
+
+sub all_true {
+	require List::Util;
+	handler
+		name      => 'Array:all_true',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => '&List::Util::all($ARG, @{$GET})',
+}
+
+sub not_all_true {
+	require List::Util;
+	handler
+		name      => 'Array:not_all_true',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => '&List::Util::notall($ARG, @{$GET})',
+}
+
+sub min {
+	require List::Util;
+	handler
+		name      => 'Array:min',
+		args      => 0,
+		template  => '&List::Util::min(@{$GET})',
+}
+
+sub max {
+	require List::Util;
+	handler
+		name      => 'Array:max',
+		args      => 0,
+		template  => '&List::Util::max(@{$GET})',
+}
+
+sub minstr {
+	require List::Util;
+	handler
+		name      => 'Array:minstr',
+		args      => 0,
+		template  => '&List::Util::minstr(@{$GET})',
+}
+
+sub maxstr {
+	require List::Util;
+	handler
+		name      => 'Array:maxstr',
+		args      => 0,
+		template  => '&List::Util::maxstr(@{$GET})',
+}
+
+sub sum {
+	require List::Util;
+	handler
+		name      => 'Array:sum',
+		args      => 0,
+		template  => '&List::Util::sum(0, @{$GET})',
+}
+
+sub product {
+	require List::Util;
+	handler
+		name      => 'Array:product',
+		args      => 0,
+		template  => '&List::Util::product(1, @{$GET})',
+}
+
+sub sample {
+	require List::Util;
+	handler
+		name      => 'Array:sample',
+		args      => 1,
+		signature => [Int],
+		usage     => '$count',
+		template  => '&List::Util::sample($ARG, @{$GET})',
+}
+
+sub reductions {
+	require List::Util;
+	handler
+		name      => 'Array:reductions',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'my $shv_callback = $ARG; List::Util::reductions { $shv_callback->($a,$b) } @{$GET}',
+}
+
+sub pairs {
+	require List::Util;
+	handler
+		name      => 'Array:pairs',
+		args      => 0,
+		template  => '&List::Util::pairs(@{$GET})',
+}
+
+sub pairkeys {
+	require List::Util;
+	handler
+		name      => 'Array:pairkeys',
+		args      => 0,
+		template  => '&List::Util::pairkeys(@{$GET})',
+}
+
+sub pairvalues {
+	require List::Util;
+	handler
+		name      => 'Array:pairkeys',
+		args      => 0,
+		template  => '&List::Util::pairkeys(@{$GET})',
+}
+
+sub pairgrep {
+	require List::Util;
+	handler
+		name      => 'Array:pairgrep',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'List::Util::pairgrep { $ARG->($_) } @{$GET}',
+}
+
+sub pairfirst {
+	require List::Util;
+	handler
+		name      => 'Array:pairfirst',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'List::Util::pairfirst { $ARG->($_) } @{$GET}',
+}
+
+sub pairmap {
+	require List::Util;
+	handler
+		name      => 'Array:pairmap',
+		args      => 1,
+		signature => [CodeRef],
+		usage     => '$coderef',
+		template  => 'List::Util::pairmap { $ARG->($_) } @{$GET}',
 }
 
 1;

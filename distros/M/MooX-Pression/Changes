@@ -6,6 +6,61 @@ Home page:    <https://metacpan.org/release/MooX-Pression>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.020	2020-02-02
+
+ [ Bug Fixes ]
+ - Fix issue parsing optional parameters introduced in 0.019.
+
+ [ Other ]
+ - Better messages when encountering syntax errors.
+ - In some cases of otherwise ambiguous syntax, assume
+   classes/roles/methods were not anonymous.
+
+0.019	2020-02-02
+
+ [ Documentation ]
+ - Include Mouse in benchmarking comparison.
+
+ [ Other ]
+ - Much improved parsing of signatures; especially type constraints within
+   signatures.
+
+0.018	2020-02-01
+
+ [ Bug Fixes ]
+ - Fix handling of :optimize.
+
+ [ Documentation ]
+ - Include Dios in benchmarking comparison.
+
+0.017	2020-02-01
+
+ - Method signatures in `requires` are no longer totally ignored.
+
+0.016	2020-01-31
+
+ - Added: For consistency with method signatures, support `has *foo` to
+   mean the same as `has foo`.
+ - Removed: Drop support for `has $foo` because it looked like a lexical
+   variable and could be confusing.
+ - Removed: Drop support for `has %foo` because it looked like a lexical
+   variable and could be confusing.
+ - Removed: Drop support for `has @foo` because it looked like a lexical
+   variable and could be confusing.
+
+0.015	2020-01-31
+
+ - Added: Support equals sign to provide attribute default value.
+
+0.014	2020-01-31
+
+ [ Documentation ]
+ - Include simple JSON encoder using multi methods as an example.
+
+ [ Other ]
+ - Added: `abstract class` keyword.
+ - Added: `interface` keyword.
+
 0.013	2020-01-28
 
  [ Documentation ]

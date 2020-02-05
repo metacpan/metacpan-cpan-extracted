@@ -67,7 +67,7 @@ Later on you can use it to communicate with Facebook on behalf of this user:
     );
 
     my $info = $fb->get(
-        'https://graph.facebook.com/v3.1/me'   # Facebook API URL
+        'https://graph.facebook.com/v4.0/me'   # Facebook API URL
     );
 
     print $info->as_json;
@@ -112,7 +112,7 @@ Big Thanks To
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2018 by Mahmoud A. Mehyar
+Copyright (C) 2012-2019 by Mahmoud A. Mehyar
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

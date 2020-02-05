@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,6 @@
    "resources" : {
       "X_twitter" : "https://twitter.com/nipotan"
    },
-   "version" : "0.20191227",
+   "version" : "0.20200131",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

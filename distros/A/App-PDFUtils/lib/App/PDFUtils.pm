@@ -1,12 +1,14 @@
 package App::PDFUtils;
 
-our $DATE = '2017-04-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-03'; # DATE
+our $DIST = 'App-PDFUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Log::ger;
 
 use Perinci::Object;
 
@@ -231,7 +233,7 @@ App::PDFUtils - Command-line utilities related to PDF files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2017-04-22.
+This document describes version 0.003 of App::PDFUtils (from Perl distribution App-PDFUtils), released on 2020-02-03.
 
 =head1 SYNOPSIS
 
@@ -253,7 +255,7 @@ files:
 
 Usage:
 
- add_pdf_password(%args) -> [status, msg, result, meta]
+ add_pdf_password(%args) -> [status, msg, payload, meta]
 
 Password-protect PDF files.
 
@@ -274,6 +276,7 @@ Whether to backup the original file to ORIG~.
 
 =item * B<password>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -281,18 +284,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 remove_pdf_password
 
 Usage:
 
- remove_pdf_password(%args) -> [status, msg, result, meta]
+ remove_pdf_password(%args) -> [status, msg, payload, meta]
 
 Remove password from PDF files.
 
@@ -332,6 +336,7 @@ Whether to backup the original file to ORIG~.
 
 =item * B<passwords> => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -339,7 +344,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -364,9 +369,9 @@ feature.
 =head1 SEE ALSO
 
 
-L<add-pdf-password>.
-
 L<remove-pdf-password>.
+
+L<add-pdf-password>.
 
 =head1 AUTHOR
 
@@ -374,7 +379,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

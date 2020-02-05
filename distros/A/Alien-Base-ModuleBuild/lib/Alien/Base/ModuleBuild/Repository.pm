@@ -7,7 +7,7 @@ use Alien::Base::ModuleBuild::File;
 use Alien::Base::ModuleBuild::Utils qw/pattern_has_capture_groups/;
 
 # ABSTRACT: Private class
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 sub new {
   my $class = shift;
@@ -104,7 +104,7 @@ Alien::Base::ModuleBuild::Repository - Private class
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 AUTHOR
 

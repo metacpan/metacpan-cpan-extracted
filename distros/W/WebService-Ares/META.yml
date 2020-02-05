@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl class to communication with ARES service.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   Encode: 0
   English: 0
@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ requires:
   perl: 5.6.2
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Ares
-  homepage: https://github.com/tupinek/WebService-Ares
+  homepage: https://github.com/michal-josef-spacek/WebService-Ares
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/WebService-Ares
-version: '0.02'
+  repository: git://github.com/michal-josef-spacek/WebService-Ares
+version: '0.03'

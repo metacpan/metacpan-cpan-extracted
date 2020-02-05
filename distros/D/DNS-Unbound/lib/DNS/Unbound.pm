@@ -63,10 +63,15 @@ use XSLoader ();
 use DNS::Unbound::Result ();
 use DNS::Unbound::X ();
 
+# Load the default async query implementation.
+# This may change when non-default implementations
+# leave experimental status.
+use DNS::Unbound::AsyncQuery::PromiseES6 ();
+
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.16';
+    $VERSION = '0.18';
     XSLoader::load();
 }
 
@@ -361,8 +366,8 @@ sub set_option {
     my $err = _ub_ctx_set_option( $_[0]->{'_ub'}, "$_[1]:", $_[2] );
 
     if ($err) {
-        my $str = _ctx_err()->{$err} || "Unknown error code: $err";
-        die "Failed to set “$_[1]” ($_[2]): $str";
+        my $str = _get_error_string_from_number($err);
+        die "Failed to set “$_[1]” option ($_[2]): $str";
     }
 
     return $_[0];
@@ -378,8 +383,8 @@ sub get_option {
     my $got = _ub_ctx_get_option( $_[0]->{'_ub'}, $_[1] );
 
     if (!ref($got)) {
-        my $str = _ctx_err()->{$got} || "Unknown error code: $got";
-        die "Failed to get “$_[1]”: $str";
+        my $str = _get_error_string_from_number($got);
+        die "Failed to get “$_[1]” option: $str";
     }
 
     return $$got;
@@ -434,10 +439,50 @@ Gives the libunbound version string.
 
 #----------------------------------------------------------------------
 
+=head1 METHODS FOR ALTERING RESOLVER LOGIC
+
+The following parallel their equivalents in libunbound.
+They return I<OBJ> and throw errors on failure.
+
+=head2 I<OBJ>->hosts( $FILENAME )
+
+Z<>
+
+=head2 I<OBJ>->resolveconf( $FILENAME )
+
+Z<>
+
+=cut
+
+sub hosts {
+    my $err = _ub_ctx_hosts( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to set hosts file: $str";
+    }
+
+    return $_[0];
+}
+
+sub resolvconf {
+    my $err = _ub_ctx_resolvconf( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to set stub nameservers: $str";
+    }
+
+    return $_[0];
+}
+
+#----------------------------------------------------------------------
+
 =head1 METHODS FOR DEALING WITH ASYNCHRONOUS QUERIES
 
 Unless otherwise noted, the following methods correspond to their
-equivalents in libunbound.
+equivalents in libunbound. They return the same values as the
+libunbound equivalents.
 
 =head2 I<OBJ>->poll()
 
@@ -506,6 +551,8 @@ sub count_pending_queries {
 The following correspond to their equivalents in libunbound
 and will only work if the underlying libunbound version supports them.
 
+They return I<OBJ> and throw errors on failure.
+
 =head2 I<OBJ>->add_ta()
 
 Z<>
@@ -513,7 +560,14 @@ Z<>
 =cut
 
 sub add_ta {
-    return _ub_ctx_add_ta( $_[0]->{'_ub'}, $_[1] );
+    my $err = _ub_ctx_add_ta( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to add trust anchor: $str";
+    }
+
+    return $_[0];
 }
 
 =head2 I<OBJ>->add_ta_autr()
@@ -523,7 +577,14 @@ Z<>
 =cut
 
 sub add_ta_autr {
-    return _ub_ctx_add_ta_autr( $_[0]->{'_ub'}, $_[1] );
+    my $err = _ub_ctx_add_ta_autr( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to add managed trust anchor file: $str";
+    }
+
+    return $_[0];
 }
 
 =head2 I<OBJ>->add_ta_file()
@@ -533,7 +594,14 @@ Z<>
 =cut
 
 sub add_ta_file {
-    return _ub_ctx_add_ta_file( $_[0]->{'_ub'}, $_[1] );
+    my $err = _ub_ctx_add_ta_file( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to add zone-style trust anchor file: $str";
+    }
+
+    return $_[0];
 }
 
 =head2 I<OBJ>->trustedkeys()
@@ -543,7 +611,14 @@ Z<>
 =cut
 
 sub trustedkeys {
-    return _ub_ctx_trustedkeys( $_[0]->{'_ub'}, $_[1] );
+    my $err = _ub_ctx_trustedkeys( $_[0]->{'_ub'}, $_[1] );
+
+    if ($err) {
+        my $str = _get_error_string_from_number($err);
+        die "Failed to add BIND-style trust anchor file: $str";
+    }
+
+    return $_[0];
 }
 
 #----------------------------------------------------------------------
@@ -653,6 +728,16 @@ sub DESTROY {
 }
 
 #----------------------------------------------------------------------
+
+sub _get_error_string_from_number {
+    my ($err) = @_;
+
+    if ($err) {
+        return _ctx_err()->{$err} || "Unknown error code: $err";
+    }
+
+    return undef;
+}
 
 1;
 

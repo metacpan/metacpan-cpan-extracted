@@ -1,5 +1,8 @@
 Revision history for Perl Acme-Alien-DontPanic2
 
+2.0000    2020-02-02 06:28:08 -0700
+  - Require Alien::Build 2.00
+
 1.9800    2020-01-30 08:03:58 -0700
   - Require Alien::Build 1.98
 

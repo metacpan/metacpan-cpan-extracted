@@ -1,5 +1,13 @@
 Revision history for Perl extension Encode::ZapCP1252
 
+0.40  2020-02-04T15:30:50Z
+      - Added link to Encoding::FixLatin. Suggested by Jonas Smedegaard.
+      - Removed Pod tests from the distribution.
+      - Fixed an issue discovered on Perl 5.31 that incorrectly resulted in
+        the creation of malformed UTF-8 when fixing unicode strings. Thanks to
+        Karl Williamson for the continuing improvement of Unicode support in
+        Perl and for the fix to this module.
+
 0.33  2011-11-23T05:19:36Z
       - Require Test::Pod 1.41 to support `L<text|url>` syntax in the Pod.
       - Support for decoded strings is supported only in 5.8.8 and higher due
@@ -16,25 +24,25 @@ Revision history for Perl extension Encode::ZapCP1252
 0.30  2010-06-12T18:05:38
       - The conversion functions now ignore `undef` arguments and just return
         without doing anything.
-      - Strings are no longer modifed in-place unless the conversion
+      - Strings are no longer modified in-place unless the conversion
         subroutines are called in a void context.
-      - The conversion functions may optionally be called with no arugment
+      - The conversion functions may optionally be called with no argument
         when run in Perl 5.10 or higher, in which case they will instead act
         on `$_`.
 
 0.20  2010-06-12T00:39:35
-      - Added `local` to examples of changing the maping tables.
-      - When the Encode module is insatlled, zapping and fixing CP1252
+      - Added `local` to examples of changing the mapping tables.
+      - When the Encode module is installed, zapping and fixing CP1252
         gremlins now works in decoded strings, too.
       - For convenience, the functions now return the strings they've
         modified.
       - Shipping with a traditional `Makefile.PL` rather than one that
         passes through to Module::Build.
-      - Moved repository to [GitHub](http://github.com/theory/encode-zapcp1252).
+      - Moved repository to [GitHub](https://github.com/theory/encode-zapcp1252).
 
 0.12  2008-06-23T17:48:04
       - Fixed pasto in the "Support" section of the docs.
-      - Fixed a typo in the "Synopsis" section of the docs, thaks to David
+      - Fixed a typo in the "Synopsis" section of the docs, thanks to David
         Beaudet.
       - Fixed the 5.6.2 requirement to be properly detected in Perl 5.5.
         Thanks to Slaven Rezic for the report.

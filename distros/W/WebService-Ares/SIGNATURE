@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,53 +12,53 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 7c2f75168dc4afd538085f625b1898bd0cd290d2 Ares.pm
-SHA1 78debd8414cb13d2c2461d79358aa5c46a2f7962 Ares/Standard.pm
-SHA1 8170df8b7387367bbb883e3d0421fa73367098a2 Changes
-SHA1 b7ceae89cdd78850407f39eeb346505c22908f4b LICENSE
-SHA1 059ecb4d8c68ae1f518c007ee690846d59deadbf MANIFEST
-SHA1 2c5a7bf3e0b8025486f76f14718dc2ff6907d51a META.yml
-SHA1 60348b37b7e75f71ebbd9ffd36614fecce05d44b Makefile.PL
-SHA1 f66dc43251da420aa46d1a5a106be8e4592f3760 README
-SHA1 cf56abbd515e63053a56a1530343cfcc1bf3c75d examples/ex1.pl
-SHA1 3be8159b9bf033e93af4fbc7ea21e05e65a65fbe examples/ex2.pl
-SHA1 18a9e945c0c453eb0b3d9493619a3a900d7466f1 examples/ex3.pl
-SHA1 00945fff225d76d45814e83427b058f602a4ca2c examples/ex4.pl
-SHA1 81bf0336a80ffb08466efd2e64f56a54cee55d14 examples/ex5.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 e386eb1b58f8546577ab000cb8cbc6adf66241ad t/WebService-Ares-Standard/01-use.t
-SHA1 4f212143aacd5621119620d7d1bcc331918a9cf8 t/WebService-Ares-Standard/02-version.t
-SHA1 98a7067a8c84eefbd894f468ee3b46dd63efe602 t/WebService-Ares-Standard/03-parse.t
-SHA1 60c7b4824d81c507e3abde4169e14b0b12afca21 t/WebService-Ares/01-use.t
-SHA1 e93b6865d9d4abc59e3bbcb387e103c71cd9b960 t/WebService-Ares/02-version.t
-SHA1 db40040c6c3c8b16f798d105463869f5b18d9824 t/WebService-Ares/03-new.t
-SHA1 8eac39081419910289c2dc4760461b302f5e0b8b t/WebService-Ares/04-commands.t
-SHA1 8cecdd2819361a4054bdc8b58c680042d767e789 t/WebService-Ares/05-error.t
-SHA1 f85fb730b81529ce677ab606f42383a632c9ac78 t/data/standard/ex1.xml
-SHA1 fc48225fdbbe9cc5cf690b8b9a2b672abf9de812 xt/WebService-Ares-Standard/01-pod_coverage.t
-SHA1 3c19a7a2b4da24bf92523f9442725824c74ab4c0 xt/WebService-Ares-Standard/02-pod.t
-SHA1 0514fa89fb13a2fb9ed229128dbcb7b0ae2e0073 xt/WebService-Ares/01-pod_coverage.t
-SHA1 5b51a6b54055f365389fd1925d0a6adc2021e234 xt/WebService-Ares/02-pod.t
+SHA256 9b43830a8b26beefea4e5aaaff13e91de2084e4037ceae5f1e74e88643682e65 Ares.pm
+SHA256 309c4a2b04f9109fe511d67020a04584188952cddfbabea83aaae0e6eb728d4d Ares/Standard.pm
+SHA256 eda152bb018bbf5b35831111e1c08d31a2e00d9ba323bd0ef9c25a256683cff7 Changes
+SHA256 30d744ab8a487b17da2f28ebb119f396a36bccf8d4c9f867f4d593ea841afaa6 LICENSE
+SHA256 284e9b3e5c0a926a2773d8e72e4f9e41bf39ae0c030c35c4691a690bdae14a93 MANIFEST
+SHA256 0063f060c59483ea4de0d272f049a4fcf33884320c0c75e10b263bdc9dbe529b META.yml
+SHA256 8ee273cdd499efec18266fa209f643637304be4392673237f9358d7c8433f82d Makefile.PL
+SHA256 76a21c745b8a0ef534d05ae7eab6afcbaa7081c1b682454f85c334d1aa68628e README
+SHA256 92a800da8e54eb761cb69bb6ef80fb177688ca975f0878ca403fc04f56e5703c examples/ex1.pl
+SHA256 de04b761b1cc2712dc4219d45169098e067f66ff7336191c90b86158f622dc73 examples/ex2.pl
+SHA256 a5325329e942296beafcd4cdbd6f9b3368c6301f9ff5572c6568048beb99d02c examples/ex3.pl
+SHA256 ffdbf646127f92bfa145f605fcb8b3f024d22dc1d7169761c087d201f7687e4e examples/ex4.pl
+SHA256 2eaa89932efa3bde7a9a389041011ce42f233e14c8d2a9f56953911aef6187d1 examples/ex5.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 be879363f4e87b3e793d78fa433cbcf888805312883dcc152b03993f7c429a10 t/WebService-Ares-Standard/01-use.t
+SHA256 f57bb7d5680c9afa508d4333c0d76b4659f61e600fca1f66bff560b6eaf20dae t/WebService-Ares-Standard/02-version.t
+SHA256 2336e83ce8ea29824c498c96098bb2404dac3d5981048b023897318edef9924d t/WebService-Ares-Standard/03-parse.t
+SHA256 8ebe9f05b03d62161bd5bfeea3605d5f1bacb5b0cbe4e3b2d02fbe7e378ee91a t/WebService-Ares/01-use.t
+SHA256 9a3985d5976bfe0ea8ce54fb95a82e2d8030ca72e4f1bfb8ad2d0c36088545be t/WebService-Ares/02-version.t
+SHA256 7f9977d6753341ab353a6a59a2b515109fb586efd5b7e4736afb5f5800e208d5 t/WebService-Ares/03-new.t
+SHA256 4b2fce4865805ddeb1d48c0febeb91654113fdd6cf7c57e0b5bdf7deda3a4c1a t/WebService-Ares/04-commands.t
+SHA256 9d3655774d147f9a8285868d5b03982a9fcbb3686f25bd98302466e27c8b2c22 t/WebService-Ares/05-error.t
+SHA256 fab7a5ed1af43d7fd219aac377b1a0f968004e70e3c24f081c5a8d52293a07bf t/data/standard/ex1.xml
+SHA256 1b31cadee9493aacd708db542eb8fd4cf2d7a5f0e9dfba9f6bab57544b798bf6 xt/WebService-Ares-Standard/01-pod_coverage.t
+SHA256 e03d3c5ef6b86b3829e4198af386cc70af5365263be027e50560e2d0bdb33377 xt/WebService-Ares-Standard/02-pod.t
+SHA256 99c65aed38b790085d442d19ec15fd3eca218a9de43725b12abbbeef50be5ffb xt/WebService-Ares/01-pod_coverage.t
+SHA256 cf3cfb9f7a9cf2372aed79d1c543938a23233334d8aa489ccad6e17752aabb57 xt/WebService-Ares/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWMhuCAAoJEJe+XXKaIuTlkjIH/AgElZd+kfPQn82tvPHfd3ta
-5Sci1vwUcAI5shm4YWCMBsEosOGbP9fazFWCRlNwAlY8igPRC5ZOTiWFqnn2B7dh
-5+RAx70+aigVGUffJv+FQqhc9vY0ANmdBi24nVQDetakIPrtnFL0NwWwDklyIUew
-91cmXo4GyecXf708ybvnu8IlNNbdca5+kV9XYDptlQS1QlyacBflYi6tL549zDyX
-bK/i4mSQ6aQ0MJzd3UBZRPJEmQjwIJHQO3dehZOit88v+HdYsCBZwEZey/1/IZJx
-mablfprANSdQ6OKyxa25aDbtMtbUliA4fCRnKkA1n/kdy06gOXFrw2lpz5KAIZM=
-=A/bo
+iQEyBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl44HtcACgkQKyiOZjWe
+rHYnfAf3UcAa5S7oBlrMayi3iPqKqX78mFtnJr58teNQk9IG3oBI8fbbAotvuqu/
+3TeIBuYtHVyPRxxirXyOyDUYVX37omS110r8ZF5AsuL/s/gS7lDYYxadtg9nAV/a
+z34C0nTFcGD8D0ElgLQVPTzREdCQw0RWevrI8TpI91Ibx3RMnfyVLSkis8KxAU/N
+BHLFiE9lRm3fq9sKe+wcrBc0ir0+kqs8VHTeh0adiaa6PrVulk/RsSA1fYqsErgw
+3rUidIKAe0C9YtyhznKMkScg6+pik5UeIKsS+MiSPnOcxQj/utgPj/kYxxwHOGG1
+BhVmEPD3c8A7bIRn38xai11lNz9K
+=GJf7
 -----END PGP SIGNATURE-----

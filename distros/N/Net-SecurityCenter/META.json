@@ -53,6 +53,6 @@
          "web" : "https://github.com/giterlizzi/perl-Net-SecurityCenter"
       }
    },
-   "version" : "0.204",
+   "version" : "0.205",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 70;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 use Data::Peek;
 
@@ -68,5 +68,7 @@ TODO: {	local $TODO = "How magic is \$? accross perl versions?";
     is ($m[2], undef, "NV \$? w/  get");
     is ($m[3], undef, "RV \$? w/  get");
     }
+
+done_testing;
 
 1;

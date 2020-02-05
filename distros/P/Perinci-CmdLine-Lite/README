@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.825 of Perinci::CmdLine::Lite (from
-    Perl distribution Perinci-CmdLine-Lite), released on 2019-11-12.
+    This document describes version 1.826 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2020-01-31.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -201,8 +201,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

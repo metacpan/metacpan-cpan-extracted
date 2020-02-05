@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.87';
+$Net::Amazon::S3::Request::VERSION = '0.88';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -8,7 +8,9 @@ use Regexp::Common qw /net/;
 # ABSTRACT: Base class for request objects
 
 enum 'AclShort' =>
-    [ qw(private public-read public-read-write authenticated-read) ];
+    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+    [ qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ];
+
 enum 'LocationConstraint' => [
     # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
     'ap-northeast-1',
@@ -184,7 +186,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -201,7 +203,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

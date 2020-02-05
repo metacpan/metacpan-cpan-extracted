@@ -6,7 +6,7 @@ use Test::More;
 package MyApp {
 	use MooX::Pression;
 	class Foo {
-		has @list;
+		has list = [];
 		overload '@{}' => sub { shift->list };
 	}
 }

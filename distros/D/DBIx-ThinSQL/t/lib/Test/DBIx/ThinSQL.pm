@@ -1,15 +1,11 @@
 package Test::DBIx::ThinSQL;
 use strict;
 use warnings;
-use Exporter::Tidy default => [
-    qw/
-      run_in_tempdir
-      /
-];
+use Exporter::Tidy default => [qw/ run_in_tempdir /];
 use File::chdir;
 use Path::Tiny;
 
-$DBIx::ThinSQL::SHARE_DIR = path('share')->absolute;
+$File::ShareDir::DIST_SHARE{'DBIx-ThinSQL'} = path('share')->absolute;
 
 sub run_in_tempdir (&) {
     my $sub = shift;

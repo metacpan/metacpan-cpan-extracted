@@ -1,9 +1,19 @@
 use lib 't/lib';
 use Test2::Plugin::AlienEnv;
-use Test2::Require::Module 'Inline' => '0.56';
-use Test2::Require::Module 'Inline::C';
-use Test2::Require::Module 'Acme::Alien::DontPanic' => '0.010';
 use Test2::V0 -no_srand => 1;
+
+BEGIN {
+  skip_all 'test requires Inline 0.56 + Inline::C + Acme::Alien::DontPanic 0.010'
+    unless eval {
+      require Acme::Alien::DontPanic;
+      Acme::Alien::DontPanic->VERSION('0.010');
+      require Inline;
+      Inline->VERSION('0.56');
+      require Inline::C;
+      1;
+    };
+}
+
 use Acme::Alien::DontPanic;
 use Inline 0.56 with => 'Acme::Alien::DontPanic';
 use Inline C => 'DATA', ENABLE => 'AUTOWRAP';

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.171';
+our $VERSION = '1.172';
 
 use Quiq::Assert;
 use Quiq::Json;
@@ -26,11 +26,83 @@ L<Quiq::Hash>
 
 Die Klasse erzeugt Code für ein Kontext-Menü, welches durch das
 jQuery-Plugin L<jQuery contextmenu|https://swisnl.github.io/jQuery-contextMenu/docs.html> realisiert wird. Der Inhalt
-des Menüs wird durch einen AJAX-Aufruf beschafft. Der Aufruf liefert
-eine JSON-Struktur mit folgendem Aufbau:
+des Menüs wird durch einen AJAX-Aufruf beschafft.
 
-  {
-  }
+Der Perl-Code
+
+  my $js = Quiq::JQuery::ContextMenu::Ajax->html(
+      className => 'contextMenu',
+      selector => '.popup',
+      trigger => 'left',
+  );
+
+liefert
+
+  $.contextMenu({
+      className: 'contextMenu',
+      selector: '.popup',
+      trigger: 'left',
+      build: function(ej,ev) {
+          var options;
+  
+          $.ajax({
+              type: 'GET',
+              url: ej.attr('href'),
+              async: false,
+              beforeSend: function () {
+                  $('body').css('cursor','wait');
+              },
+              complete: function () {
+                  $('body').css('cursor','default');
+              },
+              success: function (data,textStatus,jqXHR) {
+                  // Wir bekommen die Items in einem Array geliefert,
+                  // damit die Reihenfolge wohldefiniert ist. Hier
+                  // wandeln wir das Array in ein Objekt, wie
+                  // das ContexMenu-Plugin es erwartet.
+                  var items = {};
+                  for (var i = 0; i < data.length; i += 2) {
+                      items[data[i]] = data[i+1];
+                  }
+                  options = {
+                      items: items,
+                      callback: function(key,options) {
+                          document.location = items[key].url;
+                      },
+                  };
+              },
+              error: function () {
+                  alert('ERROR: AJAX Request failed');
+              },
+          });
+  
+          return options;
+      },
+  });
+
+Das JavaScript-Array C<data>, das vom Server geliefert wird, hat
+den Aufbau
+
+  [
+      <key>: {
+          name: '<name>',
+          url: '<url>',
+      }
+      ...
+  ]
+
+Der serverseitige Perl-Code, der eine Menü-Definition liefert (Beispiel):
+
+  return [
+      sql => {
+          name => 'SQL',
+          url => 'sqlFromLog?'.Quiq::Url->queryEncode(
+              system => $system,
+              path => $logfile,
+          ),
+      },
+      ...
+  ];
 
 =head1 SEE ALSO
 
@@ -191,7 +263,7 @@ sub js {
 
 =head1 VERSION
 
-1.171
+1.172
 
 =head1 AUTHOR
 

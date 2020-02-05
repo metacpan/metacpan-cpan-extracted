@@ -1,7 +1,8 @@
-package Pcore::Chrome v0.11.1;
+package Pcore::Chrome v0.14.1;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
+use Pcore::Util::Scalar qw[weaken];
 use Pcore::Util::Data qw[from_json];
 
 has bin           => ();
@@ -10,9 +11,12 @@ has port          => 9222;
 has user_data_dir => sub { P->file1->tempdir };
 has useragent     => ();
 
-has _proc => ();
+has _proc       => ();
+has _pac_server => ();
+has _pac_func   => ();
 
 # https://chromedevtools.github.io/devtools-protocol/tot/
+# https://peter.sh/experiments/chromium-command-line-switches/
 
 const our $CHECK_PORT_TIMEOUT => 0.1;
 const our $CONNECT_TIMEOUT    => 10;
@@ -36,6 +40,10 @@ around new => sub ( $orig, $self, %args ) {
 
     $self->{port} ||= ( P->net->get_free_port( $args{host} ) or die q[Error get free port] );
 
+    $self->_build_pac_func( $args{proxy} );
+
+    $self->_run_pac_server;
+
     my $cmd = [
         qq["$args{bin}"],
 
@@ -54,12 +62,15 @@ around new => sub ( $orig, $self, %args ) {
         '--window-size=1280x720',
 
         '--disable-default-apps',
+        '--no-default-browser-check',
         '--no-first-run',
         '--disable-infobars',
         '--disable-popup-blocking',
         '--disable-default-apps',
         '--disable-web-security',
         '--allow-running-insecure-content',
+
+        qq[--proxy-pac-url="http://$self->{_pac_server}->{listen}->{host_port}/"],
 
         # logging
         # '--disable-logging',
@@ -81,7 +92,7 @@ around new => sub ( $orig, $self, %args ) {
         $user_args ? $user_args->@* : (),
 
         # open "about:blank" by default
-        'about:blank',
+        # 'about:blank',
 
         # redirect STDERR under linux
         !$MSWIN ? '2>/dev/null' : (),
@@ -124,6 +135,78 @@ sub new_tab ( $self, $url = undef ) {
     return $tab;
 }
 
+sub set_pac_func ( $self, $js ) {
+    $self->{_pac_func} = $js;
+
+    $self->reload_pac;
+
+    return;
+}
+
+sub set_proxy ( $self, $proxy ) {
+    $self->_build_pac_func($proxy);
+
+    $self->reload_pac;
+
+    return;
+}
+
+sub reload_pac ($self) {
+    my $tab = $self->new_tab('about:blank');
+
+    my $res = $tab->navigate_to('chrome://net-internals/#proxy');
+
+    $tab->('Runtime.enable');
+
+    $res = $tab->( 'Runtime.evaluate', { expression => q[document.getElementById("proxy-view-reload-settings").click()] } );
+
+    return;
+}
+
+sub _build_pac_func ( $self, $proxy ) {
+    my $pac_proxy;
+
+    if ( !$proxy ) {
+        $pac_proxy = 'DIRECT';
+    }
+    else {
+        my $uri = P->uri($proxy);
+
+        if ( !$uri ) {
+            $pac_proxy = 'DIRECT';
+        }
+        elsif ( $uri->{scheme} eq 'socks' ) {
+            $pac_proxy = "SOCKS $uri->{host_port}";
+        }
+        else {
+            $pac_proxy = "PROXY $uri->{host_port}";
+        }
+    }
+
+    $self->{_pac_func} = <<"JS";
+function FindProxyForURL ( url, host ) {
+    return "$pac_proxy";
+}
+JS
+
+    return;
+}
+
+sub _run_pac_server ($self) {
+    require Pcore::HTTP::Server;
+
+    weaken $self;
+
+    $self->{_pac_server} = Pcore::HTTP::Server->new(
+        listen     => '//127.0.0.1:9999',
+        on_request => sub ($req) {
+            return 200, [ 'Content-Type' => 'application/x-ns-proxy-autoconfig' ], $self->{_pac_func} || $EMPTY;
+        }
+    );
+
+    return;
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -131,9 +214,9 @@ sub new_tab ( $self, $url = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 78                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 89                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 90                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 101                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

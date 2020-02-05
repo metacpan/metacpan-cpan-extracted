@@ -43,11 +43,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.020
+Version 0.021
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 our %files_being_mocked;
 
@@ -398,22 +398,22 @@ sub new {
     my $now = time;
 
     my $self = bless {
-        'dev'       => 0,        # stat[0]
-        'inode'     => 0,        # stat[1]
-        'mode'      => 0,        # stat[2]
-        'nlink'     => 0,        # stat[3]
-        'uid'       => int $>,   # stat[4]
-        'gid'       => int $),   # stat[5]
-        'rdev'      => 0,        # stat[6]
-                                 # 'size'     => undef,    # stat[7] -- Method call
-        'atime'     => $now,     # stat[8]
-        'mtime'     => $now,     # stat[9]
-        'ctime'     => $now,     # stat[10]
-        'blksize'   => 4096,     # stat[11]
-                                 # 'blocks'   => 0,        # stat[12] -- Method call
-        'fileno'    => undef,    # fileno()
-        'tty'       => 0,        # possibly this is already provided in mode?
-        'readlink'  => '',       # what the symlink points to.
+        'dev'       => 0,         # stat[0]
+        'inode'     => 0,         # stat[1]
+        'mode'      => 0,         # stat[2]
+        'nlink'     => 0,         # stat[3]
+        'uid'       => int $>,    # stat[4]
+        'gid'       => int $),    # stat[5]
+        'rdev'      => 0,         # stat[6]
+                                  # 'size'     => undef,    # stat[7] -- Method call
+        'atime'     => $now,      # stat[8]
+        'mtime'     => $now,      # stat[9]
+        'ctime'     => $now,      # stat[10]
+        'blksize'   => 4096,      # stat[11]
+                                  # 'blocks'   => 0,        # stat[12] -- Method call
+        'fileno'    => undef,     # fileno()
+        'tty'       => 0,         # possibly this is already provided in mode?
+        'readlink'  => '',        # what the symlink points to.
         'file_name' => undef,
         'contents'  => undef,
     }, $class;
@@ -1217,6 +1217,11 @@ BEGIN {
             return undef;
         }
 
+        if ( !( $mock_dir->{'mode'} & S_IFDIR ) ) {
+            $! = ENOTDIR;
+            return undef;
+        }
+
         if ( !defined $_[0] ) {
             $_[0] = Symbol::gensym;
         }
@@ -1228,7 +1233,7 @@ BEGIN {
         # This is how we tell if the file is open by something.
         my $abs_path = $mock_dir->{'file_name'};
         $mock_dir->{'obj'} = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->{'contents'} );
-        $mock_dir->{'fh'} = "$_[0]";
+        $mock_dir->{'fh'}  = "$_[0]";
 
         return 1;
 

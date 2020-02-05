@@ -1,0 +1,39 @@
+=head1 NAME
+
+XS::libgeos - geos C++ library for XS 
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+    write_makefile(
+        ...makemaker args
+        BIN_DEPS => 'XS::libgeos',
+        ...
+    );
+
+=head1 DESCRIPTION
+
+This is C++ GEOS (Geometry Engine - Open Source) L<library|https://trac.osgeo.org/geos/>.
+
+No perl interface.
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+L<Geo::Geos>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+Ivan Baidakou <dmol@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut
+

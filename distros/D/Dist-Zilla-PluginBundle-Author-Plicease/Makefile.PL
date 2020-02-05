@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Carp Encode File::Glob File::Path File::Spec FindBin JSON::PP List::Util Module::CoreList Term::ANSIColor autodie strict version warnings );
+  } qw( Carp Encode File::Glob File::Path JSON::PP List::Util Module::CoreList Term::ANSIColor autodie strict version warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -107,7 +107,7 @@ my %WriteMakefileArgs = (
     "Test::More"   => "0.98",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.42",
+  "VERSION" => "2.44",
   "test"    => {
     "TESTS" => "t/*.t"
   }

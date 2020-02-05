@@ -1639,6 +1639,8 @@ commune.am;commune.am
 communication.museum;communication.museum
 communications.museum;communications.museum
 community;community
+community-pro.de;community-pro.de
+community-pro.net;community-pro.net
 community.museum;community.museum
 como.it;como.it
 company;company
@@ -1873,12 +1875,14 @@ direct.quickconnect.to;direct.quickconnect.to
 directory;directory
 discount;discount
 discourse.group;discourse.group
+discourse.team;discourse.team
 discover;discover
 discovery.museum;discovery.museum
 dish;dish
 diskstation.eu;diskstation.eu
 diskstation.me;diskstation.me
 diskstation.org;diskstation.org
+diskussionsbereich.de;diskussionsbereich.de
 disrec.thingdust.io;disrec.thingdust.io
 ditchyourip.com;ditchyourip.com
 divtasvuodna.no;divtasvuodna.no
@@ -4819,6 +4823,7 @@ meet;meet
 meguro.tokyo.jp;meguro.tokyo.jp
 mein-iserv.de;mein-iserv.de
 mein-vigor.de;mein-vigor.de
+meinforum.net;meinforum.net
 meiwa.gunma.jp;meiwa.gunma.jp
 meiwa.mie.jp;meiwa.mie.jp
 meland.no;meland.no
@@ -5215,6 +5220,7 @@ mydrobo.com;mydrobo.com
 myds.me;myds.me
 myeffect.net;myeffect.net
 myfirewall.org;myfirewall.org
+myforum.community;myforum.community
 myfritz.net;myfritz.net
 myftp.biz;myftp.biz
 myftp.org;myftp.org
@@ -6547,6 +6553,7 @@ q-a.eu.org;q-a.eu.org
 q.bg;q.bg
 qa;qa
 qa2.com;qa2.com
+qbuser.com;qbuser.com
 qc.ca;qc.ca
 qc.com;qc.com
 qcx.io;qcx.io
@@ -7076,6 +7083,7 @@ semine.miyagi.jp;semine.miyagi.jp
 sendai.jp;sendai.jp
 sener;sener
 sennan.osaka.jp;sennan.osaka.jp
+senseering.net;senseering.net
 sensiosite.cloud;sensiosite.cloud
 seoul.kr;seoul.kr
 sera.hiroshima.jp;sera.hiroshima.jp
@@ -8059,6 +8067,7 @@ tysvær.no;xn--tysvr-vra.no
 tz;tz
 tønsberg.no;xn--tnsberg-q1a.no
 u.bg;u.bg
+u.channelsdvr.net;u.channelsdvr.net
 u.se;u.se
 u2-local.xnbay.com;u2-local.xnbay.com
 u2.xnbay.com;u2.xnbay.com
@@ -8753,6 +8762,7 @@ zw;zw
 اتصالات;xn--mgbaakc7dvf
 ارامكو;xn--mgba3a3ejt
 الاردن;xn--mgbayh7gpa
+البحرين;xn--mgbcpq6gpa1a
 الجزائر;xn--lgbbat1ad8j
 السعودية;xn--mgberp4a5d4ar
 السعوديه;xn--mgbqly7cvafr
@@ -8817,6 +8827,7 @@ zw;zw
 องค์กร.ไทย;xn--12cfi8ixb8l.xn--o3cw4h
 เน็ต.ไทย;xn--m3ch0j3a.xn--o3cw4h
 ไทย;xn--o3cw4h
+ລາວ;xn--q7ce6a
 გე;xn--node
 みんな;xn--q9jyb4c
 アマゾン;xn--cckwcxetd

@@ -120,6 +120,7 @@ lib/Quiq/ImagePool/Sequence.pm
 lib/Quiq/Ipc.pm
 lib/Quiq/JavaScript.pm
 lib/Quiq/JQuery/Accordion.pm
+lib/Quiq/JQuery/ContextMenu.pm
 lib/Quiq/JQuery/ContextMenu/Ajax.pm
 lib/Quiq/JQuery/DataTable.pm
 lib/Quiq/JQuery/Form/ViewEdit.pm
@@ -325,6 +326,7 @@ t/bin/Quiq/ImagePool/Sequence.t
 t/bin/Quiq/Ipc.t
 t/bin/Quiq/JavaScript.t
 t/bin/Quiq/JQuery/Accordion.t
+t/bin/Quiq/JQuery/ContextMenu.t
 t/bin/Quiq/JQuery/ContextMenu/Ajax.t
 t/bin/Quiq/JQuery/DataTable.t
 t/bin/Quiq/JQuery/Form/ViewEdit.t

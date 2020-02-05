@@ -1,6 +1,6 @@
-package Mojo::Pg::Database::Role::PgPromiseClass 0.001;
+package Mojo::Pg::Database::Role::PgPromiseClass 0.002;
 
-# ABSTRACT: Choose the Mojo::Promise class used by database queries
+# ABSTRACT: db query promises use Pg's promise_class
 
 use Mojo::Base -role;
 
@@ -10,9 +10,12 @@ around query_p => sub {
 };
 
 1;
+
 __END__
 
-=encoding utf8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -20,7 +23,7 @@ Mojo::Pg::Database::Role::PgPromiseClass - db query promises use Pg's promise_cl
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -66,9 +69,10 @@ Roger Crew <wrog@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Roger Crew.
+This software is Copyright (c) 2020 by Roger Crew.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

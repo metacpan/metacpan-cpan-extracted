@@ -1,0 +1,47 @@
+Cluster-SSH-Helper
+
+Helper utilities for deciding(load, memory) what machine
+of a cluster to execute stuff on via SSH.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Cluster::SSH::Helper
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Cluster-SSH-Helper
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Cluster-SSH-Helper
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Cluster-SSH-Helper
+
+    Search CPAN
+        https://metacpan.org/release/Cluster-SSH-Helper
+
+    Repository
+        https://github.com/VVelox/Cluster-SSH-Helper
+    
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2019 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

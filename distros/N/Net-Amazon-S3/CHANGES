@@ -1,5 +1,10 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.88 Sat  1 Feb 2020 21:29:52
+    - Allow passing headers from client to InitiateMultipartUpload request (Ali Zia)
+    - sign uri with iam role (kuriyama)
+    - Canned ACLs updated (ratsbane)
+
 0.87 Mon  9 Dec 2019 19:53:42 GMT
     - Time::Piece fix from Eden Crane
     - eu-north-1 region (happy-barney)

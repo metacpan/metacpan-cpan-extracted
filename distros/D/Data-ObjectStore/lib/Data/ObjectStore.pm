@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Data::RecordStore;
 use Data::ObjectStore::Cache;
 
-$VERSION = '2.12';
+$VERSION = '2.13';
 
 our $DEBUG = 0;
 our $UPGRADING;
@@ -316,7 +316,10 @@ sub save {
     }
     my $node = $self->_fetch_store_info_node;
     my $now = time;
-    $self->[DATA_PROVIDER]->use_transaction;
+
+    unless( $self->[OPTIONS]{NO_TRANSACTIONS} ) {
+        $self->[DATA_PROVIDER]->use_transaction;
+    }
 
     my( @dirty ) = keys %{$self->[DIRTY]};
     
@@ -335,7 +338,9 @@ sub save {
     $node->set_last_update_time( $now );
     $self->_save( $node );
 
-    $self->[DATA_PROVIDER]->commit_transaction;
+    unless( $self->[OPTIONS]{NO_TRANSACTIONS} ) {
+        $self->[DATA_PROVIDER]->commit_transaction;
+    }
     $self->[DIRTY] = {};
     return 1;
 } #save
@@ -511,7 +516,7 @@ sub fetch {
       };
       if( $@ ) {
           if( $force ) {
-              warn "warn '$class' to be 'Data::ObjectStore::Container'";
+              warn "Forcing '$class' to be 'Data::ObjectStore::Container'";
               $class = 'Data::ObjectStore::Container';
           } else {
               die $@;
@@ -2079,6 +2084,6 @@ Unlocks all names locked by this thread
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.12  (Jan, 2020))
+       Version 2.13  (Feb, 2020))
 
 =cut

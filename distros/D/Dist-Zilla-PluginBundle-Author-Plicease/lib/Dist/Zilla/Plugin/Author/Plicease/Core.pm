@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Core 2.42 {
+package Dist::Zilla::Plugin::Author::Plicease::Core 2.44 {
 
   use 5.014;
   use Moose;
@@ -34,6 +34,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Core 2.42 {
 
     foreach my $phase (keys %$prereqs)
     {
+      next if $phase eq 'develop';
       foreach my $type (keys %{ $prereqs->{$phase} })
       {
         foreach my $module (sort keys %{ $prereqs->{$phase}->{$type} })
@@ -118,7 +119,7 @@ Dist::Zilla::Plugin::Author::Plicease::Core - Handle core prereqs
 
 =head1 VERSION
 
-version 2.42
+version 2.44
 
 =head1 AUTHOR
 

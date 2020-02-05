@@ -1,0 +1,69 @@
+- ua: 'ia_archiver'
+  name: 'Internet Archive'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: 'Yeti/1.0 (+http://help.naver.com/robots/)'
+  name: 'Naver Yeti'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+- ua: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.0 Safari/537.36 (compatible; Yeti/1.1; +http://naver.me/spd)'
+  name: 'Naver Yeti'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.1'
+- ua: 'ichiro/3.0 (http://search.goo.ne.jp/option/use/sub4/sub4-1/)'
+  name: 'ichiro'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '3.0'
+- ua: 'Mozilla/5.0 (compatible; proximic; +https://www.comscore.com/Web-Crawler)'
+  name: 'Comscore crawler'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: 'Mozilla/5.0 (compatible; proximic; +http://www.proximic.com/info/spider.php)'
+  name: 'Comscore crawler'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+- ua: 'Mozilla/5.0 (compatible; Daum/4.1; +http://cs.daum.net/faq/15/4118.html?faqId=28966)'
+  name: 'Daum'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '4.1'
+- ua: "'Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 (KHTML, like Gecko) Safari/538.1 Daum/4.1'"
+  name: 'Daum'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '4.1'

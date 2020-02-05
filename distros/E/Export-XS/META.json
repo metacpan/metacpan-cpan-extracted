@@ -25,17 +25,17 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::libpanda" : "v1.3.6",
-            "XS::Framework" : "v1.2.4",
-            "XS::Install" : "v1.2.12",
+            "XS::Framework" : "v1.2.5",
+            "XS::Install" : "v1.2.13",
+            "XS::libpanda" : "v1.3.9",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::libpanda" : "v1.3.6",
-            "XS::Framework" : "v1.2.4",
-            "XS::Install" : "v1.2.12",
+            "XS::Framework" : "v1.2.5",
+            "XS::Install" : "v1.2.13",
+            "XS::libpanda" : "v1.3.9",
             "next::XS" : "v1.0.7"
          }
       },
@@ -49,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v3.0.2",
+   "version" : "v3.0.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -39,11 +39,7 @@ capture_new(package, ...)
 					croak("argv must be an array ref");
 			} else if (strcmp(kw, "stdout") == 0
 				   || strcmp(kw, "stderr") == 0) {
-				if (SvROK(val)
-				    && SvTYPE(SvRV(val)) == SVt_PVCV) {
-					cb[kw[3] == 'o' ? 0 : 1] = SvRV(val);
-				} else
-					croak("%s must be a code ref", kw);
+				cb[kw[3] == 'o' ? 0 : 1] = val;
 			} else if (strcmp(kw, "timeout") == 0) {
 				if (SvIOK(val)) {
 					timeout = SvUV(val);

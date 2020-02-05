@@ -18,8 +18,9 @@ use Group::Git;
 use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
+use Time::HiRes qw/sleep/;
 
-our $VERSION = version->new('0.7.2');
+our $VERSION = version->new('0.7.3');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -166,8 +167,8 @@ sub main {
                     process_thread($thread, $opt, $outfh);
                 }
             }
-            if ($count++ % 10 == 0) {
-                sleep 1;
+            if ($count++ % 100 == 0) {
+                sleep 0.5;
             }
             else {
                 warn "There are currently " . @threads . " threads (of $count started)\n" if $opt->verbose;
@@ -339,7 +340,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.2.
+This documentation refers to group-git version 0.7.3.
 
 =head1 SYNOPSIS
 

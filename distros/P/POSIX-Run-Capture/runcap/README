@@ -1,36 +1,204 @@
-#+TITLE: runcap
-
 * Overview
 
 The function *runcap* runs an external command, and waits for its
 termination, optionally capturing its standard output and standard
 error streams, and piping data to its standard input.
 
-* Building as a standalone library
+Upon return from the function, the caller can obtain the termination
+status of the program and access the captured output data.
 
-The following steps will build the project as a standalone installable
-library:
+* Usage
+
+The function *runcap* is defined as follows:
+
+#+BEGIN_SRC  C
+int runcap(struct runcap *rc, int flags);
+#+END_SRC
+
+The =rc= argument points to the structure that controls the execution
+of the program.  It contains the input and output members.  The only 
+member of this structure that must be initialized on input is
+=rc_argv=, which points to the array of pointers to 
+null-terminated strings that represent the command name and the 
+argument list to that program.  Initialization of the rest of input
+members is optional.  For each input member, there is a corresponding
+flag in =flags= which must be set, if the member is initialized.  For
+example, if the =rc_timeout= member is set (indicating maximum time
+the program execution is allowed to take), then the =RCF_TIMEOUT= flag
+must be set.
+
+Upon return, the function returns the execution status of the
+program, and initializes the output members of =rc= to hold the
+standard output and standard error streams captured from the command.
+Special functions are provided to read these streams.
+
+For a detailed description of *runcap* and accompanying functions,
+please see the [[http://man.gnu.org.ua/manpage/?3+runcap][runcap]](3) manual.  In this chapter we will illustrate
+the usage of the *runcap* library by examples.
+
+The example below defines the function *runcom* with the following
+prototype:
+
+#+BEGIN_SRC  C
+int runcom(char *cmd, char *in, char **out, char **err);
+#+END_SRC
+
+The function runs the command line given in the ~cmd~ argument 
+using =/bin/sh= and returns the data it printed on its standard output
+and error streams in the memory locations pointed to by the arguments
+~out~ and ~err~, correspondingly.  If any of these arguments is
+=NULL=, capturing of the corresponding stream will be disabled.
+
+The function returns program exit status on success, -1 if the program
+terminated on signal and -2 on error.  This example implements only 
+rudimentary error handling, in order to minimize the amount of
+irrelevant code.
+
+#+BEGIN_SRC  C
+int runcom(char *cmd, char *in, char **out, char **err)
+{
+    int status;
+    char *p;
+    char c;
+    char *argv[] = { "/bin/sh", "-c", cmd, NULL };
+    struct runcap rc;
+    int rcflags = RCF_TIMEOUT;
+
+    /* Declare the command line to be run.  The rc_argv filed is the
+     * only field that must be initialized on input.
+     */
+    rc.rc_argv = argv;
+
+    /* Set maximum execution timeout.  The presense of this setting is
+     * indicated by the RCF_TIMEOUT flag in rcflags. 
+     */
+    rc.rc_timeout = 10;
+
+    /* If the input string is supplied, initialize the input stream and
+     * raise the RCF_STDIN flag to indicate that it has been initialized.
+     */
+    if (in) {
+	rc.rc_cap[RUNCAP_STDIN].sc_base = in;
+	rc.rc_cap[RUNCAP_STDIN].sc_size = strlen(in);
+	rc.rc_cap[RUNCAP_STDIN].sc_fd = -1;
+	rcflags |= RCF_STDIN;
+    }
+
+    /* If out argument is NULL, disable capturing program's stdout.  To
+     * disable capturing a stream, it suffices to initialize its sc_size
+     * field to zero and raise the corresponding RCF_*_SIZE bit in flags.
+     */
+    if (!out) {
+        rc.rc_cap[RUNCAP_STDOUT].sc_size = 0;
+        rcflags |= RCF_STDOUT_SIZE;
+    }
+
+    /* Same for the stderr: */
+    if (!err) {
+        rc.rc_cap[RUNCAP_STDERR].sc_size = 0;
+        rcflags |= RCF_STDERR_SIZE;
+    }
+
+    /* Run the command.  The runcap function returns 0 on success.  On
+     * error, it returns -1 and sets the errno variable.  Its value is 
+     * also duplicated in the rc_errno member of struct runcap.
+     */
+    if (runcap(&rc, rcflags)) {
+	perror("runcap");
+	return -2;
+    }
+
+    /* Upon return, the sc_leng member of the capturing structure for 
+     * stdout and stderr contains total amount of bytes in the corresponding
+     * stream. The stream can be read using the runcap_getc and 
+     *  runcap_getline functions.
+     */
+    if (rc.rc_cap[RUNCAP_STDOUT].sc_leng) {
+	p = malloc(rc.rc_cap[RUNCAP_STDOUT].sc_leng + 1);
+	assert(p != NULL);
+	*out = p;
+	while (runcap_getc(&rc, RUNCAP_STDOUT, &c))
+	    *p++ = c;
+	*p = 0;
+    } else
+	*out = NULL;
+
+    if (rc.rc_cap[RUNCAP_STDERR].sc_leng) {
+	p = malloc(rc.rc_cap[RUNCAP_STDERR].sc_leng + 1);
+	assert(p != NULL);
+	*err = p;
+	while (runcap_getc(&rc, RUNCAP_STDERR, &c))
+	    *p++ = c;
+	*p = 0;
+    } else
+	*err = NULL;
+
+    /* Analyze the exit status of the command */
+    if (WIFEXITED(rc.rc_status)) {
+	status = WEXITSTATUS(rc.rc_status);
+    } else {
+	status = -1;
+
+	if (WIFSIGNALED(rc.rc_status)) {
+	    fprintf(stderr, "%s terminated on signal %d\n",
+		    argv[0], WTERMSIG(rc.rc_status));
+	} else {
+	    fprintf(stderr, "%s terminated with unrecognized status: %d\n",
+		    argv[0], rc.rc_status);
+	}
+    }
+    return status;
+}
+#+END_SRC
+
+* Downloading
+
+To clone the project from the repository, run
+
+#+BEGIN_SRC shell-script
+git clone git://git.gnu.org.ua/runcap.git
+#+END_SRC
+
+* Building
+
+The project can be used either a standalone library, or as a shared
+or static convenience library embedded in another project. If you
+cloned the project from the git repository, you will need to
+bootstrap it first. To do so, change to the =runcap= directory and 
+run 
+#+BEGIN_SRC shell-script
+  autoreconf -I. -f -i -s
+#+END_SRC
+
+Use the =RUNCAP_BUILD= environment variable to indicate the type of
+the build you need.  Allowed values are: 
+
+- install :: Build standalone installable library (default).
+- shared  :: Build shared convenience library.
+- static  :: Build static convenience library.
+
+Once bootstrapped, the project can be built with the usual sequence
+of commands:
 
 1. Configure the package
   #+BEGIN_SRC shell-script
     ./configure
   #+END_SRC
-2. Build the project.
+2. Build it
   #+BEGIN_SRC shell-script
     make
   #+END_SRC
-3. Install the files (normally run as root).
+3. If building installable library, install it (normally run as root).
   #+BEGIN_SRC shell-script
     make install
-  #+END_SRC
-  
+  #+END_SRC  
   This will install the files *libruncap.so* and *libruncap.a* to the
   system library directory, and the header file *runcap.h* to the
   system include directory.
 
 * Incorporating as a submodule
 
-To incorporate *runcap* as a submodule to your project, follow these
+To incorporate *runcap* to your project as a submodule, follow these
 steps:
 
 1. Change to your project's toplevel directory.
@@ -49,20 +217,78 @@ steps:
 
     SUBDIRS = runcap
   #+END_SRC
-5. Edit your *configure.ac*
-  #+BEGIN_SRC automake
+5. Edit your *configure.ac*. Add the following line:
+  #+BEGIN_SRC autoconf
     RUNCAP_SETUP
   #+END_SRC
-6. 
+6. Add the following to the *Makefile.am* file which builds the target
+   that uses on the *runcap* library:
   #+BEGIN_SRC make
     AM_CPPFLAGS = @RUNCAP_INC@
-    AM_LDADD = @RUNCAP_LDADD@
+    LDADD = @RUNCAP_LDADD@
   #+END_SRC
 
+* RUNCAP_SETUP autoconf macro
+
+The *RUNCAP_SETUP* macro initializes the *runcap* library. It should
+be used in the *configure.ac* file or in one of the files included to 
+it.  The macro invocation syntax is:
+
+#+BEGIN_SRC autoconf
+RUNCAP_SETUP(DIR, TYPE)
+#+END_SRC
+
+Both arguments are optional:
+
+- DIR  :: Name of the subdirectory where the *runcap* sources
+          reside. If omitted, =runcap= is assumed. When
+          building *runcap* as a standalone library, it is set to *.*
+          (a dot).
+- TYPE :: Build type: =install=, =shared=, or =static=.  Defaults to
+          =static=.
+
+This macro defines the following *make* variables:
+
+- RUNTIME_INC        :: *cpp* options to access the =runcap.h=
+                        include file.  Use it in the convenient
+                        =_CPPFLAGS= *make* variable. 
+- RUNCAP_LDADD       :: Lists the pathname of the *runcap*
+                        library. Use it in the =LDADD=
+                        or =prog_LDADD= *make* variable.
+- RUNCAP_BUILD_TYPE  :: Type of the build.
+
+
+* Copyright
+
+Copyright (C) 2017-2020 Sergey Poznyakoff
+
+Permission is granted to anyone to make or distribute verbatim copies
+of this document as received, in any medium, provided that the
+copyright notice and this permission notice are preserved,
+thus giving the recipient permission to redistribute in turn.
+
+Permission is granted to distribute modified versions
+of this document, or of portions of it,
+under the above conditions, provided also that they
+carry prominent notices stating who last changed them.
+
+* Document settings :noexport:
+
+Please ignore this section. It supplies the variables necessary for
+proper rendering of this document.
+
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+
+#+TITLE: runcap
+#+STARTUP: showall
+#+EXCLUDE_TAGS: noexport
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style1.css" />
+#+OPTIONS: ^:nil
 
 # Local Variables:
 # mode: org
 # paragraph-separate: "[ 	^L]*$"
 # version-control: never
 # End:
-

@@ -6,7 +6,7 @@ use warnings;
 use DynaLoader ();
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
-$VERSION   = "0.48";
+$VERSION   = "0.49";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT    = qw( DDumper DTidy DDsort DPeek DDisplay DDump DHexDump
 		 DDual DGrow );
@@ -34,6 +34,18 @@ my %sk = (
     0		=> 0,
     1		=> 1,
 
+    R	=> sub {	# Sort reverse
+	    my $r = shift;
+	    [ reverse sort                           keys %$r ];
+	    },
+    N	=> sub {	# Sort by key numerical
+	    my $r = shift;
+	    [         sort {      $a  <=>      $b  } keys %$r ];
+	    },
+    NR	=> sub {	# Sort by key numerical reverse
+	    my $r = shift;
+	    [         sort {      $b  <=>      $a  } keys %$r ];
+	    },
     V	=> sub {	# Sort by value
 	    my $r = shift;
 	    [         sort { $r->{$a} cmp $r->{$b} } keys %$r ];
@@ -50,13 +62,15 @@ my %sk = (
 	    my $r = shift;
 	    [         sort { $r->{$b} cmp $r->{$a} } keys %$r ];
 	    },
-    R	=> sub {	# Sort reverse
-	    my $r = shift;
-	    [ reverse sort                           keys %$r ];
-	    },
     );
 my  $_sortkeys = 1;
 our $_perltidy = 0;
+
+my %pmap = map { $_ => $_ } map { split //, $_ }
+    q{ !""#$%&'()*+,-./0123456789:;<=>},
+    q{@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^},
+    q{`abcdefghijklmnopqrstuvwxyz|~}, "{}";
+$pmap{$_} = "." for grep { !exists $pmap{$_} } map { chr } 0 .. 255;
 
 sub DDsort {
     @_ or return;
@@ -88,6 +102,7 @@ sub DDumper {
     local $Data::Dumper::Quotekeys = 0;
     local $Data::Dumper::Deparse   = 1;
     local $Data::Dumper::Terse     = 1;
+    local $Data::Dumper::Purity    = 1;
     local $Data::Dumper::Useqq     = 0;	# I want unicode visible
 
     my $s = Data::Dumper::Dumper @_;
@@ -109,6 +124,7 @@ sub DTidy {
     local $Data::Dumper::Quotekeys = 1;
     local $Data::Dumper::Deparse   = 1;
     local $Data::Dumper::Terse     = 1;
+    local $Data::Dumper::Purity    = 1;
     local $Data::Dumper::Useqq     = 0;
 
     my $s = Data::Dumper::Dumper @_;
@@ -216,7 +232,7 @@ sub DHexDump {
 	$out .= " ";
 	$out .= " ".($b[$_]||"  ") for 8 .. 15;
 	$out .= "  ";
-	$out .= ($_ < 0x20 || $_ >= 0x7f ? "." : chr $_) for map { hex $_ } @b;
+	$out .= $pmap{$_} for map { chr hex $_ } @b;
 	push @out, $out."\n";
 	$off += 16;
 	}
@@ -266,7 +282,7 @@ Data::Peek - A collection of low-level debug facilities
  my $x = ""; DGrow ($x, 10000);
  my $tv = triplevar ("\N{GREEK SMALL LETTER PI}", 3, "3.1415");
  DDsort ("R");
- DDumper [ $x ]; # use of :tidy make DDumper behave as DTidy
+ DDumper [ $x ]; # use of :tidy makes DDumper behave like DTidy
 
 =head1 DESCRIPTION
 
@@ -330,13 +346,15 @@ If L<Perl::Tidy> is not available, C<DTidy> will fallback to C<DDumper>.
 
 This idea was shamelessly copied from John McNamara's L<Data::Dumper::Perltidy>.
 
-=head2 DDsort ( 0 | 1 | R | V | VR | VN | VNR )
+=head2 DDsort ( 0 | 1 | R | N | NR | V | VR | VN | VNR )
 
 Set the hash sort algorithm for DDumper. The default is to sort by key value.
 
   0   - Do not sort
   1   - Sort by key
   R   - Reverse sort by key
+  N   - Sort by key numerical
+  NR  - Sort by key numerical descending
   V   - Sort by value
   VR  - Reverse sort by value
   VN  - Sort by value numerical
@@ -468,14 +486,13 @@ C<triplevar> is not exported by default.
 
 Example:
 
-  print DPeek for DDual
-      Data::Peek::triplevar ("\N{GREEK SMALL LETTER PI}", 3, 3.1415);
+  DDual Data::Peek::triplevar ("\N{GREEK SMALL LETTER PI}", 3, 3.1415);
 
-  PV("\317\200"\0) [UTF8 "\x{3c0}"]
-  IV(3)
-  NV(3.1415)
-  SV_UNDEF
-  IV(0)
+  PVNV("\317\200"\0) [UTF8 "\x{3c0}"]
+    PV: PV("\317\200"\0) [UTF8 "\x{3c0}"]
+    IV: IV(3)
+    NV: NV(3.1415)
+    RV: SV_UNDEF
 
 =head2 DDump ([$var [, $dig_level]])
 
@@ -685,7 +702,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 H.Merijn Brand
+Copyright (C) 2008-2020 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

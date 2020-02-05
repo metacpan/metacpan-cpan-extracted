@@ -53,39 +53,19 @@ Track web site.
 
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
-Mike McCants appears to get his Iridium status from Rod Sladen, and not
-to have updated it since late 2013. Therefore support of C<'mccants'> as
-a source of Iridium status is deprecated effective immediately.
+As of version 0.137, Iridium status format C<'mccants'> is fully
+deprecated, and will result in an exception.
 
-Unfortunately I did not pursue deprecating McCants' status, but this is
-being resumed with all attempts to use it producing a warning. This
-warning is redundant, since as of July 10 2019 his Iridium status is
-404.
+I should have put the
+C<url_iridium_status_mccants> accessor and mutator through a deprecation
+cycle at the same time, but did not. So the first attempt to access or
+change this attribute will result in a warning. At the first release
+after August 1 2020, all accesses or changes will result in a warning,
+and six months after that they will be fatal.
 
-Of course, with the Iridium satellites being replaced by the non-flaring
-Iridium Next, the quality of McCants' status becomes moot. When the last
-flaring Iridium is taken out of service (per either Kelso or Sladen,
-whichever I deem the best source at the time) all Iridium status
-functionality will be put through a deprecation cycle and removed.
-
-=head1 NOTICE: HASH REFERENCE ARGUMENTS NOW VALIDATED
-
-Some of the methods of this class take options as either a leading hash
-reference, or as command-line-style options, named with a leading dash.
-Before version 0.081_01, options passed as a hash reference
-were not validated, and extra hash keys were simply ignored. I have
-decided that this behavior is undesirable because it leaves a calling
-program with no way to know whether options passed in this way were
-honored.
-
-Beginning with version 0.081_01, extra hash keys will
-produce warnings. My intent is that these will become fatal after a
-phase-in cycle.
-
-Temporarily, environment variable
-L<SPACETRACK_SKIP_OPTION_HASH_VALIDATION|/SPACETRACK_SKIP_OPTION_HASH_VALIDATION>
-has been provided to help manage the warnings while changes are being
-made.
+Of course, since there are no longer any Iridium Classic satellites in
+service, all the Iridium status machinery is a candidate for deprecation
+and removal. Stay tuned.
 
 =head1 DESCRIPTION
 
@@ -126,7 +106,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.136';
+our $VERSION = '0.137';
 our @EXPORT_OK = qw{
     shell
 
@@ -559,7 +539,10 @@ my %accessor = (
 );
 foreach my $key ( keys %mutator ) {
     exists $accessor{$key}
-	or $accessor{$key} = sub { return $_[0]->{$_[1]} };
+	or $accessor{$key} = sub {
+	    $_[0]->_deprecation_notice( attribute => $_[1] );
+	    return $_[0]->{$_[1]};
+	};
 }
 
 # Maybe I really want a cookie_file attribute, which is used to do
@@ -1742,8 +1725,7 @@ The following commands are defined:
   help
     Display this help text.
   iridium_status
-    Status of Iridium satellites, from Mike McCants or Rod Sladen and/or
-    T. S. Kelso.
+    Status of Iridium satellites, from Rod Sladen and/or T. S. Kelso.
   login
     Acquire a session cookie. You must have already set the
     username and password attributes. This will be called
@@ -1827,9 +1809,9 @@ addition, it prevents all sources from being supplemented by canned data
 that includes all original-design Iridium satellites, including those
 that have decayed. By default this option is not asserted.
 
-Format C<'mccants'> is B<deprecated>, and will be removed in a future
-release. This entire method will be deprecated and removed once the last
-flaring Iridium satellite is removed from service.
+Format C<'mccants'> is B<deprecated>, and throws an exception as of
+version 0.137.  This entire method will be deprecated and removed once
+the last flaring Iridium satellite is removed from service.
 
 A Space Track username and password are required only if the format is
 C<'spacetrack'>.
@@ -1839,7 +1821,7 @@ If this method succeeds, the response will contain headers
  Pragma: spacetrack-type = iridium_status
  Pragma: spacetrack-source = 
 
-The spacetrack-source will be C<'kelso'>, C<'mccants'>, C<'sladen'>, or
+The spacetrack-source will be C<'kelso'>, C<'sladen'>, or
 C<'spacetrack'>, depending on the format requested.
 
 These can be accessed by C<< $st->content_type( $resp ) >> and
@@ -1865,35 +1847,6 @@ convenience:
     '[?]' - Unknown
 
 The comment will be 'Spare', 'Tumbling', or '' depending on the status.
-
-Historically, if the format was 'mccants', the primary source of
-information would be Mike McCants' "Status of Iridium Payloads" web
-page, C<https://www.prismnet.com/~mmccants/tles/iridium.html> (which ave
-status on non-functional Iridium satellites). As of July 10 2019 this is
-404.
-
-B<This format is deprecated,> since Mike no longer maintains this page.
-See
-L<DEPRECATION NOTICE: IRIDIUM STATUS|/DEPRECATION NOTICE: IRIDIUM STATUS>
-for the deprecation schedule.
-
-The Celestrak list will be used to fill in the functioning satellites so
-that a complete list is generated.  The comment will be whatever text is
-provided by Mike McCants' web page, or 'Celestrak' if the satellite data
-came from that source.
-
-As of 03-Dec-2010 Mike's web page documented the possible statuses as
-follows:
-
- blank   Object is operational
- tum     tumbling - no flares, but flashes seen on favorable
-         transits.
- unc     uncontrolled
- ?       controlled, but not at operational altitude -
-         flares may be unreliable.
- man     maneuvering, at least slightly. Flares may be
-	 unreliable and the object may be early or late
-         against prediction.
 
 In addition, the data from Celestrak may contain the following
 status:
@@ -1958,9 +1911,6 @@ In terms of the Kelso statuses, the mapping is:
     '[D]' - BODY_STATUS_IS_DECAYED
     '[?]' - BODY_STATUS_IS_TUMBLING
 
-In the McCants statuses, '?' identifies a spare, '+' identifies an
-in-service satellite, and anything else is considered to be tumbling.
-
 The BODY_STATUS constants are exportable using the :status tag.
 
 =cut
@@ -1977,20 +1927,6 @@ The BODY_STATUS constants are exportable using the :status tag.
 	'[-]' => 'Tumbling',
 	'[D]'	=> 'Decayed',
 	);
-    my %status_map = (	# Map Kelso status to McCants status.
-	kelso => {
-	    mccants => {
-		'[S]' => '?',	# spare
-		'[-]' => 'tum',	# Nonoperational
-		'[+]' => '',	# operational
-		'[P]' => '?',	# Partially Operational
-		'[B]' => 'man',	# Backup/Standby
-		'[X]' => '?',	# Extended Mission
-		'[D]' => 'tum',	# Decayed
-		'[?]' => 'tum',	# Unknown
-		},
-	    },
-	);
     my %status_portable = (	# Map statuses to portable.
 	kelso => {
 	    ''	=> BODY_STATUS_IS_OPERATIONAL,
@@ -2002,15 +1938,6 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    '[X]' => BODY_STATUS_IS_SPARE,		# Extended Mission
 	    '[D]' => BODY_STATUS_IS_DECAYED,		# Decayed
 	    '[?]' => BODY_STATUS_IS_TUMBLING,		# Unknown
-	},
-	mccants => {
-	    '' => BODY_STATUS_IS_OPERATIONAL,
-	    '?' => BODY_STATUS_IS_SPARE,
-	    'dum' => BODY_STATUS_IS_TUMBLING,
-	    'man' => BODY_STATUS_IS_TUMBLING,
-	    'tum' => BODY_STATUS_IS_TUMBLING,
-	    'tum?' => BODY_STATUS_IS_TUMBLING,
-	    'unc'  => BODY_STATUS_IS_TUMBLING,
 	},
 #	sladen => undef,	# Not needed; done programmatically.
     );
@@ -2174,7 +2101,8 @@ The BODY_STATUS constants are exportable using the :status tag.
 
     # Get Iridium data from Celestrak.
     sub _iridium_status_kelso {
-	my ( $self, $fmt, $rslt ) = @_;
+	# my ( $self, $fmt, $rslt ) = @_;
+	my ( $self, undef, $rslt ) = @_;	# $fmt only relevant to mccants
 	my $resp = $self->_get_agent()->get(
 	    $self->getv( 'url_iridium_status_kelso' )
 	);
@@ -2187,14 +2115,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    $name =~ s/ \s+ ( [[] .+? []] ) \s* \z //smx
 		and $status = $1;
 	    my $portable_status = $status_portable{kelso}{$status};
-	    my $comment;
-	    if ( 'mccants' eq $fmt ) {
-		$status = $status_map{kelso}{$fmt}{$status} || '';
-		$status = 'dum' unless $name =~ m/ \A IRIDIUM /smxi;
-		$comment = 'Celestrak';
-	    } else {
-		$comment = $kelso_comment{$status} || '';
-	    }
+	    my $comment = $kelso_comment{$status} || '';
 	    $name = ucfirst lc $name;
 	    $rslt->{$id} = [ $id, $name, $status, $comment,
 		$portable_status ];
@@ -2216,33 +2137,6 @@ The BODY_STATUS constants are exportable using the :status tag.
 	}
 
 	return;
-    }
-
-    # Get Iridium status from Mike McCants. Called dynamically
-    sub _iridium_status_mccants {	## no critic (ProhibitUnusedPrivateSubroutines)
-	my ( $self, undef, $rslt ) = @_;	# $fmt arg not used
-	$self->_iridium_status_assume_good( $rslt );
-	my $resp = $self->_get_agent()->get(
-	    $self->getv( 'url_iridium_status_mccants' )
-	);
-	$resp->is_success or return $resp;
-	foreach my $buffer (split '\n', $resp->content) {
-	    $buffer =~ m/ \A \s* (\d+) \s+ Iridium \s+ \S+ /smxi
-		or next;
-	    my ($id, $name, $status, $comment) = _trim(
-		$buffer =~ m/ (.{8}) (.{0,15}) (.{0,9}) (.*) /smx
-	    );
-	    my $portable_status =
-		exists $status_portable{mccants}{$status} ?
-		    $status_portable{mccants}{$status} :
-		    BODY_STATUS_IS_TUMBLING;
-	    $rslt->{$id} = [ $id, $name, $status, $comment,
-		$portable_status ];
-#0         1         2         3         4         5         6         7
-#01234567890123456789012345678901234567890123456789012345678901234567890
-# 24836   Iridium 914    tum      Failed; was called Iridium 14
-	}
-	return $resp;
     }
 
     my %sladen_interpret_detail = (
@@ -4960,17 +4854,21 @@ sub _check_cookie_generic {
 #	spaceflight => {
 #	    shuttle	=> 3,
 #	},
+	attribute	=> {
+	    url_iridium_status_mccants	=> 1,
+	},
 	iridium_status	=> {
-	    mccants	=> 2,
+	    mccants	=> 3,
 	},
 	iridium_status_format	=> {
-	    mccants	=> 2,
+	    mccants	=> 3,
 	},
     );
 
     sub _deprecation_notice {
 	my ( undef, $method, $argument ) = @_;	# Invocant unused
 	$deprecate{$method} or return;
+	defined $argument or confess( 'Bug - $argument undefined' );
 	$deprecate{$method}{$argument} or return;
 	$deprecate{$method}{$argument} >= 3
 	    and croak "$method $argument is retracted";
@@ -5497,6 +5395,7 @@ sub _mung_login_status {
 # We supress Perl::Critic because we're a one-liner. CAVEAT: we MUST
 # not modify the contents of @_. Modifying @_ itself is fine.
 sub _mutate_attrib {
+    $_[0]->_deprecation_notice( attribute => $_[1] );
     return ($_[0]{$_[1]} = $_[2]);
 }
 
@@ -6441,16 +6340,12 @@ file, if any, even if the C<identity> attribute is explicitly set true.
 =item iridium_status_format (string)
 
 This attribute specifies the default format of the data returned by the
-C<iridium_status()> method. Valid values are 'kelso',
-'mccants', 'sladen' or 'spacetrack'.  See that method for more
-information.
+C<iridium_status()> method. Valid values are 'kelso', 'sladen' or
+'spacetrack'.  See that method for more information.
 
-As of version 0.100_02, the default is C<'kelso'>. It used
-to be C<'mccants'>, but Mike McCants no longer maintains his Iridium
-status web page, format C<'mccants'> is deprecated, and will generate a
-warning the first time it is set. See
-L<DEPRECATION NOTICE: IRIDIUM STATUS|/DEPRECATION NOTICE: IRIDIUM STATUS>
-for the deprecation schedule.
+As of version 0.100_02, the default is C<'kelso'>. It used to be
+C<'mccants'>, but Mike McCants no longer maintains his Iridium status
+web page, and format C<'mccants'> was removed as of version 0.137.
 
 =item max_range (number)
 
@@ -6516,6 +6411,10 @@ his web site.
 The default is 'http://celestrak.com/SpaceTrack/query/iridium.txt'
 
 =item url_iridium_status_mccants (text)
+
+This attribute is B<deprecated>, and will warn on first use. On the
+first release after August 1 2020 it will warn on every use, and six
+months after that it will be fatal.
 
 This attribute specifies the location of Mike McCants' Iridium status
 page. You should normally not change this, but it is provided so you

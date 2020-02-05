@@ -12,6 +12,18 @@ ok $class->does('Mojo::File::Role::Digest'), 'Role is applied';
 can_ok $class, $_, for qw|md5_sum quickxor_hash sha1_sum sha256_sum|;
 
 my %digests = (
+  '' => {    # the resources folder itself
+    md5    => '',
+    qx     => '',
+    sha1   => '',
+    sha256 => '',
+  },
+  'inexistant.txt' => {
+    md5    => '',
+    qx     => '',
+    sha1   => '',
+    sha256 => '',
+  },
   'longer_text.txt' => {
     md5    => '7d766e0a8e5578b67adb103fd716206b',
     qx     => 'MyNPbFMLAm5Ol0JF4iqBwtfLtf8=',

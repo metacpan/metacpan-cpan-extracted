@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use HTTP::CookieMonster;
+use HTTP::CookieMonster ();
+use HTTP::Cookies       ();
 use Scalar::Util qw( reftype );
-use Storable qw( retrieve store );
 use Test::More;
 
-my $jar = retrieve('t/cookie_jar.txt');
+my $jar = HTTP::Cookies->new( file => 't/cookie_jar.txt' );
 
 my $obj = HTTP::CookieMonster->new( cookie_jar => $jar );
 ok( $obj, 'can create object with 2 args' );
@@ -24,12 +24,12 @@ is(
 );
 
 my @all_cookies = $monster->all_cookies;
-is( scalar @all_cookies, 2, 'all cookies returns array in list context' );
+is( scalar @all_cookies, 4, 'all cookies returns array in list context' );
 
 my $all_cookies = $monster->all_cookies;
-ok( $monster->get_cookie('RMID'), 'got a single cookie' );
+ok( $monster->get_cookie('nyt-geo'), 'got a single cookie' );
 
-my $rmid = $monster->get_cookie('RMID');
+my $rmid = $monster->get_cookie('nyt-geo');
 $rmid->val('random');
 is $monster->set_cookie($rmid), 1, 'can set cookie';
 

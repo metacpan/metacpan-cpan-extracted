@@ -1,3 +1,14 @@
+0.09 2020-02-02T18:44:41+01:00
+ - Add test for sections subroutine.
+ - Change =item to =head2 in METHODS section in doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Remove trivial comments.
+ - Update Module::Install readme_from.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.08 2015-10-14T11:21:19+02:00
  - Add SEE ALSO section to doc.
  - Move author tests to xt/ directory.

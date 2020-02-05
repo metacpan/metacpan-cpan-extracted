@@ -1,3 +1,14 @@
+v0.116.3 2020-02-05T02:45:20Z
+ - api per method perms fixed
+
+v0.116.2 2020-02-03T01:26:27Z
+ - app sendmail args updated
+
+v0.116.1 2020-02-03T00:23:18Z
+ - smtp remove DIGEST-MD5 auth mechanism
+ - resources updated
+ - user components
+
 v0.116.0 2020-01-28T22:49:50Z
  - pg dbh convert numbers
 

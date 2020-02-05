@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Base-Tiny
 
+0.05 2020-01-31T06:44:13+0100
+  - Change name from -async to -async_await
+
 0.04 2019-12-30T18:02:53+0100
   - (Don't) add -async flag from Mojolicious 8.28
 

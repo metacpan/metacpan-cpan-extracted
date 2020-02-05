@@ -1,5 +1,16 @@
 Revision history for HTML-T5
 
+0.009  2020-02-05
+    - Fix the Alien configure_requires in the META.yml
+        - https://rt.cpan.org/Ticket/Display.html?id=131678
+        - Thanks to SREZIC for the report.
+
+0.008  2020-02-04
+    - Use only Alien::Base::Wrapper 2.0 and Alien::TidyHTML5 v0.3.0
+        - Try to fix https://rt.cpan.org/Public/Bug/Display.html?id=128549
+        - Avoid the Devel::CheckLib shims / cruft in Makefile.PL
+        - Thanks to SREZIC for the report.
+
 0.007  2020-01-29
     - Update the minimal required version of Alien::TidyHTML5 to v0.3.0
     to get libtidy5.6.0 which is required for passing tests.

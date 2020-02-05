@@ -5,10 +5,15 @@ use Data::Object 'Class';
 use Data::Object::Data;
 use Data::Object::Try;
 
+use Exporter;
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.03'; # VERSION
+use base 'Exporter';
+
+our @EXPORT = 'testauto';
+
+our $VERSION = '0.04'; # VERSION
 
 has file => (
   is => 'ro',
@@ -21,6 +26,13 @@ has data => (
   isa => 'DataObject',
   opt => 1
 );
+
+# EXPORT
+
+fun testauto($file) {
+
+  return Test::Auto->new($file)->subtests;
+}
 
 # BUILD
 
@@ -132,6 +144,32 @@ L<Data::Object::Library>
 
 =cut
 
+=head1 SCENARIOS
+
+This package supports the following scenarios:
+
+=cut
+
+=head2 testauto
+
+  use Test::Auto;
+  use Test::More;
+
+  my $subtests = testauto 't/Test_Auto.t';
+
+  # automation
+
+  # $subtests->standard;
+
+  # ...
+
+  # done_testing;
+
+This package automatically exports the C<testauto> function which uses the
+"current file" as the automated testing source.
+
+=cut
+
 =head1 ATTRIBUTES
 
 This package has the following attributes:
@@ -151,6 +189,31 @@ This attribute is read-only, accepts C<(DataObject)> values, and is optional.
   file(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is required.
+
+=cut
+
+=head1 FUNCTIONS
+
+This package implements the following functions:
+
+=cut
+
+=head2 testauto
+
+  testauto(Str $file) : InstanceOf["Test::Auto::Subtests"]
+
+This function is exported automatically and returns a L<Test::Auto::Subtests>
+object for the test file given.
+
+=over 4
+
+=item testauto example #1
+
+  # given: synopsis
+
+  my $subtests = testauto 't/Test_Auto.t';
+
+=back
 
 =cut
 
@@ -230,6 +293,11 @@ This method returns a L<Test::Auto::Subtests> object.
   =inherits
   =integrates
   =attributes
+
+  # [repeatable; optional]
+
+  =scenario $name
+  =example $name
 
   # [repeatable; optional]
 
@@ -352,6 +420,38 @@ are tested for loadability.
 
 The C<integrates> block should contain a list of packages that are involved in
 the behavior of the main package. These packages are not automatically tested.
+
+=head2 scenarios
+
+  =scenario export-path-make
+
+  quisque egestas diam in arcu cursus euismod quis viverra nibh
+
+  =example export-path-make
+
+  # given: synopsis
+
+  package main;
+
+  use Path::Find 'path_make';
+
+  path_make 'relpath/to/file';
+
+  =cut
+
+
+There are situation where a package can be configured in different ways,
+especially where it exists without functions, methods or routines for the
+purpose of configuring the environment. The scenario directive can be used to
+automate testing and documenting package usages and configurations.Describing a
+scenario requires two blocks, i.e. C<scenario $name> and C<example $name>. The
+C<scenario> block should contain a description of the scenario and its purpose.
+The C<example> block must exist when documenting a method and should contain
+valid Perl code and return a value. The block may contain a "magic" comment in
+the form of C<given: synopsis> or C<given: example-$number $name> which if
+present will include the given code example(s) with the evaluation of the
+current block. Each scenario is tested and must be recognized to exist by the
+main package.
 
 =head2 attributes
 

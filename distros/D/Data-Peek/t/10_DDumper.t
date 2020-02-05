@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 55;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 BEGIN {
     use_ok "Data::Peek";
@@ -38,6 +38,8 @@ while (<DATA>) {
 	}
     }
 
+done_testing;
+
 1;
 
 __END__
@@ -45,12 +47,12 @@ __END__
 undef				undef
 1				1
 ""				''
-"\xa8"				'¨'
+"\xb6"				'¶'
 1.24				'1.24'
 \undef				\undef
 \1				\1
 \""				\''
-\"\xa8"				\'¨'
+\"\xb6"				\'¶'
 (0, 1)				1
 \(0, 1)				\1
 --	Structures

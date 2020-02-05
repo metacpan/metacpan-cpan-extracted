@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017 Sergey Poznyakoff
+   Copyright (C) 2017-2020 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -31,6 +31,7 @@ struct stream_capture
 	void (*sc_linemon)(const char *, size_t, void *);
   	                     /* Line monitor function */
 	void  *sc_monarg;    /* Line monitor argument */
+	int    sc_flags;     /* Stream flags */
 };
 
 #define STRCAP_BUFSIZE 4096
@@ -57,13 +58,24 @@ struct runcap
 #define RCF_PROGRAM 0x0001 /* rc_program is set */
 #define RCF_TIMEOUT 0x0002 /* rc_timeout is set */
 #define RCF_STDIN   0x0004 /* rc_cap[RUNCAP_STDIN] is set */
-#define RCF_STDOUT_SIZE    0x0008
-#define RCF_STDOUT_LINEMON 0x0010
-#define RCF_STDERR_SIZE    0x0020
-#define RCF_STDERR_LINEMON 0x0040
 
-int stream_capture_init(struct stream_capture *fc, size_t size);
-void stream_capture_free(struct stream_capture *fc);
+#define RCF_SC_SIZE        0x1 /* sc_size is set */
+#define RCF_SC_LINEMON     0x2 /* sc_linemon is set*/
+#define RCF_SC_NOCAP       0x4 /* capturing is disabled */
+#define RCF_SC_STORFD      0x8 /* sc_storfd is set */
+
+#define RCF_SC_TO_FLAG(f,s) ((f) << (4*(s)))
+#define RCF_FLAG_TO_SC(f,s) (((f) >> (4*(s))) & 0xf)
+
+#define RCF_STDOUT_SIZE    RCF_SC_TO_FLAG(RCF_SC_SIZE, RUNCAP_STDOUT)
+#define RCF_STDOUT_LINEMON RCF_SC_TO_FLAG(RCF_SC_LINEMON, RUNCAP_STDOUT)
+#define RCF_STDOUT_NOCAP   RCF_SC_TO_FLAG(RCF_SC_NOCAP, RUNCAP_STDOUT)
+#define RCF_STDOUT_STORFD  RCF_SC_TO_FLAG(RCF_SC_STORFD, RUNCAP_STDOUT)
+
+#define RCF_STDERR_SIZE    RCF_SC_TO_FLAG(RCF_SC_SIZE, RUNCAP_STDERR)
+#define RCF_STDERR_LINEMON RCF_SC_TO_FLAG(RCF_SC_LINEMON, RUNCAP_STDERR)
+#define RCF_STDERR_NOCAP   RCF_SC_TO_FLAG(RCF_SC_NOCAP, RUNCAP_STDERR)
+#define RCF_STDERR_STORFD  RCF_SC_TO_FLAG(RCF_SC_STORFD, RUNCAP_STDERR)
 
 int runcap(struct runcap *rc, int flags);
 void runcap_free(struct runcap *rc);
@@ -80,13 +92,14 @@ runcap_get_capture(struct runcap *rc, int stream)
 
 	fp = &rc->rc_cap[stream];
 	
-	if (!fp->sc_base || fp->sc_size == 0) {
+	if (!fp->sc_base || fp->sc_size == 0 || (fp->sc_flags & RCF_SC_NOCAP)) {
 		errno = EINVAL;
 		return NULL;
 	}
 	return fp;
 }
 
+ssize_t runcap_read(struct runcap *rc, int sd, char *buf, size_t size);
 int runcap_getc(struct runcap *rc, int stream, char *cp);
 ssize_t runcap_getline(struct runcap *rc, int stream, char **pstr, size_t *psize);
 off_t runcap_tell(struct runcap *rc, int stream);

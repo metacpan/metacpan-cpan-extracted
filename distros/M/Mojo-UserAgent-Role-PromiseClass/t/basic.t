@@ -46,7 +46,8 @@ is($tx->res->body, 'Hello World');
 my $pc1 = $t->ua->promise_class;
 $t->ua->promise_roles('+Fake');
 ok($pc1 eq $t->ua->promise_class, 'add +Fake twice');
-like(exception { $t->ua->promise_roles(); }, qr/^No roles supplied!.*/);
+$t->ua->promise_roles();
+ok($pc1 eq $t->ua->promise_class, 'add nothing');
 
 {
     package MyTransactor;

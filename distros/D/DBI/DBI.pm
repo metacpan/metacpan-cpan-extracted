@@ -11,7 +11,7 @@ package DBI;
 require 5.008_001;
 
 BEGIN {
-our $XS_VERSION = our $VERSION = "1.642"; # ==> ALSO update the version in the pod text below!
+our $XS_VERSION = our $VERSION = "1.643"; # ==> ALSO update the version in the pod text below!
 $VERSION = eval $VERSION;
 }
 
@@ -1546,7 +1546,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	    # attribute cache, i.e., boolean's and some others
 	    $attr->{$_} = $old_dbh->FETCH($_) for (qw(
 		AutoCommit ChopBlanks InactiveDestroy AutoInactiveDestroy
-		LongTruncOk PrintError PrintWarn Profile RaiseError
+		LongTruncOk PrintError PrintWarn Profile RaiseError RaiseWarn
 		ShowErrorStatement TaintIn TaintOut
 	    ));
 	}
@@ -2280,6 +2280,15 @@ for example:
     print "@row\n";
   }
 
+For queries that are not executed many times at once, it is often cleaner
+to use the higher level select wrappers:
+
+  $row_hashref = $dbh->selectrow_hashref("SELECT foo, bar FROM table WHERE baz=?", undef, $baz);
+
+  $arrayref_of_row_hashrefs = $dbh->selectall_arrayref(
+    "SELECT foo, bar FROM table WHERE baz BETWEEN ? AND ?",
+    { Slice => {} }, $baz_min, $baz_max);
+
 The typical method call sequence for a I<non>-C<SELECT> statement is:
 
   prepare,
@@ -2297,10 +2306,13 @@ for example:
 	$sth->execute( $foo, $bar, $baz );
   }
 
-The C<do()> method can be used for non repeated I<non>-C<SELECT> statement
-(or with drivers that don't support placeholders):
+The C<do()> method is a wrapper of prepare and execute that can be simpler
+for non repeated I<non>-C<SELECT> statements (or with drivers that don't
+support placeholders):
 
   $rows_affected = $dbh->do("UPDATE your_table SET foo = foo + 1");
+
+  $rows_affected = $dbh->do("DELETE FROM table WHERE foo = ?", undef, $foo);
 
 To commit your changes to the database (when L</AutoCommit> is off):
 
@@ -2768,6 +2780,7 @@ The C<AutoCommit> and C<PrintError> attributes for each connection
 default to "on". (See L</AutoCommit> and L</PrintError> for more information.)
 However, it is strongly recommended that you explicitly define C<AutoCommit>
 rather than rely on the default. The C<PrintWarn> attribute defaults to true.
+The C<RaiseWarn> attribute defaults to false.
 
 The C<\%attr> parameter can be used to alter the default settings of
 C<PrintError>, C<RaiseError>, C<AutoCommit>, and other attributes. For example:
@@ -3346,7 +3359,7 @@ also sets C<errstr> to undef, and C<state> to C<"">, irrespective
 of the values of the $errstr and $state parameters.
 
 The $method parameter provides an alternate method name for the
-C<RaiseError>/C<PrintError>/C<PrintWarn> error string instead of
+C<RaiseError>/C<PrintError>/C<RaiseWarn>/C<PrintWarn> error string instead of
 the fairly unhelpful 'C<set_err>'.
 
 The C<set_err> method normally returns undef.  The $rv parameter
@@ -3789,6 +3802,24 @@ By default, C<DBI-E<gt>connect> sets C<PrintError> "on".
 If desired, the warnings can be caught and processed using a C<$SIG{__WARN__}>
 handler or modules like CGI::Carp and CGI::ErrorWrap.
 
+=head3 C<RaiseWarn>
+
+Type: boolean, inherited
+
+The C<RaiseWarn> attribute can be used to force warnings to raise exceptions rather
+then simply printing them. It is "off" by default.
+When set "on", any method which sets warning condition will cause
+the DBI to effectively do a C<die("$class $method warning: $DBI::errstr")>,
+where C<$class> is the driver class and C<$method> is the name of the method
+that sets warning condition. E.g.,
+
+  DBD::Oracle::db execute warning: ... warning text here ...
+
+If you turn C<RaiseWarn> on then you'd normally turn C<PrintWarn> off.
+If C<PrintWarn> is also on, then the C<PrintWarn> is done first (naturally).
+
+This attribute was added in DBI 1.643.
+
 =head3 C<RaiseError>
 
 Type: boolean, inherited
@@ -3847,14 +3878,15 @@ Type: code ref, inherited
 The C<HandleError> attribute can be used to provide your own alternative behaviour
 in case of errors. If set to a reference to a subroutine then that
 subroutine is called when an error is detected (at the same point that
-C<RaiseError> and C<PrintError> are handled).
+C<RaiseError> and C<PrintError> are handled). It is called also when
+C<RaiseWarn> is enabled and a warning is detected.
 
 The subroutine is called with three parameters: the error message
-string that C<RaiseError> and C<PrintError> would use,
+string that C<RaiseError>, C<RaiseWarn> or C<PrintError> would use,
 the DBI handle being used, and the first value being returned by
 the method that failed (typically undef).
 
-If the subroutine returns a false value then the C<RaiseError>
+If the subroutine returns a false value then the C<RaiseError>, C<RaiseWarn>
 and/or C<PrintError> attributes are checked and acted upon as normal.
 
 For example, to C<die> with a full stack trace for any error:
@@ -3883,7 +3915,7 @@ value is important.  See L<perlsub> and L<perlref> for more information
 about I<closures>.
 
 It is possible for C<HandleError> to alter the error message that
-will be used by C<RaiseError> and C<PrintError> if it returns false.
+will be used by C<RaiseError>, C<RaiseWarn> and C<PrintError> if it returns false.
 It can do that by altering the value of $_[0]. This example appends
 a stack trace to all errors and, unlike the previous example using
 Carp::confess, this will work C<PrintError> as well as C<RaiseError>:
@@ -3964,7 +3996,7 @@ Type: boolean, inherited
 
 The C<ShowErrorStatement> attribute can be used to cause the relevant
 Statement text to be appended to the error messages generated by
-the C<RaiseError>, C<PrintError>, and C<PrintWarn> attributes.
+the C<RaiseError>, C<PrintError>, C<RaiseWarn> and C<PrintWarn> attributes.
 Only applies to errors on statement handles
 plus the prepare(), do(), and the various C<select*()> database handle methods.
 (The exact format of the appended text is subject to change.)
@@ -4680,6 +4712,8 @@ the rows directly as a list, rather than a reference to an array of rows.
 
 Note that if L</RaiseError> is not set then you can't tell the difference
 between returning no rows and an error. Using RaiseError is best practice.
+
+The C<selectall_array> method was added in DBI 1.635.
 
 =head3 C<selectall_hashref>
 

@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use File::Object;
 use Pod::Example qw(get);
@@ -20,7 +18,6 @@ use Ex1;
 # Test.
 my $ret = get('Ex1');
 my $right_ret = <<'END';
-# Pragmas.
 use strict;
 use warnings;
 
@@ -58,7 +55,6 @@ is($ret, $right_ret, 'Example as EXAMPLE1 with explicit example section '.
 # Test.
 $ret = get($modules_dir->file('Ex4.pm')->s, 'EXAMPLE', 2);
 $right_ret = <<'END';
-# Pragmas.
 use strict;
 use warnings;
 
@@ -72,11 +68,10 @@ is($ret, $right_ret, 'Example as EXAMPLE2 with explicit example section '.
 # Test.
 $ret = get($modules_dir->file('Ex5.pm')->s);
 $right_ret = <<'END';
- # Pragmas.
 use strict;
 use warnings;
 
-# Print.
+ # Print.
 print "Foo.\n";
 END
 chomp $right_ret;
@@ -86,7 +81,6 @@ is($ret, $right_ret, 'Example with inconsistent spaces on begin '.
 # Test.
 $ret = get($modules_dir->file('Ex6.pm')->s);
 $right_ret = <<'END';
-# Pragmas.
  use strict;
 use warnings;
 
@@ -111,7 +105,6 @@ is($EVAL_ERROR, "Cannot open pod file or Perl module.\n",
 # Test.
 $ret = get($modules_dir->file('Ex7.pm')->s);
 $right_ret = <<'END';
-# Pragmas.
 use strict;
 use warnings;
 
@@ -124,7 +117,6 @@ is($ret, $right_ret, 'Example with inner html code.');
 # Test.
 $ret = get($modules_dir->file('Ex8.pm')->s);
 $right_ret = <<'END';
-# Pragmas.
 use strict;
 use warnings;
 

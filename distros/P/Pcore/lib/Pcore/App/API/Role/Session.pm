@@ -317,7 +317,7 @@ sub _send_confirmation_email ( $self, $to, $token ) {
 
     state $tmpl = P->tmpl;
 
-    return $self->{app}->{util}->sendmail( $to, undef, 'Confirm your email', $tmpl->( 'email/confirm-email.txt', $params ) );
+    return $self->{app}->{util}->sendmail( $to, 'Confirm your email', $tmpl->( 'email/confirm-email.txt', $params ) );
 }
 
 # TODO domain
@@ -330,7 +330,7 @@ sub _send_password_recovery_email ( $self, $to, $token ) {
 
     state $tmpl = P->tmpl;
 
-    return $self->{app}->{util}->sendmail( $to, undef, 'Change password', $tmpl->( 'email/recover-password.txt', $params ) );
+    return $self->{app}->{util}->sendmail( $to, 'Change password', $tmpl->( 'email/recover-password.txt', $params ) );
 }
 
 sub _get_avatar ( $self, $user ) {

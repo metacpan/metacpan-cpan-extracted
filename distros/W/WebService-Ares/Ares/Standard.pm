@@ -1,11 +1,9 @@
 package WebService::Ares::Standard;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Error::Pure qw(err);
 use Readonly;
@@ -15,8 +13,7 @@ use XML::Parser;
 Readonly::Array our @EXPORT_OK => qw(parse);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Parse XML string.
 sub parse {
@@ -187,6 +184,7 @@ WebService::Ares::Standard - Perl XML::Parser parser for ARES standard XML file.
 =head1 SYNOPSIS
 
  use WebService::Ares::Standard qw(parse);
+
  my $data_hr = parse($xml);
 
 =head1 DESCRIPTION
@@ -224,11 +222,9 @@ WebService::Ares::Standard - Perl XML::Parser parser for ARES standard XML file.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Data::Printer;
  use WebService::Ares::Standard qw(parse);
 
@@ -327,11 +323,9 @@ WebService::Ares::Standard - Perl XML::Parser parser for ARES standard XML file.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Data::Printer;
  use Perl6::Slurp qw(slurp);
  use WebService::Ares::Standard qw(parse);
@@ -375,19 +369,19 @@ Perl class to communication with Ares service.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/WebService-Ares>
+L<https://github.com/michal-josef-spacek/WebService-Ares>
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2009-2015
+ © Michal Josef Špaček 2009-2020
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

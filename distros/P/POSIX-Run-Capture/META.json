@@ -4,7 +4,7 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "gpl_3"
    ],
@@ -19,27 +19,10 @@
          "inc"
       ]
    },
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.006"
-         }
-      }
-   },
    "provides" : {
       "POSIX::Run::Capture" : {
          "file" : "lib/POSIX/Run/Capture.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -50,6 +33,5 @@
          "web" : "http://git.gnu.org.ua/cgit/posixruncapture.git/"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.01"
 }

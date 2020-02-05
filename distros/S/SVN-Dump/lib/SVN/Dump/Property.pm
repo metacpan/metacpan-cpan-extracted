@@ -1,5 +1,5 @@
 package SVN::Dump::Property;
-
+$SVN::Dump::Property::VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -58,6 +58,10 @@ __END__
 =head1 NAME
 
 SVN::Dump::Property - A property block from a svn dump
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
  

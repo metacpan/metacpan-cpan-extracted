@@ -1,3 +1,13 @@
+0.17 2020-02-02T21:45:26+01:00
+ - Add missing dependency for Getopt::Std.
+ - Change default value of debug to disable.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Fix minimal Perl version in Makefile.PL.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.16 2015-10-15T13:57:30+02:00
  - Fix App::Pod::Example NAME section in doc.
  - Remove .travis.yml from distribution.

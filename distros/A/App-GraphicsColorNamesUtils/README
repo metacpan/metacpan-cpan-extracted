@@ -2,9 +2,9 @@ NAME
     App::GraphicsColorNamesUtils - Utilities related to Graphics::ColorNames
 
 VERSION
-    This document describes version 0.003 of App::GraphicsColorNamesUtils
+    This document describes version 0.004 of App::GraphicsColorNamesUtils
     (from Perl distribution App-GraphicsColorNamesUtils), released on
-    2018-10-04.
+    2020-02-04.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -23,7 +23,7 @@ FUNCTIONS
   colorcode2name
     Usage:
 
-     colorcode2name(%args) -> [status, msg, result, meta]
+     colorcode2name(%args) -> [status, msg, payload, meta]
 
     Convert RGB color code to name.
 
@@ -43,7 +43,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -52,7 +52,7 @@ FUNCTIONS
   colorname2code
     Usage:
 
-     colorname2code(%args) -> [status, msg, result, meta]
+     colorname2code(%args) -> [status, msg, payload, meta]
 
     Convert color name to code.
 
@@ -67,7 +67,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -76,7 +76,7 @@ FUNCTIONS
   list_color_names
     Usage:
 
-     list_color_names(%args) -> [status, msg, result, meta]
+     list_color_names(%args) -> [status, msg, payload, meta]
 
     List all color names from a Graphics::ColorNames scheme.
 
@@ -93,7 +93,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -102,7 +102,7 @@ FUNCTIONS
   list_color_schemes
     Usage:
 
-     list_color_schemes() -> [status, msg, result, meta]
+     list_color_schemes() -> [status, msg, payload, meta]
 
     List all installed Graphics::ColorNames schemes.
 
@@ -115,7 +115,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -124,7 +124,7 @@ FUNCTIONS
   show_color_swatch
     Usage:
 
-     show_color_swatch(%args) -> [status, msg, result, meta]
+     show_color_swatch(%args) -> [status, msg, payload, meta]
 
     List all color names from a Graphics::ColorNames scheme as a color
     swatch.
@@ -142,7 +142,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -169,7 +169,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

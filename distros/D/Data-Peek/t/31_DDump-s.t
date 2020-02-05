@@ -3,11 +3,13 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 use Data::Peek;
 
 ok (1, "Here com tests for DDump () returning string using IO");
+
+done_testing;
 
 1;

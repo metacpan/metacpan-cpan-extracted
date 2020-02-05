@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Test Module for Alien::Base
-our $VERSION = '1.9800'; # VERSION
+our $VERSION = '2.0000'; # VERSION
 
 require DynaLoader;
 our @ISA = 'DynaLoader';
@@ -25,7 +25,7 @@ Acme::Ford::Prefect - Test Module for Alien::Base
 
 =head1 VERSION
 
-version 1.9800
+version 2.0000
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Test::Fatal;
 package MyApp {
 	use MooX::Pression;
 	class Animal {
-		has $name;
+		has name;
 	}
 	class Doggo {
 		extends Species('dog', 'Canis familiaris');

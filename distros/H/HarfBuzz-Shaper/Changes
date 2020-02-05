@@ -1,6 +1,26 @@
 Revision history for HarfBuzz::Shaper.
 
-0.017
+0.018.3 Fri Jan 31 15:40
+
+    - Small build fixes.
+    - add t/99_showlog.t to get more detailed build/test information.
+
+0.018.2 Fri Jan 31 09:39
+
+    - Small build fixes.
+    - Move harfbuzz sources to a separate directory to avoid inclusion
+      of the wrong include files when using platform library.
+    
+0.018.1 Thu Jan 31 00:00
+
+    - Small build fixes.
+    
+0.018 Thu Jan 30 09:55
+
+    - Add harfbuzz source so we can build the lib ourselves if needed.
+    - Upgrade to upstream harfbuzz 2.6.4.
+
+0.017 Wed Jan 29 21:00
 
     - Add INSTALL document.
 

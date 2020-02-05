@@ -89,7 +89,7 @@ foreach my $key (sort keys %expect) {
     }
 }
 
-ok ( !%got, 'The above is all there is' ) or do {
+ok ( ! keys %got, 'The above is all there is' ) or do {
     diag( 'The following have been added:' );
     foreach (sort keys %got) {
 	diag( "    $_ => '$got{$_}{name}'" );
@@ -122,6 +122,14 @@ foreach ( @{ $names } ) {
     };
 }
 
+foreach my $key ( keys %got ) {
+    if ( $got{$key}{name} =~ m/ \b pre-launch \b /smxi ) {
+	$expect{$key}{name} ||= $got{$key}{name};
+	$expect{$key}{note} = 'Pre-launch data sets are temporary';
+	$expect{$key}{ignore} = 1;
+    }
+}
+
 foreach my $key (sort keys %expect) {
     if ($expect{$key}{ignore}) {
 	my $presence = delete $got{$key} ? 'present' : 'not present';
@@ -134,7 +142,7 @@ foreach my $key (sort keys %expect) {
     }
 }
 
-ok ( !%got, 'The above is all there is' ) or do {
+ok ( ! keys %got, 'The above is all there is' ) or do {
     diag( 'The following have been added:' );
     foreach (sort keys %got) {
 	diag( "    $got{$_}{source} $_ => '$got{$_}{name}'" );

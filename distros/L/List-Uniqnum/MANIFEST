@@ -6,5 +6,6 @@ Uniqnum.pm
 Uniqnum.xs
 t/00load.t
 t/01uniqnum.t
+t/02old_uniqnum.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

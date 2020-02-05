@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 50;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 use Data::Peek;
 
@@ -63,13 +63,13 @@ like (DPeek ($1), qr'^PVMG\("',			' $1');
   $VAR = "";
   is (DPeek ($VAR),	'PVIV(""\0)',		' $VAR ""');
   is (DPeek (\$VAR),	'\PVIV(""\0)',		'\$VAR ""');
-  $VAR = "\xa8";
-  is (DPeek ($VAR),	'PVIV("\250"\0)',	' $VAR "\xa8"');
-  is (DPeek (\$VAR),	'\PVIV("\250"\0)',	'\$VAR "\xa8"');
+  $VAR = "\xb6";
+  is (DPeek ($VAR),	'PVIV("\266"\0)',	' $VAR "\xb6"');
+  is (DPeek (\$VAR),	'\PVIV("\266"\0)',	'\$VAR "\xb6"');
   SKIP: {
       $] <= 5.008001 and skip "UTF8 tests useless in this ancient perl version", 1;
       $VAR = "a\x0a\x{20ac}";
-      like (DPeek ($VAR), qr'^PVIV\("a\\(n|12)\\342\\202\\254"\\0\) \[UTF8 "a\\?n\\x\{20ac}"\]',
+      like (DPeek ($VAR), qr'^PVIV\("a\\(n|12)(?:\\342\\202\\254|\\312\\106\\123)"\\0\) \[UTF8 "a\\?(?:n|x\{a\})\\x\{20ac}"\]',
 						  ' $VAR "a\x0a\x{20ac}"');
       }
   $VAR = sub { "VAR" };
@@ -86,7 +86,10 @@ like (DPeek (*VAR{SCALAR}), qr'\\PV(IV|MG)\(0\)',' *VAR{SCALAR}');
   is (DPeek (*VAR{HASH}),	'\HV()',	' *VAR{HASH}');
   is (DPeek (*VAR{CODE}),	'\CV(VAR)',	' *VAR{CODE}');
   is (DPeek (*VAR{IO}),		'\IO()',	' *VAR{IO}');
-  is (DPeek (*VAR{FORMAT}),$]<5.008?'SV_UNDEF':'\FM()',' *VAR{FORMAT}');
+  is (DPeek (*VAR{FORMAT}),	'\FM()',	' *VAR{FORMAT}');
   }
 }
+
+done_testing;
+
 1;

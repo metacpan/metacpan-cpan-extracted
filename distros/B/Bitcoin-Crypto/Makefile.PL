@@ -28,8 +28,6 @@ WriteMakefile(
 		'CryptX' => '>= 0.062',
 		'Bitcoin::BIP39' => '>= 0.002',
 		'Try::Tiny' => '>= 0.30',
-		'Digest::SHA' => '>= 6.02',
-		'PBKDF2::Tiny' => '>= 0.005',
 		'Throwable' => '>= 0.2',
 	},
 

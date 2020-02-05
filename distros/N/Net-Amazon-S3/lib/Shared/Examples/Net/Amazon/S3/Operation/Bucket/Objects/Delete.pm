@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete::VERSION = '0.87';
+$Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete::VERSION = '0.88';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete - used for
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 AUTHOR
 
@@ -40,7 +40,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,9 @@
 package App::GraphicsColorNamesUtils;
 
-our $DATE = '2018-10-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-04'; # DATE
+our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -26,8 +28,8 @@ sub _get_scheme_codes {
 }
 
 sub _get_all_schemes_codes {
-    require PERLANCAR::Module::List;
-    my $mods = PERLANCAR::Module::List::list_modules(
+    require Module::List::Tiny;
+    my $mods = Module::List::Tiny::list_modules(
         "Graphics::ColorNames::", {list_modules=>1});
     my %all_codes;
     for my $mod (sort keys %$mods) {
@@ -222,7 +224,7 @@ App::GraphicsColorNamesUtils - Utilities related to Graphics::ColorNames
 
 =head1 VERSION
 
-This document describes version 0.003 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2018-10-04.
+This document describes version 0.004 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-02-04.
 
 =head1 DESCRIPTION
 
@@ -249,7 +251,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- colorcode2name(%args) -> [status, msg, result, meta]
+ colorcode2name(%args) -> [status, msg, payload, meta]
 
 Convert RGB color code to name.
 
@@ -265,6 +267,7 @@ When a name with exact code is not found, find the several closest ones.
 
 =item * B<code>* => I<color::rgb24>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -272,18 +275,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 colorname2code
 
 Usage:
 
- colorname2code(%args) -> [status, msg, result, meta]
+ colorname2code(%args) -> [status, msg, payload, meta]
 
 Convert color name to code.
 
@@ -295,6 +299,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<name>* => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -302,18 +307,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_color_names
 
 Usage:
 
- list_color_names(%args) -> [status, msg, result, meta]
+ list_color_names(%args) -> [status, msg, payload, meta]
 
 List all color names from a Graphics::ColorNames scheme.
 
@@ -327,6 +333,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<scheme>* => I<perl::modname>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -334,18 +341,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_color_schemes
 
 Usage:
 
- list_color_schemes() -> [status, msg, result, meta]
+ list_color_schemes() -> [status, msg, payload, meta]
 
 List all installed Graphics::ColorNames schemes.
 
@@ -358,18 +366,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 show_color_swatch
 
 Usage:
 
- show_color_swatch(%args) -> [status, msg, result, meta]
+ show_color_swatch(%args) -> [status, msg, payload, meta]
 
 List all color names from a Graphics::ColorNames scheme as a color swatch.
 
@@ -383,6 +392,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<width> => I<posint> (default: 80)
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -390,7 +400,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -420,7 +430,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

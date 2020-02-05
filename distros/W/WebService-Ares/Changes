@@ -1,3 +1,10 @@
+0.03 2020-02-03T14:23:33+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyrigt years.
+
 0.02 2015-10-29T14:13:34+01:00
  - Change name Ares to better ARES in doc.
  - Improve LICENSE AND COPYRIGHT section in doc.

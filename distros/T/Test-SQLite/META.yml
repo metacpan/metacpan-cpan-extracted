@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Test-SQLite
   repository: https://github.com/ology/Test-SQLite.git
-version: '0.0209'
+version: '0.0210'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

@@ -1,5 +1,5 @@
 package SVN::Dump::Reader;
-
+$SVN::Dump::Reader::VERSION = '0.07';
 use strict;
 use warnings;
 use IO::Handle;
@@ -208,6 +208,10 @@ __END__
 
 SVN::Dump::Reader - A Subversion dump reader
 
+=head1 VERSION
+
+version 0.07
+
 =head1 SYNOPSIS
 
     # !!! You should use SVN::Dump, not SVN::Dump::Reader !!!
@@ -241,7 +245,7 @@ Read and return a new L<SVN::Dump::Record> object from the dump filehandle.
 If the option C<check_digest> is enabled, this method will recompute
 the digests for a dump without deltas, based on the information in the
 C<Text-content-md5> and C<Text-content-sha1> headers (if the corresponding
-L<Digest> module is availabled). In case of a mismatch, the routine
+L<Digest> module is available). In case of a mismatch, the routine
 will C<die()> with an exception complaining about a C<checksum mismatch>.
 
 =item read_header_block( )

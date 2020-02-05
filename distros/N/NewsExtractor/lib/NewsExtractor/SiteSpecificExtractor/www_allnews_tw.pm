@@ -1,8 +1,9 @@
 package NewsExtractor::SiteSpecificExtractor::www_allnews_tw;
 use utf8;
-
 use Moo;
 extends 'NewsExtractor::SiteSpecificExtractor';
+
+use Importer 'NewsExtractor::TextUtil' => 'normalize_whitespace';
 
 sub dom {
     my ($self) = @_;
@@ -24,14 +25,13 @@ sub dateline {
 sub content_text {
     my ($self) = @_;
     my $el = $self->dom->find('meta[property="og:description"]')->first;
-    return $el->attr('content');
+    return normalize_whitespace( $el->attr('content') );
 }
 
 sub journalist {
     my ($self) = @_;
-    my $text = $self->content_text();
-    my ($ret) = $text =~ m/\A【(本報記者.+?報導)】/x;
-    return $ret // '';
+    my ($txt) = $self->content_text =~ m/\A【(本報記者.+?報導)】/;
+    return $txt;
 }
 
 1;

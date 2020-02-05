@@ -1,0 +1,27 @@
+- ua: 'Opera/9.52 (Windows NT 5.1; U; ja)'
+  name: 'Opera'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '9.52'
+- ua: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36 OPR/20.0.1387.64'
+  name: 'Opera'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '20.0.1387.64'
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPT/2.1.0 Mobile/15E148'
+  name: 'Opera Touch'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '2.1.0'

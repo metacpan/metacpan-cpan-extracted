@@ -55,8 +55,21 @@ WriteMakefile1(
     LICENSE => 'perl',
     MIN_PERL_VERSION => '5.00503',
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
-            repository => 'https://github.com/jib/archive-tar-new',
+            repository => {
+                type => 'git',
+                url => 'https://github.com/jib/archive-tar-new.git',
+                web => 'https://github.com/jib/archive-tar-new',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'IO::Compress::Xz' => 0,
+                    'IO::Uncompress::UnXz' => 0,
+                },
+            },
         },
     },
     #BUILD_REQUIRES => {

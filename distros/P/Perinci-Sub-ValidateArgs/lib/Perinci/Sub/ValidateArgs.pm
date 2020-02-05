@@ -1,8 +1,9 @@
 package Perinci::Sub::ValidateArgs;
 
-# NOIFBUILT
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.011'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-05'; # DATE
+our $DIST = 'Perinci-Sub-ValidateArgs'; # DIST
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -11,50 +12,78 @@ use warnings;
 use Data::Dmp;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(gen_args_validator);
+our @EXPORT_OK = qw(gen_args_validator_from_meta validate_args_using_meta);
+
+# old name, deprecated
+*gen_args_validator = \&gen_args_validator_from_meta;
 
 # XXX cache key should also contain data_term
 #my %dsah_compile_cache; # key = schema (C<string> or R<refaddr>), value = compilation result
 
 our %SPEC;
 
-$SPEC{gen_args_validator} = {
-    v => 1.1,
-    summary => 'Generate argument validator from Rinci function metadata',
-    args => {
-        meta => {
-            schema => 'hash*', # XXX rinci::function_meta
-            description => <<'_',
+our %arg_meta = (
+    meta => {
+        schema => 'hash*', # XXX rinci::function_meta
+        req => 1,
+    },
+);
+
+our %argopt_meta = (
+    meta => {
+        schema => 'hash*', # XXX rinci::function_meta
+        description => <<'_',
 
 If not specified, will be searched from caller's `%SPEC` package variable.
 
 _
-        },
-        source => {
-            summary => 'Whether we want to get the source code instead',
-            schema => 'bool',
-            description => <<'_',
+    },
+);
+
+our %argopt_die = (
+    die => {
+        summary => 'Whether validator should die or just return '.
+            'an error message/response',
+        schema => 'bool',
+    },
+);
+
+our %args_gen_args = (
+    %argopt_meta,
+    %argopt_die,
+    source => {
+        summary => 'Whether we want to get the source code instead',
+        schema => 'bool',
+        description => <<'_',
 
 The default is to generate Perl validator code, compile it with `eval()`, and
 return the resulting coderef. When this option is set to true, the generated
 source string will be returned instead.
 
 _
-        },
-        die => {
-            summary => 'Whether validator should die or just return '.
-                'an error message/response',
-            schema => 'bool',
-        },
+    },
+);
+
+$SPEC{gen_args_validator_from_meta} = {
+    v => 1.1,
+    summary => 'Generate argument validator from Rinci function metadata',
+    description => <<'_',
+
+If you don't intend to reuse the generated validator, you can also use
+`validate_args_using_meta`.
+
+_
+    args => {
+        %args_gen_args,
     },
     result_naked => 1,
 };
-sub gen_args_validator {
+sub gen_args_validator_from_meta {
     my %args = @_;
 
     my $meta = $args{meta};
     unless ($meta) {
-        my @caller = caller(1) or die "Call gen_args_validator() inside ".
+        my @caller = caller(1) or die "Call gen_args_validator_from_meta() inside ".
             "your function or provide 'meta'";
         my ($pkg, $func) = $caller[3] =~ /(.+)::(.+)/;
         $meta = ${"$pkg\::SPEC"}{$func}
@@ -227,6 +256,36 @@ sub gen_args_validator {
     }
 }
 
+$SPEC{validate_args_using_meta} = {
+    v => 1.1,
+    summary => 'Validate arguments using Rinci function metadata',
+    description => <<'_',
+
+If you intend to reuse the generated validator, you can also use
+`gen_args_validator_from_meta`.
+
+Note: currently cannot handle `args_as => 'array'`, only `args_as => 'arrayref`.
+
+_
+    args => {
+        %arg_meta,
+        %argopt_die,
+        args => {
+            schema => ['any*', of=>['hash*', 'array*']],
+            req => 1,
+        },
+    },
+};
+sub validate_args_using_meta {
+    my %args = @_;
+
+    my $validator = gen_args_validator_from_meta(
+        meta => $args{meta},
+        die  => $args{die},
+    );
+    $validator->($args{args}) // [200, "OK"];
+};
+
 1;
 # ABSTRACT: Validate function arguments using schemas in Rinci function metadata
 
@@ -242,11 +301,11 @@ Perinci::Sub::ValidateArgs - Validate function arguments using schemas in Rinci 
 
 =head1 VERSION
 
-This document describes version 0.011 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2019-04-15.
+This document describes version 0.012 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2020-02-05.
 
 =head1 SYNOPSIS
 
- use Perinci::Sub::ValidateArgs qw(gen_args_validator);
+ use Perinci::Sub::ValidateArgs qw(gen_args_validator_from_meta);
 
  our %SPEC;
  $SPEC{foo} = {
@@ -264,7 +323,7 @@ This document describes version 0.011 of Perinci::Sub::ValidateArgs (from Perl d
      'x.func.validate_args' => 1,
  };
  sub foo {
-     state $validator = gen_args_validator();
+     state $validator = gen_args_validator_from_meta();
      my %args = @_;
      if (my $err = $validator->(\%args)) { return $err }
 
@@ -275,7 +334,7 @@ or, if you want the validator to die on failure:
 
  ...
  sub foo {
-     state $validator = gen_args_validator(die => 1);
+     state $validator = gen_args_validator_from_meta(die => 1);
      my %args = @_;
      $validator->(\%args);
 
@@ -293,13 +352,16 @@ schemas. See L<Data::Sah::Manual::ParamsValidating>.
 =head1 FUNCTIONS
 
 
-=head2 gen_args_validator
+=head2 gen_args_validator_from_meta
 
 Usage:
 
- gen_args_validator(%args) -> any
+ gen_args_validator_from_meta(%args) -> any
 
 Generate argument validator from Rinci function metadata.
+
+If you don't intend to reuse the generated validator, you can also use
+C<validate_args_using_meta>.
 
 This function is not exported by default, but exportable.
 
@@ -309,7 +371,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<die> => I<bool>
 
-Whether validator should die or just return an error message/response.
+Whether validator should die or just return an error messageE<sol>response.
 
 =item * B<meta> => I<hash>
 
@@ -323,9 +385,55 @@ The default is to generate Perl validator code, compile it with C<eval()>, and
 return the resulting coderef. When this option is set to true, the generated
 source string will be returned instead.
 
+
 =back
 
 Return value:  (any)
+
+
+
+=head2 validate_args_using_meta
+
+Usage:
+
+ validate_args_using_meta(%args) -> [status, msg, payload, meta]
+
+Validate arguments using Rinci function metadata.
+
+If you intend to reuse the generated validator, you can also use
+C<gen_args_validator_from_meta>.
+
+Note: currently cannot handle C<< args_as =E<gt> 'array' >>, only C<< args_as =E<gt> 'arrayref >>.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<args>* => I<hash|array>
+
+=item * B<die> => I<bool>
+
+Whether validator should die or just return an error messageE<sol>response.
+
+=item * B<meta>* => I<hash>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+=for Pod::Coverage ^(gen_args_validator)$
 
 =head1 HOMEPAGE
 
@@ -357,7 +465,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

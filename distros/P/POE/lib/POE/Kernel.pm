@@ -3,7 +3,7 @@ package POE::Kernel;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '1.367'; # NOTE - Should be #.### (three decimal places)
+$VERSION = '1.368'; # NOTE - Should be #.### (three decimal places)
 
 use POE::Resource::Clock qw( monotime sleep mono2wall wall2mono walltime time );
 
@@ -365,7 +365,8 @@ BEGIN {
     no strict 'refs';
     local $^W = 0;
     local $SIG{__WARN__} = sub { }; # redefine
-    *$const = sub () { $value };
+    my $tmp = $value;
+    *$const = sub () { $tmp };
   }
 
   # TRACE_FILENAME is special.

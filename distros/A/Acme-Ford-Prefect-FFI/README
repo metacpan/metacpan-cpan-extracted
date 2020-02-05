@@ -4,13 +4,13 @@ NAME
 
 VERSION
 
-    version 1.9800
+    version 2.0000
 
 SYNOPSIS
 
-     use Acme::Ford::Prefect;
+     use Acme::Ford::Prefect::FFI;
      
-     my $answer = Acme::Ford::Prefect::answer(); # == 42 of course
+     my $answer = Acme::Ford::Prefect::FFI::answer(); # == 42 of course
 
 DESCRIPTION
 
@@ -28,7 +28,7 @@ FUNCTIONS
 
  answer
 
-     my $answer = Acme::Ford::Prefect::answer();
+     my $answer = Acme::Ford::Prefect::FFI::answer();
 
     Returns the answer to life the universe and everything. Not exported.
 

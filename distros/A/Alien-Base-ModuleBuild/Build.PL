@@ -27,7 +27,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Alien-Base-ModuleBuild",
-  "dist_version" => "1.10",
+  "dist_version" => "1.12",
   "license" => "perl",
   "module_name" => "Alien::Base::ModuleBuild",
   "recursive_test_files" => 1,
@@ -39,19 +39,18 @@ my %module_build_args = (
     "Capture::Tiny" => "0.17",
     "File::chdir" => "0.1005",
     "HTTP::Tiny" => "0.044",
+    "List::Util" => "1.45",
     "Module::Build" => "0.4004",
     "Path::Tiny" => "0.077",
     "Shell::Config::Generate" => 0,
     "Shell::Guess" => 0,
     "Sort::Versions" => 0,
+    "Text::ParseWords" => "3.26",
     "URI" => 0,
     "parent" => 0,
     "perl" => "5.008001"
   },
   "test_requires" => {
-    "Acme::Alien::DontPanic" => 0,
-    "Test2::Mock" => "0.000060",
-    "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060",
     "URI::file" => 0,
     "perl" => "5.008001"
@@ -60,10 +59,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Acme::Alien::DontPanic" => 0,
   "Module::Build" => "0.4004",
-  "Test2::Mock" => "0.000060",
-  "Test2::Require::Module" => "0.000060",
   "Test2::V0" => "0.000060",
   "URI::file" => 0,
   "perl" => "5.008001"

@@ -9,6 +9,7 @@ My_WriteMakefile(
     ABSTRACT_FROM  => 'lib/HTTP/UA/Parser.pm',
     EXE_FILES    => ['script/ua_parser'],
     PREREQ_PM         => {
+        'LWP::UserAgent' => 0,
         'YAML::Tiny' => 0
     },
     LICENSE        => 'perl',

@@ -2,9 +2,10 @@
 
 package DateTimeX::strftimeq;
 
-our $DATE = '2019-11-20'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-01'; # DATE
 our $DIST = 'DateTimeX-strftimeq'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -87,21 +88,21 @@ DateTimeX::strftimeq - POSIX::strftime() with support for embedded perl code in 
 
 =head1 VERSION
 
-This document describes version 0.004 of DateTimeX::strftimeq (from Perl distribution DateTimeX-strftimeq), released on 2019-11-20.
+This document describes version 0.006 of DateTimeX::strftimeq (from Perl distribution DateTimeX-strftimeq), released on 2020-02-01.
 
 =head1 SYNOPSIS
 
  use DateTimeX::strftimeq; # by default exports strftimeq()
 
  my @time = localtime();
- print strftimeq '<%6Y-%m-%d>', @time; # <002019-11-19>
- print strftimeq '<%6Y-%m-%d%( $_->day_of_week eq 7 ? "sun" : "" )q>', @time; # <002019-11-19>
- print strftimeq '<%6Y-%m-%d%( $_->day_of_week eq 2 ? "tue" : "" )q>', @time; # <002019-11-19tue>
+ print strftimeq '<%-6Y-%m-%d>', @time; # <  2019-11-19>
+ print strftimeq '<%-6Y-%m-%d%( $_->day_of_week eq 7 ? "sun" : "" )q>', @time; # <  2019-11-19>
+ print strftimeq '<%-6Y-%m-%d%( $_->day_of_week eq 2 ? "tue" : "" )q>', @time; # <  2019-11-19tue>
 
 You can also pass DateTime object instead of ($second, $minute, $hour, $day,
 $month, $year):
 
- print strftimeq '<%6Y-%m-%d>', $dt; # <002019-11-19>
+ print strftimeq '<%-6Y-%m-%d>', $dt; # <  2019-11-19>
 
 =head1 DESCRIPTION
 
@@ -141,6 +142,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<Date::strftimeq> is exactly the same except it is DateTime-free.
+
 L<POSIX>'s C<strftime()>
 
 L<DateTime>
@@ -151,7 +154,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

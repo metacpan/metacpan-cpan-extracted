@@ -2,7 +2,7 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.098 of App::dateseq (from Perl
+    This document describes version 0.099 of App::dateseq (from Perl
     distribution App-dateseq), released on 2019-11-29.
 
 FUNCTIONS
@@ -79,6 +79,21 @@ FUNCTIONS
 
         Default is "%Y-%m-%d", unless when hour/minute/second is specified,
         then it is "%Y-%m-%dT%H:%M:%S".
+
+        "dateseq" actually uses DateTimeX::strftimeq, so you can embed Perl
+        code for flexibility. For example:
+
+         % dateseq 2019-11-19 2019-11-25 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
+
+        will print something like:
+
+         2019-11-19
+         2019-11-20
+         2019-11-21
+         2019-11-22
+         2019-11-23
+         2019-11-24su
+         2019-11-25
 
     *   to => *date*
 

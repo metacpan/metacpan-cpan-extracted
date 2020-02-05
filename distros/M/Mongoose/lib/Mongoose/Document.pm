@@ -1,5 +1,5 @@
 package Mongoose::Document;
-$Mongoose::Document::VERSION = '2.01';
+$Mongoose::Document::VERSION = '2.02';
 use strict;
 use Mongoose;
 use Mongoose::Join;

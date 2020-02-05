@@ -1,10 +1,8 @@
 package CGI::Pure;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CGI::Deurl::XS qw(parse_query_string);
 use Class::Utils qw(set_params);
 use Encode qw(decode_utf8);
@@ -21,8 +19,7 @@ Readonly::Scalar my $POST_MAX_NO_LIMIT => -1;
 Readonly::Scalar my $BLOCK_SIZE => 4_096;
 Readonly::Array my @PAR_SEP => (q{&}, q{;});
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -80,8 +77,19 @@ sub append_param {
 	# Clean from undefined values.
 	my @new_values = _remove_undef(@values);
 
-	$self->_add_param($param, ((defined $new_values[0] and ref $new_values[0])
-		? $new_values[0] : [@new_values]));
+	# Process scalars, arrays, err on other.
+	my @values_to_add;
+	foreach my $value (@new_values) {
+		if (ref $value eq 'ARRAY') {
+			push @values_to_add, @{$value};
+		} elsif (ref $value eq '') {
+			push @values_to_add, $value;
+		} else {
+			err "Parameter '$param' has bad value.";
+		}
+	}
+	$self->_add_param($param, [@values_to_add]);
+
 	return $self->param($param);
 }
 
@@ -539,12 +547,9 @@ sub _parse_params {
 # Remove undefined values.
 sub _remove_undef {
 	my (@values) = @_;
-	my @new_values;
-	foreach my $value (@values) {
-		if (defined $value) {
-			push @new_values, $value;
-		}
-	}
+
+	my @new_values = grep { defined $_ } @values;
+
 	return @new_values;
 }
 
@@ -641,6 +646,7 @@ CGI::Pure - Common Gateway Interface Class.
 =head1 SYNOPSIS
 
  use CGI::Pure;
+
  my $cgi = CGI::Pure->new(%parameters);
  $cgi->append_param('par', 'value');
  my @par_value = $cgi->param('par');
@@ -767,6 +773,9 @@ CGI::Pure - Common Gateway Interface Class.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
+ append_param():
+         Parameter '%s' has bad value.
+
  upload():
          Cannot close file '%s': %s.
          Cannot write file '%s': %s.
@@ -780,11 +789,9 @@ CGI::Pure - Common Gateway Interface Class.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use CGI::Pure;
 
  # Object.
@@ -802,11 +809,9 @@ CGI::Pure - Common Gateway Interface Class.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use CGI::Pure;
 
  # Object.
@@ -852,11 +857,11 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2004-2018 Michal Josef Špaček
+ © 2004-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

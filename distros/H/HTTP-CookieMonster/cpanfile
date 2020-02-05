@@ -12,10 +12,8 @@ requires "warnings" => "0";
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "Storable" => "0";
   requires "Test::Fatal" => "0";
   requires "Test::More" => "0";
-  requires "WWW::Mechanize" => "0";
   requires "perl" => "5.006";
 };
 
@@ -50,6 +48,7 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.014";
   requires "Test::Version" => "1";
+  requires "WWW::Mechanize" => "0";
 };
 
 on 'develop' => sub {

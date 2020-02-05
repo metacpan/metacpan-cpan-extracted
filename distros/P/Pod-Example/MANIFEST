@@ -1,3 +1,4 @@
+.travis.yml
 Changes
 Example.pm
 examples/ex1.pl
@@ -30,5 +31,6 @@ t/modules/Ex8.pm
 t/Pod-Example/01-use.t
 t/Pod-Example/02-version.t
 t/Pod-Example/03-get.t
+t/Pod-Example/04-sections.t
 xt/Pod-Example/01-pod_coverage.t
 xt/Pod-Example/02-pod.t

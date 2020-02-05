@@ -1,11 +1,9 @@
 package Pod::Example;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Module::Info;
 use Pod::Abstract;
@@ -15,8 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Get content for file or module.
 sub get {
@@ -194,29 +191,32 @@ Pod::Example - Module for getting example from POD.
 =head1 SYNOPSIS
 
  use Pod::Example qw(get sections);
+
  my $example = get($file_or_module[, $section[, $number_of_example]]);
  my @sections = sections($file_or_module[, $section]);
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<get>
 
-=item C<get($file_or_module[, $section[, $number_of_example]])>
+ my $example = get($file_or_module[, $section[, $number_of_example]]);
 
- Returns code of example.
+Returns code of example.
+
  $file_or_module    - File with pod doc or perl module.
  $section           - Pod section with example. Default value is 'EXAMPLE'.
  $number_of_example - Number of example. If exists 'EXAMPLE1' and 'EXAMPLE2'
                       sections, then this number can be '1' or '2'.
                       Default value is nothing.
 
-=item C<sections($file_or_module[, $section])>
+=head2 C<sections>
 
- Returns array of example sections.
+ my @sections = sections($file_or_module[, $section]);
+
+Returns array of example sections.
+
  $file_or_module - File with pod doc or perl module.
  $section - Pod section with example. Default value is 'EXAMPLE'.
-
-=back
 
 =head1 ERRORS
 
@@ -228,11 +228,9 @@ Pod::Example - Module for getting example from POD.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Pod::Example qw(get);
 
  # Get and print code.
@@ -243,11 +241,9 @@ Pod::Example - Module for getting example from POD.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Pod::Example qw(sections);
 
  # Get and print code.
@@ -282,21 +278,22 @@ Base class for pod-example script.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Pod-Example>
+L<https://github.com/michal-josef-spacek/Pod-Example>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
- BSD 2-Clause License
+© 2011-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

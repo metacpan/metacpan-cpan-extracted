@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.171';
+our $VERSION = '1.172';
 
 =encoding utf8
 
@@ -500,6 +500,10 @@ L<Quiq::JQuery::Accordion> - Erzeuge HTML einer jQuery UI Accodion Reiterleiste
 
 =item *
 
+L<Quiq::JQuery::ContextMenu> - Erzeuge Code für ein jQuery Kontext-Menü
+
+=item *
+
 L<Quiq::JQuery::ContextMenu::Ajax> - Erzeuge Code für ein jQuery Kontext-Menü
 
 =item *
@@ -834,7 +838,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.171
+1.172
 
 =head1 AUTHOR
 

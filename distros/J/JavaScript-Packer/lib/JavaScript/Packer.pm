@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.04";
+our $VERSION = "2.05";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -542,7 +542,7 @@ sub minify {
                     }
                 }
                 elsif ( $ord == 57 ) {
-                    $pd .= '0-9';
+                    $pd .= '[0-9]';
                 }
                 elsif ( $ord == 50 ) {
                     $pd .= '[12]';
@@ -731,7 +731,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.04
+Version 2.05
 
 =head1 DESCRIPTION
 

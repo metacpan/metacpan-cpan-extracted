@@ -1,5 +1,5 @@
 package SVN::Dump::Headers;
-
+$SVN::Dump::Headers::VERSION = '0.07';
 use strict;
 use warnings;
 use Carp;
@@ -101,6 +101,10 @@ __END__
 =head1 NAME
 
 SVN::Dump::Headers - Headers of a SVN dump record
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 

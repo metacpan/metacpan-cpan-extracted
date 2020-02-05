@@ -15,6 +15,7 @@ use overload    #
 
 has chrome => ( required => 1 );
 has id     => ( required => 1 );
+has close_on_destroy => 1;
 
 has listen => ();    # {method => callback} hook
 
@@ -27,13 +28,27 @@ has _sem => sub { Coro::Semaphore->new(1) }, is => 'lazy';
 
 our $_MSG_ID = 0;
 
+sub DESTROY ($self) {
+    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
+        $self->close;
+    }
+
+    return;
+}
+
 sub new_tab ( $self, @args ) {
     $self->{chrome}->new_tab(@args);
 
     return;
 }
 
-sub close ( $self ) {                                        ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
+sub reload_pac ( $self ) {
+    $self->{chrome}->reload_pac;
+
+    return;
+}
+
+sub close ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
     return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/close/$self->{id}");
 }
 
@@ -41,7 +56,7 @@ sub activate ( $self ) {
     return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}");
 }
 
-sub listen ( $self, $event, $cb = undef ) {                  ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+sub listen ( $self, $event, $cb = undef ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     if ($cb) {
         $self->{listen}->{$event} = $cb;
     }

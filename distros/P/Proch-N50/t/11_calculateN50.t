@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 
-my $file = "$Bin/../data/small_test.fa";
+my $file = "$RealBin/../data/small_test.fa";
 print "$file\n";
 SKIP: {
 	skip "missing input file" unless (-e "$file");

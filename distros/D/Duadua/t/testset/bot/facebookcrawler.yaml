@@ -1,0 +1,19 @@
+# https://developers.facebook.com/docs/sharing/webmasters/crawler?locale=en_US
+- ua: 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)'
+  name: 'Facebook Crawler'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.1'
+- ua: 'facebookexternalhit/1.1'
+  name: 'Facebook Crawler'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.1'

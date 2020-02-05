@@ -1,5 +1,5 @@
 ---
-abstract: 'Crypto toolkit'
+abstract: 'Cryptographic toolkit'
 author:
   - 'Karel Miko'
 build_requires:
@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/DCIT/perl-CryptX/issues
   repository: https://github.com/DCIT/perl-CryptX
-version: '0.066'
+version: '0.067'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

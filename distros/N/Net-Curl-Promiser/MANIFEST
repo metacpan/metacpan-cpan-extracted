@@ -7,6 +7,7 @@ MANIFEST
 Makefile.PL
 README.md
 examples/anyevent.pl
+examples/anyevent_promise_xs.pl
 examples/epoll.pl
 examples/io_async.pl
 examples/mojo.pl
@@ -21,6 +22,7 @@ t/Net-Curl-Promiser-AnyEvent.t
 t/Net-Curl-Promiser-IOAsync.t
 t/Net-Curl-Promiser-Mojo.t
 t/Net-Curl-Promiser-Select.t
+t/Net-Curl-Promiser-Select_setopt_fail.t
 t/lib/ClientTest.pm
 t/lib/MyServer.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

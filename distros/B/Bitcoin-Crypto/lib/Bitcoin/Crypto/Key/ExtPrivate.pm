@@ -2,13 +2,13 @@ package Bitcoin::Crypto::Key::ExtPrivate;
 
 use Modern::Perl "2010";
 use Moo;
-use Digest::SHA qw(hmac_sha512);
+use Crypt::Mac::HMAC qw(hmac);
 use Math::BigInt 1.999816 try => 'GMP';
 use Math::EllipticCurve::Prime;
 use Encode qw(encode decode);
 use Unicode::Normalize;
 use Bitcoin::BIP39 qw(gen_bip39_mnemonic bip39_mnemonic_to_entropy);
-use PBKDF2::Tiny qw(derive);
+use Crypt::KeyDerivation qw(pbkdf2);
 
 use Bitcoin::Crypto::Key::ExtPublic;
 use Bitcoin::Crypto::Config;
@@ -46,7 +46,7 @@ sub from_mnemonic
 		# requires Wordlist::LANG::BIP39 module for given LANG
 		bip39_mnemonic_to_entropy(mnemonic => $mnemonic, language => $lang);
 	}
-	my $bytes = derive("SHA-512", $mnemonic, $password, 2048);
+	my $bytes = pbkdf2($mnemonic, $password, 2048, "SHA512", 64);
 
 	return $class->from_seed($bytes);
 }
@@ -54,7 +54,7 @@ sub from_mnemonic
 sub from_seed
 {
 	my ($class, $seed) = @_;
-	my $bytes = hmac_sha512($seed, "Bitcoin seed");
+	my $bytes = hmac("SHA512", "Bitcoin seed", $seed);
 	my $key = substr $bytes, 0, 32;
 	my $cc = substr $bytes, 32, 32;
 
@@ -101,7 +101,7 @@ sub _derive_key_partial
 	# child number - 4 bytes
 	$hmac_data .= ensure_length pack("N", $child_num), 4;
 
-	my $data = hmac_sha512($hmac_data, $self->chain_code);
+	my $data = hmac("SHA512", $self->chain_code, $hmac_data);
 	my $chain_code = substr $data, 32, 32;
 
 	my $number = Math::BigInt->from_bytes(substr $data, 0, 32);

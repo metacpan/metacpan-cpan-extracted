@@ -2,8 +2,8 @@ NAME
     App::FindUtils - Utilities related to finding files
 
 VERSION
-    This document describes version 0.002 of App::FindUtils (from Perl
-    distribution App-FindUtils), released on 2019-09-18.
+    This document describes version 0.003 of App::FindUtils (from Perl
+    distribution App-FindUtils), released on 2019-12-04.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -56,6 +56,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    uniq-files from App::UniqFiles
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 

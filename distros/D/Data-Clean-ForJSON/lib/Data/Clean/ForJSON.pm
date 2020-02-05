@@ -1,7 +1,7 @@
 package Data::Clean::ForJSON;
 
-our $DATE = '2019-09-01'; # DATE
-our $VERSION = '0.394'; # VERSION
+our $DATE = '2019-11-26'; # DATE
+our $VERSION = '0.395'; # VERSION
 
 use 5.010001;
 use strict;
@@ -69,7 +69,7 @@ Data::Clean::ForJSON - Clean data so it is safe to output to JSON
 
 =head1 VERSION
 
-This document describes version 0.394 of Data::Clean::ForJSON (from Perl distribution Data-Clean-ForJSON), released on 2019-09-01.
+This document describes version 0.395 of Data::Clean::ForJSON (from Perl distribution Data-Clean-ForJSON), released on 2019-11-26.
 
 =head1 SYNOPSIS
 
@@ -276,13 +276,16 @@ with C<< {SCALAR=>'value'} >> and so on. Note that the abridging process is
 similarly unidirectional (you cannot convert back the original Perl data
 structure).
 
+Some benchmarks in L<Bencher::Scenarios::DataCleansing>. You can see that
+Data::Clean::ForJSON can be several times faster than, say, Data::Rmap.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

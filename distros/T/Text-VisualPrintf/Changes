@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-VisualPrintf
 
+3.01 2020-02-04T14:39:00Z
+
+    - Support text truncation.
+
+2.06 2020-02-03T08:54:12Z
+
+    - Update Text::VisualPrintf::IO to accept exported method.
+
 2.05 2020-01-28T17:50:07Z
 
     - Add test and document.

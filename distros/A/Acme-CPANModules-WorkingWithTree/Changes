@@ -1,4 +1,9 @@
-0.001   2019-01-09 (PERLANCAR)
+0.002   2020-02-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update module names.
+
+
+0.001   2019-01-09  Released-By: PERLANCAR
 
         - First release, split from Acme-CPANModulesBundle-PERLANCAR and remove
           the PERLANCAR:: in the name.

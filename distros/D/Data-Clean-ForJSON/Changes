@@ -1,3 +1,10 @@
+0.395   2019-11-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Bencher::Scenarios::DataCleansing.
+
+
 0.394   2019-09-01  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -20,7 +27,7 @@
 	  has been loaded to provide the overloading; otherwise, all
 	  JSON::PP::Boolean objects will be converted to 1. We now compare the
 	  scalar-deref of them first so regardless of whether any of the
-	  abovmentioned moduls has been loaded.
+	  abovementioned modules has been loaded.
 
 
 0.392   2019-08-08  Released-By: PERLANCAR; Urgency: medium

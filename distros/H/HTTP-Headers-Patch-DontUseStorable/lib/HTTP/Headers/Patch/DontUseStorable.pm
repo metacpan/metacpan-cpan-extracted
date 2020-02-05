@@ -1,14 +1,15 @@
 package HTTP::Headers::Patch::DontUseStorable;
 
-our $DATE = '2017-04-19'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-03'; # DATE
+our $DIST = 'HTTP-Headers-Patch-DontUseStorable'; # DIST
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
-#use Log::Any '$log';
 
-use Module::Patch 0.12 qw();
+use Module::Patch ();
 use base qw(Module::Patch);
 
 our %config;
@@ -35,7 +36,7 @@ sub patch_data {
 }
 
 1;
-# ABSTRACT: Do not use Storable
+# ABSTRACT: (DEPRECATED) Do not use Storable
 
 __END__
 
@@ -45,17 +46,20 @@ __END__
 
 =head1 NAME
 
-HTTP::Headers::Patch::DontUseStorable - Do not use Storable
+HTTP::Headers::Patch::DontUseStorable - (DEPRECATED) Do not use Storable
 
 =head1 VERSION
 
-This document describes version 0.05 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2017-04-19.
+This document describes version 0.060 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2020-02-03.
 
 =head1 SYNOPSIS
 
  use HTTP::Headers::Patch::DontUseStorable;
 
 =head1 DESCRIPTION
+
+B<UPDATE 2020-02-03:> As of Storable 3.08, freeze/thaw/dclone support Regexp
+objects. I'm deprecating this module.
 
 L<HTTP::Headers> (6.11 as of this writing) tries to load L<Storable> (2.56 as of
 this writing) and use its dclone() method. Since Storable still does not support
@@ -90,7 +94,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/HTTP-Heade
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-HTTP-Headers-Patch-DontUseStorable>.
+Source repository is at L<https://github.com/perlancar/perl-HTTP-Headers-Patch-DontUseStorable>.
 
 =head1 BUGS
 
@@ -108,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

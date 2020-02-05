@@ -5,7 +5,9 @@ Net::Curl::Promiser - A Promise interface for [Net::Curl::Multi](https://metacpa
 # DESCRIPTION
 
 This module wraps [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) to facilitate asynchronous
-HTTP requests with Promise objects.
+requests with Promise objects. Net::Curl::Promiser interfaces with
+Net::Curl::Multi’s polling callbacks to simplify your task of coordinating
+multiple concurrent requests.
 
 [Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) itself is a base class; you’ll need to provide
 an interface to whatever event loop you use. See ["SUBCLASS INTERFACE"](#subclass-interface)
@@ -14,10 +16,11 @@ below.
 This distribution provides the following as both demonstrations and
 portable implementations:
 
-- [Net::Curl::Promiser::Select](https://metacpan.org/pod/Net::Curl::Promiser::Select)
-- [Net::Curl::Promiser::IOAsync](https://metacpan.org/pod/Net::Curl::Promiser::IOAsync) (for [IO::Async](https://metacpan.org/pod/IO::Async))
 - [Net::Curl::Promiser::Mojo](https://metacpan.org/pod/Net::Curl::Promiser::Mojo) (for [Mojolicious](https://metacpan.org/pod/Mojolicious))
 - [Net::Curl::Promiser::AnyEvent](https://metacpan.org/pod/Net::Curl::Promiser::AnyEvent) (for [AnyEvent](https://metacpan.org/pod/AnyEvent))
+- [Net::Curl::Promiser::IOAsync](https://metacpan.org/pod/Net::Curl::Promiser::IOAsync) (for [IO::Async](https://metacpan.org/pod/IO::Async))
+- [Net::Curl::Promiser::Select](https://metacpan.org/pod/Net::Curl::Promiser::Select) (for manually-written
+`select()` loops)
 
 (See the distribution’s `/examples` directory for one based on Linux’s
 `epoll`.)
@@ -29,13 +32,20 @@ You can use a different one by overriding the [PROMISE\_CLASS()](https://metacpa
 a subclass, as long as the substitute class’s `new()` method works the
 same way as Promise::ES6’s (which itself follows the ECMAScript standard).
 
-# METHODS
+(NB: [Net::Curl::Promiser::Mojo](https://metacpan.org/pod/Net::Curl::Promiser::Mojo) uses [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise) instead of
+Promise::ES6.)
+
+# GENERAL-USE METHODS
+
+The following are of interest to any code that uses this module:
 
 ## _CLASS_->new(@ARGS)
 
 Instantiates this class. This creates an underlying
 [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object and calls the subclass’s `_INIT()`
 method at the end, passing a reference to @ARGS.
+
+(Most end classes of this module do not require @ARGS.)
 
 ## promise($EASY) = _OBJ_->add\_handle( $EASY )
 
@@ -53,6 +63,23 @@ error that [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object�
 
 Prematurely fails $EASY. The given $REASON will be the associated
 Promise object’s rejection value.
+
+## $obj = _OBJ_->setopt( … )
+
+A passthrough to the underlying [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s
+method of the same name. Returns _OBJ_ to facilitate chaining.
+
+`CURLMOPT_SOCKETFUNCTION` or `CURLMOPT_SOCKETDATA` are set internally;
+any attempt to set them via this interface will prompt an error.
+
+## $obj = _OBJ_->handles( … )
+
+A passthrough to the underlying [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s
+method of the same name.
+
+# EVENT LOOP METHODS
+
+The following are needed only when you’re managing an event loop directly:
 
 ## $num = _OBJ_->get\_timeout()
 
@@ -98,20 +125,11 @@ function is just an optimization.
 
 This should only be called from event loop logic.
 
-## $obj = _OBJ_->setopt( … )
-
-A passthrough to the underlying [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s
-method of the same name. Returns _OBJ_ to facilitate chaining.
-
-**IMPORTANT:** Don’t set `CURLMOPT_SOCKETFUNCTION` or `CURLMOPT_SOCKETDATA`.
-_OBJ_ needs to set those internally.
-
-## $obj = _OBJ_->handles( … )
-
-A passthrough to the underlying [Net::Curl::Multi](https://metacpan.org/pod/Net::Curl::Multi) object’s
-method of the same name.
-
 # SUBCLASS INTERFACE
+
+**NOTE:** The distribution provides several ready-built end classes;
+unless you’re managing your own event loop, you don’t need to concern
+yourself with this.
 
 To use Net::Curl::Promiser, you’ll need a subclass that defines
 the following methods:
@@ -147,6 +165,6 @@ If you use [AnyEvent](https://metacpan.org/pod/AnyEvent), then [AnyEvent::XSProm
 
 # LICENSE & COPYRIGHT
 
-Copyright 2019 Gasper Software Consulting.
+Copyright 2019-2020 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.

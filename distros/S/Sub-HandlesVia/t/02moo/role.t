@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
-{ package Local::Dummy1; use Test::Requires 'Moo' };
+{ package Local::Dummy1; use Test::Requires { 'Moo' => '1.006' } };
 
 {
 	package Local::Role1;

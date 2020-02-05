@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/dbic.t
 eg/test.db
 eg/test.sql
 lib/Test/SQLite.pm

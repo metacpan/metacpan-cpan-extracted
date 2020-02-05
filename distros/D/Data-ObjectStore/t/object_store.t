@@ -283,7 +283,6 @@ sub test_suite {
     # Make sure 6 items got saved...(infoNode), (rootNode), (myList), (hash in mylist), (obj in hash) and (obj in obj)
     #
     is( $store->[DATA_PROVIDER]->entry_count, 6, "correct entry count" );
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count silo method" );
 
     #
@@ -357,13 +356,12 @@ sub test_suite {
 
     # the seventh entry was written to the record store index, but not yet
     # saved to a silo until save
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct entry count silo method" );
 
     $store->save;
     $store->quick_purge;
 
     is( $store->[DATA_PROVIDER]->entry_count, 7, "correct entry count after nuking the list" );
-    is( $store->[DATA_PROVIDER]->record_count, 3, "correct entry count silo method" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, "correct active entry count after nuking the list" );
 
     undef $list_to_remove;
@@ -697,8 +695,7 @@ sub test_no_auto_clean {
     # Make sure 6 items got saved...(infoNode), (rootNode), (myList), (hash in mylist), (obj in hash) and (obj in obj)
     #
     is( $store->[DATA_PROVIDER]->entry_count, 6, "correct entry count" );
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
-    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct active entry count " );
 
     #
     # Check to make sure opening the store again will have all the same values.
@@ -778,14 +775,13 @@ sub test_no_auto_clean {
 
     # the seventh entry was written to the record store index, but not yet
     # saved to a silo until save
-    is( $store->[DATA_PROVIDER]->record_count, 6, "correct entry count silo method" );
+    is( $store->[DATA_PROVIDER]->active_entry_count, 6, "correct entry count silo method" );
 
     $store->save;
 
     ok( $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list before purge" );
     
     is( $store->[DATA_PROVIDER]->entry_count, 7, "correct entry count after nuking the list" );
-    is( $store->[DATA_PROVIDER]->record_count, 7, "correct entry count silo method before syncing store" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 7, "correct active entry count before syncing the store" );
 
     ok( $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list still in cache" );
@@ -796,7 +792,6 @@ sub test_no_auto_clean {
     undef $someobj;
 
     $store->quick_purge;
-    is( $store->[DATA_PROVIDER]->record_count, 3, "correct entry count silo method" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 3, "correct active entry count after nuking the list" );
     
     ok( ! $store->[DATA_PROVIDER]->fetch( $list_to_remove_id ), "removed list removed from store" );
@@ -1168,7 +1163,6 @@ sub test_upgrade_db {
     my $store = Data::ObjectStore->open_store( $source_dir );
 
     is( $store->[DATA_PROVIDER]->entry_count, 8, "upgrade eight IDs to start" );
-    is( $store->[DATA_PROVIDER]->record_count, 8, "upgrade seven records to start" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 8, "upgrade seven active IDS to start" );
 
     $Data::ObjectStore::UPGRADING = 0;
@@ -1188,7 +1182,6 @@ sub test_upgrade_db {
     my $obj = $hash->{foo};
 
     is( $store->[DATA_PROVIDER]->entry_count, 5, "upgrade five IDS after" );
-    is( $store->[DATA_PROVIDER]->record_count, 5, "upgrade five records after" );
     is( $store->[DATA_PROVIDER]->active_entry_count, 5, "upgrade five active IDS after" );
 
     eval {
@@ -1970,8 +1963,12 @@ sub test_classes {
         };
         like( $@, qr/Can't locate SomeThing.pm/, "removed otherthing from includable path from fetch" );
         
+        local( *STDERR );
+        my $errout;
+        open( STDERR, ">>", \$errout );
         my $newy = $store->fetch( $newid, 1 );
         is( ref($newy), 'Data::ObjectStore::Container', "Was able to force newy to be a container" );
+        like( $errout, qr/Forcing 'SomeThing' to be 'Data::ObjectStore::Container'/, "force warning" );
     }
     
     my $newy = $store->create_container( 'SomeThing' );
@@ -1991,7 +1988,12 @@ sub test_classes {
             fail( 'was able to instantiate newy with augmented non container SomeThing' );
         };
         like( $@, qr/is not a 'Data::ObjectStore::Container'/, "removed otherthing from includable path from fetch" );
+
+        local( *STDERR );
+        my $errout;
+        open( STDERR, ">>", \$errout );
         $newy = $store->fetch( $newid, 1 );
+        like( $errout, qr/Forcing 'SomeThing' to be 'Data::ObjectStore::Container'/, "force warning" );
         is( ref($newy), 'Data::ObjectStore::Container', "Was able to force newy to be a container" );
     }
 #    unshift @INC, 't/lib';

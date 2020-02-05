@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.20 31 Jan 2020
+- Update test requirements to avoid dev release of Test::Class::Tiny.
+
 0.19 30 Jan 2020
 - BUG FIX: Properly validate UTF-8 map keys when decoding.
 - InvalidUTF8 errors now correctly handle NULs in the invalid string.

@@ -9,7 +9,7 @@ SYNOPSIS
      my $type = $obj->type($new_type);
 
 METHODS
-    new(%parameters)
+    "new(%parameters)"
              Constructor.
 
             *       "color"
@@ -59,11 +59,9 @@ ERRORS
              Image type '%s' doesn't supported.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Temp qw(tempfile);
      use Image::Random;
 
@@ -90,19 +88,24 @@ DEPENDENCIES
     List::MoreUtils.
 
 SEE ALSO
-    Data::Random, Image::Select.
+    Data::Random
+        Perl module to generate random data
+
+    Image::Select
+        Perl class for creating random image.
 
 REPOSITORY
-    <https://github.com/tupinek/Image-Random>.
+    <https://github.com/michal-josef-spacek/Image-Random>.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    BSD license.
+     © 2013-2020 Michal Josef Špaček
+     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

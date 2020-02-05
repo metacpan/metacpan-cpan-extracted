@@ -53,7 +53,7 @@
          "web" : "https://github.com/Tekki/mojo-file-role-digest"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf-8
 
@@ -14,7 +14,9 @@ Net::Curl::Promiser - A Promise interface for L<Net::Curl::Multi>
 =head1 DESCRIPTION
 
 This module wraps L<Net::Curl::Multi> to facilitate asynchronous
-HTTP requests with Promise objects.
+requests with Promise objects. Net::Curl::Promiser interfaces with
+Net::Curl::Multi’s polling callbacks to simplify your task of coordinating
+multiple concurrent requests.
 
 L<Net::Curl::Promiser> itself is a base class; you’ll need to provide
 an interface to whatever event loop you use. See L</SUBCLASS INTERFACE>
@@ -25,13 +27,14 @@ portable implementations:
 
 =over
 
-=item * L<Net::Curl::Promiser::Select>
-
-=item * L<Net::Curl::Promiser::IOAsync> (for L<IO::Async>)
-
 =item * L<Net::Curl::Promiser::Mojo> (for L<Mojolicious>)
 
 =item * L<Net::Curl::Promiser::AnyEvent> (for L<AnyEvent>)
+
+=item * L<Net::Curl::Promiser::IOAsync> (for L<IO::Async>)
+
+=item * L<Net::Curl::Promiser::Select> (for manually-written
+C<select()> loops)
 
 =back
 
@@ -45,11 +48,12 @@ You can use a different one by overriding the L<PROMISE_CLASS()> method in
 a subclass, as long as the substitute class’s C<new()> method works the
 same way as Promise::ES6’s (which itself follows the ECMAScript standard).
 
+(NB: L<Net::Curl::Promiser::Mojo> uses L<Mojo::Promise> instead of
+Promise::ES6.)
+
 =cut
 
 #----------------------------------------------------------------------
-
-use Promise::ES6 ();
 
 use Net::Curl::Multi ();
 
@@ -59,13 +63,17 @@ use constant PROMISE_CLASS => 'Promise::ES6';
 
 #----------------------------------------------------------------------
 
-=head1 METHODS
+=head1 GENERAL-USE METHODS
+
+The following are of interest to any code that uses this module:
 
 =head2 I<CLASS>->new(@ARGS)
 
 Instantiates this class. This creates an underlying
 L<Net::Curl::Multi> object and calls the subclass’s C<_INIT()>
 method at the end, passing a reference to @ARGS.
+
+(Most end classes of this module do not require @ARGS.)
 
 =cut
 
@@ -118,9 +126,29 @@ sub add_handle {
 
     $self->{'multi'}->add_handle($easy);
 
-    my $promise = $self->PROMISE_CLASS()->new( sub {
-        $self->{'callbacks'}{$easy} = \@_;
-    } );
+    my $env_engine = $ENV{'NET_CURL_PROMISER_PROMISE_ENGINE'} || q<>;
+
+    my $promise;
+
+    if ($env_engine eq 'Promise::XS') {
+        require Promise::XS;
+
+        my $deferred = Promise::XS::deferred();
+        $self->{'deferred'}{$easy} = $deferred;
+        $promise = $deferred->promise();
+    }
+    elsif ($env_engine) {
+        die "bad promise engine: [$env_engine]";
+    }
+    else {
+        my $module = $self->PROMISE_CLASS() . '.pm';
+        $module =~ s<::></>g;
+        require $module;
+
+        $promise = $self->PROMISE_CLASS()->new( sub {
+            $self->{'callbacks'}{$easy} = \@_;
+        } );
+    }
 
     return $promise;
 }
@@ -141,6 +169,49 @@ sub fail_handle {
 }
 
 #----------------------------------------------------------------------
+
+=head2 $obj = I<OBJ>->setopt( … )
+
+A passthrough to the underlying L<Net::Curl::Multi> object’s
+method of the same name. Returns I<OBJ> to facilitate chaining.
+
+C<CURLMOPT_SOCKETFUNCTION> or C<CURLMOPT_SOCKETDATA> are set internally;
+any attempt to set them via this interface will prompt an error.
+
+=cut
+
+sub setopt {
+    my $self = shift;
+
+    for my $opt ( qw( SOCKETFUNCTION  SOCKETDATA ) ) {
+        my $fullopt = "CURLMOPT_$opt";
+
+        if ($_[0] == Net::Curl::Multi->can($fullopt)->()) {
+            my $ref = ref $self;
+            die "Don’t set $fullopt via $ref!";
+        }
+    }
+
+    $self->{'multi'}->setopt(@_);
+    return $self;
+}
+
+=head2 $obj = I<OBJ>->handles( … )
+
+A passthrough to the underlying L<Net::Curl::Multi> object’s
+method of the same name.
+
+=cut
+
+sub handles {
+   return shift()->{'multi'}->handles();
+}
+
+#----------------------------------------------------------------------
+
+=head1 EVENT LOOP METHODS
+
+The following are needed only when you’re managing an event loop directly:
 
 =head2 $num = I<OBJ>->get_timeout()
 
@@ -236,34 +307,11 @@ sub time_out {
 
 #----------------------------------------------------------------------
 
-=head2 $obj = I<OBJ>->setopt( … )
-
-A passthrough to the underlying L<Net::Curl::Multi> object’s
-method of the same name. Returns I<OBJ> to facilitate chaining.
-
-B<IMPORTANT:> Don’t set C<CURLMOPT_SOCKETFUNCTION> or C<CURLMOPT_SOCKETDATA>.
-I<OBJ> needs to set those internally.
-
-=cut
-
-sub setopt {
-    my $self = shift;
-    $self->{'multi'}->setopt(@_);
-    return $self;
-}
-
-=head2 $obj = I<OBJ>->handles( … )
-
-A passthrough to the underlying L<Net::Curl::Multi> object’s
-method of the same name.
-
-=cut
-
-sub handles {
-   return shift()->{'multi'}->handles();
-}
-
 =head1 SUBCLASS INTERFACE
+
+B<NOTE:> The distribution provides several ready-built end classes;
+unless you’re managing your own event loop, you don’t need to concern
+yourself with this.
 
 To use Net::Curl::Promiser, you’ll need a subclass that defines
 the following methods:
@@ -340,6 +388,14 @@ sub _finish_handle {
     if ( my $cb_ar = delete $self->{'callbacks'}{$easy} ) {
         $cb_ar->[$cb_idx]->($payload);
     }
+    elsif ( my $deferred = delete $self->{'deferred'}{$easy} ) {
+        if ($cb_idx) {
+            $deferred->reject($payload);
+        }
+        else {
+            $deferred->resolve($payload);
+        }
+    }
 
     return;
 }
@@ -394,7 +450,7 @@ L<https://github.com/FGasper/p5-Net-Curl-Promiser>
 
 =head1 LICENSE & COPYRIGHT
 
-Copyright 2019 Gasper Software Consulting.
+Copyright 2019-2020 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 

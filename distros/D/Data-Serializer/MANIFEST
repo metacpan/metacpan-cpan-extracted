@@ -27,8 +27,8 @@ lib/Data/Serializer/Convert/Bencode.pm
 lib/Data/Serializer/Convert/Bencode_XS.pm
 lib/Data/Serializer/JSON/Syck.pm
 t/ExtUtils/TBone.pm
-xt/00-01-Signature.t
-xt/00-02-Kwalitee.t
+t/00-01-Signature.t
+t/00-02-Kwalitee.t
 t/01-01-Data-Dumper.t
 t/01-02-Data-Denter.t
 t/01-03-Storable.t
@@ -57,8 +57,8 @@ t/07-02-SHA1-Digest.t
 t/07-03-SHA-256-Digest.t
 t/08-Store-Retrieve.t
 t/09-Feature-Combos.t
-xt/10-01-Pod.t
-xt/10-02-Pod-Coverage.t
+t/10-01-Pod.t
+t/10-02-Pod-Coverage.t
 t/serializer-testlib
 examples/README
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -55,23 +55,6 @@ static int use_xsbypass = 1; /* set in dbi_bootinit() */
 #endif
 #endif
 
-#ifndef CopFILEGV
-#  define CopFILEGV(cop) cop->cop_filegv
-#  define CopLINE(cop)   cop->cop_line
-#  define CopSTASH(cop)           cop->cop_stash
-#  define CopSTASHPV(cop)           (CopSTASH(cop) ? HvNAME(CopSTASH(cop)) : Nullch)
-#endif
-#ifndef PERL_GET_THX
-#define PERL_GET_THX ((void*)0)
-#endif
-#ifndef PerlProc_getpid
-#define PerlProc_getpid() getpid()
-extern Pid_t getpid (void);
-#endif
-#ifndef aTHXo_
-#define aTHXo_
-#endif
-
 #if (PERL_VERSION < 8) || ((PERL_VERSION == 8) && (PERL_SUBVERSION == 0))
 #define DBI_save_hv_fetch_ent
 #endif
@@ -82,13 +65,6 @@ extern Pid_t getpid (void);
  * This needs working around */
 #if defined(USE_ITHREADS) && (PERL_VERSION == 8) && (PERL_SUBVERSION < 9)
 #  define BROKEN_DUP_ANY_PTR
-#endif
-
-#ifndef warn_sv
-static void warn_sv(SV *sv) { dTHX; warn("%" SVf, SVfARG(sv)); }
-#endif
-#ifndef croak_sv
-static void croak_sv(SV *sv) { dTHX; sv_setsv(ERRSV, sv); croak(NULL); }
 #endif
 
 /* types of method name */
@@ -332,7 +308,7 @@ static void *
 malloc_using_sv(STRLEN len)
 {
     dTHX;
-    SV *sv = newSV(len);
+    SV *sv = newSV(len ? len : 1);
     void *p = SvPVX(sv);
     memzero(p, len);
     return p;
@@ -1422,7 +1398,7 @@ dbih_setup_handle(pTHX_ SV *orv, char *imp_class, SV *parent, SV *imp_datasv)
     SV *dbih_imp_rv;
     SV *dbi_imp_data = Nullsv;
     SV **svp;
-    char imp_mem_name[300];
+    SV *imp_mem_name;
     HV  *imp_mem_stash;
     imp_xxh_t *imp;
     imp_xxh_t *parent_imp;
@@ -1449,10 +1425,9 @@ dbih_setup_handle(pTHX_ SV *orv, char *imp_class, SV *parent, SV *imp_datasv)
     if (mg_find(SvRV(h), DBI_MAGIC) != NULL)
         croak(errmsg, neatsvpv(orv,0), imp_class, "already a DBI (or ~magic) handle");
 
-    strcpy(imp_mem_name, imp_class);
-    strcat(imp_mem_name, "_mem");
-    if ( (imp_mem_stash = gv_stashpv(imp_mem_name, FALSE)) == NULL)
-        croak(errmsg, neatsvpv(orv,0), imp_mem_name, "unknown _mem package");
+    imp_mem_name = sv_2mortal(newSVpvf("%s_mem", imp_class));
+    if ( (imp_mem_stash = gv_stashsv(imp_mem_name, FALSE)) == NULL)
+        croak(errmsg, neatsvpv(orv,0), SvPVbyte_nolen(imp_mem_name), "unknown _mem package");
 
     if ((svp = hv_fetch((HV*)SvRV(h), "dbi_imp_data", 12, 0))) {
         dbi_imp_data = *svp;
@@ -1622,6 +1597,7 @@ dbih_dumpcom(pTHX_ imp_xxh_t *imp_xxh, const char *msg, int level)
     if (DBIc_is(imp_xxh, DBIcf_HandleError))    sv_catpv(flags,"HandleError ");
     if (DBIc_is(imp_xxh, DBIcf_RaiseError))     sv_catpv(flags,"RaiseError ");
     if (DBIc_is(imp_xxh, DBIcf_PrintError))     sv_catpv(flags,"PrintError ");
+    if (DBIc_is(imp_xxh, DBIcf_RaiseWarn))      sv_catpv(flags,"RaiseWarn ");
     if (DBIc_is(imp_xxh, DBIcf_PrintWarn))      sv_catpv(flags,"PrintWarn ");
     if (DBIc_is(imp_xxh, DBIcf_ShowErrorStatement))     sv_catpv(flags,"ShowErrorStatement ");
     if (DBIc_is(imp_xxh, DBIcf_AutoCommit))     sv_catpv(flags,"AutoCommit ");
@@ -2133,6 +2109,9 @@ dbih_set_attr_k(SV *h, SV *keysv, int dbikey, SV *valuesv)
     else if (strEQ(key, "PrintError")) {
         DBIc_set(imp_xxh,DBIcf_PrintError, on);
     }
+    else if (strEQ(key, "RaiseWarn")) {
+        DBIc_set(imp_xxh,DBIcf_RaiseWarn, on);
+    }
     else if (strEQ(key, "PrintWarn")) {
         DBIc_set(imp_xxh,DBIcf_PrintWarn, on);
     }
@@ -2576,6 +2555,9 @@ dbih_get_attr_k(SV *h, SV *keysv, int dbikey)
             if (keylen==10 && strEQ(key, "RaiseError")) {
                 valuesv = boolSV(DBIc_has(imp_xxh,DBIcf_RaiseError));
             }
+            else if (keylen==9 && strEQ(key, "RaiseWarn")) {
+                valuesv = boolSV(DBIc_has(imp_xxh,DBIcf_RaiseWarn));
+            }
             else if (keylen==12 && strEQ(key, "RowCacheSize")) {
                 valuesv = &PL_sv_undef;
             }
@@ -2905,8 +2887,12 @@ dbi_profile(SV *h, imp_xxh_t *imp_xxh, SV *statement_sv, SV *method, NV t1, NV t
         mg_get(profile); /* FETCH */
     if (!profile || !SvROK(profile)) {
         DBIc_set(imp_xxh, DBIcf_Profile, 0); /* disable */
-        if (SvOK(profile) && !PL_dirty)
-            warn("Profile attribute isn't a hash ref (%s,%ld)", neatsvpv(profile,0), (long)SvTYPE(profile));
+        if (!PL_dirty) {
+            if (!profile)
+                warn("Profile attribute does not exist");
+            else if (SvOK(profile))
+                warn("Profile attribute isn't a hash ref (%s,%ld)", neatsvpv(profile,0), (long)SvTYPE(profile));
+        }
         return &PL_sv_undef;
     }
 
@@ -4004,8 +3990,8 @@ XS(XS_DBI_dispatch)
         && (
                /* is an error and has RaiseError|PrintError|HandleError set     */
            (SvTRUE(err_sv) && DBIc_has(imp_xxh, DBIcf_RaiseError|DBIcf_PrintError|DBIcf_HandleError))
-               /* is a warn (not info) and has PrintWarn set            */
-        || (  SvOK(err_sv) && strlen(SvPV_nolen(err_sv)) && DBIc_has(imp_xxh, DBIcf_PrintWarn))
+               /* is a warn (not info) and has RaiseWarn|PrintWarn set          */
+        || (  SvOK(err_sv) && strlen(SvPV_nolen(err_sv)) && DBIc_has(imp_xxh, DBIcf_RaiseWarn|DBIcf_PrintWarn))
         )
     ) {
         SV *msg;
@@ -4066,7 +4052,7 @@ XS(XS_DBI_dispatch)
         }
 
         hook_svp = NULL;
-        if (    SvTRUE(err_sv)
+        if (   (SvTRUE(err_sv) || (is_warning && DBIc_has(imp_xxh, DBIcf_RaiseWarn)))
             &&  DBIc_has(imp_xxh, DBIcf_HandleError)
             && (hook_svp = hv_fetch((HV*)SvRV(h),"HandleError",11,0))
             &&  hook_svp && SvOK(*hook_svp)
@@ -4117,9 +4103,11 @@ XS(XS_DBI_dispatch)
             dbi_profile(h, imp_xxh, statement_sv, imp_msv ? imp_msv : (SV*)cv,
                 profile_t1, dbi_time());
         }
-        if (is_warning) {
+        if (!hook_svp && is_warning) {
             if (DBIc_has(imp_xxh, DBIcf_PrintWarn))
                 warn_sv(msg);
+            if (DBIc_has(imp_xxh, DBIcf_RaiseWarn))
+                croak_sv(msg);
         }
         else if (!hook_svp && SvTRUE(err_sv)) {
             if (DBIc_has(imp_xxh, DBIcf_PrintError))
@@ -5070,11 +5058,11 @@ connected(...)
 
 
 SV *
-preparse(dbh, statement, ps_accept, ps_return, foo=Nullch)
+preparse(dbh, statement, ps_return, ps_accept, foo=Nullch)
     SV *        dbh
     char *      statement
-    IV          ps_accept
     IV          ps_return
+    IV          ps_accept
     void        *foo
 
 
@@ -5252,9 +5240,12 @@ bind_col(sth, col, ref, attribs=Nullsv)
     SV *        col
     SV *        ref
     SV *        attribs
+    PREINIT:
+    SV *ret;
     CODE:
     DBD_ATTRIBS_CHECK("bind_col", sth, attribs);
-    ST(0) = boolSV(dbih_sth_bind_col(sth, col, ref, attribs));
+    ret = boolSV(dbih_sth_bind_col(sth, col, ref, attribs));
+    ST(0) = ret;
     (void)cv;
 
 
@@ -5492,21 +5483,27 @@ void
 FETCH(h, keysv)
     SV *        h
     SV *        keysv
+    PREINIT:
+    SV *ret;
     CODE:
-    ST(0) = dbih_get_attr_k(h, keysv, 0);
+    ret = dbih_get_attr_k(h, keysv, 0);
+    ST(0) = ret;
     (void)cv;
 
 void
 DELETE(h, keysv)
     SV *        h
     SV *        keysv
+    PREINIT:
+    SV *ret;
     CODE:
     /* only private_* keys can be deleted, for others DELETE acts like FETCH */
     /* because the DBI internals rely on certain handle attributes existing  */
     if (strnEQ(SvPV_nolen(keysv),"private_",8))
-        ST(0) = hv_delete_ent((HV*)SvRV(h), keysv, 0, 0);
+        ret = hv_delete_ent((HV*)SvRV(h), keysv, 0, 0);
     else
-        ST(0) = dbih_get_attr_k(h, keysv, 0);
+        ret = dbih_get_attr_k(h, keysv, 0);
+    ST(0) = ret;
     (void)cv;
 
 

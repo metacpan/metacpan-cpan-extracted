@@ -1,0 +1,21 @@
+3.7.3.4   xx.xx.xxxx
+    - improve Makefile.PL
+    - renamed to XS::libgeos
+3.7.3.3   25.01.2020
+    - rename CPP::geos to Alien::libgeos
+    - ship libgeos sources instead of downloading them
+3.7.3.2   01.11.2019
+    - change download mirror to github
+3.7.3.1   01.11.2019
+    - fix distribution
+3.7.3.0   31.10.2019
+    - use geos version 3.7.3
+3.7.2.0   12.08.2019
+    - fix configure dependencies
+    - use geos version 3.7.2
+3.7.0.2    06.02.2019
+    - fix docs
+3.7.0.1    06.02.2019
+    - fix cpan issues
+3.7.0      06.02.2019
+    - initial release with geos version 3.7.0

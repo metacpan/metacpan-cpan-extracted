@@ -62,7 +62,13 @@ sub _cb_timer {
     my ($multi, $timeout_ms, $self) = @_;
 
     my $cb = sub {
-        $self->_time_out_in_loop();
+        #$self->_time_out_in_loop();
+        #$multi->socket_action( Net::Curl::Multi::CURL_SOCKET_TIMEOUT() );
+        $self->{'multi'}->socket_action( Net::Curl::Multi::CURL_SOCKET_TIMEOUT() );
+
+        # $self->_process_pending();
+
+        return;
     };
 
     delete $self->{'timer'};

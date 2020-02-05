@@ -20,7 +20,7 @@ use OAuth::Cmdline::GoogleDrive;
 
 use Net::Google::Drive::Simple::Item;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 ###########################################
 sub new {
@@ -243,23 +243,47 @@ sub file_upload {
     $url = URI->new( $self->{api_upload_url} . "/$file_id" );
     $url->query_form( uploadType => "media" );
 
+    if ( $self->http_put($url, {"Content-Type" => $mime_type,
+				Content => $file_data,} ) ) {
+	return $file_id;
+    }
+}
+
+###########################################
+sub rename {
+###########################################
+    my ( $self, $file_id, $new_name ) = @_;
+
+    my $url = URI->new( $self->{api_file_url} . "/$file_id" );
+
+    if ( $self->http_put($url, {"Accept" => "application/json",
+				"Content-Type" => "application/json",
+				Content => to_json({title=> $new_name}),} ) ) {
+        return 1 ;
+    }
+    return ;
+
+}
+
+###########################################
+sub http_put {
+###########################################
+    my ( $self, $url, $body ) = @_;
+
     my $req = &HTTP::Request::Common::PUT(
         $url->as_string,
         $self->{oauth}->authorization_headers(),
-        "Content-Type" => $mime_type,
-        Content        => $file_data,
+	%$body,
     );
 
     my $resp = $self->http_loop($req);
 
-    if ( $resp->is_error() ) {
-        $self->error( $self->message() );
+    if ( $resp->is_error ) {
+        $self->error( $resp->message() );
         return;
     }
-
     DEBUG $resp->as_string;
-
-    return $file_id;
+    return $resp;
 }
 
 ###########################################
@@ -579,7 +603,7 @@ sub http_loop {
 
         if ( !$resp->is_success() ) {
             $self->error( $resp->message() );
-            warn "Failed with ", $resp->code(), ": ", $resp->message();
+            warn "Failed with ", $resp->code(), ": ", $resp->message(), "\n";
             if ( --$RETRIES >= 0 ) {
                 ERROR "Retrying in $SLEEP_INTERVAL seconds";
                 sleep $SLEEP_INTERVAL;
@@ -863,6 +887,10 @@ To overwrite an existing file on Google Drive, specify the file's ID as
 an optional parameter:
 
     $gd->file_upload( $file, $dir_id, $file_id );
+
+=item C<$gd-E<gt>rename( $file_id, $name )>
+
+Renames the file or folder with C<$file_id> to the specified C<$name>.
 
 =item C<$gd-E<gt>download( $item, [$local_filename] )>
 

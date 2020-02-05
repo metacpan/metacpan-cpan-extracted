@@ -37,7 +37,7 @@
    "provides" : {
       "Test::AllModules" : {
          "file" : "lib/Test/AllModules.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "http://github.com/bayashi/Test-AllModules"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

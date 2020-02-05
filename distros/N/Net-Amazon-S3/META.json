@@ -104,13 +104,15 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.87",
+   "version" : "0.88",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",
+      "Ali Zia <ali.zia@foxtons.co.uk>",
       "Branislav Zahradnik <branislav.zahradnik@gooddata.com>",
       "Branislav Zahradn\u00edk <happy.barney@gmail.com>",
       "Christian Lackas <lackas@invicro.com>",
+      "Douglas Sims <ratsbane@gmail.com>",
       "Dylan William Hardison <dylan@hardison.net>",
       "Eden Crane <>",
       "Florian Schlichting <fsfs@debian.org>",
@@ -118,6 +120,7 @@
       "Gabriel Andrade <gabriel@Zumba.local>",
       "Gavin Carr <gavin@openfusion.com.au>",
       "Haruka Iwao <haruka@fout.jp>",
+      "Jun Kuriyama <kuriyama@s2factory.co.jp>",
       "Leo Lapworth <leo@cuckoo.org>",
       "Leon Brocard <acme@astray.com>",
       "Michael Schout <schoutm@gmail.com>",

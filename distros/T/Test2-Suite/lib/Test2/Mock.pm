@@ -2,7 +2,7 @@ package Test2::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '0.000128';
+our $VERSION = '0.000129';
 
 use Carp qw/croak confess/;
 our @CARP_NOT = (__PACKAGE__);
@@ -198,12 +198,13 @@ EOT
     my $can = eval <<EOT || die "Failed generating can method: $@";
 package $class;
 #line $line "$file (Generated can)"
+use Scalar::Util 'reftype';
     sub {
         my (\$self, \$meth) = \@_;
         if (\$self->SUPER::can(\$meth)) {
             return \$self->SUPER::can(\$meth);
         }
-        elsif (exists \$self->{\$meth}) {
+        elsif (ref \$self && reftype \$self eq 'HASH' && exists \$self->{\$meth}) {
             return sub { shift->\$meth(\@_) };
         }
         return undef;

@@ -32,7 +32,11 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Tie::IxHash" => 0
   },
-  "VERSION" => "2.01",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "URI" => 0
+  },
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +57,9 @@ my %FallbackPrereqs = (
   "Params::Coerce" => 0,
   "Scalar::Util" => 0,
   "Test::Fatal" => 0,
-  "Tie::IxHash" => 0
+  "Test::More" => 0,
+  "Tie::IxHash" => 0,
+  "URI" => 0
 );
 
 

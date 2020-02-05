@@ -10,7 +10,7 @@ use File::Temp;
 use Promise::XS;
 
 SKIP: {
-    skip 1, 'Windows, XS, fork, and heap allocation don’t get along.' if $^O eq 'MSWin32';
+    skip 'Windows, XS, fork, and heap allocation don’t get along.', 1 if $^O eq 'MSWin32';
 
     local $Promise::XS::DETECT_MEMORY_LEAKS = 1;
 

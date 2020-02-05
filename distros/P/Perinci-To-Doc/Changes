@@ -1,3 +1,9 @@
+0.870   2020-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix misplaced parenthesis which caused perl undef
+	  warning.
+
+
 0.869   2020-01-28  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to shift self.

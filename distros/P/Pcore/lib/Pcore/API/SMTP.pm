@@ -15,7 +15,6 @@ has password => ();
 has tls      => ();
 
 # handle settings
-has timeout => 10;
 has tls_ctx => $TLS_CTX_HIGH;    # Maybe [ HashRef | Enum [ $TLS_CTX_HIGH, $TLS_CTX_LOW ] ]
 
 const our $STATUS_REASON => {
@@ -177,6 +176,9 @@ sub _EHLO ( $self, $h ) {
 sub _AUTH ( $self, $h, $mechanisms ) {
 
     # NOTE partially stolen from Net::SMTP
+
+    # remove DIGEST-MD5 mechanism, because he doesn't work
+    $mechanisms =~ s/DIGEST-MD5//smg;
 
     return res [ 500, $STATUS_REASON ] if !$mechanisms;
 
@@ -405,19 +407,19 @@ sub _NOOP ( $self, $h, $cb ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 54                   | * Subroutine "sendmail" with high complexity score (23)                                                        |
-## |      | 268                  | * Subroutine "_DATA" with high complexity score (29)                                                           |
+## |      | 53                   | * Subroutine "sendmail" with high complexity score (23)                                                        |
+## |      | 270                  | * Subroutine "_DATA" with high complexity score (29)                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 141, 143             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 140, 142             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 382                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 388                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 394                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 384                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 390                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 396                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 389                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 391                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 55                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 54                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

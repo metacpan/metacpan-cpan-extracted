@@ -1,5 +1,12 @@
 Revision history for Group-Git
 
+0.7.3   2020-02-01
+        Updating for release of version 0.7.3
+        Updated date (Ivan Wills)
+        Better filtering (Ivan Wills)
+        Trying to make the process faster (Ivan Wills)
+        Updating the travis config (Ivan Wills)
+
 0.7.2   2019-08-11
         Updating for release of version 0.7.2
         Updating travis perl version (Ivan Wills)

@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Press";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-017>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-018>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-019>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-020>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-021>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-022>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-023>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-024>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-025>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-026>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-027>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-028>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-029>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-030>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-031>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-032>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-033>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-034>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-035>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-017>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-018>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-019>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-020>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-021>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-022>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-023>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-024>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-025>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-026>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-027>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-028>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-029>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-030>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-031>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-032>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-033>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-034>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-035>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-036>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-037>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-038>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-039>, <http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-040>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-press>;
@@ -621,6 +621,82 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.035.tar.gz>;
 	doap:revision        "0.035"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-036>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.036"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Abstract base classes.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Interfaces.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Using class-specific things like `factory` in a role now results in an error instead of being silently ignored.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.036.tar.gz>;
+	doap:revision        "0.036"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-037>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.037"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Process `with` much later to ensure that methods (including accessors, delegated methods, multimethods, and constants) have been installed which might be needed to satisfy role requirements.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.037.tar.gz>;
+	doap:revision        "0.037"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-038>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.038"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Abstract base classes throw exceptions from `BUILD` instead of `new`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.038.tar.gz>;
+	doap:revision        "0.038"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-039>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.039"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "In the last few releases (since 0.032?), method signatures were mistakenly being recompiled every method call, which was SLOW.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.039.tar.gz>;
+	doap:revision        "0.039"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Press/v_0-040>
+	a                    doap:Version;
+	dc:identifier        "MooX-Press-0.040"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove some Data::Dumper stuff mistakenly included in last release.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Press-0.040.tar.gz>;
+	doap:revision        "0.040"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

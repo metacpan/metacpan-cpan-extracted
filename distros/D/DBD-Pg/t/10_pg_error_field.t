@@ -2,7 +2,7 @@
 
 ## Test of $dbh->pg_error_field
 
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 use Test::More;
@@ -106,6 +106,9 @@ for my $loop (1..5) {
     $dbh->rollback();
 }
 
+$dbh->do("DROP TABLE $test_table");
+$dbh->commit();
+$dbh->disconnect();
+
 done_testing();
 
-$dbh->disconnect();

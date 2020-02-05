@@ -55,11 +55,9 @@ ERRORS
              Method '%s' is unimplemented.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
      use WebService::Ares;
 
@@ -100,11 +98,9 @@ EXAMPLE1
      # }
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use WebService::Ares;
 
      # Arguments.
@@ -195,11 +191,9 @@ EXAMPLE2
      # </are:Ares_odpovedi>
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use WebService::Ares;
 
      # Object.
@@ -224,15 +218,15 @@ SEE ALSO
         Perl XML::Parser parser for Ares standard XML file.
 
 REPOSITORY
-    <https://github.com/tupinek/WebService-Ares>
+    <https://github.com/michal-josef-spacek/WebService-Ares>
 
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2009-2015
+     © Michal Josef Špaček 2009-2020
      BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

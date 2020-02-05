@@ -8,7 +8,7 @@ use Exporter 'import';
 use IO::Prompter;
 use Term::ANSIColor qw|colored coloralias|;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @EXPORT      = ();
 our @EXPORT_OK   = ();
@@ -44,7 +44,16 @@ coloralias('warn',  'bright_magenta');
 
     *{__PACKAGE__ . "::$fn"} = sub {
       my $style = coloralias($context) =~ s/bright_/bold /r;
-      return prompt shift, -v, -style => $style, -echostyle => $style, @_;
+      return prompt shift, -v, -echostyle => $style, -style => $style, @_;
+    };
+
+    # password
+    $fn = "password_$context";
+    push $EXPORT_TAGS{prompt}->@*, $fn;
+
+    *{__PACKAGE__ . "::$fn"} = sub {
+      my $style = coloralias($context) =~ s/bright_/bold /r;
+      return prompt shift, -v, -echo => '*', -echostyle => $style, -style => $style, @_;
     };
 
     # say
@@ -96,6 +105,12 @@ Print::Colored - print, say, prompt with predefined colors
     $input = prompt_input $text, @params;
     $input = prompt_ok $text, @params;
     $input = prompt_warn $text, @params;
+
+    $password = password_error $text, @params;
+    $password = password_info $text, @params;
+    $password = password_input $text, @params;
+    $password = password_ok $text, @params;
+    $password = password_warn $text, @params;
 
     # say
     use Print::Colored ':say';
@@ -150,14 +165,14 @@ All the commands except L</color_> write directly to C<STDOUT>.
     print_ok $filehandle 'Everything okay.';    # ✗ no
     say_ok $filehandle 'Everything okay.';      # ✗ no
 
-You can't L</print_> and L</say_> to filehandles.
+You can't L</print> and L</say> to filehandles.
 
     print $filehandle color_ok 'Everything okay.';    # ✓
     say $filehandle color_ok 'Everything okay.';      # ✓
 
-Instead you have to use one of the L</color_> functions.
+Instead you have to use one of the L</color> functions.
 
-=head1 color_
+=head1 color
 
     use Print::Colored ':color';
 
@@ -193,7 +208,7 @@ Returns a text colored as C<ok>.
 
 Returns a text colored as C<warn>.
 
-=head1 print_
+=head1 print
 
     use Print::Colored ':print';
 
@@ -229,12 +244,18 @@ Prints a text colored as C<ok>.
 
 Prints a text colored as C<warn>.
 
-=head1 prompt_
+=head1 prompt
 
     use Print::Colored ':prompt';
 
-Imports the functions L</prompt_error>, L</prompt_info>, L</prompt_input>, L</prompt_ok>, and L</prompt_warn>.
+Imports the functions L</prompt_error>, L</prompt_info>, L</prompt_input>, L</prompt_ok>, L</prompt_warn>,
+L</password_error>, L</password_info>, L</password_input>, L</password_ok>, and L</password_warn>.
 Internally they call L<IO::Prompter/prompt>.
+
+    $password = prompt_input 'Enter your password: ', -echo => '*';
+    $password = password_input 'Enter your password: ';
+
+C<password> functions ask for a password and are identical to C<prompt> with parameter C<<-echo => '*'>>.
 
 =head2 prompt_error
 
@@ -266,7 +287,37 @@ Prompts colored as C<ok> and returns the input.
 
 Prompts colored as C<warn> and returns the input.
 
-=head1 say_
+=head2 password_error
+
+    $password = password_error 'Enter your password: ';
+
+Prompts colored as C<error> for a password and returns the input.
+
+=head2 password_info
+
+    $password = password_info 'Enter your password: ';
+
+Prompts colored as C<info> for a password and returns the input.
+
+=head2 password_input
+
+    $password = password_input 'Enter your password: ';
+
+Prompts colored as C<input> for a password and returns the input.
+
+=head2 password_ok
+
+    $password = password_ok 'Enter your password: ';
+
+Prompts colored as C<ok> for a password and returns the input.
+
+=head2 password_warn
+
+    $password = password_warn 'Enter your password: ';
+
+Prompts colored as C<warn> for a password and returns the input.
+
+=head1 say
 
     use Print::Colored ':say';
 
@@ -304,7 +355,7 @@ Prints a text with appended newline colored as C<warn>.
 
 =head1 AUTHOR & COPYRIGHT
 
-© 2019 by Tekki (Rolf Stöckli).
+© 2019-2020 by Tekki (Rolf Stöckli).
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

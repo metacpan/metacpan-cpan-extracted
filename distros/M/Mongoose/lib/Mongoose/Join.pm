@@ -1,5 +1,5 @@
 package Mongoose::Join;
-$Mongoose::Join::VERSION = '2.01';
+$Mongoose::Join::VERSION = '2.02';
 use Moose;
 use Moose::Util::TypeConstraints;
 use Moose::Meta::TypeConstraint::Parameterizable;

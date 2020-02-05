@@ -1,0 +1,10 @@
+# https://babbar.tech/crawler
+- ua: 'Barkrowler/0.9 (+https://babbar.tech/crawler)'
+  name: 'Barkrowler'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '0.9'

@@ -42,8 +42,7 @@ my %non_defaults = (
   lineheight => 22,
   textsize   => 0,
 );
-ok $object = $package->new(%non_defaults),
-  'Create object with non-default parameters';
+ok $object = $package->new(%non_defaults), 'Create object with non-default parameters';
 for (sort keys %non_defaults) {
   is $object->$_, $non_defaults{$_}, "$_ is $non_defaults{$_}";
 }
@@ -53,21 +52,18 @@ for (sort keys %defaults) {
 }
 
 is $object->linewidth(3)->linewidth, 3, 'Set linewidth to 3';
-is $object->linewidth('')->linewidth, $defaults{linewidth},
-  'Set linewidth back to default';
+is $object->linewidth('')->linewidth, $defaults{linewidth}, 'Set linewidth back to default';
 
 note 'Plot';
 ok $object = $package->new, 'Create object';
 my $text = 'Tekki';
 ok my $svg = $object->plot($text), 'Plot barcode';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_black_text.svg"), 'Content is correct';
 
 is $object->foreground('red')->textsize(0)->lineheight(20), $object,
   'Change color and height, hide text';
 ok $svg = $object->plot($text), 'Plot barcode';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_red_notext.svg"), 'Content is correct';
 
 done_testing();
 

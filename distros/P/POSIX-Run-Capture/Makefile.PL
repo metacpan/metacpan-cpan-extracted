@@ -9,6 +9,10 @@ WriteMakefile(
     VERSION_FROM      => 'lib/POSIX/Run/Capture.pm',
     LICENSE           =>  'gpl_3',
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    TEST_REQUIRES     => {
+	'File::Temp' => 0.23,
+	'File::Cmp'  => 1.06
+    },
     MIN_PERL_VERSION  => 5.006,
     ABSTRACT_FROM     => 'lib/POSIX/Run/Capture.pm',
     AUTHOR            => 'Sergey Poznyakoff <gray@gnu.org>',

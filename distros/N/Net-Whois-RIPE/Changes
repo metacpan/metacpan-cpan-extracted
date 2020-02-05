@@ -1,5 +1,10 @@
 Revision history for net-whois-ripe
 
+2.007003    2020-02-03
+            - Add List::Utils to the prerequisites (Kwalitee)
+            - Update copyright/authors/sponsor information
+            - Attempt to fix the undefined line bug
+
 2.007002    2020-01-23
             - Minor improvement to fix Kwalitee issues (use warnings, License information in META files)
             - Fix bogus test (Inet6Num)

@@ -25,7 +25,7 @@
 # source function library
 . /etc/rc.d/init.d/functions
 
-USER=ec2-user
+USER=www-data
 RETVAL=0
 prog="fullautoapi"
 lockfile=/var/lock/subsys/$prog
@@ -43,7 +43,7 @@ start()
            || (failure && exit)
 
 	echo -n $"Starting $prog: "
-	(nohup $FULLAUTOAPI -l localhost:3003 -e -p \
+	(nohup $FULLAUTOAPI -l /tmp/fullautoapi.socket -e -p \
            /var/run/fullautoapi.pid > /var/log/fullautoapi.log &)\
            && success || failure
 	RETVAL=$?

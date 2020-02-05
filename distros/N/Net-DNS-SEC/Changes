@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.15 February 3, 2020
+
+	Provide access to OpenSSL message digest implementations.
+
+
 **** 1.14 October 14, 2019
 
 	Improve exception capture in test scripts.
@@ -626,4 +631,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1760 2019-10-14 21:04:41Z willem $
+$Id: Changes 1766 2020-02-03 14:17:59Z willem $

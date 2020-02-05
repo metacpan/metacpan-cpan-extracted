@@ -1,3 +1,15 @@
+0.07 2020-02-02T13:14:55+01:00
+ - Add author tests.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Fix doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve tests for create() method.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update .travis.yml to reality.
+
 0.06 2014-10-24T02:02:01+02:00
  - Add tests.
  - Fix 'color' parameter default value in doc.

@@ -16,16 +16,22 @@ $modules{$_} = $_ for qw(
   Archive::Extract
   Archive::Tar
   Capture::Tiny
+  Digest::SHA
   File::chdir
+  HTML::LinkExtor
   HTTP::Tiny
+  Inline
+  Inline::C
+  Inline::CPP
+  LWP::UserAgent
+  List::Util
   Module::Build
   Path::Tiny
   Shell::Config::Generate
   Shell::Guess
   Sort::Versions
-  Test2::Mock
-  Test2::Require::Module
   Test2::V0
+  Text::ParseWords
   URI
   URI::file
   parent

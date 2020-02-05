@@ -9,8 +9,9 @@ use List::Util qw(max);
 use HTML::ExtractContent;
 use Mojo::DOM;
 use Types::Standard qw(Str Maybe);
+use NewsExtractor::Types qw(is_NewspaperName);
 
-use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace );
+use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace html2text );
 use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 has site_name => (
@@ -170,6 +171,8 @@ sub journalist {
         ($ret) = $guess->text =~ m<(責任編輯.+)\z>x;
     }
 
+    $ret = undef if ($ret && is_NewspaperName($ret));
+
     if ( !$ret && (my $content_text = $self->content_text)) {
         my @patterns = (
             qr<\b (?:特[約派])? [记記]者 \s* ([\s\p{Letter}、]+?) \s* [/╱／] \s* (?: 特稿 | 專訪 | \p{Letter}+ (?:報導|报导)) \b>xs,
@@ -192,7 +195,8 @@ sub journalist {
             qr<\A  記者 (\p{Letter}+) ／報導 >x,
             qr<\A  \[ (記者.+報導) \] >x,
             qr<\A  （ (記者.+報導) ） >x,
-            qr<\A 【(本報記者.+報導)】 >x
+            qr<\A 【(本報記者.+報導)】 >x,
+            qr<\b ﹝記者(\p{Letter}+?)／.+?報導﹞ \b>x,
         );
 
         for my $pat (@patterns) {
@@ -208,7 +212,11 @@ sub journalist {
         }
     }
 
-    $ret = normalize_whitespace($ret) if $ret;
+    if ($ret) {
+        $ret = normalize_whitespace($ret);
+        $ret = "" if is_NewspaperName($ret);
+    }
+
     return $ret;
 }
 
@@ -226,12 +234,9 @@ sub content_text {
         $html = $extractor->extract( $self->dom->to_string )->as_html;
     }
 
-    $content_dom = Mojo::DOM->new('<body>' . $html . '</body>');
-    $content_dom->find('br')->map(replace => "\n");
-    $content_dom->find('div,p')->map(append => "\n\n");
+    my $text = html2text( $html );
 
-    my @paragraphs = grep { $_ ne '' } map { normalize_whitespace($_) } split /\n\n+/, $content_dom->all_text;
-    return unless @paragraphs;
+    my @paragraphs = split /\n\n/, $text;
 
     if (my $site_name = $self->site_name) {
         $paragraphs[-1] =~ s/\A \s* \p{Punct}? \s* ${site_name} \s* \p{Punct}? \s* \z//x;
@@ -239,8 +244,6 @@ sub content_text {
     }
 
     $paragraphs[-1] =~ s/\A \s* \p{Punct}? \s* $RE{newspaper_names} \s* \p{Punct}? \s* \z//x;
-
-    pop @paragraphs if $paragraphs[-1] eq '';
 
     if (max( map { length($_) } @paragraphs ) < 30) {
         # err "[$$] Not enough contents";

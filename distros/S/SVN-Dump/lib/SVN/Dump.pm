@@ -81,6 +81,10 @@ __END__
 
 SVN::Dump - A Perl interface to Subversion dumps
 
+=head1 VERSION
+
+version 0.07
+
 =head1 SYNOPSIS
 
     #!/usr/bin/perl
@@ -142,8 +146,10 @@ a dump:
 
     use SVN::Dump;
 
-    my $dump = SVN::Dump->new( 'mydump.svn' );
-    print $dump->as_string(); # only print the dump header
+    my $dump = SVN::Dump->new( { file => 'mydump.svn' } );
+    $dump->next_record;          # read the format header
+    $dump->next_record;          # read the uuid header
+    print $dump->as_string();    # only print the dump header
 
     while( $rec = $dump->next_record() ) {
         print $rec->as_string();
@@ -208,7 +214,7 @@ L<http://svn.apache.org/repos/asf/subversion/trunk/notes/dump-load-format.txt>
 
 =head1 COPYRIGHT
 
-Copyright 2006-2013 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2006-2020 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

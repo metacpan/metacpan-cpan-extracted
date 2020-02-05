@@ -10,14 +10,14 @@ build_requires:
   Test::Simple: '0.96'
   Test::Warnings: '0'
 configure_requires:
-  Alien::libgeos: v3.7.3.3
-  Alien::libpanda: v1.3.6
-  Export::XS: v3.0.2
-  XS::Framework: v1.2.4
-  XS::Install: v1.2.12
+  Export::XS: v3.0.3
+  XS::Framework: v1.2.5
+  XS::Install: v1.2.13
+  XS::libgeos: v3.7.3.4
+  XS::libpanda: v1.3.9
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,11 +28,11 @@ no_index:
     - t
     - inc
 requires:
-  Alien::libgeos: v3.7.3.3
-  Alien::libpanda: v1.3.6
-  Export::XS: v3.0.2
-  XS::Framework: v1.2.4
-  XS::Install: v1.2.12
+  Export::XS: v3.0.3
+  XS::Framework: v1.2.5
+  XS::Install: v1.2.13
+  XS::libgeos: v3.7.3.4
+  XS::libpanda: v1.3.9
   next::XS: v1.0.7
-version: v1.0.3
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

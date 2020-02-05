@@ -7,6 +7,13 @@ my $build = Module::Build->new
 	license  => 'perl',
 	create_makefile_pl => 'passthrough',
 	build_class	=>	'Module::Build',
+	meta_merge => {
+    resources => {
+            bugtracker =>  'https://github.com/neilneely/Data-Serializer/issues',
+            homepage   =>  'http://metacpan.org/release/Data-Serializer',
+            repository =>  'git://github.com/neilneely/Data-Serializer.git',
+        },
+	},
 	requires => {
 		'Exporter'	=> 0,
 		'AutoLoader'	=> 0,

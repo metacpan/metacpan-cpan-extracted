@@ -31,9 +31,9 @@ no_index:
 provides:
   Minion::Backend::mysql:
     file: lib/Minion/Backend/mysql.pm
-    version: '0.18'
+    version: '0.19'
 requires:
-  Minion: '9.03'
+  Minion: '10.04'
   Mojo::mysql: '1.04'
   Mojolicious: '0'
   perl: '5.010'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/preaction/Minion-Backend-mysql/issues
   homepage: https://github.com/preaction/Minion-Backend-mysql
   repository: https://github.com/preaction/Minion-Backend-mysql.git
-version: '0.18'
+version: '0.19'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Alexander Nalobin <nalobin@reg.ru>'

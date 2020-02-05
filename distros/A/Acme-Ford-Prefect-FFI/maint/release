@@ -5,7 +5,7 @@ use warnings;
 use Path::Tiny qw( path );
 use Alien::Build;
 use Alien::Base::Wrapper ();
-use Acme::Alien::DontPanic2 ();
+use Acme::Alien::DontPanic ();
 
 {
   my @lines = path('dist.ini')->lines;
@@ -26,7 +26,7 @@ use Acme::Alien::DontPanic2 ();
     elsif(/^Acme::Alien::DontPanic\s*=\s*(.*)\s*$/)
     {
       my $old = $1;
-      my $new = Acme::Alien::DontPanic2->VERSION;
+      my $new = Acme::Alien::DontPanic->VERSION;
       print " acme    $old   -> $new\n";
       s/$old/$new/;
     }
@@ -43,7 +43,7 @@ use Acme::Alien::DontPanic2 ();
   my $next  = shift @lines;
 
   unshift @lines, $title, $blank, $next,
-    "  - Require Acme::Alien::DontPanic2 @{[ Acme::Alien::DontPanic2->VERSION ]} (Alien::Build @{[ Alien::Build->VERSION ]})\n";
+    "  - Require Acme::Alien::DontPanic @{[ Acme::Alien::DontPanic->VERSION ]} (Alien::Build @{[ Alien::Build->VERSION ]})\n";
 
   path('Changes')->spew(@lines);
 }

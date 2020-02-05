@@ -1,5 +1,17 @@
 Revision history for Devel-PPPort
 
+ 3.57 - 2020-01-31
+
+ * Fix eval_sv for Perl versions prior to 5.6.0 (Pali)
+ * Fix t/ppphtest.t for Perl versions prior to 5.6.0 (Pali)
+ * Fix compilation of sv_setsv_flags when GCC extensions are not present (Pali)
+ * Fix SV_NOSTEAL on 5.7.2 (Karl Williamson)
+ * Fix multiple unit test issues (Craig A. Berry, Karl Williamson, Pali)
+ * Avoid generating warnings on early Perls (Karl Williamson)
+ * Backport memCHRs (Karl Williamson)
+ * Implement sv_setsv_flags() with SV_NOSTEAL and SV_GMAGIC flags for Perl versions < 5.7.3 (Pali)
+ * Implement UTF8f format and its UTF8fARG macro (Pali)
+
  3.56 - 2019-11-25
 
  * mktests.PL: use FindBin for INC setup

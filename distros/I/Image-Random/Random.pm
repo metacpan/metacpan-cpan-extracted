@@ -1,10 +1,8 @@
 package Image::Random;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use File::Basename qw(fileparse);
@@ -12,8 +10,7 @@ use Imager;
 use Imager::Color;
 use List::MoreUtils qw(none);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -175,7 +172,7 @@ Image::Random - Perl class for creating random image.
 
 =over 8
 
-=item B<new(%parameters)>
+=item C<new(%parameters)>
 
  Constructor.
 
@@ -237,11 +234,9 @@ Image::Random - Perl class for creating random image.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Temp qw(tempfile);
  use Image::Random;
 
@@ -274,25 +269,35 @@ L<List::MoreUtils>.
 
 =head1 SEE ALSO
 
-L<Data::Random>,
-L<Image::Select>.
+=over
+
+=item L<Data::Random>
+
+Perl module to generate random data
+
+=item L<Image::Select>
+
+Perl class for creating random image.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Image-Random>.
+L<https://github.com/michal-josef-spacek/Image-Random>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2013-2020 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

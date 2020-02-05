@@ -1,4 +1,8 @@
 #!/usr/bin/perl
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 use strict;
 use warnings;
@@ -44,6 +48,13 @@ Specifically, these are the same forms as recognised by F<avr-gcc>'s C<-mmcu>
 option and F<avrdude>'s C<-p> option, for convenience in Makefiles and build
 scripts.
 
+=head2 --baud, -B BAUD
+
+Optional. Sets a different baud rate for communications. If not supplied, will
+default to 115200.
+
+If communications are unreliable, try setting a slower speed.
+
 =head2 --erase, -e
 
 Send the CHIPERASE key as well as the NVMPROG key when enabling programming
@@ -63,6 +74,7 @@ STDOUT->autoflush;
 GetOptions(
    'port|P=s' => \( my $PORT = "/dev/ttyUSB0" ),
    'part|p=s' => \( my $PART ),
+   'baud|B=i' => \( my $BAUD ),
 
    'erase|e' => \( my $ERASE ),
 
@@ -75,6 +87,7 @@ sub make_updi
    $updi = Device::AVR::UPDI->new(
       dev => $PORT,
       part => $PART,
+      baud => $BAUD,
    );
 
    $updi->init_link->get;

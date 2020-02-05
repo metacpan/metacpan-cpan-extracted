@@ -1,5 +1,5 @@
 package Mongoose::Engine;
-$Mongoose::Engine::VERSION = '2.01';
+$Mongoose::Engine::VERSION = '2.02';
 use Moose::Role;
 
 use Carp;

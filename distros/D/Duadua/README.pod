@@ -1,0 +1,58 @@
+=encoding utf8
+
+
+This is Perl module B<Duadua>.
+
+=begin html
+
+<img src="https://img.shields.io/badge/Version-0.04-green?style=flat"> <a href="https://github.com/bayashi/Duadua/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/build/badge.svg?_t=1580660494&branch=master"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1580660494&branch=master"/></a>
+
+=end html
+
+B<Duadua> provides you to parse User Agent string.
+
+
+=head1 INSTALLATION
+
+=head2 cpanm
+
+Duadua installation is straightforward. If your L<cpanm> command is set up,
+you should just be able to do
+
+    % cpanm Duadua
+
+=head2 download
+
+Download it or git clone it, then build it as per the usual:
+
+    $ git clone git@github.com:bayashi/Duadua.git
+    $ cd Duadua
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Duadua documentation is available as in POD. So you can do:
+
+    % perldoc Duadua
+
+
+=head1 REPOSITORY
+
+Duadua is hosted on github
+L<http://github.com/bayashi/Duadua>
+
+
+=head1 LICENSE
+
+C<Duadua> is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. (Note that, unlike the Artistic License 1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to having an Artistic 2.0 / GPL disjunction.) See the file LICENSE for details.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

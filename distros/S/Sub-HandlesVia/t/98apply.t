@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-{ package Local::Dummy; use Test::Requires 'Moo' };
+{ package Local::Dummy; use Test::Requires { 'Moo' => '1.006' } };
 
 {
 	package Local::Class;

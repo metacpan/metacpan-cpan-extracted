@@ -1,47 +1,53 @@
-use inc::Module::Install;
-
-name 'DBIx-ThinSQL';
-version '0.0.48';
-license 'gpl3';
-
-homepage 'https://github.com/mlawren/p5-DBIx-ThinSQL';
-bugtracker 'https://github.com/mlawren/p5-DBIx-ThinSQL/issues';
-repository 'git://github.com/mlawren/p5-DBIx-ThinSQL.git';
-
-all_from 'lib/DBIx/ThinSQL.pm';
-readme_from 'lib/DBIx/ThinSQL.pm';
-
-requires 'DBI'            => 0;
-requires 'Exporter::Tidy' => 0;
-requires 'File::ShareDir' => 0;
-requires 'Log::Any'       => 0;
-requires 'Path::Tiny'     => 0;
-
-test_requires 'File::chdir'    => 0;
-test_requires 'Test::Database' => 0;
-test_requires 'Test::Fatal'    => 0;
-test_requires 'Test::More'     => 0;
-
-tests_recursive 't';
-author_tests 'xt';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+use ExtUtils::MakeMaker::CPANfile;
+use File::ShareDir::Install;
 
 install_share 'share';
 
-no_index package => 'DBIx::ThinSQL::Driver';
-no_index package => 'DBIx::ThinSQL::Driver::Pg';
-no_index package => 'DBIx::ThinSQL::Driver::SQLite';
-no_index package => 'DBIx::ThinSQL::bind_value';
-no_index package => 'DBIx::ThinSQL::case';
-no_index package => 'DBIx::ThinSQL::db';
-no_index package => 'DBIx::ThinSQL::expr';
-no_index package => 'DBIx::ThinSQL::list';
-no_index package => 'DBIx::ThinSQL::query';
-no_index package => 'DBIx::ThinSQL::quote_identifier';
-no_index package => 'DBIx::ThinSQL::quote_value';
-no_index package => 'DBIx::ThinSQL::st';
-no_index package => 'DBIx::ThinSQL::table';
-no_index package => 'DBIx::ThinSQL::values';
+WriteMakefile(
+    NAME          => 'DBIx::ThinSQL',
+    ABSTRACT_FROM => 'lib/DBIx/ThinSQL.pm',
+    AUTHOR        => 'Mark Lawrence <nomad@null.net>',
+    VERSION_FROM  => 'lib/DBIx/ThinSQL.pm',
+    LICENSE       => 'gpl_3',
+    test          => { RECURSIVE_TEST_FILES => 1, },
+    META_MERGE    => {
+        'meta-spec' => { version => 2 },
+        no_index    => {
+            package => [
+                qw/
+                  DBIx::ThinSQL::Driver
+                  DBIx::ThinSQL::Driver::Pg
+                  DBIx::ThinSQL::Driver::SQLite
+                  DBIx::ThinSQL::bind_value
+                  DBIx::ThinSQL::case
+                  DBIx::ThinSQL::db
+                  DBIx::ThinSQL::expr
+                  DBIx::ThinSQL::list
+                  DBIx::ThinSQL::query
+                  DBIx::ThinSQL::quote_identifier
+                  DBIx::ThinSQL::quote_value
+                  DBIx::ThinSQL::st
+                  DBIx::ThinSQL::table
+                  DBIx::ThinSQL::values
+                  /
+            ],
+        },
+        resources => {
+            bugtracker =>
+              { web => 'https//github.com/mlawren/p5-DBIx-ThinSQL/issues', },
+            homepage   => 'https//github.com/mlawren/p5-DBIx-ThinSQL',
+            repository => {
+                type => 'git',
+                url  => 'ssh://git@github.com/mlawren/p5-DBIx-ThinSQL.git',
+                web  => 'https//github.com/mlawren/p5-DBIx-ThinSQL',
+            }
+        },
+    },
+);
 
-auto_install;
-
-WriteAll;
+package MY;
+use File::ShareDir::Install qw(postamble);

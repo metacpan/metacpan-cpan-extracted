@@ -54,12 +54,10 @@ for (sort keys %defaults) {
 }
 
 is $object->foreground('red')->foreground, 'red', 'Set foreground to red';
-is $object->foreground('')->foreground, $defaults{foreground},
-  'Set foreground back to default';
+is $object->foreground('')->foreground, $defaults{foreground}, 'Set foreground back to default';
 
 eval { $package->new(inexistant => 'illegal') };
-like $@, qr/Can't locate object method "inexistant"/,
-  'Correct error for inexistant parameter';
+like $@, qr/Can't locate object method "inexistant"/, 'Correct error for inexistant parameter';
 
 note 'Plot';
 ok $object = $package->new, 'Create object';
@@ -69,8 +67,7 @@ eval { $object->plot };
 like $@, qr/Too few arguments for subroutine/, 'Correct error for missing text';
 
 eval { $object->plot($text) };
-like $@, qr/Method _plot not implemented by subclass!/,
-  'Correct error for unimplemented method';
+like $@, qr/Method _plot not implemented by subclass!/, 'Correct error for unimplemented method';
 
 {
   no strict 'refs';    ## no critic 'ProhibitNoStrict'

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -342,7 +342,7 @@ sub choose_directories {
     }
     my ( $self, $opt ) = @_;
     if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = 'Dirs: ';
+        $opt->{cs_label} = '> ';
     }
     $self->__prepare_opt( $opt );
     my $init_dir_fs = $self->__prepare_path();
@@ -365,11 +365,9 @@ sub choose_directories {
         if ( $mode eq $browse ) {
             $self->{back}     = $back;
             $self->{confirm}  = $confirm;
-            $self->{prompt}   = 'Browse:';
-            $self->{cs_label} = 'Cwd: ';
-            my $marker = "+\x{feff}+";
-            $self->{marker} = $marker;
-            $dir_fs = $self->__choose_a_path( $dir_fs );
+            $self->{prompt}   = $self->{info} . "\n" . ' ' . "\n" . 'Browse:';
+            $self->{cs_label} = 'cwd: ';
+            ( $dir_fs, my $to_add_dirs ) = $self->__choose_a_path( $dir_fs );
             if ( ! defined $dir_fs ) {
                 if ( @bu ) {
                     ( $dir_fs, $chosen_dirs_fs ) = @{pop @bu};
@@ -378,28 +376,28 @@ sub choose_directories {
                 $self->__restore_defaults();
                 return;
             }
-            elsif ( $dir_fs =~ /^\Q$marker\E/ ) {
-                $dir_fs =~ s/^\Q$marker\E//;
+            elsif ( defined $to_add_dirs ) {
                 $mode = $add_dirs;
                 next;
             }
             else {
-                my $returned_dirs;
+                my $chosen_dirs;
                 if ( $self->{decoded} ) {
-                    $returned_dirs = [ map { decode 'locale_fs', $_ } @$chosen_dirs_fs ];
+                    $chosen_dirs = [ map { decode 'locale_fs', $_ } @$chosen_dirs_fs ];
                 }
                 else {
-                    $returned_dirs = $chosen_dirs_fs;
+                    $chosen_dirs = $chosen_dirs_fs;
                 }
                 $self->__restore_defaults();
-                return $returned_dirs;
+                return $chosen_dirs;
             }
         }
         elsif ( $mode eq $add_dirs ) {
             my $avail_dirs_fs = $self->__available_dirs( $dir_fs );
-            $self->{info}    .= "\n" . 'Cwd: ' . decode 'locale_fs', $dir_fs;
-            $self->{cs_label} = 'Add: ';
-            $self->{prompt}   = 'Choose dirs:';
+            $self->{info}     = 'cwd: ' . decode( 'locale_fs', $dir_fs ) . '' . "\n" . $self->{info};
+            $self->{cs_label} = '';
+            $self->{cs_begin} = '+ ';
+            $self->{prompt}   = 'Choose:';
             $self->{back}     = '<<';
             $self->{confirm}  = 'OK';
             my $idxs = $self->choose_a_subset(
@@ -429,7 +427,9 @@ sub choose_a_directory {
     }
     $self->__prepare_opt( $opt );
     my $init_dir_fs = $self->__prepare_path();
-    return $self->__choose_a_path( $init_dir_fs );
+    my $chosen_dir = $self->__choose_a_path( $init_dir_fs );
+    $self->__restore_defaults();
+    return $chosen_dir;
 }
 
 
@@ -445,7 +445,9 @@ sub choose_a_file {
     }
     $self->__prepare_opt( $opt );
     my $init_dir_fs = $self->__prepare_path();
-    return $self->__choose_a_path( $init_dir_fs );
+    my $chosen_file = $self->__choose_a_path( $init_dir_fs );
+    $self->__restore_defaults();
+    return $chosen_file;
 }
 
 sub __choose_a_path {
@@ -494,6 +496,9 @@ sub __choose_a_path {
         if ( $sub eq 'choose_a_file' ) {
             push @tmp, $self->{cs_label} . decode( 'locale_fs', ( catfile $dir_fs, $wildcard ) );
         }
+        elsif ( $sub eq 'choose_directories' ) {
+            push @tmp, $self->{cs_label} . $self->{cs_begin} . decode( 'locale_fs', $dir_fs ) . $self->{cs_end};
+        }
         else {
             push @tmp, $self->{cs_label} . decode( 'locale_fs', $dir_fs );
         }
@@ -504,42 +509,27 @@ sub __choose_a_path {
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { info => $self->{info}, prompt => $lines, default => $default_idx, alignment => $self->{alignment},
+            { prompt => $lines, default => $default_idx, alignment => $self->{alignment},
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               undef => $self->{back} }
         );
         if ( ! defined $choice ) {
-            $self->__restore_defaults();
             return;
         }
         elsif ( $choice eq $self->{confirm} ) {
-            my $returned_dir;
-            if ( $self->{decoded} ) {
-                $returned_dir = decode 'locale_fs', $prev_dir_fs
-            }
-            else {
-                $returned_dir = $prev_dir_fs;
-            }
-            $self->__restore_defaults();
-            return $returned_dir;
+            return $self->{decode} ? decode( 'locale_fs', $prev_dir_fs ) : $prev_dir_fs;
         }
         elsif ( $choice eq $self->{show_files} ) {
             my $file_fs = $self->__a_file( $dir_fs, $wildcard );
-            next if ! length $file_fs;
-            my $returned_file;
-            if ( $self->{decoded} ) {
-                $returned_file = decode 'locale_fs', $file_fs;
+            if ( ! length $file_fs ) {
+                next;
             }
-            else {
-                $returned_file = $file_fs;
-            }
-            $self->__restore_defaults();
-            return $returned_file;
+            return $self->{decode} ? decode( 'locale_fs', $file_fs ) : $file_fs;
         }
         elsif ( $choice eq $self->{add_dirs} ) {
-            return $self->{marker} . $prev_dir_fs;
+            return $prev_dir_fs, 1;
         }
         if ( $choice eq $self->{parent_dir} ) {
             $dir_fs = dirname $dir_fs;
@@ -1049,7 +1039,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.111
+Version 0.112
 
 =cut
 
@@ -1365,6 +1355,12 @@ The first argument is a reference to an array which provides the available list.
 Options:
 
 =over
+
+=item
+
+all_by_default
+
+If enabled, all elements are selected if CONFIRM is chosen without any selected elements.
 
 =item
 

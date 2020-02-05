@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/FindUtils/find_duplicate_filenames
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-09-18'; # DATE
+our $DATE = '2019-12-04'; # DATE
 our $DIST = 'App-FindUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ find-duplicate-filenames - Search directories recursively and find files/dirs wi
 
 =head1 VERSION
 
-This document describes version 0.002 of find-duplicate-filenames (from Perl distribution App-FindUtils), released on 2019-09-18.
+This document describes version 0.003 of find-duplicate-filenames (from Perl distribution App-FindUtils), released on 2019-12-04.
 
 =head1 SYNOPSIS
 

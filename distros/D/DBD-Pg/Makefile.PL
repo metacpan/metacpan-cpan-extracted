@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.10.3';
+my $VERSION = '3.10.4';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -259,7 +259,7 @@ if ($Config{dlsrc} =~ /dl_none/) {
     sub MY::test { ## no critic
         my $string = shift->SUPER::test(@_);
         $string =~ s/(PERL_DL_NONLAZY=1)/PGINITDB="$initdb" $1/g;
-        return $string;
+        return "HARNESS_OPTIONS=j1\n$string";
     }
 }
 

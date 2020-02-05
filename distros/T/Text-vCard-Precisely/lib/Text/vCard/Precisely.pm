@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -118,11 +118,6 @@ Mac OS X and iOS can't parse vCard4.0 with UTF-8 precisely. they cause some Moji
 
 Android 4.4.x can't parse vCard4.0
 
-
-=item
-
-I wanted to learn Moose, of course
-
 =back
 
 To handle an address book with several vCard entries in it, start with
@@ -229,6 +224,9 @@ Accepts/returns an ArrayRef that looks like:
     { type => ['work'], content => '651-290-1234', preferred => 1 },
     { type => ['home'], content => '651-290-1111' },
  ]
+
+After version 0.18, B<content will not be validated as phone numbers> All I<Str> type is accepted.
+So you have to validate phone numbers with your way.
 
 =head2 adr(), address()
 
@@ -434,14 +432,6 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 =item
 
 L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
-
-=item
-
-L<CPAN|http://search.cpan.org/perldoc?Text%3A%3AvCard%3A%3APrecisely>
-
-=item
-
-L<GitHub|https://github.com/worthmine/Text-vCard-Precisely>
 
 =back
 

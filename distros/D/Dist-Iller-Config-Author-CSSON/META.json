@@ -40,19 +40,19 @@
             "Badge::Depot::Plugin::Travis" : "0",
             "Dist::Zilla" : "6.012",
             "Dist::Zilla::Plugin::Authority" : "1.009",
-            "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.008",
+            "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.009",
             "Dist::Zilla::Plugin::ChangeStats::Dependencies::Git" : "0.0200",
-            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.008",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.011",
             "Dist::Zilla::Plugin::Clean" : "0.07",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.170880",
             "Dist::Zilla::Plugin::DistIller::MetaGeneratedBy" : "0",
             "Dist::Zilla::Plugin::ExecDir" : "0",
-            "Dist::Zilla::Plugin::Git" : "2.045",
+            "Dist::Zilla::Plugin::Git" : "2.046",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0.014",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
-            "Dist::Zilla::Plugin::Git::Contributors" : "0.034",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0.035",
             "Dist::Zilla::Plugin::Git::GatherDir" : "0",
             "Dist::Zilla::Plugin::Git::Push" : "0",
             "Dist::Zilla::Plugin::Git::Tag" : "0",
@@ -75,15 +75,15 @@
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.163250",
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.007",
-            "Dist::Zilla::Plugin::RunExtraTests" : "0.028",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0.029",
             "Dist::Zilla::Plugin::ShareDir" : "0",
-            "Dist::Zilla::Plugin::Test::Compile" : "2.057",
+            "Dist::Zilla::Plugin::Test::Compile" : "2.058",
             "Dist::Zilla::Plugin::Test::EOF" : "0.0501",
             "Dist::Zilla::Plugin::Test::EOL" : "0.18",
             "Dist::Zilla::Plugin::Test::Kwalitee::Extra" : "v0.2.1",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0.15",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.027",
-            "Dist::Zilla::Plugin::Test::Version" : "1.05",
+            "Dist::Zilla::Plugin::Test::Version" : "1.09",
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::TravisYML" : "1.15",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
@@ -112,7 +112,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0322"
+            "Dist::Iller::Config::Author::CSSON" : "0.0324"
          }
       },
       "runtime" : {
@@ -143,11 +143,11 @@
    "provides" : {
       "Dist::Iller::Config::Author::CSSON" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON.pm",
-         "version" : "0.0323"
+         "version" : "0.0324"
       },
       "Dist::Iller::Config::Author::CSSON::MapMetro" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm",
-         "version" : "0.0323"
+         "version" : "0.0324"
       }
    },
    "release_status" : "stable",
@@ -162,7 +162,7 @@
          "web" : "https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON"
       }
    },
-   "version" : "0.0323",
+   "version" : "0.0324",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -670,7 +670,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0323",
+                  "tag" : "0.0324",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },

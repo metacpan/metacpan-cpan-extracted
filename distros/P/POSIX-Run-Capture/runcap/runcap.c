@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017 Sergey Poznyakoff
+   Copyright (C) 2017-2020 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -23,17 +23,24 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <signal.h>
-
+#include <string.h>
 #include "runcap.h"
 
-int
-stream_capture_init(struct stream_capture *cap, size_t size)
+static int
+stream_capture_init(struct stream_capture *cap, size_t size, int flags)
 {
 	if (!cap) {
 		errno = EINVAL;
 		return -1;
 	}
 
+	if (size == 0) {
+		if (flags & RCF_SC_LINEMON)
+			size = STRCAP_BUFSIZE;
+		flags |= RCF_SC_NOCAP;
+	} else if ((flags & RCF_SC_NOCAP) && !(flags & RCF_SC_LINEMON))
+		size = 0;
+	
 	if (size) {
 		cap->sc_base = malloc(size);
 		if (!cap->sc_base)
@@ -45,8 +52,16 @@ stream_capture_init(struct stream_capture *cap, size_t size)
 	cap->sc_level = 0;
 	cap->sc_nlines = 0;
 	cap->sc_cur = 0;
-	cap->sc_storfd = -1;
+	if (!(flags & RCF_SC_STORFD))
+		cap->sc_storfd = -1;
 	cap->sc_fd = -1;
+
+	if (!(flags & RCF_SC_LINEMON)) {
+		cap->sc_linemon = NULL;
+		cap->sc_monarg = NULL;
+	}
+	cap->sc_flags = flags;
+	
 	return 0;
 }
 
@@ -59,8 +74,12 @@ stream_capture_reset(struct stream_capture *cap)
 	cap->sc_cur = 0;
 
 	if (cap->sc_storfd >= 0) {
-		close(cap->sc_storfd);
-		cap->sc_storfd = -1;
+		if (cap->sc_flags & RCF_SC_STORFD) {
+			/* FIXME: Restore fd position? */;
+		} else {
+			close(cap->sc_storfd);
+			cap->sc_storfd = -1;
+		}
 	}
 	if (cap->sc_fd >= 0) {
 		close(cap->sc_fd);
@@ -68,7 +87,7 @@ stream_capture_reset(struct stream_capture *cap)
 	}
 }
 
-void
+static void
 stream_capture_free(struct stream_capture *cap)
 {
 	stream_capture_reset(cap);
@@ -108,18 +127,20 @@ stream_capture_flush(struct stream_capture *cap)
 		cap->sc_linemon(cap->sc_base + cap->sc_cur,
 				cap->sc_level - cap->sc_cur,
 				cap->sc_monarg);
-	if (cap->sc_storfd == -1) {
-		int fd;
-		char tmpl[] = "/tmp/rcXXXXXX";
-		fd = mkstemp(tmpl);
-		if (fd == -1)
+	if (!(cap->sc_flags & RCF_SC_NOCAP)) {
+		if (cap->sc_storfd == -1) {
+			int fd;
+			char tmpl[] = "/tmp/rcXXXXXX";
+			fd = mkstemp(tmpl);
+			if (fd == -1)
+				return -1;
+			unlink(tmpl);
+			cap->sc_storfd = fd;
+		}
+		res = full_write(cap->sc_storfd, cap->sc_base, cap->sc_level);
+		if (res)
 			return -1;
-		unlink(tmpl);
-		cap->sc_storfd = fd;
 	}
-	res = full_write(cap->sc_storfd, cap->sc_base, cap->sc_level);
-	if (res)
-		return -1;
 	cap->sc_level = 0;
 	cap->sc_cur = 0;
 	return 0;
@@ -136,19 +157,23 @@ stream_capture_get(struct stream_capture *cap, int *feof)
 			return -1;
 	}
 		
-	rc = read(cap->sc_fd, cap->sc_base + cap->sc_level, cap->sc_size - cap->sc_level);
+	rc = read(cap->sc_fd, cap->sc_base + cap->sc_level,
+		  cap->sc_size - cap->sc_level);
 	if (rc == -1) {
 	        if (errno == EINTR)
 		      return 0;
 		return -1;
 	}
 	if (rc == 0) {
-		if (cap->sc_linemon && cap->sc_level > cap->sc_cur) {
-			cap->sc_linemon(cap->sc_base + cap->sc_cur,
-					cap->sc_level - cap->sc_cur,
-					cap->sc_monarg);
-			cap->sc_cur = cap->sc_level;
-			cap->sc_nlines++;
+		if (cap->sc_linemon) {
+			if (cap->sc_level > cap->sc_cur) {
+				cap->sc_linemon(cap->sc_base + cap->sc_cur,
+						cap->sc_level - cap->sc_cur,
+						cap->sc_monarg);
+				cap->sc_cur = cap->sc_level;
+				cap->sc_nlines++;
+			}
+			cap->sc_linemon(cap->sc_base, 0, cap->sc_monarg);
 		}
 		*feof = 1;
 		return 0;
@@ -170,7 +195,15 @@ stream_capture_get(struct stream_capture *cap, int *feof)
 			cap->sc_nlines++;
 		}
 	}
-	
+
+	if ((cap->sc_flags & RCF_SC_NOCAP)
+	    && cap->sc_linemon
+	    && cap->sc_level > cap->sc_cur) {
+		memmove(cap->sc_base, cap->sc_base + cap->sc_cur,
+			cap->sc_level - cap->sc_cur);
+		cap->sc_level -= cap->sc_cur;
+		cap->sc_cur = 0;
+	}
 
 	return 0;
 }
@@ -252,13 +285,19 @@ runcap_start(struct runcap *rc)
 		if (p[RUNCAP_STDOUT][0] >= 0) {
 			dup2(p[RUNCAP_STDOUT][1], RUNCAP_STDOUT);
 			close(p[RUNCAP_STDOUT][0]);
-		}
+		} else if (rc->rc_cap[RUNCAP_STDOUT].sc_storfd != -1) {
+			dup2(rc->rc_cap[RUNCAP_STDOUT].sc_storfd,
+			     RUNCAP_STDOUT);
+		}			
 		
 		if (p[RUNCAP_STDERR][0] >= 0) {
 			dup2(p[RUNCAP_STDERR][1], RUNCAP_STDERR);
 			close(p[RUNCAP_STDERR][0]);
-		}
-
+		} else if (rc->rc_cap[RUNCAP_STDERR].sc_storfd != -1) {
+			dup2(rc->rc_cap[RUNCAP_STDERR].sc_storfd,
+			     RUNCAP_STDERR);
+		}			
+		
 		i = open("/dev/null", O_RDONLY);
 		if (i == -1)
 			i = sysconf(_SC_OPEN_MAX) - 1;
@@ -451,33 +490,25 @@ runcap_init(struct runcap *rc, int flags)
 			rc->rc_cap[RUNCAP_STDIN].sc_size;
 		rc->rc_cap[RUNCAP_STDIN].sc_cur = 0;
 		rc->rc_cap[RUNCAP_STDIN].sc_storfd = -1;
-	} else if (stream_capture_init(&rc->rc_cap[RUNCAP_STDIN], 0))
+	} else if (stream_capture_init(&rc->rc_cap[RUNCAP_STDIN], 0, 0))
 		return -1;
-	
+
 	res = stream_capture_init(&rc->rc_cap[RUNCAP_STDOUT],
 				  (flags & RCF_STDOUT_SIZE)
 				    ? rc->rc_cap[RUNCAP_STDOUT].sc_size
-				    : STRCAP_BUFSIZE);
+				    : STRCAP_BUFSIZE,
+				  RCF_FLAG_TO_SC(flags, RUNCAP_STDOUT));
 	if (res)
 		return res;
-	
-	if (!(flags & RCF_STDOUT_LINEMON)) {
-		rc->rc_cap[RUNCAP_STDOUT].sc_linemon = NULL;
-		rc->rc_cap[RUNCAP_STDOUT].sc_monarg = NULL;
-	}
 	
 	res = stream_capture_init(&rc->rc_cap[RUNCAP_STDERR],
 				  (flags & RCF_STDERR_SIZE)
 				    ? rc->rc_cap[RUNCAP_STDERR].sc_size
-				    : STRCAP_BUFSIZE);
+				    : STRCAP_BUFSIZE,
+				  RCF_FLAG_TO_SC(flags, RUNCAP_STDERR));
 	if (res)
 		return res;
 
-	if (!(flags & RCF_STDERR_LINEMON)) {
-		rc->rc_cap[RUNCAP_STDERR].sc_linemon = NULL;
-		rc->rc_cap[RUNCAP_STDERR].sc_monarg = NULL;
-	}
-	
 	rc->rc_pid = (pid_t) -1;
 	rc->rc_status = 0;
 	rc->rc_errno = 0;

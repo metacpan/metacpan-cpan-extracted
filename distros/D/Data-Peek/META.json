@@ -1,67 +1,67 @@
 {
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/Tux/Data-Peek",
-         "url" : "https://github.com/Tux/Data-Peek"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "x_IRC" : "irc://irc.perl.org/#csv"
-   },
-   "release_status" : "stable",
-   "abstract" : "Modified and extended debugging facilities",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-   ],
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
-   "generated_by" : "Author",
-   "name" : "Data-Peek",
-   "provides" : {
-      "Data::Peek" : {
-         "version" : "0.48",
-         "file" : "Peek.pm"
-      }
-   },
-   "version" : "0.48",
    "prereqs" : {
-      "runtime" : {
-         "requires" : {
-            "Data::Dumper" : "0",
-            "DynaLoader" : "0",
-            "perl" : "5.008"
-         },
-         "recommends" : {
-            "Perl::Tidy" : "0",
-            "Data::Dumper" : "2.167"
-         }
-      },
       "build" : {
          "requires" : {
-            "perl" : "5.008"
-         }
-      },
+            "perl" : "5.008001"
+            }
+         },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "perl" : "5.008001",
+            "DynaLoader" : "0"
+            },
+         "recommends" : {
+            "Data::Dumper" : "2.173",
+            "Perl::Tidy" : "0"
+            }
+         },
+      "test" : {
+         "recommends" : {
+            "Test::More" : "1.302171"
+            },
+         "requires" : {
+            "Test::Warnings" : "0",
+            "Test::More" : "0.90"
+            }
          }
       },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.88",
-            "Test::NoWarnings" : "0"
-         },
-         "recommends" : {
-            "Test::More" : "1.302125"
-         }
-      }
-   },
+   "name" : "Data-Peek",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "release_status" : "stable",
    "dynamic_config" : 1,
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "repository" : {
+         "url" : "https://github.com/Tux/Data-Peek",
+         "type" : "git",
+         "web" : "https://github.com/Tux/Data-Peek"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
    "license" : [
       "perl_5"
-   ]
-}
+      ],
+   "provides" : {
+      "Data::Peek" : {
+         "file" : "Peek.pm",
+         "version" : "0.49"
+         }
+      },
+   "generated_by" : "Author",
+   "version" : "0.49",
+   "abstract" : "Modified and extended debugging facilities"
+   }

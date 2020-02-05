@@ -1,0 +1,23 @@
+0.040   2020-02-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist from Tree-FromStruct -> Tree-From-Struct.
+
+
+0.03    2016-03-29  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [doc] Mention other modules that create tree.
+
+
+0.02    2016-03-26  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- To avoid duplicated effort, trim documentation and refer to
+	  Role::TinyCommons::Tree::FromStruct instead.
+
+
+0.01    2016-03-23  Released-By: PERLANCAR
+
+        - First release.

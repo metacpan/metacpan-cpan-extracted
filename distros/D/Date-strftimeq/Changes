@@ -1,3 +1,8 @@
+0.003   2020-02-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Comment-out test that fail in some platforms [RT#131512].
+
+
 0.002   2019-12-24  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

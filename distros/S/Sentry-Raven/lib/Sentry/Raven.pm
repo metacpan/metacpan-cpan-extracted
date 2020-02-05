@@ -1,12 +1,12 @@
 package Sentry::Raven;
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 use Moo;
 use MooX::Types::MooseLike::Base qw/ ArrayRef HashRef Int Str /;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Data::Dump 'dump';
 use Devel::StackTrace;
@@ -59,7 +59,7 @@ Sentry::Raven - A perl sentry client
 
 =head1 VERSION
 
-Version 1.11
+Version 1.12
 
 =head1 SYNOPSIS
 
@@ -600,9 +600,11 @@ sub _construct_event {
     $event->{message} = _trim($event->{message}, MAX_MESSAGE);
     $event->{culprit} = _trim($event->{culprit}, MAX_CULPRIT);
 
+    my $instance_ctx = $self->context();
     foreach my $interface (@{ $self->valid_interfaces() }) {
-        $event->{$interface} = $context{$interface}
-            if $context{$interface};
+        my $interface_ctx = $context{$interface} || $instance_ctx->{$interface};
+        $event->{$interface} = $interface_ctx
+            if $interface_ctx;
     }
 
     return $event;

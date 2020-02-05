@@ -53,7 +53,7 @@
          "web" : "https://github.com/Tekki/svg-barcode-datamatrix"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

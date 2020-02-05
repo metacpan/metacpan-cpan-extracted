@@ -1,5 +1,5 @@
 package HTTP::CookieMonster;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use strict;
 use warnings;
 
@@ -157,7 +157,7 @@ HTTP::CookieMonster - Easy read/write access to your jar of HTTP::Cookies
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ version 0.10
     use WWW::Mechanize;
 
     my $mech = WWW::Mechanize->new;
-    my $url = 'http://www.nytimes.com';
+    my $url = 'https://www.nytimes.com';
     $mech->get( $url );
 
     my @cookies = cookies( $mech->cookie_jar );

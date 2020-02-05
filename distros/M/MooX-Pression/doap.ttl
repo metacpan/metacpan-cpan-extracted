@@ -13,14 +13,14 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.022000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.032"^^doap-deps:CpanId ], [
+	doap-deps:runtime-recommendation [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.022000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.040"^^doap-deps:CpanId ], [
 		doap-deps:on "Keyword::Declare 0.001014"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
-	], [
+	], [ doap-deps:on "Devel::StrictMode"^^doap-deps:CpanId ], [
 		doap-deps:on "Syntax::Keyword::Try 0.11"^^doap-deps:CpanId;
 	];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
@@ -33,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Pression";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-013>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-017>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-018>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-019>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-020>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-pression>;
@@ -309,6 +309,131 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.013.tar.gz>;
 	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-014>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.014"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`abstract class` keyword.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`interface` keyword.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include simple JSON encoder using multi methods as an example.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.015"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support equals sign to provide attribute default value.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.016"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has $foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has @foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has %foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "For consistency with method signatures, support `has *foo` to mean the same as `has foo`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-017>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.017"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Method signatures in `requires` are no longer totally ignored.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.017.tar.gz>;
+	doap:revision        "0.017"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-018>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.018"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix handling of :optimize.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include Dios in benchmarking comparison.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-019>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.019"^^xsd:string;
+	dc:issued            "2020-02-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Much improved parsing of signatures; especially type constraints within signatures.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include Mouse in benchmarking comparison.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.019.tar.gz>;
+	doap:revision        "0.019"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-020>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.020"^^xsd:string;
+	dc:issued            "2020-02-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix issue parsing optional parameters introduced in 0.019.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better messages when encountering syntax errors.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "In some cases of otherwise ambiguous syntax, assume classes/roles/methods were not anonymous.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.020.tar.gz>;
+	doap:revision        "0.020"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

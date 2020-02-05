@@ -29,6 +29,6 @@ requires:
 resources:
   bugtracker: https://github.com/ranguard/svg-tt-graph/issues
   repository: https://github.com/ranguard/svg-tt-graph
-version: '1.02'
+version: '1.03'
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

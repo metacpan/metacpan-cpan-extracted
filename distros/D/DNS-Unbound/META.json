@@ -41,6 +41,9 @@
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
+            "Net::DNS::Nameserver" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0",
             "Test::More" : "0"
@@ -58,6 +61,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

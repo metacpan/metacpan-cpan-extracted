@@ -4,7 +4,7 @@ use Role::Tiny::With ();
 
 Role::Tiny::With::with 'Mojo::DB::Connector::Base';
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 1;
 __END__

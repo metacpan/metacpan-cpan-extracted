@@ -569,8 +569,7 @@ subtest 'interpolation of version' => sub {
 
 subtest 'interpolation of helpers' => sub {
 
-  my $mock = Test2::Mock->new(
-    class => 'Alien::foopatcher',
+  my $mock = mock 'Alien::foopatcher' => (
     add => [
       new          => sub { bless 'Alien::foopatcher', {} },
       alien_helper => sub {

@@ -1,5 +1,5 @@
 package Mongoose::Role::Engine;
-$Mongoose::Role::Engine::VERSION = '2.01';
+$Mongoose::Role::Engine::VERSION = '2.02';
 use Moose::Role;
 
 requires 'save';

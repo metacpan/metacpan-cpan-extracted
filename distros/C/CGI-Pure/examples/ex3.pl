@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CGI::Pure;
 use CGI::Pure::Save;
 use File::Temp qw(tempfile);

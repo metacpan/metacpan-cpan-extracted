@@ -21,15 +21,12 @@ Files: Changes
  t/21coderef.t
  t/22overload.t
  t/24mm.t
+ t/25abstract.t
+ t/50complextypes.t
+ t/97defaults.t
  t/98geom.t
  t/99anonclass.t
 Copyright: Copyright 2020 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- lib/MooX/Pression.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -38,8 +35,15 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ lib/MooX/Pression.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: INSTALL
  LICENSE
+ examples/simple-json-encoder.pl
 Copyright: Unknown
 License: Unknown
 

@@ -1,3 +1,18 @@
+0.006   2020-02-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Comment-out test that fail in some platforms [related to
+	  RT#131512].
+
+
+0.005   2019-12-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Tweak example in Synopsis (make it less silly).
+
+	- [doc] Mention Date::strftimeq.
+
+
 0.004   2019-11-20  Released-By: PERLANCAR; Urgency: medium
 
 	- [refactor] Extract regex to Date-strftimeq, also fix exponential

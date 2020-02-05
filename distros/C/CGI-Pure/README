@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use CGI::Pure;
+
      my $cgi = CGI::Pure->new(%parameters);
      $cgi->append_param('par', 'value');
      my @par_value = $cgi->param('par');
@@ -109,6 +110,9 @@ ERRORS
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
+     append_param():
+             Parameter '%s' has bad value.
+
      upload():
              Cannot close file '%s': %s.
              Cannot write file '%s': %s.
@@ -120,11 +124,9 @@ ERRORS
              File uploads only work if you specify enctype="multipart/form-data" in your form.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use CGI::Pure;
 
      # Object.
@@ -141,11 +143,9 @@ EXAMPLE1
      # Param 'par2': value
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use CGI::Pure;
 
      # Object.
@@ -178,9 +178,9 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2004-2018 Michal Josef Špaček
+     © 2004-2020 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

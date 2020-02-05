@@ -1,5 +1,5 @@
 /* runcap - run program and capture its output
-   Copyright (C) 2017 Sergey Poznyakoff
+   Copyright (C) 2017-2020 Sergey Poznyakoff
 
    Runcap is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -46,17 +46,20 @@ usage(int code)
 {
 	FILE *fp = code ? stderr : stdout;
 	fprintf(fp, "%s [OPTIONS] COMMAND [ARG...]\n", progname);
+	fprintf(fp, "tests the runcap library\n");
 	fprintf(fp, "OPTIONS are:\n\n");
-	fprintf(fp, "  -S all|stderr|stdout   selects capture for the next -m or -s option\n");
+	fprintf(fp, "  -S all|stderr|stdout   selects capture for the next -m, -N, or -s option\n");
 	fprintf(fp, "  -f FILE                reads stdin from FILE\n");
 	fprintf(fp, "  -i                     inline read (use before -f)\n");
+	fprintf(fp, "  -N                     disable capturing\n");
 	fprintf(fp, "  -n all|stderr|stdout   print lines from the requested capture\n");
 	fprintf(fp, "  -m                     monitors each line recevied from the program (see -S)\n");
 	fprintf(fp, "  -p PROGNAME            sets program name to use instead of COMMAND\n");
-	fprintf(fp, "  -r STREAM[:COUNT:OFF:WHENCE]\n");
+	fprintf(fp, "  -r STREAM[:COUNT:OFF:WHENCE:FULL]\n");
 	fprintf(fp, "                         read and print COUNT bytes from STREAM (stdout or\n");
 	fprintf(fp, "                         stderr) starting from OFFset located using WHENCE\n");
-	fprintf(fp, "                         (0, 1, 2).\n");
+	fprintf(fp, "                         (0, 1, 2).  Use runcap_getc if FULL is 't' and\n");
+	fprintf(fp, "                         runcap_read if it is 'f'.  Default is MAX:0:0:f.\n");
 	fprintf(fp, "  -s SIZE                sets capture size (see -S)\n");
 	fprintf(fp, "  -t SECONDS             sets execution timeout\n");
 	fputc('\n', fp);
@@ -91,14 +94,17 @@ static void
 linemon(const char *ptr, size_t len, void *data)
 {
 	struct linemon_closure *clos = data;
-	
-	if (!clos->cont) {
-		printf("%s:", clos->prefix);
-		if (!(len == 1 && ptr[0] == '\n'))
-		    putchar(' ');
-	}
-	fwrite(ptr, len, 1, stdout);
-	clos->cont = ptr[len-1] != '\n';
+
+	if (len) {
+		if (!clos->cont) {
+			printf("%s:", clos->prefix);
+			if (!(len == 1 && ptr[0] == '\n'))
+				putchar(' ');
+		}
+		fwrite(ptr, len, 1, stdout);
+	} else
+		fflush(stdout);
+	clos->cont = !(len == 0 || ptr[len-1] == '\n');
 }
 
 static void
@@ -136,6 +142,7 @@ struct readreq
 	unsigned long count;
 	long off;
 	int whence;
+	int full;
 };
 
 void
@@ -146,33 +153,55 @@ readreq_parse(struct readreq *req, char *arg)
 
 	s = strchr(arg, ':');
 	if (s)
-		*s = 0;
+		*s++ = 0;
 	req->what = whatarg(arg);
 	req->count = 0;
 	req->off = 0;
 	req->whence = 0;
-	if (s)
-		*s++ = ':';
-
+	req->full = 0;
+	if (!s)
+		return;
 	arg = s;
 	while (*arg) {
 		switch (i++) {
 		case 0:
-			req->count = strtoul(arg, &s, 10);
+			if (*arg == ':')
+				s = arg;
+			else
+				req->count = strtoul(arg, &s, 10);
 			break;
 
 		case 1:
-			req->off = strtol(arg, &s, 10);
+			if (*arg == ':')
+				s = arg;
+			else
+				req->off = strtol(arg, &s, 10);
 			break;
 
 		case 2:
-			req->whence = strtol(arg, &s, 10);
-			if (!(0 <= req->whence && req->whence <= 2)) {
-				error("bad whence: %s", arg);
-				exit(1);
+			if (*arg == ':')
+				s = arg;
+			else {
+				req->whence = strtol(arg, &s, 10);
+				if (!(0 <= req->whence && req->whence <= 2)) {
+					error("bad whence: %s", arg);
+					exit(1);
+				}
 			}
 			break;
 
+		case 3:
+			if (*arg == 't')
+				req->full = 1;
+			else if (*arg == 'f')
+				req->full = 0;
+			else {
+				error("bad full: %s", arg);
+				exit(1);
+			}
+			s = arg + 1;
+			break;
+			
 		default:
 			error("too many parts in argument: %s", arg);
 			exit(1);
@@ -200,24 +229,56 @@ readreq_do(struct runcap *rc, struct readreq *req)
 	}
 
 	if (req->count == 0) 
-		req->count = rc->rc_cap[req->what].sc_size;
-	
-	for (i = 0; i < req->count; i++) {
-		char c;
+		req->count = rc->rc_cap[req->what].sc_leng;
+
+	if (req->full) {
+		char *buf = malloc(req->count);
+		ssize_t n;
 		
-		res = runcap_getc(rc, req->what, &c);
-		if (res == 0) {
-			error("unexpected eof at byte %zu\n", i);
-			break;
+		if (!buf) {
+			perror("malloc");
+			abort();
 		}
-		if (res == -1) {
-			error("%s at byte %zu\n", strerror (errno), i);
-			break;
+		n = runcap_read(rc, req->what, buf, req->count);
+		if (n < 0) {
+			perror("runcap_read");
+			exit(1);
 		}
-		putchar(c);
+		if (n > 0)
+			fwrite(buf, n, 1, stdout);
+		free(buf);
+	} else {
+		for (i = 0; i < req->count; i++) {
+			char c;
+		
+			res = runcap_getc(rc, req->what, &c);
+			if (res == 0) {
+				error("unexpected eof at byte %zu\n", i);
+				break;
+			}
+			if (res == -1) {
+				error("%s at byte %zu\n", strerror(errno), i);
+				break;
+			}
+			putchar(c);
+		}
 	}
 }
-	
+
+void
+open_outfile(char *file, int stream, struct runcap *rc, int *flags)
+{
+	int fd;
+
+	fd = open(file, O_CREAT|O_TRUNC|O_RDWR, 0644);
+	if (fd == -1) {
+		error("can't open %s: %s\n", file, strerror(errno));
+		exit(1);
+	}
+	rc->rc_cap[stream].sc_storfd = fd;
+	*flags |= RCF_SC_TO_FLAG(RCF_SC_STORFD, stream);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -238,12 +299,14 @@ main(int argc, char **argv)
 		{ "stderr" }
 	};
 
+	char *outfile[RUNCAP_NBUF] = { NULL, NULL, NULL };
+	
 	progname = strrchr(argv[0], '/');
 	if (progname)
 		progname++;
 	else
 		progname = argv[0];
-	while ((c = getopt(argc, argv, "?f:in:mp:r:S:s:t:")) != EOF) {
+	while ((c = getopt(argc, argv, "?f:iNn:mo:p:r:S:s:t:")) != EOF) {
 		switch (c) {
 		case 'f':
 			fd = open(optarg, O_RDONLY);
@@ -298,11 +361,27 @@ main(int argc, char **argv)
 		case 'S':
 			what = whatarg(optarg);
 			break;
+		case 'N':
+			if (what & WA_STDOUT) {
+				rcf |= RCF_STDOUT_NOCAP;
+			}
+			if (what & WA_STDERR) {
+				rcf |= RCF_STDERR_NOCAP;
+			}
+			break;
+		case 'o':
+			if (what & WA_STDOUT) {
+				outfile[RUNCAP_STDOUT] = optarg;
+			}
+			if (what & WA_STDERR) {
+				outfile[RUNCAP_STDERR] = optarg;
+			}
+			break;
 		case 'n':
 			numlines = whatarg(optarg);
 			break;
 		case 'r':
-			/* -r WHAT:N[:OFF:WHENCE] */
+			/* -r WHAT:N[:OFF:WHENCE:FULL] */
 			if (rqn == sizeof(rq)/sizeof(rq[0])) {
 				error("too many read requests");
 				break;
@@ -357,6 +436,11 @@ main(int argc, char **argv)
 			usage(1);
 	} else
 		rc.rc_argv = argv + optind;
+
+	if (outfile[RUNCAP_STDOUT])
+		open_outfile(outfile[RUNCAP_STDOUT], RUNCAP_STDOUT, &rc, &rcf);
+	if (outfile[RUNCAP_STDERR])
+		open_outfile(outfile[RUNCAP_STDERR], RUNCAP_STDERR, &rc, &rcf);
 
 	c = runcap(&rc, rcf);
 

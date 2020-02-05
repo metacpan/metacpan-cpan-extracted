@@ -1,5 +1,5 @@
 AC_PREREQ(2.63)
-AC_INIT([libruncap], [1.0], [gray+runcap@gnu.org.ua])
+AC_INIT([libruncap], [m4_esyscmd_s([git describe])], [gray+runcap@gnu.org.ua])
 AC_CONFIG_SRCDIR([runcap.c])
 AM_INIT_AUTOMAKE([1.11 foreign tar-ustar silent-rules])
 

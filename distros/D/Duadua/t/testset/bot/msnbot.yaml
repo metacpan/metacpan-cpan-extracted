@@ -1,0 +1,18 @@
+- ua: 'msnbot/2.0b (+http://search.msn.com/msnbot.htm)'
+  name: 'msnbot'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '2.0b'
+- ua: 'msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)'
+  name: 'msnbot'
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.1'

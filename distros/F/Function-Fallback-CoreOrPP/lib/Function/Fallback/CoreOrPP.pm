@@ -1,10 +1,13 @@
 package Function::Fallback::CoreOrPP;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-03'; # DATE
+our $DIST = 'Function-Fallback-CoreOrPP'; # DIST
+our $VERSION = '0.090'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
-
-our $VERSION = '0.08'; # VERSION
 
 our $USE_NONCORE_XS_FIRST = 1;
 
@@ -102,7 +105,7 @@ Function::Fallback::CoreOrPP - Functions that use non-core XS module but provide
 
 =head1 VERSION
 
-This document describes version 0.08 of Function::Fallback::CoreOrPP (from Perl distribution Function-Fallback-CoreOrPP), released on 2017-01-14.
+This document describes version 0.090 of Function::Fallback::CoreOrPP (from Perl distribution Function-Fallback-CoreOrPP), released on 2020-02-03.
 
 =head1 SYNOPSIS
 
@@ -161,7 +164,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Function-F
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Function-Fallback-CoreOrPP>.
+Source repository is at L<https://github.com/perlancar/perl-Function-Fallback-CoreOrPP>.
 
 =head1 BUGS
 
@@ -173,9 +176,10 @@ feature.
 
 =head1 SEE ALSO
 
-L<Clone::Any> can also uses multiple backends, but I avoid it because I don't
-think L<Storable>'s C<dclone> should be used (no Regexp support out of the box +
-must use deparse to handle coderefs).
+L<Clone::Any> can also use multiple backends. I used to avoid it because
+L<Storable>'s C<dclone> (which is used as the backend) did not support Regexp
+objects out of the box until version 3.08. Plus must use deparse to handle
+coderefs.
 
 =head1 AUTHOR
 
@@ -183,7 +187,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

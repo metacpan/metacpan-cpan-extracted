@@ -1,0 +1,50 @@
+=encoding utf8
+
+
+This is Perl module B<Acme::BayaC>.
+
+=begin html
+
+<a href="https://github.com/bayashi/Acme-BayaC/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Acme-BayaC/actions"><img src="https://github.com/bayashi/Acme-BayaC/workflows/build/badge.svg?branch=master"/></a> <a href="https://coveralls.io/r/bayashi/Acme-BayaC"><img src="https://coveralls.io/repos/bayashi/Acme-BayaC/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Acme::BayaC installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Acme::BayaC
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Acme::BayaC documentation is available as in POD. So you can do:
+
+    % perldoc Acme::BayaC
+
+
+=head1 REPOSITORY
+
+Acme::BayaC is hosted on github
+L<http://github.com/bayashi/Acme-BayaC>
+
+
+=head1 LICENSE
+
+C<Acme::BayaC> is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. (Note that, unlike the Artistic License 1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to having an Artistic 2.0 / GPL disjunction.) See the file LICENSE for details.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

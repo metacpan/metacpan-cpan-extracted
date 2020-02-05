@@ -78,6 +78,6 @@
          "web" : "https://github.com/leejo/CGI.pm"
       }
    },
-   "version" : "4.45",
+   "version" : "4.46",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

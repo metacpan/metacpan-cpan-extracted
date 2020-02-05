@@ -19,7 +19,8 @@ Roger Crew <wrog@cpan.org>
 
 ## copyright and license
 
-This software is copyright (c) 2019 by Roger Crew.
+This software is Copyright (c) 2019 by Roger Crew.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

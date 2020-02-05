@@ -1,3 +1,7 @@
+0.137		2020-02-04	T. R. Wyant
+    Use of McCants' Iridium status now throws exception, per deprecation
+    schedule.
+
 0.136		2020-01-15	T. R. Wyant
     Remove Celestrak supplemental Starlink 3 pre-launch TLE catalog.
     Kelso took it down once the launch occurred.

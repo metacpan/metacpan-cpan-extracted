@@ -5,7 +5,7 @@ use Test::More; # skip_all => 'todo';
 package MyApp {
 	use MooX::Pression;
 	class Animal {
-		has $name;
+		has name;
 		class Species (Str $common, Str $binomial) {
 			# should inherit from Animal because of nesting
 			constant common_name = $common;

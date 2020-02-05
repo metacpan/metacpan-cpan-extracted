@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 $VERSION = eval $VERSION;
 DynaLoader::bootstrap List::Uniqnum $VERSION;
 

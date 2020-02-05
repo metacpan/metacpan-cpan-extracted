@@ -1,0 +1,32 @@
+---
+abstract: 'FFI test module for Alien::Base'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Ford-Prefect2-FFI
+requires:
+  Acme::Alien::DontPanic2: '2.0000'
+  FFI::CheckLib: '0.15'
+  FFI::Platypus: '1.00'
+  FFI::Platypus::Declare: '0'
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect2-FFI/issues
+  homepage: https://metacpan.org/pod/Acme::Ford::Prefect2::FFI
+  repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect2-FFI.git
+version: '2.0000'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

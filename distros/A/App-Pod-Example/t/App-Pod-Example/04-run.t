@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use App::Pod::Example;
 use English qw(-no_match_vars);
 use File::Object;
@@ -35,6 +33,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	$modules_dir->file('Ex1.pm')->s,
 );
@@ -55,6 +54,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	$modules_dir->file('Ex2.pm')->s,
 );
@@ -69,10 +69,11 @@ capture sub {
 	return;
 } => \$stdout, \$stderr;
 is($stdout, $right_ret, 'Header on example with die().');
-like($stderr, qr{^Error\. at .* line 6\.$}, 'Example with die().');
+like($stderr, qr{^Error\. at .* line 5\.$}, 'Example with die().');
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	$modules_dir->file('Ex3.pm')->s,
 );
@@ -82,10 +83,11 @@ capture sub {
 	return;
 } => \$stdout, \$stderr;
 is($stdout, $right_ret, 'Header on example with Carp::croak().');
-like($stderr, qr{^Error\. at .* line 9\.$}, 'Example with Carp::croak().');
+like($stderr, qr{^Error\. at .* line 7\.$}, 'Example with Carp::croak().');
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	$modules_dir->file('Ex4.pm')->s,
 );
@@ -95,11 +97,12 @@ capture sub {
 	return;
 } => \$stdout, \$stderr;
 is($stdout, $right_ret, 'Header on example with Error::Pure::Die::err().');
-like($stderr, qr{^Error\. at .* line 9\.$},
+like($stderr, qr{^Error\. at .* line 7\.$},
 	'Example with Error::Pure::Die::err().');
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	$modules_dir->file('Ex5.pm')->s,
 );
@@ -120,6 +123,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-n' => 1,
 	'-r',
 	$modules_dir->file('Ex5.pm')->s,
@@ -141,6 +145,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-n' => 2,
 	'-r',
 	$modules_dir->file('Ex5.pm')->s,
@@ -162,6 +167,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	'-s' => 'EXAMPLE',
 	$modules_dir->file('Ex6.pm')->s,
@@ -184,6 +190,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-r',
 	'-s' => 'EXAMPLE',
 	$modules_dir->file('Ex6.pm')->s,
@@ -207,6 +214,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-p',
 	$modules_dir->file('Ex1.pm')->s,
 );
@@ -214,7 +222,6 @@ $right_ret = <<'END';
 #-------------------------------------------------------------------------------
 # Example source
 #-------------------------------------------------------------------------------
-# Pragmas.
 use strict;
 use warnings;
 
@@ -237,7 +244,6 @@ stdout_is(
 	$modules_dir->file('Ex1.pm')->s,
 );
 $right_ret = <<'END';
-# Pragmas.
 use strict;
 use warnings;
 
@@ -255,6 +261,7 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-d' => 1,
 	'-n' => 100,
 	'-r',
 	$modules_dir->file('Ex1.pm')->s,
@@ -279,12 +286,11 @@ stdout_is(
 	$modules_dir->file('Ex1.pm')->s,
 );
 $right_ret = <<'END';
-1: # Pragmas.
-2: use strict;
-3: use warnings;
-4: 
-5: # Print foo.
-6: print "Foo.\n";
+1: use strict;
+2: use warnings;
+3: 
+4: # Print foo.
+5: print "Foo.\n";
 END
 stdout_is(
 	sub {

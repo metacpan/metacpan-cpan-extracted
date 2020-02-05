@@ -1,0 +1,5 @@
+---
+category: textproc
+portname: p5-Config-UCL
+origins:
+  - libucl.so:textproc/libucl

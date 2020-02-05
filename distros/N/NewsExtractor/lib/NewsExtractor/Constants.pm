@@ -50,6 +50,7 @@ use constant {
         '自由時報電子報',
         '自由財經',
         '自由電子報',
+        '自由評論網',
         '自立晚報',
         '芋傳媒 TaroNews',
         '華視新聞',
@@ -62,6 +63,15 @@ use constant {
         '青年日報',
         '風傳媒',
         '食力 foodNEXT',
+        'Storm.mg',
+        '國語日報',
+        '經濟日報',
+        '快點TV',
+        'USTV 非凡電視台',
+        'NOW健康',
+        'Taiwan News',
+        '翻報',
+        '翻爆 - 翻報',
     ],
 
     CATEGORY_NAMES => [

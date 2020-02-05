@@ -1,4 +1,8 @@
+0.008     Feb 04 2020
+	* promise_roles now allows empty list (closes issue #1)
+
 0.007     Oct 29 2019
+        * add transactor tests
 	* Artistic License 2.0 (same as Mojolicious)
 
 0.006     Oct 26 2019

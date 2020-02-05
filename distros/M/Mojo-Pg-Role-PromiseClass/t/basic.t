@@ -4,7 +4,6 @@ use Test::More;
 use Mojolicious::Lite;
 use Mojo::Pg;
 
-use lib '/home/rfc/git/ua-pclass/lib';
 {
     package Mojo::Promise::Role::Fake;
     use Mojo::Base -role;

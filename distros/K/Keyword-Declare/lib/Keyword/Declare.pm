@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001015';
+our $VERSION = '0.001016';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -1150,7 +1150,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001015
+This document describes Keyword::Declare version 0.001016
 
 
 =head1 STATUS
@@ -1245,7 +1245,7 @@ count and a block, you could write:
     use Keyword::Declare;
 
     keyword loop (Int $count?, Block $block) {
-        if (defined $count) {
+        if (length $count) {
             return "for (1..$count) $block";
         }
         else {
@@ -1597,7 +1597,7 @@ the corresponding parameter variable. For example:
     # Parameter @numblocks  gets: ( '1 {x==1}', '2 {sqrt 4}', '3 {"Many"}' )
 
 However, if a parameter's type regex includes one or more named captures
-(i.e. via the C<(?<name> ... )> syntax), then the corresponding
+(i.e. via the C<< (?<name> ... ) >> syntax), then the corresponding
 parameter variable is no longer bound to a simple string.
 
 Instead, it is bound to a hash-based object of the class
@@ -1643,7 +1643,7 @@ had included named captures:
 
     # et cetera...
 
-This feature is most often used to defined keywords whose arguments
+This feature is most often used to define keywords whose arguments
 consist of a repeated sequence of components, especially when those
 components are either inherently complex (as in the previous example)
 or they are unavoidably heterogeneous in nature (as below).
@@ -1767,6 +1767,48 @@ either a scalar or an array parameter: the quantifier tells the type how often t
 match; the kind of parameter determines how that match is made available inside
 the keyword body: as a single string or object for scalar parameters, or as a list of
 individual strings or objects for array parameters.
+
+=head4 Checking whether optional parameters are present
+
+If an array parameter has a quantifier that makes it I<optional>
+(e.g. C<?>, C<*>, C<?+>, C<*?>, etc.), then the parameter array
+will be empty (and hence false) whenever the corresponding
+syntactic component is missing.
+
+In the same situation, an optional scalar parameter will contain
+an empty string (which is also false, of course).
+
+However, it is recommended that the presence or absence of optional
+scalar parameters should be tested using the built-in C<length()>
+function, not just via a boolean test, because in some cases the
+parameter could also have an explicit value of C<"0">, which is false,
+but not "missing".
+
+For example:
+
+    keyword save (Int? $count, List $data) {
+
+        # If optional count omitted, then $count will contain an empty string
+        if ( !length($count) ) {
+            return "save_all($data);";
+        }
+        else {
+            return "save_first($count, $data);";
+        }
+    }
+
+If the test had been:
+
+        if (!$count) {
+            return "save_all($data);";
+        }
+
+then a keyword invocation such as:
+
+    save 0 ($foo, $bar, $baz);
+
+would be translated to a call to C<save_all(...)>,
+instead of a call to C<save_multiple(0,...)>.
 
 
 =head3 Separated repetitions

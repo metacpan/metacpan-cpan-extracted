@@ -1,4 +1,4 @@
-package Mojo::UserAgent::Role::PromiseClass 0.007;
+package Mojo::UserAgent::Role::PromiseClass 0.008;
 
 # ABSTRACT: Choose the promise class used by Mojo::UserAgent
 
@@ -25,7 +25,7 @@ Mojo::UserAgent::Role::PromiseClass - Choose the promise class used by Mojo::Use
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ Roger Crew <wrog@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Roger Crew.
+This software is Copyright (c) 2020 by Roger Crew.
 
 This is free software, licensed under:
 

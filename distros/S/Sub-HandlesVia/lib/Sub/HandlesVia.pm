@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -349,6 +349,7 @@ native traits, and L<MouseX::NativeTraits>.
   Array ===========================================
             accessor : SubHV  DataP  Moose  Mouse  
                  all : SubHV  DataP                
+            all_true : SubHV                       
                  any : SubHV                Mouse  
                apply : SubHV                Mouse  
                clear : SubHV  DataP  Moose  Mouse  
@@ -369,14 +370,28 @@ native traits, and L<MouseX::NativeTraits>.
             is_empty : SubHV  DataP  Moose  Mouse  
                 join : SubHV  DataP  Moose  Mouse  
                  map : SubHV  DataP  Moose  Mouse  
+                 max : SubHV                       
+              maxstr : SubHV                       
+                 min : SubHV                       
+              minstr : SubHV                       
             natatime : SubHV  DataP  Moose         
+        not_all_true : SubHV                       
+           pairfirst : SubHV                       
+            pairgrep : SubHV                       
+            pairkeys : SubHV                       
+             pairmap : SubHV                       
+               pairs : SubHV                       
+          pairvalues : SubHV                       
          pick_random : SubHV                       
                  pop : SubHV  DataP  Moose  Mouse  
                print : SubHV  DataP                
+             product : SubHV                       
                 push : SubHV  DataP  Moose  Mouse  
               reduce : SubHV  DataP  Moose  Mouse  
+          reductions : SubHV                       
               remove :                      Mouse  (alias: delete)
              reverse : SubHV  DataP                
+              sample : SubHV                       
                  set : SubHV  DataP  Moose  Mouse  
        shallow_clone : SubHV  DataP  Moose         
                shift : SubHV  DataP  Moose  Mouse  
@@ -388,28 +403,33 @@ native traits, and L<MouseX::NativeTraits>.
     sort_in_place_by :                      Mouse  (sort_in_place)
               splice : SubHV  DataP  Moose  Mouse  
                store :                      Mouse  (alias: set)
+                 sum : SubHV                       
                 tail : SubHV  DataP                
                 uniq : SubHV  DataP  Moose  Mouse  
        uniq_in_place : SubHV                       
+             uniqnum : SubHV                       
+    uniqnum_in_place : SubHV                       
+             uniqstr : SubHV                       
+    uniqstr_in_place : SubHV                       
              unshift : SubHV  DataP  Moose  Mouse  
-
+ 
   Bool ============================================
                  not : SubHV  DataP  Moose  Mouse  
                reset : SubHV                       
                  set : SubHV  DataP  Moose  Mouse  
               toggle : SubHV  DataP  Moose  Mouse  
                unset : SubHV  DataP  Moose  Mouse  
-
+ 
   Code ============================================
              execute : SubHV  DataP  Moose  Mouse  
       execute_method : SubHV         Moose  Mouse  
-
+ 
   Counter =========================================
                  dec : SubHV  DataP  Moose  Mouse  
                  inc : SubHV  DataP  Moose  Mouse  
                reset : SubHV  DataP  Moose  Mouse  
                  set : SubHV         Moose  Mouse  
-
+ 
   Hash ============================================
             accessor : SubHV  DataP  Moose  Mouse  
                  all : SubHV  DataP                
@@ -432,7 +452,7 @@ native traits, and L<MouseX::NativeTraits>.
          sorted_keys : SubHV                Mouse  
                store :                      Mouse  (alias: set)
               values : SubHV  DataP  Moose  Mouse  
-
+ 
   Number ==========================================
                  abs : SubHV  DataP  Moose  Mouse  
                  add : SubHV  DataP  Moose  Mouse  
@@ -442,7 +462,7 @@ native traits, and L<MouseX::NativeTraits>.
                  mul : SubHV  DataP  Moose  Mouse  
                  set : SubHV         Moose         
                  sub : SubHV  DataP  Moose  Mouse  
-
+ 
   String ==========================================
               append : SubHV  DataP  Moose  Mouse  
                chomp : SubHV  DataP  Moose  Mouse  

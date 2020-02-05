@@ -6,7 +6,7 @@ use open IO => ':utf8', ':std';
 
 use Test::More;
 
-use Text::VisualPrintf::IO;
+use Text::VisualPrintf::IO qw(printf vprintf);
 
 {
     open OUT, ">", \(my $out) or die;

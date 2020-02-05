@@ -1,0 +1,25 @@
+---
+abstract: 'Perl bindings for libucl'
+author:
+  - 'Tomohiro Hosaka <bokutin@bokut.in>'
+build_requires:
+  Sort::Naturally: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::LeakTrace: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::Constant: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-UCL
+requires:
+  JSON::PP: '2.00'
+version: '0.03'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

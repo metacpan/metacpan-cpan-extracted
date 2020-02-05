@@ -1,3 +1,10 @@
+2.36  02/02/2020
+- Add xz test files to MANIFEST
+
+2.34  01/02/2020 (HEANEY && SKAJI)
+- Add xz support
+- Use 4 digit year in Time::Local call
+
 2.32  13/09/2018 (CBERRY)
 - Fix absolute path handling on VMS
 

@@ -25,14 +25,14 @@ recommends:
   Term::ReadKey: '0'
   Time::HiRes: '0'
 requires:
-  Complete::Bash: '0.322'
+  Complete::Bash: '0.333'
   Complete::Fish: '0.03'
   Complete::Tcsh: '0'
-  Complete::Util: '0.603'
+  Complete::Util: '0.608'
   Complete::Zsh: '0'
   Data::Clean::JSON: '0.390'
   Data::Dump: '0'
-  Data::Sah: '0.902'
+  Data::Sah: '0.903'
   Data::Sah::Util::Type: '0.45'
   Encode: '0'
   Fcntl: '0'
@@ -63,7 +63,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite
   homepage: https://metacpan.org/release/Perinci-CmdLine-Lite
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Lite.git
-version: '1.825'
+version: '1.826'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -186,7 +186,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -326,7 +326,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -340,7 +340,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

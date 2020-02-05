@@ -3,7 +3,7 @@ package Crypt::KeyWrap;
 use strict;
 use warnings;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(aes_key_wrap aes_key_unwrap gcm_key_wrap gcm_key_unwrap pbes2_key_wrap pbes2_key_unwrap ecdh_key_wrap ecdh_key_unwrap ecdhaes_key_wrap ecdhaes_key_unwrap rsa_key_wrap rsa_key_unwrap)] );
@@ -156,7 +156,7 @@ sub aes_key_unwrap {
 sub gcm_key_wrap {
   my ($kek, $pt_data, $aad, $cipher, $iv) = @_;
   $cipher = 'AES' unless defined $cipher;
-  $iv = random_bytes(Crypt::Cipher->blocksize($cipher)) unless defined $iv;
+  $iv = random_bytes(12) unless defined $iv; # 96 bits REQUIRED by RFC7518
   my ($ct_data, $tag) = gcm_encrypt_authenticate($cipher, $kek, $iv, $aad, $pt_data);
   return ($ct_data, $tag, $iv);
 }
@@ -284,12 +284,18 @@ sub ecdh_key_unwrap {
 
 sub ecdhaes_key_wrap {
   my ($kek_public, $pt_data, $alg, $apu, $apv) = @_;
-  croak "ecdhaes_key_wrap: no Crypt::PK::ECC" unless ref $kek_public eq 'Crypt::PK::ECC';
+  croak "ecdhaes_key_wrap: no Crypt::PK::(ECC|X25519)" unless ref($kek_public) =~ /^Crypt::PK::(ECC|X25519)$/;
   my $encryption_key_size = 256;
   if ($alg =~ /^ECDH-ES\+A(128|192|256)KW$/) {
     $encryption_key_size = $1;
   }
-  my $ephemeral = Crypt::PK::ECC->new()->generate_key($kek_public->curve2hash);
+  my $ephemeral;
+  if (ref($kek_public) eq 'Crypt::PK::ECC') {
+    $ephemeral = Crypt::PK::ECC->new->generate_key($kek_public->curve2hash);
+  }
+  else {
+    $ephemeral = Crypt::PK::X25519->new->generate_key();
+  }
   my $shared_secret = $ephemeral->shared_secret($kek_public);
   my $kek = _concat_kdf('SHA256', $encryption_key_size/8, $shared_secret, $alg, $apu, $apv);
   return (aes_key_wrap($kek, $pt_data), $ephemeral->export_key_jwk('public'));
@@ -297,13 +303,19 @@ sub ecdhaes_key_wrap {
 
 sub ecdhaes_key_unwrap {
   my ($kek_private, $ct_data, $alg, $epk, $apu, $apv) = @_;
-  croak "ecdhaes_key_unwrap: no Crypt::PK::ECC" unless ref $kek_private eq 'Crypt::PK::ECC';
+  croak "ecdhaes_key_unwrap: no Crypt::PK::(ECC|X25519)" unless ref($kek_private) =~ /^Crypt::PK::(ECC|X25519)$/;
   croak "ecdhaes_key_unwrap: no private key" unless $kek_private->is_private;
   my $encryption_key_size = 256;
   if ($alg =~ /^ECDH-ES\+A(128|192|256)KW$/) {
     $encryption_key_size = $1;
   }
-  my $ephemeral = ref($epk) eq 'Crypt::PK::ECC' ? $epk : Crypt::PK::ECC->new(ref $epk ? $epk : \$epk);
+  my $ephemeral;
+  if (ref($kek_private) eq 'Crypt::PK::ECC') {
+    $ephemeral = ref($epk) eq 'Crypt::PK::ECC' ? $epk : Crypt::PK::ECC->new(ref $epk ? $epk : \$epk);
+  }
+  else {
+    $ephemeral = ref($epk) eq 'Crypt::PK::X25519' ? $epk : Crypt::PK::X25519->new(ref $epk ? $epk : \$epk);
+  }
   my $shared_secret = $kek_private->shared_secret($ephemeral);
   my $kek = _concat_kdf('SHA256', $encryption_key_size/8, $shared_secret, $alg, $apu, $apv);
   my $pt_data = aes_key_unwrap($kek, $ct_data);
@@ -530,7 +542,7 @@ ECDH+AESKW key agreement/wrap algorithm as defined in L<https://tools.ietf.org/h
    ($enc_cek, $epk) = ecdhaes_key_wrap($kek, $cek, $alg, $apu, $apv);
 
    # params:
-   #  $kek     .. ECC public key - Crypt::PK::ECC instance
+   #  $kek     .. ECC public key - Crypt::PK::ECC|X25519 instance
    #  $cek     .. content encryption key
    #  $alg     .. algorithm name e.g. 'ECDH-ES+A256KW' (see rfc7518)
    # optional params:
@@ -547,10 +559,10 @@ ECDH+AESKW key agreement/unwrap algorithm as defined in L<https://tools.ietf.org
    $cek = ecdhaes_key_unwrap($kek, $enc_cek, $alg, $epk, $apu, $apv);
 
    # params:
-   #  $kek     .. ECC private key - Crypt::PK::ECC instance
+   #  $kek     .. ECC private key - Crypt::PK::ECC|X25519 instance
    #  $enc_cek .. encrypted content encryption key
    #  $alg     .. algorithm name e.g. 'ECDH-ES+A256KW' (see rfc7518)
-   #  $epk     .. ephemeral ECC public key (JWK/JSON or Crypt::PK::ECC)
+   #  $epk     .. ephemeral ECC public key (JWK/JSON or Crypt::PK::ECC|X25519)
    # optional params:
    #  $apu     .. Agreement PartyUInfo Header Parameter
    #  $apv     .. Agreement PartyVInfo Header Parameter
@@ -565,7 +577,7 @@ ECDH (Ephememeral Static) key agreement/wrap algorithm as defined in L<https://t
    ($cek, $epk) = ecdh_key_wrap($kek, $enc, $apu, $apv);
 
    # params:
-   #  $kek     .. ECC public key - Crypt::PK::ECC instance
+   #  $kek     .. ECC public key - Crypt::PK::ECC|X25519 instance
    #  $enc     .. encryption algorithm name e.g. 'A256GCM' (see rfc7518)
    # optional params:
    #  $apu     .. Agreement PartyUInfo Header Parameter
@@ -581,9 +593,9 @@ ECDH (Ephememeral Static) key agreement/unwrap algorithm as defined in L<https:/
    $cek = ecdh_key_unwrap($kek, $enc, $epk, $apu, $apv);
 
    # params:
-   #  $kek     .. ECC private key - Crypt::PK::ECC instance
+   #  $kek     .. ECC private key - Crypt::PK::ECC|X25519 instance
    #  $enc     .. encryption algorithm name e.g. 'A256GCM' (see rfc7518)
-   #  $epk     .. ephemeral ECC public key (JWK/JSON or Crypt::PK::ECC)
+   #  $epk     .. ephemeral ECC public key (JWK/JSON or Crypt::PK::ECC|X25519)
    # optional params:
    #  $apu     .. Agreement PartyUInfo Header Parameter
    #  $apv     .. Agreement PartyVInfo Header Parameter

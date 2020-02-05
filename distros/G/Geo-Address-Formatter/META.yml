@@ -21,7 +21,7 @@ name: Geo-Address-Formatter
 provides:
   Geo::Address::Formatter:
     file: lib/Geo/Address/Formatter.pm
-    version: '1.80'
+    version: '1.81'
 requires:
   Clone: '0.43'
   Data::Dumper: '0'
@@ -31,11 +31,11 @@ requires:
   Scalar::Util: '0'
   Text::Hogan: '2.03'
   Try::Catch: '0'
-  YAML::LibYAML: '0.75'
+  YAML::LibYAML: '0.81'
   perl: '5.012'
 resources:
   bugtracker: https://github.com/OpenCageData/perl-Geo-Address-Formatter/issues
   repository: git://github.com/OpenCageData/perl-Geo-Address-Formatter
-version: '1.80'
+version: '1.81'
 x_generated_by_perl: v5.26.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

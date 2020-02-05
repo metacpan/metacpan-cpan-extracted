@@ -100,8 +100,8 @@ static int get_row_diag(SQLSMALLINT recno,
 			size_t max_msg);
 static SQLSMALLINT default_parameter_type(
     char *why, imp_sth_t *imp_sth, phs_t *phs);
-static int post_connect(SV *dbh, imp_dbh_t *imp_dbh, SV *attr);
-static int set_odbc_version(SV *dbh, imp_dbh_t *imp_dbh, SV* attr);
+static int post_connect(pTHX_ SV *dbh, imp_dbh_t *imp_dbh, SV *attr);
+static int set_odbc_version(pTHX_ SV *dbh, imp_dbh_t *imp_dbh, SV* attr);
 static const char *S_SqlTypeToString (SWORD sqltype);
 static const char *S_SqlCTypeToString (SWORD sqltype);
 static const char *cSqlTables = "SQLTables(%s,%s,%s,%s)";
@@ -113,11 +113,11 @@ static const char *cSqlGetTypeInfo = "SQLGetTypeInfo(%d)";
 static SQLRETURN bind_columns(SV *h, imp_sth_t *imp_sth);
 static void AllODBCErrors(HENV henv, HDBC hdbc, HSTMT hstmt, int output,
                           PerlIO *logfp);
-static int check_connection_active(SV *h);
-static int build_results(SV *sth, imp_sth_t *imp_sth,
+static int check_connection_active(pTHX_ SV *h);
+static int build_results(pTHX_ SV *sth, imp_sth_t *imp_sth,
                          SV *dbh, imp_dbh_t *imp_dbh,
                          RETCODE orc);
-static int  rebind_param(SV *sth, imp_sth_t *imp_sth, imp_dbh_t *imp_dbh, phs_t *phs);
+static int  rebind_param(pTHX_ SV *sth, imp_sth_t *imp_sth, imp_dbh_t *imp_dbh, phs_t *phs);
 static void get_param_type(SV *sth, imp_sth_t *imp_sth, imp_dbh_t *imp_dbh, phs_t *phs);
 static void check_for_unicode_param(imp_sth_t *imp_sth, phs_t *phs);
 
@@ -178,7 +178,9 @@ DBISTATE_DECLARE;
 
 void dbd_init(dbistate_t *dbistate)
 {
-   DBIS = dbistate;
+   dTHX;
+   DBISTATE_INIT;
+   PERL_UNUSED_ARG(dbistate);
 }
 
 
@@ -208,6 +210,7 @@ static RETCODE odbc_set_query_timeout(
 
 static void odbc_clear_result_set(SV *sth, imp_sth_t *imp_sth)
 {
+   dTHX;
    SV *value;
    char *key;
    I32 keylen;
@@ -250,7 +253,7 @@ static void odbc_clear_result_set(SV *sth, imp_sth_t *imp_sth)
 
 
 
-static void odbc_handle_outparams(imp_sth_t *imp_sth, int debug)
+static void odbc_handle_outparams(pTHX_ imp_sth_t *imp_sth, int debug)
 {
    int i = (imp_sth->out_params_av) ? AvFILL(imp_sth->out_params_av)+1 : 0;
    if (debug >= 3)
@@ -341,7 +344,7 @@ static void odbc_handle_outparams(imp_sth_t *imp_sth, int debug)
 
 
 
-static int build_results(SV *sth,
+static int build_results(pTHX_ SV *sth,
                          imp_sth_t *imp_sth,
                          SV *dbh,
                          imp_dbh_t *imp_dbh,
@@ -407,6 +410,7 @@ static int build_results(SV *sth,
 int odbc_discon_all(SV *drh,
                     imp_drh_t *imp_drh)
 {
+   dTHX;
    /* The disconnect_all concept is flawed and needs more work */
    if (!PL_dirty && !SvTRUE(get_sv("DBI::PERL_ENDING",0))) {
        DBIh_SET_ERR_CHAR(drh, (imp_xxh_t*)imp_drh, Nullch, 1,
@@ -422,13 +426,14 @@ int odbc_discon_all(SV *drh,
 SQLLEN dbd_db_execdirect(SV *dbh,
                       SV *statement )
 {
+   dTHX;
    D_imp_dbh(dbh);
    SQLRETURN ret;                               /* SQLxxx return value */
    SQLLEN rows;
    SQLHSTMT stmt;
    int dbh_active;
 
-   if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
    ret = SQLAllocHandle(SQL_HANDLE_STMT,  imp_dbh->hdbc, &stmt );
    if (!SQL_SUCCEEDED(ret)) {
@@ -460,7 +465,7 @@ SQLLEN dbd_db_execdirect(SV *dbh,
 
        sql_copy = sv_mortalcopy(statement);
 
-       SV_toWCHAR(sql_copy);
+       SV_toWCHAR(aTHX_ sql_copy);
 
        wsql = (SQLWCHAR *)SvPV(sql_copy, wsql_len);
 
@@ -598,6 +603,7 @@ int dbd_db_login6_sv(
     SV *pwd,
     SV *attr)
 {
+   dTHX;
 #ifndef WITH_UNICODE
    if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
        TRACE0(imp_dbh, "non-Unicode login6_sv\n");
@@ -626,7 +632,7 @@ int dbd_db_login6_sv(
       dbd_error(dbh, rc, "db_login6_sv/SQLAllocHandle(env)");
       if (!SQL_SUCCEEDED(rc)) return 0;
 
-      if (set_odbc_version(dbh, imp_dbh, attr) != 1) return 0;
+      if (set_odbc_version(aTHX_ dbh, imp_dbh, attr) != 1) return 0;
    }
    imp_dbh->henv = imp_drh->henv;	/* needed for dbd_error */
 
@@ -706,8 +712,10 @@ int dbd_db_login6_sv(
        sv_catpv(dbname, ";");
        /*sv_catpvf(dbname, ";UID=%s;PWD=%s;",
 	 SvPV_nolen(uid), SvPV_nolen(pwd));*/
+       /*
        if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
            TRACE1(imp_dbh, "Now using dbname = %s\n", SvPV_nolen(dbname));
+       */
    }
 
    if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
@@ -715,7 +723,7 @@ int dbd_db_login6_sv(
              SvPV_nolen(dbname), neatsvpv(uid, 0));
 
    wconstr = sv_mortalcopy(dbname);
-   utf8sv_to_wcharsv(wconstr);
+   utf8sv_to_wcharsv(aTHX_ wconstr);
 
    /* The following is to work around a bug in SQLDriverConnectW in unixODBC
       which in at least 2.2.11 (and probably up to 2.2.13 official release
@@ -757,10 +765,13 @@ int dbd_db_login6_sv(
        }
 #endif
        if (SQL_SUCCEEDED(rc)) {
-           imp_dbh->out_connect_string = sv_newwvn(wout_str, wout_str_len);
+           imp_dbh->out_connect_string = sv_newwvn(aTHX_ wout_str,
+                                                   wout_str_len);
+           /*
            if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
                TRACE1(imp_dbh, "Out connection string: %s\n",
                       SvPV_nolen(imp_dbh->out_connect_string));
+           */
        }
    }
 
@@ -804,10 +815,10 @@ int dbd_db_login6_sv(
                   neatsvpv(dbname, 0), neatsvpv(uid, 0));
 
        wconstr = sv_mortalcopy(dbname);
-       utf8sv_to_wcharsv(wconstr);
+       utf8sv_to_wcharsv(aTHX_ wconstr);
        if (SvOK(uid)) {
            wuid = sv_mortalcopy(uid);
-           utf8sv_to_wcharsv(wuid);
+           utf8sv_to_wcharsv(aTHX_ wuid);
            wuidp = (SQLWCHAR *)SvPV_nolen(wuid);
            uid_len = SvCUR(wuid) / sizeof(SQLWCHAR);
        } else {
@@ -817,7 +828,7 @@ int dbd_db_login6_sv(
 
        if (SvOK(pwd)) {
            wpwd = sv_mortalcopy(pwd);
-           utf8sv_to_wcharsv(wpwd);
+           utf8sv_to_wcharsv(aTHX_ wpwd);
            wpwdp = (SQLWCHAR *)SvPV_nolen(wpwd);
            pwd_len = SvCUR(wpwd) / sizeof(SQLWCHAR);
        } else {
@@ -845,7 +856,7 @@ int dbd_db_login6_sv(
        dbd_error(dbh, rc, "db_login6sv/SQLConnectW");
    }
 
-   if (post_connect(dbh, imp_dbh, attr) != 1) return 0;
+   if (post_connect(aTHX_ dbh, imp_dbh, attr) != 1) return 0;
 
    imp_drh->connects++;
    DBIc_IMPSET_on(imp_dbh);	/* imp_dbh set up now			*/
@@ -884,6 +895,7 @@ int dbd_db_login6(
     char *pwd,
     SV *attr)
 {
+   dTHX;
    D_imp_drh_from_dbh;
 
    RETCODE rc;
@@ -901,7 +913,7 @@ int dbd_db_login6(
       dbd_error(dbh, rc, "db_login6/SQLAllocHandle(env)");
       if (!SQL_SUCCEEDED(rc)) return 0;
 
-      if (set_odbc_version(dbh, imp_dbh, attr) != 1) return 0;
+      if (set_odbc_version(aTHX_ dbh, imp_dbh, attr) != 1) return 0;
    }
    imp_dbh->henv = imp_drh->henv;	/* needed for dbd_error */
 
@@ -1008,7 +1020,8 @@ int dbd_db_login6(
                               &wout_str_len,
                               SQL_DRIVER_NOPROMPT);
        if (SQL_SUCCEEDED(rc)) {
-           imp_dbh->out_connect_string = sv_newwvn(wout_str, wout_str_len);
+           imp_dbh->out_connect_string = sv_newwvn(aTHX_ wout_str,
+                                                   wout_str_len);
            if (DBIc_TRACE(imp_dbh, CONNECTION_TRACING, 0, 0))
                TRACE1(imp_dbh, "Out connection string: %s\n",
                       SvPV_nolen(imp_dbh->out_connect_string));
@@ -1155,7 +1168,7 @@ int dbd_db_login6(
        dbd_error(dbh, rc, "db_login6/SQLConnect");
    }
 
-   if (post_connect(dbh, imp_dbh, attr) != 1) return 0;
+   if (post_connect(aTHX_ dbh, imp_dbh, attr) != 1) return 0;
 
    imp_drh->connects++;
    DBIc_IMPSET_on(imp_dbh);	/* imp_dbh set up now			*/
@@ -1167,6 +1180,7 @@ int dbd_db_login6(
 
 int dbd_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh)
 {
+   dTHX;
    RETCODE rc;
    D_imp_drh_from_dbh;
    SQLUINTEGER autoCommit = SQL_AUTOCOMMIT_OFF;
@@ -1284,6 +1298,7 @@ void dbd_error2(
     HDBC hdbc,
     HSTMT hstmt)
 {
+    dTHX;
     D_imp_xxh(h);
     int error_found = 0;
 
@@ -1451,6 +1466,7 @@ empties entire ODBC error queue.
 ------------------------------------------------------------*/
 void dbd_error(SV *h, RETCODE err_rc, char *what)
 {
+    dTHX;
     D_imp_xxh(h);
 
     struct imp_dbh_st *imp_dbh = NULL;
@@ -1499,6 +1515,7 @@ We need two data structures to translate this stuff:
 -------------------------------------------------------------------------*/
 void dbd_preparse(imp_sth_t *imp_sth, char *statement)
 {
+   dTHX;
    enum STATES {DEFAULT, LITERAL, COMMENT, LINE_COMMENT};
    enum STATES state = DEFAULT;
    enum STYLES {
@@ -1663,6 +1680,7 @@ int dbd_st_tables(
     SV *table,
     SV *table_type)
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -1685,7 +1703,7 @@ int dbd_st_tables(
                       (table && SvOK(table)) ? SvPV_nolen(table) : "undef",
                       (table_type && SvOK(table_type)) ? SvPV_nolen(table_type) : "undef");
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -1732,22 +1750,22 @@ int dbd_st_tables(
            /*printf("CATALOG OK %"IVdf" /%s/\n", SvCUR(catalog), SvPV_nolen(catalog));*/
 
            copy = sv_mortalcopy(catalog);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wcatalog = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(schema)) {
            copy = sv_mortalcopy(schema);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wschema = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(table)) {
            copy = sv_mortalcopy(table);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wtable = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(table_type)) {
            copy = sv_mortalcopy(table_type);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wtype = (SQLWCHAR *)SvPV(copy, wlen);
        }
        /*
@@ -1785,7 +1803,7 @@ int dbd_st_tables(
       imp_sth->hstmt = SQL_NULL_HSTMT;
       return 0;
    }
-   return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+   return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 
 }
 
@@ -1798,6 +1816,7 @@ int dbd_st_tables(
     char *table,
     char *table_type)
 {
+   dTHX;
    D_imp_dbh(dbh);
    D_imp_sth(sth);
    RETCODE rc;
@@ -1809,7 +1828,7 @@ int dbd_st_tables(
 
    imp_sth->done_desc = 0;
 
-   if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
    rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
    if (rc != SQL_SUCCESS) {
@@ -1847,7 +1866,7 @@ int dbd_st_tables(
       imp_sth->hstmt = SQL_NULL_HSTMT;
       return 0;
    }
-   return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+   return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 #endif  /* OLD_ONE_BEFORE_SCALARS */
 
@@ -1860,6 +1879,7 @@ int dbd_st_primary_keys(
     char *schema,
     char *table)
 {
+   dTHX;
    D_imp_dbh(dbh);
    D_imp_sth(sth);
    RETCODE rc;
@@ -1871,7 +1891,7 @@ int dbd_st_primary_keys(
 
    imp_sth->done_desc = 0;
 
-   if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
    rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
    if (rc != SQL_SUCCESS) {
@@ -1912,7 +1932,7 @@ int dbd_st_primary_keys(
       return 0;
    }
 
-   return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+   return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
@@ -1926,6 +1946,7 @@ int dbd_st_statistics(
     int unique,
     int quick)
 {
+   dTHX;
    D_imp_dbh(dbh);
    D_imp_sth(sth);
    RETCODE rc;
@@ -1939,7 +1960,7 @@ int dbd_st_statistics(
 
    imp_sth->done_desc = 0;
 
-   if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
    rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
    if (rc != SQL_SUCCESS) {
@@ -1987,7 +2008,7 @@ int dbd_st_statistics(
        return 0;
    }
 
-   return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+   return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
@@ -2010,6 +2031,7 @@ int odbc_st_prepare(
    char *statement,
    SV *attribs)
 {
+    dTHX;
     SV *sql;
 
     sql = sv_newmortal();
@@ -2037,6 +2059,7 @@ int odbc_st_prepare_sv(
     SV *statement,
     SV *attribs)
 {
+   dTHX;
    D_imp_dbh_from_sth;
    RETCODE rc;
    int dbh_active;
@@ -2068,7 +2091,7 @@ int odbc_st_prepare_sv(
               (long)imp_dbh->odbc_query_timeout);
    }
 
-   if ((dbh_active = check_connection_active(sth)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ sth)) == 0) return 0;
 
    rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
    if (!SQL_SUCCEEDED(rc)) {
@@ -2185,7 +2208,7 @@ int odbc_st_prepare_sv(
 #else
            SvUTF8_on(sql_copy);
 #endif
-           SV_toWCHAR(sql_copy);
+           SV_toWCHAR(aTHX_ sql_copy);
 
            wsql = (SQLWCHAR *)SvPV(sql_copy, wsql_len);
 
@@ -2352,6 +2375,7 @@ static const char *S_SqlCTypeToString (SWORD sqltype)
  */
 int dbd_describe(SV *sth, imp_sth_t *imp_sth, int more)
 {
+    dTHX;
     SQLRETURN rc;                           /* ODBC fn return value */
     SQLSMALLINT column_n;                   /* column we are describing */
     imp_fbh_t *fbh;
@@ -2809,6 +2833,7 @@ static SQLRETURN bind_columns(
 int dbd_st_execute(
     SV *sth, imp_sth_t *imp_sth)
 {
+    dTHX;
     IV ret;
 
     if (DBIc_TRACE(imp_sth, DBD_TRACING, 0, 3))
@@ -2831,6 +2856,7 @@ int dbd_st_execute(
 IV dbd_st_execute_iv(
     SV *sth, imp_sth_t *imp_sth)
 {
+    dTHX;
     RETCODE rc;
     D_imp_dbh_from_sth;
     int outparams = 0;
@@ -2872,7 +2898,7 @@ IV dbd_st_execute_iv(
             while( (sv = hv_iternextsv(hv, &key, &retlen)) != NULL ) {
                 if (sv != &PL_sv_undef) {
                     phs_t *phs = (phs_t*)(void*)SvPVX(sv);
-                    if (!rebind_param(sth, imp_sth, imp_dbh, phs)) return -2;
+                    if (!rebind_param(aTHX_ sth, imp_sth, imp_dbh, phs)) return -2;
                     if (DBIc_TRACE(imp_sth, DBD_TRACING, 0, 8)) {
                         if (SvOK(phs->sv) && (phs->value_type == SQL_C_CHAR)) {
                             char sbuf[256];
@@ -2908,7 +2934,7 @@ IV dbd_st_execute_iv(
                 || (SvPVX(phs->sv) != phs->sv_buf) /* has the string buffer moved? */
                 || (SvOK(phs->sv) != phs->svok)
                 ) {
-                if (!rebind_param(sth, imp_sth, imp_dbh, phs))
+                if (!rebind_param(aTHX_ sth, imp_sth, imp_dbh, phs))
                     croak("Can't rebind placeholder %s", phs->name);
             } else {
                 /* no mutation found */
@@ -3150,7 +3176,7 @@ IV dbd_st_execute_iv(
     }
 
     if (outparams) {	/* check validity of bound output SV's	*/
-        odbc_handle_outparams(imp_sth, DBIc_TRACE_LEVEL(imp_sth));
+        odbc_handle_outparams(aTHX_ imp_sth, DBIc_TRACE_LEVEL(imp_sth));
     }
 
     /*
@@ -3183,6 +3209,7 @@ IV dbd_st_execute_iv(
  */
 AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
 {
+    dTHX;
     D_imp_dbh_from_sth;
     int i;
     AV *av;
@@ -3288,7 +3315,7 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
                     imp_sth->moreResults = 0;
                     imp_sth->done_desc = 1;
                     if (outparams) {
-                        odbc_handle_outparams(imp_sth, DBIc_TRACE_LEVEL(imp_sth));
+                        odbc_handle_outparams(aTHX_ imp_sth, DBIc_TRACE_LEVEL(imp_sth));
                     }
                     /* XXX need to 'finish' here */
                     dbd_st_finish(sth, imp_sth);
@@ -3415,7 +3442,8 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
                         TRACE2(imp_sth, "    Unicode ChopBlanks orig len=%ld, new len=%ld\n",
                                orig_len, fbh->datalen);
                 }
-                sv_setwvn(sv,(SQLWCHAR*)fbh->data,fbh->datalen/sizeof(SQLWCHAR));
+                sv_setwvn(aTHX_ sv, (SQLWCHAR*)fbh->data,
+                          fbh->datalen/sizeof(SQLWCHAR));
                 if (DBIc_TRACE(imp_sth, UNICODE_TRACING, 0, 0)) { /* odbcunicode */
                     /* unsigned char dlog[256]; */
                     /* unsigned char *src; */
@@ -3524,6 +3552,7 @@ AV *dbd_st_fetch(SV *sth, imp_sth_t *imp_sth)
 
 int dbd_st_finish(SV *sth, imp_sth_t *imp_sth)
 {
+    dTHX;
     D_imp_dbh_from_sth;
     RETCODE rc;
 
@@ -3555,6 +3584,7 @@ int dbd_st_finish(SV *sth, imp_sth_t *imp_sth)
 
 void dbd_st_destroy(SV *sth, imp_sth_t *imp_sth)
 {
+    dTHX;
     D_imp_dbh_from_sth;
     RETCODE rc;
 
@@ -3788,6 +3818,7 @@ static void get_param_type(
 /*                                                                      */
 /*======================================================================*/
 static int rebind_param(
+    pTHX_
     SV *sth,
     imp_sth_t *imp_sth,
     imp_dbh_t *imp_dbh,
@@ -3866,7 +3897,7 @@ static int rebind_param(
         /* Convert the sv in place to UTF-16 encoded characters
            NOTE: the SV_toWCHAR may modify SvPV(phs->sv */
         if (SvOK(phs->sv)) {
-            SV_toWCHAR(phs->sv);
+            SV_toWCHAR(aTHX_ phs->sv);
             /* get new buffer and length */
             phs->sv_buf = SvPV(phs->sv, value_len);
         } else {                                 /* it is undef */
@@ -4407,6 +4438,7 @@ int dbd_bind_ph(
     int is_inout,
     IV maxlen)
 {
+   dTHX;
    SV **phs_svp;
    STRLEN name_len;
    char *name;
@@ -4532,7 +4564,7 @@ int dbd_bind_ph(
 
    if (DBIc_TRACE(imp_sth, DBD_TRACING, 0, 4))
        TRACE0(imp_dbh, "    -dbd_bind_ph=rebind_param\n");
-   return rebind_param(sth, imp_sth, imp_dbh, phs);
+   return rebind_param(aTHX_ sth, imp_sth, imp_dbh, phs);
 }
 
 /*------------------------------------------------------------
@@ -4549,6 +4581,7 @@ long len;
 SV *destrv;
 long destoffset;
 {
+   dTHX;
    SQLLEN retl;
    SV *bufsv;
    RETCODE rc;
@@ -4707,6 +4740,7 @@ static const db_params *
 /*======================================================================*/
 int dbd_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
 {
+    dTHX;
     RETCODE rc;
     STRLEN kl;
     char *key = SvPV(keysv,kl);
@@ -5062,6 +5096,7 @@ int dbd_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
 /*======================================================================*/
 SV *dbd_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
 {
+    dTHX;
     RETCODE rc;
     STRLEN kl;
     char *key = SvPV(keysv,kl);
@@ -5328,6 +5363,7 @@ static T_st_params S_st_store_params[] =
 /*======================================================================*/
 SV *dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
 {
+   dTHX;
    STRLEN kl;
    char *key = SvPV(keysv,kl);
    int i;
@@ -5394,7 +5430,7 @@ SV *dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
              }
 #ifdef WITH_UNICODE
              av_store(av, i,
-                      sv_newwvn((SQLWCHAR *)imp_sth->fbh[i].ColName,
+                      sv_newwvn(aTHX_ (SQLWCHAR *)imp_sth->fbh[i].ColName,
                                 imp_sth->fbh[i].ColNameLen));
 #else
              av_store(av, i, newSVpv(imp_sth->fbh[i].ColName, 0));
@@ -5458,7 +5494,7 @@ SV *dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
                        "    numfields == 0 && moreResults = 0 finish\n");
 	    }
 	    if (outparams) {
-	       odbc_handle_outparams(imp_sth, DBIc_TRACE_LEVEL(imp_sth));
+	       odbc_handle_outparams(aTHX_ imp_sth, DBIc_TRACE_LEVEL(imp_sth));
 	    }
         imp_sth->done_desc = 0;                 /* redo describe */
 
@@ -5573,6 +5609,7 @@ SV *dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
 /*======================================================================*/
 int dbd_st_STORE_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
 {
+    dTHX;
     STRLEN kl;
     char *key = SvPV(keysv,kl);
     T_st_params *par;
@@ -5642,6 +5679,7 @@ SV *odbc_get_info(dbh, ftype)
 SV *dbh;
 int ftype;
 {
+    dTHX;
     D_imp_dbh(dbh);
     RETCODE rc;
     SV *retsv = NULL;
@@ -5704,6 +5742,7 @@ char * SchemaName;
 char * TableName;
 int		 Unique;
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -5714,7 +5753,7 @@ int		 Unique;
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -5734,7 +5773,7 @@ int		 Unique;
         dbd_error(sth, rc, "odbc_get_statistics/SQLGetStatistics");
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 #endif /* THE_FOLLOWING_NO_LONGER_USED_REPLACE_BY_dbd_st_statistics */
 
@@ -5746,6 +5785,7 @@ char * CatalogName;
 char * SchemaName;
 char * TableName;
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -5756,7 +5796,7 @@ char * TableName;
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -5774,7 +5814,7 @@ char * TableName;
         dbd_error(sth, rc, "odbc_get_primary_keys/SQLPrimaryKeys");
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 #endif /* THE_FOLLOWING_NO_LONGER_USED_REPLACE_BY_dbd_st_primary_keys */
 
@@ -5790,6 +5830,7 @@ char * TableName;
 int    Scope;
 int    Nullable;
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -5800,7 +5841,7 @@ int    Nullable;
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -5821,7 +5862,7 @@ int    Nullable;
         dbd_error(sth, rc, "odbc_get_special_columns/SQLSpecialClumns");
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
@@ -5836,6 +5877,7 @@ char * FK_CatalogName;
 char * FK_SchemaName;
 char * FK_TableName;
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -5847,7 +5889,7 @@ char * FK_TableName;
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -5891,7 +5933,7 @@ char * FK_TableName;
         dbd_error(sth, rc, "odbc_get_foreign_keys/SQLForeignKeys");
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
@@ -5930,6 +5972,7 @@ int odbc_get_type_info(
     SV *sth,
     int ftype)
 {
+   dTHX;
    D_imp_dbh(dbh);
    D_imp_sth(sth);
    RETCODE rc;
@@ -5946,7 +5989,7 @@ int odbc_get_type_info(
 
    imp_sth->done_desc = 0;
 
-   if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+   if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
    rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
    if (rc != SQL_SUCCESS) {
@@ -5975,13 +6018,14 @@ int odbc_get_type_info(
       return 0;
    }
 
-   return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+   return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
 
 SV *odbc_cancel(SV *sth)
 {
+    dTHX;
     D_imp_sth(sth);
     RETCODE rc;
 
@@ -6002,6 +6046,7 @@ IV odbc_st_lob_read(
     UV length,
     IV type)
 {
+    dTHX;
     D_imp_sth(sth);
     SQLLEN len = 0;
     SQLRETURN rc;
@@ -6095,6 +6140,7 @@ IV odbc_st_lob_read(
 /************************************************************************/
 SV *odbc_col_attributes(SV *sth, int colno, int desctype)
 {
+    dTHX;
     D_imp_sth(sth);
     RETCODE rc;
     SV *retsv = NULL;
@@ -6227,6 +6273,7 @@ char *schema;
 char *table;
 char *column;
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -6237,7 +6284,7 @@ char *column;
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -6279,7 +6326,7 @@ char *column;
         imp_sth->hstmt = SQL_NULL_HSTMT;
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 #endif  /* OLD_ONE_BEFORE_SCALARS */
 
@@ -6292,6 +6339,7 @@ int odbc_db_columns(
     SV *table,
     SV *column)
 {
+    dTHX;
     D_imp_dbh(dbh);
     D_imp_sth(sth);
     RETCODE rc;
@@ -6306,7 +6354,7 @@ int odbc_db_columns(
 
     imp_sth->done_desc = 0;
 
-    if ((dbh_active = check_connection_active(dbh)) == 0) return 0;
+    if ((dbh_active = check_connection_active(aTHX_ dbh)) == 0) return 0;
 
     rc = SQLAllocHandle(SQL_HANDLE_STMT, imp_dbh->hdbc, &imp_sth->hstmt);
     if (rc != SQL_SUCCESS) {
@@ -6344,22 +6392,22 @@ int odbc_db_columns(
 
        if (SvOK(catalog)) {
            copy = sv_mortalcopy(catalog);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wcatalog = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(schema)) {
            copy = sv_mortalcopy(schema);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wschema = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(table)) {
            copy = sv_mortalcopy(table);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wtable = (SQLWCHAR *)SvPV(copy, wlen);
        }
        if (SvOK(column)) {
            copy = sv_mortalcopy(column);
-           SV_toWCHAR(copy);
+           SV_toWCHAR(aTHX_ copy);
            wcolumn = (SQLWCHAR *)SvPV(copy, wlen);
        }
        rc = SQLColumnsW(imp_sth->hstmt,
@@ -6393,7 +6441,7 @@ int odbc_db_columns(
         imp_sth->hstmt = SQL_NULL_HSTMT;
         return 0;
     }
-    return build_results(sth, imp_sth, dbh, imp_dbh, rc);
+    return build_results(aTHX_ sth, imp_sth, dbh, imp_dbh, rc);
 }
 
 
@@ -6439,7 +6487,7 @@ static void AllODBCErrors(
 /*  =======================                                             */
 /*                                                                      */
 /************************************************************************/
-static int check_connection_active(SV *h)
+static int check_connection_active(pTHX_ SV *h)
 {
     D_imp_xxh(h);
     struct imp_dbh_st *imp_dbh = NULL;
@@ -6482,6 +6530,7 @@ static int check_connection_active(SV *h)
 /*                                                                      */
 /************************************************************************/
 static int set_odbc_version(
+    pTHX_
     SV *dbh,
     imp_dbh_t *imp_dbh,
     SV* attr)
@@ -6532,6 +6581,7 @@ static int set_odbc_version(
  */
 
 static int post_connect(
+    pTHX_
     SV *dbh,
     imp_dbh_t *imp_dbh,
     SV *attr)
@@ -7002,6 +7052,7 @@ static   HWND GetConsoleHwnd(void)
 IV odbc_st_rowcount(
     SV *sth)
 {
+    dTHX;
     D_imp_sth(sth);
 /*    SQLLEN rows;
       SQLRETURN rc;*/
@@ -7029,6 +7080,7 @@ IV odbc_st_execute_for_fetch(
     IV count,			/* count of rows */
     SV *tuple_status)		/* returned tuple status */
 {
+    dTHX;
     D_imp_sth(sth);
     D_imp_dbh_from_sth;
     SQLRETURN rc;
@@ -7293,7 +7345,7 @@ IV odbc_st_execute_for_fetch(
             }
             else {
 #if defined(WITH_UNICODE)
-                SV_toWCHAR(sv);
+                SV_toWCHAR(aTHX_ sv);
                 sv_val = SvPV(sv, sv_len);
                 memcpy((char *)(phs->param_array_buf + (row * maxlen[p-1] * sizeof(SQLWCHAR))),
                        sv_val, sv_len);
@@ -7595,6 +7647,7 @@ static int taf_callback_wrapper (
     int type,
     int event) {
 
+    dTHX;
     int return_count;
     int ret;
     SV* dbh = (SV *)handle;
@@ -7662,7 +7715,7 @@ static void check_for_unicode_param(
 
 
 AV* dbd_data_sources(SV *drh ) {
-	int numDataSources = 0;
+    dTHX;
 	SQLUSMALLINT fDirection = SQL_FETCH_FIRST;
 	RETCODE rc;
     SQLCHAR dsn[SQL_MAX_DSN_LENGTH+1+9 /* strlen("DBI:ODBC:") */];

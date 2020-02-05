@@ -252,6 +252,14 @@ run_in_tempdir {
 
   SKIP: {
         skip 'DBD::DBM limitation', 2 if $driver eq 'DBM';
+        $res = $db->xarrayrefs(
+            with   => 'x(a,b)',
+            as     => [ values => [ [ 1, 2 ], [ 3, 4 ], ], ],
+            select => '*',
+            from   => 'x',
+        );
+        is_deeply $res, [ [ 1, 2 ], [ 3, 4 ] ], 'values => [ [], [] ]';
+
         $res = $db->xdo(
             insert_into => 'users(name, phone)',
             select      => [ qv('name3'), qv('phone3') ],
@@ -259,9 +267,9 @@ run_in_tempdir {
         is $res, 1, 'insert into select';
 
         $res = $db->xarrayrefs(
-            select => [qw/name phone/],
-            from   => 'users',
-            where  => [ 'phone = ', bv('phone3'), 'OR name = ', qv('name2') ],
+            select   => [qw/name phone/],
+            from     => 'users',
+            where    => [ 'phone = ', bv('phone3'), 'OR name = ', qv('name2') ],
             order_by => [ 'phone', 'name' ],
         );
 
@@ -284,7 +292,7 @@ run_in_tempdir {
 
   SKIP: {
         skip 'DBD::DBM limitation', 1 if ( $driver eq 'DBM' );
-        subtest 'txn', sub {
+        subtest 'txn',              sub {
             $res = undef;
             ok $db->{AutoCommit}, 'have autocommit';
 

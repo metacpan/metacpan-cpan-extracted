@@ -24,3 +24,7 @@ Revision history for Perl extension HTTP::UA::Parser.
 	- adding device brand and device model support by @commenthol
 	- Code cleaning
 	- Fix documentation
+
+0.007 Mon Feb 03 2020
+	- os parser fixes by Alex Solovey - https://github.com/asolovey
+	- ua parser fixes

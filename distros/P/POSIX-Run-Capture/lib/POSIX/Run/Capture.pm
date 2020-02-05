@@ -28,7 +28,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 #our @EXPORT = qw();
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load('POSIX::Run::Capture', $VERSION);
@@ -68,8 +68,8 @@ POSIX::Run::Capture - run command and capture its output
   $obj = new POSIX::Run::Capture(argv => [ $command, @args ],
  			         program => $prog,
 			         stdin => $fh_or_string,
-			         stdout => sub { ... },
-			         stderr => sub { ... },
+			         stdout => $ref_or_string,
+			         stderr => $ref_or_string,
 			         timeout => $n);
   $obj->run;
 
@@ -94,7 +94,7 @@ POSIX::Run::Capture - run command and capture its output
 
 Runs an external command and captures its output. Both standard error and
 output can be captured. Standard input can be supplied as either a
-filehandle or a text. Upon exit, the captured streams can be accessed line
+filehandle or a string. Upon exit, the captured streams can be accessed line
 by line or in one chunk. Callback routines can be supplied that will be
 called for each complete line of output read, providing a way for synchronous
 processing. 
@@ -109,8 +109,8 @@ Creates a new capture object. There are three possible invocation modes.
   new POSIX::Run::Capture(argv => [ $command, @args ],
  			  program => $prog,
 			  stdin => $fh_or_string,
-			  stdout => sub { ... },
-			  stderr => sub { ... },
+			  stdout => $ref_or_string,
+			  stderr => $ref_or_string,
 			  timeout => $n)
 
 When named arguments are used, the following keywords are allowed:
@@ -131,7 +131,7 @@ Sets the pathname of binary file to run.
 Supplies standard input for the command. The argument can be a string or
 a file handle.
 
-=item B<stdout>
+=item B<stdout> =E<gt> I<$coderef>
 
 Sets the I<line monitor> function for standard output. Line monitor is
 invoked each time a complete line is read, or the EOF is hit on the standard
@@ -145,10 +145,22 @@ following example monitor function prints its argument to STDOUT:
 
 Notice that the last line read can lack the teminating newline character.
 
-=item B<stderr>
+=item B<stdout> =E<gt> I<FH>
 
-Sets the I<line monitor> function for standard error stream. See the
-description above.
+Redirect standard output to file handle I<FH>.  Obviously, the handle should
+be writable.
+    
+=item B<stdout> =E<gt> I<NAME>
+
+Capture standard output and write it to the file I<NAME>.  If the file
+exists, it will be truncated.  Otherwise, it will be created with permissions
+of 0666 modified by the process' "umask" value.    
+
+=item B<stderr> =E<gt> I<$arg>
+
+Sets the I<line monitor> function for standard error or redirects it to
+the file handle or file, depending on the type of I<$arg> (CODE reference,
+GLOB or scalar string).  For details, see the description of B<stdout> above.
 
 =item B<timeout>
 
@@ -172,7 +184,7 @@ Whatever constructor is used, the necessary parameters can be set
 or changed later, using B<set_argv>, B<set_program>, B<set_input>,
 and B<set_timeout>.
 
-Monitors can be defined only when creating the object.
+Monitors and redirections can be defined only when creating the object.
 
 =head2 Modifying the object.
 
@@ -283,7 +295,7 @@ Sergey Poznyakoff, E<lt>gray@gnu.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Sergey Poznyakoff
+Copyright (C) 2017-2020 by Sergey Poznyakoff
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

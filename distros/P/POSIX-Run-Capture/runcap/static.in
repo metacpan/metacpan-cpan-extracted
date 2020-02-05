@@ -15,7 +15,7 @@
 @SET_MAKE@
 
 # Main Makefile.am source for runcap
-# Copyright (C) 2017 Sergey Poznyakoff
+# Copyright (C) 2017-2020 Sergey Poznyakoff
 #
 # Runcap is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -140,8 +140,8 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libruncap_a_AR = $(AR) $(ARFLAGS)
 libruncap_a_LIBADD =
-am__objects_1 = getc.$(OBJEXT) getl.$(OBJEXT) runcap.$(OBJEXT) \
-	seek.$(OBJEXT) tell.$(OBJEXT)
+am__objects_1 = getc.$(OBJEXT) getl.$(OBJEXT) read.$(OBJEXT) \
+	runcap.$(OBJEXT) seek.$(OBJEXT) tell.$(OBJEXT)
 am_libruncap_a_OBJECTS = $(am__objects_1)
 libruncap_a_OBJECTS = $(am_libruncap_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -353,6 +353,7 @@ top_srcdir = @top_srcdir@
 RUNCAP_SRC = \
  getc.c\
  getl.c\
+ read.c\
  runcap.c\
  seek.c\
  tell.c
@@ -420,6 +421,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/read.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/runcap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/seek.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tell.Po@am__quote@

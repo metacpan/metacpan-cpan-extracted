@@ -1,5 +1,5 @@
 {
-   "abstract" : "Crypto toolkit",
+   "abstract" : "Cryptographic toolkit",
    "author" : [
       "Karel Miko"
    ],
@@ -45,6 +45,6 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.066",
+   "version" : "0.067",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

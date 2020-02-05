@@ -10,7 +10,7 @@ use Carp 'croak';
 use POSIX 'fmax';
 use Sub::Util 'set_subname';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use constant DEFAULTS => {
   background => 'white',
@@ -38,9 +38,8 @@ sub new ($class, %params) {
 # methods
 
 sub plot ($self, $text) {
-  $self->{elements}
-    = [qq|  <rect width="100%" height="100%" fill="$self->{background}"/>|];
-  $self->{vbwidth} = $self->{vbheight} = 0;
+  $self->{elements} = [qq|  <rect width="100%" height="100%" fill="$self->{background}"/>|];
+  $self->{vbwidth}  = $self->{vbheight} = 0;
 
   $self->_plot($text);
 
@@ -304,10 +303,8 @@ Getter and setter for the margin around the barcode. Default C<2>.
     $plotter = $plotter->scale($newvalue);
     $plotter = $plotter->scale('');          # ''
 
-Getter and setter for the scale of the svg element.
-Sets L</width> and L</height> to products of the width and height of the graphics.
-Used to display small barcodes without blur.
-Default C<''>.
+Getter and setter for the scale of the svg element.  Sets L</width> and L</height> to products of
+the width and height of the graphics.  Used to display small barcodes without blur.  Default C<''>.
 
 =head2 width
 
@@ -317,14 +314,15 @@ Default C<''>.
 
 Getter and setter for the width of the svg element. Default C<''>.
 
+=head1 AUTHOR & COPYRIGHT
+
+© 2019–2020 by Tekki (Rolf Stöckli).
+
+This program is free software, you can redistribute it and/or modify it under the terms of the
+Artistic License version 2.0.
+
 =head1 SEE ALSO
 
 L<SVG::Barcode::Code128>, L<SVG::Barcode::DataMatrix>, L<SVG::Barcode::QRCode>.
-
-=head1 AUTHOR & COPYRIGHT
-
-© 2019 by Tekki (Rolf Stöckli).
-
-This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 
 =cut

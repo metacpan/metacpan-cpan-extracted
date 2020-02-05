@@ -7,8 +7,8 @@ package Geometry {
 	use MooX::Pression;
 	
 	class Point {
-		has $x ( is => rw, type => Int, default => 0 );
-		has $y ( is => rw, type => Int, default => 0 );
+		has *x ( is => rw, type => Int, default => 0 );
+		has *y ( is => rw, type => Int, default => 0 );
 		method clear () {
 			$self->x(0);
 			$self->y(0);
@@ -17,7 +17,7 @@ package Geometry {
 	
 	class Point3D {
 		extends Point;
-		has $z ( is => rw, type => Int, default => 0 );
+		has *z ( is => rw, type => Int, default => 0 );
 		after clear () {
 			$self->z(0);
 		}

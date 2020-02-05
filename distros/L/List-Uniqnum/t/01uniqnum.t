@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Config; # to determine nvsize
-use Test::More tests => 23;
+use Test::More tests => 25;
 use List::Uniqnum qw( uniqnum );
 #use List::Util qw( uniqnum );
 
@@ -143,9 +143,13 @@ if( $Config{ivsize} == 8 && $Config{nvsize} == 8 ) {
     # To obtain an NV, we need to first divide $p_53 by 2
     push @in, ($p_53 * 1024, $p_53/ 2 * 2048.0,
                $p_53 * 2048, $p_53 / 2 * 4096.0,
-               ($p_53 -200) * 2048, ($p_53 - 200) / 2 * 4096.0);
+               ($p_53 -200) * 2048, ($p_53 - 200) / 2 * 4096.0,
+                100000000000262144, 1.00000000000262144e17,
+                100000000001310720, 1.0000000000131072e17,
+                144115188075593728, 1.44115188075593728e17);
 
-    push @correct, ($p_53 * 1024, $p_53 * 2048, ($p_53 - 200) * 2048);
+    push @correct, ($p_53 * 1024, $p_53 * 2048, ($p_53 - 200) * 2048, 100000000000262144,
+                    100000000001310720, 144115188075593728);
 }
 
 #my @x = uniqnum(@in);
@@ -278,6 +282,29 @@ is_deeply( [ uniqnum (@in)],
 $count = uniqnum(@in);
 
 cmp_ok($count, '==', 6, 'uniqnum uniquifies mixed strings and numbers as expected in scalar context');
+}
+
+SKIP: {
+    skip ('test not relevant for this perl configuration', 2) unless $Config{ivsize} == 8;
+
+  # 1e17 is the number beyond which "%.20g" formatting fails on some
+  # 64-bit int perls - perhaps only on those built with a Microsoft compiler.
+  # The following 2 tests check that the nearest values (both above
+  # and below that tipping point) are being handled correctly.
+
+  # 99999999999999984 is the largest 64-bit integer less than 1e17
+  # that can be expressed exactly as a double
+
+  is_deeply( [ uniqnum (99999999999999984, 99999999999999984.0) ],
+             [ (99999999999999984) ],
+             'uniqnum recognizes 99999999999999984 and 99999999999999984.0 as the same' );
+
+  # 100000000000000016 is the smallest positive 64-bit integer greater than 1e17
+  # that can be expressed exactly as a double
+
+  is_deeply( [ uniqnum (100000000000000016, 100000000000000016.0) ],
+             [ (100000000000000016) ],
+             'uniqnum recognizes 100000000000000016 and 100000000000000016.0 as the same' );
 }
 
 __END__

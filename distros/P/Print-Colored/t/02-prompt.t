@@ -28,11 +28,16 @@ my $off = "${esc}[0m";
 
 local *ARGV;
 open *ARGV, '<', \<<'...' or die $!;
-this is error
-this is info
-this is input
-this is ok
-this is warn
+input error
+password error
+input info
+password info
+input input
+password input
+input ok
+password ok
+input warn
+password warn
 ...
 
 for my $context (qw|error info input ok warn|) {
@@ -42,9 +47,12 @@ for my $context (qw|error info input ok warn|) {
   my $colored_text = qq|$colors{$context}$text$off|;
 
   $fn = "${package}::prompt_$context";
-  # stdout_is { $input = &$fn($text) } $colored_text, "prompt_$context";
   ok $input = &$fn($text), "prompt_$context";
-  is $input, "this is $context", "input for $context";
+  is $input, "input $context", "input for $context";
+
+  $fn = "${package}::password_$context";
+  ok $input = &$fn($text), "password_$context";
+  is $input, "password $context", "password for $context";
 }
 
 done_testing();

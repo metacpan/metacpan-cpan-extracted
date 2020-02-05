@@ -151,8 +151,15 @@ around init => sub ( $orig, $self ) {
                             $permission = $permission_eval;
                         }
 
+                        # no permissions required
+                        if ( !defined $permission ) {
+                            $method->{$method_id}->{permissions} = undef;
+
+                            last;
+                        }
+
                         # any authenticated user
-                        if ( $permission eq $PERMS_AUTHENTICATED ) {
+                        elsif ( $permission eq $PERMS_AUTHENTICATED ) {
                             $method->{$method_id}->{permissions} = $PERMS_AUTHENTICATED;
 
                             last;
@@ -185,11 +192,11 @@ sub get_method ( $self, $method_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (24)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (25)                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 89                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 146, 155, 161        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 146, 155, 168        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

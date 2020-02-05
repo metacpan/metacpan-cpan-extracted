@@ -45,7 +45,7 @@
          "web" : "https://github.com/chromatic/Modern-Perl"
       }
    },
-   "version" : "1.20190727",
+   "version" : "1.20200201",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }

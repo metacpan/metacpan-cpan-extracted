@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use Net::GitHub;
 use Path::Tiny;
 
-our $VERSION = version->new('0.7.2');
+our $VERSION = version->new('0.7.3');
 
 extends 'Group::Git';
 
@@ -95,7 +95,7 @@ Group::Git::Github - Adds reading all repositories you have access to on github.
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Github version 0.7.2.
+This documentation refers to Group::Git::Github version 0.7.3.
 
 
 =head1 SYNOPSIS

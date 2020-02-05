@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1758 2019-10-14 13:17:11Z willem $
+# $Id: 00-load.t 1763 2020-02-02 21:48:03Z willem $
 #
 
 use strict;
@@ -11,11 +11,10 @@ my @module = qw(
 	Net::DNS::SEC::ECCGOST
 	Net::DNS::SEC::EdDSA
 	Net::DNS::SEC::RSA
+	Net::DNS::SEC::Digest
 	Net::DNS::SEC::Keyset
 	Net::DNS::SEC::Private
 	Net::DNS::SEC::libcrypto
-	Digest::GOST
-	Digest::SHA
 	File::Find
 	File::Spec
 	IO::File
@@ -37,7 +36,7 @@ diag join "\n\t", @diag;
 
 
 ok( eval { Net::DNS::SEC::libcrypto->VERSION }, 'XS component SEC.xs loaded' )
-		|| BAIL_OUT "Unable to access OpenSSL libcrypto library";
+		|| BAIL_OUT("Unable to access OpenSSL libcrypto library");
 
 use_ok('Net::DNS::SEC');
 
@@ -51,8 +50,8 @@ ok( scalar(@index), 'create consolidated algorithm index' );
 
 
 eval {
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new();
-	my $broken = Net::DNS::SEC::libcrypto::EVP_sign( 'sigdata', $evpkey );
+	# Exercise checkerr() response to failed OpenSSL operation
+	Net::DNS::SEC::libcrypto::checkerr(0)
 };
 my ($exception) = split /\n/, "$@\n";
 ok( $exception, "XS libcrypto error\t[$exception]" );

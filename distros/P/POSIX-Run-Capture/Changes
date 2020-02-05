@@ -1,5 +1,10 @@
 Revision history for Perl extension POSIX::Run::Capture.
 
+1.01  Fri Jan 31 09:16:30 2020
+	- Argument to the 'stderr' or 'stdout' can be a code reference,
+	glob (file handle) or scalar string.  In the latter two cases,
+	the stream is redirected to the file handle or the named file.
+
 1.00  Wed Aug 14 08:11:53 2019
 	- line monitor is called for every line, whether or not terminated
 	with a newline

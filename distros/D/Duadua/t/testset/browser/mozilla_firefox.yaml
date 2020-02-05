@@ -1,0 +1,18 @@
+- ua: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0'
+  name: 'Mozilla Firefox'
+  is_bot: false
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: true
+  is_chromeos: false
+  version: '71.0'
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/20.2 Mobile/15E148 Safari/605.1.15'
+  name: 'Mozilla Firefox iOS'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '20.2'

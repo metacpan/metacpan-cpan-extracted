@@ -1,9 +1,14 @@
-0.002   2017-04-22 (PERLANCAR)
+0.003   2020-02-03  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Add logging to CLI scripts.
+
+
+0.002   2017-04-22  Released-By: PERLANCAR
 
 	- [Bugfix] Logic error, forgot to 'last' after successful
 	  decrypting.
 
 
-0.001   2017-04-09 (PERLANCAR)
+0.001   2017-04-09  Released-By: PERLANCAR
 
         - First release, replaces App-RemovePdfPassword.

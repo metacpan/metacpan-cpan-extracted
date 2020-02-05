@@ -1,4 +1,4 @@
-/*  Copyright (c) 2008-2018 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2008-2020 H.Merijn Brand.  All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
  */
@@ -9,9 +9,10 @@ extern "C" {
 #include <EXTERN.h>
 #include <perl.h>
 #include <XSUB.h>
-#define	NEED_pv_pretty
-#define	NEED_pv_escape
-#define	NEED_my_snprintf
+#define NEED_pv_pretty
+#define NEED_pv_escape
+#define NEED_my_snprintf
+#define NEED_utf8_to_uvchr_buf
 #include "ppport.h"
 #ifdef __cplusplus
 }

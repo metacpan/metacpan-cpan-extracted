@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,17 +15,17 @@ name: Data-Edit-Xml-Xref
 provides:
   Data::Edit::Xml::Xref:
     file: lib/Data/Edit/Xml/Xref.pm
-    version: '20191121'
+    version: '20200201'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Edit::Xml: '20191119'
-  Data::Table::Text: '20191110'
+  Data::Edit::Xml: '20200201'
+  Data::Table::Text: '20200201'
   Dita::GB::Standard: '20190911'
   Test2::API: '0'
   Test::More: '0'
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20191121'
+version: '20200201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

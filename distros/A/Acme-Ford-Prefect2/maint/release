@@ -71,4 +71,4 @@ sub run
 }
 
 run 'dzil', 'release';
-run 'cpanm', "Acme-Alien-DontPanic2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz";
+run 'cpanm', "Acme-Ford-Prefect2-@{[ Alien::Build->VERSION . '00' ]}.tar.gz";

@@ -1,0 +1,14 @@
+#! /bin/bash
+
+perl -Ilib -e '
+	use 5.14.0;
+	use warnings;
+	use autodie ":all";
+
+	my $debug = 0;
+	shift and $debug = $1 if $ARGV[0] =~ /DEBUG=(\d+)/;
+	require Debuggit; Debuggit->import( DataPrinter => 1, DEBUG => $debug );
+
+	require App::Pb;								# cannot `use` here or it throws off Debuggit
+	App::Pb->run;
+' "$@"

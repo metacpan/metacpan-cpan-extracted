@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 use Data::Peek qw( DGrow DDump );
 
@@ -29,5 +29,7 @@ ok ($l <= $limit,		"LEN in variable <= $limit");
 ok ($dd{LEN} >= $len,		"LEN in variable >= $len");
 ok ($dd{LEN} <= $limit,		"LEN in variable <= $limit");
 is (DGrow ($x, 20), $l,		"Don't shrink");
+
+done_testing;
 
 1;

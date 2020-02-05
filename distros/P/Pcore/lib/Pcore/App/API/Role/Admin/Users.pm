@@ -7,6 +7,7 @@ with qw[Pcore::App::API::Role::Read];
 
 has default_gravatar       => ();
 has default_gravatar_image => ();
+has read_root              => undef;
 
 has max_limit        => 100;
 has default_order_by => sub { [ [ 'name', 'DESC' ] ] };
@@ -16,22 +17,27 @@ sub API_read ( $self, $auth, $args ) {
 
     # get by id
     if ( exists $args->{id} ) {
-        $where &= WHERE [ '"id" = ', \$args->{id} ];
+        $where &= WHERE [ '"user"."id" = ', \$args->{id} ];
     }
 
     # get all matched rows
     else {
 
+        # filter root
+        if ( !$self->{read_root} ) {
+            $where &= WHERE ['"user"."id" != 1'];
+        }
+
         # filter search
         if ( my $search = delete $args->{where}->{search} ) {
             my $val = lc "%$search->[1]%";
 
-            $where &= WHERE [ '"name" LIKE', \$val, 'OR "email" LIKE', \$val, 'OR "telegram_name" LIKE', \$val ];
+            $where &= WHERE [ '"user"."name" LIKE', \$val, 'OR "user"."email" LIKE', \$val, 'OR "user"."telegram_name" LIKE', \$val ];
         }
 
         # filter status
-        if ( exists $args->{where}->{status} ) {
-            $where &= [ '"enabled"', IN [ map { SQL_BOOL $_} $args->{where}->{status}->[1]->@* ] ];
+        if ( exists $args->{where}->{enabled} ) {
+            $where &= [ '"user"."enabled"', IN [ map { SQL_BOOL $_} $args->{where}->{enabled}->[1]->@* ] ];
         }
     }
 
@@ -42,7 +48,7 @@ sub API_read ( $self, $auth, $args ) {
         SELECT
             *,
             CASE
-                WHEN "gravatar" IS NOT NULL THEN 'https://s.gravatar.com/avatar/' || "gravatar" || '?d=@{[ $self->{default_gravatar_image} ]}'
+                WHEN "user"."gravatar" IS NOT NULL THEN 'https://s.gravatar.com/avatar/' || "user"."gravatar" || '?d=@{[ $self->{default_gravatar_image} ]}'
                 ELSE '@{[ $self->{default_gravatar} ]}'
             END "avatar"
         FROM

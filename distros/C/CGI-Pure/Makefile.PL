@@ -27,8 +27,8 @@ requires 'URI::Escape' => 0;
 requires 'perl' => '5.6.0';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=CGI-Pure';
-resources 'homepage' => 'https://github.com/tupinek/CGI-Pure';
-resources 'repository' => 'git://github.com/tupinek/CGI-Pure';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/CGI-Pure';
+resources 'repository' => 'git://github.com/michal-josef-spacek/CGI-Pure';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.16;
 test_requires 'File::Object' => 0.03;
@@ -36,7 +36,7 @@ test_requires 'IO::Scalar' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

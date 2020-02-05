@@ -30,7 +30,8 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'WWW::Mechanize' => '0'
                                     }
                     },
        'runtime' => {
@@ -54,10 +55,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Storable' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',
-                                   'WWW::Mechanize' => '0',
                                    'perl' => '5.006'
                                  }
                  }

@@ -3,7 +3,7 @@ abstract: Modified and extended debugging facilities
 author: 
   - H.Merijn Brand <h.m.brand@xs4all.nl>
 build_requires: 
-  perl: '5.008'
+  perl: '5.008001'
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -16,19 +16,19 @@ name: Data-Peek
 provides: 
   Data::Peek: 
     file: Peek.pm
-    version: '0.48'
+    version: '0.49'
 recommends: 
-  Data::Dumper: '2.167'
+  Data::Dumper: '2.173'
   Perl::Tidy: 0
-  Test::More: '1.302125'
+  Test::More: '1.302171'
 requires: 
   Data::Dumper: 0
   DynaLoader: 0
-  Test::More: '0.88'
-  Test::NoWarnings: 0
-  perl: '5.008'
+  Test::More: '0.90'
+  Test::Warnings: 0
+  perl: '5.008001'
 resources: 
   IRC: irc://irc.perl.org/#csv
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Data-Peek
-version: '0.48'
+version: '0.49'

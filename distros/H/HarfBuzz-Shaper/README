@@ -42,4 +42,5 @@ Copyright (C) 2020 by Johan Vromans
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-
+The source for the HarfBuzz library may be included in this kit, and
+is licenced according to hb_src/harfbuzz/COPYING.

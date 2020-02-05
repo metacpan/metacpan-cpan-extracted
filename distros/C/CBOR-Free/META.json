@@ -45,7 +45,7 @@
          "requires" : {
             "Data::Dumper" : "0",
             "FindBin" : "0",
-            "Test::Class::Tiny" : "0",
+            "Test::Class::Tiny" : "0.02",
             "Test::Deep" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/FGasper/p5-CBOR-Free"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

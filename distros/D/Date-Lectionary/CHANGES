@@ -32,3 +32,6 @@ Revision history for Date::Lectionary
 
 1.20190120 2019-01-20
  - Corrected issue where Sundays in Epiphany would be ahead by one week when Epiphany is on a Sunday.
+
+ 1.20200203 2020-02-03
+ - Corrected incorrect OT reading for Epiphany 2 & 5 in ACNA Year A.

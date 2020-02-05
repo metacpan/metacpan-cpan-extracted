@@ -1,0 +1,125 @@
+---
+abstract: 'Detect User-Agent'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  File::Basename: '0'
+  List::Util: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::AllModules: '0.17'
+  Test::More: '1.3'
+  YAML: '1.15'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Duadua
+provides:
+  Duadua:
+    file: lib/Duadua.pm
+    version: '0.04'
+  Duadua::Parser:
+    file: lib/Duadua/Parser.pm
+  Duadua::Parser::Bot::AdIdxBot:
+    file: lib/Duadua/Parser/Bot/AdIdxBot.pm
+  Duadua::Parser::Bot::Applebot:
+    file: lib/Duadua/Parser/Bot/Applebot.pm
+  Duadua::Parser::Bot::Baiduspider:
+    file: lib/Duadua/Parser/Bot/Baiduspider.pm
+  Duadua::Parser::Bot::Barkrowler:
+    file: lib/Duadua/Parser/Bot/Barkrowler.pm
+  Duadua::Parser::Bot::BingPreview:
+    file: lib/Duadua/Parser/Bot/BingPreview.pm
+  Duadua::Parser::Bot::Bingbot:
+    file: lib/Duadua/Parser/Bot/Bingbot.pm
+  Duadua::Parser::Bot::BotMisc:
+    file: lib/Duadua/Parser/Bot/BotMisc.pm
+  Duadua::Parser::Bot::DuckDuckBot:
+    file: lib/Duadua/Parser/Bot/DuckDuckBot.pm
+  Duadua::Parser::Bot::FacebookCrawler:
+    file: lib/Duadua/Parser/Bot/FacebookCrawler.pm
+  Duadua::Parser::Bot::Fastladder:
+    file: lib/Duadua/Parser/Bot/Fastladder.pm
+  Duadua::Parser::Bot::Feedbin:
+    file: lib/Duadua/Parser/Bot/Feedbin.pm
+  Duadua::Parser::Bot::Feedly:
+    file: lib/Duadua/Parser/Bot/Feedly.pm
+  Duadua::Parser::Bot::GoogleRead:
+    file: lib/Duadua/Parser/Bot/GoogleRead.pm
+  Duadua::Parser::Bot::Googlebot:
+    file: lib/Duadua/Parser/Bot/Googlebot.pm
+  Duadua::Parser::Bot::GooglebotAd:
+    file: lib/Duadua/Parser/Bot/GooglebotAd.pm
+  Duadua::Parser::Bot::GooglebotMisc:
+    file: lib/Duadua/Parser/Bot/GooglebotMisc.pm
+  Duadua::Parser::Bot::GooglebotMobile:
+    file: lib/Duadua/Parser/Bot/GooglebotMobile.pm
+  Duadua::Parser::Bot::HatenaBot:
+    file: lib/Duadua/Parser/Bot/HatenaBot.pm
+  Duadua::Parser::Bot::Inoreader:
+    file: lib/Duadua/Parser/Bot/Inoreader.pm
+  Duadua::Parser::Bot::MailRUBot:
+    file: lib/Duadua/Parser/Bot/MailRUBot.pm
+  Duadua::Parser::Bot::Msnbot:
+    file: lib/Duadua/Parser/Bot/Msnbot.pm
+  Duadua::Parser::Bot::Netcraft:
+    file: lib/Duadua/Parser/Bot/Netcraft.pm
+  Duadua::Parser::Bot::OracleGrapeshotCrawler:
+    file: lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
+  Duadua::Parser::Bot::Slackbot:
+    file: lib/Duadua/Parser/Bot/Slackbot.pm
+  Duadua::Parser::Bot::Twitterbot:
+    file: lib/Duadua/Parser/Bot/Twitterbot.pm
+  Duadua::Parser::Bot::YahooJapanBot:
+    file: lib/Duadua/Parser/Bot/YahooJapanBot.pm
+  Duadua::Parser::Bot::YahooSlurp:
+    file: lib/Duadua/Parser/Bot/YahooSlurp.pm
+  Duadua::Parser::Bot::YandexBot:
+    file: lib/Duadua/Parser/Bot/YandexBot.pm
+  Duadua::Parser::Browser::AppleSafari:
+    file: lib/Duadua/Parser/Browser/AppleSafari.pm
+  Duadua::Parser::Browser::BrowserMisc:
+    file: lib/Duadua/Parser/Browser/BrowserMisc.pm
+  Duadua::Parser::Browser::DuckDuckGo:
+    file: lib/Duadua/Parser/Browser/DuckDuckGo.pm
+  Duadua::Parser::Browser::GoogleChrome:
+    file: lib/Duadua/Parser/Browser/GoogleChrome.pm
+  Duadua::Parser::Browser::MicrosoftEdge:
+    file: lib/Duadua/Parser/Browser/MicrosoftEdge.pm
+  Duadua::Parser::Browser::MicrosoftInternetExplorer:
+    file: lib/Duadua/Parser/Browser/MicrosoftInternetExplorer.pm
+  Duadua::Parser::Browser::MozillaFirefox:
+    file: lib/Duadua/Parser/Browser/MozillaFirefox.pm
+  Duadua::Parser::Browser::Opera:
+    file: lib/Duadua/Parser/Browser/Opera.pm
+  Duadua::Parser::Browser::PaleMoon:
+    file: lib/Duadua/Parser/Browser/PaleMoon.pm
+  Duadua::Parser::Browser::UCBrowser:
+    file: lib/Duadua/Parser/Browser/UCBrowser.pm
+  Duadua::Parser::Browser::Vivaldi:
+    file: lib/Duadua/Parser/Browser/Vivaldi.pm
+  Duadua::Parser::Browser::Yandex:
+    file: lib/Duadua/Parser/Browser/Yandex.pm
+  Duadua::Parser::FeaturePhone::FeaturePhone:
+    file: lib/Duadua/Parser/FeaturePhone/FeaturePhone.pm
+  Duadua::Parser::HTTPClient::HTTPClient:
+    file: lib/Duadua/Parser/HTTPClient/HTTPClient.pm
+  Duadua::Util:
+    file: lib/Duadua/Util.pm
+requires:
+  Module::Pluggable::Object: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/bayashi/Duadua/issues
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/bayashi/Duadua
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

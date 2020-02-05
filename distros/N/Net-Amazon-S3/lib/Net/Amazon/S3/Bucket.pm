@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.87';
+$Net::Amazon::S3::Bucket::VERSION = '0.88';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -13,6 +13,7 @@ has 'creation_date' => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 has 'region' => (
     is => 'ro',
     lazy => 1,
+    predicate => 'has_region',
     default => sub { $_[0]->_head_region },
 );
 
@@ -432,7 +433,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -719,7 +720,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,12 +17,13 @@ BEGIN {
 note 'Functions and exports';
 
 for my $context (qw|error info input ok warn|) {
-  for my $command (qw|color print prompt say|) {
+  for my $command (qw|color password print prompt say|) {
     my $fn = "${command}_$context";
+    my $tag = $command =~ s/password/prompt/r;
     can_ok $package, $fn;
     ok grep(/$fn/, @Print::Colored::EXPORT_OK), "$fn is exported";
     ok grep(/$fn/, $Print::Colored::EXPORT_TAGS{all}->@*), "$fn is exported in :all";
-    ok grep(/$fn/, $Print::Colored::EXPORT_TAGS{$command}->@*), "$fn is exported in :$command";
+    ok grep(/$fn/, $Print::Colored::EXPORT_TAGS{$tag}->@*), "$fn is exported in :$tag";
   }
 }
 

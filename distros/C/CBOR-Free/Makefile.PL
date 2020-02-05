@@ -67,7 +67,7 @@ WriteMakefile1(
         'Test::FailWarnings' => 0,
         'Test::Deep'      => 0,
         'Test::Differences' => 0,
-        'Test::Class::Tiny' => 0,
+        'Test::Class::Tiny' => 0.02,
     },
 
     # SIGN => 1,

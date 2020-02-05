@@ -118,10 +118,24 @@ Returns _OBJ_.
 
 Gives the libunbound version string.
 
+# METHODS FOR ALTERING RESOLVER LOGIC
+
+The following parallel their equivalents in libunbound.
+They return _OBJ_ and throw errors on failure.
+
+## _OBJ_->hosts( $FILENAME )
+
+
+
+## _OBJ_->resolveconf( $FILENAME )
+
+
+
 # METHODS FOR DEALING WITH ASYNCHRONOUS QUERIES
 
 Unless otherwise noted, the following methods correspond to their
-equivalents in libunbound.
+equivalents in libunbound. They return the same values as the
+libunbound equivalents.
 
 ## _OBJ_->poll()
 
@@ -147,6 +161,8 @@ Returns the number of outstanding asynchronous queries.
 
 The following correspond to their equivalents in libunbound
 and will only work if the underlying libunbound version supports them.
+
+They return _OBJ_ and throw errors on failure.
 
 ## _OBJ_->add\_ta()
 

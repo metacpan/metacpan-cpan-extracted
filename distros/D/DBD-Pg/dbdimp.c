@@ -494,7 +494,7 @@ int dbd_db_ping (SV * dbh)
     }
 
     /* No matter what state we are in, send an empty query to the backend */
-    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.10.3 */");
+    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.10.4 */");
     status = PQresultStatus(result);
     PQclear(result);
     if (PGRES_FATAL_ERROR == status) {
@@ -2527,7 +2527,7 @@ int dbd_bind_ph (SV * sth, imp_sth_t * imp_sth, SV * ph_name, SV * newvalue, IV 
     }
 
     /* We ignore attribs for these special cases */
-    if (currph->isdefault || currph->iscurrent || is_array) {
+    if (currph->isdefault || currph->iscurrent || (is_array && !SvAMAGIC(newvalue))) {
         if (NULL == currph->bind_type) {
             imp_sth->numbound++;
             currph->bind_type = pg_type_data(PG_UNKNOWN);

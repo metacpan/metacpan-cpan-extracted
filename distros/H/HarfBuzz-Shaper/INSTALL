@@ -22,6 +22,8 @@ install that as well.
 If there is no harfbuzz library available on your distribution,
 HarfBuzz::Shaper will build its own version of the harfbuzz library.
 
+Note that this requires a suitable C++-compiler, e.g. GNU g++.
+
 Microsoft Windows
 -----------------
 
@@ -35,3 +37,5 @@ all set to go.
 
 For older (and maybe other) Perl installs HarfBuzz::Shaper will try to
 build its own version of the harfbuzz library.
+
+Note that this requires a suitable C++-compiler, e.g. GNU g++.

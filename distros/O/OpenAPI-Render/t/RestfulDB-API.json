@@ -1,0 +1,490 @@
+{
+   "components" : {
+      "parameters" : {
+         "columns" : {
+            "description" : "Comma-separated list of columns that are requested in the output",
+            "example" : "id,SolsaID",
+            "in" : "query",
+            "name" : "columns",
+            "schema" : {
+               "type" : "string"
+            }
+         },
+         "format" : {
+            "description" : "Requested return format. 'html' by default",
+            "example" : "html",
+            "in" : "query",
+            "name" : "format",
+            "schema" : {
+               "enum" : [
+                  "html",
+                  "csv",
+                  "xlsx",
+                  "json",
+                  "jsonapi"
+               ]
+            }
+         },
+         "id" : {
+            "description" : "Unique identifier of an entry. ID and UUID are supported. In principle other unique keys should work as well.",
+            "example" : "1",
+            "in" : "path",
+            "name" : "id",
+            "required" : true,
+            "schema" : {
+               "type" : "string"
+            }
+         },
+         "include" : {
+            "description" : "A comma-separated list of tables to be returned in the response. If not provided, all tables are returned. Currently only supported for spreadsheet downloads.",
+            "example" : "sample,experiment",
+            "in" : "query",
+            "name" : "include",
+            "schema" : {
+               "type" : "string"
+            }
+         },
+         "order" : {
+            "description" : "Database ordering, e.g.: 'order=revision:u,date:d'. Specifies a comma-separated list of database columns, together with a ':' delimited order specifiers ('a' == ascending, asc; 'd' == descending, desc)",
+            "example" : "order=revision:u,date:d",
+            "in" : "query",
+            "name" : "order",
+            "schema" : {
+               "type" : "string"
+            }
+         },
+         "table" : {
+            "description" : "Name of the table",
+            "example" : "books",
+            "in" : "path",
+            "name" : "table",
+            "required" : true,
+            "schema" : {
+               "type" : "string"
+            }
+         }
+      },
+      "requestBodies" : {
+         "insert_entry" : {
+            "content" : {
+               "application/json" : {},
+               "application/vnd.api+json" : {},
+               "application/x-www-form-urlencoded" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/insert_update_columns"
+                  }
+               },
+               "multipart/form-data" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/insert_update_request"
+                  }
+               }
+            },
+            "description" : "Entry without ID field(s)",
+            "required" : true
+         },
+         "update_entry" : {
+            "content" : {
+               "application/json" : {},
+               "application/vnd.api+json" : {},
+               "application/x-www-form-urlencoded" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/insert_update_columns"
+                  }
+               },
+               "multipart/form-data" : {
+                  "schema" : {
+                     "$ref" : "#/components/schemas/insert_update_request"
+                  }
+               }
+            },
+            "description" : "Entry with ID field(s)",
+            "required" : true
+         }
+      },
+      "responses" : {
+         "input_exception" : {
+            "content" : {
+               "application/json" : {},
+               "application/vnd.api+json" : {},
+               "text/html" : {}
+            },
+            "description" : "Problems with client-supplied input."
+         },
+         "insert_entry" : {
+            "content" : {
+               "application/json" : {},
+               "application/vnd.api+json" : {},
+               "text/html" : {}
+            },
+            "description" : "Entry or entries inserted successfully."
+         },
+         "update_entry" : {
+            "content" : {
+               "application/json" : {},
+               "application/vnd.api+json" : {},
+               "text/html" : {}
+            },
+            "description" : "Entry or entries updated successfully."
+         }
+      },
+      "schemas" : {
+         "insert_update_columns" : {
+            "patternProperties" : {
+               "column:.*" : {
+                  "type" : "string"
+               }
+            },
+            "type" : "object"
+         },
+         "insert_update_request" : {
+            "patternProperties" : {
+               "column:.*" : {
+                  "type" : "string"
+               }
+            },
+            "properties" : {
+               "csvfile" : {
+                  "format" : "binary",
+                  "type" : "string"
+               },
+               "jsonfile" : {
+                  "properties" : {},
+                  "type" : "object"
+               },
+               "odsfile" : {
+                  "format" : "binary",
+                  "type" : "string"
+               },
+               "spreadsheet" : {
+                  "format" : "binary",
+                  "type" : "string"
+               },
+               "xlsfile" : {
+                  "format" : "binary",
+                  "type" : "string"
+               },
+               "xlsxfile" : {
+                  "format" : "binary",
+                  "type" : "string"
+               }
+            },
+            "type" : "object"
+         }
+      }
+   },
+   "info" : {
+      "title" : "RestfulDB API",
+      "version" : "0.13.0-dev"
+   },
+   "openapi" : "3.0.2",
+   "paths" : {
+      "/{table}" : {
+         "get" : {
+            "description" : "Get list of entries",
+            "parameters" : [
+               {
+                  "description" : "Number of entries per page",
+                  "in" : "query",
+                  "name" : "rows",
+                  "schema" : {
+                     "type" : "integer"
+                  }
+               },
+               {
+                  "description" : "Offset of the first entry",
+                  "in" : "query",
+                  "name" : "offset",
+                  "schema" : {
+                     "type" : "integer"
+                  }
+               },
+               {
+                  "description" : "Filter to select entries to show",
+                  "example" : "solsaid STARTS WITH \"TEST\"",
+                  "in" : "query",
+                  "name" : "filter",
+                  "schema" : {
+                     "type" : "string"
+                  }
+               },
+               {
+                  "$ref" : "#/components/parameters/columns"
+               },
+               {
+                  "$ref" : "#/components/parameters/format"
+               },
+               {
+                  "$ref" : "#/components/parameters/order"
+               },
+               {
+                  "description" : "Specify the action. Solely used to download templates as of now with 'action=template'.",
+                  "example" : "template",
+                  "in" : "query",
+                  "name" : "action",
+                  "schema" : {
+                     "enum" : [
+                        "template"
+                     ]
+                  }
+               },
+               {
+                  "description" : "Column to perform the search.",
+                  "example" : "SolsaID",
+                  "in" : "query",
+                  "name" : "select_column",
+                  "schema" : {
+                     "type" : "string"
+                  }
+               },
+               {
+                  "description" : "Operator to perform the search with.",
+                  "example" : "eq",
+                  "in" : "query",
+                  "name" : "select_operator",
+                  "schema" : {
+                     "enum" : [
+                        "eq",
+                        "ne",
+                        "gt",
+                        "lt",
+                        "le",
+                        "ge",
+                        "contains",
+                        "starts",
+                        "ends",
+                        "known",
+                        "unknown"
+                     ]
+                  }
+               },
+               {
+                  "description" : "Search value.",
+                  "example" : "TEST-XX-0001",
+                  "in" : "query",
+                  "name" : "search_value",
+                  "schema" : {
+                     "type" : "string"
+                  }
+               },
+               {
+                  "description" : "Invert the matching.",
+                  "example" : "not",
+                  "in" : "query",
+                  "name" : "select_not_operator",
+                  "schema" : {
+                     "enum" : [
+                        "not"
+                     ]
+                  }
+               },
+               {
+                  "description" : "Combination with previously submitted query (conjunction, disjunction or new).",
+                  "example" : "new",
+                  "in" : "query",
+                  "name" : "select_combining",
+                  "schema" : {
+                     "enum" : [
+                        "new",
+                        "append",
+                        "within"
+                     ]
+                  }
+               },
+               {
+                  "$ref" : "#/components/parameters/include"
+               }
+            ],
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "application/json" : {},
+                     "application/vnd.api+json" : {},
+                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : {},
+                     "application/zip" : {},
+                     "text/csv" : {},
+                     "text/html" : {}
+                  },
+                  "description" : "All entries from a table."
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "parameters" : [
+            {
+               "$ref" : "#/components/parameters/table"
+            }
+         ],
+         "patch" : {
+            "description" : "Update entry or entries in a table",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/update_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/update_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "post" : {
+            "description" : "Insert or update entry or entries in a table",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/insert_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/insert_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "put" : {
+            "description" : "Insert entry or entries in a table",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/insert_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/insert_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         }
+      },
+      "/{table}/{id}" : {
+         "delete" : {
+            "description" : "Delete an entry",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "application/json" : {},
+                     "application/vnd.api+json" : {},
+                     "text/html" : {}
+                  },
+                  "description" : "An entry is deleted."
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "get" : {
+            "description" : "Get an entry by its ID",
+            "parameters" : [
+               {
+                  "$ref" : "#/components/parameters/format"
+               },
+               {
+                  "$ref" : "#/components/parameters/order"
+               }
+            ],
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "application/json" : {},
+                     "application/vnd.api+json" : {},
+                     "text/html" : {}
+                  },
+                  "description" : "An individual entry from a table."
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "parameters" : [
+            {
+               "$ref" : "#/components/parameters/table"
+            },
+            {
+               "$ref" : "#/components/parameters/id"
+            }
+         ],
+         "patch" : {
+            "description" : "Update an entry",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/update_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/update_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "post" : {
+            "description" : "Insert or update an entry",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/insert_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/insert_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "put" : {
+            "description" : "Insert an entry to a table",
+            "requestBody" : {
+               "$ref" : "#/components/requestBodies/insert_entry"
+            },
+            "responses" : {
+               "200" : {
+                  "$ref" : "#/components/responses/insert_entry"
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         }
+      },
+      "/{table}/{id}/{field}" : {
+         "get" : {
+            "description" : "Get a file stored in entry's field",
+            "responses" : {
+               "200" : {
+                  "content" : {
+                     "*/*" : {}
+                  },
+                  "description" : "A file."
+               },
+               "400" : {
+                  "$ref" : "#/components/responses/input_exception"
+               }
+            }
+         },
+         "parameters" : [
+            {
+               "$ref" : "#/components/parameters/table"
+            },
+            {
+               "$ref" : "#/components/parameters/id"
+            },
+            {
+               "in" : "path",
+               "name" : "field",
+               "required" : true
+            }
+         ]
+      }
+   },
+   "servers" : [
+      {
+         "url" : "https://solsa.crystallography.net/db/samples"
+      }
+   ]
+}

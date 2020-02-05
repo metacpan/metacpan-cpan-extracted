@@ -1,0 +1,9 @@
+- ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 YaBrowser/19.12.2.263.10 Mobile/15E148 Safari/604.1'
+  name: 'Yandex Browser'
+  is_bot: false
+  is_ios: true
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '19.12.2.263.10'

@@ -2,13 +2,12 @@ package Alien::Base::ModuleBuild::Repository::FTP;
 
 use strict;
 use warnings;
-
-our $VERSION = '1.08';
-
 use parent 'Alien::Base::ModuleBuild::Repository';
-
 use Carp;
 use Net::FTP;
+
+# ABSTRACT: HTTP repository handler
+our $VERSION = '1.12'; # VERSION
 
 sub connection {
   my $self = shift;
@@ -65,11 +64,11 @@ __END__
 
 =head1 NAME
 
-Alien::Base::ModuleBuild::Repository::FTP
+Alien::Base::ModuleBuild::Repository::FTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 AUTHOR
 

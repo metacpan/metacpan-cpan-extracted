@@ -6,7 +6,7 @@ XS::Framework::Manual::recipe05 - XS::Framework basics
 
 =head1 DESCRIPTION
 
-L<Alien::libpanda> offers lightweight intrusive smart pointer C<iptr>. Please,
+L<XS::libpanda> offers lightweight intrusive smart pointer C<iptr>. Please,
 referer intrusive pointer from L<Boost|http::/boost.org> library for introduction.
 The easiest way to add refcounted property to C++ class is to inherit from
 C<panda::Refcnt (1)>:

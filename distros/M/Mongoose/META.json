@@ -49,6 +49,8 @@
       },
       "test" : {
          "requires" : {
+            "Test::More" : "0",
+            "URI" : "0",
             "perl" : "5.006"
          }
       }
@@ -65,10 +67,10 @@
          "web" : "https://github.com/rodrigolive/mongoose"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.030001"
       },
       "plugins" : [
          {
@@ -172,7 +174,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -195,7 +197,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -212,12 +214,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.01",
+                  "tag" : "v2.02",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -237,7 +239,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -261,6 +263,17 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
             "config" : {
                "Dist::Zilla::Plugin::Git::NextVersion" : {
@@ -269,7 +282,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -380,7 +393,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }
 

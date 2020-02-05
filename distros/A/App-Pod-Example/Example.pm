@@ -1,10 +1,8 @@
 package App::Pod::Example;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
@@ -20,8 +18,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $HASH => q{#};
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Constructor.
 sub new {
@@ -35,7 +32,7 @@ sub new {
 
 	# Process arguments.
 	$self->{'_opts'} = {
-		'd' => 1,
+		'd' => 0,
 		'h' => 0,
 		'e' => 0,
 		'n' => undef,
@@ -150,6 +147,7 @@ App::Pod::Example - Base class for pod-example script.
 =head1 SYNOPSIS
 
  use App::Pod::Example;
+
  my $app = App::Pod::Example->new;
  $app->run;
 
@@ -177,11 +175,9 @@ App::Pod::Example - Base class for pod-example script.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::Pod::Example;
 
  # Arguments.
@@ -214,21 +210,21 @@ L<Readonly>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/App-Pod-Example>
+L<https://github.com/michal-josef-spacek/App-Pod-Example>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

@@ -161,7 +161,7 @@ $testrefs{selfrefarray}->[3]   = $testrefs{selfrefarray}->[1];
                                                 selfrefhash  => $counts{selfrefhash},
                                            },
                         'YAML'  => {
-                                                simpleobject  => $counts{simpleobject},
+                                                simpleobject  => 0,
                                                 simplescalar  => $counts{simplescalar},
                                                 simplescalarref  => $counts{simplescalarref},
                                                 trickyscalar  => $counts{trickyscalar},
@@ -174,7 +174,7 @@ $testrefs{selfrefarray}->[3]   = $testrefs{selfrefarray}->[1];
                                                 selfrefhash  => $counts{selfrefhash},
                                            },
                         'YAML::Syck'  => {
-                                                simpleobject  => $counts{simpleobject},
+                                                simpleobject  => 0,	
                                                 simplescalar  => $counts{simplescalar},
                                                 simplescalarref  => $counts{simplescalarref},
                                                 trickyscalar  => $counts{trickyscalar},

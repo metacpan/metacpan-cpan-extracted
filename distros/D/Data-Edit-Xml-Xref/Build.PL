@@ -1,3 +1,5 @@
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/ -I/home/phil/perl/cpan/DitaGBStandard/lib -I/home/phil/perl/cpan/DataEditXml/lib/
+
 use Module::Build;
 
 my $b = Module::Build->new(
@@ -11,8 +13,8 @@ my $b = Module::Build->new(
   requires              => {
      Carp               => 0,
     'Data::Dump'        => 0,
-    'Data::Edit::Xml'                => 20191119,
-    'Data::Table::Text'              => 20191110,
+    'Data::Edit::Xml'                => 20200201,
+    'Data::Table::Text'              => 20200201,
     'Dita::GB::Standard'             => 20190911,
     'Test::More'        => 0,
     'Test2::API'        => 0,

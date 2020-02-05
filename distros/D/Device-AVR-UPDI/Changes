@@ -1,5 +1,12 @@
 Revision history for Device-AVR-UPDI
 
+0.03    2020-02-04 17:42
+        [CHANGES]
+         * Sleep 100msec after opening serial port in case of 12V pulse
+         * Allow override of baud rate
+         * Don't attempt 230400 baud as it seems too unreliable on most UART
+           chips
+
 0.02    2019-11-07 22:06:13
         [CHANGES]
          * Move commands into one big wrapper script

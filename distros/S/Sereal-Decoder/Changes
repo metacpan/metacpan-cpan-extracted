@@ -5,7 +5,18 @@ Revision history for Perl extension Sereal-Decoder
 *          of the decoder before upgrading to version 4 of the *
 *          encoder!                                            *
 ****************************************************************
-4.008 Weds Jan 30, 2020
+4.011 Tues February 4, 2020
+    * Fix and test custom opcode logic for 5.31.2 and later.
+
+4.010 Tues February 4, 2020
+    * Update miniz
+    * Update zstd
+    * perltidy perl code to a standard style
+
+4.009 Fri January 31, 2020
+    * Update ppport.h for modern perls.
+
+4.008 Thurs Jan 30, 2020
     * Build fixes for modern perls.
     * Pod fixes
 

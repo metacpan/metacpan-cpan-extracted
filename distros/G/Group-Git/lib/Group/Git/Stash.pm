@@ -17,7 +17,7 @@ use JSON qw/decode_json/;
 use WWW::Mechanize;
 use Path::Tiny;
 
-our $VERSION = version->new('0.7.2');
+our $VERSION = version->new('0.7.3');
 
 extends 'Group::Git';
 
@@ -43,7 +43,7 @@ sub _mech {
             cache => CHI->new(
                 driver     => 'File',
                 root_dir   => $self->conf->{cache_dir},
-                expires_in => '30 min',
+                expires_in => '60 min',
             ),
         );
     }
@@ -76,9 +76,14 @@ sub _repos {
     my $start = 0;
     my $more  = 1;
     @ARGV = @argv;
+    my %exclude = map {$_ => 1} @{ $self->{conf}{'exclude-tags'} || [] };
 
     while ($more) {
         $mech->get( $url . $start );
+        if ( $mech->status != 200 ) {
+            warn 'Error (', $mech->status, ") accessing $url$start\n";
+            last;
+        }
         my $response = eval { decode_json $mech->content };
         if ( !$response ) {
             die $@ || "Error occured processing stash server response\n";
@@ -96,6 +101,8 @@ sub _repos {
             my ($dir)   = $self->recurse ? $git =~ m{([^/]+/[^/]+?)(?:[.]git)?$} : $git =~ m{/([^/]+?)(?:[.]git)?$};
             my $name    = $self->recurse ? path("$project/$repo->{name}") : path($repo->{name});
             $dir =~ s/^~//xms;
+            next if $exclude{$repo->{project}{owner} ? 'personal' : 'project'};
+            next if $self->{conf}{skip} && $project =~ /$self->{conf}{skip}/;
 
             $repos{$dir} = Group::Git::Repo->new(
                 name => path($dir),
@@ -116,7 +123,7 @@ sub _repos {
                 push @{ $conf->{tags}{project} }, "$dir";
             }
         }
-        $more  = !$response->{isLastPage};
+        last if $response->{isLastPage};
         $start = $response->{nextPageStart};
     }
 
@@ -133,7 +140,7 @@ Group::Git::Stash - Adds reading all repositories you have access to on your loc
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Stash version 0.7.2.
+This documentation refers to Group::Git::Stash version 0.7.3.
 
 =head1 SYNOPSIS
 

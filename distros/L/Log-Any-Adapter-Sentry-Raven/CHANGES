@@ -1,0 +1,65 @@
+==================================================
+Changes from 2019-02-03 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.0.1 at 2020-02-03 18:01:47 +0000
+-------------------------------------------
+
+  Change: 5a36e232cfbc3419f87f2aa3f72c223be3c3617f
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-01-31 10:23:29 +0000
+
+    Run make update 
+
+  Change: b0a6b8e34a37068ecaf375702d51f277543271fa
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2020-01-21 16:11:16 +0000
+
+    Update README 
+
+  Change: 730a32fe10e07045a931fe6a90d4ac7dc6ba9af2
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-27 09:37:10 +0000
+
+    Log::Any context = Sentry tags 
+
+  Change: ccb5fe47da30a6897de741d4ac338e4d8bc8ede9
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-27 09:16:38 +0000
+
+    cpanfile updates 
+
+  Change: 2516c1488557e66a2802c8ed0fd1f65bd8555986
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-26 10:18:44 +0000
+
+    Add tests 
+
+  Change: 9d0d8c9a576366ea56b8a314bbab5ef229753c12
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-26 09:48:11 +0000
+
+    cpanfile for new adapter 
+
+  Change: 766a18070c765fa9d084f40bea30a05fe543b873
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-26 09:48:11 +0000
+
+    Add Sentry adapter 
+
+  Change: 674c6796aeb827d6eb6729e1e3b036b86876e0eb
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-23 10:06:13 +0000
+
+    Create distribution files 
+
+  Change: 2b6624304f17cf485eaf246ecf91c2d64747d23a
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-12-23 09:43:34 +0000
+
+    Initial Commit 
+
+================
+End of releases.
+================

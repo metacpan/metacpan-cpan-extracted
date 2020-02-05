@@ -65,7 +65,7 @@ sub _build__smtp ($self) {
     } );
 }
 
-sub sendmail ( $self, $to, $bcc, $subject, $body ) {
+sub sendmail ( $self, $to, $subject, $body, %args ) {
     my $smtp = $self->_smtp;
 
     my $res;
@@ -75,12 +75,12 @@ sub sendmail ( $self, $to, $bcc, $subject, $body ) {
     }
     else {
         $res = $smtp->sendmail(
-            from     => $smtp->{username},
-            reply_to => $smtp->{username},
-            to       => $to,
-            bcc      => $bcc,
-            subject  => $subject,
-            body     => $body
+            from     => $args{from}     || $smtp->{username},
+            reply_to => $args{reply_to} || $args{from} || $smtp->{username},
+            to      => $to,
+            bcc     => $args{bcc},
+            subject => $subject,
+            body    => $body
         );
     }
 

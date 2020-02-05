@@ -1,10 +1,8 @@
 package CGI::Pure::Save;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
@@ -14,8 +12,7 @@ use URI::Escape;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -87,6 +84,7 @@ CGI::Pure::Save - Common Gateway Interface Class for loading/saving object in fi
 =head1 SYNOPSIS
 
  use CGI::Pure::Save;
+
  my $cgi = CGI::Pure::Save->new(%parameters);
  $cgi->save($fh);
  $cgi->load($fh);
@@ -134,11 +132,9 @@ CGI::Pure::Save - Common Gateway Interface Class for loading/saving object in fi
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use CGI::Pure;
  use CGI::Pure::Save;
  use File::Temp qw(tempfile);
@@ -178,11 +174,9 @@ CGI::Pure::Save - Common Gateway Interface Class for loading/saving object in fi
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use CGI::Pure;
  use CGI::Pure::Save;
  use IO::Barf qw(barf);
@@ -259,11 +253,11 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2004-2018 Michal Josef Špaček
+ © 2004-2020 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

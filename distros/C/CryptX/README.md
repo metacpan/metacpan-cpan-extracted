@@ -1,12 +1,10 @@
 # NAME
 
-CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
+CryptX - Cryptographic toolkit
 
 # DESCRIPTION
 
-Cryptography in CryptX is based on [https://github.com/libtom/libtomcrypt](https://github.com/libtom/libtomcrypt)
-
-Available modules:
+Perl modules providing a cryptography based on [LibTomCrypt](https://github.com/libtom/libtomcrypt) library.
 
 - Symmetric ciphers - see [Crypt::Cipher](https://metacpan.org/pod/Crypt::Cipher) and related modules
 
@@ -50,7 +48,7 @@ Available modules:
 
 - Public key cryptography
 
-    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt::PK::RSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt::PK::DSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt::PK::DH)
+    [Crypt::PK::RSA](https://metacpan.org/pod/Crypt::PK::RSA), [Crypt::PK::DSA](https://metacpan.org/pod/Crypt::PK::DSA), [Crypt::PK::ECC](https://metacpan.org/pod/Crypt::PK::ECC), [Crypt::PK::DH](https://metacpan.org/pod/Crypt::PK::DH), [Crypt::PK::Ed25519](https://metacpan.org/pod/Crypt::PK::Ed25519), [Crypt::PK::X25519](https://metacpan.org/pod/Crypt::PK::X25519)
 
 - Cryptographically secure random number generators - see [Crypt::PRNG](https://metacpan.org/pod/Crypt::PRNG) and related modules
 
@@ -70,4 +68,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 # COPYRIGHT
 
-Copyright (c) 2013+ DCIT, a.s. [https://www.dcit.cz](https://www.dcit.cz) / Karel Miko
+Copyright (c) 2013-2020 DCIT, a.s. [https://www.dcit.cz](https://www.dcit.cz) / Karel Miko

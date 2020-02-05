@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use JSON::PP;
 plan skip_all => 'JSON required for this test' if $@;
-my $file = "$Bin/../data/small_test.fa";
+my $file = "$RealBin/../data/small_test.fa";
 
 SKIP: {
 	skip "missing input file" unless (-e "$file");

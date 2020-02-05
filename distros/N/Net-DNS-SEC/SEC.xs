@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1758 2019-10-14 13:17:11Z willem $"
+#define XS_Id "$Id: SEC.xs 1763 2020-02-02 21:48:03Z willem $"
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
 
-Copyright (c)2018,2019 Dick Franks
+Copyright (c)2018-2020 Dick Franks
 
 All Rights Reserved
 
@@ -99,6 +99,7 @@ extern "C" {
 
 #if (OPENSSL_VERSION_NUMBER < 0x10101000)
 #define NO_EdDSA
+#define NO_SHA3
 
 #define EC_POINT_set_affine_coordinates	EC_POINT_set_affine_coordinates_GFp
 
@@ -201,21 +202,6 @@ VERSION(void)
 
 ####	EVP	####
 
-const EVP_MD*
-EVP_md5()
-
-const EVP_MD*
-EVP_sha1()
-
-const EVP_MD*
-EVP_sha256()
-
-const EVP_MD*
-EVP_sha384()
-
-const EVP_MD*
-EVP_sha512()
-
 EVP_PKEY*
 EVP_PKEY_new()
 
@@ -253,6 +239,74 @@ EVP_verify(SV *message, SV *signature, EVP_PKEY *pkey, const EVP_MD *md=NULL)
 	EVP_PKEY_free(pkey);
     OUTPUT:
 	RETVAL
+
+
+EVP_MD_CTX*
+EVP_MD_CTX_new()
+
+void
+EVP_MD_CTX_free(EVP_MD_CTX *ctx)
+
+void
+EVP_DigestInit(EVP_MD_CTX *ctx, const EVP_MD *type)
+    CODE:
+	checkerr( EVP_DigestInit( ctx, type ) );
+
+void
+EVP_DigestUpdate(EVP_MD_CTX *ctx, SV *message)
+    INIT:
+	unsigned char *m = (unsigned char*) SvPVX(message);
+	unsigned int mlen = SvCUR(message);
+    CODE:
+	checkerr( EVP_DigestUpdate( ctx, m, mlen ) );
+
+SV*
+EVP_DigestFinal(EVP_MD_CTX *ctx)
+    INIT:
+	unsigned char digest[EVP_MAX_MD_SIZE];
+	unsigned int size = sizeof(digest);
+	const EVP_MD *type = EVP_MD_CTX_md( ctx );
+    CODE:
+	checkerr( EVP_DigestFinal( ctx, digest, &size ) );
+	checkerr( EVP_DigestInit( ctx, type ) );	/* reinitialise; behave like Digest::SHA */
+	RETVAL = newSVpvn( (char*)digest, size );
+    OUTPUT:
+	RETVAL
+
+
+const EVP_MD*
+EVP_md5()
+
+const EVP_MD*
+EVP_sha1()
+
+const EVP_MD*
+EVP_sha224()
+
+const EVP_MD*
+EVP_sha256()
+
+const EVP_MD*
+EVP_sha384()
+
+const EVP_MD*
+EVP_sha512()
+
+
+#ifndef NO_SHA3
+const EVP_MD*
+EVP_sha3_224()
+
+const EVP_MD*
+EVP_sha3_256()
+
+const EVP_MD*
+EVP_sha3_384()
+
+const EVP_MD*
+EVP_sha3_512()
+
+#endif
 
 
 ####	DSA	####
@@ -472,6 +526,12 @@ ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
 #endif
 
 ####################
+
+void
+checkerr(int ret)
+    CODE:
+	checkerr(ret);
+
 
 #ifdef croak_memory_wrap
 void

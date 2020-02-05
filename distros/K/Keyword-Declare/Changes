@@ -163,3 +163,13 @@ Revision history for Keyword-Declare
       include sub-captures (no longer inserts extra sub-capture values
       into the array)
 
+
+
+0.001016  Wed Feb  5 00:04:08 2020
+
+    * Fixed doc example and added more explicit documentation showing
+      how to detect missing optional parameters. The behaviour of 
+      missing optional parameters changed in the previous release,
+      but the suggested detection mechanism is backwards compatible.
+      (Sorry, Christopher!)
+

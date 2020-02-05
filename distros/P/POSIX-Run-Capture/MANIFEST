@@ -20,6 +20,7 @@ runcap/install-sh
 runcap/install.am
 runcap/Make.am
 runcap/missing
+runcap/read.c
 runcap/README
 runcap/runcap.3
 runcap/runcap.c
@@ -35,11 +36,15 @@ runcap/t/INPUT
 runcap/t/linemon00.at
 runcap/t/linemon01.at
 runcap/t/linemon02.at
+runcap/t/linemon03.at
 runcap/t/lines.at
 runcap/t/longout.at
 runcap/t/Makefile.am
 runcap/t/Makefile.in
+runcap/t/nocap.at
 runcap/t/pipe.at
+runcap/t/read.at
+runcap/t/redirect.at
 runcap/t/rt.c
 runcap/t/seek00.at
 runcap/t/seek01.at
@@ -57,6 +62,7 @@ t/06lines.t
 t/07two.t
 t/08input.t
 t/09linemon.t
+t/10file.t
 t/TestCapture.pm
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

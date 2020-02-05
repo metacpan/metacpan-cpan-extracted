@@ -25,35 +25,35 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
-            "Alien::libpanda" : "v1.3.6",
-            "Test::Catch" : "v1.0.11",
-            "XS::Install" : "v1.2.12",
+            "Test::Catch" : "v1.0.13",
+            "XS::Install" : "v1.2.13",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.9",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::libpanda" : "v1.3.6",
-            "XS::Install" : "v1.2.12",
+            "XS::Install" : "v1.2.13",
+            "XS::libpanda" : "v1.3.9",
             "next::XS" : "v1.0.7",
             "perl" : "5.018000"
          }
       },
       "test" : {
          "requires" : {
-            "Alien::catch" : "v1.1.0",
-            "Alien::libpanda" : "v1.3.6",
-            "Test::Catch" : "v1.0.11",
+            "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
+            "XS::libcatch" : "v1.1.0",
+            "XS::libpanda" : "v1.3.9",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.4",
+   "version" : "v1.2.5",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

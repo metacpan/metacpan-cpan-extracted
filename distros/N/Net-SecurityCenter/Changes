@@ -1,5 +1,12 @@
 Revision history for Net::SecurityCenter
 
+0.205 2020/01/31
+    - Added new Net::SecurityCenter::API::ScanResult methods
+        - import
+        - reimport
+        - email
+    - Improved Net::SecurityCenter::API::ScanResult->stop method (added "type=>import")
+
 0.204 2019/11/06
     - Removed "List::Util" dependency (fix Bug #130874)
 

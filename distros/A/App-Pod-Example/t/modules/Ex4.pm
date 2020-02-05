@@ -1,6 +1,5 @@
 package Ex4;
 
-# Version.
 our $VERSION = 0.01;
 
 1;
@@ -9,11 +8,9 @@ our $VERSION = 0.01;
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Die qw(err);
 
  # Error.

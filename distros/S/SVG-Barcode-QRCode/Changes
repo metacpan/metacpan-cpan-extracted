@@ -1,19 +1,23 @@
 Revision history for perl distribution SVG-Barcode-QRCode
 
+0.12 2020-01-31T18:38:39+0100
+  - Pod reorganized
+  - Code reformatted
+
 0.11 2019-05-28T17:22:08+0200
- - Upgrade to SVG::Barcode 0.11 with scale parameter
+  - Upgrade to SVG::Barcode 0.11 with scale parameter
 
 0.10 2019-05-26T06:28:14+0200
- BREAKING CHANGES
- - Require SVG::Barcode 0.10
- - Change parameters to methods
- - Rename parameter size to dotsize
+  BREAKING CHANGES
+  - Require SVG::Barcode 0.10
+  - Change parameters to methods
+  - Rename parameter size to dotsize
 
 0.03 2019-05-24T15:18:49+0200
- - Require SVG::Barcode 0.03 to solve issue with default version 0
+  - Require SVG::Barcode 0.03 to solve issue with default version 0
 
 0.02 2019-05-23T08:27:40+0200
- - Use utilities from SVG::Barcode
+  - Use utilities from SVG::Barcode
 
 0.01 2019-05-22T13:51:37+0200
- - First version
+  - First version

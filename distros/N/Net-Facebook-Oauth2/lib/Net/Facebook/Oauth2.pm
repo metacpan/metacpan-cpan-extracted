@@ -8,14 +8,14 @@ use URI::Escape;
 use JSON::MaybeXS;
 use Carp;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub new {
     my ($class,%options) = @_;
     my $self = {};
     $self->{options} = \%options;
 
-    my $api_version = defined $options{api_version} ? $options{api_version} : 'v3.1';
+    my $api_version = defined $options{api_version} ? $options{api_version} : 'v4.0';
 
     if (!defined $options{access_token}){
         croak "You must provide your application id in new()\nNet::Facebook::Oauth2->new( application_id => '...' )" unless defined $self->{options}->{application_id};
@@ -261,8 +261,8 @@ Net::Facebook::Oauth2 - a simple Perl wrapper around Facebook OAuth 2.0 protocol
 
 =head1 FACEBOOK GRAPH API VERSION
 
-This module complies to Facebook Graph API version 3.1, the latest
-at the time of publication, B<< scheduled for deprecation not sooner than July 26th, 2020 >>.
+This module complies to Facebook Graph API version 4.0, the latest
+at the time of publication, B<< scheduled for deprecation not sooner than August 3rd, 2021 >>.
 
 =head1 SYNOPSIS
 
@@ -327,7 +327,7 @@ of this user:
     );
 
     my $info = $fb->get(
-        'https://graph.facebook.com/v3.1/me'   # Facebook API URL
+        'https://graph.facebook.com/v4.0/me'   # Facebook API URL
     );
 
     print $info->as_json;
@@ -399,22 +399,22 @@ See C<display> under the C<get_authorization_url> method below.
 =item * C<api_version>
 
 Use this to replace the API version on all endpoints. The default
-value is 'v3.1'. Note that defining an api_version parameter together with
+value is 'v4.0'. Note that defining an api_version parameter together with
 C<authorize_url>, C<access_token_url> or C<debug_token_url> is a fatal error.
 
 =item * C<authorize_url>
 
-Overrides the default (3.1) API endpoint for Facebook's oauth.
+Overrides the default (4.0) API endpoint for Facebook's oauth.
 Used mostly for testing new versions.
 
 =item * C<access_token_url>
 
-Overrides the default (3.1) API endpoint for Facebook's access token.
+Overrides the default (4.0) API endpoint for Facebook's access token.
 Used mostly for testing new versions.
 
 =item * C<debug_token_url>
 
-Overrides the default (3.1) API endpoint for Facebook's token information.
+Overrides the default (4.0) API endpoint for Facebook's token information.
 Used mostly for testing new versions.
 
 =back
@@ -571,7 +571,7 @@ are encoded. You can expect that they will grow and shrink over time.
 Please use a variable length data type without a specific maximum size to
 store access tokens.
 
-=head2 C<$fb-E<gt>get_long_lived_token( access_token =E<gt> $access_token )
+=head2 C<$fb-E<gt>get_long_lived_token( access_token =E<gt> $access_token )>
 
 Asks facebook to retrieve the long-lived (~60d) version of the provided
 short-lived (~2h) access token retrieved from C<get_access_token()>. If
@@ -694,7 +694,7 @@ Big Thanks To
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2016 by Mahmoud A. Mehyar
+Copyright (C) 2012-2019 by Mahmoud A. Mehyar
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

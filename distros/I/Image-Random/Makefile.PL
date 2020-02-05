@@ -1,13 +1,18 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Perl class for creating random image.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
+author_requires 'English' => 0;
+author_requires 'File::Object' => 0.05;
+author_requires 'Test::More' => 0;
+author_requires 'Test::NoWarnings' => 0;
+author_requires 'Test::Pod' => 0;
+author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
 name 'Image-Random';
 readme_from 'Random.pm';
@@ -20,16 +25,16 @@ requires 'List::MoreUtils' => 0;
 requires 'perl' => '5.6.0';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=Image-Random';
-resources 'homepage' => 'https://github.com/tupinek/Image-Random';
-resources 'repository' => 'git://github.com/tupinek/Image-Random';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Image-Random';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Image-Random';
 test_requires 'English' => 0;
 test_requires 'File::Object' => 0.05;
+test_requires 'Filesys::POSIX' => 0;
+test_requires 'Filesys::POSIX::Mem' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
-test_requires 'Test::Pod' => 0;
-test_requires 'Test::Pod::Coverage' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

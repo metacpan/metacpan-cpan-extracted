@@ -106,7 +106,7 @@ just satisfies the Promises/A+ convention.
 
 # MEMORY LEAK DETECTION
 
-Any promise created while `$Promise::ES6::DETECT_MEMORY_LEAKS` is truthy
+Any promise created while `$Promise::XS::DETECT_MEMORY_LEAKS` is truthy
 will throw a warning if it survives until global destruction.
 
 # SUBCLASSING
@@ -131,6 +131,7 @@ Windows. There may be a workaround possible, but none is implemented for now.
 # SEE ALSO
 
 Besides [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises) and [Promises](https://metacpan.org/pod/Promises), you may like [Promise::ES6](https://metacpan.org/pod/Promise::ES6),
-which mimics ECMAScript’s `Promise` class as much as possible. It can even
-(experimentally) use this module as a backend, so it’ll be
-_almost_—but not quite—as fast as using this module directly.
+which mimics [ECMAScript’s “Promise” class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) as much as possible.
+It can even
+(experimentally) use this module as a backend, which helps but is still
+significantly slower than using this module directly.

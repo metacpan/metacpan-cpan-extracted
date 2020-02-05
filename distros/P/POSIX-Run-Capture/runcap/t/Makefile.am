@@ -1,5 +1,5 @@
 # This file is part of runcap testsuite.
-# Copyright (C) 2017 Sergey Poznyakoff
+# Copyright (C) 2017-2020 Sergey Poznyakoff
 #
 # Runcap is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -47,9 +47,13 @@ TESTSUITE_AT = \
   longout.at\
   stdin.at\
   pipe.at\
+  read.at\
   linemon00.at\
   linemon01.at\
   linemon02.at\
+  linemon03.at\
+  nocap.at\
+  redirect.at\
   seek00.at\
   seek01.at
 # Add more files here

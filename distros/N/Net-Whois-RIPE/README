@@ -2,8 +2,9 @@ Net::Whois::RIPE
 
 A pure-perl programming interface to the RIPE Database Whois service.
 
-This is a complete rewrite of the old version of the module I inherited from
-Paul Gampe. It incorporates new concepts I've learned while I worked at the
+This is an evolution of the module I inherited from Luis Motta Campos.
+Which was a complete rewrite of the old version of the module inherited from
+Paul Gampe. It incorporated new concepts Luis have learned while working at the
 RIPE NCC between Nov 2007 and Jan 2010. 
 
 I've strived to maintain backward compatibility while providing a modern perl
@@ -38,11 +39,21 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/Net-Whois-RIPE
 
+AUTHORS
 
-COPYRIGHT AND LICENCE
+Arnaud Assad
+Luis Motta Campos
+Paul Gampe
+Kevin Backer
 
+LICENCE
+
+Copyright (C) 2012-2020 Arnaud ASSAD
 Copyright (C) 2010 Luis Motta Campos
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
+THANKS
+
+Thanks to DOOLTA (https://www.doolta.com) for sponsoring the maintenance of this module.

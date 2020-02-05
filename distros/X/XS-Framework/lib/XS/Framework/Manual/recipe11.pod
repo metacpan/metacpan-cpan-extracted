@@ -28,7 +28,7 @@ in C++ class the C<intrusive_ref_counter> is shipped: your class just
 have to inherit from it, and the counter and the operations will appear
 in the C++ class.
 
-The L<Alien::libpanda> already ships the C<Refcnt> / C<iptr> with the
+The L<XS::libpanda> already ships the C<Refcnt> / C<iptr> with the
 similar to boost's intrusive pointer policy. Let's show how to use it
 
     struct TimezoneRecipe11: public panda::Refcnt {
@@ -121,7 +121,7 @@ defined for it:
     std::uint32_t refcnt_get(MyClass*);
 
 Short summary: if C++ API offers shared ownership on objects, then it is friendly
-for integration into scripting languages. L<Alien::libpanda> ships C<Refcnt>
+for integration into scripting languages. L<XS::libpanda> ships C<Refcnt>
 and C<iptr> helpers following intrusive refcounter approach. C<ObjectTypeRefcntPtr>
 lifetime policy for C<TypemapObject> helps to adopt refcounted objects into Perl.
 
@@ -129,4 +129,4 @@ lifetime policy for C<TypemapObject> helps to adopt refcounted objects into Perl
 
 L<https://www.boost.org/>
 
-L<Alien::libpanda>
+L<XS::libpanda>

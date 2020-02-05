@@ -1,36 +1,63 @@
-SYNOPSIS
+NAME
+    HTTP::Headers::Patch::DontUseStorable - (DEPRECATED) Do not use Storable
 
+VERSION
+    This document describes version 0.060 of
+    HTTP::Headers::Patch::DontUseStorable (from Perl distribution
+    HTTP-Headers-Patch-DontUseStorable), released on 2020-02-03.
+
+SYNOPSIS
      use HTTP::Headers::Patch::DontUseStorable;
 
 DESCRIPTION
+    UPDATE 2020-02-03: As of Storable 3.08, freeze/thaw/dclone support
+    Regexp objects. I'm deprecating this module.
 
     HTTP::Headers (6.11 as of this writing) tries to load Storable (2.56 as
     of this writing) and use its dclone() method. Since Storable still does
     not support serializing Regexp objects, HTTP::Headers/HTTP::Message
     croaks when fed data with Regexp objects.
 
-    This patch avoids using Storable and clone using the alternative
-    method.
+    This patch avoids using Storable and clone using the alternative method.
 
 FAQ
-
- Is this a bug with HTTP::Headers? Why don't you submit a bug to
- HTTP-Message?
-
+  Is this a bug with HTTP::Headers? Why don't you submit a bug to HTTP-Message?
     I tend not to think this is a bug with HTTP::Headers; after all,
-    Storable's dclone() is a pretty standard way to clone data in Perl.
-    This patch is more of a workaround for current Storable's deficiencies.
+    Storable's dclone() is a pretty standard way to clone data in Perl. This
+    patch is more of a workaround for current Storable's deficiencies.
 
- Shouldn't you add STORABLE_{freeze,thaw} methods to Regexp instead?
-
+  Shouldn't you add STORABLE_{freeze,thaw} methods to Regexp instead?
     This no longer works with newer Perls (5.12 and later).
 
- Why would an HTTP::Headers object contain a Regexp object in the first
- place? Shouldn't it only contain strings (and arrays/hashes of strings)?
-
+  Why would an HTTP::Headers object contain a Regexp object in the first place? Shouldn't it only contain strings (and arrays/hashes of strings)?
     True. This might be a bug with the client code (e.g. in my module which
     uses this patch, Finance::Bank::ID::Mandiri). I haven't investigated
     further though and this is the stop-gap solution.
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Headers-Patch-DontUseStorable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Headers-Patch-DontUseStorable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Headers-Patch-Do
+    ntUseStorable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017, 2015, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

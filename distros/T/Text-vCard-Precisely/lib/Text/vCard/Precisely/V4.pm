@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V4;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -80,7 +80,7 @@ SAME as 3.0
 override '_parse_param' => sub {
     my ( $self, $content ) = @_;
     my $ref = super();
-    $ref->{media_type} = $content->{param}{MEDIATYPE} if $content->{param}{MEDIATYPE};
+    $ref->{'media_type'} = $content->{'param'}{'MEDIATYPE'} if $content->{'param'}{'MEDIATYPE'};
     return $ref;
 };
 
@@ -109,17 +109,17 @@ sub as_string {
     my $str = $self->_header();
     $str .= $self->_make_types(@types);
 
-    $str .= 'KIND:' . $self->kind . $cr if $self->kind;
-    $str .= 'BDAY:' . $self->bday . $cr if $self->bday;
-    $str .= 'ANNIVERSARY:' . $self->anniversary . $cr if $self->anniversary;
-    $str .= 'GENDER:' . $self->gender . $cr if $self->gender;
-    $str .= 'UID:' . $self->uid . $cr if $self->uid;
-    $str .= join '', @{ $self->member || [] } if $self->member;
-    map { $str .= "CLIENTPIDMAP:$_" . $cr } @{ $self->clientpidmap || [] } if $self->clientpidmap;
+    $str .= 'KIND:' . $self->kind() . $cr if $self->kind();
+    $str .= 'BDAY:' . $self->bday() . $cr if $self->bday();
+    $str .= 'ANNIVERSARY:' . $self->anniversary() . $cr if $self->anniversary();
+    $str .= 'GENDER:' . $self->gender() . $cr if $self->gender();
+    $str .= 'UID:' . $self->uid() . $cr if $self->uid();
+    $str .= join '', @{ $self->member() } if $self->member();
+    map { $str .= "CLIENTPIDMAP:$_" . $cr } @{ $self->clientpidmap() } if $self->clientpidmap();
 
     $str .= $self->_footer();
     $str = $self->_fold($str);
-    return decode( $self->encoding_out, $str ) unless $self->encoding_out eq 'none';
+    return decode( $self->encoding_out(), $str ) unless $self->encoding_out() eq 'none';
     return $str;
 }
 
@@ -538,10 +538,6 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 =item
 
 L<Text::vCard::Precisely::V3 on GitHub|https://github.com/worthmine/Text-vCard-Precisely/blob/master/lib/Text/vCard/Precisely/V3.pm>
-
-=item
-
-L<Text::vCard::Precisely::V3 on CPAN|http://search.cpan.org/~worthmine/Text-vCard-Precisely-0.04/lib/Text/vCard/Precisely/V3.pm>
 
 =item
 

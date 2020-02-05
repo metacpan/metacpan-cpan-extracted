@@ -230,6 +230,7 @@ sub new {
     my ( $attribute, $block, $object, @results, $value );
 
     for my $line (@lines) {
+        next if !defined($line);
 
         if ( $line =~ /^%(\S+)/ ) {
 

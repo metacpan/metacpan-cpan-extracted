@@ -37,14 +37,10 @@ use Test::More tests => 3;
      is( vsprintf( "%5s", 'ぱ'), '   ぱ', 'ぱ' );
 }
 
- WORKING:
 {
-    local $TODO = "Japanese combining character.";
-
     is( vsprintf( "%5s", "$h{HA}$m{CM}" ),
 	"   $h{HA}$m{CM}",
 	'は + ゜');
-
 }
 
  TODO:

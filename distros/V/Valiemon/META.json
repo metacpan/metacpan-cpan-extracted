@@ -4,7 +4,7 @@
       "pokutuna <popopopopokutuna@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "mit"
    ],
@@ -36,7 +36,7 @@
             "Software::License" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -65,7 +65,7 @@
    "provides" : {
       "Valiemon" : {
          "file" : "lib/Valiemon.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Valiemon::Attributes" : {
          "file" : "lib/Valiemon/Attributes.pm"
@@ -166,12 +166,14 @@
          "web" : "https://github.com/pokutuna/p5-Valiemon"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
-      "tarao <tarao.gnn@gmail.com>",
+      "Windymelt <windymelt@3qe.us>",
       "aereal <aereal@aereal.org>",
+      "astj <asato.wakisaka@gmail.com>",
       "hitode909 <hitode909@gmail.com>",
-      "astj <asato.wakisaka@gmail.com>"
+      "tarao <tarao.gnn@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
 }

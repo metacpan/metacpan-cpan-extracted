@@ -9,10 +9,11 @@
 
 struct line_closure
 {
-	char *str;
-	size_t len;
-	size_t size;
-	SV *cv;
+	char *str;    /* Line buffer */
+	size_t len;   /* Length of the collected line in buffer */
+	size_t size;  /* Line buffer size */
+	SV *cv;       /* Ref to Perl callback sub or file handle */
+	int fd;       /* Close this descriptor at destroy, unless -1 */
 };
 
 struct capture {

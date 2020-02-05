@@ -132,7 +132,7 @@ sub test_value
 
     local $dbh->{RaiseError} = 1;
     my $max = 60001;
-    $max = 120001 if ($type == SQL_WLONGVARCHAR);
+    $max = 120001 if ($type == SQL_WLONGVARCHAR || $dbh->{odbc_has_unicode});
     local $dbh->{LongReadLen} = $max;
 
     my $row = $dbh->selectall_arrayref(q/select a from DBD_ODBC_drop_me/);

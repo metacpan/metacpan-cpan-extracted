@@ -1,5 +1,5 @@
 {
-   "abstract" : "Brotli compression library.",
+   "abstract" : "[deprecated] Brotli compression library.",
    "author" : [
       "unknown"
    ],
@@ -25,13 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::cmake3" : "0.04",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "test" : {
@@ -43,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.7.6",
+   "version" : "v1.0.7.7",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

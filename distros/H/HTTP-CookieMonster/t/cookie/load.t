@@ -3,9 +3,8 @@
 use strict;
 use warnings;
 
+use HTTP::CookieMonster::Cookie ();
 use Test::More;
-
-use HTTP::CookieMonster::Cookie;
 
 my $cookie = HTTP::CookieMonster::Cookie->new(
     version   => 0,
@@ -22,8 +21,5 @@ my $cookie = HTTP::CookieMonster::Cookie->new(
 );
 
 isa_ok( $cookie, 'HTTP::CookieMonster::Cookie' );
-
-diag 'val: ' . $cookie->val;
-diag 'key: ' . $cookie->key;
 
 done_testing();

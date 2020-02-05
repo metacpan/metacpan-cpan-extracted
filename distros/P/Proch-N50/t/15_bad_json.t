@@ -2,11 +2,11 @@ use 5.012;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use JSON::PP;
 use Data::Dumper;
 plan skip_all => 'JSON required for this test' if $@;
-my $file = "$Bin/../data/small_test.fa_bad_file";
+my $file = "$RealBin/../data/small_test.fa_bad_file";
 
 SKIP: {
 	skip "found but unwanted input file" if (-e "$file");

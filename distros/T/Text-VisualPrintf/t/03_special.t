@@ -33,7 +33,7 @@ sub ctrls {
     join '', @seq;
 };
 
-my $longseq = ctrls(5, 4);
+my $longseq = ctrls(5, 3);
 is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
     "$longseq(   壱)",
     'Long binary format.');
@@ -53,20 +53,42 @@ is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
 	'truncation. (ASCII)');
 }
 
- TODO:
 {
-    local $TODO = "Truncation (Half-width KANA)";
-    is( Text::VisualPrintf::sprintf("%.4s", "ｱｲｳｴｵ"),
-	"ｱｲｳｴ",
+    is( Text::VisualPrintf::sprintf("%.3s", "ｱｲｳｴｵ"),
+	"ｱｲｳ",
 	'truncation. (Half-width KANA)');
+}
+
+{
+    is( Text::VisualPrintf::sprintf("%.4s", "一二三"),
+	"一二",
+	'truncation. (Kanji)');
+}
+
+{
+    is( Text::VisualPrintf::sprintf("%.3s", "一二三"),
+	"一 ",
+	'truncation. (Kanji with padding)');
+}
+
+{
+    is( Text::VisualPrintf::sprintf("%.3s", "一23"),
+	"一2",
+	'truncation. (Kanji + ASCII)');
 }
 
  TODO:
 {
-    local $TODO = "Truncation";
-    is( Text::VisualPrintf::sprintf("%.4s", "一二三"),
-	"一二",
-	'truncation. (Kanji)');
+    local $TODO = "Truncation to 1 (Half-width KANA)";
+    is( Text::VisualPrintf::sprintf("%.1s", "ｱｲｳ"),
+	"ｱ",
+	'truncation. (1 byte)');
+}
+
+{
+    is( Text::VisualPrintf::sprintf("%.2s", "ｱイウ"),
+	"ｱ ",
+	'truncation. (Half-width with padding)');
 }
 
  TODO:

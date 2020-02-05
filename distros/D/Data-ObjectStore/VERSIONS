@@ -1,3 +1,5 @@
+2.13 - updated permissions in t/OLDVERSIONDB so that test
+       scripts dont barf.
 2.12 - make build depend on version 6.04 of Data::RecordStore
 
 2.11 - fix test.

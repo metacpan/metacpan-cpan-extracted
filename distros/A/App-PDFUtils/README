@@ -1,7 +1,131 @@
-SYNOPSIS
+NAME
+    App::PDFUtils - Command-line utilities related to PDF files
 
+VERSION
+    This document describes version 0.003 of App::PDFUtils (from Perl
+    distribution App-PDFUtils), released on 2020-02-03.
+
+SYNOPSIS
     This distribution provides tha following command-line utilities related
     to PDF files:
 
-    #INSERT_EXECS_LIST
+    *   add-pdf-password
+
+    *   remove-pdf-password
+
+FUNCTIONS
+  add_pdf_password
+    Usage:
+
+     add_pdf_password(%args) -> [status, msg, payload, meta]
+
+    Password-protect PDF files.
+
+    This program is a wrapper for qpdf to password-protect PDF files
+    (in-place). This is the counterpart for remove-pdf-password.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 1)
+
+        Whether to backup the original file to ORIG~.
+
+    *   files* => *array[filename]*
+
+    *   password* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  remove_pdf_password
+    Usage:
+
+     remove_pdf_password(%args) -> [status, msg, payload, meta]
+
+    Remove password from PDF files.
+
+    This program is a wrapper for qpdf to remove passwords from PDF files
+    (in-place).
+
+    The motivation for this program is the increasing occurence of financial
+    institutions sending financial statements or documents in the format of
+    password-protected PDF file. This is annoying when we want to archive
+    the file or use it in an organization because we have to remember
+    different passwords for different financial institutions and re-enter
+    the password everytime we want to use the file. (The banks could've sent
+    the PDF in a password-protected .zip, or use PGP-encrypted email, but I
+    digress.)
+
+    You can provide the passwords to be tried in a configuration file,
+    "~/remove-pdf-password.conf", e.g.:
+
+     passwords = pass1
+     passwords = pass2
+     passwords = pass3
+
+    or:
+
+     passwords = ["pass1", "pass2", "pass3"]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 1)
+
+        Whether to backup the original file to ORIG~.
+
+    *   files* => *array[filename]*
+
+    *   passwords => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PDFUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PDFUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PDFUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    remove-pdf-password.
+
+    add-pdf-password.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

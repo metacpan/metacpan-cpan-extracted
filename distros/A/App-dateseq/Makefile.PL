@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "DateTime::Duration" => 0,
-    "DateTime::Format::Strptime" => 0,
+    "DateTime::Format::Strftimeq" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::date::dow_num" => 0,
@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.098",
+  "VERSION" => "0.099",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +90,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "DateTime::Duration" => 0,
-  "DateTime::Format::Strptime" => 0,
+  "DateTime::Format::Strftimeq" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

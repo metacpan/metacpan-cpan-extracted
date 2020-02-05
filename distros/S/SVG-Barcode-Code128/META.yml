@@ -25,6 +25,6 @@ resources:
   bugtracker: https://github.com/Tekki/svg-barcode-code128/issues
   homepage: https://github.com/Tekki/svg-barcode-code128
   repository: https://github.com/Tekki/svg-barcode-code128.git
-version: '0.11'
+version: '0.12'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

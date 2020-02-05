@@ -1,0 +1,185 @@
+#!/usr/bin/env perl
+#
+#This software is Copyright (c) 2020 by Zane C. Bowers-Hadley.
+#
+#This is free software, licensed under:
+#
+#  The Artistic License 2.0 (GPL Compatible)
+
+use strict;
+use warnings;
+use Cluster::SSH::Helper;
+use Getopt::Long;
+
+sub version {
+    print "cshelper v. 0.1.0\n";
+}
+
+sub help {
+    print '
+-c <file>    Config file.
+-h <file>    Hosts file.
+-m <method>  Selection to use.
+-d           Only print the command to run and exit.
+-p           Print the final command before running it.
+';
+}
+
+if ( !defined( $ARGV[0] ) ) {
+    die("Nothing specified to execute");
+}
+
+my $config_file;
+my $hosts_file;
+my $method;
+my $print_cmd;
+my $debug;
+my $command = join( ' ', @ARGV );
+my $env;
+
+# get the commandline options
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+Getopt::Long::Configure('pass_through');
+Getopt::Long::Configure('require_order');
+GetOptions(
+    'c=s' => \$config_file,
+    'h=s' => \$hosts_file,
+    'm=s' => \$method,
+    'e=s' => \$env,
+    'p'   => \$print_cmd,
+    'd'   => \$debug,
+);
+
+my $csh = Cluster::SSH::Helper->new_from_ini( $config_file, $hosts_file );
+
+my $return = $csh->run(
+    {
+        command   => \@ARGV,
+        method    => $method,
+        print_cmd => $print_cmd,
+        debug     => $debug,
+        env       => $env,
+    }
+);
+
+if ($debug) {
+    print $return. "\n";
+    exit;
+}
+else {
+    exit $return;
+}
+
+=head1 NAME
+
+cshelper - Find the best machine via SNMP to run a command on.
+
+=head1 SYNOPSIS
+
+cshelper [B<-d>] [B<-p>] [B<-e> <enviroment>] [B<-h> <hosts.ini>] [B<-c> <config.ini>] [B<-m> <method>] <command>
+
+=head1 DESCRIPTION
+
+This figures out the host to run the command on via polling the configured hosts via SNMP. The current methods
+below are currently supported are as below.
+
+    load_1m - Find the machine with the lowest 1m load.
+    ram_used_percent - Find the machine with the lowest used percent of RAM.
+
+=head1 ARGS
+
+=head2 B<-d>
+
+Print the command to run and then exit with out running it.
+
+=head2 B<-p>
+
+Print the command before running it.
+
+=head2 B<-e> <enviroment>
+
+Run with a altered enviroment.
+
+This will used the specified section in the config INI file
+to build a /usr/bin/env command with to use to run the
+specified command.
+
+=head2 B<-h> <hosts.ini>
+
+The hosts INI config file to use.
+
+=head2 B<-c> <config.ini>
+
+The config INI file to use.
+
+=head2 B<-m> <method>
+
+Use this method instead of default method.
+
+=head1 CONFIGURATION
+
+=head2 CONFIG.INI
+
+The default one is ~/.config/cluster-ssh-helper/config.ini .
+
+Below is a basic example.
+
+    snmp=-v 2c -c public
+
+=head3 snmp
+
+This is the additional args to pass to snmpget for auth.
+
+=head3 method
+
+This is default method to use for selecting the what host to run the command on.
+If not specified, 'load' is used.
+
+    load_1m , checks 1 minute load and uses the lowest
+    ram_used_percent , uses the host with the lowest used percent of RAM
+
+=head3 ssh
+
+The default command to use for SSH.
+
+If not specified, just 'ssh' will be used.
+
+This should not include either user or host.
+
+=head3 ssh_user
+
+If specified, this will be the default user to use for SSH.
+
+If not specified, SSH is invoked with out specifying a user.
+
+=head3 env
+
+If specified, '/usr/bin/env' will be inserted before the command to be ran.
+
+The name=values pairs for this will be built using the hash key specified by this.
+
+=head3 warn_on_poll
+
+Issue a warn() on SNMP timeouts or other polling issues. This won't be a automatic
+failure. Simply timing out on SNMP means that host will be skipped and not considered.
+
+This defaults to 1, true.
+
+=head2 HOSTS.INI
+
+The default one is ~/.config/cluster-ssh-helper/config.ini .
+
+This contains the hosts to connect to. The same variables can be used
+as from the config. Anything specified for a use will override the one in
+config.
+
+Below is a example configuration with 3 hosts in it, with the second
+one having a different SNMP auth then the other two.
+
+    [127.0.0.1]
+    [a.foo.bar]
+    snmp=-v 2c -c k3k3kqwdq
+    [b.foo.bar]
+
+=cut

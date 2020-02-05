@@ -1,19 +1,17 @@
 package Alien::libdwarf;
 use 5.012;
 
-our $VERSION = "20200114.0";
-
-use XS::Loader;
-
-XS::Loader::load_noboot();
+our $VERSION = "20200114.1";
 
 =head1 NAME
 
-Alien::libdwarf -  DWARF debugging information
+Alien::libdwarf - [deprecated] DWARF debugging information
 
 =cut
 
 =head1 DESCRIPTION
+
+Deprecated/renamed in the sake of L<XS::libdwarf>.
 
 =head1 SYNOPSIS
 

@@ -30,7 +30,7 @@ use Alien::Base::ModuleBuild::Repository::FTP;
 use Alien::Base::ModuleBuild::Repository::Local;
 
 # ABSTRACT: A Module::Build subclass for building Alien:: modules and their libraries
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
 # setup protocol specific classes
 # Alien:: author can override these defaults using alien_repository_class property
@@ -1287,7 +1287,7 @@ Alien::Base::ModuleBuild - A Module::Build subclass for building Alien:: modules
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =head1 SYNOPSIS
 

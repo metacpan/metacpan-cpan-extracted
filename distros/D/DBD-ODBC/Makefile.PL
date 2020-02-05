@@ -310,9 +310,15 @@ EOT
         $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
     }
     else {
-        # remove lib prefix and .so suffix so "-l" style link can be used
-        $ilibname =~ s/^lib(odbc.*?)\.\w+$/$1/;
-        $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+        if ($ilibname =~ /^lib(odbc[^.]*?)\.\w+$/) {
+            # remove lib prefix and .so suffix so "-l" style link can be used
+            $ilibname = $1;
+            $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+        } else {
+            # cannot use "-l" style link so specify pull path
+            $opts{LIBS} = q{};
+            $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
+        }
         warn "Warning: LD_LIBRARY_PATH doesn't include $odbclibdir\n"
             unless (exists($ENV{LD_LIBRARY_PATH}) &&
                         ($ENV{LD_LIBRARY_PATH} =~ /\Q$odbclibdir/));
@@ -573,9 +579,15 @@ EOT
             $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
         }
         else {
-            # remove lib prefix and .so suffix so "-l" style link can be used
-            $ilibname =~ s/^lib(iodbc.*?)\.\w+$/$1/;
-            $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            if ($ilibname =~ /^lib(iodbc[^.]*?)\.\w+$/) {
+                # remove lib prefix and .so suffix so "-l" style link can be used
+                $ilibname = $1;
+                $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            } else {
+                # cannot use "-l" style link so specify pull path
+                $opts{LIBS} = q{};
+                $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
+            }
             warn "Warning: LD_LIBRARY_PATH doesn't include $odbchome/lib\n"
                 if (!defined($ENV{LD_LIBRARY_PATH})) ||
                     ($ENV{LD_LIBRARY_PATH} =~ /\Q$odbclibdir/);
@@ -638,8 +650,15 @@ EOT
             $ilibpath = $ilibs[0];
             $ilibpath =~ s/(.*\.$soext).*$/$1/;
             $ilibname = basename($ilibpath);
-            $ilibname =~ s/^lib(odbc.*)\.\w+$/$1/;
-            $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            if ($ilibname =~ /^lib(odbc[^.]*?)\.\w+$/) {
+                # remove lib prefix and .so suffix so "-l" style link can be used
+                $ilibname = $1;
+                $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            } else {
+                # cannot use "-l" style link so specify pull path
+                $opts{LIBS} = q{};
+                $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
+            }
             warn "Warning: LD_LIBRARY_PATH=", ($ENV{LD_LIBRARY_PATH} ? $ENV{LD_LIBRARY_PATH} : ""), " doesn't include $odbclibdir\n"
                 unless (exists($ENV{LD_LIBRARY_PATH}) &&
                             ($ENV{LD_LIBRARY_PATH} =~ /\Q$odbclibdir/));
@@ -647,8 +666,15 @@ EOT
             $ilibpath = $ilibs[0];
             $ilibpath =~ s/(.*\.$dlext).*$/$1/;
             $ilibname = basename($ilibpath);
-            $ilibname =~ s/^lib(odbc.*)\.\w+$/$1/;
-            $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            if ($ilibname =~ /^lib(odbc[^.]*?)\.\w+$/) {
+                # remove lib prefix and .so suffix so "-l" style link can be used
+                $ilibname = $1;
+                $opts{LIBS} = "-L$odbclibdir -l$ilibname";
+            } else {
+                # cannot use "-l" style link so specify pull path
+                $opts{LIBS} = q{};
+                $opts{dynamic_lib} = { OTHERLDFLAGS => "$ilibpath" };
+            }
         } elsif (@ilibs = grep /\.($arext)$/, @libs) {
             $ilibpath = $ilibs[0];
             $ilibname = basename($ilibpath);

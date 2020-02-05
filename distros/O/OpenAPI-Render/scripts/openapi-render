@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Basename qw( basename );
+use JSON;
+use Getopt::Long::Descriptive;
+use OpenAPI::Render::HTMLForms;
+use OpenAPI::Render::reStructuredText;
+
+my $basename = basename $0;
+
+my( $opt, $usage ) = describe_options( <<"END" . 'OPTIONS',
+USAGE
+    $basename [<args>] <file>
+
+DESCRIPTION
+    $basename renders OpenAPI documents to other formats.
+
+END
+    [ 'html', 'HTML form output (default)' ],
+    [ 'rst',  'reStructuredText output' ],
+    [ 'help', 'print usage message and exit', { shortcircuit => 1 } ],
+);
+
+if( $opt->help ) {
+    print $usage->text;
+    exit;
+}
+
+@ARGV = ( '-' ) unless @ARGV;
+
+my $filename = shift @ARGV;
+
+open( my $inp, $filename );
+my $json = decode_json( join '', <$inp> );
+close $inp;
+
+my $api;
+if( $opt->rst ) {
+    $api = OpenAPI::Render::reStructuredText->new( $json );
+} else {
+    $api = OpenAPI::Render::HTMLForms->new( $json );
+}
+
+print $api->show, "\n";

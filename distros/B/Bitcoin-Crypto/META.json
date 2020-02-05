@@ -34,14 +34,12 @@
          "requires" : {
             "Bitcoin::BIP39" : "0.002",
             "CryptX" : "0.062",
-            "Digest::SHA" : "6.02",
             "Math::BigInt" : "1.999816",
             "Math::BigInt::GMP" : "1.6006",
             "Math::EllipticCurve::Prime" : "0.003",
             "Modern::Perl" : "1.20181021",
             "Moo" : "2.003004",
             "MooX::Types::MooseLike" : "0.29",
-            "PBKDF2::Tiny" : "0.005",
             "Throwable" : "0.2",
             "Try::Tiny" : "0.30",
             "perl" : "5.010"
@@ -67,6 +65,6 @@
          "url" : "https://github.com/brtastic/perl-bitcoin-crypto"
       }
    },
-   "version" : "0.992",
+   "version" : "0.993",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

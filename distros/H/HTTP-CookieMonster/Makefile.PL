@@ -30,12 +30,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Storable" => 0,
     "Test::Fatal" => 0,
-    "Test::More" => 0,
-    "WWW::Mechanize" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t t/cookie/*.t"
   }
@@ -50,12 +48,10 @@ my %FallbackPrereqs = (
   "Moo" => "1.000003",
   "Safe::Isa" => 0,
   "Scalar::Util" => 0,
-  "Storable" => 0,
   "Sub::Exporter" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,
   "URI::Escape" => 0,
-  "WWW::Mechanize" => 0,
   "strict" => 0,
   "warnings" => 0
 );

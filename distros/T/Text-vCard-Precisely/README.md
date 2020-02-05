@@ -80,7 +80,6 @@ because some reason below:
 - Text::vCard **doesn't provide** full methods based on [RFC2426](https://tools.ietf.org/html/rfc2426)
 - Mac OS X and iOS can't parse vCard4.0 with UTF-8 precisely. they cause some Mojibake
 - Android 4.4.x can't parse vCard4.0
-- I wanted to learn Moose, of course
 
 To handle an address book with several vCard entries in it, start with
 [Text::vFile::asData](https://github.com/richardc/perl-text-vfile-asdata) and then come back to this module.
@@ -186,6 +185,9 @@ Accepts/returns an ArrayRef that looks like:
        { type => ['work'], content => '651-290-1234', preferred => 1 },
        { type => ['home'], content => '651-290-1111' },
     ]
+
+After version 0.18, **content will not be validated as phone numbers** All _Str_ type is accepted.
+So you have to validate phone numbers with your way.
 
 ## adr(), address()
 
@@ -378,8 +380,6 @@ And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't sup
 - [RFC 2425](https://tools.ietf.org/html/rfc2425)
 - [RFC 6350](https://tools.ietf.org/html/rfc6350)
 - [Text::vFile::asData](https://github.com/richardc/perl-text-vfile-asdata)
-- [CPAN](http://search.cpan.org/perldoc?Text%3A%3AvCard%3A%3APrecisely)
-- [GitHub](https://github.com/worthmine/Text-vCard-Precisely)
 
 # AUTHOR
 

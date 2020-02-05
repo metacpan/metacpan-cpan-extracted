@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojo-DB-Connector
 
+0.07 2020-02-05T04:06:43Z
+    - Bump minimum List::Util version to 1.42 when unpairs was added.
+
+0.06 2020-02-04T06:05:15Z
+    - Bump minimum Mojolicious version to 7.55 when -role was added to fix tests. Should also fix $flag->can('new') in earlier versions of Mojo::Base.
+
 0.05 2020-01-27T21:42:27Z
     - Return database as a string when defaulting from URL path.
 

@@ -1,3 +1,6 @@
+1.0.7.7   25.01.2020
+    - Deprecated in the sake of XS::libbrotli
+
 1.0.7.6   25.01.2020
     - Drop downloading, embed brotli library instead
     

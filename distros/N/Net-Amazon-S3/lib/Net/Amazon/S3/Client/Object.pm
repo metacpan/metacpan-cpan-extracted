@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.87';
+$Net::Amazon::S3::Client::Object::VERSION = '0.88';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -10,12 +10,13 @@ use MIME::Base64;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::DateTime::MoreCoercions 0.07 qw( DateTime );
 use IO::File 1.14;
+use Ref::Util ();
 
 # ABSTRACT: An easy-to-use Amazon S3 client object
 
 enum 'AclShort' =>
-    [ qw(private public-read public-read-write authenticated-read) ];
-
+    # Current list at https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl
+    [ qw(private public-read public-read-write aws-exec-read authenticated-read bucket-owner-read bucket-owner-full-control log-delivery-write ) ];
 enum 'StorageClass' =>
     [ qw(standard reduced_redundancy standard_ia onezone_ia) ];
 
@@ -263,11 +264,13 @@ sub delete {
 
 sub initiate_multipart_upload {
     my $self = shift;
+    my %args = Ref::Util::is_plain_hashref($_[0]) ? %{$_[0]} : @_;
     my $http_request = Net::Amazon::S3::Request::InitiateMultipartUpload->new(
         s3     => $self->client->s3,
         bucket => $self->bucket->name,
         key    => $self->key,
         encryption => $self->encryption,
+        ($args{headers} ? (headers => $args{headers}) : ()),
     )->http_request;
     my $xpc = $self->client->_send_request_xpc($http_request);
     my $upload_id = $xpc->findvalue('//s3:UploadId');
@@ -424,7 +427,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -686,7 +689,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

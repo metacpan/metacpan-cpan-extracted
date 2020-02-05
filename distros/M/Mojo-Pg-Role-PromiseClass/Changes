@@ -1,2 +1,7 @@
+0.002     Feb 04 2020
+	* promise_roles now allows empty list
+	  (see Mojo::Base::Role::PromiseClass)
+	* Artistic License 2.0 (same as Mojolicious)
+
 0.001     Oct 26 2019
         * Initial version

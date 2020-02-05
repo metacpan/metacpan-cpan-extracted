@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-print "1..1\n";
+print "1..2\n";
 
 eval{require List::Uniqnum;};
 if($@) {
@@ -11,3 +11,9 @@ if($@) {
   print "not ok 1\n";
 }
 else {print "ok 1\n"}
+
+if($List::Uniqnum::VERSION eq '0.04') { print "ok 2\n" }
+else {
+  warn "\nVersion is $List::Uniqnum::VERSION\n";
+  print "not ok 2\n";
+}

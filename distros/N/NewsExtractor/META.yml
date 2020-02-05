@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.5.0
+    version: v0.10.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -36,18 +36,38 @@ provides:
     file: lib/NewsExtractor/JSONLDExtractor.pm
   NewsExtractor::SiteSpecificExtractor:
     file: lib/NewsExtractor/SiteSpecificExtractor.pm
+  NewsExtractor::SiteSpecificExtractor::ETtoday:
+    file: lib/NewsExtractor/SiteSpecificExtractor/ETtoday.pm
+  NewsExtractor::SiteSpecificExtractor::UDN:
+    file: lib/NewsExtractor/SiteSpecificExtractor/UDN.pm
+  NewsExtractor::SiteSpecificExtractor::house_ettoday_net:
+    file: lib/NewsExtractor/SiteSpecificExtractor/house_ettoday_net.pm
+  NewsExtractor::SiteSpecificExtractor::money_udn_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
+  NewsExtractor::SiteSpecificExtractor::news_tnn_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::turnnewsapp_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
   NewsExtractor::SiteSpecificExtractor::www_allnews_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
+  NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ntdtv_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm
   NewsExtractor::SiteSpecificExtractor::www_peopo_org:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm
+  NewsExtractor::SiteSpecificExtractor::www_rti_org_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_rti_org_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_rvn_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_rvn_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::www_setn_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_setn_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_taipeitimes_com.pm
   NewsExtractor::TXExtractor:
     file: lib/NewsExtractor/TXExtractor.pm
   NewsExtractor::TextUtil:
@@ -68,7 +88,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.5.0
+version: v0.10.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

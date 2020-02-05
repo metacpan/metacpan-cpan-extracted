@@ -15,19 +15,22 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_js : Test(4) {
+sub test_js : Test(5) {
     my $self = shift;
 
     my $obj = Quiq::JQuery::ContextMenu::Ajax->new(
-        selector => '.context',
+        className => 'contextMenu',
+        selector => '.popup',
+        trigger => 'left',
     );
     $self->is(ref($obj),'Quiq::JQuery::ContextMenu::Ajax');
 
     my $js = $obj->js;
     # warn $js,"\n";
-    $self->like($js,qr/selector:/);
-    $self->unlike($js,qr/trigger:/);
+    $self->like($js,qr/className:/);
     $self->like($js,qr/build:/);
+    $self->like($js,qr/selector:/);
+    $self->like($js,qr/trigger:/);
 }
 
 # -----------------------------------------------------------------------------

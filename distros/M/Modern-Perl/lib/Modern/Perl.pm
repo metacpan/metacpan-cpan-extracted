@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20190727';
+$Modern::Perl::VERSION = '1.20200201';
 use 5.010_000;
 
 use strict;
@@ -18,11 +18,11 @@ my $wanted_date;
 sub VERSION {
     my ($self, $version) = @_;
 
-    return $Modern::Perl::VERSION || 2019 unless defined $version;
-    return $Modern::Perl::VERSION || 2019 if             $version < 2009;
+    return $Modern::Perl::VERSION || 2020 unless defined $version;
+    return $Modern::Perl::VERSION || 2020 if             $version < 2009;
 
     $wanted_date = $version if (caller(1))[3] =~ /::BEGIN/;
-    return 2019;
+    return 2020;
 }
 
 sub import {
@@ -57,6 +57,7 @@ sub validate_date {
         2017 => ':5.24',
         2018 => ':5.26',
         2019 => ':5.28',
+        2020 => ':5.30',
     );
 
     my $date = shift;
@@ -88,7 +89,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20190727
+version 1.20200201
 
 =head1 SYNOPSIS
 

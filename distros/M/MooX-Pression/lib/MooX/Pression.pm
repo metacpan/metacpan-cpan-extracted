@@ -12,11 +12,12 @@ use feature ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.020';
 
 use Keyword::Declare;
 use B::Hooks::EndOfScope;
 use Exporter::Shiny our @EXPORT = qw( version authority overload );
+use Devel::StrictMode qw(STRICT);
 
 BEGIN {
 	package MooX::Pression::_Gather;
@@ -137,28 +138,56 @@ BEGIN {
 
 keytype SignatureList is /
 	(
-		(?&PerlBlock) | ([^\W0-9]\S*)
+		(?&PerlBlock) | (
+			~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			(
+				(?&PerlOWS)\&(?&PerlOWS)
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			)*
+			(
+				(?&PerlOWS)\|(?&PerlOWS)
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				(
+					(?&PerlOWS)\&(?&PerlOWS)
+					~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				)*
+			)*
+		)
 	)?
-	\s*
+	(?&PerlOWS)
 	(
 		(?&PerlVariable) | (\*(?&PerlIdentifier))
 	)
 	(
-		\? | (\s*=\s*(?&PerlTerm))
+		\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
 	)?
 	(
-		\s*
+		(?&PerlOWS)
 		,
-		\s*
+		(?&PerlOWS)
 		(
-			(?&PerlBlock) | ([^\W0-9]\S*)
+			(?&PerlBlock) | (
+			~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			(
+				\&
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			)*
+			(
+				\|
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				(
+					\&
+					~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				)*
+			)*
+		)
 		)?
-		\s*
+		(?&PerlOWS)
 		(
 			(?&PerlVariable) | (\*(?&PerlIdentifier))
 		)
 		(
-			\? | (\s*=\s*(?&PerlTerm))
+			\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
 		)?
 	)*
 /xs;  # fix for highlighting /
@@ -187,14 +216,28 @@ my $handle_signature_list = sub {
 			$parsed[-1]{type}          = $type;
 			$parsed[-1]{type_is_block} = 1;
 			$sig =~ s/^\Q$type//xs;
-			$sig =~ s/^\s+//xs;
+			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^([^\W0-9]\S*)/) {
+		elsif ($sig =~ /^(
+			~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			(
+				(?&PerlOWS)\&(?&PerlOWS)
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+			)*
+			(
+				(?&PerlOWS)\|(?&PerlOWS)
+				~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				(
+					(?&PerlOWS)\&(?&PerlOWS)
+					~?(?&PerlBareword)(?&PerlAnonymousArray)?
+				)*
+			)*
+		) $PPR::GRAMMAR/xso) {
 			my $type = $1;
 			$parsed[-1]{type}          = $type;
 			$parsed[-1]{type_is_block} = 0;
 			$sig =~ s/^\Q$type//xs;
-			$sig =~ s/^\s+//xs;
+			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
 		}
 		else {
 			$parsed[-1]{type} = 'Any';
@@ -206,30 +249,30 @@ my $handle_signature_list = sub {
 			$parsed[-1]{name} = $name;
 			++$seen_named;
 			$sig =~ s/^\*\Q$name//xs;
-			$sig =~ s/^\s+//xs;
+			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
 		}
 		elsif ($sig =~ /^((?&PerlVariable)) $PPR::GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name} = $name;
 			++$seen_pos;
 			$sig =~ s/^\Q$name//xs;
-			$sig =~ s/^\s+//xs;
+			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xs;
 		}
 		
 		if ($sig =~ /^\?/) {
 			$parsed[-1]{optional} = 1;
-			$sig =~ s/^\?\s*//xs;
+			$sig =~ s/^\?((?&PerlOWS)) $PPR::GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^=\s*((?&PerlTerm)) $PPR::GRAMMAR/xso) {
-			my $default = $1;
+		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlTerm)) $PPR::GRAMMAR/xso) {
+			my ($ws, $default) = ($1, $2);
 			$parsed[-1]{default} = $default;
-			$sig =~ s/^=\s*\Q$default//xs;
-			$sig =~ s/^\s+//xs;
+			$sig =~ s/^=\Q$ws$default//xs;
+			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
 		}
 		
 		if ($sig) {
 			$sig =~ /^,/ or die "WEIRD SIGNATURE??? $sig";
-			$sig =~ s/,\s*//xs;
+			$sig =~ s/^,//;
 		}
 	}
 	
@@ -374,7 +417,7 @@ sub _handle_factory_keyword {
 	
 	my $optim;
 	for my $attr (@$attrs) {
-		$optim = 1 if $attr =~ /^:optim\b/;
+		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
 	if ($via) {
@@ -414,7 +457,7 @@ sub _handle_method_keyword {
 	
 	my $optim;
 	for my $attr (@$attrs) {
-		$optim = 1 if $attr =~ /^:optim\b/;
+		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
 	if (defined $name) {
@@ -474,7 +517,7 @@ sub _handle_multimethod_keyword {
 	my $optim;
 	my $extra_code = '';
 	for my $attr (@$attrs) {
-		$optim = 1 if $attr =~ /^:optim\b/;
+		$optim = 1 if $attr =~ /^:optimize\b/;
 		$extra_code .= sprintf('alias=>%s', B::perlstring($1)) if $attr =~ /^:alias\((.+)\)$/;
 	}
 	
@@ -508,7 +551,7 @@ sub _handle_modifier_keyword {
 
 	my $optim;
 	for my $attr (@$attrs) {
-		$optim = 1 if $attr =~ /^:optim\b/;
+		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 
 	if ($has_sig) {
@@ -555,6 +598,121 @@ sub _handle_modifier_keyword {
 	}
 }
 
+sub _handle_package_keyword {
+	my ($me, $kind, $name, $code, $has_sig, $sig, $plus, $opts) = @_;
+	
+	if ($kind eq 'abstract') {
+		$kind = 'class';
+		$code = "{ q[$me]->_abstract(1);  $code }";
+	}
+	
+	if ($kind eq 'interface') {
+		$kind = 'role';
+		$code = "{ q[$me]->_interface(1); $code }";
+	}
+	
+	if ($name and $has_sig) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
+		sprintf(
+			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
+			B::perlstring("$plus$name"),
+			B::perlstring("$kind\_generator:$plus$name"),
+			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
+		);
+	}
+	elsif ($has_sig) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
+		sprintf(
+			'q[%s]->anonymous_generator(%s => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$kind,
+			$munged_code,
+			!!$signature_is_named,
+			$type_params_stuff,
+			B::perlstring($opts->{toolkit}||'Moo'),
+			B::perlstring($opts->{prefix}),
+			B::perlstring($opts->{factory_package}),
+			B::perlstring($opts->{type_library}),
+		);
+	}
+	elsif ($name) {
+		$code
+			? sprintf(
+				'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use MooX::Pression::_Gather -unparent;',
+				B::perlstring("$plus$name"),
+				B::perlstring("$kind:$plus$name"),
+				$me,
+				$code,
+			)
+			: sprintf(
+				'use MooX::Pression::_Gather -gather, %s => {};',
+				B::perlstring("$kind:$plus$name"),
+			);
+	}
+	else {
+		$code ||= '{}';
+		sprintf(
+			'q[%s]->anonymous_package(%s => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
+			$me,
+			$kind,
+			$code,
+			B::perlstring($opts->{toolkit}||'Moo'),
+			B::perlstring($opts->{prefix}),
+			B::perlstring($opts->{factory_package}),
+			B::perlstring($opts->{type_library}),
+		);
+	}
+}
+
+sub _handle_has_keyword {
+	my ($me, $name, $rawspec, $default) = @_;
+	
+	$rawspec = '()' if !defined $rawspec;
+	
+	if (defined $default and $default =~ /\$self/) {
+		$rawspec = "lazy => !!1, default => sub { my \$self = \$_[0]; $default }, $rawspec";
+	}
+	elsif (defined $default) {
+		$rawspec = "default => sub { $default }, $rawspec";
+	}
+	
+	$name =~ s/^\+\*/+/;
+	$name =~ s/^\*//;
+	
+	sprintf(
+		'q[%s]->_has(scalar(%s), %s)',
+		$me,
+		($name =~ /^\{/) ? "do $name" : B::perlstring($name),
+		$rawspec,
+	);
+}
+
+sub _handle_requires_keyword {
+	my ($me, $name, $has_sig, $sig) = @_;
+	my $r1 = sprintf(
+		'q[%s]->_requires(%s);',
+		$me,
+		($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+	);
+	my $r2 = '';
+	if (STRICT and $has_sig) {
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		$r2 = sprintf(
+			'q[%s]->_modifier(q(around), %s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
+			$me,
+			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			'sub { my $next = shift; goto $next }',
+			!!$signature_is_named,
+			$type_params_stuff,
+			1,
+		);
+	}
+	"$r1$r2";
+}
 
 #
 # KEYWORDS/UTILITIES
@@ -604,121 +762,99 @@ sub import {
 	
 	# `class` keyword
 	#
-	keyword class ('+'? $plus, QualifiedIdentifier $classname, '(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
-		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
-			B::perlstring("$plus$classname"),
-			B::perlstring("class_generator:$plus$classname"),
-			$munged_code,
-			!!$signature_is_named,
-			$type_params_stuff,
-		);
+	keyword class ('+'? $plus, QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
+	:desc(parameterizable class) :prefer {
+		my $return = $me->_handle_package_keyword(class => $name, $block, 1, $sig,  $plus, \%opts);
 	}
-	keyword class ('+'? $plus, QualifiedIdentifier $classname, Block $classdfn) {
-		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use MooX::Pression::_Gather -unparent;',
-			B::perlstring("$plus$classname"),
-			B::perlstring("class:$plus$classname"),
-			$me,
-			$classdfn,
-		);
+	keyword class ('+'? $plus, QualifiedIdentifier $name, Block $block)
+	:desc(class) :prefer {
+		my $return = $me->_handle_package_keyword(class => $name, $block, 0, undef, $plus, \%opts);
 	}
-	keyword class ('+'? $plus, QualifiedIdentifier $classname) {
-		sprintf(
-			'use MooX::Pression::_Gather -gather, %s => {};',
-			B::perlstring("class:$plus$classname"),
-		);
+	keyword class ('+'? $plus, QualifiedIdentifier $name)
+	:desc(class) :prefer {
+		my $return = $me->_handle_package_keyword(class => $name, '',     0, undef, $plus, \%opts);
 	}
-	keyword class ('(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
-		sprintf(
-			'q[%s]->anonymous_generator(class => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
-			$me,
-			$munged_code,
-			!!$signature_is_named,
-			$type_params_stuff,
-			B::perlstring($opts{toolkit}||'Moo'),
-			B::perlstring($opts{prefix}),
-			B::perlstring($opts{factory_package}),
-			B::perlstring($opts{type_library}),
-		);
+	keyword class ('(', SignatureList? $sig, ')', Block $block)
+	:desc(anonymous parameterizable class) {
+		my $return = $me->_handle_package_keyword(class => undef, $block, 1, $sig,  '',    \%opts);
 	}
-	keyword class (Block? $classdfn) {
-		$classdfn ||= '{}';
-		sprintf(
-			'q[%s]->anonymous_package(class => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
-			$me,
-			$classdfn,
-			B::perlstring($opts{toolkit}||'Moo'),
-			B::perlstring($opts{prefix}),
-			B::perlstring($opts{factory_package}),
-			B::perlstring($opts{type_library}),
-		);
+	keyword class (Block? $block)
+	:desc(anonymous class) {
+		my $return = $me->_handle_package_keyword(class => undef, $block, 0, undef, '',    \%opts);
 	}
-	
+
+	# `abstract` keyword
+	#
+	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
+	:desc(parameterizable abstract class) :prefer {
+		my $return = $me->_handle_package_keyword(abstract => $name, $block, 1, $sig,  $plus, \%opts);
+	}
+	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name, Block $block)
+	:desc(abstract class) :prefer {
+		my $return = $me->_handle_package_keyword(abstract => $name, $block, 0, undef, $plus, \%opts);
+	}
+	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name)
+	:desc(abstract class) :prefer {
+		my $return = $me->_handle_package_keyword(abstract => $name, '',     0, undef, $plus, \%opts);
+	}
+	keyword abstract ('class', '(', SignatureList? $sig, ')', Block $block)
+	:desc(anonymous parameterizable abstract class) {
+		my $return = $me->_handle_package_keyword(abstract => undef, $block, 1, $sig,  '',    \%opts);
+	}
+	keyword abstract ('class', Block? $block)
+	:desc(anonymous abstract class) {
+		my $return = $me->_handle_package_keyword(abstract => undef, $block, 0, undef, '',    \%opts);
+	}
+
 	# `role` keyword
 	#
-	keyword role (QualifiedIdentifier $classname, '(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
-		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
-			B::perlstring($classname),
-			B::perlstring('role_generator:'.$classname),
-			$munged_code,
-			!!$signature_is_named,
-			$type_params_stuff,
-		);
+	keyword role (QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
+	:desc(parameterizable role) :prefer {
+		my $return = $me->_handle_package_keyword(role => $name, $block, 1, $sig,  '',    \%opts);
 	}
-	keyword role (QualifiedIdentifier $classname, Block $classdfn) {
-		sprintf(
-			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => q[%s]->_package_callback(sub %s); use MooX::Pression::_Gather -unparent;',
-			B::perlstring($classname),
-			B::perlstring('role:'.$classname),
-			$me,
-			$classdfn,
-		);
+	keyword role (QualifiedIdentifier $name, Block $block)
+	:desc(role) :prefer {
+		my $return = $me->_handle_package_keyword(role => $name, $block, 0, undef, '',    \%opts);
 	}
-	keyword role (QualifiedIdentifier $classname) {
-		sprintf(
-			'use MooX::Pression::_Gather -gather, %s => {};',
-			B::perlstring('role:'.$classname),
-		);
+	keyword role (QualifiedIdentifier $name)
+	:desc(role) :prefer {
+		my $return = $me->_handle_package_keyword(role => $name, '',     0, undef, '',    \%opts);
 	}
-	keyword role ('(' $has_sig, SignatureList? $sig, ')', Block $classdfn) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
-		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $classdfn);
-		sprintf(
-			'q[%s]->anonymous_generator(role => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
-			$me,
-			$munged_code,
-			!!$signature_is_named,
-			$type_params_stuff,
-			B::perlstring($opts{toolkit}||'Moo'),
-			B::perlstring($opts{prefix}),
-			B::perlstring($opts{factory_package}),
-			B::perlstring($opts{type_library}),
-		);
+	keyword role ('(', SignatureList? $sig, ')', Block $block)
+	:desc(anonymous parameterizable role) {
+		my $return = $me->_handle_package_keyword(role => undef, $block, 1, $sig,  '',    \%opts);
 	}
-	keyword role (Block? $classdfn) {
-		$classdfn ||= '{}';
-		sprintf(
-			'q[%s]->anonymous_package(role => sub { do %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
-			$me,
-			$classdfn,
-			B::perlstring($opts{toolkit}||'Moo'),
-			B::perlstring($opts{prefix}),
-			B::perlstring($opts{factory_package}),
-			B::perlstring($opts{type_library}),
-		);
+	keyword role (Block? $block)
+	:desc(anonymouse role) {
+		my $return = $me->_handle_package_keyword(role => undef, $block, 0, undef, '',    \%opts);
 	}
-	
+
+	# `interface` keyword
+	#
+	keyword interface (QualifiedIdentifier $name, '(' $has_sig, SignatureList? $sig, ')', Block $block)
+	:desc(parameterizable interface) :prefer {
+		my $return = $me->_handle_package_keyword(interface => $name, $block, 1, $sig,  '',    \%opts);
+	}
+	keyword interface (QualifiedIdentifier $name, Block $block)
+	:desc(interface) :prefer {
+		my $return = $me->_handle_package_keyword(interface => $name, $block, 0, undef, '',    \%opts);
+	}
+	keyword interface (QualifiedIdentifier $name)
+	:desc(interface) :prefer {
+		my $return = $me->_handle_package_keyword(interface => $name, '',     0, undef, '',    \%opts);
+	}
+	keyword interface ('(' $has_sig, SignatureList? $sig, ')', Block $block)
+	:desc(anonymous parameterizable interface) {
+		my $return = $me->_handle_package_keyword(interface => undef, $block, 1, $sig,  '',    \%opts);
+	}
+	keyword interface (Block? $block)
+	:desc(anonymous interface) {
+		my $return = $me->_handle_package_keyword(interface => undef, $block, 0, undef, '',    \%opts);
+	}
+
 	# `toolkit` keyword
 	#
-	keyword toolkit (Identifier $tk, '(', QualifiedIdentifier|Comma @imports, ')') {
+	keyword toolkit (Identifier $tk, '(', QualifiedIdentifier|Comma @imports, ')') :desc(toolkit statement) {
 		my @processed_imports;
 		while (@imports) {
 			no warnings 'uninitialized';
@@ -742,132 +878,136 @@ sub import {
 	
 	# `begin` and `end` keywords
 	#
-	keyword begin (Block $code) {
+	keyword begin (Block $code) :desc(begin hook) {
 		sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $code);
 	}
-	keyword end (Block $code) {
+	keyword end (Block $code) :desc(end hook) {
 		sprintf('q[%s]->_end(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $code);
 	}
 	
 	# `type_name` keyword
 	#
-	keyword type_name (Identifier $tn) {
+	keyword type_name (Identifier $tn) :desc(type_name statement) {
 		sprintf('q[%s]->_type_name(%s);', $me, B::perlstring($tn));
 	}
 	
 	# `extends` keyword
 	#
-	keyword extends (RoleList $parent) {
+	keyword extends (RoleList $parent) :desc(extends statement) {
 		sprintf('q[%s]->_extends(%s);', $me, $parent->$handle_role_list('class'));
 	}
 	
 	# `with` keyword
 	#
-	keyword with (RoleList $roles) {
+	keyword with (RoleList $roles) :desc(with statement) {
 		sprintf('q[%s]->_with(%s);', $me, $roles->$handle_role_list('role'));
 	}
 	
 	# `requires` keyword
 	#
-	keyword requires (Identifier|Block $name, '(' $has_sig, SignatureList? $sig, ')') {
-		sprintf(
-			'q[%s]->_requires(%s);',
-			$me,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-		);
+	keyword requires (Identifier|Block $name, '(' $has_sig, SignatureList? $sig, ')') :desc(requires statement) {
+		$me->_handle_requires_keyword("$name", $has_sig, $sig);
 	}
-	keyword requires (Identifier|Block $name) {
-		sprintf(
-			'q[%s]->_requires(%s);',
-			$me,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
-		);
+	keyword requires (Identifier|Block $name) :desc(requires statement) {
+		$me->_handle_requires_keyword("$name", 0, undef);
 	}
 	
 	# `has` keyword
 	#
-	keyword has ('+'? $plus, /[\$\@\%]/? $sigil, Identifier $name, '!'? $postfix) {
-		sprintf('q[%s]->_has(%s);', $me, B::perlstring("$plus$sigil$name$postfix"));
+	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix) :desc(attribute definition) {
+		$me->_handle_has_keyword("$plus$name$postfix", undef, undef);
 	}
-	keyword has ('+'? $plus, /[\$\@\%]/? $sigil, Identifier $name, '!'? $postfix, '(', List $spec, ')') {
-		sprintf('q[%s]->_has(%s, %s);', $me, B::perlstring("$plus$sigil$name$postfix"), $spec);
+	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '(', List $spec, ')') :desc(attribute definition) {
+		$me->_handle_has_keyword("$plus$name$postfix", $spec, undef);
 	}
-	keyword has (Block $name) {
-		sprintf('q[%s]->_has(scalar(do %s));', $me, $name);
+	keyword has (Block $name, '(', List $spec, ')') :desc(attribute definition) {
+		$me->_handle_has_keyword($name, $spec, undef);
 	}
-	keyword has (Block $name, '(', List $spec, ')') {
-		sprintf('q[%s]->_has(scalar(do %s), %s);', $me, $name, $spec);
+	keyword has (Block $name) :desc(attribute definition) {
+		$me->_handle_has_keyword($name, undef, undef);
+	}
+	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '=', ListElem $default) :desc(attribute definition) {
+		$me->_handle_has_keyword("$plus$name$postfix", undef, $default);
+	}
+	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '(', List $spec, ')', '=', ListElem $default) :desc(attribute definition) {
+		$me->_handle_has_keyword("$plus$name$postfix", $spec, $default);
+	}
+	keyword has (Block $name, '(', List $spec, ')', '=', ListElem $default) :desc(attribute definition) {
+		$me->_handle_has_keyword($name, $spec, $default);
+	}
+	keyword has (Block $name, '=', ListElem $default) :desc(attribute definition) {
+		$me->_handle_has_keyword($name, undef, $default);
 	}
 	
 	# `constant` keyword
 	#
-	keyword constant (Identifier $name, '=', Expr $value) {
+	keyword constant (Identifier $name, '=', Expr $value) :desc(constant definition) {
 		sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $value);
 	}
 	
 	# `method` keyword
 	#
-	keyword method (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_method_keyword($name, $code, $has_sig, $sig, \@attrs);
+	keyword method (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method) :prefer {
+		$me->_handle_method_keyword($name, $code, 1, $sig,  \@attrs);
 	}
-	keyword method (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_method_keyword($name, $code, undef, undef, \@attrs);
+	keyword method (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method) :prefer {
+		$me->_handle_method_keyword($name, $code, 0, undef, \@attrs);
 	}
-	keyword method (                        MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_method_keyword(undef, $code, $has_sig, $sig, \@attrs);
+	keyword method (                        MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(anonymous method) {
+		$me->_handle_method_keyword(undef, $code, 1, $sig,  \@attrs);
 	}
-	keyword method (                        MyAttribute? @attrs, Block $code) {
-		$me->_handle_method_keyword(undef, $code, undef, undef, \@attrs);
+	keyword method (                        MyAttribute? @attrs, Block $code) :desc(anonymous method) {
+		$me->_handle_method_keyword(undef, $code, 0, undef, \@attrs);
 	}
 
 	# `multi method` keyword
 	#
-	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs);
+	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(multimethod) {
+		$me->_handle_multimethod_keyword($name, $code, 1, $sig,  \@attrs);
 	}
-	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_multimethod_keyword($name, $code, undef, undef, \@attrs);
+	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(multimethod) {
+		$me->_handle_multimethod_keyword($name, $code, 0, undef, \@attrs);
 	}
 
 	# `before`, `after`, and `around` keywords
 	#
-	keyword before (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code, $has_sig, $sig, \@attrs);
+	keyword before (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(before => $name, $code, 1, $sig,  \@attrs);
 	}
-	keyword before (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_modifier_keyword(before => $name, $code, undef, undef, \@attrs);
+	keyword before (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(before => $name, $code, 0, undef, \@attrs);
 	}
-	keyword after (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code, $has_sig, $sig, \@attrs);
+	keyword after (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(after => $name, $code, 1, $sig,  \@attrs);
 	}
-	keyword after (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_modifier_keyword(after => $name, $code, undef, undef, \@attrs);
+	keyword after (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(after => $name, $code, 0, undef, \@attrs);
 	}
-	keyword around (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code, $has_sig, $sig, \@attrs);
+	keyword around (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(around => $name, $code, 1, $sig,  \@attrs);
 	}
-	keyword around (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_modifier_keyword(around => $name, $code, undef, undef, \@attrs);
+	keyword around (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
+		$me->_handle_modifier_keyword(around => $name, $code, 0, undef, \@attrs);
 	}
 	
 	# `factory` keyword
 	#
-	keyword factory (Identifier|Block $name, MyAttribute? @attrs, '(' $has_sig, SignatureList? $sig, ')', Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, \@attrs);
+	keyword factory (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(factory method) {
+		$me->_handle_factory_keyword($name, undef, $code, 1, $sig,  \@attrs);
 	}
-	keyword factory (Identifier|Block $name, MyAttribute? @attrs, Block $code) {
-		$me->_handle_factory_keyword($name, undef, $code, undef, undef,  \@attrs);
+	keyword factory (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(factory method) {
+		$me->_handle_factory_keyword($name, undef, $code, 0, undef,  \@attrs);
 	}
-	keyword factory (Identifier|Block $name, 'via', Identifier $via) {
+	keyword factory (Identifier|Block $name, 'via', Identifier $via) :desc(proxy factory method) {
 		$me->_handle_factory_keyword($name, $via, undef, undef, undef, []);
 	}
-	keyword factory (Identifier|Block $name) {
+	keyword factory (Identifier|Block $name) :desc(proxy factory method) {
 		$me->_handle_factory_keyword($name, 'new', undef, undef, undef, []);
 	}
 	
 	# `coerce` keyword
 	#
-	keyword coerce ('from'?, Block|QualifiedIdentifier|String $from, 'via', Block|Identifier|String $via, Block? $code) {
+	keyword coerce ('from'?, Block|QualifiedIdentifier|String $from, 'via', Block|Identifier|String $via, Block? $code) :desc(coercion) {
 		if ($from =~ /^\{/) {
 			$from = "scalar(do $from)"
 		}
@@ -957,6 +1097,14 @@ sub _end {
 	shift;
 	$OPTS{end} = shift;
 }
+sub _interface {
+	shift;
+	$OPTS{interface} = shift;
+}
+sub _abstract {
+	shift;
+	$OPTS{abstract} = shift;
+}
 sub _with {
 	shift;
 	push @{ $OPTS{with}||=[] }, @_;
@@ -1003,7 +1151,7 @@ sub _modifier {
 #{
 #	package MooX::Pression::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.013';
+#	our $VERSION   = '0.020';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -1014,7 +1162,7 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.013';
+#	our $VERSION   = '0.020';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -1027,12 +1175,12 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.013';
+#	our $VERSION   = '0.020';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	
 #	package MooX::Pression::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.013';
+#	our $VERSION   = '0.020';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1046,7 +1194,7 @@ sub _modifier {
 #
 #	package MooX::Pression::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.013';
+#	our $VERSION   = '0.020';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1359,6 +1507,21 @@ It is possible to prefix a class name with a plus sign:
 Now the employee class will be named C<MyApp::Person::Employee> instead of
 the usual C<MyApp::Employee>.
 
+Classes can be declared as abstract:
+
+  package MyApp {
+    use MooX::Pression;
+    abstract class Animal {
+      class Cat;
+      class Dog;
+    }
+  }
+
+For abstract classes, there is no constructor or factory, so you cannot create
+an Animal instance directly; but you can create instances of the subclasses.
+It is usually better to use roles than abstract classes, but sometimes the
+abstract class makes more intuitive sense.
+
 =head3 C<< role >>
 
 Define a very basic role:
@@ -1375,6 +1538,32 @@ This is just the same as C<class> but defines a role instead of a class.
 
 Roles cannot be nested within each other, nor can roles be nested in classes,
 nor classes in roles.
+
+=head3 C<< interface >>
+
+An interface is a lightweight role. It cannot define attributes, methods,
+multimethods, or method modifiers, but otherwise functions as a role.
+(It may have C<requires> statements and define constants.)
+
+  package MyApp;
+  use MooX::Pression;
+  
+  interface Serializer {
+    requires serialize;
+  }
+  
+  interface Deserializer {
+    requires deserialize;
+  }
+  
+  class MyJSON {
+    with Serializer, Deserialize;
+    method serialize   ($value) { ... } 
+    method deserialize ($value) { ... } 
+  }
+  
+  my $obj = MyApp->new_myjson;
+  $obj->does('MyApp::Serializer');   # true
 
 =head3 C<< toolkit >>
 
@@ -1644,21 +1833,54 @@ values. For example:
     }
   }
 
-It is possible to add hints to the attribute name as a shortcut for common
-specifications.
+A trailing C<< ! >> indicates a required attribute.
 
   class Person {
-    has $name!;
-    has $age;
-    has @kids;
+    has name!;
   }
 
-Using C<< $ >>, C<< @ >> and C<< % >> sigils hints that the values should
-be a scalar, an arrayref, or a hashref (and tries to be smart about
-overloading). It I<< does not make the attribute available as a lexical >>!
-You still access the value as C<< $self->age >> and not just C<< $age >>.
+It is possible to give a default using an equals sign.
 
-The trailing C<< ! >> indicates a required attribute.
+  class WidgetCollection {
+    has name = "Widgets";
+    has count (type => Num) = 0;
+  }
+
+Note that the default comes after the spec, so in cases where the spec is
+long, it may be clearer to express the default inside the spec:
+
+  class WidgetCollection {
+    has name = "Widgets";
+    has count (
+      type     => Num,
+      lazy     => true,
+      required => false,
+      default  => 0,
+    );
+  }
+
+Defaults given this way will be eager (non-lazy), but can be made lazy using
+the spec:
+
+  class WidgetCollection {
+    has name = "Widgets";
+    has count (is => lazy) = 0;
+  }
+
+Defaults I<can> use the C<< $self >> object:
+
+  class WidgetCollection {
+    has name         = "Widgets";
+    has display_name = $self->name;
+  }
+
+Any default that includes C<< $self >> will automatically be lazy, but can be
+made eager using the spec. (It is almost certainly a bad idea to do so though.)
+
+  class WidgetCollection {
+    has name = "Widgets";
+    has display_name ( lazy => false ) = $self->name;
+  }
 
 If you need to decide an attribute name on-the-fly, you can replace the
 name with a block that returns the name as a string.
@@ -1680,7 +1902,7 @@ name with a block that returns the name as a string.
 This can be used to define a bunch of types from a list.
 
   class Person {
-    my @attrs = qw( $name $age );
+    my @attrs = qw( name age );
     for my $attr (@attrs) {
       has {$attr} ( required => true );
     }
@@ -1690,6 +1912,14 @@ You can think of the syntax as being kind of like C<print>.
 
   print BAREWORD_FILEHANDLE @strings;
   print { block_returning_filehandle(); } @strings;
+
+The names of attributes can start with an asterisk:
+
+  has *foo;
+
+This adds no extra meaning, but is supported for consistency with the syntax
+of named parameters in method signatures. (Depending on your text editor, it
+may also improve syntax highlighting.)
 
 =head3 C<< constant >>
 
@@ -1704,7 +1934,7 @@ C<< $person_object->latin_name >> will return 'Homo sapiens'.
 =head3 C<< method >>
 
   class Person {
-    has $spouse;
+    has spouse;
     
     method marry {
       my ($self, $partner) = @_;
@@ -1741,7 +1971,7 @@ the body of the method.
 =head4 Signatures for Named Arguments
 
   class Person {
-    has $spouse;
+    has spouse;
     
     method marry ( Person *partner, Object *date = DateTime->now ) {
       $self->spouse( $arg->partner );
@@ -1754,13 +1984,15 @@ The syntax for each named argument is:
 
   Type *name = default
 
-The type is a type name. It must start with a word character (but not a
-digit) and continues until whitespace is seen. Whitespace is not
-currently permitted in the type. (Parsing is a little naive right now.)
+The type is a type name, which will be parsed using L<Type::Parser>.
+(So it can include the C<< ~ >>, C<< | >>, and C<< & >>, operators,
+and can include parameters in C<< [ ] >> brackets. Type::Parser can
+handle whitespace in the type, but not comments.
 
-Alternatively, you can provide a block which returns a type name or
-returns a blessed Type::Tiny object. (And the block can contain
-whitespace!)
+Alternatively, you can provide a block which returns a type name as a string
+or returns a blessed Type::Tiny object. For very complex types, where you're
+expressing additional coercions or value constraints, this is probably what
+you want.
 
 The asterisk indicates that the argument is named, not positional.
 
@@ -1772,6 +2004,23 @@ argument.
   }
 
 Or it may be followed by an equals sign to set a default value.
+
+Comments may be included in the signature, but not in the middle of
+a type constraint.
+
+  method marry (
+    # comment here is okay
+    Person
+    # comment here is fine too
+    *partner
+    # and here
+  ) { ... }
+
+  method marry (
+    Person # comment here is not okay!
+           | Horse
+    *partner
+  ) { ... }
 
 As with signature-free methods, C<< $self >> and C<< $class >> wll be
 defined for you in the body of the method. However, when a signature
@@ -1934,7 +2183,7 @@ keyword C<multi>
 This feature requires L<MooX::Press> 0.035 and L<Sub::MultiMethod> to be
 installed.
 
-=head3 require
+=head3 C<< requires >>
 
 Indicates that a role requires classes to fulfil certain methods.
 
@@ -1946,14 +2195,36 @@ Indicates that a role requires classes to fulfil certain methods.
   class Employee {
     extends Person;
     with Payable;
-    has account;
+    has account!;
     method deposit (Num $amount) {
       ...;
     }
   }
 
-Required methods have an optional signature; this is currently
-ignored but may be useful for self-documenting code.
+Required methods have an optional signature; this is usually ignored, but
+if L<Devel::StrictMode> determines that strict behaviour is being used,
+the signature will be applied to the method via an C<around> modifier.
+
+Or to put it another way, this:
+
+  role Payable {
+    requires account;
+    requires deposit (Num $amount);
+  }
+
+Is a shorthand for this:
+
+  role Payable {
+    requires account;
+    requires deposit;
+    
+    use Devel::StrictMode 'STRICT';
+    if (STRICT) {
+     around deposit (Num $amount) {
+       $self->$next(@_);
+     }
+    }
+  }
 
 =head3 C<< before >>
 
@@ -2083,7 +2354,7 @@ just one object in a factory method.
   class Wheel;
   
   class Car {
-    has @wheels;
+    has wheels = [];
     
     factory new_three_wheeler () {
       return $class->new(
@@ -2220,7 +2491,7 @@ The C<< :optimize >> attribute is not currently supported for C<coerce>.
 =head3 C<< overload >>
 
   class Collection {
-    has @items;
+    has items = [];
     overload '@{}' => sub { shift->list };
   }
 
@@ -2743,6 +3014,18 @@ They work nicely in MooX::Pression though.
 
 Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>.
+
+=head1 TODO
+
+=head2 Plugin system
+
+MooX::Pression can often load MooX/MouseX/MooseX plugins and work
+fine with them, but some things won't work, like plugins that rely on
+being able to wrap C<has>. So it would be nice to have a plugin system
+that extensions can hook into.
+
+If you're interested in extending MooX::Pression, file a bug report about
+it and let's have a conversation about the best way for that to happen.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.040';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -29,6 +29,7 @@ my @delete_keys = qw(
 	can
 	type_library_can
 	factory_package_can
+	abstract
 );
 
 my $_handle_list = sub {
@@ -404,6 +405,10 @@ sub _do_coercions {
 	my $qname = $builder->qualify_name($name, $opts{prefix}, $opts{extends});
 	
 	if ($opts{coerce}) {
+		if ($opts{abstract}) {
+			require Carp;
+			Carp::croak("abstract class $qname cannot have coercions")
+		}
 		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 		my @coercions = @{$opts{'coerce'} || []};
 		
@@ -450,6 +455,26 @@ sub _do_coercions {
 sub make_role {
 	my $builder = shift;
 	my ($name, %opts) = @_;
+	
+	if ($opts{interface}) {
+		for my $key (qw/ can before after around has multimethod /) {
+			if ($opts{$key}) {
+				require Carp;
+				my $qname = $builder->qualify_name($name, $opts{prefix});
+				Carp::croak("interface $qname cannot have $key");
+			}
+		}
+	}
+
+	for my $key (qw/ abstract extends subclass factory overload /) {
+		if ($opts{$key}) {
+			require Carp;
+			my $qname = $builder->qualify_name($name, $opts{prefix});
+			my $kind  = $opts{interface} ? 'interface' : 'role';
+			Carp::croak("$kind $qname cannot have $key");
+		}
+	}
+
 	$builder->_make_package($name, %opts, is_role => 1);
 }
 
@@ -501,7 +526,7 @@ sub _make_package {
 	my $tn = $builder->type_name($qname, $opts{prefix});
 	
 	if (!exists $opts{factory}) {
-		$opts{factory} = 'new_' . lc $tn;
+		$opts{factory} = $opts{abstract} ? undef : sprintf('new_%s', lc $tn);
 	}
 	
 	my $toolkit = {
@@ -571,38 +596,14 @@ sub _make_package {
 	if (ref $opts{'begin'}) {
 		$opts{'begin'}->($qname, $opts{is_role} ? 'role' : 'class');
 	}
-	
-	{
-		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
-		my @roles = $opts{with}->$_handle_list;
-		if (@roles) {
-			my @processed;
-			while (@roles) {
-				if (@roles > 1 and ref($roles[1])) {
-					my $gen  = $builder->qualify_name(shift(@roles), $opts{prefix});
-					my @args = shift(@roles)->$_handle_list;
-					push @processed, $gen->generate_package(@args);
-				}
-				else {
-					my $role_qname = $builder->qualify_name(shift(@roles), $opts{prefix});
-					push @processed, $role_qname;
-					no strict 'refs';
-					if ( $role_qname !~ /\?$/ and not ${"$role_qname\::BUILT"} ) {
-						my ($role_dfn) = grep { $_->[0] eq "::$role_qname" } @{$opts{_roles}};
-						$builder->make_role(
-							"::$role_qname",
-							_parent_opts => $opts{_parent_opts},
-							_roles       => $opts{_roles},
-							%{ $opts{_parent_opts} },
-							%{ $role_dfn->[1] },
-						) if $role_dfn;
-					}
-				}
-			}
-			$builder->$method($qname, $opts{is_role}?'role':'class', \@processed);
-		}
+
+	if ($opts{overload}) {
+		my @overloads = $opts{overload}->$_handle_list;
+		require overload;
+		require Import::Into;
+		'overload'->import::into($qname, @overloads);
 	}
-	
+
 	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	{
 		my %methods;
@@ -735,7 +736,7 @@ sub _make_package {
 			$shv_toolkit->install_delegations($shv_data) if $shv_data;
 		}
 	}
-	
+
 	if ($opts{multimethod}) {
 		my $method = $opts{toolkit_install_multimethod} || 'install_multimethod';
 		my @mm = $opts{multimethod}->$_handle_list_add_nulls;
@@ -745,6 +746,37 @@ sub _make_package {
 		}
 	}
 
+	{
+		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
+		my @roles = $opts{with}->$_handle_list;
+		if (@roles) {
+			my @processed;
+			while (@roles) {
+				if (@roles > 1 and ref($roles[1])) {
+					my $gen  = $builder->qualify_name(shift(@roles), $opts{prefix});
+					my @args = shift(@roles)->$_handle_list;
+					push @processed, $gen->generate_package(@args);
+				}
+				else {
+					my $role_qname = $builder->qualify_name(shift(@roles), $opts{prefix});
+					push @processed, $role_qname;
+					no strict 'refs';
+					if ( $role_qname !~ /\?$/ and not ${"$role_qname\::BUILT"} ) {
+						my ($role_dfn) = grep { $_->[0] eq "::$role_qname" } @{$opts{_roles}};
+						$builder->make_role(
+							"::$role_qname",
+							_parent_opts => $opts{_parent_opts},
+							_roles       => $opts{_roles},
+							%{ $opts{_parent_opts} },
+							%{ $role_dfn->[1] },
+						) if $role_dfn;
+					}
+				}
+			}
+			$builder->$method($qname, $opts{is_role}?'role':'class', \@processed);
+		}
+	}
+	
 	if ($opts{is_role}) {
 		my $method   = $opts{toolkit_require_methods} || ("require_methods_".lc $toolkit);
 		my %requires = $opts{requires}->$_handle_list_add_nulls;
@@ -767,22 +799,35 @@ sub _make_package {
 	
 	unless ($opts{is_role}) {
 		
-		if ($opts{overload}) {
-			my @overloads = $opts{overload}->$_handle_list;
-			require overload;
-			require Import::Into;
-			'overload'->import::into($qname, @overloads);
-		}
-		
 		if ($toolkit eq 'Moose' && !$opts{'mutable'}) {
 			require Moose::Util;
 			Moose::Util::find_meta($qname)->make_immutable;
+		}
+		
+		if ($opts{abstract}) {
+			my $orig_can   = $qname->can('can');
+			my $orig_BUILD = do { no strict 'refs'; exists(&{"$qname\::BUILD"}) ? \&{"$qname\::BUILD"} : sub {} };
+			'namespace::clean'->clean_subroutines($qname, 'new', 'BUILD');
+			$builder->install_methods($qname, {
+				can   => sub {
+					if ((ref($_[0])||$_[0]) eq $qname and $_[1] eq 'new') { return; };
+					goto $orig_can;
+				},
+				BUILD => sub {
+					if (ref($_[0]) eq $qname) { require Carp; Carp::croak('abstract class'); };
+					goto $orig_BUILD;
+				},
+			});
 		}
 		
 		if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
 			my $fpackage = $opts{'factory_package'} || $opts{'caller'};
 			if ($opts{'factory'}) {
 				my @methods = $opts{'factory'}->$_handle_list;
+				if ($opts{abstract} and @methods) {
+					require Carp;
+					Carp::croak("abstract class $qname cannot have factory");
+				}
 				while (@methods) {
 					my @method_names;
 					push(@method_names, shift @methods)
@@ -1140,6 +1185,7 @@ sub install_methods {
 	my $builder = shift;
 	my ($class, $methods) = @_;
 	my %return;
+	
 	for my $name (sort keys %$methods) {
 		no strict 'refs';
 		my ($code, $signature, $signature_style, $invocant_count, $is_coderef, $caller, @curry);
@@ -1207,7 +1253,7 @@ sub install_methods {
 				? sprintf('my @invocants = splice(@_, 0, %d);', $invocant_count)
 				: ''),
 			(($signature && !$optimized)
-				? sprintf('$check = %s->_build_method_signature_check(%s, %s, %s, $signature, \\@invocants);', map(B::perlstring($_), $builder, $class, "$class\::$name", $signature_style))
+				? sprintf('$check ||= %s->_build_method_signature_check(%s, %s, %s, $signature, \\@invocants);', map(B::perlstring($_), $builder, $class, "$class\::$name", $signature_style))
 				: ''),
 			($signature
 				? (@curry ? sprintf('@_ = (@invocants, @curry, %s);', $checkcode) : sprintf('@_ = (@invocants, %s);', $checkcode))
@@ -2183,6 +2229,12 @@ It can be useful for many MooX, MooseX, and MouseX extensions though.
 
 Options to pass to C<< use overload >>.
 
+=item C<< abstract >> I<< (Bool) >>
+
+Marks the class as abstract. Abstract classes cannot have factories or
+coercions, and do not have a constuctor. They may be inherited from though.
+It is usually better to use roles.
+
 =back
 
 =head3 Role Options
@@ -2289,11 +2341,11 @@ Or force MooX::Press to happen at runtime instead of compile time.
   
 =item C<< subclass >> I<< (Any) >>
 
-This option is silently ignored.
+This option is not allowed.
 
 =item C<< factory >> I<< (Any) >>
 
-This option is silently ignored.
+This option is not allowed.
 
 =item C<< mutable >> I<< (Any) >>
 
@@ -2301,7 +2353,21 @@ This option is silently ignored.
 
 =item C<< overload >> I<< (Any) >>
 
-This option is silently ignored.
+This option is not allowed.
+
+=item C<< abstract >> I<< (Any) >>
+
+This option is not allowed.
+
+=item C<< interface >> I<< (Bool) >>
+
+An interface is a "light" role.
+
+If a role is marked as an interface, it must not have any C<can>, C<before>,
+C<after>, C<around>, C<has>, or C<multimethod> options. C<requires>,
+C<constant>, and C<type_name> are allowed. C<with> is allowed; you should
+only use C<with> to compose other interfaces (not full roles) though this
+is not currently enforced.
 
 =back
 

@@ -1,6 +1,5 @@
 use strict;
 
-use Devel::Peek;
 use FindBin '$Bin';
 use Importer 'NewsExtractor::TextUtil' => 'u';
 

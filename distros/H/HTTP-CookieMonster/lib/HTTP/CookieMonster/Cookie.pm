@@ -1,5 +1,5 @@
 package HTTP::CookieMonster::Cookie;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use strict;
 use warnings;
 
@@ -35,7 +35,7 @@ HTTP::CookieMonster::Cookie - Cookie representation used by HTTP::CookieMonster
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

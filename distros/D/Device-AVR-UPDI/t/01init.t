@@ -19,7 +19,6 @@ Future::IO->override_impl( "TestFutureIO" );
    expect( $mockfh->cfmakeraw );
    expect( $mockfh->set_mode( "115200,8,e,2" ) );
    expect( $mockfh->setflag_clocal( 1 ) );
-   expect( $mockfh->setbaud( 230400 ) );
    expect( $mockfh->autoflush );
 
    replay( $mockfh, $mockfio );
@@ -28,16 +27,22 @@ Future::IO->override_impl( "TestFutureIO" );
 
    reset( $mockfh, $mockfio );
    # BREAK
-   expect( $mockfh->getobaud )->and_scalar_return( 230400 );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->done );
+   expect( $mockfh->getobaud )->and_scalar_return( 115200 );
    expect( $mockfh->setbaud( 300 ) );
    expect( $mockfh->print( "\0" ) );
    expect( $mockfio->sysread( 1 ) )
       ->and_scalar_return( Future->done( "\0" ) );
-   expect( $mockfh->setbaud( 230400 ) );
+   expect( $mockfio->sleep( 0.05 ) )
+      ->and_scalar_return( Future->done );
+   expect( $mockfh->setbaud( 115200 ) );
    # OP
    expect( $mockfh->print( "\x55\xC3\x08" ) );
    expect( $mockfio->sysread( 3 ) )
       ->and_scalar_return( Future->done( "\x55\xC3\x08" ) );
+   expect( $mockfio->sleep( 0.1 ) )
+      ->and_scalar_return( Future->new );
 
    replay( $mockfh, $mockfio );
    $updi->init_link->get;
@@ -47,6 +52,6 @@ Future::IO->override_impl( "TestFutureIO" );
 done_testing;
 
 package TestFutureIO;
-sub sleep           { Future->new }
+sub sleep           { $mockfio->sleep($_[1]) }
 sub sysread         { $mockfio->sysread(@_[2..$#_]) }
 sub sysread_exactly { $mockfio->sysread(@_[2..$#_]) }

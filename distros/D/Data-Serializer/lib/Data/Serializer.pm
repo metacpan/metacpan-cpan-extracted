@@ -7,7 +7,7 @@ use vars qw($VERSION);
 use Carp;
 require 5.004 ;
 
-$VERSION = '0.60';
+$VERSION = '0.65';
 
 #Global cache of modules we've loaded
 my %_MODULES;
@@ -823,7 +823,7 @@ would be welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2001-2011 Neil Neely.  All rights reserved.
+Copyright (c) 2001-2020 Neil Neely.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
@@ -846,6 +846,10 @@ numerous suggestions and bug fixes.
 =head1 DEDICATION
 
 This module is dedicated to my beautiful wife Erica. 
+
+=head1 REPOSITORY
+
+L<http://github.com/neilneely/Data-Serializer/>
 
 =head1 SEE ALSO
 

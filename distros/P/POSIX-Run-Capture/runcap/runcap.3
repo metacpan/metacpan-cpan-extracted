@@ -1,5 +1,5 @@
 .\" This file is part of runcap -*- nroff -*-
-.\" Copyright (C) 2017 Sergey Poznyakoff
+.\" Copyright (C) 2017-2020 Sergey Poznyakoff
 .\"
 .\" Runcap is free software; you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with runcap.  If not, see <http://www.gnu.org/licenses/>.
-.TH RUNCAP 2 "August 22, 2017" "RUNCAP" "User Commands"
+.TH RUNCAP 2 "January 30, 2020" "RUNCAP" "User Commands"
 .SH NAME
 runcap \- run external process and capture its stdout and stderr
 .SH SYNOPSIS
@@ -102,7 +102,7 @@ the
 .B rc_cap
 array.  Its elements correspond to the standard input, output and
 error streams.  Upon successful return, the captured
-data from stdin and stdout can be retrieved using the \fBruncap_getc\fR, and
+data from stdout and stderr can be retrieved using the \fBruncap_getc\fR, and
 \fBruncap_getline\fR functions (see below).  For convenience, the
 following constants are defined in \fBruncap.h\fR to refer to the
 corresponding streams:
@@ -110,8 +110,8 @@ corresponding streams:
 .BR RUNCAP_STDOUT ,
 .BR RUNCAP_STDERR .
 .PP
-The following fields are warranted to be present in \fBstruct
-stream_capture\fR:
+The \fBstream_capture\fR structure contains the following members
+accessible to the caller:
 .PP
 .in +4n
 .nf
@@ -125,10 +125,12 @@ struct stream_capture
     off_t  sc_leng;      /* [\fIOUT\fR] total length of captured data */
     size_t sc_nlines;    /* [\fIOUT\fR] number of captured lines */
 
-    /* The following two are available only in \fBrc_cap[RUNCAP_STDIN]\fR,
-       see the subsection \fBSupplying standard input\fR below, for
-       details). */
-    size_t sc_fd;        /* Input file descriptor */
+    int    sc_storfd;    /* [\fIIN\fR] storage file descriptor */      
+
+    /* The following two are available only in \fBrc_cap[RUNCAP_STDIN]\fR
+       For details. see the subsection \fBSupplying standard input\fR.
+     */
+    int  sc_fd;          /* Input file descriptor */
     char *sc_base;       /* Input data */
 };
 .fi
@@ -143,7 +145,10 @@ Size of the buffer (\fBsize_t\fR).  If set, the \fBRCF_STDOUT_SIZE\fR
 \fBRUNCAP_STDERR\fR) bit must be set in \fIflags\fR.  If the amount of
 input data exceeds the buffer size, the data are saved in the disk
 file, therefore setting a larger buffer can improve performance.
-Setting \fBsc_size\fR to 0 disables capturing.
+
+Setting \fBsc_size\fR to 0 disables capturing.  Same effect is
+achieved by setting the \fBRCF_STDOUT_NOCAP\fR or
+\fBRCF_STDERR_NOCAP\fR flag.
 
 Default buffer size is 4096 bytes.
 .TP
@@ -153,7 +158,7 @@ A pointer to the line monitor function.  If set, the
 \fBRCF_STDERR_LINEMON\fR (for \fBRUNCAP_STDERR\fR) bit must be set in
 \fIflags\fR.
 .sp
-The line monitor function allows the caller to monitor the arrival of
+Line monitor function allows the caller to monitor the arrival of
 the new data in the corresponding stream.  It is declared as follows:
 .sp
 .BI "void linemon(const char *" line ", size_t " size ", void *" data )
@@ -162,19 +167,55 @@ where \fIline\fR is the line that has been read, \fIsize\fR is its
 length, and \fIdata\fR is an opaque pointer to application-specific
 data, supplied in the \fBsc_monarg\fR member.
 .sp
-The line monitor function is invoked each time a newline character is
-encountered in the stream, or when the stream buffer becomes full (and,
-therefore is about to be flushed into the storage file) and some
-characters remain unreported.  This means that, if the
-\fBsc_linemon\fR function is designed to log each input line, it
-should keep the state of processing (e.g. in the \fIdata\fR argument),
-and concatenate the \fIline\fR parameters until
-\fBline[size-1] == '\\n'\fR. 
+The line monitor function is invoked to notify the caller about
+arrival of new data on the stream.  There are 4 cases:
+.RS +8
+.nr step 1 1
+.IP \n[step].
+A newline newline character is encountered in the stream.
+.sp
+The \fIline\fR argument points to the beginning of the captured
+line.  The \fIsize\fR argument contains number of characters in the
+line, including the newline character.
+.IP \n+[step].
+The stream buffer is full (and therefore is about to be flushed into
+the storage file) and contains unfinished line.
+.sp
+The \fIline\fR
+argument points to the beginning of the captured line fragment.  The
+\fIsize\fR argument contains number of characters in the 
+fragment.
+.IP \n+[step].
+No more characters are available in the stream and the
+stream buffer contains unreported characters.
+.sp
+Argument assignment is the same as in previous case.
+.IP \n+[step].
+The stream reached EOF.
+.sp
+The \fIsize\fR argument is 0.  The
+\fIline\fR argument is not meaningful, although it does point to a
+valid memory location.
+.PP
+Consequently, if the \fBsc_linemon\fR function needs to process full
+lines. it has to keep the state of processing (e.g. in the \fBdata\fR
+argument), and concatenate the line parameters until the following
+condition is met:
+.sp
+.EX
+  size == 0 || line[size-1] == '\\n'
+.EE  
+.RE
 .TP
 .B sc_monarg
 The value of the \fIdata\fR parameter for the \fBsc_linemon\fR
-function.  It can be initialized only if \fBsc_linemon\fR is
-initialized as well.
+function.
+.TP
+.B sc_storfd
+File descriptor of the storage file for that stream.  If initialized, the
+\fBRCF_STDOUT_STORFD\fR or \fBRCF_STDERR_STORFD\fR bit must be set in
+\fIflags\fR.  All data obtained by that stream will be written to this
+descriptor, in addition to the normal processing.
 .SS Supplying standard input
 The
 .B rc_cap[RUNCAP_STDIN]
@@ -223,11 +264,15 @@ Total length of captured stderr.
 .B rc_cap[RUNCAP_STDERR].sc_nlines
 Number of lines in the captured stderr.
 .PP
-The actual data can be retrieved using the \fBruncap_getc\fR, and
+The last captured line can be partial, i.e. not terminated with a
+newline character.  It will be counted in the stream's \fBsc_nlines\fR
+anyways.
+.PP
+Captured data can be retrieved using the \fBruncap_getc\fR, and
 \fBruncap_getline\fR functions, described below.
-.SH Examining output
+.SS Examining output
 Upon return from \fBruncap\fR the following functions can be used to
-retrieve the captured data from the \fBstruct runcap\fR object pointed
+retrieve captured data from the \fBstruct runcap\fR object pointed
 to by its \fIrc\fR argument.  The stream to retrieve data from is
 identified by the \fIstream\fR argument, whose valid values are
 \fBRUNCAP_STDOUT\fR (or \fB1\fR) or \fBRUNCAP_STDERR\fR (or \fB2\fR).
@@ -300,6 +345,57 @@ and
 runcap_rewind(rc, stream) <=> runcap_seek(rc, stream, 0, SEEK_SET)
 .fi
 .in
+.SS Redirecting output
+In addition to the normal processing, the output sent to a particular
+stream can be redirected to a file.  To do so, initialize the
+\fBsc_storfd\fR member of the output stream to the file descriptor
+and set the \fBRCF_STDOUT_STORFD\fR or \fBRCF_STDERR_STORFD\fR
+flag (depending on the stream).  For example, the following code
+redirects the standard output of the program to the file "outfile":
+.PP
+.in +4n
+.nf
+int fd = open("outfile", O_CREAT|O_RDWR|O_TRUNC, 0600);
+assert(fd != -1);
+rc->rc_cap[RUNCAP_STDOUT].sc_storfd = fd;
+
+runcap(&rc, RCF_STDOUT_STORFD);
+.fi
+.in
+.SS Disabling capturing
+Two ways are provided to disable capturing of a particular stream.
+First, you can set the \fBsc_size\fR member of the corresponding
+\fBrc_cap\fR element to 0 and indicate that by setting the
+\fBRCF_STDOUT_SIZE\fR (for stdout) or \fBRCF_STDERR_SIZE\fR (for
+stderr) flag.  This was the method used in first releases of runcap.
+.PP
+Another way is to use the \fBRCF_STDOUT_NOCAP\fR and/or
+\fBRCF_STDERR_NOCAP\fR flag in the call to \fBruncap\fR.
+.PP
+Both methods are equivalent.
+.PP
+When capturing of a particular stream is disabled, the corresponding
+file descriptor of the program being invoked is inherited from the
+calling program.  This means, e.g., that if you disable stderr
+capturing, error diagnostics from the programs that \fBruncap\fR runs
+will appear at the stderr of your program.  Upon return from
+\fBruncap\fR both
+.B sc_leng
+and
+.B sc_nlines
+fields of the corresponding \fBrc_cap\fR structure will be zero.
+.PP
+This is changed if line monitor is installed on the stream with
+disabled capturing.  In that case, the output from the program will be
+intercepted, passed to the line monitor function and discarded.  Upon
+return, both 
+.B sc_leng
+and
+.B sc_nlines
+will reflect the actual length in bytes and number of lines in the
+processed material.
+.B sc_nlines
+field.
 .SH RETURN VALUE
 Upon successful completion,
 .B runcap()
@@ -380,7 +476,7 @@ archive(void)
 .SH AUTHORS
 Sergey Poznyakoff
 .SH COPYRIGHT
-Copyright \(co 2017 Sergey Poznyakoff
+Copyright \(co 2017--2020 Sergey Poznyakoff
 .br
 .na
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>

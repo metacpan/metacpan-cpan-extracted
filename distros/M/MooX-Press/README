@@ -726,6 +726,11 @@ DESCRIPTION
     `overload` *(HashRef)*
         Options to pass to `use overload`.
 
+    `abstract` *(Bool)*
+        Marks the class as abstract. Abstract classes cannot have factories or
+        coercions, and do not have a constuctor. They may be inherited from
+        though. It is usually better to use roles.
+
    Role Options
     Options for roles are largely the same as for classes with the following
     exceptions:
@@ -823,16 +828,28 @@ DESCRIPTION
           sub my_function { ... }
 
     `subclass` *(Any)*
-        This option is silently ignored.
+        This option is not allowed.
 
     `factory` *(Any)*
-        This option is silently ignored.
+        This option is not allowed.
 
     `mutable` *(Any)*
         This option is silently ignored.
 
     `overload` *(Any)*
-        This option is silently ignored.
+        This option is not allowed.
+
+    `abstract` *(Any)*
+        This option is not allowed.
+
+    `interface` *(Bool)*
+        An interface is a "light" role.
+
+        If a role is marked as an interface, it must not have any `can`,
+        `before`, `after`, `around`, `has`, or `multimethod` options.
+        `requires`, `constant`, and `type_name` are allowed. `with` is
+        allowed; you should only use `with` to compose other interfaces (not
+        full roles) though this is not currently enforced.
 
    Attribute Specifications
     Attribute specifications are mostly just passed to the OO toolkit

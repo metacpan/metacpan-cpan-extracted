@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.44      2020-02-04 15:36:38 -0700
+  - Added support for github actions / workflow
+
+2.43      2020-02-04 03:16:36 -0700
+  - Add a workflow key to [@Author::Plicease] and
+    [Author::Plicease::MarkDownCleanup]
+  - [Author::Plicease::Core] no longer checks for dev deps on
+    incomplete Perls
+
 2.42      2020-01-17 14:43:55 -0700
   - Merged Dist-Zilla-Plugin-Author-Plicease back into this dist.
     (it was spun off in 2.01 for reasons, but I admit it wasn't

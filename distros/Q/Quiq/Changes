@@ -1,3 +1,19 @@
+1.172 2020-02-01
+================
+
+[Quiq::Gd::Component::BlockDiagram]
+* Attribut yReverse hinzugefügt
+
+[Quiq::JQuery::ContextMenu::Ajax]
+* Doku bearbeitet
+
+[Quiq::JQuery::ContextMenu]
+* Klasse hinzugefügt
+
+[Quiq::Sql]
+* END (vorerst) aus den ProstgreSQL-Kommandos entfernt
+* Argument für portablen Typ DATETIME hinzugefügt
+
 1.171 2020-01-25
 ================
 

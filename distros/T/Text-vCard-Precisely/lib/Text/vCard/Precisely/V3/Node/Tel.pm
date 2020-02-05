@@ -9,11 +9,12 @@ extends 'Text::vCard::Precisely::V3::Node';
 
 has name => (is => 'ro', default => 'TEL', isa => 'Str' );
 
-subtype 'Tel'
-    => as 'Str'
-    => where { m/^(?:[+]?\d{1,2}|\d*)[\(\s\-]?\d{1,3}[\)\s\-]?[\s]?\d{1,4}[\s\-]?\d{3,4}$/s }
-    => message { "The Number you provided, $_, was not supported in Tel" };
-has content => (is => 'ro', default => '', isa => 'Tel' );
+#   to validate phone numbers is too difficult for me
+#subtype 'Tel'
+#    => as 'Str'
+#    => where { m/^(?:[+]?\d{1,2}|\d*)[\(\s\-]?\d{1,3}[\)\s\-]?[\s]?\d{1,4}[\s\-]?\d{3,4}$/s }
+#    => message { "The Number you provided, $_, was not supported in Tel" };
+has content => (is => 'ro', default => '', isa => 'Str' );
 
 subtype 'TelType'
     => as 'Str'

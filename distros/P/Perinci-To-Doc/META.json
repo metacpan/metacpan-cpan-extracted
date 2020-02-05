@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-To-Doc"
       }
    },
-   "version" : "0.869",
+   "version" : "0.870",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

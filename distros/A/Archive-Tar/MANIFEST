@@ -26,9 +26,11 @@ t/src/long/b
 t/src/long/bar.tar
 t/src/long/foo.tbz
 t/src/long/foo.tgz
+t/src/long/foo.txz
 t/src/short/b
 t/src/short/bar.tar
 t/src/short/foo.tbz
 t/src/short/foo.tgz
+t/src/short/foo.txz
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

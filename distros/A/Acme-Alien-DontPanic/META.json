@@ -17,8 +17,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "1.10",
-            "Alien::Build" : "1.98",
+            "Alien::Base::ModuleBuild" : "1.12",
+            "Alien::Build" : "2.00",
             "File::ShareDir" : "1.03",
             "perl" : "5.006"
          }
@@ -38,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "1.98",
+            "Alien::Base" : "2.00",
             "File::ShareDir" : "1.03",
             "perl" : "5.006"
          }
@@ -65,9 +65,9 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.9800",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
+   "version" : "2.0000",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }
 

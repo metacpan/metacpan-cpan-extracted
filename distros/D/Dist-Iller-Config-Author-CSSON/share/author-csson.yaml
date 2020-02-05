@@ -46,7 +46,7 @@ prereqs:
 plugins:
  - +plugin: Git::GatherDir
    +prereqs:
-    - develop_requires: Dist::Zilla::Plugin::Git 2.045
+    - develop_requires: Dist::Zilla::Plugin::Git 2.046
    exclude_filename:
    - META.json
    - LICENSE
@@ -150,7 +150,7 @@ plugins:
  - +plugin: DistIller::MetaGeneratedBy
 
  - +plugin: Git::Contributors
-   +version: 0.034
+   +version: 0.035
 
  - +plugin: Test::Kwalitee::Extra
    +version: v0.2.1
@@ -166,10 +166,10 @@ plugins:
    +version: 0.0501
 
  - +plugin: Test::Version
-   +version: 1.05
+   +version: 1.09
 
  - +plugin: Test::Compile
-   +version: 2.057
+   +version: 2.058
 
  - +plugin: Test::ReportPrereqs
    +version: 0.027
@@ -179,7 +179,7 @@ plugins:
  - +plugin: License
 
  - +plugin: RunExtraTests
-   +version: 0.028
+   +version: 0.029
 
  - +plugin: ShareDir
  - +plugin: ExecDir
@@ -188,7 +188,7 @@ plugins:
  - +plugin: ManifestSkip
 
  - +plugin: CheckChangesHasContent
-   +version: 0.008
+   +version: 0.011
 
  - +plugin: Git::CheckFor::CorrectBranch
    +version: 0.014
@@ -231,7 +231,7 @@ plugins:
    install_command: cpanm .
 
  - +plugin: BumpVersionAfterRelease::Transitional
-   +version: 0.008
+   +version: 0.009
    +remove_if: $env.fake_release
 
  - +plugin: CommitAfterRelease

@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Iller::Config::Author::CSSON:
     file: lib/Dist/Iller/Config/Author/CSSON.pm
-    version: '0.0323'
+    version: '0.0324'
   Dist::Iller::Config::Author::CSSON::MapMetro:
     file: lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm
-    version: '0.0323'
+    version: '0.0324'
 requires:
   Dist::Iller: '0.1401'
   Moose: '2.0000'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON/issues
   homepage: https://metacpan.org/release/Dist-Iller-Config-Author-CSSON
   repository: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON.git
-version: '0.0323'
+version: '0.0324'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -440,7 +440,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0323'
+          tag: '0.0324'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:

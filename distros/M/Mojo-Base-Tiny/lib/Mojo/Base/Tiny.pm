@@ -15,7 +15,7 @@ use Sub::Util    ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
@@ -122,7 +122,7 @@ sub import {
     }
 
     # async/await
-    elsif ($flag eq '-async') {
+    elsif ($flag eq '-async_await') {
       Carp::croak 'async/await is only available in Mojo::Base';
     }
 
@@ -283,7 +283,7 @@ efficiently with promises, it is finally time to move to a full L<Mojolicious>
 installation and to use L<Mojo::Base>.
 
   # async/await not available
-  use Mojo::Base::Tiny -strict, -async;  # throws an error
+  use Mojo::Base::Tiny -strict, -async_await;  # throws an error
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.
@@ -449,9 +449,9 @@ Mohammad S Anwar - C<mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT
 
-© 2008-2019 Sebastian Riedel and others.
+© 2008–2019 Sebastian Riedel and others.
 
-© 2019 Tekki (Rolf Stöckli).
+© 2019–2020 Tekki (Rolf Stöckli).
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version 2.0.
 

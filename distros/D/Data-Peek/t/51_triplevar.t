@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
-use Test::NoWarnings;
+use Test::More;
+use Test::Warnings;
 
 use Data::Peek qw( DDual DPeek triplevar );
 
@@ -19,5 +19,7 @@ foreach         my $iv (undef, 3     ) {
 	    }
 	}
     }
+
+done_testing;
 
 1;

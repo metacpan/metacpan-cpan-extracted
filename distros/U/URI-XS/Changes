@@ -1,3 +1,5 @@
+2.0.1    31.01.2020
+           - typemap bugfix
 2.0.0    20.01.2020
            - fix crash at global destroy phase on windows
            - add URISP typemap which allows for autoconstruction from ctor arguments

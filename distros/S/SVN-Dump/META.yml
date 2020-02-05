@@ -1,39 +1,73 @@
 ---
 abstract: 'A Perl interface to Subversion dumps'
 author:
-  - "Philippe \"BooK\" Bruhat <book@cpan.org>"
-build_requires: {}
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::Util: '0'
+  PerlIO::gzip: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::CPAN::Meta: '0'
+  Test::More: '0.88'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  lib: '0'
+  perl: '5.006'
 configure_requires:
-  Module::Build: 0.38
-dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - svn
+  - subversion
+  - dump
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SVN-Dump
 provides:
   SVN::Dump:
     file: lib/SVN/Dump.pm
-    version: 0.06
+    version: '0.07'
   SVN::Dump::Headers:
     file: lib/SVN/Dump/Headers.pm
-    version: 0
+    version: '0.07'
   SVN::Dump::Property:
     file: lib/SVN/Dump/Property.pm
-    version: 0
+    version: '0.07'
   SVN::Dump::Reader:
     file: lib/SVN/Dump/Reader.pm
-    version: 0
+    version: '0.07'
   SVN::Dump::Record:
     file: lib/SVN/Dump/Record.pm
-    version: 0
+    version: '0.07'
   SVN::Dump::Text:
     file: lib/SVN/Dump/Text.pm
-    version: 0
+    version: '0.07'
 requires:
-  Test::More: 0
+  Carp: '0'
+  Digest: '0'
+  IO::Handle: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/book/SVN-Dump
-version: 0.06
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=SVN-Dump
+  repository: http://github.com/book/SVN-Dump.git
+version: '0.07'
+x_contributors:
+  - 'fschlich <fschlich@zedat.fu-berlin.de>'
+  - 'Andrew Sayers <andrew-svn-dump@pileofstuff.org>'
+  - 'David Landgren <dland@cpan.org>'
+  - 'Roderich Schupp <rschupp@cpan.org>'
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+  - 'Nicholas Clark <nwclark@cpan.org>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

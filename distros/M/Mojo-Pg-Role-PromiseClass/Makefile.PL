@@ -13,17 +13,17 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Mojo-Pg-Role-PromiseClass",
-  "LICENSE" => "perl",
+  "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojo::Pg::Role::PromiseClass",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
-    "Mojo::Base::Role::PromiseClass" => 0,
+    "Mojo::Base::Role::PromiseClass" => "0.008",
     "Mojo::Pg" => "4.15",
     "Mojolicious" => "8.23",
     "Role::Tiny" => "2.000001"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
-  "Mojo::Base::Role::PromiseClass" => 0,
+  "Mojo::Base::Role::PromiseClass" => "0.008",
   "Mojo::Pg" => "4.15",
   "Mojolicious" => "8.23",
   "Role::Tiny" => "2.000001"

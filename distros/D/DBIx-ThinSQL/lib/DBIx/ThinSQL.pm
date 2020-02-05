@@ -27,7 +27,7 @@ use Exporter::Tidy
   ];
 
 our @ISA     = 'DBI';
-our $VERSION = '0.0.48';
+our $VERSION = '0.0.49';
 
 sub ejoin {
     my $joiner = shift;
@@ -104,12 +104,8 @@ our @ISA = qw(DBI::db);
 our @CARP_NOT;
 
 sub share_dir {
-    require Path::Tiny;
-
-    return Path::Tiny::path($DBIX::ThinSQL::SHARE_DIR)
-      if defined $DBIX::ThinSQL::SHARE_DIR;
-
     require File::ShareDir;
+    require Path::Tiny;
     return Path::Tiny::path( File::ShareDir::dist_dir('DBIx-ThinSQL') );
 }
 
@@ -313,7 +309,19 @@ sub xdump {
     my $self = shift;
     my $sth  = $self->xprepare(@_);
     $sth->execute;
-    $sth->dump_results;
+    my $header = $sth->{NAME};
+    my $data   = $sth->fetchall_arrayref;
+    unshift @$data, $header;
+    if ( eval { require Text::Table::Tiny } ) {
+        print Text::Table::Tiny::generate_table(
+            header_row => 1,
+            rows       => $data
+          ),
+          "\n";
+    }
+    else {
+        $sth->dump_results;
+    }
 }
 
 sub xval {
@@ -414,7 +422,7 @@ sub txn {
 
     }
 
-    $self->{RaiseError} = 1 unless exists $self->{HandleError};
+    $self->{RaiseError}         = 1 unless exists $self->{HandleError};
     $self->{ShowErrorStatement} = 1;
 
     my @result;
@@ -492,13 +500,13 @@ our @ISA = qw(DBI::st);
 
 sub val {
     my $self = shift;
-    my $ref = $self->fetchrow_arrayref || return;
+    my $ref  = $self->fetchrow_arrayref || return;
     return $ref->[0];
 }
 
 sub vals {
     my $self = shift;
-    my $all = $self->fetchall_arrayref || return;
+    my $all  = $self->fetchall_arrayref || return;
     return unless @$all;
     return map { $_->[0] } @$all if wantarray;
     return [ map { $_->[0] } @$all ];
@@ -506,7 +514,7 @@ sub vals {
 
 sub list {
     my $self = shift;
-    my $ref = $self->fetchrow_arrayref || return;
+    my $ref  = $self->fetchrow_arrayref || return;
     return @$ref;
 }
 
@@ -553,8 +561,8 @@ our @ISA = ('DBIx::ThinSQL::expr');
 
 sub new {
     my $class = shift;
-    return $_[0]  if ref( $_[0] ) =~ m/DBIx::ThinSQL/;
-    return $$_[0] if ref $_[0] eq 'SCALAR';
+    return $_[0]      if ref( $_[0] ) =~ m/DBIx::ThinSQL/;
+    return ${ $_[0] } if ref $_[0] eq 'SCALAR';
     return bless [@_], $class;
 }
 
@@ -778,7 +786,17 @@ sub new {
                         @query,
                         [
                             $word,
-                            DBIx::ThinSQL::values->new(
+                            ref $arg->[0] eq 'ARRAY'
+                            ? DBIx::ThinSQL::list->new(
+                                map {
+                                    DBIx::ThinSQL::values->new(
+                                        map {
+                                            DBIx::ThinSQL::bind_value->new($_)
+                                        } @$_
+                                    )
+                                } @$arg
+                              )
+                            : DBIx::ThinSQL::values->new(
                                 map { DBIx::ThinSQL::bind_value->new($_) }
                                   @$arg
                             )
@@ -811,7 +829,7 @@ sub new {
                                         : DBIx::ThinSQL::bind_value->new(
                                             $arg->{$_}
                                         )
-                                      )
+                                    )
                                 } @cols
                             )
                         ]
@@ -876,7 +894,7 @@ DBIx::ThinSQL - A lightweight SQL helper for DBI
 
 =head1 VERSION
 
-0.0.48 (2016-11-01) development release.
+0.0.49 (2020-02-04) development release.
 
 =head1 SYNOPSIS
 
@@ -1261,7 +1279,7 @@ Mark Lawrence E<lt>nomad@null.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 Mark Lawrence <nomad@null.net>
+Copyright (C) 2013-2020 Mark Lawrence <nomad@null.net>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

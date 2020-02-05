@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 use Data::Object 'WithStashable';
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 has name => (
   is => 'ro',
@@ -96,6 +96,7 @@ around BUILD($args) {
   $self->build_libraries;
   $self->build_headers;
   $self->build_footers;
+  $self->build_scenarios;
   $self->build_methods;
   $self->build_functions;
   $self->build_routines;
@@ -192,7 +193,7 @@ method check_includes() {
 
   return 1 if !$includes;
 
-  for my $include (map { [split /\s*:\s*/]  } @$includes) {
+  for my $include (map { [split /\s*:\s*/]  } grep {length} @$includes) {
     next if $include->[0] eq 'function';
     next if $include->[0] eq 'routine';
     next if $include->[0] eq 'method';
@@ -393,6 +394,46 @@ method check_footers() {
   return 1;
 }
 
+method build_scenarios() {
+  $self->parse_scenarios;
+  $self->check_scenarios or raise 'build scenarios failed';
+
+  return $self->stash('scenarios');
+}
+
+method parse_scenarios() {
+  my $source = $self->source->data;
+
+  my $scenarios = {};
+
+  for my $metadata (@{$source->list('scenario')}) {
+    if (my $content = $source->contents("example", $metadata->{name})) {
+      next if !@$content;
+
+      my $usage = $metadata->{data};
+      $scenarios->{$metadata->{name}} = {
+        usage => $usage,
+        example => $content
+      };
+    }
+  }
+
+  return $self->stash(scenarios => $scenarios);
+}
+
+method check_scenarios() {
+  my $scenarios = $self->stash('scenarios');
+
+  return 1 if !%$scenarios;
+
+  while (my($key, $val) = each(%$scenarios)) {
+    return 0 unless $val->{usage};
+    return 0 unless $val->{example};
+  }
+
+  return 1;
+}
+
 method build_methods() {
   return if !$self->includes;
 
@@ -407,7 +448,7 @@ method parse_methods() {
 
   my $methods = {};
 
-  for my $include (map { [split /\s*:\s*/]  } @{$self->includes}) {
+  for my $include (map { [split /\s*:\s*/]  } grep {length} @{$self->includes}) {
     next if $include->[0] ne 'method';
 
     my $item = {};
@@ -458,7 +499,7 @@ method parse_functions() {
 
   my $functions = {};
 
-  for my $include (map { [split /\s*:\s*/]  } @{$self->includes}) {
+  for my $include (map { [split /\s*:\s*/]  } grep {length} @{$self->includes}) {
     next if $include->[0] ne 'function';
 
     my $item = {};
@@ -509,7 +550,7 @@ method parse_routines() {
 
   my $routines = {};
 
-  for my $include (map { [split /\s*:\s*/]  } @{$self->includes}) {
+  for my $include (map { [split /\s*:\s*/]  } grep {length} @{$self->includes}) {
     next if $include->[0] ne 'routine';
 
     my $item = {};
@@ -544,6 +585,18 @@ method check_routines() {
   }
 
   return 1;
+}
+
+method scenarios($name, $attr) {
+  my $scenarios = $self->stash('scenarios');
+
+  return $scenarios if !$name;
+
+  my $result = $scenarios->{$name};
+
+  return $result if !$attr;
+
+  return $result->{$attr};
 }
 
 method methods($name, $attr) {

@@ -42,7 +42,10 @@ subtest 'unlink on a existing directory' => sub {
 
     $! = 0;
     is( unlink($temp_dir_name), 0, "MOCKED unlink returns 0 files deleted." );
-    is( $! + 0, $real_dir_unlink_error, '$! is set to EISDIR' );
+  SKIP: {
+        skip q{This docker container doesn't emit $! failures reliably.}, 1 if on_broken_docker();
+        is( $! + 0, $real_dir_unlink_error, '$! is set to EISDIR' );
+    }
 };
 
 subtest 'unlink on an existing file' => sub {
@@ -73,3 +76,9 @@ subtest 'unlink on an unmocked file' => sub {
 };
 
 done_testing();
+
+sub on_broken_docker {
+    return 0 if $] > 5.019;
+    return 0 unless -f '/.dockerenv';
+    return 1;
+}

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Fatal;
+use Devel::StrictMode 'STRICT';
 
 package MyApp {
 	use MooX::Pression;
@@ -33,6 +35,28 @@ ok eval q{
 	sub baz { 42 }
 	1;
 };
+
+my ($Role, $Class);
+package MyApp2 {
+	use MooX::Pression;
+	$Role = do { role {
+		requires xyzzy(Int $x);
+	}};
+	$Class = do { class {
+		with {"::$Role"};
+		method xyzzy { return $_[1] }
+	}};
+}
+
+if (STRICT) {
+	is( $Class->new->xyzzy(4), 4 );
+	isnt( exception { $Class->new->xyzzy(1.1) }, undef );
+}
+
+else {
+	is( $Class->new->xyzzy(4), 4 );
+	is( $Class->new->xyzzy(1.1), 1.1 );
+}
 
 done_testing;
 

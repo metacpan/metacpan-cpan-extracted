@@ -1,5 +1,5 @@
 {
-   "abstract" : "DWARF debugging information",
+   "abstract" : "[deprecated] DWARF debugging information",
    "author" : [
       "unknown"
    ],
@@ -25,14 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::cmake3" : "0.04",
-            "ExtUtils::MakeMaker" : "6.52",
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.12"
+            "XS::Install" : "v1.2.13"
          }
       },
       "test" : {
@@ -44,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "20200114.0",
+   "version" : "20200114.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

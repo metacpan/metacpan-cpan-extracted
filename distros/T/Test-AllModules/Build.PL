@@ -31,13 +31,13 @@ my $builder = Module::Build->new(
     build_requires      => {
         'FindBin' => 0,
         'File::Spec' => 0,
-        %win_build_requires,
     },
     requires => {
         'perl' => '5.8.1',
         'Module::Pluggable::Object' => 0,
         'Test::More' => 0.88,
         'Test::SharedFork' => 0,
+        %win_build_requires,
     },
     add_to_cleanup      => [ 'Test-AllModules-*' ],
     meta_merge     => {

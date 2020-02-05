@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Proch::N50;
 use Test::More;
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use Data::Dumper;
 
-my $file = "$Bin/../data/small_test.fa";
+my $file = "$RealBin/../data/small_test.fa";
 my $bad_file = $file . '_not_existing';
 
 SKIP: {

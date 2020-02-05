@@ -1,17 +1,14 @@
 package WebService::Ares;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use HTTP::Request;
 use LWP::UserAgent;
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -78,8 +75,8 @@ sub get {
 	# Parse XML.
 	my $data_hr;
 	if ($command eq 'standard') {
-		require Ares::Standard;
-		$data_hr = Ares::Standard::parse($data);
+		require WebService::Ares::Standard;
+		$data_hr = WebService::Ares::Standard::parse($data);
 	}
 
 	# Result.
@@ -152,6 +149,7 @@ WebService::Ares - Perl class to communication with ARES service.
 =head1 SYNOPSIS
 
  use WebService::Ares;
+
  my $obj = WebService::Ares->new(%parameters);
  my @commands = $obj->commands;
  my $error = $obj->error($clean);
@@ -221,11 +219,9 @@ WebService::Ares - Perl class to communication with ARES service.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Data::Printer;
  use WebService::Ares;
 
@@ -267,11 +263,9 @@ WebService::Ares - Perl class to communication with ARES service.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use WebService::Ares;
 
  # Arguments.
@@ -363,11 +357,9 @@ WebService::Ares - Perl class to communication with ARES service.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use WebService::Ares;
 
  # Object.
@@ -403,19 +395,19 @@ Perl XML::Parser parser for Ares standard XML file.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/WebService-Ares>
+L<https://github.com/michal-josef-spacek/WebService-Ares>
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2009-2015
+ © Michal Josef Špaček 2009-2020
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

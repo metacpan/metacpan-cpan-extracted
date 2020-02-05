@@ -4,11 +4,11 @@ use strict;
 use warnings;
 
 use HTTP::CookieMonster qw( cookies );
-use Storable qw( retrieve store );
+use HTTP::Cookies ();
 use Test::Fatal qw( exception );
 use Test::More;
 
-my $jar = retrieve('t/cookie_jar.txt');
+my $jar = HTTP::Cookies->new( file => 't/cookie_jar.txt' );
 
 # 1) my $cookie   = cookies( $jar ); -- first cookie (makes no sense)
 # 2) my $session  = cookies( $jar, 'session' );
@@ -22,22 +22,22 @@ ok(
 );
 
 # case 2
-my $rmid = cookies( $jar, 'RMID' );
+my $rmid = cookies( $jar, 'nyt-geo' );
 isa_ok( $rmid, 'HTTP::CookieMonster::Cookie' );
 
 # case 3
 my @all_cookies = cookies($jar);
-is( scalar @all_cookies, 2, 'all cookies returns array in list context' );
+is( scalar @all_cookies, 4, 'all cookies returns array in list context' );
 
 # case 4
-my @sessions = cookies( $jar, 'RMID' );
-is( scalar @sessions, 1, 'returns one RMID in array context' );
+my @sessions = cookies( $jar, 'nyt-geo' );
+is( scalar @sessions, 1, 'returns one nyt-geo in array context' );
 isa_ok( $sessions[0], 'HTTP::CookieMonster::Cookie' );
 
-# now let's try 2 RMID cookies
+# now let's try 2 nyt-geo cookies
 my $new_cookie = HTTP::CookieMonster::Cookie->new(
     version   => 0,
-    key       => 'RMID',
+    key       => 'nyt-geo',
     val       => 'bar',
     path      => '/',
     domain    => '.metacpan.org',
@@ -57,8 +57,8 @@ ok(
     'cookie required when calling set_cookie()'
 );
 
-@sessions = cookies( $jar, 'RMID' );
-is( scalar @sessions, 2, 'returns two RMIDs in array context' );
+@sessions = cookies( $jar, 'nyt-geo' );
+is( scalar @sessions, 2, 'returns two nyt-geos in array context' );
 foreach my $session (@sessions) {
     isa_ok( $sessions[0], 'HTTP::CookieMonster::Cookie' );
 }

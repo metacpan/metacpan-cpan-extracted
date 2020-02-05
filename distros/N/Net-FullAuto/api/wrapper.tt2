@@ -203,7 +203,7 @@ h2 {
 					<img src="[% c.uri_for('/static/images/fullauto_com.jpg') %]" />
 				</div>
 				<div class="auto_image">
-					<img src="[% c.uri_for('/static/images/automation_api.jpg') %]" />
+					<img src="[% c.uri_for('/static/images/automationapi.jpg') %]" />
 				</div>
 			</div>
 			<div id="content">
@@ -237,7 +237,7 @@ h2 {
                                         <img src="[% c.uri_for('/static/images/automates_everything.jpg') %]" />
                                 </div>
                                 <div class="copyright">
-				        &copy; 2000-2017 <a href="mailto:team@fullauto.com">FullAuto.com LLC</a>	
+				        &copy; 2000-2020 <a href="mailto:team@fullauto.com">FullAuto.com LLC</a>	
                                 </div>
                                 <div class="poweredcatalyst" onclick="location.href='http://www.catalystframework.org';" style="cursor: pointer;">
                                         <img src="[% c.uri_for('/static/images/btn_88x31_powered_shadow.png') %]" />

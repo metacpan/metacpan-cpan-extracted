@@ -1,3 +1,15 @@
+v0.14.1 2020-02-02T11:49:47Z
+ - fixes
+
+v0.14.0 2020-02-02T11:39:36Z
+ - set_pac_func method added
+
+v0.13.0 2020-02-02T10:28:28Z
+ - proxy support added
+
+v0.12.0 2020-02-02T01:53:14Z
+ - tab close on destroy
+
 v0.11.1 2019-12-06T10:46:26Z
  - gitignore updated
 

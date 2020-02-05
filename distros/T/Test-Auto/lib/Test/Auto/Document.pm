@@ -5,7 +5,7 @@ use Data::Object 'Class';
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 has content => (
   is => 'ro',
@@ -46,6 +46,7 @@ method construct() {
   push @$content, $self->construct_inherits;
   push @$content, $self->construct_integrates;
   push @$content, $self->construct_libraries;
+  push @$content, $self->construct_scenarios;
   push @$content, $self->construct_attributes;
   push @$content, $self->construct_functions;
   push @$content, $self->construct_routines;
@@ -130,6 +131,36 @@ method construct_libraries() {
   ]);
 
   return join("\n", @content);
+}
+
+method construct_scenarios() {
+  my $parser = $self->parser;
+  my $scenarios = $parser->scenarios;
+
+  return () if !$scenarios || !%$scenarios;
+
+  my @content;
+
+  push @content, $self->head1('scenarios', [
+    "This package supports the following scenarios:"
+  ]);
+
+  my @order = sort keys %$scenarios;
+
+  push @content, $self->construct_scenarios_item($_) for @order;
+
+  return join("\n", @content);
+}
+
+method construct_scenarios_item($name) {
+  my $parser = $self->parser;
+  my $scenarios = $parser->scenarios;
+  my $scenario = $scenarios->{$name} or return ();
+
+  my $usage = $scenario->{usage};
+  my $example = $scenario->{example}[0];
+
+  return $self->head2($name, [@$example, "", @$usage]);
 }
 
 method construct_attributes() {

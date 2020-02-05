@@ -1,5 +1,14 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.06
+- Add experimental Promise::XS support.
+- setopt() now fails if given CURLMOPT_SOCKETFUNCTION or CURLMOPT_SOCKETDATA.
+- Skip Mojo tests if Mojo::Promise->new() can’t take a callback. (Fixed in
+  Mojolicious 8.15.)
+- Clarify in documentation that unless you’re managing a custom event loop
+most of the N::C::P interface isn’t relevant.
+- Drop Perl 5.8 support.
+
 0.05 Wed 10 Dec 2019
 - Add add_handle_p() to Mojo module.
 - Update examples/mojo.pl and POD example to be more idiomatic.

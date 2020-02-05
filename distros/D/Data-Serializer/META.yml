@@ -1,10 +1,15 @@
 ---
 name: Data-Serializer
-version: 0.60
+version: 0.65
 author:
-  - "Neil Neely (neil@neely.cx)"
+  - Neil Neely (neil@neely.cx)
 abstract: Modules that serialize data structures
 license: perl
+resources:
+  bugtracker: https://github.com/neilneely/Data-Serializer/issues
+  homepage: http://metacpan.org/release/Data-Serializer
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/neilneely/Data-Serializer.git
 build_requires:
   File::Spec: 0
   IO::File: 0
@@ -39,14 +44,10 @@ recommends:
   YAML::Syck: 0
 configure_requires:
   Module::Build: 0.35
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
 provides:
   Data::Serializer:
     file: lib/Data/Serializer.pm
-    version: 0.60
+    version: 0.65
   Data::Serializer::Bencode:
     file: lib/Data/Serializer/Bencode.pm
     version: 0.03
@@ -100,9 +101,11 @@ provides:
     version: 0.03
   Data::Serializer::YAML:
     file: lib/Data/Serializer/YAML.pm
-    version: 0.02
+    version: 0.03
   Data::Serializer::YAML::Syck:
     file: lib/Data/Serializer/YAML/Syck.pm
-    version: 0.02
-resources:
-  license: http://dev.perl.org/licenses/
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -19,7 +19,7 @@ use JSON;
 use Mock::LWP::UserAgent ();
 use My::Module::Test ();
 
-our $VERSION = '0.136';
+our $VERSION = '0.137';
 
 my %opt = (
     directory		=> $Mock::LWP::UserAgent::CANNED_RESPONSE_DIR,

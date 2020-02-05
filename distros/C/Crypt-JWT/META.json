@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Compress::Raw::Zlib" : "0",
-            "CryptX" : "0.034",
+            "CryptX" : "0.067",
             "Exporter" : "5.57",
             "JSON::MaybeXS" : "1.003005",
             "Scalar::Util" : "0",
@@ -51,6 +51,6 @@
          "url" : "https://github.com/DCIT/perl-Crypt-JWT"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,0 +1,10 @@
+Revision history for Cluster-SSH-Helper
+
+0.1.1	 2020-02-04/09:00
+		 - Install bin/cshelper.
+		 - Correct spelling of one of the depends
+		   in Makefile.PL. CHORNY, #131665
+
+0.1.0	 2020-02-04/02:30
+		 - Initial release.
+

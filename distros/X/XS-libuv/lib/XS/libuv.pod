@@ -1,0 +1,34 @@
+=head1 NAME
+
+XS::libuv - libuv shared library for XS.
+
+=head1 SYNOPSIS
+
+In your Makefile.PL
+
+    use XS::Install;
+
+    write_makefile(
+       ...makemaker args
+       BIN_DEPS => 'XS::libuv',
+       ...
+    );
+
+=head1 DESCRIPTION
+
+This package can be used by XS modules to ensure that L<libuv|http://libuv.org/> is installed.
+No perl interface.
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -10,7 +10,7 @@ typedef enum { do_new=1, do_cat, do_set } new_cat_set_t;
 static long utf16_len(UTF16 *wp);
 static void utf16_copy(UTF16 *d, UTF16 *s);
 
-static SV * _dosvwv(SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode);
+static SV * _dosvwv(pTHX_ SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode);
 
 
 
@@ -19,7 +19,7 @@ static SV * _dosvwv(SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode);
  * termination character.
  * If len==-1, wp is a null-terminated wide string
  */
-static SV * _dosvwv(SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode)
+static SV * _dosvwv(pTHX_ SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode)
 {
     char * p=NULL;
     STRLEN svlen;
@@ -131,18 +131,18 @@ static SV * _dosvwv(SV * sv, UTF16 * wp, STRLEN len, new_cat_set_t mode)
  *
  * wp is an array of <len> wide characters without a termination character
  */
-void sv_setwvn(SV * sv, UTF16 * wp, STRLEN len)
+void sv_setwvn(pTHX_ SV * sv, UTF16 * wp, STRLEN len)
 {
     if (wp==NULL) {
         sv_setpvn(sv,NULL,len);
     } else if (len==0) {
         sv_setpvn(sv,"",0);
     } else {
-        _dosvwv(sv,wp,len,do_set);
+        _dosvwv(aTHX_ sv,wp,len,do_set);
     }
 }
 
-SV *sv_newwvn(UTF16 * wp, STRLEN len)
+SV *sv_newwvn(pTHX_ UTF16 * wp, STRLEN len)
 {
     SV *sv;
 
@@ -153,7 +153,7 @@ SV *sv_newwvn(UTF16 * wp, STRLEN len)
     } else if (len==0) {
         sv = newSVpvn("",0);
     } else {
-        sv = _dosvwv(NULL,wp,len,do_new);
+        sv = _dosvwv(aTHX_ NULL,wp,len,do_new);
     }
     return sv;
 
@@ -343,7 +343,7 @@ void PVfreeW(char * s)
  * Turns the UTF8 flag OFF unconditionally, because SV becomes a byte array
  * (for Perl).
  */
-void SV_toWCHAR(SV * sv)
+void SV_toWCHAR(pTHX_ SV * sv)
 {
     STRLEN len;
     UTF16 * wp;
@@ -366,14 +366,14 @@ void SV_toWCHAR(SV * sv)
 }
 
 /* change a UTF8 encoded SV to a wide chr string in place - see SV_toWCHAR */
-void utf8sv_to_wcharsv(SV *sv)
+void utf8sv_to_wcharsv(pTHX_ SV *sv)
 {
 #ifdef sv_utf8_decode
     sv_utf8_decode(sv);
 #else
     SvUTF8_on(sv);
 #endif
-    SV_toWCHAR(sv);
+    SV_toWCHAR(aTHX_ sv);
 }
 
 static long utf16_len(UTF16 *wp)

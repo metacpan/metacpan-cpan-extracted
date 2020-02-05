@@ -43,8 +43,7 @@ my %non_defaults = (
   encoding_mode => 'ASCII',
   size          => '16x48',
 );
-ok $object = $package->new(%non_defaults),
-  'Create object with non-default parameters';
+ok $object = $package->new(%non_defaults), 'Create object with non-default parameters';
 for (sort keys %non_defaults) {
   is $object->$_, $non_defaults{$_}, "$_ is $non_defaults{$_}";
 }
@@ -53,8 +52,7 @@ for (sort keys %defaults) {
   is $object->$_, $defaults{$_}, "$_ is $defaults{$_}";
 }
 
-is $object->encoding_mode('BASE256')->encoding_mode, 'BASE256',
-  'Set encoding_mode to BASE256';
+is $object->encoding_mode('BASE256')->encoding_mode, 'BASE256', 'Set encoding_mode to BASE256';
 is $object->encoding_mode('')->encoding_mode, $defaults{encoding_mode},
   'Set encoding_mode back to default';
 
@@ -62,14 +60,12 @@ note 'Plot';
 ok $object = $package->new, 'Create object';
 my $text = 'Tekki';
 ok my $svg = $object->width(200)->height(200)->plot($text), 'Plot Data Matrix';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_200x200_black.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_200x200_black.svg"), 'Content is correct';
 
 is $object->foreground('red')->size('16x48')->width(300)->height(100), $object,
   'Change color and level';
 ok $svg = $object->plot($text), 'Plot unicode text';
-is $svg, slurp("$FindBin::Bin/resources/Tekki_300x100_red.svg"),
-  'Content is correct';
+is $svg, slurp("$FindBin::Bin/resources/Tekki_300x100_red.svg"), 'Content is correct';
 
 done_testing();
 

@@ -3,12 +3,12 @@ NAME
     in Rinci function metadata
 
 VERSION
-    This document describes version 0.011 of Perinci::Sub::ValidateArgs
+    This document describes version 0.012 of Perinci::Sub::ValidateArgs
     (from Perl distribution Perinci-Sub-ValidateArgs), released on
-    2019-04-15.
+    2020-02-05.
 
 SYNOPSIS
-     use Perinci::Sub::ValidateArgs qw(gen_args_validator);
+     use Perinci::Sub::ValidateArgs qw(gen_args_validator_from_meta);
 
      our %SPEC;
      $SPEC{foo} = {
@@ -26,7 +26,7 @@ SYNOPSIS
          'x.func.validate_args' => 1,
      };
      sub foo {
-         state $validator = gen_args_validator();
+         state $validator = gen_args_validator_from_meta();
          my %args = @_;
          if (my $err = $validator->(\%args)) { return $err }
 
@@ -37,7 +37,7 @@ SYNOPSIS
 
      ...
      sub foo {
-         state $validator = gen_args_validator(die => 1);
+         state $validator = gen_args_validator_from_meta(die => 1);
          my %args = @_;
          $validator->(\%args);
 
@@ -52,12 +52,15 @@ DESCRIPTION
     Sah schemas. See Data::Sah::Manual::ParamsValidating.
 
 FUNCTIONS
-  gen_args_validator
+  gen_args_validator_from_meta
     Usage:
 
-     gen_args_validator(%args) -> any
+     gen_args_validator_from_meta(%args) -> any
 
     Generate argument validator from Rinci function metadata.
+
+    If you don't intend to reuse the generated validator, you can also use
+    "validate_args_using_meta".
 
     This function is not exported by default, but exportable.
 
@@ -80,6 +83,43 @@ FUNCTIONS
         The default is to generate Perl validator code, compile it with
         "eval()", and return the resulting coderef. When this option is set
         to true, the generated source string will be returned instead.
+
+    Return value: (any)
+
+  validate_args_using_meta
+    Usage:
+
+     validate_args_using_meta(%args) -> [status, msg, payload, meta]
+
+    Validate arguments using Rinci function metadata.
+
+    If you intend to reuse the generated validator, you can also use
+    "gen_args_validator_from_meta".
+
+    Note: currently cannot handle "args_as => 'array'", only "args_as =>
+    'arrayref".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args* => *hash|array*
+
+    *   die => *bool*
+
+        Whether validator should die or just return an error
+        message/response.
+
+    *   meta* => *hash*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
 
     Return value: (any)
 
@@ -110,7 +150,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

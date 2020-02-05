@@ -22,7 +22,7 @@ my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
    # KEY
    expect( $mockfh->print( "\x55\xE0" . " gorPMVN" ) );
    expect( $mockfio->sysread( 10 ) )
-      ->and_scalar_return( Future->done( "\x55\x80" . " gorPMVN" ) );
+      ->and_scalar_return( Future->done( "\x55\xE0" . " gorPMVN" ) );
    expect( $mockfio->sleep( 0.1 ) )
       ->and_scalar_return( Future->new );
    # read ASI_KEY_STATUS

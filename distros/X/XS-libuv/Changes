@@ -1,0 +1,14 @@
+1.28.0.6 31.01.2020
+         - renamed to XS::libuv
+1.28.0.5 27.01.2020
+         - simplify Makefile.PL
+1.28.0.4 27.01.2020
+         - remove C++ requirements, improve Makefile.PL
+1.28.0.3 27.01.2020
+         - use Alien::cmake3 instead of Alien::CMake
+1.28.0.2 26.01.2020
+         - fix manifest
+1.28.0.1 26.01.2020
+         - fix makefile.pl
+1.28.0   25.01.2020
+         - libuv 1.28.0

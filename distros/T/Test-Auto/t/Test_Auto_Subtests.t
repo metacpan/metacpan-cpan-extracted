@@ -27,6 +27,7 @@ method: registry
 method: routines
 method: standard
 method: synopsis
+method: scenario
 method: tryable
 
 =synopsis
@@ -268,6 +269,37 @@ standard() : InstanceOf["Test::Auto::Subtests"]
   # $self->routines;
   # $self->functions;
 
+=method scenario
+
+This method finds and evaluates (using C<eval>) the documented scenario example
+and returns a L<Data::Object::Try> object. The C<try> object can be used to
+trap exceptions using the C<catch> method, and/or execute the code and return
+the result using the C<result> method.
+
+=signature scenario
+
+scenario(Str $name, CodeRef $callback) : Any
+
+=example-1 scenario
+
+  package main;
+
+  use Test::Auto;
+
+  my $test = Test::Auto->new(
+    't/Test_Auto.t'
+  );
+
+  my $subtests = $test->subtests;
+
+  $subtests->scenario('testauto', sub {
+    my ($tryable) = @_;
+
+    ok my $result = $tryable->result, 'result ok';
+
+    $result;
+  });
+
 =method synopsis
 
 This method evaluates (using C<eval>) the documented synopsis and
@@ -404,6 +436,12 @@ $subs->example(-1, 'routines', 'method', fun($tryable) {
 });
 
 $subs->example(-1, 'standard', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subs->example(-1, 'scenario', 'method', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
 
   $result;
