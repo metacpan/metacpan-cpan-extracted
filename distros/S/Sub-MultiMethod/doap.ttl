@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -71,6 +71,29 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.003.tar.gz>;
 	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.004"^^xsd:string;
+	dc:issued            "2020-02-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve documentation about multimethods and roles.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Rock/paper/scissors example.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for multimethods in roles that consume other roles.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide a `monomethod` function to install non-multimethods with the same signature handling as `monomethod`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -10,7 +10,7 @@ use Scalar::Util qw(isdual blessed);
 use Data::Dumper;
 
 our
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 our @EXPORT_OK = qw(isnumeric isstring);
 our @ISA = qw(Exporter::Tiny);
@@ -25,9 +25,8 @@ XSLoader::load('Debug::Filter::PrintExpr', $VERSION);
 
 local ($,, $\);
 
-sub import {
-	goto \&Exporter::Tiny::import;
-}
+# Make Exporter::Tiny::import ours, so this will be called by Filter::Simple
+BEGIN {*import = \&Exporter::Tiny::import;}
 
 # variable is exposed and my be overwritten by caller
 our $handle = *STDERR;
@@ -153,13 +152,14 @@ sub _printref {
 	local ($,, $\);
 	print $handle $label ? $label : "line $line:", " ";
 	my $d = Data::Dumper->new([@value]);
-	my $dump =  $d->Dump;
 	if (scalar(@value) <= 1) {
-		$dump =~ s/^\$VAR1/$expr/;
+		$d->Names([$expr]);
 	} else {
-		$dump =~ s/^\$VAR(\d+)/"($expr)[" . ($1 - 1) . "]"/meg;
+		my @names;
+		push @names, "\${[$expr]}[$_]" foreach 0 .. $#value;
+		$d->Names(\@names);
 	}
-	print $handle "\n", $dump;
+	print $handle "\n", $d->Dump;
 }
 
 # process a debug statement

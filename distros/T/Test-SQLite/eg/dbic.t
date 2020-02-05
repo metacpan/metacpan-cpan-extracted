@@ -7,7 +7,7 @@ use Test::SQLite;
 
 use MyApp::Schema;  # Existing DBIC database model
 
-my $sqlite = Test::SQLite->new(schema => '/some/empty.sql');
+my $sqlite = Test::SQLite->new;
 isa_ok $sqlite, 'Test::SQLite';
 
 my $schema = MyApp::Schema->connect( $sqlite->dsn, '', '', $sqlite->db_attrs );
@@ -23,7 +23,7 @@ my $user = $schema->resultset('Account')->create({
 });
 isa_ok $user, 'MyApp::Schema::Result::Account';
 
-my $result = $schema->resultset('Account')->search_by_name($name); # Custom ResultSet method
+my $result = $schema->resultset('Account')->search({ name => $name })->first;
 isa_ok $result, 'MyApp::Schema::Result::Account';
 is $result->name, $user->name, 'name';
 is $result->id, $user->id, 'id';

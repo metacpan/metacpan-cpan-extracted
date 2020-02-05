@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Test-SQLite"
       }
    },
-   "version" : "0.0210",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -304,6 +304,7 @@
                      "Kaitlyn",
                      "Parkhurst",
                      "RaiseError",
+                     "SYMKAT",
                      "dbh",
                      "dsn"
                   ],

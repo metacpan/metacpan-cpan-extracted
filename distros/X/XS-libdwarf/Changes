@@ -1,3 +1,6 @@
+20200114.4   05.02.2020
+    - fix: fix builds on FreeBSD and possibly on other *BSD
+
 20200114.3   04.02.2020
     - fix: let it builds on windows/Strawberry Perl
     - fix: do not require libelf

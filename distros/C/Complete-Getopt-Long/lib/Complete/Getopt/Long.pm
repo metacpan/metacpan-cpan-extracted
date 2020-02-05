@@ -1,9 +1,9 @@
 package Complete::Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-20'; # DATE
+our $DATE = '2020-02-05'; # DATE
 our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.474'; # VERSION
+our $VERSION = '0.475'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,8 @@ our @EXPORT_OK = qw(
 our %SPEC;
 
 our $COMPLETE_GETOPT_LONG_TRACE=$ENV{COMPLETE_GETOPT_LONG_TRACE} // 0;
+our $COMPLETE_GETOPT_LONG_DEFAULT_ENV = $ENV{COMPLETE_GETOPT_LONG_DEFAULT_ENV} // 1;
+our $COMPLETE_GETOPT_LONG_DEFAULT_FILE = $ENV{COMPLETE_GETOPT_LONG_DEFAULT_FILE} // 1;
 
 sub _default_completion {
     require Complete::Env;
@@ -32,7 +34,7 @@ sub _default_completion {
     log_trace('[comp][compgl] entering default completion routine') if $COMPLETE_GETOPT_LONG_TRACE;
 
     # try completing '$...' with shell variables
-    if ($word =~ /\A\$/) {
+    if ($word =~ /\A\$/ && $COMPLETE_GETOPT_LONG_DEFAULT_ENV) {
         log_trace('[comp][compgl] completing shell variable') if $COMPLETE_GETOPT_LONG_TRACE;
         {
             my $compres = Complete::Env::complete_env(
@@ -45,7 +47,7 @@ sub _default_completion {
     }
 
     # try completing '~foo' with user dir (appending / if user's home exists)
-    if ($word =~ m!\A~([^/]*)\z!) {
+    if ($word =~ m!\A~([^/]*)\z! && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
         log_trace("[comp][compgl] completing userdir, user=%s", $1) if $COMPLETE_GETOPT_LONG_TRACE;
         {
             eval { require Unix::Passwd::File };
@@ -67,7 +69,7 @@ sub _default_completion {
     # try completing '~/blah' or '~foo/blah' as if completing file, but do not
     # expand ~foo (this is supported by complete_file(), so we just give it off
     # to the routine)
-    if ($word =~ m!\A(~[^/]*)/!) {
+    if ($word =~ m!\A(~[^/]*)/! && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
         log_trace("[comp][compgl] completing file, path=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
         $fres = Complete::Util::hashify_answer(
             Complete::File::complete_file(word=>$word),
@@ -80,7 +82,7 @@ sub _default_completion {
     # convenience, we add '*' at the end so that when user type [AB] it is
     # treated like [AB]*.
     require String::Wildcard::Bash;
-    if (String::Wildcard::Bash::contains_wildcard($word)) {
+    if (String::Wildcard::Bash::contains_wildcard($word) && $COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
         log_trace("[comp][compgl] completing with wildcard glob, glob=<%s>", "$word*") if $COMPLETE_GETOPT_LONG_TRACE;
         {
             my $compres = [glob("$word*")];
@@ -93,11 +95,15 @@ sub _default_completion {
         }
         # if empty, fallback to searching file
     }
-    log_trace("[comp][compgl] completing with file, file=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
-    $fres = Complete::Util::hashify_answer(
-        Complete::File::complete_file(word=>$word),
-        {path_sep=>'/'}
-    );
+
+    if ($COMPLETE_GETOPT_LONG_DEFAULT_FILE) {
+        log_trace("[comp][compgl] completing with file, file=<%s>", $word) if $COMPLETE_GETOPT_LONG_TRACE;
+        $fres = Complete::Util::hashify_answer(
+            Complete::File::complete_file(word=>$word),
+            {path_sep=>'/'}
+        );
+    }
+
   RETURN_RES:
     log_trace("[comp][compgl] leaving default completion routine, result=%s", $fres) if $COMPLETE_GETOPT_LONG_TRACE;
     $fres;
@@ -745,7 +751,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.474 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2019-12-20.
+This document describes version 0.475 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-02-05.
 
 =head1 SYNOPSIS
 
@@ -796,7 +802,7 @@ C<--no-window-system> or C<--no-blinking-cursor>).
 
 =item * B<completion> => I<code>
 
-Completion routine to complete option value/argument.
+Completion routine to complete option valueE<sol>argument.
 
 Completion code will receive a hash of arguments (C<%args>) containing these
 keys:
@@ -887,6 +893,7 @@ Command line arguments, like @ARGV.
 See function C<parse_cmdline> in L<Complete::Bash> on how to produce this (if
 you're using bash).
 
+
 =back
 
 Return value:  (hash|array)
@@ -901,6 +908,16 @@ the result of this function for bash.
 
 Bool. If set to true, will generated more log statements for debugging (at the
 trace level).
+
+=head2 COMPLETE_GETOPT_LONG_DEFAULT_ENV
+
+Bool. Default true. Can be set to false to disable completing from environment
+variable in default completion.
+
+=head2 COMPLETE_GETOPT_LONG_DEFAULT_FILE
+
+Bool. Default true. Can be set to false to disable completing from filesystem
+(file and directory names) in default completion.
 
 =head1 HOMEPAGE
 
@@ -938,7 +955,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

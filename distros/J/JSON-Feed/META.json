@@ -42,18 +42,16 @@
       },
       "runtime" : {
          "requires" : {
-            "FindBin" : "0",
             "JSON" : "0",
             "Moo" : "0",
-            "Path::Tiny" : "0",
-            "Ref::Util" : "0",
-            "Try::Tiny" : "0",
             "Type::Tiny" : "0",
             "namespace::clean" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "FindBin" : "0",
+            "Path::Tiny" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -61,7 +59,7 @@
    "provides" : {
       "JSON::Feed" : {
          "file" : "lib/JSON/Feed.pm",
-         "version" : "0.001"
+         "version" : "1.000"
       },
       "JSON::Feed::Types" : {
          "file" : "lib/JSON/Feed/Types.pm"
@@ -78,7 +76,7 @@
          "web" : "https://github.com/gugod/JSON-Feed"
       }
    },
-   "version" : "0.001",
+   "version" : "1.000",
    "x_authority" : "cpan:GUGOD",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

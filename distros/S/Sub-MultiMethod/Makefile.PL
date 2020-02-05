@@ -39,7 +39,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.003 },
+                          "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.004 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -55,7 +55,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
                         },
-  "version"          => 0.003,
+  "version"          => 0.004,
   "x_static_install" => 1,
 };
 

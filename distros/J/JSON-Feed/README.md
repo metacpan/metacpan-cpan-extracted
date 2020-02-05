@@ -7,9 +7,7 @@ JSON::Feed - Syndication with JSON.
 
 Parsing:
 
-    JSON::Feed->parse( '/path/feed.json' );
-    JSON::Feed->parse( $file_handle );
-    JSON::Feed->parse( \$src );
+    JSON::Feed->from_string( $json_text );
 
 Generating:
 
@@ -93,22 +91,14 @@ perl.
     Stringify this JSON Feed. At this moment, the feed structure is checked and if
     it is invalid, an exception is thrown.
 
-- parse( $file\_name )
-
-    Take `$file_name` that should be a valid JSON feed, and build an object from
-    it. Exception will be thrown if the input is not a valid JSON feed.
-
-- parse( $file\_handle )
-
-    Take a pre-opened `$file_handle` that should be a valid JSON feed and produce
-    an object from it.  This slurps the rest of $file\_handle but leave it open.
-    Exception will be thrown if the input is not a valid JSON feed.
-
-- parse( \\$json\_feed\_text )
+- from\_string( $json\_text )
 
     Take a reference to a string that is assumed to be a valid json feed and
     produce an object from it. Exception will be thrown if the input is not a
     valid JSON feed.
+
+    This method is supposed to be consume the output of `to_string` method
+    without throwing exceptions.
 
 # References
 

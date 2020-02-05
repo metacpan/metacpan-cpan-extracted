@@ -1,0 +1,49 @@
+{
+   "abstract" : "C<my> C<s>calars C<t>racked C<i>n C<c>olour",
+   "author" : [
+      "Damian Conway <DCONWAY@CPAN.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Var-Mystic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dx" : "0",
+            "Keyword::Declare" : "0",
+            "Variable::Magic" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Effects" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.000002"
+}

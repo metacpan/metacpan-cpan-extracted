@@ -1,10 +1,12 @@
-# perl Makefile.PL; make; perl -Iblib/lib t/04_resolve.t
+# perl Makefile.PL && make && perl -Iblib/lib t/04_resolve.t
 use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 17;
 
-deb "Resolve: ".resolve(sub{my($x)=(@_); $x**2 - 4*$x -1},20,2)."\n";
-deb "Resolve: ".resolve(sub{my($x)=@_; $x**log($x)-$x},0,3)."\n";
-deb "Resolve: ".resolve(sub{$_[0]})." iters=$Acme::Tools::Resolve_iterations\n";
+if($ENV{ATDEBUG}){
+  deb "Resolve: ".resolve(sub{my($x)=(@_); $x**2 - 4*$x -1},20,2)."\n";
+  deb "Resolve: ".resolve(sub{my($x)=@_; $x**log($x)-$x},0,3)."\n";
+  deb "Resolve: ".resolve(sub{$_[0]})." iters=$Acme::Tools::Resolve_iterations\n";
+}
 
 my $e;
 ok(resolve(sub{my($x)=@_; $x**2 - 4*$x -21})      == -3   ,'first solution');
@@ -27,9 +29,10 @@ eval{$e=resolve(sub{$c++; sleep_fp(0.02); $_**2 - 4*$_ -21},0,.02,undef,undef,0.
 deb "x=$e, est=$Resolve_last_estimate, iters=$Resolve_iterations, time=$Resolve_time, c=$c -- $@\n";
 ok($@=~/Could not resolve, perhaps too little time given/,'ok $@');
 
-ok( ($e=sprintf("%.12f",resolve(sub{3*$_ + $_**4 - 12}))) eq '1.632498783713',$e );
-#http://www.quickmath.com/webMathematica3/quickmath/equations/solve/basic.jsp#c=solve_stepssolveequation&v1=3x%2Bx%5E4-12%3D0&v2=x
+my$no=0;sub isr{is( ($e=$_[0]), $_[1], "r".(++$no).": e=$e, iters=$Resolve_iterations")}
+isr( sprintf("%.12f",resolve(sub{3*$_ + $_**4 - 12})), '1.632498783713' ); #*)
+isr( log(resolve(sub{ $_**log($_)-$_},0,2)), 1);
+isr( resolve(sub{$_**2+7*$_-60},0,1),        5);
+isr( resolve_equation("x^2+7x-60"),          5);
 
-ok(log($e=resolve(sub{ $_**log($_)-$_},0,2)) == 1,"e=$e");
-ok( ($e=resolve(sub{$_**2+7*$_-60},0,1)) == 5,"e=$e, iters=$Resolve_iterations");
-ok( ($e=resolve_equation("x^2+7x-60"))   == 5,"e=$e, iters=$Resolve_iterations");
+#*) http://www.quickmath.com/webMathematica3/quickmath/equations/solve/basic.jsp#c=solve_stepssolveequation&v1=3x%2Bx%5E4-12%3D0&v2=x

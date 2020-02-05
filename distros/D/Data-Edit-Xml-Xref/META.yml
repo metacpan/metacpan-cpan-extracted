@@ -15,7 +15,7 @@ name: Data-Edit-Xml-Xref
 provides:
   Data::Edit::Xml::Xref:
     file: lib/Data/Edit/Xml/Xref.pm
-    version: '20200201'
+    version: '20200202'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -27,5 +27,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20200201'
+version: '20200202'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

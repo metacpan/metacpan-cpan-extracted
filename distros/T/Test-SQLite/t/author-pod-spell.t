@@ -27,6 +27,7 @@ Kaitlyn
 Parkhurst
 RaiseError
 SQLite
+SYMKAT
 Test
 dbh
 dsn

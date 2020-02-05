@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Test-SQLite
   repository: https://github.com/ology/Test-SQLite.git
-version: '0.0210'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -222,6 +222,7 @@ x_Dist_Zilla:
             - Kaitlyn
             - Parkhurst
             - RaiseError
+            - SYMKAT
             - dbh
             - dsn
           wordlist: Pod::Wordlist

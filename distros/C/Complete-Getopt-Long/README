@@ -3,8 +3,8 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.474 of Complete::Getopt::Long (from
-    Perl distribution Complete-Getopt-Long), released on 2019-12-20.
+    This document describes version 0.475 of Complete::Getopt::Long (from
+    Perl distribution Complete-Getopt-Long), released on 2020-02-05.
 
 SYNOPSIS
     See Getopt::Long::Complete for an easy way to use this module.
@@ -153,6 +153,14 @@ ENVIRONMENT
     Bool. If set to true, will generated more log statements for debugging
     (at the trace level).
 
+  COMPLETE_GETOPT_LONG_DEFAULT_ENV
+    Bool. Default true. Can be set to false to disable completing from
+    environment variable in default completion.
+
+  COMPLETE_GETOPT_LONG_DEFAULT_FILE
+    Bool. Default true. Can be set to false to disable completing from
+    filesystem (file and directory names) in default completion.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Complete-Getopt-Long>.
@@ -185,7 +193,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

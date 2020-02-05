@@ -19,7 +19,7 @@ package Geo::IP2Location::Lite;
 use strict;
 use warnings;
 
-$Geo::IP2Location::Lite::VERSION = '0.11';
+$Geo::IP2Location::Lite::VERSION = '0.12';
 
 my $UNKNOWN            = "UNKNOWN IP ADDRESS";
 my $NO_IP              = "MISSING IP ADDRESS";
@@ -184,12 +184,10 @@ sub get_record {
 
 	my $low = 0;
 	my $high = $dbcount;
-
 	if ($indexbaseaddr > 0) {
 		$low = $obj->read32($handle, $indexaddr);
 		$high = $obj->read32($handle, $indexaddr + 4);
 	}
-
 	my $mid = 0;
 	my $ipfrom = 0;
 	my $ipto = 0;
@@ -206,6 +204,10 @@ sub get_record {
 		$ipfrom = $obj->read32($handle, $baseaddr + $mid * $dbcolumn * 4);
 		$ipto = $obj->read32($handle, $baseaddr + ($mid + 1) * $dbcolumn * 4);
 		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
+			# read whole results string into temp string and parse results from memory
+			my $raw_positions_row;
+			seek($handle, ($baseaddr + $mid * $dbcolumn * 4) - 1, 0);
+			read($handle, $raw_positions_row, $dbcolumn * 4);
 
 			my @return_vals;
 
@@ -221,22 +223,21 @@ sub get_record {
 					if ( $pos == $LATITUDE or $pos == $LONGITUDE ) {
 
 						push( @return_vals, sprintf( "%.6f",$obj->readFloat(
-							$handle,
-							$baseaddr + ( $mid * $dbcolumn * 4 ) + 4 * ( $POSITIONS->{$pos}[$dbtype] -1 )
+							substr($raw_positions_row, 4 * ( $POSITIONS->{$pos}[$dbtype] -1 ), 4)
 						) ) ); 
 
 					} elsif ( $pos == $COUNTRYLONG ) {
 
 						push( @return_vals, $obj->readStr(
 							$handle,
-							$obj->read32( $handle,$baseaddr + ( $mid * $dbcolumn * 4 ) + 4 * ( $POSITIONS->{$pos}[$dbtype] -1 ) ) +3
+							unpack("V", substr($raw_positions_row, 4 * ( $POSITIONS->{$pos}[$dbtype] -1 ), 4 ) ) + 3
 						) );
 
 					} else {
 
 						my $return_val = $obj->readStr(
 							$handle,
-							$obj->read32( $handle,$baseaddr + ( $mid * $dbcolumn * 4 ) + 4 * ( $POSITIONS->{$pos}[$dbtype] -1 ) )
+							unpack("V", substr($raw_positions_row, 4 * ( $POSITIONS->{$pos}[$dbtype]-1), 4) )
 						);
 
 						if ( $pos == $COUNTRYSHORT && $return_val eq 'UK' ) {
@@ -289,11 +290,7 @@ sub readStr {
 }
 
 sub readFloat {
-	my ($obj, $handle, $position) = @_;
-	my $data = "";
-	seek($handle, $position-1, 0);
-	read($handle, $data, 4);
-
+	my ($obj, $data) = @_;
 	return $IS_LITTLE_ENDIAN
 		? unpack("f", $data)           # "LITTLE ENDIAN - x86\n";
 		: unpack("f", reverse($data)); # "BIG ENDIAN - MAC\n";
@@ -403,7 +400,7 @@ http://www.ip2location.com
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 AUTHOR
 

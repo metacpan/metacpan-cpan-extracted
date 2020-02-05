@@ -1,3 +1,8 @@
+1.000 2020-02-05T11:59:31Z
+
+	- Remove `parse` method
+	- Add `from_string` method
+
 0.001 2019-03-10T16:03:42Z
 
 	- Inital release.

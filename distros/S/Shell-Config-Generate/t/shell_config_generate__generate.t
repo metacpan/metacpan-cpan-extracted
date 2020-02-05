@@ -15,10 +15,10 @@ subtest 'pass in shell as string' => sub {
       },
     ],
   );
-  
+
   my $scg = Shell::Config::Generate->new;
-  
-  $scg->generate('c');  
+
+  $scg->generate('c');
   is(
     $shell,
     object {
@@ -27,7 +27,7 @@ subtest 'pass in shell as string' => sub {
     },
     'for c shell',
   );
-  
+
   $scg->generate('power');
   is(
     $shell,
@@ -52,9 +52,9 @@ subtest 'pass in shell as object' => sub {
       },
     ],
   );
-  
+
   my $scg = Shell::Config::Generate->new;
-  
+
   $scg->generate(Shell::Guess->c_shell);
   is(
     $shell,
@@ -64,7 +64,7 @@ subtest 'pass in shell as object' => sub {
     },
     'for c shell',
   );
-  
+
   $scg->generate(Shell::Guess->power_shell);
   is(
     $shell,

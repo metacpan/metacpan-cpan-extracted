@@ -19,7 +19,7 @@
 # Conrefs report should use targets/ to update the conref file so conrefs fixed by fixDitaRefs are considered
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20200201;
+our $VERSION = 20200202;
 use v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -4698,7 +4698,7 @@ while a corresponding list of passing L<url>s will be written to
 Cross reference Dita XML, match topics and ameliorate missing references.
 
 
-Version 20200201.
+Version 20200202.
 
 
 The following sections describe the methods in each functional area of this
@@ -4723,19 +4723,19 @@ B<Example:>
   lll "Test 011";
     clearFolder(tests, 111);
     createSampleInputFilesForFixDitaRefsImproved3(tests);
-
+  
     my $y = 𝘅𝗿𝗲𝗳(inputFolder => out, reports => reportFolder);                    # Check results without fixes
     ok $y->statusLine eq q(Xref: 1 ref);
-
+  
     my $x = 𝘅𝗿𝗲𝗳
      (inputFolder => out,
       reports     => reportFolder,
       fixBadRefs  => 1,
       fixDitaRefs => targets,
       fixedFolder => outFixed);
-
+  
     ok !$x->errors;
-
+  
 
 =head1 Create test data
 
@@ -6999,7 +6999,8 @@ END
 
 sub deleteVariableFields($)                                                     #P Remove time and other fields that do not affect the end results
  {my ($x) = @_;                                                                 # Cross referencer
-  delete $x->{$_} for qw(timeEnded timeStart maximumNumberOfProcesses);         # Remove time fields etc.
+  delete $x->{$_} for qw(timeEnded timeStart maximumNumberOfProcesses);         # Remove time fields
+  delete $x->{$_} for qw(tagsTextsRatio);                                       # Remove floating fields
   removeFilePathsFromStructure($x);
  }
 
@@ -8191,7 +8192,6 @@ do {
                                               "c_bbbb_bbbb_c90ebf976073b2a3f7a8dc27a3c8254b.dita" => 4,
                                               "c_bbbb_cccc_d1c80714275637cde524bdfa1304a8f3.dita" => 4,
                                             },
-    tagsTextsRatio                       => 8.35714285714286,
     targetFolderContent                  => {
                                               "a.xml" => "bless({\n  source => \"a.xml\",\n  sourceDocType => \"concept\",\n  target => \"bm_a_9d0a9f8e0ac234de9e22c19054b6e455.ditamap\",\n  targetType => \"bookmap\",\n}, \"SourceToTarget\")",
                                               "b.xml" => "bless({\n  source => \"b.xml\",\n  sourceDocType => \"concept\",\n  target => \"bm_b_d2806ba589f908da1106574afd9db642.ditamap\",\n  targetType => \"bookmap\",\n}, \"SourceToTarget\")",
@@ -8754,7 +8754,6 @@ lll "Test 029";
                                                          },
                                           },
   tags                                 => { "c1.dita" => 6, "c2.dita" => 7 },
-  tagsTextsRatio                       => 1.4,
   targetFolderContent                  => {},
   targetTopicToInputFiles              => {},
   texts                                => { "c1.dita" => 4, "c2.dita" => 5 },
@@ -9030,7 +9029,6 @@ lll "Test 030";
                                             "c_12345678123456781234567812345678.dita" => { CDATA => 3, conbody => 1, concept => 1, p => 4, title => 1 },
                                           },
   tags                                 => { "c.dita" => 10, "c_12345678123456781234567812345678.dita" => 7 },
-  tagsTextsRatio                       => 3,
   targetFolderContent                  => {},
   targetTopicToInputFiles              => {},
   texts                                => { "c.dita" => 2, "c_12345678123456781234567812345678.dita" => 3 },
@@ -9239,7 +9237,6 @@ lll "Test 033 Urls";
                                             "concept.dita" => { CDATA => 3, conbody => 1, concept => 1, p => 2, title => 1, xref => 2 },
                                           },
   tags                                 => { "concept.dita" => 7 },
-  tagsTextsRatio                       => 2,
   targetFolderContent                  => {},
   targetTopicToInputFiles              => {},
   texts                                => { "concept.dita" => 3 },

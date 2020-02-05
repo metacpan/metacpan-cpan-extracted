@@ -1,5 +1,8 @@
 Revision history for Shell-Config-Generate
 
+0.34      2020-02-05 10:20:27 -0700
+  - Better diagnostics in testing (gh#22)
+
 0.33      2018-12-09 06:33:53 -0500
   - Production release identical to 0.32_01
 

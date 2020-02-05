@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -95,7 +95,7 @@ Path::Naive - Yet another abstract, Unix-like path manipulation routines
 
 =head1 VERSION
 
-This document describes version 0.03 of Path::Naive (from Perl distribution Path-Naive), released on 2014-09-19.
+This document describes version 0.040 of Path::Naive (from Perl distribution Path-Naive), released on 2020-02-05.
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,8 @@ This document describes version 0.03 of Path::Naive (from Perl distribution Path
  say concat_path("../", ".././c/");   # -> "../.././c/"
  say concat_path("a/b/c", "/d/e");    # -> "/d/e" (path2 is absolute)
 
- # this is just concat_path + normalize_path the result
+ # this is just concat_path + normalize_path the result. note that it can return
+ # path string (in scalar context) or path elements (in list context).
  $p = concat_path_n("a", "b");         # -> "a/b"
  $p = concat_path_n("a/", "b");        # -> "a/b"
  $p = concat_path_n("a", "b/");        # -> "a/b"
@@ -163,7 +164,8 @@ This document describes version 0.03 of Path::Naive (from Perl distribution Path
  @p = concat_path_n("../", ".././c/"); # -> ("..", "..", "c")
 
  # abs_path($path, $base) is equal to concat_path_n($base, $path). $base must be
- # absolute.
+ # absolute. note that it can return path string (in scalar context) or path
+ # elements (in list context).
  $p = abs_path("a", "b");              # dies, $base is not absolute
  $p = abs_path("a", "/b");             # -> "/b/a"
  $p = abs_path(".", "/b");             # -> "/b"
@@ -194,18 +196,11 @@ are used: Config::Tree, L<Riap> (L<App::riap>).
 
 =head2 is_rel_path($path) => bool
 
-=head2 concat_path($path1, $path2, ...) => STR
+=head2 concat_path($path1, $path2, ...) => str
 
 =head2 concat_path_n($path1, $path2, ...) => str | list
 
 =head2 abs_path($path) => str | list
-
-=head1 SEE ALSO
-
-L<Path::Abstract> a similar module. The difference is, it does not interpret
-C<.> and C<..>.
-
-L<File::Spec::Unix> a similar module, with some differences in parsing behavior.
 
 =head1 HOMEPAGE
 
@@ -213,7 +208,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Path-Naive
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Path-Naive>.
+Source repository is at L<https://github.com/perlancar/perl-Path-Naive>.
 
 =head1 BUGS
 
@@ -223,13 +218,20 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Path::Abstract> a similar module. The difference is, it does not interpret
+C<.> and C<..>.
+
+L<File::Spec::Unix> a similar module, with some differences in parsing behavior.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

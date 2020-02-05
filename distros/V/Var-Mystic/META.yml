@@ -1,0 +1,26 @@
+---
+abstract: 'C<my> C<s>calars C<t>racked C<i>n C<c>olour'
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Effects: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Var-Mystic
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dx: '0'
+  Keyword::Declare: '0'
+  Variable::Magic: '0'
+  perl: '5.014'
+version: '0.000002'

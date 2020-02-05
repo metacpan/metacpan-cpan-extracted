@@ -1,10 +1,10 @@
-# make;perl -Iblib/lib t/42_finddup.t
+# make && perl -Iblib/lib t/42_finddup.t
 use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 13;
 my $tmp;
 my @f;
 sub mkf {
-  my $n=shift()//4;
+  my $n=shift(); $n=4 if!defined$n;
   $tmp=tmp();
   my $str=sub{$_<4?"abcd$_":"ABCD$_"};
   @f=map{my$f="$tmp/file$_";writefile($f,&$str($_));$f}0..$n-1;
@@ -14,7 +14,7 @@ sub mkf {
 mkf();
 sub fd{Acme::Tools::cmd_finddup(@_)}
 sub f{fd('-R',@_)}
-sub sr{repl(srlz(@_),"$tmp/",'',qr/\n$/,'')}
+sub sr{repl( srlz(@_), quotemeta("$tmp/"), '', qr/\n$/, '' )}
 
 my %f=f(qw(-P 4 -M -F),@f);
 my $s=sr(\%f,'f');

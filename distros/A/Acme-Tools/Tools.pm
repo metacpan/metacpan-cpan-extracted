@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package Acme::Tools;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use 5.008;     #Perl 5.8 was released July 18th 2002
 use strict;
@@ -372,7 +372,7 @@ sub num2code {
 }
 
 sub code2num {
-  my($code,$validchars,$start)=@_; $start=0 if !defined $start;
+  my($code,$validchars,$start)=@_; $start=0 if!defined$start;
   my $l=length($validchars);
   my $num=0;
   $num=$num*$l+index($validchars,$_) for split//,$code;
@@ -605,11 +605,11 @@ our $Resolve_time;
 #todo: ren solve?
 sub resolve {
   my($f,$goal,$start,$delta,$iters,$sec)=@_;
-  $goal=0      if !defined $goal;
-  $start=0     if !defined $start;
-  $delta=1e-4  if !defined $delta;
-  $iters=100   if !defined $iters;
-  $sec=0       if !defined $sec;
+  $goal=0      if!defined$goal;
+  $start=0     if!defined$start;
+  $delta=1e-4  if!defined$delta;
+  $iters=100   if!defined$iters;
+  $sec=0       if!defined$sec;
   $iters=13e13 if $iters==0;
   croak "Iterations ($iters) or seconds ($sec) can not be a negative number" if $iters<0 or $sec<0;
   $Resolve_iterations=undef;
@@ -2463,7 +2463,7 @@ sub sim {
     ($min,$mindiff)=@r[1,2];
     @r=@{$r[0]};
   }
-  $min//=0;
+  $min=0 if!defined$min;
   my($simlikest,$simnestlikest,$likest,$idlikest)=(-1,-1);
   for(@r){
     my($s,$id)=ref($_) eq 'ARRAY' ? @$_ : ($_);
@@ -2516,12 +2516,11 @@ names are going on the list of probable doubles.
 
 sub sim_perm {
   require String::Similarity;
-  my($s1,$s2)=map s/^\s*(.+?)\s*$/$1/r, map upper($_), @_;
-  croak if not length($s1) or not length($s2);
+  my($s1,$s2)=map {s/^\s*(.+?)\s*$/$1/;$_} map upper($_), @_; #/r v5.14
+  croak if !length($s1) or !length($s2);
   my $max;
   for(cart([permutations(split(/[\s,]+/,$s1))],
-           [permutations(split(/[\s,]+/,$s2))]))
-  {
+           [permutations(split(/[\s,]+/,$s2))])) {
     my($n1,$n2)=@$_;
     if(@$n1>@$n2){    pop@$n1 while @$n1>@$n2 }
     else         {    pop@$n2 while @$n1<@$n2 }
@@ -8244,7 +8243,7 @@ sub cmd_finddup {
   # http://www.commandlinefu.com/commands/view/3555/find-duplicate-files-based-on-size-first-then-md5-hash
   # die "todo: finddup not ready yet"
   my %o;
-  my @argv=opts("ak:dhsnqv0P:FMRp",\%o,@_); $o{P}//=1024*8; $o{k}//=''; #die srlz(\%o,'o','',1);
+  my @argv=opts("ak:dhsnqv0P:FMRp",\%o,@_); $o{P}=1024*8 if!defined$o{P}; $o{k}='' if!defined$o{k};
   croak"ERR: cannot combine -a with -d, -s or -h" if $o{a} and $o{d}||$o{s}||$o{h};
   require File::Find;
   @argv=map{
@@ -8254,7 +8253,7 @@ sub cmd_finddup {
       @f;
   }@argv;
   my %md5sum;
-  my $md5sum=sub{$md5sum{$_[0]}//=md5sum($_[0])}; #memoize
+  my $md5sum=sub{$md5sum{$_[0]}=md5sum($_[0]) if!defined$md5sum{$_[0]}}; #memoize
   my $md5sum_1st_part=sub{
       open my $fh, "<", $_[0] or die "ERR: Could not read $_[0]";
       binmode($fh);
@@ -8358,7 +8357,7 @@ sub cmd_z2z {
   my @argv=opts("pt:kvhon123456789es:$pvopts",\%o,@_);
   my $t=repl(lc$o{t},qw/gzip gz bzip2 bz2/);
   die "due: unknown compression type $o{t}, known are gz, bz2 and xz" if $t!~/^(gz|bz2|xz)$/;
-  $o{p}//=1 if grep$pvopts=~/$_/,keys%o;
+  $o{p}=1 if!defined$o{p} and grep$pvopts=~/$_/,keys%o;
   delete $o{e} if $o{e} and $o{t} ne 'xz' and warn "-e available only for type xz\n";
   my $sum=sum(map -s$_,@argv);
   print "Converting ".@argv." files, total ".bytes_readable($sum)."\n" if $o{v} and @argv>1;
@@ -8770,6 +8769,8 @@ sub sum      { &Acme::Tools::bfsum      }
 =head1 HISTORY
 
 Release history
+
+ 0.27  Feb 2020   Small fixes for some platforms
 
  0.26  Jan 2020   Convert subs: base bin2dec bin2hex bin2oct dec2bin dec2hex dec2oct
                   hex2bin hex2dec hex2oct oct2bin oct2dec oct2hex

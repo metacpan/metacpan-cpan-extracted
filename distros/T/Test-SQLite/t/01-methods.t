@@ -6,21 +6,28 @@ use DBI;
 use Test::More;
 use Test::Exception;
 
-use constant SQL => 'SELECT name FROM account';
-use constant EXPECTED => [ [ 'Gene' ] ];
+use constant CREATE   => "CREATE TABLE account ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, password TEXT NOT NULL, active INTEGER NOT NULL, created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP )";
+use constant INSERT   => "INSERT INTO account (name, password, active) VALUES ('Gene', 'abc123', 1)";
+use constant SELECT   => 'SELECT name FROM account';
+use constant EXPECTED => [ ['Gene'] ];
 
 use_ok 'Test::SQLite';
 
 subtest 'construction failures' => sub {
     throws_ok {
-        Test::SQLite->new
-    } qr/No schema or database given/,
-    'schema or database required';
+        Test::SQLite->new( schema => 'eg/test.sql', database => 'eg/test.db' )
+    } qr/may not be used together/,
+    'schema and database declared together';
 
     throws_ok {
-        Test::SQLite->new( schema => 'eg/test.sql', database => 'eg/test.db' )
-    } qr/may not be used at the same time/,
-    'schema and database declared together';
+        Test::SQLite->new( database => 'eg/test.db', memory => 1 )
+    } qr/may not be used together/,
+    'database and memory declared together';
+
+    throws_ok {
+        Test::SQLite->new( schema => 'eg/test.sql', memory => 1 )
+    } qr/may not be used together/,
+    'schema and memory declared together';
 
     throws_ok {
         Test::SQLite->new( schema => 'eg/bogus.sql' )
@@ -31,6 +38,15 @@ subtest 'construction failures' => sub {
         Test::SQLite->new( database => 'eg/bogus.db' )
     } qr/database does not exist/,
     'database does not exist';
+};
+
+subtest 'no arguments' => sub {
+    my $got = no_args();
+    ok !-e $got, 'db removed';
+};
+
+subtest 'in memory' => sub {
+    in_mem();
 };
 
 subtest 'from schema' => sub {
@@ -44,6 +60,43 @@ subtest 'from database' => sub {
 };
 
 done_testing();
+
+sub no_args {
+    my $sqlite = Test::SQLite->new;
+    ok -e $sqlite->_database, 'create test database';
+
+    my $dbh = $sqlite->dbh;
+    isa_ok $dbh, 'DBI::db';
+
+    my $sth = $dbh->prepare(CREATE);
+    $sth->execute;
+    $sth = $dbh->prepare(INSERT);
+    $sth->execute;
+
+    $sth = $dbh->prepare(SELECT);
+    $sth->execute;
+    my $got = $sth->fetchall_arrayref;
+    is_deeply $got, EXPECTED, 'expected data';
+
+    return $sqlite->_database->filename;
+}
+
+sub in_mem {
+    my $sqlite = Test::SQLite->new(memory => 1);
+
+    my $dbh = $sqlite->dbh;
+    isa_ok $dbh, 'DBI::db';
+
+    my $sth = $dbh->prepare(CREATE);
+    $sth->execute;
+    $sth = $dbh->prepare(INSERT);
+    $sth->execute;
+
+    $sth = $dbh->prepare(SELECT);
+    $sth->execute;
+    my $got = $sth->fetchall_arrayref;
+    is_deeply $got, EXPECTED, 'expected data';
+}
 
 sub from_sql {
     my $sqlite = Test::SQLite->new(
@@ -62,7 +115,7 @@ sub from_sql {
 
     my $dbh = DBI->connect( $sqlite->dsn, '', '', $sqlite->db_attrs );
     isa_ok $dbh, 'DBI::db';
-    my $sth = $dbh->prepare(SQL);
+    my $sth = $dbh->prepare(SELECT);
     $sth->execute;
     my $got = $sth->fetchall_arrayref;
     is_deeply $got, EXPECTED, 'expected data';
@@ -77,7 +130,7 @@ sub from_db {
 
     my $dbh = $sqlite->dbh;
     isa_ok $dbh, 'DBI::db';
-    my $sth = $dbh->prepare(SQL);
+    my $sth = $dbh->prepare(SELECT);
     $sth->execute;
     my $got = $sth->fetchall_arrayref;
     is_deeply $got, EXPECTED, 'expected data';

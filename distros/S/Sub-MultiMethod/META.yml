@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   Sub::MultiMethod:
     file: lib/Sub/MultiMethod.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Exporter::Shiny: '0'
   MRO::Compat: '0'
@@ -42,6 +42,6 @@ resources:
   homepage: https://metacpan.org/release/Sub-MultiMethod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-multimethod.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

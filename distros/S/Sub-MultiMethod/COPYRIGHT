@@ -11,6 +11,8 @@ Files: Changes
  t/02singleclass.t
  t/03inheritance.t
  t/04roles.t
+ t/05rolesdonotinstalldispatchers.t
+ t/06monomethod.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -18,6 +20,8 @@ Files: INSTALL
  LICENSE
  examples/benchmark.pl
  examples/json.pl
+ examples/rock-paper-scissors-mxp.pl
+ examples/rock-paper-scissors.pl
  examples/roles.pl
 Copyright: Unknown
 License: Unknown

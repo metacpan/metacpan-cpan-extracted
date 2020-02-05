@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0210';
+our $VERSION = '0.0400';
 
 use Moo;
 use strictures 2;
@@ -27,6 +27,12 @@ has schema => (
 );
 
 
+has memory => (
+    is        => 'ro',
+    predicate => 'has_memory',
+);
+
+
 has db_attrs => (
     is      => 'ro',
     default => sub { return { RaiseError => 1, AutoCommit => 1 } },
@@ -40,7 +46,7 @@ has dsn => (
 
 sub _build_dsn {
     my ($self) = @_;
-    return 'dbi:SQLite:dbname=' . $self->_database->filename;
+    return 'dbi:SQLite:dbname=' . ( $self->has_memory ? $self->_database : $self->_database->filename );
 }
 
 
@@ -62,7 +68,9 @@ has _database => (
 sub _build__database {
     my ($self) = @_;
 
-    my $filename = File::Temp->new( unlink => 1, suffix => '.db', EXLOCK => 0 );
+    my $filename = $self->has_memory
+        ? ':memory:'
+        : File::Temp->new( unlink => 1, suffix => '.db', EXLOCK => 0 );
 
     if ( $self->has_database ) {
         copy( $self->database, $filename )
@@ -101,10 +109,10 @@ sub _build__database {
 
 sub BUILD {
     my ( $self, $args ) = @_;
-    die 'Schema and database may not be used at the same time.'
-        if $self->has_database and $self->has_schema;
-    die 'No schema or database given.'
-        unless $self->has_database or $self->has_schema;
+    die 'The schema, database and memory arguments may not be used together.'
+        if ( $self->has_database and $self->has_schema )
+            or ( $self->has_database and $self->has_memory )
+            or ( $self->has_schema and $self->has_memory );
 }
 
 1;
@@ -121,18 +129,32 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0210
+version 0.0400
 
 =head1 SYNOPSIS
 
   use DBI;
   use Test::SQLite;
 
-  my $sqlite = Test::SQLite->new(database => '/some/where/production.db');
+  # Start with an empty test db:
+  my $sqlite = Test::SQLite->new;
   my $dbh = $sqlite->dbh;
   # Fiddle with the test database...
   $dbh->disconnect;
 
+  # Use an in-memory database:
+  $sqlite = Test::SQLite->new(memory => 1);
+  $dbh = $sqlite->dbh;
+  # Fiddle with the test database...
+  $dbh->disconnect;
+
+  # Copy a database file to the test db:
+  $sqlite = Test::SQLite->new(database => '/some/where/production.db');
+  $dbh = $sqlite->dbh;
+  # Fiddle with the test database...
+  $dbh->disconnect;
+
+  # Use a schema file to create the test db:
   $sqlite = Test::SQLite->new(
     schema   => '/some/where/schema.sql',
     db_attrs => { RaiseError => 1, AutoCommit => 0 },
@@ -146,11 +168,9 @@ version 0.0210
 =head1 DESCRIPTION
 
 C<Test::SQLite> is loosely inspired by L<Test::PostgreSQL> and
-L<Test::mysqld>, and creates a temporary db to use in tests.  Unlike
-those modules, it is limited to setup/teardown of the test db given a
-B<database> or B<schema> SQL file.
+L<Test::mysqld>, and creates a temporary db to use in tests.
 
-Also this module will return the database B<dbh> handle, B<dsn>
+This module will also return the database B<dbh> handle, B<dsn>
 connection string, and B<db_attrs> connection attributes.
 
 =head1 ATTRIBUTES
@@ -161,7 +181,8 @@ The database to copy.
 
 =head2 has_database
 
-Boolean indicating that a database file was provided to the constructor.
+Boolean indicating that a B<database> file was provided to the
+constructor.
 
 =head2 schema
 
@@ -171,7 +192,16 @@ The SQL schema with which to create a test database.
 
 =head2 has_schema
 
-Boolean indicating that a schema file was provided to the constructor.
+Boolean indicating that a B<schema> file was provided to the
+constructor.
+
+=head2 memory
+
+Create a test database in memory.
+
+=head2 has_memory
+
+Boolean indicating that B<memory> was provided to the constructor.
 
 =head2 db_attrs
 
@@ -189,23 +219,21 @@ A connected database handle based on the B<dsn> and B<db_attrs>.
 
 =head2 new
 
+  $sqlite = Test::SQLite->new;
   $sqlite = Test::SQLite->new(%arguments);
 
-Create a new C<Test::SQLite> object, which creates a temporary
-database given a B<database> or B<schema>.
+Create a new C<Test::SQLite> object.
 
 =head2 BUILD
 
-Ensure that we are given either a B<database> or a B<schema>, and not
-both.
-
-=head1 TO DO
-
-Use in memory storage if not given a database or schema.
+Ensure that we are only given one of B<database>, B<schema> or
+B<memory> in the constructor.
 
 =head1 SEE ALSO
 
 The F<t/01-methods.t> file in this distribution.
+
+The F<eg/dbic.t> example test in this distribution.
 
 L<DBI>
 
@@ -217,7 +245,7 @@ L<Moo>
 
 =head1 THANK YOU
 
-Kaitlyn Parkhurst <symkat@symkat.com>
+Kaitlyn Parkhurst (SYMKAT) <symkat@symkat.com>
 
 =head1 AUTHOR
 

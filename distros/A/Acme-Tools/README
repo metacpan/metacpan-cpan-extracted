@@ -1,13 +1,13 @@
-Acme::Tools version 0.26
+Acme::Tools version 0.27
 ========================
 
 INSTALLATION
 
 To install this module type the following:
 
-   wget http://search.cpan.org/CPAN/authors/id/K/KJ/KJETIL/Acme-Tools-0.26.tar.gz
-   tar zxf Acme-Tools-0.26.tar.gz
-   cd Acme-Tools-0.26
+   wget http://search.cpan.org/CPAN/authors/id/K/KJ/KJETIL/Acme-Tools-0.27.tar.gz
+   tar zxf Acme-Tools-0.27.tar.gz
+   cd Acme-Tools-0.27
 
    perl Makefile.PL
    make test

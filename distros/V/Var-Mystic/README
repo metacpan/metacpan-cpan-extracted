@@ -1,0 +1,32 @@
+Var::Mystic version 0.000002
+
+The module adds a new keyword: mystic
+
+It's exactly like the 'my' keyword, except that scalar variables
+declared with it track their own changes of value, printing the
+diagnostics to STDERR.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+    Keyword::Declare
+    Data::Dx
+    Variable::Magic
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2020, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,16 +1,22 @@
-Revision history for Path-Naive
+0.040   2020-02-05  Released-By: PERLANCAR; Urgency: low
 
-0.03    2014-09-19 (PERLANCAR)
+	- No functional changes.
 
-	- Return list on list context for normalize_path, concat_path_n,
-	  abs_path.
+	- [doc] Note more prominently that concat_path_n and abs_path can
+	  return path elements in list context.
 
 
-0.02    2012-11-05 (SHARYANTO)
+0.03    2014-09-19  Released-By: PERLANCAR
+
+	- [Potentially incompatible change] Return list on list context for
+	  normalize_path, concat_path_n, abs_path.
+
+
+0.02    2012-11-05  Released-By: SHARYANTO
 
         - concat_path{,_n} can accept more than two paths.
 
 
-0.01    2012-11-05 (SHARYANTO)
+0.01    2012-11-05  Released-By: SHARYANTO
 
         - First release.

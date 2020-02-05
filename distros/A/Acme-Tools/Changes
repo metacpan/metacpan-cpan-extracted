@@ -2,6 +2,8 @@ Revision history for Perl extension Acme::Tools.
 
 See also HISTORY in Acme::Tools doc.
 
+0.27  Feb 2020   Small fixes for some platforms
+
 0.26  Jan 2020   Convert subs: base bin2dec bin2hex bin2oct dec2bin dec2hex dec2oct
                  hex2bin hex2dec hex2oct oct2bin oct2dec oct2hex
                  Array subs: joinr perm permute permute_continue pile sortby subarrays

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.33
+    version 0.34
 
 SYNOPSIS
 
@@ -350,7 +350,7 @@ CAVEATS
       more clear and ideomatic. This for example, might make more sense:
 
        if ( $?PATH == 0 ) then
-         setenv PATH '/foo/bar/bin:/bar/foo/bin' 
+         setenv PATH '/foo/bar/bin:/bar/foo/bin'
        else
          setenv PATH "$PATH":'/foo/bar/bin:/bar/foo/bin'
        endif

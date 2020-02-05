@@ -61871,3 +61871,16 @@ S/SY/SYBER/XS-libcares-1.1.1.4.tar.gz
 D/DM/DMOL/XS-libdwarf-20200114.3.tar.gz
 S/SY/SYBER/XS-libgeos-3.7.3.4.tar.gz
 S/SY/SYBER/XS-libuv-1.28.0.6.tar.gz
+K/KJ/KJETIL/Acme-Tools-0.27.tar.gz
+P/PE/PERLANCAR/Complete-Getopt-Long-0.475.tar.gz
+P/PR/PRBRENAN/Data-Edit-Xml-Xref-20200202.tar.gz
+S/SO/SOMMREY/Debug-Filter-PrintExpr-0.12.tar.gz
+L/LE/LEEJO/Geo-IP2Location-Lite-0.12.tar.gz
+G/GU/GUGOD/JSON-Feed-1.000.tar.gz
+P/PE/PERLANCAR/Org-Dump-0.551.tar.gz
+P/PE/PERLANCAR/Path-Naive-0.040.tar.gz
+P/PL/PLICEASE/Shell-Config-Generate-0.34.tar.gz
+T/TO/TOBYINK/Sub-MultiMethod-0.004.tar.gz
+G/GE/GENE/Test-SQLite-0.0400.tar.gz
+D/DC/DCONWAY/Var-Mystic-0.000002.tar.gz
+D/DM/DMOL/XS-libdwarf-20200114.4.tar.gz

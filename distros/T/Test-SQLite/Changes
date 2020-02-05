@@ -1,5 +1,12 @@
 Revision history for Test-SQLite
 
+0.0400 2020-02-05 08:18:14
+    - Improve documentation.
+    - Allow construction of an in-memory database.
+
+0.0300 2020-02-05 07:13:33
+    - Allow construction with no database or schema given.
+
 0.0210 2020-01-30 17:59:09
     - Improve documentation a bit more.
     - Add the eg/dbic.pl script.

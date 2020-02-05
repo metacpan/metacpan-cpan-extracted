@@ -1,5 +1,12 @@
 Revision history for Perl extension Geo::IP2Location::Lite
 
+0.12     2020-02-05
+        - Bring up to date with recent changes in Geo::IP2Location
+        - Reduce file I/O to improve query performance
+
+0.11     2017-10-04
+        - Up test coverage
+
 0.10     2016-12-02
         - Fix some warnings from uninitialized vars
 

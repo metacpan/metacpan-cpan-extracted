@@ -8,8 +8,8 @@ use Shell::Config::Generate;
 my $config = Shell::Config::Generate->new;
 $config->comment( 'this is my config file' );
 $config->set( FOO => 'bar' );
-$config->set_path( 
-  PERL5LIB => '/foo/bar/lib/perl5', 
+$config->set_path(
+  PERL5LIB => '/foo/bar/lib/perl5',
               '/foo/bar/lib/perl5/perl5/site',
 );
 $config->append_path(

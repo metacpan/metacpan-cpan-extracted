@@ -63,7 +63,7 @@ like $result, qr/^\s*\};$/m, 'ref suffix';
 $handle = IO::String->new($result = '');
 #\{\@a, \%h}
 like $result, qr/^line \d+:\s*$/m, 'ref list prefix';
-like $result, qr/\(\\\@a, \\\%h\)\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
+like $result, qr/^\$\{\[\\\@a, \\\%h\]\}\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
 like $result, qr/^\s*\};$/m, 'ref list suffix';
 
 $handle = IO::String->new($result = '');

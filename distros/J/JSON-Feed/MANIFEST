@@ -18,9 +18,9 @@ t/data/microblog.json
 t/data/shapeof.json
 t/data/therecord.json
 t/data/timetable.json
+t/from-string.t
 t/gen.t
 t/parse-example.t
-t/parse.t
 t/types.t
 META.yml
 MANIFEST

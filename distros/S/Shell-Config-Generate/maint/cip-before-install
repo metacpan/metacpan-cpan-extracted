@@ -5,9 +5,11 @@ set -ex
 cip sudo apt-get update
 cip sudo apt-get install -y tcsh zsh ksh csh fish
 
-# this is for testing with the powershell preview
-cip sudo apt-get install -y liblttng-ust0 libicu57
-cip exec curl -L -O https://github.com/PowerShell/PowerShell/releases/download/v6.2.0-preview.2/powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
-cip sudo dpkg -i powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
-cip exec rm -f powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
-cip sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh
+
+# this broke when we upgraded to Debian 10, because Microsoft isn't providing packages for Debian 10 apparently.
+## this is for testing with the powershell preview
+#cip sudo apt-get install -y liblttng-ust0 libicu57
+#cip exec curl -L -O https://github.com/PowerShell/PowerShell/releases/download/v6.2.0-preview.2/powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
+#cip sudo dpkg -i powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
+#cip exec rm -f powershell-preview_6.2.0-preview.2-1.debian.9_amd64.deb
+#cip sudo ln -s /usr/bin/pwsh-preview /usr/bin/pwsh

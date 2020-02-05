@@ -28,8 +28,12 @@ my($dir1, $file1) = win32_space_be_gone($dir,$file);
 ok -d $dir1, "dir exists $dir1";
 ok -r $file1, "file readable $file1";
 
-unlike $dir1, qr{\s}, "dir has no spaces";
-unlike $file1, qr{\s}, "file has no spaces";
+unlike $dir1, qr{\s}, "dir has no spaces"
+  or diag "before: $dir\n",
+          "after:  $dir1";
+unlike $file1, qr{\s}, "file has no spaces"
+  or diag "before: $file\n",
+          "after:  $file1";
 
 my $content = do {
   open my $fh, '<', $file1;

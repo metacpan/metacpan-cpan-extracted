@@ -5,10 +5,10 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 use B ();
-use Exporter::Shiny qw( multimethod multimethods_from_roles );
+use Exporter::Shiny qw( multimethod multimethods_from_roles monomethod );
 use Sub::Util ();
 use Type::Params ();
 use Types::Standard -types;
@@ -39,10 +39,27 @@ sub _generate_multimethods_from_roles {
 	!defined $target and die;
 	ref $target and die;
 	
+	my $is_role = 0+!!$globals->{role};
+	
 	return sub {
 		my @roles = @_;
 		$me->copy_package_candidates(@roles => $target);
-		$me->install_missing_dispatchers($target);
+		$me->install_missing_dispatchers($target) unless $is_role;
+	};
+}
+
+sub _generate_monomethod {
+	my ($me, $name, $args, $globals) = (shift, @_);
+	
+	my $target = $globals->{into};
+	!defined $target and die;
+	ref $target and die;
+	
+	my $is_role = 0+!!$globals->{role};
+	
+	return sub {
+		my ($sub_name, %spec) = @_;
+		$me->install_monomethod($target, $sub_name, no_dispatcher => 1, %spec);
 	};
 }
 
@@ -89,6 +106,17 @@ sub install_missing_dispatchers {
 	}
 }
 
+sub install_monomethod {
+	my $me = shift;
+	my ($target, $sub_name, %spec) = @_;
+	
+	$spec{alias} ||= [];
+	$spec{alias} = [$spec{alias}] if !ref $spec{alias};
+	unshift @{$spec{alias}}, $sub_name;
+	
+	$me->install_candidate($target, undef, no_dispatcher => 1, %spec, is_monomethod => 1);
+}
+
 sub install_candidate {
 	my $me = shift;
 	my ($target, $sub_name, %spec) = @_;
@@ -98,7 +126,8 @@ sub install_candidate {
 	
 	$spec{declaration_order} = ++$DECLARATION_ORDER;
 	
-	push @{ $CANDIDATES{$target}{$sub_name} ||= [] }, \%spec;
+	push @{ $CANDIDATES{$target}{$sub_name} ||= [] }, \%spec
+		if defined $sub_name;
 	
 	if ($spec{alias}) {
 		$spec{alias} = [$spec{alias}] unless ref $spec{alias};
@@ -141,11 +170,24 @@ sub install_candidate {
 		);
 		for my $alias (@aliases) {
 			no strict 'refs';
+			my $existing = do {
+				exists(&{"$target\::$alias"})
+					? \&{"$target\::$alias"}
+					: undef;
+			};
+			if ($existing) {
+				my $kind = ($spec{is_monomethod} && ($alias eq $aliases[0]))
+					? 'Monomethod'
+					: 'Alias';
+				require Carp;
+				Carp::croak("$kind conflicts with existing method $target\::$alias, bailing out");
+			}
 			*{"$target\::$alias"} = $coderef;
 		}
 	}
 	
-	$me->install_dispatcher($target, $sub_name, $is_method) unless $spec{no_dispatcher};
+	$me->install_dispatcher($target, $sub_name, $is_method)
+		if defined $sub_name && !$spec{no_dispatcher};
 }
 
 sub install_dispatcher {
@@ -158,6 +200,8 @@ sub install_dispatcher {
 			? \&{"$target\::$sub_name"}
 			: undef;
 	};
+	
+	return if !defined $sub_name;
 	
 	if ($existing and $DISPATCHERS{"$existing"}) {
 		return $me;   # already installed
@@ -619,6 +663,26 @@ and accept the default.
 
 =back
 
+=head2 C<< monomethod $name => %spec >>
+
+As a convenience, you can use Sub::MultiMethod to install normal methods.
+Why do this instead of using Perl's plain old C<sub> keyword? Well, it gives
+you the same signature checking.
+
+Supports the following options:
+
+=over
+
+=item C<< named >> I<< (Bool) >>
+
+=item C<< signature >> I<< (ArrayRef|CodeRef) >>
+
+=item C<< code >> I<< (CodeRef) >>
+
+=item C<< method >> I<< (Int) >>
+
+=back
+
 =head2 Dispatch Technique
 
 When a multimethod is called, a list of packages to inspect for candidates
@@ -664,6 +728,9 @@ gets passed the result from checking the signature earlier as C<< @_ >>.
 
 =head2 Roles
 
+As far as I'm aware, Sub::MultiMethod is the only multimethod implementation
+that allows multimethods imported from roles to intertegrate into a class.
+
   use v5.12;
   use strict;
   use warnings;
@@ -708,9 +775,9 @@ gets passed the result from checking the signature earlier as C<< @_ >>.
   
   my $obj = My::Class->new;
   
-  say $obj->foo_a;        # A
-  say $obj->foo( [] );    # B
-  say $obj->foo( {} );    # C
+  say $obj->foo_a;        # A (alias defined in RoleA)
+  say $obj->foo( [] );    # B (candidate from RoleB)
+  say $obj->foo( {} );    # C (Class overrides candidate from RoleA)
 
 Sub::MultiMethods doesn't try to be clever about detecting whether your
 package is a role or a class. If you want to use it in a role, simply
@@ -718,7 +785,7 @@ do:
 
     use Sub::MultiMethod -role, qw(multimethod);
 
-The only difference this makes is that the exported C<multimethod>
+The main difference this makes is that the exported C<multimethod>
 function will default to C<< no_dispatcher => 1 >>, so any multimethods
 you define in the role won't be seen by Moose/Mouse/Moo/Role::Tiny as
 part of the role's API, and won't be installed with the C<with> keyword.
@@ -733,6 +800,10 @@ consumed, so in classes that consume roles with multimethods, do this:
 The list of roles should generally be the same as from C<with>.
 This function only copies multimethods across from roles; it does not
 copy their aliases. However, C<with> should find and copy the aliases.
+
+If consuming one role into another role, remember to import
+C<multimethods_from_roles> into the consumer with the C<< -role >>
+tag so it knows not to set up the dispatchers in the role.
 
 All other things being equal, candidates defined in classes should
 beat candidates imported from roles.
@@ -762,6 +833,10 @@ C<< $is_method >> is an integer/boolean.
 
 This rarely needs to be manually called as C<install_candidate> will do it
 automatically.
+
+=item C<< Sub::MultiMethod->install_monomethod($target, $sub_name, %spec) >>
+
+Installs a regular (non-multimethod) method into the target.
 
 =item C<< Sub::MultiMethod->copy_package_candidates(@sources => $target) >>
 

@@ -1,0 +1,6 @@
+0.551   2020-02-06  Released-By: PERLANCAR; Released: no
+
+        - First release, split from Org-Parser.
+
+        - Make Org::Dump also work with Org::Parser::Tiny-produced document
+          object.

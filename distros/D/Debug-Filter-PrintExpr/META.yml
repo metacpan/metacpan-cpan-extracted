@@ -28,4 +28,4 @@ requires:
 resources:
   bugtracker: https://github.com/jo-37/debug-filter-printexpr/issues
   repository: git://github.com/jo-37/debug-filter-printexpr.git
-version: '0.11'
+version: '0.12'
