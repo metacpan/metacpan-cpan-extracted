@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::trebuchet;
 use strict;
 use warnings;
 
-our $VERSION = '2.036'; # VERSION
+our $VERSION = '2.037'; # VERSION
 
 sub data { return {
     'fontname' => 'TrebuchetMS',

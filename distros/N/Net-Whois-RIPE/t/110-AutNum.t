@@ -136,7 +136,7 @@ $tested{'mnt_lower'}++;
 # TODO
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

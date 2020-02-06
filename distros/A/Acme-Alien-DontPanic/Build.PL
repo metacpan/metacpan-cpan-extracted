@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( File::Spec FindBin base strict warnings );
+  } qw( base strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -61,8 +61,8 @@ my %module_build_args = (
     "protocol" => "https"
   },
   "configure_requires" => {
-    "Alien::Base::ModuleBuild" => "1.12",
-    "Alien::Build" => "2.00",
+    "Alien::Base::ModuleBuild" => "1.14",
+    "Alien::Build" => "2.04",
     "File::ShareDir" => "1.03",
     "perl" => "5.006"
   },
@@ -72,12 +72,12 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic",
-  "dist_version" => "2.0000",
+  "dist_version" => "2.0400",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic",
   "recursive_test_files" => 1,
   "requires" => {
-    "Alien::Base" => "2.00",
+    "Alien::Base" => "2.04",
     "File::ShareDir" => "1.03",
     "perl" => "5.006"
   },

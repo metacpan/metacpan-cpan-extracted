@@ -5,7 +5,29 @@ SYNOPSIS
       my $suite = Test::FITesque::RDF->new(source => $file)->suite;
       $suite->run_tests;
 
-    See `t/integration-basic.t` for a full test script example.
+    See `t/integration-basic.t` for a full test script example using this
+    simplest way.
+
+    To run a single test script with several fixture tables, you can either
+    add the tests to a suite, like this:
+
+      my @files = ('test1.ttl','test2.ttl');
+      my $suite = Test::FITesque::Suite->new;
+
+      foreach my $file (@files) {
+        $suite->add(Test::FITesque::RDF->new(source => $path . $file)->suite);
+      }
+      $suite->run_tests;
+
+    or iterate and run the tests for each fixture table like this:
+
+      my @files = ('test1.ttl','test2.ttl');
+
+      foreach my $file (@files) {
+        diag("Reading tests from $path$file");
+        my $suite = Test::FITesque::RDF->new(source => $path . $file)->suite;
+        $suite->run_tests;
+      }
 
 DESCRIPTION
     This module enables the use of Resource Description Framework to describe
@@ -254,12 +276,12 @@ DESCRIPTION
     changes that.
 
     To use data from one response to influence subsequent requests, the
-    framework supports datatyping literals with the `dqm:regex` datatype, for
-    example:
+    framework supports datatyping literals with the `dqm:regex` datatype for
+    headers and HTTP status codes, for example:
 
      :check_acl_location_res a http:ResponseMessage ;
         httph:link '<(.*?)>;\\s+rel="acl"'^^dqm:regex ;
-        http:status 200 .
+        http:status "200|204"^^dqm:regex .
 
     This makes it possible to use a Perl regular expression, which can be
     executed in a test script if desired. If present, it will supply another

@@ -1,5 +1,17 @@
 Revision history for Test-SQLite
 
+0.0403 2020-02-06 06:15:13
+    - Remove the unnecessary "missing documentation bits."  Oops.
+    - Modify the module and test file a bit.
+
+0.0402 2020-02-06 05:57:48
+    - Add missing documentation bits.
+
+0.0401 2020-02-06 05:46:10
+    - Improve documentation ever so slightly.
+    - Fix eg/dbic.t code a bit.
+    - Use namespace::clean.
+
 0.0400 2020-02-05 08:18:14
     - Improve documentation.
     - Allow construction of an in-memory database.

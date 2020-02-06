@@ -1,7 +1,7 @@
 package App::ListOrgTodos;
 
-our $DATE = '2019-12-30'; # DATE
-our $VERSION = '0.471'; # VERSION
+our $DATE = '2020-02-06'; # DATE
+our $VERSION = '0.472'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ App::ListOrgTodos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.471 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2020-12-30.
+This document describes version 0.472 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Only show todo items that are done.
 
 =item * B<due_in> => I<int>
 
-Only show todo items that are (nearing|passed) due.
+Only show todo items that are (nearingE<verbar>passed) due.
 
 If value is not set, then will use todo item's warning period (or, if todo item
 does not have due date or warning period in its due date, will use the default
@@ -188,13 +188,14 @@ object, remember to set the correct time zone.
 
 =item * B<with_unknown_priority> => I<bool>
 
-Also show items with no/unknown priority.
+Also show items with noE<sol>unknown priority.
 
 Relevant only when used with C<minimum_priority> and/or C<maximum_priority>.
 
 If this option is turned on, todo items that does not have any priority or have
 unknown priorities will I<still> be included. Otherwise they will not be
 included.
+
 
 =back
 
@@ -231,7 +232,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

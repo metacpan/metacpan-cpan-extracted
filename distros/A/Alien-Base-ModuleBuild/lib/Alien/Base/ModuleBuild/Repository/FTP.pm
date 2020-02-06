@@ -7,7 +7,7 @@ use Carp;
 use Net::FTP;
 
 # ABSTRACT: HTTP repository handler
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 sub connection {
   my $self = shift;
@@ -68,7 +68,7 @@ Alien::Base::ModuleBuild::Repository::FTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

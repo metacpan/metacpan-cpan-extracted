@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 use Rex::Inventory::Hal::Object;
 use Rex::Commands::Gather;

@@ -1,7 +1,9 @@
 package App::ListNewCPANDists;
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-06'; # DATE
+our $DIST = 'App-ListNewCPANDists'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -322,9 +324,42 @@ sub list_new_cpan_dists {
 
     my %resmeta = (
         'table.fields' => [qw/dist release author version date abstract/],
+        'func.stats' => create_new_cpan_dists_stats(dists => \@res)->[2],
     );
 
     [200, "OK", \@res, \%resmeta];
+}
+
+$SPEC{create_new_cpan_dists_stats} = {
+    v => 1.1,
+    args => {
+        dists => {
+            schema => 'array*',
+        },
+    },
+};
+sub create_new_cpan_dists_stats {
+    my %args = @_;
+    my $dists = $args{dists};
+
+    my %authors;
+    for my $dist (@$dists) {
+        $authors{$dist->{author}} //= {num_dists => 0};
+        $authors{$dist->{author}}{num_dists}++;
+    }
+    my @authors_by_num_dists = map {
+        +{author=>$_, num_dists=>$authors{$_}{num_dists}}
+    } sort { $authors{$b}{num_dists} <=> $authors{$a}{num_dists} }
+    keys %authors;
+    my $num_authors = keys %authors;
+
+    my $stats = {
+        "Number of new CPAN distributions this period" => scalar(@$dists),
+        "Number of authors releasing new CPAN distributions this period" => $num_authors,
+        "Authors by number of new CPAN distributions this period" => \@authors_by_num_dists,
+    };
+
+    [200, "OK", $stats];
 }
 
 $SPEC{list_monthly_new_cpan_dists} = {
@@ -431,6 +466,21 @@ sub list_monthly_new_cpan_dists_html {
             push @html, "</tr>\n";
         }
         push @html, "</table>\n";
+
+        # stats
+        my $stats = $res->[3]{'func.stats'};
+        push @html, "<h3>Stats</h3>\n";
+        push @html, "<p>Number of new CPAN distributions this period: <b>", $stats->{"Number of new CPAN distributions this period"}, "</b></p>\n";
+        push @html, "<p>Number of authors releasing new CPAN distributions this period: <b>", $stats->{"Number of authors releasing new CPAN distributions this period"}, "</b></p>\n";
+        push @html, "<p>Authors by number of new CPAN distributions this period: </p>\n";
+        push @html, "<table>\n";
+        push @html, "<tr><th>No</th><th>Author</th><th>Distributions</th></tr>\n";
+        my $i = 1;
+        for my $rec (@{ $stats->{"Authors by number of new CPAN distributions this period"} }) {
+            push @html, qq(<tr><td>$i</td><td><a href="https://metacpan.org/author/$rec->{author}">$rec->{author}</a></td><td>$rec->{num_dists}</td></tr>\n);
+            $i++;
+        }
+        push @html, "</table>\n";
     }
 
     [200, "OK", join("", @html), {'cmdline.skip_format'=>1}];
@@ -452,9 +502,39 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.010 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2019-01-13.
+This document describes version 0.011 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2020-02-06.
 
 =head1 FUNCTIONS
+
+
+=head2 create_new_cpan_dists_stats
+
+Usage:
+
+ create_new_cpan_dists_stats(%args) -> [status, msg, payload, meta]
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dists> => I<array>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 list_monthly_new_cpan_dists
@@ -486,6 +566,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -498,6 +579,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_monthly_new_cpan_dists_html
@@ -529,6 +611,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<year>* => I<int>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -541,6 +624,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 list_new_cpan_dists
@@ -576,7 +660,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>. This actually does not need to be a real CPAN local
 mirror, but can be just an empty directory. If you use happen to use
@@ -598,6 +682,7 @@ Filename of database.
 =item * B<from_time>* => I<date>
 
 =item * B<to_time> => I<date>
+
 
 =back
 
@@ -634,7 +719,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

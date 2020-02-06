@@ -29,13 +29,6 @@ SKIP: {
 
     require Net::Curl::Promiser::Mojo;
 
-    local $SIG{'ALRM'} = 60;
-
-    local $SIG{'CHLD'} = sub {
-        my $pid = waitpid -1, 1;
-        die "Subprocess $pid ended prematurely!";
-    };
-
     my $server = MyServer->new();
 
     my $port = $server->port();
@@ -46,11 +39,16 @@ SKIP: {
 
     my $promise = ClientTest::run($promiser, $port)->then( sub { print "big resolve\n" }, sub { $@ = shift; warn } );
 
-    isa_ok( $promise, 'Mojo::Promise', 'promise object' );
+  SKIP: {
+        skip 'Using Promise::XS', 1 if $promise->isa('Promise::XS::Promise');
+        isa_ok( $promise, 'Mojo::Promise', 'promise object' );
+    }
 
     my $pr2 = $promise->finally( sub { Mojo::IOLoop->stop() } );
 
     Mojo::IOLoop->start();
+
+    $server->finish();
 }
 
 done_testing();

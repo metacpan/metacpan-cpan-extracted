@@ -14,16 +14,16 @@ perl:
   - "5.14"
   - "5.12"
   - "5.10"
-#  - "5.8"
 
 before_install:
     - eval $(curl https://travis-perl.github.io/init) --auto
+    - "sudo apt-get install libcurl4-openssl-dev"
     - cpanm --notest AnyEvent || true
-#    - cpanm IO::Async  # hangs
+    - cpanm --notest IO::Async
     - cpanm --notest Test::More Time::Local Mojo::IOLoop || true
     - cpanm --notest ExtUtils::MakeMaker || true
 
-matrix:
+jobs:
   include:
     - os: osx
       perl: system

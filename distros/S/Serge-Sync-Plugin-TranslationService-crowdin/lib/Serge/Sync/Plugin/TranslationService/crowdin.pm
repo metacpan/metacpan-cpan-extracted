@@ -8,7 +8,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.902.0');
+our $VERSION = qv('0.903.0');
 
 sub name {
     return 'Crowdin translation software (https://crowdin.com) synchronization plugin';

@@ -42,8 +42,10 @@ t/0200_tags/02010_raw.t
 t/0200_tags/02011_break.t
 t/0200_tags/02012_continue.t
 t/0200_tags/02080_user_defined.t
+t/0200_tags/02101_whitespace_control.t
 t/0200_tags/lib/Template/LiquidX/Tag/Random.pm
 t/0300_basics/03001_context_object.t
 t/0400_classes/04001_context.t
 t/0500_bugs/05001_conditions.t
+t/0500_bugs/05002_issue_7.t
 META.yml

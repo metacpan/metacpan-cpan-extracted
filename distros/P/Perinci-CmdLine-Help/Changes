@@ -1,27 +1,34 @@
-0.171   2019-04-15 (PERLANCAR)
+0.172   2020-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Don't require metadata to be already normalized, provide
+	  meta_is_normalized option just like the others (e.g.
+	  Perinci::Sub::GetArgs::Argv).
+
+
+0.171   2019-04-15  Released-By: PERLANCAR
 
 	- Observe argument spec property 'slurpy' in addition to 'greedy'
 	  (Rinci 1.1.88).
 
 
-0.170   2017-08-12 (PERLANCAR)
+0.170   2017-08-12  Released-By: PERLANCAR
 
 	- Search description.alt.env.cmdline before description in meta.
 
 
-0.16    2017-07-24 (PERLANCAR)
+0.16    2017-07-24  Released-By: PERLANCAR
 
 	- [ux] When there is no summary, skip producing the whole line
 	  because showing just the program name is not very useful.
 
 
-0.15    2017-07-22 (PERLANCAR)
+0.15    2017-07-22  Released-By: PERLANCAR
 
 	- [optimize] Use pre-calculated result of
 	  gen_getopt_long_spec_from_meta() in ggls_res if supplied.
 
 
-0.14    2017-01-27 (PERLANCAR)
+0.14    2017-01-27  Released-By: PERLANCAR
 
 	- [ux] Wrap long option summary.
 
@@ -29,7 +36,7 @@
 	  JSON-encoded str).
 
 
-0.13    2016-12-28 (PERLANCAR)
+0.13    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -37,29 +44,29 @@
 	  x_spec.
 
 
-0.12    2016-12-27 (PERLANCAR)
+0.12    2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [build] Rebuild to remove extraneous dependencies.
 
 
-0.11    2016-09-28 (PERLANCAR)
+0.11    2016-09-28  Released-By: PERLANCAR
 
 	- Fix newlines formatting in example (again!).
 
 
-0.10    2016-09-26 (PERLANCAR)
+0.10    2016-09-26  Released-By: PERLANCAR
 
 	- Tweak format of examples.
 
 
-0.09    2016-08-04 (PERLANCAR)
+0.09    2016-08-04  Released-By: PERLANCAR
 
 	- [Bugfix] Hide options for arguments that have 'hidden' tag.
 
 
-0.08    2015-09-03 (PERLANCAR)
+0.08    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -68,29 +75,29 @@
 	  requirement.
 
 
-0.07    2015-07-04 (PERLANCAR)
+0.07    2015-07-04  Released-By: PERLANCAR
 
 	- Support showing the same option in multiple categories if that
 	  option has multiple category:X tags.
 
 
-0.06    2015-04-11 (PERLANCAR)
+0.06    2015-04-11  Released-By: PERLANCAR
 
 	- [ux] Don't show default value if it's undef.
 
 
-0.05    2015-04-07 (PERLANCAR)
+0.05    2015-04-07  Released-By: PERLANCAR
 
 	- Properly order categories, from information provided by
 	  Perinci::Sub::To::CLIDocData 0.18.
 
 
-0.04    2015-04-04 (PERLANCAR)
+0.04    2015-04-04  Released-By: PERLANCAR
 
         - Fix/tweak blank lines.
 
 
-0.03    2015-02-27 (PERLANCAR)
+0.03    2015-02-27  Released-By: PERLANCAR
 
 	- Show list of subcommands as comma-separated list if number of
 	  subcommands >= 12, like Perinci::CmdLine::Classic.
@@ -99,11 +106,11 @@
 	  Perinci::CmdLine::Classic.
 
 
-0.02    2015-01-15 (PERLANCAR)
+0.02    2015-01-15  Released-By: PERLANCAR
 
 	- Show subcommands, minor tweak.
 
 
-0.01     2014-12-23 (PERLANCAR)
+0.01     2014-12-23  Released-By: PERLANCAR
 
          - First release, extracted from Perinci-CmdLine-Lite.

@@ -6,7 +6,7 @@ use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub new
@@ -84,7 +84,7 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -180,6 +180,8 @@ Mohammad S Anwar (MANWAR)
 Håkon Hægland (hakonhagland, HAKONH)
 
 Meredith (merrilymeredith, MHOWARD)
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

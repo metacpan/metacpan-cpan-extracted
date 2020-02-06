@@ -22,6 +22,8 @@
       },
       "develop" : {
          "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
             "Test::More" : "0.98",
@@ -36,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::Alien::DontPanic" : "2.0000",
+            "Acme::Alien::DontPanic" : "2.0400",
             "FFI::CheckLib" : "0.15",
             "FFI::Platypus" : "1.00",
             "FFI::Platypus::Declare" : "0",
@@ -63,7 +65,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.0000",
+   "version" : "2.0400",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0

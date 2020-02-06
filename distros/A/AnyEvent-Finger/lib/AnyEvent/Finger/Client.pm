@@ -7,7 +7,7 @@ use AnyEvent::Handle;
 use Carp qw( carp );
 
 # ABSTRACT: Simple asynchronous finger client
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub new
@@ -91,7 +91,7 @@ AnyEvent::Finger::Client - Simple asynchronous finger client
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -155,13 +155,23 @@ Passes the error string as the first argument to the callback.
 
 =head2 finger
 
- $client-E<gt>finger($request, $callback, [ \%options ])
+ $client->finger($request, $callback, [ \%options ])
 
 Connect to the finger server make the given request and call the given callback
 when the response is complete.  The response will be passed to the callback as
 an array reference of lines.  Each line will have the new line (\n or \r or \r\n)
 removed.  Any of the arguments passed into the constructor as passed above
 may be overridden specifying them in the options hash (third argument).
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<AnyEvent::Finger>
+
+=item L<AnyEvent::Server>
+
+=back
 
 =head1 AUTHOR
 

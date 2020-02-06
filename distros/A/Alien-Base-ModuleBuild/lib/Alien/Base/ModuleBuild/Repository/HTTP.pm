@@ -10,7 +10,7 @@ use Alien::Base::ModuleBuild::Utils;
 use parent 'Alien::Base::ModuleBuild::Repository';
 
 # ABSTRACT: HTTP repository handler
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 our $Has_HTML_Parser = eval { require HTML::LinkExtor; 1 };
 
@@ -183,7 +183,7 @@ Alien::Base::ModuleBuild::Repository::HTTP - HTTP repository handler
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

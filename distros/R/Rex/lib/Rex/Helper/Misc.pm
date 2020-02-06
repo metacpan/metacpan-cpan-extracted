@@ -9,7 +9,7 @@ package Rex::Helper::Misc;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 sub get_random {
   my $count = shift;

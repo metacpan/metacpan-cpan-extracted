@@ -9,7 +9,7 @@ build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
@@ -28,11 +28,9 @@ optional_features: {}
 provides:
   Sub::MultiMethod:
     file: lib/Sub/MultiMethod.pm
-    version: '0.004'
+    version: '0.006'
 requires:
   Exporter::Shiny: '0'
-  MRO::Compat: '0'
-  Sub::Util: '0'
   Type::Params: '1.008003'
   Types::Standard: '1.008003'
   perl: '5.008'
@@ -42,6 +40,5 @@ resources:
   homepage: https://metacpan.org/release/Sub-MultiMethod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-multimethod.git
-version: '0.004'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1

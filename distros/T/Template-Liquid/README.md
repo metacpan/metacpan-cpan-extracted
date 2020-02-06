@@ -259,6 +259,13 @@ For more, see [Template::Liquid::Tag::Capture](https://metacpan.org/pod/Template
 
 Please see [Template::Liquid::Filters](https://metacpan.org/pod/Template%3A%3ALiquid%3A%3AFilters).
 
+# Whitespace Control
+
+In Liquid, you can include a hyphen in your tag syntax `{{-`, `-}}`, `{%-`,
+and `-%}` to strip whitespace from the left or right side of a rendered tag.
+
+See https://shopify.github.io/liquid/basics/whitespace/
+
 # Extending Template::Liquid
 
 Extending the Template::Liquid template engine for your needs is almost too

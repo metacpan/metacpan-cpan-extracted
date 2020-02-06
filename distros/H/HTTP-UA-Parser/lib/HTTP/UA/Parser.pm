@@ -2,7 +2,7 @@ package HTTP::UA::Parser;
 use strict;
 use warnings;
 use YAML::Tiny 'LoadFile';
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 my ($REGEX, $PATH, $PARSER);
 my $PACKAGE = __PACKAGE__;
 
@@ -398,7 +398,7 @@ Perl port of the ua-parser project - L<https://github.com/ua-parser>
 
     print $r->os->toString();         # -> "iOS 5.1"
     print $r->os->toVersionString();  # -> "5.1"
-    print $r->os->family              # -> "iOS"
+    print $r->os->family;             # -> "iOS"
     print $r->os->major;              # -> "5"
     print $r->os->minor;              # -> "1"
     print $r->os->patch;              # -> undef

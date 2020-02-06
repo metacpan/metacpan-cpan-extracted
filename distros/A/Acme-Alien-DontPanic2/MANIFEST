@@ -8,6 +8,7 @@ META.json
 META.yml
 README
 alienfile
+author.yml
 dist.ini
 lib/Acme/Alien/DontPanic2.pm
 maint/cip-before-install

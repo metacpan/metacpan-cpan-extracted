@@ -16,7 +16,7 @@ use HTTP::Response;
 		main::isa_ok($_[0],'WWW::Chain');
 		$_[0]->stash->{a} = 1;
 		main::isa_ok($_[1],'HTTP::Response');
-		return HTTP::Request->new( GET => 'http://duckduckgo.com/' ), "second_request";
+		return HTTP::Request->new( GET => 'http://www.perl.org/' ), "second_request";
 	}
 
 	sub second_request {
@@ -27,7 +27,7 @@ use HTTP::Response;
 	}
 }
 
-my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://duckduckgo.com/' ), 'first_request');
+my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://www.perl.org/' ), 'first_request');
 isa_ok($chain,'TestWWWChainMethods');
 
 $chain->next_responses(HTTP::Response->new);

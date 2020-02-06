@@ -86,7 +86,7 @@ $object->changed('arhuman@gmail.com 20110213');
 is( $object->changed()->[1], 'arhuman@gmail.com 20110213', 'changed properly added' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

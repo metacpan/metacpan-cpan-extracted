@@ -1,5 +1,9 @@
 Revision history for Perl module Alien-Base-ModuleBuild
 
+1.14      2020-02-05 19:08:06 -0700
+  - Add use strict and warnings to generated Install/Files.pm
+    modules (gh#17)
+
 1.12      2020-02-02 06:00:12 -0700
   - Add List::Util and Text::ParseWords prereqs back.
     They were accidentally removed from prereqs in 1.10.

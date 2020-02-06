@@ -61,17 +61,15 @@ sub _INIT {
 sub _cb_timer {
     my ($multi, $timeout_ms, $self) = @_;
 
-    my $cb = sub {
-        #$self->_time_out_in_loop();
-        #$multi->socket_action( Net::Curl::Multi::CURL_SOCKET_TIMEOUT() );
-        $self->{'multi'}->socket_action( Net::Curl::Multi::CURL_SOCKET_TIMEOUT() );
-
-        # $self->_process_pending();
-
-        return;
-    };
-
     delete $self->{'timer'};
+
+    # NB: It’s important that we not run _time_out_in_loop() immediately
+    # because if we add_handle() with an easy object that’s already
+    # completed, we’ll end up trying to remove a handle that hasn’t been
+    # added yet.
+    my $cb = sub {
+        $self->_time_out_in_loop();
+    };
 
     if ($timeout_ms < 0) {
         if ($multi->handles()) {
@@ -138,7 +136,7 @@ sub _SET_POLL_INOUT {
 sub _STOP_POLL {
     my ($self, $fd) = @_;
 
-    delete $self->{'_watches'}{$fd};
+    delete $self->{'_watches'}{$fd} or $self->_handle_extra_stop_poll($fd);
 
     return;
 }

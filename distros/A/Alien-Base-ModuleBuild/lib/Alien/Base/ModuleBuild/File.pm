@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 
 # ABSTRACT: Private class
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 sub new {
   my $class = shift;
@@ -83,7 +83,7 @@ Alien::Base::ModuleBuild::File - Private class
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

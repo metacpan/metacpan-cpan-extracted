@@ -13,5 +13,4 @@
 README\.pod
 MYMETA\.json
 MYMETA\.yml
-lib\/YAML\/.*?
 ^lib\/HTTP\/UA\/Parser\/regexes\.yaml$

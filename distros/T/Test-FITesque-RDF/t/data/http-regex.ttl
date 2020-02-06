@@ -59,7 +59,7 @@ acl:mode acl:Read. """ .
 
 
 :put_new_acl_res a http:ResponseMessage ;
-    http:status "201" .
+    http:status "201|204"^^dqm:regex .
 
 :check_result_req a http:RequestMessage ;
     http:method "GET" ;

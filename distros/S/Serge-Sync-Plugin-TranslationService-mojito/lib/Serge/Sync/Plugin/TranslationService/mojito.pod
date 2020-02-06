@@ -40,9 +40,38 @@ Mojito CLI configuration file (server connection properties)
 
 Directory of the source resource files
 
+=item I<source_locale>
+
+Source locale
+
 =item I<localized_files_path>
 
 Directory of the localized resource files
+
+
+=item I<import_translations>
+
+Import translations flag. Default YES
+
+=item I<inheritance_mode>
+
+Inheritance mode. Default REMOVE_UNTRANSLATED
+
+=item I<file_type>
+
+File type
+
+=item I<status_equal_target>
+
+Status equal target
+
+=item I<status_pull>
+
+Status pull. Default ACCEPTED
+
+=item I<destination_locales>
+
+List of destination locales
 
 =back
 
@@ -56,7 +85,7 @@ Dragos Varovici <dvarovici.work@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018-2019 by Dragos Varovici.
+This software is copyright (c) 2018-2020 by Dragos Varovici.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

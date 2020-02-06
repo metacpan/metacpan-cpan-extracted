@@ -1,7 +1,7 @@
 package Role::TinyCommons::Tree::NodeMethods;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2020-02-06'; # DATE
+our $VERSION = '0.120'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -31,7 +31,7 @@ Role::TinyCommons::Tree::NodeMethods - Role that provides tree node methods
 
 =head1 VERSION
 
-This document describes version 0.11 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2016-11-23.
+This document describes version 0.120 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
 
 =head1 DESCRIPTION
 
@@ -99,13 +99,17 @@ Both C<node1> and C<node2> are first children of their respective type.
 
 =head2 next_siblings => list
 
+=head2 remove
+
+Remove node from its parent.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyCommons-Tree>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
 
 =head1 BUGS
 
@@ -130,7 +134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

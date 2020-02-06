@@ -15,8 +15,8 @@ use lib qw{inc}; use Alien::Build::MB;
 
 my %module_build_args = (
   "build_requires" => {
-    "Alien::Build" => "2.00",
-    "Alien::Build::MB" => "0.05",
+    "Alien::Build" => "2.04",
+    "Alien::Build::MB" => "0.07",
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
@@ -31,7 +31,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Acme-Alien-DontPanic2",
-  "dist_version" => "2.0000",
+  "dist_version" => "2.0401",
   "license" => "perl",
   "module_name" => "Acme::Alien::DontPanic2",
   "recursive_test_files" => 1,
@@ -48,8 +48,8 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Alien::Build" => "2.00",
-  "Alien::Build::MB" => "0.05",
+  "Alien::Build" => "2.04",
+  "Alien::Build::MB" => "0.07",
   "Module::Build" => "0.28",
   "Test2::V0" => "0.000060",
   "Test::Alien" => "0.05",

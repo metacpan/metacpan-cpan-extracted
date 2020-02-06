@@ -1,4 +1,4 @@
-# Copyrights 2002-2018 by [Mark Overmeer].
+# Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,14 +8,13 @@
 
 package Hash::Case::Preserve;
 use vars '$VERSION';
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 use base 'Hash::Case';
 
 use strict;
 use warnings;
-
-use Log::Report 'hash-case';
+use Carp 'croak';
 
 
 sub init($)
@@ -28,7 +27,7 @@ sub init($)
     if($keep eq 'LAST')     { $self->{HCP_update} = 1 }
     elsif($keep eq 'FIRST') { $self->{HCP_update} = 0 }
     else
-    {   error "use 'FIRST' or 'LAST' with the option keep";
+    {   croak "use 'FIRST' or 'LAST' with the option keep";
     }
 
     $self->SUPER::native_init($args);

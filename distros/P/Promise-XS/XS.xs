@@ -756,7 +756,9 @@ BOOT:
     MY_CXT.pxs_flush_cr = NULL;
 }
 
-#ifdef USE_ITHREADS
+# In some old thread-multi perls sv_dup_inc() wasn’t defined.
+
+#if defined(USE_ITHREADS) && defined(sv_dup_inc)
 
 # ithreads would seem to be a very bad idea in Promise-based code,
 # but anyway ..
@@ -809,7 +811,7 @@ CLONE(...)
 
         XSRETURN_UNDEF;
 
-#endif /* USE_ITHREADS */
+#endif /* USE_ITHREADS && defined(sv_dup_inc) */
 
 #SV *
 #resolved(...)

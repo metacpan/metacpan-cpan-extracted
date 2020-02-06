@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.018.4';
+our $VERSION = '0.019';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -83,6 +83,7 @@ sub new {
     my $self = bless {} => $pkg;
     $self->{harfbuzz} = hb_version_string();
     $self->{buf} = hb_buffer_create();
+    $self->{features} = [];
 
     if ( $opts->{font} ) {
 	$self->set_font( delete $opts->{font} );
@@ -108,6 +109,7 @@ font filename are very fast.
 sub set_font {
     my ( $self, $fontfile, $size ) = @_;
 
+    croak("$fontfile: $!\n") unless -s -r $fontfile;
     my $blob = hb_blob_create_from_file($fontfile);
     my $face = $self->{"face_$fontfile"} //= hb_face_create( $blob, 0 );
     $self->{font} = $self->{"font_$fontfile"} //= do {
@@ -155,10 +157,45 @@ sub set_text {
     $self;
 }
 
-=head2 $info = $hb->shaper()
+=head2 $hb->set_features( I<feat> [ , ... ] )
 
-Performs the shaping. Upon completion an array of hashes is returned
-with one element for each glyph to be rendered.
+Sets the features for shaping.
+
+=cut
+
+sub set_features {
+    my ( $self ) = shift;
+    $self->{features} = [];
+    $self->add_features(@_);
+}
+
+=head2 $hb->add_features( I<feat> [ , ... ] )
+
+Adds features for shaping.
+
+=cut
+
+sub add_features {
+    my ( $self, @features ) = @_;
+    foreach my $feature ( @features ) {
+	push( @{ $self->{features} },
+	      hb_feature_from_string($feature)
+	      || croak("Unknown shaper feature: \"$feature\"") );
+    }
+}
+
+=head2 $info = $hb->shaper( [ I<ref to features> ] )
+
+Performs the shaping.
+
+I<features> is a reference to an array of feature strings. The
+features will be I<added> to the list of features already set with
+set_features/add_features. If the first (or only) feature is C<none>
+all current features will be ignored and only subsequent features are
+taken into account.
+
+Upon completion an array of hashes is returned with one element for
+each glyph to be rendered.
 
 The hash contains the following items:
 
@@ -175,11 +212,24 @@ of input characters!
 =cut
 
 sub shaper {
-    my ( $self ) = @_;
+    my ( $self, $fp ) = @_;
 
     croak("HarfBuzz shape() without font")     unless $self->{font};
     croak("HarfBuzz shape() without fontsize") unless $self->{size};
     croak("HarfBuzz shape() without text")     unless defined $self->{text};
+
+    my $features = $self->{features} || [];
+    if ( $fp ) {
+	foreach my $feature ( @$fp ) {
+	    if ( "none" eq lc $feature ) {
+		$features = [];
+		next;
+	    }
+	    push( @$features,
+		  hb_feature_from_string($feature)
+		  || croak("Unknown shaper feature: \"$feature\"") );
+	}
+    }
 
     hb_buffer_clear_contents( $self->{buf} );
     hb_buffer_add_utf8( $self->{buf}, $self->{text} );
@@ -191,8 +241,7 @@ sub shaper {
     # Set a scaling for precision (all info are ints!).
     my $scale = 1000;
     hb_font_set_scale( $self->{font}, $scale, $scale );
-
-    my $info = _hb_shaper( $self->{font}, $self->{buf} );
+    my $info = _hb_shaper( $self->{font}, $self->{buf}, $features );
 
     foreach my $i ( @$info ) {
 	$i->{$_} *= $self->{size} / $scale for qw( ax ay dx dy );

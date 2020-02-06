@@ -1,7 +1,7 @@
 package Log::ger::Output::Screen;
 
-our $DATE = '2018-12-22'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-02-06'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ sub get_hooks {
         } elsif (defined $ENV{COLOR}) {
             $ENV{COLOR};
         } else {
-            (-t STDOUT);
+            $stderr ? (-t STDERR) : (-t STDOUT);
         }
     };
     my $formatter = $conf{formatter};
@@ -75,11 +75,12 @@ sub get_hooks {
         # take precendence.
 
         create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
                 my $logger = sub {
-                    my $level = $args{level};
+                    my $level = $hook_args{level};
                     my $msg = $_[1];
                     if ($formatter) {
                         $msg = $formatter->($msg);
@@ -95,9 +96,10 @@ sub get_hooks {
                 [$logger];
             }],
         create_logml_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
                 my $logger = sub {
                     my $level = Log::ger::Util::numeric_level($_[1]);
                     return if $level > $Log::ger::Current_Level;
@@ -133,7 +135,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -188,7 +190,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

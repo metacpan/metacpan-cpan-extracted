@@ -5,7 +5,7 @@ use warnings;
 use Config;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Windows API
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub abi
@@ -187,7 +187,7 @@ FFI::Platypus::Lang::Win32 - Documentation and tools for using Platypus with the
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -258,6 +258,8 @@ Mohammad S Anwar (MANWAR)
 Håkon Hægland (hakonhagland, HAKONH)
 
 Meredith (merrilymeredith, MHOWARD)
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

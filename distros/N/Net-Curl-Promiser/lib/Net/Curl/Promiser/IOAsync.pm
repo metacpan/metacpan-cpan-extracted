@@ -44,6 +44,8 @@ use parent 'Net::Curl::Promiser::LoopBase';
 use IO::Async::Handle ();
 use Net::Curl::Multi ();
 
+use Net::Curl::Promiser::FDFHStore ();
+
 #----------------------------------------------------------------------
 
 sub _INIT {
@@ -53,6 +55,8 @@ sub _INIT {
 
     $self->setopt( Net::Curl::Multi::CURLMOPT_TIMERFUNCTION(), \&_cb_timer );
     $self->setopt( Net::Curl::Multi::CURLMOPT_TIMERDATA(), $self );
+
+    $self->{'_fhstore'} = Net::Curl::Promiser::FDFHStore->new();
 
     return;
 }
@@ -78,7 +82,7 @@ sub _cb_timer {
             $after = $timeout_ms / 1000;
         }
 
-        if ( $after) {
+        if ($after) {
             $self->{'timer_id'} = $loop->watch_time(
                 after => $after,
                 code => sub {
@@ -88,7 +92,7 @@ sub _cb_timer {
         }
     }
     else {
-        $self->_time_out_in_loop();
+        $loop->later( sub { $self->_time_out_in_loop() } );
     }
 
     return 1;
@@ -98,10 +102,11 @@ sub _get_handle {
     my ($self, $fd) = @_;
 
     return $self->{'_handle'}{$fd} ||= do {
+        my $s = $self->{'_fhstore'}->get_checked($fd);
 
         my $handle = IO::Async::Handle->new(
-            read_fileno => $fd,
-            write_fileno => $fd,
+            read_handle => $s,
+            write_handle => $s,
 
             on_read_ready => sub {
                 $self->_process_in_loop($fd, Net::Curl::Multi::CURL_CSELECT_IN());
@@ -121,8 +126,10 @@ sub _get_handle {
 sub _SET_POLL_IN {
     my ($self, $fd) = @_;
 
-    $self->_get_handle($fd)->want_readready(1);
-    $self->_get_handle($fd)->want_writeready(0);
+    my $h = $self->_get_handle($fd);
+
+    $h->want_readready(1);
+    $h->want_writeready(0);
 
     return;
 }
@@ -130,8 +137,10 @@ sub _SET_POLL_IN {
 sub _SET_POLL_OUT {
     my ($self, $fd) = @_;
 
-    $self->_get_handle($fd)->want_readready(0);
-    $self->_get_handle($fd)->want_writeready(1);
+    my $h = $self->_get_handle($fd);
+
+    $h->want_readready(0);
+    $h->want_writeready(1);
 
     return;
 }
@@ -139,8 +148,10 @@ sub _SET_POLL_OUT {
 sub _SET_POLL_INOUT {
     my ($self, $fd) = @_;
 
-    $self->_get_handle($fd)->want_readready(1);
-    $self->_get_handle($fd)->want_writeready(1);
+    my $h = $self->_get_handle($fd);
+
+    $h->want_readready(1);
+    $h->want_writeready(1);
 
     return;
 }
@@ -148,7 +159,12 @@ sub _SET_POLL_INOUT {
 sub _STOP_POLL {
     my ($self, $fd) = @_;
 
-    $self->{'_loop'}->remove( delete $self->{'_handle'}{$fd} );
+    if ( my $fh = delete $self->{'_handle'}{$fd} ) {
+        $self->{'_loop'}->remove($fh);
+    }
+    else {
+        $self->_handle_extra_stop_poll($fd);
+    }
 
     return;
 }

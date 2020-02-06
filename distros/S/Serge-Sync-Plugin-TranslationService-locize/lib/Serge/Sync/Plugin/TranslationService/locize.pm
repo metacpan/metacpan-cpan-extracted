@@ -10,7 +10,7 @@ use File::Find qw(find);
 use File::Spec::Functions qw(catfile abs2rel);
 use version;
 
-our $VERSION = qv('0.900.0');
+our $VERSION = qv('0.901.2');
 
 sub name {
     return 'Locize translation software (https://locize.com/) synchronization plugin';

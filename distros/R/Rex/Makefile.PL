@@ -14,7 +14,6 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "the friendly automation framework",
   "AUTHOR" => "Jan Gehring <jfried\@rexify.org>",
   "BUILD_REQUIRES" => {
-    "Test::Pod" => 0,
     "Test::UseAllModules" => "0.15"
   },
   "CONFIGURE_REQUIRES" => {
@@ -91,7 +90,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::UseAllModules" => "0.15"
   },
-  "VERSION" => "1.8.0",
+  "VERSION" => "1.8.1",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -139,7 +138,6 @@ my %FallbackPrereqs = (
   "Test::Builder::Module" => 0,
   "Test::Deep" => 0,
   "Test::More" => 0,
-  "Test::Pod" => 0,
   "Test::UseAllModules" => "0.15",
   "Text::Glob" => 0,
   "Text::Wrap" => 0,

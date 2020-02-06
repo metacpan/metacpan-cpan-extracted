@@ -1,5 +1,15 @@
 Revision history for HarfBuzz::Shaper.
 
+0.019 Thu Feb  6
+
+    - Implement shaping features. See e.g. t/30_kern.t.
+    - Remove t/99_showlog.t (doesn't show info)
+    - Small build fixes.
+
+0.018.4 Sun Feb  2 09:55
+
+    - Small build fixes.
+
 0.018.3 Fri Jan 31 15:40
 
     - Small build fixes.

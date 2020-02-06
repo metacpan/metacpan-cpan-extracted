@@ -30,7 +30,7 @@ use Alien::Base::ModuleBuild::Repository::FTP;
 use Alien::Base::ModuleBuild::Repository::Local;
 
 # ABSTRACT: A Module::Build subclass for building Alien:: modules and their libraries
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 # setup protocol specific classes
 # Alien:: author can override these defaults using alien_repository_class property
@@ -359,6 +359,8 @@ sub ACTION_code {
     open my $fh, '>', $file;
     print $fh <<EOF;
 package $module\::Install::Files;
+use strict;
+use warnings;
 require $module;
 sub Inline { shift; $module->Inline(\@_) }
 1;
@@ -1287,7 +1289,7 @@ Alien::Base::ModuleBuild - A Module::Build subclass for building Alien:: modules
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 

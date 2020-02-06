@@ -21,6 +21,7 @@ name: Timer-Milestones
 requires:
   Carp: '0'
   Exporter: '0'
+  PerlX::Maybe: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
   parent: '0'
@@ -29,5 +30,5 @@ requires:
 resources:
   homepage: https://github.com/skington/timer-milestones
   repository: https://github.com/skington/timer-milestones.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

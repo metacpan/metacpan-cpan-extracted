@@ -112,7 +112,7 @@ SKIP: {
     {
         my $iter;
         eval { $iter = $c->query('LMC-RIPE') };
-        ok !$@, q{Client performs queries without dying};
+        ok (!$@ or $@=~/IO::Socket::INET/, q{Client performs queries without dying});
         isa_ok $iter, 'Iterator';
         last unless $iter;
         ok $iter->isnt_exhausted, q{Iterator contains at least one result};
@@ -122,7 +122,7 @@ SKIP: {
     {
         my @types;
         eval { @types = $c->object_types };
-        ok !$@ , q{Client can retrieve available object types without dying.};
+        ok(!$@ or $@=~/IO::Socket::INET/, q{Client can retrieve available object types without dying});
         is $#types, 20,
           q{There are 21 known object types in the RIPE Database};
     }

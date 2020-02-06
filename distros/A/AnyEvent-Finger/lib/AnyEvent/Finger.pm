@@ -8,7 +8,7 @@ our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( finger_client finger_server );
 
 # ABSTRACT: Simple asynchronous finger client and server
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub finger_client ($$$;$)
@@ -52,7 +52,7 @@ AnyEvent::Finger - Simple asynchronous finger client and server
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -187,8 +187,6 @@ via the finger protocol.  Uses this module for its
 implementation.
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

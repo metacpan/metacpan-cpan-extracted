@@ -3,8 +3,8 @@ NAME
     Perinci::CmdLine-based app
 
 VERSION
-    This document describes version 0.171 of Perinci::CmdLine::Help (from
-    Perl distribution Perinci-CmdLine-Help), released on 2019-04-15.
+    This document describes version 0.172 of Perinci::CmdLine::Help (from
+    Perl distribution Perinci-CmdLine-Help), released on 2020-02-06.
 
 DESCRIPTION
     Currently used by Perinci::CmdLine::Lite and App::riap. Eventually I
@@ -35,7 +35,9 @@ FUNCTIONS
 
     *   meta* => *hash*
 
-        Function metadata, must be normalized.
+        Function metadata.
+
+    *   meta_is_normalized => *bool*
 
     *   per_arg_json => *bool*
 
@@ -78,7 +80,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

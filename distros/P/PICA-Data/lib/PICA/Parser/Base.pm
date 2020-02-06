@@ -2,33 +2,39 @@ package PICA::Parser::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp qw(croak);
 
 sub _new {
     my $class = shift;
-    my (%options) = @_ % 2 ? (fh => @_) : @_;
+    my (%options) = @_ % 2 ? ( fh => @_ ) : @_;
 
-    bless({
-        bless  => !!$options{bless},
-        strict => !!$options{strict},
-        fh     => defined $options{fh} ? $options{fh} : \*STDIN
-    }, $class), ;
+    bless(
+        {
+            bless  => !!$options{bless},
+            strict => !!$options{strict},
+            fh     => defined $options{fh} ? $options{fh} : \*STDIN
+        },
+        $class
+      ),
+      ;
 }
 
 sub new {
-    my $self = _new(@_);
+    my $self  = _new(@_);
     my $input = $self->{fh};
 
     # check for file or filehandle
     my $ishandle = eval { fileno($input); };
     if ( !$@ && defined $ishandle ) {
         $self->{reader} = $input;
-    } elsif ( (ref $input and ref $input eq 'SCALAR') or -e $input ) {
-        open($self->{reader}, "<:encoding(utf-8)", $input)
-            or croak "cannot read from file $input\n";
-    } else {
+    }
+    elsif ( ( ref $input and ref $input eq 'SCALAR' ) or -e $input ) {
+        open( $self->{reader}, "<:encoding(utf-8)", $input )
+          or croak "cannot read from file $input\n";
+    }
+    else {
         croak "file or filehandle $input does not exists";
     }
 
@@ -41,7 +47,8 @@ sub next {
     # get last subfield from 003@ as id
     while ( my $record = $self->_next_record ) {
         next unless @$record;
-        my ($id) = map { $_->[-1] } grep { $_->[0] =~ '003@' } @$record;
+        my ($id) =
+          map { $_->[-1] } grep { ( $_->[0] // '' ) =~ '003@' } @$record;
         $record = { _id => $id, record => $record };
         bless $record, 'PICA::Data' if $self->{bless};
         return $record;

@@ -1,7 +1,11 @@
+## no critic: Modules::ProhibitAutomaticExportation
+
 package Tree::Dump;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-06'; # DATE
+our $DIST = 'Tree-Dump'; # DIST
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,6 +28,7 @@ sub tdmp {
     $opts{show_guideline} = 1;
     $opts{on_show_node} = sub {
         my ($node, $level, $seniority, $is_last_child, $opts) = @_;
+        die "Please specify tree node object (arg0)" unless defined $node;
         my $res = "(".ref($node).") ";
         if (reftype($node) eq 'HASH') {
             $res .= dmp({
@@ -62,7 +67,7 @@ Tree::Dump - Dump a tree object
 
 =head1 VERSION
 
-This document describes version 0.05 of Tree::Dump (from Perl distribution Tree-Dump), released on 2016-11-23.
+This document describes version 0.060 of Tree::Dump (from Perl distribution Tree-Dump), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -173,7 +178,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

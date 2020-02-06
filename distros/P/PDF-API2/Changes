@@ -1,3 +1,11 @@
+2.037     2020-02-05
+
+    - Allow PDF 2.0 files to be opened.
+
+    - [RT #131147] Ignore dictionary entries with null values (reported by Klaus
+      Ethgen, fix by Vadim Repin).
+
+
 2.036     2019-09-17
 
     - Eliminate another uninitialized value warning in BaseFont.pm.

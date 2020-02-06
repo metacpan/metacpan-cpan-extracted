@@ -7,8 +7,8 @@ use autodie;
 use Test::More;
 
 use File::Temp;
-use File::Slurper;
 use Time::HiRes;
+use Socket;
 
 our $CRLF = "\x0d\x0a";
 our $HEAD_START = join(
@@ -24,113 +24,118 @@ our $BIGGIE = ('x' x 512);
 sub new {
     my ($class) = @_;
 
-    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+    my $srv = _create_socket();
+
+    my $end_fh = File::Temp::tempfile();
+
+    my ($port) = Socket::unpack_sockaddr_in(getsockname $srv);
+
+    diag "SERVER PORT: $port";
 
     my $pid = fork or do {
-        $SIG{'CHLD'} = 'DEFAULT';
-        MyServer::HTTP->run(
-            port => 0,
-            my_tempdir => $dir,
-        );
+        my $ok = eval {
+            CustomServer::HTTP::run($srv, $end_fh);
+            1;
+        };
+
+        warn if !$ok;
+        exit( $ok ? 0 : 1 );
     };
 
-    my $port;
+    diag "SERVER PID: $pid";
 
-    diag "Waiting for process $pid to tell us which port it’s bound to …";
+    close $srv;
 
-    while (!$port) {
-        select( undef, undef, undef, 0.1 );
-
-        if (-s "$dir/port") {
-            $port = File::Slurper::read_text("$dir/port");
-        }
-    }
-
-    diag "SERVER PORT: [$port]";
-
-    return bless [$dir, $pid, $port], $class;
+    return bless {
+        pid => $pid,
+        port => $port,
+        end_fh => $end_fh
+    }, $class;
 }
 
-sub port { $_[0][2] }
+sub finish {
+    $_[0]->{'finished'} ||= do {
+        my $pid = $_[0]->{'pid'};
+        diag "FINISHING SERVER: PID $pid";
 
-sub DESTROY {
-    my ($self ) = @_;
-
-    local $SIG{'CHLD'} = 'DEFAULT';
-
-    my $pid = $self->[1];
-
-    diag "Destroying server (PID $pid) …";
-
-    my $reaped;
-
-    my $SIG = 'QUIT';
-
-    while ( 1 ) {
-        if (1 == waitpid $pid, 1) {
-            diag "Reaped";
-
-            $reaped = 1;
-            last;
-        }
-
-        last if !CORE::kill $SIG, $pid;
-
-        Time::HiRes::sleep(0.1);
-    }
-
-    if (!$reaped) {
-        diag "Done sending SIG$SIG; waiting …";
+        syswrite $_[0]->{'end_fh'}, 'x';
 
         waitpid $pid, 0;
-    }
 
-    diag "Finished waiting.";
+        diag "REAPED SERVER: PID $pid";
+    };
 
     return;
+}
+
+sub _create_socket {
+    socket my $srv, Socket::AF_INET, Socket::SOCK_STREAM, 0;
+
+    bind $srv, Socket::pack_sockaddr_in(0, "\x7f\0\0\1");
+
+    listen $srv, 10;
+
+    return $srv;
+}
+
+sub port { $_[0]->{'port'} }
+
+sub DESTROY {
+    my ($self) = @_;
+
+    $self->finish();
 }
 
 #----------------------------------------------------------------------
+package CustomServer::HTTP;
 
-package MyServer::HTTP;
+use autodie;
 
-use parent 'Net::Server::HTTP';
+use Test::More;
 
-sub options {
-    my $self     = shift;
-    my $prop     = $self->{'server'};
-    my $template = shift;
+# A blocking, non-forking server.
+# Written this way to achieve maximum simplicity.
+sub run {
+    my ($socket, $end_fh) = @_;
 
-    # setup options in the parent classes
-    $self->SUPER::options($template);
+    my $rin = q<>;
+    vec( $rin, fileno($socket), 1 ) = 1;
 
-    $prop->{'my_tempdir'} ||= undef;
-    $template->{'my_tempdir'} = \$prop->{'my_tempdir'};
+    while (!-s $end_fh) {
+        my $got = select my $rout = $rin, undef, undef, 0.1;
 
-    return;
-}
+        if ($got < 0) {
+            warn "select(): $!";
+        }
 
-sub post_bind_hook {
-    my ($self) = @_;
+        next if $got <= 0;
 
-    my $socket = $self->{'server'}{'sock'}[0];
+        # print STDERR "Server ($$) accepting connection …\n";
+        accept( my $cln, $socket );
+        # print STDERR "Server ($$) received connection\n";
 
-    my $path = "$self->{'server'}{'my_tempdir'}/port";
-    File::Slurper::write_text( $path, $socket->sockport() );
+        my $buf = q<>;
+        while (-1 == index($buf, "\x0d\x0a\x0d\x0a")) {
+            sysread( $cln, $buf, 512, length $buf );
+        }
 
-    return;
-}
+        # print STDERR "Server ($$) received headers\n";
 
-sub process_http_request {
-    my $self = shift;
+        $buf =~ m<GET \s+ (\S+)>x or die "Bad request: $buf";
+        my $uri_path = $1;
 
-    my $uri_path = $ENV{'PATH_INFO'};
+        syswrite $cln, $MyServer::HEAD_START;
+        syswrite $cln, "X-URI: $uri_path$MyServer::CRLF";
+        syswrite $cln, $MyServer::CRLF;
 
-    local $| = 1;
+        syswrite $cln, ( $uri_path eq '/biggie' ? $MyServer::BIGGIE : $uri_path );
 
-    print $MyServer::HEAD_START;
-    print "X-URI: $uri_path$CRLF";
-    print $CRLF;
+        # print STDERR "Server ($$) wrote response for $uri_path\n";
 
-    print( $uri_path eq '/biggie' ? $MyServer::BIGGIE : $uri_path );
+        # Proper TCP shutdown.
+        shutdown $cln, 0;
+        1 while sysread $cln, my $throwaway, 65536;
+    }
+
+    print STDERR "Server ($$) received request to shut down\n";
 }

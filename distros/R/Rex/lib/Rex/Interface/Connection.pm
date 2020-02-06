@@ -9,7 +9,7 @@ package Rex::Interface::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 sub create {
   my ( $class, $type ) = @_;

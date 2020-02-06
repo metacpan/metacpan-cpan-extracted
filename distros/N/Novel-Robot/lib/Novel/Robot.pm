@@ -39,21 +39,21 @@ sub set_packer {
     return $self;
 } ## end sub set_packer
 
-sub get_item {
+sub get_novel {
     my ( $self, $index_url, %o ) = @_;
 
-    my $item_ref = $self->{parser}->get_item_ref( $index_url, %o );
+    my $novel_ref = $self->{parser}->get_novel_ref( $index_url, %o );
 
-    my $last_floor_num = $item_ref->{floor_num} || scalar(@{$item_ref->{floor_list}});
-    print "last_floor_num: $last_floor_num\n" if ( $o{verbose} );
+    my $last_item_num = scalar(@{$novel_ref->{item_list}})>0 ? $novel_ref->{item_list}[-1]{id} : ($novel_ref->{item_num} || scalar(@{$novel_ref->{item_list}}));
+    print "last_item_num: $last_item_num\n" if ( $o{verbose} );
 
-    return unless ($item_ref);
-    return unless(@{$item_ref->{floor_list}});
-    return unless(grep { $_->{content} } @{$item_ref->{floor_list}});
+    return unless ($novel_ref);
+    return unless(@{$novel_ref->{item_list}});
+    return unless(grep { $_->{content} } @{$novel_ref->{item_list}});
 
-    $self->{packer}->format_item_output( $item_ref, \%o );
-    my $r = $self->{packer}->main( $item_ref, %o );
-    return wantarray ? ( $r, $item_ref ) : $r;
+    $self->{packer}->format_item_output( $novel_ref, \%o );
+    my $r = $self->{packer}->main( $novel_ref, %o );
+    return wantarray ? ( $r, $novel_ref ) : $r;
 } ## end sub get_item
 
 sub split_index {
@@ -67,3 +67,9 @@ sub split_index {
 }
 
 1;
+
+=head1 NAME
+
+Novel::Robot - Download novel /bbs thread
+
+=cut

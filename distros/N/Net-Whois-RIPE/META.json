@@ -49,6 +49,6 @@
          "url" : "https://github.com/arhuman/Net-Whois-RIPE"
       }
    },
-   "version" : 2.007003,
+   "version" : 2.007004,
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

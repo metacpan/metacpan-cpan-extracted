@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Alien::Build local config
-our $VERSION = '2.02'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 sub logx ($)
@@ -39,7 +39,7 @@ Alien::Build::rc - Alien::Build local config
 
 =head1 VERSION
 
-version 2.02
+version 2.04
 
 =head1 SYNOPSIS
 

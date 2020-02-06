@@ -3,7 +3,7 @@ package Rex::SCM::Git;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 use Cwd qw(getcwd);
 use Rex::Commands::Fs;

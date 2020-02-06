@@ -38,10 +38,8 @@
       },
       "test" : {
          "requires" : {
-            "File::Slurper" : "0",
-            "File::Temp" : "0",
+            "Carp::Always" : "0",
             "FindBin" : "0",
-            "Net::Server::HTTP" : "0",
             "Test::Class::Tiny" : "0",
             "Test::Deep" : "0",
             "Test::FailWarnings" : "0",
@@ -62,6 +60,6 @@
          "web" : "https://github.com/FGasper/p5-Net-Curl-Promiser"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

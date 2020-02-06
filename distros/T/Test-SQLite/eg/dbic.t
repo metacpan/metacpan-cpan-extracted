@@ -10,7 +10,7 @@ use MyApp::Schema;  # Existing DBIC database model
 my $sqlite = Test::SQLite->new;
 isa_ok $sqlite, 'Test::SQLite';
 
-my $schema = MyApp::Schema->connect( $sqlite->dsn, '', '', $sqlite->db_attrs );
+my $schema = MyApp::Schema->connect( $sqlite->dsn, '', '' );
 isa_ok $schema, 'MyApp::Schema';
 
 $schema->deploy;

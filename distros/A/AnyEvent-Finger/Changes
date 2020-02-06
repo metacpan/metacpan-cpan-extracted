@@ -1,5 +1,8 @@
 Revision history for AnyEvent-Finger
 
+0.11      2020-02-05 14:20:27 -0700
+  - Diagnostic release
+
 0.10      2015-03-18 02:16:24 -0400
   - Documentation improvements
 

@@ -50,7 +50,7 @@ sub _hb_font_check {
 }
 
 sub render {
-    my ( $ctx, $x, $y, $text ) = @_;
+    my ( $ctx, $x, $y, $text, $fp ) = @_;
 
     my @bb = $ctx->get_pixel_bbox;
     my $bl = $bb[3];
@@ -84,11 +84,11 @@ sub render {
 	    $hb->set_font( $font->fontfilename );
 	    $hb->set_size( $fragment->{size} || $ctx->{_currentsize} );
 	    $hb->set_text( $fragment->{text} );
-	    my $info = $hb->shaper;
+	    my $info = $hb->shaper($fp);
 	    my $y = $y - $fragment->{base} - $bl;
 	    foreach my $g ( @$info ) {
 		$text->translate( $x + $g->{dx}, $y - $g->{dy} );
-		$text->glyphByCId( $g->{g} );
+		$text->glyph_by_CId( $g->{g} );
 		$x += $g->{ax};
 		$y -= $g->{ay};
 	    }
@@ -194,7 +194,7 @@ sub load_font {
 
 ################ Extensions to PDF::API2 ################
 
-sub PDF::API2::Content::glyphByCId {
+sub PDF::API2::Content::glyph_by_CId {
     my ( $self, $cid ) = @_;
     $self->add( sprintf("<%04x> Tj", $cid ) );
     $self->{' font'}->fontfile->subsetByCId($cid);
@@ -209,7 +209,7 @@ sub PDF::API2::Resource::CIDFont::TrueType::fontfilename {
 
 ################ Extensions to PDF::Builder ################
 
-sub PDF::Builder::Content::glyphByCId {
+sub PDF::Builder::Content::glyph_by_CId {
     my ( $self, $cid ) = @_;
     $self->add( sprintf("<%04x> Tj", $cid ) );
     $self->{' font'}->fontfile->subsetByCId($cid);

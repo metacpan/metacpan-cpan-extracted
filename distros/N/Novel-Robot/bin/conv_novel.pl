@@ -12,7 +12,7 @@ binmode( STDOUT, ":encoding(console_out)" );
 binmode( STDERR, ":encoding(console_out)" );
 
 my %opt;
-getopt( 'ftwb', \%opt );
+getopt( 'fTwb', \%opt );
 
 my $convert_file = convert_novel( %opt );
 
@@ -20,12 +20,12 @@ sub convert_novel {
   my ( %opt ) = @_;
   return unless(-f $opt{f} and -s $opt{f});
 
-  $opt{t} ||= 'mobi';
+  $opt{T} ||= 'mobi';
 
-  my $dst_file = $opt{t};
+  my $dst_file = $opt{T};
   unless ( $dst_file =~ /[^.]+\.[^.]+$/ ) {
     $dst_file = $opt{f};
-    $dst_file =~ s/[a-z0-9]+$/$opt{t}/i;
+    $dst_file =~ s/[a-z0-9]+$/$opt{T}/i;
   }
   print decode(locale=>"$opt{f} => $dst_file\n");
 
@@ -41,7 +41,7 @@ sub convert_novel {
   my $conv_str = join( " ", map { qq[--$_ "$conv{$_}"] } keys( %conv ) );
   my $cmd = qq[ebook-convert "$opt{f}" "$dst_file" $conv_str];
 
-  $cmd .= " --mobi-keep-original-images" if ( $opt{t} =~ /mobi$/ );
+  $cmd .= " --mobi-keep-original-images" if ( $opt{T} =~ /mobi$/ );
   system( $cmd);
 
   return $dst_file;

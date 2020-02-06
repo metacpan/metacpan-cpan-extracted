@@ -103,25 +103,66 @@ CODE:
 OUTPUT:
   RETVAL
 
+SV *
+hb_feature_from_string( SV *sv )
+PREINIT:
+  STRLEN len;
+  char* s;
+  hb_feature_t f;
+CODE:
+  s = SvPVutf8(sv, len);
+  if ( hb_feature_from_string(s, len, &f) )
+    RETVAL = newSVpv((char*)&f,sizeof(f));
+  else
+    RETVAL = newSVpv(NULL, 0);
+OUTPUT:
+  RETVAL
+
 void
 hb_shape( void *font, void* buf )
 CODE:
   hb_shape( font, buf, NULL, 0 );
 
 SV *
-_hb_shaper( void* font, void* buf )
+_hb_shaper( void* font, void* buf, SV* feat )
 INIT:
-  int nglyphs;
+  int n;
   int i;
-  AV * results;
+  AV* results;
   char glyphname[32];
+  hb_feature_t* features = NULL;
   results = (AV *)sv_2mortal((SV *)newAV());
 CODE:
-  hb_shape( font, buf, NULL, 0 );
-  nglyphs = hb_buffer_get_length(buf);
+  /* Do we have features? */
+  if ( (SvROK(feat))
+       && (SvTYPE(SvRV(feat)) == SVt_PVAV)
+       && ((n = av_len((AV *)SvRV(feat))) >= 0)) {
+
+    n++;	/* top index -> length */
+    features = (hb_feature_t*) calloc( sizeof(hb_feature_t), n );
+    for ( i = 0; i < n; i++ ) {
+      hb_feature_t* f;
+      f = (hb_feature_t*) SvPV_nolen (*av_fetch ((AV*) SvRV(feat), i, 0));
+      features[i] = *f;
+    }
+    for ( i = 0; i < n; i++ ) {
+      hb_feature_to_string( &features[i], glyphname, 32 );
+      /* fprintf( stderr, "feature[%d] = '%s'\n", i, glyphname ); */
+    }
+  }
+  else {
+    /* fprintf( stderr, "No features\n"); */
+    features = NULL;
+    n = 0;
+  }
+
+  hb_shape( font, buf, features, n );
+  if ( features ) free(features);
+
+  n = hb_buffer_get_length(buf);
   hb_glyph_position_t *pos = hb_buffer_get_glyph_positions(buf, NULL);
   hb_glyph_info_t *info = hb_buffer_get_glyph_infos(buf, NULL);
-  for ( i = 0; i < nglyphs; i++ ) {
+  for ( i = 0; i < n; i++ ) {
     HV * rh;
     hb_codepoint_t gid   = info[i].codepoint;
     rh = (HV *)sv_2mortal((SV *)newHV());

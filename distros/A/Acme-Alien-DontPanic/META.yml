@@ -9,8 +9,8 @@ build_requires:
   Test::Alien::Diag: '0'
   perl: '5.006'
 configure_requires:
-  Alien::Base::ModuleBuild: '1.12'
-  Alien::Build: '2.00'
+  Alien::Base::ModuleBuild: '1.14'
+  Alien::Build: '2.04'
   File::ShareDir: '1.03'
   perl: '5.006'
 dynamic_config: 1
@@ -21,7 +21,7 @@ meta-spec:
   version: '1.4'
 name: Acme-Alien-DontPanic
 requires:
-  Alien::Base: '2.00'
+  Alien::Base: '2.04'
   File::ShareDir: '1.03'
   perl: '5.006'
 resources:
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Alien-DontPanic/issues
   homepage: https://metacpan.org/pod/Acme::Alien::DontPanic
   repository: git://github.com/Perl5-Alien/Acme-Alien-DontPanic.git
-version: '2.0000'
+version: '2.0400'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

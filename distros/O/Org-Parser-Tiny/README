@@ -3,8 +3,8 @@ NAME
     non-core deps) as possible
 
 VERSION
-    This document describes version 0.001 of Org::Parser::Tiny (from Perl
-    distribution Org-Parser-Tiny), released on 2020-12-30.
+    This document describes version 0.003 of Org::Parser::Tiny (from Perl
+    distribution Org-Parser-Tiny), released on 2020-02-06.
 
 SYNOPSIS
      use Org::Parser::Tiny;
@@ -35,28 +35,51 @@ SYNOPSIS
          "Headline[title =~ /foo/]"
      );
 
-    Manipulate tree nodes with path-like semantic using Tree::FSLike:
+    Manipulate tree nodes with path-like semantic using
+    Tree::FSMethods::Org:
 
-     use Tree::FSLike;
-     my $fs = Tree::FSLike->new(
-         tree => $doc,
-         gen_filename_method => sub { $_[0]->can("title") ? $_[0]->title : "$_[0]" },
+    Sample sample.org:
+
+     some text before the first headline.
+
+     * header1                                                               :tag:
+     contains an internal link to another part of the document [[blah]]
+     * header2 [#A] [20%]
+     - contains priority and progress cookie (percent-style)
+     * header3 [1/10]
+     - contains progress cookie (fraction-style)
+     ** header3.1
+     ** header3.2
+     ** header3.3
+     * header4
+     blah blah.
+     * blah
+
+    Using Tree::FSMethods::Org:
+
+     use Tree::FSMethods::Org;
+     my $fs = Tree::FSMethods::Org->new(
+         org_file => "sample.org",
      );
 
      # list nodes right above the root node
-     my @nodes = $fs->ls;
+     my %nodes = $fs->ls; # (header1=>{...}, header2=>{...}, header3=>{...}, header4=>{})
 
-     # use wildcard to list nodes
-     my @nodes = $fs->ls("*foo*");
+     # list nodes below header3
+     $fs->cd("header3");
+     %nodes = $fs->ls; # ("header3.1"=>{...}, "header3.2"=>{...}, "header3.3"=>{...})
 
-     # remove top-level headlines which have "foo" in their title
-     $fs->rm($doc, "/*foo*");
+     # die, path not found
+     $fs->cd("/header5");
+
+     # remove top-level headlines which have "3"
+     $fs->rm("*3*");
 
 DESCRIPTION
     This module is a more lightweight alternative to <Org:Parser>. Currently
     it is very simple and only parses headlines; thus it is several times
     faster than Org::Parser. I use this to write utilities like
-    sort-org-headlines-tiny or to use it with Tree::FSLike.
+    sort-org-headlines-tiny or to use it with Tree::FSMethods.
 
 NODE CLASSES
   Org::Parser::Tiny::Node
@@ -150,7 +173,7 @@ METHODS
     its subclasses "Org::Parser::Tiny::Node::Document" and
     "Org::Parser::Tiny::Node::Headline"). The tree node complies to
     Role::TinyCommons::Tree::Node role, so these tools are available:
-    Data::CSel, Tree::Dump, Tree::FSLike, etc.
+    Data::CSel, Tree::Dump, Tree::FSMethods, etc.
 
     Will die if there are syntax errors in documents.
 
@@ -184,13 +207,15 @@ BUGS
 SEE ALSO
     Org::Parser, the more fully featured Org parser.
 
-    <https://orgmode.org>
+    <https://orgmode.org>.
+
+    Tree::FSMethods::Org and Tree::FSMethods.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

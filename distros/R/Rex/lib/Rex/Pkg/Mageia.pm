@@ -9,7 +9,7 @@ package Rex::Pkg::Mageia;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 use Rex::Helper::Run;
 use Rex::Pkg::Base;

@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Scalar::Util qw(refaddr);
 use Test::Fatal;
 # Prototype disagreement between Test::More and Test2::Tools::Compare, so
 # explicitly use the Test2::Tools::Compare versions.
@@ -24,6 +25,9 @@ use warnings 'redefine';
 test_validity();
 test_timing();
 test_pass_through();
+test_wrapping_stops();
+test_exported_function_interface();
+test_coderef();
 
 done_testing();
 
@@ -104,6 +108,7 @@ sub test_timing {
 }
 
 # Variables are passed through correctly.
+
 sub test_pass_through {
     # Set up a function that mangles its provided arguments, returns different
     # values according to context, and takes a note of what they were.
@@ -140,6 +145,130 @@ sub test_pass_through {
         'Return value correct in list context'
     );
     is($provided, '2 arguments', 'Arguments passed in list contet');
+}
+
+# Once we stop timing, the wrapping stops.
+
+sub test_wrapping_stops {
+    sub time_this_many_times {
+        my $frames_required = 0;
+        while ((caller($frames_required))[0] ne __PACKAGE__) {
+            $frames_required++;
+        }
+        return $frames_required;
+    }
+    is(time_this_many_times(), 0, 'Before anything else, direct access');
+
+    my $timer = Timer::Milestones->new;
+    $timer->time_function('time_this_many_times');
+    is(time_this_many_times(), 1, 'One timer: indirect access');
+
+    my $other_timer = Timer::Milestones->new;
+    $other_timer->time_function('time_this_many_times');
+    is(time_this_many_times(), 2, 'Two timers: two-level indirection');
+
+    $other_timer->stop_timing;
+    is(time_this_many_times(), 1, 'One timer finishes: back to one level');
+
+    $timer->stop_timing;
+    is(time_this_many_times(), 0, 'Both gone: direct access again');
+}
+
+# We can use exported functions as well as the OO interface for this.
+# This also tests that we can use unqualified function names passed to
+# time_function.
+
+sub test_exported_function_interface {
+    sub it_only_matters_that_we_call_it { }
+    sub this_one_matters_even_less { }
+    start_timing();
+    time_function('it_only_matters_that_we_call_it');
+    time_function('this_one_matters_even_less', summarise_calls => 1);
+    it_only_matters_that_we_call_it();
+    for (1..3) {
+        this_one_matters_even_less();
+    }
+    add_milestone('Part-way through');
+    my $report = generate_intermediate_report();
+    like($report, my $re_partial = qr{
+        ^
+        START: \s [^\n]+ \n
+        [^\n]+ \n # Don't worry about the timing for this milestone
+        \s+ \d+ \s ms \s it_only_matters_that_we_call_it \n
+        \s+ \d+ \s ms \s this_one_matters_even_less \s [(] x3 [)] \n
+        Part-way \s through
+    }xsm, 'Got subroutine calls in the first part');
+    
+    it_only_matters_that_we_call_it();
+    it_only_matters_that_we_call_it();
+    $report = generate_final_report();
+    like($report,
+        qr{
+            ^
+            $re_partial \n
+            [^\n]+ \n # Don't worry about timing for this second part either
+            ( \s+ \d+ \s ms \s it_only_matters_that_we_call_it \n ){2}
+            END: \s .+
+            $
+        }xsm,
+        'Got subroutine calls in the second part as well'
+    );
+}
+
+# You can pass a coderef to time_function; the wrapped coderef is returned.
+# The name you supply is mentioned in the report; otherwise, something vaguely
+# useful is used.
+
+sub test_coderef {
+    my $timer = Timer::Milestones->new;
+
+    # A simple coderef. This is used mostly to check that we work out its name.
+    my $line_defined = __LINE__ + 1;
+    my $simple_code = sub { return 'Duh!' };
+    my $wrapped_simple_code = $timer->time_function($simple_code);
+    isnt(refaddr($wrapped_simple_code), refaddr($simple_code),
+        'We got returned a different coderef for the simple code');
+
+    # A more elegant coderef that we'll give a name to, and report details
+    # of its arguments just to make sure all of this stuff works.
+    my $factoid = 'Hippos are more closely related to whales than pigs';
+    my $elegant_code = sub { return $factoid };
+    my $wrapped_elegant_code = $timer->time_function(
+        $elegant_code,
+        report_name_as      => 'interesting factoid',
+        summarise_arguments => sub { scalar @_ }
+    );
+    isnt(refaddr($wrapped_elegant_code), refaddr($elegant_code),
+        'We got returned a different coderef for the elegant code');
+
+    # Test the two coderefs.
+    is($wrapped_simple_code->(), 'Duh!', 'The simple coderef works');
+    is($elegant_code->(), $factoid, 'Our original elegant coderef still works');
+    is($wrapped_elegant_code->(qw(these arguments are just counted)),
+        $factoid, 'Our wrapped elegant coderef works as well');
+    $factoid = q{Rodents can't burp};
+    is($wrapped_elegant_code->('Huh!'),
+        $factoid, 'And we can still mess with it');
+
+    # Our report includes the alternative name etc. and does not include the
+    # first call to the elegant code.
+    my $final_report = $timer->generate_final_report;
+    like(
+        $final_report,
+        qr{
+            ^
+            START: \s [^\n]+ \n
+            \s+ [^\n]+ \n # Ignore total elapsed time
+            \s+ \d+ \s ms \s CODE [(] 0x [0-9a-f]+ [)] \n
+            \s+ \d+ \s ms \s interesting \s factoid \n
+            \s+ 5 \n
+            \s+ \d+ \s ms \s interesting \s factoid \n
+            \s+ 1 \n
+            END: \s .+
+            $
+        }xsm,
+        'The report uses the reported name etc.'
+    )
 }
 
 1;

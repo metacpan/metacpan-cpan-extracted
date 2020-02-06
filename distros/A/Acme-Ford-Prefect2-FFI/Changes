@@ -1,4 +1,7 @@
 Revision history for Perl module Acme-Ford-Prefect2-FFI
 
+2.0400    2020-02-05 19:12:47 -0700
+  - Require Acme::Alien::DontPanic2 2.0400 (Alien::Build 2.04)
+
 2.0000    2020-02-02 06:33:23 -0700
   - Require Acme::Alien::DontPanic2 2.0000 (Alien::Build 2.00)

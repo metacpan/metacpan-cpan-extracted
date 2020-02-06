@@ -2,7 +2,7 @@ package PICA::Writer::XML;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Scalar::Util qw(reftype);
 use XML::Writer;

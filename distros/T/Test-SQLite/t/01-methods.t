@@ -6,7 +6,7 @@ use DBI;
 use Test::More;
 use Test::Exception;
 
-use constant CREATE   => "CREATE TABLE account ( id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, password TEXT NOT NULL, active INTEGER NOT NULL, created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP )";
+use constant CREATE   => 'CREATE TABLE account (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE, password TEXT NOT NULL, active INTEGER NOT NULL, created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)';
 use constant INSERT   => "INSERT INTO account (name, password, active) VALUES ('Gene', 'abc123', 1)";
 use constant SELECT   => 'SELECT name FROM account';
 use constant EXPECTED => [ ['Gene'] ];
@@ -65,6 +65,12 @@ sub no_args {
     my $sqlite = Test::SQLite->new;
     ok -e $sqlite->_database, 'create test database';
 
+    isnt $sqlite->dsn, 'foo', 'dsn constructor ignored';
+    isnt $sqlite->dbh, 'foo', 'dbh constructor ignored';
+    isnt $sqlite->_database, 'foo', '_database constructor ignored';
+
+    is_deeply $sqlite->db_attrs, { RaiseError => 1, AutoCommit => 1 }, 'db_attrs';
+
     my $dbh = $sqlite->dbh;
     isa_ok $dbh, 'DBI::db';
 
@@ -106,12 +112,6 @@ sub from_sql {
         _database => 'foo',
     );
     ok -e $sqlite->_database, 'create test database from schema';
-
-    isnt $sqlite->dsn, 'foo', 'dsn constructor ignored';
-    isnt $sqlite->dbh, 'foo', 'dbh constructor ignored';
-    isnt $sqlite->_database, 'foo', '_database constructor ignored';
-
-    is_deeply $sqlite->db_attrs, { RaiseError => 1, AutoCommit => 1 }, 'db_attrs';
 
     my $dbh = DBI->connect( $sqlite->dsn, '', '', $sqlite->db_attrs );
     isa_ok $dbh, 'DBI::db';

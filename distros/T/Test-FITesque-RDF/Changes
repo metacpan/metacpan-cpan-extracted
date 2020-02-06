@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Test-FITesque-RDF>
 Bug tracker:  <https://github.com/kjetilk/p5-test-fitesque-rdf/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.018	2020-02-06	Support different status codes
+
+ - Added: Make it possible to use status as regular expression.
+ - Improve documentation.
+ - Updated: Use the new coercions in Attean.
+
 0.016	2019-10-28	Test coverage to 100%
 
  - Added: Add tests to bring the test coverage to 100%.

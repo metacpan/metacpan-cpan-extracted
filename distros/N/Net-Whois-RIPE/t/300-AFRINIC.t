@@ -19,7 +19,7 @@ SKIP: {
 
     my @o;
     eval { @o = $c->query('105.0.0.1') };
-    ok !$@, qq{Client performs queries without dying $@};
+    ok(!$@ or $@=~/IO::Socket::INET/, qq{Client performs queries without dying $@});
     for my $o (@o) {
         my $type = ref $o;
         ok( $type =~ /(AFRINIC|Information)/, "Object " . $o->class . " returned" );

@@ -7,9 +7,10 @@ Shaper.xs
 t/00_load.t
 t/10_basic.t
 t/20_shaper.t
-t/99_showlog.t
+t/30_kern.t
 t/LiberationSans.ttf
 t/Lohit-Devanagari.ttf
+t/NimbusRoman-Regular.otf
 lib/HarfBuzz/Shaper.pm
 inc/Devel/CheckLib.pm
 hb_src/harfbuzz/check-c-linkage-decls.sh

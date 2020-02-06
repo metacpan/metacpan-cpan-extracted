@@ -1,5 +1,8 @@
 Revision history for Perl extension Promise::XS:
 
+0.06 Thu 6 Feb 2020
+- Fix compilation on some old thread-multi perls.
+
 0.05 Sat 1 Feb 2020
 - Test fixes.
 

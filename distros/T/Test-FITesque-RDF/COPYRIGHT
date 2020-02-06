@@ -3,31 +3,6 @@ Upstream-Name: Test-FITesque-RDF
 Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 Source: https://metacpan.org/release/Test-FITesque-RDF
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
- lib/Test/FITesque/RDF.pm
- t/01basic.t
- t/integration-basic.t
- t/integration-http-list.t
- t/lib/Internal/Fixture/HTTPList.pm
- t/lib/Internal/Fixture/Multi.pm
- t/lib/Internal/Fixture/Simple.pm
- t/unit-http-list.t
- t/unit-http-mix.t
- t/unit-http-regex.t
- t/unit-http-server.t
- t/unit-list.t
- t/unit-multi-http.t
- t/unit-multi-vocab.t
- t/unit-multi.t
- t/unit-relative.t
- t/unit-simple.t
-Copyright: Copyright 2019 Kjetil Kjernsmo.
-License: Expat
-
 Files: INSTALL
  LICENSE
  README
@@ -50,6 +25,34 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: dist.ini
+ t/01basic.t
+ t/integration-basic.t
+ t/integration-http-list.t
+ t/lib/Internal/Fixture/HTTPList.pm
+ t/lib/Internal/Fixture/Multi.pm
+ t/lib/Internal/Fixture/Simple.pm
+ t/unit-http-list.t
+ t/unit-http-mix.t
+ t/unit-http-server.t
+ t/unit-list.t
+ t/unit-multi-http.t
+ t/unit-multi-vocab.t
+ t/unit-multi.t
+ t/unit-relative.t
+ t/unit-simple.t
+Copyright: Copyright 2019 Kjetil Kjernsmo.
+License: Expat
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Test/FITesque/RDF.pm
+ t/unit-http-regex.t
+Copyright: Copyright 2020 Kjetil Kjernsmo.
+License: Expat
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
@@ -61,21 +64,21 @@ Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Expat
- This software is Copyright (c) 2019 by Kjetil Kjernsmo.
+ This software is Copyright (c) 2020 by Kjetil Kjernsmo.
  
  This is free software, licensed under:
  
    The MIT (X11) License
 
 License: Artistic-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2019 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

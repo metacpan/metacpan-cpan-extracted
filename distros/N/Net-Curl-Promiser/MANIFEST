@@ -14,6 +14,7 @@ examples/mojo.pl
 examples/select.pl
 lib/Net/Curl/Promiser.pm
 lib/Net/Curl/Promiser/AnyEvent.pm
+lib/Net/Curl/Promiser/FDFHStore.pm
 lib/Net/Curl/Promiser/IOAsync.pm
 lib/Net/Curl/Promiser/LoopBase.pm
 lib/Net/Curl/Promiser/Mojo.pm

@@ -36,6 +36,14 @@ LingoHub project.
 
 Root directory.
 
+=item I<resource_directory>
+
+Resource directory.
+
+=item I<source_language>
+
+Source language.
+
 =item I<target_languages>
 
 List of target languages.
@@ -52,7 +60,7 @@ Dragos Varovici <dvarovici.work@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018-2019 by Dragos Varovici.
+This software is copyright (c) 2018-2020 by Dragos Varovici.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

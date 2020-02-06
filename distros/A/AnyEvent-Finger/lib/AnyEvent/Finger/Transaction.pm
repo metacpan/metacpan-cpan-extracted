@@ -5,7 +5,7 @@ use warnings;
 use overload '""' => sub { shift->as_string };
 
 # ABSTRACT: Simple asynchronous finger transaction
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub res { shift->{res} }
@@ -32,7 +32,7 @@ AnyEvent::Finger::Transaction - Simple asynchronous finger transaction
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ Returns the local TCP port being used to make the request.
 
 =head2 remote_address
 
- my $address = $tx-E<gt>remote_address;
+ my $address = $tx->remote_address;
 
 Returns the IP address from whence the finger request is coming from.
 
@@ -95,8 +95,6 @@ L<AnyEvent::Finger::Client>
 L<AnyEvent::Finger::Server>
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

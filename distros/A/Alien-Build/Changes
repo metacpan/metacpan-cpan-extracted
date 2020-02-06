@@ -1,5 +1,11 @@
 Revision history for Alien-Build
 
+2.04      2020-02-05 19:05:32 -0700
+  - Production release identical to 2.03_01
+
+2.03_01   2020-02-04 21:29:35 -0700
+  - Add use strict to generated ::Installl::Files modules (gh#162, gh#163)
+
 2.02      2020-02-04 13:12:49 -0700
   - Production release identical to 2.01_01
 

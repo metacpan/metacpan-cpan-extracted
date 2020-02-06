@@ -14,6 +14,7 @@ Serge::Sync::Plugin::TranslationService::locize - L<Locize|https://locize.com/> 
         {
             config_file              ./files/config/locize_config_file.yml
             path                     ./files/resources
+            format                   xliff12
         }
     }
 
@@ -29,6 +30,10 @@ implemented using the command-line client for the Locize API.
 =item I<config_file>
 
 Locize CLI path to the configuration file
+
+=item I<format>
+
+Locize CLI resources format.
 
 =item I<path>
 
@@ -46,7 +51,7 @@ Dragos Varovici <dvarovici.work@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dragos Varovici.
+This software is copyright (c) 2019-2020 by Dragos Varovici.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

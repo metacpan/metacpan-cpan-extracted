@@ -4,6 +4,8 @@ XS::Install - ExtUtils::MakeMaker based module installer for XS modules.
 
 =head1 DESCRIPTION
 
+To high-level overview please read L<Shared XS modules manifesto|XS::Manifesto>.
+
 XS::Install (formerly known as L<Panda::Install>) makes it much easier to write MakeMaker's makefiles especially for XS modules.
 It provides dependecies support between XS modules, so that one could easily use header files, code, compilation
 options, ...etc of another. XS::Install also lets you put source files in subdirectories any level deep

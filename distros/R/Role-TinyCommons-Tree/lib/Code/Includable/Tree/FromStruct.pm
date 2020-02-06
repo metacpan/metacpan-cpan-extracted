@@ -1,8 +1,9 @@
 package Code::Includable::Tree::FromStruct;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2020-02-06'; # DATE
+our $VERSION = '0.120'; # VERSION
 
+use strict;
 our $GET_PARENT_METHOD = 'parent';
 our $GET_CHILDREN_METHOD = 'children';
 our $SET_PARENT_METHOD = 'parent';
@@ -84,7 +85,7 @@ Code::Includable::Tree::FromStruct - Routine to build tree object from data stru
 
 =head1 VERSION
 
-This document describes version 0.11 of Code::Includable::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2016-11-23.
+This document describes version 0.120 of Code::Includable::Tree::FromStruct (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
 
 =for Pod::Coverage .+
 
@@ -128,7 +129,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
 
 =head1 BUGS
 
@@ -149,7 +150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,9 +1,40 @@
 ==================================================
-Changes from 1738-12-31 00:00:00 +0000 to present.
+Changes from 1746-04-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2012-10-14 03:03:41 +0000
+version 0.006 at 2020-02-06 06:32:59 +0000
+------------------------------------------
+
+  Change: a025932a3924fe7bca26ddcfe32d97999f177ec5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 07:32:44 +0000
+
+    Removed unnecessary requirement 
+
+------------------------------------------
+version 0.005 at 2020-02-06 06:29:10 +0000
+------------------------------------------
+
+  Change: 5dd64f86ab3d4a7c5a33fa22043817a3a9ce5732
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 07:29:10 +0000
+
+    Added cookie jar to LWP useragent, added shortcut for firing up chain
+    with LWP useragent. 
+
+------------------------------------------
+version 0.004 at 2020-02-06 03:45:06 +0000
+------------------------------------------
+
+  Change: 4d4c3235caef41847ee85120e86170e8db33924a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-02-06 04:45:06 +0000
+
+    Added travis, updated repo, no essential changes 
+
+------------------------------------------
+version 0.003 at 2012-10-13 22:38:14 +0000
 ------------------------------------------
 
   Change: 52130a37352bd3da26ce5398dbea88ad0ddd6889
@@ -17,6 +48,10 @@ version 0.003 at 2012-10-14 03:03:41 +0000
   Date : 2012-10-14 00:31:47 +0000
 
     Implemented suggestions of mst, now method calls possible 
+
+------------------------------------------
+version 0.001 at 2012-10-13 05:32:21 +0000
+------------------------------------------
 
   Change: 3fcb3bbdd4a27cfca8cfd0261c6371ee01e29a79
   Author: Torsten Raudssus <torsten@raudss.us>

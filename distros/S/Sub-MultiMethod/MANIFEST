@@ -22,4 +22,6 @@ t/02singleclass.t
 t/03inheritance.t
 t/04roles.t
 t/05rolesdonotinstalldispatchers.t
+t/06monomethod-weird.t
 t/06monomethod.t
+t/07multifunc.t

@@ -28,17 +28,18 @@ Net::Whois::RIPE - a pure-Perl implementation of the RIPE Database client.
 
 =head1 VERSION
 
-Version 2.007003
+Version 2.007004
 
 =cut
 
-our $VERSION = 2.007003;
+our $VERSION = 2.007004;
 
 =head1 SYNOPSIS
 
-This is a complete rewrite of version 1.31 of the module, which I inherited
-from Paul Gampe during the time I've worked for the RIPE NCC, between Nov 2007
-and Feb 2010.
+This is an evolution of the module I (Arnaud Assad) inherited from Luis Motta Campos.
+Which was a complete rewrite of the old version of the module inherited from
+Paul Gampe. It incorporated new concepts Luis have learned while working at the
+RIPE NCC between Nov 2007 and Jan 2010. 
 
 It intends to provide a cleaner, simpler, and complete implementation of a RIPE
 Database client.
@@ -534,10 +535,6 @@ sub object_types {
     return;
 }
 
-=head1 AUTHOR
-
-Luis Motta Campos, C<< <lmc at cpan.org> >>
-
 =head1 CAVEATS
 
 =over 4
@@ -597,25 +594,37 @@ L<http://search.cpan.org/dist/Net-Whois-RIPE>
 
 =back
 
+=head1 AUTHORS
+
+Arnaud Assad, C<< aassad at cpan.org >>
+Luis Motta Campos, C<< <lmc at cpan.org> >>
+Paul Gampe
+Kevin Backer
 
 =head1 ACKNOWLEDGEMENTS
+
+Thanks to DOOLTA (L<https://www.doolta.com>) for allowing Arnaud Assad to work on this module during some of his office
+hours.
+
+Thanks to Luis Motta Campos for allowing me (Arnaud Assad) the maintenance of this
+module on CPAN;
+
+Thanks to RIPE NCC for allowing Luis Motta Campos to work on this during some of his office
+hours.
+
+Thanks to Paul Gampe for allowing Luis Motta Campos to handle me the maintenance of this
+module on CPAN;
 
 Thanks to Paul Gampe and Kevin Backer for writing previous versions of this
 module;
 
-Thanks to Paul Gampe for allowing me to handle me the maintenance of this
-module on CPAN;
-
-Thanks to RIPE NCC for allowing me to work on this during some of my office
-hours.
-
 Thanks to Carlos Fuentes for the nice patch with bugfixes for version 2.00_008.
-
 Thanks to Moritz Lenz for all his contributions
 Thanks to Noris Network AG for allowing him to contribute to this module.
 
 =head1 COPYRIGHT & LICENSE
 
+Copyright 2012-2020 Arnaud Assad
 Copyright 2010 Luis Motta Campos, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it

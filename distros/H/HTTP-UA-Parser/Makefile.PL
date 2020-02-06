@@ -10,6 +10,7 @@ My_WriteMakefile(
     EXE_FILES    => ['script/ua_parser'],
     PREREQ_PM         => {
         'LWP::UserAgent' => 0,
+        'LWP::Protocol::https' => 0,
         'YAML::Tiny' => 0
     },
     LICENSE        => 'perl',

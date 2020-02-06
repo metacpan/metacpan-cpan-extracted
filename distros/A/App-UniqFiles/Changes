@@ -1,11 +1,16 @@
-0.12    2017-07-10 (PERLANCAR)
+0.130   2019-12-04  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Mention find-duplicate-filenames.
+
+
+0.12    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.11    2015-09-03 (PERLANCAR)
+0.11    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,14 +19,14 @@
 	  requirement.
 
 
-0.10    2015-08-17 (PERLANCAR)
+0.10    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.09    2015-01-03 (PERLANCAR)
+0.09    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -35,7 +40,7 @@
            generated script is not as polished as it should be. Stay tuned.
 
 
-0.07     2014-07-22 (SHARYANTO)
+0.07     2014-07-22  Released-By: SHARYANTO
 
          - No functional changes.
 
@@ -43,38 +48,38 @@
            Perinci::CmdLine::Any to reduce size of dependencies.
 
 
-0.06    2014-05-16 (SHARYANTO)
+0.06    2014-05-16  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.05    2012-03-02 (SHARYANTO)
+0.05    2012-03-02  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace Sub::Spec with Rinci/Perinci.
 
 
-0.04    2011-07-28 (SHARYANTO)
+0.04    2011-07-28  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add option: check_content.
 
 
-0.03    2011-07-28 (SHARYANTO)
+0.03    2011-07-28  Released-By: SHARYANTO
 
         - Fix behaviour to match `uniq` command: by default, duplicate files are
           returned but only one for each content.
 
 
-0.02    2011-07-28 (SHARYANTO)
+0.02    2011-07-28  Released-By: SHARYANTO
 
         - Minor bug fixes; use logging in script.
 
 
-0.01    2011-07-28 (SHARYANTO)
+0.01    2011-07-28  Released-By: SHARYANTO
 
         - First release.

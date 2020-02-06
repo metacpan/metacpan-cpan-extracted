@@ -42,6 +42,34 @@ Type of push to perform on the server. 'source' pushes source documents only, wh
 
 File types to locate and transmit to the server when using project type 'file'.
 
+=item I<cache_dir>
+
+The base directory for storing zanata cache files. Default is current directory.
+
+=item I<use_cache>
+
+Whether to use an Entity cache when fetching documents. Default is NO.
+
+=item I<purge_cache>
+
+Whether to purge the cache before performing the pull operation. Default is NO.
+
+=item I<debug>
+
+Whether to enable debug logging. Default is NO.
+
+=item I<errors>
+
+Whether to output full execution error messages (stacktraces). Default is NO.
+
+=item I<disable_ssl_cert>
+
+Whether verification of SSL certificates should be disabled. Default is NO.
+
+=item I<dry_run>
+
+Dry run: don't change any data, on the server or on the filesystem. Default is NO.
+
 =back
 
 =head1 INSTALLATION
@@ -54,7 +82,7 @@ Dragos Varovici <dvarovici.work@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018-2019 by Dragos Varovici.
+This software is copyright (c) 2018-2020 by Dragos Varovici.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

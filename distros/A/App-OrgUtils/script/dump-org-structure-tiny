@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-30'; # DATE
+our $DATE = '2020-02-06'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.471'; # VERSION
+our $VERSION = '0.472'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,13 +12,13 @@ use open qw(:std :utf8);
 use Log::ger;
 
 use Org::Parser::Tiny;
-use Tree::Dump;
+use Org::Dump;
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
 
 my $doc = Org::Parser::Tiny->new->parse($input);
-td($doc);
+print Org::Dump::dump_element($doc);
 
 1;
 # ABSTRACT: Dump Org document structure (using Org::Parser::Tiny)
@@ -36,7 +36,7 @@ dump-org-structure-tiny - Dump Org document structure (using Org::Parser::Tiny)
 
 =head1 VERSION
 
-This document describes version 0.471 of dump-org-structure-tiny (from Perl distribution App-OrgUtils), released on 2020-12-30.
+This document describes version 0.472 of dump-org-structure-tiny (from Perl distribution App-OrgUtils), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ will output something like:
 =head1 DESCRIPTION
 
 This script parses input using L<Org::Parser::Tiny> and dump the structure using
-L<Tree::Dump>. This script is mostly used for debugging.
+L<Org::Dump>. This script is mostly used for debugging.
 
 =head1 HOMEPAGE
 
@@ -89,7 +89,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,9 @@
-0.010   2019-01-13 (PERLANCAR)
+0.011   2020-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add stats.
+
+
+0.010   2019-01-13  Released-By: PERLANCAR
 
 	- [bugfix] to_time might not be defined [reported by Chris Hills].
 
@@ -7,55 +12,55 @@
 	- Enable logging for the CLIs.
 
 
-0.009   2019-01-13 (PERLANCAR)
+0.009   2019-01-13  Released-By: PERLANCAR
 
 	- Specify database schema summary.
 
 	- [Bugfix] Fix printing status/reason.
 
 
-0.008   2018-09-02 (PERLANCAR)
+0.008   2018-09-02  Released-By: PERLANCAR
 
 	- Add filter arguments: exclude_{dists,dist_re,authors,author_re}.
 
 
-0.007   2018-03-12 (PERLANCAR)
+0.007   2018-03-12  Released-By: PERLANCAR
 
 	- Turn off read_config & read_env for the CLIs.
 
 
-0.006   2018-03-12 (PERLANCAR)
+0.006   2018-03-12  Released-By: PERLANCAR
 
 	- Add some more documentation, fallback to ~/index-lncd.db if
 	  ~/cpan does not exist [RT#124757].
 
 
-0.005   2017-07-02 (PERLANCAR)
+0.005   2017-07-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [ux] Show progress in log message.
 
 
-0.004   2017-07-01 (PERLANCAR)
+0.004   2017-07-01  Released-By: PERLANCAR
 
 	- Switch from Log::Any to Log::ger.
 
 
-0.003   2017-06-16 (PERLANCAR)
+0.003   2017-06-16  Released-By: PERLANCAR
 
 	- Avoid perl undef warning.
 
 	- [ux] Do not display the 'date' column in HTML output.
 
 
-0.002   2017-06-16 (PERLANCAR)
+0.002   2017-06-16  Released-By: PERLANCAR
 
 	- Add CLIs: list-new-cpan-dists, list-monthly-new-cpan-dists-html.
 
 	- [ux] Set nicer defaults for to_time.
 
 
-0.001   2017-06-15 (PERLANCAR)
+0.001   2017-06-15  Released-By: PERLANCAR
 
         - First release.

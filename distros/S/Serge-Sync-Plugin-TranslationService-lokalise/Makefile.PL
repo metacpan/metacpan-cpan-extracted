@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Serge::Sync::Plugin::TranslationService::lokalise",
   "PREREQ_PM" => {
-    "Serge" => "1.3.2"
+    "Serge" => "1.4.0"
   },
   "TEST_REQUIRES" => {
     "Clone" => 0,
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.900.2",
+  "VERSION" => "0.901.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Serge" => "1.3.2",
+  "Serge" => "1.4.0",
   "Test::More" => 0
 );
 

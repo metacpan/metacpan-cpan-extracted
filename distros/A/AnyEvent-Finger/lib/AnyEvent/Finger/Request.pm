@@ -5,7 +5,7 @@ use warnings;
 use overload '""' => sub { shift->as_string };
 
 # ABSTRACT: Simple asynchronous finger request
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub new
@@ -70,7 +70,7 @@ AnyEvent::Finger::Request - Simple asynchronous finger request
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -148,8 +148,6 @@ L<AnyEvent::Finger::Client>
 L<AnyEvent::Finger::Server>
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::XObject';
 use strict;
 use warnings;
 
-our $VERSION = '2.036'; # VERSION
+our $VERSION = '2.037'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 

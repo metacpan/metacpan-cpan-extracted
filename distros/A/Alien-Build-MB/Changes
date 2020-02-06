@@ -1,6 +1,10 @@
 Revision history for Alien-Build-MB
 
-0.06      2020-01-30 14:28:54 -0700
+0.07      2020-02-05 21:31:12 -0700
+  - Generate ::Install::Files module like Alien::Build::MM
+    and Alien::Base::ModuleBuild do (gh#4, gh#6)
+
+0.06      2020-02-05 21:28:25 -0700
   - Bump requirement of Module::Build to 0.37_01 as we need
     that for the dynamic_config property (gh#3)
 

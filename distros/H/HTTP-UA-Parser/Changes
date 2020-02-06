@@ -28,3 +28,10 @@ Revision history for Perl extension HTTP::UA::Parser.
 0.007 Mon Feb 03 2020
 	- os parser fixes by Alex Solovey - https://github.com/asolovey
 	- ua parser fixes
+
+0.008 Thu Feb 06 2020
+	- remove local Yaml::Tiny
+	- better tests error reports
+	- fix tests encoding error, thanks to Slaven Rezić - https://github.com/eserte
+	- fix tests network issues, thanks to Slaven Rezić - https://github.com/eserte
+	- fix docs typo, thanks to Ravo.

@@ -27,7 +27,7 @@ subtest 'share' => sub {
   alienfile q{
     use alienfile;
     use Path::Tiny qw( path );
-    
+
     configure { requires 'Foo' => '2.01' };
     probe sub { 'share' };
     share {
@@ -48,12 +48,12 @@ subtest 'share' => sub {
       requires 'Baz' => '0.02'
     };
   };
-  
+
   my $abmb = Alien::Build::MB->new(
     module_name  => 'Alien::Foo',
     dist_version => '1.00',
   );
-  
+
   isa_ok $abmb, 'Alien::Build::MB';
   isa_ok $abmb, 'Module::Build';
   is( $abmb->dist_name, 'Alien-Foo', 'dist name');
@@ -70,14 +70,14 @@ subtest 'share' => sub {
   subtest 'configure' => sub {
 
     my $build = $abmb->alien_build(1);
-  
+
     isa_ok $build, 'Alien::Build';
-  
+
     is($build->runtime_prop->{install_type}, 'share', 'type = share');
     is($build->runtime_prop->{prefix}, T(), "runtime prefix");
     is($build->runtime_prop->{perl_module_version}, '1.00', 'perl_module_version is set');
     note $build->runtime_prop->{prefix};
-  
+
     my $stage = path($build->install_prop->{stage})->relative($CWD);
     is($stage->stringify, "blib/lib/auto/share/dist/Alien-Foo", "stage dir");
 
@@ -91,7 +91,7 @@ subtest 'share' => sub {
       },
       'configure requires are set'
     );
-  
+
     is(
       $abmb->build_requires,
       hash {
@@ -107,23 +107,48 @@ subtest 'share' => sub {
   subtest 'download' => sub {
 
     note scalar capture_merged { $abmb->ACTION_alien_download };
-    
+
     is($INC{'Foo.pm'}, T(), 'Foo.pm is loaded' );
     is($INC{'Bar.pm'}, T(), 'Bar.pm is loaded' );
     is($INC{'Baz.pm'}, F(), 'Baz.pm is not loaded' );
-    
+
     my $build = $abmb->alien_build(1);
 
     my $download = path($build->install_prop->{download});
-    
+
     is($download->slurp, 'testdata', 'fake tar faile has content');
 
   };
-  
+
   subtest 'build' => sub {
     note scalar capture_merged { $abmb->ACTION_alien_build };
     my $build = $abmb->alien_build(1);
-    is($build->install_prop->{did_the_install}, T());
+    is $build->install_prop->{did_the_install}, T();
+    ok -f "blib/lib/Alien/Foo/Install/Files.pm", "created Alien::Foo::Install::Files";
+
+    local $INC{'Alien/Foo.pm'} = __FILE__;
+
+    eval { require './blib/lib/Alien/Foo/Install/Files.pm' };
+    is "$@", "", "Alien::Foo::Install::Files compiles okay";
+
+    my $mock = mock 'Alien::Foo' => (
+      add => [
+        Inline => sub {
+          { x => 'y', args => [@_] };
+        },
+      ],
+    );
+
+    is(
+      Alien::Foo::Install::Files->Inline(1,2,3,4,5,6),
+      hash {
+        field x => 'y';
+        field args => [ 'Alien::Foo', 1,2,3,4,5,6 ];
+        end;
+      },
+      'called Alien::Foo->Inline',
+    );
+
   };
 
 };
@@ -135,7 +160,7 @@ subtest 'system' => sub {
   alienfile q{
     use alienfile;
     use Path::Tiny qw( path );
-    
+
     configure { requires 'Foo' => '2.01' };
     probe sub { 'system' };
     sys   {
@@ -146,14 +171,14 @@ subtest 'system' => sub {
       };
     };
   };
-  
+
   my $abmb = Alien::Build::MB->new(
     module_name  => 'Alien::Foo',
     dist_version => '1.00',
   );
-  
+
   subtest 'configure' => sub {
-  
+
     isa_ok $abmb, 'Alien::Build::MB';
     isa_ok $abmb, 'Module::Build';
 
@@ -170,7 +195,7 @@ subtest 'system' => sub {
       },
       'configure requires are set'
     );
-  
+
     is(
       $abmb->build_requires,
       hash {
@@ -183,13 +208,13 @@ subtest 'system' => sub {
     );
 
     my $build = $abmb->alien_build(1);
-    isa_ok $build, 'Alien::Build';  
+    isa_ok $build, 'Alien::Build';
     is($build->runtime_prop->{install_type}, 'system', 'type = system');
 
   };
-  
+
   subtest 'build' => sub {
-    note scalar capture_merged { $abmb->ACTION_alien_build };    
+    note scalar capture_merged { $abmb->ACTION_alien_build };
     my $build = $abmb->alien_build(1);
     is($build->install_prop->{did_the_gather}, T());
   };
@@ -199,11 +224,11 @@ subtest 'test' => sub {
 
   skip_all 'test requires Alien::Build 1.14 or better'
     unless eval { require Alien::Build; Alien::Build->VERSION('1.14') };
-  
+
   subtest 'good' => sub {
 
     local $CWD = tempdir( CLEANUP => 1 );
-    
+
     alienfile q{
       use alienfile;
       probe sub { 'system' };
@@ -219,22 +244,22 @@ subtest 'test' => sub {
 
     # AB should take care of this for us
     ok( $abmb->configure_requires->{'Alien::Build'} >= '1.14', 'need at least 1.14 of Alien::Build' );
-    
+
     note scalar capture_merged { $abmb->ACTION_alien_build };
-    
+
     my($out, $err) = capture_merged {
       eval { $abmb->ACTION_alien_test };
       $@;
     };
-    
+
     is $err, '';
-    
+
   };
 
   subtest 'bad' => sub {
 
     local $CWD = tempdir( CLEANUP => 1 );
-    
+
     alienfile q{
       use alienfile;
       probe sub { 'system' };
@@ -251,16 +276,16 @@ subtest 'test' => sub {
     # AB should take care of this for us
     ok( $abmb->configure_requires->{'Alien::Build'} >= '1.14', 'need at least 1.14 of Alien::Build' );
     ok( $abmb->configure_requires->{'Alien::Build::MB'} >= 0.05, 'need at least 0.05 of Alien::Build::MB' );
-    
+
     note scalar capture_merged { $abmb->ACTION_alien_build };
-    
+
     my($out, $err) = capture_merged {
       eval { $abmb->ACTION_alien_test };
       $@;
     };
-    
+
     like $err, qr/bogus92/;
-    
+
   };
 
 };

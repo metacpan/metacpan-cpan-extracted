@@ -1,3 +1,24 @@
+0.003   2020-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [internal] Use '_str' instead of 'raw' key to store raw string, to be
+	  more compatible with Org::Parser.
+
+	- [bugfix] Fix nodes' as_string() methods.
+
+        - Headline: allow setting level, title, is_todo, is_done, todo_state,
+	  tags.
+
+	- Add children_as_string() node method.
+
+
+0.002   2020-02-05  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Update example in Synopsis, show usage with
+	  Tree::FSMethods::Org.
+
+
 0.001   2019-12-30  Released-By: PERLANCAR
 
         - First, early release.

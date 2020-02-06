@@ -1,18 +1,15 @@
 package WWW::Chain::UA;
-BEGIN {
-  $WWW::Chain::UA::AUTHORITY = 'cpan:GETTY';
-}
-{
-  $WWW::Chain::UA::VERSION = '0.003';
-}
+our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for classes which have a request_chain function for a WWW::Chain object
-
+$WWW::Chain::UA::VERSION = '0.006';
 use Moo::Role;
 
 requires qw( request_chain );
 
 1;
+
 __END__
+
 =pod
 
 =head1 NAME
@@ -21,7 +18,7 @@ WWW::Chain::UA - Role for classes which have a request_chain function for a WWW:
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 AUTHOR
 
@@ -35,4 +32,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

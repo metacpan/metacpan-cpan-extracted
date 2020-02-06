@@ -6,6 +6,23 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2020-02-06
+
+ [ Packaging ]
+ - Don't require MRO::Compat on Perl 5.10 or above.
+ - Don't require Sub::Util if Sub::Name is already installed.
+
+0.005	2020-02-06
+
+ [ Documentation ]
+ - Document the behaviour of multimethods with a number of invocants not
+   equal to 1.
+ - Various improvements to documentation including exporting functions.
+
+ [ Test Suite ]
+ - Test `method => $n` for $n=0 and $n=2.
+ - Test `multimethod(undef, %spec)` works.
+
 0.004	2020-02-05
 
  [ Bug Fixes ]

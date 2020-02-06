@@ -29,7 +29,7 @@ optional_features: {}
 provides:
   Test::FITesque::RDF:
     file: lib/Test/FITesque/RDF.pm
-    version: '0.016'
+    version: '0.018'
 requires:
   Attean: '0.025'
   HTTP::Message: '0'
@@ -42,7 +42,7 @@ requires:
   Try::Tiny: '0'
   Types::Path::Tiny: '0'
   Types::Standard: '0'
-  Types::URI: '0'
+  Types::URI: '0.007'
   URI::NamespaceMap: '1.08'
   perl: '5.014'
 resources:
@@ -52,6 +52,6 @@ resources:
   homepage: https://metacpan.org/release/Test-FITesque-RDF
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-test-fitesque-rdf.git
-version: '0.016'
+version: '0.018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

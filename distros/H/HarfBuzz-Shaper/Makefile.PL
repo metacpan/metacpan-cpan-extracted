@@ -105,7 +105,7 @@ sub MY::postamble {
     my $cxx = $ENV{CXX} || "g++";
     return <<EOF;
 \$(MYEXTLIB) : $hb_src
-	$cxx -c -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
+	$cxx -c -std=c++11 -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<
 
 EOF
 }

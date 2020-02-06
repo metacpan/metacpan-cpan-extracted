@@ -23,6 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
+            "PerlX::Maybe" : "0",
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
             "parent" : "0",
@@ -50,7 +51,7 @@
          "web" : "https://github.com/skington/timer-milestones"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

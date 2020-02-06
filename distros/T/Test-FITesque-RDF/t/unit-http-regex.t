@@ -67,7 +67,7 @@ cmp_deeply($data,
 										 {
 										  'request' => isa("HTTP::Request"),
 										  'response' => isa("HTTP::Response"),
-										  'regex-fields' => {},
+										  'regex-fields' => {'status' => 1},
 										 },
 										 {
 										  'request' => isa("HTTP::Request"),
@@ -89,6 +89,8 @@ my $params = $data->[0]->[1]->[1]->{'-special'}->{'http-pairs'};
 is(scalar @{$params}, 3, 'There are three pairs');
 
 like($params->[0]->{response}->header('Link'), qr|;\\s|, 'Should be single escaped');
+
+is($params->[1]->{response}->code, '201|204', 'Status is correct'); #TODO: This could break if underlying framework starts to enforce a format that only includes three-digit status codes
 
 done_testing;
 

@@ -28,12 +28,18 @@ portable implementations:
 # PROMISE IMPLEMENTATION
 
 This class’s default Promise implementation is [Promise::ES6](https://metacpan.org/pod/Promise::ES6).
-You can use a different one by overriding the [PROMISE\_CLASS()](https://metacpan.org/pod/PROMISE_CLASS\(\)) method in
+You can use a different one by overriding the `PROMISE_CLASS()` method in
 a subclass, as long as the substitute class’s `new()` method works the
 same way as Promise::ES6’s (which itself follows the ECMAScript standard).
 
 (NB: [Net::Curl::Promiser::Mojo](https://metacpan.org/pod/Net::Curl::Promiser::Mojo) uses [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise) instead of
 Promise::ES6.)
+
+## **Experimental** [Promise::XS](https://metacpan.org/pod/Promise::XS) support
+
+Try out experimental Promise::XS support by running with
+`NET_CURL_PROMISER_PROMISE_ENGINE=Promise::XS` in your environment.
+This will override `PROMISE_CLASS()`.
 
 # GENERAL-USE METHODS
 

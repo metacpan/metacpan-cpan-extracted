@@ -14,7 +14,7 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI 0.007"^^doap-deps:CpanId ], [ doap-deps:on "Test::FITesque"^^doap-deps:CpanId ], [
 		doap-deps:on "URI::NamespaceMap 1.08"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "RDF::NS::Curated 1.002"^^doap-deps:CpanId;
@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Test-FITesque-RDF";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-016>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-018>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-test-fitesque-rdf>;
@@ -168,17 +168,17 @@
 	dc:issued            "2019-08-03"^^xsd:date;
 	doap-changeset:changeset [
 		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Introduce a -special key to the parameters to group all internal additions.";
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Some minor fixes.";
-		], [
 			a doap-changeset:Addition;
 			rdfs:label "Support regular expressions with a new array.";
 		], [
 			a doap-changeset:Addition;
 			rdfs:label "Improve documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Introduce a -special key to the parameters to group all internal additions.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Some minor fixes.";
 		];
 		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-010>;
 	];
@@ -237,6 +237,28 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.016.tar.gz>;
 	doap:revision        "0.016"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-018>
+	a                    doap:Version;
+	rdfs:label           "Support different status codes";
+	dc:identifier        "Test-FITesque-RDF-0.018"^^xsd:string;
+	dc:issued            "2020-02-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Make it possible to use status as regular expression.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use the new coercions in Attean.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improve documentation.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Test-FITesque-RDF/v_0-016>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Test-FITesque-RDF-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
@@ -262,6 +284,9 @@
 	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>, <https://solid.kjernsmo.net/profile/card>;
 	wot:hasKey           _:B1.
+
+<http://www.opensource.org/licenses/mit-license.php>
+	dc:title             "The MIT License"@en.
 
 <irc://irc.perl.org/#perlrdf>
 	a                    types:ChatChannel;

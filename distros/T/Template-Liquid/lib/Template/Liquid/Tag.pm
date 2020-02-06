@@ -1,5 +1,5 @@
 package Template::Liquid::Tag;
-our $VERSION = '1.0.12';
+our $VERSION = '1.0.14';
 use strict;
 use warnings;
 use base 'Template::Liquid::Document';

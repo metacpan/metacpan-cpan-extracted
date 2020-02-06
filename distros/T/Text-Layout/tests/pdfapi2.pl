@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use utf8;
 
-use lib "../CPAN";
 use PDF::API2;
 
 use lib "../lib";

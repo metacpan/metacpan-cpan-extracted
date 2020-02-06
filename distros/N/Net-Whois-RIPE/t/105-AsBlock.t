@@ -107,7 +107,7 @@ for (split /\n/, $align->dump({align => 30})) {
 is( $align->as_block(), 'AS30720 - AS30895', 'aligned as-block properly parsed' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

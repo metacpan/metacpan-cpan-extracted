@@ -1,13 +1,12 @@
 {
    "abstract" : "Play trics with hash keys",
    "author" : [
-      "Mark Overmeer"
+      "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5",
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,20 +32,22 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Report" : "0.26",
             "Test::More" : "0.47"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-Hash-Case.git",
          "web" : "https://github.com/markov2/perl5-Hash-Case"
       }
    },
-   "version" : "1.03",
-   "x_homepage" : "http://perl.overmeer.net/CPAN/",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

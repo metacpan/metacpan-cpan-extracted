@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.545'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-06'; # DATE
+our $DIST = 'Perinci-CmdLine-Inline'; # DIST
+our $VERSION = '0.546'; # VERSION
 
 # line 820, don't know how to turn off this warning?
 ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
@@ -418,6 +420,7 @@ sub _gen_common_opt_handler {
             require Perinci::CmdLine::Help;
             my $res = Perinci::CmdLine::Help::gen_help(
                 meta => $cd->{metas}{''},
+                meta_is_normalized => 1,
                 common_opts => $cd->{copts},
                 program_name => $cd->{script_name},
             );
@@ -1243,9 +1246,8 @@ _
             require Module::CoreList;
             require Data::Clean::JSON;
             my $cleanser = Data::Clean::JSON->new(
-                # pick this noncore PP module instead of the default non-core XS
-                # module Data::Clone. perl has core module Storable, but
-                # Storable still chooses to croak on Regexp objects.
+                # TODO: probably change back to using Storable since 3.08+
+                # now support Regexp objects.
                 '!clone_func' => 'Clone::PP::clone',
             );
             my $src = $cleanser->{_cd}{src};
@@ -1574,7 +1576,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.545 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2019-04-15.
+This document describes version 0.546 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -1859,6 +1861,7 @@ Whether the CLI script should validate arguments using schemas.
 
 Generate script with debugging outputs.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1909,7 +1912,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

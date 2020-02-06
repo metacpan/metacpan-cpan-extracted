@@ -28,7 +28,7 @@ $tested{'comment'}++;
 is_deeply( $object->comment(), [ 'This is the RIPE Database query service.', 'The objects are in RPSL format.' ], 'comment properly parsed' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

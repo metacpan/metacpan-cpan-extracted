@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Hash-Case>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Hash-Case/>
-    and <https://metacpan.org/release/Hash-Case>
+  * Indexed from CPAN: <https://metacpan.org/release/Hash-Case>
 
 Ties hashes to play tricks with keys.
 

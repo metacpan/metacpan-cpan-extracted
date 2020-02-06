@@ -4,14 +4,13 @@ use 5.008;
 
 WriteMakefile
   ( NAME	 => 'Hash::Case'
-  , VERSION      => '1.03'
+  , VERSION      => '1.05'
   , PREREQ_PM    =>
     { Test::More   => 0.47
-    , Log::Report  => 0.26
     }
-  , AUTHOR       => 'Mark Overmeer'
+  , AUTHOR       => 'Mark Overmeer <markov@cpan.org>'
   , ABSTRACT     => 'Play trics with hash keys'
-  , LICENSE      => 'perl'
+  , LICENSE      => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -21,9 +20,9 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-Hash-Case.git'
               , web  => 'https://github.com/markov2/perl5-Hash-Case'
               }
-          }
           , homepage => 'http://perl.overmeer.net/CPAN/'
           , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
       }
   );
 

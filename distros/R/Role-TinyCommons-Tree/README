@@ -1,5 +1,11 @@
-DESCRIPTION
+NAME
+    Role::TinyCommons::Tree - Roles related to object tree
 
+VERSION
+    This document describes version 0.120 of Role::TinyCommons::Tree (from
+    Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
+
+DESCRIPTION
     This distribution provides several roles you can use to create a tree
     class. The roles are designed for maximum reusability and minimum
     clashes with your existing class.
@@ -11,12 +17,12 @@ DESCRIPTION
      with 'Role::TinyCommons::Tree::Node';
 
     The Tree::Node common role just requires you to have two methods:
-    parent (which should return parent node object) and children (which
+    "parent" (which should return parent node object) and "children" (which
     should return a list or arrayref of children node objects).
 
-    Utility methods such as descendants, walk, is_first_child and so on are
-    separated to Role::TinyCommons::Tree::NodeMethods which you can apply
-    if you want.
+    Utility methods such as "descendants", "walk", "is_first_child" and so
+    on are separated to Role::TinyCommons::Tree::NodeMethods which you can
+    apply if you want.
 
     The actual methods in Role::TinyCommons::Tree::NodeMethods are actually
     implemented in Code::Includable::Tree::NodeMethods, so you can import
@@ -24,9 +30,33 @@ DESCRIPTION
     function call if you do not want to involve Role::Tiny. See an example
     of this usage in Data::CSel.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Role-TinyCommons-Tree>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Tree
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     There are some other general purpose tree modules CPAN, for example
     Tree::Simple or Data::Tree, but at the time of this writing there isn't
     a tree role.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

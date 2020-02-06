@@ -1,0 +1,11 @@
+use alienfile;
+
+plugin PkgConfig => pkg_name => 'liburing', minimum_version => '0.4';
+
+share {
+  start_url 'extern/liburing-0.4_preview.a68caac2253dbb3c4c45a5bb65d76c54f6d83df5.tar.gz';
+  plugin 'Fetch::Local';
+  plugin Extract => format => 'tar.gz';
+  plugin 'Gather::IsolateDynamic';
+  build ['./configure --prefix=%{.install.prefix}', 'make', 'make install'];
+};

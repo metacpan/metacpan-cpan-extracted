@@ -27,7 +27,7 @@ my %module_build_args = (
     "Joel A Berger <joel.a.berger\@gmail.com>"
   ],
   "dist_name" => "Alien-Base-ModuleBuild",
-  "dist_version" => "1.12",
+  "dist_version" => "1.14",
   "license" => "perl",
   "module_name" => "Alien::Base::ModuleBuild",
   "recursive_test_files" => 1,

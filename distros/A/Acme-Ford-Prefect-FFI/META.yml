@@ -16,7 +16,7 @@ meta-spec:
   version: '1.4'
 name: Acme-Ford-Prefect-FFI
 requires:
-  Acme::Alien::DontPanic: '2.0000'
+  Acme::Alien::DontPanic: '2.0400'
   FFI::CheckLib: '0.15'
   FFI::Platypus: '1.00'
   FFI::Platypus::Declare: '0'
@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect-FFI/issues
   homepage: https://metacpan.org/pod/Acme::Ford::Prefect::FFI
   repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect-FFI.git
-version: '2.0000'
+version: '2.0400'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

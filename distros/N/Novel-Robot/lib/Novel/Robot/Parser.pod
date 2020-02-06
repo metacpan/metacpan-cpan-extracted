@@ -1,0 +1,77 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Novel::Robot::Parser>
+
+get novel / bbs content from website
+
+小说站点解析引擎
+
+
+=head1 SUPPORT SITE
+
+
+=head2 support download novel from website
+
+
+支持小说/论坛站点下载
+
+%SITE_DOM_NAME in Parser.pm 站点列表
+
+
+=head2 support txt file
+
+支持处理txt
+
+txt : 指定解析txt文件
+
+
+=head2 support raw file
+
+支持处理序列化数据
+
+raw : 指定解析经MessagePack压缩的二进制文件
+
+
+=head1 INIT
+
+
+=head2 new
+
+init funtion, need set sitename，or url  初始化解析模块，需指定站点名称或网址
+
+       #site name : 直接指定站点
+       my $parser = Novel::Robot::Parser->new( site => 'jjwxc' );
+        
+       #url : 通过url自动检测站点
+       my $url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+       my $parser = Novel::Robot::Parser->new( site => $url );
+
+       #site name : default，不明确指定站点名称
+       my $url = 'http://www.zhonghuawuxia.com/book/71';
+       my $parser = Novel::Robot::Parser->new( site => 'default' );
+
+
+=head1 NOVEL FUNCTION
+
+
+=head2 get_novel_ref
+
+get novel / forum thread data hash ref 
+
+获取小说/贴子内容，返回一个hash引用
+
+       my $r = $parser->get_novel_ref($url, %opt);
+
+=head2 get_novel_info
+
+get novel index info / forum thread first page info
+
+获取小说/贴子首页信息
+
+       my $r = $parser->get_novel_info($url);
+
+=cut

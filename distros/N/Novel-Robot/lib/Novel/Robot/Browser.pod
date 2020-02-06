@@ -1,0 +1,67 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Novel::Robot::Browser> 
+
+get/post url, return unicode content, auto detect CJK charset
+
+自动化获取网页内容，并解码为unicode，主要是自动检测网页的中文字符集
+
+=head1 FUNCTION
+
+=head2 request_url
+  
+    my $browser = Novel::Robot::Browser->new();
+	
+=head3  get
+
+    my $url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+    my $content_get_ref = $browser->request_url($url);
+
+=head3  post
+
+    my $form_url = 'http://www.jjwxc.net/search.php';
+    my $post_data = {
+		'key1' => 'value1', 
+		'key2' => 'value2', 
+    };
+    my $content_post_ref = $browser->request_url($form_url, $post_data);
+
+=head2 request_url_whole
+
+    my $url = 'http://www.jjwxc.net/onebook.php?novelid=14089';
+    my $res = $browser->request_url_whole( $url, 
+        #post_data => ...,
+        info_sub => sub { 
+            my ($html_ref) = @_; 
+            # ...
+        }, 
+        item_list_sub => sub {
+            my ($src_arr) = @_; 
+            # ...
+        }, 
+        #min_item_num => ..., 
+        #max_item_num => ..., 
+        item_sub => sub { 
+            my ($html_ref) = @_; 
+            # ...
+        }, 
+    ); 
+
+=head2 read_moz_cookie
+    
+    #firefox sqlite3 : cookies.sqlite
+    $browser->read_moz_cookie($mozilla_cookies_sqlite_file, $domain);
+
+    #netscape http cookie file: cookie.txt
+    #same as: curl -b cookie.txt -c cookie.txt http://www.xxx.com
+    $browser->read_moz_cookie($netscape_http_cookie_file, $domain);
+
+    #cookie string: name1=value1; name2=value2
+    #same as: curl -b "name1=value1; name2=value2" http://www.xxx.com
+    $browser->read_moz_cookie($cookie_string, $domain);
+
+=cut

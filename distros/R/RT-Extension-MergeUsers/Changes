@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MergeUsers
 
+1.05 2020-02-05
+ - Fix the logic of "skipping duplicated records" in users collections
+
 1.04 2020-01-22
  - Extend user search to merged users in ticket/asset search
  - Check all the merged users for user's group memberships

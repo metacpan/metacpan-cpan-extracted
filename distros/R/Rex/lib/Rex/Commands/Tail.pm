@@ -30,7 +30,7 @@ package Rex::Commands::Tail;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;

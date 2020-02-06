@@ -1,7 +1,9 @@
 package Perinci::CmdLine::Help;
 
-our $DATE = '2019-04-15'; # DATE
-our $VERSION = '0.171'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-06'; # DATE
+our $DIST = 'Perinci-CmdLine-Help'; # DIST
+our $VERSION = '0.172'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,9 +30,12 @@ $SPEC{gen_help} = {
             schema => 'hash',
         },
         meta => {
-            summary => 'Function metadata, must be normalized',
+            summary => 'Function metadata',
             schema => 'hash*',
             req => 1,
+        },
+        meta_is_normalized => {
+            schema => 'bool*',
         },
         common_opts => {
             schema => 'hash*',
@@ -63,7 +68,11 @@ sub gen_help {
 
     local $Text::Wrap::columns = $ENV{COLUMNS} // 80;
 
-    my $meta = $args{meta};
+    my $meta = $args{meta} or return [400, 'Please specify meta'];
+    unless ($args{meta_is_normalized}) {
+        require Perinci::Sub::Normalize;
+        $meta = Perinci::Sub::Normalize::normalize_function_metadata($meta);
+    }
     my $common_opts = $args{common_opts} // {};
 
     my @help;
@@ -256,7 +265,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.171 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2019-04-15.
+This document describes version 0.172 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2020-02-06.
 
 =head1 DESCRIPTION
 
@@ -293,7 +302,9 @@ here, to avoid calculating twice.
 
 =item * B<meta>* => I<hash>
 
-Function metadata, must be normalized.
+Function metadata.
+
+=item * B<meta_is_normalized> => I<bool>
 
 =item * B<per_arg_json> => I<bool>
 
@@ -304,6 +315,7 @@ Function metadata, must be normalized.
 =item * B<program_summary> => I<str>
 
 =item * B<subcommands> => I<hash>
+
 
 =back
 
@@ -344,7 +356,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

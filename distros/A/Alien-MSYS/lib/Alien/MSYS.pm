@@ -10,7 +10,7 @@ our @EXPORT    = qw( msys msys_run );
 our @EXPORT_OK = qw( msys msys_run msys_path );
 
 # ABSTRACT: Tools required for GNU style configure scripts on Windows
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub msys (&)
@@ -68,7 +68,7 @@ Alien::MSYS - Tools required for GNU style configure scripts on Windows
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

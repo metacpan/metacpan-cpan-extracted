@@ -87,18 +87,41 @@ SYNOPSIS
       });
 
 DESCRIPTION
-    Sub::Multimethods focusses on implementing the dispatching of multimethods
+    Sub::Multimethod focusses on implementing the dispatching of multimethods
     well and is less concerned with providing a nice syntax for setting them
     up. That said, the syntax provided is inspired by Moose's `has` keyword
     and hopefully not entirely horrible.
 
-    Sub::MultiMethods has much smarter dispatching than Kavorka, but the
+    Sub::MultiMethod has much smarter dispatching than Kavorka, but the
     tradeoff is that this is a little slower. Overall, for the JSON example in
     the SYNOPSIS, Kavorka is about twice as fast. (But with Kavorka, it would
     quote the numbers in the output because numbers are a type of string, and
     that was declared first!)
 
-  `multimethod $name => %spec`
+  Functions
+    Sub::MultiMethod exports nothing by default. You can import the functions
+    you want by listing them in the `use` statement:
+
+      use Sub::MultiMethod "multimethod", "multimethods_from_roles";
+
+    You can rename functions:
+
+      use Sub::MultiMethod "multimethod" => { -as => "mm" };
+
+    If you are using Sub::MultiMethod in a role, make sure you include the
+    `-role` option:
+
+      use Sub::MultiMethod -role, "multimethod";
+
+    You can import everything using `-all`:
+
+      use Sub::MultiMethod -all;
+      use Sub::MultiMethod -role, -all;
+
+    Sub::MultiMethod also offers an API for setting up multimethods for a
+    class, in which case, you don't need to import anything.
+
+   `multimethod $name => %spec`
     The following options are supported in the specification for the
     multimethod.
 
@@ -177,8 +200,9 @@ DESCRIPTION
         are not currently supported! (And probably never will be.)
 
         (Yes, this is technically an integer rather than a boolean. This
-        allows for subs to have, say, two logical invocants. This is mostly
-        untested though.)
+        allows for subs to have, say, two logical invocants. For example, in
+        Catalyst, you might want to treat the context object as a second
+        invocant.)
 
     `score` *(Int)*
         Optional.
@@ -197,7 +221,7 @@ DESCRIPTION
         but won't install a dispatcher. You should mostly not worry about this
         and accept the default.
 
-  `monomethod $name => %spec`
+   `monomethod $name => %spec`
     As a convenience, you can use Sub::MultiMethod to install normal methods.
     Why do this instead of using Perl's plain old `sub` keyword? Well, it
     gives you the same signature checking.
@@ -208,6 +232,14 @@ DESCRIPTION
     `signature` *(ArrayRef|CodeRef)*
     `code` *(CodeRef)*
     `method` *(Int)*
+
+    `monomethod($name, %spec)` is basically just a shortcut for
+    `multimethod(undef, alias => $name, %spec)` though with error messages
+    which don't mention it being an alias.
+
+   `multimethods_from_roles @roles`
+    Imports any multimethods defined in roles, and adds them to the current
+    package as if they were defined locally. See the section on roles below.
 
   Dispatch Technique
     When a multimethod is called, a list of packages to inspect for candidates
@@ -240,19 +272,23 @@ DESCRIPTION
     constraints on values.) In these cases, the child type has the same score
     as its parent. All these scores are added together to get a single score
     for the candidate. For candidates where the signature is a coderef, this
-    is essentially a zero score for the signature unless one was specified
+    is essentially a zero score for the signature unless a score was specified
     explicitly.
 
     If multiple candidates are equally constrained, child class candidates
     beat parent class candidates; class candidates beat role candidates; and
     the candidate that was declared earlier wins.
 
+    Note that invocants are not part of the signature, so not taken into
+    account when calculating scores, but because child class candidates beat
+    parent class candidates, they should mostly behave as expected.
+
     After this, there should be one preferred candidate or none. If there is
     none, an error occurs. If there is one, that candidate is dispatched to
     using `goto` so there is no trace of Sub::MultiMethod in `caller`. It gets
     passed the result from checking the signature earlier as @_.
 
-  Roles
+   Roles
     As far as I'm aware, Sub::MultiMethod is the only multimethod
     implementation that allows multimethods imported from roles to
     intertegrate into a class.
@@ -342,7 +378,8 @@ DESCRIPTION
 
         $sub_name is the name of the method.
 
-        %spec is the multimethod spec.
+        %spec is the multimethod spec. If $target is a role, you probably want
+        to include `no_dispatcher => 1` as part of the spec.
 
     `Sub::MultiMethod->install_dispatcher($target, $sub_name, $is_method)`
         $target is the class (package) name being installed into.
@@ -365,7 +402,8 @@ DESCRIPTION
         Useful if @sources are a bunch of roles (like Role::Tiny).
 
     `Sub::MultiMethod->install_missing_dispatchers($target)`
-        Should usually be called after `copy_package_candidates`.
+        Should usually be called after `copy_package_candidates`, unless
+        $target is a role.
 
 BUGS
     Please report any bugs to

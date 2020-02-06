@@ -15,7 +15,7 @@ package PDF::API2::Basic::PDF::Objind;
 use strict;
 use warnings;
 
-our $VERSION = '2.036'; # VERSION
+our $VERSION = '2.037'; # VERSION
 
 =head1 NAME
 

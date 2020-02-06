@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+1.02  2020-02-06 12:16:32 CET
+    - Support parsing PICA XML with namespace prefix
+
 1.01  2019-12-18 09:20:11 CET
     - add match function and documentation of matching rules
 

@@ -1,7 +1,7 @@
 package App::FilterOrgByHeadlines;
 
-our $DATE = '2019-12-30'; # DATE
-our $VERSION = '0.471'; # VERSION
+our $DATE = '2020-02-06'; # DATE
+our $VERSION = '0.472'; # VERSION
 
 use 5.010;
 use strict;
@@ -301,7 +301,7 @@ App::FilterOrgByHeadlines - Filter Org by headlines
 
 =head1 VERSION
 
-This document describes version 0.471 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2020-12-30.
+This document describes version 0.472 of App::FilterOrgByHeadlines (from Perl distribution App-OrgUtils), released on 2020-02-06.
 
 =head1 FUNCTIONS
 
@@ -381,6 +381,7 @@ Include headline content.
 
 Include text before any headline.
 
+
 =back
 
 Return value:  (str|array[str])
@@ -407,7 +408,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

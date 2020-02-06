@@ -4,62 +4,73 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"         => "yet another implementation of multimethods",
-  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
-  "keywords"         => [],
-  "license"          => ["perl_5"],
-  "meta-spec"        => {
-                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                          version => 2,
-                        },
-  "name"             => "Sub-MultiMethod",
-  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"          => {
-                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                          runtime   => {
-                                         requires => {
-                                           "Exporter::Shiny" => 0,
-                                           "MRO::Compat"     => 0,
-                                           "perl"            => 5.008,
-                                           "Sub::Util"       => 0,
-                                           "Type::Params"    => 1.008003,
-                                           "Types::Standard" => 1.008003,
-                                         },
+  "abstract"       => "yet another implementation of multimethods",
+  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"       => [],
+  "license"        => ["perl_5"],
+  "meta-spec"      => {
+                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                        version => 2,
+                      },
+  "name"           => "Sub-MultiMethod",
+  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"        => {
+                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                        runtime   => {
+                                       requires => {
+                                         "Exporter::Shiny" => 0,
+                                         "perl" => 5.008,
+                                         "Type::Params" => 1.008003,
+                                         "Types::Standard" => 1.008003,
                                        },
-                          test      => {
-                                         requires => {
-                                           "Class::Tiny" => 0,
-                                           "Role::Tiny"  => 0,
-                                           "Test::Fatal" => 0,
-                                           "Test::More"  => 0.96,
-                                         },
+                                     },
+                        test      => {
+                                       requires => {
+                                         "Class::Tiny" => 0,
+                                         "Role::Tiny"  => 0,
+                                         "Test::Fatal" => 0,
+                                         "Test::More"  => 0.96,
                                        },
-                        },
-  "provides"         => {
-                          "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.004 },
-                        },
-  "release_status"   => "stable",
-  "resources"        => {
-                          bugtracker   => {
-                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod",
-                                          },
-                          homepage     => "https://metacpan.org/release/Sub-MultiMethod",
-                          license      => ["http://dev.perl.org/licenses/"],
-                          repository   => {
-                                            type => "git",
-                                            url  => "git://github.com/tobyink/p5-sub-multimethod.git",
-                                            web  => "https://github.com/tobyink/p5-sub-multimethod",
-                                          },
-                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
-                        },
-  "version"          => 0.004,
-  "x_static_install" => 1,
+                                     },
+                      },
+  "provides"       => {
+                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.006 },
+                      },
+  "release_status" => "stable",
+  "resources"      => {
+                        bugtracker   => {
+                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod",
+                                        },
+                        homepage     => "https://metacpan.org/release/Sub-MultiMethod",
+                        license      => ["http://dev.perl.org/licenses/"],
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-sub-multimethod.git",
+                                          web  => "https://github.com/tobyink/p5-sub-multimethod",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
+                      },
+  "version"        => 0.006,
 };
 
 my %dynamic_config;
+do {
+if ($] < 5.010000) {
+	$meta->{prereqs}{runtime}{requires}{'MRO::Compat'} = 0;
+}
+
+my $got_sub_name = 0;
+$got_sub_name++ if eval { require Sub::Util; Sub::Util->can('set_subname') };
+$got_sub_name++ if eval { require Sub::Name; Sub::Name->can('subname') };
+
+if (!$got_sub_name) {
+	$meta->{prereqs}{runtime}{requires}{'Sub::Name'} = 1.40;
+}
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

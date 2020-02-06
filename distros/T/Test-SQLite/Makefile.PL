@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "File::Copy" => 0,
     "File::Temp" => "0.19",
     "Moo" => 2,
+    "namespace::clean" => 0,
     "strictures" => 2
   },
   "TEST_REQUIRES" => {
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0400",
+  "VERSION" => "0.0403",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => "0.88",
   "constant" => 0,
+  "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,
   "warnings" => 0

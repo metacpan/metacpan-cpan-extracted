@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
+    "PerlX::Maybe" => 0,
     "Scalar::Util" => 0,
     "Time::HiRes" => 0,
     "parent" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Data::Dumper" => 0,
   "Exporter" => 0,
+  "PerlX::Maybe" => 0,
   "Scalar::Util" => 0,
   "Test2::Tools::Compare" => 0,
   "Test::Fatal" => 0,

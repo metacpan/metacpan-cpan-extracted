@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.02
+    version 2.04
 
 SYNOPSIS
 
@@ -841,7 +841,7 @@ THANKS
     Alien::Base system with a reliable set of tools (Alien::Build,
     alienfile, Test::Alien), which make up this toolset.
 
-    The original Alien::Base is still copyright (c) 2012-2017 Joel Berger.
+    The original Alien::Base is still copyright (c) 2012-2020 Joel Berger.
     It has the same license as the rest of the Alien::Build and related
     tools distributed as Alien-Build. Joel Berger thanked a number of
     people who helped in in the development of Alien::Base, in the
@@ -854,6 +854,9 @@ THANKS
     Alien::libuv), William N. Braswell, Jr (willthechill, WBRASWELL, author
     of Alien::JPCRE2 and Alien::PCRE2) and Ahmad Fatoum (a3f, ATHREEF,
     author of Alien::libudev and Alien::LibUSB).
+
+    The Alien ecosystem owes a debt to Dan Book, who goes by Grinnz on IRC,
+    for answering question about how to use Alien::Build and friends.
 
 AUTHOR
 

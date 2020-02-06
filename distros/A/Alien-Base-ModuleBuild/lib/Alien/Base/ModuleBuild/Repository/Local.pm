@@ -9,7 +9,7 @@ use Path::Tiny qw( path );
 use parent 'Alien::Base::ModuleBuild::Repository';
 
 # ABSTRACT: Local file repository handler
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 sub new {
   my $class = shift;
@@ -65,7 +65,7 @@ Alien::Base::ModuleBuild::Repository::Local - Local file repository handler
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

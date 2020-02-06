@@ -1,0 +1,4 @@
+0.002     2020-02-05 16:02:41 PST
+  - Updated dist.ini for easier publishing
+  - Moved the OS check to dist.ini instead of alienfile, should behave better now on cpantesters
+  - Add all exported symbols to the tests

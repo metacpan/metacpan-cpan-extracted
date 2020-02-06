@@ -36,9 +36,7 @@ WriteMakefile1(
         'Test::Fatal'       => 0,
         'Test::Deep' => 0,
         'Test::Class::Tiny' => 0,
-        'Net::Server::HTTP' => 0,
-        'File::Temp' => 0,
-        'File::Slurper' => 0,
+'Carp::Always' => 0,
     },
 );
 

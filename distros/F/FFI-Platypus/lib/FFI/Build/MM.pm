@@ -13,7 +13,7 @@ use File::Copy ();
 use ExtUtils::MakeMaker 7.12;
 
 # ABSTRACT: FFI::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 
 sub new
@@ -112,7 +112,17 @@ sub load_build
       package FFI::Build::MM::FBX;
       our $DIR      = $dir;
       our $PLATFORM = $platform;
-      do $fbx;
+
+      # make sure we catch all of the errors
+      # code copied from `perldoc -f do`
+      my $return = do $fbx;
+      unless ( $return  ) {
+          Carp::croak( "couldn't parse $fbx: $@" ) if $@;
+          Carp::croak( "couldn't do $fbx: $!" )     unless defined $return;
+          Carp::croak( "couldn't run $fbx" )       unless $return;
+      }
+
+      $return;
     };
   }
   else
@@ -298,7 +308,7 @@ FFI::Build::MM - FFI::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -417,6 +427,8 @@ Mohammad S Anwar (MANWAR)
 Håkon Hægland (hakonhagland, HAKONH)
 
 Meredith (merrilymeredith, MHOWARD)
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

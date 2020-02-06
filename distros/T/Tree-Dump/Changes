@@ -1,30 +1,33 @@
-Revision history for Tree-Dump
+0.060   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
-0.05    2016-11-23 (PERLANCAR)
+	- [ux] Die when undef is given.
+
+
+0.05    2016-11-23  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename children_method option to
 	  get_children_method.
 
 
-0.04    2016-11-21 (PERLANCAR)
+0.04    2016-11-21  Released-By: PERLANCAR
 
 	- Accept options (currently known options: indent,
 	  children_method).
 
 
-0.03    2016-04-14 (PERLANCAR)
+0.03    2016-04-14  Released-By: PERLANCAR
 
 	- Handle node that is not hash-based nor array-based, e.g.
 	  Class::InsideOut object.
 
 
-0.02    2016-03-31 (PERLANCAR)
+0.02    2016-03-31  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Update sample output.
 
 
-0.01    2016-03-31 (PERLANCAR)
+0.01    2016-03-31  Released-By: PERLANCAR
 
         - First release.

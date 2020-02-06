@@ -1,22 +1,22 @@
 package WWW::Chain::UA::LWP;
-BEGIN {
-  $WWW::Chain::UA::LWP::AUTHORITY = 'cpan:GETTY';
-}
-{
-  $WWW::Chain::UA::LWP::VERSION = '0.003';
-}
-
+our $AUTHORITY = 'cpan:GETTY';
+# ABSTRACT: Using LWP::UserAgent to execute WWW::Chain chains
+$WWW::Chain::UA::LWP::VERSION = '0.006';
 use Moo;
 extends 'LWP::UserAgent';
+
+use HTTP::Cookies;
 
 with qw( WWW::Chain::UA );
 
 use Scalar::Util 'blessed';
+use Safe::Isa;
 
 sub request_chain {
 	my ( $self, $chain ) = @_;
 	die __PACKAGE__."->request_chain needs a WWW::Chain object as parameter"
-		unless ( blessed($chain) && $chain->isa('WWW::Chain') );
+		unless ( blessed($chain) && $chain->$_isa('WWW::Chain') );
+	$self->cookie_jar({}) unless $self->cookie_jar;
 	while (!$chain->done) {
 		my @responses;
 		for (@{$chain->next_requests}) {
@@ -29,16 +29,18 @@ sub request_chain {
 }
 
 1;
+
 __END__
+
 =pod
 
 =head1 NAME
 
-WWW::Chain::UA::LWP
+WWW::Chain::UA::LWP - Using LWP::UserAgent to execute WWW::Chain chains
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 AUTHOR
 
@@ -52,4 +54,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

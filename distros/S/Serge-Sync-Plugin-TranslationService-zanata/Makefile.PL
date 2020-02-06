@@ -16,15 +16,16 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Serge::Sync::Plugin::TranslationService::zanata",
   "PREREQ_PM" => {
-    "Serge" => "1.3.2"
+    "Serge" => "1.4.0"
   },
   "TEST_REQUIRES" => {
+    "Clone" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.906.0",
+  "VERSION" => "0.907.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,10 +33,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Serge" => "1.3.2",
+  "Serge" => "1.4.0",
   "Test::More" => 0
 );
 

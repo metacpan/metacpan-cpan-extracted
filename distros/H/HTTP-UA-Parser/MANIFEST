@@ -1,12 +1,9 @@
 Changes
 lib/HTTP/UA/Parser.pm
-lib/HTTP/UA/Parser/keep.txt
 lib/HTTP/UA/Parser/Regex.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 script/ua_parser
 t/additional_os_tests.t
 t/device.t
@@ -19,3 +16,5 @@ t/test_os.t
 t/test_ua.t
 t/ua.t
 t/utils.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

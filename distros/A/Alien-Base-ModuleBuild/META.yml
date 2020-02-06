@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues
   homepage: https://metacpan.org/pod/Alien::Base::ModuleBuild
   repository: git://github.com/Perl5-Alien/Alien-Base-ModuleBuild.git
-version: '1.12'
+version: '1.14'
 x_contributors:
   - 'Joel A Berger <joel.a.berger@gmail.com>'
   - 'Graham Ollis <plicease@cpan.org>'

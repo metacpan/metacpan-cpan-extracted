@@ -139,7 +139,7 @@ $object->mnt_routes('RTES-MNT2');
 is( $object->mnt_routes()->[1], 'RTES-MNT2', 'mnt_routes properly added' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

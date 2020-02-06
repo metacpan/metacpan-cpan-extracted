@@ -11,7 +11,7 @@ build_requires:
   Test::Alien::Diag: '0'
   perl: '5.006'
 configure_requires:
-  Acme::Alien::DontPanic: '2.0000'
+  Acme::Alien::DontPanic: '2.0400'
   Alien::Base::Wrapper: '1.02'
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect/issues
   homepage: https://metacpan.org/pod/Acme::Ford::Prefect
   repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect.git
-version: '2.0000'
+version: '2.0400'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

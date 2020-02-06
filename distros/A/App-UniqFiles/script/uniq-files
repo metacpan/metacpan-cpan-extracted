@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/UniqFiles/uniq_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# Note: This script is a CLI for Riap function /App/UniqFiles/uniq_files
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2017-07-10'; # DATE
+our $DATE = '2019-12-04'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.130'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/UniqFiles/uniq_files",
     program_name => "uniq-files",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Report or omit duplicate file contents
 # PODNAME: uniq-files
@@ -33,7 +35,7 @@ uniq-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.12 of uniq-files (from Perl distribution App-UniqFiles), released on 2017-07-10.
+This document describes version 0.130 of uniq-files (from Perl distribution App-UniqFiles), released on 2019-12-04.
 
 =head1 SYNOPSIS
 
@@ -93,7 +95,7 @@ deemed as duplicate even though their content are different.
 
 =item B<--no-report-unique>
 
-=item B<--report-duplicate>=I<i>
+=item B<--report-duplicate>=I<s>
 
 Whether to return duplicate items.
 
@@ -132,17 +134,15 @@ See C<--no-report-unique>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -307,7 +307,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

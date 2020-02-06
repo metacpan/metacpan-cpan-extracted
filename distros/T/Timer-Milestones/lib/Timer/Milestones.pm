@@ -6,13 +6,16 @@ use warnings;
 use parent 'Exporter';
 
 use Carp;
-use Scalar::Util qw(blessed);
+use PerlX::Maybe;
+use Scalar::Util qw(blessed refaddr);
 
-our @EXPORT_OK = qw(start_timing add_milestone stop_timing);
+our @EXPORT_OK = qw(start_timing add_milestone stop_timing
+    generate_intermediate_report generate_final_report
+    time_function);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # Have you updated the version number in the POD below?
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -21,25 +24,47 @@ Timer::Milestones - measure code execution time succinctly by setting milestones
 
 =head1 VERSION
 
-This is version 0.001.
+This is version 0.002.
 
 =head1 SYNOPSIS
 
- use Timer::Milestones qw(start_timing mark_milestone stop_timing
-     time_method);
+ use Timer::Milestones qw(:all);
 
  start_timing();
- time_method('Some::ThirdParty::Module::do_slow_thing');
+ time_function('_my_own_function_elsewhere');
+ time_function('Some::ThirdParty::Module::do_slow_thing');
+
  my @objects = _set_up_objects();
- mark_milestone('Everything set up');
+
+ add_milestone('Everything set up');
+
  for my $object (@objects) {
      _do_something_potentially_slow($object);
+ 
+     # This code depends on a whole bunch of variables being set in the
+     # calling context, so don't bother refactoring it away into a separate
+     # function if it turns out that it's not actually slow.
+     state $code_to_time_individually = time_function(
+         sub {
+             ...
+         },
+         report_name_as  => 'Possibly slow inlined code',
+         summarise_calls => 1,
+         summarise_arguments => sub {
+             my ($object) = @_;
+             $object->type,
+         },
+     );
+     $code_to_time_individually->($object);
  }
- mark_milestone('Telling the user')
+
+ add_milestone('Telling the user')
+
  for my $object (@objects) {
      _inform_user($object);
  }
  ...
+
  stop_timing();
 
 Spits out to STDERR e.g.
@@ -49,27 +74,33 @@ Spits out to STDERR e.g.
  Everything set up
       5 min 30 s ( 31.22%)
           3 min  7 s Some::ThirdParty::Module::do_slow_thing
+         15 s Possibly slow inlined code (x10)
+             Outgoing (x7)
+             Incoming (x3)
  Telling the user
      12 min  7 s ( 68.78%)
           8 min 30 s Some::ThirdParty::Module::do_slow_thing (x3)
+         40 s _my_own_function_elsewhere
  END: Tue Feb  4 16:20:48 2020
 
 =head1 DESCRIPTION
 
 At its simplest, Timer::Milestones is yet another timer module. It is designed
 to have the smallest possible interface, so adding timing calls to your code
-doesn't make it look unreadable. It can also time execution time of functions
-in other modules, as a more informative (and quicker!) alternative to running
-everything under Devel::NYTProf.
+doesn't make it look unreadable.
+
+It can also time execution time of functions in other modules, as a more
+informative (and quicker!) alternative to running everything under
+Devel::NYTProf.
 
 =head2 Functional vs OO interface
 
 You can use Timer::Milestones via a functional interface:
 
- use Timer::Milestones qw(start_timing mark_milestone stop_timing);
+ use Timer::Milestones qw(start_timing add_milestone stop_timing);
  start_timing();
  ...;
- mark_milestone('Half-way through');
+ add_milestone('Half-way through');
  ...;
  stop_timing();
 
@@ -80,7 +111,7 @@ Or via an OO interface:
      my $timer = Timer::Milestones->new;
      # $timer->start_timing automatically called
      ...;
-     $timer->mark_milestone('Half-way through');
+     $timer->add_milestone('Half-way through');
      ...;
  }
  # $timer->stop_timing automatically called when $timer is destroyed
@@ -328,13 +359,15 @@ sub _add_function_call_to_list {
     my ($self, $function_call, $call_elements) = @_;
 
     my $elapsed_time = $function_call->{ended} - $function_call->{started};
+    my $function_name = $function_call->{report_name_as}
+        // $function_call->{function_name};
 
     # If we're not summarising calls, we're going to add another element,
     # so just do that.
     if (!$function_call->{summarise_calls}) {
         my $element = {
             type          => 'function_call',
-            function_name => $function_call->{function_name},
+            function_name => $function_name,
             elapsed_time  => $elapsed_time,
         };
         if (exists $function_call->{argument_summary}) {
@@ -351,13 +384,12 @@ sub _add_function_call_to_list {
 
     # OK, find out which element we're going to use.
     my ($element)
-        = grep { $_->{function_name} eq $function_call->{function_name} }
-        @$call_elements;
+        = grep { $_->{function_name} eq $function_name } @$call_elements;
     if (!$element) {
         push @{$call_elements},
             {
             type          => 'function_call',
-            function_name => $function_call->{function_name},
+            function_name => $function_name,
             elapsed_time  => 0,
             };
         $element = $call_elements->[-1];
@@ -512,12 +544,24 @@ sub generate_final_report {
 Stops timing, and spits out the result of L</generate_intermediate_report> to
 STDERR. This is called automatically in OO mode when the object goes out of
 scope. This does nothing if you've already called L</generate_final_report>.
+Also stops wrapping functions handed to L</time_function>.
 
 =cut
 
 sub stop_timing {
     my ($self) = _object_and_arguments(@_);
-    if (my $report = $self->generate_final_report) {
+
+    my $report = $self->generate_final_report;
+    if ($self->{wrapped_functions}) {
+        for my $function_data (@{ $self->{wrapped_functions} }) {
+            no strict 'refs';
+            no warnings 'redefine';
+            *{ $function_data->{function_name} } = $function_data->{orig_code};
+            use warnings 'redefine';
+            use strict 'refs';
+        }
+    }
+    if ($report) {
         $self->{notify_report} ||= $self->_default_notify_report;
         return $self->{notify_report}->($report);
     }
@@ -566,7 +610,7 @@ sub DESTROY {
 
 =head2 Timing other people's code
 
-Adding calls to L</mark_milestone> throughout your code is all very well, but
+Adding calls to L</add_milestone> throughout your code is all very well, but
 sometimes you want to time a small handful of methods deep in someone else's
 code (or deep in I<your> code - same difference). By carefully targeting only
 a few methods to time, you can avoid the pitfalls of profiling with
@@ -575,14 +619,17 @@ appear to be much slower than it is when not profiling.
 
 =head3 time_function
 
- In: $function_name
+ In: $function_name_or_coderef
  In: %args (optional)
+ Out: \&wrapped_function
 
-Supplied with a function name, e.g. C<DBIx::Class::Storage::DBI::_dbh_execute>,
-and an optional hash of arguments, wraps it with a temporary shim that records
-the time spent inside this function. That shim is removed, and the original
-code restored, when timing stops. Details of the functions called are included
-between milestones in the resulting report.
+Supplied with a function name or a coderef, and an optional hash of arguments,
+wraps it with a temporary shim that records the time spent inside this
+function. Details of the functions called are included between milestones in
+the resulting report.
+
+Returns the resulting wrapped function. This is useful if you supplied a coderef
+to be wrapped with timing code.
 
 Optional arguments are as follows:
 
@@ -602,19 +649,75 @@ will also mention all subsequent calls.
 This can combine with C<summarise_arguments>: calls which result in an
 identical return value from that coderef will be combined.
 
+=item report_name_as
+
+If specified, the name to use in reports instead of the default name.
+
 =back
+
+The exact behaviour of this function depends on the nature of the first
+argument, $function_name_or_coderef.
+
+=over
+
+=item *
+
+If you specify a fully-qualified function name (e.g.
+C<DBIx::Class::Storage::DBI::_execute>), time_function will look for that exact
+function, insert a wrapper into the symbol table, and use that full name in
+reports by default.
+
+=item *
+
+If you specify an unqualified function name (e.g. C<do_stuff>), it is assumed
+to be a function in the calling package, insert a wrapper into the symbol table,
+and the unqualified name will be used in reports by default.
+
+=item *
+
+If you specify a coderef, the symbol table will not be modified, and the default
+name in reports will be of the form C<CODE(0xdeadbeef)> - so if you're passing
+more than one coderef to time_function, strongly consider overriding the
+default name.
+
+=back
+
+When L</stop_timing> is called, all wrapping in the symbol table will be undone;
+but note that this means "what was in the symbol table when time_function was
+called will be put back". So if you decide that you want to time the same
+function with two separate Timer::Milestones objects, it is very important to
+stop timing in the reverse order that you started timing.
 
 =cut
 
 sub time_function {
-    my ($self, $function_name, %args) = _object_and_arguments(@_);
+    my ($self, $function_name_or_coderef, %args) = _object_and_arguments(@_);
 
-    # There had better be a function of this name.
-    no strict 'refs';
-    my $orig_code = \&{ $function_name };
-    use strict 'refs';
-    if (!defined &$orig_code) {
-        die "No such function as $function_name";
+    my ($function_name, $orig_code, $modify_symbol_table);
+
+    # If we were passed a coderef, that's simple enough.
+    if (ref($function_name_or_coderef) eq 'CODE') {
+        $orig_code     = $function_name_or_coderef;
+        $function_name = sprintf('CODE(0x%x)', refaddr($orig_code));
+    } else {
+        # OK, find the code corresponding to this function name.
+        $function_name = $function_name_or_coderef;
+        $modify_symbol_table = 1;
+
+        # If the function is unqualified, look for it in the calling package.
+        if ($function_name !~ /::/) {
+            $args{report_name_as} ||= $function_name;
+            my ($package) = caller();
+            $function_name = $package . '::' . $function_name;
+        }
+
+        # There had better be a function of this name.
+        no strict 'refs';
+        $orig_code = \&{$function_name};
+        use strict 'refs';
+        if (!defined &$orig_code) {
+            die "No such function as $function_name";
+        }
     }
 
     # OK, generate a wrapper.
@@ -626,8 +729,9 @@ sub time_function {
         # Take a snapshot before we called it.
         push @{ $self->{milestones}[-1]{function_calls} ||= [] },
             my $function_call = {
-            function_name => $function_name,
-            started       => $self->_now,
+            function_name        => $function_name,
+            started              => $self->_now,
+            maybe report_name_as => $args{report_name_as},
             };
 
         # Remember that we want to summarise these calls if necessary.
@@ -664,19 +768,25 @@ sub time_function {
         }
     };
 
-    # And install that.
-    no strict 'refs';
-    no warnings 'redefine';
-    *{ $function_name } = $wrapper;
-    use warnings 'redefine';
-    use strict 'refs';
+    # Maybe install that wrapper (and remember to uninstall it later).
+    if ($modify_symbol_table) {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{$function_name} = $wrapper;
+        use warnings 'redefine';
+        use strict 'refs';
 
-    # Remember that we did this, so we can unwind it all.
-    push @{ $self->{wrapped_functions} ||= [] },
-        {
-        function_name => $function_name,
-        orig_code     => $orig_code,
-        };
+        push @{ $self->{wrapped_functions} ||= [] },
+            {
+            function_name => $function_name,
+            orig_code     => $orig_code,
+            };
+    }
+
+    # And return the wrapper, in case the calling code wants to use it
+    # (most obviously if it was a coderef that wasn't added to the symbol
+    # table)
+    return $wrapper;
 }
 
 =head1 SEE ALSO

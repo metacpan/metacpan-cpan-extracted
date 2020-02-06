@@ -2,13 +2,13 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
-    pica_match pica_values pica_value pica_fields pica_holdings pica_items 
-    pica_guess);
-our %EXPORT_TAGS = (all => [@EXPORT_OK]); 
+  pica_match pica_values pica_value pica_fields pica_holdings pica_items
+  pica_guess);
+our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
 our $ILN_PATH = PICA::Path->new('101@a');
 our $EPN_PATH = PICA::Path->new('203@/..0');
@@ -20,17 +20,16 @@ use IO::Handle;
 use PICA::Path;
 
 sub pica_match {
-    my ($record, $path, %args) = @_;
+    my ( $record, $path, %args ) = @_;
 
     $path = eval { PICA::Path->new($path) } unless ref $path;
     return unless ref $path;
 
-    return $path->match_record($record, %args);
+    return $path->match_record( $record, %args );
 }
 
-
 sub pica_values {
-    my ($record, $path) = @_;
+    my ( $record, $path ) = @_;
 
     $path = eval { PICA::Path->new($path) } unless ref $path;
     return unless ref $path;
@@ -39,7 +38,7 @@ sub pica_values {
 }
 
 sub pica_fields {
-    my ($record, $path) = @_;
+    my ( $record, $path ) = @_;
 
     $path = eval { PICA::Path->new($path) } unless ref $path;
     return [] unless defined $path;
@@ -48,7 +47,7 @@ sub pica_fields {
 }
 
 sub pica_value {
-    my ($record, $path) = @_;
+    my ( $record, $path ) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
     $path = eval { PICA::Path->new($path) } unless ref $path;
@@ -65,29 +64,30 @@ sub pica_value {
 
 sub pica_items {
     my ($record) = @_;
-    
+
     my $blessed = blessed($record);
     $record = $record->{record} if reftype $record eq 'HASH';
-    my (@items, $current, $occurrence);
+    my ( @items, $current, $occurrence );
 
     foreach my $field (@$record) {
-        if ($field->[0] =~ /^2/) {
-            
-            if ( ($occurrence // '') ne $field->[1] ) {
+        if ( $field->[0] =~ /^2/ ) {
+
+            if ( ( $occurrence // '' ) ne $field->[1] ) {
                 if ($current) {
                     push @items, $current;
                     $current = undef;
                 }
                 $occurrence = $field->[1];
             }
-            
+
             $current //= { record => [] };
 
-            push @{$current->{record}}, [ @$field ];
-            if ($field->[0] eq '203@') {
-                ($current->{_id}) = $EPN_PATH->match_subfields($field);
+            push @{ $current->{record} }, [@$field];
+            if ( $field->[0] eq '203@' ) {
+                ( $current->{_id} ) = $EPN_PATH->match_subfields($field);
             }
-        } elsif ($current) {
+        }
+        elsif ($current) {
             push @items, $current;
             $current    = undef;
             $occurrence = undef;
@@ -97,7 +97,7 @@ sub pica_items {
     push @items, $current if $current;
 
     if ($blessed) {
-        bless $_, $blessed for @items; 
+        bless $_, $blessed for @items;
     }
 
     return \@items;
@@ -108,16 +108,17 @@ sub pica_holdings {
 
     my $blessed = blessed($record);
     $record = $record->{record} if reftype $record eq 'HASH';
-    my (@holdings, $field_buffer, $iln);
+    my ( @holdings, $field_buffer, $iln );
 
     foreach my $field (@$record) {
         my $tag = substr $field->[0], 0, 1;
-        if ($tag eq '0') {
+        if ( $tag eq '0' ) {
             next;
-        } elsif ($tag eq '1') {
-            if ($field->[0] eq '101@') {
+        }
+        elsif ( $tag eq '1' ) {
+            if ( $field->[0] eq '101@' ) {
                 my ($id) = $ILN_PATH->match_subfields($field);
-                if ( defined $iln && ($id // '') ne $iln ) {
+                if ( defined $iln && ( $id // '' ) ne $iln ) {
                     push @holdings, { record => $field_buffer, _id => $iln };
                 }
                 $field_buffer = [ [@$field] ];
@@ -133,7 +134,7 @@ sub pica_holdings {
     }
 
     if ($blessed) {
-        bless $_, $blessed for @holdings; 
+        bless $_, $blessed for @holdings;
     }
 
     return \@holdings;
@@ -157,15 +158,15 @@ use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
 
 sub pica_parser {
-    _pica_module('PICA::Parser', @_)
+    _pica_module( 'PICA::Parser', @_ );
 }
 
 sub pica_writer {
-    _pica_module('PICA::Writer', @_)
+    _pica_module( 'PICA::Writer', @_ );
 }
 
 sub pica_path {
-    PICA::Path->new(@_)
+    PICA::Path->new(@_);
 }
 
 sub pica_guess {
@@ -179,7 +180,7 @@ sub pica_guess {
         'Binary' => ( $pica =~ tr/\x{1D}// ),
         'XML'    => ( $pica =~ tr/<// ),
     );
-    $count{$_} > $count{$format} and $format = $_ for grep {$_} keys %count;
+    $count{$_} > $count{$format} and $format = $_ for grep { $_ } keys %count;
 
     $format = 'PPXML' if $format eq 'XML' and $pica =~ qr{xmlns/ppxml-1\.0};
 
@@ -192,30 +193,35 @@ sub _pica_module {
 
     if ( $type =~ /^(pica)?plus$/ ) {
         "${base}::Plus"->new(@_);
-    } elsif ( $type eq 'binary' ) {
+    }
+    elsif ( $type eq 'binary' ) {
         "${base}::Binary"->new(@_);
-    } elsif ( $type =~ /^(pica)?plain$/ ) {
+    }
+    elsif ( $type =~ /^(pica)?plain$/ ) {
         "${base}::Plain"->new(@_);
-    } elsif ( $type =~ /^(pica)?xml$/ ) {
+    }
+    elsif ( $type =~ /^(pica)?xml$/ ) {
         "${base}::XML"->new(@_);
-    } elsif ( $type =~ /^(pica)?ppxml$/ ) {
+    }
+    elsif ( $type =~ /^(pica)?ppxml$/ ) {
         "${base}::PPXML"->new(@_);
-    } else {
+    }
+    else {
         croak "unknown PICA parser type: $type";
     }
 }
 
 sub write {
-    my $pica = shift;
+    my $pica   = shift;
     my $writer = $_[0];
-    unless (blessed $writer) {
-        $writer = pica_writer(@_ ? @_ : 'plain');
+    unless ( blessed $writer) {
+        $writer = pica_writer( @_ ? @_ : 'plain' );
     }
     $writer->write($pica);
 }
 
 sub string {
-    my ($pica, $type, %options) = @_;
+    my ( $pica, $type, %options ) = @_;
     my $string = "";
     $type ||= 'plain';
     $options{fh} = \$string;
@@ -225,15 +231,16 @@ sub string {
 }
 
 sub pica_xml_struct {
-    my ($xml, %options) = @_;
+    my ( $xml, %options ) = @_;
     my $record;
 
-    foreach my $f (@{$xml->[2]}) {
+    foreach my $f ( @{ $xml->[2] } ) {
         next unless $f->[0] eq 'datafield';
-        push @$record, [
+        push @$record,
+          [
             map ( { $f->[1]->{$_} } qw(tag occurrence) ),
-            map ( { $_->[1]->{code} => $_->[2]->[0] } @{$f->[2]} )
-        ]
+            map ( { $_->[1]->{code} => $_->[2]->[0] } @{ $f->[2] } )
+          ];
     }
 
     my ($id) = map { $_->[-1] } grep { $_->[0] =~ '003@' } @$record;

@@ -7,13 +7,13 @@ use Alien::Build;
 use base qw( Module::Build );
 
 # ABSTRACT: Alien::Build installer class for Module::Build
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub new
 {
   my($class, %args) = @_;
-  
+
   if(! -f 'alienfile')
   {
     die "unable to find alienfile";
@@ -25,9 +25,9 @@ sub new
     $build->root;
     $build->checkpoint;
   }
-  
+
   my $self = $class->SUPER::new(%args);
-  
+
   my $build = $self->alien_build(1);
 
   $self->_add_prereq( "${_}_requires", 'Module::Build'    => '0.36' ) for qw( configure build );
@@ -49,7 +49,7 @@ sub new
     my $version = $config_requires{$module};
     $self->_add_prereq( 'configure_requires', $module => $version );
   }
-  
+
   unless($build->install_type =~ /^(share|system)$/)
   {
     die "unknown install type: @{[ $build->install_type ]}";
@@ -61,7 +61,7 @@ sub new
     my $version = $build_requires{$module};
     $self->_add_prereq( 'build_requires', $module => $version );
   }
-  
+
   my $final_dest = $self->install_destination($build->meta_prop->{arch} ? 'arch' : 'lib');
 
   my $prefix = Path::Tiny->new($final_dest)
@@ -71,11 +71,11 @@ sub new
   my $stage  = Path::Tiny->new("blib/lib/auto/share/dist")
                          ->child($self->dist_name)
                          ->absolute;
-  
+
   $build->set_stage ($stage->stringify );
   $build->set_prefix($prefix->stringify);
   $build->runtime_prop->{perl_module_version} = $self->dist_version;
-  
+
   $build->checkpoint;
 
   if($self->alien_alienfile_meta)
@@ -110,7 +110,7 @@ sub alien_build
 
 sub _alien_already_done ($)
 {
-  my($name) = @_; 
+  my($name) = @_;
   my $path = Path::Tiny->new("_alien/mb/$name");
   return -f $path;
 }
@@ -144,7 +144,7 @@ sub ACTION_alien_build
 
   my $build = $self->alien_build;
   $build->build;
-  
+
   if($build->meta_prop->{arch})
   {
     my $archdir = Path::Tiny->new("./blib/arch/auto/@{[ join '/', split /-/, $self->dist_name ]}");
@@ -152,9 +152,24 @@ sub ACTION_alien_build
     my $archfile = $archdir->child($archdir->basename . ".txt");
     $archfile->spew('Alien based distribution with architecture specific file in share');
   }
-  
+
+  {
+    my @parts = split /-/, $self->dist_name;
+    my $package = join '::', @parts;
+    my $install_files = Path::Tiny->new("./blib/lib")->child( @parts, 'Install', 'Files.pm' );
+    $install_files->parent->mkpath;
+    $install_files->spew_utf8(
+      "package ${package}::Install::Files;\n",
+      "use strict;\n",
+      "use warnings;\n",
+      "require ${package};\n",
+      "sub Inline { shift; ${package}->Inline(\@_) }\n",
+      "1;\n",
+    );
+  };
+
   $build->checkpoint;
-  
+
   _alien_touch 'build';
   $self;
 }
@@ -164,14 +179,14 @@ sub ACTION_alien_test
 {
   my($self) = @_;
   $self->depends_on('alien_build');
-  
+
   my $build = $self->alien_build;
   if($build->can('test'))
   {
     $build->test;
     $build->checkpoint;
   }
-  $self;  
+  $self;
 }
 
 sub ACTION_test
@@ -202,7 +217,7 @@ Alien::Build::MB - Alien::Build installer class for Module::Build
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -223,7 +238,7 @@ L<Alien::Build::MM>, which uses L<ExtUtils::MakeMaker> instead.
 The primary rationale for this class, is to prove independence
 from any particular installer, so that other installers may be
 added in the future if they become available.  If you really do
-prefer to work with L<Module::Build> though, this may be the 
+prefer to work with L<Module::Build> though, this may be the
 installer for you!
 
 =head1 CONSTRUCTOR

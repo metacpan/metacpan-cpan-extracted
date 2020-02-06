@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Simple asynchronous finger response
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub say
@@ -32,7 +32,7 @@ AnyEvent::Finger::Response - Simple asynchronous finger response
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 
@@ -73,8 +73,6 @@ L<AnyEvent::Finger::Client>
 L<AnyEvent::Finger::Server>
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

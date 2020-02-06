@@ -10,9 +10,9 @@ build_requires:
   Test::More: '0.98'
   Test::TCP: '2.06'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ no_index:
 provides:
   App::revealup:
     file: lib/App/revealup.pm
-    version: '0.21'
+    version: '0.22'
   App::revealup::base:
     file: lib/App/revealup/base.pm
   App::revealup::builder:
@@ -62,10 +62,12 @@ resources:
   bugtracker: https://github.com/yusukebe/App-revealup/issues
   homepage: https://github.com/yusukebe/App-revealup
   repository: git://github.com/yusukebe/App-revealup.git
-version: '0.21'
+version: '0.22'
 x_authority: cpan:YUSUKEBE
 x_contributors:
   - 'A. Sinan Unur <nanis@cpan.org>'
+  - 'Jose Luis Martinez <jlmartinez@capside.com>'
   - 'sillymoose <davidnmfarrell@gmail.com>'
   - 'trapple <trapplejp@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

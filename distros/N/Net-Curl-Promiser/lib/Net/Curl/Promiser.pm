@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf-8
 
@@ -44,18 +44,26 @@ C<epoll>.)
 =head1 PROMISE IMPLEMENTATION
 
 This class’s default Promise implementation is L<Promise::ES6>.
-You can use a different one by overriding the L<PROMISE_CLASS()> method in
+You can use a different one by overriding the C<PROMISE_CLASS()> method in
 a subclass, as long as the substitute class’s C<new()> method works the
 same way as Promise::ES6’s (which itself follows the ECMAScript standard).
 
 (NB: L<Net::Curl::Promiser::Mojo> uses L<Mojo::Promise> instead of
 Promise::ES6.)
 
+=head2 B<Experimental> L<Promise::XS> support
+
+Try out experimental Promise::XS support by running with
+C<NET_CURL_PROMISER_PROMISE_ENGINE=Promise::XS> in your environment.
+This will override C<PROMISE_CLASS()>.
+
 =cut
 
 #----------------------------------------------------------------------
 
 use Net::Curl::Multi ();
+
+use constant _DEBUG => 1;
 
 use constant _DEFAULT_TIMEOUT => 1000;
 
@@ -264,7 +272,6 @@ sub process {
 
     if (%$fd_action_hr) {
         for my $fd (keys %$fd_action_hr) {
-            local $self->{'_removed_fd'};
             $self->{'multi'}->socket_action( $fd, $fd_action_hr->{$fd} );
         }
     }
@@ -359,7 +366,10 @@ sub _socket_fn {
     }
     elsif ($action == Net::Curl::Multi::CURL_POLL_REMOVE) {
         $self->_STOP_POLL($fd);
-        $self->{'_removed_fd'} = $fd;
+
+        # In case we got a read and a remove right away.
+        # This *may* not be needed but doesn’t seem to hurt.
+        $self->_process_pending();
     }
     else {
         warn "$self: Unrecognized action $action on FD $fd\n";
@@ -368,34 +378,40 @@ sub _socket_fn {
     return 0;
 }
 
-sub _socket_action {
-    my ($self, $fd, $direction) = @_;
-
-    my $is_active = $self->{'multi'}->socket_action( $fd, $direction );
-
-    $self->_process_pending();
-
-    return $is_active;
-}
-
 sub _finish_handle {
     my ($self, $easy, $cb_idx, $payload) = @_;
 
-    delete $self->{'to_fail'}{$easy};
+    my $err = $@;
 
-    $self->{'multi'}->remove_handle( $easy );
+    # Don’t depend on the caller to report failures.
+    # (AnyEvent, for example, blackholes them.)
+    warn if !eval {
+        delete $self->{'to_fail'}{$easy};
 
-    if ( my $cb_ar = delete $self->{'callbacks'}{$easy} ) {
-        $cb_ar->[$cb_idx]->($payload);
-    }
-    elsif ( my $deferred = delete $self->{'deferred'}{$easy} ) {
-        if ($cb_idx) {
-            $deferred->reject($payload);
+        if ( my $cb_ar = delete $self->{'callbacks'}{$easy} ) {
+            $cb_ar->[$cb_idx]->($payload);
+        }
+        elsif ( my $deferred = delete $self->{'deferred'}{$easy} ) {
+            if ($cb_idx) {
+                $deferred->reject($payload);
+            }
+            else {
+                $deferred->resolve($payload);
+            }
         }
         else {
-            $deferred->resolve($payload);
+
+            # This shouldn’t happen, but just in case:
+            require Data::Dumper;
+            print STDERR Data::Dumper::Dumper( ORPHAN => $easy => $payload );
         }
-    }
+
+        $self->{'multi'}->remove_handle( $easy );
+
+        1;
+    };
+
+    $@ = $err;
 
     return;
 }

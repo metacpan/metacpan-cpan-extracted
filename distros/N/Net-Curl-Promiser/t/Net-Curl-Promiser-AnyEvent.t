@@ -20,14 +20,9 @@ plan tests => $ClientTest::TEST_COUNT;
 SKIP: {
     eval { require AnyEvent; 1 } or skip "AnyEvent isn’t available: $@", $ClientTest::TEST_COUNT;
 
+    diag "Using AnyEvent $AnyEvent::VERSION";
+
     require Net::Curl::Promiser::AnyEvent;
-
-    local $SIG{'ALRM'} = 60;
-
-    local $SIG{'CHLD'} = sub {
-        my $pid = waitpid -1, 1;
-        die "Subprocess $pid ended prematurely!";
-    };
 
     my $server = MyServer->new();
 
@@ -40,6 +35,8 @@ SKIP: {
     ClientTest::run($promiser, $port)->finally($cv);
 
     $cv->recv();
+
+    $server->finish();
 }
 
 done_testing();

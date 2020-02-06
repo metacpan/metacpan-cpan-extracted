@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Comment;
-our $VERSION = '1.0.12';
+our $VERSION = '1.0.14';
 use strict;
 use warnings;
 require Template::Liquid::Error;

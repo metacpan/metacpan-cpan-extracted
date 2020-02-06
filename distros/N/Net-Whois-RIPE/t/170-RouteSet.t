@@ -110,7 +110,7 @@ $object->source('APNIC');
 is( $object->source(), 'APNIC', 'source properly set' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

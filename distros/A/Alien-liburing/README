@@ -1,0 +1,44 @@
+Alien::liburing
+
+This module provides bindings for the "libuing" C library, for working
+with the io_uring Linux kernel subsystem. This library is only available
+or relavent for Linux, and will fail to install on any other operating
+systems.
+
+This library also requires a fairly new version of the Linux kernel as
+of this writing. I'd recommend at a minimum a 5.3 versioned kernel or
+newer, due to features and support.
+
+For the eventual IO::Async::Loop::IOUring module, a minimum kernel
+version of 5.4 (likely 5.5) will also be needed and detected at install
+time of that module.
+
+See the github <https://github.com/axboe/liburing> project for liburing,
+and the kernel documentation (pdf) <https://kernel.dk/io_uring.pdf> for
+io_uring documentation Also see Alien::Build::Manual::AlienUser for
+usage.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Ryan Voots.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

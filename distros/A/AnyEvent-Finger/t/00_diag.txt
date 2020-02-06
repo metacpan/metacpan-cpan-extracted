@@ -1,4 +1,0 @@
-AnyEvent
-EV
-Module::Build
-Test::More

@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -525,7 +525,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -2246,9 +2246,11 @@ under development anymore.
 
 In addition to the contributors mentioned below, I would like to
 acknowledge Brock Wilcox (AWWAIID) and Meredith Howard (MHOWARD) whose
-work on L<FFI::Sweet|https://github.com/merrilymeredith/p5-FFI-Sweet>
-not only helped me get started with FFI but significantly influenced the
-design of Platypus.
+work on C<FFI::Sweet> not only helped me get started with FFI but
+significantly influenced the design of Platypus.
+
+Dan Book, who goes by Grinnz on IRC for answering user questions about
+FFI and Platypus.
 
 In addition I'd like to thank Alessandro Ghedini (ALEXBIO) whose work
 on another Perl FFI library helped drive some of the development ideas
@@ -2287,6 +2289,8 @@ Mohammad S Anwar (MANWAR)
 Håkon Hægland (hakonhagland, HAKONH)
 
 Meredith (merrilymeredith, MHOWARD)
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

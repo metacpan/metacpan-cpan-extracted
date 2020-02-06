@@ -1,5 +1,5 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.12';
+our $VERSION = '1.0.14';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
 use strict;
@@ -61,6 +61,12 @@ sub eq {
     my ($s) = @_;
     my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
     my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+
+    # Might need to render these again
+    my $_l = $s->{template}{context}->get($l);
+    my $_r = $s->{template}{context}->get($r);
+    $l = $_l if defined $_l;
+    $r = $_r if defined $_r;
     return _equal($l, $r);
 }
 
@@ -101,6 +107,12 @@ sub gt {
     my ($l, $r)
         = map { $s->{template}{context}->get($_) || $_ }
         ($$s{'lvalue'}, $$s{'rvalue'});
+
+    # Might need to render these again
+    my $_l = $s->{template}{context}->get($l);
+    my $_r = $s->{template}{context}->get($r);
+    $l = $_l if defined $_l;
+    $r = $_r if defined $_r;
     return
           !!(grep {defined} $l, $r)
         ? (grep {m[\D]o} $l, $r)
@@ -113,7 +125,14 @@ sub lt { return !$_[0]->gt }
 sub contains {
     my ($s) = @_;
     my $l   = $s->{template}{context}->get($s->{'lvalue'});
-    my $r   = quotemeta $s->{template}{context}->get($s->{'rvalue'});
+    my $r   = $s->{template}{context}->get($s->{'rvalue'});
+
+    # Might need to render these again
+    my $_l = $s->{template}{context}->get($l);
+    my $_r = $s->{template}{context}->get($r);
+    $l = $_l if defined $_l;
+    $r = $_r if defined $_r;
+    $r = quotemeta $r;
     return if defined $r && !defined $l;
     return defined($l->{$r})       ? 1 : !1 if ref $l eq 'HASH';
     return (grep { $_ eq $r } @$l) ? 1 : !1 if ref $l eq 'ARRAY';
@@ -124,6 +143,12 @@ sub _and {
     my ($s) = @_;
     my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
     my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+
+    # Might need to render these again
+    my $_l = $s->{template}{context}->get($l);
+    my $_r = $s->{template}{context}->get($r);
+    $l = $_l if defined $_l;
+    $r = $_r if defined $_r;
     return !!($l && $r);
 }
 
@@ -131,6 +156,12 @@ sub _or {
     my ($s) = @_;
     my $l = $s->{template}{context}->get($s->{'lvalue'}) || $s->{'lvalue'};
     my $r = $s->{template}{context}->get($s->{'rvalue'}) || $s->{'rvalue'};
+
+    # Might need to render these again
+    my $_l = $s->{template}{context}->get($l);
+    my $_r = $s->{template}{context}->get($r);
+    $l = $_l if defined $_l;
+    $r = $_r if defined $_r;
     return !!($l || $r);
 }
 {    # Compound inequalities support
@@ -153,7 +184,12 @@ sub _or {
 sub is_true {
     my ($s) = @_;
     if (!defined $s->{'condition'} && !defined $s->{'rvalue'}) {
-        return !!($s->{template}{context}->get($s->{'lvalue'}) ? 1 : 0);
+
+        # Might need to render these again
+        my $l  = $s->{template}{context}->get($s->{'lvalue'});
+        my $_l = $s->{template}{context}->get($l);
+        $l = $_l if defined $_l;
+        return !!($l) ? 1 : 0;
     }
     my $condition = $s->can($s->{'condition'});
     raise Template::Liquid::Error {

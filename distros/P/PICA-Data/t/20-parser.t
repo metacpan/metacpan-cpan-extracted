@@ -74,9 +74,23 @@ note 'PICA::Parser::PPXML';
 
 my $xml
     = q{<record xmlns="info:srw/schema/5/picaXML-v1.0"><datafield tag="003@"><subfield code="0">1234€</subfield></datafield></record>};
-my $record = pica_parser( 'xml', $xml )->next;
+my $record = pica_parser( xml => $xml )->next;
 is_deeply $record->{record}, [ [ '003@', '', '0', '1234€' ] ],
     'xml from string';
+
+note 'XML with namespace';
+$xml = <<XML;
+<p:record xmlns:p="info:srw/schema/5/picaXML-v1.0">
+ <p:datafield p:tag="003@">
+   <p:subfield p:code="0">1234€</p:subfield>
+ </p:datafield>
+</p:record>
+XML
+
+$record = pica_parser( xml => $xml )->next;
+is_deeply $record->{record}, [ [ '003@', '', '0', '1234€' ] ],
+    'xml with namespace';
+
 
 note 'error handling';
 {

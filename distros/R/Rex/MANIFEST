@@ -466,4 +466,5 @@ xt/author/critic.t
 xt/author/minimum-version.t
 xt/author/perltidy.t
 xt/author/pod-syntax.t
+xt/release/cpan-changes.t
 xt/release/kwalitee.t

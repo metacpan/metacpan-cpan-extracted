@@ -32,7 +32,7 @@ $tested{'comment'}++;
 is_deeply( $object->comment(), [ '', 'No entries found in source TEST.' ], 'comment properly parsed' );
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

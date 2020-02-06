@@ -30,12 +30,13 @@ requires:
   File::Copy: '0'
   File::Temp: '0.19'
   Moo: '2'
+  namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Test-SQLite
   repository: https://github.com/ology/Test-SQLite.git
-version: '0.0400'
+version: '0.0403'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

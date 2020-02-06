@@ -1,4 +1,4 @@
-# Copyrights 2002-2018 by [Mark Overmeer].
+# Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Hash::Case;
 use vars '$VERSION';
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 
 use warnings;
@@ -16,8 +16,7 @@ use strict;
 
 use Tie::Hash;  # contains Tie::StdHash
 use base 'Tie::StdHash';
-
-use Log::Report 'hash-case';
+use Carp qw(croak);
 
 
 sub TIEHASH(@)
@@ -36,7 +35,7 @@ sub native_init($)
        if(!$add)               { ; }
     elsif(ref $add eq 'ARRAY') { $self->addPairs(@$add) }
     elsif(ref $add eq 'HASH')  { $self->addHashData($add)  }
-    else { error "cannot initialize the native hash this way" }
+    else { croak "cannot initialize the native hash this way" }
 
     $self;
 }
@@ -50,7 +49,7 @@ sub wrapper_init($)
        if(!$add)               { ; }
     elsif(ref $add eq 'ARRAY') { $self->addPairs(@$add) }
     elsif(ref $add eq 'HASH')  { $self->setHash($add)  }
-    else { error "cannot initialize a wrapping hash this way" }
+    else { croak "cannot initialize a wrapping hash this way" }
 
     $self;
 }

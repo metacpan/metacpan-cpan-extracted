@@ -1,18 +1,12 @@
 package WWW::Chain;
-BEGIN {
-  $WWW::Chain::AUTHORITY = 'cpan:GETTY';
-}
-{
-  $WWW::Chain::VERSION = '0.003';
-}
+our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: A web request chain
-
-our $VERSION ||= '0.000';
-
+$WWW::Chain::VERSION = '0.006';
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
+use WWW::Chain::UA::LWP;
 
 has stash => (
 	isa => HashRef,
@@ -62,6 +56,11 @@ sub BUILDARGS {
 		request_count => scalar @{$next_requests},
 		@args,
 	};
+}
+
+sub request_with_lwp {
+  my ( $self ) = @_;
+  return WWW::Chain::UA::LWP->new->request_chain($self);
 }
 
 sub parse_chain {
@@ -114,6 +113,7 @@ sub next_responses {
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
@@ -122,7 +122,7 @@ WWW::Chain - A web request chain
 
 =head1 VERSION
 
-version 0.003
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ version 0.003
 
     sub first_request {
       $_[0]->stash->{a} = 1;
-      return HTTP::Request->new( GET => 'http://duckduckgo.com/' ), "second_request";
+      return HTTP::Request->new( GET => 'http://conflict.industries/' ), "second_request";
     }
 
     sub second_request {
@@ -159,7 +159,7 @@ version 0.003
     }
   }
 
-  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://duckduckgo.com/' ), 'first_request');
+  my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://conflict.industries/' ), 'first_request');
 
   # Blocking usage:
 
@@ -193,4 +193,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

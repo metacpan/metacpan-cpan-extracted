@@ -118,7 +118,7 @@ $tested{'e_mail'}++;
 is($object->e_mail->[0], 'role@somewhere.com', 'e_mail');
 
 # Common tests
-do 't/common.pl';
+do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
 ok( !$@, "Can evaluate t/common.pl ($@)" );
 

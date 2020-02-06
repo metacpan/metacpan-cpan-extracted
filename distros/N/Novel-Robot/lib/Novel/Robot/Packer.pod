@@ -1,0 +1,47 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+L<Novel::Robot::Packer> pack novel/bbs content to txt / html , etc
+
+小说/贴子 打包引擎
+
+=head2 type
+
+支持输出类型
+
+    raw  : 经过MessagePack压缩的二进制文件
+
+    html : html单网页格式
+
+    txt  : txt文本格式
+
+    web  : html多网页格式(目录为index.html，每个章节1个html)
+
+=head1 FUNCTION
+
+=head2 new
+
+初始化解析模块
+
+   my $packer = Novel::Robot::Packer->new(type => 'html');
+
+=head2 main
+
+打包文件
+
+   my $book_ref = {
+       writer => 'xxx',
+       book => 'yyy',
+       item_list => [
+       { id=>1, title=>'aaa', content=> '<p>kkk</p>' },
+       { id=>2, title=>'bbb', content=> '<p>jjj</p>' },
+       ], 
+   };
+   
+   my $ret = $self->main($book_ref, with_toc => 1);
+
+
+=cut

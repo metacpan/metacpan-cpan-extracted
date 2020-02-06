@@ -3,14 +3,15 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0400';
-
-use Moo;
-use strictures 2;
+our $VERSION = '0.0403';
 
 use DBI;
 use File::Copy;
 use File::Temp ();
+
+use Moo;
+use strictures 2;
+use namespace::clean;
 
 
 has database => (
@@ -129,7 +130,7 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0400
+version 0.0403
 
 =head1 SYNOPSIS
 
@@ -149,7 +150,7 @@ version 0.0400
   $dbh->disconnect;
 
   # Copy a database file to the test db:
-  $sqlite = Test::SQLite->new(database => '/some/where/production.db');
+  $sqlite = Test::SQLite->new(database => '/some/where/database.db');
   $dbh = $sqlite->dbh;
   # Fiddle with the test database...
   $dbh->disconnect;
@@ -167,8 +168,9 @@ version 0.0400
 
 =head1 DESCRIPTION
 
-C<Test::SQLite> is loosely inspired by L<Test::PostgreSQL> and
-L<Test::mysqld>, and creates a temporary db to use in tests.
+C<Test::SQLite> is inspired by L<Test::PostgreSQL> and
+L<Test::mysqld>, and creates a temporary sqlite database to use in
+tests.
 
 This module will also return the database B<dbh> handle, B<dsn>
 connection string, and B<db_attrs> connection attributes.

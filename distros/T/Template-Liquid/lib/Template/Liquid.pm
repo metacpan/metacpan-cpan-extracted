@@ -1,5 +1,5 @@
 package Template::Liquid;
-our $VERSION = '1.0.12';
+our $VERSION = '1.0.14';
 use strict;
 use warnings;
 our (%tags, %filters);
@@ -319,6 +319,13 @@ For more, see L<Template::Liquid::Tag::Capture|Template::Liquid::Tag::Capture>.
 =head1 Standard Liquid Filters
 
 Please see L<Template::Liquid::Filters|Template::Liquid::Filters>.
+
+=head1 Whitespace Control
+
+In Liquid, you can include a hyphen in your tag syntax C<{{->, C<-}}>, C<{%->,
+and C<-%}> to strip whitespace from the left or right side of a rendered tag.
+
+See https://shopify.github.io/liquid/basics/whitespace/
 
 =head1 Extending Template::Liquid
 

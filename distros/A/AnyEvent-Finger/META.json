@@ -4,25 +4,37 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-Finger",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28",
+            "ExtUtils::MakeMaker" : "0",
             "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -36,7 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "perl" : "5.006"
          }
       }
@@ -46,13 +58,16 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/AnyEvent-Finger/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/AnyEvent-Finger",
+      "homepage" : "https://metacpan.org/pod/AnyEvent::Finger",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/AnyEvent-Finger.git",
          "web" : "https://github.com/plicease/AnyEvent-Finger"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
+   "x_use_unsafe_inc" : 0
 }
 

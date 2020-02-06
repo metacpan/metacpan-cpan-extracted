@@ -1,4 +1,4 @@
-# Copyrights 2002-2018 by [Mark Overmeer].
+# Copyrights 2002-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,14 +8,13 @@
 
 package Hash::Case::Upper;
 use vars '$VERSION';
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 use base 'Hash::Case';
 
 use strict;
 use warnings;
-
-use Log::Report 'hash-case';
+use Carp  qw(croak);
 
 
 sub init($)
@@ -23,7 +22,7 @@ sub init($)
 
     $self->SUPER::native_init($args);
 
-    error __x"no options available for {pkg}", pkg => __PACKAGE__
+    croak "no options available for ". __PACKAGE__
         if keys %$args;
 
     $self;

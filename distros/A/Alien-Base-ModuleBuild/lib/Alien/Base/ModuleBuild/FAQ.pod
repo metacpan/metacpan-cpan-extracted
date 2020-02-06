@@ -14,7 +14,7 @@ Alien::Base::ModuleBuild::FAQ - Frequently Asked Questions about Alien::Base::Mo
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 

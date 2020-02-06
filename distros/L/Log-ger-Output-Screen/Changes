@@ -1,30 +1,37 @@
-0.008   2018-12-22 (PERLANCAR)
+0.009   2020-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Check interactive on the correct handle, STDERR instead
+	  of STDOUT when 'stderr' setting is true [RT#131702] (thanks
+	  Sebastian Schleussner).
+
+
+0.008   2018-12-22  Released-By: PERLANCAR
 
 	- Observe NO_COLOR.
 
 
-0.007   2017-08-03 (PERLANCAR)
+0.007   2017-08-03  Released-By: PERLANCAR
 
         - Colors now can handle custom levels (will pick nearest level when
           there is no exact match).
 
 
-0.006   2017-08-03 (PERLANCAR)
+0.006   2017-08-03  Released-By: PERLANCAR
 
 	- Make %colors package global so it can be accessed/modified from
 	  outside, for later purposes.
 
 
-0.005   2017-06-30 (PERLANCAR)
+0.005   2017-06-30  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.011.
 
 
-0.004   2017-06-23 (PERLANCAR)
+0.004   2017-06-23  Released-By: PERLANCAR
 
 	- Adjust to Log::ger 0.005.
 
 
-0.003    2017-06-21 (PERLANCAR)
+0.003    2017-06-21  Released-By: PERLANCAR
 
          - First release, split from Log-err.

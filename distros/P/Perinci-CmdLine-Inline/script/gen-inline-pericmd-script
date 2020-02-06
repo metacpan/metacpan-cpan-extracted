@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-04-15'; # DATE
+our $DATE = '2020-02-06'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.545'; # VERSION
+our $VERSION = '0.546'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.545 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2019-04-15.
+This document describes version 0.546 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -177,7 +177,7 @@ Whether to strip code using Perl::Stripper.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -319,6 +319,10 @@ you want to pipe the result for more post-processing. In this case you can use
 Set output file, defaults to stdout.
 
 =item B<--overwrite>
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -495,6 +499,12 @@ See C<--tags>.
 
 Currently does nothing, provided only for compatibility with Perinci::CmdLine::Base.
 
+=item B<--url-json>=I<s>
+
+Program URL (JSON-encoded).
+
+See C<--url>.
+
 =item B<--url>=I<s>
 
 Program URL.
@@ -657,7 +667,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

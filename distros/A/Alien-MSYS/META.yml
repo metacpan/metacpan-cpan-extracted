@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-MSYS/issues
   homepage: https://metacpan.org/pod/Alien::MSYS
   repository: git://github.com/Perl5-Alien/Alien-MSYS.git
-version: '0.11'
+version: '0.12'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:

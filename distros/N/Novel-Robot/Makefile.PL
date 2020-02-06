@@ -22,16 +22,29 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Novel::Robot",
   "PREREQ_PM" => {
+    "Data::MessagePack" => 0,
+    "Encode" => 0,
     "Encode::Detect::CJK" => 0,
     "Encode::Locale" => 0,
     "File::Find::Rule" => 0,
+    "File::Slurp" => 0,
+    "HTML::Entities" => 0,
+    "HTML::FormatText" => 0,
+    "HTML::TreeBuilder" => 0,
+    "HTTP::CookieJar" => 0,
+    "HTTP::Tiny" => 0,
+    "IO::Uncompress::Gunzip" => 0,
     "JSON" => 0,
     "Moo" => 0,
-    "Novel::Robot::Packer" => 0,
-    "Novel::Robot::Parser" => 0,
-    "Parallel::ForkManager" => 0
+    "Parallel::ForkManager" => 0,
+    "Parallel::Loops" => 0,
+    "Template" => 0,
+    "Term::ProgressBar" => 0,
+    "URI" => 0,
+    "URI::Escape" => 0,
+    "Web::Scraper" => 0
   },
-  "VERSION" => "0.40",
+  "VERSION" => "0.41",
   "test" => {
     "TESTS" => ""
   }
@@ -39,14 +52,27 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::MessagePack" => 0,
+  "Encode" => 0,
   "Encode::Detect::CJK" => 0,
   "Encode::Locale" => 0,
   "File::Find::Rule" => 0,
+  "File::Slurp" => 0,
+  "HTML::Entities" => 0,
+  "HTML::FormatText" => 0,
+  "HTML::TreeBuilder" => 0,
+  "HTTP::CookieJar" => 0,
+  "HTTP::Tiny" => 0,
+  "IO::Uncompress::Gunzip" => 0,
   "JSON" => 0,
   "Moo" => 0,
-  "Novel::Robot::Packer" => 0,
-  "Novel::Robot::Parser" => 0,
-  "Parallel::ForkManager" => 0
+  "Parallel::ForkManager" => 0,
+  "Parallel::Loops" => 0,
+  "Template" => 0,
+  "Term::ProgressBar" => 0,
+  "URI" => 0,
+  "URI::Escape" => 0,
+  "Web::Scraper" => 0
 );
 
 

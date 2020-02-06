@@ -11,7 +11,7 @@ use AnyEvent::Finger::Request;
 use AnyEvent::Finger::Response;
 
 # ABSTRACT: Simple asynchronous finger server
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 
 sub new
@@ -170,7 +170,7 @@ AnyEvent::Finger::Server - Simple asynchronous finger server
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -340,8 +340,6 @@ L<AnyEvent::Finger>
 L<AnyEvent::Finger::Client>
 
 =back
-
-=cut
 
 =head1 AUTHOR
 

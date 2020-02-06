@@ -30,6 +30,9 @@ corpus/ffi_build_file_cxx/include/myfoo.h
 corpus/ffi_build_mm/lb1/hello.fbx
 corpus/ffi_build_mm/lb1/hello1.c
 corpus/ffi_build_mm/lb1/hello2.c
+corpus/ffi_build_mm/lb1bad/hello.fbx
+corpus/ffi_build_mm/lb1bad/hello1.c
+corpus/ffi_build_mm/lb1bad/hello2.c
 corpus/ffi_build_mm/lb2/hello1.c
 corpus/ffi_build_mm/lb2/hello2.c
 corpus/ffi_build_mm/project1/ffi/x.c

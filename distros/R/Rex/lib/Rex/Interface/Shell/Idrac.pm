@@ -9,7 +9,7 @@ package Rex::Interface::Shell::Idrac;
 use strict;
 use warnings;
 
-our $VERSION = '1.8.0'; # VERSION
+our $VERSION = '1.8.1'; # VERSION
 
 use Rex::Interface::Shell::Default;
 use base qw(Rex::Interface::Shell::Default);

@@ -7,9 +7,9 @@ use warnings;
 package Org::Parser::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-30'; # DATE
+our $DATE = '2020-02-06'; # DATE
 our $DIST = 'Org-Parser-Tiny'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub new {
     my $class = shift;
@@ -60,7 +60,7 @@ sub _parse {
             my $level = length($1);
             my $title = $2;
             my $node = Org::Parser::Tiny::Node::Headline->new(
-                raw   => $line,
+                _str  => $line,
                 level => $level,
             );
 
@@ -164,8 +164,8 @@ sub new {
 
 sub parent { $_[0]{parent} }
 sub children { $_[0]{children} || [] }
-sub as_string { $_[0]{raw} }
-
+sub as_string { $_[0]{_str} }
+sub children_as_string { join("", map { $_->as_string } @{ $_[0]->children }) }
 
 # abstract class: Org::Parser::Tiny::HasPreamble
 package Org::Parser::Tiny::Node::HasPreamble;
@@ -178,15 +178,15 @@ sub new {
     $class->SUPER::new(%args);
 }
 
-sub as_string {
-    $_[0]->{preamble} . join("", map { $_->as_string } @{ $_[0]->children });
-}
-
 
 # class: Org::Parser::Tiny::Document: top level node
 package Org::Parser::Tiny::Node::Document;
 
 our @ISA = qw(Org::Parser::Tiny::Node::HasPreamble);
+
+sub as_string {
+    $_[0]->{preamble} . $_[0]->children_as_string;
+}
 
 
 # class: Org::Parser::Tiny::Node::Headline: headline with its content
@@ -194,17 +194,48 @@ package Org::Parser::Tiny::Node::Headline;
 
 our @ISA = qw(Org::Parser::Tiny::Node::HasPreamble);
 
-sub level { $_[0]{level} }
+sub level {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{level} = $_[1] }
+    $_[0]{level};
+}
 
-sub title { $_[0]{title} }
+sub title {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{title} = $_[1] }
+    $_[0]{title};
+}
 
-sub is_todo { $_[0]{is_todo} }
+sub is_todo {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{is_todo} = $_[1] }
+    $_[0]{is_todo};
+}
 
-sub is_done { $_[0]{is_done} }
+sub is_done {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{is_done} = $_[1] }
+    $_[0]{is_done};
+}
 
-sub todo_state { $_[0]{todo_state} }
+sub todo_state {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{todo_state} = $_[1] }
+    $_[0]{todo_state};
+}
 
-sub tags { $_[0]{tags} || [] }
+sub tags {
+    if (@_ > 1) { undef $_[0]{_str}; $_[0]{tags} = $_[1] }
+    $_[0]{tags} || [];
+}
+
+sub as_string {
+    ($_[0]->{_str} //
+         join('',
+              "*" x $_[0]{level},
+              " ",
+              (length $_[0]{todo_state} ? "$_[0]{todo_state} " : ""),
+              "$_[0]{title}",
+              (defined $_[0]{tags} ? " :".join(":", @{ $_[0]{tags} }).":" : ""),
+              "\n",
+          )) .
+              $_[0]->{preamble};
+}
 
 1;
 # ABSTRACT: Parse Org documents with as little code (and no non-core deps) as possible
@@ -221,7 +252,7 @@ Org::Parser::Tiny - Parse Org documents with as little code (and no non-core dep
 
 =head1 VERSION
 
-This document describes version 0.001 of Org::Parser::Tiny (from Perl distribution Org-Parser-Tiny), released on 2020-12-30.
+This document describes version 0.003 of Org::Parser::Tiny (from Perl distribution Org-Parser-Tiny), released on 2020-02-06.
 
 =head1 SYNOPSIS
 
@@ -253,29 +284,51 @@ Select document nodes using L<Data::CSel>:
      "Headline[title =~ /foo/]"
  );
 
-Manipulate tree nodes with path-like semantic using L<Tree::FSLike>:
+Manipulate tree nodes with path-like semantic using L<Tree::FSMethods::Org>:
 
- use Tree::FSLike;
- my $fs = Tree::FSLike->new(
-     tree => $doc,
-     gen_filename_method => sub { $_[0]->can("title") ? $_[0]->title : "$_[0]" },
+Sample F<sample.org>:
+
+ some text before the first headline.
+
+ * header1                                                               :tag:
+ contains an internal link to another part of the document [[blah]]
+ * header2 [#A] [20%]
+ - contains priority and progress cookie (percent-style)
+ * header3 [1/10]
+ - contains progress cookie (fraction-style)
+ ** header3.1
+ ** header3.2
+ ** header3.3
+ * header4
+ blah blah.
+ * blah
+
+Using Tree::FSMethods::Org:
+
+ use Tree::FSMethods::Org;
+ my $fs = Tree::FSMethods::Org->new(
+     org_file => "sample.org",
  );
 
  # list nodes right above the root node
- my @nodes = $fs->ls;
+ my %nodes = $fs->ls; # (header1=>{...}, header2=>{...}, header3=>{...}, header4=>{})
 
- # use wildcard to list nodes
- my @nodes = $fs->ls("*foo*");
+ # list nodes below header3
+ $fs->cd("header3");
+ %nodes = $fs->ls; # ("header3.1"=>{...}, "header3.2"=>{...}, "header3.3"=>{...})
 
- # remove top-level headlines which have "foo" in their title
- $fs->rm($doc, "/*foo*");
+ # die, path not found
+ $fs->cd("/header5");
+
+ # remove top-level headlines which have "3"
+ $fs->rm("*3*");
 
 =head1 DESCRIPTION
 
 This module is a more lightweight alternative to L<Org:Parser>. Currently it is
 very simple and only parses headlines; thus it is several times faster than
 Org::Parser. I use this to write utilities like L<sort-org-headlines-tiny> or to
-use it with L<Tree::FSLike>.
+use it with L<Tree::FSMethods>.
 
 =head1 NODE CLASSES
 
@@ -388,7 +441,7 @@ Returns a tree of node objects (of class C<Org::Parser::Tiny::Node> and its
 subclasses C<Org::Parser::Tiny::Node::Document> and
 C<Org::Parser::Tiny::Node::Headline>). The tree node complies to
 L<Role::TinyCommons::Tree::Node> role, so these tools are available:
-L<Data::CSel>, L<Tree::Dump>, L<Tree::FSLike>, etc.
+L<Data::CSel>, L<Tree::Dump>, L<Tree::FSMethods>, etc.
 
 Will die if there are syntax errors in documents.
 
@@ -434,7 +487,9 @@ feature.
 
 L<Org::Parser>, the more fully featured Org parser.
 
-L<https://orgmode.org>
+L<https://orgmode.org>.
+
+L<Tree::FSMethods::Org> and L<Tree::FSMethods>.
 
 =head1 AUTHOR
 
@@ -442,7 +497,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

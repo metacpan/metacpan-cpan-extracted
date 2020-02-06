@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.017";
+our $VERSION = "0.018";
 
 use Text::Layout::FontDescriptor;
 
@@ -412,6 +412,7 @@ sub parse {
 	}
 	else {
 	    carp("Unknown font property: $t");
+	    $family .= " " . $_;
 	}
     }
 

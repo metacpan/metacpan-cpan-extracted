@@ -82,6 +82,7 @@ use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then se
 
 =head2 ARG
 
+    -s : site, 小说站点
     -u : book url，小说url
     -w : writer name, 作者
     -b : book name，书名
@@ -119,6 +120,10 @@ download novel from url
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
+use chrome to parse dom: (飘灯-青春期妖怪.html)
+
+    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-阿里文学网" --content_path "//div[@class='chapter-content']"
+
 jjwxc vip: 可以使用firefox浏览器，先登录m.jjwxc.net，然后用 L<cookies.txt|https://addons.mozilla.org/zh-CN/firefox/addon/cookies-txt/> 扩展导出cookies.txt，则可以下载当前登录账号所购买的小说；也可直接指定firefox配置目录下的cookies.sqlite文件；或者直接使用m.jjwxc.net的cookie字符串
 
     get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
@@ -153,7 +158,6 @@ only print info, but not download, 输出小说信息（不下载）
     -w : writer name 作者名
     -b : book name，书名
     -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -r : chapter regex, 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
     -c : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
 
     -t : save type, 小说保存类型，例如txt/html
@@ -162,13 +166,19 @@ only print info, but not download, 输出小说信息（不下载）
     -p : min_page_num-max_page_num, 只取 x-y 页
     -i : min_item_num-max_item_num, 只取 x-y 章/楼
 
-    -C : with_toc, 小说保存时是否生成目录(默认是)
-    -G : grep_content , 提取关键字
-    -F : filter_content , 过滤关键字
-    -A : only_poster, 贴子只看楼主
-    -N : min_content_word_num, 贴子每楼层最小字数
+    -D : only print info, not download, 只输出信息，不下载
+    -v : verbose, 显示进度条(默认显示)
 
-    --novel_list_path : xpath to extract novel_list, 提取novel_list的路径
+    --use_chrome      : use chrome dump_dom, only support GET method
+    --with_toc        : 小说保存时是否生成目录(默认是)
+    --grep_content    : 提取关键字
+    --filter_content  : 过滤关键字
+    --only_poster     : 贴子只看楼主
+    --min_content_word_num : 贴子每楼层最小字数
+    --max_process_num : 进程个数 
+    --chapter_regex: 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+
+    --item_list_path : xpath to extract item_list, 提取item_list的路径
     --content_path    : xpath to extract content, 提取content的路径
     --writer_path     : xpath to extract writer, 提取writer的路径
     --book_path       : xpath to extract book, 提取book的路径
@@ -176,10 +186,6 @@ only print info, but not download, 输出小说信息（不下载）
     --writer_regex    : regex to extract writer, 提取writer的正则
     --book_regex      : regex to extract book, 提取book的正则
 
-    -D : only print info, not download, 只输出信息，不下载
-    -v : verbose, 显示进度条(默认显示)
-
-    -P : max_process_num, 进程个数 
 
 =head1 conv_novel.pl
     
@@ -187,11 +193,11 @@ use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/mobi/.
 
 使用calibre将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、mobi等等。如果未指定writer及book选项，则需要将html源文件名称设置为 [作者-书名]
 
-    conv_novel.pl -f [txt_file] -t [type] -w [writer] -b [book]
-    conv_novel.pl -f [源文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
+    conv_novel.pl -f [txt_file] -T [type] -w [writer] -b [book]
+    conv_novel.pl -f [源文件] -T [目标文件类型(小写)] -w [作者] -b [书名]
 
-    conv_novel.pl -f 天平-风起阿房.html -t mobi
-    conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -t epub
+    conv_novel.pl -f 天平-风起阿房.html -T mobi
+    conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -T epub
 
 =head1 bulk_novel.pl
 
@@ -273,17 +279,17 @@ set dst type, 设置打包引擎
 
     $xs->set_packer('html');
 
-=head2 get_item 
+=head2 get_novel 
 
 download one novel/thread 下载整本小说
 
     $xs->set_parser('jjwxc');
     my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
-    $xs->get_item($index_url);
+    $xs->get_novel($index_url);
 
 
     $xs->set_parser('txt');
-    $xs->get_item([ '/somepath/somefile.txt' ]
+    $xs->get_novel([ '/somepath/somefile.txt' ]
             writer => '牵机', book => '断情逐妖记', 
             );
 
@@ -291,23 +297,65 @@ download one novel/thread 下载整本小说
 
 bulk download writer's novel 下载作者专栏
 
-    $xs->set_parser('jjwxc');
+    #!/usr/bin/perl   
+    use strict;
+    use warnings;
+    use utf8;
+
+    use Novel::Robot;
+    use Data::Dumper;
+    use Encode::Locale;
+    use Encode;
+
+    my $xs = Novel::Robot->new();
+
+    $xs->set_parser( 'jjwxc' );
+    $xs->set_packer( 'html' );
+
     my $writer_url = 'http://www.jjwxc.net/oneauthor.php?authorid=14644';
-    my ($writer_name, $books_ref) = $xs->{parser}->get_board_ref($writer_url, %opt);
-    $xs->get_item($_, %opt) for @$books_ref;
+    my $writer_ref = $xs->{parser}->get_iterate_ref(
+      $writer_url,
+        info_sub => sub {
+                $xs->{parser}->extract_elements(
+                      @_,
+                            sub => $xs->{parser}->can( "parse_board" ),
+                                );
+                  },
+                    item_list_sub => sub { $xs->{parser}->can( "parse_board_item" )->( $xs->{parser}, @_ ) },
+                    );
 
-bulk download board's threads 下载版块
+    print encode( locale => "$writer_ref->{writer},$_->{book},$_->{url}\n" ) for @{ $writer_ref->{item_list} };
 
-    $xs->set_parser('hjj');
-    my $board_url = "http://bbs.jjwxc.net/showmsg.php?board=153";
-    my ($info, $tiezis_ref) = $xs->{parser}->get_board_ref($board_url, %opt);
-    $xs->get_item($_, %opt) for @$tiezis_ref;
+    print "\nstart download\n";
+    $xs->get_novel( $_->{url} ) for @{ $writer_ref->{item_list} };
 
-query novels/threads 查询关键字并下载
+bulk download query novel 下载查询结果
 
-    my $query_type = '作者';
-    my $query_keyword='牵机';
-    my ($info, $items_ref) = $xs->{parser}->get_query_ref($query_keyword, query_type => $query_type, %opt);
-    $xs->get_item($_, %opt) for @$items_ref;
+    #!/usr/bin/perl   
+    use strict;
+    use warnings;
+    use utf8;
+
+    use Novel::Robot;
+    use Data::Dumper;
+    use Encode::Locale;
+    use Encode;
+
+    my $xs = Novel::Robot->new();
+
+    $xs->set_parser( 'jjwxc' );
+    $xs->set_packer( 'html' );
+
+    my $keyword = '断情逐妖记';
+    my $query_url = $xs->{parser}->make_query_request($keyword, query_type =>  '作品');
+    my $query_ref = $xs->{parser}->get_iterate_ref(
+      $query_url,
+        info_sub => sub { return {}; },
+          item_list_sub => sub { $xs->{parser}->can( "parse_query_item" )->( $xs->{parser}, @_ ) },
+          );
+    print encode( locale => "$_->{writer},$_->{book},$_->{url}\n" ) for @{ $query_ref->{item_list} };
+
+    print "\nonly download first\n";
+    $xs->get_novel( $_->{url} ) for @{ $query_ref->{item_list} }[0];
 
 =cut
