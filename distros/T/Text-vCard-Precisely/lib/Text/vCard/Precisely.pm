@@ -1,7 +1,6 @@
-# ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -31,8 +30,6 @@ __END__
 =head1 NAME
 
 Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisely
-
-=for html <a href="https://travis-ci.org/worthmine/Text-vCard-Precisely"><img src="https://travis-ci.org/worthmine/Text-vCard-Precisely.svg?branch=master"></a>
 
 =head1 SYNOPSIS
 
@@ -99,8 +96,9 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 
 =head1 DESCRIPTION
 
-A vCard is a digital business card. vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
-provide an API for parsing vCards
+A vCard is a digital business card.
+vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> provides an API for parsing vCards
+
 This module is forked from L<Text::vCard|https://github.com/ranguard/text-vcard>
 because some reason below:
 

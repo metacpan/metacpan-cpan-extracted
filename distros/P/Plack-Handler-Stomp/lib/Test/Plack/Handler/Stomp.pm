@@ -1,5 +1,5 @@
 package Test::Plack::Handler::Stomp;
-$Test::Plack::Handler::Stomp::VERSION = '1.14';
+$Test::Plack::Handler::Stomp::VERSION = '1.15';
 {
   $Test::Plack::Handler::Stomp::DIST = 'Plack-Handler-Stomp';
 }
@@ -169,6 +169,10 @@ sub setup_handler {
 }
 
 
+sub trace {
+    my ($self,@msg) = @_;
+    $self->add_log_message(['trace',@msg]);
+}
 sub debug {
     my ($self,@msg) = @_;
     $self->add_log_message(['debug',@msg]);
@@ -216,7 +220,7 @@ Test::Plack::Handler::Stomp - testing library for Plack::Handler::Stomp
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -447,6 +451,8 @@ logging, passing L</handler_args>, and setting a C<connection_builder>
 that returns a L<Test::Plack::Handler::Stomp::FakeStomp> with all the
 callbacks set to accumulate calls in this object.
 
+=head2 C<trace>
+
 =head2 C<debug>
 
 =head2 C<info>
@@ -472,7 +478,7 @@ Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Net-a-porter.com.
+This software is copyright (c) 2020 by Net-a-porter.com.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

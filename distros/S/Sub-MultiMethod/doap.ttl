@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -134,6 +134,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.007"^^xsd:string;
+	dc:issued            "2020-02-07"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor fixes for roles documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Refactor to expose more internals as part of the API.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add a warning if a conflict is detected in number of invocants for a multimethod.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -55,7 +55,7 @@
    "provides" : {
       "Sub::MultiMethod" : {
          "file" : "lib/Sub/MultiMethod.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -74,6 +74,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project"
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

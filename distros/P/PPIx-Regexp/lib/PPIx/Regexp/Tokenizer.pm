@@ -49,7 +49,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ is_ppi_regexp_element __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF

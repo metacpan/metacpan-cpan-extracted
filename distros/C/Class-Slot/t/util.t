@@ -1,3 +1,5 @@
+BEGIN{ $ENV{CLASS_SLOT_NO_XS} = 1 };
+
 package Point;
 use Class::Slot;
 slot 'x', rw => 1;
@@ -9,7 +11,7 @@ package main;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Class::Slot;
 
 subtest 'quote_identifier' => sub{

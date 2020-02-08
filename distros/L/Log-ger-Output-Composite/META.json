@@ -42,7 +42,7 @@
             "IPC::Open3" : "0",
             "Log::ger" : "0.027",
             "Log::ger::Layout" : "0",
-            "Log::ger::Layout::Pattern" : "0",
+            "Log::ger::Layout::Pattern" : "0.002",
             "Log::ger::Output" : "0.007",
             "Log::ger::Output::String" : "0",
             "Test::More" : "0.98"
@@ -61,10 +61,10 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Output-Composite"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028002"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -149,6 +149,11 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.012"
@@ -156,7 +161,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.597"
+            "version" : "0.599"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -197,7 +202,7 @@
                   ]
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -207,7 +212,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -242,7 +247,7 @@
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
             "name" : "@Author::PERLANCAR/OurPkgVersion",
-            "version" : "0.15"
+            "version" : "0.21"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -352,7 +357,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -393,9 +398,16 @@
             "version" : "2.058"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -520,8 +532,8 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_generated_by_perl" : "v5.28.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_static_install" : 1
 }
 

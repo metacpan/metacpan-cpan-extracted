@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 
 has issue_number => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::PublicationIssue - A part of a successively published publi
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
 
 =head1 DESCRIPTION
 

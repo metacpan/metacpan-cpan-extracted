@@ -1,7 +1,9 @@
 package Regexp::Pattern;
 
-our $DATE = '2020-01-03'; # DATE
-our $VERSION = '0.2.11'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-08'; # DATE
+our $DIST = 'Regexp-Pattern'; # DIST
+our $VERSION = '0.2.13'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -49,13 +51,13 @@ sub import {
     while (@args) {
         my $arg = shift @args;
         my ($mod, $name0, $as, $prefix, $suffix,
-            $has_tag, $lacks_tag, $gen_args);
+            $has_tag, $lacks_tag, $has_tag_matching, $lacks_tag_matching, $gen_args);
         if ($arg eq 're') {
             *{"$caller\::re"} = \&re;
             next;
         } elsif ($arg =~ /\A(\w+(?:::\w+)*)::(\w+|\*)\z/) {
             ($mod, $name0) = ($1, $2);
-            ($as, $prefix, $suffix, $has_tag, $lacks_tag) =
+            ($as, $prefix, $suffix, $has_tag, $lacks_tag, $has_tag_matching, $lacks_tag_matching) =
                 (undef, undef, undef, undef, undef);
             $gen_args = {};
             while (@args >= 2 && $args[0] =~ /\A-?\w+\z/) {
@@ -74,6 +76,10 @@ sub import {
                     $has_tag = $v;
                 } elsif ($k eq '-lacks_tag') {
                     $lacks_tag = $v;
+                } elsif ($k eq '-has_tag_matching') {
+                    $has_tag_matching = ref $v eq 'Regexp' ? $v : qr/$v/;
+                } elsif ($k eq '-lacks_tag_matching') {
+                    $lacks_tag_matching = ref $v eq 'Regexp' ? $v : qr/$v/;
                 } elsif ($k !~ /\A-/) {
                     $gen_args->{$k} = $v;
                 } else {
@@ -101,6 +107,12 @@ sub import {
                 }
                 if (defined $lacks_tag) {
                     next if grep { $_ eq $lacks_tag } @$tags;
+                }
+                if (defined $has_tag_matching) {
+                    next unless grep { $_ =~ $has_tag_matching } @$tags;
+                }
+                if (defined $lacks_tag_matching) {
+                    next if grep { $_ =~ $lacks_tag_matching } @$tags;
                 }
                 push @names, $n;
             }
@@ -141,7 +153,7 @@ Regexp::Pattern - Convention/framework for modules that contain collection of re
 
 =head1 VERSION
 
-This document describes version 0.2.11 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-01-03.
+This document describes version 0.2.13 of Regexp::Pattern (from Perl distribution Regexp-Pattern), released on 2020-02-08.
 
 =head1 SYNOPSIS
 
@@ -171,9 +183,15 @@ that is only 1-level deep):
      'Example::re3' => (variant => 'B'),  # supply generator arguments
      'JSON::*' => (-prefix => 'json_'),   # add prefix
      'License::*' => (
-       -has_tag    => 'family:cc',        # select by tag
-       -lacks_tag  => 'type:unversioned', #   also select by lack of tag
-       -suffix     => '_license',         #   also add suffix
+       # filtering options
+       -has_tag    => 'family:cc',        # only select patterns that have this tag
+       -lacks_tag  => 'type:unversioned', # only select patterns that do not have this tag
+       -has_tag_matching   => qr/^type:/, # only select patterns that have at least a tag matching this regex
+       -lacks_tag_matching => qr/^type:/, # only select patterns that do not have any tags matching this regex
+
+       # other options
+       -prefix  => 'pat_',       # add prefix
+       -suffix  => '_license',   # add suffix
      ),
  );
 
@@ -399,21 +417,28 @@ name:
 B<Filtering.> When wildcard-importing, you can select the patterns you want
 using a combination of these options: C<-has_tag> (only select patterns that
 have a specified tag), C<-lacks_tag> (only select patterns that do not have a
-specified tag).
+specified tag), C<-has_tag_matching> (only select patterns that have at least
+one tag matching specified regex pattern), C<-lacks_tag_matching> (only select
+patterns that do not have any tags matching specified regex pattern).
 
 =head2 Recommendations for writing the regex patterns
 
 =over
 
-=item * Regexp pattern should be written as a C<qr//> literal
+=item * Regexp pattern should in general be written as a C<qr//> literal instead of string
 
-Using a string literal is less desirable. That is:
+That is:
 
  pat => qr/foo[abc]+/,
 
 is preferred over:
 
  pat => 'foo[abc]+',
+
+Using a string literal is less desirable because of lack of compile-time
+checking. An exception to this rule is when you want to delay regex compilation
+for some reason, e.g. you want your user to compile the patterns themselves
+using different regex engine (see C<re::engine::*> modules on CPAN).
 
 =item * Regexp pattern should not be anchored (unless really necessary)
 

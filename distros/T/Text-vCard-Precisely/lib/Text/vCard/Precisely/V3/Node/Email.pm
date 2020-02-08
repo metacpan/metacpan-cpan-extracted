@@ -11,6 +11,8 @@ extends 'Text::vCard::Precisely::V3::Node';
 has name => (is => 'ro', default => 'EMAIL', isa => 'Str' );
 has content => (is => 'ro', default => '', isa => EmailAddress );
 
+has preferred => (is => 'rw', default => 0, isa => 'Bool' );
+
 subtype 'EmailType'
     => as 'Str'
     => where {
@@ -25,12 +27,19 @@ has types => ( is => 'rw', isa => 'ArrayRef[EmailType]', default => sub{[]} );
 override 'as_string' => sub {
     my ($self) = @_;
     my @lines;
-    push @lines, $self->name || croak "Empty name";
-    push @lines, 'ALTID=' . $self->altID if $self->can('altID') and $self->altID;
-    push @lines, 'PID=' . join ',', @{ $self->pid } if $self->can('pid') and $self->pid;
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types } ) if @{ $self->types || [] } > 0;
+    push @lines, $self->name() || croak "Empty name";
+    push @lines, 'ALTID=' . $self->altID() if $self->can('altID') and $self->altID();
+    push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->can('pid') and $self->pid();
 
-    my $string = join(';', @lines ) . ':' . $self->content;
+    push my @types, grep{ length $_ } map{ uc $_ if defined $_ } @{$self->types()};
+    push @types, 'PREF' if $self->preferred();
+    my $types = 'TYPE="' . join( ',', @types ) . '"' if @types;
+    push @lines, $types if $types;
+
+
+    #push @lines, 'TYPE=' . join( ';TYPE=', map { uc $_ } @{ $self->types } ) if @{ $self->types || [] } > 0;
+
+    my $string = join(';', @lines ) . ':' . $self->content();
     return $self->fold( $string, -force => 1 );
 };
 

@@ -41,7 +41,6 @@ subtype 'MediaType'
     => message { "The MediaType you provided, $_, was not supported" };
 has media_type => ( is => 'rw', isa => 'MediaType' );
 
-
 sub as_string {
     my ($self) = @_;
     my @lines;

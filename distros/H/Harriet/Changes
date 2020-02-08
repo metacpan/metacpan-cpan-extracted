@@ -1,5 +1,10 @@
 Revision history for Perl extension Harriet
 
+0.06 2020-02-07T12:56:43Z
+
+    - specify to relative of dir path in default and document
+      (mackee)
+
 00.05 2016-01-08T06:42:16Z
 
     commit b56340eefcae9c44eed6739f542211244ea9a974

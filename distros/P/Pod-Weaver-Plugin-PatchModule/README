@@ -1,28 +1,60 @@
-SYNOPSIS
+NAME
+    Pod::Weaver::Plugin::PatchModule - Plugin to use when building patch
+    modules
 
+VERSION
+    This document describes version 0.002 of
+    Pod::Weaver::Plugin::PatchModule (from Perl distribution
+    Pod-Weaver-Plugin-PatchModule), released on 2019-12-09.
+
+SYNOPSIS
     In weaver.ini:
 
      [-PatchModule]
 
 DESCRIPTION
-
     This plugin is used when building patch modules (modules that use
     Module::Patch to bundle a set of monkey patches, for example
-    File::Which::Patch::Hide or perl-LWP-UserAgent-Patch-FilterMirror). It
+    File::Which::Patch::Hide or LWP::UserAgent::Patch::FilterMirror). It
     currently does the following:
 
-      * Create "PATCH CONTENTS" from information given by patch_data
+    *   Create "PATCH CONTENTS" section from information given by
+        "patch_data"
 
-      * Create "PATCH CONFIGURATION" from list of configuration given by
-      patch_data
+    *   Create "PATCH CONFIGURATION" section from list of configuration
+        given by "patch_data"
 
-      * Mention some modules in See Also section
+    *   Mention some modules in SEE ALSO section
 
-      e.g. Module::Patch> (the convention/standard), the target module.
+        e.g. Module::Patch (the base module), the target module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-PatchModule>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-PatchModule>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Pat
+    chModule>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Module::Patch
 
     Dist::Zilla::Plugin::PatchModule
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

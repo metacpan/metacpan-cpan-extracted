@@ -2,6 +2,7 @@ Build.PL
 Changes
 cpanfile
 lib/Duadua.pm
+lib/Duadua/CLI.pm
 lib/Duadua/Parser.pm
 lib/Duadua/Parser/Bot/AdIdxBot.pm
 lib/Duadua/Parser/Bot/Applebot.pm
@@ -27,6 +28,7 @@ lib/Duadua/Parser/Bot/Msnbot.pm
 lib/Duadua/Parser/Bot/Netcraft.pm
 lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
 lib/Duadua/Parser/Bot/Slackbot.pm
+lib/Duadua/Parser/Bot/SMTBot.pm
 lib/Duadua/Parser/Bot/Twitterbot.pm
 lib/Duadua/Parser/Bot/YahooJapanBot.pm
 lib/Duadua/Parser/Bot/YahooSlurp.pm
@@ -51,11 +53,13 @@ Makefile.PL
 MANIFEST			This list of files
 META.json
 README.pod
+script/duadua
 t/00_compile.t
 t/100_testset.t
 t/10_basic.t
 t/15_reparse.t
 t/20_util.t
+t/50_cli.t
 t/testset/bot/adidxbot.yaml
 t/testset/bot/applebot.yaml
 t/testset/bot/baiduspider.yaml
@@ -81,6 +85,7 @@ t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml
 t/testset/bot/oracle_grapeshotcrawler.yaml
 t/testset/bot/slackbot.yaml
+t/testset/bot/smtbot.yaml
 t/testset/bot/twitterbot.yaml
 t/testset/bot/yahoo_japan_bot.yaml
 t/testset/bot/yahoo_slurp.yaml

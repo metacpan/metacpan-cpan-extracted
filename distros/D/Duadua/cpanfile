@@ -5,12 +5,19 @@ requires 'strict';
 requires 'warnings';
 requires 'Module::Pluggable::Object';
 
+# for CLI
+requires 'Pod::Usage';
+requires 'Getopt::Long';
+requires 'JSON';
+
 on 'test' => sub {
     requires 'File::Basename';
     requires 'YAML', '1.15';
     requires 'List::Util';
     requires 'Test::More', '1.3';
     requires 'Test::AllModules', '0.17';
+    # for CLI
+    requires 'Capture::Tiny';
 };
 
 on 'configure' => sub {

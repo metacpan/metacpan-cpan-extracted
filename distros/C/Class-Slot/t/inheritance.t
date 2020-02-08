@@ -1,3 +1,5 @@
+BEGIN{ $ENV{CLASS_SLOT_NO_XS} = 1 };
+
 package P1;
 use Class::Slot;
 use Types::Standard -types;
@@ -23,14 +25,12 @@ slot z => sub{1} & StrMatch[qr/[13579]$/], rw => 1; # ensure non-inlined types w
 
 
 package main;
-use strict;
-use warnings;
+use Test2::V0;
 no warnings 'once';
-use Test::More;
 
-is_deeply \@P1::SLOTS, [qw(x y)],   'P1 @SLOTS';
-is_deeply \@P2::SLOTS, [qw(x y z)], 'P2 @SLOTS';
-is_deeply \@P3::SLOTS, [qw(x y z)], 'P3 @SLOTS';
+is \@P1::SLOTS, [qw(x y)],   'P1 @SLOTS';
+is \@P2::SLOTS, [qw(x y z)], 'P2 @SLOTS';
+is \@P3::SLOTS, [qw(x y z)], 'P3 @SLOTS';
 
 ok my $p2 = P2->new(x => 10, y => 20, z => 30), 'ctor';
 is $p2->x, 10, 'get slot: x';
@@ -44,7 +44,7 @@ ok do{ local $@; eval{ P2->new(x => 'foo', y => 20, z => 30) }; $@ }, 'ctor: die
 ok(do{ local $@; eval{ P3->new(x => 10, y => 20, z => 30) }; $@ }, 'ctor: dies on stricter child type');
 
 ok(P3->new(x => 'a7', y => '39', z => '0x35'), 'ctor: ok on less strict child type');
-ok(do{ local $@; eval{ P3->new(y => '39', z => '0x35') }; $@ }, 'ctor: dies on stricter child req');
-ok(do{ my $p = P3->new(x => 'a7', y => '39', z => '0x35'); local $@; eval{ $p->x(45) }; $@ }, 'setter: dies on stricter child rw');
+ok(dies{ P3->new(y => '39', z => '0x35') }, 'ctor: dies on stricter child req');
+ok(dies{ my $p = P3->new(x => 'a7', y => '39', z => '0x35'); $p->x(45) }, 'setter: dies on stricter child rw');
 
 done_testing;

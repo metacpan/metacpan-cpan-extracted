@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl on a Stick",
+   "author" : [
+      "KMX"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Portable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Inspector" : "1.22",
+            "ExtUtils::MakeMaker" : "6.59",
+            "LWP::Online" : "1.07",
+            "Test::Exception" : "0.27",
+            "Test::More" : "0.42",
+            "Test::NoWarnings" : "0.084"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Mini" : "0.575",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/StrawberryPerl/Portable/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/StrawberryPerl/Portable"
+      }
+   },
+   "version" : "1.23",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

@@ -1,3 +1,16 @@
+0.08 2020-02-07
+-new feature: method delegation to slot types
+-bugfix: classes with no members were never initialized
+
+0.07 2020-02-07
+-new feature: slot errors retain line number where slot was defined
+-migrate tests to Test2
+-bugfix: XS code-ref type checks are no longer failing
+-bugfix: CLASS_SLOT_NO_XS not longer thinks that it is opposite day
+
+0.07    2018-12-12
+-bugfix: missing test dep
+
 0.06    2018-12-07
 -bugfix: do not call SUPER::new if no parent class can('new')
 

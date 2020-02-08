@@ -4,7 +4,10 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v6.0.0
+version v6.0.1
+
+The version number of this distribution is based on the corresponding
+version of schema classes.
 
 # SYNOPSIS
 
@@ -21,6 +24,10 @@ print $person->json_ld;
 ```
 
 # DESCRIPTION
+
+This distribution contains Perl classes for [https://schema.org](https://schema.org)
+semantic markup. These can be used to generate JSON-LD
+to embed in websites.
 
 This is a base class for the `SemanticWeb::Schema` classes, which
 were generated automatically from the following sources:

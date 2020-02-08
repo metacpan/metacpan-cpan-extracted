@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.12",
     "Data::Dmp" => "0.21",
+    "Data::Dump" => 0,
     "Module::Patch" => "0.270",
     "base" => 0,
     "strict" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.12",
   "Data::Dmp" => "0.21",
+  "Data::Dump" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

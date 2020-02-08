@@ -40,6 +40,7 @@
       },
       "x_mentions" : {
          "x_mentions" : {
+            "Carp::Patch::Config" : "0",
             "DBIx::Conn::MySQL" : "0",
             "DBIx::Conn::SQLite" : "0",
             "DD::Dummy" : "0",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-OneLinerTools"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

@@ -4,7 +4,7 @@
       "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,7 @@
       "runtime" : {
          "requires" : {
             "File::ChangeNotify" : "0",
+            "Log::Any" : "0",
             "Moose" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::Types" : "0",
@@ -51,7 +52,6 @@
             "Net::Stomp::MooseHelpers::ReconnectOnFailure" : "0",
             "Net::Stomp::MooseHelpers::TraceOnly" : "0",
             "Net::Stomp::MooseHelpers::Types" : "0",
-            "Net::Stomp::StupidLogger" : "0",
             "Path::Class" : "0",
             "Plack::Util" : "0",
             "Sub::Exporter" : "0",
@@ -87,11 +87,12 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/dakkar/Plack-Handler-Stomp.git",
+         "url" : "git://github.com/dakkar/Plack-Handler-Stomp",
          "web" : "https://github.com/dakkar/Plack-Handler-Stomp"
       }
    },
-   "version" : "1.14",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "version" : "1.15",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

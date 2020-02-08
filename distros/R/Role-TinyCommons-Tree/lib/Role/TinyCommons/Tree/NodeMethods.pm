@@ -1,7 +1,7 @@
 package Role::TinyCommons::Tree::NodeMethods;
 
-our $DATE = '2020-02-06'; # DATE
-our $VERSION = '0.120'; # VERSION
+our $DATE = '2020-02-07'; # DATE
+our $VERSION = '0.121'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -31,7 +31,7 @@ Role::TinyCommons::Tree::NodeMethods - Role that provides tree node methods
 
 =head1 VERSION
 
-This document describes version 0.120 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
+This document describes version 0.121 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
 
 =head1 DESCRIPTION
 
@@ -41,67 +41,94 @@ L<Role::TinyCommons::Tree::Node>
 
 =head1 PROVIDED METHODS
 
-=head2 descendants => list
+=head2 ancestors
 
-Return children and their children, recursively. See also: C<ancestors>.
+Return a list of ancestors, from the direct parent upwards to the root.
 
-=head2 ancestors => list
+=head2 check
 
-Return parent and parent's parent, recursively. See also: C<descendants>.
+Usage:
 
-=head2 walk($code)
+ $node->check(\%opts)
 
-=head2 first_node($code) => obj|undef
+Check references in a tree: that all children refers back to the parent.
+Options:
 
-=head2 is_first_child => bool
+=over
 
-Return true if node is the first child of its parent.
+=item * recurse => bool
 
-=head2 is_last_child => bool
+=item * check_root => bool
 
-Return true if node is the last child of its parent.
+If set to true, will also check that parent is undef (meaning this node is a
+root node).
 
-=head2 is_only_child => bool
+=back
 
-Return true if node is the only child of its parent.
+=head2 descendants
 
-=head2 is_nth_child($n) => bool
+Return a list of descendents, from the direct children, to their children's
+children, and so on until all the leaf nodes.
 
-Return true if node is the I<n>th child of its parent (starts from 1 not 0, so
-C<is_first_child> is equivalent to C<is_nth_child(1)>).
+=head2 first_node
 
-=head2 is_nth_last_child($n) => bool
+Usage:
 
-Return true if node is the I<n>th last child of its parent.
+ $node->first_node($coderef)
 
-=head2 is_first_child_of_type => bool
+Much like L<List::Util>'s C<first>. Will L</walk> the descendant nodes until the
+first coderef returns true, and return that.
 
-Return true if node is the first child (of its type) of its parent. For example,
-if the parent's children are ():
+=head2 is_first_child
 
- node1(T1) node2(T2) node3(T1) node4(T2)
+=head2 is_first_child_of_type
 
-Both C<node1> and C<node2> are first children of their respective type.
+=head2 is_last_child
 
-=head2 is_last_child_of_type => bool
+=head2 is_last_child_of_type
 
-=head2 is_only_child_of_type => bool
+=head2 is_nth_child
 
-=head2 is_nth_child_of_type($n) => bool
+=head2 is_nth_child_of_type
 
-=head2 is_nth_last_child_of_type($n) => bool
+=head2 is_nth_last_child
 
-=head2 prev_sibling => obj
+=head2 is_nth_last_child_of_type
 
-=head2 prev_siblings => list
+=head2 is_only_child
 
-=head2 next_sibling => obj
+=head2 is_only_child_of_type
 
-=head2 next_siblings => list
+=head2 next_sibling
+
+Return the sibling node directly after this node.
+
+=head2 next_siblings
+
+Return all the next siblings of this node, from the one directly after to the
+last.
+
+=head2 prev_sibling
+
+Return the sibling node directly before this node.
+
+=head2 prev_siblings
+
+Return all the previous siblings of this node, from the first to the one
+directly before.
 
 =head2 remove
 
-Remove node from its parent.
+Detach this node from its parent. Also set the parent of this node to undef.
+
+=head2 walk
+
+Usage:
+
+ $node->walk($coderef);
+
+Call C<$coderef> for all descendants (this means the self node is not included).
+$coderef will be passed the node.
 
 =head1 HOMEPAGE
 

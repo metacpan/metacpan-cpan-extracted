@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::InsertBlock;
 
-our $DATE = '2016-09-12'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2020-02-07'; # DATE
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -82,7 +82,7 @@ Dist::Zilla::Plugin::InsertBlock - Insert a block of text from another file
 
 =head1 VERSION
 
-This document describes version 0.09 of Dist::Zilla::Plugin::InsertBlock (from Perl distribution Dist-Zilla-Plugin-InsertBlock), released on 2016-09-12.
+This document describes version 0.100 of Dist::Zilla::Plugin::InsertBlock (from Perl distribution Dist-Zilla-Plugin-InsertBlock), released on 2020-02-07.
 
 =head1 SYNOPSIS
 
@@ -209,7 +209,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.04';
+	our $VERSION = '0.05';
 }
 
 # file-scoped lexicals
@@ -1743,7 +1743,7 @@ Pete Houston <cpan@openstrike.co.uk>
 
 =head1 Licence
 
-This software is copyright © 2013-2019 by Pete Houston. It is released
+This software is copyright © 2013-2020 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the
 GNU General Public Licence (version 2).
 

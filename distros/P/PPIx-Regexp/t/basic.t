@@ -336,11 +336,6 @@ class_isa_ok( 'PPIx::Regexp::Tokenizer', 'PPIx::Regexp::Support' );
 isa_ok( PPIx::Regexp::Tokenizer->new( 'xyzzy' ),
     'PPIx::Regexp::Tokenizer' );
 
-require_ok( 'PPIx::Regexp::StringTokenizer' );
-class_isa_ok( 'PPIx::Regexp::StringTokenizer', 'PPIx::Regexp::Tokenizer' );
-isa_ok( PPIx::Regexp::StringTokenizer->new( 'xyzzy' ),
-    'PPIx::Regexp::StringTokenizer' );
-
 done_testing;
 
 sub class_isa_ok {

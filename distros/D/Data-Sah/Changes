@@ -1,3 +1,8 @@
+0.904   2020-02-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Update test (new coerce rule module).
+
+
 0.903   2019-11-29  Released-By: PERLANCAR; Urgency: high
 
         - Merge two releases 0.902 and 0.902.1.

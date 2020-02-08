@@ -15,7 +15,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Class::XSAccessor 1.18
@@ -48,7 +48,10 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
+
+The version number of this distribution is based on the corresponding
+version of schema classes.
 
 =head1 SYNOPSIS
 
@@ -63,6 +66,10 @@ version v6.0.0
   print $person->json_ld;
 
 =head1 DESCRIPTION
+
+This distribution contains Perl classes for L<https://schema.org>
+semantic markup. These can be used to generate JSON-LD
+to embed in websites.
 
 This is a base class for the C<SemanticWeb::Schema> classes, which
 were generated automatically from the following sources:

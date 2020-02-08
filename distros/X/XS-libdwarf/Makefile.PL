@@ -18,7 +18,6 @@ die "FATAL: can't configure\n" if $result != 0;
 
 my %params = (
     NAME   => 'XS::libdwarf',
-    LDFROM => '-Wl,--whole-archive $(OBJECT) -Wl,--no-whole-archive',
     CLIB   => [{
         DIR       => "$bdir/libdwarf/",
         FILE      => 'libdwarf.a',

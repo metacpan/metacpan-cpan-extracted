@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.007	2020-02-07
+
+ [ Documentation ]
+ - Minor fixes for roles documentation.
+
+ [ Other ]
+ - Added: Add a warning if a conflict is detected in number of invocants
+   for a multimethod.
+ - Refactor to expose more internals as part of the API.
+
 0.006	2020-02-06
 
  [ Packaging ]

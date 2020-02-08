@@ -1,36 +1,36 @@
 ---
 abstract: 'Modify a Perl distribution to make it portable'
 author:
-  - 'Adam Kennedy <adamk@cpan.org>'
+  - KMX
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  File::Copy::Recursive: 0.35
-  File::Remove: 1.42
-  Test::More: 0.47
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Portable::Dist
+  version: '1.4'
 name: Portable-Dist
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  File::Find::Rule: 0.30
-  File::IgnoreReadonly: 0.01
-  File::Slurp: 9999.13
-  File::Spec: 3.2701
-  Object::Tiny: 1.04
-  Params::Util: 0.31
-  Win32::File::Object: 0.01
-  perl: 5.8.0
+  File::Copy::Recursive: '0.35'
+  File::Find::Rule: '0.30'
+  File::IgnoreReadonly: '0.01'
+  File::Remove: '1.42'
+  File::Slurper: '0.008'
+  File::Spec: '3.47'
+  File::chmod: '0.32'
+  Object::Tiny: '1.04'
+  Params::Util: '0.31'
+  Test::More: '0.47'
+  perl: '5.008'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 1.06
+  bugtracker: https://github.com/StrawberryPerl/Portable-Dist/issues
+  repository: https://github.com/StrawberryPerl/Portable-Dist
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

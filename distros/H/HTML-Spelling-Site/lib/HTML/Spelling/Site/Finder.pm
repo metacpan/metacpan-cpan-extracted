@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.4.2';
+$HTML::Spelling::Site::Finder::VERSION = '0.4.3';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ a directory tree.
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 SYNOPSIS
 
@@ -119,27 +119,11 @@ L<https://metacpan.org/release/HTML-Spelling-Site>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Spelling-Site>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Spelling-Site>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Spelling-Site>
 
 =item *
 

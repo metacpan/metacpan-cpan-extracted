@@ -22,16 +22,16 @@ name: HTML-Spelling-Site
 provides:
   HTML::Spelling::Site:
     file: lib/HTML/Spelling/Site.pm
-    version: v0.4.2
+    version: v0.4.3
   HTML::Spelling::Site::Checker:
     file: lib/HTML/Spelling/Site/Checker.pm
-    version: v0.4.2
+    version: v0.4.3
   HTML::Spelling::Site::Finder:
     file: lib/HTML/Spelling/Site/Finder.pm
-    version: v0.4.2
+    version: v0.4.3
   HTML::Spelling::Site::Whitelist:
     file: lib/HTML/Spelling/Site/Whitelist.pm
-    version: v0.4.2
+    version: v0.4.3
 requires:
   File::Find::Object: '0'
   HTML::Parser: '3.00'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://github.com/shlomif/html-spelling-site/issues
   homepage: http://metacpan.org/release/HTML-Spelling-Site
   repository: https://github.com/shlomif/HTML-Spelling-Site.git
-version: 0.4.2
+version: 0.4.3
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -324,7 +324,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.012'
+              version: '1.013'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

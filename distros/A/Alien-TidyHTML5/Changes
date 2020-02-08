@@ -1,5 +1,11 @@
 Revision history for Alien-TidyHTML5
 
+v0.3.1    2020-02-08 16:19:33+00:00 Europe/London
+  [Other]
+  - Added Alien::cmake3 as a requirement.
+
+  - Updated MANIFEST.SKIP.
+
 v0.3.0    2018-10-29 21:24:29+00:00 Europe/London
   [Enhancements]
   - Improved the alienfile configuration, to fix #1 (Graham Ollis).

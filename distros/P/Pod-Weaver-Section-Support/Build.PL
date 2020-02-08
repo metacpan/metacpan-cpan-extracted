@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Pod-Weaver-Section-Support",
-  "dist_version" => "1.012",
+  "dist_version" => "1.013",
   "license" => "perl",
   "module_name" => "Pod::Weaver::Section::Support",
   "recursive_test_files" => 1,

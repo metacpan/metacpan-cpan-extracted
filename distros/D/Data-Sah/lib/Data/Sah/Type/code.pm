@@ -1,7 +1,7 @@
 package Data::Sah::Type::code;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.903'; # VERSION
+our $DATE = '2020-02-07'; # DATE
+our $VERSION = '0.904'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -23,7 +23,7 @@ Data::Sah::Type::code - code type
 
 =head1 VERSION
 
-This document describes version 0.903 of Data::Sah::Type::code (from Perl distribution Data-Sah), released on 2019-11-29.
+This document describes version 0.904 of Data::Sah::Type::code (from Perl distribution Data-Sah), released on 2020-02-07.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 
@@ -49,7 +49,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

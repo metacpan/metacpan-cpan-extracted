@@ -60,7 +60,7 @@
    "provides" : {
       "Pod::Weaver::Section::Support" : {
          "file" : "lib/Pod/Weaver/Section/Support.pm",
-         "version" : "1.012"
+         "version" : "1.013"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/shlomif/perl-pod-weaver-section-support"
       }
    },
-   "version" : "1.012",
+   "version" : "1.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -396,7 +396,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "Support",
-                        "version" : "1.011"
+                        "version" : "1.012"
                      }
                   ]
                }

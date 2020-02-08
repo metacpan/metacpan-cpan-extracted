@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Mail-Message>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Mail-Message/>
-    and <https://metacpan.org/release/Mail-Message>
+  * Indexed from CPAN: <https://metacpan.org/release/Mail-Message>
 
 Until release 3.0, this module was an integral part of the Mail-Box
 distribution.  Now it can be used stand-alone.

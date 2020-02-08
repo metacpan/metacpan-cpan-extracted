@@ -1,7 +1,7 @@
 
-Net::EPP::Registry::Nominet version 0.04
+Net::EPP::Registry::Nominet version 0.05
 
-Released: 30th July 2019
+Released: 7th February 2020
 
 
 INSTALLATION
@@ -43,21 +43,7 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Deploy and document "disclose" fields for contacts
-Remove all opt-out references from the code and tests
-Allow selection of OT&E endpoint.
-Return DS records in secDNS element from domain_info (RT 129917)
-Test against OT&E instead of testbed
-Allow check_* to return scalars on demand
-Explicitly disable ssl verification if verify param not set.
-Add disclosure of owner/address info.
-Add get_debug and set_debug as methods.
-Add support for listing tags.
-Fix/skip tests which fail due to testbed server problems.
-Some more argument checks.
-Minor documentation fixes.
-Excise obsolete code.
-Move repo to gitlab.
+Test suite updated for OT&E changes on 2019-10-09
 
 See the Changes file for a complete history.
 
@@ -78,7 +64,7 @@ to read it. Alternatively, you can view the man page with
 COPYRIGHT
 ---------
 
-This software is copyright (c) 2013-2019 by Pete Houston. It is released
+This software is copyright (c) 2013-2020 by Pete Houston. It is released
 under the Artistic Licence (version 2) and the GNU General Public Licence
 (version 2).
 

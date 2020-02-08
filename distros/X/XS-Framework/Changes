@@ -1,3 +1,7 @@
+1.2.6  07.02.2020
+           - fix compilation on mingw/windows: some errc::xxxx constants does not exists on mingw, it is not exported by XS::STL::ErrorCode neither
+           - add link to XS::Manifesto
+           - change error thread_local stashes
 1.2.5  31.01.2020
            - moved to XS::libpanda
 1.2.4  24.01.2020

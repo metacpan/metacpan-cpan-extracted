@@ -579,7 +579,7 @@ sub calculations {
   # Need to set the timezone in order for x-axis labels to be 
   # formatted correctly by strftime:
   $ENV{'TZ'} = $self->{config}->{timescale_time_zone};
-  POSIX::tzset() if ($] lt '5008009');
+  POSIX::tzset() if ($] lt '5.008009');
 
   # run through the data and calculate maximum and minimum values
   my ($max_key_size,$max_time,$min_time,$max_value,$min_value,$max_x_label_length,$x_label);

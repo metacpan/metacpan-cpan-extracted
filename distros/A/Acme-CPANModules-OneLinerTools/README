@@ -3,9 +3,9 @@ NAME
     writing perl one-liners
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::OneLinerTools (from Perl distribution
-    Acme-CPANModules-OneLinerTools), released on 2020-02-06.
+    Acme-CPANModules-OneLinerTools), released on 2020-02-07.
 
 DESCRIPTION
     Modules to make your life easier when writing perl one-liners.
@@ -73,6 +73,13 @@ INCLUDED MODULES
 
          % perl -d:Confess ...
          % perl -d:Confess=dump ...
+
+    *   Carp::Patch::Config
+
+        Carp is used as a stack trace printer (also indirectly if you use
+        Devel::Confess). Sometimes you want to customize some Carp
+        parameters like $Carp::MaxArgNums and $Carp::MaxArgLen from the
+        command-line, and this is where this module helps.
 
     *   DBIx::Conn::MySQL
 

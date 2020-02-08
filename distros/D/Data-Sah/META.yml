@@ -48,7 +48,7 @@ requires:
   Lingua::EN::Numbers::Ordinate: '1.02'
   Log::ger: '0.027'
   Mo: '0'
-  Module::Installed::Tiny: '0'
+  Module::Installed::Tiny: '0.004'
   POSIX: '0'
   Regexp::Stringify: '0'
   Role::Tiny: '0'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.903'
+version: '0.904'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -191,7 +191,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -345,7 +345,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

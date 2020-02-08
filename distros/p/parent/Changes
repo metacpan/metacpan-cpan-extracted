@@ -1,3 +1,7 @@
+0.238 2020-02-07
+    . Move the prerequisite Test::More from being a runtime prerequisite
+      to a test time / build time prerequisite (PR #11, by Haarg)
+
 0.237 2018-07-06
     . Don't load vars.pm
       This drops compatibility with Perl versions before Perl 5.006.

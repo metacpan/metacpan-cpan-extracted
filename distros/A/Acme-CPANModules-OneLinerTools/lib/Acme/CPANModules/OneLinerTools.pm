@@ -1,9 +1,9 @@
 package Acme::CPANModules::OneLinerTools;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-02-07'; # DATE
 our $DIST = 'Acme-CPANModules-OneLinerTools'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => 'Modules to make your life easier when writing perl one-liners',
@@ -108,6 +108,19 @@ _
         },
 
         {
+            module => 'Carp::Patch::Config',
+            description => <<'_',
+
+<pm:Carp> is used as a stack trace printer (also indirectly if you use
+<pm:Devel::Confess>). Sometimes you want to customize some Carp parameters like
+$Carp::MaxArgNums and $Carp::MaxArgLen from the command-line, and this is where
+this module helps.
+
+_
+            tags => ['debugging'],
+        },
+
+        {
             module => 'DBIx::Conn::MySQL',
             description => <<'_',
 
@@ -157,7 +170,7 @@ Acme::CPANModules::OneLinerTools - Modules to make your life easier when writing
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2020-02-06.
+This document describes version 0.002 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2020-02-07.
 
 =head1 DESCRIPTION
 
@@ -231,6 +244,14 @@ C<-d> flag:
 
  % perl -d:Confess ...
  % perl -d:Confess=dump ...
+
+
+=item * L<Carp::Patch::Config>
+
+L<Carp> is used as a stack trace printer (also indirectly if you use
+L<Devel::Confess>). Sometimes you want to customize some Carp parameters like
+$Carp::MaxArgNums and $Carp::MaxArgLen from the command-line, and this is where
+this module helps.
 
 
 =item * L<DBIx::Conn::MySQL>

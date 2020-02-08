@@ -1,5 +1,5 @@
 package Plack::Handler::Stomp::NoNetwork;
-$Plack::Handler::Stomp::NoNetwork::VERSION = '1.14';
+$Plack::Handler::Stomp::NoNetwork::VERSION = '1.15';
 {
   $Plack::Handler::Stomp::NoNetwork::DIST = 'Plack-Handler-Stomp';
 }
@@ -143,7 +143,7 @@ Plack::Handler::Stomp::NoNetwork - like L<Plack::Handler::Stomp>, but without a 
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -209,7 +209,7 @@ Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Net-a-porter.com.
+This software is copyright (c) 2020 by Net-a-porter.com.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

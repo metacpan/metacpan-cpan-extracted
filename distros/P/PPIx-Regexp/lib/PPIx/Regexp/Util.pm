@@ -18,89 +18,35 @@ our @EXPORT_OK = qw{
     __ns_can __to_ordinal_en
 };
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
-{
+sub is_ppi_regexp_element {
+    my ( $elem ) = @_;
+    __instance( $elem, 'PPI::Element' )
+	or return;
+    return $elem->isa( 'PPI::Token::Regexp' ) ||
+	$elem->isa( 'PPI::Token::QuoteLike::Regexp' );
+}
 
-    my @ppi_zoo = (
-	[ 'PPI::Token::Regexp::Transliterate', '' ],
-
-	[ 'PPI::Token::Regexp', 'PPIx::Regexp::Tokenizer' ],
-	[ 'PPI::Token::QuoteLike::Regexp', 'PPIx::Regexp::Tokenizer' ],
-
-	[ 'PPI::Token::Quote',
-	    'PPIx::Regexp::StringTokenizer' ],
-	[ 'PPI::Token::QuoteLike::Command',
-	    'PPIx::Regexp::StringTokenizer' ],
-	[ 'PPI::Token::QuoteLike::BackTick',
-	    'PPIx::Regexp::StringTokenizer' ],
-	[ 'PPI::Token::HereDoc',
-	    'PPIx::Regexp::StringTokenizer' ],
+sub __is_ppi_regexp_element {
+    Carp::cluck(
+	'__is_ppi_regexp_element is deprecated. Use is_ppi_regexp_element'
     );
+    goto &is_ppi_regexp_element;
+}
 
-    sub is_ppi_regexp_element {
-	my ( $elem ) = @_;
-	__instance( $elem, 'PPI::Element' )
-	    or return;
-	foreach ( @ppi_zoo ) {
-	    $elem->isa( $_->[0] )
-		or next;
-	    return 'PPIx::Regexp::Tokenizer' eq $_->[1];
-	}
-	return;
+# TODO ditch this once the deprecation period ends
+sub __choose_tokenizer_class {
+    # my ( $content, $arg ) = @_;
+    my ( undef, $arg ) = @_;
+    if ( defined $arg->{parse} ) {
+	my $warning = q<The 'parse' argument is deprecated.>;
+	{ guess => 1, string => 1 }->{$arg->{parse}}
+	    and $warning = join ' ', $warning,
+		q<You should use PPIx::QuoteLike on quotish things>;
+	croak $warning;
     }
-
-    sub __is_ppi_regexp_element {
-	Carp::cluck(
-	    '__is_ppi_regexp_element is deprecated. Use is_ppi_regexp_element'
-	);
-	goto &is_ppi_regexp_element;
-    }
-
-    my %parse_type = (
-	guess	=> sub {
-	    my ( $content ) = @_;
-	    if ( __instance( $content, 'PPI::Element' ) ) {
-		foreach ( @ppi_zoo ) {
-		    $content->isa( $_->[0] )
-			and return $_->[1];
-		}
-		return;
-	    } elsif ( ref $content ) {
-		return;
-	    } else {
-		return $content =~ m/ \A \s*
-		(?: ["'`] | << | (?: (?: qq | q | qx ) \b ) ) /smx ?
-		'PPIx::Regexp::StringTokenizer' :
-		'PPIx::Regexp::Tokenizer';
-	    }
-	},
-	regex	=> sub {
-	    return 'PPIx::Regexp::Tokenizer';
-	},
-	string	=> sub {
-	    return 'PPIx::Regexp::StringTokenizer';
-	},
-    );
-
-    sub __choose_tokenizer_class {
-	my ( $content, $arg ) = @_;
-	if ( defined $arg->{parse} &&
-	    warnings::enabled( 'deprecated' )
-	) {
-	    my $warning = q<The 'parse' argument is deprecated.>;
-	    { guess => 1, string => 1 }->{$arg->{parse}}
-		and $warning = join ' ', $warning,
-		    q<You should use PPIx::QuoteLike on quotish things>;
-	    carp $warning;
-	}
-	my $parse = defined $arg->{parse} ? $arg->{parse} : 'regex';
-	my $code = $parse_type{$parse}
-	    or return PPIx::Regexp::Tokenizer->__set_errstr(
-	    "Unknown parse type '$parse'" );
-	return $code->( $content );
-    }
-
+    return 'PPIx::Regexp::Tokenizer';
 }
 
 sub __instance {

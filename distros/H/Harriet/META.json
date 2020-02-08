@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.5.0",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -58,7 +58,7 @@
       },
       "Harriet" : {
          "file" : "lib/Harriet.pm",
-         "version" : "00.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -72,9 +72,11 @@
          "web" : "https://github.com/tokuhirom/Harriet"
       }
    },
-   "version" : "00.05",
+   "version" : "0.06",
    "x_contributors" : [
-      "Ichinose Shogo <shogo82148@gmail.com>"
+      "Ichinose Shogo <shogo82148@gmail.com>",
+      "mackee <macopy123@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400",
+   "x_static_install" : 1
 }

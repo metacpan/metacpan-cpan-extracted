@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern
   homepage: https://metacpan.org/release/Regexp-Pattern
   repository: git://github.com/perlancar/perl-Regexp-Pattern.git
-version: 0.2.11
+version: 0.2.13
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -37,7 +37,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertBlock
       name: InsertBlock
-      version: '0.09'
+      version: '0.100'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:

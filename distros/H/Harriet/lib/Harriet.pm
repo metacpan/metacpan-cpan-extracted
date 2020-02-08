@@ -3,7 +3,7 @@ use 5.008005;
 use strict;
 use warnings;
 
-our $VERSION = "00.05";
+our $VERSION = "0.06";
 
 sub new {
     my ($class, $dir) = @_;
@@ -49,7 +49,7 @@ Harriet - Daemon manager for testing
 
     use Harriet;
 
-    my $harriet = Harriet->new('t/harriet/');
+    my $harriet = Harriet->new('./t/harriet/');
     $harriet->load('stf');
     print $ENV{TEST_STF}, "\n";
 
@@ -99,7 +99,7 @@ This code runs memcached. It returns memcached's end point information and guard
 
     use Harriet;
 
-    my $harriet = Harriet->new('t/harriet');
+    my $harriet = Harriet->new('./t/harriet');
     $harriet->load('memcached');
     print $ENV{memcached}, "\n";
 
@@ -109,7 +109,7 @@ harriet loads harriet script named 't/harriet/memcached.pl'.
 =head2 Save daemon process under the prove
 
     # .proverc
-    -PHarriet=t/harriet/
+    -PHarriet=./t/harriet/
 
 L<App::Prove::Plugin::Harriet> loads harriet scripts under the C<t/harriet/>, and set these to environment variables.
 

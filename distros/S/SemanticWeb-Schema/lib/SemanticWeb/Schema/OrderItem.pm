@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 
 has order_delivery => (
@@ -74,7 +74,7 @@ SemanticWeb::Schema::OrderItem - An order item is a line of an order
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
 
 =head1 DESCRIPTION
 

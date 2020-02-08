@@ -51,6 +51,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0",
+            "Alien::cmake3" : "0",
             "List::Util" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.8.0"
@@ -72,7 +73,7 @@
    "provides" : {
       "Alien::TidyHTML5" : {
          "file" : "lib/Alien/TidyHTML5.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.3.1"
       }
    },
    "release_status" : "stable",
@@ -86,9 +87,9 @@
          "web" : "https://github.com/robrwo/Alien-TidyHTML5"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.3.1",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
          "share" : {
             "Alien::cmake3" : "0.02",
@@ -111,7 +112,7 @@
       "Slaven Rezi\u0107 <slaven@rezic.de>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

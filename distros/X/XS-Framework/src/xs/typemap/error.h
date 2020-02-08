@@ -17,13 +17,13 @@ namespace panda {
 }
 
 namespace xs {
-
+    
 template <> struct Typemap<const std::error_category*> : TypemapObject<const std::error_category*, const std::error_category*, ObjectTypeForeignPtr, ObjectStorageMG> {
     static panda::string_view package () { return "XS::STL::ErrorCategory"; }
 };
 
 template <> struct Typemap<std::error_code> : TypemapBase<std::error_code> {
-    static thread_local Stash stash;
+    static PERL_THREAD_LOCAL HV* stash;
 
     static std::error_code in (const Sv& arg) {
         if (!arg.defined()) return {};
@@ -36,12 +36,12 @@ template <> struct Typemap<std::error_code> : TypemapBase<std::error_code> {
     static Sv out (const std::error_code& var, const Sv& = {}) {
         if (!var) return Sv::undef;
         auto base = Simple(panda::string_view(reinterpret_cast<const char*>(&var), sizeof(var)));
-        return stash.bless(base).ref();
+        return Stash(stash).bless(base).ref();
     }
 };
 
 template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
-    static thread_local Stash stash;
+    static PERL_THREAD_LOCAL HV* stash;
 
     static panda::ErrorCode in (const Sv& arg) {
         if (!arg.defined()) return {};
@@ -54,10 +54,8 @@ template <> struct Typemap<panda::ErrorCode> : TypemapBase<panda::ErrorCode> {
 
     static Sv out (const panda::ErrorCode& var, const Sv& = {}) {
         if (!var) return Sv::undef;
-
         auto ret = var.private_access<Simple>(panda::private_tags::ErrorCodeXsOut{});
-
-        return stash.bless(ret).ref();
+        return Stash(stash).bless(ret).ref();
     }
 };
 

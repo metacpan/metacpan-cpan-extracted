@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 
 has additional_property => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::QuantitativeValue - A point value or interval for product c
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
 
 =head1 DESCRIPTION
 

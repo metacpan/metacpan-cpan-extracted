@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.19 2020-02-08T12:13:03Z
+  - multiple vCards into single file is now available
+  - test on Windows will fail again
+
 0.18 2020-02-02T12:46:21Z
   - gave up to validate phone numbers
 

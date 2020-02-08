@@ -1,3 +1,6 @@
+20200114.5   08.02.2020
+    - bugfix in Makefile.PL
+
 20200114.4   05.02.2020
     - fix: fix builds on FreeBSD and possibly on other *BSD
 

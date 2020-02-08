@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::PatchModule;
 
-our $DATE = '2016-05-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-PatchModule'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -59,7 +61,14 @@ sub _process_module {
 
             push @pod, "=item * $cname => $sch->[0]\n\n";
             push @pod, "$c->{summary}.\n\n" if $c->{summary};
-            # XXX add description (markdown to pod)
+            if ($c->{description}) {
+                require Markdown::To::POD;
+                my $pod = Markdown::To::POD::markdown_to_pod($c->{description});
+                # make sure we add a couple of blank lines in the end
+                $pod =~ s/\s+\z//s;
+                $pod .= "\n\n\n";
+                push @pod, $pod;
+            }
         }
         push @pod, "=back\n\n";
         $self->add_text_to_section(
@@ -110,7 +119,7 @@ Pod::Weaver::Plugin::PatchModule - Plugin to use when building patch modules
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::PatchModule (from Perl distribution Pod-Weaver-Plugin-PatchModule), released on 2016-05-22.
+This document describes version 0.002 of Pod::Weaver::Plugin::PatchModule (from Perl distribution Pod-Weaver-Plugin-PatchModule), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -122,18 +131,18 @@ In F<weaver.ini>:
 
 This plugin is used when building patch modules (modules that use
 L<Module::Patch> to bundle a set of monkey patches, for example
-L<File::Which::Patch::Hide> or L<perl-LWP-UserAgent-Patch-FilterMirror>). It
+L<File::Which::Patch::Hide> or L<LWP::UserAgent::Patch::FilterMirror>). It
 currently does the following:
 
 =over
 
-=item * Create "PATCH CONTENTS" from information given by C<patch_data>
+=item * Create "PATCH CONTENTS" section from information given by C<patch_data>
 
-=item * Create "PATCH CONFIGURATION" from list of configuration given by C<patch_data>
+=item * Create "PATCH CONFIGURATION" section from list of configuration given by C<patch_data>
 
-=item * Mention some modules in See Also section
+=item * Mention some modules in SEE ALSO section
 
-e.g. L<Module::Patch>> (the convention/standard), the target module.
+e.g. L<Module::Patch> (the base module), the target module.
 
 =back
 
@@ -167,7 +176,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

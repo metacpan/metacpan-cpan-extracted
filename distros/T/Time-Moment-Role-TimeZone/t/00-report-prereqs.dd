@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'DateTime::Duration' => '0',
                                       'DateTime::TimeZone' => '0',
                                       'DateTime::TimeZone::Olson' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
@@ -14,6 +15,9 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'With::Roles' => '0'
+                                      },
                       'requires' => {
                                       'Carp' => '0',
                                       'Role::Tiny' => '2.000001',

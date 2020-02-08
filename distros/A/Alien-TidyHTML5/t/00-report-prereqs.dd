@@ -32,6 +32,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::Base' => '0',
+                                      'Alien::cmake3' => '0',
                                       'List::Util' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.8.0'

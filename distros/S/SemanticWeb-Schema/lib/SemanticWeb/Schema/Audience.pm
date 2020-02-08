@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 
 has audience_type => (
@@ -50,7 +50,7 @@ SemanticWeb::Schema::Audience - Intended audience for an item, i
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
 
 =head1 DESCRIPTION
 

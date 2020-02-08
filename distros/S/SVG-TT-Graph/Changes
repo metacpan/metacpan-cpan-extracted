@@ -1,5 +1,8 @@
 Revision history for Perl extension SVG::TT::Graph.
 
+1.04 Sat  1 Feb 2020 21:41:03
+    - Fix typo (Martin McGrath)
+
 1.03 Sat  1 Feb 2020 21:41:03
     - Call tzset conditionally (Martin McGrath)
 

@@ -1,5 +1,5 @@
 BEGIN:VCARD
 VERSION:3.0
-EMAIL;TYPE=HOME:tester@example.com
-EMAIL;TYPE=WORK:tester2@example.com
+EMAIL;TYPE="HOME":tester@example.com
+EMAIL;TYPE="WORK,PREF":tester2@example.com
 END:VCARD

@@ -1,3 +1,9 @@
+0.069		2020-02-07	T. R. Wyant
+    The PPIx::Regexp->new() 'parse' option is now fatal. This selected
+    either string or regex parse. I consider the string parse a failed
+    experiment. This is the latest step in removing it in favor of the
+    PPIx::QuoteLike package.
+
 0.068		2020-01-21	T. R. Wyant
     Expose PPIx::Regexp::Util::is_ppi_regexp_element()
 

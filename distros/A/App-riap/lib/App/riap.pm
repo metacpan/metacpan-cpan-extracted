@@ -1,7 +1,9 @@
 package App::riap;
 
-our $DATE = '2020-01-28'; # DATE
-our $VERSION = '0.381'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-07'; # DATE
+our $DIST = 'App-riap'; # DIST
+our $VERSION = '0.383'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +16,7 @@ use parent qw(Term::Shell);
 
 use Color::ANSI::Util qw(ansifg);
 use Data::Clean::ForJSON;
-use Path::Naive qw(concat_path_n);
+use Path::Naive qw(concat_and_normalize_path);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
@@ -465,8 +467,10 @@ sub _help_cmd {
 }
 
 sub _run_cmd {
-    require Perinci::Sub::GetArgs::Argv;
     require Perinci::Result::Format;
+    require Perinci::Sub::GetArgs::Argv;
+    require Perinci::Sub::ValidateArgs;
+
     local $Perinci::Result::Format::Enable_Cleansing = 1;
 
     my ($self, %args) = @_;
@@ -502,7 +506,17 @@ sub _run_cmd {
             last;
         }
 
-        $res = $args{code}->(%{$res->[2]}, -shell => $self);
+        # validate using schemas in Rinci metadata
+        my $args = $res->[2];
+        $res = Perinci::Sub::ValidateArgs::validate_args_using_meta(
+            args => $args,
+            meta => $args{meta},
+        );
+        unless ($res->[0] == 200) {
+            last;
+        }
+
+        $res = $args{code}->(%$args, -shell => $self);
     }
 
     my $fmt = $opts->{fmt} //
@@ -528,7 +542,7 @@ sub comp_ {
     my ($dir, $word) = $word0 =~ m!(.*/)?(.*)!;
     $dir //= "";
     my $pwd = $self->state("pwd");
-    my $uri = length($dir) ? concat_path_n($pwd, $dir) : $pwd;
+    my $uri = length($dir) ? concat_and_normalize_path($pwd, $dir) : $pwd;
     $uri .= "/" unless $uri =~ m!/\z!;
     my $extra = {detail=>1};
     my $res = $self->riap_request(list => $uri, $extra);
@@ -569,7 +583,7 @@ sub catch_run {
     my ($cmd, @argv) = @_;
 
     my $pwd = $self->state("pwd");
-    my $uri = concat_path_n($pwd, $cmd);
+    my $uri = concat_and_normalize_path($pwd, $cmd);
     my $res = $self->riap_request(info => $uri);
     if ($res->[0] == 404) {
         $self->_err([404, "No such command or executable (Riap function)"]);
@@ -615,7 +629,7 @@ sub catch_comp {
     local $self->{_in_completion} = 1;
 
     my $pwd = $self->state("pwd");
-    my $uri = concat_path_n($pwd, $cmd);
+    my $uri = concat_and_normalize_path($pwd, $cmd);
     my $res = $self->riap_request(info => $uri);
     return () unless $res->[0] == 200;
     return () unless $res->[2]{type} eq 'function';
@@ -750,7 +764,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.381
+version 0.383
 
 =head1 SYNOPSIS
 

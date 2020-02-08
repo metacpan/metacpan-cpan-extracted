@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-VisualPrintf
 
+3.02 2020-02-07T00:58:27Z
+
+    - Support truncation to one byte width.
+
 3.01 2020-02-04T14:39:00Z
 
     - Support text truncation.

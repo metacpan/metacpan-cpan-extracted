@@ -26,7 +26,6 @@ die "FATAL: can't configure geos cmake\n" if $result != 0;
 
 my %params = (
     NAME               => 'XS::libgeos',
-    LDFROM             => '-Wl,--whole-archive $(OBJECT) -Wl,--no-whole-archive',
     CPLUS              => 11,
     CONFIGURE_REQUIRES => {"Alien::cmake3" => '0.04'},
     clean              => {FILES => $bdir},

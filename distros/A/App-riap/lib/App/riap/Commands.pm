@@ -1,22 +1,25 @@
 package App::riap::Commands;
 
-our $DATE = '2020-01-28'; # DATE
-our $VERSION = '0.381'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-07'; # DATE
+our $DIST = 'App-riap'; # DIST
+our $VERSION = '0.383'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use Log::ger;
 
-use Path::Naive qw(is_abs_path normalize_path concat_path_n);
+use Path::Naive qw(is_abs_path normalize_path concat_and_normalize_path);
 #use Perinci::Sub::Util qw(err);
 
-# like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
-# final path is a directory (package). it also doesn't die if $p2 is empty.
-sub _concat_path_ns {
+# like Path::Naive's concat_and_normalize_path, but adds "/" at the end when it
+# thinks the final path is a directory (package). it also doesn't die if $p2 is
+# empty.
+sub _concat_and_normalize_path_with_slash {
     my ($p1, $p2) = @_;
     return $p1 unless defined($p2) && length($p2);
-    my $res = concat_path_n($p1, $p2);
+    my $res = concat_and_normalize_path($p1, $p2);
     $res .= "/" if $p2 =~ m!\A\.\.?\z|/\z!;
     $res;
 }
@@ -39,7 +42,7 @@ my $_complete_dir_or_file = sub {
     $dir //= "";
 
     my $pwd = $shell->state("pwd");
-    my $uri = length($dir) ? Path::Naive::concat_path_n($pwd, $dir) : $pwd;
+    my $uri = length($dir) ? concat_and_normalize_path($pwd, $dir) : $pwd;
     $uri .= "/" unless $uri =~ m!/\z!;
     my $extra = {};
     $extra->{type} = 'package' if $which eq 'dir';
@@ -138,7 +141,7 @@ sub ls {
     for my $path ($args{path}) {
         $uri = $pwd . ($pwd =~ m!/\z! ? "" : "/");
         if (defined $path) {
-            $uri = _concat_path_ns($pwd, $path);
+            $uri = _concat_and_normalize_path_with_slash($pwd, $path);
         }
 
         my $res;
@@ -235,7 +238,7 @@ sub cd {
         if (is_abs_path($dir)) {
             $npwd = normalize_path($dir);
         } else {
-            $npwd = concat_path_n($opwd, $dir);
+            $npwd = concat_and_normalize_path($opwd, $dir);
         }
     }
     # check if path actually exists
@@ -407,7 +410,7 @@ sub req {
     my $action = $args{action};
     my $pwd    = $shell->state("pwd");
     my $path   = $args{path};
-    my $uri    = _concat_path_ns($pwd, $path);
+    my $uri    = _concat_and_normalize_path_with_slash($pwd, $path);
     my $extra  = $args{extra} // {};
 
     $shell->riap_request($action => $uri, $extra);
@@ -432,7 +435,7 @@ sub meta {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = _concat_path_ns($pwd, $path);
+    my $uri  = _concat_and_normalize_path_with_slash($pwd, $path);
 
     $shell->riap_request(meta => $uri);
 }
@@ -456,7 +459,7 @@ sub info {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = _concat_path_ns($pwd, $path);
+    my $uri  = _concat_and_normalize_path_with_slash($pwd, $path);
 
     $shell->riap_request(info => $uri);
 }
@@ -485,7 +488,7 @@ sub call {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = _concat_path_ns($pwd, $path);
+    my $uri  = _concat_and_normalize_path_with_slash($pwd, $path);
     my $args = $args{args};
 
     $shell->riap_request(call => $uri, {args=>$args});
@@ -550,7 +553,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.381
+version 0.383
 
 =for Pod::Coverage .+
 

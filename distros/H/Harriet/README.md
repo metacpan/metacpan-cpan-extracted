@@ -6,7 +6,7 @@ Harriet - Daemon manager for testing
 
     use Harriet;
 
-    my $harriet = Harriet->new('t/harriet/');
+    my $harriet = Harriet->new('./t/harriet/');
     $harriet->load('stf');
     print $ENV{TEST_STF}, "\n";
 
@@ -56,7 +56,7 @@ This code runs memcached. It returns memcached's end point information and guard
 
     use Harriet;
 
-    my $harriet = Harriet->new('t/harriet');
+    my $harriet = Harriet->new('./t/harriet');
     $harriet->load('memcached');
     print $ENV{memcached}, "\n";
 
@@ -66,7 +66,7 @@ harriet loads harriet script named 't/harriet/memcached.pl'.
 ## Save daemon process under the prove
 
     # .proverc
-    -PHarriet=t/harriet/
+    -PHarriet=./t/harriet/
 
 [App::Prove::Plugin::Harriet](https://metacpan.org/pod/App::Prove::Plugin::Harriet) loads harriet scripts under the `t/harriet/`, and set these to environment variables.
 
@@ -85,4 +85,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-tokuhirom &lt;tokuhirom@gmail.com>
+tokuhirom <tokuhirom@gmail.com>

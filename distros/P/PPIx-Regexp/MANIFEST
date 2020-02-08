@@ -87,8 +87,6 @@ README
 t/basic.t
 t/fuzz.t
 t/parse.t
-t/string.t
-t/string_unit.t
 t/unit.t
 t/unit-adhoc.t
 t/version.t

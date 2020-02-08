@@ -139,17 +139,20 @@ SKIP: {
 	# Since December 2018 there has been a bug with the Nominet testbed
 	# whereby unrenewal failures all seem to return V209 regardless.
 	# If/when this is fixed, reset $nombug to '';
-	my $nombug = '|^V209 ';
+	#my $nombug = '|^V209 ';
+	my $nombug = '';
 
 	$datesref = $epp->unrenew ($dom, "ganymede-$tag.co.uk");
 	$reason = $epp->get_reason;
 	like ($datesref->{$dom} || $reason, qr/^\d\d\d\d-|V270 $nombug/, 'Multiple domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
 
-	$datesref = $epp->unrenew ("macbeth-$tag.plc.uk");
+	$dom = "macbeth-$tag.plc.uk";
+	$datesref = $epp->unrenew ($dom);
 	$reason = $epp->get_reason;
-	like ($datesref->{$dom} || $reason, qr/^V265 $nombug/, 'Single domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
+	like ($datesref->{$dom} || $reason, qr/^\d\d\d\d-|V265 $nombug/, 'Single domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
 
-	$datesref = $epp->unrenew ("wotnodomain-$tag.me.uk");
+	$dom = "wotnodomain-$tag.me.uk";
+	$datesref = $epp->unrenew ($dom);
 	$reason = $epp->get_reason;
 	like ($datesref->{$dom} || $reason, qr/^V208 /, 'Non-existent domain unrenewal') or diag "Reason: ". $epp->get_reason . "\n";
 
@@ -157,9 +160,12 @@ SKIP: {
 	# be unrenewed. Nominet's systems merge the registration and renewal
 	# behind the scenes so that as far as they are concerned it hasn't been
 	# renewed at all.
+	# This behaviour was fixed without warning on the OT&E on the 9th of
+	# October 2019.
 	$datesref = $epp->unrenew ($newdom);
 	$reason = $epp->get_reason;
-	like ($reason, qr/^V265 $nombug/, 'Cannot unrenew a non-renewed domain');
+	like ($datesref->{$newdom}, qr/^\d\d\d\d-/, 'Unrenew a just-renewed domain')
+		or diag "Reason: $reason\n";
 }
 
 ok ($epp->logout(), 'Logout successful');

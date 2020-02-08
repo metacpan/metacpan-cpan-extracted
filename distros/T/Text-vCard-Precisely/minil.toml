@@ -1,4 +1,4 @@
 author = "Yuki Yoshida(worthmine)"
 license = "Perl_5"
 name = "Text-vCard-Precisely"
-badges = ["travis-ci.com","metacpan"]
+badges = ["travis-ci.com","metacpan","appveyor"]

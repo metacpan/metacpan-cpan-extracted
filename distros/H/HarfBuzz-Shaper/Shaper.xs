@@ -139,25 +139,24 @@ CODE:
        && ((n = av_len((AV *)SvRV(feat))) >= 0)) {
 
     n++;	/* top index -> length */
-    features = (hb_feature_t*) calloc( sizeof(hb_feature_t), n );
+    Newx(features, n, hb_feature_t);
     for ( i = 0; i < n; i++ ) {
       hb_feature_t* f;
       f = (hb_feature_t*) SvPV_nolen (*av_fetch ((AV*) SvRV(feat), i, 0));
       features[i] = *f;
     }
-    for ( i = 0; i < n; i++ ) {
+    if (0) for ( i = 0; i < n; i++ ) {
       hb_feature_to_string( &features[i], glyphname, 32 );
-      /* fprintf( stderr, "feature[%d] = '%s'\n", i, glyphname ); */
+      fprintf( stderr, "feature[%d] = '%s'\n", i, glyphname );
     }
   }
   else {
-    /* fprintf( stderr, "No features\n"); */
     features = NULL;
     n = 0;
   }
 
   hb_shape( font, buf, features, n );
-  if ( features ) free(features);
+  if ( features ) Safefree(features);
 
   n = hb_buffer_get_length(buf);
   hb_glyph_position_t *pos = hb_buffer_get_glyph_positions(buf, NULL);

@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Lingua::EN::Numbers::Ordinate" => "1.02",
     "Log::ger" => "0.027",
     "Mo" => 0,
-    "Module::Installed::Tiny" => 0,
+    "Module::Installed::Tiny" => "0.004",
     "POSIX" => 0,
     "Regexp::Stringify" => 0,
     "Role::Tiny" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.903",
+  "VERSION" => "0.904",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,7 +93,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.45",
   "Log::ger" => "0.027",
   "Mo" => 0,
-  "Module::Installed::Tiny" => 0,
+  "Module::Installed::Tiny" => "0.004",
   "POSIX" => 0,
   "Regexp::Stringify" => 0,
   "Role::Tiny" => 0,

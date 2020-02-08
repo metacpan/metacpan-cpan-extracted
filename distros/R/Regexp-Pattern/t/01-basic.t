@@ -98,7 +98,7 @@ subtest "hash interface" => sub {
         is_deeply([sort keys %RE], [qw/a_re1_b a_re2_b a_re3_b a_re4_b a_re5_b/]);
     };
 
-    subtest "-has_tag and -lacks_tag" => sub {
+    subtest "-has_tag, -lacks_tag, -has_tag_matching, -lacks_tag_matching" => sub {
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-has_tag=>"A"));
         is_deeply([sort keys %RE], [qw/re2/]);
@@ -118,7 +118,19 @@ subtest "hash interface" => sub {
         %RE = ();
         Regexp::Pattern->import('Example::*' => (-has_tag=>"B", -lacks_tag=>"A"));
         is_deeply([sort keys %RE], [qw/re3/]);
-    };
+
+        %RE = ();
+        Regexp::Pattern->import('Example::*' => (-has_tag_matching=>qr/[AB]/));
+        is_deeply([sort keys %RE], [qw/re2 re3/]);
+
+        %RE = ();
+        Regexp::Pattern->import('Example::*' => (-lacks_tag_matching=>qr/[AB]/));
+        is_deeply([sort keys %RE], [qw/re1 re4 re5/]);
+
+        %RE = ();
+        Regexp::Pattern->import('Example::*' => (-has_tag_matching=>'A|B', -lacks_tag_matching=>'[XA]'));
+        is_deeply([sort keys %RE], [qw/re3/]);
+   };
 
     dies_ok { Regexp::Pattern->import("Example::re1" => (-foo=>1)) }
         "unknown options";

@@ -1,6 +1,11 @@
 Revision history for HarfBuzz::Shaper.
 
-0.019 Thu Feb  6
+0.020 2020-02-07
+
+    - Solve some memory corruption on Windows.
+    - Remove liberation test font.
+
+0.019 2020-02-06 16:31
 
     - Implement shaping features. See e.g. t/30_kern.t.
     - Remove t/99_showlog.t (doesn't show info)

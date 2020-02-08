@@ -1,5 +1,10 @@
 Revision history for Pod::Weaver::Section::Support
 
+1.013 2020-02-07
+    - Remove broken links to old resources:
+        - https://github.com/shlomif/HTML-Spelling-Site/issues/2
+        - Thanks to @tobyink .
+
 1.012 2019-12-28
     - Exclude files using MANIFEST.SKIP.
         - https://github.com/shlomif/perl-pod-weaver-section-support/issues/3

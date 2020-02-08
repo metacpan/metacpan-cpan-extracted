@@ -28,7 +28,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "0",
+            "JSON" : "0",
             "Module::Pluggable::Object" : "0",
+            "Pod::Usage" : "0",
             "perl" : "5.008005",
             "strict" : "0",
             "warnings" : "0"
@@ -36,6 +39,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Basename" : "0",
             "List::Util" : "0",
             "Test::AllModules" : "0.17",
@@ -47,7 +51,10 @@
    "provides" : {
       "Duadua" : {
          "file" : "lib/Duadua.pm",
-         "version" : "0.04"
+         "version" : "0.05"
+      },
+      "Duadua::CLI" : {
+         "file" : "lib/Duadua/CLI.pm"
       },
       "Duadua::Parser" : {
          "file" : "lib/Duadua/Parser.pm"
@@ -120,6 +127,9 @@
       },
       "Duadua::Parser::Bot::OracleGrapeshotCrawler" : {
          "file" : "lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm"
+      },
+      "Duadua::Parser::Bot::SMTBot" : {
+         "file" : "lib/Duadua/Parser/Bot/SMTBot.pm"
       },
       "Duadua::Parser::Bot::Slackbot" : {
          "file" : "lib/Duadua/Parser/Bot/Slackbot.pm"
@@ -194,6 +204,6 @@
          "url" : "http://github.com/bayashi/Duadua"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

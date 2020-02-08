@@ -1,25 +1,29 @@
-Revision history for Dist-Zilla-Plugin-InsertBlock
+0.100   2020-02-07  Released-By: PERLANCAR; Urgency: medium
 
-0.09    2016-09-12 (PERLANCAR)
+	- Add 'lib' to @INC temporarily to allow finding module in the same
+	  build directory.
+
+
+0.09    2016-09-12  Released-By: PERLANCAR
 
 	- Introduce options in INSERT_BLOCK directive, currently the only
-	  known option is 'pod_verbatim;.
+	  known option is 'pod_verbatim'.
 
 
-0.08    2015-10-21 (PERLANCAR)
+0.08    2015-10-21  Released-By: PERLANCAR
 
 	- [Bugfix] Newline fixes (don't strip blank lines at the top of
 	  block).
 
 
-0.07    2015-09-21 (PERLANCAR)
+0.07    2015-09-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Tweak example in Synopsis to show both block syntax.
 
 
-0.06    2015-07-02 (PERLANCAR)
+0.06    2015-07-02  Released-By: PERLANCAR
 
 	- If both InsertBlock and InsertBlock::FromModule plugins are
 	  loaded, InsertBlock::FromModule will use
@@ -27,30 +31,30 @@ Revision history for Dist-Zilla-Plugin-InsertBlock
 	  avoid clash.
 
 
-0.05    2015-06-18 (PERLANCAR)
+0.05    2015-06-18  Released-By: PERLANCAR
 
 	- Include :TestFiles.
 
 
-0.04    2015-03-21 (PERLANCAR)
+0.04    2015-03-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak logging statement.
 
 
-0.03    2015-03-11 (PERLANCAR)
+0.03    2015-03-11  Released-By: PERLANCAR
 
 	- Add module: DZP:InsertBlock::FromModule.
 
 
-0.02     2015-03-11 (PERLANCAR)
+0.02     2015-03-11  Released-By: PERLANCAR
 
          - No functional changes.
 
          - POD fixes.
 
 
-0.01     2015-03-11 (PERLANCAR)
+0.01     2015-03-11  Released-By: PERLANCAR
 
          - First release.

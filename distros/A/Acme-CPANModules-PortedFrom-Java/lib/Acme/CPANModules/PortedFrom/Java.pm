@@ -1,7 +1,7 @@
 package Acme::CPANModules::PortedFrom::Java;
 
-our $DATE = '2019-06-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-02-07'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -19,6 +19,10 @@ _
         {
             module => 'Test::Unit',
             summary => 'jUnit',
+        },
+        {
+            module => 'Getopt::ApacheCommonsCLI',
+            summary => 'Apache Commons CLI',
         },
     ],
 };
@@ -38,7 +42,7 @@ Acme::CPANModules::PortedFrom::Java - Modules/applications that are ported from 
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::PortedFrom::Java (from Perl distribution Acme-CPANModules-PortedFrom-Java), released on 2019-06-02.
+This document describes version 0.002 of Acme::CPANModules::PortedFrom::Java (from Perl distribution Acme-CPANModules-PortedFrom-Java), released on 2020-02-07.
 
 =head1 DESCRIPTION
 
@@ -54,7 +58,26 @@ If you know of others, please drop me a message.
 
 =item * L<Test::Unit> - jUnit
 
+=item * L<Getopt::ApacheCommonsCLI> - Apache Commons CLI
+
 =back
+
+=head1 FAQ
+
+=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries PortedFrom::Java | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=PortedFrom::Java -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -84,7 +107,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

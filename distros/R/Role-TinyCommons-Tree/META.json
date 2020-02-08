@@ -72,12 +72,17 @@
          "web" : "https://github.com/perlancar/perl-Role-TinyCommons-Tree"
       }
    },
-   "version" : "0.120",
+   "version" : "0.121",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertBlock::FromModule",
+            "name" : "InsertBlock::FromModule",
+            "version" : "0.09"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
             "config" : {

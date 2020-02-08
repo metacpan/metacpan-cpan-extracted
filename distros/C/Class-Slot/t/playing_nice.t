@@ -1,61 +1,66 @@
-package A;
+BEGIN{ $ENV{CLASS_SLOT_NO_XS} = 1 };
+
+package Class_A;
 
 sub new {
   my $class = shift;
-  bless { @_ , new_A => 1 }, $class;
+  bless { @_ , new_Class_A => 1 }, $class;
 }
 
 1;
 
-package B;
-use Types::Standard -types;
+
+package Class_B;
 use Class::Slot;
+use Scalar::Util qw(looks_like_number);
+use parent -norequire, 'Class_A';
 
-use parent -norequire, 'A';
-
-slot new_B => Int, req => 1;
+slot new_Class_B => \&looks_like_number, req => 1;
 
 1;
 
-package C;
 
-use parent -norequire, 'B';
+package Class_C;
+use parent -norequire, 'Class_B';
 
 sub new {
   my $class = shift;
   my $self  = $class->SUPER::new(@_);
-  $self->{new_C} = 1;
+  $self->{new_Class_C} = 1;
   return $self;
 }
 
 1;
 
-package D;
-use Types::Standard -types;
+
+package Class_D;
 use Class::Slot;
+use parent -norequire, 'Class_B';
 
-use parent -norequire, 'B';
-
-slot new_B => Any;
+slot new_Class_B => sub{ 1 };
 
 1;
 
+
 package main;
 use Class::Slot -debug;
-use Test::More;
+use Test2::V0;
 
-ok my $o = C->new(new_B => 1), 'ok';
+ok(Class_B->isa('Class_A'), 'Class_B isa Class_A');
+ok(Class_C->isa('Class_B'), 'Class_C isa Class_B');
 
-ok $o->isa('A'), 'isa A';
-is $o->{new_A}, 1, 'new_A';
+ok my $o = Class_C->new(new_Class_B => 1), 'ctor';
 
-ok $o->isa('B'), 'isa B';
-is $o->new_B, 1, 'new_B';
+ok $o->isa('Class_A'), 'isa Class_A';
+is $o->{new_Class_A}, 1, 'new_Class_A';
 
-ok $o->isa('C'), 'isa C';
-is $o->{new_C}, 1, 'new_C';
+ok $o->isa('Class_B'), 'isa Class_B';
+is $o->new_Class_B, 1, 'new_Class_B';
 
-ok(do{ eval{ C->new(new_B => 'foo') }; $@ }, 'type check when called from non-slots child class');
-ok(D->new(new_B => 'foo'), 'type check skipped when called from slots-based child class');
+ok $o->isa('Class_C'), 'isa Class_C';
+is $o->{new_Class_C}, 1, 'new_Class_C';
+
+ok(do{ eval{ C->new(new_Class_B => 'foo') }; $@ }, 'type check when called from non-slots child class');
+ok(Class_D->new(new_Class_B => 'foo'), 'type check skipped when called from slots-based child class');
 
 done_testing;

@@ -10,7 +10,7 @@ use Scalar::Util qw(isdual blessed);
 use Data::Dumper;
 
 our
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 our @EXPORT_OK = qw(isnumeric isstring);
 our @ISA = qw(Exporter::Tiny);
@@ -150,15 +150,11 @@ sub _printhashclose {
 sub _printref {
 	my ($self, $label, $line, $expr, @value) = @_;
 	local ($,, $\);
-	print $handle $label ? $label : "line $line:", " ";
+	print $handle $label ? $label : "line $line:", " dump($expr);";
 	my $d = Data::Dumper->new([@value]);
-	if (scalar(@value) <= 1) {
-		$d->Names([$expr]);
-	} else {
-		my @names;
-		push @names, "\${[$expr]}[$_]" foreach 0 .. $#value;
-		$d->Names(\@names);
-	}
+	my @names;
+	push @names, "_[$_]" foreach 0 .. $#value;
+	$d->Names(\@names);
 	print $handle "\n", $d->Dump;
 }
 
@@ -257,13 +253,13 @@ This program produces an output like this:
 	line 14: @a = ('this', 'is', 'an', 'array');
 	line 15: %h = ('' => 'empty', 'key1' => 'value1', 'key2' => 'value2', 'undef' => undef);
 	calc: @a * 2  = 8;
-	line 17: 
-	$ref = {
-		  '' => 'empty',
-		  'key1' => 'value1',
-		  'key2' => 'value2',
-		  'undef' => undef
-		};
+	line 17: dump($ref);
+	$_[0] = {
+	          '' => 'empty',
+	          'key1' => 'value1',
+	          'key2' => 'value2',
+	          'undef' => undef
+	        };
 
 =head1 DESCRIPTION
 
@@ -292,10 +288,15 @@ for various debugging purposes.
 (Besides, there is L<Smart::Comments> from Damian, that does something
 very similar but more advanced.)
 
-Just by removing the "use" of C<Debug::Filter::PrintExpr> completely
-or disabling it partially by
+Just by removing the "use" of C<Debug::Filter::PrintExpr> completely,
+disabling it partially by
 
 	no Debug::Filter::PrintExpr;
+
+or making the usage conditional (e.g. on an environment variable)
+by
+
+	use if $ENV{DEBUG}, 'Debug::Filter::PrintExpr';
 
 all these lines (or a part of them) lose their magic and remain
 simple comments.
@@ -337,7 +338,7 @@ Undefined values are represented by the unquoted string C<undef>.
 Hash and array references are shown in their usual string representation
 as e.g. C<ARRAY(0x19830d0)> or C<HASH(0xccba88)>.
 Blessed references are shown by the class they are belong to as
-C<blessed(I<class>)>.
+C<< blessed(class) >>.
 
 =item C<@>
 
@@ -353,8 +354,9 @@ I<value> is formatted like a single scalar.
 
 =item C<\>
 
-The expression shall be a list of references.
-These will be evaluated using L<Data::Dumper>.
+The expression shall evaluate to a list of references.
+These will be evaluated using L<Data::Dumper> as if used as
+parameter list to a subroutine call, i.e. named as C<$_[$i]>.
 
 =item C<">
 
@@ -567,7 +569,7 @@ Jörg Sommrey
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2018-2019, Jörg Sommrey. All rights reserved.
+Copyright (c) 2018-2020, Jörg Sommrey. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v6.0.0';
+our $VERSION = 'v6.0.1';
 
 
 has accommodation_floor_plan => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::Residence - The place where a person lives.
 
 =head1 VERSION
 
-version v6.0.0
+version v6.0.1
 
 =head1 DESCRIPTION
 

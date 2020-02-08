@@ -1,4 +1,14 @@
 Revision history for Debug-Filter-PrintExpr
+0.13	Fri Feb 7 18:17:25 2020 +0100
+		[fix]
+		corrected usage of Data::Dumper
+
+0.12	Wed Feb 5 21:03:16 2020 +0100
+		[fix]
+		improved coexistence between Exporter::Tiny and Filter::Simple	
+
+		usage of Data::Dumper's variable naming feature
+		
 0.11	Mon Nov 4 23:11:49 2019 +0100
 		[fix]
 		added dependency to Exporter::Tiny

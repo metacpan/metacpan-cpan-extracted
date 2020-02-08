@@ -7,7 +7,7 @@ use Harriet;
 sub load {
     my ($class, $p) = @_;
     my @args = @{ $p->{args} };
-    my $dir = shift @args || 't/harriet/';
+    my $dir = shift @args || './t/harriet/';
     my $harriet = Harriet->new($dir);
     $harriet->load_all();
 }
@@ -24,7 +24,7 @@ App::Prove::Plugin::Harriet - Harriet with prove
 =head1 SYNOPSIS
 
     # in your .proverc
-    -PHarriet=t/harriet/
+    -PHarriet=./t/harriet/
 
 =head1 DESCRIPTION
 

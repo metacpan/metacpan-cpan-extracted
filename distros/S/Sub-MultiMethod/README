@@ -290,8 +290,8 @@ DESCRIPTION
 
    Roles
     As far as I'm aware, Sub::MultiMethod is the only multimethod
-    implementation that allows multimethods imported from roles to
-    intertegrate into a class.
+    implementation that allows multimethods imported from roles to integrate
+    into a class.
 
       use v5.12;
       use strict;
@@ -337,14 +337,14 @@ DESCRIPTION
   
       my $obj = My::Class->new;
   
-      say $obj->foo_a;        # A (alias defined in RoleA)
+      say $obj->foo_a( {} );  # A (alias defined in RoleA)
       say $obj->foo( [] );    # B (candidate from RoleB)
       say $obj->foo( {} );    # C (Class overrides candidate from RoleA)
 
     Sub::MultiMethods doesn't try to be clever about detecting whether your
     package is a role or a class. If you want to use it in a role, simply do:
 
-        use Sub::MultiMethod -role, qw(multimethod);
+      use Sub::MultiMethod -role, qw(multimethod);
 
     The main difference this makes is that the exported `multimethod` function
     will default to `no_dispatcher => 1`, so any multimethods you define in
@@ -354,9 +354,9 @@ DESCRIPTION
     Sub::MultiMethods doesn't try to detect what roles your class has
     consumed, so in classes that consume roles with multimethods, do this:
 
-        use Sub::MultiMethod qw(multimethods_from_roles);
-    
-        multimethods_from_roles qw( My::RoleA My::RoleB );
+      use Sub::MultiMethod qw(multimethods_from_roles);
+  
+      multimethods_from_roles qw( My::RoleA My::RoleB );
 
     The list of roles should generally be the same as from `with`. This
     function only copies multimethods across from roles; it does not copy
@@ -371,7 +371,13 @@ DESCRIPTION
 
   API
     Sub::MultiMethod avoids cute syntax hacks because those can be added by
-    third party modules. It provides an API for these modules:
+    third party modules. It provides an API for these modules.
+
+    Brief note on terminology: when you define multimethods in a class, each
+    possible signature+coderef is a "candidate". The method which makes the
+    decision about which candidate to call is the "dispatcher". Roles will
+    typically have candidates but no dispatcher. Classes will need dispatchers
+    setting up for each multimethod.
 
     `Sub::MultiMethod->install_candidate($target, $sub_name, %spec)`
         $target is the class (package) name being installed into.
@@ -404,6 +410,48 @@ DESCRIPTION
     `Sub::MultiMethod->install_missing_dispatchers($target)`
         Should usually be called after `copy_package_candidates`, unless
         $target is a role.
+
+    `Sub::MultiMethod->get_multimethods($target)`
+        Returns the names of all multimethods declared for a class or role,
+        not including any parent classes.
+
+    `Sub::MultiMethod->has_multimethod_candidates($target, $method_name)`
+        Indicates whether the class or role has any candidates for a
+        multimethod. Does not include parent classes.
+
+    `Sub::MultiMethod->get_multimethod_candidates($target, $method_name)`
+        Returns a list of candidate spec hashrefs for the method, not
+        including candidates from parent classes.
+
+    `Sub::MultiMethod->get_all_multimethod_candidates($target, $method_name,
+    $is_method)`
+        Returns a list of candidate spec hashrefs for the method, including
+        candidates from parent classes (unless $is_method is false, because
+        non-methods shouldn't be inherited).
+
+    `Sub::MultiMethod->known_dispatcher($coderef)`
+        Returns a boolean indicating whether the coderef is known to be a
+        multimethod dispatcher.
+
+    `Sub::MultiMethod->pick_candidate(\@candidates, \@args, \@invocants)`
+        Returns a list of three items: first the winning candidate from an
+        array of specs, given the args and invocants, second the modified args
+        after coercion has been applied, and third the modified invocants.
+
+        This is basically how the dispatcher for a method works:
+
+          my @invocants = splice(@_, 0, $ismethod);
+          my $pkg       = __PACKAGE__;
+  
+          my $mm = 'Sub::MultiMethod';
+          my @candidates =
+            $smm->get_all_multimethod_candidates($pkg, $sub, $ismethod);
+          my ($winner, $new_args, $new_invocants) =
+            $smm->pick_candidate(\@candidates, \@_, \@invocants);
+  
+          my $coderef = $winner->{code};
+          @_ = (@$new_invocants, @$new_args);
+          goto $coderef;
 
 BUGS
     Please report any bugs to

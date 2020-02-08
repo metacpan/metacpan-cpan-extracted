@@ -30,7 +30,8 @@ sub ctrls {
 	    push @seq, pack "CC", $i, $j;
 	}
     }
-    join '', @seq;
+    local $" = '';
+    wantarray ? @seq : "@seq";
 };
 
 my $longseq = ctrls(5, 3);
@@ -38,13 +39,41 @@ is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
     "$longseq(   壱)",
     'Long binary format.');
 
- TODO:
+# TODO:
 {
-    local $TODO = "Outlimit";
+#    local $TODO = "Outlimit";
     my $allseq = ctrls(5, 5);
     is( Text::VisualPrintf::sprintf("$allseq(%5s)", "壱"),
 	"$allseq(   壱)",
-	'All binary pattern format.');
+	'5x5 binary pattern format.');
+}
+
+for my $i (1..253) {
+    my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
+    $allseq =~ s///g;
+    is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%5s)", "壱"),
+	"$allseq(   壱)",
+	"Many ASCII format ($i)");
+}
+
+ TODO:
+for my $i (254..255) {
+    local $TODO = "Too many ASCII ($i)";
+    my $allseq = join '', (map { pack("C", $_) } 1 .. $i);
+    is( Text::VisualPrintf::sprintf($allseq =~ s/%/%%/gr . "(%5s)", "壱"),
+	"$allseq(   壱)",
+	"Too many ASCII format ($i)");
+}
+
+# TODO:
+{
+#    local $TODO = "Outlimit param";
+    my @allseq = ctrls(5, 5);
+    my $format = "%s" x @allseq . "(%5s)";
+    my $expect = join '', @allseq, "(   壱)";
+    is( Text::VisualPrintf::sprintf($format, @allseq, "壱"),
+	$expect,
+	'All binary pattern paramater.');
 }
 
 {
@@ -77,9 +106,9 @@ is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
 	'truncation. (Kanji + ASCII)');
 }
 
- TODO:
+# TODO:
 {
-    local $TODO = "Truncation to 1 (Half-width KANA)";
+#    local $TODO = "Truncation to 1 (Half-width KANA)";
     is( Text::VisualPrintf::sprintf("%.1s", "ｱｲｳ"),
 	"ｱ",
 	'truncation. (1 byte)');
@@ -91,9 +120,9 @@ is( Text::VisualPrintf::sprintf("$longseq(%5s)", "壱"),
 	'truncation. (Half-width with padding)');
 }
 
- TODO:
+# TODO:
 {
-    local $TODO = "Truncation to 1";
+#    local $TODO = "Truncation to 1";
     is( Text::VisualPrintf::sprintf("%.1s", "一二三"),
 	"一",
 	'truncation. (1 byte)');

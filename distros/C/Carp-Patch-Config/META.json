@@ -31,6 +31,7 @@
          "requires" : {
             "Carp" : "1.12",
             "Data::Dmp" : "0.21",
+            "Data::Dump" : "0",
             "Module::Patch" : "0.270",
             "base" : "0",
             "perl" : "5.010001",
@@ -59,7 +60,7 @@
          "web" : "https://github.com/perlancar/perl-Carp-Patch-Config"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

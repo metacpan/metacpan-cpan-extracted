@@ -1,5 +1,8 @@
-Revision history for Pod-Weaver-Plugin-PatchModule
+0.002   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
-0.001   2016-05-22 (PERLANCAR)
+	- Show configuration description.
+
+
+0.001   2016-05-22  Released-By: PERLANCAR
 
         - First release.

@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::InsertBlock - Insert a block of text from another
+    file
 
+VERSION
+    This document describes version 0.100 of
+    Dist::Zilla::Plugin::InsertBlock (from Perl distribution
+    Dist-Zilla-Plugin-InsertBlock), released on 2020-02-07.
+
+SYNOPSIS
     In dist.ini:
 
      [InsertBlock]
@@ -7,57 +15,56 @@ SYNOPSIS
     In lib/Baz.pm:
 
      ...
-    
+
      # BEGIN_BLOCK: some_code
-    
+
      ...
-    
+
      # END_BLOCK
 
     In lib/Foo/Base.pm:
 
      ...
-    
+
      =head1 ATTRIBUTES
-    
+
      =for BEGIN_BLOCK: base_attributes
-    
+
      =head2 attr1
-    
+
      =head2 attr2
-    
+
      =for END_BLOCK: base_attributes
-    
+
      ...
 
     In lib/Foo/Bar.pm:
 
      ...
-    
+
      # INSERT_BLOCK: lib/Baz.pm some_code
-    
+
      ...
-    
+
      =head1 ATTRIBUTES
-    
+
      # INSERT_BLOCK: lib/Foo/Bar.pm base_attributes
-    
+
      =head2 attr3
-    
+
      ...
 
 DESCRIPTION
-
-    This plugin finds # INSERT_BLOCK: <file> <name> directive in your
-    POD/code, find the block of text named name in file, and inserts the
+    This plugin finds "# INSERT_BLOCK: <file> <name>" directive in your
+    POD/code, find the block of text named *name* in *file*, and inserts the
     block of text to replace the directive.
 
     Block is marked/defined using either this syntax:
 
      =for BEGIN_BLOCK: Name
-    
+
      ...
-    
+
      =for END_BLOCK: Name
 
     or this syntax:
@@ -72,19 +79,33 @@ DESCRIPTION
     you want to list POD attributes, methods, etc from a base class into a
     subclass.
 
- Options
-
-    The # INSERT_BLOCK directive accepts an optional third argument for
+  Options
+    The "# INSERT_BLOCK" directive accepts an optional third argument for
     options. Known options:
 
-      * pod_verbatim
+    *   pod_verbatim
 
-      This option pads each line of the block content with whitespace.
-      Suitable for when you are inserting a block into a POD and you want
-      to make the content of the block as POD verbatim.
+        This option pads each line of the block content with whitespace.
+        Suitable for when you are inserting a block into a POD and you want
+        to make the content of the block as POD verbatim.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-InsertBlock>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-InsertBlock>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ins
+    ertBlock>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Dist::Zilla::Plugin::InsertBlock::FromModule
 
     Dist::Zilla::Plugin::InsertCodeResult
@@ -95,4 +116,13 @@ SEE ALSO
 
     Dist::Zilla::Plugin::InsertExample - which basically insert whole files
     instead of just a block of text from a file
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

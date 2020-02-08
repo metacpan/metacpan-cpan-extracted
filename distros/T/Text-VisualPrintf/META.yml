@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::VisualPrintf:
     file: lib/Text/VisualPrintf.pm
-    version: '3.01'
+    version: '3.02'
   Text::VisualPrintf::IO:
     file: lib/Text/VisualPrintf/IO.pm
 requires:
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Text-VisualPrintf/issues
   homepage: https://github.com/kaz-utashiro/Text-VisualPrintf
   repository: git://github.com/kaz-utashiro/Text-VisualPrintf.git
-version: '3.01'
+version: '3.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

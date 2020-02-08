@@ -11,60 +11,60 @@ BEGIN { use_ok('HarfBuzz::Shaper') };
 
 my $hb = HarfBuzz::Shaper->new;
 
-$hb->set_font('LiberationSans.ttf');
+$hb->set_font('NimbusRoman-Regular.otf');
 $hb->set_size(36);
 $hb->set_text("Hell€!");
 my $info = $hb->shaper;
-
+# use DDumper; DDumper($info);
+# It's a pity this font does not have glyph names.
 my $result = [
   {
     ax => '25.992',
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 4,
-    name => 'H',
+    g => 41,
+    name => '',
   },
   {
-    ax => '20.016',
+    ax => '15.192',
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 5,
-    name => 'e',
+    g => 70,
+    name => '',
   },
   {
-    ax => '7.992',
+    ax => '10.008',
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 6,
-    name => 'l',
+    g => 77,
+    name => '',
   },
   {
-    ax => '7.992',
+    ax => '10.008',
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 6,
-    name => 'l',
+    g => 77,
+    name => '',
   },
   {
-    ax => '20.016',
+    ax => 18,
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 8,
-    name => 'Euro',
+    g => 347,
+    name => '',
   },
   {
-#    ax => '10.008',		# harfbuzz 1.8.7
-    ax => '9.972',		# harfbuzz 2.6.4
+    ax => '11.988',
     ay => 0,
     dx => 0,
     dy => 0,
-    g => 3,
-    name => 'exclam',
+    g => 2,
+    name => '',
   },
 ];
 

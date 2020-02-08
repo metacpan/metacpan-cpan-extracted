@@ -1,3 +1,13 @@
+0.383   2020-02-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Path::Naive 0.042.
+
+
+0.382   2020-02-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Validate command's args with schemas from Rinci metadata.
+
+
 0.381   2020-01-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Move 'as' to second argument of format_completion (Complete::Bash

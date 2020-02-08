@@ -1,3 +1,7 @@
+1.000     2020-02-07 13:03:27 EST
+  - Fix DateTime::TimeZone tests to not run unless DateTime::Duration is also installed (#1)
+  - Use With::Roles to simplify usage examples
+
 0.003     2019-07-03 22:53:50 EDT
   - Add 1900 to positive year values passed to Time::Local so the year is consistently interpreted
 

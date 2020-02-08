@@ -45,7 +45,7 @@ test 'custom logger' => sub {
     );
 
     $t->handler->run($self->psgi_test_app);
-    my $msg = $t->log_messages->[-1];
+    my $msg = $t->log_messages->[-2];
     is_deeply($msg,
               ['error','your error'],
               'app error logged');

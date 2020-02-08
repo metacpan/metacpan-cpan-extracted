@@ -2,7 +2,7 @@ NAME
     Carp::Patch::Config - Set some Carp variables
 
 VERSION
-    This document describes version 0.004 of Carp::Patch::Config (from Perl
+    This document describes version 0.005 of Carp::Patch::Config (from Perl
     distribution Carp-Patch-Config), released on 2019-12-09.
 
 SYNOPSIS
@@ -15,13 +15,23 @@ DESCRIPTION
 
 PATCH CONTENTS
 PATCH CONFIGURATION
-    *   -Dump => bool
+    *   -Dump => str
 
         This is not an actual configuration for Carp, but a shortcut for:
 
+         # when value is 0
+         $Carp::RefArgFormatter = undef;
+ 
+         # when value is 1
          $Carp::RefArgFormatter = sub {
              require Data::Dmp;
              Data::Dmp::dmp($_[0]);
+         };
+ 
+         # when value is 2
+         $Carp::RefArgFormatter = sub {
+             require Data::Dump;
+             Data::Dump::dump($_[0]);
          };
 
     *   -MaxArgLen => int

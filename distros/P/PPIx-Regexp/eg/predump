@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.068';
+$VERSION = '0.069';
 
 my %opt = (
     default_modifiers => [],
@@ -35,9 +35,6 @@ GetOptions( \%opt,
 		-output		=> \*STDOUT,
 	    } )
     },
-    'guess!'	=> \&set_parse,
-    'regex!'	=> \&set_parse,
-    'string!'	=> \&set_parse,
     qw{
         default_modifiers|default-modifiers=s@
 	encoding=s explain! files!
@@ -174,22 +171,6 @@ foreach my $re ( process_args( \%opt, @ARGV ) ) {
     }
 }
 
-{
-    my $deprecate;
-
-    sub set_parse {
-	my ( $opt, $assert ) = @_;
-	if ( $assert && 'regex' ne $opt ) {
-	    $deprecate++
-		or warn "The -$opt option is deprecated, and will be removed\n";
-	    $opt{parse} = "$opt";
-	} else {
-	    delete $opt{parse};
-	}
-	return;
-    }
-}
-
 __END__
 
 =head1 NAME
@@ -235,22 +216,6 @@ If true, this option specifies that the arguments are files whose
 regular expressions are to be analyzed. If this options is asserted,
 C<-objectify> and C<-unescape> are ignored.
 
-=item -guess
-
-This option is deprecated, and will be retracted in a future release
-when the string-parsing functionality is removed from
-L<PPIx::Regexp|PPIx::Regexp>.  L<PPIx::QuoteLike|PPIx::QuoteLike> is
-prefered.
-
-If true, this option specifies that the parser guess whether the
-argument is to be parsed as a regex or a string. If false, it specifies
-the default parse, which is as a regex. If more than one of C<-guess>,
-C<-regex> and C<-string> is specified, the last one parsed (normally the
-C<-string> are specified, the last specification parsed (normally the
-rightmost one) wins.
-
-The default is C<-noguess>, which specifies the default parse.
-
 =item -indent number
 
 This option specifies the number of spaces to indent each level of the
@@ -291,38 +256,12 @@ in code and interpolations. If false (specified as C<-nopostderef>) they
 are not recognized. For the default see the documentation for the
 tokenizer's L<new()|PPIx::Regexp::Tokenizer/new> method.
 
-=item -regex
-
-If true, this option specifies that the parser parse the argument as a
-regex. If false, it specifies the default parse, which is as a regex,
-so this option is unnecessary unless the default parse changes. If more
-than one of C<-guess>, C<-regex> and C<-string> is specified, the last
-one parsed (normally the C<-string> are specified, the last
-specification parsed (normally the rightmost one) wins.
-
-The default is C<-noregex>, which specifies the default parse.
-
 =item -significant
 
 If true, this option specifies that the dump include only significant
 syntax elements. That is, no comments or non-significant white space.
 The default is false. This is simply passed through to
 L<< PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
-
-=item -string
-
-This option is deprecated, and will be retracted in a future release
-when the string-parsing functionality is removed from
-L<PPIx::Regexp|PPIx::Regexp>.  L<PPIx::QuoteLike|PPIx::QuoteLike> is
-prefered.
-
-If true, this option specifies that the argument be parsed as a string,
-not a regex. If false, it specifies the default parse, which is as a
-regex. If more than one of C<-guess>, C<-regex> and C<-string> is
-specified, the last one parsed (normally the C<-string> are specified,
-the last specification parsed (normally the rightmost one) wins.
-
-The default is C<-nostring>, which specifies the default parse.
 
 =item -test
 

@@ -102,5 +102,8 @@
 Alien-TidyHTML5-.*/
 Alien-TidyHTML5-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
+local/
 _alien/

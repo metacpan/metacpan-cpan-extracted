@@ -1,4 +1,6 @@
-3.7.3.4   xx.xx.xxxx
+3.7.3.5   08.02.2020
+    - improve Makefile.PL on MacOS X
+3.7.3.4   31.01.2020
     - improve Makefile.PL
     - renamed to XS::libgeos
 3.7.3.3   25.01.2020

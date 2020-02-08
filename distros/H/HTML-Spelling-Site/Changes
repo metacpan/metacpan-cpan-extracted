@@ -1,5 +1,10 @@
 Revision history for HTML-Spelling-Site
 
+0.4.3       2020-02-08
+    - Remove some broken links.
+        - https://github.com/shlomif/HTML-Spelling-Site/issues/2
+        - Thanks to @tobyink .
+
 0.4.2       2020-01-28
     - Rebuild for order of 'NAME' and 'VERSION' sections in the generated
     POD documentation (see 0.001004 in

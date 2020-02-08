@@ -1,7 +1,6 @@
-# ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V4;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -193,11 +192,15 @@ The format in as_string() is B<different from 3.0>, but the interface is SAME
 subtype 'v4Tels' => as 'ArrayRef[Text::vCard::Precisely::V4::Node::Tel]';
 coerce 'v4Tels',
     from 'Str',
-    via { [ Text::vCard::Precisely::V4::Node::Tel->new({ content => $_ }) ] },
+    via {[ Text::vCard::Precisely::V4::Node::Tel->new({ content => $_ }) ]},
     from 'HashRef',
-    via { [ Text::vCard::Precisely::V4::Node::Tel->new($_) ] },
+    via {[
+        
+        Text::vCard::Precisely::V4::Node::Tel->new({ %$_, types => [@{ $_->{'types'} || [] }] })
+        
+        ]},
     from 'ArrayRef[HashRef]',
-    via { [ map { Text::vCard::Precisely::V4::Node::Tel->new($_) } @$_ ] };
+via {[ map{ Text::vCard::Precisely::V4::Node::Tel->new({ %$_, types => [@{ $_->{'types'} || [] }] }) } @$_ ]};
 has tel => ( is => 'rw', isa => 'v4Tels', coerce => 1 );
 
 =head2 adr(), address()

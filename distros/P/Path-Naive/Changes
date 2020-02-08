@@ -1,3 +1,21 @@
+0.042   2020-02-07  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	[Incompatible changes]
+
+        - Rename concat_path_n to concat_and_normalize_path for clarity.
+
+        - abs_path, normalize_path, & concat_and_normalize_path now always
+	  return string independent of context (we want to avoid
+	  context-sensitive return in general).
+
+
+0.041   2020-02-05  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak/format Synopsis.
+
+
 0.040   2020-02-05  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

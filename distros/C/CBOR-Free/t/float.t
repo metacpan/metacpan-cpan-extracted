@@ -63,7 +63,15 @@ is(
 );
 
 TODO: {
-    our $TODO = 'Apparently broken on MSWin32 prior to 5.24?' if $^O eq 'MSWin32';
+    my $reason;
+    if ($^O eq 'MSWin32' && $^V lt v5.24) {
+        $reason = 'Apparently broken on MSWin32 prior to 5.24?';
+    }
+    elsif ($^O eq 'linux' && $^V lt v5.22) {
+        $reason = 'Linux 5.4.12 appears to need inf detection that was added in Perl 5.22.';
+    }
+
+    local $TODO = $reason if $reason;
 
     is(
         sprintf('%v.02x', CBOR::Free::encode($neginf)),

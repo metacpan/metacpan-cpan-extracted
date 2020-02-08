@@ -23,7 +23,7 @@ name: Pod-Weaver-Section-Support
 provides:
   Pod::Weaver::Section::Support:
     file: lib/Pod/Weaver/Section/Support.pm
-    version: '1.012'
+    version: '1.013'
 requires:
   Moose: '1.03'
   Moose::Util::TypeConstraints: '1.01'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/shlomif/pod-weaver-section-support/issues
   homepage: http://metacpan.org/release/Pod-Weaver-Section-Support
   repository: https://github.com/shlomif/perl-pod-weaver-section-support
-version: '1.012'
+version: '1.013'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -285,7 +285,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: Support
-              version: '1.011'
+              version: '1.012'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -

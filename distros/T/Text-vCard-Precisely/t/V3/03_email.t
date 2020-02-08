@@ -24,7 +24,7 @@ $expected_content = $in_file->slurp_utf8;
 
 $vc->email([
     { types => ['home'], content => 'tester@example.com' },
-    { types => ['work'], content => 'tester2@example.com' },
+    { types => ['work'], content => 'tester2@example.com', preferred => 1 },
 ]);
 is $vc->as_string, $expected_content, 'email(ArrayRef of HashRef)';        # test2
 

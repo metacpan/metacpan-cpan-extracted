@@ -29,17 +29,17 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/Sub/MultiMethod.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: README
+ lib/Sub/MultiMethod.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
  This software is Copyright (c) 2020 by the copyright holder(s).

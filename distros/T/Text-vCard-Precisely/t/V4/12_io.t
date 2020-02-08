@@ -73,7 +73,7 @@ $got->remove();
 
 my $in_file = path( 't', 'V4', 'Expected', 'unix.vcf' );
 $string = $vc->load_file($in_file)->as_string();
-my $expected_content = $in_file->slurp_utf8;
+my $expected_content = $in_file->slurp_utf8();
 is $string, $expected_content, 'load_file()';                                       # 4
 
 my $load_s = $vc->load_string($data);
@@ -91,8 +91,8 @@ N:Gump;Forrest;;Mr.;
 ADR;TYPE=WORK;PREF=1:;100;Waters Edge;Baytown;LA;30314;United States of
   America
 ADR;TYPE=HOME:;42;Plantation St.;Baytown;LA;30314;United States of America
-TEL;TYPE=WORK,VOICE;VALUE=uri:tel:111 555 1212
-TEL;TYPE=HOME,VOICE;VALUE=uri:tel:404 555 1212
+TEL;VALUE=uri;TYPE="WORK,VOICE":tel:(111) 555-1212
+TEL;VALUE=uri;TYPE="HOME,VOICE":tel:(404) 555-1212
 EMAIL:forrestgump@example.com
 ORG:Bubba Gump Shrimp Co.
 TITLE:Shrimp Man

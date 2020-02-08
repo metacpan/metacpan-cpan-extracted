@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::TidyHTML5",
   "PREREQ_PM" => {
     "Alien::Base" => 0,
+    "Alien::cmake3" => 0,
     "List::Util" => 0,
     "namespace::autoclean" => 0
   },
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => 0,
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::cmake3" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
   "List::Util" => 0,
@@ -78,8 +80,16 @@ WriteMakefile(%WriteMakefileArgs);
 
 
 # BEGIN code inserted by Dist::Zilla::Plugin::AlienBuild
-sub MY::postamble {
-  $abmm->mm_postamble;
+{ package
+    MY;
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
 }
 # END code inserted by Dist::Zilla::Plugin::AlienBuild
 

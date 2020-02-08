@@ -5,7 +5,7 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 use B ();
 use Exporter::Shiny qw( multimethod multimethods_from_roles monomethod );
@@ -17,9 +17,103 @@ use Types::Standard -types;
 	eval { require Sub::Name;  \&Sub::Name::subname }     ||
 	do   { sub { pop } } ;
 
-our %CANDIDATES;
-our %DISPATCHERS;
-our $DECLARATION_ORDER = 0;
+{
+	my %CANDIDATES;
+	
+	sub get_multimethods {
+		my ($me, $target) = @_;
+		sort keys %{ $CANDIDATES{$target} || {} };
+	}
+	
+	sub get_multimethod_candidates {
+		my ($me, $target, $method_name) = @_;
+		@{ $CANDIDATES{$target}{$method_name} || [] };
+	}
+	
+	sub has_multimethod_candidates {
+		my ($me, $target, $method_name) = @_;
+		scalar @{ $CANDIDATES{$target}{$method_name} || [] };
+	}
+	
+	sub _add_multimethod_candidate {
+		my ($me, $target, $method_name, $spec) = @_;
+		push @{ $CANDIDATES{$target}{$method_name} ||= [] }, $spec;
+		if ($spec->{method} != $CANDIDATES{$target}{$method_name}[0]{method}) {
+			require Carp;
+			Carp::carp(sprintf(
+				"Added multimethod candidate for %s with method=>%d but expected method=>%d",
+				$method_name,
+				$spec->{method},
+				$CANDIDATES{$target}{$method_name}[0]{method},
+			));
+		}
+		$me;
+	}
+	
+	sub get_all_multimethod_candidates {
+		my ($me, $target, $method_name, $is_method) = @_;
+		
+		# Figure out which packages to consider when finding candidates.
+		my @packages = $is_method
+			? @{ mro::get_linear_isa($target) }
+			: $target;
+		my $curr_height = @packages;
+		
+		# Find candidates from each package
+		my @candidates;
+		my $final_fallback = undef;
+		PACKAGE: while (@packages) {
+			my $p = shift @packages;
+			my @c;
+			my $found = $me->has_multimethod_candidates($p, $method_name);
+			if ($found) {
+				@c = $me->get_multimethod_candidates($p, $method_name);
+			}
+			else {
+				no strict 'refs';
+				if (exists &{"$p\::$method_name"}) {
+					# We found a potential monomethod.
+					my $coderef = \&{"$p\::$method_name"};
+					if (!$me->known_dispatcher($coderef)) {
+						# Definite monomethod. Stop falling back.
+						$final_fallback = $coderef;
+						last PACKAGE;
+					}
+				}
+				@c = ();
+			}
+			# Record their height in case we need it later
+			$_->{height} = $curr_height for @c;
+			push @candidates, @c;
+			--$curr_height;
+		}
+		
+		# If a monomethod was found, use it as last resort
+		if (defined $final_fallback) {
+			push @candidates, {
+				signature => sub { @_ },
+				code      => $final_fallback,
+			};
+		}
+		
+		return @candidates;
+	}
+}
+
+{
+	my %DISPATCHERS;
+	
+	sub known_dispatcher {
+		my ($me, $coderef) = @_;
+		$DISPATCHERS{"$coderef"};
+	}
+	
+	sub _mark_as_dispatcher {
+		my ($me, $coderef) = @_;
+		$DISPATCHERS{"$coderef"} = 1;
+		$me;
+	}
+}
 
 sub _generate_multimethod {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -81,15 +175,15 @@ sub copy_package_candidates {
 	my $target = pop @sources;
 	
 	for my $source (@sources) {
-		for my $method_name (sort keys %{ $CANDIDATES{$source} || {} }) {
-			for my $candidate (@{ $CANDIDATES{$source}{$method_name} }) {
+		for my $method_name ($me->get_multimethods($source)) {
+			for my $candidate ($me->get_multimethod_candidates($source, $method_name)) {
 				my %new = map {
 					$keep_while_copying{$_}
 						? ( $_ => $candidate->{$_} )
 						: ()
 				} keys %$candidate;
 				$new{copied} = 1;
-				push @{ $CANDIDATES{$target}{$method_name} ||= [] }, \%new;
+				$me->_add_multimethod_candidate($target, $method_name, \%new);
 			}
 		}
 	}
@@ -99,13 +193,12 @@ sub install_missing_dispatchers {
 	my $me = shift;
 	my ($target) = @_;
 	
-	for my $method_name (sort keys %{ $CANDIDATES{$target} || {} }) {
+	for my $method_name ($me->get_multimethods($target)) {
+		my ($first) = $me->get_multimethod_candidates($target, $method_name);
 		$me->install_dispatcher(
 			$target,
 			$method_name,
-			$CANDIDATES{$target}{$method_name}[0]
-				? $CANDIDATES{$target}{$method_name}[0]{'method'}
-				: 0,
+			$first ? $first->{'method'} : 0,
 		);
 	}
 }
@@ -121,16 +214,17 @@ sub install_monomethod {
 	$me->install_candidate($target, undef, no_dispatcher => 1, %spec, is_monomethod => 1);
 }
 
+my $DECLARATION_ORDER = 0;
 sub install_candidate {
 	my $me = shift;
 	my ($target, $sub_name, %spec) = @_;
-	$spec{method} = 1 unless exists $spec{method};
+	$spec{method} = 1 unless defined $spec{method};
 	
 	my $is_method = $spec{method};
 	
 	$spec{declaration_order} = ++$DECLARATION_ORDER;
 	
-	push @{ $CANDIDATES{$target}{$sub_name} ||= [] }, \%spec
+	$me->_add_multimethod_candidate($target, $sub_name, \%spec)
 		if defined $sub_name;
 	
 	if ($spec{alias}) {
@@ -207,7 +301,7 @@ sub install_dispatcher {
 	
 	return if !defined $sub_name;
 	
-	if ($existing and $DISPATCHERS{"$existing"}) {
+	if ($existing and $me->known_dispatcher($existing)) {
 		return $me;   # already installed
 	}
 	elsif ($existing) {
@@ -244,7 +338,7 @@ sub install_dispatcher {
 		\&{"$target\::$sub_name"};
 	};
 	
-	$DISPATCHERS{"$coderef"} = 1;
+	$me->_mark_as_dispatcher($coderef);
 	
 	return $coderef;
 }
@@ -255,56 +349,20 @@ sub dispatch {
 	
 	# Steal invocants because we don't want them to be considered
 	# as part of the signature.
-	my $invocants = [];
-	push @$invocants, splice(@$argv, 0, $is_method);
+	my @invocants;
+	push @invocants, splice(@$argv, 0, $is_method);
 	
-	# Figure out which packages to consider when finding candidates.
-	my @packages = $is_method
-		? @{ mro::get_linear_isa($pkg) }
-		: $pkg;
-	my $curr_height = @packages;
-	
-	# Find candidates from each package
-	my @candidates;
-	my $final_fallback = undef;
-	PACKAGE: while (@packages) {
-		my $p = shift @packages;
-		my @c;
-		my $found = $CANDIDATES{$p}{$method_name};
-		if ($found) {
-			@c = @$found;
-		}
-		else {
-			no strict 'refs';
-			# We found a monomethod! Stop looking at parents.
-			if (exists &{"$p\::$method_name"}) {
-				$final_fallback = \&{"$p\::$method_name"};
-				last PACKAGE;
-			}
-			@c = ();
-		}
-		# Record their height in case we need it later
-		$_->{height} = $curr_height for @c;
-		push @candidates, @c;
-		--$curr_height;
-	}
-	
-	# If a monomethod was found, use it as last resort
-	if (defined $final_fallback) {
-		push @candidates, {
-			signature => sub { @_ },
-			code      => $final_fallback,
-		};
-	}
-	
-	# Now we have a list of candidates, so dispatch to it.
-	my $next = $me->can('dispatch_to_candidate');
-	@_ = (
-		$me,
-		\@candidates,
+	my ($winner, $new_argv, $new_invocants) = $me->pick_candidate(
+		[ $me->get_all_multimethod_candidates($pkg, $method_name, $is_method) ],
 		$argv,
-		$invocants,
-	);
+		\@invocants,
+	) or do {
+		require Carp;
+		Carp::croak('Multimethod could not find candidate to dispatch to, stopped');
+	};
+	
+	my $next = $winner->{code};
+	@_ = (@$new_invocants, @$new_argv);
 	goto $next;
 }
 
@@ -313,7 +371,7 @@ sub dispatch {
 #
 my $Named = CycleTuple->of(Str, Any) | Tuple->of(HashRef);
 
-sub dispatch_to_candidate {
+sub pick_candidate {
 	my $me = shift;
 	my ($candidates, $argv, $invocants) = @_;
 	
@@ -429,18 +487,12 @@ sub dispatch_to_candidate {
 	# This is filled in each call. Clean it up, just in case.
 	delete $_->{height} for @$candidates;
 	
-	if (@remaining==1) {
-		my $sig_code  = $remaining[0]{compiled}{closure};
-		my $body_code = $remaining[0]{code};
-		@_ = ( @{$invocants||[]}, @{ $returns{"$sig_code"} } );
-		goto $body_code;
-	}
-	else {
-		require Carp;
-		Carp::croak('Multimethod could not find candidate to dispatch to, stopped');
-	}
+	wantarray or die 'MUST BE CALLED IN LIST CONTEXT';
 	
-	return;
+	return unless @remaining;
+	
+	my $sig_code  = $remaining[0]{compiled}{closure};
+	return ( $remaining[0], $returns{"$sig_code"}, $invocants||[] );
 }
 
 sub dump_sig {
@@ -776,7 +828,7 @@ gets passed the result from checking the signature earlier as C<< @_ >>.
 =head3 Roles
 
 As far as I'm aware, Sub::MultiMethod is the only multimethod implementation
-that allows multimethods imported from roles to intertegrate into a class.
+that allows multimethods imported from roles to integrate into a class.
 
   use v5.12;
   use strict;
@@ -822,7 +874,7 @@ that allows multimethods imported from roles to intertegrate into a class.
   
   my $obj = My::Class->new;
   
-  say $obj->foo_a;        # A (alias defined in RoleA)
+  say $obj->foo_a( {} );  # A (alias defined in RoleA)
   say $obj->foo( [] );    # B (candidate from RoleB)
   say $obj->foo( {} );    # C (Class overrides candidate from RoleA)
 
@@ -830,7 +882,7 @@ Sub::MultiMethods doesn't try to be clever about detecting whether your
 package is a role or a class. If you want to use it in a role, simply
 do:
 
-    use Sub::MultiMethod -role, qw(multimethod);
+  use Sub::MultiMethod -role, qw(multimethod);
 
 The main difference this makes is that the exported C<multimethod>
 function will default to C<< no_dispatcher => 1 >>, so any multimethods
@@ -840,9 +892,9 @@ part of the role's API, and won't be installed with the C<with> keyword.
 Sub::MultiMethods doesn't try to detect what roles your class has
 consumed, so in classes that consume roles with multimethods, do this:
 
-    use Sub::MultiMethod qw(multimethods_from_roles);
-    
-    multimethods_from_roles qw( My::RoleA My::RoleB );
+  use Sub::MultiMethod qw(multimethods_from_roles);
+  
+  multimethods_from_roles qw( My::RoleA My::RoleB );
 
 The list of roles should generally be the same as from C<with>.
 This function only copies multimethods across from roles; it does not
@@ -858,7 +910,13 @@ beat candidates imported from roles.
 =head2 API
 
 Sub::MultiMethod avoids cute syntax hacks because those can be added by
-third party modules. It provides an API for these modules:
+third party modules. It provides an API for these modules.
+
+Brief note on terminology: when you define multimethods in a class,
+each possible signature+coderef is a "candidate". The method which
+makes the decision about which candidate to call is the "dispatcher".
+Roles will typically have candidates but no dispatcher. Classes will
+need dispatchers setting up for each multimethod.
 
 =over
 
@@ -898,6 +956,53 @@ Useful if C<< @sources >> are a bunch of roles (like Role::Tiny).
 
 Should usually be called after C<copy_package_candidates>, unless
 C<< $target >> is a role.
+
+=item C<< Sub::MultiMethod->get_multimethods($target) >>
+
+Returns the names of all multimethods declared for a class or role,
+not including any parent classes.
+
+=item C<< Sub::MultiMethod->has_multimethod_candidates($target, $method_name) >>
+
+Indicates whether the class or role has any candidates for a multimethod.
+Does not include parent classes.
+
+=item C<< Sub::MultiMethod->get_multimethod_candidates($target, $method_name) >>
+
+Returns a list of candidate spec hashrefs for the method, not including
+candidates from parent classes.
+
+=item C<< Sub::MultiMethod->get_all_multimethod_candidates($target, $method_name, $is_method) >>
+
+Returns a list of candidate spec hashrefs for the method, including candidates
+from parent classes (unless C<< $is_method >> is false, because non-methods
+shouldn't be inherited).
+
+=item C<< Sub::MultiMethod->known_dispatcher($coderef) >>
+
+Returns a boolean indicating whether the coderef is known to be a multimethod
+dispatcher.
+
+=item C<< Sub::MultiMethod->pick_candidate(\@candidates, \@args, \@invocants) >>
+
+Returns a list of three items: first the winning candidate from an array of specs,
+given the args and invocants, second the modified args after coercion has been 
+applied, and third the modified invocants.
+
+This is basically how the dispatcher for a method works:
+
+  my @invocants = splice(@_, 0, $ismethod);
+  my $pkg       = __PACKAGE__;
+  
+  my $mm = 'Sub::MultiMethod';
+  my @candidates =
+    $smm->get_all_multimethod_candidates($pkg, $sub, $ismethod);
+  my ($winner, $new_args, $new_invocants) =
+    $smm->pick_candidate(\@candidates, \@_, \@invocants);
+  
+  my $coderef = $winner->{code};
+  @_ = (@$new_invocants, @$new_args);
+  goto $coderef;
 
 =back
 

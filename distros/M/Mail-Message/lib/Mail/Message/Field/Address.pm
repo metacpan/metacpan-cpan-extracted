@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Address;
 use vars '$VERSION';
-$VERSION = '3.008';
+$VERSION = '3.009';
 
 use base 'Mail::Identity';
 
@@ -73,8 +73,8 @@ sub string()
        # language => $self->language
 
     my @parts;
-    my $name    = $self->phrase;
-    push @parts, $format->createPhrase($name, @opts) if defined $name;
+    my $phrase  = $self->phrase;
+    push @parts, $format->createPhrase($phrase, @opts) if defined $phrase;
 
     my $address = $self->address;
     push @parts, @parts ? '<'.$address.'>' : $address;

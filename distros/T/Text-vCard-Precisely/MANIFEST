@@ -6,6 +6,7 @@ README.md
 appveyor.yml
 cpanfile
 lib/Text/vCard/Precisely.pm
+lib/Text/vCard/Precisely/Multiple.pm
 lib/Text/vCard/Precisely/V3.pm
 lib/Text/vCard/Precisely/V3/Node.pm
 lib/Text/vCard/Precisely/V3/Node/Address.pm
@@ -24,6 +25,7 @@ lib/Text/vCard/Precisely/V4/Node/N.pm
 lib/Text/vCard/Precisely/V4/Node/Related.pm
 lib/Text/vCard/Precisely/V4/Node/Tel.pm
 minil.toml
+t/Multiple/example.vcf
 t/V3/00_compile.t
 t/V3/01_node.t
 t/V3/02_address.t
@@ -71,6 +73,7 @@ t/V3/Social/base.vcf
 t/V3/Social/maltiple.vcf
 t/V3/Tel/base.vcf
 t/V3/Tel/maltiple.vcf
+t/V3/Tel/multiTypes.vcf
 t/V3/Tz/base.vcf
 t/V3/Tz/multiple.vcf
 t/V3/URI/base.vcf
@@ -124,6 +127,7 @@ t/V4/Sort_as/n.vcf
 t/V4/Sort_as/org.vcf
 t/V4/Tel/base.vcf
 t/V4/Tel/maltiple.vcf
-t/precisely.t
+t/X00_precisely.t
+t/X01_multiple.t
 META.yml
 MANIFEST

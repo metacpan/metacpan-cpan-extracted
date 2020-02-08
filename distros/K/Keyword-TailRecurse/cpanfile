@@ -1,4 +1,5 @@
 requires 'perl', '5.014';
+requires 'Keyword::Simple', '0.03';     # 0.04 causes problems with some versions of Perl (5.14 and 5.16)
 requires 'Keyword::Declare', '0.001014';
 
 on 'test' => sub {

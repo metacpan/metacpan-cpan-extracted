@@ -14,7 +14,7 @@ sub import {
     for my $func (@_) {
 	unless (grep { $func eq $_ } @EXPORT_OK) {
             require Carp;
-            Carp::croak("\"$func\" is not exported");
+            Carp::croak "\"$func\" is not exported";
 	}
 	no strict 'refs';
 	no warnings 'once', 'redefine';

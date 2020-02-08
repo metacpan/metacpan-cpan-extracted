@@ -274,6 +274,22 @@ sub test_role_tinycommons_tree {
         is_deeply([Code::Includable::Tree::NodeMethods::next_siblings($n5)], [$n6, $n7], "next_siblings [1] (sub call)");
         is_deeply([Code::Includable::Tree::NodeMethods::next_siblings($n7)], []        , "next_siblings [2] (sub call)");
 
+        # check
+        {
+            lives_ok { $n0->check({check_root=>1}) };
+
+            $n3->parent($n2);
+            lives_ok { $n0->check };
+            dies_ok { $n1->check };
+            dies_ok { $n1->check({recurse=>1}) };
+            $n3->parent($n1);
+
+            # opt:check_root=1
+            $n0->parent($n0);
+            dies_ok { $n0->check({check_root => 1}) };
+            $n0->parent(undef);
+        }
+
         # remove
         {
             my @children;
@@ -309,7 +325,7 @@ Test::Role::TinyCommons::Tree - Test suite for Role::TinyCommons::Tree
 
 =head1 VERSION
 
-This document describes version 0.120 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
+This document describes version 0.121 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
 
 =head1 DESCRIPTION
 

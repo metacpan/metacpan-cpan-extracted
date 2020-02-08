@@ -1,5 +1,8 @@
 Revision history for Perl module CBOR::Free
 
+0.21 6 Feb 2020
+- Make tests ignore inconsistent Inf detection in pre-5.22 perls on Linux 5.4+.
+
 0.20 31 Jan 2020
 - Update test requirements to avoid dev release of Test::Class::Tiny.
 

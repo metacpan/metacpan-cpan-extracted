@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0404';
 
 use DBI;
 use File::Copy;
@@ -130,7 +130,7 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0403
+version 0.0404
 
 =head1 SYNOPSIS
 
@@ -179,7 +179,7 @@ connection string, and B<db_attrs> connection attributes.
 
 =head2 database
 
-The database to copy.
+The existing database to copy to create a new test database.
 
 =head2 has_database
 
@@ -207,7 +207,9 @@ Boolean indicating that B<memory> was provided to the constructor.
 
 =head2 db_attrs
 
-DBI connection attributes.  Default: { RaiseError => 1, AutoCommit => 1 }
+DBI connection attributes.
+
+Default: { RaiseError => 1, AutoCommit => 1 }
 
 =head2 dsn
 

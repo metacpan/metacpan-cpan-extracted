@@ -53,7 +53,7 @@ subtest "gen_validator()" => sub {
         # Data-Sah-Coerce distribution, to avoid adding more dependencies)
         my $sch = ['date', {
             'x.perl.coerce_to' => 'float(epoch)',
-            'x.perl.coerce_rules' => ['str_iso8601'],
+            'x.perl.coerce_rules' => ['From_str::iso8601'],
         }];
 
         subtest "str+val" => sub {

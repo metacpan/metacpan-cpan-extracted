@@ -8,7 +8,7 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
@@ -48,7 +48,6 @@ our @CARP_NOT = qw{
     PPIx::Regexp::Node
     PPIx::Regexp::Node::Range
     PPIx::Regexp::Node::Unknown
-    PPIx::Regexp::StringTokenizer
     PPIx::Regexp::Structure
     PPIx::Regexp::Structure::Assertion
     PPIx::Regexp::Structure::Atomic_Script_Run

@@ -12,6 +12,9 @@ some text before the first headline.
 
 * header1                                                               :tag:
 contains an internal link to another part of the document [[blah]]
+** header1.1
+*** header1.1.1
+** header1.2
 * header2 [#A] [20%]
 - contains priority and progress cookie (percent-style)
 * header3 [1/10]
@@ -30,11 +33,17 @@ subtest "parse() string" => sub {
     is($doc->children->[0]->as_string,
        "* header1                                                               :tag:
 contains an internal link to another part of the document [[blah]]
+** header1.1
+*** header1.1.1
+** header1.2
 ");
     delete $doc->children->[0]->{_str};
     is($doc->children->[0]->as_string,
        "* header1 :tag:
 contains an internal link to another part of the document [[blah]]
+** header1.1
+*** header1.1.1
+** header1.2
 ");
 
 };

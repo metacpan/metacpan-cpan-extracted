@@ -1,0 +1,100 @@
+#!perl
+use strict;
+use warnings;
+use Duadua::CLI;
+
+Duadua::CLI->new(@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+duadua - The CLI command to parse User-Agent string
+
+=head1 SYNOPSIS
+
+From args
+
+    $ duadua 'Googlebot/2.1 (+http://www.google.com/bot.html)' | jq .
+    {
+      "is_windows": 0,
+      "version": "2.1",
+      "is_android": 0,
+      "ua": "Googlebot/2.1 (+http://www.google.com/bot.html)",
+      "is_ios": 0,
+      "is_bot": 1,
+      "is_linux": 0,
+      "name": "Googlebot",
+      "is_chromeos": 0
+    }
+
+Multiple User-Agents
+
+    $ perl -Ilib script/duadua 'Googlebot/2.1 (+http://www.google.com/bot.html)' 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' | jq .
+    [
+      {
+        "is_windows": 0,
+        "is_ios": 0,
+        "is_android": 0,
+        "name": "Googlebot",
+        "is_linux": 0,
+        "version": "2.1",
+        "is_chromeos": 0,
+        "is_bot": 1,
+        "ua": "Googlebot/2.1 (+http://www.google.com/bot.html)"
+      },
+      {
+        "is_linux": 0,
+        "version": "2.0",
+        "is_chromeos": 0,
+        "is_bot": 1,
+        "ua": "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)",
+        "is_windows": 0,
+        "is_ios": 0,
+        "is_android": 0,
+        "name": "Bingbot"
+      }
+    ]
+
+Also works with STDIN
+
+    $ echo 'Googlebot/2.1 (+http://www.google.com/bot.html)' | duadua | jq .
+    {
+      "is_linux": 0,
+      "ua": "Googlebot/2.1 (+http://www.google.com/bot.html)",
+      "is_bot": 1,
+      "is_ios": 0,
+      "version": "2.1",
+      "is_android": 0,
+      "is_windows": 0,
+      "is_chromeos": 0,
+      "name": "Googlebot"
+    }
+
+NOTE that if an input value is multiple, then an output JSON should be array. If an input value is single, then an output JSON should be just one hash. It might be helpful for C<jq>.
+
+
+=head2 OPTIONS
+
+=head3 --help
+
+Show help
+
+=head3 --version
+
+Show version
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Duadua>
+
+=head1 LICENSE
+
+C<Duadua> is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0. (Note that, unlike the Artistic License 1.0, version 2.0 is GPL compatible by itself, hence there is no benefit to having an Artistic 2.0 / GPL disjunction.) See the file LICENSE for details.
+
+=cut

@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field::Full;
 use vars '$VERSION';
-$VERSION = '3.008';
+$VERSION = '3.009';
 
 use base 'Mail::Message::Field';
 
@@ -190,6 +190,13 @@ sub createComment($@)
 sub createPhrase($)
 {   my $self = shift;
     local $_ = shift;
+
+    # I do not case whether it gets a but sloppy in the header string,
+    # as long as it is functionally correct: no folding inside phrase
+    # quotes.
+    return $_ = $self->encode($_, @_, force => 1)
+        if length $_ > 50;
+
     $_ =  $self->encode($_, @_)
         if @_;  # encoding required...
 
@@ -213,7 +220,7 @@ sub _encode_b($)   { MIME::Base64::encode_base64(shift, '')  }
 sub _encode_q($)
 {   my $chunk = shift;
     $chunk =~ s#([\x00-\x1F=\x7F-\xFF])#sprintf "=%02X", ord $1#ge;
-    $chunk =~ s#([_\?])#sprintf "=%02X", ord $1#ge;
+    $chunk =~ s#([_\?,"])#sprintf "=%02X", ord $1#ge;
     $chunk =~ s/ /_/g;
     $chunk;
 }
@@ -247,8 +254,8 @@ sub encode($@)
 
     return $utf8
         if lc($encoding) eq 'q'
-        && $utf8 =~ m/\A[\p{IsASCII}]+\z/ms
-        && !$args{force};
+        && length $utf8 < 70
+        && ($utf8 =~ m/\A[\p{IsASCII}]+\z/ms && !$args{force});
 
     my $pre = '=?'. $charset. ($lang ? '*'.$lang : '') .'?'.$encoding.'?';
 

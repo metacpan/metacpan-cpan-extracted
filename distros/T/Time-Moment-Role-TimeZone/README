@@ -6,21 +6,19 @@ NAME
 SYNOPSIS
 
       use Time::Moment;
-      use Role::Tiny ();
+      use With::Roles;
       use DateTime::TimeZone;
     
-      my $class = Role::Tiny->create_class_with_roles('Time::Moment', 'Time::Moment::Role::TimeZone');
-    
       my $tz = DateTime::TimeZone->new(name => 'America/New_York');
-      my $tm = $class->from_epoch(1000212360)->with_time_zone_offset_same_instant($tz);
+      my $tm = Time::Moment->with::roles('+TimeZone')->from_epoch(1000212360)->with_time_zone_offset_same_instant($tz);
     
       use DateTime::TimeZone::Olson 'olson_tz';
     
       my $tz = olson_tz('Europe/Oslo');
       my $tm = Time::Moment->new(year => 2012, month => 3, day => 4, hour => 13, minute => 7, second => 42);
-      Role::Tiny->apply_roles_to_object($tm, 'Time::Moment::Role::TimeZone');
-      $tm = $tm->with_time_zone_offset_same_local($tz);
+      $tm = $tm->with::roles('+TimeZone')->with_time_zone_offset_same_local($tz);
     
+      my $class = Time::Moment->with::roles('+TimeZone');
       my $tm = $class->from_epoch(1522095272)->with_system_offset_same_instant;
     
       my $tm = $class->new_from_string('2009-05-02T12:15:30Z')->with_system_offset_same_local;

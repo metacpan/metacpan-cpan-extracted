@@ -60,7 +60,7 @@ experiment that I consider failed. Therefore this use is B<deprecated>
 in favor of L<PPIx::QuoteLike|PPIx::QuoteLike>. As of version 0.058_01,
 the first use of the C<parse> argument to L<new()|/new> resulted in a
 warning. As of version 0.062_01, all uses of the C<parse> argument
-resulted in a warning. After another six months, the C<parse> argument
+resulted in a warning. As of version 0.068_01, the C<parse> argument
 will become fatal.
 
 The author will attempt to preserve the documented interface, but if the
@@ -165,13 +165,12 @@ use base qw{ PPIx::Regexp::Node };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 use PPIx::Regexp::Lexer ();
-use PPIx::Regexp::StringTokenizer;
 use PPIx::Regexp::Token::Modifier ();	# For its modifier manipulations.
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 
 =head2 new
 
@@ -236,35 +235,8 @@ experimental.
 As it turns out, I consider parsing non-regexp quote-like things with
 this class to be a failed experiment, and the relevant functionality is
 being deprecated and removed in favor of
-L<PPIx::QuoteLike|PPIx::QuoteLike>. See above for details.
-
-If C<'regex'> is specified, the first argument is expected to be a valid
-regex, and parsed as though it were.
-
-If C<'string'> is specified, the first argument is expected to be a
-valid string literal and parsed as such. The return is still a
-C<PPIx::Regexp> object, but the
-L<regular_expression()|/regular_expression> and L<modifier()|/modifier>
-methods return nothing, and the L<replacement()|/replacement> method
-returns the content of the string.
-
-If C<'guess'> is specified, this method will try to guess what the first
-argument is. If the first argument is a L<PPI::Element|PPI::Element>,
-the guess will reflect the PPI parse. But the guess can be wrong if the
-first argument is a string representing an unusually-delimited regex.
-For example, C<'guess'> will parse C<"foo"> as a string, but Perl will
-parse it as a regex if preceded by a regex binding operator (e.g. C<$x
-=~ "foo">), as shown by
-
- perl -MO=Deparse -e '$x =~ "foo"'
-
-which prints
-
- $x =~ /foo/u
-
-under Perl 5.22.0.
-
-The default is C<'regex'>.
+L<PPIx::QuoteLike|PPIx::QuoteLike>. See above for details. As of version
+0.068_01, any use of this option throws an exception.
 
 =item postderef boolean
 
@@ -328,13 +300,9 @@ is it supported.
 
 	$errstr = undef;
 
-	my $tokenizer_class = __choose_tokenizer_class( $content, \%args )
-	    or do {
-	    $errstr = ref $content ?
-		sprintf '%s not supported', ref $content :
-		"Unknown parse type '$args{parse}'";
-	    return;
-	};
+	# As of 0.068_01 this either fails or returns
+	# PPIx::Regexp::Tokenizer
+	my $tokenizer_class = __choose_tokenizer_class( $content, \%args );
 
 	my $tokenizer = $tokenizer_class->new(
 	    $content, %args ) or do {

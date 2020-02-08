@@ -7,9 +7,9 @@ use warnings;
 package Org::Parser::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-02-07'; # DATE
 our $DIST = 'Org-Parser-Tiny'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 sub new {
     my $class = shift;
@@ -162,9 +162,22 @@ sub new {
     bless \%args, $class;
 }
 
-sub parent { $_[0]{parent} }
-sub children { $_[0]{children} || [] }
+sub parent {
+    if (@_ > 1) {
+        $_[0]{parent} = $_[1];
+    }
+    $_[0]{parent};
+}
+
+sub children {
+    if (@_ > 1) {
+        $_[0]{children} = $_[1];
+    }
+    $_[0]{children} || [];
+}
+
 sub as_string { $_[0]{_str} }
+
 sub children_as_string { join("", map { $_->as_string } @{ $_[0]->children }) }
 
 # abstract class: Org::Parser::Tiny::HasPreamble
@@ -224,7 +237,7 @@ sub tags {
     $_[0]{tags} || [];
 }
 
-sub as_string {
+sub header_as_string {
     ($_[0]->{_str} //
          join('',
               "*" x $_[0]{level},
@@ -233,8 +246,13 @@ sub as_string {
               "$_[0]{title}",
               (defined $_[0]{tags} ? " :".join(":", @{ $_[0]{tags} }).":" : ""),
               "\n",
-          )) .
-              $_[0]->{preamble};
+          ));
+}
+
+sub as_string {
+    $_[0]->header_as_string .
+        $_[0]->{preamble} .
+        $_[0]->children_as_string;
 }
 
 1;
@@ -252,7 +270,7 @@ Org::Parser::Tiny - Parse Org documents with as little code (and no non-core dep
 
 =head1 VERSION
 
-This document describes version 0.003 of Org::Parser::Tiny (from Perl distribution Org-Parser-Tiny), released on 2020-02-06.
+This document describes version 0.005 of Org::Parser::Tiny (from Perl distribution Org-Parser-Tiny), released on 2020-02-07.
 
 =head1 SYNOPSIS
 
@@ -329,6 +347,8 @@ This module is a more lightweight alternative to L<Org:Parser>. Currently it is
 very simple and only parses headlines; thus it is several times faster than
 Org::Parser. I use this to write utilities like L<sort-org-headlines-tiny> or to
 use it with L<Tree::FSMethods>.
+
+=for Pod::Coverage ^(.+)$
 
 =head1 NODE CLASSES
 
@@ -412,6 +432,11 @@ will have its C<tags()> return C<< ["tag1","tag2"] >>, while this headline:
  * foo
 
 will have its C<tags()> return C<< [] >>.
+
+=item * header_as_string
+
+First line of headline (the header) as string, without the preamble and
+children.
 
 =back
 

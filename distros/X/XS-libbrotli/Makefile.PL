@@ -5,7 +5,7 @@ use Env qw/@PATH/;
 use XS::Install;
 
 my $libdir = "brotli";
-my $bdir   = "$libdir/build";
+my $bdir   = "$libdir/_build";
 
 unshift @PATH, Alien::cmake3->bin_dir;
 mkdir $bdir unless -d $bdir;
@@ -14,7 +14,6 @@ die "can't configure cmake\n" if $result != 0;
 
 my %params = (
     NAME   => 'XS::libbrotli',
-    LDFROM => '-Wl,--whole-archive $(OBJECT) -Wl,--no-whole-archive',
     CLIB   => {
         DIR       => $bdir,
         FILE      => 'libbrotli-static.a',

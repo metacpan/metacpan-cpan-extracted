@@ -45,7 +45,20 @@ sub testSub5 {
 lives_ok { testSub5( 1 ) } "Should work fine, even if it does take a couple of seconds to run";
 
 
+package TestParent;
+
+sub testCall4 {
+    my ( $self, $key ) = @_;
+
+    return $self->{$key};
+}
+
+
 package Test;
+
+our @ISA;
+
+push @ISA, 'TestParent';
 
 use Keyword::TailRecurse 'subCallTail';
 
@@ -64,6 +77,12 @@ sub testCall2 {
     my ( $self, $key ) = @_;
 
     return $self->{$key};
+}
+
+sub testCall3 {
+    my ( $self, $key ) = @_;
+
+    tail $self->testCall4( $key );
 }
 
 package main;

@@ -36,12 +36,12 @@ use strict;
 use Carp                 ();
 use File::Spec           ();
 use File::Path           ();
-use File::Slurp          qw(read_file write_file);
+use File::Slurper        qw(read_text write_text);
 use File::Find::Rule     ();
 use File::IgnoreReadonly ();
 use Params::Util         '_STRING'; 
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use constant MSWin32 => ( $^O eq 'MSWin32' );
 
@@ -161,9 +161,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-	my $content = read_file($file,  binmode=>':utf8') or die "Couldn't read $file";
+	my $content = read_text($file);
 	$content .= $append;
-	write_file($file, {binmode=>':utf8'}, $content);
+	write_text($file, $content);
 
 	return 1;	
 }
@@ -181,9 +181,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-        my $content = read_file($file,  binmode=>':utf8') or die "Couldn't read $file";
+        my $content = read_text($file);
 	$content =~ s/\n1;/$append\n\n1;/;
-	write_file($file, {binmode=>':utf8'}, $content);
+	write_text($file, $content);
 
 	return 1;
 }
@@ -207,9 +207,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-        my $content = read_file($file,  binmode=>':utf8') or die "Couldn't read $file";
+        my $content = read_text($file);
 	$content =~ s/\n1;/$append\n\n1;/;
-	write_file($file, {binmode=>':utf8'}, $content);
+	write_text($file, $content);
 
 	return 1;
 }
@@ -225,11 +225,11 @@ sub create_minicpan_conf {
 
 	# Write the file
 	my $guard = -f $file ? File::IgnoreReadonly->new( $file ) : 0;
-	write_file(
+	write_text(
 		$file,
-		"class: CPAN::Mini::Portable\n",
-		"skip_perl: 1\n",
-		"no_conn_cache: 1\n",
+		"class: CPAN::Mini::Portable\n".
+		"skip_perl: 1\n".
+		"no_conn_cache: 1\n"
 	);
 
 	# Make the file readonly
@@ -259,10 +259,10 @@ sub modify_batch_files {
 	foreach my $file ( @files ) {
 		# Apply the change to the file
 		my $guard = File::IgnoreReadonly->new( $file );
-		my $content = read_file($file,  binmode=>':utf8') or die "Couldn't read $file";
+		my $content = read_text($file);
 		$content =~ s/([\r\n])(perl )(-x[^\r\n]*)/$1 . _perl_cmd($3)/sge;
 		$content =~ s/(#line )(\d+)/$1 . ($2+14)/e;  # we have added extra 14 lines
-		write_file($file, {binmode=>':utf8'}, $content);
+		write_text($file, $content);
 	}
 
 	return 1;
@@ -274,9 +274,9 @@ sub modify_pl2bat {
 
 	# Apply the change to the file
 	my $guard   = File::IgnoreReadonly->new( $file );
-	my $content = read_file($file,  binmode=>':utf8') or die "Couldn't read $file";
+	my $content = read_text($file);
 	$content =~ s/\bperl \$OPT\{'(a|o|n)'\}/_perl_cmd('$OPT{\'' . $1 .'\'}', 1, 1)/esg;
-	write_file($file, {binmode=>':utf8'}, $content);
+	write_text($file, $content);
 
 	return 1;
 }

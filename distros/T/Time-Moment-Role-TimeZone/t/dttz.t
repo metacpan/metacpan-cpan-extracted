@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Time::Moment;
 use Role::Tiny ();
-use Test::Needs 'DateTime::TimeZone';
+use Test::Needs 'DateTime::Duration', 'DateTime::TimeZone';
 
 my $tz = DateTime::TimeZone->new(name => 'Asia/Pyongyang');
 my $tm = Role::Tiny->create_class_with_roles('Time::Moment', 'Time::Moment::Role::TimeZone')

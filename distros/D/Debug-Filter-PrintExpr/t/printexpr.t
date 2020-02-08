@@ -55,15 +55,15 @@ like $result, qr/\);$/, 'hash suffix';
 
 $handle = IO::String->new($result = '');
 #\{\%h}
-like $result, qr/^line \d+:\s*$/m, 'ref prefix';
-like $result, qr/\\\%h = \{$/m, 'ref expr';
+like $result, qr/^line \d+: dump\(\\\%h\);$/m, 'ref prefix';
+like $result, qr/\$_\[0\] = \{$/m, 'ref expr';
 like $result, qr/^\s+'$_' => '$h{$_}',?$/m, 'ref item' foreach keys %h;
 like $result, qr/^\s*\};$/m, 'ref suffix';
 
 $handle = IO::String->new($result = '');
 #\{\@a, \%h}
-like $result, qr/^line \d+:\s*$/m, 'ref list prefix';
-like $result, qr/^\$\{\[\\\@a, \\\%h\]\}\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
+like $result, qr/^line \d+: dump\(\\\@a, \\\%h\);$/m, 'ref list prefix';
+like $result, qr/^\$_\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
 like $result, qr/^\s*\};$/m, 'ref list suffix';
 
 $handle = IO::String->new($result = '');

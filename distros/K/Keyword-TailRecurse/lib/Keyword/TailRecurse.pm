@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Keyword::Declare;
 
@@ -43,7 +43,7 @@ sub import {
         keyword tail (/\$[_a-zA-Z0-9]+\s*->\s*[_a-zA-Z0-9]+/ $methodCall, List? $parameters) {
             my ($object, $method) = split /\s*->\s*/, $methodCall;
 
-            return "\@_ = ( $object, $parameters ); goto &{(ref $object) . '::$method'};";
+            return "\@_ = ( $object, $parameters ); goto( $object->can('$method') );";
         };
 
         $imported{subCallTail} = 1;
@@ -109,7 +109,7 @@ By default the keyword C<tailRecurse> is added, but you can use the
 C<tail_recurse> and/or C<tailrecurse> keywords to add the tail recursion
 keyword in a form more suitable for different naming conventions.
 
-=head2 Sub::Call::Tail compatability
+=head2 Sub::Call::Tail compatibility
 
 If compatibility with C<Sub::Call::Tail> is required then you can use the
 C<subCallTail> flag to enable the C<tail> keyword.
@@ -136,6 +136,13 @@ C<tail> keywords are available.
 C<Keyword::TailRecurse> requires features only available in Perl v5.14 and
 above. In addition a C<Keyword::TailRecurse> dependency doesn't work in Perl
 v5.20 due to a bug in regular expression compilation.
+
+=head2 PERL V5.14 AND V5.16 DEPENDENCY
+
+There's issues with C<Keyword::Declare> and its C<Keyword::Simple> dependency
+which requires the use of C<Keyword::Simple> version 0.03 for Perl version 5.14
+and 5.16.
+
 
 =head1 SEE ALSO
 

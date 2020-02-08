@@ -1,9 +1,9 @@
 package Code::Includable::Tree::NodeMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-02-07'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.120'; # VERSION
+our $VERSION = '0.121'; # VERSION
 
 use strict;
 our $GET_PARENT_METHOD = 'parent';
@@ -18,19 +18,19 @@ use Scalar::Util ();
 # like children, but always return list
 sub _children_as_list {
     my $self = shift;
-    my @c = $self->$GET_CHILDREN_METHOD;
-    if (@c == 1) {
-        return () unless defined($c[0]);
-        return @{$c[0]} if ref($c[0]) eq 'ARRAY';
+    my @children = $self->$GET_CHILDREN_METHOD;
+    if (@children == 1) {
+        return () unless defined($children[0]);
+        return @{$children[0]} if ref($children[0]) eq 'ARRAY';
     }
-    @c;
+    @children;
 }
 
 sub _descendants {
     my ($self, $res) = @_;
-    my @c = _children_as_list($self);
-    push @$res, @c;
-    for (@c) { _descendants($_, $res) }
+    my @children = _children_as_list($self);
+    push @$res, @children;
+    for (@children) { _descendants($_, $res) }
 }
 
 sub descendants {
@@ -43,10 +43,10 @@ sub descendants {
 sub ancestors {
     my $self = shift;
     my @res;
-    my $p = $self->$GET_PARENT_METHOD;
-    while ($p) {
-        push @res, $p;
-        $p = $p->$GET_PARENT_METHOD;
+    my $parent = $self->$GET_PARENT_METHOD;
+    while ($parent) {
+        push @res, $parent;
+        $parent = $parent->$GET_PARENT_METHOD;
     }
     @res;
 }
@@ -70,40 +70,40 @@ sub is_first_child {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
-    my @c = _children_as_list($parent);
-    @c && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[0]);
+    my @siblings = _children_as_list($parent);
+    @siblings && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[0]);
 }
 
 sub is_last_child {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
-    my @c = _children_as_list($parent);
-    @c && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[-1]);
+    my @siblings = _children_as_list($parent);
+    @siblings && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[-1]);
 }
 
 sub is_only_child {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
-    my @c = _children_as_list($parent);
-    @c==1;# && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[0]);
+    my @siblings = _children_as_list($parent);
+    @siblings==1;# && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[0]);
 }
 
 sub is_nth_child {
     my ($self, $n) = @_;
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
-    my @c = _children_as_list($parent);
-    @c >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[$n-1]);
+    my @siblings = _children_as_list($parent);
+    @siblings >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[$n-1]);
 }
 
 sub is_nth_last_child {
     my ($self, $n) = @_;
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
-    my @c = _children_as_list($parent);
-    @c >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[-$n]);
+    my @siblings = _children_as_list($parent);
+    @siblings >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[-$n]);
 }
 
 sub is_first_child_of_type {
@@ -111,8 +111,8 @@ sub is_first_child_of_type {
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
     my $type = ref($self);
-    my @c = grep { ref($_) eq $type } _children_as_list($parent);
-    @c && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[0]);
+    my @siblings = grep { ref($_) eq $type } _children_as_list($parent);
+    @siblings && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[0]);
 }
 
 sub is_last_child_of_type {
@@ -120,8 +120,8 @@ sub is_last_child_of_type {
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
     my $type = ref($self);
-    my @c = grep { ref($_) eq $type } _children_as_list($parent);
-    @c && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[-1]);
+    my @siblings = grep { ref($_) eq $type } _children_as_list($parent);
+    @siblings && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[-1]);
 }
 
 sub is_only_child_of_type {
@@ -129,8 +129,8 @@ sub is_only_child_of_type {
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
     my $type = ref($self);
-    my @c = grep { ref($_) eq $type } _children_as_list($parent);
-    @c == 1; # && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[0]);
+    my @siblings = grep { ref($_) eq $type } _children_as_list($parent);
+    @siblings == 1; # && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[0]);
 }
 
 sub is_nth_child_of_type {
@@ -138,8 +138,8 @@ sub is_nth_child_of_type {
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
     my $type = ref($self);
-    my @c = grep { ref($_) eq $type } _children_as_list($parent);
-    @c >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[$n-1]);
+    my @siblings = grep { ref($_) eq $type } _children_as_list($parent);
+    @siblings >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($siblings[$n-1]);
 }
 
 sub is_nth_last_child_of_type {
@@ -147,18 +147,18 @@ sub is_nth_last_child_of_type {
     my $parent = $self->$GET_PARENT_METHOD;
     return 0 unless $parent;
     my $type = ref($self);
-    my @c = grep { ref($_) eq $type } _children_as_list($parent);
-    @c >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($c[-$n]);
+    my @children = grep { ref($_) eq $type } _children_as_list($parent);
+    @children >= $n && Scalar::Util::refaddr($self) == Scalar::Util::refaddr($children[-$n]);
 }
 
 sub prev_sibling {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD or return undef;
     my $refaddr = Scalar::Util::refaddr($self);
-    my @c = _children_as_list($parent);
-    for my $i (1..$#c) {
-        if (Scalar::Util::refaddr($c[$i]) == $refaddr) {
-            return $c[$i-1];
+    my @siblings = _children_as_list($parent);
+    for my $i (1..$#siblings) {
+        if (Scalar::Util::refaddr($siblings[$i]) == $refaddr) {
+            return $siblings[$i-1];
         }
     }
     undef;
@@ -168,10 +168,10 @@ sub prev_siblings {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD or return ();
     my $refaddr = Scalar::Util::refaddr($self);
-    my @c = _children_as_list($parent);
-    for my $i (1..$#c) {
-        if (Scalar::Util::refaddr($c[$i]) == $refaddr) {
-            return @c[0..$i-1];
+    my @siblings = _children_as_list($parent);
+    for my $i (1..$#siblings) {
+        if (Scalar::Util::refaddr($siblings[$i]) == $refaddr) {
+            return @siblings[0..$i-1];
         }
     }
     ();
@@ -181,10 +181,10 @@ sub next_sibling {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD or return undef;
     my $refaddr = Scalar::Util::refaddr($self);
-    my @c = _children_as_list($parent);
-    for my $i (0..$#c-1) {
-        if (Scalar::Util::refaddr($c[$i]) == $refaddr) {
-            return $c[$i+1];
+    my @siblings = _children_as_list($parent);
+    for my $i (0..$#siblings-1) {
+        if (Scalar::Util::refaddr($siblings[$i]) == $refaddr) {
+            return $siblings[$i+1];
         }
     }
     undef;
@@ -194,10 +194,10 @@ sub next_siblings {
     my $self = shift;
     my $parent = $self->$GET_PARENT_METHOD or return ();
     my $refaddr = Scalar::Util::refaddr($self);
-    my @c = _children_as_list($parent);
-    for my $i (0..$#c-1) {
-        if (Scalar::Util::refaddr($c[$i]) == $refaddr) {
-            return @c[$i+1 .. $#c];
+    my @siblings = _children_as_list($parent);
+    for my $i (0..$#siblings-1) {
+        if (Scalar::Util::refaddr($siblings[$i]) == $refaddr) {
+            return @siblings[$i+1 .. $#siblings];
         }
     }
     ();
@@ -206,17 +206,45 @@ sub next_siblings {
 # remove self from parent
 sub remove {
     my $self = shift;
-    my $parent = $self->$GET_PARENT_METHOD or return ();
+    my $parent = $self->$GET_PARENT_METHOD or return;
     my $refaddr = Scalar::Util::refaddr($self);
-    my @c;
-    for my $c (_children_as_list($parent)) {
-        if (Scalar::Util::refaddr($c) == $refaddr) {
+    my @remaining_siblings;
+    for my $sibling (_children_as_list($parent)) {
+        if (Scalar::Util::refaddr($sibling) == $refaddr) {
+            $sibling->$SET_PARENT_METHOD(undef);
             next;
         }
-        push @c, $c;
+        push @remaining_siblings, $sibling;
     }
-    $parent->$SET_CHILDREN_METHOD(\@c);
+    $parent->$SET_CHILDREN_METHOD(\@remaining_siblings);
 }
+
+# check references
+sub check {
+    my $self = shift;
+    my $opts = shift // {};
+
+    if ($opts->{check_root}) {
+        my $parent = $self->$GET_PARENT_METHOD;
+        defined $parent and die "check: parent is not undef";
+    }
+
+    # check that all children refers back to me in their parent
+    my $refaddr = Scalar::Util::refaddr($self);
+    my $i = 0;
+    for my $child (_children_as_list($self)) {
+        my $childs_parent = $child->$GET_PARENT_METHOD;
+        unless (defined $childs_parent &&
+                    Scalar::Util::refaddr($childs_parent) == $refaddr) {
+            die "check: Child #$i of $self does not refer back to its parent";
+        }
+        check($child, {
+            recurse=>1,
+            #check_root=>0,
+        }) if $opts->{recurse};
+    }
+}
+
 
 1;
 # ABSTRACT: Tree node routines
@@ -233,7 +261,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.120 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-06.
+This document describes version 0.121 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
 
 =head1 DESCRIPTION
 
@@ -269,6 +297,101 @@ this variable and C<$SET_CHILDREN_METHOD>.
 
 The method names C<children> can actually be customized by (locally) setting
 this variable and C<$GET_CHILDREN_METHOD>.
+
+=head1 FUNCTIONS
+
+=for BEGIN_BLOCK: methods
+
+=head2 ancestors
+
+Return a list of ancestors, from the direct parent upwards to the root.
+
+=head2 check
+
+Usage:
+
+ $node->check(\%opts)
+
+Check references in a tree: that all children refers back to the parent.
+Options:
+
+=over
+
+=item * recurse => bool
+
+=item * check_root => bool
+
+If set to true, will also check that parent is undef (meaning this node is a
+root node).
+
+=back
+
+=head2 descendants
+
+Return a list of descendents, from the direct children, to their children's
+children, and so on until all the leaf nodes.
+
+=head2 first_node
+
+Usage:
+
+ $node->first_node($coderef)
+
+Much like L<List::Util>'s C<first>. Will L</walk> the descendant nodes until the
+first coderef returns true, and return that.
+
+=head2 is_first_child
+
+=head2 is_first_child_of_type
+
+=head2 is_last_child
+
+=head2 is_last_child_of_type
+
+=head2 is_nth_child
+
+=head2 is_nth_child_of_type
+
+=head2 is_nth_last_child
+
+=head2 is_nth_last_child_of_type
+
+=head2 is_only_child
+
+=head2 is_only_child_of_type
+
+=head2 next_sibling
+
+Return the sibling node directly after this node.
+
+=head2 next_siblings
+
+Return all the next siblings of this node, from the one directly after to the
+last.
+
+=head2 prev_sibling
+
+Return the sibling node directly before this node.
+
+=head2 prev_siblings
+
+Return all the previous siblings of this node, from the first to the one
+directly before.
+
+=head2 remove
+
+Detach this node from its parent. Also set the parent of this node to undef.
+
+=head2 walk
+
+Usage:
+
+ $node->walk($coderef);
+
+Call C<$coderef> for all descendants (this means the self node is not included).
+$coderef will be passed the node.
+
+=for END_BLOCK: methods
 
 =head1 HOMEPAGE
 

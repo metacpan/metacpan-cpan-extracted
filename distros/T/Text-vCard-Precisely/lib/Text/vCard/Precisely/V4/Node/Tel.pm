@@ -18,16 +18,19 @@ override 'as_string' => sub {
     my ($self) = @_;
     my @lines;
     push @lines, $self->name || croak "Empty name";
+    push @lines, 'VALUE=uri';
     push @lines, 'ALTID=' . $self->altID if $self->altID;
     push @lines, 'PID=' . join ',', @{ $self->pid } if $self->pid;
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types } ) if @{ $self->types || [] } > 0;
-    push @lines, 'VALUE=uri';
+    push @lines, 'TYPE="' . join( ',', map { uc $_ } @{ $self->types() } ) . '"' if @{ $self->types() || [] } > 0;
 
-    ( my $content = $self->content() ) =~ s/^\s+//s;    # remove top space
-    $content =~ s/^tel:\(?//s;                          # remove tel: once
-    $content =~ s/(?:(?!\A)\D|\()+/ /sg;                # replace symbols to space
-    $content =~ s/^\s+//s;                              # remove top space again
-    my $string = join(';', @lines ) . ':tel:' . $content;
+    #( my $content = $self->content() ) =~ s/^\s+//s;    # remove top space
+    #$content =~ s/^tel:\(?//s;                          # remove tel: once
+    #$content =~ s/(?:(?!\A)\D|\()+/ /sg;                # replace symbols to space
+    #$content =~ s/^\s+//s;                              # remove top space again
+    #my $string = join(';', @lines ) . ':tel:' . $content;
+    my $colon = $self->content() =~ /^tel:/ ? ':': ':tel:';
+    
+    my $string = join(';', @lines ) . $colon . $self->content();
     return $self->fold( $string, -force => 1 );
 };
 

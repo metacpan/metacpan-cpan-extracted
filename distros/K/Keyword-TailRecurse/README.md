@@ -35,7 +35,7 @@ By default the keyword `tailRecurse` is added, but you can use the
 `tail_recurse` and/or `tailrecurse` keywords to add the tail recursion
 keyword in a form more suitable for different naming conventions.
 
-## Sub::Call::Tail compatability
+## Sub::Call::Tail compatibility
 
 If compatibility with `Sub::Call::Tail` is required then you can use the
 `subCallTail` flag to enable the `tail` keyword.
@@ -62,6 +62,12 @@ Note: with `Sub::Call:Tail` compatibility enabled both the `tailRecurse` and
 `Keyword::TailRecurse` requires features only available in Perl v5.14 and
 above. In addition a `Keyword::TailRecurse` dependency doesn't work in Perl
 v5.20 due to a bug in regular expression compilation.
+
+## PERL V5.14 AND V5.16 DEPENDENCY
+
+There's issues with `Keyword::Declare` and its `Keyword::Simple` dependency
+which requires the use of `Keyword::Simple` version 0.03 for Perl version 5.14
+and 5.16.
 
 # SEE ALSO
 

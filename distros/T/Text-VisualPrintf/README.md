@@ -15,7 +15,7 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 # VERSION
 
-Version 3.01
+Version 3.02
 
 # DESCRIPTION
 
@@ -24,7 +24,7 @@ capability of handling multi-byte wide characters properly.
 
 When the given string is truncated by the maximum precision, space
 character is padded if the wide character does not fit to the remained
-space.  It fails with the target width less than two.
+space.
 
 # FUNCTIONS
 
@@ -44,19 +44,14 @@ space.  It fails with the target width less than two.
 Strings in the LIST which contains wide-width character are replaced
 before formatting, and recovered after the process.
 
-Unique replacement string contains combinations of control characters
-(Control-A to Control-E).  If the FORMAT contains all of these two
-bytes combinations, the function behaves just like a standard one.
-
-Because this mechanism expects at least two bytes of string can be
-found in the formatted text, it does not work when the string is
-truncated to one.
+Unique replacement string contains combinations of two ASCII
+characters not found in the format string and all parameters.  If two
+characters are not available, function behaves just like a standard
+one.
 
 # SEE ALSO
 
-[Text::VisualPrintf::IO](https://metacpan.org/pod/Text::VisualPrintf::IO)
-
-[Text::VisualWidth::PP](https://metacpan.org/pod/Text::VisualWidth::PP)
+[Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf), [Text::VisualPrintf::IO](https://metacpan.org/pod/Text::VisualPrintf::IO)
 
 [https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
 

@@ -6,6 +6,11 @@ use Text::VisualPrintf;
 
 use Test::More;
 
+is( Text::VisualPrintf::sprintf( "%d %5.3f", 12345, 12.345),
+    "12345 12.345",
+    'Number %d %f' );
+
+
 is( Text::VisualPrintf::sprintf( "%12s",    "abcde"),  "       abcde", 'ASCII %s' );
 
 

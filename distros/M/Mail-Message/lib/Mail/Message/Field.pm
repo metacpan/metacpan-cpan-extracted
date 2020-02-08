@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Message::Field;
 use vars '$VERSION';
-$VERSION = '3.008';
+$VERSION = '3.009';
 
 use base 'Mail::Reporter';
 
@@ -396,9 +396,15 @@ sub stringifyData($)
           my $group = Mail::Message::Field::AddrGroup->coerce($obj);
           push @addr, $group->string if $group;
       }
+      elsif($obj->isa('Mail::Message::Field'))
+      {
+          my $folded = join ' ', $obj->foldedBody;
+          $folded =~ s/^ //;
+          $folded =~ s/\n\z//;
+          push @addr, $folded;
+      }
       else
-      {    # any other object is stringified
-           push @addr, "$obj";
+      {   push @addr, "$obj";    # any other object is stringified
       }
    }
 
