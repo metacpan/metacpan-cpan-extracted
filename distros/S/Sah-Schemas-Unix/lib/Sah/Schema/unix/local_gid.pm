@@ -1,9 +1,9 @@
 package Sah::Schema::unix::local_gid;
 
-# AUTHOR
-our $DATE = '2019-12-09'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $schema = ["unix::gid" => {
     summary => 'Group identifier (GID) that has to exist on the system',
@@ -15,7 +15,7 @@ returns a record.
 Support coercion from an existing group name.
 
 _
-    'x.perl.coerce_rules' => ['From_str::convert_unix_group_to_gid', 'From_int::check_gid_exists'],
+    'prefilters' => ['Unix::convert_unix_group_to_gid', 'Unix::check_gid_exists'],
 }, {}];
 
 1;
@@ -33,7 +33,7 @@ Sah::Schema::unix::local_gid - Group identifier (GID) that has to exist on the s
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
+This document describes version 0.010 of Sah::Schema::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

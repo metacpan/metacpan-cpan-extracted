@@ -1,9 +1,30 @@
 Revision history for Var-Mystic
 
 0.000001  Wed Feb  5 18:29:14 2020
-       Initial release.
+    Initial release.
 
 
 
 0.000002  Wed Feb  5 20:00:56 2020
-          No changes logged
+    No changes logged
+
+
+0.000003  Sun Feb  9 22:33:58 2020
+
+    Added new interface ('track' prefix instead of 'mystic' keyword)
+
+    Added test dependency on Term::ANSIColor
+
+    Added support for 'our' and 'state' variables
+
+    Added support for tracking arrays and hashes
+
+    Added support for adding tracking to variables after declaration
+
+    Added support for lexically scoped tracking ('here' option)
+
+    Added 'no Var::Mystic' to silence all tracking
+    without the need to remove keywords
+
+    Made module smarter about colouring its output
+    (no colouring if STDERR redirected away from terminal)

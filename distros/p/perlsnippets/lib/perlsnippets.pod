@@ -13,7 +13,7 @@ perlsnippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.006 of perlsnippets (from Perl distribution perlsnippets), released on 2019-12-25.
+This document describes version 0.007 of perlsnippets (from Perl distribution perlsnippets), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -204,6 +204,21 @@ It is the run-time equivalent of C<< use Foo::Bar "baz", "qux"; >>. C<< require
 Foo::Bar; >> itself is the run-time equivalent of C<< use Foo::Bar (); >>, i.e.
 loading a module without importing anything from it.
 
+=head1 PORT (Portability-related)
+
+=head2 PORT/POSIX/1 (Checking if we are on a platform that is POSIX-compatible)
+
+ $^O =~ /(?^:\A(?:aix|beos|cygwin|darwin|dragonfly|freebsd|gnu|gnukfreebsd|haiku|hpux|interix|iphoneos|irix|linux|midnightbsd|minix|mirbsd|msys|netbsd|openbsd|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk)\z)/
+
+(regexp taken from C<$RE_OS_IS_POSIX> from L<Perl::osnames> 0.121).
+
+=head2 PORT/UNIX/1 (Checking if we are on Unix platform)
+
+ $^O =~ /(?^:\A(?:aix|android|bsdos|bitrig|dgux|dynixptx|cygwin|darwin|dragonfly|freebsd|gnu|gnukfreebsd|hpux|interix|iphoneos|irix|linux|machten|midnightbsd|mirbsd|msys|netbsd|next|nto|openbsd|qnx|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk)\z)/
+
+(regexp taken from C<$RE_OS_IS_UNIX> from L<Perl::osnames> 0.121). You can also
+use L<Perl::OSType>.
+
 =head1 PROC (Process Management)
 
 =head1 PROC/CHLD (Process / Child Process)
@@ -351,7 +366,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

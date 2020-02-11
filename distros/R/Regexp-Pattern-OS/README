@@ -1,0 +1,74 @@
+NAME
+    Regexp::Pattern::OS - Regexp patterns related to OS names and Perl's $^O
+
+VERSION
+    This document describes version 0.002 of Regexp::Pattern::OS (from Perl
+    distribution Regexp-Pattern-OS), released on 2020-02-10.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("OS::os_is_known");
+
+DESCRIPTION
+    This is basically a glue to Perl::osnames.
+
+PATTERNS
+    *   os_is_known
+
+        Check that operating system ($^O) is a known value.
+
+        Examples:
+
+         "linux" =~ re("OS::os_is_known");  # matches
+
+         "MSWin32" =~ re("OS::os_is_known");  # matches
+
+         "foo" =~ re("OS::os_is_known");  # doesn't match
+
+    *   os_is_posix
+
+        Check that operating system ($^O) is (mostly) POSIX compatible.
+
+        Examples:
+
+         "linux" =~ re("OS::os_is_posix");  # matches
+
+         "MSWin32" =~ re("OS::os_is_posix");  # doesn't match
+
+    *   os_is_unix
+
+        Check that operating system ($^O) is a Unix.
+
+        Examples:
+
+         "linux" =~ re("OS::os_is_unix");  # matches
+
+         "MSWin32" =~ re("OS::os_is_unix");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-OS>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-OS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-OS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Perl::osnames
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

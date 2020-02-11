@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=perlsnippets
   homepage: https://metacpan.org/release/perlsnippets
   repository: git://github.com/perlancar/perl-perlsnippets.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -293,7 +293,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

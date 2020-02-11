@@ -1,4 +1,3 @@
-bin/CELLdemo.plx
 Build.PL
 Changes
 config/CELL_Config.pm
@@ -17,7 +16,6 @@ lib/App/CELL/Test.pm
 lib/App/CELL/Test/LogToFile.pm
 lib/App/CELL/Util.pm
 LICENSE
-Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.json
@@ -34,12 +32,15 @@ t/030-status.t
 t/031-status_ok.t
 t/032-status-expurgate.t
 t/033-status-accessor.t
+t/034-status-dump.t
 t/050-load.t
 t/070-config.t
 t/100-cell.t
 t/110-site.t
 t/111-site.t
+t/critic.t
 t/manifest.t
+t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 WISHLIST

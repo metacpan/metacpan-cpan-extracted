@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use File::Slurper qw(read_text);
+use Module::Path::More qw(module_path);
+#use Perl::OSType;
+use Perl::osnames;
+
+print "os in Perl::OSType not yet in Perl::osnames:\n";
+my $ostype_src = read_text(module_path(module => "Perl::OSType"));
+my %ostype_os;
+for my $line (split /^/m, $ostype_src) {
+    $line =~ /^\s+([\w-]+)\s+\w+\s*$/ or next;
+    $ostype_os{$1} = 1;
+}
+if ($ENV{DEBUG}) { use DD; dd \%ostype_os }
+
+for my $os (sort keys %ostype_os) {
+    print "  $os\n" unless grep { $_->[0] eq $os } @$Perl::osnames::data;
+}
+print "\n";
+
+print "os in Perl::osnames no longert in Perl::OSType:\n";
+for my $rec (@$Perl::osnames::data) {
+    next if $ostype_os{ $rec->[0] };
+    print "  $rec->[0]";
+    print " (already tagged old)" if grep { $_ eq 'old' } @{$rec->[1]};
+    print "\n";
+}
+print "\n";

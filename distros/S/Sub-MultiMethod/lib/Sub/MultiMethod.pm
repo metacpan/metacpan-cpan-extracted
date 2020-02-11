@@ -5,12 +5,12 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 use B ();
 use Exporter::Shiny qw( multimethod multimethods_from_roles monomethod );
 use Type::Params ();
-use Types::Standard -types;
+use Types::Standard qw( -types is_ClassName is_Object );
 
 *_set_subname =
 	eval { require Sub::Util;  \&Sub::Util::set_subname } ||
@@ -352,6 +352,15 @@ sub dispatch {
 	my @invocants;
 	push @invocants, splice(@$argv, 0, $is_method);
 	
+	if ( $is_method and is_Object($invocants[0]) ) {
+		# object method; reset package search from invocant class
+		$pkg = ref($invocants[0]);
+	}
+	elsif ( $is_method and is_ClassName($invocants[0]) ) {
+		# class method; reset package search from invocant class
+		$pkg = $invocants[0];
+	}
+	
 	my ($winner, $new_argv, $new_invocants) = $me->pick_candidate(
 		[ $me->get_all_multimethod_candidates($pkg, $method_name, $is_method) ],
 		$argv,
@@ -463,7 +472,7 @@ sub pick_candidate {
 	if (@remaining > 1) {
 		# Only keep those from the most derived class
 		no warnings qw(uninitialized numeric);
-		@remaining = sort { $a->{height} <=> $b->{height} } @remaining;
+		@remaining = sort { $b->{height} <=> $a->{height} } @remaining;
 		my $max_score = $remaining[0]->{height};
 		@remaining = grep { $_->{height} == $max_score } @remaining;
 	}
@@ -815,6 +824,11 @@ signature unless a score was specified explicitly.
 If multiple candidates are equally constrained, child class candidates
 beat parent class candidates; class candidates beat role candidates;
 and the candidate that was declared earlier wins.
+
+Method-resolution order (DFS/C3) is respected, though in Perl 5.8 under
+very contrived conditions (calling a sub as a function when it was
+defined as a method, but not passing a valid invocant as the first
+parameter), MRO may not always work correctly.
 
 Note that invocants are not part of the signature, so not taken into
 account when calculating scores, but because child class candidates

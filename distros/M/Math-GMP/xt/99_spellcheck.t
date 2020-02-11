@@ -44,7 +44,7 @@ while (<DATA>) {
 	}
 	next if /^#/ or ! /\w/;
 	for (split) {
-		$okword{$file}{$_}++;
+		++$okword{$file}{$_};
 	}
 }
 
@@ -55,7 +55,7 @@ sub spellcheck {
 	my $class = $sfile =~ /\.pm$/ ? 'Perl' : $sfile =~ /\.t$/ ? 'Test' : '';
 	while (my $word = $check->next_word) {
 		next if $okword{Common}{$word} or $okword{$sfile}{$word} or $okword{$class}{$word};
-		$badword{$word}++;
+		++$badword{$word};
 	}
 	my $count = keys %badword;
 	if (! $count) {

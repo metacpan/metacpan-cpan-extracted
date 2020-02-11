@@ -18,7 +18,7 @@ Sah::Type - Standard types
 
 =head1 VERSION
 
-This document describes version 0.9.46 of Sah::Type (from Perl distribution Sah), released on 2019-07-19.
+This document describes version 0.9.49 of Sah::Type (from Perl distribution Sah), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -327,7 +327,7 @@ See also: L</req>
 
 =head3 prefilters
 
-Value: array of expression string.
+Value: array of (filter rule name)s, or ([filter rule name, argument hash]).
 
 Priority: 10 (high). Run after L</default> and L</req>/L</forbidden>.
 
@@ -336,11 +336,6 @@ Category: filter.
 Attributes specific to this clause: C<temp> (bool, default 0, if set to true
 then prefiltered value will only be used during validation and at the end of the
 clause set data will not use this value).
-
-Run expression(s), usually to preprocess data before further checking. Data is
-referred to in expression by variable C<$_>. Prefiltered value should persist
-until the end of all other clauses (until the end of clause set), after which
-the old value can be restored.
 
 =head3 clause
 
@@ -494,15 +489,13 @@ avoid ambiguity with expression:
 
 =head3 postfilters
 
-Value: array of expression strings.
+Value: array of (filter rule name)s, or ([filter rule name, argument hash]).
 
 Priority: 90 (very low). Run after all other clauses.
 
 Category: filter.
 
-Run expression(s), usually to postprocess data. Data is referred to in
-expression by variable C<$_>. From here on, the data will be permanently set to
-the postfiltered value.
+From here on, the data will be permanently set to the postfiltered value.
 
 =head3 examples
 
@@ -1409,7 +1402,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

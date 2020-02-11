@@ -1,3 +1,9 @@
+0.010   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Reimplement coercion rules as filter rules because filters are
+	  more appropriate here.
+
+
 0.009   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] For better error message, coercion rules that convert UID/GID <->

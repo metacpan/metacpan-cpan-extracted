@@ -5,6 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use lib 'inc';
 use Devel::CheckLib;
+use Config;
 
 my $master = 'lib/HarfBuzz/Shaper.pm';
 my $version = MM->parse_version($master);
@@ -81,9 +82,26 @@ EOF
 
 elsif ( -s $hb_src ) {
     $hb_include = 1;
-    warn("Including harfbuzz library\n");
+    warn(<<EOD);
+
+NOTICE !! NOTICE !! NOTICE !! NOTICE !! NOTICE !!
+
+We could not find a suitable harfbuzz library so we will try to
+build our own. This will require a decent C++ compiler (C++11).
+
+If building fails, see document INSTALL for (other options.
+
+EOD
+
     $args{MYEXTLIB} = 'harfbuzz.o';
-    $args{LIBS}     = [ '-lstdc++' ];
+
+    # FreeBSD 10 doesn't want the stdc++ library???
+    if ( $Config{osname} eq "freebsd" && $Config{osvers} =~ /^10\./ ) {
+	$args{LIBS} = [];
+    }
+    else {
+	$args{LIBS} = [ '-lstdc++' ];
+    }
     $args{INC}      = '-Ihb_src',
 }
 
@@ -102,7 +120,7 @@ WriteMakefile(%args);
 
 sub MY::postamble {
     return unless $hb_include;
-    my $cxx = $ENV{CXX} || "g++";
+    my $cxx = $ENV{CXX} || "c++";
     return <<EOF;
 \$(MYEXTLIB) : $hb_src
 	$cxx -c -std=c++11 -o \$\@ -DHB_NO_MT \$(CCCDLFLAGS) \$<

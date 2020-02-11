@@ -7,7 +7,10 @@ META.yml
 Makefile.PL
 README
 dist.ini
-lib/Data/Sah/Coerce/perl/To_str/From_str/strip_slashes.pm
+lib/Data/Sah/Filter/perl/Path/expand_tilde.pm
+lib/Data/Sah/Filter/perl/Path/expand_tilde_when_on_unix.pm
+lib/Data/Sah/Filter/perl/Path/strip_slashes.pm
+lib/Data/Sah/Filter/perl/Path/strip_slashes_when_on_unix.pm
 lib/Sah/Schema/dirname.pm
 lib/Sah/Schema/dirname/unix.pm
 lib/Sah/Schema/filename.pm
@@ -25,7 +28,6 @@ t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/coerce-rule-perl-strip_slashes.t
 t/schema-dirname-unix.t
 t/schema-filename-unix.t
 t/schema-pathname-unix.t

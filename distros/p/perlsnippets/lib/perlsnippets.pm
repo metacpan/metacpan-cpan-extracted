@@ -1,7 +1,7 @@
 package perlsnippets;
 
-our $DATE = '2019-12-25'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: A collection of Perl idioms or short pieces of Perl code
@@ -18,7 +18,7 @@ perlsnippets - A collection of Perl idioms or short pieces of Perl code
 
 =head1 VERSION
 
-This document describes version 0.006 of perlsnippets (from Perl distribution perlsnippets), released on 2019-12-25.
+This document describes version 0.007 of perlsnippets (from Perl distribution perlsnippets), released on 2020-02-11.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,10 +1,9 @@
 # Data::Report::Base.pm -- Base class for reporters
-# RCS Info        : $Id: Base.pm,v 1.10 2006/06/08 13:11:05 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 13:18:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jun  6 22:13:56 2006
-# Update Count    : 317
+# Last Modified On: Sun Feb  9 20:34:18 2020
+# Update Count    : 319
 # Status          : Unknown, Use with caution!
 
 package Data::Report::Base;
@@ -35,7 +34,7 @@ sub new {
 
     my $type = delete($args->{type});
     my $style = delete($args->{style}) || "default";
-    my $self = bless { _base_type   => lc($type),
+    my $self = bless { _base_type   => lc( $type // "" ),
 		       _base_fields => [],
 		       _base_fdata  => {},
 		       _base_style  => $style,

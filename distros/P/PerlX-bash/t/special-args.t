@@ -38,32 +38,34 @@ my ($str, $f);
 	sub basename {}
 }
 
-foreach ( 'this is a test', 'this"test"is', "single'quote'test", 'test;pwd', 'test' )
+foreach ( 'this is a test', 'this"test"is', "single'quote'test", 'test;pwd', 'test', '# test' )
 {
 	$f = Path::Bmoogle->new($_);
-	$str = bash \string => "$^X -e '$proglet'", $f;
+	$str = bash \string => $^X, -e => $proglet, $f;
 	is $str, $_, "successful treatment as a filename: $_"
-			or do { diag "command line:"; print STDERR '# '; bash -x => "$^X -e 1", $f };
+			or do { diag "command line:"; print STDERR '# '; bash -x => $^X, -e => 1, $f };
 }
 
 # This class lacks a basename method, so it shouldn't work.
 # NOTE: "Not working" in this case means the object will stringify to the name, but it won't be
-# quoted.  Therefore, the first argument will only be the first word in the name, rather than the
-# entire name.
+# autoquoted.  Therefore, whether it gets quoted or not depends on special characters.  To ensure it
+# _won't_ be quoted, it needs to begin with a special character.  I haven't thought of a way to
+# begin a string with a special char that actually produces an arg to be printed, but this is
+# probably sufficient for now.
 {
 	package Path::IckyStickyPoo;
 	sub new { my $class = shift; bless { name => shift }, $class }
 	use overload '""' => sub { shift->{name} }
 }
-$f = Path::IckyStickyPoo->new("this is a test");
-$str = bash \string => "$^X -e '$proglet'", $f, '2>'.File::Spec->devnull;
-is $str, "this", "no filename without `basename`"
-		or do { diag "command line:"; print STDERR '# '; bash -x => "$^X -e 1", $f };
+$f = Path::IckyStickyPoo->new("# test");
+$str = bash \string => $^X, -e => $proglet, $f;
+is $str, "", "no filename without `basename`"
+		or do { diag "command line:"; print STDERR '# '; bash -x => $^X, -e => 1, $f };
 
 
 # If an arg is a regex, that should stringify and quote as well.
 my $re = qr/"This" (is) a* 'test'/;
-$str = bash \string => "$^X -e '$proglet'", $re, '2>'.File::Spec->devnull;
+$str = bash \string => $^X, -e => $proglet, $re, '2>'.File::Spec->devnull;
 is $str, "$re", "regex quote just like filename";
 
 

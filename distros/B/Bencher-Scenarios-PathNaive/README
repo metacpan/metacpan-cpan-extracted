@@ -1,0 +1,42 @@
+NAME
+    Bencher::Scenarios::PathNaive - Benchmark Path::Naive
+
+VERSION
+    This document describes version 0.001 of Bencher::Scenarios::PathNaive
+    (from Perl distribution Bencher-Scenarios-PathNaive), released on
+    2020-02-10.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::PathNaive::split_path
+
+    *   Bencher::Scenario::PathNaive::concat_path
+
+    *   Bencher::Scenario::PathNaive::normalize_path
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-PathNaive>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-PathNaive>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Pat
+    hNaive>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

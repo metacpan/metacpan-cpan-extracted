@@ -1,5 +1,10 @@
 Changes file for Linux::LXC
 
+1.0004    2020-02-08 20:57:32+01:00 Europe/Paris
+	* PLL-6: add LXC v3 support.
+	* PLL-7: the "exec" subroutine will avoid to share host environment variables.
+	* PLL-8: add a "get_version" subroutine.
+
 1.0003    2018-09-03 07:36:43+02:00 Europe/Paris
 	* PLL-1: manage get_config() call without parameter.
 	* PLL-4: add a paragraph in the POD file about the bug-tracker.

@@ -11,17 +11,17 @@ use SkipUnlessBash;
 
 
 # sanity checks
-lives_ok  { bash => "$^X -e 'exit 0'"    }                                        'bash e with clean exit lives';
-lives_ok  { bash => "$^X -e 'exit 1'"    }                                        'bash e with dirty exit lives';
+lives_ok  { bash       $^X, -e => 'exit 0' }                                        'bash with clean exit lives';
+lives_ok  { bash       $^X, -e => 'exit 1' }                                        'bash with dirty exit lives';
 
 # simple test
-lives_ok  { bash -e => "$^X -e 'exit 0'" }                                        'bash -e with clean exit lives';
-throws_ok { bash -e => "$^X -e 'exit 1'" } qr/unexpectedly returned exit value /, 'bash -e with dirty exit dies';
+lives_ok  { bash -e => $^X, -e => 'exit 0' }                                        'bash -e with clean exit lives';
+throws_ok { bash -e => $^X, -e => 'exit 1' } qr/unexpectedly returned exit value /, 'bash -e with dirty exit dies';
 
 # with capture
-lives_ok  { bash -e => \string => "$^X -e 'exit 0'" }
+lives_ok  { bash -e => \string => $^X, -e => 'exit 0' }
 				'bash -e and capture with clean exit lives';
-throws_ok { bash -e => \string => "$^X -e 'exit 1'" } qr/unexpectedly returned exit value /,
+throws_ok { bash -e => \string => $^X, -e => 'exit 1' } qr/unexpectedly returned exit value /,
 				'bash -e and capture with dirty exit dies';
 
 

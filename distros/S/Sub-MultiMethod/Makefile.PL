@@ -29,15 +29,17 @@ my $meta = {
                                      },
                         test      => {
                                        requires => {
-                                         "Class::Tiny" => 0,
-                                         "Role::Tiny"  => 0,
-                                         "Test::Fatal" => 0,
-                                         "Test::More"  => 0.96,
+                                         "Class::Tiny"    => 0,
+                                         "parent"         => 0,
+                                         "Role::Tiny"     => 0,
+                                         "Test::Fatal"    => 0,
+                                         "Test::More"     => 0.96,
+                                         "Test::Requires" => 0,
                                        },
                                      },
                       },
   "provides"       => {
-                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.007 },
+                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.008 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -53,7 +55,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
                       },
-  "version"        => 0.007,
+  "version"        => 0.008,
 };
 
 my %dynamic_config;

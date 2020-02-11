@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::pid;
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"Process identifier (PID)"}],["uint","int"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::pid - Process identifier (PID)
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
+This document describes version 0.010 of Sah::SchemaR::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

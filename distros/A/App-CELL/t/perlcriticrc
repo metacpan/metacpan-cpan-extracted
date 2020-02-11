@@ -1,0 +1,12 @@
+severity = 5
+verbose = %f: [%p] %m at line %l, column %c.\n
+theme = core
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 6
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 3

@@ -26,6 +26,7 @@ lib/Text/vCard/Precisely/V4/Node/Related.pm
 lib/Text/vCard/Precisely/V4/Node/Tel.pm
 minil.toml
 t/Multiple/example.vcf
+t/Multiple/windows.vcf
 t/V3/00_compile.t
 t/V3/01_node.t
 t/V3/02_address.t

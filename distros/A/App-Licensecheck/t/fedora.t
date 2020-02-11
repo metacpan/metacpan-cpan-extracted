@@ -1,10 +1,11 @@
-#!perl
+use strictures;
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 15;
+use Test::Licensecheck;
+
+plan 15;
 
 license_like(
 	't/fedora/MIT',

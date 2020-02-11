@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.231';
+our $VERSION = '2.232';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.231
+Version 2.232
 
 =head1 SYNOPSIS
 
@@ -193,17 +193,29 @@ Selecting the prompt line (the database name) opens a menu with these entries:
 
 =over
 
-=item Create Table
+=item
 
-=item Drop Table
+Create Table
 
-=item Create View
+=item
 
-=item Drop View
+Drop Table
 
-=item Attach DB
+=item
 
-=item Detach DB
+Create View
+
+=item
+
+Drop View
+
+=item
+
+Attach DB
+
+=item
+
+Detach DB
 
 =back
 
@@ -253,11 +265,17 @@ Selecting this prompt line (I<Customize:>) opens a menu with these entries:
 
 =over
 
-=item Insert Into
+=item
 
-=item Update
+Insert Into
 
-=item Delete
+=item
+
+Update
+
+=item
+
+Delete
 
 =back
 
@@ -329,19 +347,30 @@ Insert the data cell by cell.
 
 =item Copy and Paste
 
-Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
-data.
+Reads from STDIN until the end of input.
 
 The input filter L</Reparse> allows one to change the parse-settings.
 
 =item From File
 
-Like I<Copy and Paste> with the difference that the data is read from a chosen file.
+The data is read from a chosen file.
+
+The input filter L</Reparse> allows one to change the parse-settings.
 
 Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
 
-Selecting the prompt line of this sub-menu allows one to set different directory and file settings described in
-L</Insert Data>.
+Selecting I<From File> opens a menu where one can choose the directory which should be searched for files.
+
+If I<Dir history> is set to 1 and a directory has already been saved, this menu is skipped and the directory is chosen
+automatically.
+
+After a directory has been chosen a sub-menu is opened where one can choose the source file.
+
+Selecting the prompt line of the directory sub-menu or the prompt line of the file sub-menu allows one to set the
+different directory- and file-settings described in L</Insert Data>.
+
+If the directory is chosen automatically, the prompt line sub-menu of the file sub-menu offers also the possibility to
+select a new directory.
 
 =back
 
@@ -366,34 +395,7 @@ I<Delete>, I<Update> or I<Insert Into>  may not be available with C<JOIN> and C<
 
 Selecting I<Insert Into> opens a sub-menu where one can choose the type of the data source.
 
-=over
-
-=item Prompt line
-
-Selecting the prompt line of this sub-menu allows one to set the parse settings described in L</Insert Data>.
-
-=item Plain
-
-Insert the data cell by cell.
-
-=item Copy and Paste
-
-Multi line input: reads until the end of input. It is OS-depend how to indicate the end of input.
-
-The input filter L</Reparse> allows one to change the parse-settings.
-
-=item From File
-
-Read the input from am file.
-
-Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
-
-Selecting the prompt line of this sub-menu allows one to set different directory and file settings described in
-L</Insert Data>.
-
-=back
-
-Selecting the prompt line of this sub-menu allows one to set the options described in L</Insert Data>.
+See L<Create Table> for the different types of data sources.
 
 If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
 column. This feature is available if supported by the database plugin.
@@ -666,13 +668,21 @@ Add menu entries to menus:
 
 =over
 
-=item Derived (table)
+=item
 
-=item Join
+Derived (table)
 
-=item Union
+=item
 
-=item DB settings
+Join
+
+=item
+
+Union
+
+=item
+
+DB settings
 
 =back
 
@@ -680,7 +690,9 @@ Add menu entries to menus:
 
 =over
 
-=item Derived (table)
+=item
+
+Derived (table)
 
 =back
 
@@ -688,9 +700,13 @@ Add menu entries to menus:
 
 =over
 
-=item Derived (table)
+=item
 
-=item Union All
+Derived (table)
+
+=item
+
+Union All
 
 =back
 
@@ -745,17 +761,29 @@ entry has been chosen.
 
 =over
 
-=item Concatenate
+=item
 
-=item Truncate
+Concatenate
 
-=item Bit_Length
+=item
 
-=item Char_Length
+Truncate
 
-=item Epoch_to_Date
+=item
 
-=item Epoch_to_DateTime
+Bit_Length
+
+=item
+
+Char_Length
+
+=item
+
+Epoch_to_Date
+
+=item
+
+Epoch_to_DateTime
 
 =back
 
@@ -785,19 +813,33 @@ Enable write access - use with care.
 
 =over
 
-=item Insert Records
+=item
 
-=item Update Records
+Insert Records
 
-=item Delete Records
+=item
 
-=item Create Table
+Update Records
 
-=item Drop Table
+=item
 
-=item Create View
+Delete Records
 
-=item Drop View
+=item
+
+Create Table
+
+=item
+
+Drop Table
+
+=item
+
+Create View
+
+=item
+
+Drop View
 
 =back
 
@@ -822,17 +864,29 @@ derived tables which get then a default alias.
 
 =over
 
-=item Aggregate
+=item
 
-=item Derived tables
+Aggregate
 
-=item Functions in the SELECT sub-statement.
+=item
 
-=item Join
+Derived tables
 
-=item Subqueries in the SELECT sub-statement.
+=item
 
-=item Union
+Functions in the SELECT sub-statement.
+
+=item
+
+Join
+
+=item
+
+Subqueries in the SELECT sub-statement.
+
+=item
+
+Union
 
 =back
 

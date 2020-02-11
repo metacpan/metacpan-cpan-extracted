@@ -2,27 +2,29 @@ package Test::Licensecheck::ScanCode;
 
 my $CLASS = __PACKAGE__;
 
-use parent qw(Test::Licensecheck);
-@EXPORT
-	= qw(done_testing is_licensed_like_scancode are_licensed_like_scancode);
+use strictures;
 
-use strict;
-use warnings;
+use Test2::API qw(context);
+use Test2::Todo;
+use Test2::Compare qw(compare strict_convert);
 
-use Test::Requires qw(
-	File::BaseDir
-	List::MoreUtils
-	YAML::XS
-);
+use Test2::Require::Module qw(YAML::XS);
+use Test2::Require::TestCorpus qw(ScanCode);
+
+use Test::Licensecheck;
 
 use Path::Tiny 0.053;
 use App::Licensecheck;
+use List::SomeUtils qw(uniq);
 
-my $tb     = $CLASS->builder;
+use base qw(Exporter);
+our @EXPORT = qw(are_licensed_like_scancode);
+
 my $corpus = File::BaseDir::data_dirs('tests/ScanCode');
 
-$tb->skip_all('no corpus at $ENV{XDG_DATA_DIRS} + tests/ScanCode/')
-	unless $corpus;
+my $app = App::Licensecheck->new;
+$app->lines(0);
+$app->deb_fmt(1);
 
 sub licenses ($)
 {
@@ -104,82 +106,77 @@ sub parse_skipfile ($;$)
 	return $skips;
 }
 
-# test corpus data
-my $app = App::Licensecheck->new;
-$app->lines(0);
-$app->deb_fmt(1);
-
-sub is_licensed_like_scancode ($$;$$)
-{
-	my ( $file, $licenses, $skiplist, $overrides ) = @_;
-
-	return if (/\.yml$/);
-
-#	return if ( $skiplist and $skiplist->{ $file->basename(qr/\.[^.]+/) } );
-	if ( $skiplist and $skiplist->{ $file->basename(qr/\.[^.]+/) } ) {
-		$tb->todo_start;
-	}
-
-	# avoid fc() to support older Perl: SPDX probably use only ASCII
-	my $expected = join ' and/or ',
-		List::MoreUtils::uniq sort { lc($a) cmp lc($b) }
-		map                        { $licenses->{$_}{spdx_license_key} || $_ }
-		@{ expected( $file, $licenses, $overrides ) };
-
-	my ( $detected, $detected_copyright ) = $app->parse($file);
-
-	# TODO: Report SPDX bug: Missing versioning
-	$detected =~ s/Aladdin\K-8//g;
-
-	# TODO: support SPDX identifiers (not Debian)
-	$detected =~ s/-clause\b/-Clause/g;
-
-	# TODO: normalize to upstream preferred number formats
-	$detected =~ s/\b(?:[AL]?GPL)-\d\K\.0(?![.\d])//g;
-	$detected =~ s/\b(?:Apache|BSL|MPL)-\d(?!\.)\K/.0/g;
-
-	# TODO: support legal reasoning for arguably too vague licensing
-	# https://github.com/nexB/scancode-toolkit/issues/668
-	$detected =~ s/\b(?:GFDL)\K(?!-)/-1.1+/g;
-	$detected =~ s/\b(?:GPL)\K(?!-)/-1+/g;
-	$detected =~ s/\b(?:LGPL)\K(?!-)/-2+/g;
-	$detected =~ s/\b(?:MPL)\K(?!-)/-1.0+/g;
-
-	# TODO: rename to UNKNOWN_OR_NONE
-	# TODO: support NONE (i.e. certainly no license)
-	$detected =~ s/^UNKNOWN\K$/_OR_NONE/g;
-
-	$tb->is_eq(
-		$detected, $expected,
-		"detect licensing \"$expected\" for " . $file->basename
-	);
-	if ( $tb->in_todo ) {
-		$tb->todo_end;
-	}
-}
-
 sub are_licensed_like_scancode ($;$$)
 {
 	my ( $testpaths, $skipfile, $overrides ) = @_;
 
-	my $licenses = licenses($corpus);
+	my $ctx = context();
 
-	#note explain $licenses;
+	my $licenses = licenses($corpus);
 
 	my $skiplist = parse_skipfile( $skipfile, $testpaths );
 
-	for (
+	my $failures;
+
+	foreach my $file (
 		sort { lc($a) cmp lc($b) }
 		map  { path($corpus)->child($_)->children } @{$testpaths}
 		)
 	{
-		is_licensed_like_scancode( $_, $licenses, $skiplist, $overrides );
-	}
-}
 
-sub done_testing
-{
-	$tb->done_testing;
+		next if ( $file =~ /\.yml$/ );
+
+		my $pat = 'detect %s "%s" for ' . $file->basename;
+
+		my $todo = Test2::Todo->new( reason => 'Fix later' )
+			if ( $skiplist and $skiplist->{ $file->basename(qr/\.[^.]+/) } );
+
+		# avoid fc() to support older Perl: SPDX probably use only ASCII
+		my $exp = join ' and/or ',
+			uniq sort { lc($a) cmp lc($b) }
+			map       { $licenses->{$_}{spdx_license_key} || $_ }
+			@{ expected( $file, $licenses, $overrides ) };
+
+		my ( $got, $got_copyright ) = $app->parse($file);
+
+		# TODO: Report SPDX bug: Missing versioning
+		$got =~ s/Aladdin\K-8//g;
+
+		# TODO: support SPDX identifiers (not Debian)
+		$got =~ s/-clause\b/-Clause/g;
+
+		# TODO: normalize to upstream preferred number formats
+		$got =~ s/\b(?:[AL]?GPL)-\d\K\.0(?![.\d])//g;
+		$got =~ s/\b(?:Apache|BSL|MPL)-\d(?!\.)\K/.0/g;
+
+		# TODO: support legal reasoning for arguably too vague licensing
+		# https://github.com/nexB/scancode-toolkit/issues/668
+		$got =~ s/\b(?:GFDL)\K(?!-)/-1.1+/g;
+		$got =~ s/\b(?:GPL)\K(?!-)/-1+/g;
+		$got =~ s/\b(?:LGPL)\K(?!-)/-2+/g;
+		$got =~ s/\b(?:MPL)\K(?!-)/-1.0+/g;
+
+		# TODO: rename to UNKNOWN_OR_NONE
+		# TODO: support NONE (i.e. certainly no license)
+		$got =~ s/^UNKNOWN\K$/_OR_NONE/g;
+
+		my $name = sprintf( $pat, 'licensing', $exp );
+
+		my $delta = compare( $got, $exp, \&strict_convert );
+		if ($delta) {
+			$ctx->fail( $name, $delta->diag );
+			$failures++;
+		}
+		else {
+			$ctx->ok( 1, $name );
+		}
+
+		$todo->end
+			if ($todo);
+	}
+
+	$ctx->release;
+	return $failures ? 1 : 0;
 }
 
 1;

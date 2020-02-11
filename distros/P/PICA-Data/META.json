@@ -41,6 +41,7 @@
             "Exporter" : "0",
             "IO::File" : "1.14",
             "IO::Handle" : "0",
+            "JSON::PP" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
             "XML::LibXML" : "2",
@@ -74,7 +75,7 @@
          "web" : "https://github.com/GBV/PICA-Data"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_contributors" : [
       "Carsten Klee <klee@cpan.org>",
       "Jakob Vo\u00df <jakob.voss@gbv.de>",

@@ -4,7 +4,14 @@ Makefile.PL
 MANIFEST
 README
 t/00.load.t
-t/tracking.t
+t/scalar.t
 bin/demo.pl
+t/lexical_scalar.t
+t/my_array.t
+t/my_hash.t
+t/my_scalar.t
+t/no_tracking.t
+t/our_scalar.t
+t/state_scalar.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

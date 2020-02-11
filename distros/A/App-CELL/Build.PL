@@ -15,6 +15,7 @@ my $build = Module::Build->new(
         dist => [ 'config' ], 
     },
     configure_requires => {
+        'File::ShareDir::Install' => 0.11,
         'Module::Build'      => 0,
         'Software::License'  => 0,
     },

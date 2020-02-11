@@ -25,3 +25,4 @@ t/05rolesdonotinstalldispatchers.t
 t/06monomethod-weird.t
 t/06monomethod.t
 t/07multifunc.t
+t/08mro.t

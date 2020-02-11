@@ -35,6 +35,8 @@ requires:
   Data::Dump: '0'
   Data::Sah::Coerce: '0.038'
   Data::Sah::CoerceCommon: '0'
+  Data::Sah::Filter: '0.003'
+  Data::Sah::FilterCommon: '0.003'
   Data::Sah::Normalize: '0.03'
   Data::Sah::Resolve: '0.003'
   Exporter: '5.57'
@@ -68,7 +70,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.904'
+version: '0.906'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

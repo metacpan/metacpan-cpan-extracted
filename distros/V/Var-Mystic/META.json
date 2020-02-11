@@ -1,5 +1,5 @@
 {
-   "abstract" : "C<my> C<s>calars C<t>racked C<i>n C<c>olour",
+   "abstract" : "B<M>onitor B<y>our B<s>tate, B<t>racked B<i>n B<c>olour",
    "author" : [
       "Damian Conway <DCONWAY@CPAN.org>"
    ],
@@ -34,16 +34,17 @@
          "requires" : {
             "Data::Dx" : "0",
             "Keyword::Declare" : "0",
-            "Variable::Magic" : "0",
+            "Variable::Magic" : "0.58",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "Term::ANSIColor" : "0",
             "Test::Effects" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.000002"
+   "version" : "0.000003"
 }

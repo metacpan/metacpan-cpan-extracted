@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -773,7 +773,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 

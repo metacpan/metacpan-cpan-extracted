@@ -7,6 +7,86 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.44	2020-02-10
+
+ [ Test Suite ]
+ - ensure local script is executable
+
+v3.0.43	2020-02-10
+
+ [ REGRESSIONS ]
+ - now misses trove declarations for AGPL-3+
+
+ [ Bug Fixes ]
+ - adjust end position of located license name
+ - resolve license fulltext last, to leave room for shadowing with
+   -or-newer grant
+ - tests: declare "use utf8" and "use feature 'unicode_strings'" in
+   encode.t
+
+ [ Documentation ]
+ - update TODOs
+
+ [ Test Suite ]
+ - drop unused function is_licensed_like_scancode
+ - tighten encode.t (still fails with non-UTF-8 locales)
+ - update author tests related to ZPL since Regexp::Pattern::License
+   v3.1.102
+ - update tests
+ - use List::SomeUtils (not List::MoreUtils)
+ - use Test2::V0
+
+ [ Packaging ]
+ - relax to require strictures unversioned
+ - require Encode::Locale Encode
+ - require MooX::Struct
+ - require Regexp::Pattern 0.2.12 and Regexp::Pattern::License 3.1.102
+ - stop test-recommend List::MoreUtils
+ - stop test-require UNIVERSAL::require (unused since v3.0.2)
+ - test-require Test2::V0 (not Test::Builder::Module Test::Requires
+   Test::More)
+
+ [ Other ]
+ - avoid misdetecting CECILL-1.1 as GPL-1+ due to extending trait pattern
+   licensed_under since Regexp::Pattern::License v3.1.102
+ - consistently use strictures, unversioned
+ - consult coverage of well-formed scan to avoid duplicate matches
+ - improve detection of AGPL licenses
+ - optimize detection of ZPL licenses
+ - simplify avoiding license duplicates in expression by skipping grant of
+   same id as already found fulltext
+ - simplify flagging step-wise grants
+ - stop resolve regexes licensed_under version_later (unused since v3.0.42)
+ - tighten which regexes to generate
+ - track detected licensing as objects
+ - track step-wise traits as objects
+ - track traits as objects
+
+v3.0.42	2020-02-01
+
+ [ REGRESSIONS ]
+ - now fails to detect dual-licensing of CC-BY-SA-3.0 or LGPL-2 (test case:
+   utilities.scad)
+
+ [ Bug Fixes ]
+ - gracefully skip to next file on failure decoding a file (broken since
+   v3.0.38)
+   Dominique Dumont++
+
+ [ Test Suite ]
+ - environment variable LICENSECHECK sets path to licensecheck (default:
+   bin/licensecheck)
+   Gregor Hermann++
+ - simplify tests Software-License.t devscripts.t encoding.t
+
+ [ Packaging ]
+ - test-require Test::Command::Simple (not Test::Script)
+
+ [ Other ]
+ - drop obsolete custom patterns
+ - optimization: drop custom CC patterns
+ - optimization: stop skip detection of GPL/LGPL fulltext
+
 v3.0.41	2020-01-30
 
  [ Documentation ]

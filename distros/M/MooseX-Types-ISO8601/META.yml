@@ -2,7 +2,7 @@
 abstract: 'ISO8601 date and duration string type constraints and coercions for Moose'
 author:
   - 'Tomas Doran (t0m) <bobtfish@bobtfish.net>'
-  - 'Dave Lambley <davel@state51.co.uk>'
+  - 'Dave Lambley <dlambley@cpan.org>'
 build_requires:
   DateTime::Format::ISO8601: '0'
   File::Spec: '0'
@@ -32,7 +32,7 @@ no_index:
 provides:
   MooseX::Types::ISO8601:
     file: lib/MooseX/Types/ISO8601.pm
-    version: '0.19'
+    version: '0.20'
 recommends:
   MooseX::Types::DateTime::MySQL: '0'
 requires:
@@ -61,10 +61,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-ISO8601
   homepage: https://github.com/moose/MooseX-Types-ISO8601
   repository: https://github.com/moose/MooseX-Types-ISO8601.git
-version: '0.19'
+version: '0.20'
 x_Dist_Zilla:
   perl:
-    version: '5.031007'
+    version: '5.031008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -246,6 +246,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::ETHER/PodCoverageTests'
       version: '6.013'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::No404s
+      name: '@Author::ETHER/Test::Pod::No404s'
+      version: '1.004'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -504,7 +508,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.23.0
+          git_version: 2.25.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -571,7 +575,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20191220'
+          Module::CoreList: '5.20200120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -596,7 +600,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.046'
@@ -604,7 +608,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -612,7 +616,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -638,7 +642,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.046'
@@ -721,7 +725,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -734,11 +738,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.19
+          tag: v0.20
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -775,7 +779,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -797,7 +801,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.046'
@@ -943,7 +947,7 @@ x_contributors:
   - 'zebardy <zebardy@gmail.com>'
   - 'Gregory Oschwald <goschwald@maxmind.com>'
   - 'Mark Fowler <mark@twoshortplanks.com>'
-x_generated_by_perl: v5.31.7
+x_generated_by_perl: v5.31.8
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

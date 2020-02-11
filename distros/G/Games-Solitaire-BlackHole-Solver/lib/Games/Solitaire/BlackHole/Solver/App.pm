@@ -1,204 +1,52 @@
 package Games::Solitaire::BlackHole::Solver::App;
-$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.2.2';
-use strict;
-use warnings;
+$Games::Solitaire::BlackHole::Solver::App::VERSION = '0.4.0';
+use 5.014;
+use Moo;
 
-use 5.008;
+extends('Games::Solitaire::BlackHole::Solver::App::Base');
 
-use Getopt::Long;
-use Pod::Usage;
-
-
-sub new
-{
-    my $class = shift;
-    return bless {}, $class;
-}
-
-my @ranks = ( "A", 2 .. 9, qw(T J Q K) );
-my %ranks_to_n = ( map { $ranks[$_] => $_ } 0 .. $#ranks );
-
-my $card_re_str = '[' . join( "", @ranks ) . '][HSCD]';
-my $card_re     = qr{$card_re_str};
-
-sub _get_rank
-{
-    return $ranks_to_n{ substr( shift(), 0, 1 ) };
-}
-
-sub _calc_lines
-{
-    my $filename = shift;
-
-    if ( $filename eq "-" )
-    {
-        return [<STDIN>];
-    }
-    else
-    {
-        open my $in, "<", $filename
-            or die
-            "Could not open $filename for inputting the board lines - $!";
-        my @lines = <$in>;
-        close($in);
-        return \@lines;
-    }
-}
 
 sub run
 {
-    my $output_fn;
+    my $self      = shift;
+    my $RANK_KING = $self->_RANK_KING;
 
-    my ( $help, $man, $version );
+    $self->_process_cmd_line(
+        {
+            extra_flags => {}
+        }
+    );
 
-    GetOptions(
-        "o|output=s" => \$output_fn,
-        'help|h|?'   => \$help,
-        'man'        => \$man,
-        'version'    => \$version,
-    ) or pod2usage(2);
-
-    pod2usage(1) if $help;
-    pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
-
-    if ($version)
-    {
-        print
-"black-hole-solve version $Games::Solitaire::BlackHole::Solver::App::VERSION\n";
-        exit(0);
-    }
-
-    my $filename = shift(@ARGV);
-
-    my $output_handle;
-
-    if ( defined($output_fn) )
-    {
-        open( $output_handle, ">", $output_fn )
-            or die "Could not open '$output_fn' for writing";
-    }
-    else
-    {
-        open( $output_handle, ">&STDOUT" );
-    }
-
-    my @lines = @{ _calc_lines($filename) };
-    chomp(@lines);
-
-    my $found_line = shift(@lines);
-
-    my $init_foundation;
-    if ( my ($card) = $found_line =~ m{\AFoundations: ($card_re)\z} )
-    {
-        $init_foundation = _get_rank($card);
-    }
-    else
-    {
-        die "Could not match first foundation line!";
-    }
-
-    my @board_cards  = map { [ split /\s+/, $_ ] } @lines;
-    my @board_values = map {
-        [ map { _get_rank($_) } @$_ ]
-    } @board_cards;
-
-    my $init_state = "";
-
-    vec( $init_state, 0, 8 ) = $init_foundation;
-
-    foreach my $col_idx ( 0 .. $#board_values )
-    {
-        vec( $init_state, 4 + $col_idx, 2 ) =
-            scalar( @{ $board_values[$col_idx] } );
-    }
-
-    # The values of %positions is an array reference with the 0th key being the
-    # previous state, and the 1th key being the column of the move.
-    my %positions = ( $init_state => [] );
-
-    my @queue = ($init_state);
-
-    my %is_good_diff = ( map { $_ => 1 } ( 1, $#ranks ) );
+    $self->_set_up_solver( 0, [ 1, $RANK_KING ] );
 
     my $verdict = 0;
 
-    my $trace_solution = sub {
-        my $final_state = shift;
-
-        my $state = $final_state;
-        my ( $prev_state, $col_idx );
-
-        my @moves;
-        while ( ( $prev_state, $col_idx ) = @{ $positions{$state} } )
-        {
-            push @moves,
-                $board_cards[$col_idx]
-                [ vec( $prev_state, 4 + $col_idx, 2 ) - 1 ];
-        }
-        continue
-        {
-            $state = $prev_state;
-        }
-        print {$output_handle} map { "$_\n" } reverse(@moves);
-    };
+    $self->_next_task;
 
 QUEUE_LOOP:
-    while ( my $state = pop(@queue) )
+    while ( my $state = $self->_get_next_state_wrapper )
     {
         # The foundation
-        my $fnd      = vec( $state, 0, 8 );
         my $no_cards = 1;
 
-        # my @debug_pos;
-        foreach my $col_idx ( 0 .. $#board_values )
+        my @_pending;
+
+        if (1)
         {
-            my $pos = vec( $state, 4 + $col_idx, 2 );
-
-            # push @debug_pos, $pos;
-            if ($pos)
-            {
-                $no_cards = 0;
-
-                my $card = $board_values[$col_idx][ $pos - 1 ];
-                if (
-                    exists(
-                        $is_good_diff{ ( $card - $fnd ) % scalar(@ranks) }
-                    )
-                    )
-                {
-                    my $next_s = $state;
-                    vec( $next_s, 0, 8 ) = $card;
-                    vec( $next_s, 4 + $col_idx, 2 )--;
-                    if ( !exists( $positions{$next_s} ) )
-                    {
-                        $positions{$next_s} = [ $state, $col_idx ];
-                        push( @queue, $next_s );
-                    }
-                }
-            }
+            $self->_find_moves( \@_pending, $state, \$no_cards );
         }
 
-        # print "Checking ", join(",", @debug_pos), "\n";
         if ($no_cards)
         {
-            print {$output_handle} "Solved!\n";
-            $trace_solution->($state);
+            $self->_trace_solution( $state, );
             $verdict = 1;
             last QUEUE_LOOP;
         }
+        last QUEUE_LOOP
+            if not $self->_process_pending_items( \@_pending, $state );
     }
 
-    if ( !$verdict )
-    {
-        print {$output_handle} "Unsolved!\n";
-    }
-
-    if ( defined($output_fn) )
-    {
-        close($output_handle);
-    }
-
-    exit( !$verdict );
+    return $self->_my_exit( $verdict, );
 }
 
 
@@ -217,7 +65,7 @@ implemented as a class to solve the Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.2.2
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -272,6 +120,27 @@ Other flags:
 
 Output to a solution file.
 
+=item * --quiet
+
+Do not emit the solution.
+
+=item * --next-task
+
+Add a new task (see L<https://en.wikipedia.org/wiki/Context_switch> ).
+
+=item * --task-name [name]
+
+Name the task.
+
+=item * --seed [index]
+
+Set the PRNG seed for the task.
+
+=item * --prelude [num-iters]@[task-name],[num-iters2]@[task-name2]
+
+Start from running the iters counts for each task IDs. Similar
+to L<https://fc-solve.shlomifish.org/docs/distro/USAGE.html#prelude_flag> .
+
 =back
 
 More information about Black Hole Solitaire can be found at:
@@ -283,10 +152,6 @@ More information about Black Hole Solitaire can be found at:
 =item * L<http://pysolfc.sourceforge.net/doc/rules/blackhole.html>
 
 =back
-
-=head1 VERSION
-
-version 0.2.2
 
 =head1 METHODS
 
@@ -342,28 +207,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2010 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -384,35 +228,11 @@ L<https://metacpan.org/release/Games-Solitaire-BlackHole-Solver>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Games-Solitaire-BlackHole-Solver>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Solitaire-BlackHole-Solver>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Games-Solitaire-BlackHole-Solver>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Games-Solitaire-BlackHole-Solver>
 
 =item *
 
@@ -463,5 +283,26 @@ from your repository :)
 L<https://github.com/shlomif/black-hole-solitaire>
 
   git clone https://github.com/shlomif/black-hole-solitaire
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/games-solitaire-blackhole-solver/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

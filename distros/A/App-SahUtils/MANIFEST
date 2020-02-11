@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/SahUtils.pm
 script/coerce-with-sah
+script/filter-with-sah
 script/format-with-sah
 script/get-sah-type
 script/is-sah-builtin-type
@@ -23,6 +24,7 @@ script/is-sah-simple-type
 script/is-sah-type
 script/list-sah-clauses
 script/list-sah-coerce-rule-modules
+script/list-sah-filter-rule-modules
 script/list-sah-schema-modules
 script/list-sah-schemas-modules
 script/list-sah-type-modules
@@ -30,6 +32,7 @@ script/normalize-sah-schema
 script/resolve-sah-schema
 script/sah-to-human
 script/show-sah-coerce-rule-module
+script/show-sah-filter-rule-module
 script/show-sah-schema-module
 script/validate-with-sah
 t/00-compile.t

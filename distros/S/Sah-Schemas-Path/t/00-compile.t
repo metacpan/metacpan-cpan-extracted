@@ -6,10 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Data/Sah/Coerce/perl/To_str/From_str/strip_slashes.pm',
+    'Data/Sah/Filter/perl/Path/expand_tilde.pm',
+    'Data/Sah/Filter/perl/Path/expand_tilde_when_on_unix.pm',
+    'Data/Sah/Filter/perl/Path/strip_slashes.pm',
+    'Data/Sah/Filter/perl/Path/strip_slashes_when_on_unix.pm',
     'Sah/Schema/dirname.pm',
     'Sah/Schema/dirname/unix.pm',
     'Sah/Schema/filename.pm',

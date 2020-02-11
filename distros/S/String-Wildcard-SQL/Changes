@@ -1,12 +1,16 @@
-Revision history for String-Wildcard-SQL
+0.030   2020-02-09  Released-By: PERLANCAR; Urgency: medium
 
-0.02    2015-01-03 (PERLANCAR)
+	- Like String::Wildcard::Bash, also make regex accessible and
+	  exportable ($RE_WILDCARD_SQL).
+
+
+0.02    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.01    2014-07-26 (SHARYANTO)
+0.01    2014-07-26  Released-By: SHARYANTO
 
         - First release.

@@ -6,7 +6,7 @@ use vars qw($VERSION %DEFAULTS);
 use Carp;
 #use Data::Dumper;
 
-$VERSION = '1.77';
+$VERSION = '1.78';
 %DEFAULTS = (
   "CSV_DELIMITER"=>',', # controls how to read/write CSV file
   "CSV_QUALIFIER"=>'"',
@@ -1728,7 +1728,11 @@ sub fromSQL {
     $sth = $dbh->prepare($sql) or confess "Preparing: , ".$dbh->errstr;
   }
   my @vars=() unless defined $vars;
-  $sth->execute(@$vars) or confess "Executing: ".$dbh->errstr;
+  # This enables us to execute asynchronous queries and still retrieve the results into a Data::Table object once it finishes.
+  unless ($sth->{Executed}) {
+    $sth->execute(@$vars) or confess "Executing: ".$dbh->errstr;
+  }
+#  $sth->execute(@$vars) or confess "Executing: ".$dbh->errstr;
 #  $Data::Table::ID = undef;
 #  $Data::Table::ID = $sth->{'mysql_insertid'};
   if ($sth->{NUM_OF_FIELDS}) {

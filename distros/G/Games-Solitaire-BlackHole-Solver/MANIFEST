@@ -11,10 +11,10 @@ bin/black-hole-solve
 bin/golf-solitaire-solve-perl
 contrib/make_pysol_board.py
 dist.ini
-ignore.txt
 inc/Test/Run/Builder.pm
 lib/Games/Solitaire/BlackHole/Solver.pm
 lib/Games/Solitaire/BlackHole/Solver/App.pm
+lib/Games/Solitaire/BlackHole/Solver/App/Base.pm
 lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm
 t/00-compile.t
 t/00-load.t

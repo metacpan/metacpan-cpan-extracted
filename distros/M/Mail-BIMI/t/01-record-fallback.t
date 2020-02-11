@@ -8,13 +8,18 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 use Mail::DMARC::PurePerl;
+use Net::DNS::Resolver::Mock;
 
 my $test_domain = 'test.fastmail.com';
 my $test_org_domain = Mail::DMARC::PurePerl->new->get_organizational_domain($test_domain);
 is( $test_org_domain, 'fastmail.com', 'Mail::DMARC public suffix list correctly functioning' );
 
+my $resolver = Net::DNS::Resolver::Mock->new;
+$resolver->zonefile_read('t/zonefile');
+
 {
   my $bimi = Mail::BIMI->new;
+  $bimi->resolver($resolver);
 
   my $dmarc = Mail::DMARC::PurePerl->new;
   $dmarc->result->result( 'pass' );
@@ -32,6 +37,7 @@ is( $test_org_domain, 'fastmail.com', 'Mail::DMARC public suffix list correctly 
 
 {
   my $bimi = Mail::BIMI->new;
+  $bimi->resolver($resolver);
 
   my $dmarc = Mail::DMARC::PurePerl->new;
   $dmarc->result->result( 'pass' );

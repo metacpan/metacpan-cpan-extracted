@@ -1,3 +1,22 @@
+0.013   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] D'oh, fix filter rule name again.
+
+
+0.012   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak/fix filter rule names.
+
+        - Tweak completion.
+
+
+0.011   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Use prefilters instead of coerce rules.
+
+        - [ux] Expand tilde (e.g. "~/foo" becomes "/home/budi/foo").
+
+
 0.010   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule modules again, revert to using lower_case

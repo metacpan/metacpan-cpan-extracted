@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.232    2020-02-10
+        - From file: possibility the set a new directory if the directory is chosen automatically.
+        - Update documentation.
+
 2.231    2020-01-02
         - Update required Term::Choose::Util versions.
         - Update year copyright.

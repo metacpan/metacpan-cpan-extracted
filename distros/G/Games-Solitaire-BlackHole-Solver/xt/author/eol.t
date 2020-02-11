@@ -11,6 +11,7 @@ my @files = (
     'bin/golf-solitaire-solve-perl',
     'lib/Games/Solitaire/BlackHole/Solver.pm',
     'lib/Games/Solitaire/BlackHole/Solver/App.pm',
+    'lib/Games/Solitaire/BlackHole/Solver/App/Base.pm',
     'lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm',
     't/00-compile.t',
     't/00-load.t',

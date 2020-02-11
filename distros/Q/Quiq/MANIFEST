@@ -133,6 +133,7 @@ lib/Quiq/LaTeX/Figure.pm
 lib/Quiq/LaTeX/LongTable.pm
 lib/Quiq/LineProcessor.pm
 lib/Quiq/LineProcessor/Line.pm
+lib/Quiq/List.pm
 lib/Quiq/LockedCounter.pm
 lib/Quiq/Math.pm
 lib/Quiq/MediaWiki/Client.pm
@@ -339,6 +340,7 @@ t/bin/Quiq/LaTeX/Figure.t
 t/bin/Quiq/LaTeX/LongTable.t
 t/bin/Quiq/LineProcessor.t
 t/bin/Quiq/LineProcessor/Line.t
+t/bin/Quiq/List.t
 t/bin/Quiq/LockedCounter.t
 t/bin/Quiq/Math.t
 t/bin/Quiq/MediaWiki/Client.t

@@ -57,7 +57,7 @@ my $configure_fullautoapi=sub {
    my $service_and_cert_password=$_[1]||'';
    my $domain_url=$_[2]||'';
    my ($stdout,$stderr)=('','');
-   my $handle=$localhost;my $connect_error='';
+   my $handle=connect_shell();my $connect_error='';
    $handle->cwd('~');
    my $userhome=$handle->cmd('pwd');
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
@@ -83,8 +83,7 @@ my $configure_fullautoapi=sub {
    ($hash,$output,$error)=run_aws_cmd($c);
    $c='aws ec2 authorize-security-group-ingress '.
       "--group-name $security_group --protocol ".
-      'tcp --port 3003 --cidr '.$cidr." 2>&1";
-   ($hash,$output,$error)=run_aws_cmd($c);
+      'tcp --port 3000 --cidr '.$cidr." 2>&1";
    ($hash,$output,$error)=run_aws_cmd($c);
    ($stdout,$stderr)=$handle->cmd($sudo."perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
@@ -1028,34 +1027,38 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
-   ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".
-      "$nginx_path/nginx/nginx.conf");
+   my $ngx="$nginx_path/nginx/nginx.conf";
+   ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/1024/64/' ".$ngx);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/worker_processes  1;/worker_processes  2;/' ".
-      "$nginx_path/nginx/nginx.conf");
+      "sed -i 's/worker_processes  1;/worker_processes  2;/' ".$ngx);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i '0,/root   html/{//d;}' $nginx_path/nginx/nginx.conf");
+      "sed -i '0,/root   html/{//d;}' ".$ngx);
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i '0,/index  index.html/{//d;}' $nginx_path/nginx/nginx.conf");
+      "sed -i '0,/index  index.html/{//d;}' ".$ngx);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'/koi8-r/a%NL%        root ${home_dir}FullAutoAPI/root;\' ".
+      $ngx);
+   $handle->cmd_raw($sudo.
+       "sed -i 's/\\(^root.*;$\\\)/    \\1/' $ngx");
    $ad='            include        fastcgi_params;%NL%'.
-       "            fastcgi_param  SCRIPT_NAME '';%NL%".
-       "            root ${home_dir}FullAutoAPI/root;%NL%".
+       "            fastcgi_param  SCRIPT_NAME %SQ%%SQ%;%NL%".
        '            fastcgi_param  PATH_INFO  $fastcgi_script_name;%NL%'.
        '            fastcgi_pass   unix:/tmp/fullautoapi.socket;';
    $ad=<<END;
 sed -i '1,/location/ {/location/a\\\
 $ad
-}' $nginx_path/nginx/nginx.conf
+}' $ngx
 END
    $handle->cmd_raw($sudo.$ad);
    $ad='%NL%        location /static {'.
        "%NL%            root ${home_dir}FullAutoAPI/root;".
        '%NL%        }%NL%';
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'/404/a$ad\' $nginx_path/nginx/nginx.conf");
+       "sed -i \'/404/a$ad\' ".$ngx);
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "$nginx_path/nginx/nginx.conf");
+       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".$ngx);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \"s/%SQ%/\'/g\" ".$ngx);
    foreach my $port (443,444,445,443) {
       $avail_port=
       `true &>/dev/null </dev/tcp/127.0.0.1/$port && echo open || echo closed`;
@@ -1066,8 +1069,7 @@ END
    }
    $ad='client_max_body_size 10M;';
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \'/octet-stream/i$ad\' $nginx_path/nginx/nginx.conf");
-   my $ngx="$nginx_path/nginx/nginx.conf";
+       "sed -i \'/octet-stream/i$ad\' ".$ngx);
    $handle->cmd_raw($sudo.
        "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
    #($stdout,$stderr)=$handle->cmd($sudo.
@@ -4322,7 +4324,7 @@ END
        "            if (ref \$cmd eq %SQ%ARRAY%SQ%) {%NL%".
        "               if (\$cmd->[0] eq %SQ%cmd%SQ%) {%NL%".
        "                  (\$stdout,\$stderr)=\$fullauto->cmd(%NL%".
-       "                     \$cmd->[1]);%NL%".
+       "                     \$cmd->[1],%SQ%__display__%SQ%);%NL%".
        "                  push \@{\$out},[\$stdout,\$stderr]%NL%".
        "               } elsif (\$cmd->[0] eq %SQ%cmd_raw%SQ%) {%NL%".
        "                  (\$stdout,\$stderr)=\$fullauto->cmd_raw(%NL%".
@@ -4585,7 +4587,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chmod -v 777 /var/lock/subsys','__display__');
       print "\n   STARTING FULLAUTO API MANAGEMENT DASHBOARD . . .\n\n",
-      ($stdout,$stderr)=$handle->cmd(
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'service fullautoapi start','__display__');
       sleep 15;
       print "\n   ACCESS FULLAUTO API MANAGEMENT DASHBOARD AT:\n\n",

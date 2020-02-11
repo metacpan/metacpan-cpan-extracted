@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Const::Fast" => "0.003"
   },
-  "VERSION" => "0.2.0",
+  "VERSION" => "0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

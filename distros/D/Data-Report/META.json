@@ -1,0 +1,63 @@
+{
+   "abstract" : "Framework for flexible reporting",
+   "author" : [
+      "Johan Vromans <jv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Report",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.46",
+            "Test::More" : "0",
+            "Text::CSV" : "1",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Text::CSV" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/perl-Data-Report/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sciurius/perl-Data-Report.git",
+         "web" : "https://github.com/sciurius/perl-Data-Report"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

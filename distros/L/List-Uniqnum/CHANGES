@@ -6,3 +6,12 @@
 0.03 - fix uniqnum for MS compilers
 
 0.04 - provide more efficient version of uv_fits_double()
+
+0.05 - In Uniqnum.xs, change the condition:
+       #ifdef _MSC_VER
+       to
+       #if defined(_MSC_VER) && _MSC_VER < 1900
+
+       I still don't know if "1900" is correct. I believe that the correct
+       figure is greater than 1600 and less than or equal to 1924, but
+       I haven't yet narrowed it down further.     

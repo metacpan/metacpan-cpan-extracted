@@ -1,6 +1,30 @@
 Revision history for Pb
 
+0.02      2020-02-10 22:15:50-08:00 America/Los_Angeles
+
+    [New Features]
+    * New global option: `--interactive`.
+    * Now catching `die` inside a `CODE` directive (with appropriate error).
+    * STDERR now also goes to logfile (if any).
+
+    [Docs]
+    * Fix bogus issue tracker URL.
+    * Document more subs to make newer Pod::Coverage happy.
+
+    [Distro Fixes]
+    * Add manual dependency on IPC::System::Simple.
+      (brought in via `use autodie ':all'`)
+      github #1 (thx Chris White (cxw42))
+    * Fix failing unit test due to `autodie` causing different exit values.
+      (thx CPAN Testers)
+    * Fix test failures for non-English locales by not hardcoding errors.
+      github #2 (thx Slaven Rezić (SREZIC))
+    * Don't try to run unit tests on machines with no `bash`.
+      (using code stolen from PerlX::bash)
+    * Attempt to fix CPAN Testers failure caused by downstream bug:
+      CLI::Osprey not requiring proper version of Getopt::Long::Descriptive.
+
 0.01      2020-02-03 03:41:32-08:00 America/Los_Angeles
 
     [New Features]
-    * initial version (basic functionality)
+    * Initial version (basic functionality).

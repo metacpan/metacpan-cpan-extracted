@@ -1,5 +1,5 @@
 # Linux::LXC - Manage LXC containers.
-# Copyright (C) 2018 Spydemon <jsaipakoimetr@spyzone.fr>
+# Copyright (C) 2020 Spydemon <jsaipakoimetr@spyzone.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Linux::LXC;
-$Linux::LXC::VERSION = '1.0003';
+$Linux::LXC::VERSION = '1.0004';
 
 use v5.0;
 
@@ -54,6 +54,12 @@ sub get_stopped_containers {
 	split("\n", `lxc-ls -1 --stopped`);
 }
 
+sub get_version {
+	my $version = `lxc-start --version`;
+    chomp($version);
+	return $version;
+}
+
 #######################
 # Objects subroutines #
 #######################
@@ -86,7 +92,7 @@ sub destroy {
 sub exec {
 	my ($this, $cmd) = @_;
 	$this->_check_container_is_running();
-	$this->_qx('lxc-attach -n '.$this->get_utsname(), $cmd, wantarray);
+	$this->_qx('lxc-attach --clear-env -n '.$this->get_utsname(), $cmd, wantarray);
 }
 
 sub get_lxc_path {
@@ -147,7 +153,12 @@ sub is_stopped {
 
 sub put {
 	my ($this, $input, $dest) = @_;
-	my ($uid) = $this->get_config('lxc.id_map', qr/^u 0 (\d+)/, ALLOW_UNDEF);
+	# id map configuration attribute name changes between LXC version 2 and 3… Purpose of $idmap_label variable is to
+	# take care of it.
+    my $idmap_label = $this->get_version() =~ /^2/
+		? 'lxc.id_map'
+		: 'lxc.idmap';
+	my ($uid) = $this->get_config($idmap_label, qr/^u 0 (\d+)/, ALLOW_UNDEF);
 	$this->_check_container_is_existing();
 	if (!-r $input) {
 		croak "Input $input is not readable";

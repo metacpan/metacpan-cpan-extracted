@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2020, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 package App::CELL::Status;
 
@@ -38,6 +38,8 @@ use 5.012;
 
 use App::CELL::Log qw( $log );
 use App::CELL::Util qw( stringify_args );
+use Data::Dumper;
+use Params::Validate qw( :all );
 use Storable qw( dclone );
 use Scalar::Util qw( blessed );
 use Try::Tiny;
@@ -169,40 +171,86 @@ sub new {
 }
 
 
-#=head2 dump
-#
-#Dump an existing status object. Takes: PARAMHASH. Parameter 'to' determines
-#destination, which can be 'string' (default), 'log' or 'fd'.
-#
-#    # dump object to string
-#    my $dump_str = $status->dump();
-#       $dump_str = $status->dump( to => 'string' );
-#    
-#    # dump object to log
-#    $status->dump( to => 'log' );
-#
-#    # dump object to file descriptor
-#    $status->dump( fd => STDOUT );
-#    $status->dump( to => 'fd', fd => STDOUT );
-#
-#Always returns a true value.
-#
-#=cut
-#
-#sub dump {
-#    my ( $self, %ARGS ) = shift;
-#    if ( not %ARGS ) {
-#        $log->status_obj( $self );
-#    } else {
-#        if ( exists $ARGS{fd} ) {
-#            $log->debug( "Future dump-to-fd code goes here" );
-#        } else {
-#            $log->debug( "Doing nothing" );
-#        }
-#    }
-#
-#    return 1;
-#}
+=head2 dump
+
+Dump an existing status object. Takes: PARAMHASH. Parameter 'to' determines
+destination, which can be 'string' (default), 'log' or 'fd'.
+
+    # dump object to string
+    my $dump_str = $status->dump();
+       $dump_str = $status->dump( to => 'string' );
+
+    # dump object to log
+    $status->dump( to => 'log' );
+
+    # dump object to file descriptor
+    $status->dump( fd => STDOUT );
+    $status->dump( to => 'fd', fd => \*STDOUT );
+
+Always returns a true value.
+
+=cut
+
+sub dump {
+    my $self = shift;
+    my ( %ARGS ) = validate( @_, { 'to' => 0, 'fd' => 0 } );
+    my ( $action, $fh );
+    if ( not %ARGS ) {
+        $action = 'string';
+    } elsif ( exists $ARGS{'to'} ) {
+        if ( $ARGS{'to'} eq 'string' ) {
+            $action = 'string';
+        } elsif ( $ARGS{'to'} eq 'log' ) {
+            $action = 'log';
+        } elsif ( $ARGS{'to'} eq 'fd' and exists $ARGS{'fd'} ) {
+            $action = 'fd';
+            $fh = $ARGS{'fd'};
+        } else {
+            die "App::CELL->Status->dump() doing nothing (bad arguments)";
+        }
+    } elsif ( exists $ARGS{'fd'} ) {
+        $action = 'fd';
+        $fh = $ARGS{'fd'};
+    } else {
+        die "App::CELL->Status->dump() doing nothing (bad arguments)";
+    }
+    if ( $action eq "string" ) {
+        return _prep_dump_string(
+            level => $self->level,
+            code => $self->code,
+            text => $self->text,
+        );
+    } elsif ( $action eq "log" ) {
+        $log->status_obj( $self );
+    } elsif ( $action eq "fd" ) {
+        print $fh _prep_dump_string(
+            level => $self->level,
+            code => $self->code,
+            text => $self->text,
+        ), "\n";
+    } else {
+        die "App::CELL->Status->dump() doing nothing (bad things happening)";
+    }
+
+    return 1;
+}
+
+
+sub _prep_dump_string {
+    my %ARGS = validate( @_, {
+        'level' => 1,
+        'code' => 0,
+        'text' => 1,
+    } );
+
+    my $prepped_string = "$ARGS{'level'}: ";
+    if ( $ARGS{'code'} and $ARGS{'code'} ne $ARGS{'text'} ) {
+        $prepped_string .= "($ARGS{'code'}) ";
+    }
+    $prepped_string .= "$ARGS{'text'}";
+
+    return $prepped_string;
+}
 
 
 =head2 ok

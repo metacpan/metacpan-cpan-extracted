@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::TextResultRole;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -75,7 +75,7 @@ Data::Sah::Compiler::TextResultRole - Role for compilers that produce text resul
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Compiler::TextResultRole (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Compiler::TextResultRole (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =head1 ATTRIBUTES
 

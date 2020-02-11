@@ -3,9 +3,9 @@ NAME
     Regexp::Pattern::* distribution
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.005 of
     Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution
-    Pod-Weaver-Plugin-Regexp-Pattern), released on 2018-09-10.
+    Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-02-11.
 
 SYNOPSIS
     In your weaver.ini:
@@ -23,6 +23,9 @@ DESCRIPTION
 
     *   Add a Patterns section containing list of patterns contained in the
         module
+
+    *   Mention some modules in the See Also section, including
+        Regexp::Pattern
 
 CONFIGURATION
 HOMEPAGE
@@ -50,7 +53,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

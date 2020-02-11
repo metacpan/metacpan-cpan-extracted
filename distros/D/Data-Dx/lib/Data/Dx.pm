@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000010';
 
 use Keyword::Declare;
 
@@ -42,15 +42,16 @@ sub _dx {
 
 sub import {
     my (undef, $opt_ref) = @_;
+    my %opt = ( colour => -t *STDERR, %{$opt_ref//{}} );
 
     # Lexical colour control...
     $^H{'Data::Dx no_colour'} = 1
-        if exists($opt_ref->{colour}) && !$opt_ref->{colour};
+        if !$opt{colour};
 
     # Lexical output redirect...
-    if ($opt_ref->{to}) {
+    if ($opt{to}) {
         $^H{'Data::Dx output'} = @OUTPUT;
-        push @OUTPUT, $opt_ref->{to};
+        push @OUTPUT, $opt{to};
     }
 
     keyword Dx (Expr $expr) { _dx($expr) }
@@ -69,7 +70,7 @@ sub _color {
             require Win32::Console::ANSI if $^O eq 'MSWin32';
             require Term::ANSIColor;
             sub { return shift if ((caller 1)[10]//{})->{'Data::Dx no_colour'}
-                            || ((caller 2)[10]//{})->{'Data::Dx no_colour'};
+                               || ((caller 2)[10]//{})->{'Data::Dx no_colour'};
                  goto &Term::ANSIColor::colored;
             }
     } // sub { shift };
@@ -150,7 +151,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000009
+This document describes Data::Dx version 0.000010
 
 
 =head1 SYNOPSIS
@@ -256,7 +257,15 @@ by changing the original C<use Data::Dx> to C<no Data::Dx>
 
 If the module is imported with the C<'colour'> option set false,
 output is dumped without colouring, even if Term::ANSIColor is
-available. The option defaults to true.
+available.
+
+The option defaults to true if C<STDERR> is directed to a terminal,
+and to false otherwise.
+
+If you want coloured output even when C<STDERR> isn't directed to a terminal,
+specify it explicitly like this:
+
+    use Data::Dx { colour => 1 };
 
 =back
 

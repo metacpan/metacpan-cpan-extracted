@@ -1,7 +1,9 @@
 package Test::Data::Sah::Perl;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.906'; # VERSION
 
 use 5.010001;
 use strict;
@@ -106,7 +108,6 @@ sub run_spectest_for_perl {
                        exists
                        if
                        postfilters
-                       prefilters
                        prop
                        uniq
 
@@ -139,7 +140,7 @@ Test::Data::Sah::Perl - Routines for testing Data::Sah (perl compiler)
 
 =head1 VERSION
 
-This document describes version 0.904 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =head1 FUNCTIONS
 

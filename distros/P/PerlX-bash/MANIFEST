@@ -7,6 +7,7 @@ Makefile.PL
 dist.ini
 lib/PerlX/bash.pm
 t/capture.t
+t/dash-c.t
 t/dash-e.t
 t/dash-x.t
 t/errors.t
@@ -16,7 +17,9 @@ t/lib/SkipUnlessBash.pm
 t/lib/TestUtilFuncs.pm
 t/path.t
 t/require.t
+t/shq.t
 t/simple.t
 t/special-args.t
+xt/author/bash_debug_is.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

@@ -18,12 +18,16 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-Solitaire-BlackHole-Solver",
-  "dist_version" => "0.2.2",
+  "dist_version" => "0.4.0",
   "license" => "mit",
   "module_name" => "Games::Solitaire::BlackHole::Solver",
   "recursive_test_files" => 1,
   "requires" => {
+    "Exporter" => 0,
     "Getopt::Long" => "2.36",
+    "List::Util" => 0,
+    "Math::Random::MT" => 0,
+    "Moo" => 0,
     "Pod::Usage" => 0,
     "perl" => "5.014",
     "strict" => 0,

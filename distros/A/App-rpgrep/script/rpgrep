@@ -1,0 +1,282 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/rpgrep/rpgrep
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
+
+our $DATE = '2020-02-09'; # DATE
+our $DIST = 'App-rpgrep'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/rpgrep/rpgrep",
+    program_name => "rpgrep",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->{common_opts}{version}{getopt} = "version|V";
+
+$cmdline->run;
+
+# ABSTRACT: Print lines matching a Regexp::Pattern pattern
+# PODNAME: rpgrep
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rpgrep - Print lines matching a Regexp::Pattern pattern
+
+=head1 VERSION
+
+This document describes version 0.002 of rpgrep (from Perl distribution App-rpgrep), released on 2020-02-09.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % rpgrep [options] <pattern> [file] ...
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--anchor>
+
+Generate an anchored version of the pattern.
+
+=item B<--file>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+=item B<--gen-arg>=I<s>%, B<-A>
+
+Supply generator arguments.
+
+If pattern is a dynamic pattern (generated on-demand) and the generator requires
+some arguments, you can supply them here.
+
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--gen-args-json>=I<s>
+
+Supply generator arguments (JSON-encoded).
+
+See C<--gen-arg>.
+
+=item B<--pattern>=I<s>*
+
+Name of pattern, with module prefix but without the 'Regexp::Pattern'.
+
+=back
+
+=head2 General output control options
+
+=over
+
+=item B<--color>=I<s>
+
+Valid values:
+
+ ["never","always","auto"]
+
+=item B<--count>, B<-c>
+
+Supress normal output, return a count of matching lines.
+
+=item B<--quiet-arg>, B<--silent>, B<-q>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Matching control options
+
+=over
+
+=item B<--all>
+
+Require all patterns to match, instead of just one.
+
+=item B<--ignore-case>, B<-i>
+
+=item B<--invert-match>, B<-v>
+
+Invert the sense of matching.
+
+=back
+
+=head2 Output line prefix control options
+
+=over
+
+=item B<--line-number>, B<-n>
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-V>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C rpgrep rpgrep
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete rpgrep 'p/*/`rpgrep`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-rpgrep>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-rpgrep>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rpgrep>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

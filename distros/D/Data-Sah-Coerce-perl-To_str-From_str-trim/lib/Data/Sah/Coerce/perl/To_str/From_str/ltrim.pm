@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::ltrim;
 
-# AUTHOR
-our $DATE = '2019-11-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
 our $DIST = 'Data-Sah-Coerce-perl-To_str-From_str-trim'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ use warnings;
 sub meta {
     +{
         v => 4,
-        summary => 'Trim whitespaces at the beginning of string',
+        summary => '(DEPRECATED) Trim whitespaces at the beginning of string',
         prio => 50,
     };
 }
@@ -34,7 +34,7 @@ sub coerce {
 }
 
 1;
-# ABSTRACT: Trim whitespaces at the beginning of string
+# ABSTRACT: (DEPRECATED) Trim whitespaces at the beginning of string
 
 __END__
 
@@ -44,17 +44,22 @@ __END__
 
 =head1 NAME
 
-Data::Sah::Coerce::perl::To_str::From_str::ltrim - Trim whitespaces at the beginning of string
+Data::Sah::Coerce::perl::To_str::From_str::ltrim - (DEPRECATED) Trim whitespaces at the beginning of string
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::Coerce::perl::To_str::From_str::ltrim (from Perl distribution Data-Sah-Coerce-perl-To_str-From_str-trim), released on 2019-11-28.
+This document describes version 0.007 of Data::Sah::Coerce::perl::To_str::From_str::ltrim (from Perl distribution Data-Sah-Coerce-perl-To_str-From_str-trim), released on 2020-02-11.
 
 =head1 SYNOPSIS
 
 To use in a Sah schema:
 
  ["str",{"x.perl.coerce_rules"=>["From_str::ltrim"]}]
+
+=head1 DESCRIPTION
+
+DEPRECATION NOTICE: Using L<Data::Sah::Filter::perl::Str::ltrim> is now more
+appropriate as multiple filters can be applied to data.
 
 =for Pod::Coverage ^(meta|coerce)$
 
@@ -80,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

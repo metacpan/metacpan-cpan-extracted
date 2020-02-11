@@ -87,7 +87,9 @@ DESCRIPTION
         [ [ '003@', undef, '0' => '12345X' ] ]
 
     PICA path expressions (see PICA::Path) can be used to facilitate
-    processing PICA+ records and PICA::Schema to validate PICA+ records.
+    processing PICA+ records and PICA::Schema can be used to validate PICA+
+    records with Avram Schemas
+    <https://format.gbv.de/schema/avram/specification>.
 
 FUNCTIONS
 
@@ -251,11 +253,12 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-      * PICA::Record (deprecated) implemented an alternative framework for
-      processing PICA+ records.
+      * pica-validate command line script to parse, serialize, count, and
+      validate PICA+ data.
 
-      * Use Catmandu::PICA for processing PICA records with the Catmandu
-      toolkit, for instance to convert PICA XML to plain PICA+:
+      * Use Catmandu::PICA for more elaborated processing of PICA records
+      with the Catmandu toolkit.
 
-         catmandu convert PICA --type xml to PICA --type plain < picadata.xml
+      * PICA::Record implemented an alternative framework for processing
+      PICA+ records (deprecated!).
 

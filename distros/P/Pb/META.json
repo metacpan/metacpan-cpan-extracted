@@ -37,10 +37,12 @@
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Path" : "0",
+            "Getopt::Long::Descriptive" : "0.100",
+            "IPC::System::Simple" : "1.23",
             "Import::Into" : "0",
             "Moo" : "0",
             "MooX::HandlesVia" : "0",
-            "PerlX::bash" : "0",
+            "PerlX::bash" : "0.05",
             "Proc::Pidfile" : "0",
             "Safe::Isa" : "0",
             "Sub::Install" : "0",
@@ -58,6 +60,7 @@
       "test" : {
          "requires" : {
             "Debuggit" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
             "Test::Most" : "0",
             "Test::Trap" : "0",
@@ -68,17 +71,17 @@
    "provides" : {
       "Pb" : {
          "file" : "lib/Pb.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Pb::Command::Context" : {
          "file" : "lib/Pb/Command/Context.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/barefootcoder/pb/issues"
+         "web" : "https://github.com/barefootcoder/leadpipe/issues"
       },
       "homepage" : "https://github.com/barefootcoder/leadpipe",
       "repository" : {
@@ -87,7 +90,7 @@
          "web" : "https://github.com/barefootcoder/leadpipe"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.14.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
 }

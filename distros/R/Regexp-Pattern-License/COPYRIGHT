@@ -33,12 +33,12 @@ Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-3.0
-
 Files: t/01-basic.t
 Copyright: Copyright 2019 Jonas Smedegaard.
+License: GPL-3.0
+
+Files: dist.ini
+Copyright: Copyright 2017 Jonas Smedegaard.
 License: GPL-3.0
 
 License: GPL-3.0

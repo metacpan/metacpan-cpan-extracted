@@ -1,0 +1,43 @@
+---
+abstract: 'Better local share directory support with Mojo::File'
+author:
+  - 'srchulo <srchulo@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-File-Share
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::File::Share:
+    file: lib/Mojo/File/Share.pm
+    version: '0.02'
+requires:
+  File::ShareDir: '0'
+  Mojolicious: '7.15'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/srchulo/Mojo-File-Share/issues
+  homepage: https://github.com/srchulo/Mojo-File-Share
+  repository: git://github.com/srchulo/Mojo-File-Share.git
+version: '0.02'
+x_authority: cpan:SRCHULO
+x_contributors:
+  - 'srchulo <violapiratejunky@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

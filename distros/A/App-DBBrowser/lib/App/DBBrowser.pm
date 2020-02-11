@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.231';
+our $VERSION = '2.232';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -236,6 +236,7 @@ sub run {
                 else {
                     $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
                 }
+                # ### if sqlite ...
                 my $prompt = 'Choose Database:';
                 my $choices_db = [ undef, @databases ];
                 # Choose
@@ -711,7 +712,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.231
+Version 2.232
 
 =head1 DESCRIPTION
 

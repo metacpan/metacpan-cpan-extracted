@@ -236,9 +236,20 @@ sub __directory {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     if ( ! $sf->{o}{insert}{history_dirs} ) {
-        return $sf->__new_dir_search();
+        require App::DBBrowser::Opt::Set;
+        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+        $opt_set->__new_dir_search();
+        if ( ! defined $sf->{o}{insert}{add_file_dir} ) {
+            return;
+        }
+        return realpath delete $sf->{o}{insert}{add_file_dir};
     }
-    elsif ( $sf->{o}{insert}{history_dirs} == 1 ) {
+    if ( $sf->{o}{insert}{add_file_dir} ) { # set in the prompt menu
+        my $dir_fs = delete $sf->{o}{insert}{add_file_dir};
+        $sf->__add_to_history( $dir_fs );
+        return realpath $dir_fs; # available in the prompt menu only if history_dirs == 1, therefore `return $dir_fs;`
+    }
+    if ( $sf->{o}{insert}{history_dirs} == 1 ) {
         my $h_ref = $ax->read_json( $sf->{i}{f_dir_history} );
         if ( @{$h_ref->{dirs}||[]} ) {
             return realpath encode 'locale_fs', $h_ref->{dirs}[0];
@@ -277,7 +288,10 @@ sub __directory {
             next DIR;
         }
         elsif ( $choices->[$idx] eq $new_search ) {
-            $dir_fs = $sf->__new_dir_search();
+            require App::DBBrowser::Opt::Set;
+            my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $sf->{o} );
+            $opt_set->__new_dir_search();
+            $dir_fs = delete $sf->{o}{insert}{add_file_dir};
             # Choose
             if ( ! defined $dir_fs || ! length $dir_fs ) {
                 next DIR;
@@ -289,21 +303,6 @@ sub __directory {
         $sf->__add_to_history( $dir_fs );
         return $dir_fs;
     }
-}
-
-
-sub __new_dir_search {
-    my ( $sf ) = @_;
-    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
-    # Choose
-    my $dir_fs = $tu->choose_a_directory(
-        { init_dir => $default_dir, decoded => 0, clear_screen => 1 }
-    );
-    if ( $dir_fs ) {
-        $sf->{i}{tmp_files_dir} = decode 'locale_fs', $dir_fs;
-    }
-    return $dir_fs;
 }
 
 
@@ -322,8 +321,6 @@ sub __add_to_history {
 }
 
 
-
-
 sub __file_setting_menu_entries {
     my ( $sf ) = @_;
     my $groups = [
@@ -334,8 +331,10 @@ sub __file_setting_menu_entries {
         { name => '_show_hidden_files', text => "- Show hidden",   section => 'insert' },
         { name => 'history_dirs',       text => "- Dir History",   section => 'insert' },
         { name => '_file_encoding',     text => "- File Encoding", section => 'insert' },
-
     ];
+    if ( $sf->{o}{insert}{history_dirs} == 1 ) {
+        push @$options, { name => 'add_file_dir', text => "- NEW search", section => 'insert' };
+    }
     return $groups, $options;
 
 }

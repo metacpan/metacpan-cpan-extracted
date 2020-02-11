@@ -1,0 +1,146 @@
+NAME
+    Regexp::Pattern::Palindrome - Regexp patterns related to palindrome
+
+VERSION
+    This document describes version 0.001 of Regexp::Pattern::Palindrome
+    (from Perl distribution Regexp-Pattern-Palindrome), released on
+    2020-02-10.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Palindrome::gen_palindrome_alphanum");
+
+DESCRIPTION
+    Regexp::Pattern is a convention for organizing reusable regex patterns.
+
+PATTERNS
+    *   gen_palindrome_alphanum
+
+        Generate regex to match palindrome alphanumeric word of certain
+        minimum length.
+
+        This is a dynamic pattern which will be generated on-demand.
+
+        The following arguments are available to customize the generated
+        pattern:
+
+        *   min_len
+
+        Examples:
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>1});  # matches
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # doesn't match
+
+         "aaa" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # matches
+
+         "aba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # matches
+
+         "abba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # matches
+
+         "abcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # matches
+
+         "abc" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>3});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>5});  # doesn't match
+
+         "abcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>5});  # matches
+
+         "abccba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>5});  # matches
+
+         "abcde" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>5});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>7});  # doesn't match
+
+         "abcdcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>7});  # matches
+
+         "abcddcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>7});  # matches
+
+         "abcdefg" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>7});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>9});  # doesn't match
+
+         "abcdedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>9});  # matches
+
+         "abcdeedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>9});  # matches
+
+         "abcdefghi" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>9});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>11});  # doesn't match
+
+         "abcdefedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>11});  # matches
+
+         "abcdeffedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>11});  # matches
+
+         "abcdefghijk" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>11});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>13});  # doesn't match
+
+         "abcdefgfedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>13});  # matches
+
+         "abcdefggfedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>13});  # matches
+
+         "abcdefghijklm" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>13});  # doesn't match
+
+         "a" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>15});  # doesn't match
+
+         "abcdefghgfedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>15});  # matches
+
+         "abcdefghhgfedcba" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>15});  # matches
+
+         "abcdefghijklmno" =~ re("Palindrome::gen_palindrome_alphanum", {min_len=>15});  # doesn't match
+
+    *   palindrome_alphanum
+
+        Palindrome alphanumeric word (single alphanum included).
+
+        Examples:
+
+         "foo" =~ re("Palindrome::palindrome_alphanum");  # doesn't match
+
+         "Aa" =~ re("Palindrome::palindrome_alphanum");  # doesn't match
+
+         "-" =~ re("Palindrome::palindrome_alphanum");  # doesn't match
+
+         "a-a" =~ re("Palindrome::palindrome_alphanum");  # doesn't match
+
+         "a" =~ re("Palindrome::palindrome_alphanum");  # matches
+
+         "aa" =~ re("Palindrome::palindrome_alphanum");  # matches
+
+         "zzz" =~ re("Palindrome::palindrome_alphanum");  # matches
+
+         "kodok" =~ re("Palindrome::palindrome_alphanum");  # matches
+
+        Feb 2nd, 2020 in YYYYMMDD format.
+
+         20200202 =~ re("Palindrome::palindrome_alphanum");  # matches
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Palindrome>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Palindrome>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Palind
+    rome>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern::Perl
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

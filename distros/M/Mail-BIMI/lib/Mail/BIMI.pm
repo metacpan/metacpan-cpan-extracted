@@ -1,6 +1,6 @@
 package Mail::BIMI;
 # ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200129'; # VERSION
+our $VERSION = '1.20200210'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};
@@ -16,6 +16,7 @@ use Mail::BIMI::Result;
   has domain => ( is => 'rw', isa => Str );
   has selector => ( is => 'rw', isa => Str, lazy => 1, builder => sub{ return 'default' } );
   has dmarc_object => ( is => 'rw', isa => class_type('Mail::DMARC::Result') );
+  has spf_object => ( is => 'rw', isa => class_type('Mail::SPF::Result') );
   has record => ( is => 'rw', lazy => 1, builder => '_build_record' );
   has result => ( is => 'rw', lazy => 1, builder => '_build_result' );
 
@@ -38,6 +39,22 @@ sub _build_result($self) {
       return $result;
   }
 
+  if ( $self->spf_object ) {
+      my $spf_request = $self->spf_object->request;
+      if ( $spf_request ) {
+          my $spf_record = $spf_request->record;
+          if ( $spf_record ) {
+              my @spf_terms = $spf_record->terms;
+              if ( @spf_terms ) {
+                    my $last_term = pop @spf_terms;
+                    if ( $last_term->name eq 'all' && $last_term->qualifier eq '+') {
+                        $result->set_result( 'skipped', 'SPF +all detected' );
+                        return $result;
+                    }
+                }
+            }
+        }
+    }
 
   if ( ! $self->record ) {
     $result->set_result( 'none', 'No BIMI Record' );

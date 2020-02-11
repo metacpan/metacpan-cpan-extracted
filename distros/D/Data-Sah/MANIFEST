@@ -130,6 +130,7 @@ t/perl-type-timeofday.t
 t/spectest-human.t-
 t/spectest-perl.t
 t/tmp-perl-clause-if.t
+t/tmp-perl-clause-prefilters.t
 t/tmp-perl-expr.t
 t/util-type-date.t
 weaver.ini

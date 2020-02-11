@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BrowserOpenUtils/open_browser
-# and generated automatically using Perinci::CmdLine::Gen version 0.490
+# and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-05-28'; # DATE
+our $DATE = '2019-12-09'; # DATE
 our $DIST = 'App-BrowserOpenUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ open-browser - open-browser
 
 =head1 VERSION
 
-This document describes version 0.002 of open-browser (from Perl distribution App-BrowserOpenUtils), released on 2019-05-28.
+This document describes version 0.003 of open-browser (from Perl distribution App-BrowserOpenUtils), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -140,6 +140,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--dry-run>
 
 Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 

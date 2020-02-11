@@ -1,6 +1,4 @@
-.includepath
-.project
-Build.PL
+Makefile.PL
 Changes
 lib/Data/Report.pm
 lib/Data/Report/Base.pm
@@ -33,4 +31,4 @@ t/09poc03.t
 t/09poc04.t
 t/09poc05.t
 t/09poc06.t
-Makefile.PL
+META.json                                Module JSON meta-data (added by MakeMaker)

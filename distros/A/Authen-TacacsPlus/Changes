@@ -65,3 +65,7 @@ Revision history for Perl extension Authen::TacacsPlus.
 0.26 2015-12-08 Mike McCauley
      - pass CFLAGS and CPPFLAGS explicitly in the subdirectory to get all
      hardening flags, Patch from Florian Schlichting.
+
+0.27 2020-02-09  Mike McCauley
+     - Patch from Jacob Farkas via RT to allow building under on Alpine Linux
+     under Docker on armv7l, and possibly others

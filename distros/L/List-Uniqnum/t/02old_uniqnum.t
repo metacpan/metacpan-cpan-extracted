@@ -10,24 +10,40 @@ use warnings;
 use Config;
 use List::Uniqnum;
 
-if(List::Uniqnum::_have_msc_ver() && $Config{nvsize} == 8 && $Config{ivsize} == 8) {
+my $msc_ver = List::Uniqnum::_have_msc_ver(); 
 
-  print "1..3\n";
+if($msc_ver && $msc_ver < 1900 && $Config{nvsize} == 8 && $Config{ivsize} == 8) {
 
-  my $ls = 63;
-  
-  my @in = (1 << $ls, 2 ** $ls,
-            1 << ($ls - 3), 2 ** ($ls - 3),
-            5 << ($ls - 3), 5 * (2 ** ($ls - 3)));
+  print "1..6\n";
 
-  my $p_53 = (1 << 53) - 1; # 9007199254740991
+  # Create some UV-NV pairs of equivalent values.
+  # Each of these values is exactly representable
+  # as either a UV or an NV.
 
-  # To obtain an NV, we need to first divide $p_53 by 2
-  push @in, ($p_53 * 1024, $p_53/ 2 * 2048.0,
-             $p_53 * 2048, $p_53 / 2 * 4096.0,
-             ($p_53 -200) * 2048, ($p_53 - 200) / 2 * 4096.0,
-              100000000000262144, 1.00000000000262144e17,
-              144115188075593728, 1.44115188075593728e17);
+  my @in =  ( 9223372036854775808,  9.223372036854775808e+18,
+              1152921504606846976,  1.152921504606846976e+18,
+              5764607523034234880,  5.764607523034234880e+18,
+              9223372036854774784,  9.223372036854774784e+18,
+              18446744073709549568, 1.8446744073709549568e+19,
+              18446744073709139968, 1.8446744073709139968e+19,
+              100000000000262144,   1.00000000000262144e+17,
+            # 100000000001310720,   1.00000000001310720e+17, # This one never needed the workaround
+                                                             # because it's only 18-digits long and
+                                                             # finishes with '0' - thus allowing "%.20g" 
+                                                             # formatting to produce correct results.
+
+              144115188075593728,   1.44115188075593728e+17 );
+
+
+  my @correct =  ( 9223372036854775808,
+                   1152921504606846976,
+                   5764607523034234880,
+                   9223372036854774784,
+                   18446744073709549568,
+                   18446744073709139968,
+                   100000000000262144,
+                 # 100000000001310720,
+                   144115188075593728 );
 
   my @u = List::Uniqnum::old_uniqnum(@in);
 
@@ -56,6 +72,18 @@ if(List::Uniqnum::_have_msc_ver() && $Config{nvsize} == 8 && $Config{ivsize} == 
     print "not ok 2\n";
   }
 
+  @u = List::Uniqnum::old_uniqnum(-100000000000000016, -100000000000000016.0);
+
+  if(is_deeply(\@u, [-100000000000000016, -100000000000000016.0])) {
+    # Test failed as expected
+    print "ok 3\n";
+  }
+  else {
+    # Test unexpectedly passed 
+    warn "\nGot      @u\nExpected -100000000000000016 ", -100000000000000016.0, "\n";
+    print "not ok 3\n";
+  }
+
 ################################
 ################################
 
@@ -63,12 +91,32 @@ if(List::Uniqnum::_have_msc_ver() && $Config{nvsize} == 8 && $Config{ivsize} == 
 
   if(is_deeply(\@u, [99999999999999984])) {
     # Test passed as expected
-    print "ok 3\n";
+    print "ok 4\n";
   }
   else {
     # Test unexpectedly failed 
-    warn "\nGot      @u\nExpected @in\n";
-    print "not ok 3\n";
+    warn "\nGot      @u\nExpected 99999999999999984\n";
+    print "not ok 4\n";
+  }
+
+  @u = List::Uniqnum::old_uniqnum(-99999999999999984, -99999999999999984.0);
+
+  if(is_deeply(\@u, [-99999999999999984])) {
+    # Test passed as expected
+    print "ok 5\n";
+  }
+  else {
+    # Test unexpectedly failed 
+    warn "\nGot      @u\nExpected -99999999999999984\n";
+    print "not ok 5\n";
+  }
+
+  if(List::Uniqnum::uv_fits_double(1073741825)) {
+    print "ok 6\n";
+  }
+  else {
+    warn "\n Expected 1 but got ", List::Uniqnum::uv_fits_double(1073741825), "\n";
+    print "not ok 6\n";
   }
 
 ################################

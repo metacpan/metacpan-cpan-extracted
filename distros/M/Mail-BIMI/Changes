@@ -1,3 +1,7 @@
+1.20200210 2020-02-10 UTC
+  - Tests now use Mocked DNS Zones
+  - Allow SPF object to be checked for +all
+
 1.20200129 2020-01-29 UTC
   - Fixed prereqs
 

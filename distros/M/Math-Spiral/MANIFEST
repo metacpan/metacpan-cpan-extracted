@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.md
+t/Math-Spiral.t
+lib/Math/Spiral.pm
+cpanfile
+.gitignore
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

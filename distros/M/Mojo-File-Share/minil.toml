@@ -1,0 +1,7 @@
+name = "Mojo-File-Share"
+# badges = ["travis-ci.com"]
+authority="cpan:SRCHULO"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

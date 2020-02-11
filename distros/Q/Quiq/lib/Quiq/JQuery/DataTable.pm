@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 use Quiq::Html::Table::List;
 use Quiq::Unindent;
@@ -640,8 +640,10 @@ sub instantiate {
         if (my $searchable = $col->searchable) {
             $keyVals .= "searchable: '$searchable',\n"; 
         }
-        if (my $orderable = $col->orderable) {
-            $keyVals .= "orderable: '$orderable',\n"; 
+        my $orderable = $col->orderable;
+        if (defined $orderable) {
+            $keyVals .= sprintf "orderable: %s,\n",
+                $orderable? 'true': 'false'; 
         }
         if (my $visible = $col->visible) {
             $keyVals .= "visible: '$visible',\n"; 
@@ -715,7 +717,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

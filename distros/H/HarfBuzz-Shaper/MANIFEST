@@ -4,6 +4,7 @@ Makefile.PL
 MANIFEST
 README
 Shaper.xs
+typemap
 t/00_load.t
 t/10_basic.t
 t/20_shaper.t

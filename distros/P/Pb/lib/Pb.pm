@@ -4,7 +4,7 @@ use 5.14.0;
 use warnings;
 use autodie ':all';
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 use Exporter;
 our @EXPORT =
@@ -22,9 +22,9 @@ use CLI::Osprey;
 
 use Safe::Isa;
 use Type::Tiny;
-use PerlX::bash			qw< bash pwd >;
+use PerlX::bash			0.05	qw< bash pwd >;
 use Import::Into;
-use Sub::Install		qw< install_sub >;
+use Sub::Install				qw< install_sub >;
 use File::Basename;
 
 use Pb::Command::Context;
@@ -70,6 +70,11 @@ our %CONTROL;										# key == command name, value == control structure
 option pretend =>
 (
 	is => 'ro', doc => "don't run commands; just print them",
+);
+
+option interactive =>
+(
+	is => 'ro', doc => "only run commands if user approves each one",
 );
 
 
@@ -329,20 +334,42 @@ sub verify (&$)
 }
 
 
+# figure out whether a directive should be executed, based on runmode
+sub _should_doit
+{
+	my ($dtype, $action) = @_;
+
+	if ( $FLOW->runmode eq 'NOACTION' )
+	{
+		my $msg = "would run";
+		$msg .= $dtype eq 'shell command' ? ':' : " $dtype";
+		$msg .= " $action" if $action;
+		say $msg;
+		return 0;
+	}
+	elsif ( $FLOW->runmode eq 'ASKACTION' )
+	{
+		my $prompt = "run $dtype?";
+		$prompt .= " $action" if $action;
+		$prompt .= "  [y/N] ";
+		print $prompt;
+		return <STDIN> =~ /^y/i;
+	}
+	# other run modes mean just do it
+	return 1;
+}
+
+
 
 sub SH (@)
 {
 	my @cmd = @_;
 
-	if ( $FLOW->runmode eq 'NOACTION' )
-	{
-		say "would run: @cmd";
-		return;
-	}
+	return unless _should_doit('shell command', "@cmd");
 
 	# In the rare case where `--pretend` is set but `runmode` is *not* "NOACTION," don't send our
 	# output to the logfile.
-	push @cmd, ">>$FLOW->{LOGFILE}" if exists $FLOW->{LOGFILE} and not $OPT{pretend};
+	push @cmd, ">>$FLOW->{LOGFILE}", "2>&1" if exists $FLOW->{LOGFILE} and not $OPT{pretend};
 
 	my $exitval = bash @cmd;
 	if (defined wantarray)							# someone cares about our exit value
@@ -362,13 +389,7 @@ sub CODE (@)
 	my $block = pop;
 	my ($name) = @_;
 
-	if ( $FLOW->runmode eq 'NOACTION' )
-	{
-		my $msg = "would run code block";
-		$msg .= " [$name]" if $name;
-		say $msg;
-		return;
-	}
+	return unless _should_doit('code block', $name ? "[$name]" : '');
 
 	# If we have a logfile, better make sure our code block is printing to it rather than STDOUT, if
 	# it prints anything.
@@ -379,14 +400,20 @@ sub CODE (@)
 	}
 
 	my $retval;
-	do
+	eval
 	{
+		# Note that you can't do an `if` block here, because
+		# that would make a separate scope for the `local`.
 		local *STDOUT = $log if $log;
+		local *STDERR = $log if $log;
 		$retval = $block->();
 	};
-	unless ($retval)
+	if (not $retval or $@)
 	{
-		my $msg = "code block" . ($name ? " [$name]" : '') . " returned false value [" . ($retval // 'undef') . "]";
+		my $msg = "code block" . ($name ? " [$name]" : '');
+		$msg .= $@
+				? " died [" . $@ =~ s/( at \S+ line \d+\.?)\n.*\Z//rs . "]"
+				: " returned false value [" . ($retval // 'undef') . "]";
 		fatal($msg);
 	}
 }
@@ -477,11 +504,12 @@ Pb - a workflow system made from Perl and bash
 
 =head1 VERSION
 
-This document describes version 0.01 of Pb.
+This document describes version 0.02 of Pb.
 
 =head1 SYNOPSIS
 
     use Pb;
+    use Path::Tiny;
     use Types::Standard -types;
 
     my %HOSTS =
@@ -497,7 +525,7 @@ This document describes version 0.01 of Pb.
     flow
     {
         verify { pwd eq $ENV{MY_ROOT_DIR} } 'must be run from $MY_ROOT_DIR';
-        verify { -x $FLOW->{file}         } 'file must exist';
+        verify { -f $FLOW->{file}         } 'file must exist';
 
         my $host = $HOSTS{$FLOW->{env}};
         my $from = path($FLOW->{file});
@@ -563,7 +591,7 @@ and context.
 
 =item *
 
-Will abort if any individual directive fails (like C<bash -e>).
+Will abort if any individual directive fails (similar to C<bash -e>).
 
 =item *
 
@@ -687,6 +715,7 @@ Print a fatal error and exit.
 
 =for Pod::Coverage 	run
 	go
+	pretend
 
 =head1 STATUS
 
@@ -745,7 +774,7 @@ via TDD (Test-Driven Development), so a patch that includes a failing test is mu
 likely to get accepted (or at least likely to get accepted more quickly).
 
 If you just want to report a problem or suggest a feature, that's okay too.  You can create
-an issue on GitHub here: L<http://github.com/barefootcoder/pb/issues>.
+an issue on GitHub here: L<https://github.com/barefootcoder/leadpipe/issues>.
 
 =head2 Source Code
 

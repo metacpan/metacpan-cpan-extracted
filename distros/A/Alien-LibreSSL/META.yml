@@ -8,12 +8,13 @@ build_requires:
   ExtUtils::MakeMaker: '6.52'
   Test2::V0: '0.000060'
   Test::Alien: '0'
+  Test::Alien::Diag: '0'
   perl: '5.008001'
 configure_requires:
-  Alien::Build: '1.74'
+  Alien::Build: '1.19'
   Alien::Build::MM: '0.32'
-  Alien::Build::Plugin::Decode::Mojo: '0'
   ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0'
   perl: '5.008001'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
@@ -26,21 +27,21 @@ requires:
   Alien::Base: '0.038'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/Alien-LibreSSL/issues
+  bugtracker: https://github.com/Perl5-Alien/Alien-LibreSSL/issues
   homepage: https://metacpan.org/pod/Alien::LibreSSL
-  repository: git://github.com/plicease/Alien-LibreSSL.git
-version: '0.03'
+  repository: git://github.com/Perl5-Alien/Alien-LibreSSL.git
+version: '0.05'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.28'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:
     share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
       Config: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      Mojo::DOM: '0'
-      Mojolicious: '7.00'
+      Mojo::DOM58: '1.00'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'

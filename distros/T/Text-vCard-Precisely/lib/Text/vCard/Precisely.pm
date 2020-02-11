@@ -1,6 +1,6 @@
 package Text::vCard::Precisely;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -70,28 +70,6 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
  });
 
  $vc->url({ content => 'https://twitter.com/worthmine', types => ['twitter'] }); # for URL param
-
- use Facebook::Graph;
- use Encode;
-
- my $fb = Facebook::Graph->new(
-    app_id => 'your app id',
-    secret => 'your secret key',
- );
- $fb->authorize;
- $fb->access>token( $fb->{'app_id'} . '|' . $fb->{'secret'} );
- my $q = $fb->query->find( 'some facebookID' )
- ->select>fields(qw( id name ))
- ->request
- ->as_hashref;
-
- $vc->socialprofile({ # Now you can set X-Social-Profile but Android ignore it
-    content => 'https://www.facebook/' . 'some facebookID',
-    types => 'facebook',
-    displayname => encode_utf8( $q->{'name'} ),
-    userid => $q->{'id'},
- });
-
  print $vc->as_string();
 
 =head1 DESCRIPTION

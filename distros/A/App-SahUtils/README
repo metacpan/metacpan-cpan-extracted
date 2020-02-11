@@ -2,14 +2,16 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.471 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2019-12-09.
+    This document describes version 0.475 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2020-02-11.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
     to Sah and Data::Sah:
 
     *   coerce-with-sah
+
+    *   filter-with-sah
 
     *   format-with-sah
 
@@ -39,6 +41,8 @@ SYNOPSIS
 
     *   list-sah-coerce-rule-modules
 
+    *   list-sah-filter-rule-modules
+
     *   list-sah-schema-modules
 
     *   list-sah-schemas-modules
@@ -52,6 +56,8 @@ SYNOPSIS
     *   sah-to-human
 
     *   show-sah-coerce-rule-module
+
+    *   show-sah-filter-rule-module
 
     *   show-sah-schema-module
 
@@ -382,7 +388,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

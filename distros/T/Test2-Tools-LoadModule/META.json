@@ -1,0 +1,67 @@
+{
+   "abstract" : "Test whether a module can be successfully loaded.",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Tools-LoadModule",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::V0" : "0",
+            "lib" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.567",
+            "Getopt::Long" : "2.34",
+            "Test2::API" : "0",
+            "Test2::Util" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test2::Tools::LoadModule" : {
+         "file" : "lib/Test2/Tools/LoadModule.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Tools-LoadModule"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Test2-Tools-LoadModule.git",
+         "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

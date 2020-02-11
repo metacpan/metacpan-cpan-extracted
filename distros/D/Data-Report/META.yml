@@ -1,33 +1,32 @@
 ---
-name: Data-Report
-version: 0.10
+abstract: 'Framework for flexible reporting'
 author:
-  - 'Johan Vromans <jvromans@squirrel.nl>'
-abstract: Framework for flexible reporting
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
+  - 'Johan Vromans <jv@cpan.org>'
 build_requires:
-  Test::More: 0
-  Text::CSV: 1
-recommends:
-  HTML::Entities: 0
-provides:
-  Data::Report:
-    file: lib/Data/Report.pm
-    version: 0.10
-  Data::Report::Base:
-    file: lib/Data/Report/Base.pm
-  Data::Report::Plugin::Csv:
-    file: lib/Data/Report/Plugin/Csv.pm
-  Data::Report::Plugin::Html:
-    file: lib/Data/Report/Plugin/Html.pm
-  Data::Report::Plugin::Text:
-    file: lib/Data/Report/Plugin/Text.pm
-generated_by: Module::Build version 0.2808
+  ExtUtils::MakeMaker: '0'
+  Text::CSV: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Report
 no_index:
+  directory:
+    - t
+    - inc
   package:
     - DB
+requires:
+  ExtUtils::MakeMaker: '6.46'
+  Test::More: '0'
+  Text::CSV: '1'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/sciurius/perl-Data-Report/issues
+  repository: https://github.com/sciurius/perl-Data-Report.git
+version: '1.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

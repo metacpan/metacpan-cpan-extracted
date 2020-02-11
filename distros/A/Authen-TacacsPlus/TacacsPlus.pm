@@ -17,7 +17,7 @@ require DynaLoader;
 @EXPORT_OK = qw(
 	TACPLUS_CLIENT
 );
-$VERSION = '0.26';
+$VERSION = '0.27';
 
 sub new
 {

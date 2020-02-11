@@ -16,8 +16,8 @@ my $uninit_msg = q|Use of uninitialized argument to bash|;
 throws_ok { bash } qr/Not enough arguments/, 'bash with no args dies';
 throws_ok { bash echo => undef } qr/$uninit_msg/, 'bash with an undefined arg dies';
 throws_ok { bash \lines => } qr/Not enough arguments/, 'bash with only capture args dies';
-throws_ok { bash -c => } qr/Not enough arguments/, 'bash with only switch args dies';
-throws_ok { bash \lines => -c => } qr/Not enough arguments/, 'bash with only capture _and_ switch args dies';
+throws_ok { bash -e => } qr/Not enough arguments/, 'bash with only switch args dies';
+throws_ok { bash \lines => -e => } qr/Not enough arguments/, 'bash with only capture _and_ switch args dies';
 
 # You would think you could wrap a `warning_is` inside a `dies_ok` here.
 # You would be wrong.

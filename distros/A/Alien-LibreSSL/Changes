@@ -1,5 +1,13 @@
 Revision history for Alien-LibreSSL
 
+0.05      2020-02-11 05:55:06 -0700
+  - More accurate probing of system libs on even older versions of Strawberry.
+
+0.04      2020-02-10 20:18:35 -0700
+  - Use Home Brew OpenSSL as system SSL if available.
+  - Honor the OPENSSL_PREFIX environment variable, if set.
+  - More accurate probing of system libs on older versions of Strawberry.
+
 0.03      2019-06-04 08:42:45 -0700
   - Don't trust the system OpenSSL on recent OS X
     if /usr/include/openssl does not exist.

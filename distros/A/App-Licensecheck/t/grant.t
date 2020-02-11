@@ -1,10 +1,11 @@
-#!perl
+use strictures;
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 47;
+use Test::Licensecheck;
+
+plan 49;
 
 # AFL
 license_is(
@@ -17,11 +18,11 @@ license_is(
 	[   qw(
 			t/grant/AGPL/fastx.c
 			t/grant/AGPL/fet.cpp
-			t/grant/AGPL/setup.py
 			)
 	],
 	'AGPL-3+'
 );
+license_is( 't/grant/AGPL/setup.py', [ 'AGPL-3', 'AGPL-3+' ] );
 
 # Apache
 license_is( 't/grant/Apache_and_more/PIE.htc', 'Apache-2.0 or GPL-2' );
@@ -46,7 +47,7 @@ license_is(
 );
 license_is(
 	't/grant/CC-BY-SA_and_more/utilities.scad',
-	'CC-BY-SA-3.0 or LGPL-2'
+	[ 'CC-BY-SA-3.0', 'CC-BY-SA-3.0 or LGPL-2' ]
 );
 
 # EPL

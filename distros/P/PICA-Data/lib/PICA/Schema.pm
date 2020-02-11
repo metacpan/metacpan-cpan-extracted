@@ -2,7 +2,7 @@ package PICA::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(field_identifier check_value);
@@ -11,12 +11,12 @@ use Scalar::Util qw(reftype);
 use PICA::Schema::Error;
 
 sub new {
-    my ($class, $schema) = @_;
+    my ( $class, $schema ) = @_;
     bless $schema, $class;
 }
 
 sub check {
-    my ($self, $record, %options) = @_;
+    my ( $self, $record, %options ) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
 
@@ -26,16 +26,23 @@ sub check {
     my %field_identifiers;
     for my $field (@$record) {
         $field_identifiers{ field_identifier($field) } = 1;
-        push @errors, $self->check_field($field, %options);
+        my $error = $self->check_field( $field, %options );
+        if ( $error and !grep { $_ eq $error } @errors ) {
+            push @errors, $error;
+        }
     }
 
-    for my $id (keys %{$self->{fields}}) {
+    for my $id ( keys %{ $self->{fields} } ) {
         my $field = $self->{fields}{$id};
-        if ($field->{required} && !$field_identifiers{$id}) {
-            push @errors, PICA::Schema::Error->new(
-                [ substr($id,0,4), length $id gt 4 ? substr($id, 5) : undef ],
+        if ( $field->{required} && !$field_identifiers{$id} ) {
+            push @errors,
+              PICA::Schema::Error->new(
+                [
+                    substr( $id, 0, 4 ),
+                    length $id gt 4 ? substr( $id, 5 ) : undef
+                ],
                 required => 1
-            );
+              );
         }
     }
 
@@ -43,134 +50,148 @@ sub check {
 }
 
 sub check_field {
-    my ($self, $field, %opts) = @_;
+    my ( $self, $field, %opts ) = @_;
 
-    my $id = field_identifier($field);
+    my $id   = field_identifier($field);
     my $spec = $self->{fields}{$id};
 
-    if ($opts{allow_deprecated}) {
-        $opts{allow_deprecated_fields} = 1;
+    if ( $opts{allow_deprecated} ) {
+        $opts{allow_deprecated_fields}    = 1;
         $opts{allow_deprecated_subfields} = 1;
     }
 
-    if ($opts{ignore_unknown}) {
-        $opts{ignore_unknown_fields} = 1;
+    if ( $opts{ignore_unknown} ) {
+        $opts{ignore_unknown_fields}    = 1;
         $opts{ignore_unknown_subfields} = 1;
     }
 
-    if (!$spec) { # field is not defined
+    if ( !$spec ) {    # field is not defined
         $spec = $self->{'deprecated-fields'}{$id};
+        my $simple = [ split( '/', $id ) ];
 
-        if ($spec) { # field is deprectaed
-            unless ($opts{allow_deprecated_fields}) {
-                return PICA::Schema::Error->new($field, deprecated => 1)
+        if ($spec) {    # field is deprectaed
+            unless ( $opts{allow_deprecated_fields} ) {
+                return PICA::Schema::Error->new( $simple, deprecated => 1 );
             }
-        } elsif ($opts{ignore_unknown_fields}) {
-            return ()
-        } else {
-            return PICA::Schema::Error->new($field)
+        }
+        elsif ( $opts{ignore_unknown_fields} ) {
+            return ();
+        }
+        else {
+            return PICA::Schema::Error->new($simple);
         }
     }
 
-    if ($opts{counter} && !$spec->{repeatable}) {
-        my $tag_occ = join '/', grep { defined } @$field[0,1];
-        if ($opts{counter}{$tag_occ}++) {
-            return PICA::Schema::Error->new($field, repeated => 1)
+    if ( $opts{counter} && !$spec->{repeatable} ) {
+        my $tag_occ = join '/', grep { defined } @$field[ 0, 1 ];
+        if ( $opts{counter}{$tag_occ}++ ) {
+            return PICA::Schema::Error->new( $field, repeated => 1 );
         }
     }
 
-    if ($opts{ignore_subfields}) {
+    if ( $opts{ignore_subfields} ) {
         return ();
     }
 
     my %errors;
-    if ($spec->{subfields}) {
+    if ( $spec->{subfields} ) {
         my $order;
         my %sfcounter;
-        my (undef, undef, @subfields) = @$field;
+        my ( undef, undef, @subfields ) = @$field;
 
         while (@subfields) {
-            my ($code, $value) = splice @subfields, 0, 2;
+            my ( $code, $value ) = splice @subfields, 0, 2;
             my $sfspec = $spec->{subfields}{$code};
 
-            if (!$sfspec) { # subfield is not defined
+            if ( !$sfspec ) {    # subfield is not defined
                 $sfspec = $spec->{'deprecated-subfields'}{$code};
-                if ($sfspec) { # subfield is deprecated
-                    unless ($opts{allow_deprecated_subfields}) {
-                        $errors{$code} = { deprecated => 1 }
+                if ($sfspec) {    # subfield is deprecated
+                    unless ( $opts{allow_deprecated_subfields} ) {
+                        $errors{$code} = { deprecated => 1 };
                     }
-                } elsif (!$opts{ignore_unknown_subfields}) {
-                    $errors{$code} = { }
+                }
+                elsif ( !$opts{ignore_unknown_subfields} ) {
+                    $errors{$code} = {};
                 }
             }
 
             if ($sfspec) {
-                if (!$sfspec->{repeatable} && $sfcounter{$code}) {
-                    $errors{$code} = { repeated => 1 }
-                } elsif (!$opts{ignore_subfield_order} && defined $sfspec->{order}) {
-                    if (defined $order && $order > $sfspec->{order}) {
-                        $errors{$code} = { order => $sfspec->{order} }
-                    } else {
-                        $order = 1*$sfspec->{order};
+                if ( !$sfspec->{repeatable} && $sfcounter{$code} ) {
+                    $errors{$code} = { repeated => 1 };
+                }
+                elsif ( !$opts{ignore_subfield_order}
+                    && defined $sfspec->{order} )
+                {
+                    if ( defined $order && $order > $sfspec->{order} ) {
+                        $errors{$code} = { order => $sfspec->{order} };
+                    }
+                    else {
+                        $order = 1 * $sfspec->{order};
                     }
                 }
                 $sfcounter{$code}++;
 
-                $errors{$code} = $_ for check_value($value, $sfspec, %opts);
+                $errors{$code} = $_ for check_value( $value, $sfspec, %opts );
             }
 
         }
 
-        foreach my $code (keys %{$spec->{subfields}}) {
-            if (!$sfcounter{$code} && $spec->{subfields}{$code}{required}) {
-                $errors{$code} = { required => 1 }
+        foreach my $code ( keys %{ $spec->{subfields} } ) {
+            if ( !$sfcounter{$code} && $spec->{subfields}{$code}{required} ) {
+                $errors{$code} = { required => 1 };
             }
         }
     }
 
-    return %errors ? PICA::Schema::Error->new($field, subfields => \%errors) : ();
+    return %errors
+      ? PICA::Schema::Error->new( $field, subfields => \%errors )
+      : ();
 }
 
 sub check_value {
-    my ($value, $schedule, %opts) = @_;
+    my ( $value, $schedule, %opts ) = @_;
 
     # TODO: check compatible with ECMA 262 (2015) regular expression grammar
-    if ($schedule->{pattern} and $value !~ /$schedule->{pattern}/) {
+    if ( $schedule->{pattern} and $value !~ /$schedule->{pattern}/ ) {
         return {
-            value => $value,
+            value   => $value,
             pattern => $schedule->{pattern},
-        }
+        };
     }
 
     # check positions and codes
     my $positions = $schedule->{positions} // {};
-    foreach my $pos (keys %$positions) {
+    foreach my $pos ( keys %$positions ) {
         my @p = split '-', $pos;
 
-        if (length $value < int $p[-1]) {
+        if ( length $value < int $p[-1] ) {
             return {
-                value => $value,
+                value    => $value,
                 position => $pos,
-            }
+            };
         }
 
         my $def = $positions->{$pos};
-        if ($def->{codes}) {
-            my $codes = $def->{codes};
+        if ( $def->{codes} ) {
+            my $codes      = $def->{codes};
             my $deprecated = $def->{'deprecated-codes'} // {};
-            my $c = substr $value, $p[0]-1, (@p > 1 ? $p[1]-$p[0] : 0) + 1;
-            if (!defined $codes->{$c}) {
-                if (!$deprecated->{$c}) {
+            my $c          = substr $value, $p[0] - 1,
+              ( @p > 1 ? $p[1] - $p[0] : 0 ) + 1;
+            if ( !defined $codes->{$c} ) {
+                if ( !$deprecated->{$c} ) {
                     return {
-                        value => $value,
+                        value    => $value,
                         position => $pos
-                    }
-                } elsif (!$opts{allow_deprecated} && !$opts{allow_deprecated_codes}) {
-                    # TODO: there is no way to see that an invalid value is deprecated
+                    };
+                }
+                elsif (!$opts{allow_deprecated}
+                    && !$opts{allow_deprecated_codes} )
+                {
+              # TODO: there is no way to see that an invalid value is deprecated
                     return {
-                        value => $value,
+                        value    => $value,
                         position => $pos
-                    }
+                    };
                 }
             }
         }
@@ -180,8 +201,10 @@ sub check_value {
 }
 
 sub field_identifier {
-    my ($tag, $occ) = @{$_[0]};
-    (($occ // '') ne '' and substr($tag,0,1) eq '0') ? "$tag/$occ" : $tag;
+    my ( $tag, $occ ) = @{ $_[0] };
+    ( ( $occ // '' ) ne '' and substr( $tag, 0, 1 ) eq '0' )
+      ? "$tag/$occ"
+      : $tag;
 }
 
 sub TO_JSON {

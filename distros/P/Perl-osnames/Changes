@@ -1,32 +1,41 @@
-Revision history for Perl-osnames
+0.121   2020-02-10  Released-By: PERLANCAR; Urgency: medium
 
-0.11    2014-12-19 (PERLANCAR)
+	- [Update data] Rename vms->VMS; Add gnu, iphoneos, msys, os2, sco_sv,
+	  sunos, srv4, srv5, unicos, unicosmk.
+
+
+0.120   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add exportable variables: $RE_OS_IS_{KNOWN,POSIX,UNIX}.
+
+
+0.11    2014-12-19  Released-By: PERLANCAR
 
 	- Perl 5.8 compatibility (don't use defined-or operator).
 
 
-0.10    2014-12-19 (PERLANCAR)
+0.10    2014-12-19  Released-By: PERLANCAR
 
         - Add more OS'es from Perl::OSType.
 
         - Mention and recommend users to use Perl::OSType instead.
 
 
-0.09    2014-12-18 (PERLANCAR)
+0.09    2014-12-18  Released-By: PERLANCAR
 
         - Add functions: is_posix, is_unix.
 
         - Make $data exportable.
 
 
-0.08    2014-12-18 (PERLANCAR)
+0.08    2014-12-18  Released-By: PERLANCAR
 
 	- No data changes.
 
 	- Forgot to move documentation about tags from App-osnames.
 
 
-0.07    2014-12-18 (PERLANCAR)
+0.07    2014-12-18  Released-By: PERLANCAR
 
         - First release, split from App-osnames to provide a
           minimal-dependencies distribution that contains the data.

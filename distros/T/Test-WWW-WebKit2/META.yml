@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for using an embedding WebKit2 engine for tests'
+author:
+  - 'Jason  Shaun Carty <jc@atikon.com>'
+  - 'Philipp Voglhofer <pv@atikon.com>'
+  - 'Philipp A. Lehner <pl@atikon.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-WWW-WebKit2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  WWW::WebKit2: '0.1'
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

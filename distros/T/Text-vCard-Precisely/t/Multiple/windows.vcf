@@ -1,0 +1,45 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 11.2//EN
+FN:Alice
+N:;Alice;;;
+TEL:090 0123 4567
+EMAIL:alice@example.com
+REV:2017-12-02T11:21:01Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 11.2//EN
+FN:Bob
+N:;Bob;;;
+TEL:090 0000 1234
+EMAIL:bob@example.com
+REV:2017-12-02T11:21:01Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 11.2//EN
+FN:Chris
+N:;Chris;;;
+TEL:090 0100 4567
+EMAIL:chris@example.com
+REV:2017-12-02T11:21:01Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 11.2//EN
+FN:Dave
+N:;Dave;;;
+TEL:090 0200 7890
+EMAIL:dave@example.com
+REV:2017-12-02T11:21:01Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//iOS 11.2//EN
+FN:Edward
+N:;Edward;;;
+TEL:090 0300 0000
+EMAIL:edward@example.com
+REV:2017-12-02T11:21:01Z
+END:VCARD

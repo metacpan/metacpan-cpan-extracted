@@ -1,3 +1,24 @@
+0.9.49  2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- In addition to string (filter rule name), element of
+	  prefilters/postfilters value can also be a 2-element array:
+	  [filter rule name, argument hash] to pass arguments to filter
+	  rule generator module [no spectest yet].
+
+
+0.9.48  2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix prefilters spectest.
+
+
+0.9.47  2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] prefilters/postfilters values are now rule
+	  names instead of expr.
+
+	- Add some expr tests.
+
+
 0.9.46  2019-07-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Introduce clauses: examples, invalid_examples.
@@ -110,7 +131,7 @@
          - Add a test for any.
 
 
-0.9.32   2015-02-14 (PERLANCAR) - The Day After Friday The 13th
+0.9.32   2015-02-14  Released-By: PERLANCAR; Note: The Day After Friday The 13th
 
          - No spec changes.
 

@@ -1,5 +1,11 @@
 Revision history for HarfBuzz::Shaper.
 
+0.021
+
+    - Add set/get_language.
+    - Simplify XS by using typemaps.
+    - Try fix some build problems on FreeBSD 10.
+
 0.020 2020-02-07
 
     - Solve some memory corruption on Windows.

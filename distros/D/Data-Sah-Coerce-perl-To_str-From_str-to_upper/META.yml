@@ -1,9 +1,9 @@
 ---
-abstract: 'Coerce string to upper case'
+abstract: '(DEPRECATED) Coerce string to upper case'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah::Coerce: '0.037'
+  Data::Sah::Coerce: '0.038'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -25,11 +25,19 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce-perl-To_str-From_str-to_upper
   homepage: https://metacpan.org/release/Data-Sah-Coerce-perl-To_str-From_str-to_upper
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce-perl-To_str-From_str-to_upper.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Deprecated
+      config:
+        Dist::Zilla::Plugin::Deprecated:
+          all: 1
+          modules: []
+      name: Deprecated
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Data::Sah::Coerce
       name: Data::Sah::Coerce
@@ -148,7 +156,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -288,7 +296,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
             -
               class: Pod::Weaver::Plugin::Data::Sah::Coerce
               name: -Data::Sah::Coerce
@@ -306,7 +314,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -439,6 +447,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
+x_deprecated: 1
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

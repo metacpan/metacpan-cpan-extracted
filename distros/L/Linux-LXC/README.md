@@ -24,6 +24,12 @@ of the release should not be written by hand but should be replaced by
 do it).
 * Run the `dzil build` command that will create the new package of the
 module.
+* Run the `dzil release` command that will upload the module to the
+CPAN. If you are releasing from outside your test environment, you will
+probably have to delete the _RunExtraTests_ and _TestRelease_ options
+from the _dist.ini_ file because integration tests will fail and thus,
+avoiding the release to be uploaded. If you do so, please run a `dzil
+test` command from your test virtual machine before the releasing!
 
 # How to run integration (extra) tests?
 
@@ -40,13 +46,20 @@ for running them.
 create a shared folder.
 * Share your git repo of the projet with the virtual OS, say, in
 /opt/perl-linux-lxc folder.
+    * This command can be useful for mounting the folder: `mount -t vboxsf perl-virt-lxc /opt/perl-linux-lxc`.
 * Install some external packages:
-    * `apt install make lxc`
+    * `apt install dh-dist-zilla make lxc`
     * Install the currently released version of Linux::LXC for
     installing all dependencies: `cpan Linux::LXC`.
     * Install Dist::Zilla and a lot of other needed modules :
     `cpan Dist::Zilla Dist::Zilla::Plugin::RunExtraTests Test::Pod
-    Test::Pod::Coverage Pod::Coverage::TestPod Log::Any::Adapter`.
+    Test::Pod::Coverage Pod::Coverage::TestPod Pod::Coverage::TrustPod Log::Any::Adapter`.
+
+## What to test?
+LXC version 3 is not backward compliant with 2 one. Thus, it is important to test that any modification of the plugin
+will not add regression with LXC 2. This can be done by running all tests on a system that use LXC 2 and on a second one with LXC 3.
+
+Debian 9.5 can be used as host for testing LXC 2, and Debian 10 as host for LXC 3.
 
 ## How to run the tests?
 Extra tests are the most important because it's the ones that manipulate

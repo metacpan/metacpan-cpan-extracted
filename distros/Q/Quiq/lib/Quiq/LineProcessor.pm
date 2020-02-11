@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -393,7 +393,7 @@ sub dump {
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

@@ -1,0 +1,18 @@
+This directory contains tools used in maintaining this package.
+Specifically:
+
+README
+    This file.
+
+events
+    Run one of the Test2::Tools::LoadModule subroutines and dump the
+    events generated. The name of the subroutine and the module to load
+    are specified as command arguments. The rest of the possible
+    subroutine arguments are specified as options.
+
+version_regex
+    Builds the LAX_VERSION constant in Test2::Tools::LoadModule from
+    $version::regex::LAX. Use with caution, since version::regex is
+    completely undocumented.
+
+# ex: set filetype=text textwidth=72 autoindent :

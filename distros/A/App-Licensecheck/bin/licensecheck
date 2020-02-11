@@ -2,7 +2,7 @@
 
 use utf8;
 use open qw(:locale);
-use strictures 2;
+use strictures;
 use autodie;
 
 use version;
@@ -27,11 +27,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.41
+Version v3.0.44
 
 =cut
 
-our $VERSION = version->declare('v3.0.41');
+our $VERSION = version->declare('v3.0.44');
 
 my $progname = path($0)->basename;
 

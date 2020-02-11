@@ -6,6 +6,21 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.042	2020-02-11
+
+ - If a signature includes `head` and `tail` options, reify any string type
+   constraints found there. This feature assumes you're using Type::Params
+   1.009002 or above.
+ - The `confess` exported by MooX::Press::Keywords no longer passes a
+   single argument through sprintf; only calling sprintf when multiple
+   arguments are given.
+
+0.041	2020-02-09
+
+ - Added: Factory packages now have a `qualify` method allowing them to
+   translate unprefixed class names to fully-qualified ones.
+ - Added: MooX::XSConstructor is loaded and used if it's installed.
+
 0.040	2020-02-01
 
  [ Bug Fixes ]

@@ -7,6 +7,8 @@ build_requires:
   Role::Tiny: '0'
   Test::Fatal: '0'
   Test::More: '0.96'
+  Test::Requires: '0'
+  parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 1
@@ -28,7 +30,7 @@ optional_features: {}
 provides:
   Sub::MultiMethod:
     file: lib/Sub/MultiMethod.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Exporter::Shiny: '0'
   Type::Params: '1.008003'
@@ -40,5 +42,5 @@ resources:
   homepage: https://metacpan.org/release/Sub-MultiMethod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-multimethod.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

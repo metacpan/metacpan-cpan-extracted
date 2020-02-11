@@ -1,0 +1,6 @@
+default._bimi.gallifreyburning.com TXT "v=bimi1; l=https://gallifreyburning.com/bimi.svg"
+foobar._bimi.gallifreyburning.com TXT "v=bimi1; l=https://bimi.example.com/marks/bazz.svg"
+spfall.gallifreyburning.com TXT "v=spf1 ip4:1.2.3.4 +all"
+default._bimi.gallifreyburning.com TXT ""v=bimi1; l=https://bimi.example.com/marks/spfall.svg"
+
+

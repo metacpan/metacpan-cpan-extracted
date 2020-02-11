@@ -1,36 +1,32 @@
 package App::Licensecheck;
 
 use utf8;
-use strictures 2;
+use strictures;
 use autodie;
 
 use version;
-use Log::Any ();
+use Log::Any qw($log);
 use List::SomeUtils qw(nsort_by);
 use Path::Iterator::Rule;
 use Path::Tiny;
+use Try::Tiny;
 use Fcntl qw(:seek);
 use Encode;
 use Array::IntSpan;
-use Regexp::Pattern 0.2.0 (
+use Regexp::Pattern::License 3.1.102;
+use Regexp::Pattern 0.2.12 (
 	're',
 	'License::*' => (
-		engine   => 'RE2',
-		subject  => 'trait',
-		-prefix  => 'TRAIT_',
-		-has_tag => 'type:trait',
+		engine              => 'RE2',
+		subject             => 'trait',
+		-prefix             => 'TRAIT_',
+		-has_tag_matching   => '^type:trait(?:\z|:)',
+		-lacks_tag_matching => '^type:trait:exception(?:\z|:)',
 	),
-	'License::license_label' => (
-		subject => 'trait',
-		-prefix => 'TRAIT_GLOBAL_',
-	),
-	'License::license_label_trove' => (
-		subject => 'trait',
-		-prefix => 'TRAIT_GLOBAL_',
-	),
-	'License::licensed_under' => (
-		subject => 'trait',
-		-prefix => 'TRAIT_GLOBAL_',
+	'License::*' => (
+		subject           => 'trait',
+		-prefix           => 'TRAIT_GLOBAL_',
+		-has_tag_matching => '^type:trait:grant:prefix(?:\z|:)',
 	),
 	'License::version' => (
 		capture => 'numbered',
@@ -43,31 +39,29 @@ use Regexp::Pattern 0.2.0 (
 		-prefix => 'TRAIT_KEEP_',
 	),
 	'License::*' => (
-		engine     => 'RE2',
-		subject    => 'name',
-		-prefix    => 'NAME_',
-		-lacks_tag => 'type:trait',
+		engine              => 'RE2',
+		subject             => 'name',
+		-prefix             => 'NAME_',
+		-lacks_tag_matching => '^type:trait(?:\z|:)',
 	),
 	'License::*' => (
-		subject    => 'license',
-		-prefix    => 'LICENSE_GLOBAL_',
-		-lacks_tag => 'type:trait',
+		subject             => 'license',
+		-prefix             => 'LICENSE_GLOBAL_',
+		-lacks_tag_matching => '^type:trait(?:\z|:)',
 	),
 	'License::*' => (
-		engine     => 'RE2',
-		subject    => 'grant',
-		-prefix    => 'GRANT_',
-		-lacks_tag => 'type:trait',
+		engine              => 'RE2',
+		subject             => 'grant',
+		-prefix             => 'GRANT_',
+		-lacks_tag_matching => '^type:trait(?:\z|:)',
 	),
 	'License::*' => (
-		engine     => 'RE2',
-		subject    => 'license',
-		-prefix    => 'LICENSE_',
-		-lacks_tag => 'type:trait',
+		engine              => 'RE2',
+		subject             => 'license',
+		-prefix             => 'LICENSE_',
+		-lacks_tag_matching => '^type:trait(?:\z|:)',
 	),
 );
-
-use Regexp::Pattern::License 3.1.96;
 use String::Copyright 0.003 {
 	format => sub { join ' ', $_->[0] || (), $_->[1] || () }
 };
@@ -78,6 +72,41 @@ use String::Copyright 0.003 {
 	'copyright' => { -as => 'copyright_optimistic' };
 
 use Moo;
+use MooX::Struct Thing => [
+	qw( $name! +begin! +end! ),
+	BUILDARGS => sub {
+		$log->tracef( 'detected something: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	}
+	],
+	Trait => [
+	-extends  => ['Thing'],
+	BUILDARGS => sub {
+		$log->tracef( 'located trait: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	}
+	],
+	Licensing => [
+	-extends  => ['Thing'], qw(@traits),
+	BUILDARGS => sub {
+		$log->debugf( 'collected some licensing: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	}
+	],
+	Fulltext => [
+	-extends  => ['Licensing'],
+	BUILDARGS => sub {
+		$log->debugf( 'collected fulltext: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	}
+	],
+	Grant => [
+	-extends  => ['Licensing'],
+	BUILDARGS => sub {
+		$log->debugf( 'collected grant: %s: %d-%d', @{ $_[1] } );
+		return MooX::Struct::BUILDARGS(@_);
+	}
+	];
 
 use experimental qw(switch);
 use namespace::clean;
@@ -88,11 +117,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.41
+Version v3.0.44
 
 =cut
 
-our $VERSION = version->declare('v3.0.41');
+our $VERSION = version->declare('v3.0.44');
 
 =head1 SYNOPSIS
 
@@ -125,7 +154,7 @@ my @L_type_combo         = sort keys %{ $L{type}{combo} };
 my @L_type_group         = sort keys %{ $L{type}{group} };
 
 my @L_tidy
-	= qw(afl aladdin apache artistic bsl cecill cecill_b cecill_c wtfpl wtfnmfpl);
+	= qw(afl agpl agpl_1 agpl_2 agpl_3 aladdin apache artistic bsl cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_nc cc_nd cc_sa cc_sp cecill cecill_b cecill_c wtfpl wtfnmfpl zpl zpl_1 zpl_1_1 zpl_2 zpl_2_1);
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -503,9 +532,9 @@ sub licensepatterns
 		}
 	}
 	foreach my $trait (
-		qw(any_of licensed_under or_at_option
+		qw(any_of or_at_option
 		fsf_unlimited fsf_unlimited_retention
-		version_later version_later_postfix)
+		version_later_postfix)
 		)
 	{
 		my $re = re( "License::$trait", subject => 'trait' );
@@ -513,38 +542,22 @@ sub licensepatterns
 	}
 
 	#<<<  do not let perltidy touch this (keep long regex on one line)
-	$list{re_grant_license}{local}{version_agpl_gpl}{1} = qr/$RE{TRAIT_KEEP_version_numberstring}(?:[.,])? (?:\(?only\)?.? )?(?:of $list{re_name}{gnu}|(as )?published by the Free Software Foundation)/i;
-	$list{re_grant_license}{local}{version_agpl_gpl}{2} = qr/$list{re_name}{gnu}\b[;,] $RE{TRAIT_KEEP_version_numberstring}\b[.,]? /i;
-	$list{re_grant_license}{local}{version_agpl_gpl}{3} = qr/either $RE{TRAIT_KEEP_version_numberstring},? $list{re_trait}{version_later_postfix}/;
-	$list{re_grant_license}{local}{version_agpl_gpl}{4} = qr/GPL as published by the Free Software Foundation, $RE{TRAIT_KEEP_version_numberstring}/i;
+	$list{re_grant_license}{local}{version_gpl}{1} = qr/$RE{TRAIT_KEEP_version_numberstring}(?:[.,])? (?:\(?only\)?.? )?(?:of $list{re_name}{gnu}|(as )?published by the Free Software Foundation)/i;
+	$list{re_grant_license}{local}{version_gpl}{2} = qr/$list{re_name}{gnu}\b[;,] $RE{TRAIT_KEEP_version_numberstring}\b[.,]? /i;
+	$list{re_grant_license}{local}{version_gpl}{3} = qr/either $RE{TRAIT_KEEP_version_numberstring},? $list{re_trait}{version_later_postfix}/;
+	$list{re_grant_license}{local}{version_gpl}{4} = qr/GPL as published by the Free Software Foundation, $RE{TRAIT_KEEP_version_numberstring}/i;
 	$list{re_grant_license}{local}{address_agpl_gpl_lgpl}{1} = qr/(?:675 Mass Ave|59 Temple Place|51 Franklin Steet|02139|02111-1307)/i;
 	$list{re_grant_license}{local}{exception_agpl_gpl_lgpl}{1} = qr/permission (?:is (also granted|given))? to link (the code of )?this program with (any edition of )?(Qt|the Qt library)/i;
-	$list{re_grant_license}{local}{generated}{1} = qr/unless such copies or derivative works are solely in the form of machine-executable object code generated by a source language processor/;
 	$list{re_grant_license}{local}{generated}{2} = qr/(All changes made in this file will be lost|DO NOT ((?:HAND )?EDIT|delete this file|modify)|edit the original|Generated (automatically|by|from|data|with)|generated.*file|auto[- ]generated)/i;
 	$list{re_grant_license}{local}{multi}{1} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{lgpl}$RE{TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{multi}{2} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{gpl}$RE{TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{lgpl}{1} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{lgpl}$RE{TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{lgpl}{3} = qr/either $list{re_name}{gpl}$RE{TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $list{re_name}{lgpl}/i;
 	$list{re_grant_license}{local}{lgpl}{4} = qr/$RE{TRAIT_GLOBAL_licensed_under}$RE{TRAIT_KEEP_version}? of $list{re_name}{lgpl}/i;
 	$list{re_grant_license}{local}{lgpl}{5} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_name}{lgpl}\b[,;:]?(?: either)? ?$RE{TRAIT_KEEP_version_numberstring},? $list{re_trait}{or_at_option} $RE{TRAIT_KEEP_version_numberstring}/i;
 	$list{re_grant_license}{local}{lgpl}{6} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_name}{lgpl}(?:[,;:]?(?: either)?$RE{TRAIT_KEEP_version}?)?/i;
-	$list{re_grant_license}{local}{agpl}{1} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_name}{agpl}/i;
-	$list{re_grant_license}{local}{agpl}{2} = qr/(?:signe la|means the) GNU Affero General Public License/i;
-	$list{re_grant_license}{local}{agpl}{3} = qr/GNU Affero General Public License into/i;
-	$list{re_grant_license}{local}{agpl}{4} = qr/means either the GNU/i;
-	$list{re_grant_license}{local}{agpl}{5} = qr/AFFERO GENERAL PUBLIC LICENSE$RE{TRAIT_KEEP_version}?/i;
-	$list{re_grant_license}{local}{gpl}{1} = qr/Copyright \(C\) (?:19|yy)yy <?name of author>?\s+This program is free software/;
-	$list{re_grant_license}{local}{gpl}{2} = qr/under the GNU GPL,? with none of the additional permissions of this License/;
-	$list{re_grant_license}{local}{gpl}{3} = qr/GNU Affero General Public License/;
 	$list{re_grant_license}{local}{gpl}{4} = qr/Terms of the Perl programming language system itself/;
-	$list{re_grant_license}{local}{gpl}{6} = qr/$RE{TRAIT_GLOBAL_licensed_under}$list{re_trait}{any_of}(?:[^.]|\.\S)*$list{re_name}{gpl}$RE{TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{gpl}{7} = qr/either $list{re_name}{gpl}$RE{TRAIT_KEEP_version}?(?: \((?:the )?"?GPL"?\))?, or $list{re_name}{lgpl}$RE{TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{gpl}{8} = qr/$RE{TRAIT_GLOBAL_licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$list{re_name}{gpl}/i;
 	$list{re_grant_license}{local}{gpl}{9} = qr/$RE{TRAIT_GLOBAL_licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$list{re_name}{gpl}$RE{TRAIT_KEEP_version}?/i;
-	foreach my $id ( sort keys %{ $list{family}{cc} } ) {
-		$list{re_grant_license}{local}{cc}{1}{$id} = qr/$list{re_name}{$id}$RE{TRAIT_KEEP_version_numberstring} or $RE{TRAIT_KEEP_version_numberstring}/i;
-		$list{re_grant_license}{local}{cc}{2}{$id} = qr/$list{re_name}{$id}$RE{TRAIT_KEEP_version}(?:,? (?:and|or) (?:the )?(?:GNU )?([AL]?GPL)-?$RE{TRAIT_KEEP_version})?/i;
-	}
 	$list{re_grant_license}{local}{bsd}{1} = qr/THIS SOFTWARE IS PROVIDED .*AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
 	$list{re_grant_license}{local}{bsd}{5} = qr/licen[sc]e:? ?bsd-(\d)-clause/i;
 	$list{re_grant_license}{local}{bsd}{6} = qr/licen[sc]e:? ?bsd\b/i;
@@ -554,7 +567,6 @@ sub licensepatterns
 	$list{re_grant_license}{local}{fsful}{1} = qr/This (\w+)(?: (?:file|script))? is free software; $list{re_trait}{fsf_unlimited}/i;
 	$list{re_grant_license}{local}{fsfullr}{1} = qr/This (\w+)(?: (?:file|script))?  is free software; $list{re_trait}{fsf_unlimited_retention}/i;
 	$list{re_grant_license}{local}{php}{1} = qr/$RE{TRAIT_GLOBAL_licensed_under}$RE{TRAIT_KEEP_version_numberstring} of the PHP license/;
-	$list{re_grant_license}{local}{pd}{1} = qr/$list{re_grant_license}{public_domain}/;
 	foreach my $id ( sort keys %{ $list{type}{versioned} } ) {
 		$list{re_grant_license}{local}{versioned}{$id} = qr/$list{re_name}{$id}$RE{TRAIT_KEEP_version}?/;
 	}
@@ -581,12 +593,12 @@ sub parse_license
 	my %match;
 	my ( %grant, %license );
 
-  # %expressions contains DEP-5 or SPDX identifiers
+  # @clues and @expressions contains DEP-5 or SPDX identifiers
   # it would be more efficient to store license info only in this
   # array and then convert it to legacy formulation, but there are
   # corner case (like extrainfo) that would not fit. So the old storage scheme
   # is kept with the new (SPDX/DEP-5) scheme to keep backward compat.
-	my %expressions;
+	my ( @clues, @expressions );
 
 	my $spdx_extra;
 	my $gen_spdx = sub {
@@ -639,11 +651,7 @@ sub parse_license
 			$v2    ? "(v$v2)"    : (),
 		);
 		my $expr = join( ' or ', @spdx );
-		$self->log->debugf(
-			'collected license expression: %s [%s]',
-			$expr, $file
-		);
-		push @{ $expressions{$expr} }, 'unknown';
+		push @expressions, Licensing [ $expr, -1, -1 ];
 		$license = join( ' ', $L{caption}{$legacy} || $legacy, $license );
 	};
 
@@ -676,21 +684,16 @@ sub parse_license
 			@L_type_singleversion,
 		);
 		my $license = pop @licenses;
+		next unless ($license);
 		next
-			if (
-			  !$license
-			or $license{$license}
-			or defined(
-				$coverage->get_range( $pos, $pos_license{$pos}{$license} )
-					->get_element(0)
-			)
-			);
+			if defined(
+			$coverage->get_range( $pos, $pos_license{$pos}{$license} )
+				->get_element(0) );
 		$self->log->tracef(
 			'detected and flagged well-formed license fulltext: %s: %s [%s]',
 			$license, $pos, $file
 		);
 		$coverage->set_range( $pos, $pos_license{$pos}{$license}, $license );
-		$gen_license->( $id2patterns->($license) );
 		$license{$license} = 1;
 	}
 
@@ -703,22 +706,18 @@ sub parse_license
 					$coverage->get_range( $-[0], $+[0] )->get_element(0)
 				)
 				);
-			$self->log->tracef(
-				'located license trait "%s": %d-%d "%s" [%s]',
-				$trait, $-[0], $+[0],
-				substr( $licensetext, $-[0], $+[0] - $-[0] ), $file
-			);
-			$match{_}{$trait}{ $-[0] } = $+[0];
+			push @clues, Trait [ $trait, $-[0], $+[0] ];
 		}
 	}
 
 	# step-wise grant detection
-	my %pos_grant;
 	LICENSED_UNDER:
 	foreach my $pos (
-		values %{ $match{_}{license_label_trove} },
-		values %{ $match{_}{license_label} },
-		values %{ $match{_}{licensed_under} },
+		(   sort map { $_->end }
+			grep     { $_->name eq 'license_label_trove' } @clues
+		),
+		( sort map { $_->end } grep { $_->name eq 'license_label' } @clues ),
+		( sort map { $_->end } grep { $_->name eq 'licensed_under' } @clues ),
 		)
 	{
 		foreach my $id (@RE_NAME) {
@@ -726,12 +725,10 @@ sub parse_license
 				$self->log->tracef(
 					'located license name: %s: %d-%d [%s]',
 					$id, $pos + $-[0], $pos + $+[0],
-					substr(
-						$licensetext, $pos + $-[0], $pos + $+[0] - $-[0]
-					),
+					substr( $licensetext, $pos + $-[0], $+[0] - $-[0] ),
 					$file
 				);
-				$match{$id}{name}{ $pos + $-[0] } = $pos + $+[0];
+				$match{$id}{name}{ $pos + $-[0] } = $pos + $+[0] - $-[0];
 			}
 		}
 
@@ -751,7 +748,6 @@ sub parse_license
 		);
 		my $name = pop @names;
 
-		GRANT:
 		if (    $name
 			and $match{$name}{name}{$pos_name}
 			and !defined(
@@ -770,73 +766,57 @@ sub parse_license
 					= substr( $licensetext, $pos_ver )
 					=~ /^$RE{TRAIT_KEEP_version}/;
 				if ($version) {
-					$self->log->tracef(
-						'located license trait "%s": %d-%d "%s" [%s]',
-						'version', $pos_ver + $-[1], $pos_ver + $+[1],
-						$version,  $file
-					);
+					push @clues, Trait [
+						'version',
+						$pos_ver + $-[1], $pos_ver + $+[1]
+					];
 					if ($later) {
-						$self->log->tracef(
-							'located license trait "%s": %d-%d "%s" [%s]',
-							'or_later', $pos_ver + $-[2], $pos_ver + $+[2],
-							$later,     $file
-						);
+						push @clues, Trait [
+							'or_later',
+							$pos_ver + $-[2], $pos_ver + $+[2]
+						];
 					}
 					$version =~ s/(?:\.0)+$//;
 					$name .= "_$version";
 					$name .= '_or_later' if ($later);
 				}
 			}
-			$self->log->tracef(
-				'located step-wise license grant: %s: %s [%s]',
-				$name, $pos, $file
-			);
-			$pos_grant{$pos}{$name} = 1;
-		}
-	}
-	foreach my $pos ( keys %pos_grant ) {
-		my @name = keys %{ $pos_grant{$pos} };
-		foreach my $name (@name) {
-			next if ( $license{$name} );
-			$self->log->tracef(
-				'flagged step-wise license grant: %s: %s [%s]',
-				$name, $pos, $file
-			);
+			push @clues, Trait [ 'grant', $pos, -1 ];
 			$grant{$name} = 1;
 		}
 	}
 
-	if ( grep { $match{$_}{name} } @agpl, @gpl ) {
+	if ( grep { $match{$_}{name} } @gpl ) {
 
-		# version of AGPL/GPL
+		# version of GPL
 		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{version_agpl_gpl}{1} ) {
+			when ( $L{re_grant_license}{local}{version_gpl}{1} ) {
 				$self->log->tracef(
-					'detected custom pattern version_agpl_gpl#1: %s: %s [%s]',
+					'detected custom pattern version_gpl#1: %s: %s [%s]',
 					$1, $-[0], $file
 				);
 				$gplver      = " (v$1)";
 				@spdx_gplver = ($1)
 			}
-			when ( $L{re_grant_license}{local}{version_agpl_gpl}{2} ) {
+			when ( $L{re_grant_license}{local}{version_gpl}{2} ) {
 				$self->log->tracef(
-					'detected custom pattern version_agpl_gpl#2: %s: %s [%s]',
+					'detected custom pattern version_gpl#2: %s: %s [%s]',
 					$1, $-[0], $file
 				);
 				$gplver      = " (v$1)";
 				@spdx_gplver = ($1);
 			}
-			when ( $L{re_grant_license}{local}{version_agpl_gpl}{3} ) {
+			when ( $L{re_grant_license}{local}{version_gpl}{3} ) {
 				$self->log->tracef(
-					'detected custom pattern version_agpl_gpl#3: %s: %s [%s]',
+					'detected custom pattern version_gpl#3: %s: %s [%s]',
 					$1, $-[0], $file
 				);
 				$gplver      = " (v$1 or later)";
 				@spdx_gplver = ( $1 . '+' );
 			}
-			when ( $L{re_grant_license}{local}{version_agpl_gpl}{4} ) {
+			when ( $L{re_grant_license}{local}{version_gpl}{4} ) {
 				$self->log->tracef(
-					'detected custom pattern version_agpl_gpl#4: %s: %s [%s]',
+					'detected custom pattern version_gpl#4: %s: %s [%s]',
 					$1, $-[0], $file
 				);
 				$gplver      = " (v$1)";
@@ -873,15 +853,7 @@ sub parse_license
 
 	# generated file
 	given ($licensetext) {
-
-		# exclude blurb found in boost license text
-		when ( $L{re_grant_license}{local}{generated}{1} ) {
-			$self->log->tracef(
-				'detected and skipped custom pattern generated#1: %s [%s]',
-				$-[0], $file
-			);
-			break;
-		}
+		break if ( $license{bsl_1} );
 		when ( $L{re_grant_license}{local}{generated}{2} ) {
 			$self->log->tracef(
 				'detected custom pattern generated#2: %s [%s]',
@@ -920,24 +892,6 @@ sub parse_license
 		# LGPL
 		given ($licensetext) {
 
-			# LGPL, among several
-			when ( $L{re_grant_license}{local}{lgpl}{1} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern lgpl#1: %s [%s]',
-					$-[0], $file
-				);
-				break;    # handled in multi-licensing loop
-			}
-
-			# GPL or LGPL
-			when ( $L{re_grant_license}{local}{lgpl}{3} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern lgpl#3: %s [%s]',
-					$-[0], $file
-				);
-				break;    # handled in GPL loop
-			}
-
 			# LGPL, version first
 			when ( $L{re_grant_license}{local}{lgpl}{4} ) {
 				$self->log->tracef(
@@ -955,11 +909,7 @@ sub parse_license
 				);
 				$license = "LGPL (v$1 or v$2) $license";
 				my $expr = "LGPL-$1 or LGPL-$2";
-				$self->log->debugf(
-					'collected license expression: %s [%s]',
-					$expr, $file
-				);
-				push @{ $expressions{$expr} }, 'local lgpl #5';
+				push @expressions, Grant [ $expr, -1, -1 ];
 			}
 
 			# LGPL, version last
@@ -979,49 +929,22 @@ sub parse_license
 
 		# AGPL
 		given ($licensetext) {
-			when ( $L{re_grant_license}{local}{agpl}{1} ) {
+			when ( !!$grant{agpl} ) {
+				my $expr = join ' ', $gen_spdx->('AGPL');
+				break if ( $license{agpl_3} and $expr eq 'AGPL-3' );
 				$self->log->tracef(
-					'detected custom pattern agpl#1: %s: %s [%s]',
+					'detected custom-parsed agpl: %s: %s [%s]',
 					'agpl', $-[0], $file
 				);
 				$license = "AGPL$gplver$extrainfo $license";
-				my @expr = $gen_spdx->('AGPL');
-				$self->log->debugf(
-					'collected license expression: %s [%s]',
-					[@expr], $file
-				);
-				push @{ $expressions{$_} }, 'local agpl #1' for (@expr);
+				push @expressions, Grant [ $expr, -1, -1 ];
 			}
-
-			# exclude CeCILL-2.1 license
-			when ( $L{re_grant_license}{local}{agpl}{2} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern agpl#2: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
-
-			# exclude GPL-3 license
-			when ( $L{re_grant_license}{local}{agpl}{3} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern agpl#3: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
-
-			# exclude MPL-2.0 license
-			when ( $L{re_grant_license}{local}{agpl}{4} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern agpl#4: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
+			break if ( $license{cecill_2_1} );
+			break if ( $license{gpl_3} );
+			break if ( $license{mpl_2} );
 			when ( $L{re_grant_license}{local}{agpl}{5} ) {
 				$self->log->tracef(
-					'detected custom pattern agpl#6: agpl %s %s: %s [%s]',
+					'detected custom pattern agpl#5: agpl %s %s: %s [%s]',
 					$1, $2, $-[0], $file
 				);
 				$gen_license->( 'agpl', $1, $2 );
@@ -1035,33 +958,7 @@ sub parse_license
 
 		# GPL
 		given ($licensetext) {
-
-			# exclude GPL fulltext (rarely if ever used as grant)
-			when ( $L{re_grant_license}{local}{gpl}{1} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern gpl#1: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
-
-			# exclude LGPL-3 fulltext (rarely if ever used as grant)
-			when ( $L{re_grant_license}{local}{gpl}{2} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern gpl#2: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
-
-			# exclude AGPL-3 license
-			when ( $L{re_grant_license}{local}{gpl}{3} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern gpl#3: %s [%s]',
-					$-[0], $file
-				);
-				break;
-			}
+			break if ( grep { $license{$_} or $grant{$_} } @agpl );
 
 			# exclude Perl combo license
 			when ( $L{re_grant_license}{local}{gpl}{4} ) {
@@ -1072,19 +969,10 @@ sub parse_license
 				break;
 			}
 
-			# GPL, among several
-			when ( $L{re_grant_license}{local}{gpl}{6} ) {
-				$self->log->tracef(
-					'detected and skipped custom pattern gpl#6: %s [%s]',
-					$-[0], $file
-				);
-				break;    # handled in multi-licensing loop
-			}
-
 			# GPL or LGPL
 			when ( $L{re_grant_license}{local}{gpl}{7} ) {
 				$self->log->tracef(
-					'detected custom pattern agpl#7: %s %s %s %s %s %s %s %s: %s [%s]',
+					'detected custom pattern gpl#7: %s %s %s %s %s %s %s %s: %s [%s]',
 					'gpl', $1, $2, 'lgpl', $3, $4, $-[0], $file
 				);
 				$gen_license->( 'gpl', $1, $2, 'lgpl', $3, $4 );
@@ -1097,13 +985,10 @@ sub parse_license
 					);
 					$license = "GPL$gplver$extrainfo $license";
 					my $expr = join ' ', $gen_spdx->('GPL');
-					$self->log->debugf(
-						'collected license expression: %s [%s]',
-						$expr, $file
-					);
-					push @{ $expressions{$expr} }, 'local gpl #7';
+					push @expressions, Grant [ $expr, -1, -1 ];
 				}
 			}
+			break if ( $license{cecill_1_1} );
 			when ( $L{re_grant_license}{local}{gpl}{9} ) {
 				$self->log->tracef(
 					'detected custom pattern gpl#9: %s %s %s: %s [%s]',
@@ -1114,42 +999,6 @@ sub parse_license
 		}
 		$self->log->tracef( 'flagged license object: gpl [%s]', $file );
 		$match{gpl}{custom} = 1;
-	}
-
-	# CC
-	given ($licensetext) {
-		foreach my $id (@L_family_cc) {
-			next unless ( $match{$id}{name} );
-			when ( $L{re_grant_license}{local}{cc}{1}{$id} ) {
-				$self->log->tracef(
-					'detected custom pattern cc#1: %s %s %s: %s [%s]',
-					$id, $1, $2, $-[0], $file
-				);
-				$license = "$L{caption}{$id} (v$1 or v$2) $license";
-				my $expr = "$L{name}{$id}-$1 or $L{name}{$id}-$2";
-				$self->log->debugf(
-					'collected license expression: %s [%s]',
-					$expr, $file
-				);
-				push @{ $expressions{$expr} }, 'local cc #1';
-			}
-			when ( $L{re_grant_license}{local}{cc}{2}{$id} ) {
-				$self->log->tracef(
-					'detected custom pattern cc#2: %s %s %s %s %s: %s [%s]',
-					$id, $1, $2, $3, $4, $-[0], $file
-				);
-				$gen_license->( $id, $1, $2, $3, $4 );
-			}
-		}
-	}
-	foreach my $id (
-		qw(cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_nc cc_nd cc_sa cc_sp)
-		)
-	{
-		$match{$id}{custom} = 1;
-		foreach ( $L{members}{$id} ? @{ $L{members}{$id} } : () ) {
-			$match{$_}{custom} = 1;
-		}
 	}
 
 	# BSD
@@ -1249,12 +1098,7 @@ sub parse_license
 				'fsful', $-[0], $file
 			);
 			$license = "FSF Unlimited ($1 derivation) $license";
-			my $expr = "FSFUL~$1";
-			$self->log->debugf(
-				'collected license expression: %s [%s]',
-				$expr, $file
-			);
-			push @{ $expressions{$expr} }, 'local fsful #1';
+			push @expressions, Fulltext [ "FSFUL~$1", -1, -1 ];
 		}
 	}
 	$self->log->tracef( 'flagged license object: fsful [%s]', $file );
@@ -1270,12 +1114,7 @@ sub parse_license
 			);
 			$license
 				= "FSF Unlimited (with Retention, $1 derivation) $license";
-			my $expr = "FSFULLR~$1";
-			$self->log->debugf(
-				'collected license expression: %s [%s]',
-				$expr, $file
-			);
-			push @{ $expressions{$expr} }, 'local fsfullr #1';
+			push @expressions, Fulltext [ "FSFULLR~$1", -1, -1 ];
 		}
 	}
 	$self->log->tracef( 'flagged license object: %s [%s]', 'fsfullr', $file );
@@ -1292,22 +1131,6 @@ sub parse_license
 		}
 	}
 
-	# public-domain
-	given ($licensetext) {
-		when ( $L{re_grant_license}{local}{pd}{1} ) {
-			$self->log->tracef(
-				'detected custom pattern pd#1: %s: %s [%s]',
-				'public_domain', $-[0], $file
-			);
-			$gen_license->('public_domain');
-		}
-	}
-	$self->log->tracef(
-		'flagged license object: %s [%s]', 'public_domain',
-		$file
-	);
-	$match{public_domain}{custom} = 1;
-
 	# singleversion
 	foreach my $id (@L_type_singleversion) {
 		next if ( $match{$id}{custom} );
@@ -1323,8 +1146,7 @@ sub parse_license
 		}
 
 		if ( $license{$id} or $grant{$id} ) {
-			$gen_license->( $id2patterns->($id) )
-				if ( $grant{$id} );
+			$gen_license->( $id2patterns->($id) );
 
 			# skip unversioned equivalent
 			if ( $L{series}{$id} ) {
@@ -1353,8 +1175,6 @@ sub parse_license
 				next;
 			}
 		}
-
-		# FIXME: match grant (not name)
 		if ( $match{$id}{name} ) {
 			if ( $licensetext =~ $L{re_grant_license}{local}{versioned}{$id} )
 			{
@@ -1369,7 +1189,12 @@ sub parse_license
 		next if ( $match{$id}{custom} );
 		next if ( $license{$id} );
 		if ( $RE{"GRANT_$id"} ) {
-			if ( $licensetext =~ $RE{"GRANT_$id"} ) {
+			if ($licensetext =~ $RE{"GRANT_$id"}
+				and !defined(
+					$coverage->get_range( $-[0], $+[0] )->get_element(0)
+				)
+				)
+			{
 				$self->log->tracef(
 					'detected versioned grant/license: %s: [%s]',
 					$id, $-[0], $file
@@ -1382,8 +1207,8 @@ sub parse_license
 
 	# other
 	foreach my $id ( @L_type_unversioned, @L_type_combo ) {
-		next if ( $match{$id}{custom} );
-		next if ( grep { $_ eq $id } @L_tidy );
+		next if ( !$license{$id} and $match{$id}{custom} );
+		next if ( !$license{$id} and grep { $_ eq $id } @L_tidy );
 
 		# skip embedded or referenced licenses
 		if ( $id eq 'zlib' ) {
@@ -1421,8 +1246,15 @@ sub parse_license
 			}
 		}
 
-		next if ( $license{$id} );
-		if ( $grant{$id} or $licensetext =~ $RE{"GRANT_$id"} ) {
+		if (   $license{$id}
+			or $grant{$id}
+			or ($licensetext =~ $RE{"GRANT_$id"}
+				and !defined(
+					$coverage->get_range( $-[0], $+[0] )->get_element(0)
+				)
+			)
+			)
+		{
 			$self->log->tracef(
 				'detected unversioned/combo grant/license: %s: [%s]',
 				$id, $-[0], $file
@@ -1433,7 +1265,7 @@ sub parse_license
 
 	# Remove trailing spaces.
 	$license =~ s/$L{re_grant_license}{local}{trailing_space}//;
-	my $expr = join( ' and/or ', sort keys %expressions );
+	my $expr = join( ' and/or ', sort map { $_->name } @expressions );
 	$self->log->infof(
 		'resolved license expression: %s [%s]', $expr,
 		$file

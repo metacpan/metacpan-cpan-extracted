@@ -62,7 +62,7 @@ sub _options {
         ],
         group_database => [
             { name => 'plugins',      text => "- DB Plugins",  section => 'G' },
-            { name => '_db_defaults', text => "- DB Settings", section => '' },
+            { name => '_db_defaults', text => "- DB Settings", section => ''  },
         ],
         group_behavior => [
             { name => '_menu_memory',  text => "- Menu memory",  section => 'G'     },
@@ -80,13 +80,13 @@ sub _options {
             { name => '_e_write_access',  text => "- Write access",  section => 'enable' },
         ],
         group_sql => [
-            { name => '_meta',                   text => "- Metadata",       section => 'G' },
-            { name => 'operators',               text => "- Operators",      section => 'G' },
-            { name => '_alias',                  text => "- Alias",          section => 'alias' },
-            { name => '_sql_identifiers',        text => "- Identifiers",    section => 'G' },
+            { name => '_meta',                   text => "- Metadata",       section => 'G'      },
+            { name => 'operators',               text => "- Operators",      section => 'G'      },
+            { name => '_alias',                  text => "- Alias",          section => 'alias'  },
+            { name => '_sql_identifiers',        text => "- Identifiers",    section => 'G'      },
             { name => '_autoincrement_col_name', text => "- Auto increment", section => 'create' },
             { name => '_data_type_guessing',     text => "- Data types",     section => 'create' },
-            { name => 'max_rows',                text => "- Max Rows",       section => 'G' },
+            { name => 'max_rows',                text => "- Max Rows",       section => 'G'      },
         ],
         group_output => [
             { name => 'min_col_width',       text => "- Colwidth",      section => 'table' },
@@ -100,15 +100,15 @@ sub _options {
             { name => '_file_find_warnings', text => "- Warnings",      section => 'G' },
         ],
         group_insert => [
-            { name => '_parse_file',    text => "- Parse file",        section => 'insert' },
-            { name => '_parse_copy',    text => "- Parse C & P",       section => 'insert' },
-            { name => '_split_config',  text => "- split settings",    section => 'split'  },
-            { name => '_csv_char',      text => "- CSV settings-a",    section => 'csv'    },
-            { name => '_csv_options',   text => "- CSV settings-b",    section => 'csv'    },
-            { name => '_file_encoding', text => "- File encoding",     section => 'insert' },
-            { name => 'history_dirs',   text => "- Dir history",       section => 'insert' },
-            { name => '_file_filter',       text => "- File filter", section => 'insert' },
-            { name => '_show_hidden_files', text => "- Show hidden", section => 'insert' },
+            { name => '_parse_file',        text => "- Parse file",     section => 'insert' },
+            { name => '_parse_copy',        text => "- Parse C & P",    section => 'insert' },
+            { name => '_split_config',      text => "- split settings", section => 'split'  },
+            { name => '_csv_char',          text => "- CSV settings-a", section => 'csv'    },
+            { name => '_csv_options',       text => "- CSV settings-b", section => 'csv'    },
+            { name => '_file_encoding',     text => "- File encoding",  section => 'insert' },
+            { name => 'history_dirs',       text => "- Dir history",    section => 'insert' },
+            { name => '_file_filter',       text => "- File filter",    section => 'insert' },
+            { name => '_show_hidden_files', text => "- Show hidden",    section => 'insert' },
         ],
     };
     return $groups->{$group};
@@ -524,6 +524,9 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq 'add_file_dir' ) {
+                $sf->__new_dir_search();
+            }
             else {
                 die "Unknown option: $opt";
             }
@@ -615,6 +618,21 @@ sub __group_readline {
         }
         $sf->{write_config}++;
     }
+}
+
+
+sub __new_dir_search { # used in Read.pm
+    my ( $sf ) = @_;
+    my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
+    my $default_dir = $sf->{i}{tmp_files_dir} || $sf->{i}{home_dir};
+    # Choose
+    my $dir_fs = $tu->choose_a_directory(
+        { init_dir => $default_dir, decoded => 0, clear_screen => 1 }
+    );
+    if ( $dir_fs ) {
+        $sf->{i}{tmp_files_dir} = $dir_fs;
+    }
+    $sf->{o}{insert}{add_file_dir} = $dir_fs; # don't keep saved value even if $dir_fs is not defined
 }
 
 

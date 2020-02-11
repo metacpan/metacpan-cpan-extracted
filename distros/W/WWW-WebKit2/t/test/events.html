@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>events</title>
+        <style>
+        #big_content { border: 1px solid green; height: 2000px; }
+        html, body { height: 100%; }
+        </style>
+        <script>
+            window.onload = function() {
+                var div = document.createElement('div');
+                div.id = 'foobarbaz';
+
+                window.setTimeout(function() {
+                    document.body.appendChild(div);
+                }, 500);
+
+                window.setTimeout(function() {
+                    document.body.removeChild(div);
+                }, 1000);
+
+                window.setTimeout(function() {
+                    alert('hello there');
+                }, 1500);
+
+                var input = document.querySelector('input[name="focus"]');
+                input.addEventListener('focus', function(e) {
+                    alert('focused');
+                });
+                input.addEventListener('blur', function(e) {
+                    alert('blurred');
+                });
+                document.querySelector('#start_ajax').addEventListener('click', function(e) {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('GET', window.ajax_url);
+                    xhr.send();
+                    xhr.onload = function() {
+                        if (xhr.readyState === xhr.DONE && xhr.status === 200) {
+                            window.setTimeout(function() {
+                                document.querySelector('#ajax_result').innerHTML = 'Hello World';
+                            }, 1000);
+                        }
+                    };
+                });
+
+                document.querySelector('#start_ajax_with_reload').addEventListener('click', function(e) {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('GET', window.ajax_url);
+                    xhr.send();
+                    xhr.onload = function() {
+                        if (xhr.readyState === xhr.DONE && xhr.status === 200) {
+                            window.setTimeout(function() {
+                                console.log('reloading')
+                                window.location.reload(true);
+                            }, 1000);
+                        }
+                    };
+                });
+
+                document.cookie = 'foo=bar; path=/';
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Events Header</h1>
+
+        <div id="big_content">
+            <form>
+                <input name="focus" value="1" />
+            </form>
+        </div>
+
+        <button id="start_ajax">Start AJAX</button>
+        <button id="start_ajax_with_reload">Start AJAX with page reload</button>
+        <div id="ajax_result"></div>
+    </body>
+</html>

@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -54,11 +54,11 @@ App::CELL - Configuration, Error-handling, Localization, and Logging
 
 =head1 VERSION
 
-Version 0.222
+Version 0.227
 
 =cut
 
-our $VERSION = '0.222';
+our $VERSION = '0.227';
 
 
 
@@ -219,7 +219,7 @@ directory (available only after sitedir has been successfully loaded)
 =cut
 
 sub sitedir { 
-    return '' if not $App::CELL::Load::sitedir_loaded;
+    return '' if not $App::CELL::Load::sitedir;
     return $App::CELL::Load::sitedir;
 }
 
@@ -415,7 +415,7 @@ sub msg {
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014-2015, SUSE LLC
+Copyright (c) 2014-2020, SUSE LLC
 
 All rights reserved.
 

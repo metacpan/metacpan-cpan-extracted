@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.20 2020-02-10T21:37:42Z
+  - accomplished to fix the test for Windows
+  - remove Facebook::Graph from SYNOPSIS
+
 0.19 2020-02-08T12:13:03Z
   - multiple vCards into single file is now available
   - test on Windows will fail again

@@ -1,5 +1,32 @@
 Revision history for perlx-bash
 
+0.05      2020-02-09 00:45:03-08:00 America/Los_Angeles
+
+    [New Features]
+    * `bash -c` now works like the POD says it did all along.
+    * Likewise, autoquoting now works like the POD says it did all along.
+    * Also, `shq` now exists and is exported.
+
+    [Bug Fixes]
+    * `&` now properly considered to be a special character.
+    * `head` and `tail` no longer go out-of-bounds of their input lists.
+    * `bash \string =>` now autochomps, as expected.
+    * Lines sent to filter mode subs are now pre-chomped, as expected.
+
+    [Doc Fixes]
+    * Added POD for all functions.
+      (thx Pod::Coverage tests)
+    * Added POD for filter modes.
+    * Update: no longer considered experimental!
+
+    [Distro Fixes]
+    * Make `-x` testing work when Lmod is present.
+      github #3 (thx Slaven Rezić (SREZIC))
+    * Fix CPAN Testers failure (in unit tests) for older versions of Perl.
+    * Checking of minimum bash version was backwards.
+    * Add diagnostic info for what version of bash we're dealing with.
+      (based on Andreas Koenig (ANDK)'s suggestion for Date::Easy)
+
 0.04      2020-01-09 19:08:54-08:00 America/Los_Angeles
 
     [New Features]

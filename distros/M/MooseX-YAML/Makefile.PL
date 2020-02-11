@@ -6,9 +6,11 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME         => 'MooseX::YAML',
+	ABSTRACT     => 'DWIM loading of Moose objects from YAML',
+	AUTHOR       => 'Yuval Kogman <nothingmuch@woobling.org>',
+	LICENSE      => 'perl',
 	VERSION_FROM => 'lib/MooseX/YAML.pm',
 	INSTALLDIRS  => 'site',
-	SIGN         => 1,
 	PL_FILES     => { },
 	PREREQ_PM    => {
 		'Test::use::ok' => 0,

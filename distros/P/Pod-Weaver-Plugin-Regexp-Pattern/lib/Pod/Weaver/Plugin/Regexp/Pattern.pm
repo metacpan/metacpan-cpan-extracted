@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -86,7 +86,10 @@ sub _process_module {
         for my $patname (@patnames) {
             my $patspec = $var->{$patname};
             push @pod, "=item * $patname\n\n";
-            push @pod, $patspec->{summary}, ".\n\n" if $patspec->{summary};
+            if (defined $patspec->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($patspec->{summary}), ".\n\n";
+            }
             push @pod, $self->_md2pod($patspec->{description})
                 if $patspec->{description};
 
@@ -98,7 +101,10 @@ sub _process_module {
                     for my $argname (sort keys %{ $patspec->{gen_args} }) { # XXX sort by position, then name
                         my $argspec = $patspec->{gen_args}{$argname};
                         push @pod, "=item * $argname\n\n";
-                        push @pod, $argspec->{summary}, ".\n\n" if $argspec->{summary};
+                        if (defined $argspec->{summary}) {
+                            require String::PodQuote;
+                            push @pod, String::PodQuote::pod_quote($argspec->{summary}), ".\n\n";
+                        }
                         push @pod, $self->_md2pod($argspec->{description})
                             if $argspec->{description};
                     }
@@ -118,7 +124,10 @@ sub _process_module {
                 last unless @eg;
                 push @pod, "Examples:\n\n";
                 for my $eg (@eg) {
-                    push @pod, " # $eg->{summary}\n" if defined $eg->{summary};
+                    if (defined $eg->{summary}) {
+                        require String::PodQuote;
+                        push @pod, String::PodQuote::pod_quote($eg->{summary}), ".\n\n";
+                    }
 
                     push @pod, " ", dmp($eg->{str}), " =~ re(", dmp("$rp_package\::$patname"), ($eg->{gen_args} ? ", ".dmp($eg->{gen_args}) : ""), "); ";
                     if (ref $eg->{matches} eq 'ARRAY') {
@@ -159,6 +168,17 @@ sub _process_module {
             });
     }
 
+    # mention some modules in See Also section
+    {
+        my @pod = (
+            "L<Regexp::Pattern>\n\n",
+            "Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.\n\n",
+        );
+        $self->add_text_to_section(
+            $document, join('', @pod), 'SEE ALSO',
+        );
+    }
+
     $self->log(["Generated POD for '%s'", $filename]);
 }
 
@@ -196,7 +216,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.003 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2018-09-10.
+This document describes version 0.005 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-02-11.
 
 =head1 SYNOPSIS
 
@@ -216,6 +236,8 @@ Currently it does the following:
 =item * Add a description about Regexp::Pattern in the Description section
 
 =item * Add a Patterns section containing list of patterns contained in the module
+
+=item * Mention some modules in the See Also section, including Regexp::Pattern
 
 =back
 
@@ -251,7 +273,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

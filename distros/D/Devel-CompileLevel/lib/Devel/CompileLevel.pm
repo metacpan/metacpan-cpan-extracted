@@ -3,10 +3,13 @@ use strict;
 use warnings;
 no warnings 'once';
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 $VERSION =~ tr/_//d;
 
 use Exporter (); BEGIN { *import = \&Exporter::import }
+BEGIN {
+  *_WARNING_BITS_CHECK = "$]" <= 5.031006 ? sub(){1} : sub(){0};
+}
 
 our @EXPORT_OK = qw(
   compile_level
@@ -15,16 +18,25 @@ our @EXPORT_OK = qw(
 
 sub compile_level () {
   no warnings;
-  local ${^WARNING_BITS} = $warnings::NONE;
-  my $level = 0;
-  while (my @caller = caller(++$level)) {
-    my $hints = $caller[9];
-    next
-      if $hints ne ${^WARNING_BITS};
-    ${^WARNING_BITS} ^= "\x01";
-    my $newhints = (caller($level))[9];
-    if ($newhints ne $hints) {
-      return $level - 1;
+  if (_WARNING_BITS_CHECK) {
+    local ${^WARNING_BITS} = $warnings::NONE;
+    my $level = 0;
+    while (my @caller = caller(++$level)) {
+      my $hints = $caller[9];
+      next
+        if $hints ne ${^WARNING_BITS};
+      ${^WARNING_BITS} ^= "\x01";
+      my $newhints = (caller($level))[9];
+      if ($newhints ne $hints) {
+        return $level - 1;
+      }
+    }
+  }
+  else {
+    my $level = 0;
+    while (my @caller = caller(++$level)) {
+      return $level - 1
+        if $caller[3] =~ /::BEGIN\z/;
     }
   }
   return undef;

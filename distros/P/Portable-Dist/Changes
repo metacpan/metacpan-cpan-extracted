@@ -1,5 +1,11 @@
 Changes for Perl extension Portable-Dist
 
+1.09    2020-02-09
+        - no changes, fixing release troubles
+
+1.08    2020-02-08
+        - switch to read_binary, write_binary
+
 1.07    2020-02-07
         - switch to EUMM
         - switch to File::Slurper

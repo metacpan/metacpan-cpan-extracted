@@ -1,9 +1,9 @@
 package Sah::SchemaR::pathname;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["str",[{summary=>"Filesystem path name","x.completion"=>["filename"]}],["str"]];
+our $rschema = ["str",[{prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem path name","x.completion"=>["filename"]}],["str"]];
 
 1;
 # ABSTRACT: Filesystem path name
@@ -20,7 +20,7 @@ Sah::SchemaR::pathname - Filesystem path name
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2019-11-29.
+This document describes version 0.013 of Sah::SchemaR::pathname (from Perl distribution Sah-Schemas-Path), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

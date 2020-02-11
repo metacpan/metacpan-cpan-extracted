@@ -1,0 +1,36 @@
+---
+abstract: 'Perl extension for controlling an embedding WebKit2 engine'
+author:
+  - 'Jason Shaun Carty <jc@atikon.com>'
+  - 'Philipp Voglhofer <pv@atikon.com>'
+  - 'Philipp A. Lehner <pl@atikon.com>'
+build_requires:
+  Test::Fake::HTTPD: '0'
+  Test::More: '0.88'
+  URI: '0'
+configure_requires:
+  ExtUtils::Depends: '0'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::PkgConfig: '0'
+  Glib::MakeHelper: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-WebKit2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Glib: '0'
+  Gtk3: '0'
+  Gtk3::WebKit2: '0.01'
+  Moose: '0'
+  Time::HiRes: '0'
+  X11::Xlib: '0'
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

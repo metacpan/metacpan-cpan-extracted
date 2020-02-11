@@ -1,7 +1,9 @@
 package Data::Sah::Compiler::Prog::TH;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -22,7 +24,7 @@ sub clause_prefilters {}
 
 # handled in compiler's after_all_clauses()
 
-#sub clause_postfilters {}
+sub clause_postfilters {}
 
 sub clause_name {
     my ($self, $cd) = @_;
@@ -87,7 +89,7 @@ sub set_tmp_data_term {
         $cd->{data_term} = $t;
     }
     local $cd->{_debug_ccl_note} = 'set temporary data term';
-    $c->add_ccl($cd, "(".$c->expr_assign($t, $expr). ", ".$c->true.")",
+    $c->add_ccl($cd, "(".$c->expr_set($t, $expr). ", ".$c->true.")",
                 {err_msg => ''});
 }
 
@@ -192,7 +194,7 @@ Data::Sah::Compiler::Prog::TH - Base class for programming-language emiting comp
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =for Pod::Coverage ^(compiler|clause_.+|handle_.+|gen_.+|set_tmp_data_term|restore_data_term)$
 

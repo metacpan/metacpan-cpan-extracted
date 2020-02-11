@@ -1,0 +1,22 @@
+0.004   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filter: Str::replace_map.
+
+
+0.003   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add might_fail support (like in Data::Sah::Coerce) in the filter
+	  rules. We want it after all to use filter rules as checkers. Add
+	  return_type 'val' as well as 'str_errmsg+val'.
+
+	- Add filter: Str::check (perl only for now, mostly to demo might_fail).
+
+
+0.002   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filter rules: Str::upcase, Str::downcase.
+
+
+0.001   2020-02-10  Released-By: PERLANCAR
+
+        - First release.

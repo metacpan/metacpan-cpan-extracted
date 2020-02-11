@@ -1,3 +1,8 @@
+0.007   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Mark deprecated in favor of filters Str::{ltrim,rtrim,trim}.
+
+
 0.006   2019-11-28  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename coerce rule modules again, revert to using lower_case

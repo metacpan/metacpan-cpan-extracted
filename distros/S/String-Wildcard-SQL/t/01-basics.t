@@ -3,9 +3,12 @@
 use 5.010;
 use strict;
 use warnings;
-
-use String::Wildcard::SQL qw(contains_wildcard);
 use Test::More 0.98;
+
+use String::Wildcard::SQL qw(
+                                $RE_WILDCARD_SQL
+                                contains_wildcard
+                        );
 
 subtest contains_wildcard => sub {
     subtest "none" => sub {

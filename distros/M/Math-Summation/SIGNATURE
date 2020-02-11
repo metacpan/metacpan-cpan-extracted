@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 c47673c4e69e1729cb882a768341cecd1440764e430f84ac64ff783f94e35bfa Changes
+SHA256 b857edab549ac6893e2df5e1ec768ee46b62bcf1607a55e876f4d23f079eacce LICENSE
+SHA256 fd07b53373ec4ab551d614012dafaf60be72fa0fc476c52a5ecc44d5b39947f6 MANIFEST
+SHA256 089dd98e52dc966e613b96234102d3253a64257fa1b5722d4e954b1879aa014b MANIFEST.SKIP
+SHA256 3d8697dccf6dbad3e06222ff46f5357e10acc2ad761a460f16476ed8bb6abd6a META.json
+SHA256 7f1a56ff2e0d1e4e22e5f5bc1c04f0885be5f7b6b0fc11d95a6d5f61d094f5a8 META.yml
+SHA256 bdaae94f9e243e167cc5977237a40d50077096d91a4accbbe00b2685f4a11d7a Makefile.PL
+SHA256 9a5f855ce337b08c9f989a5e19ca4d288b01f038835a5ce02f6bc5662deda74e README
+SHA256 5e4d38efe236ea8d633c18a1476887570fea3f5b6bc19e87066b0d7336586db4 lib/Math/Summation.pm
+SHA256 e887b97b1d39e2e8ff68cf06009bc5ee55f16bfdeaf53a1c18712a510f67568c t/00sig.t
+SHA256 1d7836548cf6bb5026733550dba3533835548f0a1f8d6d21240e33797bb4f00a t/01load.t
+SHA256 619b1110fa525a5c8a9a824a0bf0a45f3ba69a7e0a8fcbcf17088dccf1517d9f t/02summation.t
+SHA256 51b34197196515bc2fc29daf632edd7b00e975d0f18fff88247d6dacbadbc43e t/author-changelog.t
+SHA256 37edc8bc6ae28560b47f65506479189a6b4f091ce4b5a0a0d870fa829d8e9a63 t/author-git.t
+SHA256 3895f91b6c6a050c93926abafd9db783f70a0ea96b5a16880f19bea536e9955e t/release-cpan-changes.t
+SHA256 3f3c44f4c1d2b7bd15dafc9e372745b71dde066780c01e43328ae708f876b799 t/release-kwalitee.t
+SHA256 b7ed467cd8c6cc4ff9ca289f76d87965894c7e79cd2fc9db30a29761f5413c7a t/release-pod-coverage.t
+SHA256 719727b9d070d578d1b260726488405a50297cedad0caf1bf172ddcea3a0d4ed t/release-pod-syntax.t
+SHA256 0fd7dacc82bb24e57e36aa7c54ab10403c0ef5377594fe2bf824464cad17bae5 t/release-pod.t
+SHA256 2af76a23b802226e78950bdc4e9f409aa8765c221d3f27d1f067a98fb0a7f92f t/release-portability.t
+SHA256 365f0d117b1555121cc55e247d1e12db946592e3ab060303d40e784d1c0d543b t/release-synopsis.t
+SHA256 d326c0695d9453313ee410b4ee7e81d01f0326e2891f39d2887c2388de8c5afd t/release-test-version.t
+SHA256 4eccf03fbe993f81dae7dbd4ffe00e49f59666e7c2612954a454c31fe3e33b6c t/release-unused-vars.t
+SHA256 c3bd4cb3c18538c4405716b6d98a34b7aeffba3ed441164bef0daf42bc503aca t/release-whitespaces.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJeQY5EAAoJEGcmPl2fr166wXQIAIYLiRelJrTVj6U7LcELiP13
+CLuYvQt2RZi/VyWhfpJ5iAh/zn8zj6mNxRxg7YStand+j/YclJF1Hjfkke8X/ajd
+o9H2yE7oIV630czuPoMjUGhPhhH9fc07lC2hUNjeHAixf996O6/iyk9aNr5TDSfM
+7k+yxPDAHDbfRYJY9poF3dSuiBvNJc4eCZJ7u8WUAsyCvJu1W9S3yLlTRu5c6KHA
+P3yfLQq42mq7d/TyYZx4jiDR2tbiEZ0U9WMZKTD6WyA8vbh3KDjTDEdd2IILgwps
+3dM2cR/QwOmPAGO0TskRV801t5RJKfcI90kwq8B1V3ylAgslAwKdBGfsp9uEGBY=
+=Z3K7
+-----END PGP SIGNATURE-----

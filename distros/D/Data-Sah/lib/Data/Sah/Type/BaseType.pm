@@ -1,7 +1,9 @@
 package Data::Sah::Type::BaseType;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.906'; # VERSION
 
 # why name it BaseType instead of Base? because I'm sick of having 5 files named
 # Base.pm in my editor (there would be Type::Base and the various
@@ -15,6 +17,11 @@ use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
 #use Sah::Schema::Common;
 #use Sah::Schema::Sah;
+
+our $sch_filter_elem = ['any', {of=>[
+    ['str', {req=>1}, {}],
+    ['array', {req=>1, len=>2, elems=>[ ['str',{req=>1},{}], ['hash',{req=>1}, {}] ]}, {}],
+]}, {}];
 
 requires 'handle_type';
 
@@ -66,16 +73,16 @@ has_clause 'default',
         },
     },
     ;
-# has_clause 'prefilters',
-#     v => 2,
-#     tags       => ['filter'],
-#     prio       => 10,
-#     schema     => ['array' => {of=>['sah::expr', {req=>1}, {}]}, {}],
-#     attrs      => {
-#         temp => {
-#         },
-#     }
-#     ;
+has_clause 'prefilters',
+    v => 2,
+    tags       => ['filter'],
+    prio       => 10,
+    schema      => ['array' => {of=>$sch_filter_elem}, {}],
+    attrs      => {
+        temp => {
+        },
+    }
+    ;
 has_clause 'default_lang',
     v => 2,
     tags       => ['meta', 'defhash'],
@@ -153,16 +160,14 @@ has_clause 'clset',
     tags   => ['constraint'],
     schema => ['sah::clset', {req=>1}, {}],
     ;
-# has_clause 'postfilters',
-#     v => 2,
-#     tags       => ['filter'],
-#     prio       => 90,
-#     schema     => ['array' => {req=>1, of=>['sah::expr', {req=>1}, {}]}, {}],
-#     attrs      => {
-#         temp => {
-#         },
-#     }
-#     ;
+has_clause 'postfilters',
+    v => 2,
+    tags       => ['filter'],
+    prio       => 90,
+    schema     => ['array' => {req=>1, of=>$sch_filter_elem}, {}],
+    attrs      => {
+    }
+    ;
 has_clause 'examples',
     v => 2,
     tags       => ['meta'],
@@ -191,7 +196,7 @@ Data::Sah::Type::BaseType - Base type
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

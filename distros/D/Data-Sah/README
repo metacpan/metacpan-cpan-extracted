@@ -2,8 +2,8 @@ NAME
     Data::Sah - Fast and featureful data structure validation
 
 VERSION
-    This document describes version 0.904 of Data::Sah (from Perl
-    distribution Data-Sah), released on 2020-02-07.
+    This document describes version 0.906 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2020-02-11.
 
 SYNOPSIS
     Non-OO interface:
@@ -105,16 +105,19 @@ STATUS
 
     *   def/subschema
 
-    *   expression
-
     *   obj: meths, attrs properties
 
     *   .prio, .err_msg, .ok_err_msg attributes
 
     *   .result_var attribute
 
-    *   BaseType: if, prefilters, postfilters, check, prop, check_prop
-        clauses
+    *   BaseType: more forms of if clause
+
+        Only the basic form of the "if" clause is implemented.
+
+    *   BaseType: prefilters.temp
+
+    *   BaseType: check, prop, check_prop clauses
 
     *   HasElems: each_index, check_each_elem, check_each_index, exists
         clauses
@@ -148,6 +151,8 @@ MODULE ORGANIZATION
 
     Data::Sah::Coerce::$LANG::To_$TARGET_TYPE::From_$SOURCE_TYPE::$DESCRIPTI
     ON contains coercion rules.
+
+    Data::Sah::Filter::$LANG::$TOPIC::$DESCRIPTION contains filtering rules.
 
     Data::Sah::TypeX::$TYPENAME::$CLAUSENAME namespace can be used to name
     distributions that extend an existing Sah type by introducing a new

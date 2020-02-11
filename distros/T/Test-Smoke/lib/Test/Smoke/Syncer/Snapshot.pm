@@ -137,7 +137,7 @@ sub _fetch_snapshot_HTTP {
     my $self = shift;
 
     require LWP::Simple;
-    my $snap_name = $self->{server} eq 'http://perl5.git.perl.org'
+    my $snap_name = $self->{server} eq 'http://github.com/Perl'
         ? 'perl-current.tar.gz'
         : $self->{sfile};
 

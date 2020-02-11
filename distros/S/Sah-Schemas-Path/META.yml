@@ -3,13 +3,11 @@ abstract: 'Schemas related to filesystem path'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah: '0.902'
-  Data::Sah::Coerce: '0.038'
+  Data::Sah: '0.905'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0.98'
-  Test::Needs: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -22,6 +20,7 @@ name: Sah-Schemas-Path
 requires:
   Perinci::Sub::XCompletion::dirname: '0'
   Perinci::Sub::XCompletion::filename: '0'
+  Perl::osnames: '0.121'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -29,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Path
   homepage: https://metacpan.org/release/Sah-Schemas-Path
   repository: git://github.com/perlancar/perl-Sah-Schemas-Path.git
-version: '0.010'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -160,7 +159,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -300,7 +299,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.07'
             -
               class: Pod::Weaver::Plugin::Data::Sah::Coerce
               name: -Data::Sah::Coerce
@@ -308,7 +307,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.04'
+              version: '0.05'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -322,7 +321,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

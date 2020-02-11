@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "script/open-browser"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::BrowserOpenUtils",
   "PREREQ_PM" => {
     "Browser::Open" => 0,
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.816",
+    "Perinci::CmdLine::Lite" => "1.820",
     "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.816",
+  "Perinci::CmdLine::Lite" => "1.820",
   "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "strict" => 0,

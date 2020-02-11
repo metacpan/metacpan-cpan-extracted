@@ -1,7 +1,7 @@
 package Text::vCard::Precisely::V3::Node;
 
 use Carp;
-use Encode;
+use Encode qw( decode_utf8 encode_utf8 );
 
 use 5.12.5;
 use Text::LineFold;
@@ -65,13 +65,14 @@ sub as_string {
 
     push @lines, uc($node) || croak "Empty name";
     push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types } ) if @{ $self->types || [] } > 0;
-    push @lines, 'PREF=' . $self->pref if $self->pref;
-    push @lines, 'LANGUAGE=' . $self->language if $self->language;
+    push @lines, 'PREF=' . $self->pref() if $self->pref();
+    push @lines, 'LANGUAGE=' . $self->language() if $self->language();
 
+    my $content = $self->content();
     my $string = join(';', @lines ) . ':' . (
-        ref $self->content eq 'Array'?
-        map{ $node =~ /^(:?LABEL|GEO)$/s? $self->content : $self->_escape($_) } @{ $self->content }:
-        $node =~ /^(:?LABEL|GEO)$/s? $self->content: $self->_escape( $self->content )
+        ref($content) eq 'Array'?
+        map{ $node =~ /^(:?LABEL|GEO)$/s? $content : $self->_escape($_) } @$content:
+        $node =~ /^(:?LABEL|GEO)$/s? $content: $self->_escape($content)
     );
     return $self->fold($string);
 }
@@ -83,9 +84,9 @@ sub fold {
     my $lf = Text::LineFold->new( CharMax => 74, Newline => "\x0D\x0A", TabSize => 1 );   # line break with 75bytes
     my $decoded = decode_utf8($string);
 
+    use utf8;
     $string =~ s/(?<!\r)\n/\t/g;
-
-    $string = $decoded =~ /\P{ascii}+/ || $arg{-force}?
+    $string = ( $decoded =~ /\P{ascii}+/ || $arg{'-force'} )?
         $lf->fold( "", " ", $string ):
         $lf->fold( "", "  ", $string );
 

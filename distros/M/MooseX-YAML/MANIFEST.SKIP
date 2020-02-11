@@ -42,3 +42,7 @@
 
 # XS shit
 \.(?:bs|c|o)$
+
+^local/
+^MYMETA
+^.gitignore

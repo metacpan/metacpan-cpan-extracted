@@ -1,7 +1,7 @@
 package Text::vCard::Precisely::V4::Node;
 
 use Carp;
-use Encode;
+use Encode qw(decode_utf8);
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -44,19 +44,20 @@ has media_type => ( is => 'rw', isa => 'MediaType' );
 sub as_string {
     my ($self) = @_;
     my @lines;
-    push @lines, uc( $self->name ) || croak "Empty name";
-    push @lines, 'ALTID=' . $self->altID if $self->altID;
-    push @lines, 'PID=' . join ',', @{ $self->pid } if $self->pid;
-    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types } ) if @{ $self->types || [] } > 0;
-    push @lines, 'PREF=' . $self->pref if $self->pref;
-    push @lines, 'MEDIATYPE=' . $self->media_type if $self->media_type;
-    push @lines, 'LANGUAGE=' . $self->language if $self->language;
-    push @lines, 'SORT-AS="' . $self->sort_as .'"' if $self->sort_as and $self->name =~ /^(:?FN|ORG)$/;
+    push @lines, $self->name() || croak "Empty name";
+    push @lines, 'ALTID=' . $self->altID() if $self->altID();
+    push @lines, 'PID=' . join ',', @{ $self->pid() } if $self->pid();
+    push @lines, 'TYPE=' . join( ',', map { uc $_ } @{ $self->types() } ) if @{ $self->types() || [] } > 0;
+    push @lines, 'PREF=' . $self->pref() if $self->pref();
+    push @lines, 'MEDIATYPE=' . $self->media_type() if $self->media_type();
+    push @lines, 'LANGUAGE=' . $self->language() if $self->language();
+    push @lines, 'SORT-AS="' . $self->sort_as() .'"' if $self->sort_as() and $self->name() =~ /^(:?FN|ORG)$/;
 
+    my $content = $self->content();
     my $string = join(';', @lines ) . ':' . (
-        ref $self->content eq 'Array'?
-            map{ $self->name eq 'GEO'? $self->content : $self->_escape($_) } @{ $self->content }:
-            $self->name eq 'GEO'? $self->content: $self->_escape( $self->content )
+        ref($content) eq 'Array'?
+            map{ $self->name() eq 'GEO'? $content: $self->_escape($_) } @$content:
+            $self->name() eq 'GEO'? $content: $self->_escape($content)
     );
     return $self->fold($string);
 };

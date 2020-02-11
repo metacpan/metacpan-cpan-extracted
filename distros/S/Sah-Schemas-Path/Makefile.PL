@@ -19,19 +19,18 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Perinci::Sub::XCompletion::dirname" => 0,
     "Perinci::Sub::XCompletion::filename" => 0,
+    "Perl::osnames" => "0.121",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.902",
-    "Data::Sah::Coerce" => "0.038",
+    "Data::Sah" => "0.905",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98",
-    "Test::Needs" => 0
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,15 +38,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.902",
-  "Data::Sah::Coerce" => "0.038",
+  "Data::Sah" => "0.905",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::dirname" => 0,
   "Perinci::Sub::XCompletion::filename" => 0,
+  "Perl::osnames" => "0.121",
   "Test::More" => "0.98",
-  "Test::Needs" => 0,
   "strict" => 0,
   "warnings" => 0
 );

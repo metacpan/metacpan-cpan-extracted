@@ -1,7 +1,9 @@
 package String::Wildcard::SQL;
 
-our $DATE = '2015-01-03'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-09'; # DATE
+our $DIST = 'String-Wildcard-SQL'; # DIST
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,10 +12,11 @@ use warnings;
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
+                       $RE_WILDCARD_SQL
                        contains_wildcard
                );
 
-my $re1 =
+our $RE_WILDCARD_SQL =
     qr/
       #    (?:
       #        # non-empty, non-escaped character class
@@ -24,14 +27,24 @@ my $re1 =
       #|
           (?:
               # non-escaped % and _
-              (?<!\\)(?:\\\\)*[_%]
+              (?P<sql_joker>
+                  (?<!\\)(?:\\\\)*[_%]
+              )
+          |
+              (?P<literal>
+                  .+?
+              )
           )
       /ox;
 
 sub contains_wildcard {
-    my ($str, $variant) = @_;
+    my $str = shift;
 
-    $str =~ /$re1/go;
+    while ($str =~ /$RE_WILDCARD_SQL/go) {
+        my %m = %+;
+        return 1 if $m{sql_joker};
+    }
+    0;
 }
 
 1;
@@ -49,7 +62,7 @@ String::Wildcard::SQL - SQL wildcard string routines
 
 =head1 VERSION
 
-This document describes version 0.02 of String::Wildcard::SQL (from Perl distribution String-Wildcard-SQL), released on 2015-01-03.
+This document describes version 0.030 of String::Wildcard::SQL (from Perl distribution String-Wildcard-SQL), released on 2020-02-09.
 
 =head1 SYNOPSIS
 
@@ -61,7 +74,9 @@ This document describes version 0.02 of String::Wildcard::SQL (from Perl distrib
 
 =head1 DESCRIPTION
 
-=for Pod::Coverage ^(qqquote)$
+=head1 VARIABLES
+
+=head2 $RE_WILDCARD_SQL
 
 =head1 FUNCTIONS
 
@@ -70,20 +85,13 @@ This document describes version 0.02 of String::Wildcard::SQL (from Perl distrib
 Return true if C<$str> contains wildcard pattern. Wildcard patterns include C<%>
 (meaning zero or more characters) and C<_> (exactly one character).
 
-=head1 SEE ALSO
-
-L<Regexp::Wildcards> to convert a string with wildcard pattern to equivalent
-regexp pattern. Can handle Unix wildcards as well as SQL and DOS/Win32.
-
-Other C<String::Wildcard::*> modules.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/String-Wildcard-SQL>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-String-Wildcard-SQL>.
+Source repository is at L<https://github.com/perlancar/perl-String-Wildcard-SQL>.
 
 =head1 BUGS
 
@@ -93,13 +101,20 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Regexp::Wildcards> to convert a string with wildcard pattern to equivalent
+regexp pattern. Can handle Unix wildcards as well as SQL and DOS/Win32.
+
+Other C<String::Wildcard::*> modules.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

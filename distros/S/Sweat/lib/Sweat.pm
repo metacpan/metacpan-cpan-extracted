@@ -1,6 +1,6 @@
 package Sweat;
 
-our $VERSION = 201912110;
+our $VERSION = 202002100;
 
 use v5.10;
 
@@ -22,6 +22,7 @@ use File::Which;
 
 use Sweat::Group;
 use Sweat::Article;
+use Sweat::ArticleHandler;
 
 use Moo;
 use namespace::clean;
@@ -134,6 +135,17 @@ has 'fortune_program' => (
     default => 'fortune',
 );
 
+has 'refocus_program' => (
+    is => 'lazy',
+    isa => Maybe[Str],
+);
+
+has 'refocus' => (
+    is => 'rw',
+    isa => Bool,
+    default => 0,
+);
+
 has 'newsapi_key' => (
     is => 'rw',
     isa => Maybe[Str],
@@ -151,9 +163,11 @@ has 'language' => (
     default => 'en',
 );
 
-has 'articles' => (
-    is => 'lazy',
-    isa => ArrayRef,
+has 'article_handler' => (
+    is => 'ro',
+    isa => sub { $_[0]->isa('Sweat::ArticleHandler') },
+    default => sub { Sweat::ArticleHandler->new },
+    handles => [ qw( add_article next_article ) ],
 );
 
 has 'weather' => (
@@ -193,7 +207,7 @@ sub BUILD {
         _mangle_args( $_ );
     }
 
-    for my $method( qw(shuffle entertainment chair jumping)) {
+    for my $method( qw(shuffle entertainment chair jumping refocus)) {
         next if defined $args->{$method};
         if ( defined $config->{$method} ) {
             my $value = $config->{$method} // 0;
@@ -264,14 +278,14 @@ sub _load_entertainment {
     if ( $self->entertainment ) {
         local $| = 1;
         say "Loading entertainment, please wait...";
-        $self->articles;
+        $self->_load_articles;
         $self->weather;
         say "...done.";
     }
 
 }
 
-sub _build_articles {
+sub _load_articles {
     my $self = shift;
 
     if ( $self->newsapi_key ) {
@@ -283,10 +297,11 @@ sub _build_articles {
                 country => $self->country,
                 pageSize => $self->drill_count,
             );
-            return [
-                map { Sweat::Article->new_from_newsapi_article($_) }
-                    $result->articles
-            ];
+            foreach ( $result->articles ) {
+                $self->add_article(
+                    Sweat::Article->new_from_newsapi_article($_)
+                );
+            }
         }
         catch {
             die "Sweat ran into a problem fetching news articles: $_\n";
@@ -294,17 +309,16 @@ sub _build_articles {
     }
     else {
         try {
-            my @articles;
-            $articles[0] = Sweat::Article->new_from_random_wikipedia_article;
-            print '.';
-            for (1..$self->drill_count) {
-                push @articles,
-                    Sweat::Article->new_from_linked_wikipedia_article(
-                        $articles[-1]
-                    );
-                    print '.';
+            my $article = Sweat::Article->new_from_random_wikipedia_article;
+            unless ( fork ) {
+                $self->add_article( $article );
+                for (1..$self->drill_count) {
+                    $article = Sweat::Article->
+                               new_from_linked_wikipedia_article($article);
+                    $self->add_article( $article );
+                }
+                exit;
             }
-            return \@articles;
         }
         catch {
             die "Sweat ran into a problem fetching Wikipedia articles: $_\n";
@@ -354,6 +368,9 @@ sub order {
         }
         if ( defined $self->url_program ) {
             system( split (/\s+/, $self->url_program), $url );
+            if ( defined $self->refocus_program ) {
+                system $self->refocus_program;
+            }
         }
     }
 
@@ -468,12 +485,6 @@ sub fortune {
     }
 
     return $text;
-}
-
-sub next_article {
-    my $self = shift;
-
-    return shift @{ $self->articles };
 }
 
 sub _build_weather {
@@ -640,6 +651,54 @@ sub _mangle_args {
             delete $$args{$key};
         }
     }
+}
+
+sub _build_refocus_program {
+    my $self = shift;
+
+    return unless $self->refocus;
+
+    my $pstree = `pstree -p $$`;
+
+    if ( (uname())[0] eq 'Darwin') {
+        unless ( which( 'pstree' ) ) {
+            warn "The refocus feature requires the 'pstree' program to be "
+                . "installed. I can't find it, so I won't be able to "
+                . "refocus the window during the workout. Sorry...\n";
+            return;
+        }
+
+        my ($app) = $pstree =~ /(\S+Applications\S+)/;
+        if ($app) {
+            return "open -a $app";
+        }
+        else {
+            warn "I can't figure out what terminal I'm running in?! "
+                 . "I won't be able to refocus the window during the "
+                 . "workout. Sorry...\n";
+            return;
+        }
+    }
+    else {
+        unless ( which( 'xdotool' ) ) {
+            warn "The refocus feature requires the 'xdotool' program to be "
+                . "installed. I can't find it, so I won't be able to "
+                . "refocus the window during the workout. Sorry...\n";
+            return;
+        }
+
+        my $window_id = `xdotool getactivewindow`;
+        if ( $window_id ) {
+            return "xdotool windowactivate $window_id";
+        }
+        else {
+            warn "I can't figure out what window I'm running in?! "
+                 . "I won't be able to refocus the window during the "
+                 . "workout. Sorry...\n";
+            return;
+        }
+    }
+
 }
 
 1;

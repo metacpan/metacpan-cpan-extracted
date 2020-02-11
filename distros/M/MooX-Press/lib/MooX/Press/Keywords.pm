@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press::Keywords;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.040';
+our $VERSION   = '0.042';
 
 use Type::Library -base;
 use Type::Utils ();
@@ -34,7 +34,7 @@ $EXPORT_TAGS{ 'privacy' } = [qw/ ro rw rwp lazy /];
 
 use Scalar::Util qw( blessed );
 sub confess {
-	@_ = sprintf(shift, @_);
+	@_ = sprintf(shift, @_) if @_ > 1;
 	require Carp;
 	goto \&Carp::confess;
 }

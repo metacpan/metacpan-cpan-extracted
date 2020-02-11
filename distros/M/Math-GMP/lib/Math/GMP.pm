@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.19
+version 2.20
 
 =head1 SYNOPSIS
 
@@ -598,7 +598,7 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -625,35 +625,11 @@ L<https://metacpan.org/release/Math-GMP>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Math-GMP>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Math-GMP>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Math-GMP>
 
 =item *
 

@@ -70,10 +70,6 @@ list below is not in any particular order.
 * There seems to be some sort of problem with Osprey's handling of unknown
   options.  I keep seeing this error message: `Can't locate object method
   \"die\" via package \"CLI::Osprey::Descriptive::Usage\"`
-* While a `CODE` block returning false gets you a nice fatal error message, if
-  the block `die`s instead, it's a bit uglier.  Defniitely catch that and
-  convert to a nicer message.  I anticipated this by using a `do` block inside
-  the `CODE` func which can easily be converted to an `eval` block instead.
-* The `STDERR` of a `CODE` block isn't currently logged to the logfile.  That
-  seems pretty problematic.  (Verify that `STDERR` is also being handled
-  appropriately by `SH` directives.)
+* Failure to supply a required argument gives you an error, because `undef`
+  fails the validation check.  But the error should say that you failed to
+  supply a required argument (duh).

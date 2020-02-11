@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -37,6 +37,7 @@ use warnings;
 use 5.012;
 
 # IMPORTANT: this module must not depend on any other CELL modules
+#            except possibly App::CELL::Util
 use Data::Dumper;
 use File::Spec;
 use Log::Any;
@@ -288,7 +289,7 @@ sub AUTOLOAD {
     my %ARGS;
     %ARGS = @ARGS if @ARGS % 2 == 0;
     my ( $file, $line );
-    my $level;
+    my ( $level, $text );
     my $method_uc = uc $method;
     if ( $method_uc eq 'OK' or $method_uc eq 'NOT_OK' ) {
         $level = $method_uc;
@@ -318,14 +319,13 @@ sub AUTOLOAD {
         return unless $ENV{'CELL_DEBUG_MODE'};
     }
 
-    # if we were called with 'cell => 1', prepend '(CELL)' to the message
-    my $cell = '';
-    $cell = '(CELL) ' if $ARGS{cell};
-
     $log->init( ident => $ident ) if not $log_any_obj;
     die "No Log::Any object!" if not $log_any_obj;
     return if not $debug_mode and ( $method_lc eq 'debug' or $method_lc eq 'trace' );
-    $log_any_obj->$method_lc( _assemble_log_message( "$cell$level: $msg_text", $file, $line ) );
+    if ( not $msg_text ) {
+        $msg_text = "<NO_TEXT>"
+    }
+    $log_any_obj->$method_lc( _assemble_log_message( "$level: $msg_text", $file, $line ) );
     return;
 }
 
@@ -338,12 +338,16 @@ Take a status object and log it.
 
 sub status_obj {
     my ( $self, $status_obj, $cell ) = @_;
-    my ( $level, $text, $caller, %ARGS );
+    my ( $level, $code, $text, $caller, %ARGS );
     $level  = $status_obj->level;
+    $code   = $status_obj->code;
     $text   = $status_obj->text;
     $caller = $status_obj->caller;
     $ARGS{caller} = $caller if $caller;
     $ARGS{cell} = $cell if $cell;
+    if ( $code ne $text ) {
+        $text = "($code) $text"
+    }
     $text = "<STATUS OBJECT WITHOUT TEXT OR CODE>" if not $text;
     #( $level, $text ) = _sanitize_level( $level, $text );
 

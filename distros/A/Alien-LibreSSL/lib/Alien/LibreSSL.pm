@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Alien wrapper for LibreSSL (alternative to OpenSSL)
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::LibreSSL - Alien wrapper for LibreSSL (alternative to OpenSSL)
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -82,14 +82,19 @@ to install L<Net::SSLeay>.
 
 =head1 CAVEATS
 
-Normally L<Alien::Build> + L<alienfile> use L<Net::SSLeay> (via L<HTTP::Tiny> or
-L<LWP::UserAgent>) in order to download C<https> URLs from the internet, but for
-this to be a dependency of L<Net::SSLeay> that will obviously not work.  Instead
-this alien attempts to bootstrap SSL by downloading via C<wget> or C<curl>, if
-they are available.  By default, if they are not available then this Alien will
-attempt to download via C<http>.  This obviously might not be desirable for some
-so you can set C<ALIEN_OPENSSL_FTP> to C<0> if you want to ensure the transfer
-happens over C<https> (and will die, if it isn't available).
+None of this applies to a system install where OpenSSL or LibreSSL is already
+installed.
+
+Retrieving LibreSSL or OpenSSL via the internet when you do not already have an
+SSL implementation introduces a bootstrapping problem.  Newer versions of
+L<Alien::Build> + L<alienfile> prefer the use of C<curl> over L<Net::SSLeay>
+because on some platforms it is more reliable.  Further, this Alien will try
+to use C<wget>.  C<curl> and C<wget> will only be used if they support the
+C<https> protocol.  If neither C<curl>, C<wget> are available and L<Net::SSLeay>
+isn't I<already> installed, then this Alien will refuse to install because it
+has no safe way of retreiving LibreSSL from the internet.  You can force
+an insecure install via C<ftp> or C<http> using the C<ALIEN_OPENSSL_FTP>
+environment variable below, but that is NOT recommended.
 
 =head1 ENVIRONMENT
 

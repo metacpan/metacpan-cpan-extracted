@@ -7,6 +7,26 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.1.102	2020-02-10
+
+ [ Bug Fixes ]
+ - tag object cc_cc0_1 as type:singleversion:cc_cc0 (not bogusly
+   type:versioned:decimal)
+ - tag objects bdwgc_matlab lgpl_bdwgc as type:unversioned (not bogusly
+   type:versioned:decimal)
+
+ [ Other ]
+ - add objects agpl_1 agpl_2 agpl_3
+ - add objects zpl zpl_1 zpl_1_1 zpl_2 zpl_2_1
+ - extend license pattern cecill_1_1 to fully mask any_of
+ - extend license patterns cecill_1_1 cecill_2 cecill_2_1 to avoid
+   misdetecting as GPL-2+
+ - extend trait pattern licensed_under to cover more phrases
+ - stop custom-treat name-only as grant for select objects (some use for
+   that now better done with tag license:is:grant)
+ - tag objects license_label license_label_trove licensed_under as
+   type:trait:grant:prefix (not type:trait)
+
 v3.1.101	2020-01-30
 
  [ Documentation ]

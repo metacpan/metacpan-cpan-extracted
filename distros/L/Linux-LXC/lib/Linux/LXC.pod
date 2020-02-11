@@ -4,7 +4,7 @@ Linux::LXC - Manage your LXC containers.
 
 =head1 VERSION
 
-1.0003
+1.0004
 
 =head1 SYNOPSYS
 
@@ -52,6 +52,10 @@ Will return an array with the name of all LXC containers currently running on th
 =head3 get_stopped_containers()
 
 Will return an array with the name of all LXC containers currently stopped on the system.
+
+=head3 get_version()
+
+Will return the version number of LXC implementation that runs on the host.
 
 =head2 Object methods
 
@@ -257,7 +261,7 @@ If you want an account for contributing, report any enhancement suggestion or bu
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Spydemon.
+This software is copyright (c) 2020 by Spydemon.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

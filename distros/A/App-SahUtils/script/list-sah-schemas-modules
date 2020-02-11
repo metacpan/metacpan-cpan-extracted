@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.471'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.475'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -26,8 +26,8 @@ my $res = gen_read_table_func(
         pk => 'name',
     },
     table_data => sub {
-        require PERLANCAR::Module::List;
-        my $mods = PERLANCAR::Module::List::list_modules(
+        require Module::List::Tiny;
+        my $mods = Module::List::Tiny::list_modules(
             'Sah::Schemas::', {list_modules=>1, recurse=>1});
         my @rows;
         for my $mod (sort keys %$mods) {
@@ -60,7 +60,7 @@ list-sah-schemas-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.471 of list-sah-schemas-modules (from Perl distribution App-SahUtils), released on 2019-12-09.
+This document describes version 0.475 of list-sah-schemas-modules (from Perl distribution App-SahUtils), released on 2020-02-11.
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,18 @@ Return array of full records instead of just ID fields.
 
 By default, only the key (ID) field is returned per result entry.
 
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
 
 =item B<--field>=I<s@>
 
@@ -551,6 +563,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Paging options
@@ -649,6 +665,7 @@ List of available configuration parameters:
  dist.not_in (see --dist-not-in)
  dist.xmax (see --dist-xmax)
  dist.xmin (see --dist-xmin)
+ exclude_fields (see --exclude-field)
  fields (see --field)
  format (see --format)
  might_fail (see --might-fail)
@@ -744,7 +761,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

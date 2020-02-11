@@ -87,7 +87,8 @@ pb_basecmd(test_autodie => <<'END');
 	open my $in, "/this/file/cannot/possibly/exist";
 	exit 2;
 END
-check_error pb_run('help'), 2, qr/No such file or directory/, "autodie is turned on";
+# apparently the exit value is not predictable across different versions of `autodie`
+check_error pb_run('help'), '?', qr/\Q$ERRNO{ENOENT}/, "autodie is turned on";
 
 # `verify` demands its second argument (otherwise the error message wouldn't be very useful)
 pb_basecmd(test_verify_syntax => <<'END');

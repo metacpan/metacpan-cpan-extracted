@@ -11,10 +11,11 @@ build_requires:
   Test::Warnings: '0'
   Try::Tiny: '0'
 configure_requires:
+  File::ShareDir::Install: '0.11'
   Module::Build: '0'
   Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +24,12 @@ name: App-CELL
 provides:
   App::CELL:
     file: lib/App/CELL.pm
-    version: '0.222'
+    version: '0.227'
   App::CELL::Config:
     file: lib/App/CELL/Config.pm
   App::CELL::Guide:
     file: lib/App/CELL/Guide.pm
-    version: '0.222'
+    version: '0.227'
   App::CELL::Load:
     file: lib/App/CELL/Load.pm
   App::CELL::Log:
@@ -57,5 +58,5 @@ resources:
   bugtracker: https://github.com/smithfarm/cell/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/cell
-version: '0.222'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.227'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

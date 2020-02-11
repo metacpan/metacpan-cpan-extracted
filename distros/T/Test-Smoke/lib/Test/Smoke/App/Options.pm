@@ -421,7 +421,7 @@ sub gitorigin {
     return $opt->new(
         name => 'gitorigin',
         option => '=s',
-        default => 'git://perl5.git.perl.org/perl.git',
+        default => 'git://github.com/Perl/perl5.git',
         helptext => "The remote location of the git repository.",
     );
 }
@@ -701,7 +701,7 @@ sub rsyncsource {
     return $opt->new(
         name => 'source',
         option => '=s',
-        default => 'perl5.git.perl.org::perl-current',
+        default => 'github.com/Perl::perl-current',
         helptext => "The remote location of the rsync archive.",
     );
 }

@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Spiral
+
+0.01  Tue, 11 Feb 2020 09:40:08 GMT
+	- original version; created by h2xs 1.23 with options
+		-AX -n Math::Spiral
+

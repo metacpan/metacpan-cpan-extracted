@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Games/Solitaire/BlackHole/Solver.pm',
     'Games/Solitaire/BlackHole/Solver/App.pm',
+    'Games/Solitaire/BlackHole/Solver/App/Base.pm',
     'Games/Solitaire/BlackHole/Solver/Golf/App.pm'
 );
 

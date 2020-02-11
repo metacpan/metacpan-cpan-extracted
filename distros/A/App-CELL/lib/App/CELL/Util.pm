@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -38,6 +38,7 @@ use 5.012;
 
 use Data::Dumper;
 use Date::Format;
+use Params::Validate qw( :all );
 
 =head1 NAME
 
@@ -69,16 +70,18 @@ This module provides the following public functions:
 
 =over 
 
-=item C<utc_timestamp>
-
 =item C<is_directory_viable>
+
+=item C<stringify_args>
+
+=item C<utc_timestamp>
 
 =back
 
 =cut 
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( utc_timestamp is_directory_viable stringify_args );
+our @EXPORT_OK = qw( is_directory_viable stringify_args utc_timestamp );
 
 
 
@@ -91,15 +94,6 @@ our $not_viable_reason = '';
 
 
 =head1 FUNCTIONS
-
-
-=head2 utc_timestamp
-
-=cut
-
-sub utc_timestamp {
-   return uc time2str("%Y-%m-%d %H:%M %Z", time, 'GMT');
-}
 
 
 =head2 is_directory_viable
@@ -159,6 +153,16 @@ sub stringify_args {
     }
     return $args_as_string;
 }
+
+
+=head2 utc_timestamp
+
+=cut
+
+sub utc_timestamp {
+   return uc time2str("%Y-%m-%d %H:%M %Z", time, 'GMT');
+}
+
 
 # END OF App::CELL::Util.pm
 1;

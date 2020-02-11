@@ -1,6 +1,6 @@
 package Pb::Command::Context;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 use Moo;
 use 5.14.0;
@@ -93,7 +93,8 @@ sub _prep_filename
 sub _extrapolate_run_mode
 {
 	my ($self) = @_;
-	return 'NOACTION' if $self->_opts->{pretend};
+	return 'NOACTION'  if $self->_opts->{pretend};
+	return 'ASKACTION' if $self->_opts->{interactive};
 	return 'ACTION';
 }
 
@@ -397,7 +398,7 @@ Pb::Command::Context - context object for a Pb command
 
 =head1 VERSION
 
-This document describes version 0.01 of Pb::Command::Context.
+This document describes version 0.02 of Pb::Command::Context.
 
 =head1 DESCRIPTION
 
@@ -405,6 +406,27 @@ This is the command context class used by L<Pb>.  A lot of it is for internal us
 may be useful for calling on the C<$FLOW> object.
 
 =head1 ATTRIBUTES
+
+=head2 runmode
+
+Whether commands are printed or not then executed or not.
+
+=head2 statfile
+
+Status file for the command (if any).
+
+=head2 proc_pidfile
+
+L<Proc::Pidfile> object for the command (if any).
+
+=head2 toplevel_command
+
+L<CLI::Osprey> object for the (ultimate) parent of the current command.  (If the command has no
+parent, C<toplevel_command> is just the current command.)
+
+=head2 update_statfile
+
+Whether or not to update the L</statfile> for the current error.
 
 =head2 error
 
@@ -472,7 +494,7 @@ Get a logfile ready for outputting to.
 
 =head2 prep_pidfile
 
-Build a Proc::Pidfile object and handle any "already running" issues.
+Build a L<Proc::Pidfile> object and handle any "already running" issues.
 
 =head1 AUTHOR
 

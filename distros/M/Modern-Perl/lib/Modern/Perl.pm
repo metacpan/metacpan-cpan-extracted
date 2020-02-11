@@ -1,6 +1,6 @@
 package Modern::Perl;
 # ABSTRACT: enable all of the features of Modern Perl with one import
-$Modern::Perl::VERSION = '1.20200201';
+$Modern::Perl::VERSION = '1.20200211';
 use 5.010_000;
 
 use strict;
@@ -89,7 +89,7 @@ Modern::Perl - enable all of the features of Modern Perl with one import
 
 =head1 VERSION
 
-version 1.20200201
+version 1.20200211
 
 =head1 SYNOPSIS
 
@@ -120,11 +120,11 @@ Modern Perl tutorial.
 
 As of Modern::Perl 2019, you may also enable this pragma from the command line:
 
-    $ perl -Modern::Perl -e "say 'Take that, awk!'"
+    $ perl -Modern::Perl -e 'say "Take that, awk!"'
 
 You may also enable year-specific features:
 
-    $ perl -Modern::Perl=2020 -e "say 'Looking forward to Perl 5.30!'"
+    $ perl -Modern::Perl=2020 -e 'say "Looking forward to Perl 5.30!"'
 
 =head2 Wrapping Modern::Perl
 

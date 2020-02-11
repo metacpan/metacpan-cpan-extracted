@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -56,9 +56,6 @@ set('CELL_META_SITEDIR_LOADED', 0);
 
 # list of sitedirs found and loaded
 set('CELL_META_SITEDIR_LIST', []);
-
-# boolean value whether App::CELL has been initialized
-set('CELL_META_INIT_STATUS_BOOL', 0);
 
 # date and time when App::CELL was initialized
 set('CELL_META_START_DATETIME', '');

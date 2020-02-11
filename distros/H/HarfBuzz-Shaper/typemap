@@ -1,0 +1,21 @@
+TYPEMAP
+
+hb_buffer_t  * T_PTROBJ
+hb_blob_t    * T_PTROBJ
+hb_face_t    * T_PTROBJ
+hb_font_t    * T_PTROBJ
+hb_feature_t * T_PTROBJ
+
+# Perl strings autoconverting to (utf8) bytes.
+bytestring_t       T_BYTESTRING
+bytestring_nolen_t T_BYTESTRING_nolen
+
+INPUT
+
+# With length...
+T_BYTESTRING
+	$var = SvPVutf8($arg,STRLEN_length_of_$var)
+
+# And without length.
+T_BYTESTRING_nolen
+	$var = SvPVutf8_nolen($arg)

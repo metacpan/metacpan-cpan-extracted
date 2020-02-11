@@ -27,6 +27,11 @@ subtest "basics" => sub {
     ($res, $val) = @{ $v->("/") };
     ok(!$res);
     is($val, "/");
+
+    # valid: foo/bar/baz
+    ($res, $val) = @{ $v->("foo///bar/baz") };
+    ok(!$res);
+    is($val, "foo/bar/baz");
 };
 
 done_testing;

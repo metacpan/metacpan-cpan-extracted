@@ -3,14 +3,15 @@ package TestUtilFuncs;
 use PerlX::bash;
 
 use Test::More;
-use Test::Command	0.08;
+use Test::Output			qw< stderr_from >;
+use Test::Command	0.08	import => [qw< stderr_like stderr_is_eq >];
 use Test::Builder;
 use Test::Exception;
 
 use Capture::Tiny qw< capture >;
 
 use base 'Exporter';
-our @EXPORT_OK = qw< throws_error perl_error_is >;
+our @EXPORT_OK = qw< throws_error perl_error_is bash_debug_is >;
 
 
 sub throws_error ($$$)
@@ -72,6 +73,25 @@ sub perl_error_is
 		my $regex = qr/^\Q$expected\E( at \S+ line \d+\.)?\n/;
 		stderr_like(_perl_command($cmd, @extra), $regex, $tname);
 	}
+}
+
+
+sub bash_debug_is (&$$)
+{
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	my ($code, $expected, $testname) = @_;
+
+	my $stderr = &stderr_from($code);
+	if ($stderr =~ /Shell debugging temporarily silenced/)
+	{
+		# looks like Lmod is installed
+		$stderr =~ s/\A
+							.*?
+							^ Shell \s debugging \s restarted $ \s*
+						(?:	^ \+ \s unset \s .*?              $ \s* )?
+					//msx;
+	}
+	is $stderr, $expected, $testname;
 }
 
 

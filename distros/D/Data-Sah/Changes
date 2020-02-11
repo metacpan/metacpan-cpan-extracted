@@ -1,6 +1,19 @@
+0.906   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Sah 0.9.49 (elements in prefilters/postfilters can be
+	  [name,args] instead of just name).
+
+	- Support filter rules that might fail.
+
+
+0.905   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Implement prefilters.
+
+
 0.904   2020-02-07  Released-By: PERLANCAR; Urgency: medium
 
-	- Update test (new coerce rule module).
+	- [test] Update a test that still used old coerce rule module names.
 
 
 0.903   2019-11-29  Released-By: PERLANCAR; Urgency: high

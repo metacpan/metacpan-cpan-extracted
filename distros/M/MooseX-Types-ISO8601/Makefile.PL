@@ -72,7 +72,7 @@ EOW
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "ISO8601 date and duration string type constraints and coercions for Moose",
-  "AUTHOR" => "Tomas Doran (t0m) <bobtfish\@bobtfish.net>, Dave Lambley <davel\@state51.co.uk>",
+  "AUTHOR" => "Tomas Doran (t0m) <bobtfish\@bobtfish.net>, Dave Lambley <dlambley\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "Module::Build::Tiny" => "0.034"
@@ -113,7 +113,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }

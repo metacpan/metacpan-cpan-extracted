@@ -2,8 +2,8 @@ NAME
     App::BrowserOpenUtils - Utilities related to Browser::Open
 
 VERSION
-    This document describes version 0.002 of App::BrowserOpenUtils (from
-    Perl distribution App-BrowserOpenUtils), released on 2019-05-28.
+    This document describes version 0.003 of App::BrowserOpenUtils (from
+    Perl distribution App-BrowserOpenUtils), released on 2019-12-09.
 
 SYNOPSIS
 DESCRIPTION
@@ -58,6 +58,9 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::BrowserUtils
 
 AUTHOR
     perlancar <perlancar@cpan.org>

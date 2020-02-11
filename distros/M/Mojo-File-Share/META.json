@@ -1,0 +1,80 @@
+{
+   "abstract" : "Better local share directory support with Mojo::File",
+   "author" : [
+      "srchulo <srchulo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-File-Share",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "Mojolicious" : "7.15",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::File::Share" : {
+         "file" : "lib/Mojo/File/Share.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/srchulo/Mojo-File-Share/issues"
+      },
+      "homepage" : "https://github.com/srchulo/Mojo-File-Share",
+      "repository" : {
+         "url" : "git://github.com/srchulo/Mojo-File-Share.git",
+         "web" : "https://github.com/srchulo/Mojo-File-Share"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:SRCHULO",
+   "x_contributors" : [
+      "srchulo <violapiratejunky@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

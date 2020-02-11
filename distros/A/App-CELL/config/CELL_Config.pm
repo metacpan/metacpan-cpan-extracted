@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -49,17 +49,17 @@
 # CELL_DEBUG_MODE
 #        debug mode means that calls to $log->trace and $log->debug
 #        won't be suppressed - off by default
-set('CELL_DEBUG_MODE', 0);
+set( 'CELL_DEBUG_MODE', 0 );
 
 # boolean value expressing whether sharedir has been loaded
 # (defaults to 1 since the param is initialized only when distro sharedir
 # is loaded)
-set('CELL_SHAREDIR_LOADED', 1);
+set( 'CELL_SHAREDIR_LOADED', 1 );
 
 # CELL_SHAREDIR_FULLPATH
 #        full path of App::CELL distro sharedir
 #        overrided by site param when sharedir is loaded
-set('CELL_SHAREDIR_FULLPATH', '');
+set( 'CELL_SHAREDIR_FULLPATH', '' );
 
 # CELL_SUPP_LANG
 #        reference to a list of supported language tags
@@ -70,19 +70,19 @@ set( 'CELL_SUPP_LANG', [ 'en' ] );
 # CELL_DEF_LANG
 #        the language that messages will be displayed in by default,
 #        when no language is specified by other means
-set('CELL_DEF_LANG', 'en');
+set( 'CELL_DEF_LANG', 'en' );
 
 # CELL_CORE_UNIT_TESTING
 #        used only for App::CELL unit tests
-set('CELL_CORE_UNIT_TESTING', [ 'nothing special' ] );
+set( 'CELL_CORE_UNIT_TESTING', [ 'nothing special' ] );
 
 # CELL_LOAD_SANITY_CORE
 #        used by App::CELL::Load::init sanity check
-set('CELL_LOAD_SANITY_CORE', 'Bar');
+set( 'CELL_LOAD_SANITY_CORE', 'Bar' );
 
 # CELL_CORE_SAMPLE
 #        sample core variable (for demo purposes)
-set('CELL_CORE_SAMPLE', 'layers of sediments' );
+set( 'CELL_CORE_SAMPLE', 'layers of sediments' );
 
 # CELL_LOG_SHOW_CALLER
 #        determine whether App::CELL::Log appends file and line number of

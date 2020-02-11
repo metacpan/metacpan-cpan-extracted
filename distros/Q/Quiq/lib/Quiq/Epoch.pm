@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -337,9 +337,18 @@ Formatangabe. Folgende Formate sind definiert:
 
 =over 4
 
+=item YYYY-MM-DD
+
+Datum in ISO-Darstellung.
+
 =item YYYY-MM-DD HH:MI:SS
 
 Zeit in ISO-Darstellung.
+
+=item YYYY-MM-DD HH:MI:SS.XXX
+
+Zeit in ISO-Darstellung mit Nachkommastellen. Die Anzahl der X
+gibt die Anzahl der Nachkommastellen an (in obiger Angabe drei).
 
 =back
 
@@ -367,12 +376,16 @@ Der Zeitpunkt wird in der lokalen Zeitzone interpretiert.
 sub as {
     my ($self,$fmt) = @_;
 
-    my $strFmt;
+    my ($strFmt,$n);
     if ($fmt eq 'YYYY-MM-DD HH:MI:SS') {
         $strFmt = '%Y-%m-%d %H:%M:%S';
     }
     elsif ($fmt eq 'YYYY-MM-DD') {
         $strFmt = '%Y-%m-%d';
+    }
+    elsif ($fmt =~ /^YYYY-MM-DD HH:MI:SS\.(X+)$/) {
+        $strFmt = '%Y-%m-%d %H:%M:%S';
+        $n = length($1);
     }
     else {
         $self->throw(
@@ -381,8 +394,17 @@ sub as {
         );
     }
     
-    return POSIX::strftime($strFmt,CORE::localtime $$self);
-} 
+    my $str = POSIX::strftime($strFmt,CORE::localtime $$self);
+    if ($n) {
+        # Mit Nachkommastellen
+
+        my ($x) = $$self =~ /\.(\d+)/;
+        $x //= '000000';
+        $str .= '.'.substr $x,0,$n;
+    }
+
+    return $str;
+}
 
 # -----------------------------------------------------------------------------
 
@@ -391,6 +413,17 @@ sub as {
 =head4 Synopsis
 
   $str = $t->asIso;
+  $str = $t->asIso($x);
+
+=head4 Arguments
+
+=over 4
+
+=item $x (Default: 0)
+
+Anzahl der Nachkommastellen.
+
+=back
 
 =head4 Returns
 
@@ -401,14 +434,21 @@ Zeit-Darstellung (String)
 # -----------------------------------------------------------------------------
 
 sub asIso {
-    return shift->as('YYYY-MM-DD HH:MI:SS');
+    my ($self,$x) = @_;
+
+    my $fmt = 'YYYY-MM-DD HH:MI:SS';
+    if ($x) {
+         $fmt .= '.'.('X' x $x);
+    }
+
+    return $self->as($fmt);
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

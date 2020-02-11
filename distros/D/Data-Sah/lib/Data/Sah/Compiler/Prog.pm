@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -181,12 +181,6 @@ sub add_var {
 # XXX requires: stmt_assign_hash_value
 
 # XXX requires: stmt_return
-
-# assign value to a variable
-sub expr_assign {
-    my ($self, $v, $t) = @_;
-    "$v = $t";
-}
 
 sub _xlt {
     my ($self, $cd, $text) = @_;
@@ -795,30 +789,105 @@ sub before_all_clauses {
             ($cd->{coerce_to} ? " # coerce to: $cd->{coerce_to}" : "");
     } # GEN_COERCE_EXPR
 
+    my $prefilters_expr;
+    my $prefilters_ccl_note;
+  GEN_PREFILTERS_EXPRS:
+    {
+        my @filter_names;
+        for my $i (0..@$clsets-1) {
+            my $clset = $clsets->[$i];
+            push @filter_names, @{ $clset->{prefilters} }
+                if defined $clset->{prefilters};
+        }
+        last unless @filter_names;
+
+        require Data::Sah::FilterCommon;
+        my $rules = Data::Sah::FilterCommon::get_filter_rules(
+            compiler => $cname,
+            data_term => $dt,
+            filter_names => \@filter_names,
+        );
+
+        my @exprs;
+        for my $i (0..$#{$rules}) {
+            my $rule = $rules->[$i];
+
+            $self->add_compile_module(
+                $cd, "Data::Sah::Filter::$cname\::$rule->{name}",
+                {category => 'filter'},
+            );
+            if ($rule->{modules}) {
+                for my $mod (keys %{ $rule->{modules} }) {
+                    my $modspec = $rule->{modules}{$mod};
+                    $modspec = {version=>$modspec} unless ref $modspec eq 'HASH';
+                    $self->add_runtime_module($cd, $mod, {category=>'filter', %$modspec});
+                }
+            }
+
+            my $rule_might_fail = $rule->{meta}{might_fail};
+            my $expr;
+            if ($rule->{meta}{might_fail}) {
+                my $expr_fail;
+                # XXX rather hackish: like when coercion handling, to avoid
+                # adding another temporary variable, we reuse data term to hold
+                # filtering result (which contains error message string as well
+                # filtered data) then set the data term to the filtered data
+                # again. this might fail in languages or setting that is
+                # stricter (e.g. data term must be of certain type).
+                if ($rt_is_full) {
+                    $expr_fail = $self->expr_list(
+                        $self->expr_set_err_full($et, 'errors', $self->expr_array_subscript($dt, 0)),
+                        $self->false,
+                    );
+                } elsif ($rt_is_str) {
+                    $expr_fail = $self->expr_list(
+                        $self->expr_set_err_str($et, $self->expr_array_subscript($dt, 0)),
+                        $self->expr_set($dt, $self->expr_array_subscript($dt, 1)),
+                        $self->false,
+                    );
+                } else {
+                    $expr_fail = $self->false;
+                }
+
+                $expr = $self->expr_list(
+                    $self->expr_set($dt, $rule->{expr_filter}),
+                    $self->expr_ternary(
+                        $self->expr_defined($self->expr_array_subscript($dt, 0)),
+                        $expr_fail,
+                        $self->expr_list(
+                            $self->expr_set($dt, $self->expr_array_subscript($dt, 1)),
+                            $self->true,
+                        )
+                    ),
+                );
+            } else {
+                $expr = $self->expr_list(
+                    $self->expr_set($dt, $rule->{expr_filter}),
+                    $self->true,
+                );
+            }
+            push @exprs, $expr;
+        } # for rules
+        $prefilters_expr = join(" ".$self->logical_and_op." ", @exprs);
+        $prefilters_ccl_note = "prefilters: ".
+            join(", ", map {$_->{name}} @$rules);
+    } # GEN_PREFILTERS_EXPR
+
   HANDLE_TYPE_CHECK:
     {
         $self->_die($cd, "BUG: type handler did not produce _ccl_check_type")
             unless defined($cd->{_ccl_check_type});
         local $cd->{_debug_ccl_note};
 
-        # XXX handle prefilters
-
         # handle coercion
         if ($coerce_expr) {
             $cd->{_debug_ccl_note} = $coerce_ccl_note;
             if ($coerce_might_fail) {
-                # XXX rather hackish: to avoid adding another temporary
-                # variable, we reuse data term to hold coercion result (which
-                # contains error message string as well coerced data) then set
-                # the data term to the coerced data again. this might fail in
-                # languages or setting that is stricter (e.g. data term must be
-                # of certain type).
 
                 my $expr_fail;
                 if ($rt_is_full) {
                     $expr_fail = $self->expr_list(
                         $self->expr_set_err_full($et, 'errors', $self->expr_array_subscript($dt, 0)),
-                        $self->expr_set($dt, $self->literal(undef)),
                         $self->false,
                     );
                 } elsif ($rt_is_str) {
@@ -862,7 +931,20 @@ sub before_all_clauses {
                     },
                 );
             }
-        }
+        } # handle coercion
+
+        # handle prefilters
+        if (defined $prefilters_expr) {
+            $cd->{_debug_ccl_note} = $prefilters_ccl_note;
+            $self->add_ccl(
+                $cd,
+                $prefilters_expr,
+                {
+                    err_msg => "",
+                    err_level => "fatal",
+                },
+            );
+        } # handle prefilters
 
         $cd->{_debug_ccl_note} = "check type '$cd->{type}'";
         $self->add_ccl(
@@ -984,7 +1066,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =head1 SYNOPSIS
 

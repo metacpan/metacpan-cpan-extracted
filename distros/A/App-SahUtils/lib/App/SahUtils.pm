@@ -1,7 +1,7 @@
 package App::SahUtils;
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.471'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.475'; # VERSION
 
 use 5.010001;
 use strict;
@@ -346,7 +346,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.471 of App::SahUtils (from Perl distribution App-SahUtils), released on 2019-12-09.
+This document describes version 0.475 of App::SahUtils (from Perl distribution App-SahUtils), released on 2020-02-11.
 
 =head1 SYNOPSIS
 
@@ -356,6 +356,8 @@ L<Sah> and L<Data::Sah>:
 =over
 
 =item * L<coerce-with-sah>
+
+=item * L<filter-with-sah>
 
 =item * L<format-with-sah>
 
@@ -385,6 +387,8 @@ L<Sah> and L<Data::Sah>:
 
 =item * L<list-sah-coerce-rule-modules>
 
+=item * L<list-sah-filter-rule-modules>
+
 =item * L<list-sah-schema-modules>
 
 =item * L<list-sah-schemas-modules>
@@ -398,6 +402,8 @@ L<Sah> and L<Data::Sah>:
 =item * L<sah-to-human>
 
 =item * L<show-sah-coerce-rule-module>
+
+=item * L<show-sah-filter-rule-module>
 
 =item * L<show-sah-schema-module>
 
@@ -426,6 +432,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -461,6 +468,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -494,6 +502,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -530,6 +539,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -563,6 +573,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -599,6 +610,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -632,6 +644,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -668,6 +681,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -701,6 +715,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -737,6 +752,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -771,6 +787,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<schema>* => I<any>
+
 
 =back
 
@@ -811,7 +828,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

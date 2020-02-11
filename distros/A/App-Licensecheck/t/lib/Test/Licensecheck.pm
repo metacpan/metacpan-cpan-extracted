@@ -2,80 +2,128 @@ package Test::Licensecheck;
 
 my $CLASS = __PACKAGE__;
 
-use parent qw(Test::Builder::Module);
-@EXPORT = qw(license_is license_like done_testing);
+use strictures;
 
-use strict;
-use warnings;
+use Test2::API qw(context);
+use Test2::Todo;
+use Test2::Compare qw(compare relaxed_convert strict_convert);
 
 use File::Basename;
 use App::Licensecheck;
 
-my $tb = $CLASS->builder;
+use base 'Exporter';
+our @EXPORT = qw(license_is license_like);
 
-# test corpus data
 my $app = App::Licensecheck->new;
 $app->lines(0);
 $app->deb_fmt(1);
 
 sub license_is ($$)
 {
-	my ( $corpus, $expected ) = @_;
-	my ( $expected_license, $expected_license_todo );
-	my $expected_copyright;
+	my ( $corpus, $exp ) = @_;
 
-	# expected is either scalar, or array of current+todo
-	if ( ref($expected) eq 'ARRAY' ) {
-		( $expected_license, $expected_license_todo ) = @{$expected};
+	my $ctx = context();
+
+	my ( $failures, $exp_license, $exp_license_todo, $exp_copyright );
+
+	# exp is either scalar, or array of current+todo
+	if ( ref($exp) eq 'ARRAY' ) {
+		( $exp_license, $exp_license_todo ) = @{$exp};
 	}
 	else {
-		$expected_license = $expected;
+		$exp_license = $exp;
 	}
 
 	# corpus is either scalar (file), or array (list of files)
 	for ( ref($corpus) eq 'ARRAY' ? @{$corpus} : $corpus ) {
-		my ( $detected_license, $detected_copyright ) = $app->parse($_);
+		my ( $got_license, $got_copyright ) = $app->parse($_);
 
-		$tb->is_eq(
-			$detected_license, $expected_license,
-			"detect licensing \"$expected_license\" for " . basename($_)
-		) if ($expected_license);
+		my $pat = 'detect %s "%s" for ' . basename($_);
 
-		if ($expected_license_todo) {
-			$tb->todo_start;
-			$tb->is_eq(
-				$detected_license, $expected_license_todo,
-				"detect licensing \"$expected_license_todo\" for "
-					. basename($_)
+		if ($exp_license) {
+			my $name = sprintf( $pat, 'licensing', $exp_license );
+
+			my $delta = compare(
+				$got_license, $exp_license,
+				\&strict_convert
 			);
-			$tb->todo_end;
+			if ($delta) {
+				$ctx->fail( $name, $delta->diag );
+				$failures++;
+			}
+			else {
+				$ctx->ok( 1, $name );
+			}
 		}
 
-		$tb->is_eq(
-			$detected_copyright, $expected_copyright,
-			"detect copyright \"$expected_copyright\" for " . basename($_)
-		) if ($expected_copyright);
+		if ($exp_license_todo) {
+			my $todo = Test2::Todo->new( reason => 'Fix later' );
+
+			my $name = sprintf( $pat, 'licensing', $exp_license_todo );
+
+			my $delta = compare(
+				$got_license, $exp_license_todo,
+				\&strict_convert
+			);
+			if ($delta) {
+				$ctx->fail( $name, $delta->diag );
+				$failures++;
+			}
+			else {
+				$ctx->ok( 1, $name );
+			}
+
+			$todo->end;
+		}
+
+		if ($exp_copyright) {
+			my $name = sprintf( $pat, 'copyright', $exp_copyright );
+
+			my $delta = compare(
+				$got_copyright, $exp_copyright,
+				\&strict_convert
+			);
+			if ($delta) {
+				$ctx->fail( $name, $delta->diag );
+				$failures++;
+			}
+			else {
+				$ctx->ok( 1, $name );
+			}
+		}
 	}
+	$ctx->release;
+	return $failures ? 1 : 0;
 }
 
 sub license_like ($$)
 {
-	my ( $corpus, $expected ) = @_;
+	my ( $corpus, $exp ) = @_;
 
-	# expected is either regexp, or array of regexp
-	for ( ref($expected) eq 'ARRAY' ? @{$expected} : $expected ) {
-		my ($detected) = $app->parse($corpus);
+	my $ctx = context();
 
-		$tb->like(
-			$detected, $_,
-			"detect licensing \"$_\" for " . basename($corpus)
-		);
+	my $pat = 'detect %s "%s" for ' . basename($corpus);
+
+	my $failures;
+
+	# exp is either regexp, or array of regexp
+	for ( ref($exp) eq 'ARRAY' ? @{$exp} : $exp ) {
+		my ($got) = $app->parse($corpus);
+
+		my $name = sprintf( $pat, 'licensing', $_ );
+
+		my $delta = compare( $got, $_, \&relaxed_convert );
+		if ($delta) {
+			$ctx->fail( $name, $delta->diag );
+			$failures++;
+		}
+		else {
+			$ctx->ok( 1, $name );
+		}
 	}
-}
 
-sub done_testing ()
-{
-	$tb->done_testing;
+	$ctx->release;
+	return $failures ? 1 : 0;
 }
 
 1;

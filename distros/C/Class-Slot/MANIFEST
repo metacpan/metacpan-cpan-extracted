@@ -19,3 +19,4 @@ t/late_binding.t
 t/line_numbers.t
 t/playing_nice.t
 t/util.t
+t/very_late_binding.t

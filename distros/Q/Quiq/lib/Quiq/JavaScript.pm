@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 use Quiq::Path;
 use Scalar::Util ();
@@ -68,6 +68,10 @@ Die Regeln der Umwandlung:
 
 =item *
 
+ist $code C<undef>, wird C<undef> geliefert
+
+=item *
+
 Kommentare (\s*//.*) werden entfernt
 
 =item *
@@ -96,18 +100,21 @@ wie JavaScipt es auch erlaubt, weggelassen werden.
 sub line {
     my ($self,$code) = @_;
 
-    my $line = '';
-    open my $fh,'<',\$code or $self->throw;
-    while (<$fh>) {
-        s|\s*//.*||; # Kommentar entfernen
-        s/^\s+//;
-        s/\s+$//;
-        next if $_ eq '';
+    my $line;
+    if (defined $code) {
+        open my $fh,'<',\$code or $self->throw;
+        while (<$fh>) {
+            s|\s*//.*||; # Kommentar entfernen
+            s/^\s+//;
+            s/\s+$//;
+            next if $_ eq '';
 
-        if ($line ne '') {
-            $line .= ' ';
+            if (defined $line) {
+                $line .= ' ';
+            }
+            $line .= $_;
         }
-        $line .= $_;
+        close $fh;
     }
 
     return $line;
@@ -260,7 +267,7 @@ sub script {
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

@@ -1,13 +1,24 @@
-0.003   2018-09-10 (PERLANCAR)
+0.005   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- For each module in the build: Mention some modules in the See
+	  Also section.
+
+
+0.004   2019-12-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Use String::PodQuote to quote summary when added into POD.
+
+
+0.003   2018-09-10  Released-By: PERLANCAR
 
 	- [bugfix] Show gen_args in examples for dynamic pattern.
 
 
-0.002   2018-09-10 (PERLANCAR)
+0.002   2018-09-10  Released-By: PERLANCAR
 
 	- Render examples as POD (Regexp::Pattern 0.2.4).
 
 
-0.001   2016-09-13 (PERLANCAR)
+0.001   2016-09-13  Released-By: PERLANCAR
 
         - First release.

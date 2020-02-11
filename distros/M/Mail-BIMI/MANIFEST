@@ -18,7 +18,9 @@ lib/Mail/BIMI/Role/Error.pm
 lib/Mail/BIMI/Role/Resolver.pm
 t/00-load.t
 t/01-dns-lookup-no-record.t
+t/01-dns-lookup-spfall.t
 t/01-dns-lookup.t
 t/01-record-fallback.t
 t/01-record-validation.t
 t/01-results.t
+t/zonefile

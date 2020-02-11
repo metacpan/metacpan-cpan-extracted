@@ -85,10 +85,10 @@ EOW
       "dist_abstract" => "ISO8601 date and duration string type constraints and coercions for Moose",
       "dist_author" => [
         "Tomas Doran (t0m) <bobtfish\@bobtfish.net>",
-        "Dave Lambley <davel\@state51.co.uk>"
+        "Dave Lambley <dlambley\@cpan.org>"
       ],
       "dist_name" => "MooseX-Types-ISO8601",
-      "dist_version" => "0.19",
+      "dist_version" => "0.20",
       "license" => "perl",
       "module_name" => "MooseX::Types::ISO8601",
       "recommends" => {

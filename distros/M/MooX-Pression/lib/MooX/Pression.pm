@@ -12,9 +12,10 @@ use feature ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.020';
+our $VERSION   = '0.100';
 
-use Keyword::Declare;
+use Keyword::Simple ();
+use PPR;
 use B::Hooks::EndOfScope;
 use Exporter::Shiny our @EXPORT = qw( version authority overload );
 use Devel::StrictMode qw(STRICT);
@@ -133,66 +134,430 @@ BEGIN {
 };
 
 #
+# GRAMMAR
+#
+
+our $GRAMMAR = qr{
+	(?(DEFINE)
+	
+		(?<PerlKeyword>
+		
+			(?: class           (?&MxpClassSyntax)     )|
+			(?: abstract        (?&MxpAbstractSyntax)  )|
+			(?: role            (?&MxpRoleSyntax)      )|
+			(?: interface       (?&MxpRoleSyntax)      )|
+			(?: toolkit         (?&MxpToolkitSyntax)   )|
+			(?: begin           (?&MxpHookSyntax)      )|
+			(?: end             (?&MxpHookSyntax)      )|
+			(?: type_name       (?&MxpTypeNameSyntax)  )|
+			(?: extends         (?&MxpExtendsSyntax)   )|
+			(?: with            (?&MxpWithSyntax)      )|
+			(?: requires        (?&MxpWithSyntax)      )|
+			(?: has             (?&MxpHasSyntax)       )|
+			(?: constant        (?&MxpConstantSyntax)  )|
+			(?: coerce          (?&MxpCoerceSyntax)    )|
+			(?: method          (?&MxpMethodSyntax)    )|
+			(?: factory         (?&MxpFactorySyntax)   )|
+			(?: factory         (?&MxpFactoryViaSyntax))|
+			(?: before          (?&MxpModifierSyntax)  )|
+			(?: after           (?&MxpModifierSyntax)  )|
+			(?: around          (?&MxpModifierSyntax)  )|
+			(?: multi           (?&MxpMultiSyntax)     )
+		)#</PerlKeyword>
+		
+		(?<MxpSimpleTypeSpec>
+			~?(?&PerlBareword)(?&PerlAnonymousArray)?
+		)#</MxpSimpleTypeSpec>
+		
+		(?<MxpTypeSpec>
+		
+			(?&MxpSimpleTypeSpec)
+			(?:
+				\s*\&\s*
+				(?&MxpSimpleTypeSpec)
+			)*
+			(?:
+				\s*\|\s*
+				(?&MxpSimpleTypeSpec)
+				(?:
+					\s*\&\s*
+					(?&MxpSimpleTypeSpec)
+				)*
+			)*
+		)#</MxpTypeSpec>
+		
+		(?<MxpExtendedTypeSpec>
+		
+			(?&MxpTypeSpec)|(?&PerlBlock)
+		)#</MxpExtendedTypeSpec>
+		
+		(?<MxpSignatureElement>
+		
+			(?&PerlOWS)
+			(?: (?&MxpExtendedTypeSpec))?                 # CAPTURE:type
+			(?&PerlOWS)
+			(?:                                           # CAPTURE:name
+				(?&PerlVariable) | (\*(?&PerlIdentifier))
+			)
+			(?:                                           # CAPTURE:postamble
+				\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
+			)?
+		)#</MxpSignatureElement>
+		
+		(?<MxpSignatureList>
+			
+			(?&MxpSignatureElement)
+			(?:
+				(?&PerlOWS)
+				,
+				(?&PerlOWS)
+				(?&MxpSignatureElement)
+			)*
+		)#</MxpSignatureList>
+		
+		(?<MxpAttribute>
+		
+			:
+			[^\W0-9]\w*
+			(?:
+				[(]
+					[^\)]+
+				[)]
+			)?
+		)#</MxpAttribute>
+		
+		(?<MxpRoleList>
+		
+			(?&PerlOWS)
+			(?:
+				(?&PerlBlock) | (?&PerlQualifiedIdentifier)
+			)
+			(?:
+				(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+			)?
+			(?:
+				(?&PerlOWS)
+				,
+				(?&PerlOWS)
+				(?:
+					(?&PerlBlock) | (?&PerlQualifiedIdentifier)
+				)
+				(?:
+					(?:\s*\?) | (?: (?&PerlOWS)(?&PerlList))
+				)?
+			)*
+		)#</MxpRoleList>
+		
+		(?<MxpClassSyntax>
+		
+			(?&PerlOWS)
+			(?: [+] )?                                    # CAPTURE:plus
+			(?: (?&PerlQualifiedIdentifier) )?            # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )?                          # CAPTURE:block
+			(?&PerlOWS)
+		)#</MxpClassSyntax>
+		
+		(?<MxpAbstractSyntax>
+			
+			class
+			(?&PerlOWS)
+			(?: [+] )?                                    # CAPTURE:plus
+			(?: (?&PerlQualifiedIdentifier) )?            # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )?                          # CAPTURE:block
+			(?&PerlOWS)
+		)#</MxpAbstractSyntax>
+		
+		(?<MxpRoleSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlQualifiedIdentifier) )?            # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )?                          # CAPTURE:block
+			(?&PerlOWS)
+		)#</MxpRoleSyntax>
+		
+		(?<MxpHookSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:hook
+			(?&PerlOWS)
+		)#</MxpHookSyntax>
+		
+		(?<MxpTypeNameSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier) )                      # CAPTURE:name
+			(?&PerlOWS)
+		)#</MxpTypeNameSyntax>
+		
+		(?<MxpToolkitSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier) )                      # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:imports
+						(?: (?&PerlQualifiedIdentifier)|(?&PerlComma)|(?&PerlOWS) )*
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+		)#</MxpToolkitSyntax>
+		
+		(?<MxpExtendsSyntax>
+		
+			(?&PerlOWS)
+			(?:                                           # CAPTURE:list
+				(?&MxpRoleList)
+			)
+			(?&PerlOWS)
+		)#</MxpExtendsSyntax>
+		
+		(?<MxpWithSyntax>
+		
+			(?&PerlOWS)
+			(?:                                           # CAPTURE:list
+				(?&MxpRoleList)
+			)
+			(?&PerlOWS)
+		)#</MxpWithSyntax>
+		
+		(?<MxpRequiresSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+		)#</MxpRequiresSyntax>
+		
+		(?<MxpHasSyntax>
+		
+			(?&PerlOWS)
+			(?: \+ )?                                     # CAPTURE:plus
+			(?: \* )?                                     # CAPTURE:asterisk
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: \! )?                                     # CAPTURE:postfix
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?: (?&PerlList) )                      # CAPTURE:spec
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?:
+				[=]
+				(?&PerlOWS)
+				(?: (?&PerlAssignment) )                   # CAPTURE:default
+			)?
+			(?&PerlOWS)
+		)#</MxpHasSyntax>
+		
+		(?<MxpConstantSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier) )                      # CAPTURE:name
+			(?&PerlOWS)
+			=
+			(?&PerlOWS)
+			(?: (?&PerlExpression) )                      # CAPTURE:expr
+			(?&PerlOWS)
+		)#</MxpConstantSyntax>
+		
+		(?<MxpMethodSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )?       # CAPTURE:name
+			(?&PerlOWS)
+			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpMethodSyntax>
+	
+		(?<MxpMultiSyntax>
+		
+			(?&PerlOWS)
+			method
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?&PerlOWS)
+			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpMultiSyntax>
+		
+		(?<MxpModifierSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?&PerlOWS)
+			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpModifierSyntax>
+		
+		# Easier to provide two separate patterns for `factory`
+		
+		(?<MxpFactorySyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?&PerlOWS)
+			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
+			(?&PerlOWS)
+			(?:
+				[(]
+					(?&PerlOWS)
+					(?:                                     # CAPTURE:sig
+						(?&MxpSignatureList)?
+					)
+					(?&PerlOWS)
+				[)]
+			)?
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpFactorySyntax>
+		
+		(?<MxpFactoryViaSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?&PerlOWS)
+			(?:
+				(: via )
+				(?:                                        # CAPTURE:via
+					(?&PerlBlock)|(?&PerlIdentifier)|(?&PerlString)
+				)
+			)?
+			(?&PerlOWS)
+		)#</MxpFactoryViaSyntax>
+		
+		(?<MxpCoerceSyntax>
+		
+			(?&PerlOWS)
+			(?: from )?
+			(?&PerlOWS)
+			(?:                                           # CAPTURE:from
+				(?&PerlBlock)|(?&PerlQualifiedIdentifier)|(?&PerlString)
+			)
+			(?&PerlOWS)
+			(?: via )
+			(?&PerlOWS)
+			(?:                                           # CAPTURE:via
+				(?&PerlBlock)|(?&PerlIdentifier)|(?&PerlString)
+			)
+			(?&PerlOWS)
+			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?&PerlOWS)
+		)#</MxpCoerceSyntax>
+		
+
+	)
+	$PPR::GRAMMAR
+}xso;
+
+my %_fetch_re_cache;
+sub _fetch_re {
+	my $name = shift;
+	$_fetch_re_cache{$name} ||= do {
+		"$GRAMMAR" =~ m{<$name>(.+)</$name>}s or die "could not fetch re for $name";
+		(my $re = $1) =~ s/\)\#$//;
+		my @lines = split /\n/, $re;
+		for (@lines) {
+			if (my ($named_capture) = /# CAPTURE:(\w+)/) {
+				s/\(\?\:/\(\?<$named_capture>/;
+			}
+		}
+		$re = join "\n", @lines;
+		qr/ $re $GRAMMAR /xs;
+	}
+}
+
+#
 # HELPERS
 #
 
-keytype SignatureList is /
-	(
-		(?&PerlBlock) | (
-			~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			(
-				(?&PerlOWS)\&(?&PerlOWS)
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			)*
-			(
-				(?&PerlOWS)\|(?&PerlOWS)
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				(
-					(?&PerlOWS)\&(?&PerlOWS)
-					~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				)*
-			)*
-		)
-	)?
-	(?&PerlOWS)
-	(
-		(?&PerlVariable) | (\*(?&PerlIdentifier))
-	)
-	(
-		\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
-	)?
-	(
-		(?&PerlOWS)
-		,
-		(?&PerlOWS)
-		(
-			(?&PerlBlock) | (
-			~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			(
-				\&
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			)*
-			(
-				\|
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				(
-					\&
-					~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				)*
-			)*
-		)
-		)?
-		(?&PerlOWS)
-		(
-			(?&PerlVariable) | (\*(?&PerlIdentifier))
-		)
-		(
-			\? | ((?&PerlOWS)=(?&PerlOWS)(?&PerlTerm))
-		)?
-	)*
-/xs;  # fix for highlighting /
-
-my $handle_signature_list = sub {
+sub _handle_signature_list {
+	my $me = shift;
 	my $sig = $_[0];
 	my $seen_named = 0;
 	my $seen_pos   = 0;
@@ -211,63 +576,49 @@ my $handle_signature_list = sub {
 		
 		push @parsed, {};
 		
-		if ($sig =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xso) {
+		if ($sig =~ /^((?&PerlBlock)) $GRAMMAR/xso) {
 			my $type = $1;
 			$parsed[-1]{type}          = $type;
 			$parsed[-1]{type_is_block} = 1;
 			$sig =~ s/^\Q$type//xs;
-			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^(
-			~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			(
-				(?&PerlOWS)\&(?&PerlOWS)
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-			)*
-			(
-				(?&PerlOWS)\|(?&PerlOWS)
-				~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				(
-					(?&PerlOWS)\&(?&PerlOWS)
-					~?(?&PerlBareword)(?&PerlAnonymousArray)?
-				)*
-			)*
-		) $PPR::GRAMMAR/xso) {
+		elsif ($sig =~ /^((?&MxpTypeSpec)) $GRAMMAR/xso) {
 			my $type = $1;
 			$parsed[-1]{type}          = $type;
 			$parsed[-1]{type_is_block} = 0;
 			$sig =~ s/^\Q$type//xs;
-			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
 		else {
 			$parsed[-1]{type} = 'Any';
 			$parsed[-1]{type_is_block} = 0;
 		}
 		
-		if ($sig =~ /^\*((?&PerlIdentifier)) $PPR::GRAMMAR/xso) {
+		if ($sig =~ /^\*((?&PerlIdentifier)) $GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name} = $name;
 			++$seen_named;
 			$sig =~ s/^\*\Q$name//xs;
-			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^((?&PerlVariable)) $PPR::GRAMMAR/xso) {
+		elsif ($sig =~ /^((?&PerlVariable)) $GRAMMAR/xso) {
 			my $name = $1;
 			$parsed[-1]{name} = $name;
 			++$seen_pos;
 			$sig =~ s/^\Q$name//xs;
-			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xs;
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xs;
 		}
 		
 		if ($sig =~ /^\?/) {
 			$parsed[-1]{optional} = 1;
-			$sig =~ s/^\?((?&PerlOWS)) $PPR::GRAMMAR//xso;
+			$sig =~ s/^\?((?&PerlOWS)) $GRAMMAR//xso;
 		}
-		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlTerm)) $PPR::GRAMMAR/xso) {
+		elsif ($sig =~ /^=((?&PerlOWS))((?&PerlTerm)) $GRAMMAR/xso) {
 			my ($ws, $default) = ($1, $2);
 			$parsed[-1]{default} = $default;
 			$sig =~ s/^=\Q$ws$default//xs;
-			$sig =~ s/^((?&PerlOWS)) $PPR::GRAMMAR//xso;
+			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
 		
 		if ($sig) {
@@ -327,31 +678,10 @@ my $handle_signature_list = sub {
 		$type_params_stuff,
 		$extra,
 	);
-};
+}
 
-keytype RoleList is /
-	\s*
-	(
-		(?&PerlBlock) | (?&PerlQualifiedIdentifier)
-	)
-	(
-		(?:\s*\?) | (?&PerlList)
-	)?
-	(
-		\s*
-		,
-		\s*
-		\+?\s*
-		(
-			(?&PerlBlock) | (?&PerlQualifiedIdentifier)
-		)
-		(
-			(?:\s*\?) | (?&PerlList)
-		)?
-	)*
-/xs;  #/*
-
-my $handle_role_list = sub {
+sub _handle_role_list {
+	my $me = shift;
 	my ($rolelist, $kind) = @_;
 	my @return;
 	
@@ -364,13 +694,13 @@ my $handle_role_list = sub {
 		my $suffix = '';
 		my $role_params   = undef;
 		
-		if ($rolelist =~ /^((?&PerlBlock)) $PPR::GRAMMAR/xso) {
+		if ($rolelist =~ /^((?&PerlBlock)) $GRAMMAR/xso) {
 			$role = $1;
 			$role_is_block = 1;
 			$rolelist =~ s/^\Q$role//xs;
 			$rolelist =~ s/^\s+//xs;
 		}
-		elsif ($rolelist =~ /^((?&PerlQualifiedIdentifier)) $PPR::GRAMMAR/xso) {
+		elsif ($rolelist =~ /^((?&PerlQualifiedIdentifier)) $GRAMMAR/xso) {
 			$role = $1;
 			$rolelist =~ s/^\Q$role//xs;
 			$rolelist =~ s/^\s+//xs;
@@ -384,7 +714,7 @@ my $handle_role_list = sub {
 			$suffix = '?';
 			$rolelist =~ s/^\?\s*//xs;
 		}
-		elsif ($rolelist =~ /^((?&PerlList)) $PPR::GRAMMAR/xso) {
+		elsif ($rolelist =~ /^((?&PerlList)) $GRAMMAR/xso) {
 			$role_params = $1;
 			$rolelist =~ s/^\Q$role_params//xs;
 			$rolelist =~ s/^\s+//xs;
@@ -408,9 +738,7 @@ my $handle_role_list = sub {
 	}
 	
 	return join(",", @return);
-};
-
-keytype MyAttribute is /:[^\W0-9]\w*(?:\([^\)]+\))?/xs;
+}
 
 sub _handle_factory_keyword {
 	my ($me, $name, $via, $code, $has_sig, $sig, $attrs) = @_;
@@ -438,7 +766,7 @@ sub _handle_factory_keyword {
 			!!$optim,
 		);
 	}
-	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 	my $munged_code = sprintf('sub { my($factory,$class,%s)=(shift,shift,@_); %s; do %s }', $signature_var_list, $extra, $code);
 	sprintf(
 		'q[%s]->_factory(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -462,7 +790,7 @@ sub _handle_method_keyword {
 	
 	if (defined $name) {
 		if ($has_sig) {
-			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			return sprintf(
 				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -487,7 +815,7 @@ sub _handle_method_keyword {
 	}
 	else {
 		if ($has_sig) {
-			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 			return sprintf(
 				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
@@ -522,7 +850,7 @@ sub _handle_multimethod_keyword {
 	}
 	
 	if ($has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
 		return sprintf(
 			'q[%s]->_multimethod(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, %s });',
@@ -555,7 +883,7 @@ sub _handle_modifier_keyword {
 	}
 
 	if ($has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code;
 		if ($kind eq 'around') {
 			$munged_code = sprintf('sub { my($next,$self,%s)=(shift,shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
@@ -612,7 +940,7 @@ sub _handle_package_keyword {
 	}
 	
 	if ($name and $has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
 		sprintf(
 			'use MooX::Pression::_Gather -parent => %s; use MooX::Pression::_Gather -gather, %s => { code => %s, named => %d, signature => %s }; use MooX::Pression::_Gather -unparent;',
@@ -624,7 +952,7 @@ sub _handle_package_keyword {
 		);
 	}
 	elsif ($has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		my $munged_code = sprintf('sub { q(%s)->_package_callback(sub { my ($generator,%s)=(shift,@_); %s; do %s }, @_) }', $me, $signature_var_list, $extra, $code);
 		sprintf(
 			'q[%s]->anonymous_generator(%s => { code => %s, named => %d, signature => %s }, toolkit => %s, prefix => %s, factory_package => %s, type_library => %s)',
@@ -700,7 +1028,7 @@ sub _handle_requires_keyword {
 	);
 	my $r2 = '';
 	if (STRICT and $has_sig) {
-		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $handle_signature_list->($sig);
+		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 		$r2 = sprintf(
 			'q[%s]->_modifier(q(around), %s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 			$me,
@@ -712,6 +1040,19 @@ sub _handle_requires_keyword {
 		);
 	}
 	"$r1$r2";
+}
+
+sub _syntax_error {
+	my $ref = pop;
+	my ($me, $kind, @poss) = @_;
+	require Carp;
+	Carp::croak(
+		"Unexpected syntax in $kind.\n" .
+		"Expected:\n" .
+		join("", map "\t$_\n", @poss) .
+		"Got:\n" .
+		"\t" . substr($$ref, 0, 32)
+	);
 }
 
 #
@@ -762,259 +1103,348 @@ sub import {
 	
 	# `class` keyword
 	#
-	keyword class ('+'? $plus, QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
-	:desc(parameterizable class) :prefer {
-		my $return = $me->_handle_package_keyword(class => $name, $block, 1, $sig,  $plus, \%opts);
-	}
-	keyword class ('+'? $plus, QualifiedIdentifier $name, Block $block)
-	:desc(class) :prefer {
-		my $return = $me->_handle_package_keyword(class => $name, $block, 0, undef, $plus, \%opts);
-	}
-	keyword class ('+'? $plus, QualifiedIdentifier $name)
-	:desc(class) :prefer {
-		my $return = $me->_handle_package_keyword(class => $name, '',     0, undef, $plus, \%opts);
-	}
-	keyword class ('(', SignatureList? $sig, ')', Block $block)
-	:desc(anonymous parameterizable class) {
-		my $return = $me->_handle_package_keyword(class => undef, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword class (Block? $block)
-	:desc(anonymous class) {
-		my $return = $me->_handle_package_keyword(class => undef, $block, 0, undef, '',    \%opts);
+	Keyword::Simple::define class => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpClassSyntax') or $me->_syntax_error(
+			'class declaration',
+			'class <name> (<signature>) { <block> }',
+			'class <name> { <block> }',
+			'class <name>',
+			'class (<signature>) { <block> }',
+			'class { <block> }',
+			'class;',
+			$ref,
+		);
+		
+		my ($pos, $plus, $name, $sig, $block) = ($+[0], $+{plus}, $+{name}, $+{sig}, $+{block});
+		my $has_sig = !!exists $+{sig};
+		$plus  ||= '';
+		$block ||= '{}';
+		
+		substr($$ref, 0, $pos) = $me->_handle_package_keyword(class => $name, $block, $has_sig, $sig, $plus, \%opts);
+	};
+
+	Keyword::Simple::define abstract => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpAbstractSyntax') or $me->_syntax_error(
+			'abstract class declaration',
+			'abstract class <name> (<signature>) { <block> }',
+			'abstract class <name> { <block> }',
+			'abstract class <name>',
+			'abstract class (<signature>) { <block> }',
+			'abstract class { <block> }',
+			'abstract class;',
+			$ref,
+		);
+		
+		my ($pos, $plus, $name, $sig, $block) = ($+[0], $+{plus}, $+{name}, $+{sig}, $+{block});
+		my $has_sig = !!exists $+{sig};
+		$plus  ||= '';
+		$block ||= '{}';
+		
+		substr($$ref, 0, $pos) = $me->_handle_package_keyword(abstract => $name, $block, $has_sig, $sig, $plus, \%opts);
+	};
+
+	for my $kw (qw/ role interface /) {
+		Keyword::Simple::define $kw => sub {
+			my $ref = shift;
+			
+			$$ref =~ _fetch_re('MxpRoleSyntax') or $me->_syntax_error(
+				"$kw declaration",
+				"$kw <name> (<signature>) { <block> }",
+				"$kw <name> { <block> }",
+				"$kw <name>",
+				"$kw (<signature>) { <block> }",
+				"$kw { <block> }",
+				"$kw;",
+				$ref,
+			);
+			
+			my ($pos, $name, $sig, $block) = ($+[0], $+{name}, $+{sig}, $+{block});
+			my $has_sig = !!exists $+{sig};
+			$block ||= '{}';
+			
+			substr($$ref, 0, $pos) = $me->_handle_package_keyword($kw => $name, $block, $has_sig, $sig, '', \%opts);
+		};
 	}
 
-	# `abstract` keyword
-	#
-	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
-	:desc(parameterizable abstract class) :prefer {
-		my $return = $me->_handle_package_keyword(abstract => $name, $block, 1, $sig,  $plus, \%opts);
-	}
-	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name, Block $block)
-	:desc(abstract class) :prefer {
-		my $return = $me->_handle_package_keyword(abstract => $name, $block, 0, undef, $plus, \%opts);
-	}
-	keyword abstract ('class', '+'? $plus, QualifiedIdentifier $name)
-	:desc(abstract class) :prefer {
-		my $return = $me->_handle_package_keyword(abstract => $name, '',     0, undef, $plus, \%opts);
-	}
-	keyword abstract ('class', '(', SignatureList? $sig, ')', Block $block)
-	:desc(anonymous parameterizable abstract class) {
-		my $return = $me->_handle_package_keyword(abstract => undef, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword abstract ('class', Block? $block)
-	:desc(anonymous abstract class) {
-		my $return = $me->_handle_package_keyword(abstract => undef, $block, 0, undef, '',    \%opts);
-	}
-
-	# `role` keyword
-	#
-	keyword role (QualifiedIdentifier $name, '(', SignatureList? $sig, ')', Block $block)
-	:desc(parameterizable role) :prefer {
-		my $return = $me->_handle_package_keyword(role => $name, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword role (QualifiedIdentifier $name, Block $block)
-	:desc(role) :prefer {
-		my $return = $me->_handle_package_keyword(role => $name, $block, 0, undef, '',    \%opts);
-	}
-	keyword role (QualifiedIdentifier $name)
-	:desc(role) :prefer {
-		my $return = $me->_handle_package_keyword(role => $name, '',     0, undef, '',    \%opts);
-	}
-	keyword role ('(', SignatureList? $sig, ')', Block $block)
-	:desc(anonymous parameterizable role) {
-		my $return = $me->_handle_package_keyword(role => undef, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword role (Block? $block)
-	:desc(anonymouse role) {
-		my $return = $me->_handle_package_keyword(role => undef, $block, 0, undef, '',    \%opts);
-	}
-
-	# `interface` keyword
-	#
-	keyword interface (QualifiedIdentifier $name, '(' $has_sig, SignatureList? $sig, ')', Block $block)
-	:desc(parameterizable interface) :prefer {
-		my $return = $me->_handle_package_keyword(interface => $name, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword interface (QualifiedIdentifier $name, Block $block)
-	:desc(interface) :prefer {
-		my $return = $me->_handle_package_keyword(interface => $name, $block, 0, undef, '',    \%opts);
-	}
-	keyword interface (QualifiedIdentifier $name)
-	:desc(interface) :prefer {
-		my $return = $me->_handle_package_keyword(interface => $name, '',     0, undef, '',    \%opts);
-	}
-	keyword interface ('(' $has_sig, SignatureList? $sig, ')', Block $block)
-	:desc(anonymous parameterizable interface) {
-		my $return = $me->_handle_package_keyword(interface => undef, $block, 1, $sig,  '',    \%opts);
-	}
-	keyword interface (Block? $block)
-	:desc(anonymous interface) {
-		my $return = $me->_handle_package_keyword(interface => undef, $block, 0, undef, '',    \%opts);
-	}
-
-	# `toolkit` keyword
-	#
-	keyword toolkit (Identifier $tk, '(', QualifiedIdentifier|Comma @imports, ')') :desc(toolkit statement) {
-		my @processed_imports;
-		while (@imports) {
-			no warnings 'uninitialized';
-			my $next = shift @imports;
-			if ($next =~ /^::(.+)$/) {
-				push @processed_imports, $1;
+	Keyword::Simple::define toolkit => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpToolkitSyntax') or $me->_syntax_error(
+			'toolkit declaration',
+			'toolkit <toolkit> (<extensions>)',
+			'toolkit <toolkit>;',
+			$ref,
+		);
+		
+		my ($pos, $name, $imports) = ($+[0], $+{name}, $+{imports});
+		
+		if ($imports) {
+			my @imports = grep defined,
+				($imports =~ / ((?&PerlQualifiedIdentifier)|(?&PerlComma)) $GRAMMAR /xg);
+			my @processed_imports;
+			while (@imports) {
+				no warnings 'uninitialized';
+				my $next = shift @imports;
+				if ($next =~ /^::(.+)$/) {
+					push @processed_imports, $1;
+				}
+				elsif ($next =~ /^[^\W0-9]/) {
+					push @processed_imports, sprintf('%sX::%s', $name, $next);
+				}
+				else {
+					die "Expected package name, got $next";
+				}
+				$imports[0] eq ',' and shift @imports;
 			}
-			elsif ($next =~ /^[^\W0-9]/) {
-				push @processed_imports, sprintf('%sX::%s', $tk, $next);
-			}
-			else {
-				die "Expected package name, got $next";
-			}
-			$imports[0] eq ',' and shift @imports;
+			substr($$ref, 0, $pos) = sprintf('q[%s]->_toolkit(%s);', $me, join ",", map(B::perlstring($_), $name, @processed_imports));
 		}
-		sprintf('q[%s]->_toolkit(%s);', $me, join ",", map(B::perlstring($_), $tk, @processed_imports));
-	}
-	keyword toolkit (Identifier $tk) {
-		sprintf('q[%s]->_toolkit(%s);', $me, B::perlstring($tk));
-	}
-	
+		
+		else {
+			substr($$ref, 0, $pos) = sprintf('q[%s]->_toolkit(%s);', $me, B::perlstring($name));
+		}
+	};
+
 	# `begin` and `end` keywords
 	#
-	keyword begin (Block $code) :desc(begin hook) {
-		sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $code);
-	}
-	keyword end (Block $code) :desc(end hook) {
-		sprintf('q[%s]->_end(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $code);
+	for my $kw (qw/ begin end /) {
+		Keyword::Simple::define $kw => sub {
+			my $ref = shift;
+			
+			$$ref =~ _fetch_re('MxpHookSyntax') or $me->_syntax_error(
+				"$kw hook",
+				"$kw { <block> }",
+				$ref,
+			);
+			
+			my ($pos, $capture) = ($+[0], $+{hook});
+			substr($$ref, 0, $pos) = sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $capture);
+		};
 	}
 	
 	# `type_name` keyword
 	#
-	keyword type_name (Identifier $tn) :desc(type_name statement) {
-		sprintf('q[%s]->_type_name(%s);', $me, B::perlstring($tn));
-	}
+	Keyword::Simple::define type_name => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpTypeNameSyntax') or $me->_syntax_error(
+			'type name declaration',
+			'type_name <identifier>',
+			$ref,
+		);
+		
+		my ($pos, $capture) = ($+[0], $+{name});
+		substr($$ref, 0, $pos) = sprintf('q[%s]->_type_name(%s);', $me, B::perlstring($capture));
+	};
 	
 	# `extends` keyword
 	#
-	keyword extends (RoleList $parent) :desc(extends statement) {
-		sprintf('q[%s]->_extends(%s);', $me, $parent->$handle_role_list('class'));
-	}
+	Keyword::Simple::define extends => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpExtendsSyntax') or $me->_syntax_error(
+			'extends declaration',
+			'extends <classes>',
+			$ref,
+		);
+		
+		my ($pos, $capture) = ($+[0], $+{list});
+		substr($$ref, 0, $pos) = sprintf('q[%s]->_extends(%s);', $me, $me->_handle_role_list($capture, 'class'));
+	};
 	
 	# `with` keyword
 	#
-	keyword with (RoleList $roles) :desc(with statement) {
-		sprintf('q[%s]->_with(%s);', $me, $roles->$handle_role_list('role'));
-	}
+	Keyword::Simple::define with => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpWithSyntax') or $me->_syntax_error(
+			'with declaration',
+			'with <roles>',
+			$ref,
+		);
+		
+		my ($pos, $capture) = ($+[0], $+{list});
+		
+		substr($$ref, 0, $pos) = sprintf('q[%s]->_with(%s);', $me, $me->_handle_role_list($capture, 'role'));
+	};
 	
 	# `requires` keyword
 	#
-	keyword requires (Identifier|Block $name, '(' $has_sig, SignatureList? $sig, ')') :desc(requires statement) {
-		$me->_handle_requires_keyword("$name", $has_sig, $sig);
-	}
-	keyword requires (Identifier|Block $name) :desc(requires statement) {
-		$me->_handle_requires_keyword("$name", 0, undef);
-	}
+	Keyword::Simple::define requires => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpRequiresSyntax') or $me->_syntax_error(
+			'requires declaration',
+			'requires <name> (<signature>)',
+			'requires <name>',
+			$ref,
+		);
+		
+		my ($pos, $name, $sig) = ($+[0], $+{name}, $+{sig});
+		my $has_sig = !!exists $+{sig};
+		substr($$ref, 0, $pos) = $me->_handle_requires_keyword($name, $has_sig, $sig)
+	};
 	
 	# `has` keyword
 	#
-	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix) :desc(attribute definition) {
-		$me->_handle_has_keyword("$plus$name$postfix", undef, undef);
-	}
-	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '(', List $spec, ')') :desc(attribute definition) {
-		$me->_handle_has_keyword("$plus$name$postfix", $spec, undef);
-	}
-	keyword has (Block $name, '(', List $spec, ')') :desc(attribute definition) {
-		$me->_handle_has_keyword($name, $spec, undef);
-	}
-	keyword has (Block $name) :desc(attribute definition) {
-		$me->_handle_has_keyword($name, undef, undef);
-	}
-	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '=', ListElem $default) :desc(attribute definition) {
-		$me->_handle_has_keyword("$plus$name$postfix", undef, $default);
-	}
-	keyword has ('+'? $plus, '*'?, Identifier $name, '!'? $postfix, '(', List $spec, ')', '=', ListElem $default) :desc(attribute definition) {
-		$me->_handle_has_keyword("$plus$name$postfix", $spec, $default);
-	}
-	keyword has (Block $name, '(', List $spec, ')', '=', ListElem $default) :desc(attribute definition) {
-		$me->_handle_has_keyword($name, $spec, $default);
-	}
-	keyword has (Block $name, '=', ListElem $default) :desc(attribute definition) {
-		$me->_handle_has_keyword($name, undef, $default);
-	}
+	Keyword::Simple::define has => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpHasSyntax') or $me->_syntax_error(
+			'attribute declaration',
+			'has <name> (<spec>) = <default>',
+			'has <name> (<spec>)',
+			'has <name> = <default>',
+			'has <name>',
+			$ref,
+		);
+		
+		my ($pos, $plus, $name, $postfix, $spec, $default) = ($+[0], $+{plus}, $+{name}, $+{postfix}, $+{spec}, $+{default});
+		my $has_spec    = !!exists $+{spec};
+		my $has_default = !!exists $+{default};
+		$plus     ||= '';
+		$postfix  ||= '';
+		substr($$ref, 0, $pos) = $me->_handle_has_keyword("$plus$name$postfix", $has_spec ? $spec : undef, $has_default ? $default : undef);
+	};
 	
 	# `constant` keyword
 	#
-	keyword constant (Identifier $name, '=', Expr $value) :desc(constant definition) {
-		sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $value);
-	}
+	Keyword::Simple::define constant => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpConstantSyntax') or $me->_syntax_error(
+			'constant declaration',
+			'constant <name> = <value>',
+			$ref,
+		);
+		
+		my ($pos, $name, $expr) = ($+[0], $+{name}, $+{expr});
+		substr($$ref, 0, $pos) = sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $expr);
+	};
 	
 	# `method` keyword
 	#
-	keyword method (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method) :prefer {
-		$me->_handle_method_keyword($name, $code, 1, $sig,  \@attrs);
-	}
-	keyword method (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method) :prefer {
-		$me->_handle_method_keyword($name, $code, 0, undef, \@attrs);
-	}
-	keyword method (                        MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(anonymous method) {
-		$me->_handle_method_keyword(undef, $code, 1, $sig,  \@attrs);
-	}
-	keyword method (                        MyAttribute? @attrs, Block $code) :desc(anonymous method) {
-		$me->_handle_method_keyword(undef, $code, 0, undef, \@attrs);
-	}
+	Keyword::Simple::define method => sub {
+		my $ref = shift;
+		
+		state $re_attr = _fetch_re('MxpAttribute');
+		
+		$$ref =~ _fetch_re('MxpMethodSyntax') or $me->_syntax_error(
+			'method declaration',
+			'method <name> <attributes> (<signature>) { <block> }',
+			'method <name> (<signature>) { <block> }',
+			'method <name> <attributes> { <block> }',
+			'method <name> { <block> }',
+			'method <attributes> (<signature>) { <block> }',
+			'method (<signature>) { <block> }',
+			'method <attributes> { <block> }',
+			'method { <block> }',
+			$ref,
+		);
+		
+		my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+		my $has_sig = !!exists $+{sig};
+		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
+		
+		substr($$ref, 0, $pos) = $me->_handle_method_keyword($name, $code, $has_sig, $sig,  \@attrs);
+	};
 
-	# `multi method` keyword
+	# `multi` keyword
 	#
-	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(multimethod) {
-		$me->_handle_multimethod_keyword($name, $code, 1, $sig,  \@attrs);
-	}
-	keyword multi ('method', Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(multimethod) {
-		$me->_handle_multimethod_keyword($name, $code, 0, undef, \@attrs);
-	}
+	Keyword::Simple::define multi => sub {
+		my $ref = shift;
+		
+		state $re_attr = _fetch_re('MxpAttribute');
+		
+		$$ref =~ _fetch_re('MxpMultiSyntax') or $me->_syntax_error(
+			'multimethod declaration',
+			'multi method <name> <attributes> (<signature>) { <block> }',
+			'multi method <name> (<signature>) { <block> }',
+			'multi method <name> <attributes> { <block> }',
+			'multi method <name> { <block> }',
+			$ref,
+		);
+		
+		my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+		my $has_sig = !!exists $+{sig};
+		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
+		
+		substr($$ref, 0, $pos) = $me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs);
+	};
 
 	# `before`, `after`, and `around` keywords
 	#
-	keyword before (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(before => $name, $code, 1, $sig,  \@attrs);
-	}
-	keyword before (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(before => $name, $code, 0, undef, \@attrs);
-	}
-	keyword after (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(after => $name, $code, 1, $sig,  \@attrs);
-	}
-	keyword after (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(after => $name, $code, 0, undef, \@attrs);
-	}
-	keyword around (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(around => $name, $code, 1, $sig,  \@attrs);
-	}
-	keyword around (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(method modifier) {
-		$me->_handle_modifier_keyword(around => $name, $code, 0, undef, \@attrs);
-	}
-	
-	# `factory` keyword
-	#
-	keyword factory (Identifier|Block $name, MyAttribute? @attrs, '(', SignatureList? $sig, ')', Block $code) :desc(factory method) {
-		$me->_handle_factory_keyword($name, undef, $code, 1, $sig,  \@attrs);
-	}
-	keyword factory (Identifier|Block $name, MyAttribute? @attrs, Block $code) :desc(factory method) {
-		$me->_handle_factory_keyword($name, undef, $code, 0, undef,  \@attrs);
-	}
-	keyword factory (Identifier|Block $name, 'via', Identifier $via) :desc(proxy factory method) {
-		$me->_handle_factory_keyword($name, $via, undef, undef, undef, []);
-	}
-	keyword factory (Identifier|Block $name) :desc(proxy factory method) {
-		$me->_handle_factory_keyword($name, 'new', undef, undef, undef, []);
+	for my $kw (qw( before after around )) {
+		Keyword::Simple::define $kw => sub {
+			my $ref = shift;
+			
+			state $re_attr = _fetch_re('MxpAttribute');
+		
+			$$ref =~ _fetch_re('MxpModifierSyntax') or $me->_syntax_error(
+				"$kw method modifier declaration",
+				"$kw <name> <attributes> (<signature>) { <block> }",
+				"$kw <name> (<signature>) { <block> }",
+				"$kw <name> <attributes> { <block> }",
+				"$kw <name> { <block> }",
+				$ref,
+			);
+			
+			my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+			my $has_sig = !!exists $+{sig};
+			my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
+			
+			substr($$ref, 0, $pos) = $me->_handle_modifier_keyword($kw, $name, $code, $has_sig, $sig, \@attrs);
+		};
 	}
 	
-	# `coerce` keyword
-	#
-	keyword coerce ('from'?, Block|QualifiedIdentifier|String $from, 'via', Block|Identifier|String $via, Block? $code) :desc(coercion) {
+	Keyword::Simple::define factory => sub {
+		my $ref = shift;
+		
+		if ( $$ref =~ _fetch_re('MxpFactorySyntax') ) {
+			state $re_attr = _fetch_re('MxpAttribute');
+			my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
+			my $has_sig = !!exists $+{sig};
+			my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
+			substr($$ref, 0, $pos) = $me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, \@attrs);
+			return;
+		}
+		
+		$$ref =~ _fetch_re('MxpFactoryViaSyntax') or $me->_syntax_error(
+			'factory method declaration',
+			'factory <name> <attributes> (<signature>) { <block> }',
+			'factory <name> (<signature>) { <block> }',
+			'factory <name> <attributes> { <block> }',
+			'factory <name> { <block> }',
+			'factory <name> via <methodname>',
+			'factory <name>',
+			$ref,
+		);
+		
+		my ($pos, $name, $via) = ($+[0], $+{name}, $+{via});
+		$via ||= 'new';
+		substr($$ref, 0, $pos) = $me->_handle_factory_keyword($name, $via, undef, undef, undef, []);
+	};
+	
+	Keyword::Simple::define coerce => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpCoerceSyntax') or $me->_syntax_error(
+			'coercion declaration',
+			'coerce from <type> via <method_name> { <block> }',
+			'coerce from <type> via <method_name>',
+			$ref,
+		);
+		
+		my ($pos, $from, $via, $code) = ($+[0], $+{from}, $+{via}, $+{code});
 		if ($from =~ /^\{/) {
 			$from = "scalar(do $from)"
 		}
 		elsif ($from !~ /^(q\b)|(qq\b)|"|'/) {
 			$from = B::perlstring($from);
 		}
-		
 		if ($via =~ /^\{/) {
 			$via = "scalar(do $via)"
 		}
@@ -1022,9 +1452,9 @@ sub import {
 			$via = B::perlstring($via);
 		}
 		
-		sprintf('q[%s]->_coerce(%s, %s, %s);', $me, $from, $via, $code ? "sub { my \$class; local \$_; (\$class, \$_) = \@_; do $code }" : '');
-	}
-	
+		substr($$ref, 0, $pos) = sprintf('q[%s]->_coerce(%s, %s, %s);', $me, $from, $via, $code ? "sub { my \$class; local \$_; (\$class, \$_) = \@_; do $code }" : '');
+	};
+		
 	# Go!
 	#
 	on_scope_end {
@@ -1074,6 +1504,9 @@ sub _package_callback {
 	my $cb = shift;
 	local %OPTS = ();
 	&$cb;
+#	use Data::Dumper;
+#	$Data::Dumper::Deparse = 1;
+#	print "OPTS:".Dumper $cb, +{ %OPTS };
 	return +{ %OPTS };
 }
 sub _has {
@@ -1151,7 +1584,7 @@ sub _modifier {
 #{
 #	package MooX::Pression::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.020';
+#	our $VERSION   = '0.100';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -1162,7 +1595,7 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.020';
+#	our $VERSION   = '0.100';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -1175,12 +1608,12 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.020';
+#	our $VERSION   = '0.100';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	
 #	package MooX::Pression::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.020';
+#	our $VERSION   = '0.100';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1194,7 +1627,7 @@ sub _modifier {
 #
 #	package MooX::Pression::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.020';
+#	our $VERSION   = '0.100';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1267,10 +1700,7 @@ MyApp.pm
   use warnings;
   
   package MyApp {
-    use MooX::Pression (
-      version    => 0.1,
-      authority  => 'cpan:MYPAUSEID',
-    );
+    use MooX::Pression;
     
     class Person {
       has name   ( type => Str, required => true );
@@ -1316,7 +1746,7 @@ my_script.pl
 L<MooX::Pression> is kind of like L<Moops>; a marrying together of L<Moo>
 with L<Type::Tiny> and some keyword declaration magic. Instead of being
 built on L<Kavorka>, L<Parse::Keyword>, L<Keyword::Simple> and a whole
-heap of crack, it is built on L<MooX::Press> and L<Keyword::Declare>.
+heap of crack, it is built on L<MooX::Press>, L<Keyword::Simple>, and L<PPR>.
 I'm not saying there isn't some crazy stuff going on under the hood, but
 it ought to be a little more maintainable.
 
@@ -2142,10 +2572,9 @@ anonymous method (coderef):
 Note that while C<< $anon >> is a coderef, it is still a method, and
 still expects to be passed an object as C<< $self >>.
 
-Due to limitations with L<Keyword::Declare> and L<Keyword::Simple>,
-keywords are always complete statements, so C<< method ... >> has an
-implicit semicolon before and after it. This means that this won't
-work:
+Due to limitations with L<Keyword::Simple>, keywords are always
+complete statements, so C<< method ... >> has an implicit semicolon
+before and after it. This means that this won't work:
 
   my $x = method { ... };
 
@@ -2666,8 +3095,8 @@ It is possible to make anonymous classes:
   my $object = $class->new;
 
 The C<< do { ... } >> block is necessary because of a limitation in
-L<Keyword::Declare> and L<Keyword::Simple>, where any keywords they
-define must be complete statements.
+L<Keyword::Simple>, where any keywords it defines must be complete
+statements.
 
 Anonymous classes can have methods and attributes and so on:
 
@@ -2812,9 +3241,8 @@ Anonymous parameterizable roles are possible.
 
 MooX::Pression has fewer dependencies than Moops, and crucially doesn't
 rely on L<Package::Keyword> and L<Devel::CallParser> which have... issues.
-MooX::Pression uses Damian Conway's excellent L<Keyword::Declare>
-(which in turn uses L<PPR>) to handle most parsing needs, so parsing should
-be more predictable.
+MooX::Pression uses Damian Conway's excellent L<PPR> to handle most parsing
+needs, so parsing should be more predictable.
 
 Moops is faster though.
 

@@ -14,7 +14,7 @@ use Test::Smoke::Util::FindHelpers 'whereis';
 
 my %df_rsync = (
     rsync => 'rsync',
-    source => 'perl5.git.perl.org::perl-current',
+    source => 'github.com/Perl::perl-current',
     opts   => '-az --delete',
     ddir   => File::Spec->canonpath(
         File::Spec->rel2abs('perl-current', abs_path(cwd()))

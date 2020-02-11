@@ -73,8 +73,6 @@
     + Copyright
     + Filenames
   * Optimize:
-    + Map matches, and skip repeatedly scanning parts already identified
-    + First scan for well-formed grants using prefix + name + postfix patterns
     + Support detection reversion, and first scan for grants then licenses - reverting embedded grants
   * Test against challenging projects
     + ghostpdl
@@ -85,3 +83,23 @@
 
   * Maybe use libdata-binary-perl
   * Maybe use Text::Locus to track (and emit in verbose/debug mode) where patterns are detected?
+
+  * Quality flagging
+    + ambiguous: license ref pointing to multiple license fulltexts (e.g. "MIT" or "GNU" or "GPL"
+    + unlicensed: copyright holder(s) but no licensing
+    + ungranted: license fullref requiring explicit grant, but no corresponding license grant
+    + incomplete: fractions of license fullref, but no complete fullref
+    + alien: license label but no license name
+    + unowned: license but no copyright holder
+    + uncertain: license ref and more unknown text in same sentence/paragraph/section
+    + buried: license or copyright not at top of file
+    + unstructured: license/copyright not at ideal place of data structure
+      (e.g. in commend field of EXIF data, or in content or comment of html)
+    + unaligned: license/copyright out of sync between layers of structure
+      (e.g. ICC data and EXIF data of PNG, or content and metadata of PDF/HTML)
+    + imperfect: license ref not following format documented in license fulltext
+    + conflict: incompatible licenses (e.g. GPL-3+ and GPL-2-only, or OpenSSL and GPL)
+
+  * use nano-style configurable wordchars/punct/brackets/matchbrackets chars and quotestr regex
+    e.g. to determine sentences
+    (see "paragraphs" and "justify" in "man nanorc")

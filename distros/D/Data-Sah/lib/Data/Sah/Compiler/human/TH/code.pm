@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH::code;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -39,7 +39,7 @@ Data::Sah::Compiler::human::TH::code - perl's type handler for type "code"
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Compiler::human::TH::code (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Compiler::human::TH::code (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =for Pod::Coverage ^(clause_.+|superclause_.+)$
 

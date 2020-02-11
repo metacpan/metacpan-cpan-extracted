@@ -1,0 +1,122 @@
+#!/usr/bin/env perl
+
+use 5.008001;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.001';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ dump! strict! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+require version::regex;
+
+no warnings qw{ once };
+my $re = $opt{strict} ? $version::regex::STRICT : $version::regex::LAX;
+use warnings qw{ once };
+
+if ( $opt{dump} ) {
+    require Data::Dumper;
+    print Data::Dumper::Dumper( $re );
+} else {
+    local $_ = "$re"; 	# serialize
+    s/ \s* undef \s* [|] \s* / /smx;
+    s/ \? \^ : /?-x:/smxg;
+    s/ \? \^ x: /?x:/smxg;
+    s/ \? : /?-x:/smxg;
+    chomp;
+    my $rigor = $opt{strict} ? 'STRICT' : 'LAX';
+    print <<"EOD";
+# The following cribbed shamelessly from version::regex $version::regex::VERSION,
+# after being munged to suit by tools/version_regex $VERSION.
+# This technical debt is incurred to avoid having to require a version
+# of the version module large enough to export the is_lax() subroutine.
+use constant ${rigor}_VERSION\t=> qr/$_/;
+EOD
+}
+
+__END__
+
+=head1 TITLE
+
+version_regex - Lift and mung version::regex regexen
+
+=head1 SYNOPSIS
+
+ version_regex
+ version_regex -help
+ version_regex -version
+
+=head1 OPTIONS
+
+=head2 -dump
+
+If this Boolean option is asserted, the output is a
+L<Data::Dumper|Data::Dumper> dump of the regexp.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -strict
+
+If this Boolean option is asserted, the output is constant
+C<STRICT__VERSION> rather than C<LAX_VERSION>, and is based on
+C<$version::regex::STRICT>.
+
+The default is C<-nostrict>
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This B<unsupported> Perl script loads C<version::regex>,
+serializes C<$version::regex::LAX>, modifies it to suit, and generates
+code to include it into
+L<Test2::Tools::LoadModule|Test2::Tools::LoadModule>.
+
+B<Caveat:> C<version::regex> is undocumented, and does not come with
+older versions of L<version|version>. So this script represents major
+mucking around with the internals of another module. Be warned.
+
+The only modification needed to the underlying regex is to remove the
+leading C< undef | >. But under any modern Perl, serialization
+introduces the notation C<'(?^:...)>, which requires at least Perl
+5.13.6. Because C</x> is the only modifier used, I was able to
+
+    s/ \? \^ : /?-x:/smxg;
+    s/ \? \^ x: /?x:/smxg;
+    s/ \? : /?-x:/smxg;
+
+to get the intended effect.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

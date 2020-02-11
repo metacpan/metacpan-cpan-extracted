@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::signal;
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{_=>undef,summary=>"Unix signal name (e.g. TERM or KILL) or number (9 or 15)","x.examples"=>["HUP","INT","QUIT","ILL","ABRT","FPE","KILL","SEGV","PIPE","ALRM","TERM","USR1","USR2","CHLD","CONT","STOP","TSTP","TTIN","TTOU",1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 o
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
+This document describes version 0.010 of Sah::SchemaR::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

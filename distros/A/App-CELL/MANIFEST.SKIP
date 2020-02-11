@@ -76,6 +76,9 @@
 \bOBS_PROJECT$
 \bVERSION_MODULE$
 
+# Avoid the example directory
+\bexample/
+
 # Avoid perlcritic, travis config files
 \B\.perlcriticrc\b
 \B\.travis.yml\b

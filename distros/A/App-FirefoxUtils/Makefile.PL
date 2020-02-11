@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
+    "App::BrowserUtils" => 0,
     "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
     "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -33,7 +34,6 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.820",
-    "Proc::Find" => "0.051",
     "Sah::Schema::true" => 0,
     "Sah::Schema::unix::local_uid" => 0,
     "strict" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +53,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::BrowserUtils" => 0,
   "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" => 0,
   "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -64,7 +65,6 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.820",
-  "Proc::Find" => "0.051",
   "Sah::Schema::true" => 0,
   "Sah::Schema::unix::local_uid" => 0,
   "Test::More" => 0,

@@ -1,9 +1,15 @@
 use alienfile;
+use Config;
+use Env qw( @PKG_CONFIG_PATH @PKG_CONFIG_LIBDIR );
+use Path::Tiny ();
 
 configure {
-  requires 'Alien::Build' => '1.74';
-  requires 'Alien::Build::Plugin::Decode::Mojo';
+  requires 'Path::Tiny'
 };
+
+if(defined $ENV{OPENSSL_PREFIX} && -d "$ENV{OPENSSL_PREFIX}/lib/pkgconfig") {
+  unshift @PKG_CONFIG_PATH, "$ENV{OPENSSL_PREFIX}/lib/pkgconfig";
+}
 
 if($^O eq 'darwin' && ! -d '/usr/include/openssl')
 {
@@ -14,13 +20,73 @@ if($^O eq 'darwin' && ! -d '/usr/include/openssl')
   # why ship the .pc file?  We set PKG_CONFIG_LIBDIR to just the
   # to skip /usr/lib/pkgconfig, unless the user has specified it.
   # (presumably if they have set it, they have done so for a reason).
-  $ENV{PKG_CONFIG_LIBDIR} ||= join ':', qw(
-    /usr/local/lib/pkgconfig
-    /usr/local/share/pkgconfig
-  );
+  unless(defined $ENV{PKG_CONFIG_LIBDIR}) {
+    @PKG_CONFIG_LIBDIR = qw(
+      /usr/local/lib/pkgconfig
+      /usr/local/share/pkgconfig
+    )
+  }
+
+  if( -d '/usr/local/Cellar/libressl')
+  {
+    require File::Glob;
+    my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/libressl/*/lib/pkgconfig');
+    push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  if( -d '/usr/local/Cellar/openssl')
+  {
+    require File::Glob;
+    my($dir) = File::Glob::bsd_glob('/usr/local/Cellar/openssl/*/lib/pkgconfig');
+    push @PKG_CONFIG_LIBDIR, $dir;
+  }
+
+  log "overidding PKG_CONFIG_LIBDIR on macOS: $ENV{PKG_CONFIG_LIBDIR}";
 }
 
-plugin 'PkgConfig' => 'openssl';
+if($^O eq 'MSWin32' && $Config{myuname} =~ /strawberry-?perl 5\.([0-9]+)\./ && $1 < 20)
+{
+  my $libdir = Path::Tiny->new($^X)->parent->parent->parent->child('c/lib');
+  # older versions of Straberry didn't have a working pkg-config
+  plugin 'Probe::CBuilder' => (
+    libs    => $_,
+    version => qr/version = \|(.*?)\|/,
+    program => <<'EOF',
+#include <stdio.h>
+#include <openssl/crypto.h>
+int main()
+{
+  const char *version;
+#ifdef OPENSSL_VERSION
+  version = OpenSSL_version(OPENSSL_VERSION);
+#else
+  version = SSLeay_version(SSLEAY_VERSION);
+#endif
+  printf("version = |%s|\n", version);
+  return 0;
+}
+EOF
+  ) for (
+    '-leay32 -lssl32',
+    '-lssl -lcrypto',
+    '-lcrypto -lssl',
+    "-L$libdir -leay32 -lssl32",
+    "-L$libdir -lssl -lcrypto",
+    "-L$libdir -lcrypto -lssl",
+  );
+
+  meta->after_hook(gather_system => sub {
+    my $build = shift;
+    if($build->runtime_prop->{version} =~ /^(open|libre)ssl (\S+)/i)
+    {
+      $build->runtime_prop->{version} = $2;
+    }
+  });
+}
+else
+{
+  plugin 'PkgConfig' => 'openssl';
+}
 
 share {
 
@@ -28,7 +94,6 @@ share {
   plugin Download => (
     version       => qr/^libressl-([0-9\.]+)\.tar\.gz$/,
     bootstrap_ssl => 1,
-    decoder       => 'Decode::Mojo',
   );
 
   unless(meta->has_hook('fetch'))
@@ -61,25 +126,12 @@ share {
 
     if(meta->prop->{platform}->{compiler_type} eq 'microsoft')
     {
-      requires 'Text::Patch';
-      requires 'Path::Tiny';
-
-      #meta->after_hook(
-      #  extract => sub {
-      #    my($build) = @_;
-      #    my($dir) = map { $_->basename } Path::Tiny->new('.')->children;
-      #    chdir $dir;
-      #    $build->system('%{perl} %{.install.patch}/libressl-2.6.2.pl');
-      #    die 'execute failed' if $?;
-      #    chdir '..';
-      #  }
-      #);
-
       gather sub {
         my($build) = @_;
         my $prefix = $build->runtime_prop->{prefix};
 
-	my @libs = grep /^[a-z]+\.lib$/, map { $_->basename } Path::Tiny->new('.')->child('lib')->children;
+        require Path::Tiny;
+        my @libs = grep /^[a-z]+\.lib$/, map { $_->basename } Path::Tiny->new('.')->child('lib')->children;
         
         $build->runtime_prop->{$_} = "-I$prefix/include " for qw( cflags cflags_static );
         $build->runtime_prop->{$_} = "-LIBPATH:$prefix/lib @libs " for qw( libs libs_static );
@@ -89,6 +141,16 @@ share {
   else
   {
     plugin 'Build::Autoconf';
+
+    if($^O eq 'darwin')
+    {
+      build [
+        '%{configure} --enable-shared --enable-static',
+        '%{make}',
+        '%{make} install',
+      ];
+
+      plugin 'Gather::IsolateDynamic';
+    }
   }
 }
-

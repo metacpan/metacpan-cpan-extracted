@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.101
+Version v3.1.102
 
 =cut
 
-our $VERSION = version->declare("v3.1.101");
+our $VERSION = version->declare("v3.1.102");
 
 =head1 DESCRIPTION
 
@@ -178,8 +178,6 @@ $RE{adobe_glyph} = {
 	'caption.alt.org.tldr'              => 'Adobe Glyph List License',
 	tags => [ 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.sentence' =>
 		'and to permit others to do the same, provided that the derived work is not represented as being a copy',
 };
@@ -286,6 +284,12 @@ $RE{afl_3} = {
 
 =item * agpl
 
+=item * agpl_1
+
+=item * agpl_2
+
+=item * agpl_3
+
 =cut
 
 $RE{agpl} = {
@@ -307,6 +311,104 @@ $RE{agpl} = {
 		"${gnu}AGPL",
 	],
 };
+
+$RE{agpl_1} = {
+	name                  => 'AGPLv1',
+	'name.alt.org.debian' => 'AGPL-1',
+	'name.alt.org.spdx'   => 'AGPL-1.0',
+	caption               => 'Affero General Public License, Version 1',
+	iri                   => 'http://www.affero.org/oagpl.html',
+	tags                  => [
+		'family:gpl',
+		'type:singleversion:agpl',
+	],
+
+	'_pat.alt.subject.name.misc.extra' => [
+		"$the?AFFERO $gpl(?: \\(AGPL\\))?,? [Vv]ersion 1(?: of the license)?",
+		"${the}AGPL(?: [Vv]ersion |[v-]? ?)1",
+	],
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"${BB}If the Program as you received it is intended to interact",
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"AFFERO GENERAL PUBLIC LICENSE${E}Version 1"
+		. ".*$F\\)$EE"
+		. "${BB}If the Program as you received it is intended to interact"
+		. "(?:.*$F$EE"
+		. "12$F [^.]* EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES$F)?",
+	'pat.alt.subject.license.scope.multisection.part.tail' =>
+		"(?:AFFERO GENERAL PUBLIC LICENSE${E}Version 1"
+		. ".*$F\\))?$EE"
+		. "${BB}If the Program as you received it is intended to interact"
+		. "$F$EE"
+		. "12$F [^.]* EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES$F",
+};
+
+$RE{agpl_2} = {
+	name                  => 'AGPLv2',
+	'name.alt.org.debian' => 'AGPL-2',
+	caption               => 'Affero General Public License, Version 2',
+	iri                   => 'http://www.affero.org/agpl2.html',
+	tags                  => [
+		'family:gpl',
+		'type:singleversion:agpl'
+	],
+
+	'_pat.alt.subject.name.misc.extra' => [
+		"$the?AFFERO $gpl(?: \\(AGPL\\))?,? [Vv]ersion 2(?: of the license)?",
+		"${the}AGPL(?: [Vv]ersion |[v-]? ?)2",
+	],
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"This is version 2 of the Affero General Public License$F",
+};
+
+$RE{agpl_3} = {
+	name                           => 'AGPLv3',
+	'name.alt.org.debian'          => 'AGPL-3',
+	'name.alt.org.gnu'             => 'AGPLv3.0',
+	'name.alt.org.osi'             => 'AGPL-3.0',
+	'name.alt.org.spdx'            => 'AGPL-3.0',
+	'name.alt.org.tldr.path.short' => 'agpl3',
+	caption => 'GNU Affero General Public License, Version 3',
+	'caption.alt.org.gnu' =>
+		'GNU Affero General Public License (AGPL) version 3',
+	'caption.alt.org.trove' => 'GNU Affero General Public License v3',
+	'caption.alt.org.tldr' =>
+		'GNU Affero General Public License v3 (AGPL-3.0)',
+	iri                  => 'https://www.gnu.org/licenses/agpl',
+	'iri.alt.format.txt' => 'https://www.gnu.org/licenses/agpl.txt',
+	'iri.alt.path.fragmented' =>
+		'https://www.gnu.org/licenses/licenses.html#AGPL',
+	'iri.alt.path.versioned' => 'http://www.gnu.org/licenses/agpl-3.0.html',
+	tags                     => [
+		'family:gpl',
+		'type:singleversion:agpl'
+	],
+
+	'_pat.alt.subject.name.misc.extra' => [
+		"$the?$gnu?AFFERO $gpl(?: \\(AGPL\\))?$by_fsf?,? [Vv]ersion 3(?: of the license)?",
+		"(?:$the$gnu?|$gnu)AGPL(?: [Vv]ersion |[v-]? ?)3",
+	],
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		"${Q}This License$Q refers to version 3 of the GNU Affero",
+	'pat.alt.subject.license.scope.multisection.part.head' =>
+		"GNU AFFERO GENERAL PUBLIC LICENSE${E}Version 3"
+		. ".*$F\\)$EE"
+		. "${Q}This License$Q refers to version 3 of the GNU Affero"
+		. "(?:.*$F$EE"
+		. "If the disclaimer .* unless a warranty or assumption of liability accompanies a copy of the Program in return for a fee$F"
+		. "(?:(?:${EE}END OF TERMS AND CONDITIONS)?"
+		. ".* and how to apply and follow the GNU AGPL, see \\S+$F)?)?",
+	'pat.alt.subject.license.scope.multisection.part.tail' =>
+		"(?:GNU AFFERO GENERAL PUBLIC LICENSE${E}Version 3"
+		. ".*$F\\))?$EE"
+		. "${Q}This License$Q refers to version 3 of the GNU Affero"
+		. ".*$F$EE"
+		. "If the disclaimer .* unless a warranty or assumption of liability accompanies a copy of the Program in return for a fee$F"
+		. "(?:(?:${EE}END OF TERMS AND CONDITIONS)?"
+		. ".* and how to apply and follow the GNU AGPL, see \\S+$F)?",
+};
+
+#FIXME $RE{agpl_3}{_pat_word} = '(?:AGPL|agpl)${D}?3';
 
 =item * aladdin
 
@@ -372,8 +474,6 @@ $RE{apache} = {
 	'caption.alt.misc.british'  => 'Apache Licence',
 	iri  => 'https://www.apache.org/licenses/LICENSE-2.0',
 	tags => ['type:versioned:decimal'],
-
-	'.default_pat' => 'name',
 
 # FIXME
 	'pat.alt.subject.name' => "$the?Apache(?: Software)? Licen[cs]e",
@@ -595,8 +695,6 @@ END
 	iri  => 'http://www.hboehm.info/gc/license.txt',
 	tags => [ 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.paragraph' =>
 		"$P{perm_granted} $P{to_copy} $P{this_prg} $P{any_purpose}, $P{retain_notices_all}$F$E$P{perm} $P{to_dist_mod} $P{granted}, $P{retain_notices}, and $P{note_mod} with $P{copr}$F",
 };
@@ -610,7 +708,7 @@ $RE{bdwgc_matlab} = {
 	description => <<'END',
 Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
 END
-	tags => [ 'type:versioned:decimal', 'license:is:grant' ],
+	tags => [ 'type:unversioned', 'license:is:grant' ],
 
 	'pat.alt.subject.license.scope.paragraph' =>
 		"$P{perm_granted} $P{to_copy} $P{this_prg} $P{any_purpose}, $P{retain_notices_all}$F$E$P{repro_code_cite_authors_copr}, and $Q$P{used_perm}$F$Q$E$P{repro_matlab_cite_authors}$F$E$P{perm} $P{to_dist_mod} $P{granted}, $P{retain_notices}, and $P{note_mod} with $P{copr}$F$E$P{retain_you_avail_orig}$F",
@@ -1336,7 +1434,7 @@ $RE{cc_cc0_1} = {
 	iri => 'https://creativecommons.org/publicdomain/zero/1.0/',
 	'iri.alt.org.wikipedia' =>
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
-	tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
+	tags => [ 'cc', 'family:cc', 'type:singleversion:cc_cc0' ],
 
 	'pat.alt.subject.grant.scope.line.scope.sentence' =>
 		'has waived all copyright and related or neighboring rights',
@@ -1539,7 +1637,47 @@ $RE{cecill_1_1} = {
 
 	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}1\.1",
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
-		'Version 1\.1 of 10/26/2004',
+		'Version 1\.1 of 10\/26\/2004',
+	'pat.alt.subject.license.scope.sentence.part.1_initial_sw(en)' =>
+		'for the first time '
+		. 'under the terms and conditions of the Agreement',
+	'pat.alt.subject.license.scope.sentence.part.2(en)' =>
+		'Agreement is to grant users the right '
+		. 'to modify and redistribute the software governed',
+	'pat.alt.subject.license.scope.sentence.part.5_3(en)' =>
+		'redistribute copies '
+		. 'of the modified or unmodified Software to third parties ',
+	'pat.alt.subject.license.scope.sentence.part.5_3_2(en)' =>
+		'to all the provisions hereof',
+	'pat.alt.subject.license.scope.sentence.part.5_3_3(en)' =>
+		'may be distributed under a separate Licensing Agreement',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.5_3_4(en)' =>
+		'is subject to the provisions of the GPL License',
+	'pat.alt.subject.license.scope.sentence.part.6_1_1(en)' =>
+		'compliance with the terms and conditions '
+		. 'under which the Holder has elected to distribute its work '
+		. 'and no one shall be entitled to and',
+	'pat.alt.subject.license.scope.sentence.part.6_1_2(en)' =>
+		'the Agreement, for the duration',
+	'pat.alt.subject.license.scope.sentence.part.7_2(en)' =>
+		'shall be subject to a separate',
+	'pat.alt.subject.license.scope.line.scope.sentence.part.8_1(en)' =>
+		'(?:Subject to the provisions of Article 8\.2, should'
+		. '|subject to providing evidence of it)',
+	'pat.alt.subject.license.scope.sentence.part.10_2(en)' =>
+		'all licenses that it may have granted '
+		. 'prior to termination of the Agreement '
+		. 'shall remain valid subject to their',
+	'pat.alt.subject.license.scope.sentence.part.12_3(en)' =>
+		'Any or all Software distributed '
+		. 'under a given version of the Agreement '
+		. 'may only be subsequently distributed '
+		. 'under the same version of the Agreement, '
+		. 'or a subsequent version, '
+		. 'subject to the provisions of article',
+	'pat.alt.subject.license.scope.paragraph.part.13_1(en)' =>
+		"The Agreement is governed by French law$F "
+		. 'The Parties agree to endeavor to settle',
 };
 
 $RE{cecill_2} = {
@@ -1565,6 +1703,8 @@ $RE{cecill_2} = {
 		"Version 2\\.0 dated 2006${D}09${D}05",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
 		"Version 2\\.0 du 2006${D}09${D}05",
+	'pat.alt.subject.license.scope.line.scope.sentence.part.gpl' =>
+		'subject to the provisions of one of the versions of the GNU GPL, and',
 };
 
 $RE{cecill_2_1} = {
@@ -1594,6 +1734,8 @@ $RE{cecill_2_1} = {
 		"Version 2\\.1 dated 2013${D}06${D}21",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
 		"Version 2\\.1 du 2013${D}06${D}21",
+	'pat.alt.subject.license.scope.line.scope.sentence.part.gpl' =>
+		'subject to the provisions of one of the versions of the GNU GPL, GNU',
 };
 
 =item * cecill_b
@@ -1810,8 +1952,6 @@ $RE{dsdp} = {
 	'caption.alt.org.fedora.web.mit' => 'PetSC variant',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
 		'This program discloses material protectable',
 	'pat.alt.subject.license.scope.paragraph' =>
@@ -2021,8 +2161,6 @@ $RE{gpl} = {
 	'caption.alt.misc.british'     => 'GNU General Public Licence',
 	tags                           => ['type:versioned:decimal'],
 
-	'.default_pat' => 'name',
-
 	'_pat.alt.subject.name' => [
 		"$the?$gnu?$gpl(?: \\(GPL\\))?$by_fsf?",
 		"$the$gnu?GPL",
@@ -2063,8 +2201,6 @@ $RE{icu} = {
 	caption                          => 'ICU License',
 	'caption.alt.org.fedora.web.mit' => 'Modern style (ICU Variant)',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
-
-	'.default_pat' => 'license',
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{note_copr_perm} of the Software and that $P{repro_copr_perm_appear_doc}$F$EE$P{asis_sw_warranty}(?:[^.]+$F$E){2}$P{nopromo_except}",
@@ -2168,8 +2304,6 @@ $RE{lgpl} = {
 	'caption.alt.misc.british' => 'GNU Lesser General Public Licence',
 	tags                       => ['type:versioned:decimal'],
 
-	'.default_pat' => 'name',
-
 	'_pat.alt.subject.name' => [
 		"$the?$gnu?Library $gpl(?: \\(LGPL\\))?$by_fsf?",
 		"$the?$gnu?Lesser(?: \\(Library\\))? $gpl(?: \\(LGPL\\))?$by_fsf?",
@@ -2193,7 +2327,7 @@ $RE{lgpl_bdwgc} = {
 	description => <<'END',
 Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
 END
-	tags => ['type:versioned:decimal'],
+	tags => ['type:unversioned'],
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{perm_granted} $P{to_copy} $P{this_prg} under the terms of $the${gnu}LGPL, $P{retain_copr_avail_orig}$F$EE$P{repro_code_modcode_cite_copr_avail_note}, and $Q$P{used_perm}$F$Q$E$P{perm} $P{to_dist_mod} $P{granted}, $P{retain_copr_avail_note}, and $P{note_mod}$F",
@@ -2269,8 +2403,6 @@ SPDX and fedora sample seem not generic but the unique file COPYING from project
 END
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.sentence' =>
 		"Permission $P{to_dist} $P{sw_doc} $P{any_purpose} and $P{nofee} $P{granted}, $P{retain_copr_appear} and that $P{repro_copr_perm_appear_doc}, and that $P{nopromo_name_written}$F",
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
@@ -2292,8 +2424,6 @@ Identical to MIT-CMU, except...
 END
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.sentence' =>
 		"Permission $P{to_dist} $P{sw_doc} $P{any_purpose} and $P{nofee} $P{granted}, $P{retain_copr_appear} and that $P{repro_copr_perm_warr_appear_doc}, and that $P{nopromo_name_written_prior}$F",
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
@@ -2312,8 +2442,6 @@ $RE{mit_enna} = {
 	'caption.alt.org.fedora.web.mit'    => 'enna variant',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.section' =>
 		"$P{perm_granted}, $P{free_charge}, $P{to_pers} $P{the_sw}, $P{to_deal_the_sw_rights} $P{to_mod_sublic} $P{sw}, and $P{to_perm_pers}, $P{subj_cond}:?$E$P{retain_copr_perm_sw_copr}$F$E$P{ack_pub_use_nosrc}$F${E}This includes acknowledgments in either Copyright notices, Manuals, Publicity and Marketing documents or any documentation provided with any product containing this software$F$E$P{license_not_lib}$F",
 	'pat.alt.subject.license.scope.line' => $P{ack_pub_use_nosrc},
@@ -2330,8 +2458,6 @@ $RE{mit_feh} = {
 	caption                             => 'feh License',
 	'caption.alt.org.fedora.web.mit'    => 'feh variant',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
-
-	'.default_pat' => 'license',
 
 	'pat.alt.subject.license.scope.paragraph' =>
 		"$P{perm_granted}, $P{free_charge}, $P{to_pers} $P{the_sw}, $P{to_deal_the_sw_rights} $P{to_mod_sublic} $P{sw}, and $P{to_perm_pers}, $P{subj_cond}:?$E$P{retain_copr_perm_sw_doc} and $P{ack_doc_pkg_use}$F",
@@ -2358,8 +2484,6 @@ $RE{mit_new} = {
 	iri                     => 'http://www.jclark.com/xml/copying.txt',
 	'iri.alt.org.wikipedia' => 'https://en.wikipedia.org/wiki/MIT_License',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
-
-	'.default_pat' => 'license',
 
 	'pat.alt.subject.license.scope.sentence' =>
 		"$P{to_mod_sublic} $P{sw}\\b[^.]+\\s+$P{retain_copr_perm_subst}",
@@ -2405,8 +2529,6 @@ Origin: Possibly by Jamie Zawinski in 1993 for xscreensaver.
 END
 	tags => [ 'mit', 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.line.scope.paragraph' =>
 		"documentation$F${E}No representations are made",
 };
@@ -2421,8 +2543,6 @@ $RE{mit_oldstyle_disclaimer} = {
 	'caption.alt.org.fedora.web.mit' => 'Old Style with legal disclaimer',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
 
-	'.default_pat' => 'license',
-
 	'pat.alt.subject.license.scope.multisection' =>
 		"supporting documentation$F$EE$P{asis_name_sw}",
 };
@@ -2436,8 +2556,6 @@ $RE{mit_oldstyle_permission} = {
 	'caption.alt.org.fedora.web.mit' =>
 		'Old Style (no advertising without permission)',
 	tags => [ 'family:mit', 'type:unversioned', 'license:is:grant' ],
-
-	'.default_pat' => 'license',
 
 	'pat.alt.subject.license.scope.multisection' =>
 		"$P{without_written_prior}$F$EE$P{asis_name_sw}",
@@ -3021,6 +3139,69 @@ $RE{zlib_acknowledgement} = {
 		"$P{origin_sw_no_misrepresent}; $P{you_not_claim_wrote}$F$E$P{use_ack_req}$F${EE}Portions Copyright \\S+ $ND+ Charlie Poole or Copyright \\S+ $ND+ James W\\. Newkirk, Michael C\\. Two, Alexei A\\. Vorontsov or Copyright \\S+ $ND+ Philip A\\. Craig$EE$P{altered_srcver_mark}$F$EE$P{notice_no_alter}",
 };
 
+=item * zpl
+
+=item * zpl_1
+
+=item * zpl_1_1
+
+=item * zpl_2
+
+=item * zpl_2_1
+
+=cut
+
+$RE{zpl} = {
+	name                        => 'ZPL',
+	'name.alt.org.wikidata'     => 'Q3780982',
+	'name.alt.org.wikipedia'    => 'Zope_Public_License',
+	caption                     => 'Zope Public License',
+	'caption.alt.org.wikipedia' => 'Zope Public License',
+	tags                        => ['type:versioned:decimal'],
+};
+
+$RE{zpl_1} = {
+	name                     => 'ZPL-1.0',
+	'name.alt.org.fsf'       => 'ZopePLv1.0',
+	caption                  => 'Zope Public License (ZPL) Version 1.0',
+	'caption.alt.misc.plain' => 'Zope Public License 1.0',
+	'caption.alt.org.trove.synth.nogrant' => 'Zope Public License',
+	'iri.alt.archive.20000816090640' => 'http://www.zope.org/Resources/ZPL',
+	tags                             => ['type:singleversion:zpl'],
+};
+
+$RE{zpl_1_1} = {
+	name                => 'ZPL-1.1',
+	'name.alt.org.spdx' => 'ZPL-1.1',
+	caption             => 'Zope Public License 1.1',
+	tags                => ['type:singleversion:zpl'],
+};
+
+$RE{zpl_2} = {
+	name                           => 'ZPL-2.0',
+	'name.alt.org.osi'             => 'ZPL-2.0',
+	'name.alt.org.spdx'            => 'ZPL-2.0',
+	'name.alt.org.tldr.path.short' => 'zpl-2.0',
+	caption                        => 'Zope Public License 2.0',
+	'caption.alt.org.osi'          => 'The Zope Public License Ver.2.0',
+	'caption.alt.org.tldr'         => 'Zope Public License 2.0 (ZPL-2.0)',
+	iri  => 'http://old.zope.org/Resources/License/ZPL-1.1',
+	tags => ['type:singleversion:zpl'],
+
+	'pat.alt.subject.license.scope.sentence' =>
+		'The name Zope Corporation \(tm\) must not be used to endorse',
+};
+
+$RE{zpl_2_1} = {
+	name                  => 'ZPL-2.1',
+	'name.alt.org.fsf'    => 'ZPL-2.1',
+	'name.alt.org.spdx'   => 'ZPL-2.1',
+	caption               => 'Zope Public License 2.1',
+	'caption.alt.org.fsf' => 'Zope Public License Version 2.1',
+	iri                   => 'http://old.zope.org/Resources/ZPL/',
+	tags                  => ['type:singleversion:zpl'],
+};
+
 =back
 
 =head2 Licensing traits
@@ -3124,7 +3305,7 @@ $RE{'fsf_unlimited_retention'} = {
 
 $RE{license_label} = {
 	caption => 'license grant "License:" phrase',
-	tags    => ['type:trait'],
+	tags    => ['type:trait:grant:prefix'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		"(?P<_license_label>[Ll]icen[sc]e|[Ii]dentifier)$CQ",
@@ -3136,7 +3317,7 @@ $RE{license_label} = {
 
 $RE{license_label_trove} = {
 	caption => 'license grant "License:" phrase',
-	tags    => ['type:trait'],
+	tags    => ['type:trait:grant:prefix'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		'(?P<_license_label_trove>License(?: ::)? OSI Approved(?: ::)?)',
@@ -3148,12 +3329,12 @@ $RE{license_label_trove} = {
 
 $RE{licensed_under} = {
 	caption => 'license grant "licensed under" phrase',
-	tags    => ['type:trait'],
+	tags    => ['type:trait:grant:prefix'],
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		'(?P<_licensed_under>'
 		. '(?:(?:[Ll]icen[sc]ed(?: for use)?|[Dd]istribut(?:able|ed)|[Ff]or distribution|permitted|provided|[Pp]ublished|[Rr]eleased) under'
-		. '|[Ll]icen[sc]ed using'
+		. '|[Ll]icen[sc]ed using|is subject to the provisions of'
 		. '|(?:in form of source code|may be copied|placed their code|to [Yy]ou) under'
 		. '|(?:[Tt]his|[Mm]y) (?:software|file|work) is under' # vague: object required
 		. '|(?:are|is) release under'    # vague: object required
@@ -3836,7 +4017,7 @@ for my $id (@_OBJECTS) {
 		my $subjects
 			= $args{subject}
 			? [ split( /,/, $args{subject} ) ]
-			: [ $RE{$id}{'.default_pat'} || @pat_subject ];
+			: [@pat_subject];
 
 		my $pat = _join_pats( map { $RE{$id}{"pat.alt.subject.$_"} }
 				@{$subjects} );
@@ -3885,7 +4066,7 @@ for my $id (@_OBJECTS) {
 	$RE{$id}{'gen_args'}{subject} = {
 		summary => 'Choose subject (or several, comma-separated)',
 		schema  => [ 'str*', in => [@pat_subject] ],
-		default => $RE{$id}{'.default_pat'} || join ',', @pat_subject,
+		default => join ',', @pat_subject,
 		req     => 1,
 	};
 

@@ -25,21 +25,13 @@ contact the author.
 
 # METHODS
 
-# SUPPORT
-
-Bugs should be reported via the CPAN bug tracker.
-
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Portable-Dist](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Portable-Dist)
-
-For other issues, or commercial support, contact the author.
-
 # AUTHOR
 
 Adam Kennedy <adamk@cpan.org>
 
 # SEE ALSO
 
-[Portable](https://metacpan.org/pod/Portable), [http://win32.perl.org/](http://win32.perl.org/), [http://strawberryperl.com/](http://strawberryperl.com/)
+[Portable](https://metacpan.org/pod/Portable), [http://strawberryperl.com/](http://strawberryperl.com/)
 
 # COPYRIGHT
 

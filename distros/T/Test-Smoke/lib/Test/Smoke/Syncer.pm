@@ -27,7 +27,7 @@ my %CONFIG = (
 # these settings have to do synctype==rsync
     df_rsync    => 'rsync', # you might want a path there
     df_opts     => '-az --delete',
-    df_source   => 'perl5.git.perl.org::perl-current',
+    df_source   => 'github.com/Perl::perl-current',
 
     rsync       => {
         allowed  => [qw(rsync source opts)],
@@ -37,7 +37,7 @@ my %CONFIG = (
 
 # these settings have to do with synctype==snapshot
     df_ftp      => 'Net::FTP',
-    df_server   => 'perl5.git.perl.org',
+    df_server   => 'github.com/Perl',
     df_sdir     => '/pub/apc/perl-current-snap',
     df_sfile    => '',
     df_snapext  => 'tar.gz',
@@ -46,7 +46,7 @@ my %CONFIG = (
         'Archive::Tar' : 'gzip -d -c %s | tar xf -' ),
 
     df_patchup  => 0,
-    df_pserver  => 'perl5.git.perl.org',
+    df_pserver  => 'github.com/Perl',
     df_pdir     => '/pub/apc/perl-current-diffs',
     df_ftpusr   => 'anonymous',
     df_ftppwd   => 'smokers@perl.org',
@@ -106,7 +106,7 @@ my %CONFIG = (
 
 # synctype: git
     df_gitbin        => 'git',
-    df_gitorigin     => 'git://perl5.git.perl.org/perl.git',
+    df_gitorigin     => 'git://github.com/Perl/perl5.git',
     df_gitdir        => undef,
     df_gitdfbranch   => 'blead',
     df_gitbranchfile => undef,

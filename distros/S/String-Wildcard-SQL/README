@@ -1,26 +1,53 @@
-SYNOPSIS
+NAME
+    String::Wildcard::SQL - SQL wildcard string routines
 
+VERSION
+    This document describes version 0.030 of String::Wildcard::SQL (from
+    Perl distribution String-Wildcard-SQL), released on 2020-02-09.
+
+SYNOPSIS
         use String::Wildcard::SQL qw(contains_wildcard);
-    
+
         say 1 if contains_wildcard(""));      # -> 0
         say 1 if contains_wildcard("ab%"));   # -> 1
         say 1 if contains_wildcard("ab\\%")); # -> 0
 
 DESCRIPTION
-
+VARIABLES
+  $RE_WILDCARD_SQL
 FUNCTIONS
+  contains_wildcard($str[, $variant]) => bool
+    Return true if $str contains wildcard pattern. Wildcard patterns include
+    "%" (meaning zero or more characters) and "_" (exactly one character).
 
- contains_wildcard($str[, $variant]) => bool
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/String-Wildcard-SQL>.
 
-    Return true if $str contains wildcard pattern. Wildcard patterns
-    include % (meaning zero or more characters) and _ (exactly one
-    character).
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-String-Wildcard-SQL>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-SQL>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Regexp::Wildcards to convert a string with wildcard pattern to
     equivalent regexp pattern. Can handle Unix wildcards as well as SQL and
     DOS/Win32.
 
-    Other String::Wildcard::* modules.
+    Other "String::Wildcard::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

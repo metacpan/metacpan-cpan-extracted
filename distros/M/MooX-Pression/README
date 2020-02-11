@@ -9,10 +9,7 @@ SYNOPSIS
       use warnings;
   
       package MyApp {
-        use MooX::Pression (
-          version    => 0.1,
-          authority  => 'cpan:MYPAUSEID',
-        );
+        use MooX::Pression;
     
         class Person {
           has name   ( type => Str, required => true );
@@ -57,8 +54,8 @@ DESCRIPTION
     MooX::Pression is kind of like Moops; a marrying together of Moo with
     Type::Tiny and some keyword declaration magic. Instead of being built on
     Kavorka, Parse::Keyword, Keyword::Simple and a whole heap of crack, it is
-    built on MooX::Press and Keyword::Declare. I'm not saying there isn't some
-    crazy stuff going on under the hood, but it ought to be a little more
+    built on MooX::Press, Keyword::Simple, and PPR. I'm not saying there isn't
+    some crazy stuff going on under the hood, but it ought to be a little more
     maintainable.
 
     Some of the insane features of Moops have been dialled back, and others
@@ -863,9 +860,9 @@ DESCRIPTION
     Note that while $anon is a coderef, it is still a method, and still
     expects to be passed an object as $self.
 
-    Due to limitations with Keyword::Declare and Keyword::Simple, keywords are
-    always complete statements, so `method ...` has an implicit semicolon
-    before and after it. This means that this won't work:
+    Due to limitations with Keyword::Simple, keywords are always complete
+    statements, so `method ...` has an implicit semicolon before and after it.
+    This means that this won't work:
 
       my $x = method { ... };
 
@@ -1369,8 +1366,8 @@ DESCRIPTION
       my $object = $class->new;
 
     The `do { ... }` block is necessary because of a limitation in
-    Keyword::Declare and Keyword::Simple, where any keywords they define must
-    be complete statements.
+    Keyword::Simple, where any keywords it defines must be complete
+    statements.
 
     Anonymous classes can have methods and attributes and so on:
 
@@ -1509,9 +1506,8 @@ DESCRIPTION
   MooX::Pression vs Moops
     MooX::Pression has fewer dependencies than Moops, and crucially doesn't
     rely on Package::Keyword and Devel::CallParser which have... issues.
-    MooX::Pression uses Damian Conway's excellent Keyword::Declare (which in
-    turn uses PPR) to handle most parsing needs, so parsing should be more
-    predictable.
+    MooX::Pression uses Damian Conway's excellent PPR to handle most parsing
+    needs, so parsing should be more predictable.
 
     Moops is faster though.
 

@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "App::BrowserUtils" : "0",
             "Data::Sah::Coerce::perl::To_int::From_int::check_uid_exists" : "0",
             "Data::Sah::Coerce::perl::To_int::From_str::convert_unix_user_to_uid" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
@@ -41,7 +42,6 @@
             "Log::ger" : "0.027",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.820",
-            "Proc::Find" : "0.051",
             "Sah::Schema::true" : "0",
             "Sah::Schema::unix::local_uid" : "0",
             "perl" : "5.010001",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxUtils"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

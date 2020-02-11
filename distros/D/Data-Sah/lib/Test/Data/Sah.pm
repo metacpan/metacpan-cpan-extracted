@@ -2,8 +2,8 @@
 
 package Test::Data::Sah;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -228,7 +228,7 @@ sub run_spectest {
     }
 
     {
-        for my $file (grep {/^10-type-/} @specfiles) {
+        for my $file (grep {/^10-type-/ || /^20-clause-(prefilters)/} @specfiles) {
             unless (!@files || grep { $_ eq $file } @files) {
                 diag "Skipping file $file";
                 next;
@@ -317,7 +317,7 @@ Test::Data::Sah - Test routines for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.904 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Test::Data::Sah (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =head1 FUNCTIONS
 

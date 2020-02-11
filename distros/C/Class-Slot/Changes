@@ -1,3 +1,11 @@
+0.09 2020-02-10
+-bugfix: run-time loading of module triggering first import of Class::Slot could
+ result in "Too late to run INIT block" warnings and fail to trigger late-binding
+ behavior
+-bugfix: source filters do not work in string evals; Class::Slot now works around
+ this by adjusting to late-binding behavior and installing 'slot' as a routine in
+ the caller
+
 0.08 2020-02-07
 -new feature: method delegation to slot types
 -bugfix: classes with no members were never initialized

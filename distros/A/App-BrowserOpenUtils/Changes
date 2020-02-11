@@ -1,9 +1,16 @@
-0.002   2019-05-28 (PERLANCAR)
+0.003   2019-12-09  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::BrowserUtils.
+
+
+0.002   2019-05-28  Released-By: PERLANCAR
 
 	- open-browser: Use Perinci::CmdLine, accept multiple URLs, add
 	  --dry-run (-n).
 
 
-0.001   2017-07-02 (PERLANCAR)
+0.001   2017-07-02  Released-By: PERLANCAR
 
         - First release.

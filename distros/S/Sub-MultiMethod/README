@@ -279,6 +279,11 @@ DESCRIPTION
     beat parent class candidates; class candidates beat role candidates; and
     the candidate that was declared earlier wins.
 
+    Method-resolution order (DFS/C3) is respected, though in Perl 5.8 under
+    very contrived conditions (calling a sub as a function when it was defined
+    as a method, but not passing a valid invocant as the first parameter), MRO
+    may not always work correctly.
+
     Note that invocants are not part of the signature, so not taken into
     account when calculating scores, but because child class candidates beat
     parent class candidates, they should mostly behave as expected.

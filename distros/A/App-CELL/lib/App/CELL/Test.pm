@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -145,10 +145,9 @@ Touch a file
 sub _touch {
     my ( $file ) = @_;
     my $now = time;
-    local (*TMP);
 
     utime ($now, $now, $file)
-                || open (TMP, ">>$file")
+                || open my $fh, ">>", $file
                 || warn ("Couldn't touch file: $!\n");
 } 
 

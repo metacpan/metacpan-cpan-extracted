@@ -1,7 +1,7 @@
-package MooseX::Types::ISO8601; # git description: v0.18-18-gbfe141b
+package MooseX::Types::ISO8601; # git description: v0.19-6-g9d4094e
 # ABSTRACT: ISO8601 date and duration string type constraints and coercions for Moose
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use strict;
 use warnings;
@@ -391,7 +391,7 @@ MooseX::Types::ISO8601 - ISO8601 date and duration string type constraints and c
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -560,7 +560,7 @@ Specifically, there are missing features:
 
 =item *
 
-No timezone support - all times are assumed UTC
+When no time-zone is specified, UTC is assumed. (Should floating timezone be used?)
 
 =item *
 
@@ -612,7 +612,7 @@ L<http://dotat.at/tmp/ISO_8601-2004_E.pdf>
 
 =head1 ACKNOWLEDGEMENTS
 
-The development of this code was sponsored by my (Tom's) employer L<http://www.state51.co.uk>.
+The development of this code was sponsored by my (Tom's) employer L<http://www.state51.com/>.
 
 =head1 SUPPORT
 
@@ -635,7 +635,7 @@ Tomas Doran (t0m) <bobtfish@bobtfish.net>
 
 =item *
 
-Dave Lambley <davel@state51.co.uk>
+Dave Lambley <dlambley@cpan.org>
 
 =back
 

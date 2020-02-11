@@ -8,6 +8,7 @@ requires 'Scalar::Util', '0';
 requires 'XML::LibXML', '1.78';
 requires 'XML::LibXML', '2';
 requires 'XML::Writer', '0';
+requires 'JSON::PP', '0'; # core since Perl 5.14 anyway
 
 
 # don't included here because Dist::Zilla::App::Command::listdeps would include it

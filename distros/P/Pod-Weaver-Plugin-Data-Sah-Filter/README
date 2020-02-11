@@ -1,0 +1,62 @@
+NAME
+    Pod::Weaver::Plugin::Data::Sah::Filter - Plugin to use when building
+    Data::Sah::Filter::* or Data::Sah::FilterBundle::* distribution
+
+VERSION
+    This document describes version 0.001 of
+    Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution
+    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2020-02-10.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-Data::Sah::Filter]
+
+DESCRIPTION
+    This plugin is to be used when building "Data::Sah::Filter::*" or
+    "Data::Sah::FilterBundle::*" distribution. Currently it does the
+    following:
+
+    For each "lib/Data/Sah/Filter/*" module file:
+
+    *   Add a Synopsis section (if doesn't already exist) containing an
+        example on how to use the Sah filter rule module in a Sah schema
+
+    For each "lib/Data/Sah/FilterBundle/*" module file:
+
+    *   Add list of filter rule modules at the beginning of Description
+        section
+
+CONFIGURATION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-Data-Sah-Filter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Data-Sah-Filter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Dat
+    a-Sah-Filter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Sah::Filter
+
+    Dist::Zilla::Plugin::Data::Sah::Filter
+
+    Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Quiq - Class library for rapid development (German documentation)
 =head1 DESCRIPTION
 
 Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
-die ich in Perl-Projekten (nur Unix/Linux) einsetze. Sie sind nach
+die ich in Perl-Projekten (nur Unix/Linux) nutze. Sie sind nach
 einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
 sich unter kontinuierlicher Weiterentwicklung.
 
@@ -556,6 +556,10 @@ L<Quiq::LineProcessor::Line> - Zeile einer Datei
 
 =item *
 
+L<Quiq::List> - Liste von Objekten
+
+=item *
+
 L<Quiq::LockedCounter> - Persistenter Zähler mit Lock
 
 =item *
@@ -838,7 +842,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
@@ -108,7 +108,8 @@ sub pica_holdings {
 
     my $blessed = blessed($record);
     $record = $record->{record} if reftype $record eq 'HASH';
-    my ( @holdings, $field_buffer, $iln );
+    my ( @holdings, $iln );
+    my $field_buffer = [];
 
     foreach my $field (@$record) {
         my $tag = substr $field->[0], 0, 1;
@@ -351,7 +352,8 @@ or in short form:
     [ [ '003@', undef, '0' => '12345X' ] ]
 
 PICA path expressions (see L<PICA::Path>) can be used to facilitate processing
-PICA+ records and L<PICA::Schema> to validate PICA+ records.
+PICA+ records and L<PICA::Schema> can be used to validate PICA+ records with
+L<Avram Schemas|https://format.gbv.de/schema/avram/specification>.
 
 =head1 FUNCTIONS
 
@@ -545,15 +547,18 @@ the same terms as Perl itself.
 
 =item
 
-L<PICA::Record> (deprecated) implemented an alternative framework for
-processing PICA+ records.
+L<pica-validate> command line script to parse, serialize, count, and validate
+PICA+ data.
 
 =item 
 
-Use L<Catmandu::PICA> for processing PICA records with the L<Catmandu> toolkit,
-for instance to convert PICA XML to plain PICA+:
+Use L<Catmandu::PICA> for more elaborated processing of PICA records with the
+L<Catmandu> toolkit.
 
-   catmandu convert PICA --type xml to PICA --type plain < picadata.xml
+=item
+
+L<PICA::Record> implemented an alternative framework for processing PICA+
+records (B<deprecated!>).
 
 =back
 

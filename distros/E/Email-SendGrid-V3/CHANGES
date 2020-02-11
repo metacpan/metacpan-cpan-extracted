@@ -1,0 +1,65 @@
+==================================================
+Changes from 2019-02-10 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version v0.900.1 at 2020-02-10 22:48:37 +0000
+---------------------------------------------
+
+  Change: c399855e363f664bb57cd9596d6351cb6680d7bb
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-02-10 14:23:59 +0000
+
+    Fix versioning scheme 
+
+--------------------------------------------
+version v0.90.1 at 2020-02-10 18:34:35 +0000
+--------------------------------------------
+
+  Change: 80b2e4efe7529cacaeba2e7d201a0f75d32b9ef4
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-02-10 12:55:52 +0000
+
+    Run make update 
+
+  Change: c375445fce29a256e9901ee31dc4d09f7efbdf7c
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 14:25:59 +0000
+
+    Enable ExtraTests
+
+    As well as removing duplicate or useless extra tests 
+
+  Change: 4197c68ee94e1445f517460e132f2473e4832d71
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 14:25:58 +0000
+
+    Create distribution files 
+
+  Change: 3b8d56d1779e79e88436a4a7ce5ea963655339ad
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 14:25:58 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+
+  Change: b8e96d6b43b96dc83b1c6e57b3b74f4d611efebd
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-15 15:10:46 +0000
+
+    This is not a gitc managed distribution anymore 
+
+  Change: 5ce78c6e6668096309e73160e2aa4d13c4e12c46
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-15 14:04:31 +0000
+
+    Remove Mamefile.PL related infrastructure 
+
+  Change: 33aacff1db15d47b34a38050a4814a87fba21173
+  Author: nagamejun <nagamejun@gmail.com>
+  Date : 2019-09-28 17:12:33 +0000
+
+    Convert to UTF-8 byte string JSON 
+
+================================================
+Plus 2 releases after 2019-02-10 00:00:00 +0000.
+================================================

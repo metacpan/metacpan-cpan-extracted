@@ -36,12 +36,12 @@ use strict;
 use Carp                 ();
 use File::Spec           ();
 use File::Path           ();
-use File::Slurper        qw(read_text write_text);
+use File::Slurper        qw(read_binary write_binary);
 use File::Find::Rule     ();
 use File::IgnoreReadonly ();
 use Params::Util         '_STRING'; 
 
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 
 use constant MSWin32 => ( $^O eq 'MSWin32' );
 
@@ -161,9 +161,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-	my $content = read_text($file);
+	my $content = read_binary($file);
 	$content .= $append;
-	write_text($file, $content);
+	write_binary($file, $content);
 
 	return 1;	
 }
@@ -181,9 +181,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-        my $content = read_text($file);
+        my $content = read_binary($file);
 	$content =~ s/\n1;/$append\n\n1;/;
-	write_text($file, $content);
+	write_binary($file, $content);
 
 	return 1;
 }
@@ -207,9 +207,9 @@ END_PERL
 
 	# Apply the change to the file
 	my $guard = File::IgnoreReadonly->new( $file );
-        my $content = read_text($file);
+        my $content = read_binary($file);
 	$content =~ s/\n1;/$append\n\n1;/;
-	write_text($file, $content);
+	write_binary($file, $content);
 
 	return 1;
 }
@@ -225,7 +225,7 @@ sub create_minicpan_conf {
 
 	# Write the file
 	my $guard = -f $file ? File::IgnoreReadonly->new( $file ) : 0;
-	write_text(
+	write_binary(
 		$file,
 		"class: CPAN::Mini::Portable\n".
 		"skip_perl: 1\n".
@@ -259,10 +259,10 @@ sub modify_batch_files {
 	foreach my $file ( @files ) {
 		# Apply the change to the file
 		my $guard = File::IgnoreReadonly->new( $file );
-		my $content = read_text($file);
+		my $content = read_binary($file);
 		$content =~ s/([\r\n])(perl )(-x[^\r\n]*)/$1 . _perl_cmd($3)/sge;
 		$content =~ s/(#line )(\d+)/$1 . ($2+14)/e;  # we have added extra 14 lines
-		write_text($file, $content);
+		write_binary($file, $content);
 	}
 
 	return 1;
@@ -274,9 +274,9 @@ sub modify_pl2bat {
 
 	# Apply the change to the file
 	my $guard   = File::IgnoreReadonly->new( $file );
-	my $content = read_text($file);
+	my $content = read_binary($file);
 	$content =~ s/\bperl \$OPT\{'(a|o|n)'\}/_perl_cmd('$OPT{\'' . $1 .'\'}', 1, 1)/esg;
-	write_text($file, $content);
+	write_binary($file, $content);
 
 	return 1;
 }
@@ -309,21 +309,13 @@ MARKER
 
 =pod
 
-=head1 SUPPORT
-
-Bugs should be reported via the CPAN bug tracker.
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Portable-Dist>
-
-For other issues, or commercial support, contact the author.
-
 =head1 AUTHOR
 
 Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<Portable>, L<http://win32.perl.org/>, L<http://strawberryperl.com/>
+L<Portable>, L<http://strawberryperl.com/>
 
 =head1 COPYRIGHT
 

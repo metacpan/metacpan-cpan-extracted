@@ -3,8 +3,8 @@
    "author" : [
       "Grant Street Group <developers@grantstreet.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -13,53 +13,47 @@
       "version" : "2"
    },
    "name" : "Email-SendGrid-V3",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "7.1101"
          }
       },
       "develop" : {
          "requires" : {
-            "Module::Metadata" : "1.00",
-            "Perl::PrereqScanner" : "1.023",
-            "Pod::Markdown::Github" : "0",
-            "Pod::Readme" : "v1.1.2",
-            "Test2::Suite" : "0",
-            "Test::CPAN::Changes" : "0",
-            "Test::Pod" : "1.51",
-            "Test::Pod::Coverage" : "1.10",
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
             "Test::Strict" : "0",
-            "Test::Version" : "2.00",
-            "perl" : "v5.10.1"
+            "Test::Version" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "HTTP::Tiny" : "0",
             "JSON" : "0",
-            "constant" : "0",
-            "namespace::clean" : "0",
-            "perl" : "5.010001"
+            "namespace::clean" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test2::Bundle::More" : "0",
-            "Test2::Tools::Exception" : "0"
+            "Test2::Tools::Exception" : "0",
+            "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Email::SendGrid::V3" : {
+         "file" : "lib/Email/SendGrid/V3.pm",
+         "version" : "v0.900.1"
       }
    },
    "release_status" : "stable",
@@ -67,14 +61,15 @@
       "bugtracker" : {
          "web" : "https://github.com/GrantStreetGroup/Email-SendGrid-V3/issues"
       },
-      "homepage" : "https://github.com/GrantStreetGroup/Email-SendGrid-V3",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/GrantStreetGroup/Email-SendGrid-V3.git",
+         "url" : "git://github.com/GrantStreetGroup/Email-SendGrid-V3.git",
          "web" : "https://github.com/GrantStreetGroup/Email-SendGrid-V3"
       }
    },
-   "version" : "0.90",
-   "x_authority" : "cpan:GSG",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v0.900.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.03",
+   "x_static_install" : 1
 }
+

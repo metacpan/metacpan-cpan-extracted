@@ -1,3 +1,27 @@
+0.475   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [filter-with-sah] Add --return-type option.
+
+
+0.474   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utilities: list-sah-filter-rule-modules,
+	  show-sah-filter-rule-module.
+
+	- [validate-with-sah][ux] Add -R as shortcut alias for
+	  --show-raw-compile.
+
+
+0.473   2020-02-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: filter-with-sah.
+
+
+0.472   2019-12-25  Released-By: PERLANCAR; Urgency: low
+
+	- Replace PERLANCAR::Module::List with Module::List::Tiny.
+
+
 0.471   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [list-sah-coerce-rule-modules] Show summary in --detail (-l).

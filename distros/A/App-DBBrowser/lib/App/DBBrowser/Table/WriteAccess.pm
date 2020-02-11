@@ -204,6 +204,7 @@ sub __transaction {
             );
             $ax->print_sql( $sql, $waiting );
             if ( ! defined $choice || $choice ne $commit_ok ) {
+                # $sth->finish if $sf->{i}{driver} eq 'SQLite'; # finish called automatically when $sth is destroyed ?
                 $dbh->rollback;
                 $rolled_back = 1;
             }
@@ -214,6 +215,7 @@ sub __transaction {
         1 }
     ) {
         $ax->print_error_message( $@ );
+        # $sth->finish if $sf->{i}{driver} eq 'SQLite'; # finish called automatically when $sth is destroyed ?
         $dbh->rollback;
         $rolled_back = 1;
     }

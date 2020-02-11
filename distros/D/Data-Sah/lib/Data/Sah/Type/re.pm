@@ -1,7 +1,7 @@
 package Data::Sah::Type::re;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -24,7 +24,7 @@ Data::Sah::Type::re - re type
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Type::re (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Type::re (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

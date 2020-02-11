@@ -34,6 +34,7 @@ requires:
   Exporter: '0'
   IO::File: '1.14'
   IO::Handle: '0'
+  JSON::PP: '0'
   List::Util: '0'
   Scalar::Util: '0'
   XML::LibXML: '2'
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://github.com/GBV/PICA-Data/issues
   homepage: https://github.com/GBV/PICA-Data
   repository: https://github.com/GBV/PICA-Data.git
-version: '1.02'
+version: '1.03'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'Jakob Voß <jakob.voss@gbv.de>'

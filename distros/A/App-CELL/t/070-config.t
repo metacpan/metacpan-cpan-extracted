@@ -43,7 +43,7 @@ ok( defined( $status ), "Blooey exists after its creation" );
 $status = $meta->CELL_META_TEST_PARAM_BLOOEY;
 is( $status, "Blooey", "Blooey has the right value via get_param" );
 
-$status = App::CELL::Load::init( appname => 'CELLtest' );
+$status = App::CELL::Load::init( verbose => 1 );
 is( $status->level, "WARN", "Load without sitedir gives warning" );
 
 # 'exists' returns undef on failure

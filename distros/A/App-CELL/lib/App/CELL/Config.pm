@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -269,7 +269,6 @@ sub set {
                                'Line' => (caller)[2],
                                'Value' => $value,
                           };
-        #$log->debug( Dumper $meta );
     } elsif ( $self->{'CELL_CONFTYPE'} eq 'core' ) {
         if ( exists $core->{$param} ) {
             %ARGS = (

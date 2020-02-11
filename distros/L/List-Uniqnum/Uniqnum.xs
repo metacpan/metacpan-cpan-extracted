@@ -1,18 +1,19 @@
 
-#if defined(_WIN32) && !defined(_MSC_VER)  /* Only Microsoft compilers define _MSC_VER */
+/* For MinGW-built perls, define __USE_MINGW_ANSI_STDIO unless  *
+ * it has already been defined. We need this for "%.20g"        *
+ * formatting - and it must be done done prior to the inclusion *
+ * of all headers.                                              */
+
+#if defined(_WIN32) && defined(__MINGW32__) 
 
 #  ifndef __USE_MINGW_ANSIO_STDIO
-
-     /* Satisfy uniqnum formatting requirements *
-      * when using mingw ports of gcc           */
 #     define __USE_MINGW_ANSI_STDIO 1
 
-     /* Identify that perl's ccflags have  *
-      * not defined __USE_MINGW_STDIO_ANSI */
-#     define WIN32_PERL_NO_ANSI 1
+     /* Identify that perl itself was built    *
+      * without __USE_MINGW_STDIO_ANSI defined */
+#     define MINGW_PERL_NO_ANSI 1
 
 #  endif
-
 #endif
 
 
@@ -91,8 +92,7 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
         }
 #ifdef NVSIZE_EQUAL_IVSIZE      /* Defined by Makefile.PL if $Config{nvsize} == $Config{ivsize} */
         if(!SvOK(arg) || SvUOK(arg)) {
-#ifdef _MSC_VER
-
+#if defined(_MSC_VER) && _MSC_VER < 1900
             if(SvUV(arg) > 100000000000000000 && uv_fits_double(SvUV(arg))) {
                 nv_arg = SvNV(arg);
                 sv_setpvn(keysv, (char *) &nv_arg, USED_NV_BYTES);
@@ -102,10 +102,10 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
             sv_setpvf(keysv, "%" UVuf, SvUV(arg));
         }
         else if(SvIOK(arg)) {
-#ifdef _MSC_VER
-            int sign;
-            sign = SvIV(arg) < 0 ? -1 : 1;           
-            if(SvIV(arg) * sign > 100000000000000000 && uv_fits_double(SvIV(arg) * sign)) {
+#if defined(_MSC_VER) && _MSC_VER < 1900
+            UV sign;
+            sign = SvIV(arg) < 0 ? SvIV(arg) * -1 : SvIV(arg);           
+            if(sign > 100000000000000000 && uv_fits_double(sign)) {
                 nv_arg = SvNV(arg);
                 sv_setpvn(keysv, (char *) &nv_arg, USED_NV_BYTES);
             }
@@ -133,7 +133,7 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
             /* smaller floats mostly get formatted using %g and could be   *
              * equal to a UV or IV                                         */
             else {
-#ifdef WIN32_PERL_NO_ANSI
+#ifdef MINGW_PERL_NO_ANSI
 
                /* Because perl was not built with ansi compliance, doing: *
                 * sv_setpvf(keysv, "%0.20" NVgf, nv_arg)                  *
@@ -142,7 +142,7 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
                 char buffer[32];
                 sprintf(buffer, "%0.20" NVgf, nv_arg);
                 sv_setpvf(keysv, "%s", buffer);
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && _MSC_VER < 1900
 
             nv_arg = SvNV(arg);
 
@@ -210,7 +210,7 @@ void uniqnum(pTHX_ SV * input_sv, ...) {
 
 int _have_msc_ver(void) {
 #ifdef _MSC_VER
-  return 1;
+  return _MSC_VER;
 #else
   return 0;
 #endif

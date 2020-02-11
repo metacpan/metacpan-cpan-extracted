@@ -1,11 +1,17 @@
-use strictures 2;
+use strictures;
 
-use Test::Requires { 'Software::LicenseUtils' => '0.103014' };
+use Test2::V0;
+use Test2::Require::Module 'Software::LicenseUtils' => '0.103014';
+
+use Test::Command::Simple;
+
 use Software::LicenseUtils;
-use Path::Tiny;
+use Path::Tiny 0.053;
 
-use Test::More;
-use Test::Script;
+my $CMD = $ENV{'LICENSECHECK'} || 'bin/licensecheck';
+
+# ensure local script is executable
+path($CMD)->chmod('a+x') if ( $CMD eq 'bin/licensecheck' );
 
 my %LICENSES = (
 	'AGPL-3.0'     => 'AGPL-3',
@@ -39,9 +45,9 @@ my %LICENSES = (
 	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'Artistic or GPL-1+',
 	PostgreSQL                              => 'PostgreSQL',
 	'QPL-1.0'                               => 'QPL-1.0',
-	SSLeay => 'BSD-2-clause and/or BSD~unspecified',
-	SISSL  => 'UNKNOWN',
-	Zlib   => 'Zlib',
+	SSLeay                                  => 'BSD-2-clause',
+	SISSL                                   => 'UNKNOWN',
+	Zlib                                    => 'Zlib',
 );
 
 my $workdir = Path::Tiny->tempdir( CLEANUP => ( not $ENV{PRESERVE} ) );
@@ -57,32 +63,32 @@ foreach ( keys %LICENSES ) {
 			}
 		);
 	};
-	plan skip_all => "Software::License failed to create license $_" if $@;
+	skip_all "Software::License failed to create license $_" if $@;
 	$workdir->child($_)->spew_utf8( $license->notice, $license->license );
 }
-plan tests => scalar( 1 + keys %LICENSES );
-my $corpus = $workdir;
-script_runs(
-	[ 'bin/licensecheck', qw(--recursive -m --deb-fmt -c .+), "$corpus" ],
-	{ stdout => \my $stdout },
-);
-foreach ( split /\v+/, $stdout ) {
+plan 4 + keys %LICENSES;
+
+run_ok $CMD, qw(--recursive -m --deb-fmt -c .+), $workdir;
+is stderr, '', 'No stderr';
+foreach ( split /\v+/, stdout ) {
 	if (m{^$workdir/([\S ]+)\t(.+)$}) {
 		my $file    = $1;
 		my $result  = $2;
-		my $success = is( $result, $LICENSES{$file}, $file );
+		my $success = is $result, $LICENSES{$file}, $file;
 		if ((      $LICENSES{$file} eq 'UNKNOWN'
 				or $LICENSES{$file} eq
 				'Apache-1.0 and/or BSD-4-clause and/or OpenSSL'
-				or $LICENSES{$file} eq 'BSD-2-clause and/or BSD~unspecified'
+				or ( $file eq 'SSLeay' and $LICENSES{$file} ne 'SSLeay' )
 			)
 			and $success
 			)
 		{
-			diag("licensecheck failed to parse $file as expected");
+			note "licensecheck failed to parse $file as expected";
 		}
 	}
 	else {
-		die "Unexpected output: $_";
+		diag "Unexpected output: $_";
 	}
 }
+
+done_testing;

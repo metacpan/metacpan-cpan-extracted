@@ -1,7 +1,9 @@
 package App::BrowserOpenUtils;
 
-our $DATE = '2019-05-28'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-09'; # DATE
+our $DIST = 'App-BrowserOpenUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +64,7 @@ App::BrowserOpenUtils - Utilities related to Browser::Open
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BrowserOpenUtils (from Perl distribution App-BrowserOpenUtils), released on 2019-05-28.
+This document describes version 0.003 of App::BrowserOpenUtils (from Perl distribution App-BrowserOpenUtils), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -132,6 +134,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<App::BrowserUtils>
 
 =head1 AUTHOR
 

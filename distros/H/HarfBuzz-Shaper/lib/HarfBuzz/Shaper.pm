@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -82,7 +82,7 @@ sub new {
 
     my $self = bless {} => $pkg;
     $self->{harfbuzz} = hb_version_string();
-    $self->{buf} = hb_buffer_create();
+    $self->{buffer} = hb_buffer_create();
     $self->{features} = [];
 
     if ( $opts->{font} ) {
@@ -159,7 +159,10 @@ sub set_text {
 
 =head2 $hb->set_features( I<feat> [ , ... ] )
 
-Sets the features for shaping.
+Sets persistent features for shaping. Features are strings as described in
+L<https://harfbuzz.github.io/harfbuzz-hb-common.html#hb-feature-from-string>.
+
+Multiple feature strings may be supplied.
 
 =cut
 
@@ -171,7 +174,8 @@ sub set_features {
 
 =head2 $hb->add_features( I<feat> [ , ... ] )
 
-Adds features for shaping.
+Just like set_features, but the specified features are I<added> to the
+set of persistent features.
 
 =cut
 
@@ -184,6 +188,29 @@ sub add_features {
     }
 }
 
+=head2 $hb->set_language( I<lang> )
+
+Sets the language for shaping. I<lang> must be a string containing a
+valid BCP-47 language code.
+
+=cut
+
+sub set_language {
+    my ( $self, $lang ) = @_;
+    hb_buffer_set_language( $self->{buffer}, $lang );
+}
+
+=head2 $hb->get_language
+
+Returns the language currently set for this shaper, as a string.
+
+=cut
+
+sub get_language {
+    my ( $self ) = @_;
+    hb_buffer_get_language( $self->{buffer} );
+}
+
 =head2 $info = $hb->shaper( [ I<ref to features> ] )
 
 Performs the shaping.
@@ -192,7 +219,8 @@ I<features> is a reference to an array of feature strings. The
 features will be I<added> to the list of features already set with
 set_features/add_features. If the first (or only) feature is C<none>
 all current features will be ignored and only subsequent features are
-taken into account.
+taken into account. Changes apply to this call only, the persistent
+set of featutes is B<not> modified.
 
 Upon completion an array of hashes is returned with one element for
 each glyph to be rendered.
@@ -231,17 +259,17 @@ sub shaper {
 	}
     }
 
-    hb_buffer_clear_contents( $self->{buf} );
-    hb_buffer_add_utf8( $self->{buf}, $self->{text} );
+    hb_buffer_clear_contents( $self->{buffer} );
+    hb_buffer_add_utf8( $self->{buffer}, $self->{text} );
 
-    hb_buffer_guess_segment_properties( $self->{buf} );
+    hb_buffer_guess_segment_properties( $self->{buffer} );
 
     # Set the font point size for correct hinting.
     hb_font_set_ptem( $self->{font}, $self->{size} );
     # Set a scaling for precision (all info are ints!).
     my $scale = 1000;
     hb_font_set_scale( $self->{font}, $scale, $scale );
-    my $info = _hb_shaper( $self->{font}, $self->{buf}, $features );
+    my $info = hb_shaper( $self->{font}, $self->{buffer}, $features );
 
     foreach my $i ( @$info ) {
 	$i->{$_} *= $self->{size} / $scale for qw( ax ay dx dy );

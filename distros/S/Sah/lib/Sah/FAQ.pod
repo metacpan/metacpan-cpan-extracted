@@ -17,7 +17,7 @@ Sah::FAQ - Frequently asked questions
 
 =head1 VERSION
 
-This document describes version 0.9.46 of Sah::FAQ (from Perl distribution Sah), released on 2019-07-19.
+This document describes version 0.9.49 of Sah::FAQ (from Perl distribution Sah), released on 2020-02-11.
 
 =head1 GENERAL
 
@@ -175,11 +175,6 @@ C<allowed_keys>, C<forbidden_keys>, to validate a certain property of the value
  // check hash values are unique
  ["hash", {"prop": ["values", ["array", {"uniq":1}]]}]
 
-Or, for more general use, you can apply a temporary prefilter first to the data:
-
- // check hash values are unique
- ["array", {"prefilters.temp":1, "prefilters":["values($_)"], "uniq":1}]
-
 =head3 General advice when writing schemas?
 
 =over 4
@@ -322,7 +317,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

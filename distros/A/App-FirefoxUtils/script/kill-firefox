@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/FirefoxUtils/terminate_firefox
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-05'; # DATE
+our $DATE = '2019-12-09'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ kill-firefox - Terminate  (kill -KILL) Firefox
 
 =head1 VERSION
 
-This document describes version 0.005 of kill-firefox (from Perl distribution App-FirefoxUtils), released on 2019-12-05.
+This document describes version 0.006 of kill-firefox (from Perl distribution App-FirefoxUtils), released on 2019-12-09.
 
 =head1 SYNOPSIS
 
@@ -57,13 +57,13 @@ C<*> marks required options.
 
 =item B<--user>=I<s@>
 
-Kill Firefox processes of certain users only.
+Kill browser processes that belong to certain user(s) only.
 
 Can be specified multiple times.
 
 =item B<--users-json>=I<s>
 
-Kill Firefox processes of certain users only (JSON-encoded).
+Kill browser processes that belong to certain user(s) only (JSON-encoded).
 
 See C<--user>.
 

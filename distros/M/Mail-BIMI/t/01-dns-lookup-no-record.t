@@ -8,8 +8,14 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Record;
 use Mail::DMARC::PurePerl;
+use Net::DNS::Resolver::Mock;
 
 my $bimi = Mail::BIMI->new;
+
+my $resolver = Net::DNS::Resolver::Mock->new;
+$resolver->zonefile_read('t/zonefile');
+$bimi->resolver($resolver);
+
 my $dmarc = Mail::DMARC::PurePerl->new;
 $dmarc->result->result( 'pass' );
 $dmarc->result->disposition( 'reject' );

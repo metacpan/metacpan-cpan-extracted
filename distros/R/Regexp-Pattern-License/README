@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.101
+    Version v3.1.102
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -34,6 +34,12 @@ PATTERNS
     *   afl_3
 
     *   agpl
+
+    *   agpl_1
+
+    *   agpl_2
+
+    *   agpl_3
 
     *   aladdin
 
@@ -330,6 +336,16 @@ PATTERNS
     *   zlib
 
     *   zlib_acknowledgement
+
+    *   zpl
+
+    *   zpl_1
+
+    *   zpl_1_1
+
+    *   zpl_2
+
+    *   zpl_2_1
 
   Licensing traits
     Patterns each covering a single trait occuring in licenses.

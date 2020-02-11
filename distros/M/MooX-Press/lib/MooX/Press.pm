@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.040';
+our $VERSION   = '0.042';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -143,6 +143,7 @@ sub import {
 		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 		
 		%methods = delete($opts{factory_package_can})->$_handle_list_add_nulls;
+		$methods{qualify} ||= sub { $builder->qualify($_[1], $opts{'prefix'}) };
 		$builder->$method_installer($opts{'factory_package'}||$opts{'caller'}, \%methods) if keys %methods;
 		
 		%methods = delete($opts{type_library_can})->$_handle_list_add_nulls;
@@ -544,11 +545,11 @@ sub _make_package {
 	}
 	else {
 		my $optthing = '';
-		if ($toolkit eq 'Moo' and $INC{'Type/Tiny.pm'} and eval { require MooX::TypeTiny; 1 }) {
-			$optthing = ' use MooX::TypeTiny;';
+		if ($toolkit eq 'Moo') {
+			$optthing = ' use MooX::TypeTiny;'      if eval { require MooX::TypeTiny };
 		}
-		elsif ($toolkit eq 'Moose' and eval { require MooseX::XSAccessor; 1 }) {
-			$optthing = ' use MooseX::XSAccessor;';
+		elsif ($toolkit eq 'Moose') {
+			$optthing = ' use MooseX::XSAccessor;'  if eval { require MooseX::XSAccessor };
 		}
 		eval "package $qname; use $toolkit;$optthing use namespace::autoclean; 1"
 			or $builder->croak("Could not create package $qname: $@");
@@ -804,6 +805,10 @@ sub _make_package {
 			Moose::Util::find_meta($qname)->make_immutable;
 		}
 		
+		if ($toolkit eq 'Moo' && eval { require MooX::XSConstructor }) {
+			'MooX::XSConstructor'->setup_for($qname);
+		}
+		
 		if ($opts{abstract}) {
 			my $orig_can   = $qname->can('can');
 			my $orig_BUILD = do { no strict 'refs'; exists(&{"$qname\::BUILD"}) ? \&{"$qname\::BUILD"} : sub {} };
@@ -854,7 +859,7 @@ sub _make_package {
 					}
 				}
 			}
-			eval "sub $qname\::FACTORY { '$fpackage' }; 1"
+			eval "sub $qname\::FACTORY { q[$fpackage] }; 1"
 				or $builder->croak("Couldn't create link back to factory $qname\::FACTORY: $@");
 		}
 		
@@ -873,7 +878,7 @@ sub _make_package {
 		$opts{'end'}->($qname, $opts{is_role} ? 'role' : 'class');
 	}
 	
-	if ($opts{type_library}) {
+	if ($opts{type_library} and $opts{type_name}) {
 		my $mytype = $opts{type_library}->get_type_for_package($opts{'is_role'} ? 'role' : 'class', $qname);
 		$mytype->coercion->freeze if $mytype;
 	}
@@ -1040,8 +1045,6 @@ sub _process_enum_moose {
 sub make_attribute_mouse {
 	my $builder = shift;
 	my ($class, $attribute, $spec) = @_;
-	use Data::Dumper;
-	print Dumper($spec);
 	if (is_Object($spec->{isa}) and $spec->{isa}->isa('Type::Tiny::Enum') and $spec->{handles}) {
 		$builder->_process_enum_mouse(@_);
 	}
@@ -1364,6 +1367,36 @@ sub _build_method_signature_check {
 		);
 	}
 	
+	for my $position (qw( head tail )) {
+		if (ref $global_opts->{$position}) {
+			require Type::Params;
+			'Type::Params'->VERSION(1.009002);
+			$reg ||= do {
+				require Type::Registry;
+				'Type::Registry'->for_class($method_class);
+			};
+			$global_opts->{$position} = [map {
+				my $type = $_;
+				if (ref $type) {
+					$type;
+				}
+				elsif ($type =~ /^\%/) {
+					HashRef->of(
+						$reg->lookup(substr($type, 1))
+					);
+				}
+				elsif ($type =~ /^\@/) {
+					ArrayRef->of(
+						$reg->lookup(substr($type, 1))
+					);
+				}
+				else {
+					$reg->lookup($type);
+				}
+			} @{$global_opts->{$position}} ];
+		}
+	}
+	
 	my $next = $is_named ? \&Type::Params::compile_named_oo : \&Type::Params::compile;
 	@_ = ($global_opts, @params);
 	return [@_] if $gimme_list;
@@ -1603,6 +1636,13 @@ In every class (but not role) that MooX::Press builds, there will be a
 C<FACTORY> method created so that, for example
 
   MyApp::Cow->FACTORY  # returns "MyApp"
+
+The factory package will also have a method called C<qualify> installed,
+which uses the same logic as MooX::Press to add prefixes to class/role
+names.
+
+  MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
+  MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
 
 =item C<< type_library >> I<< (Str|Undef) >>
 
@@ -2663,6 +2703,10 @@ you can provide code this way, it might be slightly faster.
 MooX::Press will automatically load L<MooX::TypeTiny> if it's installed,
 which optimizes how Type::Tiny constraints and coercions are inlined into
 Moo constructors. This is only used for Moo classes.
+
+MooX::Press will automatically load and apply L<MooX::XSConstructor> if it's
+installed, which will optmimize constructors for some very basic classes.
+Again, this is only for Moo classes.
 
 MooX::Press will automatically load L<MooseX::XSAccessor> if it's installed,
 which speeds up some Moose accessors. This is only used for Moose classes.

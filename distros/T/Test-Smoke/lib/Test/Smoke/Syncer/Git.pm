@@ -36,7 +36,7 @@ Do the actual syncing.
 
 There are 2 repositories, they both need to be updated:
 
-The first (proxy) repository has the perl5.git.perl.org repository as its
+The first (proxy) repository has the github.com/Perl repository as its
 (origin) remote. The second repository is used to run the smoker from.
 
 For the proxy-repository we do:

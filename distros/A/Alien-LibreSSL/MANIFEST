@@ -11,6 +11,7 @@ alienfile
 author.yml
 dist.ini
 lib/Alien/LibreSSL.pm
+maint/cip-test
 patch/Net-SSLeay.diff
 patch/gen.pl
 patch/libressl-2.6.2.diff

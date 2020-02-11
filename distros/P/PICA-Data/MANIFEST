@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 README
+bin/pica-validate
 cpanfile
 dist.ini
 lib/PICA/Data.pm

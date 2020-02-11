@@ -1,7 +1,7 @@
 package Sah::SchemaR::unix::groupname;
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with GID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix group name"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::groupname - Unix group name
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::unix::groupname (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
+This document describes version 0.010 of Sah::SchemaR::unix::groupname (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 #! /usr/bin/env perl
 
-use 5.024;
+use 5.014;
 use warnings;
 
 use Var::Mystic;
 
-my $untracked = 'untracked';
-mystic $tracked = 'tracked';
+      my $untracked = 'untracked';
+track my $tracked = 'tracked';
 
 for (1..5) {
     $untracked++;

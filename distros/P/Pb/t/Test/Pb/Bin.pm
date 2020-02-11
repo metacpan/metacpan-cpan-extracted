@@ -4,18 +4,37 @@ use 5.14.0;
 use autodie ':all';
 
 use Exporter 'import';
-our @EXPORT = qw< pb_basecmd pb_run check_output check_error _slurp >;
+our @EXPORT = qw< pb_basecmd pb_run pb_run_interactive check_output check_error _slurp %ERRNO >;
 
 
 use Test::Most;
 
+use Errno				();
 use File::Temp			qw< tempdir >;
 use File::Path			qw< make_path >;
+use File::Spec;
 use File::Basename;
 
 
 my $TMPDIR = tempdir( TMPDIR => 1, CLEANUP => 1 );
 my $BASE;
+
+
+# this is how PerlX::bash does it
+{
+    my $devnull = File::Spec->devnull;
+    my $msg = 'successful';
+    `bash -c "echo $msg" 2>$devnull` eq "$msg\n" or plan skip_all => "no bash available!";
+}
+
+
+# This helps us avoid errors in non-English locales.  See
+# https://github.com/barefootcoder/leadpipe/issues/2 for the discussion which led to this.  Thx to
+# Slaven Rezić (a.k.a. SREZIC, a.k.a. eserte) for the suggestion.
+our %ERRNO =
+(
+	ENOENT		=> do { $! = Errno::ENOENT;    "$!" },	# No such file or directory
+);
 
 
 # helpers
@@ -51,12 +70,24 @@ sub pb_flowpm
 }
 
 
+use Test::Trap qw< :output(systemsafe) >;
+
 sub pb_run
 {
-	use Test::Trap qw< :output(systemsafe) >;
 	my @args = @_;
 
 	trap { system($BASE, @args) };
+	return $trap;
+}
+
+sub pb_run_interactive
+{
+	my $answers = pop;
+	my @args = @_;
+	die("answers must be all 'y' or 'n'") unless $answers =~ /^[yn]+$/;
+	$answers = join("\n", split(//, $answers));
+
+	trap { system("echo '$answers' | $BASE --interactive @args") };
 	return $trap;
 }
 
@@ -88,7 +119,7 @@ sub check_error
 {
 	my $testname = pop;
 	my $trap = shift;
-	my $exit = $_[0] =~ /^\d+$/ ? shift : 1;
+	my $exit = $_[0] =~ /^\d+$/ ? shift : $_[0] eq '?' ? (shift, qr/[12]\d*/) : 1;
 	my @lines = @_;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 

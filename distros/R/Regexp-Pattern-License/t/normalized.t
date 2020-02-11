@@ -6,7 +6,7 @@ use warnings;
 
 use lib 't/lib';
 
-use MyTest tests => 152;
+use MyTest tests => 160;
 
 license_covered(
 	'adobe_2006',
@@ -109,6 +109,37 @@ license_covered(
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 EOF
 	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'agpl_1',
+	name => 'Affero General Public License, Version 1',
+	text => <<EOF,
+* d) If the Program as you received it is intended to interact with users through a computer network and if, in the version you received, any user interacting with the Program was given the opportunity to request transmission to that user of the Program's complete source code, you must not remove that facility from your modified version of the Program or work based on the Program, and must offer an equivalent opportunity for all users interacting with your Program through a computer network to request immediate transmission by HTTP of the complete source code of your modified version or other derivative work.
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'agpl_2',
+	name => 'Affero General Public License, Version 2',
+	text => <<EOF,
+This is version 2 of the Affero General Public License.
+It gives each licensee permission to distribute the Program or a work based on the Program (as defined in version 1 of the Affero GPL) under the GNU Affero General Public License, version 3 or any later version.
+EOF
+	TODO => [qw(grant_grant)]
+);
+
+license_covered(
+	'agpl_3',
+	name  => 'GNU Affero General Public License, Version 3',
+	grant => <<EOF,
+Released under the terms of the GNU Affero General Public License version 3.
+EOF
+	text => <<EOF,
+"This License" refers to version 3 of the GNU Affero General Public License.
+EOF
+	TODO => [qw()]
 );
 
 license_covered(
@@ -1662,6 +1693,40 @@ Portions Copyright (c) 2002-2007 Charlie Poole or Copyright (c) 2002-2004 James 
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 EOF
+);
+
+license_covered(
+	'zpl',
+	name => 'ZPL License',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'zpl_1',
+	name => 'Zope Public License 1.0',
+	iri  => 'http://www.zope.org/Resources/ZPL',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'zpl_1_1',
+	name => 'Zope Public License 1.1',
+	iri  => 'https://spdx.org/licenses/ZPL-1.1',
+	TODO => [qw(not_iri_name subject_license)]
+);
+
+license_covered(
+	'zpl_2',
+	name => 'Zope Public License 2.0',
+	iri  => 'http://old.zope.org/Resources/License/ZPL-1.1',
+	TODO => [qw(subject_license)]
+);
+
+license_covered(
+	'zpl_2_1',
+	name => 'Zope Public License 2.1',
+	iri  => 'http://old.zope.org/Resources/ZPL/',
+	TODO => [qw(subject_license)]
 );
 
 license_covered(

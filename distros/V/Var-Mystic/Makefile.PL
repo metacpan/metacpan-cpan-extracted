@@ -12,11 +12,12 @@ WriteMakefile(
     MIN_PERL_VERSION       => 5.014,
     TEST_REQUIRES => {
         'Test::Effects'    => 0,
+        'Term::ANSIColor'  => 0,
     },
     PREREQ_PM => {
         'Keyword::Declare' => 0,
         'Data::Dx'         => 0,
-        'Variable::Magic'  => 0,
+        'Variable::Magic'  => 0.58,
     },
     dist                   => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean                  => { FILES => 'Var-Mystic-*' },

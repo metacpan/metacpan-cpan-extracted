@@ -9,3 +9,6 @@ BEGIN { use_ok('Data::Report::Base'); }
 BEGIN { use_ok('Data::Report::Plugin::Text'); }
 BEGIN { use_ok('Data::Report::Plugin::Html'); }
 BEGIN { use_ok('Data::Report::Plugin::Csv' ); }
+
+diag( "Testing Data::Report $Data::Report::VERSION, ".
+      "Perl $], $^X" );

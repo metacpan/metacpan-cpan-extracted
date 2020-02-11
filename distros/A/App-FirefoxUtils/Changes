@@ -1,3 +1,8 @@
+0.006   2019-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Extract base routine to App-BrowserUtils.
+
+
 0.005   2019-12-05  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

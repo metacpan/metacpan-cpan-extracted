@@ -1,3 +1,8 @@
+0.007   2020-02-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add snippets: PORT/UNIX/1, PORT/POSIX/1.
+
+
 0.006   2019-12-25  Released-By: PERLANCAR; Urgency: medium
 
 	- Add snippets: ARY/UNIQ/1, ARY/UNIQ/2.SUB/DEFINED/1, SUB/LIST/1.

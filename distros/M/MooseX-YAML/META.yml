@@ -1,25 +1,27 @@
---- #YAML:1.0
-name:               MooseX-YAML
-version:            0.04
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+---
+abstract: 'DWIM loading of Moose objects from YAML'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    MooseX::Blessed::Reconstruct:  0.03
-    namespace::clean:     0
-    Sub::Exporter:        0.982
-    Test::use::ok:        0
-    YAML:                 0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-YAML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MooseX::Blessed::Reconstruct: '0.03'
+  Sub::Exporter: '0.982'
+  Test::use::ok: '0'
+  YAML: '0'
+  namespace::clean: '0'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

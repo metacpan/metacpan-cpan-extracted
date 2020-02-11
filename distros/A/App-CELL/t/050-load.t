@@ -5,9 +5,7 @@ use warnings;
 use App::CELL::Load;
 use App::CELL::Log qw( $log );
 use App::CELL::Test;
-use Data::Dumper;
 use File::Spec;
-#use File::Touch;
 use Test::More;
 use Test::Warnings;
 
@@ -110,13 +108,12 @@ set( 'TEST_PARAM_2', [ 0, 1, 2 ] );
 set( 'TEST_PARAM_3', { 'one' => 1, 'two' => 2 } );
 set( 'TEST_PARAM_1', 'Now is the winter of our discontent' );
 set( 'TEST_PARAM_4', sub { 1; } );
-set( 'UNDEFINED_VALUE', undef );
 1;
 EOS
 App::CELL::Test::populate_file( $full_path, $stuff);
 my %params = ();
 my $count = App::CELL::Load::parse_config_file( File => $full_path, Dest => \%params );
-is( keys( %params ), 5, "Correct number of parameters loaded from file" );
+is( keys( %params ), 4, "Correct number of parameters loaded from file" );
 is( $count, keys( %params ), "Return value matches number of parameters loaded");
 ok( exists $params{ 'TEST_PARAM_1' }, "TEST_PARAM_1 loaded from file" );
 is( $params{ 'TEST_PARAM_1' }->{ 'Value' }, "Fine and dandy", "TEST_PARAM_1 has the right value" );
@@ -126,20 +123,26 @@ is( $params{ 'UNDEFINED_VALUE' }->{ 'Value' }, undef, 'UNDEFINED_VALUE is undef'
 
 $log->info("*****");
 $log->info("***** TESTING wrong number of arguments in set" );
+$return_list = App::CELL::Load::find_files( 'site', $tmpdir );
+is( scalar @$return_list, 1, "Found right number of site config files");
+#diag( "scalar \@\$return_list == ", scalar @$return_list );
+$full_path = $return_list->[0];
 $stuff = <<'EOS';
 # This is a test
-set( 'TEST_PARAM_1', 'Fine and dandy' );
-set( 'TEST_PARAM_2', [ 0, 1, 2 ] );
-set( 'TEST_PARAM_3', { 'one' => 1, 'two' => 2 } );
-set( 'TEST_PARAM_1', 'Now is the winter of our discontent' );
-set( 'TEST_PARAM_4', sub { 1; } );
-set( 'WRONG_NUMBER_OF_ARGUMENTS', 1, 2 );
+set( 'ONE_ARGUMENT_NO_VALUE' );
+set( 'TOO_MANY_ARGUMENTS', 1, 2, 3 );
+set( 'EXPLICIT_UNDEF', undef );
 1;
 EOS
 $count = App::CELL::Test::populate_file( $full_path, $stuff );
 ok( $count > 0, "$count characters written; greater than zero" );
 %params = ();
 $count = App::CELL::Load::parse_config_file( File => $full_path, Dest => \%params );
-is( $count, 0 ); # FIXME
+is( $count, 3 );
+is( keys( %params ), 3, "Correct number of parameters loaded from file" );
+is( $count, keys( %params ), "Return value matches number of parameters loaded");
+is( $params{ 'ONE_ARGUMENT_NO_VALUE' }->{ 'Value' }, undef, 'ONE_ARGUMENT_NO_VALUE is undef' );
+is( $params{ 'TOO_MANY_ARGUMENTS' }->{ 'Value' }, 1, 'TOO_MANY_ARGUMENTS is 1' );
+is( $params{ 'EXPLICIT_UNDEF' }->{ 'Value' }, undef, 'EXPLICIT_UNDEF is undef' );
 
 done_testing;

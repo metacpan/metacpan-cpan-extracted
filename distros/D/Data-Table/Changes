@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Table.
 
+1.78 Tue Feb 11 08:44:44 PST 2020
+  Patch fromSQL to allow pre-executed handle
+  Patch provided by Jeff Janes
+
 1.77 Wed Jan 23 14:02:24 PST 2019
   No code change, add more examples under match_pattern_hash
   Suggested by James Volkman

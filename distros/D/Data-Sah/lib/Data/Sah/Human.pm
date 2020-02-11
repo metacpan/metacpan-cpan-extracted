@@ -1,7 +1,7 @@
 package Data::Sah::Human;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.904'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.906'; # VERSION
 
 use 5.010;
 use strict;
@@ -45,7 +45,7 @@ Data::Sah::Human - Some functions to use Data::Sah human compiler
 
 =head1 VERSION
 
-This document describes version 0.904 of Data::Sah::Human (from Perl distribution Data-Sah), released on 2020-02-07.
+This document describes version 0.906 of Data::Sah::Human (from Perl distribution Data-Sah), released on 2020-02-11.
 
 =head1 SYNOPSIS
 

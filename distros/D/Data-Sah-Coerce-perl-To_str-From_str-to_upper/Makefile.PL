@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Coerce string to upper case",
+  "ABSTRACT" => "(DEPRECATED) Coerce string to upper case",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -21,13 +21,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah::Coerce" => "0.037",
+    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Coerce" => "0.037",
+  "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

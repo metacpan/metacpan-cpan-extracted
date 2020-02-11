@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::local_gid;
 
-our $DATE = '2019-12-09'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-02-11'; # DATE
+our $VERSION = '0.010'; # VERSION
 
-our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"Group identifier (GID)"},{description=>"\nExisting means having a group name associated with this GID, i.e. `getgrgid`\nreturns a record.\n\nSupport coercion from an existing group name.\n\n",summary=>"Group identifier (GID) that has to exist on the system","x.perl.coerce_rules"=>["From_str::convert_unix_group_to_gid","From_int::check_gid_exists"]}],["unix::gid","uint","int"]];
+our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"Group identifier (GID)"},{description=>"\nExisting means having a group name associated with this GID, i.e. `getgrgid`\nreturns a record.\n\nSupport coercion from an existing group name.\n\n",prefilters=>["Unix::convert_unix_group_to_gid","Unix::check_gid_exists"],summary=>"Group identifier (GID) that has to exist on the system"}],["unix::gid","uint","int"]];
 
 1;
 # ABSTRACT: Group identifier (GID) that has to exist on the system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::local_gid - Group identifier (GID) that has to exist on the 
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2019-12-09.
+This document describes version 0.010 of Sah::SchemaR::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

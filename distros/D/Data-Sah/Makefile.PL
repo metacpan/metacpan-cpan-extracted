@@ -21,6 +21,8 @@ my %WriteMakefileArgs = (
     "Data::Dump" => 0,
     "Data::Sah::Coerce" => "0.038",
     "Data::Sah::CoerceCommon" => 0,
+    "Data::Sah::Filter" => "0.003",
+    "Data::Sah::FilterCommon" => "0.003",
     "Data::Sah::Normalize" => "0.03",
     "Data::Sah::Resolve" => "0.003",
     "Exporter" => "5.57",
@@ -64,7 +66,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.904",
+  "VERSION" => "0.906",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,6 +78,8 @@ my %FallbackPrereqs = (
   "Data::Dump" => 0,
   "Data::Sah::Coerce" => "0.038",
   "Data::Sah::CoerceCommon" => 0,
+  "Data::Sah::Filter" => "0.003",
+  "Data::Sah::FilterCommon" => "0.003",
   "Data::Sah::Normalize" => "0.03",
   "Data::Sah::Resolve" => "0.003",
   "Exporter" => "5.57",

@@ -1,15 +1,17 @@
 package Sah::Schema::dirname::unix;
 
-# AUTHOR
-our $DATE = '2019-11-29'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-11'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ["str" => {
     summary => 'Filesystem directory name on a Unix system',
-    match => '\A(?:/|/?(?:[^/\0]{1,255})(?:/[^/\0]{1,255})?)\z',
-    'x.perl.coerce_rules' => [
-        'From_str::strip_slashes',
+    match => '\A(?:/|/?(?:[^/\0]{1,255})(?:/[^/\0]{1,255})*)\z',
+    'x.completion' => ['dirname'],
+    prefilters => [
+        'Path::expand_tilde',
+        'Path::strip_slashes',
     ],
 }, {}];
 
@@ -28,7 +30,7 @@ Sah::Schema::dirname::unix - Filesystem directory name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::dirname::unix (from Perl distribution Sah-Schemas-Path), released on 2019-11-29.
+This document describes version 0.013 of Sah::Schema::dirname::unix (from Perl distribution Sah-Schemas-Path), released on 2020-02-11.
 
 =head1 HOMEPAGE
 
@@ -52,7 +54,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

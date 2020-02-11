@@ -1,10 +1,11 @@
-#!perl
+use strictures;
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use lib 't/lib';
-use Test::Licensecheck tests => 36;
+use Test::Licensecheck;
+
+plan 36;
 
 license_is( 't/devscripts/academic.h',      'AFL-3.0' );
 license_is( 't/grant/Apache/one_helper.rb', 'Apache-2.0' );

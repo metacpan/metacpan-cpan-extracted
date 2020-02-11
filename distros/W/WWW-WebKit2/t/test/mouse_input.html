@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>mouse input tests</title>
+    <script>
+        function test_function(e) {
+
+            alert("Test Alert");
+        }
+        function mouse_down_test() {
+            document.getElementById("mouse_down_test").setAttribute("value", "mouse_is_pressed_down");
+        }
+
+        function mouse_up_test() {
+            document.getElementById("mouse_up_test").setAttribute("value", "mouse_has_been_released");
+        }
+    </script>
+    <style type="text/css">
+        #mouse_down_test{
+            width: 200px;
+            height: 100px;
+            background: blue;
+        }
+        #mouse_up_test{
+            width: 200px;
+            height: 100px;
+            background: yellow;
+        }
+        #click_test{
+            width: 200px;
+            height: 100px;
+            background: black;
+            cursor: pointer;
+        }
+        #click_test_out_of_sight {
+            position: absolute;
+            top: 2000px;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            background: green;
+        }
+
+        div.container {
+            visibility: hidden;
+        }
+        div.container ul.hide {
+            display: none;
+        }
+    </style>
+</head>
+<body id="body">
+    <form class="form">
+        <select name="dropdown_list" id="dropdown_list">
+            <option>Please select</option>
+            <option value="testone">Testone</option>
+            <option value="testtwo">Testtwo</option>
+            <option value="testthree">Testthree</option>
+            <option value="testfour">Testfour</option>
+        </select>
+        <br>
+        <input type="radio" id="radiotest_one" value="radiotest_one" name="radiotest">
+        <label for="radiotest_one">Radio Test One </label>
+        <br>
+        <input type="radio" id="radiotest_two" value="radiotest_two" name="radiotest">
+        <label for="radiotest_two">Radio Test Two</label>
+        <br>
+        <input type="checkbox" id="checkboxtest" value="checkboxtest" name="checkboxtest">
+        <label for="checkboxtest">Checkbox Test One</label>
+        <br>
+        <input type="checkbox" id="checkbox_js_check" value="checkbox_js_check" name="checkbox_js_check">
+        <label for="checkbox_js_check">Checkbox Javascript Check</label>
+    </form>
+    <ul id="test_list">
+        <li id="test_item_one">Coffee</li>
+        <li id="test_item_two">Tea</li>
+    </ul>
+    <div id="click_test" onclick="alert('Test Alert')"> </div>
+    <div id="click_test_out_of_sight" onclick="alert('Found me!')"></div>
+    <div id="double_click" ondblclick="alert('Double clicked!')"></div>
+    <div id="mouse_down_test" onmousedown="mouse_down_test()"></div>
+    <div id="mouse_up_test" onmouseup="mouse_up_test()"></div>
+
+    <div class='container'>
+        <ul class='hide'>
+            <li>
+                <span id='invisible_1' onclick="alert('Found invisible!')">Item 1</span>
+            </li>
+            <li>
+                <span>Item 2</span>
+            </li>
+        </ul>
+    </div>
+</body>
+    <script>
+        var test_item_one = document.getElementById("test_item_one");
+        test_item_one.addEventListener("mouseover", function( event ) {
+            var test_item_new = document.createElement("LI");
+            test_item_new.id = "test_item_new";
+            test_item_new.setAttribute("value", "value_added");
+            console.log(test_item_new.value);
+            var textnode = document.createTextNode("Latte");
+            test_item_new.appendChild(textnode);
+            document.getElementById("test_list").appendChild(test_item_new);
+
+        });
+
+        document.getElementById('checkbox_js_check').checked = true;
+    </script>
+</html>

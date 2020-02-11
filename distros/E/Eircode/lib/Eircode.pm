@@ -15,7 +15,7 @@ our @EXPORT_OK = ( qw<
                          normalise_eircode
                          split_eircode
                      > );
-our $VERSION = "0.2.0";
+our $VERSION = "0.2.1";
 
 
 
@@ -111,7 +111,7 @@ Eircode - Validation and utilities for Eircodes / Irish postcodes
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

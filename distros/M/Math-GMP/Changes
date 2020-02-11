@@ -1,5 +1,11 @@
 Revision history for Perl extension Math::GMP.
 
+2.20  2020-02-09 Shlomif
+    - Try to fix tests when using libgmp version 6.2.0
+        - https://rt.cpan.org/Public/Bug/Display.html?id=131718
+        - Thanks to GREGOA and HVDS and Debian.
+        - The tests should still pass on earlier libgmps.
+
 2.19  2018-04-08 Shlomif
     - Fix int() on large unsigned integers.
         - https://github.com/turnstep/Math-GMP/issues/2

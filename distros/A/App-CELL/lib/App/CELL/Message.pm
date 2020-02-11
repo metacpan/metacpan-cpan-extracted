@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -261,8 +261,6 @@ sub new {
         $ARGS{text} = $text . " ARGS: $stringy";
     } else {
 
-        $log->debug( "About to try sprintf on ->$text<- with arguments ->$stringy<-", 
-                     cell => 1 );
         # insert the arguments into the message text -- needs to be in an eval
         # block because we have no control over what crap the application
         # programmer might send us

@@ -177,6 +177,9 @@ t/encoding.t
 t/encoding/README.gs550j
 t/encoding/copr-iso8859.h
 t/encoding/copr-utf8.h
+t/exception/Classpath/LICENSE
+t/exception/Font/LICENSE
+t/exception/OpenSSL/LICENSE
 t/fedora.t
 t/fedora/MIT
 t/fedora/README
@@ -223,4 +226,5 @@ t/grant/WTFPL/COPYING.WTFPL
 t/grant/misc/rpplexer.h
 t/lib/Test/Licensecheck.pm
 t/lib/Test/Licensecheck/ScanCode.pm
+t/lib/Test2/Require/TestCorpus.pm
 t/license.t

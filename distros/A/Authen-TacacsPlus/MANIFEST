@@ -17,5 +17,5 @@ tacpluslib/tac_client.c
 tacpluslib/tac_plus.h       
 tacpluslib/tacplus_client.h 
 tacpluslib/utils.c          
-
-META.yml                                 Module meta-data (added by MakeMaker)
+META.json
+META.yml

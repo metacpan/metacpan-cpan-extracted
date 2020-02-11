@@ -1,0 +1,96 @@
+NAME
+    App::rpgrep - Print lines matching a Regexp::Pattern pattern
+
+VERSION
+    This document describes version 0.002 of App::rpgrep (from Perl
+    distribution App-rpgrep), released on 2020-02-09.
+
+FUNCTIONS
+  rpgrep
+    Usage:
+
+     rpgrep(%args) -> [status, msg, payload, meta]
+
+    Print lines matching a Regexp::Pattern pattern.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Require all patterns to match, instead of just one.
+
+    *   anchor => *bool*
+
+        Generate an anchored version of the pattern.
+
+    *   color => *str*
+
+    *   count => *true*
+
+        Supress normal output, return a count of matching lines.
+
+    *   files => *array[filename]*
+
+    *   gen_args => *hash*
+
+        Supply generator arguments.
+
+        If pattern is a dynamic pattern (generated on-demand) and the
+        generator requires some arguments, you can supply them here.
+
+    *   ignore_case => *bool*
+
+    *   invert_match => *bool*
+
+        Invert the sense of matching.
+
+    *   line_number => *true*
+
+    *   pattern* => *regexppattern::name*
+
+        Name of pattern, with module prefix but without the
+        'Regexp::Pattern'.
+
+    *   quiet => *true*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-rpgrep>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-rpgrep>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-rpgrep>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    App::RegexpPatternUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

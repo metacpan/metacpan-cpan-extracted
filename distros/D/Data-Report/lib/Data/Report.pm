@@ -1,11 +1,13 @@
 # Data::Reporter.pm -- Framework for flexible reporting
-# RCS Info        : $Id: Report.pm,v 1.17 2008/08/18 09:51:23 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Wed Dec 28 13:18:40 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 18 11:52:01 2008
-# Update Count    : 265
+# Last Modified On: Sun Feb  9 20:52:04 2020
+# Update Count    : 271
 # Status          : Unknown, Use with caution!
+
+use strict;
+use warnings;
 
 package Data::Report;
 
@@ -15,7 +17,7 @@ Data::Report - Framework for flexible reporting
 
 =cut
 
-$VERSION = "0.10";
+our $VERSION = "1.001";
 
 =head1 SYNOPSIS
 
@@ -133,7 +135,7 @@ sub create {
     }
 
     # 'type' attribute is mandatory.
-    my $type = ucfirst(lc($args->{type}));
+    my $type = ucfirst(lc( $args->{type} // "" ));
     #croak("Missing \"type\" attribute") unless $type;
     $type = "Text" unless $type;
 
@@ -741,34 +743,22 @@ your bug as I make changes.
 
 =head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+Development of this module takes place on GitHub:
+L<https://github.com/sciurius/perl-Data-Report>.
 
-    perldoc Data::Report          (user API)
-    perldoc Data::Report::Base    (plugin writer documentation)
+After installing, you can find documentation for this module with the
+perldoc command.
 
-You can also look for information at:
+    perldoc Data::Report
 
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Report>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Data-Report>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Data-Report>
-
-=back
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
 
 =head1 ACKNOWLEDGEMENTS
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006,2008 Squirrel Consultancy, all rights reserved.
+Copyright 2006,2008,2020 Squirrel Consultancy, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

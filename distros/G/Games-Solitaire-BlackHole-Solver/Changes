@@ -1,5 +1,9 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.4.0   2020-02-09
+        - Add the switch-tasking flags including "--prelude".
+            - They can perform better on average.
+
 0.2.2   2019-01-03
         - Optimize the tests' runtime by converting the Golf test to a seed that is
         solved faster.

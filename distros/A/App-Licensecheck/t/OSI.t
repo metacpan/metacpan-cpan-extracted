@@ -1,8 +1,11 @@
-use strictures 2;
+use strictures;
 
-use Test::More;
+use Test2::V0;
+
 use App::Licensecheck;
 use Path::Tiny;
+
+plan 26;
 
 my $app = App::Licensecheck->new;
 $app->lines(0);

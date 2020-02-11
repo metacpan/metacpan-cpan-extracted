@@ -12,6 +12,9 @@
 #include <harfbuzz/hb.h>
 #include <harfbuzz/hb-ot.h>
 
+typedef const char * bytestring_t;
+typedef const char * bytestring_nolen_t;
+
 MODULE = HarfBuzz::Shaper		PACKAGE = HarfBuzz::Shaper		
 PROTOTYPES: ENABLE
 
@@ -25,83 +28,68 @@ CODE:
 OUTPUT:
     RETVAL
 
-void *
+hb_buffer_t *
 hb_buffer_create()
-  CODE:
-    RETVAL = hb_buffer_create();
-  OUTPUT:
-    RETVAL
 
 void
-hb_buffer_clear_contents( void* buf )
-CODE:
-  hb_buffer_clear_contents(buf);
+hb_buffer_clear_contents( hb_buffer_t *buf )
 
 void
-hb_buffer_add_utf8(void* buf, SV* sv)
-PREINIT:
-  STRLEN len;
-  char* s;
-CODE:
-  s = SvPVutf8(sv, len);
-  hb_buffer_add_utf8( buf, s, len, 0, len);
+hb_buffer_add_utf8(hb_buffer_t *buf, bytestring_t s, size_t length(s), unsigned int offset=0, size_t len=-1)
 
-void *
-hb_blob_create_from_file(SV* sv)
-PREINIT:
-  STRLEN len;
-  char* s;
-CODE:
-  s = SvPVutf8(sv, len);
-  RETVAL = hb_blob_create_from_file(s);
-OUTPUT:
-  RETVAL
+hb_blob_t *
+hb_blob_create_from_file( bytestring_nolen_t s )
 
 void
-hb_blob_destroy(void* blob)
-CODE:
-  hb_blob_destroy(blob);
+hb_blob_destroy(hb_blob_t *blob)
 
-void *
-hb_face_create(void* buf, int index)
-CODE:
-  RETVAL = hb_face_create( buf, index);
-OUTPUT:
-  RETVAL
+hb_face_t *
+hb_face_create(hb_blob_t *blob, int index)
 
-void *
-hb_font_create(void* face)
-CODE:
-  RETVAL = hb_font_create(face);
-OUTPUT:
-  RETVAL
+hb_font_t *
+hb_font_create(hb_face_t *face)
 
 void
-hb_ot_font_set_funcs(void* font)
-CODE:
-  hb_ot_font_set_funcs(font);
+hb_ot_font_set_funcs(hb_font_t *font)
 
 void
-hb_font_set_scale( void* font, int xscale, int yscale)
-CODE:
-  hb_font_set_scale(font, xscale, yscale);
+hb_font_set_scale( hb_font_t *font, int xscale, int yscale)
 
 void
-hb_font_set_ptem( void* font, float pt )
-CODE:
-  hb_font_set_ptem(font, pt);
-
-void
-hb_buffer_guess_segment_properties( void* buf )
-CODE:
-  hb_buffer_guess_segment_properties(buf);
+hb_font_set_ptem( hb_font_t *font, float pt )
 
 int
-hb_buffer_get_length( void* buf )
+hb_buffer_set_language( hb_buffer_t *buf, bytestring_t s, size_t length(s) )
+PREINIT:
+  hb_language_t lang;
 CODE:
-  RETVAL = hb_buffer_get_length(buf);
+  lang = hb_language_from_string(s, XSauto_length_of_s);
+  if ( lang ) {
+    hb_buffer_set_language( buf, lang );
+    RETVAL = 1;
+  }
+  else
+    XSRETURN_UNDEF;
 OUTPUT:
   RETVAL
+
+SV *
+hb_buffer_get_language( hb_buffer_t *buf )
+PREINIT:
+  hb_language_t lang;
+  const char *s;
+CODE:
+  lang = hb_buffer_get_language(buf);
+  s = hb_language_to_string(lang);
+  RETVAL = newSVpvn(s, strlen(s));
+OUTPUT:
+  RETVAL
+
+void
+hb_buffer_guess_segment_properties( hb_buffer_t *buf )
+
+int
+hb_buffer_get_length( hb_buffer_t *buf )
 
 SV *
 hb_feature_from_string( SV *sv )
@@ -114,17 +102,17 @@ CODE:
   if ( hb_feature_from_string(s, len, &f) )
     RETVAL = newSVpv((char*)&f,sizeof(f));
   else
-    RETVAL = newSVpv(NULL, 0);
+    XSRETURN_UNDEF;
 OUTPUT:
   RETVAL
 
 void
-hb_shape( void *font, void* buf )
+hb_shape( hb_font_t *font, hb_buffer_t *buf )
 CODE:
   hb_shape( font, buf, NULL, 0 );
 
 SV *
-_hb_shaper( void* font, void* buf, SV* feat )
+hb_shaper( hb_font_t *font, hb_buffer_t *buf, SV* feat )
 INIT:
   int n;
   int i;
@@ -171,7 +159,7 @@ CODE:
     hv_store(rh, "dy",   2, newSViv(pos[i].y_offset),    0);
     hv_store(rh, "g",    1, newSViv(gid),                0);
     hb_font_get_glyph_name(font, gid,
-			   glyphname, sizeof(glyphname));	
+			   glyphname, sizeof(glyphname));
     hv_store(rh, "name", 4,
 		 newSVpvn(glyphname, strlen(glyphname)),  0);
     av_push(results, newRV_inc((SV *)rh));

@@ -8,7 +8,7 @@ use v5.20;
 use TAP::Harness;
 
 my %args = (
-	verbosity => 0,
+	verbosity => 1,
 	lib => ['../lib'],
 	color => 1
 );

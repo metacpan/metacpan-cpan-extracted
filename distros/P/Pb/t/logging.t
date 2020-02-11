@@ -33,7 +33,12 @@ my $test_cmd = <<'END';
 
 		# now do something that will actually create a logfile
 		SH echo => "this is a test";
-		SH echo => "a second line";
+		CODE sub { say "a second line" };
+		CODE sub { say STDERR "third line" };
+		# get a little tricky
+		SH $^X => -le => 'print STDERR "fourth line"';
+		# this is probably the trickiest one of all ...
+		SH echo => "fifth line", '>&2';
 	};
 
 	command logfile_var =>
@@ -71,7 +76,7 @@ check_output pb_run('get_logfile2'), "$logdir/some/other/file", "logfile name in
 
 # verify that we got our logfile output
 my $log = _slurp("$logdir/some/file");
-my @lines = ( "this is a test", "a second line", );
+my @lines = ( "this is a test", "a second line", "third line", "fourth line", "fifth line", );
 is $log, join('', map { "$_\n" } @lines), "base logging works (SH directive)";
 
 # can we do variable substitutions in logfile names?

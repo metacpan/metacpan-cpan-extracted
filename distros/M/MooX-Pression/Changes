@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/MooX-Pression>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.100	2020-02-10
+
+ - Major rewrite using PPR and Keyword::Simple for parsing instead of
+   Keyword::Declare. This massively improves compile-time speed and
+   improved compatibility with Perl 5.14 and Perl 5.16.
+
 0.020	2020-02-02
 
  [ Bug Fixes ]

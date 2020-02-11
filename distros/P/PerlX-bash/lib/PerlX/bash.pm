@@ -5,17 +5,22 @@ use warnings;
 
 use Exporter 'import';
 our @EXPORT = ('bash');
-our @EXPORT_OK = (@EXPORT, qw< pwd head tail >);
+our @EXPORT_OK = (@EXPORT, qw< shq pwd head tail >);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 use Carp;
 use Contextual::Return;
-use List::Util 1.33 qw< any >;
+use List::Util 1.33 qw< min max any >;
 use Scalar::Util qw< blessed >;
 use IPC::System::Simple qw< run capture EXIT_ANY $EXITVAL >;
+
+# see e.g. https://mywiki.wooledge.org/BashGuide/SpecialCharacters
+my $BASH_SPECIAL_CHARS = qr/[\s\$'"\\#\[\]!<>|;{}()~&]/;
+my $BASH_REDIRECTION   = qr/^\d[<>].+/;
+
 
 
 my @AUTOQUOTE =
@@ -29,6 +34,9 @@ sub _should_quote ()
 	my $arg = $_;
 	local $_;
 	return 1 if any { $_->($arg) } @AUTOQUOTE;
+	return 0 if $arg =~ /^$BASH_SPECIAL_CHARS/;
+	return 0 if $arg =~ $BASH_REDIRECTION;
+	return 1 if $arg =~ $BASH_SPECIAL_CHARS;
 	return 0;
 }
 
@@ -37,14 +45,10 @@ sub _process_bash_arg ()
 	# incoming arg is in $_
 	my $arg = $_;				# make a copy
 	croak("Use of uninitialized argument to bash") unless defined $arg;
-	if (_should_quote)
-	{
-		$arg = "$arg";			# stringify
-		$arg =~ s/'/'\\''/g;	# handle internal single quotes
-		$arg = "'$arg'";		# quote with single quotes
-	}
+	$arg = shq($arg) if _should_quote;
 	return $arg;
 }
+
 
 
 sub bash (@)
@@ -52,6 +56,7 @@ sub bash (@)
 	my (@opts, $capture);
 	my $exit_codes = [0..125];
 
+	my $dash_c_cmd;
 	while ( $_[0] and ($_[0] =~ /^-/ or ref $_[0]) )
 	{
 		my $arg = shift;
@@ -59,6 +64,11 @@ sub bash (@)
 		{
 			croak("bash: multiple capture specifications") if $capture;
 			$capture = $$arg;
+		}
+		elsif ($arg eq '-c')
+		{
+			$dash_c_cmd = shift;
+			croak("Missing argument for bash -c") unless length($dash_c_cmd);
 		}
 		elsif ($arg eq '-e')
 		{
@@ -69,7 +79,15 @@ sub bash (@)
 			push @opts, $arg;
 		}
 	}
-	croak("Not enough arguments for bash") unless @_;
+	if (defined $dash_c_cmd)
+	{
+		croak("Too many arguments for bash -c") if @_;
+	}
+	else
+	{
+		croak("Not enough arguments for bash") unless @_;
+		$dash_c_cmd = shift if @_ == 1 and $_[0] and $_[0] =~ /\s/;
+	}
 
 	my $filter;
 	$filter = pop if ref $_[-1] eq 'CODE';
@@ -79,7 +97,7 @@ sub bash (@)
 	push @cmd, @opts;
 	push @cmd, '-c';
 
-	my $bash_cmd = join(' ', map { _process_bash_arg } @_);
+	my $bash_cmd = $dash_c_cmd ? $dash_c_cmd : join(' ', map { _process_bash_arg } @_);
 	push @cmd, $bash_cmd;
 
 	if ($capture)
@@ -90,6 +108,7 @@ sub bash (@)
 		my $output = capture $exit_codes, qw< bash -c >, $bash_cmd;
 		if ($capture eq 'string')
 		{
+			chomp $output;
 			return $output;
 		}
 		elsif ($capture eq 'lines')
@@ -122,6 +141,7 @@ sub bash (@)
 			local $_;
 			while (<CHILD>)
 			{
+				chomp;
 				$filter->($_);
 			}
 			unless (close(CHILD))
@@ -147,15 +167,25 @@ sub bash (@)
 }
 
 
+sub shq
+{
+	local $_ = shift;
+	#$_ = "$_";					# stringify
+	s/'/'\\''/g;				# handle internal single quotes
+	"'$_'";						# quote with single quotes
+}
+
+
+
 use Cwd ();
 *pwd = \&Cwd::cwd;
+
 
 
 sub head
 {
 	my $num = shift;
-	$num = @_ + $num if $num < 0;
-#warn("# num is $num");
+	$num = $num < 0 ? @_ + $num : min($num, scalar @_);
 	@_[0..$num-1];
 }
 
@@ -163,8 +193,7 @@ sub tail
 {
 	my $num = shift;
 	return () unless $num;
-	$num = $num < 0 ? @_ + $num : $num - 1 ;
-#warn("# num is $num");
+	$num = $num < 0 ? max(@_ + $num, 0) : $num - 1 ;
 	@_[$num..$#_];
 }
 
@@ -187,26 +216,26 @@ PerlX::bash - tighter integration between Perl and bash
 
 =head1 VERSION
 
-This document describes version 0.04 of PerlX::bash.
+This document describes version 0.05 of PerlX::bash.
 
 =head1 SYNOPSIS
 
-	# put all instances of Firefox to sleep
-	foreach (bash \lines => pgrep => 'firefox')
-	{
-		bash kill => -STOP => $_ or die("can't spawn `kill`!");
-	}
+    # put all instances of Firefox to sleep
+    foreach (bash \lines => pgrep => 'firefox')
+    {
+        bash kill => -STOP => $_ or die("can't spawn `kill`!");
+    }
 
-	# count lines in $file
-	my $num_lines;
-	local $@;
-	eval { $num_lines = bash \string => -e => wc => -l => $file };
-	die("can't spawn `wc`!") if $@;
+    # count lines in $file
+    my $num_lines;
+    local $@;
+    eval { $num_lines = bash \string => -e => wc => -l => $file };
+    die("can't spawn `wc`!") if $@;
 
-	# can capture actual exit status
-	my $pattern = qr/.../;
-	my $status = bash grep => -e => $pattern => $file, ">$tmpfile";
-	die("`grep` had an error!") if $status == 2;
+    # can capture actual exit status
+    my $pattern = qr/.../;
+    my $status = bash grep => -e => $pattern => $file, ">$tmpfile";
+    die("`grep` had an error!") if $status == 2;
 
 =head1 DESCRIPTION
 
@@ -223,13 +252,13 @@ C<bash> over C<system> are:
 B<Actual bash syntax.>  The C<system> command runs C<sh>, and, even if C<sh> on your system is just
 a symlink to C<bash>, it will I<not> respect the full bash syntax.  For instance, this
 
-	system("diff <(sort $file1) <(sort $file2)");
+    system("diff <(sort $file1) <(sort $file2)");
 
 will B<not> work on your system (unless your system is super-special in some magical way), because
 this type of advanced bash syntax is backwards-incompatible with old Bourne shell syntax.  However,
 I<this>
 
-	bash diff => "<(sort $file1)", "<(sort $file2)";
+    bash diff => "<(sort $file1)", "<(sort $file2)";
 
 works just fine.
 
@@ -239,10 +268,10 @@ B<Better return context.>  The return value of C<system> is "backwards" because 
 code of the command it ran, which is 0 if there were no errors, which is false, thus leading to
 confusing code like so:
 
-	if (!system($cmd))
-	{
-		say "It worked!";
-	}
+    if (not system($cmd))
+    {
+        say "It worked!";
+    }
 
 But C<bash> returns true if the command succeeded, and false if it didn't ... in a boolean context.
 In other scalar contexts, it returns the numeric value of the exit code.  If anything goes wrong, an
@@ -287,14 +316,14 @@ one run mode is a fatal error.
 
 =head3 Capture Modes
 
-Capture modes take the ouptut of the B<bash> command and return it for storage into a Perl variable.
-There are 3 basic capture modes, all of which are indicated by a backslashed argument.
+Capture modes take the ouptut of the C<bash> command and returns it for storage into a Perl
+variable.  There are 3 basic capture modes, all of which are indicated by a backslashed argument.
 
 =head4 String
 
 To capture the entire output as one scalar string, use C<\string>, like so:
 
-	my $num_lines = bash \string => wc => -l => $file;
+    my $num_lines = bash \string => wc => -l => $file;
 
 This is almost exactly like backquotes, except that the output is chomped for you.
 
@@ -302,7 +331,7 @@ This is almost exactly like backquotes, except that the output is chomped for yo
 
 To capture the output as a series of lines, use C<\lines> instead:
 
-	my @lines = bash \lines => git => log => qw< --oneline >, $file;
+    my @lines = bash \lines => git => log => qw< --oneline >, $file;
 
 Individual lines are pre-chomped.
 
@@ -310,7 +339,7 @@ Individual lines are pre-chomped.
 
 If you'd rather have the output split on whitespace, try C<\words>:
 
-	my @words = bash \words => awk => '$1 == "foo" { print $3, $5 }', $file;
+    my @words = bash \words => awk => '$1 == "foo" { print $3, $5 }', $file;
 
 Specifically, the output is split on the equivalent of C</[$ENV{IFS}]+/>; if C<$IFS> is not set in
 your environment, a default value of C<" \t\n"> is used.
@@ -322,15 +351,56 @@ context; in scalar context, they just return the first element of the list.
 
 =head3 Filter Modes
 
-Not yet documented.
+If you write some code that looks like this:
+
+    # print paragraph "1:" through paragraph "10:"
+    say foreach grep { (/^(\d+):/ && $1 < 10)../^$/ } bash \lines => 'my-script';
+
+then it's going to do what you think: all the lines of output are filtered through your C<grep> and
+you get just the lines you wanted.  However, if C<my-script> takes a long time to produce its
+output, this solution may not make you happy, because you get nothing at all until C<my-script> has
+completely finished running.  It would be nicer if you could get the output as it was produced,
+right?
+
+Try this instead:
+
+    # print paragraph "1:" through paragraph "10:"
+    bash \lines => 'my-script |' => sub { say if (/^(\d+):/ && $1 < 10)../^$/ };
+
+You'll be much happier.
+
+Technical details:
+
+=over
+
+=item *
+
+There are two filter modes: C<|> and C<|&>.  The former runs each line of C<STDOUT> through your
+filter function.  The latter runs both C<STDOUT> and C<STDERR> through it.
+
+=item *
+
+In order to use a filter mode, your final argument must be a coderef, and your penultimate argument
+must either consist of, or end with, one of the two modes.
+
+=item *
+
+From the perspective of your filter sub, the incoming line is both C<$_> and C<$_[0]>; use whichever
+you prefer.
+
+=item *
+
+Just as with C<\lines>, each line is pre-chomped for you.
+
+=back
 
 =head2 Arguments
 
 No matter how many arguments you pass to C<bash>, they will be turned into a single command string
 and run via C<bash -c>.  However, PerlX::bash tries to make intelligent guesses as to which of your
 arguments are meant to be treated as a single argument in the command line (and therefore might
-require quoting), and which aren't.  Understanding what the rules behind these guesses can help
-avoid surprises.
+require quoting), and which aren't.  Understanding the rules behind these guesses can help avoid
+surprises.
 
 Basically, there are 3 rules:
 
@@ -348,7 +418,51 @@ L</"Special Characters">) is never quoted.
 =item *
 
 Some things are I<sometimes> quoted.  Any argument that I<contains> a special character (see
-L</"Special Characters">) is quoted.
+L</"Special Characters">) is quoted, unless one of the following things is true:
+
+=over
+
+=item *
+
+It is the only argument left after processing capture modes and filters, B<and> it has whitespace in
+it.  In other words, this:
+
+    bash "echo foo; echo bar";
+
+is the same as this:
+
+    bash -c => "echo foo; echo bar";
+
+On the grounds that that's most likely what you meant.  (You weren't really trying to generate a
+C<echo foo; echo bar: command not found> error, were you?)  Basically, if it looks like it would
+make a lovely command line as is, we don't mess with it.
+
+=item *
+
+It looks like a redirection.  While the majority of redirections I<do> begin with a special char,
+sometimes they start with a number; all the following strings would qualify as "looking like a
+redirection," despite not beginning with a special char:
+
+=over
+
+=item *
+
+C<< 2>something >> (standard redirection with fileno)
+
+=item *
+
+C<< 2>&1 >> (redirection from fileno to fileno)
+
+=item *
+
+C<< 4<<<$SOMEVAR >> (here string)
+
+=back
+
+Note that some redirection syntax may be bash-version-specific, but the decision on whether to quote
+or not does I<not> take the C<bash> version into account.
+
+=back
 
 =item *
 
@@ -363,19 +477,19 @@ The reason that arguments which I<begin> with a special character are treated di
 (oppositely, even) from other arguments containing special characters is to avoid quoting things
 such as redirections.  So, for instance:
 
-	bash echo => "foo", ">bar";
+    bash echo => "foo", ">bar";
 
 is the equivalent of:
 
-	system(q| bash -c 'echo foo >bar' |);
+    system('bash', '-c', q[echo foo >bar]);
 
 whereas:
 
-	bash echo => "foo", "ba>r";
+    bash echo => "foo", "ba>r";
 
 is the equivalent of:
 
-	system(q| bash -c 'echo foo "ba>r"' |);
+    system('bash', '-c', q[echo foo 'ba>r']);
 
 Mostly this does what you want.  For when it doesn't, see L</"Quoting Details">.
 
@@ -408,10 +522,11 @@ For purposes of determining whether to quote arguments, the most important chara
 a string contains any I<special characters>.  Here's the character class of all characters
 considered "special" by bash:
 
-	[ \$'"\\#\[\]!<>|;{}()~]
+    [\s\$'"\\#\[\]!<>|;{}()~&]
 
 Note that space is a special character, as are both types of quotes and all four types of brackets,
-and backslash.
+and backslash.  Note that the list does B<not> include C<=> or the glob characters (C<*> and C<?>),
+because you probably don't want those quoted under most circumstances.
 
 =head3 Quoting Details
 
@@ -419,17 +534,21 @@ If an argument is quoted, it is run through L</shq>, which means it is surrounde
 quotes, and any internal single quotes are appropriately escaped.  This is similar to how `bash -x`
 does it when it prints command lines.
 
-If an argument is not quoted but you wish it were, you can simply call C<shq> yourself (feature not
-yet implemented):
+If an argument is not quoted but you wish it were, you can simply call C<shq> yourself (but remember
+it is not exported by default):
 
-	bash echo => shq(">bar");	# to print ">bar"
+    use PerlX::bash qw< bash shq >;
+    bash echo => shq(">bar");   # to print ">bar"
 
 If an argument I<is> quoted but you wish it weren't, you need to fall back to passing the entire
-command as one big string.  For this, use the C<-c> switch:
+command as one big string.  (The C<-c> switch is not required, but it may be clearer.)
 
-	bash -c => "echo foo;echo bar";
-	# or just, you know, make the semi-colon a separate arg:
-	bash echo => "foo", ';', echo => "bar";
+    # this echoes one line, not two:
+    bash echo => "foo;echo bar";
+    # this gives you two:
+    bash -c => "echo foo;echo bar";
+    # or just, you know, make the semi-colon a separate arg:
+    bash echo => "foo", ';', echo => "bar";
 
 =head2 Switches
 
@@ -441,27 +560,97 @@ handled by PerlX::bash directly.
 Just as with system B<bash>, the C<-c> switch means that the entire command will be sent as one big
 string.  This completely disables all argument quoting (see L</Arguments>).
 
+When using C<-c>, it must be immediately followed by exactly one argument, which is neither C<undef>
+nor the empty string (but C<"0"> is okay, although not particularly useful).  Otherwise it's a fatal
+error.
+
 =head3 -e
 
 Without the use of C<-e>, any exit value from the command is considered acceptable.  (Exceptions are
 still raised if the command fails to launch or is killed by a signal.)  By using C<-e>, exit values
 other than 0 cause exceptions.
 
-	bash       diff => $file1, $file2; # just print diffs, if any
-	bash -e => diff => $file1, $file2; # if there are diffs, print them, then throw exception
+    bash       diff => $file1, $file2; # just print diffs, if any
+    bash -e => diff => $file1, $file2; # if there are diffs, print them, then throw exception
 
 This mimics the C<bash -e> behavior of the system C<bash>.
 
+=head1 FUNCTIONS
+
+=head2 bash
+
+Call your system's C<bash>.  See L</DESCRIPTION> for full details.
+
+=head2 shq
+
+Manually quote something for use as a command-line argument to C<bash>.  The following steps are
+performed:
+
+=over
+
+=item *
+
+The argument is stringified, in case it is an object.
+
+=item *
+
+Any single quotes in the string are globally replaced with C<'\''>.
+
+=item *
+
+The entire string is then enclosed in single quotes.
+
+=back
+
+This should get the string to I<bash> as you intended it; however, beware of arguments which are
+consequently passed on to another shell (e.g. when your C<bash> command is C<ssh>).  In those cases,
+extra quoting may be required, and you must provide that before calling C<shq>.
+
+Exported only on request.
+
+=head2 pwd
+
+This is just an alias for L<Cwd/cwd>.  We use the C<pwd> name because that's more comfortable for
+regular users of C<bash>.  Exported on request only, so just C<use Cwd> instead if you prefer the
+more Perl-ish name.
+
+=head2 head
+
+=head2 tail
+
+Perl functions that work much like the POSIX-standard C<head> and C<tail> utilities, but for array
+elements rather than lines of files.  Exported only on request.
+
+    # this code:          is the same as this code:
+    head  3 => @list;   # @list[0..2]
+    head -3 => @list;   # @list[0..$#list-3]
+    tail -3 => @list;   # @list[@list-3..$#list]
+    tail +3 => @list;   # @list[2..$#list]
+
+Note that not only is it way easier to type, easier to understand when reading, and possibly saves
+you a temporary variable, it also can be safer: when e.g. C<@list> contains only 2 elements, several
+of the right-hand constructs will give you unexpected answers.  However, C<head> and C<tail> always
+just return as many elements as they can, which is probably closer to what you were expecting:
+
+    my @list = 1..2;
+    @list[@list-3..$#list];  # (2, 1, 2) #!!!
+    tail -3 => @list;        # (1, 2)
+
+Their use really shines, however, when used in conjunction with C<bash \lines> and some functional
+programming:
+
+    my @top_3_numbered_lines = head 3 => grep /^\d/, bash \lines => 'my-script';
+
 =head1 STATUS
 
-This module is still an experiment, but I am currently using it daily for small tasks.  The basic
-functionality is very useful; however, I still cannot yet promise I won't make sweeping changes to
-the interface.  I still welcome suggestions and contributions, and continue to recommend that you do
-I<not>  rely on this in production code (yet).
+This module is no longer experimental, and is currently being used for production tasks.  There will
+be no further sweeping changes to the interface, but some tweaking may be necessary as it sees more
+and more use.  Documentation should be complete at this point; anything missing should be considered
+a bug and reported.  I continue to welcome suggestions and contributions, and now recommend that you
+use this for any purpose you like, but perhaps just keep a close eye on it as it continues to
+mature.
 
-Documentation is much improved, but still not complete.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -478,7 +667,7 @@ via TDD (Test-Driven Development), so a patch that includes a failing test is mu
 likely to get accepted (or at least likely to get accepted more quickly).
 
 If you just want to report a problem or suggest a feature, that's okay too.  You can create
-an issue on GitHub here: L<http://github.com/barefootcoder/perlx-bash/issues>.
+an issue on GitHub here: L<https://github.com/barefootcoder/perlx-bash/issues>.
 
 =head2 Source Code
 
@@ -493,7 +682,7 @@ Buddy Burden <barefootcoder@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2019 by Buddy Burden.
+This software is Copyright (c) 2015-2020 by Buddy Burden.
 
 This is free software, licensed under:
 

@@ -1,10 +1,9 @@
 # Data::Report::Plugin::Html.pm -- HTML plugin for Data::Report
-# RCS Info        : $Id: Html.pm,v 1.8 2008/08/18 09:51:23 jv Exp $
 # Author          : Johan Vromans
 # Created On      : Thu Dec 29 15:46:47 2005
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Aug 18 11:45:39 2008
-# Update Count    : 83
+# Last Modified On: Sun Feb  9 19:52:28 2020
+# Update Count    : 84
 # Status          : Unknown, Use with caution!
 
 package Data::Report::Plugin::Html;

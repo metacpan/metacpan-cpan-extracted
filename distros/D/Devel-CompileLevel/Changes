@@ -1,5 +1,8 @@
 Revision history for Devel-CompileLevel
 
+0.001003 - 2020-02-10
+  - fix detection on perl 5.31.7
+
 0.001002 - 2016-10-31
   - fix detection on perl 5.16
 

@@ -163,6 +163,10 @@
 #include <sys/syslog.h>
 #endif
 
+#ifdef LINUX
+#include <fcntl.h>
+#endif
+
 #include <utmp.h>
 
 #include <unistd.h>

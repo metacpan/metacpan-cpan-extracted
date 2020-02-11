@@ -34,7 +34,7 @@ use warnings;
 # our $editor = '';
 # our $berkeleydb = '';
 # our $berkeleydb_perl_module_lib = '';
-our $save_fa_logs_dot_zip_in_current_directory = 1;
+# our $save_fa_logs_dot_zip_in_current_directory = 1;
 
 #################################################################
 ##  Do NOT alter code BELOW this block.

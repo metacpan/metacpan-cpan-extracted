@@ -22,7 +22,7 @@
 #
 #######################################################################
 
-from urllib import urlencode
+from urllib.parse import urlencode
 import httplib2
 import argparse
 import re
@@ -46,7 +46,7 @@ parser.add_argument('pem_file',nargs='?',default='fullauto.pem')
 args=parser.parse_args()
 client_id = args.clientid;
 
-# http://mancoosi.org/~abate/upload-file-using-httplib
+# https://web.archive.org/web/20160316113959/http://mancoosi.org/~abate/upload-file-using-httplib 
 def upload(url,filename,bearer):
     def encode (file_path, fields=[]):
         BOUNDARY = '----------bundary------'
@@ -62,7 +62,7 @@ def upload(url,filename,bearer):
                ])
         # Now add the file itself
         file_name = os.path.basename(file_path)
-        f = open(file_path, 'rb')
+        f = open(file_path)
         file_content = f.read()
         f.close()
         body.extend(
@@ -76,15 +76,18 @@ def upload(url,filename,bearer):
            ])
         # Finalize the form body
         body.extend(['--' + BOUNDARY + '--', ''])
+        # https://arstechnica.com/civis/viewtopic.php?t=202651
         return 'multipart/form-data; boundary=%s' % BOUNDARY, CRLF.join(body)
 
     if os.path.exists(filename):
-        print "UPLOADING: "+filename
+        print ("UPLOADING: "+filename)
         content_type, body = encode(filename)
         headers = { 'Content-Type': content_type,'Authorization': bearer }
         httpx = httplib2.Http(disable_ssl_certificate_validation=True)
-        httpx.request(url,'POST', body, headers)
-        print "\n   Waiting for 3 seconds . . .\n"
+        print (body)
+        output=httpx.request(url,'POST', body, headers)
+        print (output)
+        print ("\n   Waiting for 3 seconds . . .\n")
         time.sleep( 3 )
 
 pem_file_path='';
@@ -93,78 +96,79 @@ home = expanduser("~")
 cwd = os.getcwd()
 username = getpass.getuser()
 if os.path.isfile(args.pem_file) and os.access(args.pem_file, os.R_OK):
-    print "CWD="+cwd
+    print ("CWD="+cwd)
     pem_file_path=cwd+'/'+args.pem_file
-    os.chmod(pem_file_path,0777)
-    print pem_file_path+" exists and is readable"
+    os.chmod(pem_file_path,0o777)
+    print (pem_file_path+" exists and is readable")
 elif os.path.isfile(home+'/'+args.pem_file) and \
        os.access(home+'/'+args.pem_file, os.R_OK):
     pem_file_path=home+'/'+args.pem_file
-    os.chmod(pem_file_path,0777)
-    print pem_file_path+" exists and is readable"
+    os.chmod(pem_file_path,0o777)
+    print (pem_file_path+" exists and is readable")
 elif os.path.isfile('/cygdrive/c/Users/'+username+'/Desktop/'+args.pem_file) \
        and os.access('/cygdrive/c/Users/'+username+'/Desktop/'+args.pem_file, \
        os.R_OK):
     pem_file_path='/cygdrive/c/Users/'+username+'/Desktop/'+args.pem_file
-    os.chmod(pem_file_path,0777)
-    print pem_file_path+"\nexists and is readable"
+    os.chmod(pem_file_path,0o777)
+    print (pem_file_path+"\nexists and is readable")
 else:
-    print args.pem_file+" is missing or is not readable"
+    print (args.pem_file+" is missing or is not readable")
     sys.exit()
-with open(pem_file_path,'rb') as f:
+with open(pem_file_path) as f:
     pemfile = f.read()
-print pemfile
+print (pemfile)
 
 http = httplib2.Http(disable_ssl_certificate_validation=True)
 http.follow_redirects = False
-url = "https://localhost/request?client_id=" + client_id \
+url = "http://localhost/request?client_id=" + client_id \
       + "&response_type=code&redirect_uri=/cmd"
-print "URL="+url
+print ("URL="+url)
 headerz, content = http.request(url, "GET")
-code = re.search('code=(\d+)',content)
+print (content)
+code = re.search('code=(\d+)',content.decode('utf-8'))
 code = code.group(1)
-url = "https://localhost//token?grant_type=authorization_code&client_id=" \
+url = "http://localhost//token?grant_type=authorization_code&client_id=" \
       + client_id + "&redirect_uri=/cmd&code=" + code
 headerz, content = http.request(url, "GET")
-accesstoken = re.search('access_token":(\d+)',content)
+accesstoken = re.search('access_token":(\d+)',content.decode('utf-8'))
 accesstoken = accesstoken.group(1);
-refreshtoken = re.search('refresh_token":(\d+)',content)
+refreshtoken = re.search('refresh_token":(\d+)',content.decode('utf-8'))
 refreshtoken = refreshtoken.group(1);
 credentials_file = 'credentials.csv'
 if os.path.isfile(credentials_file) and os.access(credentials_file, os.R_OK):
     cred_file_path=cwd+'/'+credentials_file
-    os.chmod(cred_file_path,0777)
-    print cred_file_path+" exists and is readable"
+    os.chmod(cred_file_path,0o777)
+    print (cred_file_path+" exists and is readable")
 elif os.path.isfile(home+'/'+credentials_file) and \
        os.access(home+'/'+credentials_file, os.R_OK):
     cred_file_path=home+'/'+credentials_file
-    os.chmod(cred_file_path,0777)
-    print cred_file_path+" exists and is readable"
+    os.chmod(cred_file_path,0o777)
+    print (cred_file_path+" exists and is readable")
 elif os.path.isfile('/cygdrive/c/Users/'+username+'/Desktop/'+ \
        credentials_file) and os.access('/cygdrive/c/Users/'+username+ \
        '/Desktop/'+credentials_file, os.R_OK):
     cred_file_path='/cygdrive/c/Users/'+username+'/Desktop/'+credentials_file
-    os.chmod(cred_file_path,0777)
-    print cred_file_path+"\nexists and is readable"
+    os.chmod(cred_file_path,0o777)
+    print (cred_file_path+"\nexists and is readable")
 else:
-    print credentials_file+" is missing or is not readable"
+    print (credentials_file+" is missing or is not readable")
     sys.exit()
 bearer  = "Bearer "+accesstoken
-url = 'https://localhost/cmd'
+url = 'http://localhost/cmd'
 upload(url,cred_file_path,bearer)
 #sys.exit()
 with open("/tmp/"+credentials_file) as f:
     for line in f:
         items=line.split(',');
-data = {'cmd': [['aws_configure',items[1],items[2]],
-                ['cmd','hostname'],
+#data = {'cmd': [['aws_configure',items[1],items[2]],
+data = {'cmd': [['cmd','hostname'],
                 ['cwd','/bin'],
                 ['cmd_raw','export HELLO=hello'],
                 ['cmd','echo $HELLO'],
                 ['cmd','pwd'],
                 ['cmd','aws ec2 describe-instances']]}
 headers = {'Content-Type': 'application/json','Authorization': bearer }
-url     = 'https://localhost/cmd'
+url     = 'http://localhost/cmd'
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
@@ -174,22 +178,22 @@ myip=([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2
      s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, \
      socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
 for inst in result['Reservations']:
-   print inst
+   print (inst)
    for elem in inst['Instances']:
-      print elem
+      print (elem)
       if elem['State']['Name'] == 'terminated':
-            print "GOT CONTINUE"
+            print ("GOT CONTINUE")
             continue
       if myip == elem['PrivateIpAddress']:
-            print elem['SecurityGroups'][0]['GroupId']
-            print elem['PrivateIpAddress']
-            print elem['State']['Name']
-            print elem['SubnetId']
+            print (elem['SecurityGroups'][0]['GroupId'])
+            print (elem['PrivateIpAddress'])
+            print (elem['State']['Name'])
+            print (elem['SubnetId'])
             break
    else:
       continue
    break
-print "\n   Waiting for 3 seconds . . .\n"
+print ("\n   Waiting for 3 seconds . . .\n")
 time.sleep( 3 )
 gid      = elem['SecurityGroups'][0]['GroupId']
 sid      = elem['SubnetId']
@@ -200,11 +204,11 @@ headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
 result = json.loads(result[0][0])
-print result
+print (result)
 cidr=''
 dockergid=''
 for inst in result['SecurityGroups']:
-   print inst
+   print (inst)
    dockergid = inst['GroupId']
    try:
       cidr      = inst['IpPermissions'][0]['IpRanges'][0]['CidrIp']
@@ -219,10 +223,14 @@ ingress  = 'aws ec2 authorize-security-group-ingress ' + \
            '--group-name DockerSecurityGroup --protocol tcp ' + \
            '--port 22 --cidr ' + cidr + ' 2>&1'
 
-print ingress
+print (ingress)
+
+print ("\n   Waiting for 3 seconds . . .\n")
+time.sleep( 3 )
 
 upload(url,pem_file_path,bearer)
 
+print ("Done with Upload")
 #sys.exit()
 
 time.sleep( 1 )
@@ -252,12 +260,12 @@ mvcre=credentials_file
 if re.search(' ',args.pem_file):
     mvcre="'"+mvcre+"'"
     
-data = {'cmd': [['cmd','mv /tmp/'+mvpem+
+data = {'cmd': [['cmd','sudo mv -vf /tmp/'+mvpem+
                  ' '+homedir+'/FullAutoAPI'],
-                ['cmd','mv /tmp/'+mvcre+
+                ['cmd','sudo mv -vf /tmp/'+mvcre+
                  ' '+homedir+'/FullAutoAPI'],
                 ['cwd',homedir+'/FullAutoAPI'],
-                ['cmd','chmod 400 '+mvpem],
+                ['cmd','chmod -v 400 '+mvpem],
                 ['cmd',new_sg],
                 ['cmd',ingress]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
@@ -279,9 +287,9 @@ else:
    result=json.loads(result[4][0])
    sec_group_id=result['GroupId']
 time.sleep( 1 )
-print "   Continuing . . .\n";
+print ("   Continuing . . .\n")
 #sys.exit()
-region = "wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/document|grep region"
+region = "sudo wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/document|grep region"
 data = {'cmd': [['cmd',region]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
@@ -316,80 +324,80 @@ while loop == 1: # This creates an infinite loop
    result = json.loads(content)
    result = json.loads(result['result'])
    result = json.loads(result[0][0])
-   print '------------------'
-   print result['Reservations'][0]['Instances'][0]['State']['Name']
+   print ('------------------')
+   print (result['Reservations'][0]['Instances'][0]['State']['Name'])
    if result['Reservations'][0]['Instances'][0]['State']['Name'] == 'running':
       break
-print '==================='
-print docker_ip
-print "USERNAME/PEMFILE="+remuser+'/'+args.pem_file
+print ('===================')
+print (docker_ip)
+print ("USERNAME/PEMFILE="+remuser+'/'+args.pem_file)
 data = {'cmd': [['connect_secure',{'ip':docker_ip,'login':'ec2-user','identityfile':'/home/'+remuser+'/FullAutoAPI/'+args.pem_file,'noretry':'1'}]]}
 time.sleep( 1 )
 docker_server1='';
-print "\nGoing to Attempt to Connect to new Docker Server via ssh . . .\n"
+print ("\nGoing to Attempt to Connect to new Docker Server via ssh . . .\n")
 while loop == 1: # This creates an infinite loop
    headerz, content = http.request(url, "POST", body=dumps(data), \
       headers=headers)
    result = json.loads(content)
    result = json.loads(result['result'])
    if re.search('Connection timed out|Connection refused',result[0][1]):
-      print "\n   Waiting for sshd service to start . . .\n"
+      print ("\n   Waiting for sshd service to start . . .\n")
       time.sleep( 3 )
       continue
    else:
-      print "GOT DOCKER!!!!"+result[0][1]
+      print ("GOT DOCKER!!!!"+result[0][1])
       docker_server1=result[0][0]
    break
 time.sleep( 1 )
-print "DOCKER_SERVER1="+docker_server1
+print ("DOCKER_SERVER1="+docker_server1)
 data = {'cmd': [['label',[docker_server1,'cmd','sudo yum -y install docker docker-registry']],
                 ['label',[docker_server1,'cmd','sudo service docker start']],
                 ['label',[docker_server1,'cmd','sudo usermod -a -G docker ec2-user']]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
-print result[0][1]
+print (result[0][1])
 time.sleep( 1 )
 data = {'cmd': [['label',[docker_server1,'close']]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
-print result
-print "USERNAME="+remuser+'/'+args.pem_file
+print (result)
+print ("USERNAME="+remuser+'/'+args.pem_file)
 data = {'cmd': [['connect_secure',{'ip':docker_ip,'login':'ec2-user', \
    'identityfile':'/home/'+remuser+'/FullAutoAPI/'+
    args.pem_file,'noretry':'1'}]]}
 time.sleep( 1 )
 docker_server1='';
 while loop == 1: # This creates an infinite loop
-   print "GOING FOR CONNECT"
+   print ("GOING FOR CONNECT")
    headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
    result = json.loads(content)
    result = json.loads(result['result'])
    if re.search('Connection timed out|Connection refused',result[0][1]):
-      print result[0][1]
+      print (result[0][1])
       time.sleep( 1 )
       continue
    else:
-      print "GOT DOCKER AGAIN!!!!"
+      print ("GOT DOCKER AGAIN!!!!")
       docker_server1=result[0][0]
    break
 time.sleep( 1 )
-print "DOCKER_SERVER1="+docker_server1
+print ("DOCKER_SERVER1="+docker_server1)
 data = {'cmd': [['label',[docker_server1,'cmd','hostname']]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
-print "HOSTNAME="+str(result[0][0])
+print ("HOSTNAME="+str(result[0][0]))
 time.sleep( 1 )
 data = {'cmd': [['label',[docker_server1,'cmd','docker info']]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
-print "DOCKER INFO="+str(result[0][0])
+print ("DOCKER INFO="+str(result[0][0]))
 time.sleep( 1 )
 data = {'cmd': [['label',[docker_server1,'docker_run','ubuntu /bin/bash']]]}
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
-print "DOCKER CONTAINER HOSTNAME="+str(result[0][0])
+print ("DOCKER CONTAINER HOSTNAME="+str(result[0][0]))

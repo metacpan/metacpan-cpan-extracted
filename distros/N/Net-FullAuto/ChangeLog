@@ -20,6 +20,24 @@
 #######################################################################
 
 
+2020-02-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000528 released
+
+        * Updated Instruction Set FullAutoAPI_is.pm.
+
+        * Updated Docker_is.py.
+
+
+2020-02-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000527 released
+
+        * Updated Instruction Set FullAutoAPI_is.pm.
+
+	* Updated Docker_is.py.
+
+
 2020-02-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000526 released

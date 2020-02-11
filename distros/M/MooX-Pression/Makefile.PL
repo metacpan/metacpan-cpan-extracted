@@ -23,12 +23,13 @@ my $meta = {
                                          recommends => { "Class::XSAccessor" => 0, "MooX::TypeTiny" => 0, "perl" => "5.022000" },
                                          requires   => {
                                                          "B::Hooks::EndOfScope" => 0,
-                                                         "Devel::StrictMode"    => 0,
-                                                         "Exporter::Tiny"       => "1.000000",
-                                                         "Import::Into"         => 0,
-                                                         "Keyword::Declare"     => 0.001014,
-                                                         "MooX::Press"          => "0.040",
-                                                         "perl"                 => "5.014000",
+                                                         "Devel::StrictMode" => 0,
+                                                         "Exporter::Tiny" => "1.000000",
+                                                         "Import::Into" => 0,
+                                                         "Keyword::Simple" => 0,
+                                                         "MooX::Press" => "0.040",
+                                                         "perl" => "5.014000",
+                                                         "PPR" => 0,
                                                          "Syntax::Keyword::Try" => 0.11,
                                                        },
                                        },
@@ -37,7 +38,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => "0.020" },
+                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => "0.100" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +54,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Pression/project",
                         },
-  "version"          => "0.020",
+  "version"          => "0.100",
   "x_static_install" => 1,
 };
 

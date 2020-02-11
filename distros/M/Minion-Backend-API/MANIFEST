@@ -1,0 +1,14 @@
+Makefile.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README.md
+t/Minion/Backend/Fake.pm
+t/backend_api.t
+t/fake.t
+t/minion_api.t
+t/MyApp.pm
+lib/Minion/Backend/API.pm
+lib/Mojolicious/Plugin/Minion/API.pm
+cpanfile

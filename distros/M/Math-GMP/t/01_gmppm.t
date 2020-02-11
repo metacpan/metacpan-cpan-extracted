@@ -26,7 +26,11 @@ foreach my $line (@data) {
 	my $ans = pop(@args);
 
 	my $expect_list = 0;
-	if ($ans =~ s/\AL//) {
+    my $ans_any = ($ans =~ s/\AANY//);
+    if ($ans_any) {
+        $ans = [ split /,/, $ans ];
+    }
+	elsif ($ans =~ s/\AL//) {
 		$ans = [ split /,/, $ans ];
 		$expect_list = 1;
 	}
@@ -186,19 +190,23 @@ foreach my $line (@data) {
 	}
     my ($x,$y,$z);
 	my $got = eval $try;
-	if ($expect_list) {
-		is_deeply($got, $ans, "Test worked: $try");
-	} else {
-		is("$got", $ans, "Test worked: $try");
-	}
+    my $test_sub = sub {
+        my $desc = shift;
+        my $blurb = "Test worked ${desc}: $try";
+        if ($ans_any) {
+            ok(scalar(1 == scalar(grep { $_ eq $got } @$ans)), $blurb);
+        } elsif ($expect_list) {
+            is_deeply($got, $ans, $blurb);
+        } else {
+            is("$got", $ans, $blurb);
+        }
+    };
+
+    $test_sub->("");
     if ($WITH_FEATURE)
     {
         $got = eval "use feature 'bitwise'; no warnings 'experimental::bitwise'; $try";
-        if ($expect_list) {
-            is_deeply($got, $ans, "Test worked [feature bitwise]: $try");
-        } else {
-            is("$got", $ans, "Test worked [feature bitwise]: $try");
-        }
+        $test_sub->("[feature bitwise]");
     }
     else
     {
@@ -757,7 +765,7 @@ i454249403:i-79475159:-1
 -5694706465843977004:9365273357682496999:-1
 878944444444444447324234:216539985579699669610468715172511426009:-1
 &probab_prime
-3878888047:25:1
+3878888047:25:ANY1,2
 14811094489161957443:25:1
 232959001450513754379792189108873634181:25:1
 91824020991616815553147615676933454480045241423098328989602116468298297311309:25:1

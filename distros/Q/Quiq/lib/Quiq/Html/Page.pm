@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.172';
+our $VERSION = '1.173';
 
 use Quiq::Css;
 use Quiq::JQuery::Function;
@@ -224,16 +224,26 @@ sub html {
 
     # ready-Handler
 
-    my $readyHandlers = '';
+    #my $readyHandlers = '';
+    #for (@$readyA) {
+    #    $readyHandlers .= Quiq::JQuery::Function->ready($_)."\n";
+    #}
+    #if ($readyHandlers) {
+    #    push @$javaScript,$readyHandlers;
+    #}
+
     for (@$readyA) {
-        $readyHandlers .= Quiq::JQuery::Function->ready($_)."\n";
-    }
-    if ($readyHandlers) {
-        push @$javaScript,$readyHandlers;
+        push @$javaScript,Quiq::JQuery::Function->ready($_);
     }
 
     # Script-Definition(en)
-    my $scriptTags = Quiq::JavaScript->script($h,$javaScript);
+
+    # my $scriptTags = Quiq::JavaScript->script($h,$javaScript);
+
+    my $scriptTags;
+    for my $js (@$javaScript) {
+        $scriptTags .= Quiq::JavaScript->script($h,$js);
+    }
 
     # Wenn $body keinen body-Tag enthält, fügen wir ihn hinzu.
 
@@ -292,7 +302,7 @@ sub html {
 
 =head1 VERSION
 
-1.172
+1.173
 
 =head1 AUTHOR
 

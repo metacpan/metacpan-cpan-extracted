@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Simple tests => 25;
+use Test::Simple tests => 26;
 use Eircode qw< check_eircode >;
 
 my @t = (
@@ -25,8 +25,9 @@ my @t = (
     [["D6W B2CD"], 1, 'Known exceptional routing key pass'],
     [["D22 YD82"], 1, 'D22 YD82'],
     [["F93 T3P6"], 1, 'F93 T3P6'],
+    [["a65b2cd", {space_optional => 1}, 1, 'space_optional with our example code and no spaces']],
     [["f93t3p6", {space_optional =>1}], 1, 'space_optional + lower case no spaces'],
-    [["F93T3P6", {space_optional =>1}], 1, 'space_optional + lower case no spaces'],
+    [["F93T3P6", {space_optional =>1}], 1, 'space_optional + Upper case no spaces'],
     [["f93 t3p6", {space_optional =>1}], 1, 'space_optional + lower case correct space'],
     [["f93  t3p6", {space_optional =>1}], 1, 'space_optional + lower case too much space'],
     [["f93t 3p6", {space_optional =>1}], 0, 'space_optional + lower case wrong space'],

@@ -3,8 +3,6 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-my ($k1, $k2, $k3);
-
 package MyApp {
 	use MooX::Pression;
 	
@@ -13,22 +11,26 @@ package MyApp {
 	}
 	
 	class Bar {
-		
-		$k1 = do { class; };
-		
-		$k2 = do { class {
-			extends {"::$k1"};
-			has foo (type => 'Foozle', required => true);
-			class Baz;
-		}};
-		
-		$k3 = do { class (Int $x) {
-			extends {"::$k1"};
-			has bar ( type => 'Int', default => $x );
-		}};
-		
+		method get_classes () {
+			my $k1 = do { class; };
+
+			my $k2 = do { class {
+				extends {"::$k1"};
+				has foo (type => 'Foozle', required => true);
+				class Baz;
+			}};
+			
+			my $k3 = do { class (Int $x) {
+				extends {"::$k1"};
+				has bar ( type => 'Int', default => $x );
+			}};
+			
+			return ($k1, $k2, $k3);
+		}
 	}
 }
+
+my ($k1, $k2, $k3) = MyApp->new_bar->get_classes;
 
 my $obj1 = $k1->new();
 

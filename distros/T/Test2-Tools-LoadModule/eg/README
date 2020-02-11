@@ -1,0 +1,11 @@
+This directory contains sample code for this package:
+
+README
+    This file.
+
+basic.t
+    This is a specimen test script using Test2::Tools::LoadModule. It
+    is runnable, and tests Text::Wrap. It is also annotated for
+    conversion to meet your needs. It assumes that the things tested are
+    so fundamental that you want to abort the entire testing run if any
+    test fails.

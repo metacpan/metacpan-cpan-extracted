@@ -137,6 +137,13 @@ DESCRIPTION
 
           MyApp::Cow->FACTORY  # returns "MyApp"
 
+        The factory package will also have a method called `qualify`
+        installed, which uses the same logic as MooX::Press to add prefixes to
+        class/role names.
+
+          MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
+          MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
+
     `type_library` *(Str|Undef)*
         MooX::Press will automatically create a Type::Library-based type
         library with type constraints for all your classes and roles. It will
@@ -1122,6 +1129,10 @@ DESCRIPTION
     MooX::Press will automatically load MooX::TypeTiny if it's installed,
     which optimizes how Type::Tiny constraints and coercions are inlined into
     Moo constructors. This is only used for Moo classes.
+
+    MooX::Press will automatically load and apply MooX::XSConstructor if it's
+    installed, which will optmimize constructors for some very basic classes.
+    Again, this is only for Moo classes.
 
     MooX::Press will automatically load MooseX::XSAccessor if it's installed,
     which speeds up some Moose accessors. This is only used for Moose classes.

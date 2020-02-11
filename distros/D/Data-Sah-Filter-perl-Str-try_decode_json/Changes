@@ -1,0 +1,5 @@
+0.001   2020-02-11  Released-By: PERLANCAR
+
+        - First release. Currently unusable in Perinci::CmdLine-based
+          applications because Perinci::Sub::GetArgs::Argv will croak before we
+          get to the prefilters.

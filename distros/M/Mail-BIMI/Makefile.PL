@@ -37,10 +37,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Mail::SPF::Request" => 0,
+    "Mail::SPF::Server" => 0,
+    "Net::DNS::Resolver::Mock" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20200129",
+  "VERSION" => "1.20200210",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,9 +60,12 @@ my %FallbackPrereqs = (
   "Mail::AuthenticationResults::Header::SubEntry" => 0,
   "Mail::DMARC" => 0,
   "Mail::DMARC::PurePerl" => 0,
+  "Mail::SPF::Request" => 0,
+  "Mail::SPF::Server" => 0,
   "Moo" => 0,
   "Moo::Role" => 0,
   "Net::DNS::Resolver" => 0,
+  "Net::DNS::Resolver::Mock" => 0,
   "Test::More" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => 0,

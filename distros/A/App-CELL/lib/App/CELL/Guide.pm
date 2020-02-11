@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2020, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -46,11 +46,11 @@ App::CELL::Guide - Introduction to App::CELL (POD-only module)
 
 =head1 VERSION
 
-Version 0.222
+Version 0.227
 
 =cut
 
-our $VERSION = '0.222';
+our $VERSION = '0.227';
 
 
 
@@ -62,19 +62,19 @@ our $VERSION = '0.222';
 
 =head1 INTRODUCTION
 
-L<App::CELL> is the Configuration, Error-handling, Localization, and
-Logging (CELL) framework for applications written in Perl. In the
-L</APPROACH> section, this Guide describes the CELL approach to each of
-these four areas, separately. Then, in the </RATIONALE> section,
-it presents the author's reasons for bundling them together.
+L<App::CELL> is the Configuration, Error-handling, Localization, and Logging
+(CELL) framework for applications written in Perl. In the L</GENERAL APPROACH>
+section, this Guide describes the CELL approach to each of these four areas,
+separately. Then, in the L</RATIONALE> section, it presents the author's reasons
+for bundling them together.
 
 
 
 =head1 HISTORY
 
-CELL was written by Smithfarm in 2013 and 2014, initially as part of the
-Dochazka project [[ link to SourceForge ]]. Due to its generic nature, it
-was spun off into a separate project.
+The original L<App::CELL> was written by Nathan Cutler in 2013 and 2014,
+initially as part of the L<App::Dochazka::REST> project. Later, with a view to
+its generic nature, it was spun off into a separate project.
 
 
 
@@ -215,8 +215,11 @@ log messages:
 
 To actually see your log messages, you have to do something like this:
 
-    use Log::Any::Adapter ('File', $ENV{'HOME'} . '/tmp/CELLtest.log');
+    use Log::Any::Adapter ( 'File', $ENV{'HOME'} . '/CELLtest.log' );
 
+or, even simpler:
+
+    use Log::Any::Adapter ( 'Stderr' );
 
 
 
@@ -244,7 +247,7 @@ the sitedir for files matching this description, and attempts to load them.
 
 =head4 Core parameters
 
-As in Request Tracker, C<core> paramters have immutable values and are
+As in Request Tracker, C<core> parameters have immutable values and are
 intended to be used as "factory defaults", set by the developer, that the
 site administrator can override by setting site parameters. If the
 application is called FooApp, its core configuration settings could be
@@ -756,7 +759,7 @@ starting with C<CELL_>.
 
 =head2 Mutable and immutable parameters
 
-It is important to realize that, although core parameters can be overriden
+It is important to realize that, although core parameters can be overridden
 by site parameters, internally the values of both are immutable. Although
 it is possible to change them by cheating, the 'set' method of C<$core> and
 C<$site> will refuse to change the value of an existing core/site parameter.

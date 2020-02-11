@@ -17,6 +17,7 @@ t/control.t
 t/errors.t
 t/export.t
 t/flow-guts.t
+t/interactive.t
 t/logging.t
 t/opt.t
 t/pretend.t
