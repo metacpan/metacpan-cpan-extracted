@@ -1,8 +1,9 @@
 package Data::Sah::CoerceJS;
 
-our $DATE = '2020-01-03'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,6 +39,9 @@ sub gen_coercer {
     my %args = @_;
 
     my $rt = $args{return_type} // 'val';
+    # old values still supported but deprecated
+    $rt = 'bool_coerced+val' if $rt eq 'status+val';
+    $rt = 'bool_coerced+str_errmsg+val' if $rt eq 'status+err+val';
 
     my $rules = Data::Sah::CoerceCommon::get_coerce_rules(
         %args,
@@ -55,9 +59,9 @@ sub gen_coercer {
             if ($i == $#{$rules}) {
                 if ($rt eq 'val') {
                     $prev_term = 'data';
-                } elsif ($rt eq 'status+val') {
+                } elsif ($rt eq 'bool_coerced+val') {
                     $prev_term = '[null, data]';
-                } else { # status+err+val
+                } else { # bool_coerced+str_errmsg+val
                     $prev_term = '[null, null, data]';
                 }
             } else {
@@ -70,13 +74,13 @@ sub gen_coercer {
                 } else {
                     $expr = "($rule->{expr_match}) ? ($rule->{expr_coerce}) : $prev_term";
                 }
-            } elsif ($rt eq 'status+val') {
+            } elsif ($rt eq 'bool_coerced+val') {
                 if ($rule->{meta}{might_fail}) {
                     $expr = "(function() { if ($rule->{expr_match}) { var _tmp1 = $rule->{expr_coerce}; if (_tmp1[0]) { return [true, null] } else { return [true, _tmp1[1]] } } else { return $prev_term } })()";
                 } else {
                     $expr = "($rule->{expr_match}) ? [true, $rule->{expr_coerce}] : $prev_term";
                 }
-            } else { # status+err+val
+            } else { # bool_coerced+str_errmsg+val
                 if ($rule->{meta}{might_fail}) {
                     $expr = "(function() { if ($rule->{expr_match}) { var _tmp1 = $rule->{expr_coerce}; if (_tmp1[0]) { return [true, _tmp1[0], null] } else { return [true, null, _tmp1[1]] } } else { return $prev_term } })()";
                 } else {
@@ -90,8 +94,8 @@ sub gen_coercer {
             "function (data) {\n",
             "    if (data === undefined || data === null) {\n",
             "        ", ($rt eq 'val' ? "return null;" :
-                             $rt eq 'status+val' ? "return [null, null];" :
-                             "return [null, null, null];" # status+err+val
+                             $rt eq 'bool_coerced+val' ? "return [null, null];" :
+                             "return [null, null, null];" # bool_coerced+str_errmsg+val
                          ), "\n",
             "    }\n",
             "    return ($expr);\n",
@@ -100,9 +104,9 @@ sub gen_coercer {
     } else {
         if ($rt eq 'val') {
             $code = 'function (data) { return data }';
-        } elsif ($rt eq 'status+val') {
+        } elsif ($rt eq 'bool_coerced+val') {
             $code = 'function (data) { return [null, data] }';
-        } else {
+        } else { # bool_coerced+str_errmsg+val
             $code = 'function (data) { return [null, null, data] }';
         }
     }
@@ -154,7 +158,7 @@ Data::Sah::CoerceJS - Generate coercer code
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::CoerceJS (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,7 @@
 use alienfile;
 use File::chdir;
-use File::Spec;
 
-requires 'File::chdir';
+configure { requires 'File::chdir' };
 
 plugin 'Probe::CommandLine' => (
   command => 'patch',
@@ -12,11 +11,29 @@ plugin 'Probe::CommandLine' => (
 
 share {
   plugin 'Download' => (
-    url     => 'http://ftp.gnu.org/gnu/patch',
+    url     => 'https://ftp.gnu.org/gnu/patch',
     version => qr/^patch-([0-9\.]+)\.tar\.gz$/,
   );
-  plugin 'Extract' => 'tar.gz';  
+  plugin 'Extract' => 'tar.gz';
   plugin 'Build::Autoconf' => ();
+
+  ## This doesn't work anyway.
+  #if($^O eq 'MSWin32')
+  #{
+  #  requires 'Path::Tiny';
+  #  # TODO: there is a bootstrapping problem here, applying a patch to the source
+  #  # code of patch itself.  Strawberry Perl comes with patch so we may not need
+  #  # this anyway.
+  #  # The filename is misnamed it is actually intended to be applied to 2.7.6
+  #  patch [
+  #    'patch -p1 --binary < %{.install.patch}/msys2-patch-2.7.1.patch',
+  #    sub {
+  #      # applying the above patch confuses the timestamps sending autoconf
+  #      # into a tailspin.  Avoid all that be touching the appropriate files.
+  #      Path::Tiny->new($_)->touch for grep { -f $_ } qw( aclocal.m4 configure Makefile.am Makefile.in );
+  #    },
+  #  ];
+  #}
 
   requires 'File::Basename';
 
@@ -36,9 +53,9 @@ sys {
 
   gather sub {
     my($build) = @_;
-    
+
     my($out, $err) = Capture::Tiny::capture(sub { system 'patch', '--version' });
-    
+
     if($out =~ /GNU patch ([0-9\.]+)/)
     {
       $build->runtime_prop->{version}   = $1;
@@ -49,12 +66,17 @@ sys {
       $build->runtime_prop->{version}   = $1;
       $build->runtime_prop->{my_vendor} = lc $2;
     }
+    elsif($out =~ /patch ([0-9\.]+)/)
+    {
+      $build->runtime_prop->{version}   = $1;
+      $build->runtime_prop->{my_vendor} = 'unknown';
+    }
     else
     {
       # detection logic for additional vendors
       # welcome.
       $build->runtime_prop->{version}   = 'unknown';
-      $build->runtime_prop->{my_vendor} = 'unknown';      
+      $build->runtime_prop->{my_vendor} = 'unknown';
     }
   };
 };

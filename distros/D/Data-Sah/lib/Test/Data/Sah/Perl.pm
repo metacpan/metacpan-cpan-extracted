@@ -1,9 +1,9 @@
 package Test::Data::Sah::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ sub run_spectest_for_perl {
             }
 
             if ($test->{valid_inputs}) {
-                # test multiple inputs, currently only done for rt=bool
+                # test multiple inputs, currently only done for rt=bool_valid
                 for my $i (0..@{ $test->{valid_inputs} }-1) {
                     my $data = $test->{valid_inputs}[$i];
                     ok($vbool->($ho ? \$data : $data), "valid input [$i]");
@@ -52,37 +52,37 @@ sub run_spectest_for_perl {
             } elsif (exists $test->{valid}) {
                 # test a single input
                 if ($test->{valid}) {
-                    ok($vbool->($ho ? \$data : $data), "valid (rt=bool)");
+                    ok($vbool->($ho ? \$data : $data), "valid (rt=bool_valid)");
                     if ($ho) {
                         is_deeply($data, $test->{output}, "output");
                     }
                 } else {
-                    ok(!$vbool->($ho ? \$data : $data), "invalid (rt=bool)");
+                    ok(!$vbool->($ho ? \$data : $data), "invalid (rt=bool_valid)");
                 }
             }
 
             my $vstr = gen_validator($test->{schema},
-                                     {return_type=>'str'});
+                                     {return_type=>'str_errmsg'});
             if (exists $test->{valid}) {
                 if ($test->{valid}) {
-                    is($vstr->($test->{input}), "", "valid (rt=str)");
+                    is($vstr->($test->{input}), "", "valid (rt=str_errmsg)");
                 } else {
-                    like($vstr->($test->{input}), qr/\S/, "invalid (rt=str)");
+                    like($vstr->($test->{input}), qr/\S/, "invalid (rt=str_errmsg)");
                 }
             }
 
             my $vfull = gen_validator($test->{schema},
-                                      {return_type=>'full'});
+                                      {return_type=>'hash_details'});
             my $res = $vfull->($test->{input});
-            is(ref($res), 'HASH', "validator (rt=full) returns hash");
+            is(ref($res), 'HASH', "validator (rt=hash_details) returns hash");
             if (exists($test->{errors}) || exists($test->{warnings}) ||
                     exists($test->{valid})) {
                 my $errors = $test->{errors} // ($test->{valid} ? 0 : 1);
-                is(scalar(keys %{ $res->{errors} // {} }), $errors, "errors (rt=full)")
+                is(scalar(keys %{ $res->{errors} // {} }), $errors, "errors (rt=hash_details)")
                     or diag explain $res;
                 my $warnings = $test->{warnings} // 0;
                 is(scalar(keys %{ $res->{warnings} // {} }), $warnings,
-                   "warnings (rt=full)")
+                   "warnings (rt=hash_details)")
                     or diag explain $res;
             }
         }, # test_func
@@ -140,7 +140,7 @@ Test::Data::Sah::Perl - Routines for testing Data::Sah (perl compiler)
 
 =head1 VERSION
 
-This document describes version 0.906 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Test::Data::Sah::Perl (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 FUNCTIONS
 

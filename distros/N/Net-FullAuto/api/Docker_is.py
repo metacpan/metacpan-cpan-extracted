@@ -43,6 +43,7 @@ parser = argparse.ArgumentParser(description=
    'Python Docker ISet using FullAuto API.')
 parser.add_argument('clientid')
 parser.add_argument('pem_file',nargs='?',default='fullauto.pem')
+parser.add_argument('domain',nargs='?',default='fullautosoftware.net')
 args=parser.parse_args()
 client_id = args.clientid;
 
@@ -120,14 +121,14 @@ print (pemfile)
 
 http = httplib2.Http(disable_ssl_certificate_validation=True)
 http.follow_redirects = False
-url = "http://localhost/request?client_id=" + client_id \
+url = "https://"+args.domain+"/request?client_id=" + client_id \
       + "&response_type=code&redirect_uri=/cmd"
 print ("URL="+url)
 headerz, content = http.request(url, "GET")
 print (content)
 code = re.search('code=(\d+)',content.decode('utf-8'))
 code = code.group(1)
-url = "http://localhost//token?grant_type=authorization_code&client_id=" \
+url = "https://"+args.domain+"//token?grant_type=authorization_code&client_id=" \
       + client_id + "&redirect_uri=/cmd&code=" + code
 headerz, content = http.request(url, "GET")
 accesstoken = re.search('access_token":(\d+)',content.decode('utf-8'))
@@ -154,7 +155,7 @@ else:
     print (credentials_file+" is missing or is not readable")
     sys.exit()
 bearer  = "Bearer "+accesstoken
-url = 'http://localhost/cmd'
+url = 'https://'+args.domain+'/cmd'
 upload(url,cred_file_path,bearer)
 #sys.exit()
 with open("/tmp/"+credentials_file) as f:
@@ -168,7 +169,7 @@ data = {'cmd': [['cmd','hostname'],
                 ['cmd','pwd'],
                 ['cmd','aws ec2 describe-instances']]}
 headers = {'Content-Type': 'application/json','Authorization': bearer }
-url     = 'http://localhost/cmd'
+url     = 'https://'+args.domain+'/cmd'
 headerz, content = http.request(url, "POST", body=dumps(data), headers=headers)
 result = json.loads(content)
 result = json.loads(result['result'])
@@ -230,7 +231,7 @@ time.sleep( 3 )
 
 upload(url,pem_file_path,bearer)
 
-print ("Done with Upload")
+print ("   Done With Upload . . .\n")
 #sys.exit()
 
 time.sleep( 1 )

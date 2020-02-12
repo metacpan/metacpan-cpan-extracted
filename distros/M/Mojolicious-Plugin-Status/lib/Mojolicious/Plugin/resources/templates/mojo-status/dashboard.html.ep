@@ -6,6 +6,12 @@
   % }
 % end
 
+% my $localtime = sub {
+%   my ($s, $m, $h, $day, $month, $year) = localtime shift;
+%   return sprintf '%04d-%02d-%02d %02d:%02d:%02d', $year + 1900, $month + 1,
+%     $day, $h, $m, $s;
+% };
+
 <table class="table borderless novertpad">
   <tbody>
     <tr>
@@ -19,6 +25,15 @@
     </tr>
     <tr>
       <th class="fit text-left noleftpad" scope="row">
+        <i class="fas fa-chart-pie"></i>
+      </th>
+      <th class="fit text-left noleftpad" scope="row">Plugin:</th>
+      <td>
+        <%= $Mojolicious::Plugin::Status::VERSION %> (<%= "$usage/$size" %>)
+      </td>
+    </tr>
+    <tr>
+      <th class="fit text-left noleftpad" scope="row">
         <i class="fas fa-rocket"></i>
       </th>
       <th class="fit text-left noleftpad" scope="row">Perl:</th>
@@ -26,18 +41,21 @@
     </tr>
     <tr>
       <th class="fit text-left noleftpad" scope="row">
+        <i class="fas fa-clock"></i>
+      </th>
+      <th class="fit text-left noleftpad" scope="row">Started:</th>
+      <td>
+        <span class="badge badge-dark">
+          <%= $localtime->($stats->{started}) %>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <th class="fit text-left noleftpad" scope="row">
         <i class="fas fa-stream"></i>
       </th>
       <th class="fit text-left noleftpad" scope="row">Requests:</th>
       <td><%= $stats->{processed} %></td>
-    </tr>
-    <tr>
-      <th class="fit text-left noleftpad" scope="row">
-        <i class="fas fa-clock"></i>
-      </th>
-      <th class="fit text-left noleftpad" scope="row">Uptime:</th>
-      % my $seconds = int(time - $stats->{started});
-      <td><%= $seconds == 1 ? '1 second' : "$seconds seconds" %></td>
     </tr>
     <tr>
       <th class="fit text-left noleftpad" scope="row">
@@ -50,6 +68,8 @@
     </tr>
   </tbody>
 </table>
+
+<h4>Activity</h4>
 
 <div class="row">
   <div class="col-md-12">
@@ -70,26 +90,87 @@
         </tr>
       </thead>
       <tbody>
-        % for my $row (@$table) {
+        % for my $row (@$activity) {
           <tr>
-            % for my $i (0 .. 10) {
-              <td>
-                % if ($i == 7) {
-                  % if ($row->[$i]) {
-                    <i class="fas fa-circle"></i>
-                  % }
-                  % elsif (defined $row->[$i]) {
-                    <i class="fas fa-check-circle"></i>
-                  % }
-                % }
-                % else {
-                  <%= $row->[$i] // '' %>
-                % }
-              </td>
-            % }
+            <td><%= $row->[0] // '' %></td>
+            <td><%= $row->[1] // '' %></td>
+            <td><%= $row->[2] // '' %></td>
+            <td><%= $row->[3] // '' %></td>
+            <td><%= $row->[4] // '' %></td>
+            <td><%= $row->[5] // '' %></td>
+            <td><%= $row->[6] // '' %></td>
+            <td>
+              % if ($row->[7]) {
+                <i class="fas fa-circle"></i>
+              % }
+              % elsif (defined $row->[7]) {
+                <i class="fas fa-check-circle"></i>
+              % }
+            </td>
+            <td><%= $row->[8] // '' %></td>
+            <td><%= $row->[9] // '' %></td>
+            <td class="wrappable"><code><%= $row->[10] // '' %></code></td>
           </tr> 
         % }
       </tbody>
     </table>
   </div>
 </div>
+
+% if (@$slowest) {
+
+  <h4>Slowest</h4>
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Request</th>
+            <th>ID</th>
+            <th></th>
+            <th>Worker</th>
+            <th>Client</th>
+            <th>Started</th>
+          </tr>
+        </thead>
+        <tbody>
+          % for my $row (@$slowest) {
+            % my $time = $row->[0];
+            <tr>
+              <td><%= $time %></td>
+              <td class="wrappable"><code><%= $row->[1] %></code></td>
+              <td><%= $row->[2] %></td>
+              <td>
+                % if ($time < 5) {
+                  <span style="color: green">
+                    <i class="fas fa-smile"></i>
+                  </span>
+                % }
+                % elsif ($time < 30) {
+                  <span style="color: orange">
+                    <i class="fas fa-meh"></i>
+                  </span>
+                % }
+                % else {
+                  <span style="color: red">
+                    <i class="fas fa-frown"></i>
+                  </span>
+                % }
+              </td>
+              <td><%= $row->[3] %></td>
+              <td><%= $row->[4] %></td>
+              <td>
+                <span class="badge badge-dark">
+                  <%= $localtime->($row->[5]) %>
+                </span>
+              </td>
+            </tr>
+          % }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+% }

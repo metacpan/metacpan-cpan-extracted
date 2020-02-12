@@ -60,7 +60,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More'   => '0',
+		'Test::More'   => '1',
 		},
 
 	'RECOMMENDS' => {

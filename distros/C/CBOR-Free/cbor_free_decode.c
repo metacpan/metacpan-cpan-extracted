@@ -70,7 +70,7 @@ void _free_decode_state(decode_ctx* decode_state);
 
 //----------------------------------------------------------------------
 
-SV *_call_with_arguments( pTHX_ SV* cb, U8 count, SV** args ) {
+SV *_call_with_arguments( pTHX_ SV* cb, const U8 count, SV** args ) {
     // --- Almost all copy-paste from “perlcall” … blegh!
     dSP;
 
@@ -112,29 +112,41 @@ UV _iv_to_str(IV num, char *numstr, const char strlen) {
 void _croak_incomplete( pTHX_ decode_ctx* decstate, STRLEN lack ) {
     _free_decode_state(decstate);
 
-    char lackstr[24];
-    _uv_to_str( lack, lackstr, sizeof(lackstr) );
+    SV* args[2] = {
+        newSVpvs("Incomplete"),
+        newSVuv(lack),
+    };
 
-    char * words[3] = { "Incomplete", lackstr, NULL };
+    _call_with_arguments(
+        aTHX_
+        newSVpvs("CBOR::Free::_die"),
+        2,
+        args
+    );
 
-    _die( G_DISCARD, words );
+    assert(0);
 }
 
 void _croak_invalid_control( pTHX_ decode_ctx* decstate ) {
     const uint8_t ord = (uint8_t) *(decstate->curbyte);
     STRLEN offset = decstate->curbyte - decstate->start;
 
-    char ordstr[24];
-    char offsetstr[24];
-
-    _uv_to_str(ord, ordstr, sizeof(ordstr));
-    _uv_to_str(offset, offsetstr, sizeof(offsetstr));
-
-    char * words[] = { "InvalidControl", ordstr, offsetstr, NULL };
-
     _free_decode_state(decstate);
 
-    _die( G_DISCARD, words );
+    SV* args[3] = {
+        newSVpvs("InvalidControl"),
+        newSVuv(ord),
+        newSVuv(offset),
+    };
+
+    _call_with_arguments(
+        aTHX_
+        newSVpvs("CBOR::Free::_die"),
+        3,
+        args
+    );
+
+    assert(0);
 }
 
 void _croak_invalid_utf8( pTHX_ decode_ctx* decstate, char *string, STRLEN len ) {
@@ -189,42 +201,58 @@ void _croak_invalid_map_key( pTHX_ decode_ctx* decstate, const uint8_t byte, STR
             }
     }
 
-    char offsetstr[20];
-    _uv_to_str( offset, offsetstr, sizeof(offsetstr) );
+    SV* args[3] = {
+        newSVpvs("InvalidMapKey"),
+        newSVpv(bytestr, 0),
+        newSVuv(offset),
+    };
 
-    char * words[] = { "InvalidMapKey", bytestr, offsetstr, NULL };
+    _call_with_arguments(
+        aTHX_
+        newSVpvs("CBOR::Free::_die"),
+        3,
+        args
+    );
 
-    _die( G_DISCARD, words);
+    assert(0);
 }
 
 void _croak_cannot_decode_64bit( pTHX_ decode_ctx* decstate, const uint8_t *u64bytes, STRLEN offset ) {
     _free_decode_state(decstate);
 
-    char numhex[20];
-    numhex[19] = 0;
+    SV* args[3] = {
+        newSVpvs("CannotDecode64Bit"),
+        newSVpvn(u64bytes, 8),
+        newSVuv(offset),
+    };
 
-    my_snprintf( numhex, sizeof(numhex), "%02x%02x_%02x%02x_%02x%02x_%02x%02x", u64bytes[0], u64bytes[1], u64bytes[2], u64bytes[3], u64bytes[4], u64bytes[5], u64bytes[6], u64bytes[7] );
+    _call_with_arguments(
+        aTHX_
+        newSVpvs("CBOR::Free::_die"),
+        3,
+        args
+    );
 
-    char offsetstr[20];
-    _uv_to_str( offset, offsetstr, sizeof(offsetstr) );
-
-    char * words[] = { "CannotDecode64Bit", numhex, offsetstr, NULL };
-
-    _die( G_DISCARD, words );
+    assert(0);
 }
 
 void _croak_cannot_decode_negative( pTHX_ decode_ctx* decstate, UV abs, STRLEN offset ) {
     _free_decode_state(decstate);
 
-    char absstr[40];
-    _uv_to_str( abs, absstr, sizeof(absstr) );
+    SV* args[3] = {
+        newSVpvs("NegativeIntTooLow"),
+        newSVuv(abs),
+        newSVuv(offset),
+    };
 
-    char offsetstr[20];
-    _uv_to_str( offset, offsetstr, sizeof(offsetstr) );
+    _call_with_arguments(
+        aTHX_
+        newSVpvs("CBOR::Free::_die"),
+        3,
+        args
+    );
 
-    char * words[] = { "NegativeIntTooLow", absstr, offsetstr, NULL };
-
-    _die( G_DISCARD, words );
+    assert(0);
 }
 
 void _warn_unhandled_tag( pTHX_ UV tagnum, U8 value_major_type ) {

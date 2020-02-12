@@ -1,7 +1,14 @@
 Revision history for Date-Holidays-GB
 
+0.013  2020-02-12 13:17:35 GMT
+
+ [Update]
+ - 2021 dates added
+ - generate script includes old dates removed from live data
+
 0.012  2019-01-09 17:59:34 GMT
 
+ [Update]
  - 2020 dates added
 
 0.011  2018-04-04 15:44:41 BST
@@ -36,7 +43,7 @@ Revision history for Date-Holidays-GB
 
  [Maintenance]
  - generate from gov.uk JSON not ical
- - simplify generation script, remove templating 
+ - simplify generation script, remove templating
 
 0.005  2014-05-22 13:48:14 BST
 

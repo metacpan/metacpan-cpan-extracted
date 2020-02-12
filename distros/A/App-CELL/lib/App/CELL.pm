@@ -54,11 +54,11 @@ App::CELL - Configuration, Error-handling, Localization, and Logging
 
 =head1 VERSION
 
-Version 0.227
+Version 0.229
 
 =cut
 
-our $VERSION = '0.227';
+our $VERSION = '0.229';
 
 
 
@@ -328,7 +328,7 @@ BEGIN {
             return App::CELL::Status->new(
                 level => $level_uc,
                 code => $code,
-                caller => [ caller ],
+                caller => [ CORE::caller() ],
                 %ARGS,
             );
         }

@@ -57,14 +57,14 @@ lib/App/Dochazka/REST/Test.pm
 lib/App/Dochazka/REST/Util.pm
 lib/App/Dochazka/REST/Holiday.pm
 LICENSE
-Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README.rst
 run-tests.sh
 t/001-noauto.t
-t/ldap.t
+t/critic.t
 t/dispatch/001-resource.t
 t/dispatch/activity.t
 t/dispatch/component.t
@@ -84,6 +84,8 @@ t/dispatch/supervisor.t
 t/dispatch/top.t
 t/fillup.t
 t/fillup-bug-67.t
+t/ldap.t
+t/manifest.t
 t/mason.t
 t/model/activity.t
 t/model/canonicalize.t
@@ -98,6 +100,7 @@ t/model/schedintvls.t
 t/model/schedule.t
 t/model/split_tsrange.t
 t/model/timestamp_delta.t
+t/perlcriticrc
 t/sql/current_priv.t
 t/sql/disabled_to_zero.t
 t/sql/immutable_id.t

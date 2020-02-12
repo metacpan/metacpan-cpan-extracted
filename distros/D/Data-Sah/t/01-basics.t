@@ -57,7 +57,7 @@ subtest "gen_validator()" => sub {
         }];
 
         subtest "str+val" => sub {
-            my $v = gen_validator($sch, {return_type=>'str+val'});
+            my $v = gen_validator($sch, {return_type=>'str_errmsg+val'});
 
             my ($res, $errstr, $val);
 

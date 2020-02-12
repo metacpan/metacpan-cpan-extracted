@@ -55,6 +55,7 @@ override _build_WriteMakefile_args => sub {
     return +{
         %{ super() },
         LIBS => ['-lucl'],
+        INC  => '-I/usr/include/ucl', # Debian libucl-dev
     };
 };
 

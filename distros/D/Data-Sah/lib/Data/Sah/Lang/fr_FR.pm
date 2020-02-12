@@ -1,7 +1,7 @@
 package Data::Sah::Lang::fr_FR;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $DATE = '2020-02-12'; # DATE
+our $VERSION = '0.907'; # VERSION
 
 use 5.010;
 use strict;
@@ -127,7 +127,7 @@ Data::Sah::Lang::fr_FR - fr_FR locale
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Lang::fr_FR (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Lang::fr_FR (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =for Pod::Coverage .+
 

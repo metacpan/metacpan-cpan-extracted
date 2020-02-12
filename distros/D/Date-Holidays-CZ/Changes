@@ -39,3 +39,16 @@ Revision history for Perl extension Date::Holidays::CZ
 0.13 2016-04-23 11:28 CEST
 - MANIFEST: add t/basic.t
 
+0.14 2020-02-11 18:17 CET
+- Travis CI
+- Drop plain-text README, add Perl Critic and Manifest tests
+
+0.15 2020-02-11 18:20 CET
+- Prepare for dochazka-esque prerelease.sh and release.sh
+
+0.16 2020-02-11 19:26 CET
+- README.rst: fix typo in module name
+
+0.17 2020-02-11 19:31 CET
+- Drop distro-specific prerelease.sh and release.sh
+

@@ -19,6 +19,7 @@ Files: Changes
  t/23roleorder.t
  t/24mm.t
  t/25abstract.t
+ t/30bare.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

@@ -21,7 +21,7 @@ requires:
   Complete::Util: '0.608'
   Data::Dump: '0'
   Data::Dump::Color: '0'
-  Data::Sah: '0.905'
+  Data::Sah: '0.907'
   Data::Sah::Coerce: '0.038'
   Data::Sah::CoerceCommon: '0.011'
   Data::Sah::CoerceJS: '0.011'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils
   homepage: https://metacpan.org/release/App-SahUtils
   repository: git://github.com/perlancar/perl-App-SahUtils.git
-version: '0.475'
+version: '0.477'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

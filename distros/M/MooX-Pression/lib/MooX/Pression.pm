@@ -12,7 +12,7 @@ use feature ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.100';
+our $VERSION   = '0.301';
 
 use Keyword::Simple ();
 use PPR;
@@ -142,6 +142,7 @@ our $GRAMMAR = qr{
 	
 		(?<PerlKeyword>
 		
+			(?: include         (?&MxpIncludeSyntax)   )|
 			(?: class           (?&MxpClassSyntax)     )|
 			(?: abstract        (?&MxpAbstractSyntax)  )|
 			(?: role            (?&MxpRoleSyntax)      )|
@@ -165,7 +166,47 @@ our $GRAMMAR = qr{
 			(?: multi           (?&MxpMultiSyntax)     )
 		)#</PerlKeyword>
 		
+		(?<MxpSimpleIdentifier>
+		
+			(?&PerlIdentifier)|(?&PerlBlock)
+		)#</MxpSimpleIdentifier>
+		
+		(?<MxpSimpleIdentifiers>
+		
+			(?&MxpSimpleIdentifier)
+			(?:
+				(?&PerlOWS)
+				,
+				(?&PerlOWS)
+				(?&MxpSimpleIdentifier)
+			)*
+		)#</MxpSimpleIdentifiers>
+		
+		(?<MxpDecoratedIdentifier>
+			
+			(?: \+ )?                                     # CAPTURE:plus
+			(?: \* )?                                     # CAPTURE:asterisk
+			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
+			(?: \! | \? )?                                # CAPTURE:postfix
+		)#</MxpDecoratedIdentifier>
+		
+		(?<MxpDecoratedIdentifierSolo>
+			(?: (?&MxpDecoratedIdentifier) )   # deliberately non-capturing
+		)#</MxpDecoratedIdentifierSolo>
+		
+		(?<MxpDecoratedIdentifiers>
+		
+			(?&MxpDecoratedIdentifier)
+			(?:
+				(?&PerlOWS)
+				,
+				(?&PerlOWS)
+				(?&MxpDecoratedIdentifier)
+			)*
+		)#</MxpDecoratedIdentifiers>
+		
 		(?<MxpSimpleTypeSpec>
+		
 			~?(?&PerlBareword)(?&PerlAnonymousArray)?
 		)#</MxpSimpleTypeSpec>
 		
@@ -268,8 +309,16 @@ our $GRAMMAR = qr{
 			(?&PerlOWS)
 		)#</MxpClassSyntax>
 		
+		(?<MxpIncludeSyntax>
+		
+			(?&PerlOWS)
+			(?: (?&PerlQualifiedIdentifier) )?            # CAPTURE:name
+			(?&PerlOWS)
+		)#</MxpIncludeSyntax>
+		
 		(?<MxpAbstractSyntax>
 			
+			(?&PerlOWS)
 			class
 			(?&PerlOWS)
 			(?: [+] )?                                    # CAPTURE:plus
@@ -360,7 +409,7 @@ our $GRAMMAR = qr{
 		(?<MxpRequiresSyntax>
 		
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
 			(?:
 				[(]
@@ -377,10 +426,7 @@ our $GRAMMAR = qr{
 		(?<MxpHasSyntax>
 		
 			(?&PerlOWS)
-			(?: \+ )?                                     # CAPTURE:plus
-			(?: \* )?                                     # CAPTURE:asterisk
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
-			(?: \! )?                                     # CAPTURE:postfix
+			(?: (?&MxpDecoratedIdentifiers) )             # CAPTURE:name
 			(?&PerlOWS)
 			(?:
 				[(]
@@ -412,7 +458,7 @@ our $GRAMMAR = qr{
 		(?<MxpMethodSyntax>
 		
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )?       # CAPTURE:name
+			(?: (?&MxpSimpleIdentifier) )?                # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -429,13 +475,13 @@ our $GRAMMAR = qr{
 			(?: (?&PerlBlock) )                           # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpMethodSyntax>
-	
+		
 		(?<MxpMultiSyntax>
 		
 			(?&PerlOWS)
 			method
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -456,7 +502,7 @@ our $GRAMMAR = qr{
 		(?<MxpModifierSyntax>
 		
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: (?&MxpSimpleIdentifiers) )                # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -479,7 +525,7 @@ our $GRAMMAR = qr{
 		(?<MxpFactorySyntax>
 		
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -500,7 +546,7 @@ our $GRAMMAR = qr{
 		(?<MxpFactoryViaSyntax>
 		
 			(?&PerlOWS)
-			(?: (?&PerlIdentifier)|(?&PerlBlock) )        # CAPTURE:name
+			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?&PerlOWS)
 			(?:
 				(: via )
@@ -517,7 +563,7 @@ our $GRAMMAR = qr{
 			(?: from )?
 			(?&PerlOWS)
 			(?:                                           # CAPTURE:from
-				(?&PerlBlock)|(?&PerlQualifiedIdentifier)|(?&PerlString)
+				(?&MxpExtendedTypeSpec)
 			)
 			(?&PerlOWS)
 			(?: via )
@@ -537,8 +583,13 @@ our $GRAMMAR = qr{
 
 my %_fetch_re_cache;
 sub _fetch_re {
+	my $key = "@_";
 	my $name = shift;
-	$_fetch_re_cache{$name} ||= do {
+	my %opts = @_;
+	
+	$opts{anchor} ||= '';
+	
+	$_fetch_re_cache{$key} ||= do {
 		"$GRAMMAR" =~ m{<$name>(.+)</$name>}s or die "could not fetch re for $name";
 		(my $re = $1) =~ s/\)\#$//;
 		my @lines = split /\n/, $re;
@@ -548,7 +599,9 @@ sub _fetch_re {
 			}
 		}
 		$re = join "\n", @lines;
-		qr/ $re $GRAMMAR /xs;
+		$opts{anchor} eq 'start' ? qr/ ^ $re $GRAMMAR   /xs :
+		$opts{anchor} eq 'end'   ? qr/   $re $GRAMMAR $ /xs :
+		$opts{anchor} eq 'both'  ? qr/ ^ $re $GRAMMAR $ /xs : qr/ $re $GRAMMAR /xs
 	}
 }
 
@@ -597,14 +650,18 @@ sub _handle_signature_list {
 		
 		if ($sig =~ /^\*((?&PerlIdentifier)) $GRAMMAR/xso) {
 			my $name = $1;
-			$parsed[-1]{name} = $name;
+			$parsed[-1]{name}       = $name;
+			$parsed[-1]{named}      = 1;
+			$parsed[-1]{positional} = 0;
 			++$seen_named;
 			$sig =~ s/^\*\Q$name//xs;
 			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xso;
 		}
 		elsif ($sig =~ /^((?&PerlVariable)) $GRAMMAR/xso) {
 			my $name = $1;
-			$parsed[-1]{name} = $name;
+			$parsed[-1]{name}       = $name;
+			$parsed[-1]{named}      = 0;
+			$parsed[-1]{positional} = 1;
 			++$seen_pos;
 			$sig =~ s/^\Q$name//xs;
 			$sig =~ s/^((?&PerlOWS)) $GRAMMAR//xs;
@@ -630,8 +687,37 @@ sub _handle_signature_list {
 	my @signature_var_list;
 	my $type_params_stuff = '[';
 	
+	my (@head, @tail);
+	if ($seen_named and $seen_pos) {
+		while (@parsed and $parsed[0]{positional}) {
+			push @head, shift @parsed;
+		}
+		while (@parsed and $parsed[-1]{positional}) {
+			unshift @tail, pop @parsed;
+		}
+		if (grep $_->{positional}, @parsed) {
+			require Carp;
+			Carp::croak("Signature contains an unexpected mixture of positional and named parameters");
+		}
+		for my $p (@head, @tail) {
+			my $is_optional = $p->{optional};
+			$is_optional ||= ($p->{type} =~ /^Optional/s);
+			if ($is_optional) {
+				require Carp;
+				Carp::croak("Cannot have optional positional parameter $p->{name} in signature with named parameters");
+			}
+			elsif ($p->{default}) {
+				require Carp;
+				Carp::croak("Cannot have positional parameter $p->{name} with default in signature with named parameters");
+			}
+			elsif ($p->{name} =~ /^[\@\%]/) {
+				require Carp;
+				Carp::croak("Cannot have slurpy parameter $p->{name} in signature with named parameters");
+			}
+		}
+	}
+	
 	require B;
-	die "cannot mix named and positional (yet?)" if $seen_pos && $seen_named;
 
 	my $extra = '';
 	my $count = @parsed;
@@ -671,6 +757,17 @@ sub _handle_signature_list {
 	
 	@signature_var_list = '$arg' if $seen_named;
 	$type_params_stuff .= ']';
+	
+	if (@head or @tail) {
+		require Type::Params;
+		'Type::Params'->VERSION(1.009002);
+		my $head_stuff = join(q[,] => map { $_->{type_is_block} ? sprintf('scalar(do %s)', $_->{type}) : B::perlstring($_->{type}) } @head);
+		my $tail_stuff = join(q[,] => map { $_->{type_is_block} ? sprintf('scalar(do %s)', $_->{type}) : B::perlstring($_->{type}) } @tail);
+		my $opts = sprintf('{head=>%s,tail=>%s},', $head_stuff?"[$head_stuff]":0, $tail_stuff?"[$tail_stuff]":0);
+		substr($type_params_stuff, 1, 0) = $opts; # insert options after "["
+		unshift @signature_var_list, map $_->{name}, @head;
+		push @signature_var_list, map $_->{name}, @tail;
+	}
 	
 	return (
 		$seen_named,
@@ -738,6 +835,15 @@ sub _handle_role_list {
 	}
 	
 	return join(",", @return);
+}
+
+sub _handle_name_list {
+	my ($me, $names) = @_;
+	return unless $names;
+	
+	state $re = _fetch_re('MxpDecoratedIdentifierSolo');
+	my @names = grep defined, ($names =~ /($re) $GRAMMAR/xg);
+	return @names;
 }
 
 sub _handle_factory_keyword {
@@ -875,12 +981,18 @@ sub _handle_multimethod_keyword {
 }
 
 sub _handle_modifier_keyword {
-	my ($me, $kind, $name, $code, $has_sig, $sig, $attrs) = @_;
+	my ($me, $kind, $names, $code, $has_sig, $sig, $attrs) = @_;
 
 	my $optim;
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
+	
+	my @names = $me->_handle_name_list($names);
+	
+	my $processed_names =
+		join q[, ],
+		map { /^\{/ ? "scalar(do $_)" : B::perlstring($_) } @names;
 
 	if ($has_sig) {
 		my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
@@ -895,7 +1007,7 @@ sub _handle_modifier_keyword {
 			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 			$me,
 			$kind,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$processed_names,
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$signature_is_named,
 			$type_params_stuff,
@@ -908,7 +1020,7 @@ sub _handle_modifier_keyword {
 			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$processed_names,
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$optim,
 		);
@@ -919,7 +1031,7 @@ sub _handle_modifier_keyword {
 			'q[%s]->_modifier(q(%s), %s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 			$me,
 			$kind,
-			($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
+			$processed_names,
 			$optim ? B::perlstring($munged_code) : $munged_code,
 			!!$optim,
 		);
@@ -997,7 +1109,7 @@ sub _handle_package_keyword {
 }
 
 sub _handle_has_keyword {
-	my ($me, $name, $rawspec, $default) = @_;
+	my ($me, $names, $rawspec, $default) = @_;
 	
 	$rawspec = '()' if !defined $rawspec;
 	
@@ -1008,15 +1120,20 @@ sub _handle_has_keyword {
 		$rawspec = "default => sub { $default }, $rawspec";
 	}
 	
-	$name =~ s/^\+\*/+/;
-	$name =~ s/^\*//;
+	my @names = $me->_handle_name_list($names);
 	
-	sprintf(
-		'q[%s]->_has(scalar(%s), %s)',
-		$me,
-		($name =~ /^\{/) ? "do $name" : B::perlstring($name),
-		$rawspec,
-	);
+	my @r;
+	for my $name (@names) {
+		$name =~ s/^\+\*/+/;
+		$name =~ s/^\*//;
+		push @r, sprintf(
+			'q[%s]->_has(%s, %s)',
+			$me,
+			($name =~ /^\{/) ? "scalar(do $name)" : B::perlstring($name),
+			$rawspec,
+		);
+	}
+	join ";", @r;
 }
 
 sub _handle_requires_keyword {
@@ -1101,12 +1218,28 @@ sub import {
 	$_->import::into($caller, qw( -types -is -assert ))
 		for qw(Types::Standard Types::Common::Numeric Types::Common::String);
 	
+	# `include` keyword
+	#
+	Keyword::Simple::define include => sub {
+		my $ref = shift;
+		
+		$$ref =~ _fetch_re('MxpIncludeSyntax', anchor => 'start') or $me->_syntax_error(
+			'include directive',
+			'include <name>',
+			$ref,
+		);
+		
+		my ($pos, $name) = ($+[0], $+{name});
+		my $qualified = 'MooX::Press'->qualify_name($name, $opts{prefix});
+		substr($$ref, 0, $pos) = sprintf('BEGIN { eval(q[%s]->_include(%s)) or die($@) };', $me, B::perlstring($qualified));
+	};
+
 	# `class` keyword
 	#
 	Keyword::Simple::define class => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpClassSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpClassSyntax', anchor => 'start') or $me->_syntax_error(
 			'class declaration',
 			'class <name> (<signature>) { <block> }',
 			'class <name> { <block> }',
@@ -1128,7 +1261,7 @@ sub import {
 	Keyword::Simple::define abstract => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpAbstractSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpAbstractSyntax', anchor => 'start') or $me->_syntax_error(
 			'abstract class declaration',
 			'abstract class <name> (<signature>) { <block> }',
 			'abstract class <name> { <block> }',
@@ -1151,7 +1284,7 @@ sub import {
 		Keyword::Simple::define $kw => sub {
 			my $ref = shift;
 			
-			$$ref =~ _fetch_re('MxpRoleSyntax') or $me->_syntax_error(
+			$$ref =~ _fetch_re('MxpRoleSyntax', anchor => 'start') or $me->_syntax_error(
 				"$kw declaration",
 				"$kw <name> (<signature>) { <block> }",
 				"$kw <name> { <block> }",
@@ -1173,7 +1306,7 @@ sub import {
 	Keyword::Simple::define toolkit => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpToolkitSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpToolkitSyntax', anchor => 'start') or $me->_syntax_error(
 			'toolkit declaration',
 			'toolkit <toolkit> (<extensions>)',
 			'toolkit <toolkit>;',
@@ -1214,7 +1347,7 @@ sub import {
 		Keyword::Simple::define $kw => sub {
 			my $ref = shift;
 			
-			$$ref =~ _fetch_re('MxpHookSyntax') or $me->_syntax_error(
+			$$ref =~ _fetch_re('MxpHookSyntax', anchor => 'start') or $me->_syntax_error(
 				"$kw hook",
 				"$kw { <block> }",
 				$ref,
@@ -1230,7 +1363,7 @@ sub import {
 	Keyword::Simple::define type_name => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpTypeNameSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpTypeNameSyntax', anchor => 'start') or $me->_syntax_error(
 			'type name declaration',
 			'type_name <identifier>',
 			$ref,
@@ -1245,7 +1378,7 @@ sub import {
 	Keyword::Simple::define extends => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpExtendsSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpExtendsSyntax', anchor => 'start') or $me->_syntax_error(
 			'extends declaration',
 			'extends <classes>',
 			$ref,
@@ -1260,7 +1393,7 @@ sub import {
 	Keyword::Simple::define with => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpWithSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpWithSyntax', anchor => 'start') or $me->_syntax_error(
 			'with declaration',
 			'with <roles>',
 			$ref,
@@ -1276,7 +1409,7 @@ sub import {
 	Keyword::Simple::define requires => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpRequiresSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpRequiresSyntax', anchor => 'start') or $me->_syntax_error(
 			'requires declaration',
 			'requires <name> (<signature>)',
 			'requires <name>',
@@ -1293,7 +1426,7 @@ sub import {
 	Keyword::Simple::define has => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpHasSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpHasSyntax', anchor => 'start') or $me->_syntax_error(
 			'attribute declaration',
 			'has <name> (<spec>) = <default>',
 			'has <name> (<spec>)',
@@ -1302,12 +1435,10 @@ sub import {
 			$ref,
 		);
 		
-		my ($pos, $plus, $name, $postfix, $spec, $default) = ($+[0], $+{plus}, $+{name}, $+{postfix}, $+{spec}, $+{default});
+		my ($pos, $name, $spec, $default) = ($+[0],  $+{name}, $+{spec}, $+{default});
 		my $has_spec    = !!exists $+{spec};
 		my $has_default = !!exists $+{default};
-		$plus     ||= '';
-		$postfix  ||= '';
-		substr($$ref, 0, $pos) = $me->_handle_has_keyword("$plus$name$postfix", $has_spec ? $spec : undef, $has_default ? $default : undef);
+		substr($$ref, 0, $pos) = $me->_handle_has_keyword($name, $has_spec ? $spec : undef, $has_default ? $default : undef);
 	};
 	
 	# `constant` keyword
@@ -1315,7 +1446,7 @@ sub import {
 	Keyword::Simple::define constant => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpConstantSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpConstantSyntax', anchor => 'start') or $me->_syntax_error(
 			'constant declaration',
 			'constant <name> = <value>',
 			$ref,
@@ -1332,7 +1463,7 @@ sub import {
 		
 		state $re_attr = _fetch_re('MxpAttribute');
 		
-		$$ref =~ _fetch_re('MxpMethodSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpMethodSyntax', anchor => 'start') or $me->_syntax_error(
 			'method declaration',
 			'method <name> <attributes> (<signature>) { <block> }',
 			'method <name> (<signature>) { <block> }',
@@ -1359,7 +1490,7 @@ sub import {
 		
 		state $re_attr = _fetch_re('MxpAttribute');
 		
-		$$ref =~ _fetch_re('MxpMultiSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpMultiSyntax', anchor => 'start') or $me->_syntax_error(
 			'multimethod declaration',
 			'multi method <name> <attributes> (<signature>) { <block> }',
 			'multi method <name> (<signature>) { <block> }',
@@ -1383,7 +1514,7 @@ sub import {
 			
 			state $re_attr = _fetch_re('MxpAttribute');
 		
-			$$ref =~ _fetch_re('MxpModifierSyntax') or $me->_syntax_error(
+			$$ref =~ _fetch_re('MxpModifierSyntax', anchor => 'start') or $me->_syntax_error(
 				"$kw method modifier declaration",
 				"$kw <name> <attributes> (<signature>) { <block> }",
 				"$kw <name> (<signature>) { <block> }",
@@ -1403,7 +1534,7 @@ sub import {
 	Keyword::Simple::define factory => sub {
 		my $ref = shift;
 		
-		if ( $$ref =~ _fetch_re('MxpFactorySyntax') ) {
+		if ( $$ref =~ _fetch_re('MxpFactorySyntax', anchor => 'start') ) {
 			state $re_attr = _fetch_re('MxpAttribute');
 			my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
 			my $has_sig = !!exists $+{sig};
@@ -1412,7 +1543,7 @@ sub import {
 			return;
 		}
 		
-		$$ref =~ _fetch_re('MxpFactoryViaSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpFactoryViaSyntax', anchor => 'start') or $me->_syntax_error(
 			'factory method declaration',
 			'factory <name> <attributes> (<signature>) { <block> }',
 			'factory <name> (<signature>) { <block> }',
@@ -1431,7 +1562,7 @@ sub import {
 	Keyword::Simple::define coerce => sub {
 		my $ref = shift;
 		
-		$$ref =~ _fetch_re('MxpCoerceSyntax') or $me->_syntax_error(
+		$$ref =~ _fetch_re('MxpCoerceSyntax', anchor => 'start') or $me->_syntax_error(
 			'coercion declaration',
 			'coerce from <type> via <method_name> { <block> }',
 			'coerce from <type> via <method_name>',
@@ -1495,10 +1626,15 @@ sub overload {
 	}
 }
 
+# `MooX::Pression::PACKAGE_SPEC` keyword
+#
+sub PACKAGE_SPEC { \%OPTS }
+
 
 #
 # CALLBACKS
 #
+
 sub _package_callback {
 	shift;
 	my $cb = shift;
@@ -1577,14 +1713,31 @@ sub _multimethod {
 }
 sub _modifier {
 	shift;
-	my ($kind, $name, $value) = @_;
-	push @{ $OPTS{$kind} ||= [] }, $name, $value;
+	my ($kind, @args) = @_;
+	push @{ $OPTS{$kind} ||= [] }, @args;
+}
+sub _include {
+	shift;
+	
+	require Path::ScanINC;
+	my @chunks = split /::/, $_[0];
+	$chunks[-1] .= '.pl';
+	my $file = Path::ScanINC->new->first_file(@chunks);
+	
+	ref $file eq 'ARRAY' and die "not supported yet";
+	my $code = $file->slurp_utf8;
+	
+	sprintf(
+		"do {\n# line 1 %s\n%s\n};\n1;\n",
+		B::perlstring($file),
+		$code,
+	);
 }
 
 #{
 #	package MooX::Pression::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.100';
+#	our $VERSION   = '0.301';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -1595,7 +1748,7 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.100';
+#	our $VERSION   = '0.301';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -1608,12 +1761,12 @@ sub _modifier {
 #	
 #	package MooX::Pression::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.100';
+#	our $VERSION   = '0.301';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	
 #	package MooX::Pression::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.100';
+#	our $VERSION   = '0.301';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1627,7 +1780,7 @@ sub _modifier {
 #
 #	package MooX::Pression::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.100';
+#	our $VERSION   = '0.301';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1793,6 +1946,8 @@ within this namespace prefix in a single Perl module file. This Perl
 module file would normally be named based on the prefix, so in the
 example above, it would be "MyApp/Objects.pm" and in the example from
 the SYNOPSIS, it would be "MyApp.pm".
+
+But see also the documentation for C<include>.
 
 Of course, there is nothing to stop you from having multiple prefixes
 for different logical parts of a larger codebase, but MooX::Pression
@@ -2312,6 +2467,14 @@ made eager using the spec. (It is almost certainly a bad idea to do so though.)
     has display_name ( lazy => false ) = $self->name;
   }
 
+Commas may be used to separate multiple attributes:
+
+  class WidgetCollection {
+    has name, display_name ( type => Str );
+  }
+
+The specification and defaults are applied to every attribute in the list.
+
 If you need to decide an attribute name on-the-fly, you can replace the
 name with a block that returns the name as a string.
 
@@ -2329,19 +2492,25 @@ name with a block that returns the name as a string.
     social_security_no => 1234,
   );
 
-This can be used to define a bunch of types from a list.
-
-  class Person {
-    my @attrs = qw( name age );
-    for my $attr (@attrs) {
-      has {$attr} ( required => true );
-    }
-  }
-
 You can think of the syntax as being kind of like C<print>.
 
   print BAREWORD_FILEHANDLE @strings;
   print { block_returning_filehandle(); } @strings;
+
+The block is called in scalar context, so you'll need a loop to define a list
+like this:
+
+  class Person {
+    my @attrs = qw( name age );
+    
+    # this does not work
+    has {@attrs} ( required => true );
+    
+    # this works
+    for my $attr (@attrs) {
+      has {$attr} ( required => true );
+    }
+  }
 
 The names of attributes can start with an asterisk:
 
@@ -2393,10 +2562,10 @@ bareword name for the method.
   }
 
 MooX::Pression supports method signatures for named arguments and
-positional arguments. If you need a mixture of named and positional
-arguments, this is not currently supported, so instead you should
-define the method with no signature at all, and unpack C<< @_ >> within
-the body of the method.
+positional arguments. A mixture of named and positional arguments
+is allowed, with some limitations. For anything more complicates,
+you should define the method with no signature at all, and unpack
+C<< @_ >> within the body of the method.
 
 =head4 Signatures for Named Arguments
 
@@ -2518,6 +2687,54 @@ pretend it is a hashref or arrayref.
   method marry ( $partner, $date, ArrayRef[Str] @vows ) {
     ...;
   }
+
+=head4 Signatures with Mixed Arguments
+
+Since MooX::Pression 0.200, you may mix named and positional arguments
+with the following limitations:
+
+=over
+
+=item *
+
+Positional arguments must appear at the beginning and/or end of the list.
+They cannot be surrounded by named arguments.
+
+=item *
+
+Positional arguments cannot be optional and cannot have a default. They
+must be required. (Named arguments can be optional and have defaults.)
+
+=item *
+
+No slurpies!
+
+=back
+
+  method print_html ($tag, Str $text, *htmlver?, *xml?, $fh) {
+  
+    confess "update your HTML" if $arg->htmlver < 5;
+    
+    if (length $text) {
+      print $fh "<tag>$text</tag>";
+    }
+    elsif ($arg->xml) {
+      print $fh "<tag />";
+    }
+    else {
+      print $fh "<tag></tag>";
+    }
+  }
+  
+  $obj->print_html('h1', 'Hello World', { xml => true }, \*STDOUT);
+  $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
+  $obj->print_html('h1', 'Hello World',                  \*STDOUT);
+
+Mixed signatures are basically implemented like named signatures, but
+prior to interpreting C<< @_ >> as a hash, some parameters are spliced
+off the head and tail. We need to know how many elements to splice off
+each end, so that is why there are restrictions on slurpies and optional
+parameters.
 
 =head4 Empty Signatures
 
@@ -2678,6 +2895,12 @@ not care about the types of the arguments, so can omit checking them.
     say "Speak now or forever hold your peace!";
   }
 
+Commas may be used to modify multiple methods:
+
+  before marry, sky_dive (@args) {
+    say "wish me luck!";
+  }
+
 The C<< :optimize >> attribute is supported for C<before>.
 
 =head3 C<< after >>
@@ -2694,6 +2917,12 @@ There's not much to say about C<after>. It's just like C<before>.
   
   after marry ( $partner, $date? ) {
     say "You may kiss the bride!";
+  }
+
+Commas may be used to modify multiple methods:
+
+  after marry, finished_school_year (@args) {
+    $self->go_on_holiday();
   }
 
 The C<< :optimize >> attribute is supported for C<after>.
@@ -2724,6 +2953,15 @@ are not shifted off C<< @_ >> for you, but the variables are still defined.
     say "Speak now or forever hold your peace!";
     my $return = $self->$next($_[2], $_[3]);
     say "You may kiss the bride!";
+    return $return;
+  }
+
+Commas may be used to modify multiple methods:
+
+  around insert, update ($dbh, @args) {
+    $dbh->begin_transaction;
+    my $return = $self->$next(@_);
+    $dbh->commit_transaction;
     return $return;
   }
 
@@ -2965,6 +3203,75 @@ It is used to indicate who is the maintainer of the package.
 If C<class> definitions are nested, C<authority> will be inherited by
 child classes. If a parent class is specified via C<extends>, C<authority>
 will not be inherited.
+
+=head3 C<< include >>
+
+C<include> is the MooX::Pression equivalent of Perl's C<require>.
+
+  package MyApp {
+    use MooX::Pression;
+    include Database;
+    include Classes;
+    include Roles;
+  }
+
+It works somewhat more crudely than C<require> and C<use>, evaluating
+the included file pretty much as if it had been copy and pasted into the
+file that included it.
+
+The names of the files to load are processsed using the same rules for
+prefixes as classes and roles (so MyApp::Database, etc in the example),
+and C<< @INC >> is searched just like C<require> and C<use> do, but
+instead of looking for a file called "MyApp/Database.pm", MooX::Pression
+will look for "MyApp/Database.pl" (yes, ".pl"). This naming convention
+ensures people won't accidentally load MyApp::Database using C<use>
+or C<require> because it isn't intended to be loaded outside the context
+of the MyApp package.
+
+The file "MyApp/Database.pl" might look something like this:
+
+  class Database {
+    has dbh = DBI->connect(...);
+    
+    factory get_db {
+      state $instance = $class->new;
+    }
+  }
+
+Note that it doesn't start with a C<package> statement, nor
+C<use MooX::Pression>. It's just straight on to the definitions.
+There's no C<< 1; >> needed at the end.
+
+C<< use strict >> and C<< use warnings >> are safe to put in the
+file if you need them to satisfy linters, but they're not necessary
+because the contents of the file are evaluated as if they had been
+copied and pasted into the main MyApp module.
+
+There are I<no> checks to prevent a file from being included more than
+once, and there are I<no> checks to deal with cyclical inclusions.
+
+Inclusions are currently only supported at the top level, and not within
+class and role definitions.
+
+=head3 C<< MooX::Pression::PACKAGE_SPEC() >>
+
+This function can be used while a class or role is being compiled to
+tweak the specification for the class/role.
+
+  class Foo {
+    has foo;
+    MooX::Pression::PACKAGE_SPEC->{has}{foo}{type} = Int;
+  }
+
+It returns a hashref of attributes, methods, etc. L<MooX::Press> should
+give you an idea about how the hashref is structured, but MooX::Pression
+only supports a subset of what MooX::Press supports. For example, MooX::Press
+allows C<has> to be an arrayref or a hashref, but MooX::Pression only supports
+a hashref. The exact subset that MooX::Pression supports is subject to change
+without notice.
+
+This can be used to access MooX::Press features that MooX::Pression doesn't
+expose.
 
 =head2 Helper Subs
 

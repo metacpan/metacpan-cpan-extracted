@@ -1,12 +1,14 @@
 package Data::Sah;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-12'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.907'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any qw($log);
+#use Log::ger;
 
 use Mo qw(build default);
 
@@ -124,7 +126,7 @@ Data::Sah - Fast and featureful data structure validation
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -148,10 +150,10 @@ Non-OO interface:
 
  # generate validator which reports error message string
  $v = gen_validator(["int*", min=>1, max=>10],
-                    {return_type=>'str', lang=>'id_ID'});
+                    {return_type=>'str_errmsg', lang=>'id_ID'});
  # ditto but the error message will be in Indonesian
  $v = gen_validator(["int*", min=>1, max=>10],
-                    {return_type=>'str', lang=>'id_ID'});
+                    {return_type=>'str_errmsg', lang=>'id_ID'});
  say $v->(5);  # ''
  say $v->(12); # 'Data tidak boleh lebih besar dari 10'
                # (in English: 'Data must not be larger than 10')
@@ -240,6 +242,8 @@ Some features are not implemented yet:
 =item * BaseType: more forms of if clause
 
 Only the basic form of the C<if> clause is implemented.
+
+=item * BaseType: postfilters
 
 =item * BaseType: prefilters.temp
 
@@ -506,12 +510,12 @@ L<App::SahUtils> distribution (use the C<--show-code> option).
 
 =head2 How to show the validation error message? The validator only returns true/false!
 
-Pass the C<< return_type=>"str" >> to get an error message string on error, or
-C<< return_type=>"full" >> to get a hash of detailed error messages. Note also
-that the error messages are translateable (e.g. use C<LANG> or C<< lang=>... >>
-option. For example:
+Pass the C<< return_type=>"str_errmsg" >> to get an error message string on
+error, or C<< return_type=>"hash_details" >> to get a hash of detailed error
+messages. Note also that the error messages are translateable (e.g. use C<LANG>
+or C<< lang=>... >> option. For example:
 
- my $v = gen_validator([int => between => [1,10]], {return_type=>"str"});
+ my $v = gen_validator([int => between => [1,10]], {return_type=>"str_errmsg"});
  say "$_: ", $v->($_) for 1, "x", 12;
 
 will output:
@@ -522,22 +526,22 @@ will output:
 
 =head2 How to show all the error and warning messages?
 
-If you pass C<< return_type=>"full" >> then the generated validator code can
-return a hashref containing all the errors (in the C<errors> key) and warnings
-(in the C<warnings> key) instead of just a boolean (when C<< return_type=>"bool"
->>) or a string containing the first encountered error message (when C<<
-return_type=>"str" >>) .
+If you pass C<< return_type=>"hash_details" >> then the generated validator code
+can return a hashref containing all the errors (in the C<errors> key) and
+warnings (in the C<warnings> key) instead of just a boolean (when C<<
+return_type=>"bool_valid" >>) or a string containing the first encountered error
+message (when C<< return_type=>"str_errmsg" >>) .
 
 =head2 How to get the data value with the default filled in, or coercion done?
 
-If you use C<< return_type=>"full" >>, the generated validator code will also
-return the input data after the default is filled in or coercion is done in the
-C<value> key of the result hashref. Or, if you do not need a validator that
-checks for all errors/warnings, you can use C<< return_type=>"bool+val" >> or
-C<< return_type=>"str+val" >>. For example:
+If you use C<< return_type=>"hash_details" >>, the generated validator code will
+also return the input data after the default is filled in or coercion is done in
+the C<value> key of the result hashref. Or, if you do not need a validator that
+checks for all errors/warnings, you can use C<< return_type=>"bool_valid+val" >>
+or C<< return_type=>"str_errmsg+val" >>. For example:
 
  my $v = gen_validator(["date", {"x.perl.coerce_to"=>"DateTime"}],
-                       {return_type=>"str+val"});
+                       {return_type=>"str_errmsg+val"});
 
  my ($err, $val) = @{ $v->("2016-05-14") };
 
@@ -550,7 +554,7 @@ what is usually used further after validation process.
 
 It shows the path to data item that fails the validation, e.g.:
 
- my $v = gen_validator([array => of => [int=>min=>5], {return_type=>"str"});
+ my $v = gen_validator([array => of => [int=>min=>5], {return_type=>"str_errmsg"});
  say $v->([10, 5, "x"]);
 
 prints:
@@ -568,9 +572,9 @@ prints:
  @[1][a]: Input is not of type integer
 
 Note that for validator that returns full result hashref (C<<
-return_type=>"full" >>) the error messages in the C<errors> key are also keyed
-with data path, albeit in a slightly different format (i.e. slash-separated,
-e.g. C<2> and C<1/a>) for easier parsing.
+return_type=>"hash_details" >>) the error messages in the C<errors> key are also
+keyed with data path, albeit in a slightly different format (i.e.
+slash-separated, e.g. C<2> and C<1/a>) for easier parsing.
 
 =head2 How to show the process of validation by the compiled code?
 
@@ -581,7 +585,7 @@ information, which you can display. For example:
  % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
    -MData::Sah=gen_validator -E'
    $v = gen_validator([array => of => [hash => {req_keys=>["a"]}]],
-                      {return_type=>"str", debug=>1});
+                      {return_type=>"str_errmsg", debug=>1});
    say "Validation result: ", $v->([{a=>1}, "x"]);'
 
 will output:
@@ -659,17 +663,21 @@ feature.
 
 =head1 SEE ALSO
 
-=head3 Other compiled validators
-
 =head3 Other interpreted validators
 
 L<Params::Validate> is very fast, although minimal. L<Data::Rx>, L<Kwalify>,
 L<Data::Verifier>, L<Data::Validator>, L<JSON::Schema>, L<Validation::Class>.
 
 For Moo/Mouse/Moose stuffs: L<Moose> type system, L<MooseX::Params::Validate>,
-L<Type::Tiny>, among others.
+among others.
 
 Form-oriented: L<Data::FormValidator>, L<FormValidator::Lite>, among others.
+
+=head3 Other compiled validators
+
+L<Type::Tiny>
+
+L<Params::ValidationCompiler>
 
 =head1 AUTHOR
 

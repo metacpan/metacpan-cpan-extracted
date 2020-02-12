@@ -80,9 +80,12 @@ sub can_ed25519 {
 
         diag "Checking $bin for ed25519 support …";
 
-        system { $bin } $bin, 'genpkey', '-algorithm', 'ed25519';
+        my $cmd = "$bin genpkey -algorithm ed25519";
 
-        if ($?) {
+        my $out = `$cmd`;
+
+        # On some OpenSSLs/OSes $? isn’t populated, even in failure.
+        if ($? || $out !~ m<BEGIN>) {
             $_can_ed25519 = 0;
             diag "$bin does not support ed25519.";
         }

@@ -1,3 +1,14 @@
+0.047   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Rename return_type values for clarity: status+val ->
+	  bool_coerced+val, status+err+val -> bool_coerced+str_errmsg+val;
+	  old values are still supported but deprecated and no longer
+	  documented.
+
+	- [ux] Upon coercion failure, we return the original data where
+	  appropriate instead of undef.
+
+
 0.046   2020-01-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Upgrade dependency Time::Local from TestRecommends to

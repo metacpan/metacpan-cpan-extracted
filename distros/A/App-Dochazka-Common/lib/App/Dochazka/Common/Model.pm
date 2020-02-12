@@ -248,7 +248,8 @@ sub make_reset {
         # process arguments
         my $self = shift;
         #confess "Not an instance method call" unless ref $self;
-        my %ARGS = validate( @_, $val_spec ) if @_ and defined $_[0];
+        my %ARGS;
+        %ARGS = validate( @_, $val_spec ) if @_ and defined $_[0];
 
         # Set attributes to run-time values sent in argument list.
 	# Attributes that are not in the argument list will get set to undef.

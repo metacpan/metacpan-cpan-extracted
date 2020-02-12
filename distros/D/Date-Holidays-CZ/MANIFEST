@@ -5,10 +5,12 @@ example/svatky.plx
 lib/Date/Holidays/CZ.pm
 LICENSE
 MANIFEST 
+MANIFEST.SKIP
 META.json
 META.yml
-README
+README.rst
 t/00-load.t
 t/basic.t
-META.yml
-META.json
+t/critic.t
+t/manifest.t
+t/perlcriticrc

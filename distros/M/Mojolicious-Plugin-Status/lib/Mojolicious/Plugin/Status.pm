@@ -2,12 +2,13 @@ package Mojolicious::Plugin::Status;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use BSD::Resource 'getrusage';
-use File::Map 'map_anonymous';
 use Time::HiRes 'time';
-use Mojo::File qw(path tempfile);
+use Mojo::File 'path';
 use Mojo::IOLoop;
+use Mojo::MemoryMap;
+use Mojo::Util 'humanize_bytes';
 
-our $VERSION = '1.02';
+our $VERSION = '1.04';
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -15,13 +16,11 @@ sub register {
   # Config
   my $prefix = $config->{route} // $app->routes->any('/mojo-status');
   $prefix->to(return_to => $config->{return_to} // '/');
-  my $size = $config->{size} ||= 52428800;
+  $self->{slowest} = $config->{slowest} // 10;
 
   # Initialize cache
-  $self->{tempfile} = tempfile->touch;
-  map_anonymous my $map, $config->{size}, 'shared';
-  $self->{map} = \$map;
-  $self->_guard->_store({started => time, processed => 0});
+  my $map = $self->{map} = Mojo::MemoryMap->new($config->{size});
+  $map->writer->store({started => time, processed => 0, slowest => []});
 
   # Only the two built-in servers are supported for now
   $app->hook(before_server_start => sub { $self->_start(@_) });
@@ -38,127 +37,7 @@ sub register {
     ->name('mojo_status');
 }
 
-sub _dashboard {
-  my $c = shift;
-
-  my $stats = $c->stash('mojo_status')->_guard->_fetch;
-
-  $c->respond_to(
-    html => sub {
-      $c->render(
-        'mojo-status/dashboard',
-        table => _table($stats),
-        stats => $stats
-      );
-    },
-    json => {json => $stats}
-  );
-}
-
-sub _guard {
-  my $self = shift;
-  my $fh   = $self->{fh}{$$} ||= $self->{tempfile}->open('>');
-  return Mojolicious::Plugin::Status::_Guard->new(fh => $fh,
-    map => $self->{map});
-}
-
-sub _read_write {
-  my ($record, $id) = @_;
-  return unless my $stream = Mojo::IOLoop->stream($id);
-  @{$record}{qw(bytes_read bytes_written)}
-    = ($stream->bytes_read, $stream->bytes_written);
-}
-
-sub _request {
-  my ($self, $c) = @_;
-
-  # Request start
-  my $tx    = $c->tx;
-  my $id    = $tx->connection;
-  my $req   = $tx->req;
-  my $url   = $req->url->to_abs;
-  my $proto = $tx->is_websocket ? 'ws' : 'http';
-  $proto .= 's' if $req->is_secure;
-  $self->_guard->_change(sub {
-    $_->{workers}{$$}{connections}{$id}{request} = {
-      request_id => $req->request_id,
-      method     => $req->method,
-      protocol   => $proto,
-      host       => $url->host,
-      path       => $url->path->to_abs_string,
-      query      => $url->query->to_string,
-      started    => time
-    };
-    _read_write($_->{workers}{$$}{connections}{$id}, $id);
-    $_->{workers}{$$}{connections}{$id}{processed}++;
-    $_->{workers}{$$}{processed}++;
-    $_->{processed}++;
-  });
-
-  # Request end
-  $tx->on(
-    finish => sub {
-      my $tx = shift;
-      $self->_guard->_change(sub {
-        return unless $_->{workers}{$$};
-        $_->{workers}{$$}{connections}{$id}{request}{finished} = time;
-        $_->{workers}{$$}{connections}{$id}{request}{status}   = $tx->res->code;
-      });
-    }
-  );
-}
-
-sub _resources {
-  my $self = shift;
-
-  $self->_guard->_change(sub {
-    @{$_->{workers}{$$}}{qw(utime stime maxrss)} = (getrusage)[0, 1, 2];
-    for my $id (keys %{$_->{workers}{$$}{connections}}) {
-      _read_write($_->{workers}{$$}{connections}{$id}, $id);
-    }
-  });
-}
-
-sub _start {
-  my ($self, $server, $app) = @_;
-  return unless $server->isa('Mojo::Server::Daemon');
-
-  # Register started workers
-  Mojo::IOLoop->next_tick(sub {
-    $self->_guard->_change(sub {
-      $_->{workers}{$$} = {started => time, processed => 0};
-    });
-  });
-
-  # Remove stopped workers
-  $server->on(
-    reap => sub {
-      my ($server, $pid) = @_;
-      $self->_guard->_change(sub { delete $_->{workers}{$pid} });
-    }
-  ) if $server->isa('Mojo::Server::Prefork');
-
-  # Collect stats
-  $app->hook(after_build_tx  => sub { $self->_tx(@_) });
-  $app->hook(before_dispatch => sub { $self->_request(@_) });
-  Mojo::IOLoop->next_tick(sub { $self->_resources });
-  Mojo::IOLoop->recurring(5 => sub { $self->_resources });
-}
-
-sub _stream {
-  my ($self, $id) = @_;
-
-  my $stream = Mojo::IOLoop->stream($id);
-  $stream->on(
-    close => sub {
-      $self->_guard->_change(
-        sub { delete $_->{workers}{$$}{connections}{$id} if $_->{workers}{$$} }
-      );
-    }
-  );
-}
-
-sub _table {
+sub _activity {
   my $stats = shift;
 
   # Workers
@@ -166,7 +45,7 @@ sub _table {
   for my $pid (sort keys %{$stats->{workers}}) {
     my $worker = $stats->{workers}{$pid};
     my $cpu    = sprintf '%.2f', $worker->{utime} + $worker->{stime};
-    my @worker = ($pid, $cpu, $worker->{maxrss});
+    my @worker = ($pid, $cpu, humanize_bytes($worker->{maxrss}));
 
     # Connections
     my $connections = $worker->{connections};
@@ -175,8 +54,10 @@ sub _table {
       for my $cid (sort keys %$connections) {
         my $conn = $connections->{$cid};
         @worker = ('', '', '') if $repeat++;
-        my $rw   = "$conn->{bytes_read}/$conn->{bytes_written}";
-        my @conn = ($conn->{remote_address}, $rw, $conn->{processed});
+        my $bytes_read    = humanize_bytes $conn->{bytes_read};
+        my $bytes_written = humanize_bytes $conn->{bytes_written};
+        my $rw            = "$bytes_read/$bytes_written";
+        my @conn          = ($conn->{remote_address}, $rw, $conn->{processed});
 
         # Request
         if (my $req = $conn->{request}) {
@@ -200,6 +81,161 @@ sub _table {
   return \@table;
 }
 
+sub _dashboard {
+  my $c = shift;
+
+  my $map = $c->stash('mojo_status')->{map};
+  if ($c->param('reset')) {
+    $map->writer->change(sub { $_->{slowest} = [] });
+    return $c->redirect_to('mojo_status');
+  }
+
+  my $stats = $map->writer->fetch;
+  $c->respond_to(
+    html => sub {
+      $c->render(
+        'mojo-status/dashboard',
+        usage    => humanize_bytes($map->usage),
+        size     => humanize_bytes($map->size),
+        activity => _activity($stats),
+        slowest  => _slowest($stats),
+        stats    => $stats
+      );
+    },
+    json => {json => $stats}
+  );
+}
+
+sub _read_write {
+  my ($record, $id) = @_;
+  return unless my $stream = Mojo::IOLoop->stream($id);
+  @{$record}{qw(bytes_read bytes_written)}
+    = ($stream->bytes_read, $stream->bytes_written);
+}
+
+sub _request {
+  my ($self, $c) = @_;
+
+  # Request start
+  my $tx    = $c->tx;
+  my $id    = $tx->connection;
+  my $req   = $tx->req;
+  my $url   = $req->url->to_abs;
+  my $proto = $tx->is_websocket ? 'ws' : 'http';
+  $proto .= 's' if $req->is_secure;
+  $self->{map}->writer->change(sub {
+    $_->{workers}{$$}{connections}{$id}{request} = {
+      request_id => $req->request_id,
+      method     => $req->method,
+      protocol   => $proto,
+      path       => $url->path->to_abs_string,
+      query      => $url->query->to_string,
+      started    => time
+    };
+    _read_write($_->{workers}{$$}{connections}{$id}, $id);
+    $_->{workers}{$$}{connections}{$id}{remote_address} = $tx->remote_address;
+    $_->{workers}{$$}{connections}{$id}{processed}++;
+    $_->{workers}{$$}{processed}++;
+    $_->{processed}++;
+  });
+
+  # Request end
+  $tx->on(
+    finish => sub {
+      my $tx = shift;
+      $self->{map}->writer->change(sub {
+        return unless $_->{workers}{$$};
+        $_->{workers}{$$}{connections}{$id}{request}{finished} = time;
+        $_->{workers}{$$}{connections}{$id}{request}{status}   = $tx->res->code;
+      });
+    }
+  );
+}
+
+sub _rendered {
+  my ($self, $c) = @_;
+
+  my $id   = $c->tx->connection;
+  my $map  = $self->{map};
+  my $conn = $map->writer->fetch->{workers}{$$}{connections}{$id};
+  return unless $conn && (my $r = $conn->{request});
+  $r->{runtime} = time - $r->{started};
+  @{$r}{qw(remote_address worker)} = ($conn->{remote_address}, $$);
+
+  $map->writer->change(sub {
+    my $slowest = $_->{slowest};
+    @$slowest = sort { $b->{runtime} <=> $a->{runtime} } @$slowest, $r;
+    my %seen;
+    @$slowest = grep { !$seen{"$_->{method} $_->{path}"}++ } @$slowest;
+    pop @$slowest while @$slowest > $self->{slowest};
+  });
+}
+
+sub _resources {
+  my $self = shift;
+
+  $self->{map}->writer->change(sub {
+    @{$_->{workers}{$$}}{qw(utime stime maxrss)} = (getrusage)[0, 1, 2];
+    for my $id (keys %{$_->{workers}{$$}{connections}}) {
+      _read_write($_->{workers}{$$}{connections}{$id}, $id);
+    }
+  });
+}
+
+sub _slowest {
+  my $stats = shift;
+
+  my @table;
+  for my $r (@{$stats->{slowest}}) {
+    my $str  = "$r->{method} $r->{path}";
+    my $time = sprintf '%.2f', $r->{runtime};
+    push @table,
+      [$time, $str, @{$r}{qw(request_id worker remote_address started)}];
+  }
+
+  return \@table;
+}
+
+sub _start {
+  my ($self, $server, $app) = @_;
+  return unless $server->isa('Mojo::Server::Daemon');
+
+  # Register started workers
+  Mojo::IOLoop->next_tick(sub {
+    $self->{map}->writer->change(sub {
+      $_->{workers}{$$} = {started => time, processed => 0};
+    });
+  });
+
+  # Remove stopped workers
+  $server->on(
+    reap => sub {
+      my ($server, $pid) = @_;
+      $self->{map}->writer->change(sub { delete $_->{workers}{$pid} });
+    }
+  ) if $server->isa('Mojo::Server::Prefork');
+
+  # Collect stats
+  $app->hook(after_build_tx  => sub { $self->_tx(@_) });
+  $app->hook(before_dispatch => sub { $self->_request(@_) });
+  $app->hook(after_dispatch  => sub { $self->_rendered(@_) });
+  Mojo::IOLoop->next_tick(sub { $self->_resources });
+  Mojo::IOLoop->recurring(5 => sub { $self->_resources });
+}
+
+sub _stream {
+  my ($self, $id) = @_;
+
+  my $stream = Mojo::IOLoop->stream($id);
+  $stream->on(
+    close => sub {
+      $self->{map}->writer->change(
+        sub { delete $_->{workers}{$$}{connections}{$id} if $_->{workers}{$$} }
+      );
+    }
+  );
+}
+
 sub _tx {
   my ($self, $tx, $app) = @_;
 
@@ -207,55 +243,20 @@ sub _tx {
     connection => sub {
       my ($tx, $id) = @_;
 
-      return if $self->_guard->_fetch->{workers}{$$}{connections}{$id};
+      my $map = $self->{map};
+      return if $map->writer->fetch->{workers}{$$}{connections}{$id};
 
-      $self->_guard->_change(sub {
+      $map->writer->change(sub {
         $_->{workers}{$$}{connections}{$id} = {
-          started        => time,
-          remote_address => $tx->remote_address,
-          processed      => 0,
-          bytes_read     => 0,
-          bytes_written  => 0
+          started       => time,
+          processed     => 0,
+          bytes_read    => 0,
+          bytes_written => 0
         };
       });
       $self->_stream($id);
     }
   );
-}
-
-package Mojolicious::Plugin::Status::_Guard;
-use Mojo::Base -base;
-
-use Fcntl ':flock';
-use Sereal qw(get_sereal_decoder get_sereal_encoder);
-
-my ($DECODER, $ENCODER) = (get_sereal_decoder, get_sereal_encoder);
-
-sub DESTROY { flock shift->{fh}, LOCK_UN }
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  flock $self->{fh}, LOCK_EX;
-  return $self;
-}
-
-sub _change {
-  my ($self, $cb) = @_;
-  my $stats = $self->_fetch;
-  $cb->($_) for $stats;
-  $self->_store($stats);
-}
-
-sub _fetch {
-  my $self = shift;
-  return $DECODER->decode(${$self->{map}});
-}
-
-sub _store {
-  my ($self, $data) = @_;
-  my $bytes = $ENCODER->encode($data);
-  return if length $bytes > length ${$self->{map}};
-  substr ${$self->{map}}, 0, length $bytes, $bytes;
 }
 
 1;
@@ -328,6 +329,13 @@ to generating a new one with the prefix C</mojo-status>.
 
 Size of anonymous mapped memory to use for storing statistics, defaults to
 C<52428800> (50 MiB).
+
+=head2 slowest
+
+  # Mojolicious::Lite
+  plugin Status => {slowest => 5}; 
+
+Number of slowest requests to track, defaults to C<10>.
 
 =head1 METHODS
 

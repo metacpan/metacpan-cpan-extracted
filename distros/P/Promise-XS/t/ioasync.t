@@ -6,6 +6,8 @@ use Promise::XS;
 
 eval { require IO::Async::Loop; 1 } or plan skip_all => $@;
 
+diag "IO::Async::Loop $IO::Async::Loop::VERSION";
+
 my $loop = IO::Async::Loop->new();
 
 Promise::XS::use_event('IO::Async' => $loop);

@@ -6,6 +6,34 @@ Home page:    <https://metacpan.org/release/MooX-Pression>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Pression>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.301	2020-02-12
+
+ [ Packaging ]
+ - Require MooX::Press 0.043.
+
+ [ Other ]
+ - Allow `has`, `around`, `before`, and `after` to accept a list of
+   attribute/method names instead of just one.
+
+0.300	2020-02-12
+
+ - Added: `MooX::Pression::PACKAGE_SPEC` can be used to tweak the hashref
+   passed to MooX::Press.
+ - Added: `include` can now be used to load files.
+
+0.200	2020-02-11
+
+ [ Bug Fixes ]
+ - Fixed over-eager regexps which weren't just matching at the start of
+   strings.
+
+ [ Documentation ]
+ - mip-087-001.pl
+
+ [ Other ]
+ - Updated: If Type::Params 1.009002 or above is available, allow mixed
+   named and positional parameters in method signatures.
+
 0.100	2020-02-10
 
  - Major rewrite using PPR and Keyword::Simple for parsing instead of

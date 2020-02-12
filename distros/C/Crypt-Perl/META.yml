@@ -35,7 +35,6 @@ requires:
   MIME::Base64: '3.11'
   Math::BigInt: '1.999805'
   Math::ProvablePrime: '0.043'
-  Math::Utils: '1.07'
   Symbol::Get: '0.02'
   Try::Tiny: '0'
   autodie: '0'
@@ -44,5 +43,5 @@ requires:
   perl: '5.008000'
 resources:
   repository: https://github.com/FGasper/p5-Crypt-Perl.git
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

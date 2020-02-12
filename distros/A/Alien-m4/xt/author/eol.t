@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::EOL' 
+BEGIN {
+  plan skip_all => 'test requires Test::EOL'
     unless eval q{ use Test::EOL; 1 };
 };
 use Test::EOL;

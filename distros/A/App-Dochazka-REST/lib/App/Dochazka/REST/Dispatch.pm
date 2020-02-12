@@ -2748,7 +2748,8 @@ sub _handler_interval_fillup_scheduled {
     my $method = $context->{'method'};
     my $path = $context->{'path'};
     my $entity = $context->{'request_entity'};
-    my ( $act, $clobber, $dry_run, $emp );
+    my $supervisor_ok = 0;
+    my ( $acl_check, $act, $clobber, $dry_run, $emp );
 
     # first pass
     return 1 if $self->_first_pass_always_exists( $pass ); 
@@ -2779,8 +2780,21 @@ sub _handler_interval_fillup_scheduled {
         delete $entity->{'clobber'};
         $dry_run = { 'dry_run' => '1' };
         delete $entity->{'dry_run'};
+        $supervisor_ok = 1;
     } else {
         die "ASSERTfillupscheduled";
+    }
+
+    # ACL check
+    if ( $supervisor_ok ) {
+        $acl_check = acl_check_is_me( $self, 'eid' => $emp->eid ) ||
+                     acl_check_is_my_report( $self, 'eid' => $emp->eid );
+    } else {
+        $acl_check = acl_check_is_me( $self, 'eid' => $emp->eid );
+    }
+    if ( ! $acl_check ) {
+        $self->mrest_declare_status( code => 403, explanation => "DISPATCH_KEEP_TO_YOURSELF" );
+        return;
     }
 
     # create Fillup object
@@ -2856,10 +2870,6 @@ sub _extract_employee_spec {
         return;
     }
     map { delete $entity->{$_} } ( 'eid', 'nick', 'sec_id' );
-    if ( ! acl_check_is_me( $self, $key => $value ) ) {
-        $self->mrest_declare_status( code => 403, explanation => "DISPATCH_KEEP_TO_YOURSELF" );
-        return;
-    }
     my $emp = shared_first_pass_lookup( $self, $key, $value );
     return unless $emp->isa( 'App::Dochazka::REST::Model::Employee' );
     return $emp;

@@ -5,10 +5,11 @@ use strict;
 use MIME::QuotedPrint qw/encode_qp/;
 use MIME::Base64      qw/encode_base64/;
 use MIME::Types;
+use Encode            qw/encode_utf8/;
 use Carp;
 use Params::Validate  qw/validate SCALAR HASHREF/;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 sub new {
   my $class = shift;
@@ -184,11 +185,11 @@ sub content {
     if ($mime_type =~ /^text|xml$/) {
       $encoding = 'quoted-printable';
       $content  =~ s/\r\n/\n/g;
-      $encoded  = encode_qp($content, ''); # '': no "soft line breaks"
+      $encoded  = encode_qp(encode_utf8($content), ''); # '': no "soft line breaks"
     }
     else {
       $encoding = 'base64';
-      $encoded  = encode_base64($content);
+      $encoded  = encode_base64(encode_utf8($content));
     }
 
     $mime .= qq{--$boundary\n}

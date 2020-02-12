@@ -8,6 +8,8 @@ build_requires:
   File::Temp: '0'
   Log::Any::Test: '0'
   Params::Validate: '0'
+  Test::More: '0'
+  Test::Output: '0'
   Test::Warnings: '0'
   Try::Tiny: '0'
 configure_requires:
@@ -24,12 +26,12 @@ name: App-CELL
 provides:
   App::CELL:
     file: lib/App/CELL.pm
-    version: '0.227'
+    version: '0.229'
   App::CELL::Config:
     file: lib/App/CELL/Config.pm
   App::CELL::Guide:
     file: lib/App/CELL/Guide.pm
-    version: '0.227'
+    version: '0.229'
   App::CELL::Load:
     file: lib/App/CELL/Load.pm
   App::CELL::Log:
@@ -58,5 +60,5 @@ resources:
   bugtracker: https://github.com/smithfarm/cell/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/cell
-version: '0.227'
+version: '0.229'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

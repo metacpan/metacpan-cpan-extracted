@@ -3,21 +3,34 @@ use strict;
 use warnings;
 
 package Mxpress::PDF {
-	our $VERSION = '0.02';
+	our $VERSION = '0.03';
 	use MooX::Pression (
-		version	=> '0.02',
+		version	=> '0.03',
 		authority => 'cpan:LNATION',
 	);
 	use Colouring::In;
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
-	class File () {
+	class File (HashRef $args) {
+		my @plugins = (qw/font line box circle text title subtitle subsubtitle toc image/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		for my $p (@plugins) {
+			my $meth = sprintf('_store_%s', $p);
+			has {$meth} (type => Object);
+			method {$p} () {
+				my $klass = $self->$meth;
+				if (!$klass) {
+					$klass = $class->FACTORY->$p($self, %{$args->{$p}});
+					$self->$meth($klass);
+				}
+				return $klass;
+			}
+		}
 		has file_name (type => Str, required => 1);
 		has pdf (required => 1, type => Object);
 		has pages (required => 1, type => ArrayRef);
 		has page (type => Object);
 		has page_args (type => HashRef);
-		has onsave_cbs (type => ArrayRef);	
+		has onsave_cbs (type => ArrayRef);
 		method add_page (Map %args) {
 			my $page = $self->FACTORY->page(
 				$self->pdf,
@@ -28,8 +41,8 @@ package Mxpress::PDF {
 			);
 			push @{$self->pages}, $page;
 			$self->page($page);
-			$self->boxed->add( fill_colour => $page->background ) if $page->background;
-			$self->page->set_position($page->parse_position([]));	
+			$self->box->add( fill_colour => $page->background ) if $page->background;
+			$self->page->set_position($page->parse_position([]));
 			$self;
 		}
 		method save {
@@ -96,6 +109,8 @@ package Mxpress::PDF {
 	}
 	role Utils {
 		has padding (type => Num);
+		has margin_top (type => Num);
+		has margin_bottom (type => Num);
 		method add_padding (Num $padding) {
 			$self->padding($self->padding + $padding);
 		}
@@ -112,12 +127,16 @@ package Mxpress::PDF {
 				$_ =~ m/[^\d\.]/ ? $_ : $_/mm
 			} @{$position};
 			my $page = $self->can('file') ? $self->file->page : $self;
-			$x = $page->x + $self->padding/mm unless defined $x;
-			$y = $page->y - $self->padding/mm unless defined $y;
-			$y = $page->y if $y =~ m/current/;
-			$w = $page->w - ($self->padding ? ($x + $self->padding/mm) : 0) unless defined $w;
-			$h = $y - ($self->padding + $page->padding)/mm unless defined $h;
+			$x //= $page->x + ($self->padding/mm);
+			$y //= $page->y - ($self->padding/mm);
+			$w //= $page->w - ($self->padding/mm);
+			$h //= $y - (($self->padding + $page->padding)/mm);
 			return $xy ? ($x, $y) : ($x, $y, $w, $h);
+		}
+		method set_y (Num $y) {
+			$y -= $self->margin_bottom if $self->margin_bottom;
+			my $page = $self->can('file') ? $self->file->page : $self;
+			return $page->y($y);
 		}
 		method valid_colour (Str $css) {
 			return Colouring::In->new($css)->toHEX(1);
@@ -138,6 +157,7 @@ package Mxpress::PDF {
 	class Plugin {
 		with Utils;
 		has file (type => Object);
+		has position (type => ArrayRef);
 		method set_attrs (Map %args) {
 			$self->can($_) && $self->$_($args{$_}) for keys %args;
 		}
@@ -167,23 +187,70 @@ package Mxpress::PDF {
 				return $loaded->{$family};
 			}
 		}
-		class +Boxed {
+		class +Shape {
 			has fill_colour ( type => Str );
-			has position ( type => ArrayRef );
-			factory boxed (Object $file, Map %args) {
+			has radius ( type => Num );
+			method generic_new (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
 					fill_colour => $file->page->valid_colour($args{fill_colour} || '#fff'),
-					padding => $args{padding} || 0
+					padding => $args{padding} || 0,
+					($args{radius} ? (radius => $args{radius}) : ())
 				);
 			}
 			method add (Map %args) {
 				$self->set_attrs(%args);
-				my $box = $self->file->page->current->gfx;
-				my $boxed = $box->rect($self->parse_position($self->position || [0, 0, $self->file->page->w * mm, $self->file->page->h * mm]));
-				$boxed->fillcolor($self->fill_colour);
-				$boxed->fill;
+				my $shape = $self->file->page->current->gfx;
+				$self->shape($shape);
 				return $self->file;
+			}
+			class +Line {
+				has end_position;
+				factory line (Object $file, Map %args) {
+					$class->generic_new($file, %args);
+				}
+				method shape (Object $shape) {
+					$shape->strokecolor($self->fill_colour);
+					my ($x, $y, $w, $h) = $self->parse_position($self->position || []);
+					$shape->move($x, $y);
+					($x, $y) = $self->end_position ? $self->parse_position($self->end_position, \1) : ($w, $y);
+					$shape->line($x, $y);
+					$shape->stroke;
+				}
+			}
+			class +Box {
+				factory box (Object $file, Map %args) {
+					return $class->generic_new($file, %args);
+				}
+				method shape (Object $shape) {
+					my $box = $shape->rect(
+						$self->parse_position(
+							$self->position || [0, 0, $self->file->page->w, $self->file->page->h]
+						)
+					);
+					$box->fillcolor($self->fill_colour);
+					$box->fill;
+				}
+			}
+			class +Circle {
+				factory circle (Object $file, Map %args) {
+					$args{radius} ||= 50;
+					return $class->generic_new($file, %args);
+				}
+				method shape (Object $shape) {
+					my ($x, $y, $r) = $self->parse_position(
+						$self->position || [
+							($self->file->page->x*mm) + $self->radius,
+							($self->file->page->y*mm) - $self->radius,
+							$self->radius
+						]
+					);
+					my $circle = $shape->circle(
+						$x, $y, $r
+					);
+					$circle->fillcolor($self->fill_colour);
+					$circle->fill;
+				}
 			}
 		}
 		class +Text {
@@ -192,12 +259,10 @@ package Mxpress::PDF {
 			has first_line_indent (type => Num);
 			has first_paragraph_indent (type => Num);
 			has align (type => Str); #enum
-			has margin_top (type => Num);
 			has margin_bottom (type => Num);
 			has indent (type => Num);
 			has pad (type => Str);
 			has pad_end (type => Str);
-			has position (type => ArrayRef);
 			has next_page;
 			factory text (Object $file, Map %args) {
 				$class->generic_new($file, %args);
@@ -236,7 +301,6 @@ package Mxpress::PDF {
 					$self->parse_position($self->position)
 				);
 				$ypos = $y - $l;
-				$ypos -= $self->margin_top/mm if $self->margin_top;
 				my ($fl, $fp, @paragraph) = (1, 1, split ( / /, shift(@paragraphs) || '' ));
 				# while we have enough height to add a new line
 				while ($ypos >= $y - $h) {
@@ -249,10 +313,10 @@ package Mxpress::PDF {
 					}
 					my ($xpos, $lw, $line_width, @line) = ($x, $w, 0);
 					($xpos, $lw) = $self->_set_indent($xpos, $lw, $fl, $fp);
-					while (@paragraph and ($line_width + (scalar(@line) * $space_width) + $width{$paragraph[0]}) < $lw) {
-						$line_width += $width{$paragraph[0]};
+					while (@paragraph and ($line_width + (scalar(@line) * $space_width) + ($width{$paragraph[0]}||0)) < $lw) {
+						$line_width += $width{$paragraph[0]} || 0;
 						push @line, shift(@paragraph);
-					}	
+					}
 					my ($wordspace, $align);
 					if ($self->align eq 'fulljustify' or $self->align eq 'justify' and @paragraph) {
 						if (scalar(@line) == 1) {
@@ -284,9 +348,10 @@ package Mxpress::PDF {
 						$ypos -= $l if @paragraph;
 					} elsif ($self->pad) {
 						my $pad_end = $self->pad_end;
+						$lw -= $self->page->padding/mm;
 						my $pad = sprintf ("%s%s",
 							$self->pad x int(((
-								(((($lw + $wordspace) - $line_width) - $text->advancewidth($self->pad . $pad_end)) - ($self->padding/mm)) 
+								(((($lw + $wordspace) - $line_width) - $text->advancewidth($self->pad . $pad_end)))
 							) / $text->advancewidth($self->pad))),
 							$pad_end
 						);
@@ -297,7 +362,7 @@ package Mxpress::PDF {
 				}
 				unshift( @paragraphs, join( ' ', @paragraph ) ) if scalar(@paragraph);
 				$ypos -= $self->margin_bottom/mm if $self->margin_bottom;
-				$self->file->page->y($ypos);
+				$self->set_y($ypos);
 				if (scalar @paragraphs && $self->next_page) {
 					my $next_page = $self->next_page->($self);
 					return $self->add(join("\n", @paragraphs), %args);
@@ -331,29 +396,26 @@ package Mxpress::PDF {
 				}
 				return ($total_width, $space_width, %width);
 			}
-		}
-		class +Title {
-			extends Plugin::Text;
-			factory title (Object $file, Map %args) {
-				$args{font}->{size} ||= 50/pt;
-				$args{font}->{line_height} ||= 40/pt;
-				$class->generic_new($file, %args);
+			class +Title {
+				factory title (Object $file, Map %args) {
+					$args{font}->{size} ||= 50/pt;
+					$args{font}->{line_height} ||= 40/pt;
+					$class->generic_new($file, %args);
+				}
 			}
-		}
-		class +Subtitle {
-			extends Plugin::Text;
-			factory subtitle (Object $file, Map %args) {
-				$args{font}->{size} ||= 25;
-				$args{font}->{line_height} ||= 20;
-				$class->generic_new($file, %args);
+			class +Subtitle {
+				factory subtitle (Object $file, Map %args) {
+					$args{font}->{size} ||= 25;
+					$args{font}->{line_height} ||= 20;
+					$class->generic_new($file, %args);
+				}
 			}
-		}
-		class +Subsubtitle {
-			extends Plugin::Text;
-			factory subsubtitle (Object $file, Map %args) {
-				$args{font}->{size} ||= 20;
-				$args{font}->{line_height} ||= 15;
-				$class->generic_new($file, %args);
+			class +Subsubtitle {
+				factory subsubtitle (Object $file, Map %args) {
+					$args{font}->{size} ||= 20;
+					$args{font}->{line_height} ||= 15;
+					$class->generic_new($file, %args);
+				}
 			}
 		}
 		class +TOC::Outline {
@@ -369,14 +431,14 @@ package Mxpress::PDF {
 				my ($x, $y) = $file->page->parse_position($args{position} || []);
 				$y += $args{jump_lh};
 				my $new = $outline->outline()->open()
-					->title($args{title})
+					->title($args{outline_title})
 					->dest($file->page->current, '-xyz' => [$x, $y, 0]);
 				return $class->new(
 					x => $x,
 					y => $y,
 					children => [],
 					level => $args{level} || 0,
-					title => $args{title}, 
+					title => $args{outline_title},
 					file => $file,
 					page => $file->page,
 					outline => $new,
@@ -436,10 +498,10 @@ package Mxpress::PDF {
 			}
 			method placeholder (Map %args) {
 				$self->set_attrs(%args);
-				$self->file->subtitle->add($args{title} ? @{$args{title}} : 'Table of contents');
+				#$self->file->subtitle->add($args{title} ? @{$args{title}} : 'Table of contents');
 				$self->toc_placeholder({
 					page => $self->file->page,
-	       				position => [$self->parse_position($args{position} || [])]
+					position => [$self->parse_position($args{position} || [])]
 				});
 				$self->file->onsave('toc', 'render', %args);
 				$self->file->add_page;
@@ -454,7 +516,7 @@ package Mxpress::PDF {
 					if (defined $args{$_}) {
 						($text, %targs) = ref $args{$_} ? @{$args{$_}} : $args{$_};
 						$level = $_;
-						$args{title} ||= $text;
+						$args{outline_title} ||= $text;
 						$args{jump_lh} = $self->file->$level->font->line_height;
 						last;
 					}
@@ -483,7 +545,7 @@ package Mxpress::PDF {
 				my $total_height = ($self->count * $one_toc_link) - $h;
 				while ($total_height > 0) {
 					$args{page_offset}++;
-					$self->file->add_page(num => $placeholder->{page}->num + $args{page_offset});	
+					$self->file->add_page(num => $placeholder->{page}->num + $args{page_offset});
 					$total_height -= $self->file->page->h;
 				}
 				$self->file->page($placeholder->{page});
@@ -492,38 +554,83 @@ package Mxpress::PDF {
 				}
 			}
 		}
+		class +Image {
+			has width (type => Num);
+			has height (type => Num);
+			has align (type => Str);
+			has valid_mime (type => HashRef);
+			factory image (Object $file, Map %args) {
+				return $class->new(
+					file => $file,
+					padding => 0,
+					align => 'center',
+					valid_mime => {
+						jpeg => 'image_jpeg',
+						tiff => 'image_tiff',
+						pnm => 'image_pnm',
+						png => 'image_png',
+						gif => 'image_gif'
+					},
+					%args
+				);
+			}
+			multi method add (FileHandle $image, Str $type, Map %args) {
+				$self->set_attrs(%args);
+				$type = $self->valid_type->{$type};
+				return $self->_add($self->file->pdf->$type($image));
+			}
+			multi method add (Str $image, Map %args) {
+				$self->set_attrs(%args);
+				my $type = $self->_identify_type($image);
+				return $self->_add($self->file->pdf->$type($image));
+			}
+			method _add (Object $image) {
+				my ($x, $y, $w, $h) = $self->_image_position($image);
+				my $photo = $self->file->page->current->gfx;
+				$photo->image(
+					$image,
+					$x, $y, $w, $h
+				);
+				$self->set_y($y);
+				return $self->file;
+			}
+			method _identify_type (Str $image) {
+				my $reg = sprintf '\.(%s)$', join ("|", keys %{$self->valid_mime});
+				$image =~ m/$reg/;
+				return $self->valid_mime->{$1} || 'image_png';
+			}
+			method _image_position (Object $image) {
+				my ($x, $y, $w, $h) = $self->parse_position($self->position || []);
+				my $height = $self->height || $image->height;
+				my $width = $self->width || $image->width;
+				$width = $w if $width > $w;
+				if ($self->align eq 'fill') {
+					$height = $h;
+					$width = $w;
+				} elsif ($self->align eq 'right') {
+					$x += ($w - $width);
+				} elsif ($self->align eq 'center') {
+					$x = ($w - $width) / 2;
+				}
+				# todo scale
+				if ($height <= $h) {
+					$y -= $height;
+				} else {
+					$self->file->add_page;
+					($x, $y, $w, $h) = $self->parse_position([]);
+					if ($height > $h) {
+						$height = $h;
+					}
+					$y -= $height;
+				}
+				return ($x, $y, $width, $height);
+			}
+		}
 	}
 	class Factory {
 		use PDF::API2;
 		factory new_pdf (Str $name, Map %args) {
-			my @plugins = (qw/font boxed text title subtitle subsubtitle toc/, ($args{plugins} ? @{$args{plugins}} : ()));
-			my $spec = Mxpress::PDF::File->_generate_package_spec();
-			for my $p (@plugins) {
-				my $meth = sprintf('_store_%s', $p);
-      				$spec->{has}->{$meth} = { type => Object };
-				$spec->{can}->{$p} = {
-					code => sub {
-						my $class = $_[0]->$meth;
-						if (!$class) {
-							$class = $factory->$p($_[0], %{$args{$p}});
-							$_[0]->$meth($class)
-						}
-						return $class;
-					}
-				};
-			}
-			return MooX::Press->generate_package(
-				'class',
-				"Mxpress::PDF::File",
-				{
-					factory_package => $factory,
-					caller => $class,
-					prefix => $factory,
-					toolkit => 'Moo',
-					type_library => 'Mxpress::PDF::Types',
-				},
-				$spec
-			)->new(
+			return $factory->generate_file( \%args )->new(
 				file_name => $name,
 				pages => [],
 				num => 0,
@@ -547,7 +654,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -577,11 +684,11 @@ Version 0.02
 		},
 	)->add_page->title->add(
 		'This is a title'
-	)->toc->placeholder->toc->add(
-                title => 'This is a title'
-        )->text->add(
-                'Add some text.'
-        )->toc->add(
+	)->line->add->toc->placeholder->toc->add(
+		title => 'This is a title'
+	)->text->add(
+		'Add some text.'
+	)->toc->add(
 		subtitle => 'This is a subtitle'
 	)->text->add(
 		'Add some more text.'
@@ -589,6 +696,8 @@ Version 0.02
 		subsubtitle => 'This is a subsubtitle'
 	)->text->add(
 		'Add some more text.'
+	)->image->add(
+		'path/to/file.png'
 	)->save;
 
 =head2 Note

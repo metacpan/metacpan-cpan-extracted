@@ -13,7 +13,7 @@ Data::Sah::Manual::Developer - Data::Sah developer information
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Manual::Developer (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Manual::Developer (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 OVERVIEW
 
@@ -148,10 +148,10 @@ it:
 
 The above is fine if all you want is a validator that returns true/false (bool).
 What if instead you want to return some error message on failure.
-gen_validator() supports this: if you pass the option C<< return_type => "str"
->> you will get such validator:
+gen_validator() supports this: if you pass the option C<< return_type =>
+"str_errmsg" >> you will get such validator:
 
- $validator = gen_validator(["int", min=>1, max=>10, default=>1], {return_type=>"str"});
+ $validator = gen_validator(["int", min=>1, max=>10, default=>1], {return_type=>"str_errmsg"});
 
 To do this, each Perl expression will need to be able to set an error message:
 
@@ -182,24 +182,25 @@ Other possible values for the C<return_type> are:
 
 =over
 
-=item * C<full>
+=item * C<hash_details>
 
 This will generate validator that returns a hash (instead of a single string)
 with more information about all the errors and warnings encountered during
 validation. It works with the same principle.
 
-=item * C<bool+val>
+=item * C<bool_valid+val>
 
-=item * C<str+val>
+=item * C<str_errmsg+val>
 
-The C<bool+val> and C<str+val> return types are the same as C<bool> and C<str>
-return types respectively, but instead of a bool (or str), they return an
-array(ref) containing bool (or str) as well as the final input value. Final
-input value means input value that might be the default value, after application
-of coercion and/or filters, the value that usually is used further after the
-validation process.
+The C<bool_valid+val> and C<str_errmsg+val> return types are the same as
+C<bool_valid> and C<str_errmsg> return types respectively, but instead of a bool
+(or str), they return an array(ref) containing bool (or str) as well as the
+final input value. Final input value means input value that might be the default
+value, after application of coercion and/or filters, the value that usually is
+used further after the validation process.
 
-For the C<full> return type, the final input value is put in the C<value> key.
+For the C<hash_details> return type, the final input value is put in the
+C<value> key.
 
 =back
 

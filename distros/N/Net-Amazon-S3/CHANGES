@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.89 Tue 11 Feb 2020 20:26:26
+    - fix signature v4 test (Ali Zia)
+
 0.88 Sat  1 Feb 2020 21:29:52
     - Allow passing headers from client to InitiateMultipartUpload request (Ali Zia)
     - sign uri with iam role (kuriyama)

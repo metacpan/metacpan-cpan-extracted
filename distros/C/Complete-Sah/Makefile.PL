@@ -18,11 +18,11 @@ my %WriteMakefileArgs = (
   "NAME" => "Complete::Sah",
   "PREREQ_PM" => {
     "Complete::Common" => "0.22",
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.608",
     "Data::Sah::Normalize" => 0,
     "Exporter" => "5.57",
     "Log::ger" => "0.027",
-    "Module::Installed::Tiny" => 0,
+    "Module::Installed::Tiny" => "0.004",
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,10 +30,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Sah::Schema::negint" => 0,
+    "Sah::Schema::posint" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,14 +44,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Common" => "0.22",
-  "Complete::Util" => "0.603",
+  "Complete::Util" => "0.608",
   "Data::Sah::Normalize" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.027",
-  "Module::Installed::Tiny" => 0,
+  "Module::Installed::Tiny" => "0.004",
+  "Sah::Schema::negint" => 0,
+  "Sah::Schema::posint" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "strict" => 0,

@@ -3,7 +3,7 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =encoding utf-8
 
@@ -77,6 +77,9 @@ L<Math::BigInt::GMP> or L<Math::BigInt::Pari> (either of which requires XS).
 It’s one application where pure-Perl cryptography just doesn’t seem
 feasible. :-( Everything else, though, including all ECDSA and Ed25519
 operations, should be fine.
+
+Note that this distribution’s test suite is pretty slow without an
+XS backend.
 
 =head1 TODO
 

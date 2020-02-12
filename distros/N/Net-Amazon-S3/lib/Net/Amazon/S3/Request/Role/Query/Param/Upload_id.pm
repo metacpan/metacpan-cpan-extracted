@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Upload_id;
 # ABSTRACT: upload_id query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Upload_id::VERSION = '0.88';
+$Net::Amazon::S3::Request::Role::Query::Param::Upload_id::VERSION = '0.89';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Upload_id - upload_id query param 
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

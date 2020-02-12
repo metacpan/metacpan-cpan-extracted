@@ -210,7 +210,7 @@ sub new {
     if ( $ARGS{called_from_status} ) {
         $my_caller = $ARGS{caller};
     } else {
-        $my_caller = [ caller ];
+        $my_caller = [ CORE::caller() ];
     }
    
     if ( not exists( $ARGS{'code'} ) ) {

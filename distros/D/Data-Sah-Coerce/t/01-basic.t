@@ -91,11 +91,11 @@ subtest "opt:coerce_rules" => sub {
     };
 };
 
-subtest "opt:return_type=status+val" => sub {
+subtest "opt:return_type=bool_coerced+val" => sub {
     subtest "perl" => sub {
         test_needs "Time::Duration::Parse::AsHash";
 
-        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"status+val");
+        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"bool_coerced+val");
         is_deeply($c_pl->("1h"), [1, 3600]);
         is_deeply($c_pl->("foo"), [undef, "foo"]);
     };
@@ -103,7 +103,7 @@ subtest "opt:return_type=status+val" => sub {
     subtest "js" => sub {
         plan skip_all => "node.js not available" unless get_nodejs_path();
 
-        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"status+val");
+        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"duration", coerce_to=>"float(secs)", return_type=>"bool_coerced+val");
         my $res;
 
         $res = $c_js->(3600);
@@ -117,11 +117,11 @@ subtest "opt:return_type=status+val" => sub {
     };
 };
 
-subtest "opt:return_type=status+err+val" => sub {
+subtest "opt:return_type=bool_coerced+str_errmsg+val" => sub {
     subtest "perl" => sub {
         test_needs "DateTime";
 
-        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"date", coerce_to=>"DateTime", return_type=>"status+err+val");
+        my $c_pl = Data::Sah::Coerce::gen_coercer(type=>"date", coerce_to=>"DateTime", return_type=>"bool_coerced+str_errmsg+val");
         my $res;
 
         $res = $c_pl->(1527889633);
@@ -141,7 +141,7 @@ subtest "opt:return_type=status+err+val" => sub {
     subtest "js" => sub {
         plan skip_all => "node.js not available" unless get_nodejs_path();
 
-        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"date", return_type=>"status+err+val");
+        my $c_js = Data::Sah::CoerceJS::gen_coercer(type=>"date", return_type=>"bool_coerced+str_errmsg+val");
         my $res;
 
         $res = $c_js->(1527889633);

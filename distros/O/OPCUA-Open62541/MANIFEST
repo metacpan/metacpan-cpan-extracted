@@ -1,0 +1,23 @@
+Changes
+lib/OPCUA/Open62541.pm
+LICENSE
+Makefile.PL
+MANIFEST
+Open62541-statuscodes.xsh
+Open62541.xs
+ppport.h
+README
+script/statuscodes_h2xi.pl
+t/OPCUA-Open62541.t
+t/server-config-default.t
+t/server-config.t
+t/server-iterate.t
+t/server-leak.t
+t/server-running.t
+t/server.t
+t/statuscodes.t
+t/types.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -132,10 +132,13 @@ is( $status->code, 'DOCHAZKA_CUD_OK' );
 my $phid = $status->payload->{'phid'};
 ok( $phid );
 
-note( 'inactive boss can\'t see peon\'s work using GET interval/iid/:iid' );
-$status = req( $test, 403, 'boss', 'GET', "interval/iid/$iid" );
-is( $status->code, 'DISPATCH_ACL_CHECK_FAILED' ); 
-is( $status->text, 'ACL check failed for resource interval/iid/:iid' );
+note( 'inactive boss can still see peon\'s work using GET interval/iid/:iid' );
+$status = req( $test, 200, 'boss', 'GET', "interval/iid/$iid" );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_INTERVAL_FOUND' );
+ok( $status->{'payload'} );
+ok( $status->{'payload'}->{'iid'} );
+is( $status->{'payload'}->{'iid'}, $iid );
 
 note( 'restore boss\'s active status' );
 $status = req( $test, 200, 'root', 'DELETE', "priv/history/phid/$phid" );
@@ -178,12 +181,17 @@ is( $status->code, 'DOCHAZKA_CUD_OK' );
 $phid = $status->payload->{'phid'};
 ok( $phid );
 
-note( 'inactive boss can\'t see peon\'s work using a range' );
+note( 'inactive boss can still see peon\'s work using a range' );
 @variants = ( "nick/peon", "eid/$peon_eid" );
 for my $variant ( @variants ) {
-    $status = req( $test, 403, 'boss', 'GET', "interval/$variant/( \"1957-01-01\", \"1957-01-31\" )" );
-    is( $status->code, 'DISPATCH_ACL_CHECK_FAILED' ); 
-    like( $status->text, qr/ACL check failed for resource interval/ );
+    $status = req( $test, 200, 'boss', 'GET', 
+        "interval/$variant/( \"1957-01-01\", \"1957-01-31\" )" );
+    is( $status->level, 'OK' );
+    is( $status->code, 'DISPATCH_RECORDS_FOUND' );
+    is( ref( $status->payload ), 'ARRAY' );
+    is( scalar( @{ $status->payload } ), 1 );
+    is( ref( $status->payload->[0] ), 'HASH' );
+    is( $status->payload->[0]->{'iid'}, $iid );
 }
 
 note( 'restore boss\'s active status' );

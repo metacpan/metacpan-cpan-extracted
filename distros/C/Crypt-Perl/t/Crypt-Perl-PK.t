@@ -35,6 +35,27 @@ if ( !caller ) {
 
 #----------------------------------------------------------------------
 
+sub test__parse_key__generic_private : Tests(1) {
+    my $ecc = <<END;
+-----BEGIN PRIVATE KEY-----
+MIG2AgEAMBAGByqGSM49AgEGBSuBBAAiBIGeMIGbAgEBBDCjQEAvrGxBbZnLFgK9
+d5KiCiu2Fj4hSLXTKDHL32/TjRVmd3oy9mEqhsIvjNoYNdWhZANiAASoAjX340vY
+1Sb+SZ1OrYG6WvMXN3htrB1N6sT1g4qYVTYTFOMgyRZQkkYmEqqVGc3Y0co3tfWf
+w16OQ3fGdNzSlv3AjLRRAsH7PvRShUzkQYe/6CT7hF16g0y8hChh3+M=
+-----END PRIVATE KEY-----
+END
+
+    my $parsed = Crypt::Perl::PK::parse_key($ecc);
+
+    isa_ok(
+        $parsed,
+        'Crypt::Perl::ECDSA::PrivateKey',
+        'parse_key($ecc)',
+    );
+
+    return;
+}
+
 sub test__parse_key : Tests(4) {
     my $rsa_priv = <<END;
 -----BEGIN RSA PRIVATE KEY-----

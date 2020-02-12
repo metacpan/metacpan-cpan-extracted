@@ -1,5 +1,8 @@
 Revision history for Config-UCL
 
+0.04    2020-02-13T05:08:17+09
+    - add -I/usr/include/ucl for Debian libucl-dev (SREZIC++) [RT#131674]
+
 0.03    2020-02-03T23:07:29+09
     - bump up version number to 0.03
 

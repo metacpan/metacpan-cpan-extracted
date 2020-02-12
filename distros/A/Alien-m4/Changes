@@ -1,5 +1,12 @@
 Revision history for Alien-m4
 
+0.19      2020-02-11 21:36:48 -0700
+  - Apply patch for macOS share install (gh#6, gh#7)
+
+0.18      2020-02-11 15:32:14 -0700
+  - Use https for better security (gh#5)
+  - Apply patch for recent glibc compatability on Linux (gh#3, gh#5)
+
 0.17      2017-08-30 11:08:35 -0400
   - Improved probe for system m4
     finds gm4, gnum4, $ENV{M4} as autoconf does

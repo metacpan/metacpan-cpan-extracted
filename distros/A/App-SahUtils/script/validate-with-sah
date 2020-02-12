@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.475'; # VERSION
+our $DATE = '2020-02-12'; # DATE
+our $VERSION = '0.477'; # VERSION
 
 use 5.010;
 use strict;
@@ -41,7 +41,7 @@ _
     },
     args => {
         schema => {
-            #schema=>['any*', 'x.perl.coerce_rules'=>['From_str::try_json_decode']], # doesn't work well yet
+            #schema=>['any*', prefilters=>['Str::try_decode_json']], # doesn't work yet because Perinci::Sub::GetArgs::Argv croaks before we get to here
             schema=>['any*'],
             pos=>0,
             tags => ['category:schema-specification'],
@@ -118,7 +118,18 @@ _
         },
 
         return_type => {
-            schema=>['str*', in=>[qw/bool bool+val str str+val full/]],
+            schema=>['str*', {
+                in => [qw/bool_valid bool_valid+val str_errmsg str_errmsg+val hash_details/],
+                prefilters => [
+                    ["Str::replace_map", {map=>{
+                        "bool"     => "bool_valid",
+                        "bool+val" => "bool_valid+val",
+                        "str"      => "str_errmsg",
+                        "str+val"  => "str_errmsg+val",
+                        "full"     => "hash_details",
+                    }}],
+                ],
+            }],
             default=>'str',
             cmdline_aliases => {
                 r => {},
@@ -484,7 +495,7 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.475 of validate-with-sah (from Perl distribution App-SahUtils), released on 2020-02-11.
+This document describes version 0.477 of validate-with-sah (from Perl distribution App-SahUtils), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -566,7 +577,7 @@ Show validator JavaScript code:
          &&
          
          // set temporary data term
-         (tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data), true)
+         ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
          
          &&
          
@@ -605,7 +616,7 @@ Show validator JS code only, with line number:
    12|        &&
      |        
    14|        // set temporary data term
-   15|        (tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data), true)
+   15|        ((tmp_data[0] = typeof(data)=='number' ? data : parseFloat(data)), true)
      |        
    17|        &&
      |        
@@ -878,7 +889,7 @@ Default value:
 
 Valid values:
 
- ["bool","bool+val","str","str+val","full"]
+ ["bool_valid","bool_valid+val","str_errmsg","str_errmsg+val","hash_details"]
 
 =item B<--str-val>
 

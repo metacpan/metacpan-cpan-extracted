@@ -1,7 +1,7 @@
 package Data::Sah::Type::Sortable;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $DATE = '2020-02-12'; # DATE
+our $VERSION = '0.907'; # VERSION
 
 use Data::Sah::Util::Role 'has_clause';
 use Role::Tiny;
@@ -92,7 +92,7 @@ Data::Sah::Type::Sortable - Role for sortable types
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Type::Sortable (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Type::Sortable (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 DESCRIPTION
 

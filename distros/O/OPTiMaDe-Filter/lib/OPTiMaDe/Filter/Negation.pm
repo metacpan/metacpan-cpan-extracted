@@ -19,12 +19,14 @@ sub inner
 sub to_filter
 {
     my( $self ) = @_;
+    $self->validate;
     return '(NOT ' . $self->inner->to_filter . ')';
 }
 
 sub to_SQL
 {
     my( $self, $options ) = @_;
+    $self->validate;
 
     my( $sql, $values ) = $self->inner->to_SQL( $options );
     if( wantarray ) {
@@ -41,6 +43,12 @@ sub modify
 
     $self->inner( OPTiMaDe::Filter::modify( $self->inner, $code, @_ ) );
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+    die 'inner undefined for OPTiMaDe::Filter::Negation' if !$self->inner;
 }
 
 1;

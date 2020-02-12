@@ -12,36 +12,36 @@ Dios.
  # Moose implementations
  # ============================================================
  #               Rate         MXD   Prs_Moose Moops_Moose
- # MXD          101/s          --        -98%        -98%
- # Prs_Moose   4715/s       4573%          --        -21%
- # Moops_Moose 5966/s       5813%         27%          --
+ # MXD         94.2/s          --        -98%        -98%
+ # Prs_Moose   4525/s       4702%          --        -18%
+ # Moops_Moose 5531/s       5769%         22%          --
  # 
  # ============================================================
  # Moo implementations
  # ============================================================
  #             Rate Moops_Moo   Prs_Moo
- # Moops_Moo 3349/s        --      -23%
- # Prs_Moo   4325/s       29%        --
+ # Moops_Moo 3169/s        --      -24%
+ # Prs_Moo   4148/s       31%        --
  # 
  # ============================================================
  # Mouse implementations
  # ============================================================
  #               Rate   Prs_Mouse Moops_Mouse
- # Prs_Mouse   6053/s          --        -34%
- # Moops_Mouse 9221/s         52%          --
+ # Prs_Mouse   5966/s          --        -31%
+ # Moops_Mouse 8698/s         46%          --
  # 
  # ============================================================
  # All implementations
  # ============================================================
  #               Rate    Dios   MXD Moops_Moo Prs_Moo Prs_Moose Moops_Moose Prs_Mouse Moops_Mouse
- # Dios        2.36/s      --  -98%     -100%   -100%     -100%       -100%     -100%       -100%
- # MXD          101/s   4181%    --      -97%    -97%      -98%        -98%      -98%        -99%
- # Moops_Moo   3381/s 143357% 3251%        --     -2%      -19%        -43%      -45%        -58%
- # Prs_Moo     3442/s 145920% 3311%        2%      --      -18%        -42%      -44%        -57%
- # Prs_Moose   4199/s 178067% 4062%       24%     22%        --        -29%      -31%        -48%
- # Moops_Moose 5910/s 250665% 5758%       75%     72%       41%          --       -3%        -26%
- # Prs_Mouse   6108/s 259061% 5954%       81%     77%       45%          3%        --        -24%
- # Moops_Mouse 8011/s 339815% 7840%      137%    133%       91%         36%       31%          --
+ # Dios        2.19/s      --  -98%     -100%   -100%     -100%       -100%     -100%       -100%
+ # MXD         94.5/s   4209%    --      -97%    -98%      -98%        -98%      -98%        -99%
+ # Moops_Moo   3139/s 142960% 3220%        --    -26%      -31%        -45%      -47%        -64%
+ # Prs_Moo     4225/s 192461% 4369%       35%      --       -7%        -26%      -29%        -52%
+ # Prs_Moose   4567/s 208038% 4731%       45%      8%        --        -20%      -23%        -48%
+ # Moops_Moose 5689/s 259136% 5917%       81%     35%       25%          --       -5%        -35%
+ # Prs_Mouse   5966/s 271781% 6210%       90%     41%       31%          5%        --        -32%
+ # Moops_Mouse 8727/s 397592% 9130%      178%    107%       91%         53%       46%          --
 
 For Moose classes, Moops is the fastest, followed by MooseX::Pression,
 with MooseX::Declare trailing a long was behind.
@@ -55,8 +55,9 @@ Overall, Mouse beats Moose beats Moo.
 All of the above are faster than Dios.
 
 Compile time isn't measured in this benchmark, but it's likely that Moo-based
-classes will compile faster. Moops compiles a lot faster than MooseX::Declare,
-MooX::Pression, and Dios.
+classes will compile faster. Moops compiles a lot faster than MooseX::Declare
+and Dios. MooX::Pression does not compile as fast as Moops, but it's not much
+slower.
 
 =head1 AUTHOR
 
@@ -147,11 +148,43 @@ use IO::Callback;
 			$self->_set_n( $self->n + $x );
 		}
 	}
+	
+	class ::Foo::PrsShv_Moose {
+		toolkit Moose;
+		has n (
+			is          => rwp,
+			type        => Int,
+			default     => 0,
+			handles_via => 'Counter',
+			handles     => { add => 'inc' },
+		);
+	}
+	class ::Foo::PrsShv_Mouse {
+		toolkit Mouse;
+		has n (
+			is          => rwp,
+			type        => Int,
+			default     => 0,
+			handles_via => 'Counter',
+			handles     => { add => 'inc' },
+		);
+	}
+	class ::Foo::PrsShv_Moo {
+		toolkit Moo;
+		has n (
+			is          => rwp,
+			type        => Int,
+			default     => 0,
+			handles_via => 'Counter',
+			handles     => { add => 'inc' },
+		);
+	}
 }
 
 my @impl = qw(
 	Moops_Moose  Moops_Mouse  Moops_Moo
 	Prs_Moose    Prs_Mouse    Prs_Moo
+	PrsShv_Moose PrsShv_Mouse PrsShv_Moo
 	MXD
 	Dios
 );
@@ -162,18 +195,18 @@ for my $impl (@impl) {
 	my $class = "Foo::$impl";
 	like(
 		exception { $class->new(n => 1.1) },
-		qr{(Validation failed for 'Int')|(did not pass type constraint "Int")|(is not of type Int)},
+		qr{(Validation failed for 'Int')|(did not pass type constraint "Int")|(is not of type Int)|(failed type constraint)},
 		"Class '$class' throws error on incorrect constructor call",
 	);
 	my $o = $class->new(n => 0);
 	like(
 		exception { $o->add(1.1) },
-		qr{(^Validation failed)|(did not pass type constraint "Int")|(is not of type Int)},
+		qr{(^Validation failed)|(did not pass type constraint "Int")|(is not of type Int)|(failed type constraint)},
 		"Objects of class '$class' throw error on incorrect method call",
 	);
 	$o->add(40);
 	$o->add(2);
-	is($o->n, 42, "Objects of class '$class' function correctly");	
+	is($o->n, 42, "Objects of class '$class' function correctly");
 }
 
 # Ensure benchmarks run with TAP-friendly output.
@@ -199,19 +232,19 @@ my %speed_test = (map {
 print "=" x 60, "\n";
 print "Moose implementations\n";
 print "=" x 60, "\n";
-cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Moose Prs_Moose MXD / });
+cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Moose Prs_Moose PrsShv_Moose MXD / });
 print "\n";
 
 print "=" x 60, "\n";
 print "Moo implementations\n";
 print "=" x 60, "\n";
-cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Moo Prs_Moo / });
+cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Moo Prs_Moo PrsShv_Moo / });
 print "\n";
 
 print "=" x 60, "\n";
 print "Mouse implementations\n";
 print "=" x 60, "\n";
-cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Mouse Prs_Mouse / });
+cmpthese(-1, { map { $_ => $speed_test{$_} } qw/ Moops_Mouse Prs_Mouse PrsShv_Mouse / });
 print "\n";
 
 print "=" x 60, "\n";

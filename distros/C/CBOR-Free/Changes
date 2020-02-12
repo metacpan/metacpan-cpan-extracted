@@ -1,5 +1,9 @@
 Revision history for Perl module CBOR::Free
 
+0.22 11 Feb 2020
+- Fix compilation on Perl 5.10.0. (i.e., supply missing HeUTF8 macro)
+- Fix out-of-range error reporting on pre-5.24 64-bit Windows perls.
+
 0.21 6 Feb 2020
 - Make tests ignore inconsistent Inf detection in pre-5.22 perls on Linux 5.4+.
 

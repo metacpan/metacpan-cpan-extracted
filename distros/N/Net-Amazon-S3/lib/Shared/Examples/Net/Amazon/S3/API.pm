@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::API;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.88';
+$Shared::Examples::Net::Amazon::S3::API::VERSION = '0.89';
 use strict;
 use warnings;
 
@@ -139,6 +139,7 @@ sub operation_bucket_create {
             bucket => $params{with_bucket},
             (acl_short => $params{with_acl}) x!! exists $params{with_acl},
             (location_constraint => $params{with_region}) x!! exists $params{with_region},
+            (region => $params{with_region}) x!! exists $params{with_region},
         })
         ;
 }
@@ -270,7 +271,7 @@ Shared::Examples::Net::Amazon::S3::API - used for testing and as example
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

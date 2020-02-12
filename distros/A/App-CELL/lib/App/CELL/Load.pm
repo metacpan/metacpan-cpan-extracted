@@ -268,7 +268,7 @@ sub _report_load_status {
             level => 'WARN',
             code => 'CELL_DIR_WALKED_NOTHING_FOUND',
             args => [ $what, $dir_desc, $dir_path, $quantfiles ],
-            caller => [ caller ],
+            caller => [ CORE::caller() ],
             cell => 1,
         );
     }
@@ -278,7 +278,7 @@ sub _report_load_status {
         level => 'INFO',
         code => 'CELL_DIR_WALKED_ITEMS_LOADED',
         args => [ $quantitems, $what, $quantfiles, $dir_desc, $dir_path ],
-        caller => [ caller ],
+        caller => [ CORE::caller() ],
         cell => 1,
     ) if ( $dir_desc eq 'sitedir' ) or ( $dir_desc eq 'sharedir' and $meta->CELL_META_LOAD_VERBOSE );
     return $return_status;

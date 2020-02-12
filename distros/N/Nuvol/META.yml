@@ -1,0 +1,32 @@
+---
+abstract: 'A cloud toolkit'
+author:
+  - 'Rolf Stöckli <tekki@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nuvol
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojo::File::Role::Digest: '0.04'
+  Mojolicious: '8.32'
+  Print::Colored: '0.02'
+  Role::Tiny: v2.1.4
+  perl: v5.24.0
+resources:
+  bugtracker: https://github.com/Tekki/nuvol/issues
+  homepage: https://github.com/Tekki/nuvol
+  repository: https://github.com/Tekki/nuvol.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

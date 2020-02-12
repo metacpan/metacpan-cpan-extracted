@@ -1,0 +1,32 @@
+OPCUA-Open62541 version 0.001
+============================
+
+The OPCUA::Open62541 module is a Perl XS extension to use the
+open62541 OPC UA library from Perl.  The relevant C types, functions
+and callbacks of the library are converted to their Perl equivalents.
+
+This is work in progress, whatever is needed gets wrapped.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  open62541 OPC UA library, https://open62541.org/
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2020 Alexander Bluhm <bluhm@genua.de>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Thanks to genua GmbH, https://www.genua.de/ for sponsoring this work.

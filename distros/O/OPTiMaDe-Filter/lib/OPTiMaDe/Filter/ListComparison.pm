@@ -34,6 +34,7 @@ sub values {
 
 sub to_filter {
     my( $self ) = @_;
+    $self->validate;
 
     my @values;
     for my $i (0..$#{$self->{values}}) {
@@ -67,6 +68,21 @@ sub modify {
                                 OPTiMaDe::Filter::modify( $_->[1], $code, @_ ) ] }
                             @{$self->{values}} ];
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+
+    if( !$self->property ) {
+        die 'property undefined for OPTiMaDe::Filter::ListComparison';
+    }
+    if( !$self->operator ) {
+        die 'operator undefined for OPTiMaDe::Filter::ListComparison';
+    }
+    if( !$self->values ) {
+        die 'values undefined for OPTiMaDe::Filter::ListComparison';
+    }
 }
 
 1;

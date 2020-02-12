@@ -1,5 +1,9 @@
 Revision history for Perl extension Promise::XS:
 
+0.07 Tue 11 Feb 2020
+- Support old event loop versions that lack zero-timer methods.
+- Report event loop versions in distribution tests.
+
 0.06 Thu 6 Feb 2020
 - Fix compilation on some old thread-multi perls.
 

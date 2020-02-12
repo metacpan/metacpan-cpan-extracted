@@ -10,7 +10,7 @@ my %WriteMakefile_args = (
     VERSION_FROM        => 'lib/Net/Amazon/Signature/V4.pm',
     ABSTRACT_FROM       => 'lib/Net/Amazon/Signature/V4.pm',
     MIN_PERL_VERSION    => '5.8.1',
-    LICENSE             => 'perl',
+    LICENSE             => 'perl_5',
     PREREQ_PM => {
         'Digest::SHA' => 0,
         'Time::Piece' => '1.17',
@@ -40,7 +40,9 @@ my %WriteMakefile_args = (
             'Javier Arturo Rodriguez <javier@rodriguez.org.mx>',
             'José Borges Ferreira <jose.ferreira@anubisnetworks.com>',
             'Karen Etheridge <ether@cpan.org>',
+            'Maik Hentsche <caldrin@amazon.com>',
             'Steven Hartland <steven.hartland@multiplay.co.uk>',
+            'Tim Mullin <tim@cpanel.net>',
         ],
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

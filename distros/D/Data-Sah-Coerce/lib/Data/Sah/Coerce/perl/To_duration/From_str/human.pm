@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_duration::From_str::human;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,13 @@ Data::Sah::Coerce::perl::To_duration::From_str::human - Coerce duration from hum
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Coerce::perl::To_duration::From_str::human (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::Coerce::perl::To_duration::From_str::human (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+
+=head1 SYNOPSIS
+
+To use in a Sah schema:
+
+ ["duration",{"x.perl.coerce_rules"=>["From_str::human"]}]
 
 =head1 DESCRIPTION
 

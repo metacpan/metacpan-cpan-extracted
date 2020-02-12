@@ -3,67 +3,56 @@ abstract: 'Dochazka ATT system shared modules'
 author:
   - 'Smithfarm <presnypreklad@gmail.com>'
 build_requires:
-  Params::Validate: 1.06
-  Test::Deep::NoTest: 0
-  Test::Fatal: 0
+  Params::Validate: '1.06'
+  Test::Deep::NoTest: '0'
+  Test::Fatal: '0'
 configure_requires:
-  Module::Build: 0.37
-  Software::License: 0
+  Module::Build: '0.37'
+  Software::License: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Dochazka-Common
 provides:
   App::Dochazka::Common:
     file: lib/App/Dochazka/Common.pm
-    version: 0.208
+    version: '0.209'
   App::Dochazka::Common::Model:
     file: lib/App/Dochazka/Common/Model.pm
-    version: 0
   App::Dochazka::Common::Model::Activity:
     file: lib/App/Dochazka/Common/Model/Activity.pm
-    version: 0
   App::Dochazka::Common::Model::Component:
     file: lib/App/Dochazka/Common/Model/Component.pm
-    version: 0
   App::Dochazka::Common::Model::Employee:
     file: lib/App/Dochazka/Common/Model/Employee.pm
-    version: 0
   App::Dochazka::Common::Model::Interval:
     file: lib/App/Dochazka/Common/Model/Interval.pm
-    version: 0
   App::Dochazka::Common::Model::Lock:
     file: lib/App/Dochazka/Common/Model/Lock.pm
-    version: 0
   App::Dochazka::Common::Model::Policy:
     file: lib/App/Dochazka/Common/Model/Policy.pm
-    version: 0
   App::Dochazka::Common::Model::Privhistory:
     file: lib/App/Dochazka/Common/Model/Privhistory.pm
-    version: 0
   App::Dochazka::Common::Model::Schedhistory:
     file: lib/App/Dochazka/Common/Model/Schedhistory.pm
-    version: 0
   App::Dochazka::Common::Model::Schedintvls:
     file: lib/App/Dochazka/Common/Model/Schedintvls.pm
-    version: 0
   App::Dochazka::Common::Model::Schedule:
     file: lib/App/Dochazka/Common/Model/Schedule.pm
-    version: 0
   App::Dochazka::Common::Model::Tempintvl:
     file: lib/App/Dochazka/Common/Model/Tempintvl.pm
-    version: 0
 requires:
-  Params::Validate: 1.06
-  Test::Deep::NoTest: 0
-  Time::Piece: 0
-  Time::Seconds: 0
-  perl: 5.012
+  Params::Validate: '1.06'
+  Test::Deep::NoTest: '0'
+  Time::Piece: '0'
+  Time::Seconds: '0'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/smithfarm/dochazka-common/issues
-  license: http://opensource.org/licenses/BSD-3-Clause
+  license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/dochazka-common
-version: 0.208
+version: '0.209'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

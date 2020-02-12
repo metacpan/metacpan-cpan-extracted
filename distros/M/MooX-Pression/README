@@ -100,6 +100,8 @@ DESCRIPTION
     above, it would be "MyApp/Objects.pm" and in the example from the
     SYNOPSIS, it would be "MyApp.pm".
 
+    But see also the documentation for `include`.
+
     Of course, there is nothing to stop you from having multiple prefixes for
     different logical parts of a larger codebase, but MooX::Pression assumes
     that if it's been set up for a prefix, it owns that prefix and everything
@@ -608,6 +610,14 @@ DESCRIPTION
         has display_name ( lazy => false ) = $self->name;
       }
 
+    Commas may be used to separate multiple attributes:
+
+      class WidgetCollection {
+        has name, display_name ( type => Str );
+      }
+
+    The specification and defaults are applied to every attribute in the list.
+
     If you need to decide an attribute name on-the-fly, you can replace the
     name with a block that returns the name as a string.
 
@@ -625,19 +635,25 @@ DESCRIPTION
         social_security_no => 1234,
       );
 
-    This can be used to define a bunch of types from a list.
-
-      class Person {
-        my @attrs = qw( name age );
-        for my $attr (@attrs) {
-          has {$attr} ( required => true );
-        }
-      }
-
     You can think of the syntax as being kind of like `print`.
 
       print BAREWORD_FILEHANDLE @strings;
       print { block_returning_filehandle(); } @strings;
+
+    The block is called in scalar context, so you'll need a loop to define a
+    list like this:
+
+      class Person {
+        my @attrs = qw( name age );
+    
+        # this does not work
+        has {@attrs} ( required => true );
+    
+        # this works
+        for my $attr (@attrs) {
+          has {$attr} ( required => true );
+        }
+      }
 
     The names of attributes can start with an asterisk:
 
@@ -686,10 +702,10 @@ DESCRIPTION
       }
 
     MooX::Pression supports method signatures for named arguments and
-    positional arguments. If you need a mixture of named and positional
-    arguments, this is not currently supported, so instead you should define
-    the method with no signature at all, and unpack @_ within the body of the
-    method.
+    positional arguments. A mixture of named and positional arguments is
+    allowed, with some limitations. For anything more complicates, you should
+    define the method with no signature at all, and unpack @_ within the body
+    of the method.
 
    Signatures for Named Arguments
       class Person {
@@ -809,6 +825,43 @@ DESCRIPTION
       method marry ( $partner, $date, ArrayRef[Str] @vows ) {
         ...;
       }
+
+   Signatures with Mixed Arguments
+    Since MooX::Pression 0.200, you may mix named and positional arguments
+    with the following limitations:
+
+    *   Positional arguments must appear at the beginning and/or end of the
+        list. They cannot be surrounded by named arguments.
+
+    *   Positional arguments cannot be optional and cannot have a default.
+        They must be required. (Named arguments can be optional and have
+        defaults.)
+
+    *   No slurpies!
+
+      method print_html ($tag, Str $text, *htmlver?, *xml?, $fh) {
+  
+        confess "update your HTML" if $arg->htmlver < 5;
+    
+        if (length $text) {
+          print $fh "<tag>$text</tag>";
+        }
+        elsif ($arg->xml) {
+          print $fh "<tag />";
+        }
+        else {
+          print $fh "<tag></tag>";
+        }
+      }
+  
+      $obj->print_html('h1', 'Hello World', { xml => true }, \*STDOUT);
+      $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
+      $obj->print_html('h1', 'Hello World',                  \*STDOUT);
+
+    Mixed signatures are basically implemented like named signatures, but
+    prior to interpreting @_ as a hash, some parameters are spliced off the
+    head and tail. We need to know how many elements to splice off each end,
+    so that is why there are restrictions on slurpies and optional parameters.
 
    Empty Signatures
     There is a difference between the following two methods:
@@ -964,6 +1017,12 @@ DESCRIPTION
         say "Speak now or forever hold your peace!";
       }
 
+    Commas may be used to modify multiple methods:
+
+      before marry, sky_dive (@args) {
+        say "wish me luck!";
+      }
+
     The `:optimize` attribute is supported for `before`.
 
    `after`
@@ -979,6 +1038,12 @@ DESCRIPTION
   
       after marry ( $partner, $date? ) {
         say "You may kiss the bride!";
+      }
+
+    Commas may be used to modify multiple methods:
+
+      after marry, finished_school_year (@args) {
+        $self->go_on_holiday();
       }
 
     The `:optimize` attribute is supported for `after`.
@@ -1008,6 +1073,15 @@ DESCRIPTION
         say "Speak now or forever hold your peace!";
         my $return = $self->$next($_[2], $_[3]);
         say "You may kiss the bride!";
+        return $return;
+      }
+
+    Commas may be used to modify multiple methods:
+
+      around insert, update ($dbh, @args) {
+        $dbh->begin_transaction;
+        my $return = $self->$next(@_);
+        $dbh->commit_transaction;
         return $return;
       }
 
@@ -1242,6 +1316,73 @@ DESCRIPTION
     If `class` definitions are nested, `authority` will be inherited by child
     classes. If a parent class is specified via `extends`, `authority` will
     not be inherited.
+
+   `include`
+    `include` is the MooX::Pression equivalent of Perl's `require`.
+
+      package MyApp {
+        use MooX::Pression;
+        include Database;
+        include Classes;
+        include Roles;
+      }
+
+    It works somewhat more crudely than `require` and `use`, evaluating the
+    included file pretty much as if it had been copy and pasted into the file
+    that included it.
+
+    The names of the files to load are processsed using the same rules for
+    prefixes as classes and roles (so MyApp::Database, etc in the example),
+    and @INC is searched just like `require` and `use` do, but instead of
+    looking for a file called "MyApp/Database.pm", MooX::Pression will look
+    for "MyApp/Database.pl" (yes, ".pl"). This naming convention ensures
+    people won't accidentally load MyApp::Database using `use` or `require`
+    because it isn't intended to be loaded outside the context of the MyApp
+    package.
+
+    The file "MyApp/Database.pl" might look something like this:
+
+      class Database {
+        has dbh = DBI->connect(...);
+    
+        factory get_db {
+          state $instance = $class->new;
+        }
+      }
+
+    Note that it doesn't start with a `package` statement, nor `use
+    MooX::Pression`. It's just straight on to the definitions. There's no `1;`
+    needed at the end.
+
+    `use strict` and `use warnings` are safe to put in the file if you need
+    them to satisfy linters, but they're not necessary because the contents of
+    the file are evaluated as if they had been copied and pasted into the main
+    MyApp module.
+
+    There are *no* checks to prevent a file from being included more than
+    once, and there are *no* checks to deal with cyclical inclusions.
+
+    Inclusions are currently only supported at the top level, and not within
+    class and role definitions.
+
+   `MooX::Pression::PACKAGE_SPEC()`
+    This function can be used while a class or role is being compiled to tweak
+    the specification for the class/role.
+
+      class Foo {
+        has foo;
+        MooX::Pression::PACKAGE_SPEC->{has}{foo}{type} = Int;
+      }
+
+    It returns a hashref of attributes, methods, etc. MooX::Press should give
+    you an idea about how the hashref is structured, but MooX::Pression only
+    supports a subset of what MooX::Press supports. For example, MooX::Press
+    allows `has` to be an arrayref or a hashref, but MooX::Pression only
+    supports a hashref. The exact subset that MooX::Pression supports is
+    subject to change without notice.
+
+    This can be used to access MooX::Press features that MooX::Pression
+    doesn't expose.
 
   Helper Subs
     Earlier it was stated that `sub` cannot be used to define methods in

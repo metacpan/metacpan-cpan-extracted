@@ -136,7 +136,7 @@ sub new {
 
     # if caller array not given, create it
     if ( not $ARGS{caller} ) {
-        $ARGS{caller} = [ caller ];
+        $ARGS{caller} = [ CORE::caller() ];
     }
 
     $ARGS{args} = [] if not defined( $ARGS{args} );
@@ -277,7 +277,7 @@ sub ok {
     } 
     $ARGS->{level} = 'OK';
     $ARGS->{payload} = $payload if $payload;
-    $ARGS->{caller} = [ caller ];
+    $ARGS->{caller} = [ CORE::caller() ];
     return bless $ARGS, __PACKAGE__;
 }
 
@@ -306,7 +306,7 @@ sub not_ok {
     } 
     $ARGS->{level} = 'NOT_OK';
     $ARGS->{payload} = $payload if $payload;
-    $ARGS->{caller} = [ caller ];
+    $ARGS->{caller} = [ CORE::caller() ];
     return bless $ARGS, __PACKAGE__;
 }
 

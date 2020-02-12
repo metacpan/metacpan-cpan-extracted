@@ -16,16 +16,14 @@ Net::Amazon::Signature::V4 - Implements the Amazon Web Services signature versio
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 =head1 SYNOPSIS
-
-This module signs an HTTP::Request to Amazon Web Services by appending an Authorization header. Amazon Web Services signature version 4, AWS4-HMAC-SHA256, is used.
 
     use Net::Amazon::Signature::V4;
 
@@ -34,32 +32,50 @@ This module signs an HTTP::Request to Amazon Web Services by appending an Author
     my $signed_req = $sig->sign( $req );
     ...
 
+=head1 DESCRIPTION
+
+This module signs an HTTP::Request to Amazon Web Services by appending an Authorization header. Amazon Web Services signature version 4, AWS4-HMAC-SHA256, is used.
+
 The primary purpose of this module is to be used by Net::Amazon::Glacier.
 
 =head1 METHODS
 
-=head2 new( $access_key_id, $secret, $endpoint, $service )
+=head2 new
+
+    my $sig = Net::Amazon::Signature::V4->new( $access_key_id, $secret, $endpoint, $service );
+    my $sig = Net::Amazon::Signature::V4->new({
+        access_key_id => $access_key_id,
+        secret        => $secret,
+        endpoint      => $endpoint,
+        service       => $service,
+    });
 
 Constructs the signature object, which is used to sign requests.
 
 Note that the access key ID is an alphanumeric string, not your account ID. The endpoint could be "eu-west-1", and the service could be "glacier".
 
+Since version 0.20, parameters can be passed in a hashref. The keys C<access_key_id>, C<secret>, C<endpoint>, and C<service> are required.
+C<security_token>, if passed, will be applied to each signed request as the C<X-Amz-Security-Token> header.
+
 =cut
 
 sub new {
 	my $class = shift;
-	my ( $access_key_id, $secret, $endpoint, $service ) = @_;
-	my $self = {
-		access_key_id => $access_key_id,
-		secret        => $secret,
-		endpoint      => $endpoint,
-		service       => $service,
-	};
+	my $self = {};
+	if (@_ == 1 and ref $_[0] eq 'HASH') {
+		@$self{keys %{$_[0]}} = values %{$_[0]};
+	} else {
+		@$self{qw(access_key_id secret endpoint service)} = @_;
+	}
+	# The URI should not be double escaped for the S3 service
+	$self->{no_escape_uri} = ( lc($self->{service}) eq 's3' ) ? 1 : 0;
 	bless $self, $class;
 	return $self;
 }
 
-=head2 sign( $request )
+=head2 sign
+
+    my $signed_request = $sig->sign( $request );
 
 Signs a request with your credentials by appending the Authorization header. $request should be an HTTP::Request. The signed request is returned.
 
@@ -94,7 +110,7 @@ sub _canonical_request {
 		? ( $1, $2 )
 		: ( $req->uri, '' );
 	$creq_canonical_uri =~ s@^https?://[^/]*/?@/@;
-	$creq_canonical_uri = _simplify_uri( $creq_canonical_uri );
+	$creq_canonical_uri = $self->_simplify_uri( $creq_canonical_uri );
 	$creq_canonical_query_string = _sort_query_string( $creq_canonical_query_string );
 
 	# Ensure Host header is present as its required
@@ -113,6 +129,9 @@ sub _canonical_request {
 	my $amz_date = $req->header('x-amz-date');
 	if (!$amz_date) {
 		$req->header('X-Amz-Date' => _req_timepiece($req)->strftime('%Y%m%dT%H%M%SZ'));
+	}
+	if (defined $self->{security_token} and !defined $req->header('X-Amz-Security-Token')) {
+		$req->header('X-Amz-Security-Token' => $self->{security_token});
 	}
 	my @sorted_headers = _headers_to_sign( $req );
 	my $creq_canonical_headers = join '',
@@ -175,6 +194,7 @@ Maintained by Dan Book, C<< <dbook at cpan.org> >>
 =cut
 
 sub _simplify_uri {
+	my $self = shift;
 	my $orig_uri = shift;
 	my @parts = split /\//, $orig_uri;
 	my @simple_parts = ();
@@ -183,7 +203,12 @@ sub _simplify_uri {
 		} elsif ( $part eq '..' ) {
 			pop @simple_parts;
 		} else {
-			push @simple_parts, uri_escape($part);
+			if ( $self->{no_escape_uri} ) {
+				push @simple_parts, $part;
+			}
+			else {
+				push @simple_parts, uri_escape($part);
+			}
 		}
 	}
 	my $simple_uri = '/' . join '/', @simple_parts;
@@ -233,8 +258,8 @@ sub _req_timepiece {
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-amazon-signature-v4 at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-Signature-V4>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-Net-Amazon-Signature-V4 at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Net-Amazon-Signature-V4>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -253,31 +278,24 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Amazon-Signature-V4>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Amazon-Signature-V4>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * Source on GitHub
 
-L<http://annocpan.org/dist/Net-Amazon-Signature-V4>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Net-Amazon-Signature-V4>
+L<https://github.com/Grinnz/Net-Amazon-Signature-V4>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Net-Amazon-Signature-V4/>
+L<https://metacpan.org/release/Net-Amazon-Signature-V4>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Tim Nordenfur.
+This software is copyright (c) 2012 by Tim Nordenfur.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 
 =cut

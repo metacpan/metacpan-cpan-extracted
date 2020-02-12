@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Signature::V2;
 # ABSTRACT: V2 signatures
-$Net::Amazon::S3::Signature::V2::VERSION = '0.88';
+$Net::Amazon::S3::Signature::V2::VERSION = '0.89';
 use Moose;
 use URI::Escape qw( uri_escape_utf8 );
 use HTTP::Date qw[ time2str ];
@@ -161,7 +161,7 @@ Net::Amazon::S3::Signature::V2 - V2 signatures
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

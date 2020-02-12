@@ -1,5 +1,13 @@
 Revision history for perl distribution JSON-Validator
 
+3.20 2020-02-12T09:47:21+0900
+ - Fix validating draft6 "false" and "true" schemas #190
+   Contributor: Karen Etheridge
+ - Add JSON::Validator::Util with E(), data_checksum(), data_section(),
+   data_type(), is_type(), schema_extract(), json_pointer(),
+   prefix_errors(), schema_type() and uniq()
+ - Removed support for JSON_VALIDATOR_REPORT
+
 3.19 2020-02-07T11:10:58+0900
  - Add clearer error when more than one oneOf rule matched #184
    Contributor: Karen Etheridge
@@ -44,7 +52,7 @@ Revision history for perl distribution JSON-Validator
 3.09 2019-05-04T22:28:55+0700
  - Prettier definition names from bundle().
  - Changed default bundle() definitions location from "x-bundle" to "definitions".
- - Deprecated bundle({ref_ref => ...})
+ - Deprecated bundle({ref_key => ...})
  - Deprecated bundle({replace => ...})
 
 3.08 2019-04-06T15:07:11+0700

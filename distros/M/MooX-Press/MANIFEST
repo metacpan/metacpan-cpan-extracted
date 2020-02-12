@@ -35,3 +35,4 @@ t/22overload.t
 t/23roleorder.t
 t/24mm.t
 t/25abstract.t
+t/30bare.t

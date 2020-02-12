@@ -21,7 +21,7 @@ Date::Holidays::GB - Determine British holidays - Current UK public and bank hol
 
 # DESCRIPTION
 
-A [Date::Holidays](https://metacpan.org/pod/Date::Holidays) style package updated with the British bank holiday dates now
+A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) style package updated with the British bank holiday dates now
 published at [https://www.gov.uk/bank-holidays](https://www.gov.uk/bank-holidays). Holidays may apply to all
 regions, or some combination - see the `regions` parameter for more details.
 
@@ -29,8 +29,8 @@ Module is named with correct ISO-3166-1 code for the United Kingdom: "GB"
 (Great Britain)
 
 To just work with holiday days for a single region, use one of the subclasses:
-[Date::Holidays::GB::EAW](https://metacpan.org/pod/Date::Holidays::GB::EAW), [Date::Holidays::GB::NIR](https://metacpan.org/pod/Date::Holidays::GB::NIR), or
-[Date::Holidays::GB::SCT](https://metacpan.org/pod/Date::Holidays::GB::SCT).
+[Date::Holidays::GB::EAW](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AGB%3A%3AEAW), [Date::Holidays::GB::NIR](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AGB%3A%3ANIR), or
+[Date::Holidays::GB::SCT](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AGB%3A%3ASCT).
 
 # EXPORTS
 
@@ -68,7 +68,7 @@ taking place on that date, with the region name(s) in parenthesis.
 Holidays that occur in all regions are returned with a single canonical name,
 taken from the name in England & Wales.
 
-Date keys are in the format MMDD, as per the behaviour of [Date::Holidays](https://metacpan.org/pod/Date::Holidays).
+Date keys are in the format MMDD, as per the behaviour of [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays).
 
 ## is\_holiday
 
@@ -107,10 +107,10 @@ update/alter the package if necessary.
 
 # SEE ALSO
 
-- [Date::Holidays](https://metacpan.org/pod/Date::Holidays)
-- [Date::Holidays::UK](https://metacpan.org/pod/Date::Holidays::UK) - not currently updated
-- [Date::Holidays::UK::EnglandAndWales](https://metacpan.org/pod/Date::Holidays::UK::EnglandAndWales) - only England and Wales
-- [Date::Holidays::EnglandWales](https://metacpan.org/pod/Date::Holidays::EnglandWales) - not currently updated
+- [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays)
+- [Date::Holidays::UK](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AUK) - not currently updated
+- [Date::Holidays::UK::EnglandAndWales](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AUK%3A%3AEnglandAndWales) - only England and Wales
+- [Date::Holidays::EnglandWales](https://metacpan.org/pod/Date%3A%3AHolidays%3A%3AEnglandWales) - not currently updated
 
 # SUPPORT
 

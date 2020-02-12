@@ -28,18 +28,18 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Complete" : "0.201",
+            "Complete" : "0.202",
             "Rinci" : "v1.1.90"
          }
       },
       "runtime" : {
          "requires" : {
             "Complete::Common" : "0.22",
-            "Complete::Util" : "0.603",
+            "Complete::Util" : "0.608",
             "Data::Sah::Normalize" : "0",
             "Exporter" : "5.57",
             "Log::ger" : "0.027",
-            "Module::Installed::Tiny" : "0",
+            "Module::Installed::Tiny" : "0.004",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -50,6 +50,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Sah::Schema::negint" : "0",
+            "Sah::Schema::posint" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
@@ -67,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Complete-Sah"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -392,7 +394,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.07"
+                        "version" : "0.080"
                      }
                   ]
                }
@@ -413,7 +415,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

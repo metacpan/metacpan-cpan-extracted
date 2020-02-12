@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5;
 # ABSTRACT: Content-MD5 header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5::VERSION = '0.88';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5::VERSION = '0.89';
 use Moose::Role;
 use Digest::MD5 qw[];
 use MIME::Base64 qw[];
@@ -29,7 +29,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_md5 - Content-MD5 header r
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

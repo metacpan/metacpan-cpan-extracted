@@ -35,7 +35,7 @@
          "requires" : {
             "BSD::Resource" : "0",
             "File::Map" : "0",
-            "Mojolicious" : "7.88",
+            "Mojolicious" : "8.33",
             "Sereal" : "0",
             "perl" : "5.010001"
          }
@@ -57,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "1.02",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

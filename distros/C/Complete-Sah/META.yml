@@ -6,6 +6,8 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Sah::Schema::negint: '0'
+  Sah::Schema::posint: '0'
   Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
@@ -19,11 +21,11 @@ meta-spec:
 name: Complete-Sah
 requires:
   Complete::Common: '0.22'
-  Complete::Util: '0.603'
+  Complete::Util: '0.608'
   Data::Sah::Normalize: '0'
   Exporter: '5.57'
   Log::ger: '0.027'
-  Module::Installed::Tiny: '0'
+  Module::Installed::Tiny: '0.004'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -31,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Sah
   homepage: https://metacpan.org/release/Complete-Sah
   repository: git://github.com/perlancar/perl-Complete-Sah.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -290,7 +292,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.080'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -304,7 +306,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

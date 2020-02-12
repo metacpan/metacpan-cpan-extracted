@@ -1,9 +1,9 @@
 package Complete::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-18'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,12 @@ complete from the `in` clause. Or for something like `[int => between => [1,
 _
     args => {
         schema => {
-            summary => 'Must be normalized',
+            description => <<'_',
+
+Will be normalized, unless when `schema_is_normalized` is set to true, in which
+case schema must already be normalized.
+
+_
             req => 1,
         },
         schema_is_normalized => {
@@ -169,10 +174,7 @@ sub complete_from_schema {
 
                 $fres = combine_answers(
                     grep { defined } map {
-                        complete_from_schema(
-                            schema=>Data::Sah::Normalize::normalize_schema($_),
-                            word => $word,
-                        )
+                        complete_from_schema(schema=>$_, word => $word)
                     } @{ $cs->{of} }
                 );
                 goto RETURN_RES; # directly return result
@@ -305,12 +307,34 @@ sub complete_from_schema {
             return; # from eval
         }
     }; # eval
-
     log_trace("[compsah] complete_from_schema died: %s", $@) if $@;
+
+    my $replace_map;
+  GET_REPLACE_MAP:
+    {
+        last unless $cs->{prefilters};
+        # TODO: make replace_map in Complete::Util equivalent as
+        # Str::replace_map's map.
+        for my $entry (@{ $cs->{prefilters} }) {
+            next unless ref $entry eq 'ARRAY';
+            next unless $entry->[0] eq 'Str::replace_map';
+            $replace_map = {};
+            for my $k (keys %{ $entry->[1]{map} }) {
+                my $v = $entry->[1]{map}{$k};
+                $replace_map->{$v} = [$k];
+            }
+            last;
+        }
+    }
 
     goto RETURN_RES unless $words;
     $fres = hashify_answer(
-        complete_array_elem(array=>$words, summaries=>$summaries, word=>$word),
+        complete_array_elem(
+            array=>$words,
+            summaries=>$summaries,
+            word=>$word,
+            (replace_map => $replace_map) x !!$replace_map,
+        ),
         {static=>$static && $word eq '' ? 1:0},
     );
 
@@ -334,7 +358,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::Sah (from Perl distribution Complete-Sah), released on 2019-12-18.
+This document describes version 0.004 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -366,11 +390,13 @@ Arguments ('*' denotes required arguments):
 
 =item * B<schema>* => I<any>
 
-Must be normalized.
+Will be normalized, unless when C<schema_is_normalized> is set to true, in which
+case schema must already be normalized.
 
 =item * B<schema_is_normalized> => I<bool> (default: 0)
 
 =item * B<word>* => I<str> (default: "")
+
 
 =back
 
@@ -407,7 +433,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

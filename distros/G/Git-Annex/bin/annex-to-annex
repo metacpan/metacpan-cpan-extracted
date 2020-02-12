@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+# PODNAME: annex-to-annex
+# ABSTRACT: use hardlinks to migrate files between git annex repos
+#
+# Copyright (C) 2019-2020 Sean Whitton
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use App::annex_to_annex;
+exit App::annex_to_annex->main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+annex-to-annex - use hardlinks to migrate files between git annex repos
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+B<annex-to-annex> [B<--commit>] I<source> ... I<destination>
+
+=head1 DESCRIPTION
+
+This script moves files and directories from one or more git annexes
+into a destination git annex, where possible using hardlinks instead
+of copying files.
+
+It is useful for splitting and consolidating git annexes.  For
+example, at the end of the semester I use this script to move files
+from my work annex, which gets synced to a lot of places, into an
+archival annex, which doesn't.
+
+Each I<source> should be a file or directory in a git annex.
+I<destination> should be a subdirectory of a git annex.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--commit>
+
+Commit changes in the source and destination annexes.  Otherwise
+changes are merely added to the index.
+
+=back
+
+=head1 SEE ALSO
+
+git-annex(1), annex-to-annex-dropunused(1), annex-to-annex-reinject(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2020 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

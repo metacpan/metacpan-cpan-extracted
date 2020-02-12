@@ -8,7 +8,7 @@ use Carp;
 
 use subs qw();
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 =encoding utf8
 
@@ -125,14 +125,15 @@ number.
 	4	Tiger
 	5	Leopard
 	6	Snow Leopard
-	7   Lion
+	7	Lion
 	8	Mountain Lion
 	9	Mavericks
 	10	Yosemite
-	11  El Capitan
-	12  Sierra
-	13  High Sierra
-	14  Mojave
+	11	El Capitan
+	12	Sierra
+	13	High Sierra
+	14	Mojave
+	15	Catalina
 
 =item minor_version_numbers()
 
@@ -146,10 +147,10 @@ qw(Cheetah Puma ... )
 =cut
 
 BEGIN {
-my @names = qw( Cheetah Puma Jaguar Panther Tiger Leopard ) ;
-push @names, 'Snow Leopard', 'Lion', 'Mountain Lion',
+my @names = ( 'Cheetah', 'Puma', 'Jaguar', 'Panther', 'Tiger',
+	'Leopard', 'Snow Leopard', 'Lion', 'Mountain Lion',
 	'Mavericks', 'Yosemite', 'El Capitan', 'Sierra',
-	'High Sierra', 'Mojave';
+	'High Sierra', 'Mojave', 'Catalina' );
 
 sub minor_to_name { $names[ $_[1] ] }
 

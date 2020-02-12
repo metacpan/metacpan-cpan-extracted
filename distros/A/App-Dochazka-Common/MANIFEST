@@ -14,12 +14,14 @@ lib/App/Dochazka/Common/Model/Schedintvls.pm
 lib/App/Dochazka/Common/Model/Schedule.pm
 lib/App/Dochazka/Common/Model/Tempintvl.pm
 LICENSE
-Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README.rst
 t/00-load.t
+t/critic.t
+t/manifest.t
 t/model/model.t
 t/model/activity.t
 t/model/component.t
@@ -33,3 +35,4 @@ t/model/schedintvls.t
 t/model/schedule.t
 t/model/tempintvl.t
 t/model/reset.t
+t/perlcriticrc

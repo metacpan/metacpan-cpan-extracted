@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2020-02-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000529 released
+
+        * Updated Docker_is.py.
+
+
 2020-02-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000528 released

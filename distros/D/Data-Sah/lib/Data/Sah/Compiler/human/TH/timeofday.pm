@@ -1,7 +1,7 @@
 package Data::Sah::Compiler::human::TH::timeofday;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $DATE = '2020-02-12'; # DATE
+our $VERSION = '0.907'; # VERSION
 
 use 5.010;
 use strict;
@@ -40,7 +40,7 @@ Data::Sah::Compiler::human::TH::timeofday - human's type handler for type "timeo
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Compiler::human::TH::timeofday (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Compiler::human::TH::timeofday (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =for Pod::Coverage ^(name|clause_.+|superclause_.+|before_.+|after_.+)$
 

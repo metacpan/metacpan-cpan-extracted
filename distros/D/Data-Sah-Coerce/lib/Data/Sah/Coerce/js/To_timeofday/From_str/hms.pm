@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::js::To_timeofday::From_str::hms;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -60,7 +60,13 @@ Data::Sah::Coerce::js::To_timeofday::From_str::hms - Coerce timeofday from strin
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Coerce::js::To_timeofday::From_str::hms (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::Coerce::js::To_timeofday::From_str::hms (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+
+=head1 SYNOPSIS
+
+To use in a Sah schema:
+
+ ["timeofday",{"x.perl.coerce_rules"=>["From_str::hms"]}]
 
 =head1 DESCRIPTION
 

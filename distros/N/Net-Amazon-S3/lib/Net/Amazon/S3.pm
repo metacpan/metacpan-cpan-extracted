@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.88';
+$Net::Amazon::S3::VERSION = '0.89';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -164,6 +164,7 @@ sub add_bucket {
         bucket              => $conf->{bucket},
         acl_short           => $conf->{acl_short},
         location_constraint => $conf->{location_constraint},
+        ( $conf->{region} ? (region => $conf->{region}) : () ),
     )->http_request;
 
     return 0
@@ -457,7 +458,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

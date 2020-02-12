@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "Complete::Util" => "0.608",
     "Data::Dump" => 0,
     "Data::Dump::Color" => 0,
-    "Data::Sah" => "0.905",
+    "Data::Sah" => "0.907",
     "Data::Sah::Coerce" => "0.038",
     "Data::Sah::CoerceCommon" => "0.011",
     "Data::Sah::CoerceJS" => "0.011",
@@ -82,7 +82,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.475",
+  "VERSION" => "0.477",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,7 +94,7 @@ my %FallbackPrereqs = (
   "Complete::Util" => "0.608",
   "Data::Dump" => 0,
   "Data::Dump::Color" => 0,
-  "Data::Sah" => "0.905",
+  "Data::Sah" => "0.907",
   "Data::Sah::Coerce" => "0.038",
   "Data::Sah::CoerceCommon" => "0.011",
   "Data::Sah::CoerceJS" => "0.011",

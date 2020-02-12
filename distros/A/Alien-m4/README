@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.19
 
 SYNOPSIS
 
@@ -53,7 +53,7 @@ CAVEATS
     perfectly good. Unfortunately, the main use case for this module is
     Alien::Autotools and friends. Autoconf requires the GNU m4, probably
     for political reasons, possibly for technical reasons. If you are using
-    one of these Unixen, don't dispair, you can usually install the GNU
+    one of these Unixen, don't despair, you can usually install the GNU
     version of m4 either by building from source or by installing a binary
     package, with either the name gm4 or gnum4, and this module will find
     it, and Alien::Autotools will be able to use it.

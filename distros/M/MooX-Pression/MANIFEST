@@ -12,6 +12,7 @@ SIGNATURE
 dist.ini
 doap.ttl
 examples/bench.pl
+examples/mip-087-001.pl
 examples/simple-json-encoder.pl
 lib/MooX/Pression.pm
 t/01basic.t
@@ -29,7 +30,14 @@ t/21coderef.t
 t/22overload.t
 t/24mm.t
 t/25abstract.t
+t/40loading.t
+t/41ps.t
 t/50complextypes.t
+t/51mixedsigs.t
+t/52lists.t
 t/97defaults.t
 t/98geom.t
 t/99anonclass.t
+t/lib/Local/Example.pm
+t/lib/Local/Example/MoreClasses.pl
+t/lib/Local/Example/Roles.pl

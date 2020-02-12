@@ -3,30 +3,30 @@ abstract: 'Dochazka REST server'
 author:
   - 'Nathan Cutler <ncutler@suse.com>'
 build_requires:
-  App::CELL: 0.215
-  App::Dochazka::Common: 0.205
-  Authen::Passphrase::SaltedDigest: 0.008
-  DBIx::Connector: 0.47
-  Date::Holidays::CZ: 0.12
-  File::ShareDir::Install: 0.11
-  File::Slurp: 0
-  HTTP::Request: 0
-  Mason: 0
-  Plack::Test: 0
-  Test::Fatal: 0
-  Test::JSON: 0
-  Test::Warnings: 0
-  Web::MREST: 0.287
-  Web::MREST::CLI: 0.276
-  Web::Machine: 0.15
+  App::CELL: '0.215'
+  App::Dochazka::Common: '0.205'
+  Authen::Passphrase::SaltedDigest: '0.008'
+  DBIx::Connector: '0.47'
+  Date::Holidays::CZ: '0.12'
+  File::ShareDir::Install: '0.11'
+  File::Slurp: '0'
+  HTTP::Request: '0'
+  Mason: '0'
+  Plack::Test: '0'
+  Test::Fatal: '0'
+  Test::JSON: '0'
+  Test::Warnings: '0'
+  Web::MREST: '0.287'
+  Web::MREST::CLI: '0.276'
+  Web::Machine: '0.15'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Dochazka-REST
 no_index:
   directory:
@@ -34,111 +34,86 @@ no_index:
 provides:
   App::Dochazka::REST:
     file: lib/App/Dochazka/REST.pm
-    version: 0.557
+    version: '0.558'
   App::Dochazka::REST::ACL:
     file: lib/App/Dochazka/REST/ACL.pm
-    version: 0
   App::Dochazka::REST::Auth:
     file: lib/App/Dochazka/REST/Auth.pm
-    version: 0
   App::Dochazka::REST::ConnBank:
     file: lib/App/Dochazka/REST/ConnBank.pm
-    version: 0
   App::Dochazka::REST::Dispatch:
     file: lib/App/Dochazka/REST/Dispatch.pm
-    version: 0
   App::Dochazka::REST::Docs::Resources:
     file: lib/App/Dochazka/REST/Docs/Resources.pm
-    version: 0
   App::Dochazka::REST::Docs::Workflow:
     file: lib/App/Dochazka/REST/Docs/Workflow.pm
-    version: 0
   App::Dochazka::REST::Fillup:
     file: lib/App/Dochazka/REST/Fillup.pm
-    version: 0
   App::Dochazka::REST::Guide:
     file: lib/App/Dochazka/REST/Guide.pm
-    version: 0
   App::Dochazka::REST::Holiday:
     file: lib/App/Dochazka/REST/Holiday.pm
-    version: 0
   App::Dochazka::REST::LDAP:
     file: lib/App/Dochazka/REST/LDAP.pm
-    version: 0
   App::Dochazka::REST::Mason:
     file: lib/App/Dochazka/REST/Mason.pm
-    version: 0
   App::Dochazka::REST::Model::Activity:
     file: lib/App/Dochazka/REST/Model/Activity.pm
-    version: 0
   App::Dochazka::REST::Model::Component:
     file: lib/App/Dochazka/REST/Model/Component.pm
-    version: 0
   App::Dochazka::REST::Model::Employee:
     file: lib/App/Dochazka/REST/Model/Employee.pm
-    version: 0
   App::Dochazka::REST::Model::Interval:
     file: lib/App/Dochazka/REST/Model/Interval.pm
-    version: 0
   App::Dochazka::REST::Model::Lock:
     file: lib/App/Dochazka/REST/Model/Lock.pm
-    version: 0
   App::Dochazka::REST::Model::Privhistory:
     file: lib/App/Dochazka/REST/Model/Privhistory.pm
-    version: 0
   App::Dochazka::REST::Model::Schedhistory:
     file: lib/App/Dochazka/REST/Model/Schedhistory.pm
-    version: 0
   App::Dochazka::REST::Model::Schedintvls:
     file: lib/App/Dochazka/REST/Model/Schedintvls.pm
-    version: 0
   App::Dochazka::REST::Model::Schedule:
     file: lib/App/Dochazka/REST/Model/Schedule.pm
-    version: 0
   App::Dochazka::REST::Model::Shared:
     file: lib/App/Dochazka/REST/Model/Shared.pm
-    version: 0
   App::Dochazka::REST::Model::Tempintvl:
     file: lib/App/Dochazka/REST/Model/Tempintvl.pm
-    version: 0
   App::Dochazka::REST::ResourceDefs:
     file: lib/App/Dochazka/REST/ResourceDefs.pm
-    version: 0
   App::Dochazka::REST::Shared:
     file: lib/App/Dochazka/REST/Shared.pm
-    version: 0
   App::Dochazka::REST::Test:
     file: lib/App/Dochazka/REST/Test.pm
-    version: 0
   App::Dochazka::REST::Util:
     file: lib/App/Dochazka/REST/Util.pm
-    version: 0
 requires:
-  App::CELL: 0.215
-  App::Dochazka::Common: 0.207
-  Authen::Passphrase::SaltedDigest: 0.008
-  DBD::Pg: 0
-  DBI: 0
-  DBIx::Connector: 0.47
-  Date::Calc: 0
-  Date::Holidays::CZ: 0.12
-  File::ShareDir: 1
-  JSON: 0
-  Mason: 0
-  Params::Validate: 1.06
-  Path::Router: 0.12
-  Plack::Middleware::Session: 0
-  Plack::Middleware::StackTrace: 0
-  Plack::Runner: 0
-  Pod::Simple::HTML: 0
-  Test::Deep::NoTest: 0
-  Try::Tiny: 0
-  Web::MREST: 0.287
-  Web::MREST::CLI: 0.276
-  Web::Machine: 0.15
-  perl: 5.012
+  App::CELL: '0.215'
+  App::Dochazka::Common: '0.207'
+  Authen::Passphrase::SaltedDigest: '0.008'
+  DBD::Pg: '0'
+  DBI: '0'
+  DBIx::Connector: '0.47'
+  Date::Calc: '0'
+  Date::Holidays::CZ: '0.12'
+  File::ShareDir: '1'
+  JSON: '0'
+  Mason: '0'
+  Params::Validate: '1.06'
+  Path::Router: '0.12'
+  Plack::Middleware::Session: '0'
+  Plack::Middleware::StackTrace: '0'
+  Plack::Runner: '0'
+  Pod::Simple::HTML: '0'
+  Test::Deep::NoTest: '0'
+  Try::Tiny: '0'
+  Web::MREST: '0.287'
+  Web::MREST::CLI: '0.276'
+  Web::Machine: '0.15'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/smithfarm/dochazka-rest/issues
-  license: http://opensource.org/licenses/BSD-3-Clause
+  license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/dochazka-rest
-version: 0.557
+version: '0.558'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

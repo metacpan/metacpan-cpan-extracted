@@ -22,18 +22,26 @@ Files: Changes
  t/22overload.t
  t/24mm.t
  t/25abstract.t
+ t/40loading.t
+ t/41ps.t
  t/50complextypes.t
+ t/51mixedsigs.t
+ t/52lists.t
  t/97defaults.t
  t/98geom.t
  t/99anonclass.t
+ t/lib/Local/Example.pm
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
+Files: INSTALL
+ LICENSE
+ examples/mip-087-001.pl
+ examples/simple-json-encoder.pl
+ t/lib/Local/Example/MoreClasses.pl
+ t/lib/Local/Example/Roles.pl
+Copyright: Unknown
+License: Unknown
 
 Files: README
  lib/MooX/Pression.pm
@@ -41,11 +49,11 @@ Files: README
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- examples/simple-json-encoder.pl
-Copyright: Unknown
-License: Unknown
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.

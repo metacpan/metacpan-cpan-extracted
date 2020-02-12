@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# PODNAME: annex-to-annex-reinject
+# ABSTRACT: use 'git annex reinject' to redo annex-to-annex
+#
+# Copyright (C) 2019-2020 Sean Whitton
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use App::annex_to_annex_reinject;
+exit App::annex_to_annex_reinject->main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+annex-to-annex-reinject - use 'git annex reinject' to redo annex-to-annex
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+B<annex-to-annex-reinject> I<SOURCEANNEX> I<DESTANNEX>
+
+=head1 DESCRIPTION
+
+Wrapper around B<git annex reinject --known>, invoked in I<DESTANNEX>,
+on the files in the git-annex objects dir of the I<SOURCEANNEX>
+(usually I<SOURCEANNEX>/.git/annex/objects).  After reinjecting files,
+the git-annex branch of I<SOURCEANNEX> is updated so that it does not
+think the content is present there anymore.
+
+Suppose that you use annex-to-annex(1) to migrate files from ~/work to
+~/old on your laptop, where each of ~/work and ~/old are git annexes.
+Then on your USB backup drive, you can use this script to move the
+contents of migrated files from your clone of ~/work to your clone of ~/old:
+
+=over 4
+
+    % annex-to-annex-reinject /media/spwhitton/usb/work /media/spwhitton/usb/old
+
+=back
+
+=head1 OPTIONS
+
+None.
+
+=head1 SEE ALSO
+
+git-annex-reinject(1), annex-to-annex(1), annex-to-annex-dropunused(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2020 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -1,9 +1,9 @@
 package Data::Sah::Compiler::Prog::TH;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 use 5.010;
 use strict;
@@ -194,7 +194,7 @@ Data::Sah::Compiler::Prog::TH - Base class for programming-language emiting comp
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Compiler::Prog::TH (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =for Pod::Coverage ^(compiler|clause_.+|handle_.+|gen_.+|set_tmp_data_term|restore_data_term)$
 

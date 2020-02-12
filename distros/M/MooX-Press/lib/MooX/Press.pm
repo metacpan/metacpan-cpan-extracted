@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.042';
+our $VERSION   = '0.043';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -1274,6 +1274,8 @@ sub _optimize_signature {
 	my $builder = shift;
 	my ($method_class, $method_name, $signature_style, $signature) = @_;
 	
+	$signature_style ||= 'none' if !$signature;
+	
 	return if $signature_style eq 'none';
 	return if $signature_style eq 'code';
 	
@@ -1296,6 +1298,8 @@ sub _build_method_signature_check {
 	my $builder = shift;
 	my ($method_class, $method_name, $signature_style, $signature, $invocants, $gimme_list) = @_;
 	my $type_library;
+	
+	$signature_style ||= 'none' if !$signature;
 	
 	return sub { @_ } if $signature_style eq 'none';
 	return $signature if $signature_style eq 'code';
@@ -1430,6 +1434,9 @@ sub _prepare_method_modifier {
 	my $signature = $method->{signature};
 	my @curry     = @{ $method->{curry} || [] };
 	my $signature_style = $method->{named} ? 'named' : 'positional';
+	
+	return $coderef unless $signature || @curry;
+	$signature ||= sub { @_ };
 	
 	my $invocant_count = 1 + !!($kind eq 'around');
 	$invocant_count  = $method->{invocant_count} if exists $method->{invocant_count};

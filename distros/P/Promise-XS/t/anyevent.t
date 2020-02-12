@@ -6,6 +6,8 @@ use Promise::XS;
 
 eval { require AnyEvent; 1 } or plan skip_all => $@;
 
+diag "AnyEvent $AnyEvent::VERSION";
+
 Promise::XS::use_event('AnyEvent');
 
 my $deferred = Promise::XS::deferred();

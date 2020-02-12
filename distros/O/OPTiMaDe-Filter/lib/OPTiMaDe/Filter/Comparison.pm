@@ -50,6 +50,7 @@ sub right
 sub to_filter
 {
     my( $self ) = @_;
+    $self->validate;
 
     my $operator = $self->{operator};
     my @operands;
@@ -71,6 +72,8 @@ sub to_filter
 sub to_SQL
 {
     my( $self, $options ) = @_;
+    $self->validate;
+
     $options = {} unless $options;
     my( $delim, $placeholder ) = (
         $options->{delim},
@@ -127,6 +130,18 @@ sub modify
     $self->{operands} = [ map { OPTiMaDe::Filter::modify( $_, $code, @_ ) }
                               @{$self->{operands}} ];
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+
+    if( @{$self->{operands}} != 2 ) {
+        die 'number of operands for OPTiMaDe::Filter::Comparison must be 2, ' .
+            'got ' . @{$self->{operands}};
+    }
+    die 'operator undefined for OPTiMaDe::Filter::Comparison'
+        if !$self->operator;
 }
 
 1;

@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.043	2020-02-12
+
+ [ Bug Fixes ]
+ - If methods or method modifiers were given as a hashref rather than a
+   coderef, MooX::Press would assume that meant there was a signature and
+   later complain about the signature being undef, but there are other
+   reasons to sometimes give a method or method modifier as a hashref, so
+   this assumption is no longer made.
+
+ [ Test Suite ]
+ - Test that bare attributes work.
+
+ [ Other ]
+ - Added: MooX::Press::keywords now exports `bare` like `rw`, `ro`, `rwp`,
+   and `lazy`.
+
 0.042	2020-02-11
 
  - If a signature includes `head` and `tail` options, reify any string type

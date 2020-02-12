@@ -5,6 +5,8 @@ pod_spelling_system:
   # (regardless of what spell check thinks)
   stopwords:
     - exe
+    - Mughal
+    - Zakariyya
 
 pod_coverage:
   skip: 0

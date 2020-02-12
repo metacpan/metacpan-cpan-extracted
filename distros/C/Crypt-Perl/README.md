@@ -52,6 +52,9 @@ It’s one application where pure-Perl cryptography just doesn’t seem
 feasible. :-( Everything else, though, including all ECDSA and Ed25519
 operations, should be fine.
 
+Note that this distribution’s test suite is pretty slow without an
+XS backend.
+
 # TODO
 
 There are TODO items listed in the submodules; the following are general

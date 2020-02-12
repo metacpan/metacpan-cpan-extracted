@@ -1,7 +1,9 @@
 #!perl
+use utf8;
+use Test::More tests => 5;
 
-use Test::More tests => 4;
-
+use MIME::QuotedPrint qw/encode_qp/;
+use Encode            qw/encode_utf8/;
 use MsOffice::Word::HTML::Writer;
 
 my $doc = MsOffice::Word::HTML::Writer->new(
@@ -18,6 +20,8 @@ $doc->write("new page after section break");
 my $txt = "this <b>is</b> an <em>April 1<sup>st</sup> joke</em>";
 $doc->write($doc->quote($txt, 'true')); # prevent HTML entity encoding
 
+$doc->write("27 Ocak 1756 yılında Salzbug'da doğmuş, 5 Aralık 1791 yılında Viyana'da ölmüştür");
+
 my $content = $doc->content;
 
 like($content, qr(<w:View>Print</w:View>), "View => print");
@@ -30,3 +34,6 @@ is(scalar(@break_right), 2, "page break:right");
 
 like($content, qr(<em>April 1<sup>st</sup> joke</em>), 
     "prevent HTML entity encoding");
+
+my $utf8_word = encode_qp(encode_utf8('doğmuş'), '');
+like($content, qr/$utf8_word/, 'UTF8 support');

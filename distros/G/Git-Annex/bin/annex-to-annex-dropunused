@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+# PODNAME: annex-to-annex-dropunused
+# ABSTRACT: drop old hardlinks migrated by annex-to-annex
+#
+# Copyright (C) 2019-2020 Sean Whitton
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use App::annex_to_annex_dropunused;
+exit App::annex_to_annex->main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+annex-to-annex-dropunused - drop old hardlinks migrated by annex-to-annex
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+B<annex-to-annex-dropunused>
+
+=head1 DESCRIPTION
+
+This program drops files which have been migrated by
+annex-to-annex(1).  You can run it in the source annex(es) to get rid
+of the old unused files which are known to have been migrated.
+
+Only files which have been hardlinked into the destination annex will
+be removed, i.e., no data will be irrevocably removed by this command.
+
+=head1 OPTIONS
+
+None.
+
+=head1 SEE ALSO
+
+git-annex-dropunused(1), annex-to-annex(1), annex-to-annex-reinject(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2020 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

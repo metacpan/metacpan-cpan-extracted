@@ -251,7 +251,7 @@ sub set {
     return App::CELL::Status->not_ok if not blessed $self;
     my %ARGS = (
                     level => 'OK',
-                    caller => [ caller ],
+                    caller => [ CORE::caller() ],
                );
     if ( $self->{'CELL_CONFTYPE'} eq 'meta' ) {
         if ( exists $meta->{$param} ) {

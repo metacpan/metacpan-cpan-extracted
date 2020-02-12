@@ -37,6 +37,7 @@ sub values {
 
 sub to_filter {
     my( $self ) = @_;
+    $self->validate;
 
     my @zip_list;
     foreach my $zip (@{$self->{values}}) {
@@ -75,6 +76,21 @@ sub modify
                                 OPTiMaDe::Filter::modify( $_->[1], $code, @_ ) ] }
                             @{$self->{values}} ];
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+
+    if( !$self->{properties} ) {
+        die 'properties undefined for OPTiMaDe::Filter::Zip';
+    }
+    if( !$self->operator ) {
+        die 'operator undefined for OPTiMaDe::Filter::Zip';
+    }
+    if( !$self->values ) {
+        die 'values undefined for OPTiMaDe::Filter::Zip';
+    }
 }
 
 1;

@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Operation::Service::Buckets::List;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Operation::Service::Buckets::List::VERSION = '0.88';
+$Shared::Examples::Net::Amazon::S3::Operation::Service::Buckets::List::VERSION = '0.89';
 use strict;
 use warnings;
 
@@ -68,7 +68,7 @@ Shared::Examples::Net::Amazon::S3::Operation::Service::Buckets::List - used for 
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

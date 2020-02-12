@@ -1,7 +1,7 @@
 package Data::Sah::Util::Role;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $DATE = '2020-02-12'; # DATE
+our $VERSION = '0.907'; # VERSION
 
 use 5.010;
 use strict 'subs', 'vars';
@@ -125,7 +125,7 @@ Data::Sah::Util::Role - Sah utility routines for roles
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Util::Role (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Util::Role (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 DESCRIPTION
 

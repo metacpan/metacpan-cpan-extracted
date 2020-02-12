@@ -14,12 +14,15 @@ sub new {
 sub to_filter
 {
     my( $self ) = @_;
+    $self->validate;
     return join '.', @$self;
 }
 
 sub to_SQL
 {
     my( $self, $options ) = @_;
+    $self->validate;
+
     $options = {} unless $options;
     my( $delim, $placeholder ) = (
         $options->{delim},
@@ -47,6 +50,12 @@ sub modify
     my $code = shift;
 
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+    die 'name undefined for OPTiMaDe::Filter::Property' if !@$self;
 }
 
 1;

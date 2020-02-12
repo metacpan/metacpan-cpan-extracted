@@ -1,4 +1,9 @@
 Revision history for Net-Amazon-Signature-v4
+0.20	2020-02-11
+		- Don't double-escape URI segments for S3 (RT#128728, GH#7)
+		- Allow passing attributes to new() in a hashref
+		- security_token attribute can be specified to apply to each signed request (GH#8)
+
 0.19	2018-08-24
 		- Fix error in signature if a URI path component is 0 (GH#4)
 		- Fix canonical path encoding for use in Elasticsearch service (GH#6)

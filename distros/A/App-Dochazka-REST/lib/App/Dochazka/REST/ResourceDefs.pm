@@ -879,7 +879,7 @@ EOH
         handler => {
             GET => 'handler_get_employee_eid_full',
         },
-        acl_profile => 'active',
+        acl_profile => 'inactive',
         cli => 'employee eid $EID full',
         validations => {
             eid => 'Int',
@@ -1922,7 +1922,10 @@ EOH
             GET => 'handler_interval_eid',
             DELETE => 'handler_interval_eid',
         },
-        acl_profile => 'active', 
+        acl_profile => {
+            GET => 'inactive', 
+            DELETE => 'active',
+        },
         cli => 'interval eid $EID $TSRANGE',
         validations => {
             'eid' => 'Int',
@@ -2042,7 +2045,11 @@ EOH
             PUT => 'handler_interval_iid',
             DELETE => 'handler_interval_iid',
         },
-        acl_profile => 'active',
+        acl_profile => {
+            GET => 'inactive',
+            PUT => 'active',
+            DELETE => 'active',
+        },
         cli => 'interval iid $iid [$JSON]',
         validations => {
             'iid' => 'Int',
@@ -2112,7 +2119,10 @@ EOH
             GET => 'handler_interval_nick',
             DELETE => 'handler_interval_nick',
         },
-        acl_profile => 'active', 
+        acl_profile => {
+            GET => 'inactive', 
+            DELETE => 'active',
+        },
         cli => 'interval nick $NICK $TSRANGE',
         validations => {
             'nick' => $term_validation,
@@ -2167,7 +2177,7 @@ EOH
             POST => 'handler_interval_scheduled',
         },
         acl_profile => {
-            POST => 'active',
+            POST => 'inactive',
         },
         cli => 'interval scheduled',
         description => 'Generate intervals according to schedule',

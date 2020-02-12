@@ -316,7 +316,7 @@ my %eid_map = (
     'root' => $site->DOCHAZKA_EID_OF_ROOT,
 );
 
-foreach my $nick ( 'demo', 'inactive' ) {
+foreach my $nick ( 'demo' ) {
     my $eid = $eid_map{$nick};
     foreach my $uri ( "employee/eid/$eid/full", "employee/nick/$nick/full" ) {
         note( "$nick tries and fails to use $uri resource" );

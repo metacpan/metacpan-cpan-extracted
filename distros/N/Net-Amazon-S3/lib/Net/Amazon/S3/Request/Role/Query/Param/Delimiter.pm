@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Delimiter;
 # ABSTRACT: delimiter query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Delimiter::VERSION = '0.88';
+$Net::Amazon::S3::Request::Role::Query::Param::Delimiter::VERSION = '0.89';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -23,7 +23,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Delimiter - delimiter query param 
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

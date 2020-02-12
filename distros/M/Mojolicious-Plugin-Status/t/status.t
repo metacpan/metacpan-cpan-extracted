@@ -9,7 +9,7 @@ use Test::Mojo;
 my $route = any '/status';
 
 plugin Status =>
-  {shm_key => 4321, return_to => '/does_not_exist', route => $route};
+  {return_to => '/does_not_exist', route => $route, slowest => 5};
 
 get '/' => sub {
   my $c = shift;
@@ -72,12 +72,20 @@ $t->get_ok('/status.json')->status_is(200)->json_is('/processed', 50)
   ->json_has('/started')->json_has("/workers/$$/connections")
   ->json_has("/workers/$$/maxrss")->json_has("/workers/$$/processed")
   ->json_has("/workers/$$/started")->json_has("/workers/$$/stime")
-  ->json_has("/workers/$$/utime");
+  ->json_has("/workers/$$/utime")->json_has('/slowest/0')
+  ->json_has('/slowest/0/runtime')->json_has('/slowest/0/path')
+  ->json_has('/slowest/0/request_id')->json_has('/slowest/1')
+  ->json_has('/slowest/4')->json_hasnt('/slowest/5');
 
 # HTML
 $t->get_ok('/status')
   ->element_exists_not('meta[http-equiv=refresh][content=5]')
   ->text_like('a[href=/does_not_exist]' => qr/Back to Site/);
+
+# Reset
+$t->get_ok('/status.json')->status_is(200)->json_has('/slowest/2');
+$t->get_ok('/status?reset=1')->status_is(302);
+$t->get_ok('/status.json')->status_is(200)->json_hasnt('/slowest/2');
 
 # Subprocess
 SKIP: {

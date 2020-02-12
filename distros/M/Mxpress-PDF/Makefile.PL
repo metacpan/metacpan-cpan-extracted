@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
 	'PDF::API2' => 0,
 	'MooX::Pression' => 0,
 	'Colouring::In' => 0,
+	'Sub::MultiMethod' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mxpress-PDF-*' },

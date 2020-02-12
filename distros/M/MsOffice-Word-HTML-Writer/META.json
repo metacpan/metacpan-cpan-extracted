@@ -4,13 +4,13 @@
       "Laurent Dami <laurent.dami AT etat.ge.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MsOffice-Word-HTML-Writer",
    "prereqs" : {
@@ -22,19 +22,21 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
             "MIME::Base64" : "0",
             "MIME::QuotedPrint" : "0",
             "MIME::Types" : "0",
             "Module::Build" : "0",
             "Params::Validate" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "utf8" : "0"
          }
       }
    },
    "provides" : {
       "MsOffice::Word::HTML::Writer" : {
          "file" : "lib/MsOffice/Word/HTML/Writer.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -43,5 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.03"
+   "version" : "1.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

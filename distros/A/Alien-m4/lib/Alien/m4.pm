@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build GNU m4
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 
 sub alien_helper
@@ -36,7 +36,7 @@ Alien::m4 - Find or build GNU m4
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ Why GNU m4?  Many Unixen come with BSD or other variants of m4 which are
 perfectly good.  Unfortunately, the main use case for this module is
 L<Alien::Autotools> and friends.  Autoconf requires the GNU m4, probably
 for political reasons, possibly for technical reasons.  If you are using
-one of these Unixen, don't dispair, you can usually install the GNU
+one of these Unixen, don't despair, you can usually install the GNU
 version of m4 either by building from source or by installing a binary
 package, with either the name C<gm4> or C<gnum4>, and this module will
 find it, and L<Alien::Autotools> will be able to use it.

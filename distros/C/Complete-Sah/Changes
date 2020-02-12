@@ -1,3 +1,23 @@
+0.004   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [testing] Fix test failures. Add missing dependency to schema modules
+	  Sah::Schema::{posint,negint} [RT#131722].
+
+
+0.003   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Use information from Str::replace_map filter.
+
+	- [optimize] Remove double normalization.
+
+
+0.002   2019-12-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [Rinci]Fix summary/description for 'schema' argument.
+
+
 0.001   2019-12-18  Released-By: PERLANCAR
 
         - First release, extracted from Perinci-Sub-Complete.

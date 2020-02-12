@@ -14,6 +14,7 @@ lib/JSON/Validator/Error.pm
 lib/JSON/Validator/Formats.pm
 lib/JSON/Validator/Joi.pm
 lib/JSON/Validator/Ref.pm
+lib/JSON/Validator/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -66,6 +67,7 @@ t/id-keyword-draft4.t
 t/id-keyword-draft7.t
 t/invalid-ref.t
 t/issue-103-one-of.t
+t/issue-158-draf7-coerce-defaults.t
 t/issue-22-duplicate-error-messages.t
 t/issue-42-cache-control.t
 t/issue-59-oneof-blessed-booleans.t
@@ -112,6 +114,7 @@ t/spec/with-relative-ref.json
 t/stack/Some.pm
 t/stack/Some/Module.pm
 t/to-json.t
+t/util.t
 t/validate-draft07.t
 t/validate-id.t
 t/validate-json.t

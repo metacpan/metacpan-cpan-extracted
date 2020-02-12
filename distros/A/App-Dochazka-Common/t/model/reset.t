@@ -104,6 +104,7 @@ my %props_dispatch = (
         shid => undef, 
         eid => 44,
         sid => 93432,
+        scode => 'ORC',
         effective => 'some year',
         remark => 'that\'s not a paparazzi!',
     },

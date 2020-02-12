@@ -1,8 +1,8 @@
 package Data::Sah::Coerce::perl::To_date::From_obj::time_moment;
 
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,7 +62,13 @@ Data::Sah::Coerce::perl::To_date::From_obj::time_moment - Coerce date from Time:
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Coerce::perl::To_date::From_obj::time_moment (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::Coerce::perl::To_date::From_obj::time_moment (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+
+=head1 SYNOPSIS
+
+To use in a Sah schema:
+
+ ["date",{"x.perl.coerce_rules"=>["From_obj::time_moment"]}]
 
 =head1 DESCRIPTION
 

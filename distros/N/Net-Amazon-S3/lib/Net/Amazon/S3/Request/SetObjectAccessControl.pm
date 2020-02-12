@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::SetObjectAccessControl;
-$Net::Amazon::S3::Request::SetObjectAccessControl::VERSION = '0.88';
+$Net::Amazon::S3::Request::SetObjectAccessControl::VERSION = '0.89';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Object';
@@ -46,7 +46,7 @@ Net::Amazon::S3::Request::SetObjectAccessControl - An internal class to set an o
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

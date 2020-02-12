@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,12 +28,14 @@ requires:
   perl: '5.008001'
 resources:
   repository: https://github.com/Grinnz/Net-Amazon-Signature-V4.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Arthur Axel fREW Schmidt <frioux@gmail.com>'
   - 'Dan Book <dbook@cpan.org>'
   - 'Javier Arturo Rodriguez <javier@rodriguez.org.mx>'
   - 'José Borges Ferreira <jose.ferreira@anubisnetworks.com>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Maik Hentsche <caldrin@amazon.com>'
   - 'Steven Hartland <steven.hartland@multiplay.co.uk>'
+  - 'Tim Mullin <tim@cpanel.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

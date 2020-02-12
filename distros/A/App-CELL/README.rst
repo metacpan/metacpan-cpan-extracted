@@ -40,15 +40,15 @@ dependencies shown in Build.PL -- either using distro packages
 or ``cpanm``.
 
 Since ``App::CELL`` needs its configuration files installed
-in the system in order to run, install it:
+in the system in order to run, install it::
 
     $ perl Build.PL ; ./Build ; sudo ./Build install
 
-Then:
+Then::
 
     $ prove -l t/
 
-To include the Perl Critic test, do:
+To include the "Perl Critic" and "Check Manifest" tests, do::
 
     $ sudo cpanm Test::Perl::Critic
     $ sudo cpanm Test::Check::Manifest
@@ -59,7 +59,7 @@ To include the Perl Critic test, do:
 How to cut a release
 --------------------
 
-First, clone the ``smithfarm/dochazka.git`` repo:
+First, clone the ``smithfarm/dochazka.git`` repo::
 
     $ git clone https://github.com/smithfarm/dochazka.git
     $ cd dochazka

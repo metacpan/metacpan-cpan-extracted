@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -18,8 +18,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
-            "ExtUtils::MakeMaker" : "6.52",
-            "File::chdir" : "0"
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
@@ -27,6 +26,7 @@
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
+            "File::chdir" : "0",
             "perl" : "5.006"
          }
       },
@@ -34,10 +34,14 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -74,25 +78,25 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
             "Config" : "0",
             "File::Basename" : "0",
-            "File::chdir" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },
          "system" : {
-            "Capture::Tiny" : "0",
-            "File::chdir" : "0"
+            "Capture::Tiny" : "0"
          }
       }
    },
@@ -100,7 +104,8 @@
       "Graham Ollis <plicease@cpan.org>",
       "Zakariyya Mughal"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
    "x_use_unsafe_inc" : 0
 }
 

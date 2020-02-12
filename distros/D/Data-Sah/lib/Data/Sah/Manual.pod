@@ -13,7 +13,7 @@ Data::Sah::Manual - Data::Sah manual
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Manual (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Manual (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 OVERVIEW
 

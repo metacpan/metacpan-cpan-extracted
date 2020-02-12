@@ -1,13 +1,15 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
+BEGIN {
   plan skip_all => 'test requires 5.010 or better'
     unless $] >= 5.010;
-  plan skip_all => 'test requires Test::Pod::Coverage' 
+  plan skip_all => 'test requires Test::Pod::Coverage'
     unless eval q{ use Test::Pod::Coverage; 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML; 1; };
+  plan skip_all => 'test does not always work in cip check'
+    if defined $ENV{CIPSTATIC} && $ENV{CIPSTATIC} eq 'true';
 };
 use Test::Pod::Coverage;
 use YAML qw( LoadFile );
@@ -62,12 +64,12 @@ foreach my $class (@classes)
   SKIP: {
     my($is_private_class) = map { 1 } grep { $class =~ $_->{regex} && $_->{all} } @private_classes;
     skip "private class: $class", 1 if $is_private_class;
-    
+
     my %methods = map {; $_ => 1 } map { split /,/, $_->{method} } grep { $class =~ $_->{regex} } @private_classes;
     $methods{$_} = 1 for keys %private_methods;
-    
+
     my $also_private = eval 'qr{^' . join('|', keys %methods ) . '$}';
-    
+
     pod_coverage_ok $class, { also_private => [$also_private] };
   };
 }

@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/SahUtils/is_sah_type
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.475'; # VERSION
+our $VERSION = '0.477'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +37,7 @@ is-sah-type - Check that a string or array schema is a Sah type
 
 =head1 VERSION
 
-This document describes version 0.475 of is-sah-type (from Perl distribution App-SahUtils), released on 2020-02-11.
+This document describes version 0.477 of is-sah-type (from Perl distribution App-SahUtils), released on 2020-02-12.
 
 =head1 SYNOPSIS
 

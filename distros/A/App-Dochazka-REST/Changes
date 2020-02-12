@@ -3750,3 +3750,8 @@ SPLIT OFF App::MREST into separate distribution
 - ResourceDefs: let inactive and above search employee profiles
 - Dispatch: refrain from returning 400 on certain harmless updates
 
+0.558 2020-02-11 19:49 CET
+- ResourceDefs: allow inactives to get full employee profiles of supervisees
+- Dispatch: allow supervisor to generate scheduled intervals of supervisee
+- build/ops: drop Makefile.PL, add t/critic.t and t/manifest.t
+

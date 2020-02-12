@@ -1,6 +1,6 @@
 package Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete;
 # ABSTRACT: used for testing and as example
-$Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete::VERSION = '0.88';
+$Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete::VERSION = '0.89';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Shared::Examples::Net::Amazon::S3::Operation::Bucket::Objects::Delete - used for
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 

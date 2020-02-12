@@ -1,3 +1,13 @@
+0.477   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Data::Sah 0.907 (changed return_type values).
+
+
+0.476   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Data::Sah::Coerce 0.047 (renamed return_type values).
+
+
 0.475   2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [filter-with-sah] Add --return-type option.

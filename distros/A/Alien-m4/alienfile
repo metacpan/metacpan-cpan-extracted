@@ -19,7 +19,7 @@ probe sub {
     {
       my $version = $1;
       my @version = split /\./, $version;
-    
+
       # GNU M4 seems to have a history of brokenness
       # so says AutoConf:
       # GNU M4 1.4.6 or later is required; 1.4.16 or newer is recommended.
@@ -27,18 +27,18 @@ probe sub {
       # Glibc 2.9 - 2.12 and GNU M4 1.4.11 - 1.4.15 have another strstr bug.
 
       return 'share' unless $version[0] >= 1;
-    
+
       if($version[0] == 1)
       {
         return 'share' unless $version[1] >= 4;
-      
+
         if($version[1] == 4)
         {
           return 'share' unless $version[2] >= 6;
           return 'share' if $version[2] =~ /^(11|12|13|14|15)$/;
         }
       }
-    
+
       $build->install_prop->{my_version} = $version;
       $build->install_prop->{my_command} = $command;
 
@@ -63,44 +63,62 @@ probe sub {
       $build->install_prop->{my_patch_asprintf} = 1;
     }
   }
-  
+
   return 'share';
 };
 
 share {
 
   plugin 'Download' => (
-    url     => 'http://ftp.gnu.org/gnu/m4',
+    url     => 'https://ftp.gnu.org/gnu/m4',
     version => qr/m4-([0-9\.]+)\.tar\.gz/,
   );
-  
+
   plugin 'Extract' => 'tar.gz';
-  
+
   plugin 'Build::Autoconf' => ();
 
-  patch sub {
-    my($build) = @_;
+  if($^O eq 'MSWin32')
+  {
 
-    # workaround: m4 has its own implementation of asprintf
-    # and so does mingw.  The latter is defined as an inline
-    # function in stdio.h which conflicts at least on some
-    # older versions of the mingw runtime, or gcc.  This
-    # makes the asprintf.c empty so that it will build cleanly
-    # when that happened.  Observed with the mingw that comes
-    # with AS perl 5.24.  I may have also seen it from cpantesters
-    # from a probable strawberry Perl
-    if($build->install_prop->{my_patch_asprintf})
-    {
-      $build->log('patching lib/asprintf.c');
-      path('lib/asprintf.c')->spew('');
-    }
-  };
+    patch sub {
+      my($build) = @_;
+
+      # workaround: m4 has its own implementation of asprintf
+      # and so does mingw.  The latter is defined as an inline
+      # function in stdio.h which conflicts at least on some
+      # older versions of the mingw runtime, or gcc.  This
+      # makes the asprintf.c empty so that it will build cleanly
+      # when that happened.  Observed with the mingw that comes
+      # with AS perl 5.24.  I may have also seen it from cpantesters
+      # from a probable strawberry Perl
+      if($build->install_prop->{my_patch_asprintf})
+      {
+        $build->log('patching lib/asprintf.c');
+        path('lib/asprintf.c')->spew('');
+      }
+    };
+  }
+  elsif($^O eq 'linux')
+  {
+    patch [
+      # this is the patch that Debian applies
+      '%{patch} -p1 < %{.install.patch}/01-fix-ftbfs-with-glibc-2.28.patch',
+    ];
+  }
+  elsif($^O eq 'darwin')
+  {
+    patch [
+      # this is the patch that homebrew applies
+      '%{patch} -p0 < %{.install.patch}/secure_snprintf.patch',
+    ];
+  }
 
   gather sub {
     my($build) = @_;
     my @stdout;
     capture { @stdout = `m4 --version` };
-    $build->runtime_prop->{version} = 
+    $build->runtime_prop->{version} =
       defined $stdout[0] && $stdout[0] =~ /^m4/ && $stdout[0] =~ /([0-9\.]+)$/
         ? $1
         : 'unknown';

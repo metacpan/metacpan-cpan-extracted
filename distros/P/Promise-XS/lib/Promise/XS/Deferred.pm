@@ -63,8 +63,9 @@ that warning. (It’s generally better, of course, to handle all errors.)
 
 sub set_deferral_AnyEvent() {
     require AnyEvent;
+
     ___set_deferral_generic(
-        \&AnyEvent::postpone,
+        AnyEvent->can('postpone') || \&_anyevent_postpone_compat,
     );
 }
 
@@ -72,17 +73,53 @@ sub set_deferral_IOAsync {
     my ($loop) = @_;
 
     ___set_deferral_generic(
-        $loop->can('later'),
+        $loop->can('later') || \&_ioasync_later_compat,
         $loop,
     );
 }
 
 sub set_deferral_Mojo() {
     require Mojo::IOLoop;
+
     ___set_deferral_generic(
-        Mojo::IOLoop->can('next_tick'),
+        Mojo::IOLoop->can('next_tick') || \&_mojo_next_tick_compat,
         'Mojo::IOLoop',
     );
+}
+
+#----------------------------------------------------------------------
+# Polyfills for old versions of the event loops that didn’t include
+# zero-timer convenience functions:
+
+my %ae_timer;
+
+sub _anyevent_postpone_compat {
+    my $cb = $_[0];
+
+    my ($w, $w_str);
+
+    $w = AnyEvent->timer( after => 0, cb => sub {
+        delete $ae_timer{$w_str};
+        $cb->();
+    } );
+
+    $w_str = "$w";
+    $ae_timer{$w_str} = $w;
+}
+
+sub _ioasync_later_compat {
+    local ($@, $!);
+    require IO::Async::Timer;
+
+    $_[0]->add( IO::Async::Timer->new(
+        mode => 'countdown',
+        delay => 0,
+        on_expire => $_[1],
+    )->start() );
+}
+
+sub _mojo_next_tick_compat {
+    Mojo::IOLoop->timer( 0, $_[1] );
 }
 
 1;

@@ -1,6 +1,8 @@
 Changes
 examples/mixed.pl
 examples/status.png
+lib/Mojo/MemoryMap.pm
+lib/Mojo/MemoryMap/Writer.pm
 lib/Mojolicious/Plugin/resources/public/mojo-status/app.css
 lib/Mojolicious/Plugin/resources/public/mojo-status/bootstrap/bootstrap.css
 lib/Mojolicious/Plugin/resources/public/mojo-status/bootstrap/bootstrap.js
@@ -30,6 +32,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/map.t
 t/pod.t
 t/pod_coverage.t
 t/status.t

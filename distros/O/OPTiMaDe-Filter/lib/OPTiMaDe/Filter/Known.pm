@@ -27,6 +27,7 @@ sub property
 sub to_filter
 {
     my( $self ) = @_;
+    $self->validate;
     return $self->property->to_filter . ' IS ' .
            ($self->is_known ? 'KNOWN' : 'UNKNOWN');
 }
@@ -34,6 +35,7 @@ sub to_filter
 sub to_SQL
 {
     my( $self, $options ) = @_;
+    $self->validate;
 
     my( $sql, $values ) = $self->property->to_SQL( $options );
     $sql = "$sql IS " . ($self->is_known ? 'NOT NULL' : 'NULL');
@@ -51,6 +53,12 @@ sub modify
 
     $self->property( OPTiMaDe::Filter::modify( $self->property, $code, @_ ) );
     return $code->( $self, @_ );
+}
+
+sub validate
+{
+    my $self = shift;
+    die 'property undefined for OPTiMaDe::Filter::Known' if !$self->property;
 }
 
 1;

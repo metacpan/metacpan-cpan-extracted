@@ -1,9 +1,9 @@
 package Data::Sah::Type::BaseType;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah'; # DIST
-our $VERSION = '0.906'; # VERSION
+our $VERSION = '0.907'; # VERSION
 
 # why name it BaseType instead of Base? because I'm sick of having 5 files named
 # Base.pm in my editor (there would be Type::Base and the various
@@ -196,7 +196,7 @@ Data::Sah::Type::BaseType - Base type
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Type::BaseType (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =for Pod::Coverage ^(clause_.+|clausemeta_.+)$
 

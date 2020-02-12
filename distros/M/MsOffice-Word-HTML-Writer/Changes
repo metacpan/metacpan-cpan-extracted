@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-HTML-Writer
 
+1.04 11.02.2020
+  - support for UTF8 contents
+
 1.03 05.04.2013
   - new argument 'prevent_html_encoding' for the quote() method
   - save_as() method returns the generated filename

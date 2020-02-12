@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce
   homepage: https://metacpan.org/release/Data-Sah-Coerce
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce.git
-version: '0.046'
+version: '0.047'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -299,6 +299,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.07'
+            -
+              class: Pod::Weaver::Plugin::Data::Sah::Coerce
+              name: -Data::Sah::Coerce
+              version: '0.001'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

@@ -1,13 +1,16 @@
 #!perl
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.475'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-12'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.477'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+use Data::Sah::CoerceCommon;
 
 our %SPEC;
 
@@ -23,11 +26,10 @@ $SPEC{coerce_with_sah} = {
     },
     args => {
         type => {
-            schema => 'str*',
+            schema => 'sah::type_name*',
             req => 1,
             pos => 0,
             tags => ['category:coercer-specification'],
-            'x.schema.entity' => 'sah::type_name',
         },
         coerce_to => {
             schema => 'str*',
@@ -55,7 +57,15 @@ $SPEC{coerce_with_sah} = {
             },
         },
         return_type => {
-            schema => ['str*', in=>[qw/val status+val status+err+val/]],
+            schema => ['str*', {
+                in => [qw/val bool_coerced+val bool_coerced+str_errmsg+val/],
+                prefilters => [
+                    ["Str::replace_map", {map=>{
+                        "status+val"     => "bool_coerced+val",
+                        "status+err+val" => "bool_coerced+str_errmsg+val",
+                    }}],
+                ],
+            }],
             default => 'val',
             cmdline_aliases => {r=>{}},
             tags => ['category:coercer-specification'],
@@ -317,7 +327,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.475 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2020-02-11.
+This document describes version 0.477 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -356,24 +366,24 @@ Examples:
                                                                "EBhm"              => "E h:mm B",
                                                                "EBhms"             => "E h:mm:ss B",
                                                                "Ed"                => "d E",
-                                                               "Ehm"               => "E h:mm a",
                                                                "EHm"               => "E HH:mm",
-                                                               "EHms"              => "E HH:mm:ss",
+                                                               "Ehm"               => "E h:mm a",
                                                                "Ehms"              => "E h:mm:ss a",
+                                                               "EHms"              => "E HH:mm:ss",
                                                                "Gy"                => "y G",
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
                                                                "H"                 => "HH",
                                                                "h"                 => "h a",
-                                                               "hm"                => "h:mm a",
                                                                "Hm"                => "HH:mm",
-                                                               "hms"               => "h:mm:ss a",
+                                                               "hm"                => "h:mm a",
                                                                "Hms"               => "HH:mm:ss",
-                                                               "Hmsv"              => "HH:mm:ss v",
+                                                               "hms"               => "h:mm:ss a",
                                                                "hmsv"              => "h:mm:ss a v",
-                                                               "Hmv"               => "HH:mm v",
+                                                               "Hmsv"              => "HH:mm:ss v",
                                                                "hmv"               => "h:mm a v",
+                                                               "Hmv"               => "HH:mm v",
                                                                "M"                 => "L",
                                                                "Md"                => "M/d",
                                                                "MEd"               => "E, M/d",
@@ -722,7 +732,7 @@ Show source code (JavaScript):
      if (data === undefined || data === null) {
          return null;
      }
-     return ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : (function() { if ((data instanceof Date)) { var _tmp1 = isNaN(data) ? ['Invalid date'] : [null, data]; if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return (function() { if (typeof(data)=='string') { var _tmp1 = (function (_m) { _m = new Date(data); if (isNaN(_m)) { return ['Invalid date'] } else { return [null, _m] } })(); if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return data } })() } })());
+     return ((typeof(data)=='number' && data >= 100000000 && data <= 2147483648) ? ((new Date(data * 1000))) : (function() { if ((data instanceof Date)) { var _tmp1 = isNaN(data) ? ['Invalid date', data] : [null, data]; if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return (function() { if (typeof(data)=='string') { var _tmp1 = (function (_m) { _m = new Date(data); if (isNaN(_m)) { return ['Invalid date', _m] } else { return [null, _m] } })(); if (_tmp1[0]) { return null } else { return _tmp1[1] } } else { return data } })() } })());
  }
 
 =head1 OPTIONS
@@ -777,9 +787,9 @@ Default value:
 
 Valid values:
 
- ["val","status+val","status+err+val"]
+ ["val","bool_coerced+val","bool_coerced+str_errmsg+val"]
 
-=item B<--type>=I<sah>::type_name*
+=item B<--type>=I<s>*
 
 =back
 

@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Coerce"
       }
    },
-   "version" : "0.046",
+   "version" : "0.047",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -406,6 +406,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.07"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Data::Sah::Coerce",
+                        "name" : "-Data::Sah::Coerce",
+                        "version" : "0.001"
                      }
                   ]
                }

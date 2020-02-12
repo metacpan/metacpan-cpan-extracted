@@ -1,9 +1,11 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.906'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-12'; # DATE
+our $DIST = 'Data-Sah'; # DIST
+our $VERSION = '0.907'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
@@ -69,10 +71,19 @@ sub check_compile_args {
     if ($ct ne 'validator') {
         $self->_die({}, "code_type currently can only be 'validator'");
     }
-    my $rt = ($args->{return_type} //= 'bool');
-    if ($rt !~ /\A(bool\+val|bool|str\+val|str|full)\z/) {
+    for ($args->{return_type}) {
+        $_ //= 'bool_valid';
+        # old values that are still supported but now deprecated
+        $_ = "bool_valid"     if $_ eq 'bool';
+        $_ = "bool_valid+val" if $_ eq 'bool+val';
+        $_ = "str_errmsg"     if $_ eq 'str';
+        $_ = "str_errmsg+val" if $_ eq 'str+val';
+        $_ = "hash_details"   if $_ eq 'full';
+    }
+    my $rt = $args->{return_type};
+    if ($rt !~ /\A(bool_valid\+val|bool_valid|str_errmsg\+val|str_errmsg|hash_details)\z/) {
         $self->_die({}, "Invalid value for return_type, ".
-                        "use bool|bool+val|str|str+val|full");
+                        "use bool_valid+val|bool_valid|str_errmsg+val|str_errmsg|hash_details");
     }
     $args->{var_prefix} //= "_sahv_";
     $args->{sub_prefix} //= "_sahs_";
@@ -226,7 +237,7 @@ sub expr_validator_sub {
     my $dt         = $args{data_term};
     my $vt         = delete($args{var_term}) // $dt;
     my $do_log     = $args{debug_log} // $args{debug};
-    my $rt         = $args{return_type} // 'bool';
+    my $rt         = $args{return_type} // 'bool_valid';
 
     $args{indent_level} = 1;
 
@@ -258,35 +269,35 @@ sub expr_validator_sub {
                 #$log->tracef('-> (validator)(%s) ...', $dt);\n";
                 $self->stmt_declare_local_var($resv, "\n\n" . $cd->{result})."\n\n",
 
-                # when rt=bool, return true/false result
+                # when rt=bool_valid, return true/false result
                 #(";\n\n\$log->tracef('<- validator() = %s', \$res)")
-                #    x !!($do_log && $rt eq 'bool'),
+                #    x !!($do_log && $rt eq 'bool_valid'),
                 ($self->stmt_return($rest)."\n")
-                    x !!($rt eq 'bool'),
+                    x !!($rt eq 'bool_valid'),
 
-                # when rt=str, return string error message
+                # when rt=str_errmsg, return string error message
                 #($log->tracef('<- validator() = %s', ".
                 #     "\$err_data);\n\n";
-                #    x !!($do_log && $rt eq 'str'),
+                #    x !!($do_log && $rt eq 'str_errmsg'),
                 ($self->expr_set_err_str($et, $self->literal('')).";",
                  "\n\n".$self->stmt_return($et)."\n")
-                    x !!($rt eq 'str'),
+                    x !!($rt eq 'str_errmsg'),
 
-                # when rt=bool+val, return true/false result as well as final
-                # input value
+                # when rt=bool_valid+val, return true/false result as well as
+                # final input value
                 ($self->stmt_return($self->expr_array($rest, $dt))."\n")
-                    x !!($rt eq 'bool+val'),
+                    x !!($rt eq 'bool_valid+val'),
 
-                # when rt=str+val, return string error message as well as final
-                # input value
+                # when rt=str_errmsg+val, return string error message as well as
+                # final input value
                 ($self->expr_set_err_str($et, $self->literal('')).";",
                  "\n\n".$self->stmt_return($self->expr_array($et, $dt))."\n")
-                    x !!($rt eq 'str+val'),
+                    x !!($rt eq 'str_errmsg+val'),
 
-                # when rt=full, return error hash
+                # when rt=hash_details, return error hash
                 ($self->stmt_assign_hash_value($et, $self->literal('value'), $dt),
                  "\n".$self->stmt_return($et)."\n")
-                    x !!($rt eq 'full'),
+                    x !!($rt eq 'hash_details'),
             )
         ),
     );
@@ -381,7 +392,7 @@ sub add_ccl {
     my $rt = $cd->{args}{return_type};
     my $et = $cd->{args}{err_term};
     my $err_code;
-    if ($rt eq 'full') {
+    if ($rt eq 'hash_details') {
         $self->add_var($cd, '_sahv_dpath', []) if $cd->{use_dpath};
         my $k = $el eq 'warn' ? 'warnings' : 'errors';
         $err_code = $self->expr_set_err_full($et, $k, $err_expr) if $err_expr;
@@ -485,7 +496,7 @@ sub join_ccls {
                     if ($rt !~ /\Abool/) {
                         my $et = $cd->{args}{err_term};
                         my $clerrc;
-                        if ($rt eq 'full') {
+                        if ($rt eq 'hash_details') {
                             $clerrc = $self->expr_reset_err_full($et);
                         } else {
                             $clerrc = $self->expr_reset_err_str($et);
@@ -501,7 +512,7 @@ sub join_ccls {
             $ret =
                 $ccl->{err_level} eq 'fatal' ? 0 :
                     # this must not be done because it messes up ok/nok counting
-                    #$rt eq 'full' ? 1 :
+                    #$rt eq 'hash_details' ? 1 :
                         $ccl->{err_level} eq 'warn' ? 1 : 0;
             if ($rt =~ /\Abool/ && $ret) {
                 $res .= $true;
@@ -589,11 +600,11 @@ sub before_all_clauses {
     my ($self, $cd) = @_;
 
     my $rt = $cd->{args}{return_type};
-    my $rt_is_full = $rt =~ /\Afull/;
+    my $rt_is_hash = $rt =~ /\Ahash/;
     my $rt_is_str  = $rt =~ /\Astr/;
 
     $cd->{use_dpath} //= (
-        $rt_is_full ||
+        $rt_is_hash ||
         ($rt_is_str && $cd->{has_subschema})
     );
 
@@ -834,7 +845,7 @@ sub before_all_clauses {
                 # filtered data) then set the data term to the filtered data
                 # again. this might fail in languages or setting that is
                 # stricter (e.g. data term must be of certain type).
-                if ($rt_is_full) {
+                if ($rt_is_hash) {
                     $expr_fail = $self->expr_list(
                         $self->expr_set_err_full($et, 'errors', $self->expr_array_subscript($dt, 0)),
                         $self->false,
@@ -885,7 +896,7 @@ sub before_all_clauses {
             if ($coerce_might_fail) {
 
                 my $expr_fail;
-                if ($rt_is_full) {
+                if ($rt_is_hash) {
                     $expr_fail = $self->expr_list(
                         $self->expr_set_err_full($et, 'errors', $self->expr_array_subscript($dt, 0)),
                         $self->false,
@@ -1066,7 +1077,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.906 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-02-11.
+This document describes version 0.907 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2020-02-12.
 
 =head1 SYNOPSIS
 
@@ -1307,26 +1318,27 @@ The kind of code to generate. For now the only valid (and default) value is
 =item * return_type => STR (default: bool)
 
 Specify what kind of return value the generated code should produce. Either
-C<bool>, C<bool+val>, C<str>, C<str+val>, or C<full>.
+C<bool_valid>, C<bool_valid+val>, C<str_errmsg>, C<str_errmsg+val>, or
+C<hash_details>.
 
-C<bool> means generated validator code should just return true/false depending
-on whether validation succeeds/fails.
+C<bool_valid> means generated validator code should just return true/false
+depending on whether validation succeeds/fails.
 
-C<bool+val> is like C<bool>, but instead of just C<bool> the validator code will
-return a two-element arrayref C<< [bool, val] >> where C<val> is the final value
-of data (after setting of default, coercion, etc.)
+C<bool_valid+val> is like C<bool_valid>, but instead of just C<bool_valid> the
+validator code will return a two-element arrayref C<< [bool_valid, val] >> where
+C<val> is the final value of data (after setting of default, coercion, etc.)
 
-C<str> means validation should return an error message string (the first one
-encountered) if validation fails and an empty string/undef if validation
+C<str_errmsg> means validation should return an error message string (the first
+one encountered) if validation fails and an empty string/undef if validation
 succeeds.
 
-C<str+val> is like C<str>, but instead of just C<str> the validator code will
-return a two-element arrayref C<< [str, val] >> where C<val> is the final value
-of data (after setting of default, coercion, etc.)
+C<str_errmsg+val> is like C<str_errmsg>, but instead of just C<str_errmsg> the
+validator code will return a two-element arrayref C<< [str_errmsg, val] >> where
+C<val> is the final value of data (after setting of default, coercion, etc.)
 
-C<full> means validation should return a full data structure. From this
-structure you can check whether validation succeeds, retrieve all the collected
-errors/warnings, etc.
+C<hash_details> means validation should return a full hash data structure. From
+this structure you can check whether validation succeeds, retrieve all the
+collected errors/warnings, etc.
 
 =item * coerce => bool (default: 1)
 

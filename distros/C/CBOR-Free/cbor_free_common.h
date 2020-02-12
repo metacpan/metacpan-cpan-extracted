@@ -27,6 +27,14 @@
 
 #define _croak croak
 
+/* Compatibility for 5.10.0 --------------------------------------------- */
+#ifndef HeUTF8
+#   define HeUTF8(he) ((HeKLEN(he) == HEf_SVKEY) ?  \
+        SvUTF8(HeKEY_sv(he)) :                      \
+        (U32)HeKUTF8(he))
+#endif
+/* ---------------------------------------------------------------------- */
+
 enum CBOR_TYPE {
     CBOR_TYPE_UINT,
     CBOR_TYPE_NEGINT,

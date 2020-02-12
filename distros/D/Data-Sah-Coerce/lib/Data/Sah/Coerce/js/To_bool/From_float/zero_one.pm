@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::js::To_bool::From_float::zero_one;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,7 +52,13 @@ Data::Sah::Coerce::js::To_bool::From_float::zero_one - Coerce 0 to false and 1 t
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Coerce::js::To_bool::From_float::zero_one (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::Coerce::js::To_bool::From_float::zero_one (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+
+=head1 SYNOPSIS
+
+To use in a Sah schema:
+
+ ["bool",{"x.perl.coerce_rules"=>["From_float::zero_one"]}]
 
 =head1 DESCRIPTION
 

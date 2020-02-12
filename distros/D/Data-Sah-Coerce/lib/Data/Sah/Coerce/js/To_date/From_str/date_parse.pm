@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::js::To_date::From_str::date_parse;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-03'; # DATE
+our $DATE = '2020-02-12'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,7 +31,7 @@ sub coerce {
     );
 
     # note: (function(a,b,c){...})() is a trick to simulate lexical variables
-    $res->{expr_coerce} = "(function (_m) { _m = new Date($dt); if (isNaN(_m)) { return ['Invalid date'] } else { return [null, _m] } })()";
+    $res->{expr_coerce} = "(function (_m) { _m = new Date($dt); if (isNaN(_m)) { return ['Invalid date', _m] } else { return [null, _m] } })()";
 
     $res;
 }
@@ -51,7 +51,13 @@ Data::Sah::Coerce::js::To_date::From_str::date_parse - Coerce date from string u
 
 =head1 VERSION
 
-This document describes version 0.046 of Data::Sah::Coerce::js::To_date::From_str::date_parse (from Perl distribution Data-Sah-Coerce), released on 2020-01-03.
+This document describes version 0.047 of Data::Sah::Coerce::js::To_date::From_str::date_parse (from Perl distribution Data-Sah-Coerce), released on 2020-02-12.
+
+=head1 SYNOPSIS
+
+To use in a Sah schema:
+
+ ["date",{"x.perl.coerce_rules"=>["From_str::date_parse"]}]
 
 =head1 DESCRIPTION
 

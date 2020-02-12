@@ -315,7 +315,7 @@ Net::Amazon::S3::Signature::V4Implementation - Implements the Amazon Web Service
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,15 @@
+0.907   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename return_type values for clarity: bool -> bool_valid, bool+val ->
+	  bool_valid+val, str -> str_errmsg, str+val -> str_errmsg+val, full ->
+	  hash_details. (Old names are supported for now, but deprecated and no
+	  longer documented).
+
+	- [doc] Mention Params::ValidationCompiler.
+
+	- [doc] Note in Status that postfilters is not yet implemented.
+
+
 0.906   2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to Sah 0.9.49 (elements in prefilters/postfilters can be

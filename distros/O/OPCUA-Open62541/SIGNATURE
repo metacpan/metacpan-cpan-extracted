@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 b383ed80c10298a8a625163b03a7317d590dc2aff0c8257f17dd9b6c9acdaa8f Changes
+SHA256 64e4682856888b11781458bd565a3a50455dfe0c2d70e38d5b2d15d066b2011a LICENSE
+SHA256 cb46b8b1431734b7e7d9ed0a213828b3fd680a735dd410684e11a476d3112372 MANIFEST
+SHA256 8857e9f3db089b974f99dbb79c5337caccae594f6a5c272ed9e4da6e0f5f3c04 META.json
+SHA256 aae22b2ff717a510fee618e7ded8a322f445ba15139d57c68ac2111d02961351 META.yml
+SHA256 5803ace2496ea29b09dd7c65e3fa9058bf15236a5946376d49041b25fc0a471f Makefile.PL
+SHA256 2b9bd60124706f37451050cd1f84b65ccbafb4091828932df05d1e1c19b6cb1b Open62541-statuscodes.xsh
+SHA256 619fda3eca556b9776beaa7dc12197386cfdb1d111fc25f384f8e60de21e3bfd Open62541.xs
+SHA256 7d7ee836ec3da6dd9106896cf6be683936290957e6d9211886d62b324445b0cc README
+SHA256 28244450329b866f17a33cd4985453d4aa92dc6a8bacefc30242e05580481b5f lib/OPCUA/Open62541.pm
+SHA256 ac4ba9a010f545973463f0733893a173a6b35b8ab4dc78a423038374372759cd ppport.h
+SHA256 e5706f5757fe173b105c2b286dcc0bfc27b2d53bef215a02ce572588b40bcde7 script/statuscodes_h2xi.pl
+SHA256 27531003ed08c433c407a9d29ceb720b91ae0f04c851ac3888e0d03b13580e2e t/OPCUA-Open62541.t
+SHA256 c972d11616db4bdb3293d6a16710cd7fbcc55cbef728cad2e3528d69d034bcc2 t/server-config-default.t
+SHA256 628f4e6ea5943275d80f26c8842eb00462275aef99f21a192a8b1ced84447e2f t/server-config.t
+SHA256 d5df2ecdd33ae11351dc496525896ddbd822ea86309ea019fa7e698b67cd852a t/server-iterate.t
+SHA256 1a04015028267f4b31ee0dd3e4a718c4d8188954eb2990560723715556ae2f30 t/server-leak.t
+SHA256 86a9826ac9ce36d7d6679e23979eb64efeeea0e5aee79904d679582b778df07c t/server-running.t
+SHA256 3a41257c7408a00d969c94b5c07b5625b429a16e77e9f6627ff8f0cf1a07cfda t/server.t
+SHA256 5e2c3aa55eec7a3264dad809704f0ca4de2d21e431225e4ab9b01706052b37dd t/statuscodes.t
+SHA256 48ea020fb91db3cc8ca02782e9b4d8f4bda8d3a8b8b79503ee194ab9834ed517 t/types.t
+SHA256 c5c387a99e5c637edc42db168772f5748fd1f351165b1dcf9f44f1f173210eb9 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJeRCrQAAoJEMX0g63e6GOApAQP/2N8xYzdtIFJlbla/dT2RUZD
+GESmR/7NYqEqNDkxTS/11gKAvBb503roD6CgFcd3AU6j+F6lsYQK8D8ULdB7TEBY
+dDOhYZqzpZ1n1+RSfu/C91n+arHSGDGal0ADXw4mXl3za0otNjc08efSuUmx9Yc6
+Su/yKEaZdhjRitwVgiUsgZlXMM5PabRcWymSlMlfoSsb0MpH9cF0BztiYbDepHGf
+ByE8MwwZZfaT9RUdbMgQkYKqRuiyIjaZBpRpRkV7MDpJVxz31sobcVhgUMtH+PNp
+A8cLNwtY58iQjHIVPE5/qoejMLBEDxNN34FqMLORYC+zpa/OgMpvMYAUBqf/tOQF
+vgPNWTrFS3+HU9Xr3yrV8wgWnJqhDUEO52yNKZcv1HMlnIL09MAAy08yQSamZ4Br
+0h32OYxkdIKTZn2NyfyLDY5yZGu7NsyFlJg/SZwq9ahzQENIANavZ6+kFs2GCbOL
+GgSII/DWBbQZavZt/G3Dgan6F1z+K0alo4oo290Z6P1ZkGO5xyBGQoZKFG9t8qmU
+pD/jSz1vaP3Y0Z9/+kG4mAKyLjB6RXkVdL4H/GVnPjguMcgyJ3FZImOULEOWV59F
+U4v6uhOnH2rqf0wph8aKko2rBx0wcLNwdC2y77liG/gB2Hqdgca4HT56cU4mT553
+KKZgM9i+dC0x1ispPl5+
+=cAEr
+-----END PGP SIGNATURE-----

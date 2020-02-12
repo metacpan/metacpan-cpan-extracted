@@ -5,6 +5,7 @@ use warnings;
 use App::CELL qw( $CELL $log );
 use Data::Dumper;
 use Test::More;
+use Test::Output;
 use Test::Warnings;
 
 #
@@ -35,7 +36,7 @@ $status = $CELL->status_warn( 'CELL_TEST_MESSAGE' );
 $status->dump( 'to' => 'log' );
 my $dumped_string = $status->dump();
 is( $dumped_string, "WARN: (CELL_TEST_MESSAGE) This is a test message", "Message without args logged correctly to string" );
-$status->dump( fd => \*STDOUT );
+stdout_is { $status->dump( fd => \*STDOUT ) } "WARN: (CELL_TEST_MESSAGE) This is a test message\n", "Message without args printed correctly to STDOUT";
 
 $log->info("*****");
 $log->info("***** TESTING \$status->dump with args" );
@@ -44,6 +45,6 @@ $status = $CELL->status_warn( 'CELL_UNKNOWN_MESSAGE_CODE', args => [ 'bad news b
 $status->dump( 'to' => 'log' );
 $dumped_string = $status->dump();
 is( $dumped_string, "WARN: (CELL_UNKNOWN_MESSAGE_CODE) Unknown system message ->bad news bears<-", "Message with args logged correctly to string" );
-$status->dump( fd => \*STDOUT );
+stdout_is { $status->dump( fd => \*STDOUT ) } "WARN: (CELL_UNKNOWN_MESSAGE_CODE) Unknown system message ->bad news bears<-\n", "Message with args printed correctly to STDOUT";
 
 done_testing;

@@ -24,7 +24,7 @@ require lib::filter;
             valid  => 1,
         },
     );
-    test_sah_cases(\@tests, {gen_validator_opts=>{return_type=>"str"}});
+    test_sah_cases(\@tests, {gen_validator_opts=>{return_type=>"str_errmsg"}});
 }
 
 my @num_tests = (

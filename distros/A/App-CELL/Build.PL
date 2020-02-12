@@ -25,6 +25,8 @@ my $build = Module::Build->new(
         'File::Spec'         => 0,
         'File::Temp'         => 0,
         'Params::Validate'   => 0,
+        'Test::More'         => 0,
+        'Test::Output'       => 0,
         'Test::Warnings'     => 0,
         'Try::Tiny'          => 0,
     },

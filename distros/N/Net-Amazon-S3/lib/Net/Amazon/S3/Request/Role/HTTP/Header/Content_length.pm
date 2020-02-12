@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header::Content_length;
 # ABSTRACT: Content-Lenghth header role
-$Net::Amazon::S3::Request::Role::HTTP::Header::Content_length::VERSION = '0.88';
+$Net::Amazon::S3::Request::Role::HTTP::Header::Content_length::VERSION = '0.89';
 use Moose::Role;
 use Digest::MD5 qw[];
 use MIME::Base64 qw[];
@@ -26,7 +26,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header::Content_length - Content-Lenghth h
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =head1 AUTHOR
 
