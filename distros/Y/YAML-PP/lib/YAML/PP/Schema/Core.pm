@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Core;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use YAML::PP::Schema::JSON qw/
     represent_int represent_float represent_literal represent_bool
@@ -56,7 +56,7 @@ sub register {
     $schema->add_resolver(
         tag => 'tag:yaml.org,2002:float',
         match => [ equals => $_ => 0 + "inf" ],
-    ) for (qw/ .inf .Inf .INF /);
+    ) for (qw/ .inf .Inf .INF +.inf +.Inf +.INF /);
     $schema->add_resolver(
         tag => 'tag:yaml.org,2002:float',
         match => [ equals => $_ => 0 - "inf" ],
@@ -88,7 +88,7 @@ sub register {
         code => \&represent_literal,
     ) for ("", qw/
         true TRUE True false FALSE False null NULL Null ~
-        .inf .Inf .INF -.inf -.Inf -.INF .nan .NaN .NAN
+        .inf .Inf .INF +.inf +.Inf +.INF -.inf -.Inf -.INF .nan .NaN .NAN
     /);
     $schema->add_representer(
         regex => qr{$RE_INT_CORE|$RE_FLOAT_CORE|$RE_INT_OCTAL|$RE_INT_HEX},
@@ -123,10 +123,15 @@ YAML::PP::Schema::Core - YAML 1.2 Core Schema
 
 =head1 DESCRIPTION
 
-This schema loads additional values to the JSON schema as special types, for
+This schema is the official recommended Core Schema for YAML 1.2.
+It loads additional values to the JSON schema as special types, for
 example C<TRUE> and C<True> additional to C<true>.
 
+Official Schwma:
 L<https://yaml.org/spec/1.2/spec.html#id2804923>
+
+Here you can see all Schemas and examples implemented by YAML::PP:
+L<https://perlpunk.github.io/YAML-PP-p5/schemas.html>
 
 =head1 METHODS
 

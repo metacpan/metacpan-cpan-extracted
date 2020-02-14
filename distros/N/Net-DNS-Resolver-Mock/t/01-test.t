@@ -3,10 +3,11 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Test::Exception;
 
 use Net::DNS::Resolver::Mock;
 
-plan tests => 19;
+plan tests => 20;
 
 {
     my $Resolver = Net::DNS::Resolver::Mock->new();
@@ -64,5 +65,8 @@ plan tests => 19;
     $Reply = $Resolver->query( 'cnameptr.example.com.', 'PTR' );
     is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );
     is( $Reply->{ 'answer' }->[0]->rdatastr(), 'reverse.example.com.', 'Correct Address returned' );;
+
+    $Resolver->die_on( 'cnameptr.example.com.', 'PTR', 'Die Test' );;
+    dies_ok( sub{ $Resolver->query( 'cnameptr.example.com.', 'PTR' ) }, 'Dies ok' );
 }
 

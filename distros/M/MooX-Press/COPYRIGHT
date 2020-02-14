@@ -20,6 +20,7 @@ Files: Changes
  t/24mm.t
  t/25abstract.t
  t/30bare.t
+ t/31lexhas.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

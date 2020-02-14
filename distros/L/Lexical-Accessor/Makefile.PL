@@ -4,69 +4,74 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"         => "true private attributes for Moose/Moo/Mouse",
-  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
-  "keywords"         => [],
-  "license"          => ["perl_5"],
-  "meta-spec"        => {
-                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                          version => 2,
-                        },
-  "name"             => "Lexical-Accessor",
-  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"          => {
-                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                          runtime   => {
-                                         recommends => { "Sub::Name" => 0, "Type::Utils" => 0.026 },
-                                         requires   => {
-                                                         "Eval::TypeTiny" => 0,
-                                                         "Exporter::Tiny" => 0,
-                                                         "Hash::FieldHash" => 0,
-                                                         "perl" => 5.008003,
-                                                       },
-                                       },
-                          test      => {
-                                         recommends => {
-                                                         "Class::Tiny" => 0.006,
-                                                         "Moo" => "1.000000",
-                                                         "Moose" => "2.0000",
-                                                         "Mouse" => "1.00",
-                                                       },
-                                         requires   => {
-                                                         "Test::Fatal"     => 0,
-                                                         "Test::More"      => 0.96,
-                                                         "Test::Requires"  => 0,
-                                                         "Types::Standard" => 0.004,
-                                                       },
-                                       },
-                        },
-  "provides"         => {
-                          "Lexical::Accessor"    => { file => "lib/Lexical/Accessor.pm", version => 0.009 },
-                          "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.009 },
-                        },
-  "release_status"   => "stable",
-  "resources"        => {
-                          bugtracker   => {
-                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor",
-                                          },
-                          homepage     => "https://metacpan.org/release/Lexical-Accessor",
-                          license      => ["http://dev.perl.org/licenses/"],
-                          repository   => {
-                                            type => "git",
-                                            url  => "git://github.com/tobyink/p5-lexical-accessor.git",
-                                            web  => "https://github.com/tobyink/p5-lexical-accessor",
-                                          },
-                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project",
-                        },
-  "version"          => 0.009,
-  "x_contributors"   => ["Lukas Atkinson (AMON) <amon\@cpan.org>"],
-  "x_static_install" => 1,
+  "abstract"       => "true private attributes for Moose/Moo/Mouse",
+  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"       => [],
+  "license"        => ["perl_5"],
+  "meta-spec"      => {
+                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                        version => 2,
+                      },
+  "name"           => "Lexical-Accessor",
+  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"        => {
+                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                        runtime   => {
+                                       recommends => {
+                                                       "Hash::FieldHash" => 0,
+                                                       "Sub::HandlesVia" => 0,
+                                                       "Sub::Name"       => 0,
+                                                       "Type::Utils"     => 0.026,
+                                                     },
+                                       requires   => { "Eval::TypeTiny" => 0, "Exporter::Tiny" => 0, "perl" => 5.008003 },
+                                     },
+                        test      => {
+                                       recommends => {
+                                                       "Class::Tiny" => 0.006,
+                                                       "Moo" => "1.000000",
+                                                       "Moose" => "2.0000",
+                                                       "Mouse" => "1.00",
+                                                     },
+                                       requires   => {
+                                                       "Test::Fatal"     => 0,
+                                                       "Test::More"      => 0.96,
+                                                       "Test::Requires"  => 0,
+                                                       "Types::Standard" => 0.004,
+                                                     },
+                                     },
+                      },
+  "provides"       => {
+                        "Lexical::Accessor"    => { file => "lib/Lexical/Accessor.pm", version => 0.012 },
+                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.012 },
+                      },
+  "release_status" => "stable",
+  "resources"      => {
+                        bugtracker   => {
+                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor",
+                                        },
+                        homepage     => "https://metacpan.org/release/Lexical-Accessor",
+                        license      => ["http://dev.perl.org/licenses/"],
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-lexical-accessor.git",
+                                          web  => "https://github.com/tobyink/p5-lexical-accessor",
+                                        },
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project",
+                      },
+  "version"        => 0.012,
+  "x_contributors" => ["Lukas Atkinson (AMON) <amon\@cpan.org>"],
 };
 
 my %dynamic_config;
+do {
+if ($] < 5.010000) {
+	$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0;
+}
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

@@ -36,7 +36,6 @@
 #include <rpm/rpmtag.h>
 #include <rpm/rpmte.h>
 #include <rpm/rpmts.h>
-#include <rpm/rpmvf.h>
 
 /**
  * A constant pair name/value

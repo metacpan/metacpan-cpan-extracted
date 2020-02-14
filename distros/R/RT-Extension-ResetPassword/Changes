@@ -1,5 +1,8 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.05 2020-02-14
+ - Update Module::Install so "make initdb" could work in recent perls
+
 1.04 2016-11-01
  - Update ENV reference to use the new RequestENV function
 

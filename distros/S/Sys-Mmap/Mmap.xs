@@ -88,6 +88,12 @@ int arg;
 #else
             goto not_there;
 #endif
+	if (strEQ(name, "MAP_POPULATE"))
+#ifdef MAP_POPULATE
+	return MAP_POPULATE; 
+#else
+	goto not_there;
+#endif
         if (strEQ(name, "MAP_HUGETLB"))
 #ifdef MAP_HUGETLB
             return MAP_HUGETLB;

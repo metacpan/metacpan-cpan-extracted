@@ -20,6 +20,8 @@ my %WriteMakefileArgs = (
     "Data::Cmp" => "0.002",
     "Exporter" => "5.57",
     "Log::ger" => "0.027",
+    "Ref::Util" => 0,
+    "Scalar::Util" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,10 +29,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Storable" => 0,
+    "Storable" => "3.08",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.036",
+  "VERSION" => "0.039",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +46,9 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.027",
-  "Storable" => 0,
+  "Ref::Util" => 0,
+  "Scalar::Util" => 0,
+  "Storable" => "3.08",
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0

@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1740 2019-04-04 14:45:31Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1761 2020-01-01 11:58:34Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -431,7 +431,7 @@ SKIP: {
 	ok( !$resolver->bgread(undef), '_bgread()	undefined handle' );
 
 	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $second = $resolver->_make_query_packet(qw(net-dns.org SOA));
+	my $second = bless {%$packet, id => -1}, ref($packet);
 	my $handle = $resolver->_bgsend_udp( $packet, $second->data );
 	ok( !$resolver->bgread($handle), '_bgread()	no reply' );
 

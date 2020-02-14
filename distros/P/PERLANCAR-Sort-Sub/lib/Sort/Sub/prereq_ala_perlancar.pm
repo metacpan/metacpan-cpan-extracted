@@ -1,11 +1,20 @@
 package Sort::Sub::prereq_ala_perlancar;
 
-our $DATE = '2017-02-17'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort prereqs PERLANCAR-style',
+    };
+}
 
 sub gen_sorter {
     my ($is_reverse, $is_ci) = @_;
@@ -50,7 +59,33 @@ Sort::Sub::prereq_ala_perlancar - Sort prereqs PERLANCAR-style
 
 =head1 VERSION
 
-This document describes version 0.06 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2017-02-17.
+This document describes version 0.07 of Sort::Sub::prereq_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2019-12-15.
+
+=head1 SYNOPSIS
+
+Generate sorter (accessed as variable) via L<Sort::Sub> import:
+
+ use Sort::Sub '$prereq_ala_perlancar'; # use '$prereq_ala_perlancar<i>' for case-insensitive sorting, '$prereq_ala_perlancar<r>' for reverse sorting
+ my @sorted = sort $prereq_ala_perlancar ('item', ...);
+
+Generate sorter (accessed as subroutine):
+
+ use Sort::Sub 'prereq_ala_perlancar<ir>';
+ my @sorted = sort {prereq_ala_perlancar} ('item', ...);
+
+Generate directly without Sort::Sub:
+
+ use Sort::Sub::prereq_ala_perlancar;
+ my $sorter = Sort::Sub::prereq_ala_perlancar::gen_sorter(
+     ci => 1,      # default 0, set 1 to sort case-insensitively
+     reverse => 1, # default 0, set 1 to sort in reverse order
+ );
+ my @sorted = sort $sorter ('item', ...);
+
+Use in shell/CLI with L<sortsub> (from L<App::sortsub>):
+
+ % some-cmd | sortsub prereq_ala_perlancar
+ % some-cmd | sortsub prereq_ala_perlancar --ignore-case -r
 
 =head1 DESCRIPTION
 
@@ -61,7 +96,7 @@ case-insensitively).
 Case-sensitive option is ignored. Sorting is always done using the
 abovementioned rule.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 HOMEPAGE
 
@@ -81,13 +116,15 @@ feature.
 
 =head1 SEE ALSO
 
+L<Sort::Sub>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -134,7 +134,7 @@ subtest transmute_data => sub {
             dies   => 1,
         );
         test_transmute_data(
-            name   => "required argument: value",
+            name   => "required argument: value|value_code",
             data   => {},
             rules  => [ [create_hash_key=>{name=>'bar'}] ],
             dies   => 1,
@@ -144,6 +144,25 @@ subtest transmute_data => sub {
             data   => {foo=>1},
             rules  => [ [create_hash_key=>{name=>'bar', value=>2}] ],
             result => {foo=>1, bar=>2},
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless({foo=>1}, "Class"),
+            rules  => [ [create_hash_key=>{name=>'bar', value=>2}] ],
+            result => bless({foo=>1, bar=>2}, "Class"),
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=0",
+            data   => bless({foo=>1}, "Class"),
+            rules  => [ [create_hash_key=>{name=>'bar', value=>2, transmute_object=>0}] ],
+            result => bless({foo=>1}, "Class"),
+        );
+        test_transmute_data(
+            name   => "create bar (with value_code)",
+            data   => {foo=>1},
+            rules  => [ [create_hash_key=>{name=>'bar', value_code=>sub {1+1} }] ],
+            result => {foo=>1, bar=>2},
+            reverse_dies => 1,
         );
         test_transmute_data(
             name   => "foo already exists -> dies",
@@ -193,6 +212,18 @@ subtest transmute_data => sub {
             rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar'}] ],
             result => {bar=>1},
         );
+        test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless({foo=>1}, "Class"),
+            rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar'}] ],
+            result => bless({bar=>1}, "Class"),
+        );
+        #test_transmute_data(
+        #    name   => "opt:transmute_object=0",
+        #    data   => bless({foo=>1}, "Class"),
+        #    rules  => [ [rename_hash_key=>{from=>'foo', to=>'bar', transmute_object=>0}] ],
+        #    result => bless({foo=>1}, "Class"),
+        #);
         test_transmute_data(
             name   => "foo doesn't exist -> dies",
             data   => {baz=>1},
@@ -260,6 +291,25 @@ subtest transmute_data => sub {
             result => {a=>2},
         );
         test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless({a=>1}, "Class"),
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2}] ],
+            result => bless({a=>2}, "Class"),
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=0",
+            data   => bless({a=>1}, "Class"),
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to=>2, transmute_object=>0}] ],
+            result => bless({a=>1}, "Class"),
+        );
+        test_transmute_data(
+            name   => "modify a (with to_code)",
+            data   => {a=>1},
+            rules  => [ [modify_hash_value=>{name=>"a", from=>1, to_code=>sub {1+1}}] ],
+            result => {a=>2},
+            reverse_dies => 1,
+        );
+        test_transmute_data(
             name   => "from is optional",
             data   => {a=>3},
             rules  => [ [modify_hash_value=>{name=>"a", to=>2}] ],
@@ -290,6 +340,20 @@ subtest transmute_data => sub {
             reverse_dies => 1,
         );
         test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless({foo=>1}, "Class"),
+            rules  => [ [delete_hash_key=>{name=>'foo'}] ],
+            result => bless({}, "Class"),
+            reverse_dies => 1,
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=0",
+            data   => bless({foo=>1}, "Class"),
+            rules  => [ [delete_hash_key=>{name=>'foo', transmute_object=>0}] ],
+            result => bless({foo=>1}, "Class"),
+            reverse_dies => 1,
+        );
+        test_transmute_data(
             name   => "foo doesn't exist -> noop",
             data   => {bar=>1},
             rules  => [ [delete_hash_key=>{name=>'foo'}] ],
@@ -316,6 +380,18 @@ subtest transmute_data => sub {
             data   => [{a=>1}, {a=>2}, {}],
             rules  => [ [transmute_array_elems=>{rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
             result => [{a=>1,b=>2}, {a=>2,b=>2}, {b=>2}],
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless([{a=>1}, {a=>2}, {}], "Class"),
+            rules  => [ [transmute_array_elems=>{rules=>[ [create_hash_key=>{name=>'b', value=>2}] ]}] ],
+            result => bless([{a=>1,b=>2}, {a=>2,b=>2}, {b=>2}], "Class"),
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=0",
+            data   => bless([{a=>1}, {a=>2}, {}], "Class"),
+            rules  => [ [transmute_array_elems=>{rules=>[ [create_hash_key=>{name=>'b', value=>2}] ], transmute_object=>0}] ],
+            result => bless([{a=>1}, {a=>2}, {}], "Class"),
         );
         test_transmute_data(
             name   => "rules_module",
@@ -369,6 +445,18 @@ subtest transmute_data => sub {
             result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3,b=>2}},
         );
         test_transmute_data(
+            name   => "opt:transmute_object=1 (the default)",
+            data   => bless({k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}}, "Class"),
+            rules  => [ [transmute_hash_values=>{rules=>[ [create_hash_key=>{name=>'b',value=>2}] ]}] ],
+            result => bless({k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3,b=>2}}, "Class"),
+        );
+        test_transmute_data(
+            name   => "opt:transmute_object=0",
+            data   => bless({k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}}, "Class"),
+            rules  => [ [transmute_hash_values=>{rules=>[ [create_hash_key=>{name=>'b',value=>2}] ], transmute_object=>0}] ],
+            result => bless({k1=>{a=>1}, k2=>{a=>2}, k3=>{a=>3}}, "Class"),
+        );
+        test_transmute_data(
             name   => "rules_module",
             data   => {k1=>{c=>3}},
             rules  => [ [transmute_hash_values=>{rules_module=>'Example'}] ],
@@ -399,6 +487,40 @@ subtest transmute_data => sub {
             result => {k1=>{a=>1,b=>2}, k2=>{a=>2,b=>2}, k3=>{a=>3}},
         );
     };
+
+    subtest "rule: transmute_nodes" => sub {
+
+        my $tree = {id=>1, parent=>undef, children=>[ {id=>2, children=>[]}, {id=>3, children=>[ {id=>4, children=>[] } ]} ]};
+        $tree->{children}[0]{parent} = $tree;
+        $tree->{children}[1]{parent} = $tree;
+        $tree->{children}[1]{children}[0]{parent} = $tree->{children}[1];
+
+        my $transmuted_tree = {id=>1, parent=>"foo", children=>[ {id=>2, children=>[], parent=>"foo"}, {id=>3, children=>[ {id=>4, children=>[], parent=>"foo" } ], parent=>"foo"} ]};
+
+        test_transmute_data(
+            name   => "tree",
+            data   => $tree,
+            rules  => [ [transmute_nodes=>{rules=>[ [create_hash_key=>{name=>'parent', replace=>1, value=>'foo'}] ]}] ],
+            result => $transmuted_tree,
+            reverse_dies => 1,
+        );
+
+        test_transmute_data(
+            name   => "opt:recurse_object=0 (the default)",
+            data   => bless([{}], "Class"),
+            rules  => [ [transmute_nodes=>{rules=>[ [create_hash_key=>{name=>'a', value=>1}] ]}] ],
+            result => bless([{}], "Class"),
+            reverse_dies => 1,
+        );
+        test_transmute_data(
+            name   => "opt:recurse_object=1",
+            data   => bless([{}], "Class"),
+            rules  => [ [transmute_nodes=>{rules=>[ [create_hash_key=>{name=>'a', value=>1}] ], recurse_object=>1}] ],
+            result => bless([{a=>1}], "Class"),
+            reverse_dies => 1,
+        );
+    };
+
 };
 
 DONE_TESTING:

@@ -1,6 +1,6 @@
 package Mail::BIMI::Record::Authority;
-# ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200210'; # VERSION
+# ABSTRACT: Class to model a BIMI authority
+our $VERSION = '1.20200214'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};

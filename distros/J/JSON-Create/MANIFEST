@@ -42,7 +42,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
 README
-review-response.pod
 t/bool.t
 t/code.t
 t/escape-slash.t

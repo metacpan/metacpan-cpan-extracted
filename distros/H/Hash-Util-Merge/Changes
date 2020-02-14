@@ -1,0 +1,8 @@
+Revision history for Hash-Util-Merge:
+
+v0.1.1    2020-02-14 08:24:57+00:00 Europe/London
+  [Documentation]
+  - Fix typo in SYNOPSIS, thanks @manwar
+
+v0.1.0    2020-02-13 17:37:40+00:00 Europe/London
+  - Initial version released.

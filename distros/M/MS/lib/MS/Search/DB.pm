@@ -197,7 +197,7 @@ MS::Search::DB - A class to facilitate construction of MS/MS protein search data
         source   => 'uniprot',
         taxid    => '12345',
         ref_only => 1,
-    )
+    );
 
     # add contaminant sequences from cRAP
     $db->add_crap();

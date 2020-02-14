@@ -1,3 +1,6 @@
+0.25 2020-02-14
+* Bug fix for uninitialised arrays
+
 0.24 2017-06-13
 * Windows compilation
 

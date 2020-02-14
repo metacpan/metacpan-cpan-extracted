@@ -9,7 +9,7 @@ use bytes ();
 use JSON::PP::Boolean;
 use XSLoader;
 BEGIN {
-    $VERSION = '0.04';
+    $VERSION = '0.05';
     XSLoader::load( 'Config::UCL', $VERSION );
 }
 

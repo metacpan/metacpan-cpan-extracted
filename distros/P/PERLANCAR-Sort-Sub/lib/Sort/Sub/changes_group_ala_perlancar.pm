@@ -1,11 +1,20 @@
 package Sort::Sub::changes_group_ala_perlancar;
 
-our $DATE = '2017-02-17'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort changes group heading PERLANCAR-style',
+    };
+}
 
 sub gen_sorter {
     require Sort::BySpec;
@@ -40,7 +49,33 @@ Sort::Sub::changes_group_ala_perlancar - Sort changes group heading PERLANCAR-st
 
 =head1 VERSION
 
-This document describes version 0.06 of Sort::Sub::changes_group_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2017-02-17.
+This document describes version 0.07 of Sort::Sub::changes_group_ala_perlancar (from Perl distribution PERLANCAR-Sort-Sub), released on 2019-12-15.
+
+=head1 SYNOPSIS
+
+Generate sorter (accessed as variable) via L<Sort::Sub> import:
+
+ use Sort::Sub '$changes_group_ala_perlancar'; # use '$changes_group_ala_perlancar<i>' for case-insensitive sorting, '$changes_group_ala_perlancar<r>' for reverse sorting
+ my @sorted = sort $changes_group_ala_perlancar ('item', ...);
+
+Generate sorter (accessed as subroutine):
+
+ use Sort::Sub 'changes_group_ala_perlancar<ir>';
+ my @sorted = sort {changes_group_ala_perlancar} ('item', ...);
+
+Generate directly without Sort::Sub:
+
+ use Sort::Sub::changes_group_ala_perlancar;
+ my $sorter = Sort::Sub::changes_group_ala_perlancar::gen_sorter(
+     ci => 1,      # default 0, set 1 to sort case-insensitively
+     reverse => 1, # default 0, set 1 to sort in reverse order
+ );
+ my @sorted = sort $sorter ('item', ...);
+
+Use in shell/CLI with L<sortsub> (from L<App::sortsub>):
+
+ % some-cmd | sortsub changes_group_ala_perlancar
+ % some-cmd | sortsub changes_group_ala_perlancar --ignore-case -r
 
 =head1 DESCRIPTION
 
@@ -77,7 +112,7 @@ Then come new features. After that, enhancements. Bug fixes currently come last
 (actually bug fixes vary in importance but we currently do not categorize them
 further into subgroups).
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 HOMEPAGE
 
@@ -95,13 +130,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Sort::Sub>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,35 @@
+---
+abstract: 'Just Another Serialized Object Notation library.'
+author:
+  - 'Bob Kleemann <bobk@cpan.org>'
+build_requires:
+  Carp: '1.25'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jasonify
+provides:
+  Jasonify:
+    file: lib/Jasonify.pm
+    version: v0.20.45
+requires:
+  Carp: '1.25'
+  Datify: '0'
+  Scalar::Util: '0'
+  String::Tools: '0'
+  overload: '0'
+  parent: '0'
+  perl: v5.14.0
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rkleemann/Jasonify/issues
+  repository: git://github.com/rkleemann/Jasonify.git
+version: v0.20.045
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

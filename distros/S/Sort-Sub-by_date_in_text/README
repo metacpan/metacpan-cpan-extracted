@@ -1,17 +1,75 @@
-DESCRIPTION
+NAME
+    Sort::Sub::by_date_in_text - Sort by date found in text or (if no date
+    is found) ascibetically
 
+VERSION
+    This document describes version 0.009 of Sort::Sub::by_date_in_text
+    (from Perl distribution Sort-Sub-by_date_in_text), released on
+    2019-12-15.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$by_date_in_text'; # use '$by_date_in_text<i>' for case-insensitive sorting, '$by_date_in_text<r>' for reverse sorting
+     my @sorted = sort $by_date_in_text ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'by_date_in_text<ir>';
+     my @sorted = sort {by_date_in_text} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::by_date_in_text;
+     my $sorter = Sort::Sub::by_date_in_text::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub by_date_in_text
+     % some-cmd | sortsub by_date_in_text --ignore-case -r
+
+DESCRIPTION
     The generated sort routine will sort by date found in text (extracted
     using Date::Extract) or (f no date is found in text) ascibetically.
     Items that have a date will sort before items that do not.
 
 ENVIRONMENT
-
- DEBUG => bool
-
+  DEBUG => bool
     If set to true, will print stuffs to stderr.
 
- PERL_DATE_EXTRACT_MODULE => str
-
+  PERL_DATE_EXTRACT_MODULE => str
     Can be set to Date::Extract, Date::Extract::ID, or
     DateTime::Format::Alami::EN, DateTime::Format::Alami::ID.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-by_date_in_text>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-by_date_in_text>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_date_in_t
+    ext>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

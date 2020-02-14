@@ -3,7 +3,8 @@ package MS::Spectrum;
 use strict;
 use warnings;
 
-use List::Util qw/min max any/;
+use List::Util qw/min max/;
+use List::MoreUtils qw/any/;
 
 #use MS::Mass qw/elem_mass/;
 

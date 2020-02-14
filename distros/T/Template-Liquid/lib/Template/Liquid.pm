@@ -1,5 +1,5 @@
 package Template::Liquid;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 use strict;
 use warnings;
 our (%tags, %filters);
@@ -46,9 +46,22 @@ sub parse {
 
 sub render {
     my ($s, %assigns) = @_;
-    $s->{context} = Template::Liquid::Context->new(template => $s,
-                                                   assigns => \%assigns);
-    return $s->{document}->render();
+    my $result;
+    if (!$s->{context}) {
+        $s->{context} =
+            Template::Liquid::Context->new(template => $s,
+                                           assigns  => \%assigns);
+        $result = $s->{document}->render();
+    }
+    else {
+        # This is quite similar to $s->{context}->block(), but
+        # we want %assigns to override what is currently in the scope
+        my $old_scope = $s->{context}->{scopes}->[-1];
+        $s->{context}->push({%$old_scope, %assigns});
+        $result = $s->{document}->render();
+        $s->{context}->pop;
+    }
+    return $result;
 }
 1;
 

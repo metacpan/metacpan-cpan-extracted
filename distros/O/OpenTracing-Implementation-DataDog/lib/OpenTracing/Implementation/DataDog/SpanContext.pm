@@ -26,13 +26,15 @@ with 'OpenTracing::Role::SpanContext';
 
 use OpenTracing::Implementation::DataDog::Utils qw/random_64bit_int/;
 
-use Types::Standard qw/Enum Str/;
+use Types::Common::String qw/NonEmptyStr/;
+use Types::Standard qw/Enum Int/;
 
 
 
 has trace_id => (
     is              => 'ro',
     default         => sub { random_64bit_int() },
+    isa             => Int,
 );
 
 
@@ -40,7 +42,7 @@ has trace_id => (
 has service_name => (
     is              => 'ro',
     required        => 1,
-    isa             => Str,
+    isa             => NonEmptyStr,
 );
 
 
@@ -55,7 +57,7 @@ has service_type => (
 
 has resource_name => (
     is              => 'ro',
-    isa             => Str,
+    isa             => NonEmptyStr,
     required        => 1,
 );
 

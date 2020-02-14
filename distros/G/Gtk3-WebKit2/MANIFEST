@@ -1,0 +1,12 @@
+COPYING
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/browser.pl
+lib/Gtk3/JavaScriptCore.pm
+lib/Gtk3/WebKit2.pm
+t/webkit.t
+META.json                                Module JSON meta-data (added by MakeMaker)

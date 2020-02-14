@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1740 2019-04-04 14:45:31Z willem $
+# $Id: Parameters.pm 1761 2020-01-01 11:58:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1740 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2019-03-26)
+##	(last updated 2019-12-23)
 ##
 ################################################
 
@@ -126,12 +126,12 @@ my @typebyname = (
 	MAILA	   => 254,					# RFC1035
 	ANY	   => 255,					# RFC1035 RFC6895 RFC8482
 	URI	   => 256,					# RFC7553
-	CAA	   => 257,					# RFC6844
+	CAA	   => 257,					# RFC8659
 	AVC	   => 258,					#
 	DOA	   => 259,					# draft-durand-doa-over-dns
-	AMTRELAY   => 260,					# draft-ietf-mboned-driad-amt-discovery
+	AMTRELAY   => 260,					# RFC-ietf-mboned-driad-amt-discovery-13
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
-	DLV	   => 32769,					# RFC4431
+	DLV	   => 32769,					# RFC-ietf-dnsop-obsolete-dlv-02 RFC4431
 	);
 our %typebyval = reverse( TYPE0 => 0, @typebyname );
 push @typebyname, map /^\d/ ? $_ : lc($_), @typebyname;
@@ -184,7 +184,7 @@ our %rcodebyname = @rcodebyname;
 
 # Registry: DNS EDNS0 Option Codes (OPT)
 my @ednsoptionbyname = (
-	LLQ		=> 1,					# http://files.dns-sd.org/draft-sekar-dns-llq.txt
+	LLQ		=> 1,					# RFC-sekar-dns-llq-06
 	UL		=> 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
 	NSID		=> 3,					# RFC5001
 	DAU		=> 5,					# RFC6975
@@ -199,7 +199,6 @@ my @ednsoptionbyname = (
 	'KEY-TAG'	=> 14,					# RFC8145
 	'CLIENT-TAG'	=> 16,					# draft-bellis-dnsop-edns-tags
 	'SERVER-TAG'	=> 17,					# draft-bellis-dnsop-edns-tags
-
 	DEVICEID	=> 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
@@ -233,6 +232,10 @@ my @dsotypebyname = (
 	KEEPALIVE	  => 0x0001,				# RFC8490
 	RETRYDELAY	  => 0x0002,				# RFC8490
 	ENCRYPTIONPADDING => 0x0003,				# RFC8490
+	SUBSCRIBE	  => 0x0040,				# RFC-ietf-dnssd-push-25
+	PUSH		  => 0x0041,				# RFC-ietf-dnssd-push-25
+	UNSUBSCRIBE	  => 0x0042,				# RFC-ietf-dnssd-push-25
+	RECONFIRM	  => 0x0043,				# RFC-ietf-dnssd-push-25
 	);
 our %dsotypebyval = reverse @dsotypebyname;
 push @dsotypebyname, map /^\d/ ? $_ : lc($_), @dsotypebyname;
@@ -251,7 +254,7 @@ sub classbyname {
 		my $val = 0 + $2;
 		croak qq[classbyname("$name") out of range] if $val > 0xffff;
 		return $val;
-			}
+	}
 }
 
 sub classbyval {
@@ -261,7 +264,7 @@ sub classbyval {
 		$val += 0;
 		croak qq[classbyval($val) out of range] if $val > 0xffff;
 		return "CLASS$val";
-			}
+	}
 }
 
 
@@ -276,7 +279,7 @@ sub typebyname {
 		}
 		_typespec("$name.RRNAME") unless $typebyname{uc $name};
 		return $typebyname{uc $name} || croak qq[unknown type "$name"];
-			}
+	}
 }
 
 sub typebyval {
@@ -288,7 +291,7 @@ sub typebyval {
 		$typebyval{$val} = "TYPE$val";
 		_typespec("$val.RRTYPE");
 		return $typebyval{$val};
-			}
+	}
 }
 
 

@@ -1,4 +1,4 @@
-# $Id: 04-packet.t 1749 2019-07-21 09:15:55Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1761 2020-01-01 11:58:34Z willem $	-*-perl-*-
 
 use strict;
 
@@ -126,7 +126,7 @@ foreach my $section (qw(question)) {
 
 foreach my $section (qw(answer authority additional)) {
 	my @original = map { $_->ttl(0); $_->string } $update->$section;    # almost! need TTL defined
-	my @content = map { $_->string } $decoded->$section;
+	my @content  = map { $_->string } $decoded->$section;
 	is_deeply( \@content, \@original, "check content of $section section" );
 }
 
@@ -212,21 +212,20 @@ is( $rr->size, '4096', 'EDNS0 packet size correct' );
 }
 
 
-eval {					## exercise but do not test print
+eval {					## exercise dump and debug diagnostics
 	require Data::Dumper;
 	local $Data::Dumper::Maxdepth;
 	local $Data::Dumper::Sortkeys;
-	my $object   = new Net::DNS::Packet('example.com');
-	my $buffer   = $object->data;
+	my $packet = new Net::DNS::Packet();
+	$packet->header->opcode('DSO');
+	my $buffer   = $packet->data . pack( 'n2H*', 1, 3, 'c0ffee' );
 	my $corrupt  = substr $buffer, 0, 10;
 	my $filename = '04-packet.txt';
 	open( TEMP, ">$filename" ) || die "Could not open $filename for writing";
-	select( ( select(TEMP), $object->print )[0] );
-	select( ( select(TEMP), $object->dump )[0] );
+	select( ( select(TEMP), $packet->dump )[0] );
 	$Data::Dumper::Maxdepth = 6;
 	$Data::Dumper::Sortkeys = 1;
-	select( ( select(TEMP), $object->dump )[0] );
-	select( ( select(TEMP), Net::DNS::Packet->new( \$buffer, 1 ) )[0] );
+	select( ( select(TEMP), Net::DNS::Packet->new( \$buffer,  1 )->dump )[0] );
 	select( ( select(TEMP), Net::DNS::Packet->new( \$corrupt, 1 ) )[0] );
 	close(TEMP);
 	unlink($filename);

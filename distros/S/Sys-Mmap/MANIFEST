@@ -3,10 +3,12 @@ Changes
 Copying
 Makefile.PL
 MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST.SKIP
 Mmap.pm
 Mmap.xs
 README
 t/mmap.t
 t/munmap_errors.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

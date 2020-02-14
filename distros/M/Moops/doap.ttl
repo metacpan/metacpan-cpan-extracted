@@ -63,6 +63,8 @@
 	], [
 		doap-deps:on "PerlX::Assert 0.902"^^doap-deps:CpanId;
 	], [
+		doap-deps:on "Devel::GlobalDestruction"^^doap-deps:CpanId;
+	], [
 		doap-deps:on "PerlX::Define 0.101"^^doap-deps:CpanId;
 	], [ doap-deps:on "Scalar::Util 1.40"^^doap-deps:CpanId ], [ doap-deps:on "Variable::Magic"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Utils 1.000000"^^doap-deps:CpanId;
@@ -93,7 +95,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Moops";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Moops/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-036>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Moops/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Moops/v_0-037>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moops>;
@@ -821,6 +823,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Moops-0.036.tar.gz>;
 	doap:revision        "0.036"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Moops/v_0-037>
+	a                    doap:Version;
+	dc:identifier        "Moops-0.037"^^xsd:string;
+	dc:issued            "2020-02-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add dependency on Devel::GlobalDestruction.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Update STATUS section.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Moops-0.037.tar.gz>;
+	doap:revision        "0.037"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/amon>
 	a                    foaf:Person;

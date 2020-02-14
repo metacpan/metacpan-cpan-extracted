@@ -28,31 +28,31 @@ no_index:
 provides:
   GitLab::API::v4:
     file: lib/GitLab/API/v4.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Config:
     file: lib/GitLab/API/v4/Config.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Constants:
     file: lib/GitLab/API/v4/Constants.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Mock:
     file: lib/GitLab/API/v4/Mock.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Mock::Engine:
     file: lib/GitLab/API/v4/Mock/Engine.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Mock::RESTClient:
     file: lib/GitLab/API/v4/Mock/RESTClient.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::Paginator:
     file: lib/GitLab/API/v4/Paginator.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::RESTClient:
     file: lib/GitLab/API/v4/RESTClient.pm
-    version: '0.23'
+    version: '0.25'
   GitLab::API::v4::WWWClient:
     file: lib/GitLab/API/v4/WWWClient.pm
-    version: '0.23'
+    version: '0.25'
 requires:
   Carp: '0'
   Const::Fast: '0.014'
@@ -81,7 +81,7 @@ resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/GitLab-API-v4
   repository: git://github.com/bluefeet/GitLab-API-v4.git
-version: '0.23'
+version: '0.25'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Dave Webb <github@d5ve.com>'
@@ -93,6 +93,7 @@ x_contributors:
   - 'Marek R. Sotola <Marek.R.Sotola@nasa.gov>'
   - 'Nigel Gregoire <nigelgregoire@gmail.com>'
   - 'Simon Ruderich <simon@ruderich.org>'
+  - 'Thomas Klausner <domm@plix.at>'
   - 'gregor herrmann <gregoa@debian.org>'
   - 'royce55 <royce@ecs.vuw.ac.nz>'
   - 'trunov-ms <trunov.ms@gmail.com>'

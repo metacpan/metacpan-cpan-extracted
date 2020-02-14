@@ -1,7 +1,7 @@
 This archive contains the distribution Mail-BIMI,
-version 1.20200210:
+version 1.20200214:
 
-  Class to model a collection of egress pools
+  BIMI object
 
 This software is copyright (c) 2020 by Marc Bradshaw.
 

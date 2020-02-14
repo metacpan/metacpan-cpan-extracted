@@ -96,7 +96,7 @@ sub send_span {
     my $self = shift;
     my $span = shift;
     
-    my $data = __PACKAGE__->_map_span_to_datadog_data( $span );
+    my $data = __PACKAGE__->to_struct( $span );
     
     my $resp = $self->_http_post_struct_as_json( [[ $data ]] );
     
@@ -105,7 +105,13 @@ sub send_span {
 
 
 
-sub _map_span_to_datadog_data {
+# to_struct
+#
+# Gather required data from the span and it's context, tags and baggage items.
+# this data structure is specific for sending it through the DataDog agent and
+# therefore can not be a intance method of the DataDog::Span object.
+#
+sub to_struct {
     my $class = shift;
     my $span = shift;
     

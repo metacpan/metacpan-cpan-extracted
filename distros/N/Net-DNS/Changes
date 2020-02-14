@@ -1,4 +1,14 @@
-$Id: Changes 1757 2019-08-30 08:35:19Z willem $                       -*-text-*-
+$Id: Changes 1770 2020-02-13 10:42:04Z willem $                       -*-text-*-
+
+
+**** 1.22 Feb 13, 2020
+
+Fix rt.cpan.org #131579
+
+	Parse issue in Net::DNS::RR->token
+
+Feature
+	Provide rudimentary decode and print for DSO packet.
 
 
 **** 1.21 Aug 30, 2019
@@ -30,7 +40,7 @@ Fix rt.cpan.org #128901
 
 Fix rt.cpan.org #128081
 
-	Recurse.pm fails to resolve domain “kickboxingireland.ie”
+	Recurse.pm fails to resolve domain "kickboxingireland.ie"
 
 Fix rt.cpan.org #127307
 

@@ -1,0 +1,209 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-13'; # DATE
+our $DIST = 'Tree-Shell'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Tree::Shell;
+
+my $shell = Tree::Shell->new;
+
+$shell->cmdloop;
+
+1;
+# ABSTRACT: Navigate and manipulate in-memory tree objects using a CLI shell
+# PODNAME: treesh
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+treesh - Navigate and manipulate in-memory tree objects using a CLI shell
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+ % treesh --help
+ % treesh [opts]
+
+ treesh> _
+
+Load a tree object (from an Org document):
+
+ treesh> load --as animals --driver org --source /home/budi/animals.org
+ treesh> load animals org /home/budi/animals.org
+
+Load another tree object:
+
+ treesh> load plants org ~/plants.org
+
+See loaded objects:
+
+ treesh> objects
+ +-----------+--------+---------------------------+-----+
+ | name      | driver | source                    | cwd |
+ +-----------+--------+---------------------------+-----+
+ | animals   | org    | /home/budi/animals.json   | /   |
+ | plants    | org    | /home/budi/plants.org     | /   |
+ +-----------+--------+---------------------------+-----+
+
+Dump a loaded object:
+
+ treesh> dumpobj animals
+ ...
+
+Browse top-level children of a tree object:
+
+ treesh> setcurobj plants
+ treesh> ls -l
+ ...
+
+or:
+
+ treesh> ls -l --obj plants
+ ...
+
+Change "directory" to view another part of the tree (from hereon, please
+remember that you can set the object you want to work with with C<setcurobj>
+command first, or specify the name of the object using C<--object> option):
+
+ treesh> cd /dog
+ treesh> ls -l
+
+Removing nodes of a tree object:
+
+ treesh> rm poo*
+
+[NOT YET IMPLEMENTED] Reload an object from file (reverting all modifications):
+
+ treesh> reloadobj animals
+
+[NOT YET IMPLEMENTED] Save a loaded object to file:
+
+ treesh> saveobj animals
+
+[NOT YET IMPLEMENTED] Save a loaded object to another file:
+
+ treesh> saveobj animals /home/budi/animals-new.org
+
+=head1 DESCRIPTION
+
+This utility lets you navigate and manipulate in-memory tree objects. Currently
+supported tree objects:
+
+=over
+
+=item * Org (parsed using L<Org::Parser::Tiny>)
+
+=item * JSON [NOT YET IMPLEMETED]
+
+=item * YAML [NOT YET IMPLEMETED]
+
+=item * HTML [NOT YET IMPLEMETED]
+
+=item * PPI [NOT YET IMPLEMETED]
+
+=back
+
+You can then browse the tree as if it were a filesystem, using command like
+C<cd> and C<ls>. You can prune nodes, add/modify nodes, as well as move/copy
+nodes around. You can save the changes back to file.
+
+=head1 OPTIONS
+
+=over
+
+=item * --help-, -h, -?
+
+Show short help message and exit.
+
+=item * --version, -v
+
+Show version and exit.
+
+=back
+
+=head1 COMMANDS
+
+For now, use C<help> command, or I<command> C<--help>.
+
+=head1 SETTINGS
+
+Settings are configuration and regulate how the shell behaves.
+
+=head2 output_format => str (default: C<text>)
+
+Set output format for command results. The same formatting is used by
+L<Perinci::CmdLine>. See that module or L<Perinci::Result::Format> for more
+details.
+
+=head2 debug_completion => bool (default: 0)
+
+Whether to show debugging information when doing tab completion.
+
+=head2 debug_time_command => bool (default: 0)
+
+Whether to show how long a command takes.
+
+=head1 FAQ
+
+=head2 The prompt looks rather garbled (e.g. extra " m >" character)!
+
+It looks to be an issue with L<Term::ReadLine::Perl>. Try installing
+L<Term::ReadLine::Gnu> instead.
+
+=head2 How do I redirect output of command to files?
+
+B<treesh> is meant to be a simple shell, not a full-blown Unix shell. So this
+feature is currently not implemented.
+
+=head2 What about variables, aliases, looping, or $other_Unix_shell_feature?
+
+Again, B<treesh> is meant to be a simple shell, not a full-blown Unix shell. So
+those features are currently not implemented.
+
+=head1 ENVIRONMENT
+
+=head2 TREESH_HISTFILE => str (default: C<~/.treesh_history>)
+
+Specify location of command history file. Like in shells, can be set to empty
+string to disable history loading/saving.
+
+=head2 TREESHRC => str (default: C<~/.treeshrc>)
+
+Specify location of settings file.
+
+=head1 FILES
+
+=head2 C<~/.treesh_history>
+
+Command history file.
+
+=head2 C<~/.treeshrc>
+
+Settings file (L<IOD> format).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

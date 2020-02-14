@@ -1,3 +1,27 @@
+0.039   2020-02-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add transmute_object & recurse_object arguments to set how to
+	  behave when dealing with objects.
+
+
+0.038   2020-02-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update examples in Synopsis (demo rules_module argument,
+	  transmute_nodes rule, modify_hash_value rule, argument value_code
+	  in create_hash_key rule).
+
+
+0.037   2020-02-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add rule: transmute_nodes.
+
+	- Rule create_hash_key: add argument value_code.
+
+        - Rule modify_hash_value: add argument to_code.
+
+
 0.036   2019-10-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add rule: modify_hash_value.

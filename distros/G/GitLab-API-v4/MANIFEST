@@ -13,6 +13,7 @@ author/sections/boards.yml
 author/sections/branches.yml
 author/sections/broadcast_messages.yml
 author/sections/commits.yml
+author/sections/container_registry.yml
 author/sections/custom_attributes.yml
 author/sections/deploy_keys.yml
 author/sections/deployments.yml

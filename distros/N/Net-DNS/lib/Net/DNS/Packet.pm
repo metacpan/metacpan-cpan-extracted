@@ -1,9 +1,9 @@
 package Net::DNS::Packet;
 
 #
-# $Id: Packet.pm 1747 2019-06-27 15:02:31Z willem $
+# $Id: Packet.pm 1761 2020-01-01 11:58:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1747 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
 
 
 =head1 NAME
@@ -31,6 +31,7 @@ use warnings;
 use integer;
 use Carp;
 
+use Net::DNS::Parameters(qw(dsotypebyval));
 use constant UDPSZ => 512;
 
 BEGIN {
@@ -120,7 +121,7 @@ sub decode {
 		# header section
 		my ( $id, $status, @count ) = unpack 'n6', $$data;
 		my ( $qd, $an, $ns, $ar ) = @count;
-		$offset = HEADER_LENGTH;
+		my $length = length $$data;
 
 		$self = bless {
 			id	   => $id,
@@ -130,12 +131,13 @@ sub decode {
 			answer	   => [],
 			authority  => [],
 			additional => [],
-			replysize  => length $$data
+			replysize  => $length
 			}, $class;
 
 		# question/zone section
 		my $hash = {};
 		my $record;
+		$offset = HEADER_LENGTH;
 		while ( $qd-- ) {
 			( $record, $offset ) = decode Net::DNS::Question( $data, $offset, $hash );
 			CORE::push( @{$self->{question}}, $record );
@@ -157,7 +159,15 @@ sub decode {
 			CORE::push( @{$self->{additional}}, $record );
 		}
 
-		return $self;
+		return unless $offset == HEADER_LENGTH;
+		return unless $self->header->opcode eq 'DSO';
+
+		$self->{dso} = [];
+		while ( $offset < $length ) {
+			my ( $t, $l, $v ) = unpack "\@$offset n2a*", $$data;
+			CORE::push( @{$self->{dso}}, [$t, substr( $v, 0, $l )] );
+			$offset += 4 + $l;
+		}
 	};
 
 	if ($debug) {
@@ -381,38 +391,42 @@ sub string {
 	my $self = shift;
 
 	my $header = $self->header;
-	my $update = $header->opcode eq 'UPDATE';
-
 	my $server = $self->{replyfrom};
 	my $length = $self->{replysize};
-	my $string = $server ? ";; Response received from $server ($length octets)\n" : "";
+	my $origin = $server ? ";; Response received from $server ($length octets)\n" : "";
+	my @record = ( "$origin;; HEADER SECTION", $header->string );
 
-	$string .= ";; HEADER SECTION\n" . $header->string;
+	if ( $self->{dso} ) {
+		CORE::push( @record, ";; DSO SECTION" );
+		foreach ( @{$self->{dso}} ) {
+			my ( $t, $v ) = @$_;
+			CORE::push( @record, pack 'a* A18 a*', ";;\t", dsotypebyval($t), unpack( 'H*', $v ) );
+		}
+		return join "\n", @record, "\n";
+	}
 
-	my $question = $update ? 'ZONE' : 'QUESTION';
-	my @question = map $_->string, $self->question;
+	my @section  = $header->opcode eq 'UPDATE' ? qw(ZONE PREREQUISITE UPDATE) : qw(QUESTION ANSWER AUTHORITY);
+	my @question = $self->question;
 	my $qdcount  = scalar @question;
 	my $qds	     = $qdcount != 1 ? 's' : '';
-	$string .= join "\n;; ", "\n;; $question SECTION ($qdcount record$qds)", @question;
+	CORE::push( @record, ";; $section[0] SECTION ($qdcount record$qds)", map ';; ' . $_->string, @question );
 
-	my $answer = $update ? 'PREREQUISITE' : 'ANSWER';
-	my @answer  = map $_->string, $self->answer;
+	my @answer  = $self->answer;
 	my $ancount = scalar @answer;
 	my $ans	    = $ancount != 1 ? 's' : '';
-	$string .= join "\n", "\n\n;; $answer SECTION ($ancount record$ans)", @answer;
+	CORE::push( @record, "\n;; $section[1] SECTION ($ancount record$ans)", map $_->string, @answer );
 
-	my $authority = $update ? 'UPDATE' : 'AUTHORITY';
-	my @authority = map $_->string, $self->authority;
+	my @authority = $self->authority;
 	my $nscount   = scalar @authority;
 	my $nss	      = $nscount != 1 ? 's' : '';
-	$string .= join "\n", "\n\n;; $authority SECTION ($nscount record$nss)", @authority;
+	CORE::push( @record, "\n;; $section[2] SECTION ($nscount record$nss)", map $_->string, @authority );
 
-	my @additional = map $_->string, $self->additional;
+	my @additional = $self->additional;
 	my $arcount    = scalar @additional;
 	my $ars	       = $arcount != 1 ? 's' : '';
-	$string .= join "\n", "\n\n;; ADDITIONAL SECTION ($arcount record$ars)", @additional;
+	CORE::push( @record, "\n;; ADDITIONAL SECTION ($arcount record$ars)", map $_->string, @additional );
 
-	return "$string\n\n";
+	join "\n", @record, "\n";
 }
 
 
@@ -839,7 +853,7 @@ Portions Copyright (c)2002-2004 Chris Reinhardt.
 
 Portions Copyright (c)2002-2009 Olaf Kolkman
 
-Portions Copyright (c)2007-2015 Dick Franks
+Portions Copyright (c)2007-2019 Dick Franks
 
 All rights reserved.
 

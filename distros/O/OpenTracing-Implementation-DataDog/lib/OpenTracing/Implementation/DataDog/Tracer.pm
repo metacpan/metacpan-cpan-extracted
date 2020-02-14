@@ -14,19 +14,28 @@ OpenTracing::Implementation::DataDog::Tracer - Keep track of traces
     use aliased 'OpenTracing::Implementation::DataDog::ScopeManager';
     
     my $TRACER = Tracer->new(
-        agent => Agent->new(),
-        scope_manager->ScopeManager->new(),
+        agent                 => Agent->new(),
+        scope_manager         => ScopeManager->new(),
+        default_scope_builder => sub {
+            return {
+                service_name  => 'Your Service name',
+                resource_name => 'Some Resource name',
+            }
+        },
     );
 
 and later
 
     sub foo {
         
-        my $scope = $TRACER->start_active_span( Foo => %options );
+        my $scope = $TRACER->start_active_span( 'Operation Name' => %options );
         
         ...
         
-    } # $scope runs out of scope and gets destroyed ...
+        $scope->close;
+        
+        return $foo
+    }
 
 =cut
 
@@ -41,8 +50,10 @@ use aliased 'OpenTracing::Implementation::DataDog::SpanContext';
 use aliased 'OpenTracing::Implementation::DataDog::Agent';
 use aliased 'OpenTracing::Implementation::DataDog::ScopeManager';
 
+use Carp;
 use Ref::Util qw/is_plain_hashref/;
-use Types::Standard qw/HashRef InstanceOf Maybe Object/;
+use Types::Standard qw/HashRef InstanceOf Maybe Object CodeRef/;
+
 
 has agent => (
     is          => 'lazy',
@@ -61,14 +72,48 @@ has default_context => (
     coerce
     => sub { is_plain_hashref $_[0] ? SpanContext->new( %{$_[0]} ) : $_[0] },
     default
-    => sub { { service_name => "????", resource_name => "????" } },
+    => sub { croak "Can not construct a default SpanContext" },
     reader      => 'get_default_context',
     writer      => 'set_default_context',
 );
 
 
+has default_context_builder => (
+    is          => 'rw',
+    isa         => CodeRef,
+    predicate   => 1,
+);
 
-sub extract_context { $_[0]->get_default_context() }
+sub _build_default_context_builder {
+    sub{ shift->get_default_context }
+}
+
+
+
+=head1 CAVEATS
+
+C<extract_context> and C<inject_context> do not support any off the defined
+methods at all. All that C<extract_context> does at this moment, is providing a
+deafault C<SpanContext>, either given or cuntructed using a code-reference in
+C<default_context_builder>
+
+=cut
+
+
+
+sub extract_context {
+    my $self = shift;
+    
+    return $self->get_default_context
+        unless $self->has_default_context_builder;
+    
+    my $builder_result = $self->default_context_builder->( @_ );
+    
+    return $builder_result
+        unless is_plain_hashref $builder_result;
+    
+    return SpanContext->new( %{$builder_result} );
+}
 
 
 

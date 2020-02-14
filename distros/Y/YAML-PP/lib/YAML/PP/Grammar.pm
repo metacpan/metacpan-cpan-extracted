@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Grammar;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use base 'Exporter';
 
@@ -1102,7 +1102,7 @@ __END__
 
 =head1 NAME
 
-YAML::PP::Grammar
+YAML::PP::Grammar - YAML grammar
 
 =head1 GRAMMAR
 

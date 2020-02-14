@@ -39,10 +39,12 @@
          "requires" : {
             "Exporter::Tiny" : "1.000000",
             "Import::Into" : "0",
+            "Lexical::Accessor" : "0.012",
             "Module::Runtime" : "0",
-            "Moo" : "1.006",
+            "Moo" : "2.000000",
             "MooX::Enumeration" : "0.010",
-            "Sub::HandlesVia" : "0.004",
+            "Sub::HandlesVia" : "0.013",
+            "Sub::MultiMethod" : "0.008",
             "Type::Tiny" : "1.008003",
             "namespace::autoclean" : "0",
             "perl" : "5.008008"
@@ -63,11 +65,11 @@
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.043"
+         "version" : "0.046"
       },
       "MooX::Press::Keywords" : {
          "file" : "lib/MooX/Press/Keywords.pm",
-         "version" : "0.043"
+         "version" : "0.046"
       }
    },
    "release_status" : "stable",
@@ -86,7 +88,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.043",
+   "version" : "0.046",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

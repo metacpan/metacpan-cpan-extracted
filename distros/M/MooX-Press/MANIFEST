@@ -36,3 +36,4 @@ t/23roleorder.t
 t/24mm.t
 t/25abstract.t
 t/30bare.t
+t/31lexhas.t

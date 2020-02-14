@@ -147,7 +147,6 @@ sub escape_all_unicode
 sub stringify
 {
     my ($jc, $input) = @_;
-    my $abstraction_leaked;
     if (! utf8::is_utf8 ($input)) {
 	if ($input =~ /[\x{80}-\x{FF}]/ && $jc->{_strict}) {
 	    return "Non-ASCII byte in non-utf8 string";
@@ -411,7 +410,6 @@ sub user_error
 sub create_json
 {
     my ($input, %options) = @_;
-    my $output;
     my $jc = bless {
 	output => '',
     };

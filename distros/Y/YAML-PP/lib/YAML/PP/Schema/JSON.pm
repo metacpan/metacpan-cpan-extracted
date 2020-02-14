@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/
@@ -11,6 +11,7 @@ our @EXPORT_OK = qw/
 /;
 
 use B;
+use Carp qw/ croak /;
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE /;
 
@@ -25,16 +26,37 @@ sub _to_float { unpack F => pack F => $_[2]->[0] }
 sub register {
     my ($self, %args) = @_;
     my $schema = $args{schema};
+    my $options = $args{options};
+    my $empty_null = 0;
+    for my $opt (@$options) {
+        if ($opt eq 'empty=str') {
+        }
+        elsif ($opt eq 'empty=null') {
+            $empty_null = 1;
+        }
+        else {
+            croak "Invalid option for JSON Schema: '$opt'";
+        }
+    }
 
     $schema->add_resolver(
         tag => 'tag:yaml.org,2002:null',
         match => [ equals => null => undef ],
     );
-    $schema->add_resolver(
-        tag => 'tag:yaml.org,2002:null',
-        match => [ equals => '' => undef ],
-        implicit => 0,
-    );
+    if ($empty_null) {
+        $schema->add_resolver(
+            tag => 'tag:yaml.org,2002:null',
+            match => [ equals => '' => undef ],
+            implicit => 1,
+        );
+    }
+    else {
+        $schema->add_resolver(
+            tag => 'tag:yaml.org,2002:str',
+            match => [ equals => '' => '' ],
+            implicit => 1,
+        );
+    }
     $schema->add_resolver(
         tag => 'tag:yaml.org,2002:bool',
         match => [ equals => true => $schema->true ],
@@ -162,6 +184,8 @@ YAML::PP::Schema::JSON - YAML 1.2 JSON Schema
 =head1 SYNOPSIS
 
     my $yp = YAML::PP->new( schema => ['JSON'] );
+    my $yp = YAML::PP->new( schema => [qw/ JSON empty=str /] );
+    my $yp = YAML::PP->new( schema => [qw/ JSON empty=null /] );
 
 =head1 DESCRIPTION
 
@@ -169,7 +193,43 @@ With this schema, the resolution of plain values will work like in JSON.
 Everything that matches a special value will be loaded as such, other plain
 scalars will be loaded as strings.
 
-L<https://yaml.org/spec/1.2/spec.html#id2803231>
+Note that this is different from the official YAML 1.2 JSON Schema, where all
+strings have to be quoted.
+
+Here you can see all Schemas and examples implemented by YAML::PP:
+L<https://perlpunk.github.io/YAML-PP-p5/schemas.html>
+
+Official Schwma: L<https://yaml.org/spec/1.2/spec.html#id2803231>
+
+=head1 CONFIGURATION
+
+The official YAML 1.2 JSON Schema wants all strings to be quoted.
+YAML::PP currently does not require that (it might do this optionally in
+the future).
+
+That means, there are no empty nodes allowed in the official schema. Example:
+
+    ---
+    key:
+
+The default behaviour of YAML::PP::Schema::JSON is to return an empty string,
+so it would be equivalent to:
+
+    ---
+    key: ''
+
+You can configure it to resolve this as C<undef>:
+
+    my $yp = YAML::PP->new( schema => [qw/ JSON empty=null /] );
+
+This way it is equivalent to:
+
+    ---
+    key: null
+
+The default is:
+
+    my $yp = YAML::PP->new( schema => [qw/ JSON empty=str /] );
 
 =head1 METHODS
 

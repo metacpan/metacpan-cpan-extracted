@@ -1,7 +1,9 @@
 package Sort::Sub::by_date_in_text;
 
-our $DATE = '2017-04-25'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub-by_date_in_text'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,6 +12,13 @@ use warnings;
 use DateTime;
 
 our $DATE_EXTRACT_MODULE = $ENV{PERL_DATE_EXTRACT_MODULE} // "Date::Extract";
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort by date found in text or (if no date is found) ascibetically',
+    };
+}
 
 sub gen_sorter {
     my ($is_reverse, $is_ci) = @_;
@@ -98,7 +107,7 @@ Sort::Sub::by_date_in_text - Sort by date found in text or (if no date is found)
 
 =head1 VERSION
 
-This document describes version 0.008 of Sort::Sub::by_date_in_text (from Perl distribution Sort-Sub-by_date_in_text), released on 2017-04-25.
+This document describes version 0.009 of Sort::Sub::by_date_in_text (from Perl distribution Sort-Sub-by_date_in_text), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -132,7 +141,7 @@ The generated sort routine will sort by date found in text (extracted using
 L<Date::Extract>) or (f no date is found in text) ascibetically. Items that have
 a date will sort before items that do not.
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 ENVIRONMENT
 
@@ -171,7 +180,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

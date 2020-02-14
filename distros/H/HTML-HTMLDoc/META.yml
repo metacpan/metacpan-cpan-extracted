@@ -1,11 +1,44 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         HTML-HTMLDoc
-version:      0.10
-version_from: lib/HTML/HTMLDoc.pm
-installdirs:  site
+---
+abstract: 'Perl interface to the htmldoc program for producing PDF Files from HTML content.'
+author:
+  - "Eric Chernoff - ericschernoff at\tgmail.com - is the primary maintainer starting from the 0.12 release."
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-HTMLDoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTML::HTMLDoc:
+    file: lib/HTML/HTMLDoc.pm
+    version: '0.12'
+  HTML::HTMLDoc::PDF:
+    file: lib/HTML/HTMLDoc/PDF.pm
+    version: '0.12'
 requires:
-    IPC::Open3:                    
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ericschernoff/HTMLDoc/issues
+  homepage: https://github.com/ericschernoff/HTMLDoc
+  repository: git://github.com/ericschernoff/HTMLDoc.git
+version: '0.12'
+x_contributors:
+  - 'Eric Chernoff <eric@weaverstreet.net>'
+  - 'Eric Chernoff <ericschernoff@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

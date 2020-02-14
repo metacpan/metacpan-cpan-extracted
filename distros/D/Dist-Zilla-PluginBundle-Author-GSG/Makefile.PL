@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::ChangelogFromGit" => 0,
     "Dist::Zilla::Plugin::Git::Commit" => 0,
     "Dist::Zilla::Plugin::Git::Contributors" => 0,
-    "Dist::Zilla::Plugin::Git::NextVersion" => 0,
+    "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
     "Dist::Zilla::Plugin::Git::Push" => 0,
     "Dist::Zilla::Plugin::Git::Tag" => 0,
     "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Strict" => 0
   },
-  "VERSION" => "v0.0.19",
+  "VERSION" => "v0.0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +74,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::ChangelogFromGit" => 0,
   "Dist::Zilla::Plugin::Git::Commit" => 0,
   "Dist::Zilla::Plugin::Git::Contributors" => 0,
-  "Dist::Zilla::Plugin::Git::NextVersion" => 0,
+  "Dist::Zilla::Plugin::Git::NextVersion" => "2.044",
   "Dist::Zilla::Plugin::Git::Push" => 0,
   "Dist::Zilla::Plugin::Git::Tag" => 0,
   "Dist::Zilla::Plugin::GitHub::Meta" => "0.46",

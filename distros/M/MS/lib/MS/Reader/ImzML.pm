@@ -36,14 +36,14 @@ sub _post_load {
         if (defined $sha1) {
             require Digest::SHA;
             my $h = Digest::SHA->new(1);
-            $h->addfile($self->{__fn_ibd});
+            $h->addfile($self->{__fn_ibd}, 'b');
             croak "IBD SHA-1 mismatch" if (lc($sha1) ne lc($h->hexdigest));
         }
         elsif (defined $md5) {
             require Digest::MD5;
             my $h = Digest::MD5->new();
-            $h->addfile($self->{__fn_ibd});
-            croak "IBD SHA-1 mismatch" if (lc($md5) ne lc($h->hexdigest));
+            $h->addfile($self->{__fn_ibd}, 'b');
+            croak "IBD MD5 mismatch" if (lc($md5) ne lc($h->hexdigest));
         }
         else { croak "Missing IBD checksum cvParam" }
     }
@@ -144,14 +144,14 @@ sub _load_new {
     if (defined $sha1) {
         require Digest::SHA;
         my $h = Digest::SHA->new(1);
-        $h->addfile($fn_ibd);
+        $h->addfile($fn_ibd, 'b');
         croak "IBD SHA-1 mismatch" if (lc($sha1) ne lc($h->hexdigest));
     }
     elsif (defined $md5) {
         require Digest::MD5;
         my $h = Digest::MD5->new();
-        $h->addfile($fn_ibd);
-        croak "IBD SHA-1 mismatch" if (lc($md5) ne lc($h->hexdigest));
+        $h->addfile($fn_ibd, 'b');
+        croak "IBD MD5 mismatch" if (lc($md5) ne lc($h->hexdigest));
     }
     else { croak "Missing IBD checksum cvParam" }
 

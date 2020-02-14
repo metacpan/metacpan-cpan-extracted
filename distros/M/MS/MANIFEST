@@ -44,6 +44,7 @@ lib/MS/Search/DB/Source/uniprot.pm
 lib/MS/Spectrum.pm
 LICENSE
 MANIFEST			This list of files
+MANIFEST.SKIP			This list of files
 META.json
 META.yml
 README.md

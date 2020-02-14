@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.113   2020-02-13
+        - 'choose_directories': update and bugfixes.
+        - 'choose_a_directory': fixed option 'info'.
+
 0.112   2020-02-04
         - Update 'choose_directories'.
 

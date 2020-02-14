@@ -10,11 +10,13 @@ t/004env.t
 t/005lib.t
 t/006before.t
 t/050child-processes.t                   Tests -from:children
-t/child.pl
+t/child.pl                                 script run from t/050child-processes.t
 t/090pod.t                               Tests POD for errors
 t/098pod-coverage.t                      Tests for POD coverage
+t/quiet.t                                Test that -quiet suppresses (some) warnings
+t/too-late-quiet.t                       Test that -quiet doesn't suppress warnings about not hiding stuff
 
-t/P.pm                                   Dummy module used in tests (002-006, 050)
+t/P.pm                                   Dummy module used in tests
 t/Q.pm                                   "
 t/R.pm                                   "
 

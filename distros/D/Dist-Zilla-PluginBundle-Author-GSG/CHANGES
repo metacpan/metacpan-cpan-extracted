@@ -1,9 +1,28 @@
 ==================================================
-Changes from 2019-01-10 00:00:00 +0000 to present.
+Changes from 2019-02-06 00:00:00 +0000 to present.
 ==================================================
 
 --------------------------------------------
-version v0.0.19 at 2020-01-10 16:56:22 +0000
+version v0.0.20 at 2020-02-06 16:49:05 +0000
+--------------------------------------------
+
+  Change: 67c5d264531300dc43f4d596ae0215f02ef46738
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-06 11:48:15 +0000
+
+    Update README and LICENSE 
+
+  Change: 53f7b6467d3d41c886d380b89902e109cddec92f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-24 11:46:48 +0000
+
+    Require Dist::Zilla::Plugin::Git 2.044
+
+    Earlier versions cause test failures for reasons that aren't clear.
+    Easiest fix is to just require a version that works. 
+
+--------------------------------------------
+version v0.0.19 at 2020-01-10 16:54:53 +0000
 --------------------------------------------
 
   Change: 886ec6514388aa8099de957c23a4b1ce5ef41e9c

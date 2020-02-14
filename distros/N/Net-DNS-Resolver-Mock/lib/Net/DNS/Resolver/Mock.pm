@@ -3,13 +3,21 @@ package Net::DNS::Resolver::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '1.20171219'; # VERSION
+our $VERSION = '1.20200214'; # VERSION
 
 use base 'Net::DNS::Resolver';
 
 use Net::DNS::Packet;
 use Net::DNS::Question;
 use Net::DNS::ZoneFile;
+
+my $die_on = {};
+
+sub die_on {
+    my ( $self, $name, $type, $error ) = @_;
+    $die_on->{ "$name $type" } = $error;
+    return;
+}
 
 sub zonefile_read {
     my ( $self, $zonefile ) = @_;
@@ -25,6 +33,10 @@ sub zonefile_parse {
 
 sub send {
     my ( $self, $name, $type ) = @_;
+
+    if ( exists ( $die_on->{ "$name $type" } ) ) {
+        die $die_on->{ "$name $type" };
+    }
 
     $name =~ s/\.$//;
 
@@ -100,6 +112,10 @@ Reads specified file for zone data
 =item zonefile_parse ( $String )
 
 Reads the zone data from the supplied string
+
+=item die_on ( $Name, $Type, $Error )
+
+Die with $Error for a query of $Name and $Type
 
 =back
 

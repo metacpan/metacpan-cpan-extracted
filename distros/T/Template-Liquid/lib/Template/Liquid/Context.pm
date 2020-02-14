@@ -1,5 +1,5 @@
 package Template::Liquid::Context;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 require Template::Liquid::Utility;
 require Template::Liquid::Error;
 use strict;
@@ -104,6 +104,8 @@ sub get {
     return $var
         if $var =~ m[^[-\+]?(\d*\.)?\d+$]o && !exists $$cursor->{$path[0]};
     return     if $var eq '';
+    return ''  if $var eq '""';
+    return ""  if $var eq "''";
     return     if $var eq 'null';
     return     if $var eq 'nil';
     return     if $var eq 'blank';

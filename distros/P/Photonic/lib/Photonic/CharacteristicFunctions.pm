@@ -1,5 +1,39 @@
 package Photonic::CharacteristicFunctions;
-$Photonic::CharacteristicFunctions::VERSION = '0.010';
+$Photonic::CharacteristicFunctions::VERSION = '0.011';
+
+=encoding UTF-8
+
+=head1 COPYRIGHT NOTICE
+
+Photonic - A perl package for calculations on photonics and
+metamaterials.
+
+Copyright (C) 1916 by W. Luis Mochán
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 1, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
+
+    mochan@fis.unam.mx
+
+    Instituto de Ciencias Físicas, UNAM
+    Apartado Postal 48-3
+    62251 Cuernavaca, Morelos
+    México
+
+=cut
+
+
 use Carp;
 BEGIN {
     require Exporter;
@@ -22,7 +56,7 @@ sub ellipse { #f y e determinan univocamente el problema  general de inclusion
     my $z=PDL->zeroes(2*$N+1,2*$N+1); #change to admit arbitrary lattice
     my $r=$z->PDL::ndcoords-PDL->pdl($N,$N);
     if(($e>=1.0 && $ff<PI/(4.0*$e)) || ($e<=1.0 && $ff<PI*$e/4.0)){
-	$a=sqrt($ff/PI)*(PDL->pdl(1.0/sqrt($e),sqrt($e))); 
+	$a=sqrt($ff/PI)*(PDL->pdl(1.0/sqrt($e),sqrt($e)));
 	$a*=2*$N+1;
     }else{croak "filling fraction very large: overlaping of ellipses ! \n"}
     my $t=($r->((1))/$a->((1)))**2+($r->((0))/$a->((0)))**2<=1.0;
@@ -34,7 +68,7 @@ sub triangle { #smooth triangle for testing
     my $r0=shift; #radio relativo nominal
     my $deltar=shift; #fluctuaciones
     my $theta0=shift;
-    
+
     my $z=PDL->zeroes(2*$N+1,2*$N+1); #change to admit arbitrary lattice
     my $r=$z->PDL::ndcoords-PDL->pdl($N,$N);
     my $theta=atan2($r->((1)), $r->((0)));
@@ -50,7 +84,7 @@ sub isosceles { #smooth isoceles triangle for testing
     my $delta2=shift; #fluctuaciones en 2 theta
     my $delta3=shift; #fluctuaciones en 3 theta
     my $theta0=shift;
-    
+
     my $z=PDL->zeroes(2*$N+1,2*$N+1); #change to admit arbitrary lattice
     my $r=$z->PDL::ndcoords-PDL->pdl($N,$N);
     my $theta=atan2($r->((1)), $r->((0)));
@@ -71,7 +105,7 @@ Photonic::CharacteristicFunctions
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -83,7 +117,7 @@ version 0.010
 =head1 DESCRIPTION
 
 Provide a few characteristic functions that may be used in Photonic
-calculations.  
+calculations.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -98,17 +132,16 @@ filling fraction $ff and quotient between Y and X axes $e.
 
 returns a smooth pear shaped triangle in a square lattice of side
 (2*$N+1)x(2*$N+1) with border
-r(theta)=$r0+$deltar*cos(3*(theta-$theta0)) 
+r(theta)=$r0+$deltar*cos(3*(theta-$theta0))
 in polar coordinates
 
 =item * isosceles($N, $r0, $delta2, $delta3, $theta0)
 
 returns a smooth pear shaped triangle in a square lattice of side
 (2*$N+1)x(2*$N+1) with border
-=r(theta)=$r0+$delta2*cos(2*(theta-$theta0))+$delta3*cos(3*(theta-$theta0)) 
+=r(theta)=$r0+$delta2*cos(2*(theta-$theta0))+$delta3*cos(3*(theta-$theta0))
 in polar coordinates
 
 =back
 
 =cut
-   

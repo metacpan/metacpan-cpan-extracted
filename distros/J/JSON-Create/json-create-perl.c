@@ -951,6 +951,8 @@ json_create_add_stringified (json_create_t * jc, SV *r)
 	CALL (add_char (jc, ','));		\
     }
 
+//#define JCDEBUGTYPES
+
 /* Given a reference to a hash in "input_hv", recursively process it
    into JSON. "object" here means "JSON object", not "Perl object". */
 
@@ -993,7 +995,7 @@ json_create_add_object (json_create_t * jc, HV * input_hv)
 	}
 	CALL (add_char (jc, ':'));
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "Creating value of hash.\n");
+	fprintf (stderr, "%s:%d: Creating value of hash.\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 	CALL (json_create_recursively (jc, value));
     }
@@ -1010,17 +1012,42 @@ json_create_add_array (json_create_t * jc, AV * av)
     I32 n_keys;
     int i;
     SV * value;
+    SV ** avv;
 
+#ifdef JCDEBUGTYPES
+    fprintf (stderr, "%s:%d: Adding first char [.\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
     CALL (add_char (jc, '['));
     n_keys = av_len (av) + 1;
+#ifdef JCDEBUGTYPES
+    fprintf (stderr, "%s:%d: n_keys = %d.\n", __FILE__, __LINE__, n_keys);
+#endif /* JCDEBUGTYPES */
     /* This deals correctly with empty arrays, since av_len is -1 if
        the array is empty, so we do not test for a valid n_keys value
        before entering the loop. */
     for (i = 0; i < n_keys; i++) {
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: i = %d.\n", __FILE__, __LINE__, i);
+#endif /* JCDEBUGTYPES */
 	COMMA;
-	value = * (av_fetch (av, i, 0 /* don't delete the array value */));
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: i = %d.\n", __FILE__, __LINE__, i);
+#endif /* JCDEBUGTYPES */
+	avv = av_fetch (av, i, 0 /* don't delete the array value */);
+	if (avv) {
+	    value = * avv;
+	}
+	else {
+#ifdef JCDEBUGTYPES
+	    fprintf (stderr, "%s:%d: null value returned by av_fetch.\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
+	    value = & PL_sv_undef;
+	}
 	CALL (json_create_recursively (jc, value));
     }
+#ifdef JCDEBUGTYPES
+    fprintf (stderr, "%s:%d: Adding last char ].\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
     CALL (add_char (jc, ']'));
     return json_create_ok;
 }
@@ -1045,8 +1072,6 @@ json_create_handle_unknown_type (json_create_t * jc, SV * r)
 	goto handle_type;						\
     }
 
-//#define JCDEBUGTYPES
-
 static INLINE json_create_status_t
 json_create_handle_ref (json_create_t * jc, SV * input)
 {
@@ -1061,14 +1086,14 @@ json_create_handle_ref (json_create_t * jc, SV * input)
     switch (t) {
     case SVt_PVAV:
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "array\n");
+	fprintf (stderr, "%s:%d: Array\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 	CALL (json_create_add_array (jc, (AV *) r));
 	break;
 
     case SVt_PVHV:
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "hash\n");
+	fprintf (stderr, "%s:%d: Hash.\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 	CALL (json_create_add_object (jc, (HV *) r));
 	break;
@@ -1076,7 +1101,7 @@ json_create_handle_ref (json_create_t * jc, SV * input)
     case SVt_NV:
     case SVt_PVNV:
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "NV/PVNV\n");
+	fprintf (stderr, "%s:%d: NV/PVNV\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_float (jc, r));
@@ -1085,7 +1110,7 @@ json_create_handle_ref (json_create_t * jc, SV * input)
     case SVt_IV:
     case SVt_PVIV:
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "IV/PVIV\n");
+	fprintf (stderr, "%s:%d: IV/PVIV\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_integer (jc, r));
@@ -1230,25 +1255,37 @@ json_create_handle_object (json_create_t * jc, SV * input)
 static json_create_status_t
 json_create_recursively (json_create_t * jc, SV * input)
 {
+#ifdef JCDEBUGTYPES
+    fprintf (stderr, "%s:%d: sv = %p.\n", __FILE__, __LINE__, input);
+#endif /* JCDEBUGTYPES */
     if (! SvOK (input)) {
 	/* We were told to add an undefined value, so put the literal
 	   'null' (without quotes) at the end of "jc" then return. */
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: adding 'null'.\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
 	ADD ("null");
 	return json_create_ok;
     }
     /* JSON::Parse inserts pointers to &PL_sv_yes and no as literal
        "true" and "false" markers. */
     if (input == &PL_sv_yes) {
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: adding 'true'.\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
 	ADD ("true");
 	return json_create_ok;
     }
     if (input == &PL_sv_no) {
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: adding 'false'.\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
 	ADD ("false");
 	return json_create_ok;
     }
     if (SvROK (input)) {
 #ifdef JCDEBUGTYPES
-	fprintf (stderr, "A reference.\n");
+	fprintf (stderr, "%s:%d: A reference.\n", __FILE__, __LINE__);
 #endif /* JCDEBUGTYPES */
 
 	/* We have a reference, so decide what to do with it. */
@@ -1261,14 +1298,14 @@ json_create_recursively (json_create_t * jc, SV * input)
 	    }
 	    else {
 #ifdef JCDEBUGTYPES
-		fprintf (stderr, "create handle eferences\n");
+		fprintf (stderr, "create handle references\n");
 #endif /* JCDEBUGTYPES */
 		CALL (json_create_handle_ref (jc, input));
 	    }
 	}
 	else {
 #ifdef JCDEBUGTYPES
-	    fprintf (stderr, "create handle eferences\n");
+	    fprintf (stderr, "create handle references\n");
 #endif /* JCDEBUGTYPES */
 	    CALL (json_create_handle_ref (jc, input));
 	}

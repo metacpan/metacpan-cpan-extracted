@@ -1,80 +1,80 @@
 package Test::Auto::Parser;
 
-use Data::Object 'Class';
+use Data::Object 'Class', 'Test::Auto::Types';
 
 use Data::Object 'WithStashable';
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has name => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has abstract => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has synopsis => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has includes => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has description => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has inherits => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has integrates => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has attributes => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has libraries => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has headers => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has footers => (
   is => 'ro',
-  isa => 'ArrayRef[Str]',
+  isa => 'Strings',
   opt => 1
 );
 
 has source => (
   is => 'ro',
-  isa => 'InstanceOf["Test::Auto"]',
+  isa => 'Source',
   req => 1
 );
 
@@ -100,6 +100,7 @@ around BUILD($args) {
   $self->build_methods;
   $self->build_functions;
   $self->build_routines;
+  $self->build_types;
 
   return $self;
 }
@@ -587,6 +588,65 @@ method check_routines() {
   return 1;
 }
 
+method build_types() {
+  $self->parse_types;
+  $self->check_types or raise 'build types failed';
+
+  return $self->stash('types');
+}
+
+method parse_types() {
+  my $source = $self->source->data;
+
+  my $types = {};
+  my $listings = $source->list('type');
+
+  for my $name (map {$$_{name}} @{$listings}) {
+    my $item = {};
+
+    $item->{usage} = $source->contents('type', $name);
+    $item->{library} = $source->contents('type-library', $name);
+    $item->{parent} = $source->contents('type-parent', $name);
+    $item->{composite} = $source->contents('type-composite', $name);
+
+    my $index;
+
+    $index = 1;
+    while (my $content = $source->contents("type-coercion-$index", $name)) {
+      last if !@$content;
+
+      $item->{coercions}{$index} = $content;
+      $index++;
+    }
+
+    $index = 1;
+    while (my $content = $source->contents("type-example-$index", $name)) {
+      last if !@$content;
+
+      $item->{examples}{$index} = $content;
+      $index++;
+    }
+
+    $types->{$name} = $item;
+  }
+
+  return $self->stash(types => $types);
+}
+
+method check_types() {
+  my $types = $self->stash('types');
+
+  return 1 if !%$types;
+
+  while (my($key, $val) = each(%$types)) {
+    return 0 unless $val->{usage};
+    return 0 unless $val->{library};
+    return 0 unless $val->{examples};
+  }
+
+  return 1;
+}
+
 method scenarios($name, $attr) {
   my $scenarios = $self->stash('scenarios');
 
@@ -629,6 +689,18 @@ method routines($name, $attr) {
   return $routines if !$name;
 
   my $result = $routines->{$name};
+
+  return $result if !$attr;
+
+  return $result->{$attr};
+}
+
+method types($name, $attr) {
+  my $types = $self->stash('types');
+
+  return $types if !$name;
+
+  my $result = $types->{$name};
 
   return $result if !$attr;
 
@@ -678,10 +750,9 @@ Specification Parser
 
 =head1 DESCRIPTION
 
-This package use the L<Test::Auto> object as a parser target, where the
-object's file property points to a test file containing POD blocks which adhere
-to the specification as defined in L<Test::Auto/SPECIFICATION>, parses the test
-file and returns a parser object for accessing the data.
+This package parses files containing POD blocks which adhere to the
+specification as defined in L<Test::Auto/SPECIFICATION>, and provides methods
+for accessing the data.
 
 =cut
 
@@ -809,7 +880,11 @@ L<"license file"|https://github.com/iamalnewkirk/test-auto/blob/master/LICENSE>.
 
 =head1 PROJECT
 
+L<Wiki|https://github.com/iamalnewkirk/test-auto/wiki>
+
 L<Project|https://github.com/iamalnewkirk/test-auto>
+
+L<Initiatives|https://github.com/iamalnewkirk/test-auto/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/test-auto/milestones>
 

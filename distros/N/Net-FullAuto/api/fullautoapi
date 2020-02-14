@@ -25,7 +25,7 @@
 # source function library
 . /etc/rc.d/init.d/functions
 
-USER=www-data
+USER=''
 RETVAL=0
 prog="fullautoapi"
 lockfile=/var/lock/subsys/$prog
@@ -43,8 +43,8 @@ start()
            || (failure && exit)
 
 	echo -n $"Starting $prog: "
-	(nohup $FULLAUTOAPI -l /tmp/fullautoapi.socket -e -p \
-           /var/run/fullautoapi.pid > /var/log/fullautoapi.log &)\
+	($FULLAUTOAPI -l /tmp/fullautoapi.socket -d -e -p \
+           $PID_FILE >> /var/log/fullautoapi.log 2>&1)\
            && success || failure
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch $lockfile
@@ -62,6 +62,8 @@ stop()
 	PID=`cat "$PID_FILE"`
 	if [ -n "$PID" ]; then
 		/bin/kill "$PID" >/dev/null 2>&1
+                service memcached start
+                /bin/rm -f /tmp/fullautoapi.socket
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then
 			RETVAL=1

@@ -426,7 +426,13 @@ int _specbuild(rpmSpec spec, SV * sv_buildflags) {
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
     BTA_t flags = calloc(1, sizeof(*flags));
     flags->buildAmount = buildflags;
+#if defined(RPM4_15_0)
+    rpmts ts = rpmtsCreate();
+    return rpmSpecBuild(ts, spec, flags);
+    (void)rpmtsFree(ts);
+#else
     return rpmSpecBuild(spec, flags);
+#endif
 }
 
 void _installsrpms(rpmts ts, char * filename) {

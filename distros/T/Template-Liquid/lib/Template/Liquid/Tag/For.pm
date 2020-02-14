@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::For;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -34,9 +34,15 @@ sub new {
     my ($var, $range, $attr) = ($1, $2, $3 || '');
     my $reversed = $attr =~ s[^reversed\b][]o ? 1 : 0;
     my %attr     = map {
-        my ($k, $v)
-            = split($Template::Liquid::Utility::FilterArgumentSeparator, $_,
-                    2);
+
+        #my $blah = $_;
+        #my ($k, $v)
+        #    = grep { defined $_ }
+        #    $_
+        #    =~ m[$Template::Liquid::Utility::VariableFilterArgumentParser]g;
+        #use Data::Dump;
+        ##ddx [$k, $v];
+        my ($k, $v) = $_ =~ m[$Template::Liquid::Utility::TagAttributes]g;
         { $k => $v };
     } grep { defined && length } split qr[\s+]o, $attr || '';
     my $s = bless {attributes      => \%attr,
@@ -78,6 +84,8 @@ sub render {
         : ();
     my $list = $s->{template}{context}->get($range);
     my $type = 'ARRAY';
+
+    #warn $list;
     #
     my $_undef_list = 0;
     if (ref $list eq 'HASH') {
@@ -108,8 +116,9 @@ sub render {
             = (defined $limit
                ? $limit + (defined $offset ? $offset : 0) - 1
                : $#$list);
-        $max    = $#$list if $max > $#$list;
-        @$list  = @{$list}[$min .. $max];
+        $max  = $#$list if $max > $#$list;
+        $list = [@{$list}[$min .. $max]]
+            ;    # make a copy so we can use the list again
         @$list  = reverse @$list if $reversed;
         $limit  = defined $limit ? $limit : scalar @$list;
         $offset = defined $offset ? $offset : 0;

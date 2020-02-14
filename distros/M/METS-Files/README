@@ -1,0 +1,146 @@
+NAME
+    METS::Files - Class for METS files manipulation.
+
+SYNOPSIS
+     use METS::Files;
+     my $obj = METS::Files->new(
+             'mets_data' => $mets_data,
+     );
+     my @files = $obj->get_use_files($use);
+     my @types = $obj->get_use_types;
+
+METHODS
+    "new()"
+             Constructor.
+
+            *       "mets_data"
+
+                     METS data.
+                     Parameter is required.
+                     Default value is undef.
+
+    "get_use_files($use)"
+             Get "USE" files.
+             Returns array with files.
+
+    "get_use_types()"
+             Get "USE" types.
+             Returns array with types.
+
+ERRORS
+     new():
+             Parameter 'mets_data' is required.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use METS::Files;
+     use Perl6::Slurp qw(slurp);
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 mets_file\n";
+             exit 1;
+     }
+     my $mets_file = $ARGV[0];
+
+     # Get mets data.
+     my $mets_data = slurp($mets_file);
+
+     # Object.
+     my $obj = METS::Files->new(
+             'mets_data' => $mets_data,
+     );
+
+     # Get files.
+     my $files_hr;
+     foreach my $use ($obj->get_use_types) {
+             $files_hr->{$use} = [$obj->get_use_files($use)];
+     }
+
+     # Dump to output.
+     p $files_hr;
+
+     # Output without arguments like:
+     # Usage: __SCRIPT__ mets_file
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use METS::Files;
+
+     # Example METS data.
+     my $mets_data = <<'END';
+     <?xml version="1.0" encoding="UTF-8"?>
+     <mets xmlns:xlink="http://www.w3.org/TR/xlink">
+       <fileSec>
+         <fileGrp ID="IMGGRP" USE="Images">
+           <file ID="IMG00001" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00001" MIMETYPE="image/tiff" SEQ="1" SIZE="5184000" GROUPID="1">
+             <FLocat LOCTYPE="URL" xlink:href="file://./003855/003855r.tif" />
+           </file>
+           <file ID="IMG00002" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00002" MIMETYPE="image/tiff" SEQ="2" SIZE="5200228" GROUPID="2">
+             <FLocat LOCTYPE="URL" xlink:href="file://./003855/003855v.tif" />
+           </file>
+         </fileGrp>
+         <fileGrp ID="PDFGRP" USE="PDF">
+           <file ID="PDF00001" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00001" MIMETYPE="text/pdf" SEQ="1" SIZE="251967" GROUPID="1">
+             <FLocat LOCTYPE="URL" xlink:href="file://./003855/003855r.pdf" />
+           </file>
+           <file ID="PDF00002" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00002" MIMETYPE="text/pdf" SEQ="2" SIZE="172847" GROUPID="2">
+             <FLocat LOCTYPE="URL" xlink:href="file://./003855/003855v.pdf" />
+           </file>
+         </fileGrp>
+       </fileSec>
+     </mets>
+     END
+
+     # Object.
+     my $obj = METS::Files->new(
+             'mets_data' => $mets_data,
+     );
+
+     # Get files.
+     my $files_hr;
+     foreach my $use ($obj->get_use_types) {
+             $files_hr->{$use} = [$obj->get_use_files($use)];
+     }
+
+     # Dump to output.
+     p $files_hr;
+
+     # Output:
+     # \ {
+     #     Images   [
+     #         [0] "file://./003855/003855r.tif",
+     #         [1] "file://./003855/003855v.tif"
+     #     ],
+     #     PDF      [
+     #         [0] "file://./003855/003855r.pdf",
+     #         [1] "file://./003855/003855v.pdf"
+     #     ]
+     # }
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, METS::Parse::Simple, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/METS-Files>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Josef Špaček 2015-2020
+     BSD 2-Clause License
+
+VERSION
+    0.01
+

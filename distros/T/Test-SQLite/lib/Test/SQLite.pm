@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0404';
+our $VERSION = '0.0406';
 
 use DBI;
 use File::Copy;
@@ -69,20 +69,20 @@ has _database => (
 sub _build__database {
     my ($self) = @_;
 
-    my $filename = $self->has_memory
+    my $tempfile = $self->has_memory
         ? ':memory:'
         : File::Temp->new( unlink => 1, suffix => '.db', EXLOCK => 0 );
 
     if ( $self->has_database ) {
-        copy( $self->database, $filename )
+        copy( $self->database, $tempfile->filename )
             or die "Can't copy " . $self->database . ": $!";
     }
     elsif ( $self->has_schema ) {
         open my $schema, '<', $self->schema
             or die "Can't read " . $self->schema . ": $!";
 
-        my $dbh = DBI->connect( "dbi:SQLite:dbname=$filename", '', '', { RaiseError => 1, AutoCommit => 0 } )
-            or die "Can't connect to $filename: " . $DBI::errstr;
+        my $dbh = DBI->connect( "dbi:SQLite:dbname=$tempfile", '', '', { RaiseError => 1, AutoCommit => 0 } )
+            or die "Can't connect to $tempfile: " . $DBI::errstr;
 
         my $sql = '';
         while ( my $line = readline($schema) ) {
@@ -91,7 +91,7 @@ sub _build__database {
 
             $sql .= $line;
 
-            if ( $line =~ /;\s*$/ ) {
+            if ( $line =~ /;/ ) {
                 $dbh->do($sql)
                     or die 'Error executing SQL for ' . $self->schema . ': ' . $dbh->errstr;
 
@@ -104,7 +104,7 @@ sub _build__database {
         $dbh->disconnect;
     }
 
-    return $filename;
+    return $tempfile;
 }
 
 
@@ -130,7 +130,7 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0404
+version 0.0406
 
 =head1 SYNOPSIS
 

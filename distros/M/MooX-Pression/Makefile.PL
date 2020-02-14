@@ -27,7 +27,7 @@ my $meta = {
                                                          "Exporter::Tiny" => "1.000000",
                                                          "Import::Into" => 0,
                                                          "Keyword::Simple" => 0,
-                                                         "MooX::Press" => 0.043,
+                                                         "MooX::Press" => 0.045,
                                                          "Path::ScanINC" => 0,
                                                          "perl" => "5.014000",
                                                          "PPR" => 0,
@@ -39,7 +39,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => 0.301 },
+                          "MooX::Pression" => { file => "lib/MooX/Pression.pm", version => "0.400" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -55,7 +55,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Pression/project",
                         },
-  "version"          => 0.301,
+  "version"          => "0.400",
   "x_static_install" => 1,
 };
 

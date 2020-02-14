@@ -1,0 +1,53 @@
+NAME
+    Data::xmute - Transmute (transform) data structure using rules modules
+
+VERSION
+    This document describes version 0.001 of Data::xmute (from Perl
+    distribution Data-xmute), released on 2020-02-13.
+
+SYNOPSIS
+     use Data::xmute; # exports xmute()
+
+     my $xmuted = xmute($data, "Rule1", "Rule2", ...);
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    This is a thin wrapper for Data::Transmute to offer a more concise
+    interface.
+
+FUNCTIONS
+  xmute
+    Usage:
+
+     my $xmuted = xmute($data, $rule_module_name1, ...);
+
+    Transmute data using one or more rule modules (modules in the
+    "Data::Transmute::Rules::*" namespace, sans prefix).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-xmute>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Data-xmute>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-xmute>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Transmute
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

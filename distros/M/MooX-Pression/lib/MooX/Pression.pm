@@ -12,7 +12,7 @@ use feature ();
 package MooX::Pression;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.301';
+our $VERSION   = '0.400';
 
 use Keyword::Simple ();
 use PPR;
@@ -163,7 +163,8 @@ our $GRAMMAR = qr{
 			(?: before          (?&MxpModifierSyntax)  )|
 			(?: after           (?&MxpModifierSyntax)  )|
 			(?: around          (?&MxpModifierSyntax)  )|
-			(?: multi           (?&MxpMultiSyntax)     )
+			(?: multi           (?&MxpMultiSyntax)     )|
+			(?: try             (?&TrySyntax)          )
 		)#</PerlKeyword>
 		
 		(?<MxpSimpleIdentifier>
@@ -185,7 +186,7 @@ our $GRAMMAR = qr{
 		(?<MxpDecoratedIdentifier>
 			
 			(?: \+ )?                                     # CAPTURE:plus
-			(?: \* )?                                     # CAPTURE:asterisk
+			(?: \* | \$ )?                                # CAPTURE:asterisk
 			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
 			(?: \! | \? )?                                # CAPTURE:postfix
 		)#</MxpDecoratedIdentifier>
@@ -458,7 +459,7 @@ our $GRAMMAR = qr{
 		(?<MxpMethodSyntax>
 		
 			(?&PerlOWS)
-			(?: (?&MxpSimpleIdentifier) )?                # CAPTURE:name
+			(?: \$? (?&MxpSimpleIdentifier) )?            # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -576,7 +577,31 @@ our $GRAMMAR = qr{
 			(?&PerlOWS)
 		)#</MxpCoerceSyntax>
 		
-
+		# try/catch/finally is implemented by another module
+		# but we need to be able to grok it to be able to parse
+		# blocks
+		#
+		(?<TrySyntax>
+		
+			(?&PerlOWS)
+			(?: do )?
+			(?&PerlOWS)
+			(?&PerlBlock)
+			(?:
+				(?&PerlOWS)
+				catch
+				(?&PerlOWS)
+				(?&PerlBlock)
+			)?
+			(?:
+				(?&PerlOWS)
+				finally
+				(?&PerlOWS)
+				(?&PerlBlock)
+			)?
+			(?&PerlOWS)
+		)#</TrySyntax>
+		
 	)
 	$PPR::GRAMMAR
 }xso;
@@ -894,11 +919,18 @@ sub _handle_method_keyword {
 		$optim = 1 if $attr =~ /^:optimize\b/;
 	}
 	
-	if (defined $name) {
+	my $lex_name;
+	if (defined $name and $name =~ /^\$(.+)$/) {
+		$lex_name = $name;
+	}
+	
+	my $return = '';
+	
+	if (defined $name and not defined $lex_name) {
 		if ($has_sig) {
 			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
-			return sprintf(
+			$return = sprintf(
 				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				$me,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
@@ -910,7 +942,7 @@ sub _handle_method_keyword {
 		}
 		else {
 			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
-			return sprintf(
+			$return = sprintf(
 				'q[%s]->_can(%s, { caller => __PACKAGE__, code => %s, optimize => %d });',
 				$me,
 				($name =~ /^\{/ ? "scalar(do $name)" : B::perlstring($name)),
@@ -923,7 +955,7 @@ sub _handle_method_keyword {
 		if ($has_sig) {
 			my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $me->_handle_signature_list($sig);
 			my $munged_code = sprintf('sub { my($self,%s)=(shift,@_); %s; my $class = ref($self)||$self; do %s }', $signature_var_list, $extra, $code);
-			return sprintf(
+			$return = sprintf(
 				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, named => %d, signature => %s, optimize => %d });',
 				'MooX::Press',
 				$optim ? B::perlstring($munged_code) : $munged_code,
@@ -934,7 +966,7 @@ sub _handle_method_keyword {
 		}
 		else {
 			my $munged_code = sprintf('sub { my $self = $_[0]; my $class = ref($self)||$self; do %s }', $code);
-			return sprintf(
+			$return = sprintf(
 				'q[%s]->wrap_coderef({ caller => __PACKAGE__, code => %s, optimize => %d });',
 				'MooX::Press',
 				$optim ? B::perlstring($munged_code) : $munged_code,
@@ -942,6 +974,12 @@ sub _handle_method_keyword {
 			);
 		}
 	}
+	
+	if ($lex_name) {
+		return "my $lex_name = $return";
+	}
+	
+	return $return;
 }
 
 sub _handle_multimethod_keyword {
@@ -1126,12 +1164,26 @@ sub _handle_has_keyword {
 	for my $name (@names) {
 		$name =~ s/^\+\*/+/;
 		$name =~ s/^\*//;
-		push @r, sprintf(
-			'q[%s]->_has(%s, %s)',
-			$me,
-			($name =~ /^\{/) ? "scalar(do $name)" : B::perlstring($name),
-			$rawspec,
-		);
+		
+		if ($name =~ /^\$(.+)$/) {
+			my $display_name = $1;
+			unshift @r, "my $name";
+			push @r, sprintf(
+				'q[%s]->_has(%s, is => "private", accessor => \\%s, %s)',
+				$me,
+				($display_name =~ /^\{/) ? "scalar(do $display_name)" : B::perlstring($display_name),
+				$name,
+				$rawspec,
+			);
+		}
+		else {
+			push @r, sprintf(
+				'q[%s]->_has(%s, %s)',
+				$me,
+				($name =~ /^\{/) ? "scalar(do $name)" : B::perlstring($name),
+				$rawspec,
+			);
+		}
 	}
 	join ";", @r;
 }
@@ -1160,21 +1212,71 @@ sub _handle_requires_keyword {
 }
 
 sub _syntax_error {
-	my $ref = pop;
-	my ($me, $kind, @poss) = @_;
 	require Carp;
-	Carp::croak(
-		"Unexpected syntax in $kind.\n" .
-		"Expected:\n" .
-		join("", map "\t$_\n", @poss) .
-		"Got:\n" .
-		"\t" . substr($$ref, 0, 32)
-	);
+	if (ref $_[-1]) {
+		my $ref = pop;
+		my ($me, $kind, @poss) = @_;
+		Carp::croak(
+			"Unexpected syntax in $kind.\n" .
+			"Expected:\n" .
+			join("", map "\t$_\n", @poss) .
+			"Got:\n" .
+			"\t" . substr($$ref, 0, 32)
+		);
+	}
+	else {
+		my ($me, $kind, $msg) = @_;
+		Carp::croak("Unexpected syntax in $kind.\n" . $msg);
+	}
+}
+
+my $owed = 0;
+sub _inject {
+	my ($me, $ref, $trim_length, $new_code, $pad_at_end) = @_;
+	$pad_at_end ||= 0;
+	
+	my @orig_lines = split /\n/, substr($$ref, 0, $trim_length), -1;
+	my @new_lines  = split /\n/, $new_code, -1;
+	
+	if ($#orig_lines > $#new_lines) {
+		my $diff = $#orig_lines - $#new_lines;
+		if ($owed and $owed > $diff) {
+			$owed -= $diff;
+			$diff = 0;
+		}
+		elsif ($owed) {
+			$diff -= $owed;
+			$owed = 0;
+		}
+		my $prefix = "\n" x $diff;
+		$new_code = $pad_at_end ? $new_code.$prefix : $prefix.$new_code;
+	}
+	elsif ($#orig_lines < $#new_lines) {
+		$owed += ($#new_lines - $#orig_lines);
+	}
+	
+	substr $$ref, 0, $trim_length, $new_code;
 }
 
 #
 # KEYWORDS/UTILITIES
 #
+
+my @EXPORTABLES = qw(
+	-booleans
+	-privacy
+	-utils
+	-types
+	-is
+	-assert
+	-features
+	try
+	class abstract role interface
+	include toolkit begin end extends with requires
+	has constant method multi factory before after around
+	type_name coerce
+	version authority overload
+);
 
 sub import {
 	no warnings 'closure';
@@ -1189,6 +1291,8 @@ sub import {
 	$opts{factory_package}  = $opts{prefix} unless exists $opts{factory_package};
 	$opts{type_library}     = 'Types'       unless exists $opts{type_library};
 	$opts{type_library}     = 'MooX::Press'->qualify_name($opts{type_library}, $opts{prefix});
+	
+	my %want = map +($_ => 1), @{ $opts{keywords} || \@EXPORTABLES };
 	
 	# Optionally export wrapper subs for pre-declared types
 	#
@@ -1207,16 +1311,23 @@ sub import {
 	# Export utility stuff
 	#
 	MooX::Pression::_Gather->import::into($caller, -gather => %opts);
-	MooX::Press::Keywords->import::into($caller, qw( -booleans -privacy -util )); # imports strict and warnings
-	Syntax::Keyword::Try->import::into($caller);
+	strict->import::into($caller);
+	warnings->import::into($caller);
+	MooX::Press::Keywords->import::into($caller, $_)
+		for grep $want{$_}, qw(-booleans -privacy -util);
+	Syntax::Keyword::Try->import::into($caller) if $want{try};
 	if ($] >= 5.018) {
-		feature->import::into($caller, qw( say state unicode_strings unicode_eval evalbytes current_sub fc ));
+		feature->import::into($caller, qw( say state unicode_strings unicode_eval evalbytes current_sub fc ))
+			if $want{-features};
 	}
 	elsif ($] >= 5.014) {
-		feature->import::into($caller, qw( say state unicode_strings ));
+		feature->import::into($caller, qw( say state unicode_strings ))
+			if $want{-features};
 	}
-	$_->import::into($caller, qw( -types -is -assert ))
-		for qw(Types::Standard Types::Common::Numeric Types::Common::String);
+	for my $library (qw/ Types::Standard Types::Common::Numeric Types::Common::String /) {
+		$library->import::into($caller, $_)
+			for grep $want{$_}, qw( -types -is -assert );
+	}
 	
 	# `include` keyword
 	#
@@ -1231,8 +1342,8 @@ sub import {
 		
 		my ($pos, $name) = ($+[0], $+{name});
 		my $qualified = 'MooX::Press'->qualify_name($name, $opts{prefix});
-		substr($$ref, 0, $pos) = sprintf('BEGIN { eval(q[%s]->_include(%s)) or die($@) };', $me, B::perlstring($qualified));
-	};
+		$me->_inject($ref, $pos, sprintf('BEGIN { eval(q[%s]->_include(%s)) or die($@) };', $me, B::perlstring($qualified)));
+	} if $want{include};
 
 	# `class` keyword
 	#
@@ -1255,8 +1366,8 @@ sub import {
 		$plus  ||= '';
 		$block ||= '{}';
 		
-		substr($$ref, 0, $pos) = $me->_handle_package_keyword(class => $name, $block, $has_sig, $sig, $plus, \%opts);
-	};
+		$me->_inject($ref, $pos, "\n#\n#\n#\n#\n".$me->_handle_package_keyword(class => $name, $block, $has_sig, $sig, $plus, \%opts), 1);
+	} if $want{class};
 
 	Keyword::Simple::define abstract => sub {
 		my $ref = shift;
@@ -1277,8 +1388,8 @@ sub import {
 		$plus  ||= '';
 		$block ||= '{}';
 		
-		substr($$ref, 0, $pos) = $me->_handle_package_keyword(abstract => $name, $block, $has_sig, $sig, $plus, \%opts);
-	};
+		$me->_inject($ref, $pos, $me->_handle_package_keyword(abstract => $name, $block, $has_sig, $sig, $plus, \%opts), 1);
+	} if $want{abstract};
 
 	for my $kw (qw/ role interface /) {
 		Keyword::Simple::define $kw => sub {
@@ -1299,8 +1410,8 @@ sub import {
 			my $has_sig = !!exists $+{sig};
 			$block ||= '{}';
 			
-			substr($$ref, 0, $pos) = $me->_handle_package_keyword($kw => $name, $block, $has_sig, $sig, '', \%opts);
-		};
+			$me->_inject($ref, $pos, $me->_handle_package_keyword($kw => $name, $block, $has_sig, $sig, '', \%opts), 1);
+		} if $want{$kw};
 	}
 
 	Keyword::Simple::define toolkit => sub {
@@ -1333,13 +1444,13 @@ sub import {
 				}
 				$imports[0] eq ',' and shift @imports;
 			}
-			substr($$ref, 0, $pos) = sprintf('q[%s]->_toolkit(%s);', $me, join ",", map(B::perlstring($_), $name, @processed_imports));
+			$me->_inject($ref, $pos, sprintf('q[%s]->_toolkit(%s);', $me, join ",", map(B::perlstring($_), $name, @processed_imports)));
 		}
 		
 		else {
-			substr($$ref, 0, $pos) = sprintf('q[%s]->_toolkit(%s);', $me, B::perlstring($name));
+			$me->_inject($ref, $pos, sprintf('q[%s]->_toolkit(%s);', $me, B::perlstring($name)));
 		}
-	};
+	} if $want{toolkit};
 
 	# `begin` and `end` keywords
 	#
@@ -1354,8 +1465,8 @@ sub import {
 			);
 			
 			my ($pos, $capture) = ($+[0], $+{hook});
-			substr($$ref, 0, $pos) = sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $capture);
-		};
+			$me->_inject($ref, $pos, sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $capture));
+		} if $want{$kw};
 	}
 	
 	# `type_name` keyword
@@ -1370,8 +1481,8 @@ sub import {
 		);
 		
 		my ($pos, $capture) = ($+[0], $+{name});
-		substr($$ref, 0, $pos) = sprintf('q[%s]->_type_name(%s);', $me, B::perlstring($capture));
-	};
+		$me->_inject($ref, $pos, sprintf('q[%s]->_type_name(%s);', $me, B::perlstring($capture)));
+	} if $want{type_name};
 	
 	# `extends` keyword
 	#
@@ -1385,8 +1496,8 @@ sub import {
 		);
 		
 		my ($pos, $capture) = ($+[0], $+{list});
-		substr($$ref, 0, $pos) = sprintf('q[%s]->_extends(%s);', $me, $me->_handle_role_list($capture, 'class'));
-	};
+		$me->_inject($ref, $pos, sprintf('q[%s]->_extends(%s);', $me, $me->_handle_role_list($capture, 'class')));
+	} if $want{extends};
 	
 	# `with` keyword
 	#
@@ -1401,8 +1512,8 @@ sub import {
 		
 		my ($pos, $capture) = ($+[0], $+{list});
 		
-		substr($$ref, 0, $pos) = sprintf('q[%s]->_with(%s);', $me, $me->_handle_role_list($capture, 'role'));
-	};
+		$me->_inject($ref, $pos, sprintf('q[%s]->_with(%s);', $me, $me->_handle_role_list($capture, 'role')));
+	} if $want{with};
 	
 	# `requires` keyword
 	#
@@ -1418,8 +1529,8 @@ sub import {
 		
 		my ($pos, $name, $sig) = ($+[0], $+{name}, $+{sig});
 		my $has_sig = !!exists $+{sig};
-		substr($$ref, 0, $pos) = $me->_handle_requires_keyword($name, $has_sig, $sig)
-	};
+		$me->_inject($ref, $pos, $me->_handle_requires_keyword($name, $has_sig, $sig));
+	} if $want{requires};
 	
 	# `has` keyword
 	#
@@ -1428,18 +1539,18 @@ sub import {
 		
 		$$ref =~ _fetch_re('MxpHasSyntax', anchor => 'start') or $me->_syntax_error(
 			'attribute declaration',
-			'has <name> (<spec>) = <default>',
-			'has <name> (<spec>)',
-			'has <name> = <default>',
-			'has <name>',
+			'has <names> (<spec>) = <default>',
+			'has <names> (<spec>)',
+			'has <names> = <default>',
+			'has <names>',
 			$ref,
 		);
 		
 		my ($pos, $name, $spec, $default) = ($+[0],  $+{name}, $+{spec}, $+{default});
 		my $has_spec    = !!exists $+{spec};
 		my $has_default = !!exists $+{default};
-		substr($$ref, 0, $pos) = $me->_handle_has_keyword($name, $has_spec ? $spec : undef, $has_default ? $default : undef);
-	};
+		$me->_inject($ref, $pos, $me->_handle_has_keyword($name, $has_spec ? $spec : undef, $has_default ? $default : undef));
+	} if $want{has};
 	
 	# `constant` keyword
 	#
@@ -1453,8 +1564,8 @@ sub import {
 		);
 		
 		my ($pos, $name, $expr) = ($+[0], $+{name}, $+{expr});
-		substr($$ref, 0, $pos) = sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $expr);
-	};
+		$me->_inject($ref, $pos, sprintf('q[%s]->_constant(%s, %s);', $me, B::perlstring($name), $expr));
+	} if $want{constant};
 	
 	# `method` keyword
 	#
@@ -1480,8 +1591,8 @@ sub import {
 		my $has_sig = !!exists $+{sig};
 		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
 		
-		substr($$ref, 0, $pos) = $me->_handle_method_keyword($name, $code, $has_sig, $sig,  \@attrs);
-	};
+		$me->_inject($ref, $pos, $me->_handle_method_keyword($name, $code, $has_sig, $sig,  \@attrs));
+	} if $want{method};
 
 	# `multi` keyword
 	#
@@ -1503,8 +1614,8 @@ sub import {
 		my $has_sig = !!exists $+{sig};
 		my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
 		
-		substr($$ref, 0, $pos) = $me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs);
-	};
+		$me->_inject($ref, $pos, $me->_handle_multimethod_keyword($name, $code, $has_sig, $sig, \@attrs));
+	} if $want{multi};
 
 	# `before`, `after`, and `around` keywords
 	#
@@ -1516,10 +1627,10 @@ sub import {
 		
 			$$ref =~ _fetch_re('MxpModifierSyntax', anchor => 'start') or $me->_syntax_error(
 				"$kw method modifier declaration",
-				"$kw <name> <attributes> (<signature>) { <block> }",
-				"$kw <name> (<signature>) { <block> }",
-				"$kw <name> <attributes> { <block> }",
-				"$kw <name> { <block> }",
+				"$kw <names> <attributes> (<signature>) { <block> }",
+				"$kw <names> (<signature>) { <block> }",
+				"$kw <names> <attributes> { <block> }",
+				"$kw <names> { <block> }",
 				$ref,
 			);
 			
@@ -1527,8 +1638,8 @@ sub import {
 			my $has_sig = !!exists $+{sig};
 			my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
 			
-			substr($$ref, 0, $pos) = $me->_handle_modifier_keyword($kw, $name, $code, $has_sig, $sig, \@attrs);
-		};
+			$me->_inject($ref, $pos, $me->_handle_modifier_keyword($kw, $name, $code, $has_sig, $sig, \@attrs));
+		} if $want{$kw};
 	}
 	
 	Keyword::Simple::define factory => sub {
@@ -1539,7 +1650,7 @@ sub import {
 			my ($pos, $name, $attributes, $sig, $code) = ($+[0], $+{name}, $+{attributes}, $+{sig}, $+{code});
 			my $has_sig = !!exists $+{sig};
 			my @attrs   = $attributes ? grep(defined, ( ($attributes) =~ /($re_attr)/xg )) : ();
-			substr($$ref, 0, $pos) = $me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, \@attrs);
+			$me->_inject($ref, $pos, $me->_handle_factory_keyword($name, undef, $code, $has_sig, $sig, \@attrs));
 			return;
 		}
 		
@@ -1556,8 +1667,8 @@ sub import {
 		
 		my ($pos, $name, $via) = ($+[0], $+{name}, $+{via});
 		$via ||= 'new';
-		substr($$ref, 0, $pos) = $me->_handle_factory_keyword($name, $via, undef, undef, undef, []);
-	};
+		$me->_inject($ref, $pos, $me->_handle_factory_keyword($name, $via, undef, undef, undef, []));
+	} if $want{factory};
 	
 	Keyword::Simple::define coerce => sub {
 		my $ref = shift;
@@ -1583,8 +1694,8 @@ sub import {
 			$via = B::perlstring($via);
 		}
 		
-		substr($$ref, 0, $pos) = sprintf('q[%s]->_coerce(%s, %s, %s);', $me, $from, $via, $code ? "sub { my \$class; local \$_; (\$class, \$_) = \@_; do $code }" : '');
-	};
+		$me->_inject($ref, $pos, sprintf('q[%s]->_coerce(%s, %s, %s);', $me, $from, $via, $code ? "sub { my \$class; local \$_; (\$class, \$_) = \@_; do $code }" : ''));
+	} if $want{coerce};
 		
 	# Go!
 	#
@@ -1595,6 +1706,7 @@ sub import {
 	
 	# Need this to export `authority` and `version`...
 	@_ = ($me);
+	push @_, grep $want{$_}, @MooX::Pression::EXPORT;
 	goto \&Exporter::Tiny::import;
 }
 
@@ -1638,32 +1750,38 @@ sub PACKAGE_SPEC { \%OPTS }
 sub _package_callback {
 	shift;
 	my $cb = shift;
-	local %OPTS = ();
+	local %OPTS = (in_package => 1);
 	&$cb;
+	delete $OPTS{in_package};
 #	use Data::Dumper;
 #	$Data::Dumper::Deparse = 1;
 #	print "OPTS:".Dumper $cb, +{ %OPTS };
 	return +{ %OPTS };
 }
 sub _has {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('attribute declaration', 'Not supported outside class or role');
 	my ($attr, %spec) = @_;
 	$OPTS{has}{$attr} = \%spec;
 }
 sub _extends {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('extends declaration', 'Not supported outside class');
 	@{ $OPTS{extends}||=[] } = @_;
 }
 sub _type_name {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('extends declaration', 'Not supported outside class or role');
 	$OPTS{type_name} = shift;
 }
 sub _begin {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('begin hook', 'Not supported outside class or role (use import option instead)');
 	$OPTS{begin} = shift;
 }
 sub _end {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('end hook', 'Not supported outside class or role (use import option instead)');
 	$OPTS{end} = shift;
 }
 sub _interface {
@@ -1675,54 +1793,83 @@ sub _abstract {
 	$OPTS{abstract} = shift;
 }
 sub _with {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('with declaration', 'Not supported outside class or role');
 	push @{ $OPTS{with}||=[] }, @_;
 }
 sub _toolkit {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('toolkit declaration', 'Not supported outside class or role (use import option instead)');
 	my ($toolkit, @imports) = @_;
 	$OPTS{toolkit} = $toolkit;
 	push @{ $OPTS{import}||=[] }, @imports if @imports;
 }
 sub _requires {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('requires declaration', 'Not supported outside role');
 	push @{ $OPTS{requires}||=[] }, @_;
 }
 sub _coerce {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('coercion declaration', 'Not supported outside class');
 	push @{ $OPTS{coerce}||=[] }, @_;
 }
 sub _factory {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('factory method declaration', 'Not supported outside class');
 	push @{ $OPTS{factory}||=[] }, @_;
 }
 sub _constant {
-	shift;
+	my $me = shift;
 	my ($name, $value) = @_;
+	if (! $OPTS{in_package}) {
+		'MooX::Press'->install_constants(scalar(caller), { $name => $value });
+		return;
+	}
 	$OPTS{constant}{$name} = $value;
 }
 sub _can {
-	shift;
+	my $me = shift;
 	my ($name, $code) = @_;
+	if (! $OPTS{in_package}) {
+		'MooX::Press'->install_methods(scalar(caller), { $name => $code });
+		return;
+	}
 	$OPTS{can}{$name} = $code;
 }
 sub _multimethod {
-	shift;
+	my $me = shift;
 	my ($name, $spec) = @_;
+	if (! $OPTS{in_package}) {
+		'MooX::Press'->install_multimethod(scalar(caller), 'class', $name, $spec);
+		return;
+	}
 	push @{ $OPTS{multimethod} ||= [] }, $name => $spec;
 }
 sub _modifier {
-	shift;
+	my $me = shift;
 	my ($kind, @args) = @_;
+	if (! $OPTS{in_package}) {
+		my $codelike = pop @args;
+		my $coderef  = 'MooX::Press'->_prepare_method_modifier(scalar(caller), $kind, \@args, $codelike);
+		require Class::Method::Modifiers;
+		Class::Method::Modifiers::install_modifier(scalar(caller), $kind, @args, $coderef);
+	}
 	push @{ $OPTS{$kind} ||= [] }, @args;
 }
 sub _include {
-	shift;
+	my $me = shift;
+	$OPTS{in_package} and $me->_syntax_error('include directive', 'Not supported inside class or role');
 	
 	require Path::ScanINC;
 	my @chunks = split /::/, $_[0];
 	$chunks[-1] .= '.pl';
 	my $file = Path::ScanINC->new->first_file(@chunks);
+	
+	if (!$file) {
+		require Carp;
+		Carp::croak("No such file: " . join("/", @chunks));
+	}
 	
 	ref $file eq 'ARRAY' and die "not supported yet";
 	my $code = $file->slurp_utf8;
@@ -1737,7 +1884,7 @@ sub _include {
 #{
 #	package MooX::Pression::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.301';
+#	our $VERSION   = '0.400';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -1748,7 +1895,7 @@ sub _include {
 #	
 #	package MooX::Pression::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.301';
+#	our $VERSION   = '0.400';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -1761,12 +1908,12 @@ sub _include {
 #	
 #	package MooX::Pression::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.301';
+#	our $VERSION   = '0.400';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	
 #	package MooX::Pression::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.301';
+#	our $VERSION   = '0.400';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -1780,7 +1927,7 @@ sub _include {
 #
 #	package MooX::Pression::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.301';
+#	our $VERSION   = '0.400';
 #	our @ISA       = qw(MooX::Pression::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2174,7 +2321,9 @@ You can of course specify you want to use Moo:
 
 Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor will.
 
-It is possible to set a default toolkit when you import MooX::Pression.
+Although it is not possible to use the C<toolkit> keyword outside of
+C<class>, C<abstract class>, C<role>, and C<interface> blocks, it is
+possible to specify a default toolkit when you import MooX::Pression.
 
   use MooX::Pression (
     ...,
@@ -2188,7 +2337,8 @@ It is possible to set a default toolkit when you import MooX::Pression.
 
 =head3 C<< extends >>
 
-Defines a parent class. Only for use within C<class> blocks.
+Defines a parent class. Only for use within C<class> and C<abstract class>
+blocks.
 
   class Person {
     extends Animal;
@@ -2235,6 +2385,9 @@ to the end of it:
 
 This is equivalent to declaring an empty role.
 
+The C<with> keyword cannot be used outside of C<class>, C<abstract class>,
+C<role>, and C<interface> blocks.
+
 =head3 C<< begin >>
 
 This code gets run early on in the definition of a class or role.
@@ -2251,7 +2404,9 @@ be defined yet.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
-It is possible to define a global chunk of code to run too:
+The C<begin> keyword cannot be used outside of C<class>, C<abstract class>,
+C<role>, and C<interface> blocks, though it is possible to define a global
+default for it:
 
   use MooX::Pression (
     ...,
@@ -2282,7 +2437,9 @@ This code gets run late in the definition of a class or role.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
-It is possible to define a global chunk of code to run too:
+The C<end> keyword cannot be used outside of C<class>, C<abstract class>,
+C<role>, and C<interface> blocks, though it is possible to define a global
+default for it:
 
   use MooX::Pression (
     ...,
@@ -2302,12 +2459,16 @@ blocks will not be inherited.
 
 =head3 C<< has >>
 
+Defines an attribute.
+
   class Person {
     has name;
     has age;
   }
   
   my $bob = MyApp->new_person(name => "Bob", age => 21);
+
+Cannot be used outside of C<class>, C<abstract class>, and C<role> blocks.
 
 Moo-style attribute specifications may be given:
 
@@ -2329,8 +2490,9 @@ in a parent class.
     }
   }
 
-C<rw>, C<rwp>, C<ro>, C<lazy>, C<true>, and C<false> are allowed as
-barewords for readability, but C<is> is optional, and defaults to C<rw>.
+C<rw>, C<rwp>, C<ro>, C<lazy>, C<bare>, C<private>, C<true>, and C<false>
+are allowed as barewords for readability, but C<is> is optional, and defaults
+to C<rw>.
 
 Note C<type> instead of C<isa>. Any type constraints from L<Types::Standard>,
 L<Types::Common::Numeric>, and L<Types::Common::String> will be avaiable as
@@ -2520,7 +2682,112 @@ This adds no extra meaning, but is supported for consistency with the syntax
 of named parameters in method signatures. (Depending on your text editor, it
 may also improve syntax highlighting.)
 
+=head4 Private attributes
+
+If an attribute name starts with a dollar sign, it is a private (lexical)
+attribute. Private attributes cannot be set in the constructor, and cannot
+be directly accessed outside the class's lexical scope.
+
+  class Foo {
+    has $ua = HTTP::Tiny->new;
+    
+    method fetch_data ( Str $url ) {
+      my $response = $self->$ua->get($url);
+      $response->{is_success} or confess('request failed');
+      return $response->{content};
+    }
+  }
+
+Note how C<< $self->$ua >> is still called as a method. You don't just do
+C<< $ua->get() >>. The invocant is still required, just like it would be
+with a normal public attribute:
+
+  class Foo {
+    has ua = HTTP::Tiny->new;
+    
+    method fetch_data ( Str $url ) {
+      my $response = $self->ua->get($url);
+      $response->{is_success} or confess('request failed');
+      return $response->{content};
+    }
+  }
+
+Private attributes can have delegated methods (C<handles>):
+
+  class Foo {
+    has $ua (
+      default => sub { HTTP::Tiny->new },
+      handles => [
+        http_get  => 'get',
+        http_post => 'post',
+      ],
+    );
+    
+    method fetch_data ( Str $url ) {
+      my $response = $self->http_get($url);
+      $response->{is_success} or confess('request failed');
+      return $response->{content};
+    }
+  }
+
+These can even be made lexical too:
+
+  class Foo {
+    my ($http_get, $http_post);  # predeclare
+    
+    has $ua (
+      default => sub { HTTP::Tiny->new },
+      handles => [
+        \$http_get  => 'get',
+        \$http_post => 'post',
+      ],
+    );
+    
+    method fetch_data ( Str $url ) {
+      my $response = $self->$http_get($url);
+      $response->{is_success} or confess('request failed');
+      return $response->{content};
+    }
+  }
+
+Note how an arrayref is used for C<handles> instead of a hashref. This
+is because scalarrefs don't work as hashref keys.
+
+Although constructors ignore private attributes, you may set them in a
+factory method.
+
+  class Foo {
+    has $ua;
+    
+    factory new_foo (%args) {
+      my $instance = $class->new(%args);
+      $instance->$ua( HTTP::Tiny->new );
+      return $instance;
+    }
+  }
+
+C<< has $foo >> is just a shortcut for:
+
+  my $foo;
+  has foo => (is => "private", accessor => \$foo);
+
+You can use C<< is => "private" >> to create even I<more> private attributes
+without even having that lexical accessor:
+
+  has foo => (is => "private");
+
+If it seems like an attribute that can't be set in the constructor and
+doesn't have accessors would be useless, you're wrong. Because it can still
+have delegations and a default value.
+
+Private attributes use lexical variables, so are visible to subclasses
+only if the subclass definition is nested in the base class.
+
+Private attributes are available from MooX::Pression 0.400.
+
 =head3 C<< constant >>
+
+Defines a constant.
 
   class Person {
     extends Animal;
@@ -2530,7 +2797,12 @@ may also improve syntax highlighting.)
 C<< MyApp::Person->latin_name >>, C<< MyApp::Person::latin_name >>, and
 C<< $person_object->latin_name >> will return 'Homo sapiens'.
 
+Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
+will define a constant in the caller package. (That is, usually the factory.)
+
 =head3 C<< method >>
+
+Defines a method.
 
   class Person {
     has spouse;
@@ -2545,6 +2817,9 @@ C<< $person_object->latin_name >> will return 'Homo sapiens'.
 
 C<< sub { ... } >> will not work as a way to define methods within the
 class. Use C<< method { ... } >> instead.
+
+Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
+C<method> will define a method in the caller package. (Usually the factory.)
 
 The variables C<< $self >> and C<< $class >> will be automatically defined
 within all methods. C<< $self >> is set to C<< $_[0] >> (though the invocant
@@ -2804,6 +3079,22 @@ A workaround is to wrap it in a C<< do { ... } >> block.
 
   my $x = do { method { ... } };
 
+=head4 Private methods
+
+A shortcut for the pattern of:
+
+  my $x = do { method { ... } };
+
+Is this:
+
+  method $x { ... }
+
+MooX::Pression will declare the variable C<< my $x >> for you, assign the
+coderef to the variable, and you don't need to worry about a C<do> block
+to wrap it.
+
+This feature is available from MooX::Pression 0.400.
+
 =head4 Multimethods
 
 Multi methods should I<< Just Work [tm] >> if you prefix them with the
@@ -2828,6 +3119,12 @@ keyword C<multi>
 
 This feature requires L<MooX::Press> 0.035 and L<Sub::MultiMethod> to be
 installed.
+
+Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
+C<multi method> will define a multi method in the caller package. (That is,
+usually the factory.)
+
+Multimethods cannot be anonymous or private.
 
 =head3 C<< requires >>
 
@@ -2872,6 +3169,8 @@ Is a shorthand for this:
     }
   }
 
+Can only be used in C<role> and C<interface> blocks.
+
 =head3 C<< before >>
 
   before marry {
@@ -2903,6 +3202,10 @@ Commas may be used to modify multiple methods:
 
 The C<< :optimize >> attribute is supported for C<before>.
 
+Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
+and C<interface> blocks, modifying methods in the caller package, which is
+usually the factory package.
+
 =head3 C<< after >>
 
 There's not much to say about C<after>. It's just like C<before>.
@@ -2926,6 +3229,10 @@ Commas may be used to modify multiple methods:
   }
 
 The C<< :optimize >> attribute is supported for C<after>.
+
+Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
+and C<interface> blocks, modifying methods in the caller package, which is
+usually the factory package.
 
 =head3 C<< around >>
 
@@ -2969,6 +3276,10 @@ The C<< :optimize >> attribute is supported for C<around>.
 
 Note that C<< SUPER:: >> won't work as expected in MooX::Pression, so
 C<around> should be used instead.
+
+Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
+and C<interface> blocks, modifying methods in the caller package, which is
+usually the factory package.
 
 =head3 C<< factory >>
 
@@ -3072,6 +3383,8 @@ like saying C<< via new >>.
 
 The C<< :optimize >> attribute is supported for C<factory>.
 
+The C<factory> keyword can only be used inside C<class> blocks.
+
 =head4 Implementing a singleton
 
 Factories make it pretty easy to implement a singleton.
@@ -3103,6 +3416,9 @@ objects!)
 
 The class will still be called L<MyApp::Homo::Sapiens> but the type in the
 type library will be called B<Human> instead of B<Homo_Sapiens>.
+
+Can only be used in C<class>, C<abstract class>, C<role>, and C<interface>
+blocks.
 
 =head3 C<< coerce >>
 
@@ -3155,6 +3471,8 @@ statement more readable.
 
 The C<< :optimize >> attribute is not currently supported for C<coerce>.
 
+Can only be used in C<class> blocks.
+
 =head3 C<< overload >>
 
   class Collection {
@@ -3165,6 +3483,8 @@ The C<< :optimize >> attribute is not currently supported for C<coerce>.
 The list passed to C<overload> is passed to L<overload> with no other
 processing.
 
+Can only be used in C<class> blocks.
+
 =head3 C<< version >>
 
   class Person {
@@ -3172,6 +3492,9 @@ processing.
   }
 
 This just sets C<< $MyApp::Person::VERSION >>.
+
+Can only be used in C<class>, C<abstract class>, C<role>, and C<interface>
+blocks.
 
 You can set a default version for all packages like this:
 
@@ -3193,6 +3516,9 @@ will not be inherited.
 This just sets C<< $MyApp::Person::AUTHORITY >>.
 
 It is used to indicate who is the maintainer of the package.
+
+Can only be used in C<class>, C<abstract class>, C<role>, and C<interface>
+blocks.
 
   use MooX::Pression (
     ...,
@@ -3391,6 +3717,33 @@ MooX::Pression exports L<Syntax::Keyword::Try> for you. Useful to have.
 And last but not least, it exports all the types, C<< is_* >> functions,
 and C<< assert_* >> functions from L<Types::Standard>,
 L<Types::Common::String>, and L<Types::Common::Numeric>.
+
+As of version 0.304, you can choose which parts of MooX::Pression you
+import:
+
+  package MyApp {
+    use MooX::Pression keywords => [qw/
+      -booleans
+      -privacy
+      -utils
+      -types
+      -is
+      -assert
+      -features
+      try
+      class abstract role interface
+      include toolkit begin end extends with requires
+      has constant method multi factory before after around
+      type_name coerce
+      version authority overload
+    /];
+
+It should mostly be obvious what they all do, but C<< -privacy >> is
+C<ro>, C<rw>, C<rwp>, etc; C<< -types >> is bareword type constraints
+(though even without this export, they should work in method signatures),
+C<< -is >> are the functions like C<is_NonEmptyStr> and C<is_Object>,
+C<< -assert >> are functions like C<assert_Int>, C<< -utils >> gives
+you C<blessed> and C<confess>.
 
 =head2 Anonymous Classes and Roles
 
@@ -3660,30 +4013,9 @@ however you need to.
 
 =head3 Lexical accessors
 
-Moops automatically imported C<lexical_has> from L<Lexical::Accessor>
-into each class. MooX::Pression does not, but thanks to how namespacing
-works, it only needs to be imported once if you want to use it.
-
-  package MyApp {
-    use MooX::Pression;
-    use Lexical::Accessor;
-    
-    class Foo {
-      my $identifier = lexical_has identifier => (
-        is      => rw,
-        isa     => Int,
-        default => sub { 0 },
-      );
-      
-      method some_method () {
-        $self->$identifier( 123 );    # set identifier
-        ...;
-        return $self->$identifier;    # get identifier
-      }
-    }
-  }
-
-Lexical accessors give you true private object attributes.
+MooX::Pression has tighter integration with L<Lexical::Accessor>,
+allowing you to use the same keyword C<has> to declare private
+and public attributes.
 
 =head3 Factories
 
@@ -3761,6 +4093,9 @@ that extensions can hook into.
 
 If you're interested in extending MooX::Pression, file a bug report about
 it and let's have a conversation about the best way for that to happen.
+I probably won't start a plugin API until someone actually wants to
+write a plugin, because that will give me a better idea about what kind
+of API is required.
 
 =head1 SEE ALSO
 

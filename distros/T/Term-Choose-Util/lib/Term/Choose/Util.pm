@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf
@@ -210,9 +210,9 @@ sub _defaults {
         layout         => 1,
         #tabs_info     => undef,
         #tabs_prompt   => undef,
-        add_dirs       => 'Add-DIRS',
+        add_dirs       => '[Add-Dirs]',
         back           => 'BACK',
-        show_files     => 'Show-FILES',
+        show_files     => '[Show-Files]',
         confirm        => 'CONFIRM',
         parent_dir     => '..',
         #mark          => undef,
@@ -228,7 +228,6 @@ sub _defaults {
         #cs_label      => undef,
         cs_separator   => ', ',
         thousands_separator => ',',
-
     };
 };
 
@@ -342,7 +341,7 @@ sub choose_directories {
     }
     my ( $self, $opt ) = @_;
     if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = '> ';
+        $opt->{cs_label} = 'Dirs: ';
     }
     $self->__prepare_opt( $opt );
     my $init_dir_fs = $self->__prepare_path();
@@ -350,24 +349,11 @@ sub choose_directories {
     my $chosen_dirs_fs = [];
     my ( $browse, $add_dirs ) = ( 'Browse', 'Add_Dirs' );
     my $mode = $browse;
-    my $back     = $self->{back};
-    my $confirm  = $self->{confirm};
-    my $cs_label = $self->{cs_label};
     my @bu;
 
     while ( 1 ) {
-        my $term_w = get_term_width();
-        my $cs_label_w = print_columns_ext( $cs_label, $self->{color} );
-        $self->{info} = line_fold(
-             $cs_label . join( ', ', map { decode 'locale_fs', $_ } @$chosen_dirs_fs ), $term_w,
-            { subseq_tab => ' ' x $cs_label_w, color => $self->{color} }
-        );
         if ( $mode eq $browse ) {
-            $self->{back}     = $back;
-            $self->{confirm}  = $confirm;
-            $self->{prompt}   = $self->{info} . "\n" . ' ' . "\n" . 'Browse:';
-            $self->{cs_label} = 'cwd: ';
-            ( $dir_fs, my $to_add_dirs ) = $self->__choose_a_path( $dir_fs );
+            ( $dir_fs, my $to_add_dirs ) = $self->__choose_a_path( $dir_fs, { chosen_dirs_fs => $chosen_dirs_fs } );
             if ( ! defined $dir_fs ) {
                 if ( @bu ) {
                     ( $dir_fs, $chosen_dirs_fs ) = @{pop @bu};
@@ -394,16 +380,31 @@ sub choose_directories {
         }
         elsif ( $mode eq $add_dirs ) {
             my $avail_dirs_fs = $self->__available_dirs( $dir_fs );
-            $self->{info}     = 'cwd: ' . decode( 'locale_fs', $dir_fs ) . '' . "\n" . $self->{info};
-            $self->{cs_label} = '';
-            $self->{cs_begin} = '+ ';
-            $self->{prompt}   = 'Choose:';
-            $self->{back}     = '<<';
-            $self->{confirm}  = 'OK';
+            my $info = defined $self->{info} ? $self->{info} : '';
+            if ( length $info ) {
+                $info .= "\n";
+            }
+            my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
+            $info .= line_fold(
+                $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @$chosen_dirs_fs ), get_term_width(),
+                { subseq_tab => ' ' x $cs_label_w, color => $self->{color} }
+            );
+            my $prompt = 'Choose directories:' . "\n>" . decode( 'locale_fs', $dir_fs );
+            my $bu_opt;
+            my @used_options = qw(info prompt back confirm cs_label cs_begin index);
+            for my $o ( @used_options ) {
+                $bu_opt->{$o} = $self->{$o};
+            }
             my $idxs = $self->choose_a_subset(
                 [ sort map { decode 'locale_fs', $_ } @$avail_dirs_fs ],
-                { index => 1 }
+                {   info => $info, prompt => $prompt, back => '<<', confirm => 'OK',
+                    cs_label => '', cs_begin => '+ ',
+                    index => 1
+                }
             );
+            for my $o ( @used_options ) {
+                $self->{$o} = $bu_opt->{$o};
+            }
             if ( defined $idxs && @$idxs ) {
                 push @bu, [ $dir_fs, [ @$chosen_dirs_fs ] ];
                 push @$chosen_dirs_fs, map { catdir $dir_fs, $_ } @{$avail_dirs_fs}[@$idxs];
@@ -451,7 +452,7 @@ sub choose_a_file {
 }
 
 sub __choose_a_path {
-    my ( $self, $dir_fs ) = @_;
+    my ( $self, $dir_fs, $opt ) = @_;
     my $sub =  ( caller( 1 ) )[3];
     $sub =~ s/^.+::(?:__)?([^:]+)\z/$1/;
     my @pre;
@@ -495,21 +496,26 @@ sub __choose_a_path {
         my @tmp;
         if ( $sub eq 'choose_a_file' ) {
             push @tmp, $self->{cs_label} . decode( 'locale_fs', ( catfile $dir_fs, $wildcard ) );
+            push @tmp, $self->{prompt} if defined $self->{prompt} && length $self->{prompt};
         }
         elsif ( $sub eq 'choose_directories' ) {
-            push @tmp, $self->{cs_label} . $self->{cs_begin} . decode( 'locale_fs', $dir_fs ) . $self->{cs_end};
+            my $cs_label_w = print_columns_ext( $self->{cs_label}, $self->{color} );
+            push @tmp, line_fold(
+                $self->{cs_label} . join( ', ', map { decode 'locale_fs', $_ } @{$opt->{chosen_dirs_fs}} ), get_term_width(),
+                { subseq_tab => ' ' x $cs_label_w, color => $self->{color} }
+            );
+            my $prompt = defined $self->{prompt} ? $self->{prompt} : 'Browse directories:';
+            push @tmp, $prompt . "\n>" . decode( 'locale_fs', $dir_fs );
         }
         else {
             push @tmp, $self->{cs_label} . decode( 'locale_fs', $dir_fs );
-        }
-        if ( defined $self->{prompt} && length $self->{prompt} ) {
-            push @tmp, $self->{prompt};
+            push @tmp, $self->{prompt} if defined $self->{prompt} && length $self->{prompt};
         }
         my $lines = join( "\n", @tmp );
         # Choose
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, default => $default_idx, alignment => $self->{alignment},
+            { info => $self->{info}, prompt => $lines, default => $default_idx, alignment => $self->{alignment},
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
@@ -1039,7 +1045,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.112
+Version 0.113
 
 =cut
 
@@ -1283,7 +1289,7 @@ show_files
 
 Customize the string of the menu entry "I<show_files>".
 
-Default: C<Show-FILES>
+Default: C<[Show-Files]>
 
 =back
 
@@ -1311,7 +1317,7 @@ add_dirs
 
 Customize the string of the menu entry "I<add_dirs>".
 
-Default: C<Add-DIR>
+Default: C<[Add-Dir]>
 
 =back
 

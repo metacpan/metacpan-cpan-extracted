@@ -31,7 +31,7 @@ DESCRIPTION
     subclasses can define a private (or even public) attribute with the same
     name as your private one and they will not interfere with each other.
 
-    Private attributes can not be initialized by Moose/Moo/Mouse constructors,
+    Private attributes cannot be initialized by Moose/Moo/Mouse constructors,
     but you can safely initialize them inside a `BUILD` sub.
 
   Functions
@@ -70,6 +70,17 @@ DESCRIPTION
                   reader      => \$get_foo,
                   writer      => \$set_foo,
                );
+
+            They can also be method names as strings:
+
+               my ($set_foo);
+   
+               lexical_has foo => (
+                  reader      => 'get_foo',
+                  writer      => \$set_foo,
+               );
+
+            This allows you to provide a partly public API for an attribute.
 
         `default`, `builder`, `lazy`
             Lazy defaults and builders are allowed. Eager (non-lazy) defaults
@@ -128,9 +139,10 @@ DESCRIPTION
         `handles`
             Delegates methods. Has slightly different syntax to Moose's option
             of the same name - is required to be an arrayref of pairs such
-            that each pair is a scalar ref followed by a method name, a
-            coderef, or an arrayref (where the first element is a method name
-            or coderef and subsequent elements are curried arguments).
+            that in each pair, the first is a scalar ref or a string method
+            name that will be handled, and the second is a coderef or string
+            method name that will do the handling. (The second can be an
+            arrayref in the case of currying.)
 
                my ($get, $post);
   
@@ -145,6 +157,29 @@ DESCRIPTION
    
                # later...
                my $response = $self->$get('http://example.net/');
+
+            Supports Sub::HandlesVia:
+
+               my $remove_task;
+               lexical_has tasks => (
+                  isa          => ArrayRef,
+                  handles_via  => 'Array',
+                  handles      => [
+                     task_count     => 'count',
+                     add_task       => 'push',
+                     next_task      => [ 'get', 0 ],
+                     \$remove_task  => 'unshift',
+                  ],
+               );
+   
+               # later...
+               while ($self->task_count) {
+                  my $task    = $self->next_task;
+                  my $success = $self->handle_task($task);
+                  if ($success) {
+                     $self->$remove_task;
+                  }
+               }
 
         `initializer`, `traits`, `lazy_build`
             Not currently implemented. Providing any of these options throws

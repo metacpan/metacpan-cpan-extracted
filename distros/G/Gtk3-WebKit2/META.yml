@@ -1,0 +1,26 @@
+---
+abstract: 'WebKit2 bindings for Perl'
+author:
+  - 'Jason Shaun Carty <jc@atikon.com>'
+  - 'Philipp Voglhofer <pv@atikon.com>'
+  - 'Philipp A. Lehner <pl@atikon.com>'
+build_requires:
+  Test::NeedsDisplay: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Gtk3-WebKit2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Glib::Object::Introspection: '0'
+  Gtk3: '0'
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

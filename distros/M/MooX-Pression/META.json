@@ -47,7 +47,7 @@
             "Exporter::Tiny" : "1.000000",
             "Import::Into" : "0",
             "Keyword::Simple" : "0",
-            "MooX::Press" : "0.043",
+            "MooX::Press" : "0.045",
             "PPR" : "0",
             "Path::ScanINC" : "0",
             "Syntax::Keyword::Try" : "0.11",
@@ -65,7 +65,7 @@
    "provides" : {
       "MooX::Pression" : {
          "file" : "lib/MooX/Pression.pm",
-         "version" : "0.301"
+         "version" : "0.400"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Pression/project"
    },
-   "version" : "0.301",
+   "version" : "0.400",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

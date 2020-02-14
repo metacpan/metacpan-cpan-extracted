@@ -26,6 +26,8 @@ sub process_bimi {
   my $result = $bimi->result;
   my $auth_results = $result->get_authentication_results;
   is( $auth_results, $expected_result, $test );
+  is ( $result->domain, $domain, 'result domain' );
+  is ( $result->selector, $selector, 'result selector' );
 }
 
 sub get_dmarc_result {

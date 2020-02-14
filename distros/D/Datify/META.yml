@@ -3,6 +3,7 @@ abstract: 'Simple stringification of data.'
 author:
   - 'Bob Kleemann <bobk@cpan.org>'
 build_requires:
+  Carp: '1.25'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -16,18 +17,19 @@ name: Datify
 provides:
   Datify:
     file: lib/Datify.pm
-    version: v0.19.45
+    version: v0.20.45
   Datify::Path:
     file: lib/Datify/Path.pm
-    version: v0.19.45
+    version: v0.20.45
 requires:
-  Carp: '0'
+  Carp: '1.25'
   List::Util: '0'
   Scalar::Util: '0'
   String::Tools: v0.18.277
   Sub::Util: '1.40'
   mro: '0'
   overload: '0'
+  parent: '0'
   perl: v5.14.0
   strict: '0'
   warnings: '0'
@@ -35,6 +37,6 @@ resources:
   bugtracker: https://github.com/rkleemann/Datify/issues
   homepage: http://metacpan.org/release/Datify/
   repository: git://github.com/rkleemann/Datify.git
-version: v0.19.045
+version: v0.20.045
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -20,10 +20,10 @@ my $yts = "$Bin/../test-suite/yaml-test-suite-data";
 
 # skip tests that parser can't parse
 my @skip = qw/
-    4ABK 87E4 8CWC 8UDB 9MMW
+    4FJ6 4ABK 87E4 8CWC 8UDB 9MMW
     CN3R CT4Q DFF7
-    FRK4
-    KZN9 L9U5 LQZ7 LX3P
+    FRK4 F8F9 G5U8
+    K858 KZN9 L9U5 LQZ7 LX3P
     Q9WF QF4Y
 
     6BFJ
@@ -56,6 +56,7 @@ push @skip, qw/
 
 R4YG
 /;
+
 # test
 push @skip, qw/
 XLQ9
@@ -68,6 +69,10 @@ MJS9
 
 
 /;
+# TODO fix testsuite
+# EXG3
+# 4QFQ
+
 # unicode
 push @skip, qw/
 H3Z8
@@ -82,20 +87,20 @@ my $testsuite = YAML::PP::Test->new(
 );
 
 my %skip_yaml_equal = (
-    '4MUZ' => 1,
-    '7ZZ5' => 1,
+
     'K858' => 1,
     'X38W' => 1,
-    'Q5MG' => 1,
     'G4RS' => 1,
-    '9DXL' => 1,
-    '6ZKB' => 1,
-    '6SLA' => 1,
     '6CK3' => 1,
     '5TYM' => 1,
     '565N' => 1,
+    # fix testsuite
+    '4MUZ' => 1,
     '8KB6' => 1,
     '9BXH' => 1,
+    '6ZKB' => 1,
+    '6SLA' => 1,
+    '9DXL' => 1,
 );
 
 my ($testcases) = $testsuite->read_tests(

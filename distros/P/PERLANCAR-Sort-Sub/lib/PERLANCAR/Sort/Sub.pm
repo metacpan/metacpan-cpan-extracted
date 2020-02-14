@@ -1,5 +1,10 @@
 package PERLANCAR::Sort::Sub;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'PERLANCAR-Sort-Sub'; # DIST
+our $VERSION = '0.07'; # VERSION
+
 1;
 # ABSTRACT: PERLANCAR's Sort::Sub subroutines
 
@@ -15,7 +20,7 @@ PERLANCAR::Sort::Sub - PERLANCAR's Sort::Sub subroutines
 
 =head1 VERSION
 
-This document describes version 0.06 of PERLANCAR::Sort::Sub (from Perl distribution PERLANCAR-Sort-Sub), released on 2017-02-17.
+This document describes version 0.07 of PERLANCAR::Sort::Sub (from Perl distribution PERLANCAR-Sort-Sub), released on 2019-12-15.
 
 =head1 HOMEPAGE
 
@@ -39,7 +44,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

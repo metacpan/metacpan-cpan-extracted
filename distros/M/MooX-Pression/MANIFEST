@@ -30,11 +30,14 @@ t/21coderef.t
 t/22overload.t
 t/24mm.t
 t/25abstract.t
+t/31lexhas.t
 t/40loading.t
 t/41ps.t
 t/50complextypes.t
 t/51mixedsigs.t
 t/52lists.t
+t/53outsiders.t
+t/80lines.t
 t/97defaults.t
 t/98geom.t
 t/99anonclass.t

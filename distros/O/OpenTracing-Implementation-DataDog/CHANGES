@@ -2,6 +2,29 @@ CHANGE LOG
 ==========
 
 
+2020-02-13 - v0.03
+------------------
+
+### Fixed
+    - Undeclared dependency Test::MockModule
+    - Test failure (with -Duselongdouble?)
+
+
+2020-02-12 - v0.02
+------------------
+
+### Added
+    - `default_context_builder` attribute for `Tracer`,
+       which allows delaying the building a default context as long as possible.
+
+### Changed
+    - refactor SpanContext
+    - refactor Agent
+
+### Added
+    - increase the number of tests to 42
+
+
 2020-01-01 - v0.01
 ------------------
 

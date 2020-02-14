@@ -1,18 +1,18 @@
-# $Id: 05-ZONEMD.t 1740 2019-04-04 14:45:31Z willem $	-*-perl-*-
+# $Id: 05-ZONEMD.t 1761 2020-01-01 11:58:34Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Net::DNS;
 
 
 my $name = 'ZONEMD.example';
 my $type = 'ZONEMD';
 my $code = 63;
-my @attr = qw( serial digtype reserved digest);
-my @data = ( 12345, 1, 0, '2bb183af5f22588179a53b0a98631fad1a292118' );
+my @attr = qw( serial digtype parameter digest);
+my @data = ( 12345, 1, 2, '2bb183af5f22588179a53b0a98631fad1a292118' );
 my @also = qw( digestbin );
 
-my $wire = join '', qw( 00003039 01 00 2BB183AF5F22588179A53B0A98631FAD1A292118 );
+my $wire = join '', qw( 00003039 01 02 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 
 
 {
@@ -56,14 +56,14 @@ my $wire = join '', qw( 00003039 01 00 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 {
 	my $rr = new Net::DNS::RR(". $type");
-	foreach ( @attr, 'rdstring' ) {
+	foreach ( @attr, @also, 'rdstring' ) {
 		ok( !$rr->$_(), "'$_' attribute of empty RR undefined" );
 	}
 }
 
 
 {
-	my $rr = new Net::DNS::RR( type => $type, serial => 12345 );
+	my $rr = new Net::DNS::RR( type => $type, digtype => 1 );
 	ok( $rr->string, 'string method with default values' );
 	is( $rr->string, Net::DNS::RR->new( $rr->string )->string, 'parse $rr->string' );
 	$rr->digestbin('');
@@ -72,7 +72,7 @@ my $wire = join '', qw( 00003039 01 00 2BB183AF5F22588179A53B0A98631FAD1A292118 
 
 
 {
-	my $rr = new Net::DNS::RR(". $type @data");
+	my $rr = new Net::DNS::RR( type => $type );
 	eval { $rr->digest('123456789XBCDEF'); };
 	my ($exception) = split /\n/, "$@\n";
 	ok( $exception, "corrupt hexadecimal\t[$exception]" );

@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
 #
-# $Id: Nameserver.pm 1692 2018-07-06 08:55:39Z willem $
+# $Id: Nameserver.pm 1761 2020-01-01 11:58:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1692 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
 
 
 =head1 NAME
@@ -82,6 +82,7 @@ sub new {
 	# local server addresses must also be accepted by a resolver
 	my $LocalAddr = $self{LocalAddr} || [DEFAULT_ADDR];
 	my $resolver = new Net::DNS::Resolver( nameservers => $LocalAddr );
+	$resolver->force_v4(1) unless USE_SOCKET_IP;
 	$resolver->force_v4(1) if FORCE_IPv4;
 	my @localaddresses = $resolver->nameservers;
 

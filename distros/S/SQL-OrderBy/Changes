@@ -1,4 +1,10 @@
-Revision history for Perl extension SQL::OrderBy.
+Revision history for SQL::OrderBy
+
+0.1000 2020-02-14 10:18:08
+    - Modernize distribution.
+    - Improve documentation.
+
+~
 
 0.01  Mon Feb  3 14:11:20 2003
 	- original version; created by h2xs 1.22 with options

@@ -6,7 +6,8 @@ use warnings;
 use parent qw/MS::Reader::MzML::Record/;
 use MS::CV qw/:MS/;
 use MS::Mass qw/elem_mass/;
-use List::Util qw/any sum/;
+use List::Util qw/sum/;
+use List::MoreUtils qw/any/;
 
 sub _pre_load {
 

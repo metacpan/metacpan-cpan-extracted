@@ -1,0 +1,64 @@
+---
+abstract: 'Automate the Windows application Notepad++'
+author:
+  - 'Peter C. jones <petercj AT cpan.org>'
+build_requires:
+  Config: '0'
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Path::Tiny: '0.058'
+  Test::More: '0.86'
+  Win32: '0'
+  Win32::API: '0'
+  Win32::GuiTest: '1.64'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Test::More: '0.86'
+  Win32: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Notepad++
+  - automation
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Mechanize-NotepadPlusPlus
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Win32::Mechanize::NotepadPlusPlus:
+    file: lib/Win32/Mechanize/NotepadPlusPlus.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Config: '0'
+  Encode: '0'
+  Exporter: '5.57'
+  File::Which: '0'
+  IPC::Open2: '0'
+  Win32: '0'
+  Win32::API: '0.71'
+  Win32::GUI: '0'
+  Win32::GuiTest: '1.64'
+  constant: '0'
+  perl: '5.010000'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues
+  repository: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Cycle;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -50,8 +50,9 @@ sub new {
     }
     else {
         my @list
-            = split $Template::Liquid::Utility::VariableFilterArgumentParser,
-            $args->{'attrs'};
+            = grep { defined $_ }
+            $args->{'attrs'}
+            =~ m[$Template::Liquid::Utility::VariableFilterArgumentParser]g;
         $s = bless {name     => $name,
                     blocks   => [],
                     tag_name => $args->{'tag_name'},

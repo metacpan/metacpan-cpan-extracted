@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Perl;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use Scalar::Util qw/ blessed reftype /;
 
@@ -715,7 +715,6 @@ YAML:
 
         # Code
         my $string = 'unblessed';
-        utf8::upgrade($string);
         qr{$string}
 
 
@@ -727,7 +726,6 @@ YAML:
 
         # Code
         my $string = 'blessed';
-        utf8::upgrade($string);
         bless qr{$string}, "Foo"
 
 

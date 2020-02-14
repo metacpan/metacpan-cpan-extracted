@@ -2,8 +2,8 @@ NAME
     Data::Transmute - Transmute (transform) data structure using rules data
 
 VERSION
-    This document describes version 0.036 of Data::Transmute (from Perl
-    distribution Data-Transmute), released on 2019-10-10.
+    This document describes version 0.039 of Data::Transmute (from Perl
+    distribution Data-Transmute), released on 2020-02-13.
 
 SYNOPSIS
      use Data::Transmute qw(
@@ -23,13 +23,18 @@ SYNOPSIS
              [create_hash_key => {name=>'foo', value=>1}],
 
              # create another hash key, but this time ignore/noop if key already
-             # exists (ignore=1). this is like INSERT IGNORE in SQL.
+             # exists (ignore=1). this is like INSERT IGNORE in SQL. note: this
+             # makes the rule irreversible.
              [create_hash_key => {name=>'bar', value=>2, ignore=>1}],
 
              # create yet another key, this time replace existing keys (replace=1).
-             # this is like REPLACE INTO in SQL.
+             # this is like REPLACE INTO in SQL. note: this makes the rule
+             # irreversible.
              [create_hash_key => {name=>'baz', value=>3, replace=>1}],
 
+             # compute value with coderef (supply 'value_code' instead of 'value').
+             # note: this makes the rule irreversible.
+             [create_hash_key => {name=>'baz', value_code=>sub {uc($_[0]}, replace=>1}],
 
              # RENAMING HASH KEY
 
@@ -41,6 +46,23 @@ SYNOPSIS
              # rename another key, but this time ignore if old name doesn't exist
              # (ignore=1) or if new name already exists (replace=1)
              [rename_hash_key => {from=>'corge', to=>'grault', ignore_missing_from=>1, replace=>1}],
+
+
+             # MODIFYING HASH VALUE
+
+             # this rule only applies when data is a hash, when data is not a hash
+             # this will do nothing. change the value of a single keypair (key
+             # specified in 'name'), error if key doesn't exist or old value doesn't
+             # equal specified ('from').
+             [modify_hash_value => {name=>'foo', from=>'old', to=>'new'}],
+
+             # 'from' is optional, but if you omit it, the rule becomes
+             # irreversible.
+             [modify_hash_value => {name=>'foo', to=>'new'}],
+
+             # instead of specifying new value in 'to', you can compute new value
+             # using 'to_code'. note: if you do this the rule becomes irreversible.
+             [modify_hash_value => {name=>'foo', from_old=>'old', to_code=>sub {uc $_[0]}}],
 
 
              # DELETING HASH KEY
@@ -56,16 +78,18 @@ SYNOPSIS
              # this rule only applies when data is an arrayref, when data is not an
              # array this will do nothing. for each array element, apply transmute
              # rules to it.
-             [transmute_array_elems => {rules => [...]}],
+             [transmute_array_elems => {
+                  rules => [...],              # or 'rules_module'
+              }],
 
              # you can select only certain elements to transmute by using one+ of:
              # index_is, index_in, index_match, index_filter.
              [transmute_array_elems => {
+                  rules => [...],              # or 'rules_module'
                   #index_is => 1,              # only transmute 2nd element (index is 0-based)
                   #index_in => [0,1,2],        # only transmute the first 3 elements
                   #index_match => qr/.../,     # only transmute elements where the index matches a regex
                   #index_filter => sub{...},   # only transmute elements where $filter->(index=>$index) returns true
-                  rules => [...],
               }],
 
 
@@ -74,16 +98,29 @@ SYNOPSIS
              # this rule only applies when data is a hashref, when data is not a
              # hash this will do nothing. for each hash value, apply transmute rules
              # to it.
-             [transmute_hash_values => {rules => [...]}],
+             [transmute_hash_values => {
+                  rules => [...],            # or 'rules_module'
+
+              }],
 
              # you can select only certain keys to transmute by using one+ of:
              # key_is, key_in, key_match, key_filter.
              [transmute_hash_values => {
+                  rules => [...],            # or 'rules_module'
                   #key_is => 'foo',          # only transmute value of key 'foo'
                   #key_in => ['foo', 'bar'], # only transmute value of keys 'foo', 'bar'
                   #key_match => qr/.../,     # only transmute value of keys that match a regex
                   #key_filter => sub{...},   # only transmute value of keys where $filter->(key=>$key) returns true
-                  rules => [...],
+              }],
+
+
+             # APPLYING (SUB)RULES TO NODES
+
+             # this rule will transmute data, then recurse (walk) to array elements
+             # (if data is an array) and hash values (if data is a hash). can handle
+             # circular references. this rule is irreversible.
+             [transmute_nodes => {
+                  rules => [...],              # or 'rules_module'
               }],
 
          ],
@@ -119,17 +156,38 @@ RULES
 
     *   name*
 
-    *   value*
+    *   value
+
+        Either "value" or "value_code" is required.
+
+    *   value_code
+
+        Either "value" or "value_code" is required.
+
+        Instead of specifying value, you can also supply a coderef to
+        compute the value. The coderef will be passed the current value of
+        the hash key (or undef if there is none).
+
+        If you supply "value_code", your rule will become irreversible.
 
     *   ignore
 
         Bool. If set to true, will ignore/noop if key already exists. This
         is like INSERT IGNORE (INSERT OR IGNORE) in SQL.
 
+        If you set "ignore" to true, your rule will become irreversible.
+
     *   replace
 
         Bool. If set to true, will replace existing keys. This is like
         REPLACE INTO in SQL.
+
+        If you set "replace" to true, your rule will become irreversible.
+
+    *   transmute_object
+
+        Bool, default true. By default, blessed hash is also transmuted. But
+        if you set this to false, blessed hash will not be touched.
 
   rename_hash_key
     This rule only applies when data is a hash, when data is not a hash this
@@ -152,6 +210,11 @@ RULES
         Bool. If set to true, will overwrite (instead of error) when target
         key already exists.
 
+    *   transmute_object
+
+        Bool, default true. By default, blessed hash is also transmuted. But
+        if you set this to false, blessed hash will not be touched.
+
   modify_hash_value
     This rule only applies when data is a hash, when data is not a hash this
     will do nothing. Modify a single hash value from original value *from*
@@ -167,9 +230,24 @@ RULES
 
         String or undef. Original value.
 
-    *   to*
+    *   to
 
         String or undef. New value.
+
+        Either "to" or "to_code" is required.
+
+    *   to_code
+
+        Coderef. Instead of specifying new vlaue via "to", you can also
+        supply "to_code" (a coderef) to compute the value. The coderef will
+        be passed the current value.
+
+        If you set "to_code", your rule will become irreversible.
+
+    *   transmute_object
+
+        Bool, default true. By default, blessed hash is also transmuted. But
+        if you set this to false, blessed hash will not be touched.
 
   delete_hash_key
     This rule only applies when data is a hash, when data is not a hash this
@@ -179,6 +257,11 @@ RULES
     Known arguments ("*" means required):
 
     *   name*
+
+    *   transmute_object
+
+        Bool, default true. By default, blessed hash is also transmuted. But
+        if you set this to false, blessed hash will not be touched.
 
   transmute_array_elems
     This rule only applies when data is an arrayref, when data is not an
@@ -209,6 +292,11 @@ RULES
         true. Aside from "index", the coderef will also receive these
         arguments: "rules" (the rule), "array" (the array).
 
+    *   transmute_object
+
+        Bool, default true. By default, blessed array is also transmuted.
+        But if you set this to false, blessed array will not be touched.
+
   transmute_hash_values
     This rule only applies when data is a hashref, when data is not a hash
     this will do nothing. For each hash value, apply transmute rules to it.
@@ -236,6 +324,36 @@ RULES
         Coderef. Only transmute value of keys where $coderef->(key=>$key) is
         true. Aside from "key", the coderef will also receive these
         arguments: "rules" (the rule), "hash" (the hash).
+
+    *   transmute_object
+
+        Bool, default true. By default, blessed hash is also transmuted. But
+        if you set this to false, blessed hash will not be touched.
+
+  transmute_nodes
+    This rule will transmute data, then recurse (walk) to array elements (if
+    data is an array) or hash values (if data is a hash) and transmute each
+    of those child data. Can handle circular references.
+
+    This rule is not irreversible.
+
+    Known arguments ("*" means required):
+
+    *   recurse_object
+
+        Boolean, default false. Whether to recurse into (hash-based and
+        array-based) objects. By default, objects are not recursed. Set this
+        to true to recurse into objects.
+
+    *   rules
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
+
+    *   rules_module
+
+        Either "rules" or "rules_module" is required. "rules" takes
+        precedence over "rules_module".
 
 FUNCTIONS
   transmute_data
@@ -359,7 +477,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2015 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

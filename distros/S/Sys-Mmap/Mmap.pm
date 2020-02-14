@@ -130,7 +130,7 @@ manually.
 The Sys::Mmap module exports the following constants into your namespace:
 
     MAP_SHARED MAP_PRIVATE MAP_ANON MAP_ANONYMOUS MAP_FILE
-    MAP_NORESERVE
+    MAP_NORESERVE MAP_POPULATE
     MAP_HUGETLB MAP_HUGE_2MB MAP_HUGE_1GB 
     PROT_EXEC PROT_NONE PROT_READ PROT_WRITE
 
@@ -156,7 +156,7 @@ There should be a tied interface to C<hardwire()> as well.
 
 Scott Walter's spelling is awful.
 
-C<hardwire()> will segfault Perl if the C<mmap()> area it was refering to is
+C<hardwire()> will segfault Perl if the C<mmap()> area it was referring to is
 C<munmap()>'d out from under it.
 
 C<munmap()> will segfault Perl if the variable was not successfully C<mmap()>'d
@@ -177,18 +177,23 @@ Malcolm Beattie, 21 June 1996.
 =cut
 
 use strict;
-our ($VERSION, @ISA, @EXPORT, $AUTOLOAD);
-require Exporter;
-@ISA = qw(Exporter);
+use warnings;
 
-@EXPORT = qw(mmap munmap
+our $VERSION = '0.20';
+
+our $AUTOLOAD; # For sub AUTOLOAD
+
+require Exporter;
+our @ISA = qw(Exporter);
+
+our @EXPORT = qw(mmap munmap
 	     MAP_ANON MAP_ANONYMOUS MAP_FILE MAP_LOCKED MAP_PRIVATE MAP_SHARED MAP_NORESERVE
+    MAP_POPULATE
     MAP_HUGETLB
     MAP_HUGE_2MB
     MAP_HUGE_1GB
 	     PROT_EXEC PROT_NONE PROT_READ PROT_WRITE);
 
-$VERSION = '0.19';
 
 sub new {
 

@@ -1,0 +1,31 @@
+---
+abstract: 'See if a number looks like a number, integer, numeric, infinity, not-a-number, zero, non-zero, positive, negative, even, or odd.'
+author:
+  - 'Bob Kleemann <bobk@cpan.org>'
+build_requires:
+  Scalar::Util: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LooksLike
+provides:
+  LooksLike:
+    file: lib/LooksLike.pm
+    version: v0.20.45
+requires:
+  B: '0'
+  perl: v5.12.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rkleemann/LooksLike/issues
+  repository: git://github.com/rkleemann/LooksLike.git
+version: v0.20.045
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

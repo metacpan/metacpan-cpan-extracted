@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+# Proper testing requires a . at the end of the error message
+use Carp 1.25;
+
 use Test2::V0;
 plan 8;
 

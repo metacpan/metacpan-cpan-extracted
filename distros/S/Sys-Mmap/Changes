@@ -1,3 +1,8 @@
+Todd Rinaldo, Feb 13 2020 v0.20
+* Add use warnings to improve kwalitee
+* Spelling error in manpage
+* Add MAP_POPULATE support, which has been available since Linux Kernel 2.5
+
 Scott Walters, Mar 1 2017 v0.19
 * Update the FSF's mailing address in their license;
   thanks to knnniggett

@@ -1,0 +1,50 @@
+NAME
+    Data::Transmute::Rules::TreeNodeHash::StringifyParent - Stringify parent
+    attributes in tree nodes to make the tree more dump-friendly
+
+VERSION
+    This document describes version 0.001 of
+    Data::Transmute::Rules::TreeNodeHash::StringifyParent (from Perl
+    distribution Data-Transmute-Rules-TreeNodeHash-StringifyParent),
+    released on 2020-02-13.
+
+DESCRIPTION
+    Tree is an interlinked data structure, where a child node links back to
+    its parent (and the parent links back to *its* parent, and so on). This
+    makes the dump of a tree structure looks unwieldy; if you dump a node,
+    you will end up dumping the whole tree.
+
+    This rule walks the tree structure and replaces the value of hash key
+    'parent' to its stringified value. This will prevent "dumping upwards"
+    and make the structure more dump-friendly.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Transmute-Rules-TreeNodeHash-Stringif
+    yParent>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Transmute-Rules-TreeNodeHash-Str
+    ingifyParent>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Transmute-Rules-
+    TreeNodeHash-StringifyParent>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Transmute::Rules::TreeNodeHash::StringifyChildren
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

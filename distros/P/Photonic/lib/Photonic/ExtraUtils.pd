@@ -1,10 +1,46 @@
-pp_setversion('0.010');
+pp_setversion('0.011');
 
 pp_addpm({At=>Top},<<'EOD');
+
+=encoding UTF-8
 
 =head1 NAME
 
 Photonic::ExtraUtils - Glue for utility Fortran routines
+
+=head1 VERSION
+
+version 0.011
+
+=head1 COPYRIGHT NOTICE
+
+Photonic - A perl package for calculations on photonics and
+metamaterials.
+
+Copyright (C) 1916 by W. Luis Mochán
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 1, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
+
+    mochan@fis.unam.mx
+
+    Instituto de Ciencias Físicas, UNAM
+    Apartado Postal 48-3
+    62251 Cuernavaca, Morelos
+    México
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -12,11 +48,11 @@ Photonic::ExtraUtils - Glue for utility Fortran routines
 
        dgtsl($c, $d, $e, $b, $info=PDL->null);
        cgtsl($c, $d, $e, $b, $info=PDL->null);
-      
+
 
 =head1 DESCRIPTION
 
-Call some fortran routines from perl code.       
+Call some fortran routines from perl code.
 
 =cut
 
@@ -60,25 +96,15 @@ the solution. $info returns 0 for success or k if the k-1-th element
 of the diagonal became zero. Either 2Xn pdl's are used to represent
 complex numbers, as in PDL::Complex.
 
-=begin Pod::Coverage
-
-       dgtls
-
-       cgtls
-
-=head2 set_boundscheck
-
-=head2 set_debugging
-
-=end Pod::Coverage
-
-
+=head2  set_boundscheck
+=head2  set_debugging
 
 =cut
 
 END
 
 use strict;
+use warnings;
 use Carp;
 use ExtUtils::F77;
 use PDL::Complex;
@@ -91,8 +117,8 @@ pp_addhdr(qq{
 	void cgtsl$underscore(int *N, double *c, double *d, double *e, double
 		*b, int *info);
 });
-          
-pp_def('dgtsl', 
+
+pp_def('dgtsl',
        Pars=>'[phys] c(n); [phys] d(n); [phys] e(n); [phys] y(n); [o] b(n); int [o] info();',
        GenericTypes=>['D'],
        PMCode => q{
@@ -104,8 +130,8 @@ pp_def('dgtsl',
 	      $i=PDL->null unless defined $i;
 	      map {
 		  $_=$_->copy unless $_->is_inplace;
-	          $_->set_inplace(0); 
-              }  ($c, $d, $e);  
+	          $_->set_inplace(0);
+              }  ($c, $d, $e);
 	      if($y->is_inplace){$b=$y}
 	      elsif(not defined $b and not $y->is_inplace){
 		  $b=$y->copy;
@@ -121,7 +147,7 @@ pp_def('dgtsl',
 	  dgtsl$underscore(&N, \$P(c), \$P(d), \$P(e),\$P(b), \$P(info));
        },
     );
-pp_def('cgtsl', 
+pp_def('cgtsl',
        Pars=>'[phys]c(2,n); [phys]d(2,n); [phys]e(2,n); [phys]y(2,n); [o] b(2,n); int [o] info();',
        GenericTypes=>['D'],
        PMCode => q{
@@ -135,8 +161,8 @@ pp_def('cgtsl',
 	      $i=PDL->null unless defined $i;
 	      map {
 		  $_=$_->copy unless $_->is_inplace;
-	          $_->set_inplace(0); 
-              }  ($c, $d, $e);  
+	          $_->set_inplace(0);
+              }  ($c, $d, $e);
 	      if($y->is_inplace){$b=$y}
 	      elsif(not defined $b and not $y->is_inplace){
 		  $b=$y->copy;
@@ -154,7 +180,7 @@ pp_def('cgtsl',
           cgtsl$underscore(&N, \$P(c), \$P(d), \$P(e),\$P(b), \$P(info));
        },
     );
-#pp_def('test', 
+#pp_def('test',
 #       Pars=>'a(); [o] b();',
 # 	#       GenericTypes=>['D'],
 #       PMCode => q{
@@ -171,4 +197,3 @@ pp_def('cgtsl',
 # );
 
 pp_done();
-

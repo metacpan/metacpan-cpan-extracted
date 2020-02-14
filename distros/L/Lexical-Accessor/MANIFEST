@@ -20,5 +20,6 @@ t/02moose.t
 t/03mouse.t
 t/04moo.t
 t/05classtiny.t
+t/30shv.t
 t/90subclassing.t
 t/rt101024.t

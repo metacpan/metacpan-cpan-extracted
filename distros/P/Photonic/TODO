@@ -1,0 +1,18 @@
+# -*- mode: org; -*-
+
+* TODO Return as, bs, b2s as pdl instead of array?
+* DONE Check upper iterations in continued fractions
+* DONE Factor out OneH?
+  Did for retarded and non retarded, 2 media
+  Did for the rest.
+* DONE Relax need for odd dimensions
+* TODO Merge exact surface SHG calculation with current surface calculation.
+* TODO Write and publish paper.
+* DONE Allow non-orthogonal unit vectors
+* TODO Allow saving states for reorthogonalization and reinitialization
+  Done for reorthogonalization. Reinitialization pending.
+* DONE [2019-01-04 Fri] Generalize to three or more media nonretarded
+* DONE Complete spinor generalization.
+* DONE Generalize to three or more media retarded
+
+* DONE [2018-11-20 Tue] Add TODO file

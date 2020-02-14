@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mets xmlns:xlink="http://www.w3.org/TR/xlink" xmlns:mets="http://www.loc.gov/METS/">
+  <mets:fileSec>
+    <mets:fileGrp ID="IMGGRP" USE="Images">
+      <mets:file ID="IMG00001" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00001" MIMETYPE="image/tiff" SEQ="1" SIZE="5184000" GROUPID="1">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://./003855/003855r.tif" />
+      </mets:file>
+      <mets:file ID="IMG00002" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00002" MIMETYPE="image/tiff" SEQ="2" SIZE="5200228" GROUPID="2">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://./003855/003855v.tif" />
+      </mets:file>
+    </mets:fileGrp>
+    <mets:fileGrp ID="PDFGRP" USE="PDF">
+      <mets:file ID="PDF00001" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00001" MIMETYPE="text/pdf" SEQ="1" SIZE="251967" GROUPID="1">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://./003855/003855r.pdf" />
+      </mets:file>
+      <mets:file ID="PDF00002" CREATED="2006-06-20T12:00:00" ADMID="IMGPARAM00002" MIMETYPE="text/pdf" SEQ="2" SIZE="172847" GROUPID="2">
+        <mets:FLocat LOCTYPE="URL" xlink:href="file://./003855/003855v.pdf" />
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+</mets>

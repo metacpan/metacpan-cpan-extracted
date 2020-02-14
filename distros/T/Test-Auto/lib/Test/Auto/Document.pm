@@ -1,15 +1,15 @@
 package Test::Auto::Document;
 
-use Data::Object 'Class';
+use Data::Object 'Class', 'Test::Auto::Types';
 
 use Type::Registry;
 use Test::More;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 has content => (
   is => 'ro',
-  isa => 'ArrayRef[Str]'
+  isa => 'Strings'
 );
 
 has template => (
@@ -20,7 +20,7 @@ has template => (
 
 has parser => (
   is => 'ro',
-  isa => 'InstanceOf["Test::Auto::Parser"]',
+  isa => 'Parser',
   req => 1
 );
 
@@ -46,6 +46,7 @@ method construct() {
   push @$content, $self->construct_inherits;
   push @$content, $self->construct_integrates;
   push @$content, $self->construct_libraries;
+  push @$content, $self->construct_constraints;
   push @$content, $self->construct_scenarios;
   push @$content, $self->construct_attributes;
   push @$content, $self->construct_functions;
@@ -131,6 +132,78 @@ method construct_libraries() {
   ]);
 
   return join("\n", @content);
+}
+
+method construct_constraints() {
+  my $parser = $self->parser;
+  my $types = $parser->types;
+
+  return () if !$types || !%$types;
+
+  my @content;
+
+  push @content, $self->head1('constraints', [
+    "This package declares the following type constraints:",
+  ]);
+
+  my @order = sort keys %$types;
+
+  push @content, $self->construct_constraints_item($_) for @order;
+
+  return join("\n", @content);
+}
+
+method construct_constraints_item($name) {
+  my $label = lc $name;
+  my $parser = $self->parser;
+  my $types = $parser->types;
+  my $type = $types->{$name} or return ();
+
+  my @content;
+
+  my $usage = $type->{usage}[0];
+  my $library = $type->{library}[0] if $type->{library};
+  my $composite = $type->{composite}[0] if $type->{composite};
+  my $parent = $type->{parent}[0] if $type->{parent};
+
+  push @content, @$usage;
+
+  if ($library) {
+    $library = $library->[0];
+    push @content, "", "This type is defined in the L<$library> library.";
+  }
+
+  if ($parent) {
+    push @content, $self->over($self->item(
+      "$label parent", join "\n", @$parent
+    ));
+  }
+
+  if ($composite) {
+    push @content, $self->over($self->item(
+      "$label composition", join "\n", @$composite
+    ));
+  }
+
+  if (my $coercions = $type->{coercions}) {
+    for my $number (sort keys %{$coercions}) {
+      my $coercion = $coercions->{$number}[0];
+      push @content, $self->over($self->item(
+        "$label coercion #$number", join "\n", @$coercion
+      ));
+    }
+  }
+
+  if (my $examples = $type->{examples}) {
+    for my $number (sort keys %{$examples}) {
+      my $example = $examples->{$number}[0];
+      push @content, $self->over($self->item(
+        "$label example #$number", join "\n", @$example
+      ));
+    }
+  }
+
+  return $self->head2($name, [@content]);
 }
 
 method construct_scenarios() {
@@ -542,7 +615,11 @@ L<"license file"|https://github.com/iamalnewkirk/test-auto/blob/master/LICENSE>.
 
 =head1 PROJECT
 
+L<Wiki|https://github.com/iamalnewkirk/test-auto/wiki>
+
 L<Project|https://github.com/iamalnewkirk/test-auto>
+
+L<Initiatives|https://github.com/iamalnewkirk/test-auto/projects>
 
 L<Milestones|https://github.com/iamalnewkirk/test-auto/milestones>
 

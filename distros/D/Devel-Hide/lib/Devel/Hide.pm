@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.0010';
+our $VERSION = '0.0011';
 
 # blech! package variables
 use vars qw( @HIDDEN $VERBOSE );
@@ -67,7 +67,7 @@ BEGIN {
 }
 
 # Pushes a list to the set of hidden modules/filenames
-# warns about the modules which could not be hidden
+# warns about the modules which could not be hidden (always)
 # and about the ones that were successfully hidden (if $VERBOSE)
 #
 # It works as a batch producing warning messages
@@ -86,7 +86,7 @@ sub _push_hidden {
             $IS_HIDDEN{$_}++;
         }
     }
-    if ( $VERBOSE && @too_late ) {
+    if ( @too_late ) {
         warn __PACKAGE__, ': Too late to hide ', join( ', ', @too_late ), "\n";
     }
     if ( $VERBOSE && keys %IS_HIDDEN ) {
@@ -113,37 +113,10 @@ BEGIN {
 
 }
 
-# works for perl 5.8.0, uses in-core files
-sub _scalar_as_io8 {
-    open my $io, '<', \$_[0]
-        or die $!;    # this should not happen (perl 5.8 should support this)
-    return $io;
-}
-
-# works for perl >= 5.6.1, uses File::Temp
-sub _scalar_as_io6 {
-    my $scalar = shift;
-    require File::Temp;
-    my $io = File::Temp::tempfile();
-    print {$io} $scalar;
-    seek $io, 0, 0;    # rewind the handle
-    return $io;
-}
-
-BEGIN {
-
-    *_scalar_as_io = ( $] >= 5.008 ) ? \&_scalar_as_io8 : \&_scalar_as_io6;
-
-    # _scalar_as_io is one of the two sub's above
-
-}
-
 sub _dont_load {
     my $filename = shift;
-    my $oops;
     my $hidden_by = $VERBOSE ? 'hidden' : 'hidden by ' . __PACKAGE__;
-    $oops = qq{die "Can't locate $filename ($hidden_by)\n"};
-    return _scalar_as_io($oops);
+    die "Can't locate $filename in \@INC ($hidden_by)\n";
 }
 
 sub _is_hidden {
@@ -192,21 +165,31 @@ sub _append_to_perl5opt {
 
     $ENV{PERL5OPT} = join( ' ',
         defined($ENV{PERL5OPT}) ? $ENV{PERL5OPT} : (),
-        'MDevel::Hide=' . join(',', @_)
+        '-MDevel::Hide=' . join(',', @_)
     );
 
 }
 
 sub import {
     shift;
-    if( @_ && $_[0] eq '-from:children' ) {
-        $HIDE_FROM{children} = 1;
+    while(@_ && $_[0] =~ /^-/) {
+        if( $_[0] eq '-from:children' ) {
+            $HIDE_FROM{children} = 1;
+        } elsif( $_[0] eq '-quiet' ) {
+            $VERBOSE = 0;
+            $HIDE_FROM{children_quietly} = 1;
+        } else {
+            die("Devel::Hide: don't recognize $_[0]\n");
+        }
         shift;
     }
     if (@_) {
         _push_hidden(@_);
         if ($HIDE_FROM{children}) {
-            _append_to_perl5opt(@_);
+            _append_to_perl5opt(
+                ($HIDE_FROM{children_quietly} ? '-quiet' : ()),
+                @_
+            );
         }
     }
 
@@ -277,7 +260,7 @@ specified files/modules are installed or not).
 
 They I<die> with a message like:
 
-    Can't locate Module/ToHide.pm (hidden)
+    Can't locate Module/ToHide.pm in @INC (hidden)
 
 The original intent of this module is to allow Perl developers
 to test for alternative behavior when some modules are not
@@ -330,12 +313,25 @@ import()
 
 =back
 
-Optionally, you can propagate the list of hidden modules to your
-process' child processes, by passing '-from:children' as the
-first option when you use() this module. This works by populating
+Optionally, you can provide some arguments *before* the
+list of modules:
+
+=over
+
+=item -from:children
+
+propagate the list of hidden modules to your
+process' child processes. This works by populating
 C<PERL5OPT>, and is incompatible with Taint mode, as
 explained in L<perlrun>.
 
+=item -quiet
+
+suppresses diagnostic output. You will still get told about
+errors. This is passed to child processes if -from:children
+is in effect.
+
+=back
 
 =head2 CAVEATS
 
@@ -396,6 +392,8 @@ with contributions from David Cantrell E<lt>dcantrell@cpan.orgE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2005-2007, 2018 by Adriano R. Ferreira
+
+Some parts copyright (C) 2020 by David Cantrell
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

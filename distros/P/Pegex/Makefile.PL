@@ -29,14 +29,14 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "Scalar::Util" => 0,
     "XXX" => "0.35",
-    "YAML::PP" => "0.018"
+    "YAML::PP" => "0.019"
   },
   "TEST_REQUIRES" => {
     "JSON::PP" => 0,
     "Test::Pod" => 0,
     "Tie::IxHash" => 0
   },
-  "VERSION" => "0.74",
+  "VERSION" => "0.75",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "Test::Pod" => 0,
   "Tie::IxHash" => 0,
   "XXX" => "0.35",
-  "YAML::PP" => "0.018"
+  "YAML::PP" => "0.019"
 );
 
 

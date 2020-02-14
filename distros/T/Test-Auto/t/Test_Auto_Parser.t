@@ -1,5 +1,7 @@
 use 5.014;
 
+use lib 't/lib';
+
 use Do;
 use Test::Auto;
 use Test::More;
@@ -29,10 +31,9 @@ Specification Parser
 
 =description
 
-This package use the L<Test::Auto> object as a parser target, where the
-object's file property points to a test file containing POD blocks which adhere
-to the specification as defined in L<Test::Auto/SPECIFICATION>, parses the test
-file and returns a parser object for accessing the data.
+This package parses files containing POD blocks which adhere to the
+specification as defined in L<Test::Auto/SPECIFICATION>, and provides methods
+for accessing the data.
 
 =libraries
 
@@ -57,8 +58,9 @@ source: ro, req, InstanceOf["Test::Auto"]
 
 package main;
 
-my $test = Test::Auto->new(__FILE__);
+my $subs = testauto(__FILE__);
 
-$test->subtests->standard;
+$subs = $subs->standard;
+$subs->plugin('ShortDescription')->tests(length => 200);
 
 ok 1 and done_testing;

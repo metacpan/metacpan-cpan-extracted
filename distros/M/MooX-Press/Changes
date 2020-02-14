@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.046	2020-02-14
+
+ [ Packaging ]
+ - Require Lexical::Accessor 0.012 to avoid Hash::FieldHash requirement.
+ - Require Moo 2 because Moo 1 is just so old.
+
+0.045	2020-02-14
+
+ - Added: Integrate Lexical::Accessor support.
+
+0.044	2020-02-12
+
+ [ Packaging ]
+ - Bump minimum required version of Sub::HandlesVia.
+ - Make Sub::MultiMethod required rather than an optional dependency, so
+   that other modules using MooX::Press and MooX::Pression don't need to
+   depend on it explicitly.
+
 0.043	2020-02-12
 
  [ Bug Fixes ]

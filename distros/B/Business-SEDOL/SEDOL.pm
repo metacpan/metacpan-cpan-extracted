@@ -29,7 +29,7 @@ old-style SEDOLs (SEDOLs issued prior to 26 January 2004) and new-style SEDOLs.
 use strict;
 use vars qw($VERSION $ERROR);
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 # Global variables used by many.
 # SEDOLs can basically be comprised of 0..9 and B..Z excluding vowels.

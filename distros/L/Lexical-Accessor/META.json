@@ -3,8 +3,8 @@
    "author" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -37,13 +37,14 @@
       },
       "runtime" : {
          "recommends" : {
+            "Hash::FieldHash" : "0",
+            "Sub::HandlesVia" : "0",
             "Sub::Name" : "0",
             "Type::Utils" : "0.026"
          },
          "requires" : {
             "Eval::TypeTiny" : "0",
             "Exporter::Tiny" : "0",
-            "Hash::FieldHash" : "0",
             "perl" : "5.008003"
          }
       },
@@ -65,11 +66,11 @@
    "provides" : {
       "Lexical::Accessor" : {
          "file" : "lib/Lexical/Accessor.pm",
-         "version" : "0.009"
+         "version" : "0.012"
       },
       "Sub::Accessor::Small" : {
          "file" : "lib/Sub/Accessor/Small.pm",
-         "version" : "0.009"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -88,10 +89,9 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project"
    },
-   "version" : "0.009",
+   "version" : "0.012",
    "x_contributors" : [
       "Lukas Atkinson (AMON) <amon@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
-   "x_static_install" : 1
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

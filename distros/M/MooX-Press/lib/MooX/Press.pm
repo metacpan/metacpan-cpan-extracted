@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.043';
+our $VERSION   = '0.046';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -653,7 +653,7 @@ sub _make_package {
 			my %spec =
 				is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
 				is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
-				$attrspec->$_handle_list_add_nulls; # ????? should not add nulls ?????
+				$attrspec->$_handle_list;
 			if (is_CodeRef $spec{builder}) {
 				my $code = delete $spec{builder};
 				$spec{builder} = $buildername;
@@ -665,10 +665,17 @@ sub _make_package {
 			
 			%spec = (%spec_hints, %spec);
 			$spec{is} ||= 'rw';
+			
 			if ($spec{is} eq 'lazy') {
-				$spec{is}   = 'ro',
+				$spec{is}   = 'ro';
 				$spec{lazy} = !!1;
 				$spec{builder} ||= $buildername;
+			}
+			elsif ($spec{is} eq 'private') {
+				$spec{is}   = 'rw';
+				$spec{lazy} = !!1;
+				$spec{init_arg} = undef;
+				$spec{lexical}  = !!1;
 			}
 			
 			if ($spec{does}) {
@@ -726,15 +733,29 @@ sub _make_package {
 				$spec{coerce} = !!1;
 			}
 			
-			my ($shv_toolkit, $shv_data);
-			if ($spec{handles_via}) {
-				$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
-				eval "require $shv_toolkit" or die($@);
-				$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
+			if ($spec{lexical}) {
+				require Lexical::Accessor;
+				if ($spec{traits} || $spec{handles_via}) {
+					'Lexical::Accessor'->VERSION('0.010');
+				}
+				my $la = 'Lexical::Accessor'->new_from_has(
+					$attrname,
+					package => $qname,
+					%spec,
+				);
+				$la->install_accessors;
 			}
-			
-			$builder->$method($qname, $attrname, \%spec);
-			$shv_toolkit->install_delegations($shv_data) if $shv_data;
+			else
+			{
+				my ($shv_toolkit, $shv_data);
+				if ($spec{handles_via}) {
+					$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
+					eval "require $shv_toolkit" or die($@);
+					$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
+				}
+				$builder->$method($qname, $attrname, \%spec);
+				$shv_toolkit->install_delegations($shv_data) if $shv_data;
+			}
 		}
 	}
 
@@ -2440,6 +2461,38 @@ This is optional rather than being required, and defaults to "rw".
 MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
 will translate them if you're using Moose or Mouse.
 
+There is a special value C<< is => "private" >> to create private
+attributes. These attributes cannot be set by the constructor
+(they always have C<< init_arg => undef >>) and do not have accessor
+methods. They are stored inside-out, so cannot even be accessed using
+direct hashref access of the object. If you're thinking this makes them
+totally inaccessible, and therefore useless, think again.
+
+For private attributes, you can request an accessor as a coderef:
+
+  my $my_attr;
+  use MooX::Press (
+    'class:Foo' => {
+      has => {
+        'my_attr' => { is => 'private', accessor => \$my_attr },
+      },
+      can => {
+        'my_method' => sub {
+          my $self = shift;
+          $self->$my_attr(42);        # writer
+          return $self->$my_attr();   # reader
+        },
+      },
+    },
+  );
+
+Private attributes may have defaults and builders (but they are always
+lazy!) They may also have C<handles>. (Though if the C<handles> option
+is an arrayref, it is treated slightly differently from non-private
+attributes; see L<Lexical::Accessor> for details.) You may find you can
+do everything you need with the builders and delegations, so having an
+accessor is unnecessary.
+
 =item C<< isa >> I<< (Str|Object) >>
 
 When the type constraint is a string, it is B<always> assumed to be a class
@@ -3013,6 +3066,8 @@ Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>.
 
 =head1 SEE ALSO
+
+L<Zydeco>.
 
 L<Moo>, L<MooX::Struct>, L<Types::Standard>.
 

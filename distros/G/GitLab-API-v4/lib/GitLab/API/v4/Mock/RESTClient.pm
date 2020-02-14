@@ -1,5 +1,5 @@
 package GitLab::API::v4::Mock::RESTClient;
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 =encoding utf8
 

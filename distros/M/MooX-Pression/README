@@ -321,7 +321,9 @@ DESCRIPTION
     Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor
     will.
 
-    It is possible to set a default toolkit when you import MooX::Pression.
+    Although it is not possible to use the `toolkit` keyword outside of
+    `class`, `abstract class`, `role`, and `interface` blocks, it is possible
+    to specify a default toolkit when you import MooX::Pression.
 
       use MooX::Pression (
         ...,
@@ -334,7 +336,8 @@ DESCRIPTION
       );
 
    `extends`
-    Defines a parent class. Only for use within `class` blocks.
+    Defines a parent class. Only for use within `class` and `abstract class`
+    blocks.
 
       class Person {
         extends Animal;
@@ -380,6 +383,9 @@ DESCRIPTION
 
     This is equivalent to declaring an empty role.
 
+    The `with` keyword cannot be used outside of `class`, `abstract class`,
+    `role`, and `interface` blocks.
+
    `begin`
     This code gets run early on in the definition of a class or role.
 
@@ -395,7 +401,9 @@ DESCRIPTION
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
-    It is possible to define a global chunk of code to run too:
+    The `begin` keyword cannot be used outside of `class`, `abstract class`,
+    `role`, and `interface` blocks, though it is possible to define a global
+    default for it:
 
       use MooX::Pression (
         ...,
@@ -425,7 +433,9 @@ DESCRIPTION
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
-    It is possible to define a global chunk of code to run too:
+    The `end` keyword cannot be used outside of `class`, `abstract class`,
+    `role`, and `interface` blocks, though it is possible to define a global
+    default for it:
 
       use MooX::Pression (
         ...,
@@ -444,12 +454,16 @@ DESCRIPTION
     not be inherited.
 
    `has`
+    Defines an attribute.
+
       class Person {
         has name;
         has age;
       }
   
       my $bob = MyApp->new_person(name => "Bob", age => 21);
+
+    Cannot be used outside of `class`, `abstract class`, and `role` blocks.
 
     Moo-style attribute specifications may be given:
 
@@ -471,8 +485,9 @@ DESCRIPTION
         }
       }
 
-    `rw`, `rwp`, `ro`, `lazy`, `true`, and `false` are allowed as barewords
-    for readability, but `is` is optional, and defaults to `rw`.
+    `rw`, `rwp`, `ro`, `lazy`, `bare`, `private`, `true`, and `false` are
+    allowed as barewords for readability, but `is` is optional, and defaults
+    to `rw`.
 
     Note `type` instead of `isa`. Any type constraints from Types::Standard,
     Types::Common::Numeric, and Types::Common::String will be avaiable as
@@ -663,7 +678,111 @@ DESCRIPTION
     syntax of named parameters in method signatures. (Depending on your text
     editor, it may also improve syntax highlighting.)
 
+   Private attributes
+    If an attribute name starts with a dollar sign, it is a private (lexical)
+    attribute. Private attributes cannot be set in the constructor, and cannot
+    be directly accessed outside the class's lexical scope.
+
+      class Foo {
+        has $ua = HTTP::Tiny->new;
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->$ua->get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Note how `$self->$ua` is still called as a method. You don't just do
+    `$ua->get()`. The invocant is still required, just like it would be with a
+    normal public attribute:
+
+      class Foo {
+        has ua = HTTP::Tiny->new;
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->ua->get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Private attributes can have delegated methods (`handles`):
+
+      class Foo {
+        has $ua (
+          default => sub { HTTP::Tiny->new },
+          handles => [
+            http_get  => 'get',
+            http_post => 'post',
+          ],
+        );
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->http_get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    These can even be made lexical too:
+
+      class Foo {
+        my ($http_get, $http_post);  # predeclare
+    
+        has $ua (
+          default => sub { HTTP::Tiny->new },
+          handles => [
+            \$http_get  => 'get',
+            \$http_post => 'post',
+          ],
+        );
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->$http_get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Note how an arrayref is used for `handles` instead of a hashref. This is
+    because scalarrefs don't work as hashref keys.
+
+    Although constructors ignore private attributes, you may set them in a
+    factory method.
+
+      class Foo {
+        has $ua;
+    
+        factory new_foo (%args) {
+          my $instance = $class->new(%args);
+          $instance->$ua( HTTP::Tiny->new );
+          return $instance;
+        }
+      }
+
+    `has $foo` is just a shortcut for:
+
+      my $foo;
+      has foo => (is => "private", accessor => \$foo);
+
+    You can use `is => "private"` to create even *more* private attributes
+    without even having that lexical accessor:
+
+      has foo => (is => "private");
+
+    If it seems like an attribute that can't be set in the constructor and
+    doesn't have accessors would be useless, you're wrong. Because it can
+    still have delegations and a default value.
+
+    Private attributes use lexical variables, so are visible to subclasses
+    only if the subclass definition is nested in the base class.
+
+    Private attributes are available from MooX::Pression 0.400.
+
    `constant`
+    Defines a constant.
+
       class Person {
         extends Animal;
         constant latin_name = 'Homo sapiens';
@@ -672,7 +791,12 @@ DESCRIPTION
     `MyApp::Person->latin_name`, `MyApp::Person::latin_name`, and
     `$person_object->latin_name` will return 'Homo sapiens'.
 
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks, will
+    define a constant in the caller package. (That is, usually the factory.)
+
    `method`
+    Defines a method.
+
       class Person {
         has spouse;
     
@@ -686,6 +810,10 @@ DESCRIPTION
 
     `sub { ... }` will not work as a way to define methods within the class.
     Use `method { ... }` instead.
+
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks,
+    `method` will define a method in the caller package. (Usually the
+    factory.)
 
     The variables $self and $class will be automatically defined within all
     methods. $self is set to $_[0] (though the invocant is not shifted off
@@ -928,6 +1056,21 @@ DESCRIPTION
 
       my $x = do { method { ... } };
 
+   Private methods
+    A shortcut for the pattern of:
+
+      my $x = do { method { ... } };
+
+    Is this:
+
+      method $x { ... }
+
+    MooX::Pression will declare the variable `my $x` for you, assign the
+    coderef to the variable, and you don't need to worry about a `do` block to
+    wrap it.
+
+    This feature is available from MooX::Pression 0.400.
+
    Multimethods
     Multi methods should *Just Work [tm]* if you prefix them with the keyword
     `multi`
@@ -951,6 +1094,12 @@ DESCRIPTION
 
     This feature requires MooX::Press 0.035 and Sub::MultiMethod to be
     installed.
+
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks,
+    `multi method` will define a multi method in the caller package. (That is,
+    usually the factory.)
+
+    Multimethods cannot be anonymous or private.
 
    `requires`
     Indicates that a role requires classes to fulfil certain methods.
@@ -994,6 +1143,8 @@ DESCRIPTION
         }
       }
 
+    Can only be used in `role` and `interface` blocks.
+
    `before`
       before marry {
         say "Speak now or forever hold your peace!";
@@ -1025,6 +1176,10 @@ DESCRIPTION
 
     The `:optimize` attribute is supported for `before`.
 
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
+
    `after`
     There's not much to say about `after`. It's just like `before`.
 
@@ -1047,6 +1202,10 @@ DESCRIPTION
       }
 
     The `:optimize` attribute is supported for `after`.
+
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
 
    `around`
     The `around` method modifier is somewhat more interesting.
@@ -1089,6 +1248,10 @@ DESCRIPTION
 
     Note that `SUPER::` won't work as expected in MooX::Pression, so `around`
     should be used instead.
+
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
 
    `factory`
     The `factory` keyword is used to define alternative constructors for your
@@ -1190,6 +1353,8 @@ DESCRIPTION
 
     The `:optimize` attribute is supported for `factory`.
 
+    The `factory` keyword can only be used inside `class` blocks.
+
    Implementing a singleton
     Factories make it pretty easy to implement a singleton.
 
@@ -1219,6 +1384,9 @@ DESCRIPTION
 
     The class will still be called MyApp::Homo::Sapiens but the type in the
     type library will be called Human instead of Homo_Sapiens.
+
+    Can only be used in `class`, `abstract class`, `role`, and `interface`
+    blocks.
 
    `coerce`
       class Person {
@@ -1271,6 +1439,8 @@ DESCRIPTION
 
     The `:optimize` attribute is not currently supported for `coerce`.
 
+    Can only be used in `class` blocks.
+
    `overload`
       class Collection {
         has items = [];
@@ -1280,12 +1450,17 @@ DESCRIPTION
     The list passed to `overload` is passed to overload with no other
     processing.
 
+    Can only be used in `class` blocks.
+
    `version`
       class Person {
         version 1.0;
       }
 
     This just sets $MyApp::Person::VERSION.
+
+    Can only be used in `class`, `abstract class`, `role`, and `interface`
+    blocks.
 
     You can set a default version for all packages like this:
 
@@ -1306,6 +1481,9 @@ DESCRIPTION
     This just sets $MyApp::Person::AUTHORITY.
 
     It is used to indicate who is the maintainer of the package.
+
+    Can only be used in `class`, `abstract class`, `role`, and `interface`
+    blocks.
 
       use MooX::Pression (
         ...,
@@ -1498,6 +1676,32 @@ DESCRIPTION
     And last but not least, it exports all the types, `is_*` functions, and
     `assert_*` functions from Types::Standard, Types::Common::String, and
     Types::Common::Numeric.
+
+    As of version 0.304, you can choose which parts of MooX::Pression you
+    import:
+
+      package MyApp {
+        use MooX::Pression keywords => [qw/
+          -booleans
+          -privacy
+          -utils
+          -types
+          -is
+          -assert
+          -features
+          try
+          class abstract role interface
+          include toolkit begin end extends with requires
+          has constant method multi factory before after around
+          type_name coerce
+          version authority overload
+        /];
+
+    It should mostly be obvious what they all do, but `-privacy` is `ro`,
+    `rw`, `rwp`, etc; `-types` is bareword type constraints (though even
+    without this export, they should work in method signatures), `-is` are the
+    functions like `is_NonEmptyStr` and `is_Object`, `-assert` are functions
+    like `assert_Int`, `-utils` gives you `blessed` and `confess`.
 
   Anonymous Classes and Roles
    Anonymous classes
@@ -1754,30 +1958,9 @@ DESCRIPTION
     signature and unpack @_ inside your method body however you need to.
 
    Lexical accessors
-    Moops automatically imported `lexical_has` from Lexical::Accessor into
-    each class. MooX::Pression does not, but thanks to how namespacing works,
-    it only needs to be imported once if you want to use it.
-
-      package MyApp {
-        use MooX::Pression;
-        use Lexical::Accessor;
-    
-        class Foo {
-          my $identifier = lexical_has identifier => (
-            is      => rw,
-            isa     => Int,
-            default => sub { 0 },
-          );
-      
-          method some_method () {
-            $self->$identifier( 123 );    # set identifier
-            ...;
-            return $self->$identifier;    # get identifier
-          }
-        }
-      }
-
-    Lexical accessors give you true private object attributes.
+    MooX::Pression has tighter integration with Lexical::Accessor, allowing
+    you to use the same keyword `has` to declare private and public
+    attributes.
 
    Factories
     MooX::Pression puts an emphasis on having a factory package for
@@ -1846,7 +2029,10 @@ TODO
     extensions can hook into.
 
     If you're interested in extending MooX::Pression, file a bug report about
-    it and let's have a conversation about the best way for that to happen.
+    it and let's have a conversation about the best way for that to happen. I
+    probably won't start a plugin API until someone actually wants to write a
+    plugin, because that will give me a better idea about what kind of API is
+    required.
 
 SEE ALSO
     Less magic version: MooX::Press, portable::loader.

@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Devel::CheckLib" : "0"
          }
       },
       "runtime" : {
@@ -37,11 +37,13 @@
          "requires" : {
             "Test::LeakTrace" : "0",
             "Test::NoWarnings" : "0",
+            "Test::Pod" : "1.00",
+            "Test::TCP" : "0",
             "Test::Warn" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,114 +1,43 @@
 use v5.14;
 use warnings;
 
-package Datify::Path v0.19.045;
+package Datify::Path v0.20.045;
 # ABSTRACT: Describe structures like filesystem paths.
 # VERSION
 
 use Carp            ();    #qw( carp croak );
-use Datify          ();    #qw( self );
+use Datify          ();    #qw( self _internal );
+use List::Util      ();    #qw( reduce );
 use Scalar::Util    ();    #qw( blessed refaddr reftype );
 use String::Tools qw( subst );
 
-our %SETTINGS = ();
+use parent 'Datify';
 
 ### Public methods ###
 
 
-
-sub new {
-    my $class = shift || __PACKAGE__;
-
-    my %self = ();
-    if ( defined( my $blessed = Scalar::Util::blessed($class) ) ) {
-        %self  = %$class;    # shallow copy
-        $class = $blessed;
-    }
-    return @_ ? bless( \%self, $class )->set(@_) : bless( \%self, $class );
-}
+### Constructor ###
 
 
 
-sub get {
-    my $self = shift;
-    my $count = scalar(@_);
-
-    if ( defined( Scalar::Util::blessed($self) ) ) {
-        return
-              $count == 0 ? %{ { %SETTINGS, %$self } }
-            : $count == 1 ?
-                exists  $self->{ $_[0] }
-                    ?   $self->{ $_[0] }
-                    : $SETTINGS{ $_[0] }
-            : map { exists $self->{$_} ? $self->{$_} : $SETTINGS{$_} } @_;
-    } else {
-        return
-              $count == 0 ? %SETTINGS
-            : $count == 1 ? $SETTINGS{ $_[0] }
-            :               @SETTINGS{@_};
-    }
-}
-
-
-
-sub set {
-    my $self = shift;
-    return $self unless @_;
-    my %set  = @_;
-
-    my $return;
-    my $class;
-    if ( defined( $class = Scalar::Util::blessed($self) ) ) {
-        # Make a shallow copy
-        $self   = bless { %$self }, $class;
-        $return = 0;
-    } else {
-        $class  = $self;
-        $self   = \%SETTINGS;
-        $return = 1;
-    }
+### Accessor ###
 
 
 
 
-    my $internal = $class->isa( scalar caller );
-    while ( my ( $k, $v ) = each %set ) {
-        Carp::carp( 'Unknown key ', $k )
-            unless $internal
-            || exists $self->{$k}
-            || exists $SETTINGS{$k};
-        $self->{$k} = $v;
-    }
 
-    return ( $self, $class )[$return];
-}
+### Setter ###
 
-
-
-sub exists {
-    my $self = shift;
-    return unless my $count = scalar(@_);
-
-    if ( Scalar::Util::blessed($self) ) {
-        return $count == 1
-            ? do {  exists $self->{ $_[0] } || exists $SETTINGS{ $_[0] } }
-            : map { exists $self->{ $_ }    || exists $SETTINGS{ $_ } } @_;
-    } else {
-        return
-            $count == 1 ? exists $SETTINGS{ $_[0] }
-            :       map { exists $SETTINGS{ $_ } } @_;
-    }
-}
 
 
 
 sub pathify {
     return unless defined( my $wantarray = wantarray );
-    my $self = &Datify::self;
+    my $self = &self;
     local $_ = @_ == 0 ? $_ : @_ == 1 ? shift : \@_;
 
     my $values = $self->_cache_get($_) // [ $self->_scalar($_) ];
-    if ( $self->isa( scalar caller ) ) {
+    if ( $self->_internal ) {
         $self->_cache_add( $_ => $values );
     } else {
         $values = [ map $self->_flatten, @$values ];
@@ -117,14 +46,22 @@ sub pathify {
     return $wantarray ? @$values : $values;
 }
 
-### Private methods ###
+### Private Methods ###
+### Do not use these methods outside of this package,
+### they are subject to change or disappear at any time.
+*self = \&Datify::self;
+sub _settings() {
+    Carp::croak('Illegal use of private method') unless $_[0]->_internal;
+    \state %SETTINGS;
+}
+
 
 __PACKAGE__->set(
     datify_options => {},
 );
 
 sub _datify {
-    my $self = &Datify::self;
+    my $self = &self;
     my $datify = $self->get('_datify');
     if ( not $datify ) {
         $datify = Datify->new( %{ $self->get('datify_options') // {} } );
@@ -138,7 +75,7 @@ __PACKAGE__->set(
 );
 
 sub _flatten {
-    my $self = &Datify::self;
+    my $self = &self;
     local $_ = shift if @_;
     my $ref = Scalar::Util::reftype($_);
     my ( $key, $value ) = $ref && $ref eq 'ARRAY' ? @$_ : ($_);
@@ -180,7 +117,7 @@ __PACKAGE__->set(
 );
 
 sub _array {
-    my $self = &Datify::self;
+    my $self = &self;
     local $_ = shift if @_;
 
     my $datify     = $self->_datify;
@@ -210,7 +147,7 @@ __PACKAGE__->set(
 );
 
 sub _hash {
-    my $self = &Datify::self;
+    my $self = &self;
     local $_ = shift if @_;
 
     my $path_separator = $self->get('path_separator');
@@ -246,7 +183,7 @@ sub _hash {
 #}
 
 sub _scalar {
-    my $self = &Datify::self;
+    my $self = &self;
     local $_ = shift if @_;
 
     return undef unless defined;
@@ -273,17 +210,7 @@ __PACKAGE__->set(
     nested     => '$key$subkey',
 );
 
-sub _push_position {
-    my $self     = shift;
-    my $position = shift;
-    push @{ $self->{_position} //= [] }, $position;
-    return $self;
-}
-sub _pop_position {
-    my $self = shift;
-    return pop @{ $self->{_position} };
-}
-sub _position {
+sub _cache_position {
     my $self = shift;
 
     my $nest = $self->get('nested');
@@ -300,7 +227,7 @@ sub _cache_add {
 
     return $self unless my $refaddr = Scalar::Util::refaddr $ref;
     my $_cache = $self->{_cache} //= {};
-    my $entry = $_cache->{$refaddr} //= [ [ \$self->_position ] ];
+    my $entry = $_cache->{$refaddr} //= [ [ \$self->_cache_position ] ];
     push @$entry, $value if @$entry == $self->get('_cache_hit');
 
     return $self;
@@ -315,11 +242,11 @@ sub _cache_get {
     if ( my $entry = $_cache->{$refaddr} ) {
         my $repr = $self->get('_cache_hit');
         return $entry->[$repr]
-            // Carp::croak 'Recursive structures not allowed at ',
-                           $self->_position;
+            // Carp::croak( 'Recursive structures not allowed at ',
+                $self->_cache_position );
     } else {
         # Pre-populate the cache, so that we can check for loops
-        $_cache->{$refaddr} = [ [ \$self->_position ] ];
+        $_cache->{$refaddr} = [ [ \$self->_cache_position ] ];
         return;
     }
 }
@@ -350,6 +277,12 @@ Create a C<Datify::Path> object with the following options.
 
 See L</OPTIONS> for a description of the options and their default values.
 
+=head2 C<exists( name, name, ... )>
+
+Determine if values exists for one or more settings.
+
+Can be called as a class method or an object method.
+
 =head2 C<get( name, name, ... )>
 
 Get one or more existing values for one or more settings.
@@ -372,12 +305,6 @@ persist the change:
 
  $datify = $datify->set( ... );
 
-=head2 exists( name, name, ... )
-
-Determine if values exists for one or more settings.
-
-Can be called as a class method or an object method.
-
 =head2 pathify( ... )
 
 =head1 BUGS
@@ -391,7 +318,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.19.045 of this module.
+This document describes version v0.20.045 of this module.
 
 =head1 AUTHOR
 

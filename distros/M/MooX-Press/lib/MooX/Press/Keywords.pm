@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press::Keywords;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.043';
+our $VERSION   = '0.046';
 
 use Type::Library -base;
 use Type::Utils ();
@@ -25,13 +25,14 @@ sub false ()   { !!0 }
 
 $EXPORT_TAGS{ 'booleans' } = [qw/ true false /];
 
-sub ro   ()   { 'ro'   }
-sub rw   ()   { 'rw'   }
-sub rwp  ()   { 'rwp'  }
-sub lazy ()   { 'lazy' }
-sub bare ()   { 'bare' }
+sub ro   ()    { 'ro'      }
+sub rw   ()    { 'rw'      }
+sub rwp  ()    { 'rwp'     }
+sub lazy ()    { 'lazy'    }
+sub bare ()    { 'bare'    }
+sub private () { 'private' }
 
-$EXPORT_TAGS{ 'privacy' } = [qw/ ro rw rwp lazy bare /];
+$EXPORT_TAGS{ 'privacy' } = [qw/ ro rw rwp lazy bare private /];
 
 use Scalar::Util qw( blessed );
 sub confess {
@@ -117,7 +118,7 @@ C<true> and C<false> boolean constants.
 
 =item *
 
-C<ro>, C<rw>, C<rwp>, C<lazy>, and C<bare> string constants.
+C<ro>, C<rw>, C<rwp>, C<lazy>, C<private>, and C<bare> string constants.
 
 =item *
 

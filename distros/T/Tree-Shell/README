@@ -1,0 +1,20 @@
+NAME
+    Tree::Shell - Navigate and manipulate in-memory tree objects using a CLI
+    shell
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+    See treesh for more details.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,9 +1,14 @@
-0.008   2017-04-25 (PERLANCAR)
+0.009   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add meta().
+
+
+0.008   2017-04-25  Released-By: PERLANCAR
 
 	- Allow using DateTime::Format::Alami::*.
 
 
-0.007   2016-12-18 (PERLANCAR)
+0.007   2016-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -11,19 +16,19 @@
 	  the convention.
 
 
-0.006   2016-12-18 (PERLANCAR) (unreleased)
+0.006   2016-12-18 (PERLANCAR)  Released-By: unreleased
 
         - Rename module/dist from Sort-Sub-{,by_}date_in_text.
 
 
-0.005   2016-12-17 (PERLANCAR)
+0.005   2016-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
         - [dist] Rebuild with update Pod::Weaver::Plugin::Sort::Sub.
 
 
-0.004   2016-12-17 (PERLANCAR)
+0.004   2016-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -31,17 +36,17 @@
 	  etc.
 
 
-0.003   2016-12-16 (PERLANCAR)
+0.003   2016-12-16  Released-By: PERLANCAR
 
 	- Add debugging message on DEBUG.
 
 
-0.002   2016-04-06 (PERLANCAR)
+0.002   2016-04-06  Released-By: PERLANCAR
 
 	- Allow customizing which Date::Extract module to use (via
 	  PERL_DATE_EXTRACT_MODULE).
 
 
-0.001   2016-04-06 (PERLANCAR)
+0.001   2016-04-06  Released-By: PERLANCAR
 
         - First release.

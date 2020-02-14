@@ -27,6 +27,10 @@ PUBLIC METHODS
 
       Reads the zone data from the supplied string
 
+    die_on ( $Name, $Type, $Error )
+
+      Die with $Error for a query of $Name and $Type
+
 DEPENDENCIES
 
       Net::DNS::Resolver

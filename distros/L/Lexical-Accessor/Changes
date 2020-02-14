@@ -6,6 +6,26 @@ Home page:    <https://metacpan.org/release/Lexical-Accessor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.012	2020-02-14
+
+ - Make Hash::FieldHash a recommendation rather than a requirement; fall
+   back to Hash::Util::FieldHash on Perl 5.10+ and
+   Hash::Util::FieldHash::Compat on Perl 5.8.
+
+0.011	2020-02-14
+
+ - Allow private attributes to have public accessor methods. (They could
+   already have public methods delegated to them.)
+
+0.010	2020-02-14
+
+ [ Documentation ]
+ - Document that you can use non-lexical methods for delegations. (This has
+   already worked for at least five years.)
+
+ [ Other ]
+ - Added: Sub::HandlesVia support.
+
 0.009	2017-06-13
 
  [ Bug Fixes ]

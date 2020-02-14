@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Colouring::In: '0'
-  MooX::Pression: '0'
-  PDF::API2: '0'
-  Sub::MultiMethod: '0'
+  Colouring::In: '0.14'
+  MooX::Pression: '0.303'
+  PDF::API2: '2.037'
+  Sub::MultiMethod: '0.0008'
   perl: '5.006'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

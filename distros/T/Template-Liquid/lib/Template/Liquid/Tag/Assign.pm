@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Assign;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 use strict;
 use warnings;
 require Template::Liquid::Error;
@@ -36,11 +36,9 @@ sub new {
             $filter =~ s[\s*$][]o;    # XXX - the splitter should clean...
             $filter =~ s[^\s*][]o;    # XXX -  ...this up for us.
             my @f_args
-                = $f_args
-                ? split
-                $Template::Liquid::Utility::VariableFilterArgumentParser,
+                = !defined $f_args ? () : grep { defined $_ }
                 $f_args
-                : ();
+                =~ m[$Template::Liquid::Utility::VariableFilterArgumentParser]g;
             push @{$args->{'filters'}}, [$filter, \@f_args];
         }
     }
@@ -63,7 +61,11 @@ sub render {
                     $val = $call->($val, @$args);
                     next FILTER;
                 }
-                raise Template::Liquid::FilterNotFound $name;
+                raise Template::Liquid::Error {
+                                        type    => 'Filter',
+                                        message => "Filter '$name' not found",
+                                        fatal   => 1
+                };
             }
         }
     }

@@ -1,5 +1,5 @@
 package Template::Liquid::Tag::Break;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 use strict;
 use warnings;
 require Template::Liquid::Error;

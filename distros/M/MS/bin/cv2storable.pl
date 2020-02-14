@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Storable qw/nstore_fd/;
-use List::Util qw/any/;
+use List::MoreUtils qw/any/;
 use Getopt::Long;
 
 my ($fn_ms, $fn_mod, $fn_mi, $fn_ims, $fn_uo, $dump) = (undef) x 6;

@@ -1,0 +1,42 @@
+CHANGES
+examples/moveFindResultsWindow.pl
+examples/readme.txt
+lib/Win32/Mechanize/NotepadPlusPlus.pm
+lib/Win32/Mechanize/NotepadPlusPlus/__hwnd.pm
+lib/Win32/Mechanize/NotepadPlusPlus/__npp_idm.pm
+lib/Win32/Mechanize/NotepadPlusPlus/__npp_msgs.pm
+lib/Win32/Mechanize/NotepadPlusPlus/__sci_msgs.pm
+lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
+lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+RELEASE.md
+src/convertHeaders.pl
+src/menuCmdID.h
+src/Notepad_plus_msgs.h
+src/Scintilla.h
+t/00-load.t
+t/01-bits.t
+t/09-sendMessage.t
+t/10-defaults.t
+t/11-vars-editor.t
+t/11-vars-main.t
+t/11-vars-notepad.t
+t/20-sessionSaver.t
+t/30-nppViaObject.t
+t/31-nppBeforeObject.t
+t/myTestHelpers.pm
+t/npp-buffer.t
+t/npp-files.t
+t/npp-gui.t
+t/npp-meta.t
+t/npp-sci.t
+t/sci-auto.t
+t/sci-manu.t
+t/sci-undo.t
+xt/00-sign.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

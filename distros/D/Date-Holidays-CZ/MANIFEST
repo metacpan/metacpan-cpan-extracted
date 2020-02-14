@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING.rst
 example/business-days-diff.plx
 example/svatky.plx
 lib/Date/Holidays/CZ.pm
@@ -14,3 +15,4 @@ t/basic.t
 t/critic.t
 t/manifest.t
 t/perlcriticrc
+t/pod.t

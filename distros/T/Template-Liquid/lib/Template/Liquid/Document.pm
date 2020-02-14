@@ -1,5 +1,5 @@
 package Template::Liquid::Document;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 require Template::Liquid::Variable;
 require Template::Liquid::Utility;
 use strict;
@@ -89,11 +89,9 @@ NODE: while (my $token = shift @{$tokens}) {
                 $filter =~ s[\s*$][]o;    # XXX - the splitter should clean...
                 $filter =~ s[^\s*][]o;    # XXX -  ...this up for us.
                 my @args
-                    = $args
-                    ? split
-                    $Template::Liquid::Utility::VariableFilterArgumentParser,
+                    = !defined $args ? () : grep { defined $_ }
                     $args
-                    : ();
+                    =~ m[$Template::Liquid::Utility::VariableFilterArgumentParser]g;
                 push @filters, [$filter, \@args];
             }
             push @{$s->{'nodelist'}},

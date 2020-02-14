@@ -52,3 +52,9 @@ Revision history for Perl extension Date::Holidays::CZ
 0.17 2020-02-11 19:31 CET
 - Drop distro-specific prerelease.sh and release.sh
 
+0.18 2020-02-14 09:43 CET
+- CONTRIBUTING.rst: add new file
+- Try to fix MANIFEST.SKIP
+- CZ.pm: Add license text to main module POD
+- t/pod.t: test POD
+

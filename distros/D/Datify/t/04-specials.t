@@ -67,6 +67,7 @@ my $datify = join(' ', do {
         quote2           => '"',
         quote3           => '/',
         reference        => '\\\\$_',
+        scalar_ref       => '\\\\do{1;$_}',
         sigils           => '$@',
         true             => 1,
         vformat          => 'v%vd'
@@ -77,28 +78,26 @@ format EMPTY_FORMAT =
 .
 
 my @specials = (
-    undef             => undef()          => 'undef',
-    '\\8_675_309'     => \867_5309        => 'number ref',
-    "\\'scalar'"      => \'scalar'        => 'string ref',
+    [ 'undef'           => undef()          => 'undef'      ],
+    [ '\\8_675_309'     => \867_5309        => 'number ref' ],
+    [ "\\'scalar'"      => \'scalar'        => 'string ref' ],
 
-    "['array', 1]"    => [ array => 1 ]   => 'array ref',
-    'sub {...}'       => sub {}           => 'code ref',
-    '*::STDOUT'       => *STDOUT          => 'glob',
-    '{hash => 1}'     => { hash  => 1 }   => 'hash ref',
-    "\\substr('', 0)" => \substr('', 0)   => 'lvalue ref',
-    'qr/(?^:\s*)/'    => qr/\s*/          => 'regexp',
-    'v99.98.97'       => v99.98.97        => 'vstring',
+    [ "['array', 1]"    => [ array => 1 ]   => 'array ref'  ],
+    [ 'sub {...}'       => sub {}           => 'code ref'   ],
+    [ '*::STDOUT'       => *STDOUT          => 'glob'       ],
+    [ '{hash => 1}'     => { hash  => 1 }   => 'hash ref'   ],
+    [ "\\substr('', 0)" => \substr('', 0)   => 'lvalue ref' ],
+    [ 'qr/(?^:\s*)/'    => qr/\s*/          => 'regexp'     ],
+    [ 'v99.98.97'       => v99.98.97        => 'vstring'    ],
 
-    q!bless(*STDOUT{IO}, 'IO::File')! => *STDOUT{IO} => 'IO',
+    [ q!bless(*STDOUT{IO}, 'IO::File')! => *STDOUT{IO} => 'IO' ],
 
-    "bless({}, 'Datify')"
-        => Datify->new()
-        => 'simple Datify object',
-    "bless({$datify}, 'Datify')"
-        => Datify->new( Datify->get )
-        => 'complete Datify object',
+    [ "bless({}, 'Datify')" => Datify->new() => 'simple Datify object' ],
+    [ "bless({$datify}, 'Datify')" =>
+                               Datify->new( Datify->get ) =>
+                                                'complete Datify object' ],
 
-    "format UNKNOWN =\n.\n" => *EMPTY_FORMAT{FORMAT} => 'format ref',
+    [ "format UNKNOWN =\n.\n" => *EMPTY_FORMAT{FORMAT} => 'format ref' ],
 );
 foreach my $stringified (qw( [] {} 'string' 123 456.78 )) {
     my $thing = eval $stringified;
@@ -112,15 +111,15 @@ foreach my $stringified (qw( [] {} 'string' 123 456.78 )) {
         $thing = \do { 1; $thing };
         $repr = '\\' . $repr;
     }
-    push @specials,
-        qq!bless($repr, 'Test::${ref}::Object')!,
-        bless( $thing, "Test::${ref}::Object" ),
-        "a $ref object",
-        ;
+    push @specials, [
+        qq!bless($repr, 'Test::${ref}::Object')! =>
+        bless( $thing, "Test::${ref}::Object" )  =>
+        "a $ref object"
+    ];
 }
 
-for ( my $i = 0; $i < @specials - 1; $i += 3 ) {
-    my ( $string, $special, $desc ) = @specials[ $i, $i + 1, $i + 2 ];
+foreach my $string_special_desc (@specials) {
+    my ( $string, $special, $desc ) = @$string_special_desc;
     my $str;
 
     $str = Datify->scalarify($special);

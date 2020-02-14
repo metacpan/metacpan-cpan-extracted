@@ -4,13 +4,13 @@
       "Jeremy Volkening <jdv@base2bio.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MS",
    "prereqs" : {
@@ -46,7 +46,7 @@
    "provides" : {
       "MS" : {
          "file" : "lib/MS.pm",
-         "version" : "0.204001"
+         "version" : "0.204002"
       },
       "MS::CV" : {
          "file" : "lib/MS/CV.pm"
@@ -169,5 +169,6 @@
          "url" : "https://github.com/jvolkening/p5-MS"
       }
    },
-   "version" : "0.204001"
+   "version" : "0.204002",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

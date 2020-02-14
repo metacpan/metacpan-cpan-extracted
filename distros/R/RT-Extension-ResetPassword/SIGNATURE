@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,39 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 f36944c6f5b628fe5fe3a53c76e1c2d255dace9d Changes
-SHA1 a532a85c86e4b60c6ed06c93fb62bf159f0bab56 MANIFEST
-SHA1 0adcd7cdda430f2e7dbbacbefada3a0af255b5ad META.yml
-SHA1 bf975311a45adfd4da65a2b3614e440c0b365cc4 Makefile.PL
-SHA1 d8c5dd22534248085f1e4947d2a8a1d75b2ee231 README
-SHA1 aa8aa3d9512d7ef1ce98d5b2921776adc961fa7e etc/initialdata
-SHA1 6fab2c0c83c72aa30556578ae4b324b25d6fe9c3 html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
-SHA1 07da398d027e387459d6e785891923c578ff0000 html/NoAuth/ResetPassword/Request.html
-SHA1 957b33bce599f8d73778be00a1029717c70c75da html/NoAuth/ResetPassword/Reset/dhandler
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 20c3e601f307847362142395e404613b8266ef2b inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 05a05009a56ed3324a5c037bd433f57d6726bb33 lib/RT/Extension/ResetPassword.pm
+SHA256 ac87bb33ba08198d06a539b9363e023ecb6f2066ade5a0934b5464c32b1db68d Changes
+SHA256 f0336855d47a16147e121bdde5db11c58ec86f422702432bb08daa16d5fa8678 MANIFEST
+SHA256 7263ac97faa5d69ab8d90954c3511bfa74bbcf125b848cd231a2333a1dbd2e87 META.yml
+SHA256 199a209932dbeb860b34b7ddce745dc354d17f0001c4ec11d6ccd4a8c7ed95c9 Makefile.PL
+SHA256 674a933c5b99ed2c28b3b392a4363ce7c53a7df1faca0035e9cd78c52e222a1d README
+SHA256 ec273beec622cbc98484f1167ac579622b400a5a071c91e0a73afd15dd9d8aff etc/initialdata
+SHA256 1dfa948230ac875cda796066b7b17b792a4d8b554847f482ab413d2634104a1f html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
+SHA256 5998fc153b775139e3a618845460dc66dfaf7e2522fe4e4fc58c13bf8bfa4778 html/NoAuth/ResetPassword/Request.html
+SHA256 a98bd2f5907519b548a673910ef85a1120e2bc8e85797b647efad42408b2f0a8 html/NoAuth/ResetPassword/Reset/dhandler
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 82b4425807ec3774f36958effd62d88c167b95c6da08c0749d7ae9e6c2af25a2 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 aa0459acb78db16cbeb209ac94c1be8f883120669bccea4c84b457a2dc90874d lib/RT/Extension/ResetPassword.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJYGN3qAAoJEBXncVGnZqUUMr4H/3v5fFdiX64GwIZ/1Gx1Pkvv
-Nd51tVtSNdYPXMHjA8KsCu3tRcoRHJ3pYKqFKg7YAKa2elKI/ekkJ8Ii4G55+ufy
-MtjP42J1jkVg5LXHXPUtLnfQygmbYKBNUDlcmFXgFBYeZBhzay9LhSdXaFo/c05C
-wAdGFlPXi3I2wKXmicL0TU50dQGT5EOAJ4JgwXvgv/QvvuCFOInGy8tgCXFtG3M/
-AiDzcrlTVNrqORq7OkgZKytIhD4sS02IQg7aNGhuyJvlwYTqro8/Rtp++fGNyRLV
-8fSqm7YTb1MJ1di5PUka7R4yPe1kFC1D99d1+s/fe2z9mpilQn1JJBuRDoc/7fM=
-=8ws0
+iQEcBAEBCAAGBQJeRxZHAAoJEA3wooP+rICybccH/jnmv0v8KjGLYM6uCZComBIH
+livaDzCG+Cb+/YIgLKZboWnJ73lZG2WTmMPHf1dEizecVyQDAwaN4Y7Vc7BMVFgv
+AIwXlKAPOKNvioN9nWKtS31CGutxALnZxbYO50lpNsgUkgJzmTKfWz9jq6qLv9GI
+uDB6IYUUceNyns/1jvoXqtsV3QMlZvizkVYu6wyLq8KlUvFbQRXAaMmofD0EAqGO
+yhXRPtfx83Uatd3mhiJ3+rgqAvWF0/TDhqIMvNZMNtnCqZEIe29+uWcbMZXOxQ7a
+xCXywvz/xPJS8UckJL4wr6AbMGTDsEnpXXAYerm9ilBR3Ofu+sdmLjayFWiZWAg=
+=xRpS
 -----END PGP SIGNATURE-----

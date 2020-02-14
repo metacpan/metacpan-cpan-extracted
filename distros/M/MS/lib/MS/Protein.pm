@@ -5,8 +5,8 @@ use warnings;
 
 use Carp;
 use Exporter qw/import/;
-use List::Util qw/any sum/;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/sum/;
+use List::MoreUtils qw/any uniq/;
 use Scalar::Util qw/blessed/;
 
 use MS::Mass qw/:all/;

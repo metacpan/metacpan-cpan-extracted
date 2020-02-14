@@ -876,6 +876,38 @@ DESCRIPTION
         MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
         will translate them if you're using Moose or Mouse.
 
+        There is a special value `is => "private"` to create private
+        attributes. These attributes cannot be set by the constructor (they
+        always have `init_arg => undef`) and do not have accessor methods.
+        They are stored inside-out, so cannot even be accessed using direct
+        hashref access of the object. If you're thinking this makes them
+        totally inaccessible, and therefore useless, think again.
+
+        For private attributes, you can request an accessor as a coderef:
+
+          my $my_attr;
+          use MooX::Press (
+            'class:Foo' => {
+              has => {
+                'my_attr' => { is => 'private', accessor => \$my_attr },
+              },
+              can => {
+                'my_method' => sub {
+                  my $self = shift;
+                  $self->$my_attr(42);        # writer
+                  return $self->$my_attr();   # reader
+                },
+              },
+            },
+          );
+
+        Private attributes may have defaults and builders (but they are always
+        lazy!) They may also have `handles`. (Though if the `handles` option
+        is an arrayref, it is treated slightly differently from non-private
+        attributes; see Lexical::Accessor for details.) You may find you can
+        do everything you need with the builders and delegations, so having an
+        accessor is unnecessary.
+
     `isa` *(Str|Object)*
         When the type constraint is a string, it is always assumed to be a
         class name and your application's namespace prefix is added. So `isa
@@ -1410,6 +1442,8 @@ BUGS
     <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>.
 
 SEE ALSO
+    Zydeco.
+
     Moo, MooX::Struct, Types::Standard.
 
     portable::loader.

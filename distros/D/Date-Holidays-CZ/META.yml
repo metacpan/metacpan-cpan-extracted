@@ -17,7 +17,7 @@ name: Date-Holidays-CZ
 provides:
   Date::Holidays::CZ:
     file: lib/Date/Holidays/CZ.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Date::Calc: '5'
   perl: '5.01'
@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/smithfarm/date-holidays-cz/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/smithfarm/date-holidays-cz.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

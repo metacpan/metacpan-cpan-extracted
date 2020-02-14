@@ -16,7 +16,7 @@ use JSON::XS ();
 use Encode;
 
 chomp(my $version = qx{git describe --dirty});
-my $yaml_test_suite = 'yaml-test-suite';
+my $yaml_test_suite = 'test-suite/yaml-test-suite-data/';
 my @dirs = grep { m{/[0-9A-Z]{4}$} } map { "$_" } io->dir($yaml_test_suite)->all;
 my @valid = grep { not -f "$_/error" } @dirs;
 my @invalid = grep { -f "$_/error" } @dirs;
@@ -100,6 +100,9 @@ pre.diff {
 </style>
 </head>
 <body>
+<a href="test-suite.html">YAML Test Suite Test Cases</a>
+| <a href="schema-examples.html">Schema examples</a>
+| <a href="schemas.html">Schema comparison</a><hr>
 Generated with YAML::PP $version<br>
 <a href="#valid">Valid (@{[ scalar @valid ]})</a><br>
 <a href="#invalid">Invalid (@{[ scalar @invalid ]})</a><br>
@@ -107,6 +110,7 @@ EOM
 
 my $ypp = YAML::PP->new(
     boolean => 'JSON::PP',
+    schema => [qw/ Core /],
 );
 my $table;
 for my $dir (sort @valid) {
@@ -217,7 +221,7 @@ sub highlight_test {
         "Doc " . ($_+1) . ': ' . $coder->encode( $docs[ $_ ] );
     } 0 .. $#docs;
 
-    my $yppd = YAML::PP::Dumper->new( bool => 'JSON::PP' );
+    my $yppd = YAML::PP->new( boolean => 'JSON::PP' );
     my $yaml_dump = $yppd->dump_string(@docs);
 
     my @reload_docs = $ypp->load_string($yaml_dump);

@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1748 2019-07-15 07:57:00Z willem $
+# $Id: Base.pm 1762 2020-02-02 21:39:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1762 $)[1];
 
 
 #
@@ -636,14 +636,14 @@ sub bgbusy {
 
 
 sub bgisready {				## historical
-	_deprecate('prefer bgbusy()');				# uncoverable pod
+	_deprecate('prefer  ! bgbusy(...)');			# uncoverable pod
 	!&bgbusy;
 }
 
 
 sub bgread {
 	while (&bgbusy) {					# side effect: TCP retry
-		IO::Select->new( $_[1] )->can_read(0.02);	# use 3 orders of magnitude less CPU
+		IO::Select->new( $_[1] )->can_read(0.02);	# reduce my CPU usage by 3 orders of magnitude
 	}
 	&_bgread;
 }

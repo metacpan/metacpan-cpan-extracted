@@ -1,7 +1,7 @@
 package Template::Liquid::Utility;
 use strict;
 use warnings;
-our $VERSION         = '1.0.14';
+our $VERSION         = '1.0.16';
 our $FilterSeparator = qr[\s*\|\s*]o;
 my $ArgumentSeparator = qr[,]o;
 our $FilterArgumentSeparator    = qr[\s*:\s*]o;
@@ -30,8 +30,15 @@ my $PartialTemplateParser
 my $TemplateParser = qr[(${PartialTemplateParser}|${AnyStartingTag})]os;
 our $VariableParser
     = qr[${VariableStart}([\w\.]+)(?:\s*\|\s*(.+)\s*)?${VariableEnd}$]so;
-our $VariableFilterArgumentParser
-    = qr[\s*,\s*(?=(?:[^\']*\'[^\']*\')*(?![^\']*\'))]os;
+our $VariableFilterArgumentParser = qr[
+ (?:
+	(?:\s*,\s*)?
+	(?:
+	   ((?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\"))
+	  |((?:\')(?:[^\\\']*(?:\\.[^\\\']*)*)(?:\'))
+	  |(?:([^,]+)(?:\s*,\s*)?)
+	)
+)]smx;
 our $TagMatch = qr[^${Template::Liquid::Utility::TagStart}   # {%
                                 (.+?)                              # etc
                               ${Template::Liquid::Utility::TagEnd} # %}

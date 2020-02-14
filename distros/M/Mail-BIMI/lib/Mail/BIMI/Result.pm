@@ -1,6 +1,6 @@
 package Mail::BIMI::Result;
-# ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200210'; # VERSION
+# ABSTRACT: Class to model a BIMI result
+our $VERSION = '1.20200214'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};
@@ -40,9 +40,6 @@ sub get_authentication_results_object($self) {
 
 sub get_authentication_results($self) {
   return $self->get_authentication_results_object->as_string;
-}
-
-sub get_bimi_location {
 }
 
 1;

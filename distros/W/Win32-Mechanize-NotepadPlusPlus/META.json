@@ -1,0 +1,98 @@
+{
+   "abstract" : "Automate the Windows application Notepad++",
+   "author" : [
+      "Peter C. jones <petercj AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Notepad++",
+      "automation"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Win32-Mechanize-NotepadPlusPlus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "Test::More" : "0.86",
+            "Win32" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Encode" : "0",
+            "Exporter" : "5.57",
+            "File::Which" : "0",
+            "IPC::Open2" : "0",
+            "Win32" : "0",
+            "Win32::API" : "0.71",
+            "Win32::GUI" : "0",
+            "Win32::GuiTest" : "1.64",
+            "constant" : "0",
+            "perl" : "5.010000",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Encode" : "0",
+            "FindBin" : "0",
+            "Path::Tiny" : "0.058",
+            "Test::More" : "0.86",
+            "Win32" : "0",
+            "Win32::API" : "0",
+            "Win32::GuiTest" : "1.64",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Win32::Mechanize::NotepadPlusPlus" : {
+         "file" : "lib/Win32/Mechanize/NotepadPlusPlus.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Win32-Mechanize-NotepadPlusPlus@rt.cpan.org",
+         "web" : "https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus.git",
+         "web" : "https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

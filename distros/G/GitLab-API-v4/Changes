@@ -1,5 +1,15 @@
 Revision history for Perl extension GitLab-API-v4.
 
+0.25 2020-02-12T22:20:48Z
+
+ - Add the delete_pipeline method.
+
+0.24 2020-02-12T22:09:39Z
+
+ - Add all the container registry methods.
+ - Add http_tiny_request and http_tiny_response to ::RESTClient.  This
+   should help people debug issues easier.
+
 0.23 2019-10-18T19:55:06Z
 
  - Fix delete_runner so that it doesn't try to decode the response.

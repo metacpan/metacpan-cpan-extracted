@@ -3,16 +3,16 @@ use strict;
 use warnings;
 
 package Mxpress::PDF {
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 	use MooX::Pression (
-		version	=> '0.03',
+		version	=> '0.04',
 		authority => 'cpan:LNATION',
 	);
 	use Colouring::In;
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font line box circle text title subtitle subsubtitle toc image/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (type => Object);
@@ -32,6 +32,13 @@ package Mxpress::PDF {
 		has page_args (type => HashRef);
 		has onsave_cbs (type => ArrayRef);
 		method add_page (Map %args) {
+			$args{is_rotated} = 0;
+			if ($self->page) {
+				$self->page->next_column() && return;
+				$self->page->next_row() && return;
+				$args{is_rotated} = $self->page->is_rotated;
+				$args{columns} = $self->page->columns;
+			}
 			my $page = $self->FACTORY->page(
 				$self->pdf,
 				page_size => 'A4',
@@ -41,7 +48,7 @@ package Mxpress::PDF {
 			);
 			push @{$self->pages}, $page;
 			$self->page($page);
-			$self->box->add( fill_colour => $page->background ) if $page->background;
+			$self->box->add( fill_colour => $page->background, full => \1 ) if $page->background;
 			$self->page->set_position($page->parse_position([]));
 			$self;
 		}
@@ -67,6 +74,11 @@ package Mxpress::PDF {
 		has background (type => Str);
 		has num (type => Num, required => 1);
 		has current (type => Object);
+		has columns (type => Num);
+		has column (type => Num);
+		has rows (type => Num);
+		has row (type => Num);
+		has row_y (type => Num);
 		has is_rotated (type => Num);
 		has x (type => Num);
 		has y (type => Num);
@@ -91,23 +103,50 @@ package Mxpress::PDF {
 					y => $try,
 				)),
 				padding => 0,
+				columns => 1,
+				column => 1,
+				rows => 1,
+				row => 1,
 				%args
 			);
 			return $new_page;
 		}
 		method rotate {
-			my ($h, $w) = ($self->h, $self->w);
+			my ($blx, $bly, $trx, $try) = $self->current->get_mediabox;
 			$self->current->mediabox(
+				$self->x(0),
 				0,
-				0,
-				$self->w($h),
-				$self->h($self->y($w))
+				$self->w($try),
+				$self->h($self->y($trx)),
 			);
+			$self->set_position($self->parse_position([]));
 			$self->is_rotated(!$self->is_rotated);
 			return $self;
 		}
+		method next_column {
+			if ($self->column < $self->columns) {
+				my ($blx, $bly, $trx, $try) = $self->current->get_mediabox;
+				$self->y($self->row_y || $try - ($self->padding/mm));
+				$self->column($self->column + 1);
+				return 1;
+			}
+			return;	
+		}
+		method next_row {
+			if ($self->row < $self->rows) {
+				my ($blx, $bly, $trx, $try) = $self->current->get_mediabox;
+				my $row_height = ($self->h + (($self->padding*2)/mm)) / $self->rows;
+				my $offset = int($try - ($row_height * ($self->row)));
+				$self->row_y($self->y($offset));
+				$self->column(1);
+				$self->row($self->row + 1);
+				return 1;
+			}
+			return;
+		}
 	}
 	role Utils {
+		has full (type => Bool);
 		has padding (type => Num);
 		has margin_top (type => Num);
 		has margin_bottom (type => Num);
@@ -126,11 +165,25 @@ package Mxpress::PDF {
 			my ($x, $y, $w, $h) = map {
 				$_ =~ m/[^\d\.]/ ? $_ : $_/mm
 			} @{$position};
-			my $page = $self->can('file') ? $self->file->page : $self;
+			my $file = $self->can('file');
+			my $page = $file ? $self->file->page : $self;
 			$x //= $page->x + ($self->padding/mm);
 			$y //= $page->y - ($self->padding/mm);
 			$w //= $page->w - ($self->padding/mm);
 			$h //= $y - (($self->padding + $page->padding)/mm);
+			if ($file && $page->columns > 1 && !$self->full) {
+				$w = ($w / $page->columns);
+				$x += ($w * ($page->column - 1));
+				$w -= $page->padding/mm;
+			}
+			if ($file && $page->rows > 1 && !$self->full) {
+				$h = ($page->h + (($page->padding*2)/mm)) / $page->rows;
+				$h -= ((($page->h + (($page->padding*3)/mm)) - $y) - ($h * ($page->row - 1)));
+				if ($page->row > 1) {
+					$y -= $page->padding/mm;
+					$h -= $page->padding/mm;
+				}
+			}
 			return $xy ? ($x, $y) : ($x, $y, $w, $h);
 		}
 		method set_y (Num $y) {
@@ -190,12 +243,14 @@ package Mxpress::PDF {
 		class +Shape {
 			has fill_colour ( type => Str );
 			has radius ( type => Num );
+			has start (type => Num);
+			has end (type => Num);
 			method generic_new (Object $file, Map %args) {
 				return $class->new(
+					padding => $args{padding} || 0,	
+					%args,
 					file => $file,
 					fill_colour => $file->page->valid_colour($args{fill_colour} || '#fff'),
-					padding => $args{padding} || 0,
-					($args{radius} ? (radius => $args{radius}) : ())
 				);
 			}
 			method add (Map %args) {
@@ -252,10 +307,45 @@ package Mxpress::PDF {
 					$circle->fill;
 				}
 			}
+			class +Pie {
+				factory pie (Object $file, Map %args) {
+					$args{radius} ||= 50;
+					$args{start} ||= 180;
+					$args{end} ||= 135;
+					return $class->generic_new($file, %args);
+				}
+				method shape (Object $shape) {
+					my ($x, $y, $r) = $self->parse_position($self->position || [
+						($self->file->page->x*mm) + $self->radius,
+						($self->file->page->y*mm) - $self->radius,
+						$self->radius,
+					]);
+					my $pie = $shape->pie($x, $y, $r, $r, $self->start, $self->end);
+					$pie->fillcolor($self->fill_colour);
+					$pie->fill;
+				}
+			}
+			class +Ellipse {
+				factory ellipse (Object $file, Map %args) {
+					$args{start} ||= 50;
+					$args{end} ||= 100;
+					return $class->generic_new($file, %args);
+				}
+				method shape (Object $shape) {
+					my ($x, $y) = $self->parse_position($self->position || [
+						($self->file->page->x*mm) + $self->start,
+						($self->file->page->y*mm) - ($self->end / 2),
+					]);
+					my $ellipse = $shape->ellipse($x, $y, $self->start, $self->end);
+					$ellipse->fillcolor($self->fill_colour);
+					$ellipse->fill;
+				}
+			}
 		}
 		class +Text {
 			has font (type => Object);
 			has paragraph_space (type => Num);
+			has paragraphs_to_columns (type => Bool);
 			has first_line_indent (type => Num);
 			has first_paragraph_indent (type => Num);
 			has align (type => Str); #enum
@@ -284,14 +374,24 @@ package Mxpress::PDF {
 					),
 					position => $args{position} || [],
 					(map {
-						$args{$_} ? ( $_ => $args{$_} ) : ()
-					} qw/margin_bottom margin_top indent align padding pad pad_end/)
+						defined $args{$_} ? ( $_ => $args{$_} ) : ()
+					} qw/
+						margin_bottom margin_top indent align padding pad pad_end first_line_indent 
+						first_paragraph_indent paragrah_space paragraphs_to_columns
+					/)
 				});
 			}
 			method add (Str $string, Map %args) {
 				$self->set_attrs(%args);
 				my ($xpos, $ypos);
 				my @paragraphs = split /\n/, $string;
+				my $columns = $self->file->page->columns;
+				my $page_column;
+				if ($columns == 1 && $self->paragraphs_to_columns) {
+					@paragraphs = grep { $_ =~ m/\w/ } @paragraphs;
+					$self->file->page->columns(scalar grep { ($_ =~ m/\w/) } @paragraphs);
+					$page_column = 1;
+				}
 				my $text = $self->file->page->current->text;
 				$text->font( $self->font->load, $self->font->size/pt );
 				$text->fillcolor( $self->font->colour );
@@ -307,7 +407,13 @@ package Mxpress::PDF {
 					unless (@paragraph) {
 						last unless scalar @paragraphs;
 						@paragraph = split( / /, shift(@paragraphs) );
-						$ypos -= $self->paragraph_space/mm if $self->paragraph_space;
+						if ($page_column) {
+							$page_column++;
+							$x += 50/mm;
+							$ypos = $y;
+						}
+						$ypos -= $l;
+						$ypos -= $self->paragraph_space/mm if $self->paragraph_space;	
 						last unless $ypos >= $y - $h;
 						($fl, $fp) = (1, 0);
 					}
@@ -362,11 +468,12 @@ package Mxpress::PDF {
 				}
 				unshift( @paragraphs, join( ' ', @paragraph ) ) if scalar(@paragraph);
 				$ypos -= $self->margin_bottom/mm if $self->margin_bottom;
-				$self->set_y($ypos);
+				$self->file->page->columns($columns);
 				if (scalar @paragraphs && $self->next_page) {
 					my $next_page = $self->next_page->($self);
 					return $self->add(join("\n", @paragraphs), %args);
 				}
+				$self->set_y($ypos);
 				return $self->file;
 			}
 			method _set_indent (Num $xpos, Num $w, Num $fl, Num $fp) {
@@ -654,51 +761,617 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
 =head1 SYNOPSIS
-
+	
 	use Mxpress::PDF;
 
-	my $pdf = Mxpress::PDF->new_pdf('test-pdf',
+	my @data = qw/
+		Brian
+		Dougal
+		Dylan
+		Ermintrude
+		Florence
+		Zebedee
+	/;
+
+	my $gen_text = sub { join( ' ', map { $data[int(rand(scalar @data))] } 0 .. int(rand(shift))) };
+
+	my $pdf = Mxpress::PDF->new_pdf('test',
 		page => {
 			background => '#000',
-			padding => 5
+			padding => 15,
 		},
 		toc => {
 			font => { colour => '#00f' },
 		},
 		title => {
-			font => { colour => '#f00' },
+			font => { 
+				colour => '#f00',
+			},
+			margin_bottom => 3,
 		},
 		subtitle => {
-			font => { colour => '#0ff' },
+			font => { 
+				colour => '#0ff', 
+			},
+			margin_bottom => 3
 		},
 		subsubtitle => {
-			font => { colour => '#f0f' },
+			font => { 
+				colour => '#f0f',
+			},
+			margin_bottom => 3
 		},
 		text => {
-			font => { colour => '#fff' },
+			font => { align => 'justify', colour => '#fff' },
+			margin_bottom => 3
 		},
 	)->add_page->title->add(
-		'This is a title'
-	)->line->add->toc->placeholder->toc->add(
-		title => 'This is a title'
-	)->text->add(
-		'Add some text.'
-	)->toc->add(
-		subtitle => 'This is a subtitle'
-	)->text->add(
-		'Add some more text.'
-	)->toc->add(
-		subsubtitle => 'This is a subsubtitle'
-	)->text->add(
-		'Add some more text.'
-	)->image->add(
-		'path/to/file.png'
-	)->save;
+		$gen_text->(5)
+	)->toc->placeholder;
+
+	$pdf->page->columns(2);
+
+	for (0 .. 100) {
+		$pdf->toc->add( 
+			[qw/title subtitle subsubtitle/]->[int(rand(3))] => $gen_text->(4) 
+		)->text->add( $gen_text->(1000) );
+	}
+
+=head1 Factory
+
+=new new_pdf 
+
+Start a new pdf.
+
+	my $file = Mxpress->new_pdf(
+		page => {},
+		toc => {},
+		title => {},
+		subtitle => {},
+		subsubtitle => {},
+		text => {},
+		toc => {},
+		box => {},
+		line => {},
+		circle => {},
+		pie => {},
+		ellipse => {}
+	)
+
+=cut
+
+=head page
+
+	Mxpress::Page->page(%page_args);
+
+...
+
+=head1 File
+
+=head2 Attributes
+
+	$file->$attr
+
+=head3 file_name (type => Str, required => 1);
+
+=head3 pdf (required => 1, type => Object);
+
+=head3 pages (required => 1, type => ArrayRef);
+
+=head3 page (type => Object);
+
+=head3 page_args (type => HashRef);
+
+=head3 onsave_cbs (type => ArrayRef);
+
+=head2 Plugins
+
+	$file->$plugin->$thing()
+
+=head3 font
+
+=head3 line
+
+=head3 box
+
+=head3 circle
+
+=head3 pie
+
+=head3 toc
+
+=head3 title 
+
+=head3 subtitle 
+
+=head3 subsubtitle 
+
+=head3 text 
+
+=head3 toc 
+
+=head3 box 
+
+=head3 line 
+
+=head3 circle 
+
+=head3 pie 
+
+=head3 ellipse 
+
+=head2 Methods
+
+=head3 add_page
+
+	$file->add_page(%page_attrs)
+
+=head3 save
+
+	$file->save();
+
+=head3 onsave
+
+	$file->onsave($plugin, $cb, \%plugin_args)
+
+=head1 Page
+
+	my $page = $file->page;
+
+=head2 Attributes
+
+	$page->$attr	
+
+=head3 page_size (type => Str);
+
+=head3 background (type => Str);
+
+=head3 num (type => Num, required => 1);
+
+=head3 current (type => Object);
+
+=head3 columns (type => Num);
+
+=head3 column (type => Num);
+
+=head3 rows (type => Num);
+
+=head3 row (type => Num);
+
+=head3 row_y (type => Num);
+
+=head3 is_rotated (type => Num);
+
+=head3 x (type => Num);
+
+=head3 y (type => Num);
+
+=head3 w (type => Num);
+
+=head3 h (type => Num);
+
+=head3 full (type => Bool);
+
+=head3 padding (type => Num);
+
+=head3 margin_top (type => Num);
+
+=head3 margin_bottom (type => Num);
+
+=head2 Methods
+
+=head3 rotate
+
+	$page->rotate();
+
+=head3 next_column
+
+	$page->next_column();
+
+=head3 next_row
+
+	$page->next_row();
+
+=head1 Font
+
+	my $font = $file->font;
+
+=head2 Attributes
+
+	$font->$attr();
+
+=head3 colour (type => Str);
+
+=head3 size (type => Num);
+
+=head3 family (type => Str);
+
+=head3 loaded (type => HashRef);
+
+=head3 line_height ( type => Num);
+
+=head2 Methods
+
+=head3 load
+
+	$font->load()
+
+=head3 find
+
+	$font->find($famild, $enc?)
+
+=head1 Line
+
+	my $line = $file->line;
+
+=head2 Attributes
+
+	$line->$attr();
+
+=head3 fill_colour (type => Str);
+
+=head3 position (type => ArrayRef);
+
+=head3 end_position (type => ArrayRef);
+
+=head2 Methods
+
+=head3 add
+
+	$line->add(%line_args);
+
+=head3 shape
+
+	$line->shape($shape);
+
+=head1 Box
+
+	my $box = $file->box;
+
+=head2 Attributes
+
+	$box->$attr();
+
+=head3 fill_colour (type => Str);
+
+=head3 position (type => ArrayRef);
+
+=head2 Methods
+
+=head3 add
+
+	$box->add(%line_args);
+
+=head3 shape
+
+	$box->shape($shape);
+
+=head1 Circle
+
+	my $circle = $file->circle;
+
+=head2 Attributes
+
+	$circle->$attr();
+
+=head3 fill_colour (type => Str);
+
+=head3 radius (type => Num);
+
+=head3 position (type => ArrayRef);
+
+=head2 Methods
+
+=head3 add
+
+	$circle->add(%line_args);
+
+=head3 shape
+
+	$circle->shape($shape);
+
+=head1 Pie
+
+	my $pie = $file->pie;
+
+=head2 Attributes
+
+	$pie->$attr();
+
+=head3 fill_colour (type => Str);
+
+=head3 radius (type => Num);
+
+=head3 start (type => Num);
+
+=head3 end (type => Num);
+
+=head3 position (type => ArrayRef);
+
+=head2 Methods
+
+=head3 add
+
+	$pie->add(%pie_attrs);
+
+=head3 shape
+
+	$pie->shape($shape);
+
+=head1 Ellipse
+
+	my $ellipse = $file->ellipse;
+
+=head2 Attributes
+
+	$ellipse->$attr();
+
+=head2 Attributes
+
+=head3 fill_colour (type => Str);
+
+=head3 radius (type => Num);
+
+=head3 start (type => Num);
+
+=head3 end (type => Num);
+
+=head3 position (type => ArrayRef);
+
+=head2 Methods
+
+=head3 add
+
+	$ellipse->add(%ellipse_attrs);
+
+=head3 shape
+
+	$ellipse->shape($shape);
+
+=head1 Text
+
+	my $text = $file->text;
+
+=head2 Attributes
+
+	$text->$attrs();
+
+=head3 font (type => Object);
+
+=head3 paragraph_space (type => Num);
+
+=head3 paragraphs_to_columns (type => Bool);
+
+=head3 first_line_indent (type => Num);
+
+=head3 first_paragraph_indent (type => Num);
+
+=head3 align (type => Str); #enum
+
+=head3 margin_bottom (type => Num);
+
+=head3 indent (type => Num);
+
+=head3 pad (type => Str);
+
+=head3 pad_end (type => Str);
+
+=head3 next_page;
+
+=head2 Methods
+
+=head2 add
+
+	$text->add($string_of_text, %text_args);
+
+=head1 Title
+
+	my $title = $file->title;
+
+=head2 Attributes
+
+	$title->$attrs();
+
+=head3 font (type => Object);
+
+=head3 paragraph_space (type => Num);
+
+=head3 paragraphs_to_columns (type => Bool);
+
+=head3 first_line_indent (type => Num);
+
+=head3 first_paragraph_indent (type => Num);
+
+=head3 align (type => Str); #enum
+
+=head3 margin_bottom (type => Num);
+
+=head3 indent (type => Num);
+
+=head3 pad (type => Str);
+
+=head3 pad_end (type => Str);
+
+=head3 next_page;
+
+=head2 Methods
+
+=head2 add
+
+	$title->add($string_of_text, %text_args);
+
+=head1 Subtitle
+
+	my $st = $file->subtitle;
+
+=head2 Attributes
+
+	$st->$attrs();
+
+=head3 font (type => Object);
+
+=head3 paragraph_space (type => Num);
+
+=head3 paragraphs_to_columns (type => Bool);
+
+=head3 first_line_indent (type => Num);
+
+=head3 first_paragraph_indent (type => Num);
+
+=head3 align (type => Str); #enum
+
+=head3 margin_bottom (type => Num);
+
+=head3 indent (type => Num);
+
+=head3 pad (type => Str);
+
+=head3 pad_end (type => Str);
+
+=head3 next_page;
+
+=head2 Methods
+
+=head2 add
+
+	$st->add($string_of_text, %text_args);
+
+=head1 Subsubtitle
+
+	my $sst = $file->subsubtitle;
+
+=head2 Attributes
+
+	$sst->$attrs();
+
+=head3 font (type => Object);
+
+=head3 paragraph_space (type => Num);
+
+=head3 paragraphs_to_columns (type => Bool);
+
+=head3 first_line_indent (type => Num);
+
+=head3 first_paragraph_indent (type => Num);
+
+=head3 align (type => Str); #enum
+
+=head3 margin_bottom (type => Num);
+
+=head3 indent (type => Num);
+
+=head3 pad (type => Str);
+
+=head3 pad_end (type => Str);
+
+=head3 next_page;
+
+=head2 Methods
+
+=head2 add
+
+	$sst->add($string_of_text, %text_args);
+
+=head1 TOC
+
+	my $toc = $file->toc;
+
+=head2 Attributes
+
+=head3 count (type => Num);
+
+=head3 toc_placeholder (type => HashRef);
+
+=head3 outline (type => Object);
+
+=head3 outlines (type => ArrayRef);
+
+=head3 indent (type => Num);
+
+=head3 levels (type => ArrayRef);
+
+=head3 toc_line_offset (type => Num);
+
+=head3 font (type => HashRef);
+
+=head2 Methods
+
+=head3 placeholder
+
+The placeholder position where the table of contents will be rendered.
+	
+	$toc->placeholder(%placeholder_attrs);
+
+=head3 add
+
+Add to the table of contents
+
+	$toc->add(%placeholders_attrs)
+
+=head1 TOC Outline
+
+	my $outline = $file->FACTORY->add_outline()
+	
+=head2 Attributes
+
+	$outline->$attrs();
+
+=head3 outline (type => Object);
+
+=head3 x (type => Num);
+
+=head3 y (type => Num);
+
+=head3 title (type => Str);
+
+=head3 page (type => Object);
+
+=head3 level (type => Num);
+
+=head3 children (type => ArrayRef);
+
+=head2 Methods
+
+=head3 render
+
+	$outline->render(%outline_attrs)
+
+=head1 Image
+
+	my $img = $file->image;
+
+=head2 Attributes
+
+	$img->$attrs();
+
+=head3 width (type => Num);
+
+=head3 height (type => Num);
+
+=head3 align (type => Str);
+
+=head3 valid_mime (type => HashRef);
+
+=head2 Methods
+
+=head3 add
+
+	$img->add($image_fh, $type, %image_attrs)
+
+or
+
+	$img->add($image_file_path, %image_attrs)
+
+=cut
+
+=head1 Factory
+
+=cut
 
 =head2 Note
 

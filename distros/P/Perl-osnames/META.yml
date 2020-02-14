@@ -24,11 +24,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-osnames
   homepage: https://metacpan.org/release/Perl-osnames
   repository: git://github.com/perlancar/perl-Perl-osnames.git
-version: '0.121'
+version: '0.122'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertCodeResult
+      name: InsertCodeResult
+      version: '0.051'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -283,7 +287,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.080'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

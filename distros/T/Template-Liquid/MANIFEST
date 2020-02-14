@@ -31,6 +31,7 @@ lib/Template/Liquid/Variable.pm
 minil.toml
 t/0100_filters/0101_standard_filters.t
 t/0200_tags/02001_for.t
+t/0200_tags/02001_for_limit.t
 t/0200_tags/02002_case.t
 t/0200_tags/02003_cycle.t
 t/0200_tags/02004_capture.t
@@ -45,6 +46,7 @@ t/0200_tags/02080_user_defined.t
 t/0200_tags/02101_whitespace_control.t
 t/0200_tags/lib/Template/LiquidX/Tag/Random.pm
 t/0300_basics/03001_context_object.t
+t/0300_basics/03002_render_context.t
 t/0400_classes/04001_context.t
 t/0500_bugs/05001_conditions.t
 t/0500_bugs/05002_issue_7.t

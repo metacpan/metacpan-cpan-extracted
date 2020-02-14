@@ -1,6 +1,6 @@
 package Mail::BIMI::Record;
-# ABSTRACT: Class to model a collection of egress pools
-our $VERSION = '1.20200210'; # VERSION
+# ABSTRACT: Class to model a BIMI record
+our $VERSION = '1.20200214'; # VERSION
 use 5.20.0;
 use Moo;
 use Types::Standard qw{Str HashRef ArrayRef};
@@ -30,12 +30,12 @@ sub _build_authorities($self) {
 sub _build_locations($self) {
   my $record = '';
   if ( ! exists $self->record->{l} ) {
-    $self->add_error( 'Missing l tag' );
+    $self->add_error( $self->MISSING_L_TAG );
   }
   else {
     $record = $self->record->{l} // '';
     if ( $record eq '' ) {
-      $self->add_error( 'Empty l tag' );
+      $self->add_error( $self->EMPTY_L_TAG );
     }
   }
 
@@ -53,8 +53,8 @@ sub _build_is_valid($self) {
     $self->add_error( 'Missing v tag' );
   }
   else {
-    $self->add_error( 'Empty v tag' )   if lc $self->record->{v} eq '';
-    $self->add_error( 'Invalid v tag' ) if lc $self->record->{v} ne 'bimi1';
+    $self->add_error( $self->EMPTY_V_TAG )   if lc $self->record->{v} eq '';
+    $self->add_error( $self->INVALID_V_TAG ) if lc $self->record->{v} ne 'bimi1';
   }
 
   return 0 if !$self->locations->is_valid;
@@ -70,7 +70,7 @@ sub _build_record($self) {
 
   my @records = grep { $_ =~ /^v=bimi1;/i } eval { $self->_get_dns_rr( 'TXT', $selector. '._bimi.' . $domain); };
   if ( my $error = $@ ) {
-    $self->add_error( 'error querying DNS' );
+    $self->add_error( $self->DNS_ERROR );
     return {};
   }
 
@@ -83,7 +83,7 @@ sub _build_record($self) {
 
     @records = grep { $_ =~ /^v=bimi1;/i } eval { $self->_get_dns_rr( 'TXT', $fallback_selector. '._bimi.' . $fallback_domain); };
     if ( my $error = $@ ) {
-      $self->add_error( 'error querying DNS' );
+      $self->add_error( $self->DNS_ERROR );
       return {};
     }
     if ( !@records ) {
@@ -102,14 +102,13 @@ sub _build_record($self) {
     }
   }
   elsif ( scalar @records > 1 ) {
-    push $self->error->@*, $self->MULTI_BIMI_RECORD;
+    $self->add_error( $self->MULTI_BIMI_RECORD );
     return {};
   }
   else {
     # We have one record, let's use that.
     return $self->_parse_record($records[0]);
   }
-  return {};
 }
 
 sub _get_dns_rr($self,$type,$domain) {
@@ -141,7 +140,7 @@ sub _parse_record($self,$record) {
     my ( $key, $value ) = split '=', $part, 2;
     $key = lc $key;
     if ( exists $data->{ $key } ) {
-      push $self->error->@*, 'Duplicate key in record';
+      $self->add_error( $self->DUPLICATE_KEY );
     }
     if ( grep { $key eq $_ } ( qw{ v l a } ) ) {
       $data->{$key} = $value;

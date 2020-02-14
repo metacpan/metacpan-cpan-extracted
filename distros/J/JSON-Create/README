@@ -6,7 +6,7 @@
                                                                 
 
 
-This is the README for JSON::Create version 0.24.
+This is the README for JSON::Create version 0.25.
 
 JSON::Create is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -53,12 +53,11 @@ Perl.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?JSON::Create
     * http://metacpan.org/release/JSON-Create
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -79,11 +78,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm JSON::Create
 
-To install the module from the source file, JSON-Create-0.24.tar.gz, follow
+To install the module from the source file, JSON-Create-0.25.tar.gz, follow
 this sequence of commands:
 
-    tar xfz JSON-Create-0.24.tar.gz
-    cd JSON-Create-0.24
+    tar xfz JSON-Create-0.25.tar.gz
+    cd JSON-Create-0.25
     perl Makefile.PL
     make
     make install
@@ -108,6 +107,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Jun 13 17:01:16 2017.
+This README was written on Fri Feb 14 21:41:38 2020.
 
 -----------------------------------------------------------------------------

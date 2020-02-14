@@ -24,7 +24,7 @@ requires 'Dist::Zilla::Plugin::MetaProvides::Package';
 requires 'Dist::Zilla::Plugin::GitHub::Meta', '0.46';
 requires 'Dist::Zilla::Plugin::GitHub::UploadRelease';
 
-requires 'Dist::Zilla::Plugin::Git::NextVersion';
+requires 'Dist::Zilla::Plugin::Git::NextVersion', '2.044';
 requires 'Dist::Zilla::Plugin::Git::Commit';
 requires 'Dist::Zilla::Plugin::Git::Tag';
 requires 'Dist::Zilla::Plugin::Git::Push';

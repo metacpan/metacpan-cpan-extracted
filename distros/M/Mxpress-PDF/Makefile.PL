@@ -17,10 +17,10 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'PDF::API2' => 0,
-	'MooX::Pression' => 0,
-	'Colouring::In' => 0,
-	'Sub::MultiMethod' => 0
+	'PDF::API2' => '2.037',,
+	'MooX::Pression' => '0.303',
+	'Colouring::In' => '0.14',
+	'Sub::MultiMethod' => '0.0008'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mxpress-PDF-*' },

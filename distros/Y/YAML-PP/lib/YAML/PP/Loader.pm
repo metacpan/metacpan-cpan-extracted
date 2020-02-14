@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Loader;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use YAML::PP::Parser;
 use YAML::PP::Constructor;
@@ -83,7 +83,7 @@ sub load {
     $parser->parse();
 
     my $docs = $constructor->docs;
-    return wantarray ? @$docs : $docs->[-1];
+    return wantarray ? @$docs : $docs->[0];
 }
 
 

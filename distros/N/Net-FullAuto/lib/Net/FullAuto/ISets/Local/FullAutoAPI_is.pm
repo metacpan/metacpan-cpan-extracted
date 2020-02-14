@@ -752,11 +752,11 @@ if ($do==1) { # INSTALL LATEST VERSION OF NGINX
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
    # https://www.wpwhitesecurity.com/creating-mysql-wordpress-database/
-   ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
-   ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
-   $handle->print($sudo.'passwd www-data');
+   #($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
+   #($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
+   #$handle->print($sudo.'passwd www-data');
    my $prompt=$handle->prompt();
-   while (1) {
+   while (0) {
       my $output.=fetch($handle);
       last if $output=~/$prompt/;
       print $output;
@@ -1003,8 +1003,8 @@ END
       'yum -y install certbot-nginx','__display__');
    # https://www.digitalocean.com/community/tutorials/
    # how-to-secure-nginx-with-let-s-encrypt-on-centos-7
-   my $make_nginx='./configure --user=www-data '.
-                  '--group=www-data '.
+   my $make_nginx="./configure --user=$username ".
+                  "--group=$username ".
                   "--prefix=$nginx_path/nginx ".
                   '--sbin-path=/usr/sbin/nginx '.
                   "--conf-path=$nginx_path/nginx/nginx.conf ".
@@ -1158,7 +1158,7 @@ END
          "server_name $domain_url www.$domain_url/' ".
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i 's/#user  nobody;/user  www-data;/' ".
+         "sed -i \'s/#user  nobody;/user  $username;/\' ".
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/#error_page  404              /404.html;/".
@@ -3224,7 +3224,7 @@ ENDD
          'cp -v memcached.sysconfig /etc/sysconfig/memcached',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i \'s/nobody/www-data/\' /etc/sysconfig/memcached");
+         "sed -i \'s/nobody/$username/\' /etc/sysconfig/memcached");
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chmod -v 777 /var/run','__display__');
    }

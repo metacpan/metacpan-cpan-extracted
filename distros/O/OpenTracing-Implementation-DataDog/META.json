@@ -42,13 +42,14 @@
             "MooX::Attribute::ENV" : "0",
             "MooX::HandlesVia" : "0",
             "OpenTracing::Implementation" : "0.03",
-            "OpenTracing::Role" : "0.05",
+            "OpenTracing::Role" : "0.06",
             "PerlX::Maybe" : "0",
             "Ref::Util" : "0",
             "Sub::Trigger::Lock" : "0",
             "Syntax::Feature::Maybe" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
+            "Types::Common::String" : "0",
             "Types::Interface" : "0",
             "Types::Standard" : "0",
             "aliased" : "0",
@@ -62,6 +63,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

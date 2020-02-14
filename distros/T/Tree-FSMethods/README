@@ -1,0 +1,173 @@
+NAME
+    Tree::FSMethods - Perform filesystem-like operations on object tree(s)
+
+VERSION
+    This document describes version 0.001 of Tree::FSMethods (from Perl
+    distribution Tree-FSMethods), released on 2020-02-13.
+
+SYNOPSIS
+     use Tree::FSMethods;
+
+     my $fs = Tree::FSMethods->new(
+         tree => $tree,
+         # tree2 => $other_tree,
+         # filename_method => 'filename',
+     );
+
+    Listing files:
+
+     # list top-level (root)
+     my %nodes = $fs->ls; # ("foo"=>{...}, "bar"=>{...}, "baz"=>{...})
+
+     # specify path. will list all nodes under /proj.
+     my %nodes = $fs->ls("/proj");
+
+     # specify wildcard. will list all nodes under /proj which has 'perl' in their
+     # names.
+     my %nodes = $fs->ls("/proj/*perl*");
+
+DESCRIPTION
+METHODS
+  new
+    Usage:
+
+     my $fs = Tree::FSMethods->new(%args);
+
+    Arguments:
+
+    *   tree
+
+        Optional. Object. The tree node object. A tree node object is any
+        regular Perl object satisfying the following criteria: 1) it
+        supports a "parent" method which should return a single parent node
+        object, or undef if object is the root node); 2) it supports a
+        "children" method which should return a list (or an arrayref) of
+        children node objects (where the list/array will be empty for a leaf
+        node). Note: you can use Role::TinyCommons::Tree::Node to enforce
+        this requirement.
+
+    *   tree2
+
+        See "tree".
+
+        Optional. Object. Used for some operations: "cp", "mv".
+
+    *   filename_method
+
+        Optional. String or coderef.
+
+        By default, will call "filename" method on tree node to get the
+        filename of a node. If that method is not available, will use
+        "title" method. If that method is also not available, will use its
+        "hash address" given by the stringification, e.g.
+        "HASH(0x56242e558740)" or "Foo=HASH(0x56242e558740)".
+
+        If "filename_method" is specified and is a string, will use the
+        method specified by it.
+
+        If "filename_method" is a coderef, will call the coderef, passing
+        the tree node as argument and expecting filename as the return
+        value.
+
+        If filename is empty, will use "unnamed".
+
+        If filename is non-unique (in the same "directory"), will append
+        ".2", ".3", ".4" (and so on) suffixes.
+
+  cd
+    Usage:
+
+     $fs->cd($path_wildcard);
+
+    Change working directory. Dies on failure.
+
+  cwd
+    Usage:
+
+     my $cwd = $fs->cwd;
+
+    Return current working directory.
+
+  ls
+    Usage:
+
+     my %res = $fs->ls( [ $path_wildcard, ... ]);
+
+    Dies on failure (e.g. can't cd to specified path).
+
+  cp
+    Usage:
+
+     $fs->cp($src_path_wildcard, $target_path);
+
+    Copies nodes from "tree" to "tree2" (or "tree", if "tree2" is not
+    loaded). Dies on failure (e.g. can't find source or target path).
+
+    Examples:
+
+     $fs->cp("proj/*perl*", "proj/");
+
+    This will set nodes under "proj/" in the source tree matching wildcard
+    "*perl*" to "proj/" in the target tree.
+
+  mkdir
+    Usage:
+
+     $fs->mkdir([ \%opts, ] $path);
+
+  mv
+    Usage:
+
+     $fs->mv($src_path, $target_path);
+
+    Moves nodes from "tree" to "tree2" (or "tree", if "tree2" is not
+    loaded). Dies on failure (e.g. can't find source or target path).
+
+  rm
+    Usage:
+
+     $fs->rm($path_wildcard);
+
+  showtree
+    Usage:
+
+     my $str = $fs->showtree([ $starting_path ]);
+
+    Like the DOS tree command, will return a visual representation of the
+    "filesystem", e.g.:
+
+     file1
+     file2
+     |-- file3
+     |-- file4
+     |   |-- file5
+     |   \-- file6
+     \-- file7
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tree-FSMethods>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tree-FSMethods>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tree-FSMethods>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::TinyCommons::Tree
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

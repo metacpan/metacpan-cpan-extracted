@@ -1,5 +1,7 @@
 use 5.014;
 
+use lib 't/lib';
+
 use Do;
 use Test::Auto;
 use Test::More;
@@ -100,9 +102,10 @@ render() : Str
 
 package main;
 
-my $test = Test::Auto->new(__FILE__);
+my $subs = testauto(__FILE__);
 
-my $subs = $test->subtests->standard;
+$subs = $subs->standard;
+$subs->plugin('ShortDescription')->tests;
 
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result, 'result ok';

@@ -1,0 +1,164 @@
+NAME
+    Perinci::Class::Base - Base class for your Rinci-metadata-containing
+    classes
+
+VERSION
+    This document describes version 0.001 of Perinci::Class::Base (from Perl
+    distribution Perinci-Class-Base), released on 2020-02-14.
+
+SYNOPSIS
+    In My/Animal.pm:
+
+     package My::Animal;
+     use parent 'Perinci::Class::Base';
+ 
+     our %SPEC;
+ 
+     $SPEC{speak} = {
+         v => 1.1,
+         is_meth => 1,
+     };
+     sub speak {
+         die "Please override me!";
+     }
+ 
+     sub new {
+         my ($package, %args) = @_;
+         bless \%args, $package;
+     }
+ 
+     1;
+
+    In My/Dog.pm:
+
+     package My::Dog;
+     use parent 'My::Animal';
+ 
+     our %SPEC;
+ 
+     # speak's metadata will "inherit" (use metadata from the base class), since we
+     # don't have additionl/modified/removed arguments, etc.
+ 
+     sub speak {
+         print "woof\n";
+         [200];
+     }
+ 
+     $SPEC{play_dead} = {
+         v => 1.1,
+         is_meth => 1,
+         args => {
+             seconds => {schema=>'uint*', default=>5},
+         },
+     };
+     sub play_dead {
+         my ($self, %args) = @_;
+         sleep $;
+         [200];
+     }
+ 
+     1;
+
+    in My/Parrot.pm:
+
+     package My::Parrot;
+     use parent 'My::Animal';
+ 
+     our %SPEC;
+ 
+     # we are modifying 'speak' metadata as we add an argument.
+     $SPEC{speak} = {
+         v => 1.,
+         is_meth => 1,
+         args => {
+             word => {schema=>'str*'},
+         },
+     };
+     sub speak {
+         my ($self, $word) = @_;
+         print "squawk! $word!\n";
+         [200];
+     }
+ 
+     1;
+
+    To get Rinci metadata for a method:
+
+     use My::Dog;
+     my $meta = My::Dog->get_rinci_meta_for('speak');
+
+    A more convenient syntax to define modified method metadata in My/Dog.pm
+    (the second argument will be merged using Data::ModeMerge):
+
+     __PACKAGE__->modify_rinci_meta_for(speak => {
+         args => {
+             word => {schema=>'str*'},
+         },,
+      });
+
+DESCRIPTION
+    EXPERIMENTAL, WORK IN PROGRESS.
+
+    Perinci::Class::Base is a base class that provides some Rinci-related
+    utility routines, mainly to get/modify Rinci metadata in a class
+    settings.
+
+FUNCTIONS
+  get_rinci_meta_for
+    Usage:
+
+     get_rinci_meta_for($name) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $name* => *str*
+
+    Return value: (any)
+
+  modify_rinci_meta_for
+    Usage:
+
+     modify_rinci_meta_for($name, $value) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $name* => *str*
+
+    *   $value* => *hash*
+
+    Return value: (any)
+
+METHODS
+  get_sub_meta_for
+  modify_sub_meta_for
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Class-Base>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Class-Base>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Class-Base>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -2,40 +2,57 @@ use Test::More;
 
 use_ok('Mxpress::PDF');
 
+my @data = qw/Brian
+Dougal
+Dylan
+Ermintrude
+Florence
+Zebedee/;
+
+my $gen_text = sub { join( ' ', map { $data[int(rand(scalar @data))] } 0 .. int(rand(shift))) };
+
 my $pdf = Mxpress::PDF->new_pdf('test',
 	page => {
 		background => '#000',
-		padding => 5
+		padding => 15,
 	},
 	toc => {
 		font => { colour => '#00f' },
 	},
 	title => {
-		font => { colour => '#f00' },
+		font => { 
+			colour => '#f00',
+		},
+		margin_bottom => 3,
 	},
 	subtitle => {
-		font => { colour => '#0ff' },
+		font => { 
+			colour => '#0ff', 
+		},
+		margin_bottom => 3
 	},
 	subsubtitle => {
-		font => { colour => '#f0f' },
+		font => { 
+			colour => '#f0f',
+		},
+		margin_bottom => 3
 	},
 	text => {
-		font => { colour => '#fff' },
+		font => { align => 'justify', colour => '#fff' },
+		margin_bottom => 3
 	},
 )->add_page->title->add(
-	'This is a title'
-)->toc->placeholder->toc->add(
-	title => 'This is a title'
-)->text->add(
-	'Add some text.'
-)->toc->add(
-	subtitle => 'This is a subtitle'
-)->text->add(
-	'Add some more text.'
-)->toc->add(
-	subsubtitle => 'This is a subsubtitle'
-)->text->add(
-	'Add some more text.'
-)->save();
+	$gen_text->(5)
+)->toc->placeholder;
+
+$pdf->page->columns(2);
+
+for (0 .. 100) {
+	$pdf->toc->add( 
+		[qw/title subtitle subsubtitle/]->[int(rand(3))] => $gen_text->(4) 
+	)->text->add( $gen_text->(1000) );
+}
+
+$pdf->save;
 
 done_testing();

@@ -3,6 +3,14 @@ Upstream-Name: Lexical-Accessor
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Lexical-Accessor
 
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ TODO
+ examples/benchmark.pl
+Copyright: Unknown
+License: Unknown
+
 Files: t/01basic.t
  t/02moose.t
  t/03mouse.t
@@ -11,18 +19,12 @@ Files: t/01basic.t
 Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- TODO
- examples/benchmark.pl
-Copyright: Unknown
-License: Unknown
-
 Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2017 Toby Inkster.
+ t/30shv.t
+Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -37,8 +39,7 @@ Files: README
 Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
- dist.ini
+Files: dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -51,14 +52,14 @@ Copyright: This software is copyright (c) 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2020 by the copyright holder(s).
  
  This is free software, licensed under:
  

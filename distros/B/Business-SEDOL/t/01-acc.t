@@ -8,7 +8,7 @@ BEGIN { plan tests => 7 }
 
 my $s = Business::SEDOL->new();
 ok($s->sedol, undef);
-{ local $ = 0; ok($s->series, ''); }
+{ local $^W = 0; ok($s->series, ''); }
 ok($s->sedol('0123457'), '0123457');
 ok($s->sedol, '0123457');
 ok($s->series, '0');

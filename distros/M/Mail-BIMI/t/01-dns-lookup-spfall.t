@@ -10,7 +10,7 @@ use Mail::BIMI::Record;
 use Mail::DMARC::PurePerl;
 use Mail::SPF::Server;
 use Mail::SPF::Request;
-use Net::DNS::Resolver::Mock;
+use Net::DNS::Resolver::Mock 1.20200214;
 
 my $resolver = Net::DNS::Resolver::Mock->new;
 $resolver->zonefile_read('t/zonefile');

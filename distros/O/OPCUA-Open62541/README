@@ -1,5 +1,5 @@
-OPCUA-Open62541 version 0.001
-============================
+OPCUA-Open62541
+===============
 
 The OPCUA::Open62541 module is a Perl XS extension to use the
 open62541 OPC UA library from Perl.  The relevant C types, functions

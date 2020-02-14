@@ -1,5 +1,18 @@
  Changelog for Perl dist Template-Liquid
 
+1.0.16 2020-02-13T20:39:23Z
+
+  - Make Template::Liquid->render() respect a preexisting context (PR #4, Corion)
+  - For limit modified (PR #5, Corion)
+  - Platform related test fixes
+
+1.0.15 2020-02-13T17:41:29Z
+
+  - Add filters: at_least, at_most, compact, concat, date, escape, lstrip, map, reverse, rstrip,
+      slice, sort_natural, strip, uniq, url_decode, url_encode, where
+  - Fix filters: ceil, modulo, sort
+  - Fix filter param parsing
+
 1.0.14 2020-02-06T06:14:55Z
 
   - Whitespace control (See https://shopify.github.io/liquid/basics/whitespace/)

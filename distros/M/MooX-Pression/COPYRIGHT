@@ -22,11 +22,14 @@ Files: Changes
  t/22overload.t
  t/24mm.t
  t/25abstract.t
+ t/31lexhas.t
  t/40loading.t
  t/41ps.t
  t/50complextypes.t
  t/51mixedsigs.t
  t/52lists.t
+ t/53outsiders.t
+ t/80lines.t
  t/97defaults.t
  t/98geom.t
  t/99anonclass.t
@@ -43,17 +46,17 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: README
- lib/MooX/Pression.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: README
+ lib/MooX/Pression.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.

@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Sub::Accessor::Small ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.009';
+our $VERSION   = '0.012';
 our @EXPORT    = qw/ lexical_has /;
 our @ISA       = qw/ Sub::Accessor::Small /;
 
@@ -99,13 +99,13 @@ sub canonicalize_opts : method
 		$me->{lazy} ||= 1 if $me->{default} || $me->{builder};
 	}
 	
-	for my $type (qw/ reader writer accessor clearer predicate /)
-	{
-		if (defined($me->{$type}) and not ref($me->{$type}) eq q(SCALAR))
-		{
-			croak("Expected $type to be a scalar ref; not '$me->{$type}'");
-		}
-	}
+#	for my $type (qw/ reader writer accessor clearer predicate /)
+#	{
+#		if (defined($me->{$type}) and not ref($me->{$type}) eq q(SCALAR))
+#		{
+#			croak("Expected $type to be a scalar ref; not '$me->{$type}'");
+#		}
+#	}
 }
 
 sub expand_handles
@@ -167,7 +167,7 @@ complete privacy: subclasses can define a private (or even public)
 attribute with the same name as your private one and they will not
 interfere with each other.
 
-Private attributes can not be initialized by L<Moose>/L<Moo>/L<Mouse>
+Private attributes cannot be initialized by L<Moose>/L<Moo>/L<Mouse>
 constructors, but you can safely initialize them inside a C<BUILD> sub.
 
 =head2 Functions
@@ -214,6 +214,17 @@ into them:
       reader      => \$get_foo,
       writer      => \$set_foo,
    );
+
+They can also be method names as strings:
+
+   my ($set_foo);
+   
+   lexical_has foo => (
+      reader      => 'get_foo',
+      writer      => \$set_foo,
+   );
+
+This allows you to provide a partly public API for an attribute.
 
 =item C<< default >>, C<< builder >>, C<< lazy >>
 
@@ -280,10 +291,11 @@ Boolean. Makes the setter weaken any references it is called with.
 =item C<< handles >>
 
 Delegates methods. Has slightly different syntax to Moose's option of
-the same name - is required to be an arrayref of pairs such that each
-pair is a scalar ref followed by a method name, a coderef, or an
-arrayref (where the first element is a method name or coderef and
-subsequent elements are curried arguments).
+the same name - is required to be an arrayref of pairs such that in
+each pair, the first is a scalar ref or a string method name that will
+be handled, and the second is a coderef or string method name that
+will do the handling. (The second can be an arrayref in the case of
+currying.)
  
    my ($get, $post);
   
@@ -298,6 +310,29 @@ subsequent elements are curried arguments).
    
    # later...
    my $response = $self->$get('http://example.net/');
+
+Supports L<Sub::HandlesVia>:
+
+   my $remove_task;
+   lexical_has tasks => (
+      isa          => ArrayRef,
+      handles_via  => 'Array',
+      handles      => [
+         task_count     => 'count',
+         add_task       => 'push',
+         next_task      => [ 'get', 0 ],
+         \$remove_task  => 'unshift',
+      ],
+   );
+   
+   # later...
+   while ($self->task_count) {
+      my $task    = $self->next_task;
+      my $success = $self->handle_task($task);
+      if ($success) {
+         $self->$remove_task;
+      }
+   }
 
 =item C<< initializer >>, C<< traits >>, C<< lazy_build >>
 

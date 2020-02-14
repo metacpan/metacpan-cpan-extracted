@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1748 2019-07-15 07:57:00Z willem $
+# $Id: Text.pm 1762 2020-02-02 21:39:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1762 $)[1];
 
 
 =head1 NAME
@@ -188,12 +188,8 @@ sub string {
 	my $self = shift;
 
 	my @s = map split( '', $_ ), @$self;			# escape special and ASCII non-printable
-	my $string = _decode_utf8( join '', map $escape{$_}, @s );
-
-	return $string unless $string =~ /[ \t\n\r\f"]|^$/;	# unquoted contiguous
-
-	$string =~ s/\\([^"0-9])/$1/g;				# unescape printable characters except \"
-	join '', '"', $string, '"';				# quoted string
+	my $s = _decode_utf8( join '', map $escape{$_}, @s );
+	return $s =~ /\\034|[ \t\n\r\f();]|^$/ ? qq("$s") : $s; # quote special characters and empty string
 }
 
 
@@ -234,12 +230,9 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 	my @C0 = ( 0 .. 31 );					# control characters
 	my @NA = UTF8 ? ( 192, 193, 216 .. 223, 245 .. 255 ) : ( 128 .. 255 );
 
-	my %table = (						# transparent,	    \" \( \) \; \\
-		map( ( $_ => $_ ), map pack( 'C', $_ ), ( 0 .. 255 ) ),
-		map( ( pack( 'C', $_ ) => pack( 'C2', 92, $_ ) ), ( 34, 40, 41, 59, 92 ) ),
-		);
+	my %table = map( ( $_ => $_ ), map pack( 'C', $_ ), ( 0 .. 255 ) );
 
-	foreach my $n ( @C0, 92, 127, @NA ) {			# numerical escape
+	foreach my $n ( @C0, 34, 92, 127, @NA ) {		# numerical escape
 		my $codepoint = sprintf( '%03u', $n );
 
 		# transliteration for non-ASCII character encodings

@@ -1,32 +1,57 @@
 TYPEMAP
-OPCUA_Open62541_Boolean		T_BOOL
-OPCUA_Open62541_SByte		T_IV
-OPCUA_Open62541_Byte		T_UV
-OPCUA_Open62541_Int16		T_IV
-OPCUA_Open62541_UInt16		T_UV
-OPCUA_Open62541_Int32		T_IV
-OPCUA_Open62541_UInt32		T_UV
-OPCUA_Open62541_Int64		T_IV
-OPCUA_Open62541_UInt64		T_UV
-OPCUA_Open62541_StatusCode	T_UV
-OPCUA_Open62541_Server		T_PTROBJ_SPECIAL
-OPCUA_Open62541_ServerConfig	T_PTROBJ_SPECIAL
+OPCUA_Open62541_Boolean			T_BOOL
+OPCUA_Open62541_SByte			T_IV
+OPCUA_Open62541_Byte			T_UV
+OPCUA_Open62541_Int16			T_IV
+OPCUA_Open62541_UInt16			T_UV
+OPCUA_Open62541_Int32			T_IV
+OPCUA_Open62541_UInt32			T_UV
+# XXX this only works for Perl on 64 bit platforms
+OPCUA_Open62541_Int64			T_IV
+OPCUA_Open62541_UInt64			T_UV
+OPCUA_Open62541_ByteString		T_UA_STRING
+OPCUA_Open62541_StatusCode		T_UV
+OPCUA_Open62541_String			T_UA_STRING
+OPCUA_Open62541_DataType		T_UA_DATATYPE
+OPCUA_Open62541_Variant			T_PTROBJ_SPECIAL
+OPCUA_Open62541_VariableAttributes	T_PTROBJ_SPECIAL
+OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
+OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
+OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
+OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
+OPCUA_Open62541_ClientState		T_ENUM
 
 #############################################################################
 INPUT
+T_UA_STRING
+	$var.data = SvPV($arg, $var.length);
+T_UA_DATATYPE
+	{
+		UV index = SvUV($arg);
+		if (index < UA_TYPES_COUNT) {
+			$var = &UA_TYPES[index];
+		} else {
+			croak(\"unsigned value %lu not below UA_TYPES_COUNT\",
+			    index);
+		}
+	}
 T_PTROBJ_SPECIAL
 	if (SvROK($arg) && sv_derived_from($arg,
 	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
 		IV tmp = SvIV((SV*)SvRV($arg));
 		$var = INT2PTR($type,tmp);
 	} else {
-		Perl_croak_nocontext(\"%s: %s is not of type %s\",
+		croak(\"%s: %s is not of type %s\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 		    \"$var\", \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\");
 	}
 
 #############################################################################
 OUTPUT
+T_UA_STRING
+	sv_setpvn($arg, $var.data, $var.length);
+T_UA_DATATYPE
+	sv_setuv($arg, $var.typeIndex);
 T_PTROBJ_SPECIAL
 	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\",
 	    (void*)$var);

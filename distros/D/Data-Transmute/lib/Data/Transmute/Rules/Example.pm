@@ -24,7 +24,7 @@ Data::Transmute::Rules::Example - Example rules module
 
 =head1 VERSION
 
-This document describes version 0.036 of Data::Transmute::Rules::Example (from Perl distribution Data-Transmute), released on 2019-10-10.
+This document describes version 0.039 of Data::Transmute::Rules::Example (from Perl distribution Data-Transmute), released on 2020-02-13.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

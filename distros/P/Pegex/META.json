@@ -40,7 +40,7 @@
             "JSON::PP" : "0",
             "Scalar::Util" : "0",
             "XXX" : "0.35",
-            "YAML::PP" : "0.018",
+            "YAML::PP" : "0.019",
             "perl" : "v5.8.1"
          }
       },
@@ -64,7 +64,7 @@
          "web" : "https://github.com/ingydotnet/pegex-pm"
       }
    },
-   "version" : "0.74",
+   "version" : "0.75",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

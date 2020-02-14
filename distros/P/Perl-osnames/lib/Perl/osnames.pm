@@ -1,9 +1,9 @@
 package Perl::osnames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-10'; # DATE
+our $DATE = '2020-02-13'; # DATE
 our $DIST = 'Perl-osnames'; # DIST
-our $VERSION = '0.121'; # VERSION
+our $VERSION = '0.122'; # VERSION
 
 use strict;
 use warnings;
@@ -138,7 +138,7 @@ Perl::osnames - List possible $^O ($OSNAME) values, with description
 
 =head1 VERSION
 
-This document describes version 0.121 of Perl::osnames (from Perl distribution Perl-osnames), released on 2020-02-10.
+This document describes version 0.122 of Perl::osnames (from Perl distribution Perl-osnames), released on 2020-02-13.
 
 =head1 DESCRIPTION
 
@@ -183,9 +183,21 @@ An arrayref of records (arrayrefs), each structured as:
 
 =head2 $RE_OS_IS_KNOWN
 
+Current value:
+
+ qr/\A(?:aix|amigaos|android|bsdos|beos|bitrig|dgux|dos|dynixptx|cygwin|darwin|dec_osf|dragonfly|freebsd|gnu|gnukfreebsd|haiku|hpux|interix|iphoneos|irix|linux|MacOS|machten|midnightbsd|minix|mirbsd|mpeix|msys|MSWin32|netbsd|next|nto|openbsd|os2|os390|os400|posix-bc|qnx|riscos|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk|vmesa|VMS|vos)\z/
+
 =head2 $RE_OS_IS_POSIX
 
+Current value:
+
+ qr/\A(?:aix|beos|cygwin|darwin|dragonfly|freebsd|gnu|gnukfreebsd|haiku|hpux|interix|iphoneos|irix|linux|midnightbsd|minix|mirbsd|msys|netbsd|openbsd|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk)\z/
+
 =head2 $RE_OS_IS_UNIX
+
+Current value:
+
+ qr/\A(?:aix|android|bsdos|bitrig|dgux|dynixptx|cygwin|darwin|dragonfly|freebsd|gnu|gnukfreebsd|hpux|interix|iphoneos|irix|linux|machten|midnightbsd|mirbsd|msys|netbsd|next|nto|openbsd|qnx|sco|sco_sv|solaris|sunos|svr4|svr5|unicos|unicosmk)\z/
 
 =head1 FUNCTIONS
 

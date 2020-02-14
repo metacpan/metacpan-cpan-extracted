@@ -68,13 +68,11 @@
 \bBuild.COM$
 \bBUILD.COM$
 \bbuild.com$
-^MANIFEST\.SKIP
 
 # Avoid archives of this distribution
 \bApp-Dochazka-REST-[\d\.\_]+
 \bCPAN_NAME$
 release.sh$
-\bREADME\.md$
 
 # Avoid release script helper files
 \bCPAN_NAME$

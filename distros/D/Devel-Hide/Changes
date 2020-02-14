@@ -1,5 +1,11 @@
 Revision history for Perl extension Devel::Hide.
 
+0.0011      2020-02-12
+
+   - Fix https://rt.cpan.org/Public/Bug/Display.html?id=120220
+   - Fix https://rt.cpan.org/Public/Bug/Display.html?id=120221
+   - Add -quiet option to suppress some notices
+
 0.0010      2018-06-15 09:12:54-07:00 America/Los_Angeles
 
    - Makefile.PL: better prereqs declaration

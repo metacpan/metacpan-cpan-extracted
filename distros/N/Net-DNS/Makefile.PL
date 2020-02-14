@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1761 2020-01-01 11:58:34Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -52,21 +52,22 @@ my %prerequisite = (
 
 
 my %optional = (
-	'Net::DNS::SEC'	       => 1.01,	## For information only
 	'Digest::BubbleBabble' => 0.01,
 	'Net::LibIDN2'	       => 1.00,
 	);
 
 
+## IMPORTANT:	THE USE AND/OR HANDLING OF STRONG ENCRYPTION TECHNOLOGIES IS
+##		PROHIBITED OR SEVERELY RESTRICTED IN MANY TERRITORIES.
+delete $prerequisite{'Net::DNS::SEC'};	## MUST NOT list Net::DNS::SEC dependency in metadata.
+delete $optional{'Net::DNS::SEC'};	## Require explicit user action to install Net::DNS::SEC.
+
+
 my @debris = qw(
-		.resolv.conf
+		.resolv.conf *.lock
 		t/IPv6.enabled
 		t/online.enabled t/online.nonfatal
-		zone[0-9].txt zone[0-9][0-9].txt
 		);
-
-
-delete $optional{'Net::DNS::SEC'};	## Note: MUST NOT be installed automatically
 
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1';

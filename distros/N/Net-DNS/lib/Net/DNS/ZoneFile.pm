@@ -1,9 +1,9 @@
 package Net::DNS::ZoneFile;
 
 #
-# $Id: ZoneFile.pm 1748 2019-07-15 07:57:00Z willem $
+# $Id: ZoneFile.pm 1769 2020-02-13 10:40:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1748 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1769 $)[1];
 
 
 =head1 NAME
@@ -94,9 +94,10 @@ sub new {
 		croak 'argument not a file handle';
 	}
 
-	$self->{filename}   = $file ||= '';
-	$self->{filehandle} = new IO::File($file) or croak "$! $file";
+	croak 'filename argument undefined' unless $file;
+	$self->{filehandle} = new IO::File( $file, '<' ) or croak "$file: $!";
 	$self->{fileopen}{$file}++;
+	$self->{filename} = $file;
 	return $self;
 }
 
@@ -533,8 +534,8 @@ sub _include {				## open $INCLUDE file
 	my $opened = {%{$self->{fileopen}}};
 	die qq(\$INCLUDE $file: Unexpected recursion) if $opened->{$file}++;
 
-	my @discipline = PERLIO ? ( join ':', '<', PerlIO::get_layers $self->{filehandle} ) : ();
-	my $filehandle = new IO::File( $file, @discipline ) or die qq(\$INCLUDE $file: $!);
+	my $discipline = PERLIO ? join( ':', '<', PerlIO::get_layers $self->{filehandle} ) : '<';
+	my $filehandle = new IO::File( $file, $discipline ) or die qq(\$INCLUDE $file: $!);
 
 	delete $self->{latest};					# forget previous owner
 	$self->{parent} = bless {%$self}, ref($self);		# save state, create link

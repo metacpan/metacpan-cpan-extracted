@@ -1,0 +1,31 @@
+NAME
+    PERLANCAR::Sort::Sub - PERLANCAR's Sort::Sub subroutines
+
+VERSION
+    This document describes version 0.07 of PERLANCAR::Sort::Sub (from Perl
+    distribution PERLANCAR-Sort-Sub), released on 2019-12-15.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PERLANCAR-Sort-Sub>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PERLANCAR-Sort-Sub>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PERLANCAR-Sort-Sub>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

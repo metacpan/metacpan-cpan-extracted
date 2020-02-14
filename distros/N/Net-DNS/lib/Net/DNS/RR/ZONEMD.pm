@@ -1,9 +1,9 @@
 package Net::DNS::RR::ZONEMD;
 
 #
-# $Id: ZONEMD.pm 1740 2019-04-04 14:45:31Z willem $
+# $Id: ZONEMD.pm 1761 2020-01-01 11:58:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1740 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1761 $)[1];
 
 
 use strict;
@@ -27,14 +27,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
-	@{$self}{qw(serial digtype reserved digestbin)} = unpack 'NC2a*', $rdata;
+	@{$self}{qw(serial digtype parameter digestbin)} = unpack 'NC2a*', $rdata;
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'NC2a*', @{$self}{qw(serial digtype reserved digestbin)};
+	pack 'NC2a*', @{$self}{qw(serial digtype parameter digestbin)};
 }
 
 
@@ -42,7 +42,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my @digest = split /(\S{64})/, $self->digest || qq("");
-	my @rdata = ( @{$self}{qw(serial digtype reserved)}, @digest );
+	my @rdata  = ( @{$self}{qw(serial digtype parameter)}, @digest );
 }
 
 
@@ -51,7 +51,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 
 	$self->serial(shift);
 	$self->digtype(shift);
-	$self->reserved(shift);
+	$self->parameter(shift);
 	$self->digest(@_);
 }
 
@@ -59,7 +59,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 sub _defaults {				## specify RR attribute default values
 	my $self = shift;
 
-	@{$self}{qw(serial digtype reserved digestbin)} = ( 0, 1, 0, '' );
+	$self->_parse_rdata( 0, 1, 0, '' );
 }
 
 
@@ -79,7 +79,12 @@ sub digtype {
 }
 
 
-sub reserved {0}						# uncoverable pod
+sub parameter {
+	my $self = shift;
+
+	$self->{parameter} = 0 + shift if scalar @_;
+	$self->{parameter} || 0;
+}
 
 
 sub digest {
@@ -135,6 +140,13 @@ Unsigned 32-bit integer zone serial number.
     $rr->digtype( $digtype );
 
 8-bit integer digest type field.
+
+=head2 parameter
+
+    $parameter = $rr->parameter;
+    $rr->parameter( $parameter );
+
+Digest algorithm parameter field.
 
 =head2 digest
 

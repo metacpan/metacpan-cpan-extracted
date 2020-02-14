@@ -29,18 +29,20 @@ SYNOPSIS
 STATUS
     Unstable.
 
-    Until version 1.000, stuff might change, but not without good reason.
+    Will probably never be stable.
 
-  Planned Changes
-    *   Support for using Function::Parameters to handle method signatures is
-        likely to be dropped.
+    A lot of the modules that Moops is built on have problems. In particular,
+    Devel::CallParser is broken on a lot of Perl versions, and Parse::Keyword
+    has *fundamental errors in the way it handles closures* (which Moops works
+    around using PadWalker).
 
-    *   Parameterized class and parameterized role support is planned.
+    Moops will remain on CPAN for the foreseeable future and I'll continue to
+    accept patches that fix bugs, but don't expect any new features to be
+    added.
 
-    *   The internals for parsing `class`, `role`, `namespace`, and `library`
-        may change to use Parse::Keyword rather than Keyword::Simple. This
-        will likely break any extensions that rely on subclassing or adding
-        traits to the Moops::Parser or Moops::Keyword classes.
+    For a replacement, consider MooX::Pression. It's not a drop-in replacement
+    but it has a similar syntax to Moops, and provides many of the same
+    features.
 
 DESCRIPTION
     Moops is sugar for declaring and using roles and classes in Perl.

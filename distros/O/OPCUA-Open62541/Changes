@@ -1,5 +1,11 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.002 2020-02-14
+    - Use Devel::CheckLib to ensure open62541 library is available.
+    - Implement type conversions for setting scalars in variant type.
+    - Connect client to server.
+    - Implement client and its config.
+
 0.001  2020-02-12
     - Implement basic functions needed to build a simple OPC UA server.
       That is "4.2 Building a Simple Server" and "11.2 Server Lifecycle"

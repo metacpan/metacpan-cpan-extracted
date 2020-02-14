@@ -1,5 +1,5 @@
 package Template::Liquid::Variable;
-our $VERSION = '1.0.14';
+our $VERSION = '1.0.16';
 require Template::Liquid::Error;
 use strict;
 use warnings;
@@ -39,6 +39,7 @@ sub render {
 
             #use Data::Dump qw[dump];
             #warn sprintf 'Before %s(%s): %s', $name, dump($args), dump($val);
+            #warn $s->{template}{context}->get($args->[0]) if ref $args;
                     $val = $call->(
                               $val,
                               map { $s->{template}{context}->get($_); } @$args

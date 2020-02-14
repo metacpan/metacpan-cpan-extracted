@@ -19,7 +19,8 @@ definitions.
 Installation
 ------------
 
-To install this module type the following::
+To install this module, first install all the dependencies listed in
+``Build.PL``, and then type the following::
 
    perl Build.PL
    ./Build
@@ -30,18 +31,6 @@ To install this module type the following::
 Submitting patches
 ------------------
 
-Patches are welcome. If you can, please fork the project on github::
-
-    http://github.com/smithfarm/date-holidays-cz.git
-
-and open a Pull Request.
-
-
-Dependencies
-------------
-
-This module requires these other modules and libraries::
-
-* Date::Calc 5.0
-* POSIX, Time::Local (from the standard Perl distribution)
+Before you submit a patch, read carefully the file ``CONTRIBUTING.rst`` in the
+same directory as this ``README.rst``.
 

@@ -6,6 +6,14 @@ use MooX::Pression prefix => 'MyApp';
 
 class Foo {
 	has name ( required => true );
+	
+	method bleh {
+		try {}
+		catch {}
+		try {}
+		catch {}
+		if (1) {}
+	}
 }
 
 try {

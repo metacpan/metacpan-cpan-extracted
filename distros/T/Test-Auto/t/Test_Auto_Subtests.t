@@ -1,5 +1,7 @@
 use 5.014;
 
+use lib 't/lib';
+
 use Do;
 use Test::Auto;
 use Test::More;
@@ -23,6 +25,7 @@ method: inherits
 method: libraries
 method: methods
 method: package
+method: plugin
 method: registry
 method: routines
 method: standard
@@ -213,6 +216,21 @@ package() : Any
 
   $subtests->package;
 
+=method plugin
+
+This method builds, tests, and returns a plugin object based on the name
+provided.
+
+=signature plugin
+
+plugin(Str $name) : Object
+
+=example-1 plugin
+
+  # given: synopsis
+
+  $subtests->plugin('ShortDescription');
+
 =method registry
 
 This method returns a type registry object comprised of the types declare in
@@ -268,6 +286,7 @@ standard() : InstanceOf["Test::Auto::Subtests"]
   # $self->methods;
   # $self->routines;
   # $self->functions;
+  # $self->types;
 
 =method scenario
 
@@ -358,9 +377,10 @@ tryable(Any @arguments) : InstanceOf["Data::Object::Try"]
 
 package main;
 
-my $test = Test::Auto->new(__FILE__);
+my $subs = testauto(__FILE__);
 
-my $subs = $test->subtests;
+$subs = $subs->standard;
+$subs->plugin('ShortDescription')->tests;
 
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
@@ -418,6 +438,12 @@ $subs->example(-1, 'methods', 'method', fun($tryable) {
 });
 
 $subs->example(-1, 'package', 'method', fun($tryable) {
+  ok my $result = $tryable->result, 'result ok';
+
+  $result;
+});
+
+$subs->example(-1, 'plugin', 'method', fun($tryable) {
   ok my $result = $tryable->result, 'result ok';
 
   $result;

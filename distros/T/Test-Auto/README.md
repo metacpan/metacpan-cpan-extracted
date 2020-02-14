@@ -28,8 +28,8 @@ Test Automation, Docs Generation
 # DESCRIPTION
 
 This package aims to provide, a standard for documenting Perl 5 software
-projects, a framework writing tests, and automation for validating the tests,
-documentation, and usage examples.
+projects, a framework writing tests, test automation, and documentation
+generation.
 
 # REASONING
 
@@ -181,6 +181,15 @@ This method returns a [Test::Auto::Subtests](https://metacpan.org/pod/Test::Auto
     =routine $name
     =signature $name
     =example-$number $name # [repeatable]
+
+    # [repeatable; optional]
+
+    =type $name
+    =type-library $name
+    =type-composite $name # [optional]
+    =type-parent $name # [optional]
+    =type-coercion $name # [optional]
+    =type-example-$number $name # [repeatable]
 
 The specification is designed to accommodate typical package declarations. It
 is used by the parser to provide the content used in the test automation and
@@ -444,6 +453,54 @@ present will include the given code example(s) with the evaluation of the
 current block. Each routine is tested and must be recognized to exist by the
 main package.
 
+## types
+
+    =type Path
+
+      Path
+
+    =type-parent Path
+
+      Object
+
+    =type-library Path
+
+    Path::Types
+
+    =type-composite Path
+
+      InstanceOf["Path::Find"]
+
+    =type-coercion-1 Path
+
+      # can coerce from Str
+
+      './path/to/file'
+
+    =type-example-1 Path
+
+      require Path::Find;
+
+      Path::Find::path('./path/to/file')
+
+    =cut
+
+When developing Perl programs, or type libraries, that use [Type::Tiny](https://metacpan.org/pod/Type::Tiny) based
+type constraints, testing and documenting custom type constraints is often
+overlooked. Describing a custom type constraint requires at least two blocks,
+i.e. `type $name` and `type-library $name`. While it's not strictly required,
+it's a good idea to also include at least one `type-example-1 $name`. The
+optional `type-parent` block should contain the name of the parent type. The
+`type-composite` block should contain a type expression that represents the
+derived type. The `type-coercion-$number` block is a repeatable block which
+is used to validate type coercion. The `type-coercion-$number` block should
+contain valid Perl code and return the value to be coerced. The
+`type-example-$number` block is a repeatable block, and it's a good idea to
+have at least one block must exist when documenting a type. The
+`type-example-$number` block should contain valid Perl code and return a
+value. Each type is tested and must be recognized to exist within the package
+specified by the `type-library` block.
+
 # AUTOMATION
 
     $test->standard;
@@ -458,6 +515,7 @@ This is the equivalent of writing:
     $test->methods;
     $test->routines;
     $test->functions;
+    $test->types;
 
 This framework provides a set of automated subtests based on the package
 specification, but not everything can be automated so it also provides you with
@@ -519,7 +577,11 @@ of the The Apache License, Version 2.0, as elucidated in the
 
 # PROJECT
 
+[Wiki](https://github.com/iamalnewkirk/test-auto/wiki)
+
 [Project](https://github.com/iamalnewkirk/test-auto)
+
+[Initiatives](https://github.com/iamalnewkirk/test-auto/projects)
 
 [Milestones](https://github.com/iamalnewkirk/test-auto/milestones)
 

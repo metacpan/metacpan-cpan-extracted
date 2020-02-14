@@ -1,5 +1,11 @@
 Revision history for Datify.
 
+v0.20.045 2020-02-14
+
+ - Moved %SETTINGS into a state variable, and created an accessor.
+ - Datify::Path is now a subclass of Datify.
+ - Several internal and testing changes.
+
 v0.19.045 2019-02-14
 
  - Datify:
@@ -8,7 +14,7 @@ v0.19.045 2019-02-14
        by subtracting some magic, or adding it, respectively.
      - Changed calls to ref() to Scalar::Util::blessed()
        or Scalar::Util::reftype(), as appropriate.
-     - Update new(), get(), and set() to operate on local parameters 
+     - Update new(), get(), and set() to operate on local parameters
        before global ones.
      - Converted several "if ... elsif ... else ..." blocks to
        the equivalent trinary "? ... : ... ? : ..." statements.
@@ -29,7 +35,7 @@ v0.19.045 2019-02-14
    - Lots of changes to the internals:
      - Changed calls to ref() to Scalar::Util::blessed()
        or Scalar::Util::reftype(), as appropriate.
-     - Update new(), get(), and set() to operate on local parameters 
+     - Update new(), get(), and set() to operate on local parameters
        before global ones.
      - Converted several "if ... elsif ... else ..." blocks to
        the equivalent trinary "? ... : ... ? : ..." statements.

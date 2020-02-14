@@ -17,20 +17,22 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Datify",
   "PREREQ_PM" => {
-    "Carp" => 0,
+    "Carp" => "1.25",
     "List::Util" => 0,
     "Scalar::Util" => 0,
     "String::Tools" => "0.18.277",
     "Sub::Util" => "1.40",
     "mro" => 0,
     "overload" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Carp" => "1.25",
     "Test2::V0" => 0
   },
-  "VERSION" => "v0.19.045",
+  "VERSION" => "v0.20.045",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }
@@ -38,7 +40,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
+  "Carp" => "1.25",
   "List::Util" => 0,
   "Scalar::Util" => 0,
   "String::Tools" => "0.18.277",
@@ -46,6 +48,7 @@ my %FallbackPrereqs = (
   "Test2::V0" => 0,
   "mro" => 0,
   "overload" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

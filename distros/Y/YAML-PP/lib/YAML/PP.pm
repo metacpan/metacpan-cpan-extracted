@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -96,7 +96,7 @@ sub default_schema {
     my $schema = YAML::PP::Schema->new(
         boolean => $args{boolean},
     );
-    $schema->load_subschemas(qw/ JSON /);
+    $schema->load_subschemas(qw/ Core /);
     return $schema;
 }
 
@@ -236,17 +236,17 @@ YAML::PP is a modern, modular YAML processor.
 It aims to support C<YAML 1.2> and C<YAML 1.1>. See L<http://yaml.org/>.
 
 YAML is a serialization language. The YAML input is called "YAML Stream".
-A stream consists of one or more "Documents", seperated by a line with a
+A stream consists of one or more "Documents", separated by a line with a
 document start marker C<--->. A document optionally ends with the document
 end marker C<...>.
 
-This allows to process continuous streams additionally to a fixed input
+This allows one to process continuous streams additionally to a fixed input
 file or string.
 
 The YAML::PP frontend will currently load all documents, and return only
-the last if called with scalar context.
+the first if called with scalar context.
 
-The YAML backend is implemented in a modular way that allows to add
+The YAML backend is implemented in a modular way that allows one to add
 custom handling of YAML tags, perl objects and data types. The inner API
 is not yet stable. Suggestions welcome.
 
@@ -268,11 +268,11 @@ One of the three YAML 1.2 official schemas
 
 =item L<YAML::PP::Schema::JSON>
 
-One of the three YAML 1.2 official schemas. Default
+One of the three YAML 1.2 official schemas.
 
 =item L<YAML::PP::Schema::Core>
 
-One of the three YAML 1.2 official schemas
+One of the three YAML 1.2 official schemas. Default
 
 =item L<YAML::PP::Schema::YAML1_1>
 
@@ -377,7 +377,7 @@ Still TODO:
     ---
     [ a, b, c ]: value
 
-=item Implicit mapping in flow syle sequences
+=item Implicit mapping in flow style sequences
 
     ---
     [ a, b, c: d ]
@@ -422,7 +422,7 @@ C<t/31.schema.t>.
 You can choose the Schema, however, the API for that is not yet fixed.
 Currently it looks like this:
 
-    my $ypp = YAML::PP->new(schema => ['Core']); # default is 'JSON'
+    my $ypp = YAML::PP->new(schema => ['JSON']); # default is 'Core'
 
 The Tags C<!!seq> and C<!!map> are still ignored for now.
 
@@ -579,14 +579,21 @@ The layout is like libyaml output:
     my $doc = $ypp->load_string("foo: bar");
     my @docs = $ypp->load_string("foo: bar\n---\n- a");
 
-Input should be Unicode characters (decoded).
+Input should be Unicode characters.
+
+So if you read from a file, you should decode it, for example with
+C<Encode::decode_utf8($bytes)>.
+
+Note that in scalar context, C<load_string> and C<load_file> return the first
+document (like L<YAML::Syck>), while L<YAML> and L<YAML::XS> return the
+last.
 
 =item load_file
 
     my $doc = $ypp->load_file("file.yaml");
     my @docs = $ypp->load_file("file.yaml");
 
-Strings will be loaded as unicode characters (decoded).
+Strings will be loaded as unicode characters.
 
 =item dump_string
 
@@ -594,10 +601,13 @@ Strings will be loaded as unicode characters (decoded).
     my $yaml = $ypp->dump_string($doc1, $doc2);
     my $yaml = $ypp->dump_string(@docs);
 
-Input strings should be Unicode characters. If not, they will be upgraded with
+Input strings should be Unicode characters.
 C<utf8::upgrade>.
 
-Output will return Unicode characters (decoded).
+Output will return Unicode characters.
+
+So if you want to write that to a file (or pass to YAML::XS, for example),
+you typically encode it via C<Encode::encode_utf8($yaml)>.
 
 =item dump_file
 
@@ -605,8 +615,7 @@ Output will return Unicode characters (decoded).
     $ypp->dump_file("file.yaml", $doc1, $doc2);
     $ypp->dump_file("file.yaml", @docs);
 
-Input data should be UTF-8 decoded. If not, it will be upgraded with
-C<utf8::upgrade>.
+Input data should be Unicode characters.
 
 =item dump
 
@@ -642,6 +651,10 @@ Creates and returns the default schema
 The functions C<Load>, C<LoadFile>, C<Dump> and C<DumpFile> are provided
 as a drop-in replacement for other existing YAML processors.
 No function is exported by default.
+
+Note that in scalar context, C<Load> and C<LoadFile> return the first
+document (like L<YAML::Syck>), while L<YAML> and L<YAML::XS> return the
+last.
 
 =over
 
@@ -784,7 +797,7 @@ These projects are a big help for any developer. So I got the idea
 to write my own parser and started on New Year's Day 2017.
 Without the test suite and the editor I would have never started this.
 
-I also started another YAML Test project which allows to get a quick
+I also started another YAML Test project which allows one to get a quick
 overview of which frameworks support which YAML features:
 
 =over 4
@@ -798,13 +811,13 @@ overview of which frameworks support which YAML features:
 L<https://github.com/yaml/yaml-test-suite>
 
 It contains about 230 test cases and expected parsing events and more.
-There will be more tests coming. This test suite allows to write parsers
+There will be more tests coming. This test suite allows you to write parsers
 without turning the examples from the Specification into tests yourself.
 Also the examples aren't completely covering all cases - the test suite
 aims to do that.
 
-The suite contains .tml files, and in a seperate 'data' branch you will
-find the content in seperate files, if you can't or don't want to
+The suite contains .tml files, and in a separate 'data' branch you will
+find the content in separate files, if you can't or don't want to
 use TestML.
 
 Thanks also to Felix Krause, who is writing a YAML parser in Nim.

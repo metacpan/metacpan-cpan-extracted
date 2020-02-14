@@ -21,15 +21,17 @@ my $meta = {
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
                                          requires => {
-                                           "Exporter::Tiny" => "1.000000",
-                                           "Import::Into" => 0,
-                                           "Module::Runtime" => 0,
-                                           "Moo" => 1.006,
-                                           "MooX::Enumeration" => "0.010",
+                                           "Exporter::Tiny"       => "1.000000",
+                                           "Import::Into"         => 0,
+                                           "Lexical::Accessor"    => 0.012,
+                                           "Module::Runtime"      => 0,
+                                           "Moo"                  => "2.000000",
+                                           "MooX::Enumeration"    => "0.010",
                                            "namespace::autoclean" => 0,
-                                           "perl" => 5.008008,
-                                           "Sub::HandlesVia" => 0.004,
-                                           "Type::Tiny" => 1.008003,
+                                           "perl"                 => 5.008008,
+                                           "Sub::HandlesVia"      => 0.013,
+                                           "Sub::MultiMethod"     => 0.008,
+                                           "Type::Tiny"           => 1.008003,
                                          },
                                        },
                           test      => {
@@ -38,8 +40,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.043 },
-                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.043 },
+                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.046 },
+                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.046 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -53,7 +55,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                         },
-  "version"          => 0.043,
+  "version"          => 0.046,
   "x_static_install" => 1,
 };
 

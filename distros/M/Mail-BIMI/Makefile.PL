@@ -7,7 +7,7 @@ use 5.020000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Class to model a collection of egress pools",
+  "ABSTRACT" => "BIMI object",
   "AUTHOR" => "Marc Bradshaw <marc\@marcbradshaw.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -39,11 +39,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Mail::SPF::Request" => 0,
     "Mail::SPF::Server" => 0,
-    "Net::DNS::Resolver::Mock" => 0,
+    "Net::DNS::Resolver::Mock" => "1.20200214",
+    "Test::Class" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20200210",
+  "VERSION" => "1.20200214",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +67,9 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moo::Role" => 0,
   "Net::DNS::Resolver" => 0,
-  "Net::DNS::Resolver::Mock" => 0,
+  "Net::DNS::Resolver::Mock" => "1.20200214",
+  "Test::Class" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Type::Utils" => 0,
   "Types::Standard" => 0,
