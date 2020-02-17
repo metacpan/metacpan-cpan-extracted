@@ -25,8 +25,6 @@ subtest 'categories' => sub {
     is $cat->name, "generic", "generic ok";
     $cat = XS::STL::system_category();
     is $cat->name, "system", "system ok";
-    $cat = XS::STL::iostream_category();
-    is $cat->name, "iostream", "io ok";
     $cat = XS::STL::future_category();
     is $cat->name, "future", "future ok";
 };

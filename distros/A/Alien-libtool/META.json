@@ -72,27 +72,29 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alien-libtool/issues"
+         "web" : "https://github.com/Perl5-Alien/Alien-libtool/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::libtool",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alien-libtool.git",
-         "web" : "https://github.com/plicease/Alien-libtool"
+         "url" : "git://github.com/Perl5-Alien/Alien-libtool.git",
+         "web" : "https://github.com/Perl5-Alien/Alien-libtool"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
       "requires" : {
          "share" : {
             "Alien::m4" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -106,8 +108,8 @@
       "Zaki Mughal (zmughal, sivoais)",
       "Chase Whitener (genio, CAPOEIRAB)"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12",
    "x_use_unsafe_inc" : 0
 }
 

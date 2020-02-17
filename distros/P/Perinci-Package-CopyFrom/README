@@ -1,0 +1,75 @@
+NAME
+    Perinci::Package::CopyFrom - Copy (some) contents from another package
+    (with Rinci metadata awareness)
+
+VERSION
+    This document describes version 0.001 of Perinci::Package::CopyFrom
+    (from Perl distribution Perinci-Package-CopyFrom), released on
+    2020-02-16.
+
+SYNOPSIS
+     package My::Source;
+     our %SPEC;
+     $SPEC{func1} = {...}
+     sub func1 { ... }
+     $SPEC{func2} = {...}
+     sub func2 { ... }
+     $SPEC{func3} = {...}
+     sub func3 { ... }
+     1;
+
+     package My::Modified;
+     use Package::CopyFrom; # exports copy_from()
+     BEGIN { copy_from 'My::Source' } # copies 'func1', 'func2', 'func3' as well as their Rinci metadata
+     our %SPEC;
+
+     # provide our own modification to 'func2'
+     $SPEC{func2} = { ... }
+     sub func2 { ... }
+
+     # provide our own modification to 'func3', using some helper from
+     # Perinci::Sub::Util
+     use Perinci::Sub::Util qw(gen_modified_sub);
+     gen_modified_sub(...);
+
+     # add a new function 'func4'
+     $SPEC{func4} = { ... }
+     sub func4 { ... }
+     1;
+
+DESCRIPTION
+    This is a variant of Package::CopyFrom that can also copy Rinci metadata
+    for you.
+
+FUNCTIONS
+  copy_from
+    See "copy_from" in Package::CopyFrom.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Package-CopyFrom>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Package-CopyFrom>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Package-CopyF
+    rom>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Rinci, Perinci, Package::CopyFrom.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

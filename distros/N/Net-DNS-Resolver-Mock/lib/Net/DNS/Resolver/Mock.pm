@@ -3,7 +3,7 @@ package Net::DNS::Resolver::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '1.20200214'; # VERSION
+our $VERSION = '1.20200215'; # VERSION
 
 use base 'Net::DNS::Resolver';
 
@@ -12,6 +12,36 @@ use Net::DNS::Question;
 use Net::DNS::ZoneFile;
 
 my $die_on = {};
+{
+    my @_debug_output;
+    sub enable_debug {
+        my ( $self ) = @_;
+        $self->{_mock_debug} = 1;
+        $self->_add_debug( "Net::DNS::Resolver::Mock Debugging enabled" );
+        return;
+    }
+    sub disable_debug {
+        my ( $self ) = @_;
+        $self->clear_debug();
+        delete $self->{_mock_debug};
+        return;
+    }
+    sub _add_debug {
+        my ( $self, $debug ) = @_;
+        push @_debug_output, $debug;
+        warn $debug;
+        return;
+    }
+    sub clear_debug {
+        my ( $self ) = @_;
+        @_debug_output = ();
+        return;
+    }
+    sub get_debug {
+        my ( $self ) = @_;
+        return @_debug_output;
+    }
+}
 
 sub die_on {
     my ( $self, $name, $type, $error ) = @_;
@@ -33,6 +63,8 @@ sub zonefile_parse {
 
 sub send {
     my ( $self, $name, $type ) = @_;
+
+    $self->_add_debug( "DNS Lookup '$name' '$type'" ) if $self->{_mock_debug};
 
     if ( exists ( $die_on->{ "$name $type" } ) ) {
         die $die_on->{ "$name $type" };
@@ -116,6 +148,23 @@ Reads the zone data from the supplied string
 =item die_on ( $Name, $Type, $Error )
 
 Die with $Error for a query of $Name and $Type
+
+=item enable_debug ()
+
+Once set, the resolver will write any lookups received to STDERR
+and will be available via the following methods
+
+=item disble_debug ()
+
+Disable debugging
+
+=item clear_debug ()
+
+Clear the debugging list
+
+=item get_debug ()
+
+Returns a list of debugging entries
 
 =back
 

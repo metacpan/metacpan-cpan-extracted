@@ -95,7 +95,7 @@ WriteMakefile(
   'ABSTRACT' => 'Perl extension for embedding Lua scripts into Perl code',
   'AUTHOR' => 'Rob Hoelz <rob@hoelz.ro>',
   'LICENSE' => 'perl',
-  'VERSION' => '0.15',
+  'VERSION' => '0.16',
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '0'
   },

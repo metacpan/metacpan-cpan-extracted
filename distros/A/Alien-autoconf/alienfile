@@ -14,7 +14,7 @@ probe sub {
   my($build) = @_;
 
 #  my %tools;
-#  
+#
 #  foreach my $tool (qw( autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames ))
 #  {
 #    $tools{$tool} = 0;
@@ -24,7 +24,7 @@ probe sub {
 #      my(undef, undef, $stdout) = capture {
 #        `$tool --version`;
 #      };
-#      
+#
 #      if($stdout =~ /GNU Autoconf/ && $stdout =~ /([0-9\.]+)$/)
 #      {
 #        my $version = $1;
@@ -63,14 +63,14 @@ share {
   }
 
   plugin Download => (
-    url => 'http://ftp.gnu.org/gnu/autoconf',
+    url => 'https://ftp.gnu.org/gnu/autoconf',
     filter => qr/^autoconf-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz',
-  
+
   plugin 'Build::Autoconf' => ( msys_version => '0.08' );
-  
+
   meta->before_hook(
     gather_share => sub {
       my($build) = @_;
@@ -114,7 +114,7 @@ share {
           $exe->chmod("0755");
         }
       }
-      
+
       # patch autom4te config
       {
         my $orig = Path::Tiny->new('share/autoconf/autom4te.cfg');
@@ -125,7 +125,7 @@ share {
           s/--prepend-include '(.*)'/--prepend-include '$stage'/;
         });
       }
-      
+
       # script to compute path to autoconf root
       {
         my $exe = Path::Tiny->new('bin/alien_autoconf_root');

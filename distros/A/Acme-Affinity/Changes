@@ -1,6 +1,13 @@
 Revision history for Acme-Affinity
 
+0.0106 2020-02-14 16:04:06
+    - Remove accidental eg file.
+
+0.0105 2020-02-14 15:49:34
+    - Enhanced the eg/permutations code.
+
 0.0104 2019-05-26 12:38:01
+    - Use object accessors, not variables of accessors.
     - Math::BigRat->numify the returned ->score.
     - Add an example program to compute all possible scores.
 

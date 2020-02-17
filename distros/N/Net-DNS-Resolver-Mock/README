@@ -31,6 +31,23 @@ PUBLIC METHODS
 
       Die with $Error for a query of $Name and $Type
 
+    enable_debug ()
+
+      Once set, the resolver will write any lookups received to STDERR and
+      will be available via the following methods
+
+    disble_debug ()
+
+      Disable debugging
+
+    clear_debug ()
+
+      Clear the debugging list
+
+    get_debug ()
+
+      Returns a list of debugging entries
+
 DEPENDENCIES
 
       Net::DNS::Resolver

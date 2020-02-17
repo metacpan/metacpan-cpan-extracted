@@ -1,9 +1,9 @@
 This archive contains the distribution Acme-Affinity,
-version 0.0104:
+version 0.0106:
 
   Compute the affinity between two people
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

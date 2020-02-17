@@ -22,8 +22,8 @@ my $yts = "$Bin/../test-suite/yaml-test-suite-data";
 my @skip = qw/
     4FJ6 4ABK 87E4 8CWC 8UDB 9MMW
     CN3R CT4Q DFF7
-    FRK4 F8F9 G5U8
-    K858 KZN9 L9U5 LQZ7 LX3P
+    FRK4 G5U8
+    KZN9 L9U5 LQZ7 LX3P
     Q9WF QF4Y
 
     6BFJ
@@ -38,7 +38,6 @@ push @skip, qw/
 # quoting
 push @skip, qw/
 36F6
-82AN
 9YRD
 HS5T
 EX5H
@@ -63,14 +62,12 @@ XLQ9
 K54U
 PUW8
 3MYT
-EXG3
 JDH8
 MJS9
 
 
 /;
 # TODO fix testsuite
-# EXG3
 # 4QFQ
 
 # unicode
@@ -88,13 +85,13 @@ my $testsuite = YAML::PP::Test->new(
 
 my %skip_yaml_equal = (
 
-    'K858' => 1,
     'X38W' => 1,
     'G4RS' => 1,
     '6CK3' => 1,
     '5TYM' => 1,
     '565N' => 1,
     # fix testsuite
+    'K858' => 1,
     '4MUZ' => 1,
     '8KB6' => 1,
     '9BXH' => 1,

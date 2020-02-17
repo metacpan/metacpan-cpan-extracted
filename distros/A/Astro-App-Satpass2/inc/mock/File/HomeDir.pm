@@ -9,7 +9,7 @@ use Carp;
 
 use constant HASH_REF	=> ref {};
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 our $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG;
 our $MOCK_FILE_HOMEDIR_MY_HOME;
@@ -20,6 +20,10 @@ sub my_dist_config {
     HASH_REF eq ref $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG
 	and return $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG->{$dist};
     return $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG;
+}
+
+sub my_dist_data {
+    goto &my_dist_config;
 }
 
 sub my_home {
@@ -72,23 +76,28 @@ This class supports the following public methods:
 This method returns the contents of global variable
 C<$File::HomeDir::MOCK_FILE_HOMEDIR_MY_HOME>.
 
-=head2 my_dist_dir
+=head2 my_dist_config
 
- local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_DIR
+ local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG
      = '/foo/bar';
- say File::HomeDir->my_dist_dir( 'blarg' ); # '/foo/bar'
+ say File::HomeDir->my_dist_config( 'blarg' ); # '/foo/bar'
 
- local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_DIR = {
+ local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG = {
      blarg      => '/foo/bar',
      burfle     => '/baz/biz/buzz',
  };
- say File::HomeDir->my_dist_dir( 'blarg' ); # '/foo/bar'
+ say File::HomeDir->my_dist_config( 'blarg' ); # '/foo/bar'
 
 If C<$File::HomeDir::MOCK_FILE_HOMED)R_MY_DIST_DIR> is a hash reference,
 this method returns the value corresponding to the argument. Otherwise
 it simply returns the value of
 C<$File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_DIR>, regardless of the
 value of its argument.
+
+=head2 my_dist_data
+
+This is just a synonym for L<my_dist_config()|/my_dist_config>, added to
+support the macOS "Catalina sidestep."
 
 =head2 users_home
 

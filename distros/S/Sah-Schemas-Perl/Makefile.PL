@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Perl",
   "PREREQ_PM" => {
-    "Complete::File" => 0,
+    "Complete::File" => "0.440",
     "Complete::Module" => 0,
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.608",
+    "Module::CoreList" => 0,
     "Perinci::Sub::XCompletion::perl_distname" => 0,
     "Perinci::Sub::XCompletion::perl_modname" => 0,
     "Perinci::Sub::XCompletion::perl_modname_or_prefix" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.903",
+    "Data::Sah" => "0.907",
     "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,14 +46,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::File" => 0,
+  "Complete::File" => "0.440",
   "Complete::Module" => 0,
-  "Complete::Util" => "0.603",
-  "Data::Sah" => "0.903",
+  "Complete::Util" => "0.608",
+  "Data::Sah" => "0.907",
   "Data::Sah::Coerce" => "0.038",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Module::CoreList" => 0,
   "Module::Path::More" => "0.32",
   "Perinci::Sub::XCompletion::perl_distname" => 0,
   "Perinci::Sub::XCompletion::perl_modname" => 0,

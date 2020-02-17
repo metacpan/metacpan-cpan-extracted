@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Writer::File;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Scalar::Util qw/ openhandle /;
 

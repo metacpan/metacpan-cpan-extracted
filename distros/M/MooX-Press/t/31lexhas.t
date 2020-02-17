@@ -63,5 +63,55 @@ is($obj2->pop_bizzle, 420);
 is($obj2->pop_bizzle, 999);
 is($obj2->pop_bizzle, 666);
 
+
+note 'public';
+
+my ($bpush, $bpop, $bread, $bwrite, $bclear);
+use MooX::Press (
+	prefix => 'MyApp3',
+	class => [
+		'Foo' => {
+			has => {
+				bizzle => [
+					is           => rw,
+					isa          => ArrayRef,
+					required     => true,
+					init_arg     => 'b',
+					reader       => \$bread,
+					writer       => \$bwrite,
+					clearer      => \$bclear,
+					accessor     => 'bizzle',
+					handles_via  => 'Array',
+					handles      => [
+						\$bpush => 'push',
+						\$bpop  => 'pop',
+						'ball'  => 'all',
+					],
+				],
+			},
+		},
+	],
+);
+
+my $obj3 = MyApp3->new_foo( b => [666,999] );
+
+is_deeply( $obj3->bizzle, [666,999], 'constructor and rw accessor' );
+
+$obj3->$bclear;
+
+is( $obj3->bizzle, undef, 'clearer' );
+
+$obj3->$bwrite([42]);
+
+is_deeply( $obj3->$bread, [42], 'writer and reader' );
+
+$obj3->$bpush(69,70);
+
+is_deeply( $obj3->$bread, [42, 69, 70], 'delegation(push) and reader' );
+
+is($obj3->$bpop, 70, 'delegation(pop)');
+
+is_deeply( [ $obj3->ball ], [42, 69], 'delegation(pop) and delegation(all)' );
+
 done_testing;
 

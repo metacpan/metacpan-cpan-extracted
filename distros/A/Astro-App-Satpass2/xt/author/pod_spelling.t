@@ -108,12 +108,14 @@ JSON
 jul
 julian
 kluged
+launchd
 localization
 localizations
 lookup
 Lookup
 lookups
 ly
+macOS
 MacPorts
 meananomaly
 meanmotion

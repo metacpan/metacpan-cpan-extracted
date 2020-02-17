@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Moops>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Moops>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.038	2020-02-15
+
+ [ Documentation ]
+ - Add GOTCHAS section.
+
 0.037	2020-02-13
 
  [ Documentation ]
@@ -32,13 +37,13 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Bug Fixes ]
  - Fix enormous memory leak leading to segfault caused when a role
    application in a scope guard threw an exception.
-   Fixes RT#99409.
    Fixes RT#99389.
+   Fixes RT#99409.
    Ben Goldberg++
    Lukas Atkinson++
    Søren Døssing++
-   <https://rt.cpan.org/Ticket/Display.html?id=99409>
    <https://rt.cpan.org/Ticket/Display.html?id=99389>
+   <https://rt.cpan.org/Ticket/Display.html?id=99409>
    <http://purl.org/NET/cpan-uri/rt/ticket/99438>
 
  [ Documentation ]

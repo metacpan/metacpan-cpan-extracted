@@ -35,5 +35,6 @@ t/22overload.t
 t/23roleorder.t
 t/24mm.t
 t/25abstract.t
+t/26accumulate.t
 t/30bare.t
 t/31lexhas.t

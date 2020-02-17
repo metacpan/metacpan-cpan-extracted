@@ -1,5 +1,19 @@
 Revision history for Date-Holidays-GB
 
+0.015  2020-02-17 14:08:56 GMT
+
+ [Maintenance]
+ - correct module abstract 
+
+0.014  2020-02-17 10:40:36 GMT
+
+ [Update]
+ - documented next_holiday() method
+ - added more logical 'date' interface to functions
+
+ [Maintenance]
+ - corrected date in abstract
+
 0.013  2020-02-12 13:17:35 GMT
 
  [Update]

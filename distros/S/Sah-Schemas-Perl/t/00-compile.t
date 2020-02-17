@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 46 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
@@ -34,6 +34,7 @@ my @module_files = (
     'Sah/Schema/perl/pod_or_pm_filename.pm',
     'Sah/Schema/perl/podname.pm',
     'Sah/Schema/perl/qualified_funcname.pm',
+    'Sah/Schema/perl/release/version.pm',
     'Sah/Schema/perl/unqualified_funcname.pm',
     'Sah/Schema/perl/version.pm',
     'Sah/SchemaR/perl/distname.pm',
@@ -50,6 +51,7 @@ my @module_files = (
     'Sah/SchemaR/perl/pod_or_pm_filename.pm',
     'Sah/SchemaR/perl/podname.pm',
     'Sah/SchemaR/perl/qualified_funcname.pm',
+    'Sah/SchemaR/perl/release/version.pm',
     'Sah/SchemaR/perl/unqualified_funcname.pm',
     'Sah/SchemaR/perl/version.pm',
     'Sah/Schemas/Perl.pm'

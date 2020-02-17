@@ -1,9 +1,9 @@
 package Org::Examples;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-30'; # DATE
+our $DATE = '2020-02-16'; # DATE
 our $DIST = 'Org-Examples'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Example Org documents
@@ -20,7 +20,7 @@ Org::Examples - Example Org documents
 
 =head1 VERSION
 
-This document describes version 0.001 of Org::Examples (from Perl distribution Org-Examples), released on 2020-12-30.
+This document describes version 0.002 of Org::Examples (from Perl distribution Org-Examples), released on 2020-02-16.
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

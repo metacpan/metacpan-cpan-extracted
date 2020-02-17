@@ -120,7 +120,8 @@ DESCRIPTION
         "MyApp::OO", then it will create a class called "MyApp::OO::Animal".
 
         This is optional and defaults to the caller. If you wish to have no
-        prefix, then pass an explicit `prefix => undef` option.
+        prefix, then pass an explicit `prefix => undef` option. (If the caller
+        is `main`, then the prefix defaults to undef.)
 
         You can bypass the prefix for a specific class or a specific role
         using a leading double colon, like "::Animal".
@@ -129,8 +130,10 @@ DESCRIPTION
         A package name to install methods like the `new_cat` and `new_cow`
         methods in "SYNOPSIS".
 
-        This defaults to prefix, but may be explicitly set to undef to
-        suppress the creation of such methods.
+        This defaults to prefix if the prefix is defined, and "Local"
+        otherwise, but may be explicitly set to undef to suppress the creation
+        of such methods. If the factory_package is "Local", you'll get a
+        warning, except in `perl -e` one-liners.
 
         In every class (but not role) that MooX::Press builds, there will be a
         `FACTORY` method created so that, for example
@@ -143,6 +146,12 @@ DESCRIPTION
 
           MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
           MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
+
+        The factpry package will have a global variable %PACKAGES where the
+        keys are names of all the packages MooX::Press created for you, and
+        the values are what kind of package they are:
+
+          say $MyApp::PACKAGES{"MyApp::Cow"};     # 'class'
 
     `type_library` *(Str|Undef)*
         MooX::Press will automatically create a Type::Library-based type
@@ -902,11 +911,13 @@ DESCRIPTION
           );
 
         Private attributes may have defaults and builders (but they are always
-        lazy!) They may also have `handles`. (Though if the `handles` option
-        is an arrayref, it is treated slightly differently from non-private
-        attributes; see Lexical::Accessor for details.) You may find you can
-        do everything you need with the builders and delegations, so having an
+        lazy!) They may also have `handles`. You may find you can do
+        everything you need with the builders and delegations, so having an
         accessor is unnecessary.
+
+        (As of version 0.050, setting `reader`, `writer`, `accessor`,
+        `clearer`, or `predicate` to a scalarref will also work for *public*
+        attributes too!)
 
     `isa` *(Str|Object)*
         When the type constraint is a string, it is always assumed to be a
@@ -1032,6 +1043,55 @@ DESCRIPTION
     `handles_via` *(Str|ArrayRef[Str])*
         If your attribute has a `handles_via` option, MooX::Press will load
         Sub::HandlesVia for you.
+
+    `handles` *(ArrayRef|HashRef|RoleName)*
+        `handles` is effectively a mapping of methods in the package being
+        defined to methods in a target package. If `handles` is a hashref,
+        then it is obvious how that works. If `handles` is a role name, then
+        the mapping includes all the methods that are part of the role's API,
+        and they map to methods of the same name in the target package. (Only
+        Moose and Mouse support `handles` being a role name.)
+
+        For attributes with an enum type constraint, the special values
+        `handles => 1` and `handles => 2` described above also work.
+
+        When `handles` is an arrayref, then the different backend modules
+        would interpret it differently:
+
+          # Moo, Moose, Mouse, Sub::HandlesVia, Moo(se)X::Enumeration
+          [ "value1", "value2", "value3", "value4" ]
+  
+          # Lexical::Accessor
+          [ "key1" => "value1", "key2" => "value2" ]
+
+        Since version 0.050, MooX::Press smooths over the differences between
+        them by converting these arrayrefs to hashrefs. Rather surprisingly,
+        *the Lexical::Accessor interpretation of arrayrefs is used*. It is
+        treated as a list of key-value pairs.
+
+        This is because even though that's the minority interpretation, it's
+        the more useful interpretation, allowing methods from the target
+        package to be given a different name in the package being defined, or
+        even assigned to lexical variables.
+
+          has => [
+            'ua' => {
+              is      => 'bare',
+              default => sub { HTTP::Tiny->new },
+              handles => [
+                \$get  => 'get',
+                \$post => 'post',
+              ],
+            },
+          ],
+
+        Now $get will be a coderef that you can call as a method:
+
+          $self->$get($url);   # same as $self->{ua}->get($url)
+
+        If you use `handles => \%hash`, you should get expected behaviour. If
+        you use `handles => \@array`, just be aware that your array is going
+        to be interpreted like a hash from MooX::Press 0.050 onwards!
 
     `coerce` *(Bool|CodeRef)*
         MooX::Press automatically implies `coerce => 1` when you give a type

@@ -38,7 +38,7 @@ sub requires {
 	'Astro::Coord::ECI::TLE'	=> 0.077,
 	'Astro::Coord::ECI::TLE::Iridium'	=> 0.077,
 	'Astro::Coord::ECI::TLE::Set'	=> 0.077,
-	'Astro::Coord::ECI::Utils'	=> 0.077,	# for time_gm() ...
+	'Astro::Coord::ECI::Utils'	=> 0.112,	# for greg_time_gm() ...
 	'Carp'			=> 0,
 	'Clone'			=> 0,
 	'Cwd'			=> 0,

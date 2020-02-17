@@ -1,0 +1,146 @@
+NAME
+    Package::CopyFrom - Copy (some) contents from another package
+
+VERSION
+    This document describes version 0.003 of Package::CopyFrom (from Perl
+    distribution Package-CopyFrom), released on 2020-02-16.
+
+SYNOPSIS
+     package My::Package;
+     use Package::CopyFrom; # exports copy_from()
+
+     BEGIN { copy_from 'Your::Package' }
+
+     # provide your own variables/subroutines
+     our $scalar = 'foo';
+     sub func1 { ... }
+     ...
+
+     1;
+
+DESCRIPTION
+    This module provides "copy_from" to fill the contents of the caller's
+    (target) package from the specified (source) package, with some options.
+    "copy_from" can be used as an alternative to OO inheritance: you copy
+    routines from another "base" package then add/modify some other.
+
+FUNCTIONS
+  copy_from
+    Usage:
+
+     copy_from [ \%opts, ] $source_package
+
+    Load module $source_package if not already loaded (unless the "load"
+    option is set to false, in which case no module loading is done), then
+    copy the contents of the package into the caller's package. Currently
+    only coderefs, scalars, arrays, and hashes are copied.
+
+    Options:
+
+    *   to
+
+        String. Default to "copy_from"'s caller package. Can be used to
+        explicitly set the target package.
+
+    *   load
+
+        Boolean, default true. If set to false, no attempt to load module
+        named $source_package is made.
+
+    *   dclone
+
+        Boolean, default false. By default, only shallow copying of arrays
+        and hashes are done. If this option is true, Storable's "dclone" is
+        used.
+
+    *   skip_sub
+
+        Boolean, default false. Whether to exclude all subs.
+
+    *   skip_scalar
+
+        Boolean. Whether to exclude all scalar variables.
+
+    *   skip_array
+
+        Boolean, default false. Whether to exclude all array variables.
+
+    *   skip_hash
+
+        Boolean, default false. Whether to exclude all hash variables.
+
+    *   exclude
+
+        Arrayref. List of names to exclude.
+
+        Examples:
+
+         exclude => ['@EXPORT', '@EXPORT_OK', '%EXPORT_TAGS', '$VERSION'];
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Package-CopyFrom>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Package-CopyFrom>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Package-CopyFrom>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+GOTCHAS
+    If your copying module is loaded by user during runtime instead of
+    compile-time, then subroutine name from your module will be overwritten
+    by the runtime "copy_from" invocation. Illustration:
+
+     # in Source.pm
+     package Source;
+     sub func1 { ... }
+     sub func2 { print "Source's version" }
+     1;
+
+     # in YourModule.pm
+     package YourModule;
+     use Package::CopyFrom;
+     copy_from 'Source';
+     # modify func2
+     sub func2 { "YourModule's version" }
+     1;
+
+     # in script1.pl
+     use YourModule;
+     YourModule::func2(); # prints "YourModule's version", ok.
+
+     # in script2.pl
+     require YourModule;
+     YourModule::func2(); # prints "Source's version"!
+
+    To ensure that your subroutines do not get copied (overwritten) by the
+    source package's that have the same name, perform the copying at
+    compile-time:
+
+     # in YourModule.pm
+     package YourModule;
+     BEGIN { use Package::CopyFrom; copy_from 'Source' }
+     # modify func2
+     sub func2 { "YourModule's version" }
+     1;
+
+SEE ALSO
+    Package::Rename can also copy packages.
+
+    Variants: Perinci::Package::CopyFrom
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

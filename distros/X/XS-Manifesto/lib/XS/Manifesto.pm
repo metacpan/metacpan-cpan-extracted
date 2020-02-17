@@ -1,6 +1,6 @@
 package XS::Manifesto;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ not possible to implement this at all with pure C-layer.
 
 The L<Alien>-specific issue is that it doesn't aim for 
 B<sharing binary (executable) code> (see 
-L<Alien CAVEATS| https://metacpan.org/pod/Alien#When-building-from-source-code,-build-static-libraries-whenever-possible> ). 
+L<Alien CAVEATS | https://metacpan.org/pod/Alien#CAVEATS>).
 While this approach has benefits, like the requirement of an Alien-library to
 be a build-only (compile-only) dependency, the ease of module upgrades (without
 rebuilding dependencies), etc., it has it's own limitations:

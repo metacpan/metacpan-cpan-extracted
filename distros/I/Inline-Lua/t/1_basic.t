@@ -2,13 +2,14 @@ use Test::More;
 
 no warnings 'once';
 
-BEGIN { plan tests => 8 };
+BEGIN { plan tests => 9 };
 
 use Inline Lua	    => 'DATA',
 	   Undef    => 'undefined value';
 
 ok(1);
 ok(take_num(42) == 43,				    "num");
+ok(cast_int(42) eq "42X",			    "cast int");
 ok(abs(take_num(42.42) - 42.42) - 1 < 0.1,	    "num");
 ok(take_string("foo", "bar") eq "foobar",	    "string");
 ok(! defined take_nil($Inline::Lua::Nil),	    "nil");
@@ -20,6 +21,10 @@ __END__
 __Lua__
 function take_num (a)
     return a+1
+end
+
+function cast_int (a)
+    return a .. "X"
 end
 
 function take_string (a, b)

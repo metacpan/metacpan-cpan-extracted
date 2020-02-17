@@ -101,7 +101,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "CPAN" : "0",
             "Capture::Tiny" : "0",
             "Dist::Zilla::Plugin::MakeMaker" : "5.022",
             "ExtUtils::MakeMaker" : "6.64",
@@ -207,7 +206,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::DynamicPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/DynamicPrereqs.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       }
    },
    "release_status" : "stable",
@@ -225,7 +224,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.036",
+   "version" : "0.037",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.031008"
@@ -1101,7 +1100,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.036",
+                  "tag" : "v0.037",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1297,7 +1296,7 @@
                }
             },
             "name" : "DynamicPrereqs",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",

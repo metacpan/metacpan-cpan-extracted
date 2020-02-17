@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use Win32 ();
 use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
 use FindBin;
 use lib $FindBin::Bin;
@@ -48,6 +49,12 @@ notepad()->closeAll();
     $ret = $npp->open($oFile);
     ok $ret, sprintf 'msg{NPPM_DOOPEN} ->open("%s"): %d', $oFile, $ret;
 }
+
+# ####### <debug>
+# diag sprintf "file list: '%s'\n", path($_)->absolute()->canonpath() for ($0, 'src/Scintilla.h', 'src/convertHeaders.pl', Path::Tiny->tempfile() );
+# diag sprintf "long path: '%s'\n", wrapGetLongPathName(path($_)->absolute()->canonpath()) for ($0, 'src/Scintilla.h', 'src/convertHeaders.pl', Path::Tiny->tempfile() );
+# done_testing(); exit;
+# ####### </debug>
 
 my @opened;
 foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
@@ -107,11 +114,11 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
 
     # getCurrentFilename
     my $rfile = $npp->getCurrentFilename();
-    like $rfile, qr/\Q$oFile\E/, sprintf 'msg{NPPM_GETFULLPATHFROMBUFFERID} ->getCurrentFilename() = "%s"', $rfile;
+    is path($rfile)->basename, path($oFile)->basename, sprintf 'msg{NPPM_GETFULLPATHFROMBUFFERID} ->getCurrentFilename() = "%s"', $rfile;
 
     # also getBufferFilename
     my $bfile = $npp->getBufferFilename();
-    like $bfile, qr/\Q$oFile\E/, sprintf 'msg{NPPM_GETFULLPATHFROMBUFFERID} ->getBufferFilename(0x%08x) = "%s"', $bufferid, $bfile;
+    is path($bfile)->basename, path($oFile)->basename, sprintf 'msg{NPPM_GETFULLPATHFROMBUFFERID} ->getBufferFilename(0x%08x) = "%s"', $bufferid, $bfile;
 
     # getCurrentLang
     my $mylang = $npp->getCurrentLang();
@@ -136,16 +143,17 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     ok $ret, sprintf '->activateBufferID(0x%08x) = %d', $opened[1]{bufferID}, $ret;
     my $rFile = $npp->getCurrentFilename();
     my $oFile = $opened[1]{oFile};
-    like $rFile, qr/\Q$oFile\E/, sprintf '->activateBufferID() verify correct file active';
+    is path($rFile)->basename, path($oFile)->basename, sprintf '->activateBufferID() verify correct file active';
 }
 
 # activateFile
 {
-    my $ret = $npp->activateFile( $opened[0]{oFile} );
-    ok $ret, sprintf '->activateFile(%s) = %d', $opened[0]{oFile}, $ret;
+    my $f = wrapGetLongPathName($opened[0]{oFile});
+    my $ret = $npp->activateFile( wrapGetLongPathName( $f ) );
+    ok $ret, sprintf '->activateFile(%s) = %d', $f, $ret;
     my $rFile = $npp->getCurrentFilename();
-    my $oFile = $opened[0]{oFile};
-    like $rFile, qr/\Q$oFile\E/, sprintf '->activateFile() verify correct file active';
+    my $oFile = $f;
+    is path($rFile)->basename, path($oFile)->basename, sprintf '->activateFile() verify correct file active';
 }
 
 # getFiles
@@ -154,7 +162,7 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     my $found = '';
     $found .= join("\x00", '', @{$_}[3,2,0])    for @$tuples;
     foreach my $h ( @opened ) {
-        my $match = join("\x00", '', @{$h}{qw/view docIndex oFile/});
+        my $match = join("\x00", '', @{$h}{qw/view docIndex/}, wrapGetLongPathName($h->{oFile}) );
         like $found, qr/\Q$match\E/, sprintf "->getFiles(): look for %s", explain($match);
     }
 }
@@ -287,7 +295,7 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     ##################
     # reloadFile
     ##################
-    my $f = $opened[0]{oFile};
+    my $f = wrapGetLongPathName($opened[0]{oFile});
     $npp->activateFile($f);
 
     $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
@@ -328,8 +336,11 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
             $txt = '';
         };
         $txt =~ s/\0+$//;   # in case it reads back nothing, I need to remove the trailing NULLs
-        isnt $txt, "", sprintf 'reloadFile with prompt: verify buffer no longer empty';
+        isnt $txt, "", sprintf 'reloadFile with prompt: verify buffer no longer empty'
+or BAIL_OUT 'isnt empty'
+;
         is length($txt), $orig_len , sprintf 'reloadFile with prompt: verify buffer matches original length: %d vs %d', length($txt), $orig_len;
+#myTestHelpers::setDebugInfo(0);
       }
     }
 

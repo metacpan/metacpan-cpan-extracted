@@ -4,6 +4,10 @@
 
 using namespace xs;
 
+#if !defined(_WIN32) && !defined(__DragonFly__) && !defined(__NetBSD__)
+  #define _XSFW_SKIP_CHECK 1
+#endif
+
 void register_error_constants () {
     struct ecdata {
         panda::string_view long_name;
@@ -21,7 +25,7 @@ void register_error_constants () {
         {"argument_out_of_domain",              "EDOM",             std::errc::argument_out_of_domain},
         {"bad_address",                         "EFAULT",           std::errc::bad_address},
         {"bad_file_descriptor",                 "EBADF",            std::errc::bad_file_descriptor},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EBADMSG)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EBADMSG)
         {"bad_message",                         "EBADMSG",          std::errc::bad_message},
         #endif
         {"broken_pipe",                         "EPIPE",            std::errc::broken_pipe},
@@ -39,7 +43,7 @@ void register_error_constants () {
         {"filename_too_long",                   "ENAMETOOLONG",     std::errc::filename_too_long},
         {"function_not_supported",              "ENOSYS",           std::errc::function_not_supported},
         {"host_unreachable",                    "EHOSTUNREACH",     std::errc::host_unreachable},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EIDRM)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EIDRM)
         {"identifier_removed",                  "EIDRM",            std::errc::identifier_removed},
         #endif
         {"illegal_byte_sequence",               "EILSEQ",           std::errc::illegal_byte_sequence},
@@ -54,24 +58,24 @@ void register_error_constants () {
         {"network_reset",                       "ENETRESET",        std::errc::network_reset},
         {"network_unreachable",                 "ENETUNREACH",      std::errc::network_unreachable},
         {"no_buffer_space",                     "ENOBUFS",          std::errc::no_buffer_space},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ECHILD)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ECHILD)
         {"no_child_process",                    "ECHILD",           std::errc::no_child_process},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOLINK)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOLINK)
         {"no_link",                             "ENOLINK",          std::errc::no_link},
         #endif
         {"no_lock_available",                   "ENOLCK",           std::errc::no_lock_available},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENODATA)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENODATA)
         {"no_message_available",                "ENODATA",          std::errc::no_message_available},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOMSG)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOMSG)
         {"no_message",                          "ENOMSG",           std::errc::no_message},
         #endif
         {"no_protocol_option",                  "ENOPROTOOPT",      std::errc::no_protocol_option},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOSPC)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOSPC)
         {"no_space_on_device",                  "ENOSPC",           std::errc::no_space_on_device},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOSR)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOSR)
         {"no_stream_resources",                 "ENOSR",            std::errc::no_stream_resources},
         #endif
         {"no_such_device_or_address",           "ENXIO",            std::errc::no_such_device_or_address},
@@ -80,24 +84,24 @@ void register_error_constants () {
         {"no_such_process",                     "ESRCH",            std::errc::no_such_process},
         {"not_a_directory",                     "ENOTDIR",          std::errc::not_a_directory},
         {"not_a_socket",                        "ENOTSOCK",         std::errc::not_a_socket},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOSTR)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOSTR)
         {"not_a_stream",                        "ENOSTR",           std::errc::not_a_stream},
         #endif
         {"not_connected",                       "ENOTCONN",         std::errc::not_connected},
         {"not_enough_memory",                   "ENOMEM",           std::errc::not_enough_memory},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOTSUP)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOTSUP)
         {"not_supported",                       "ENOTSUP",          std::errc::not_supported},
         #endif
         {"operation_canceled",                  "ECANCELED",        std::errc::operation_canceled},
         {"operation_in_progress",               "EINPROGRESS",      std::errc::operation_in_progress},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EPERM)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EPERM)
         {"operation_not_permitted",             "EPERM",            std::errc::operation_not_permitted},
         #endif
         {"operation_not_supported",             "EOPNOTSUPP",       std::errc::operation_not_supported},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EWOULDBLOCK)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EWOULDBLOCK)
         {"operation_would_block",               "EWOULDBLOCK",      std::errc::operation_would_block},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EOWNERDEAD)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EOWNERDEAD)
         {"owner_dead",                          "EOWNERDEAD",       std::errc::owner_dead},
         #endif
         {"permission_denied",                   "EACCES",           std::errc::permission_denied},
@@ -107,23 +111,23 @@ void register_error_constants () {
         {"resource_deadlock_would_occur",       "EDEADLK",          std::errc::resource_deadlock_would_occur},
         {"resource_unavailable_try_again",      "EAGAIN",           std::errc::resource_unavailable_try_again},
         {"result_out_of_range",                 "ERANGE",           std::errc::result_out_of_range},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ENOTRECOVERABLE)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ENOTRECOVERABLE)
         {"state_not_recoverable",               "ENOTRECOVERABLE",  std::errc::state_not_recoverable},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ETIME)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETIME)
         {"stream_timeout",                      "ETIME",            std::errc::stream_timeout},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ETXTBSY)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETXTBSY)
         {"text_file_busy",                      "ETXTBSY",          std::errc::text_file_busy},
         #endif
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_ETIMEDOUT)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_ETIMEDOUT)
         {"timed_out",                           "ETIMEDOUT",        std::errc::timed_out},
         #endif
         {"too_many_files_open_in_system",       "ENFILE",           std::errc::too_many_files_open_in_system},
         {"too_many_files_open",                 "EMFILE",           std::errc::too_many_files_open},
         {"too_many_links",                      "EMLINK",           std::errc::too_many_links},
         {"too_many_symbolic_link_levels",       "ELOOP",            std::errc::too_many_symbolic_link_levels},
-        #if !defined(_WIN32) || defined(_GLIBCXX_HAVE_EOVERFLOW)
+        #if _XSFW_SKIP_CHECK || defined(_GLIBCXX_HAVE_EOVERFLOW)
         {"value_too_large",                     "EOVERFLOW",        std::errc::value_too_large},
         #endif
         {"wrong_protocol_type",                 "EPROTOTYPE",       std::errc::wrong_protocol_type},
@@ -135,9 +139,6 @@ void register_error_constants () {
         errc_stash.add_const_sub(item.short_name, v);
     }
 
-    Stash io_errc_stash("XS::STL::io_errc", GV_ADD);
-    io_errc_stash.add_const_sub("stream", Simple(int(std::io_errc::stream)));
-    
     Stash future_errc_stash("XS::STL::future_errc", GV_ADD);
     future_errc_stash.add_const_sub("broken_promise",            Simple(int(std::future_errc::broken_promise)));
     future_errc_stash.add_const_sub("future_already_retrieved",  Simple(int(std::future_errc::future_already_retrieved)));
@@ -147,6 +148,5 @@ void register_error_constants () {
     Stash stl_stash("XS::STL", GV_ADD);
     stl_stash.add_const_sub("generic_category",  xs::out<const std::error_category*>(&std::generic_category()));
     stl_stash.add_const_sub("system_category",   xs::out<const std::error_category*>(&std::system_category()));
-    stl_stash.add_const_sub("iostream_category", xs::out<const std::error_category*>(&std::iostream_category()));
     stl_stash.add_const_sub("future_category",   xs::out<const std::error_category*>(&std::future_category()));
 }

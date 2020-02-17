@@ -6,7 +6,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 use Chart::Plotly;
 
@@ -52,6 +52,20 @@ sub TO_JSON {
     my $self   = shift;
     my $layout = $self->layout;
     my $config = $self->config;
+    my %json   = ( data => $self->traces() );
+    if ( defined $layout ) {
+        $json{layout} = $layout;
+    }
+    if ( defined $config ) {
+        $json{config} = $config;
+    }
+    return \%json;
+}
+
+sub to_json_text {
+    my $self   = shift;
+    my $layout = $self->layout;
+    my $config = $self->config;
     my $json   = '{ "data": ' . Chart::Plotly::_process_data( $self->traces() );
     if ( defined $layout ) {
         $layout = Chart::Plotly::_process_data($layout);
@@ -89,7 +103,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 
@@ -144,9 +158,28 @@ If plotly.js is going to be loaded in another place or some other way (e.g.: via
 
 =head2 TO_JSON
 
-Returns the json corresponding to the plot
+Returns the structure suitable to serialize to JSON corresponding to the plot.
+
+This method is meant to be called by a JSON serializer, not directly.
+
+Beware with nested data. For example piddle are still there and you're
+responsible to provide an appropiatte serializer. If you want
+the text representation of json use the method: to_json_text
+
+=head2 to_json_text
+
+Returns the plot serialized in JSON. Not suitable to use in 
+nested structures. For nested structures you should check TO_JSON
 
 =head2 from_json
+
+Build the plot from a json string in the format returned by to_json_text.
+
+Beware when using to_json_text and from_json the plot object can be
+slightly different (although the representation is the same). That is the
+reconstructed plot is equivalent to the first, for example when using PDL, 
+piddles are serialized to simple arrays and when deserialized are just plain
+arrays.
 
 =head1 AUTHOR
 

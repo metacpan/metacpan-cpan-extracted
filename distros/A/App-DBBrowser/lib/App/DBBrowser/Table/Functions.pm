@@ -37,15 +37,16 @@ sub col_function {
     else {
         $cols = [ @{$sql->{cols}} ];
     }
-    my $functions_args = {
+    my $functions_col_count = {
         Bit_Length          => 1,
         Char_Length         => 1,
         Concat              => 9, # Concatenate
         Epoch_to_Date       => 1,
         Epoch_to_DateTime   => 1,
         Truncate            => 1,
+        Round               => 1,
     };
-    my @functions_sorted = qw( Concat Truncate Bit_Length Char_Length Epoch_to_Date Epoch_to_DateTime );
+    my @functions_sorted = qw( Concat Truncate Round Bit_Length Char_Length Epoch_to_Date Epoch_to_DateTime );
 
     SCALAR_FUNC: while ( 1 ) {
         # Choose
@@ -57,8 +58,8 @@ sub col_function {
             return;
         }
         $function =~ s/^\s\s//;
-        my $arg_count = $functions_args->{$function};
-        my $col = $sf->__choose_columns( $sql, $function, $arg_count, $cols ); # cols - col
+        my $col_count = $functions_col_count->{$function};
+        my $col = $sf->__choose_columns( $sql, $function, $col_count, $cols ); # cols - col
         if ( ! defined $col ) {
             next SCALAR_FUNC;
         }
@@ -71,13 +72,13 @@ sub col_function {
 }
 
 sub __choose_columns {
-    my ( $sf, $sql, $function, $arg_count, $cols ) = @_;
+    my ( $sf, $sql, $function, $col_count, $cols ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-    if ( ! $arg_count ) {
+    if ( ! $col_count ) {
         return;
     }
-    elsif ( $arg_count == 1 ) {
+    elsif ( $col_count == 1 ) {
         # Choose
         return $tc->choose(
             [ undef, @$cols ],
@@ -88,7 +89,7 @@ sub __choose_columns {
         # Choose
         my $subset = $tu->choose_a_subset(
             $cols,
-            { current_selection_label => $function . ': ', layout => 1, current_selection_separator => ',', keep_chosen => 1 }
+            { cs_label => $function . ': ', layout => 1, cs_separator => ',', keep_chosen => 1 }
         );
         if ( ! defined $subset || ! @$subset ) {
             return;
@@ -131,10 +132,29 @@ sub __prepare_col_func {
         my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
         my $precision = $tu->choose_a_number( 2,
-            { current_selection_label => $name, info => $info, small_first => 1 }
+            { cs_label => $name, info => $info, small_first => 1 }
         );
         return if ! defined $precision;
         $quote_f = $plui->truncate( $qt_col, $precision );
+    }
+    elsif ( $func eq 'Round' ) {
+        my $info = $func . ': ' . $qt_col;
+        my $name = "Decimal places: ";
+        my $precision = $tu->choose_a_number( 2,
+            { cs_label => $name, info => $info, small_first => 1 }
+        );
+        return if ! defined $precision;
+        my $positive_precision = 'ROUND(' . $qt_col . ',  ' . $precision . ')';
+        my $negative_precision = 'ROUND(' . $qt_col . ', -' . $precision . ')';
+        my $choice = $tc->choose(
+            [ undef, $positive_precision, $negative_precision ],
+            { layout => 3, undef => '<<', prompt => 'Choose sign:' }
+        );
+        return if ! defined $choice;
+        if ( $choice eq $negative_precision  ) {
+            $precision = -$precision;
+        }
+        $quote_f = $plui->round( $qt_col, $precision );
     }
     elsif ( $func eq 'Bit_Length' ) {
         $quote_f = $plui->bit_length( $qt_col );

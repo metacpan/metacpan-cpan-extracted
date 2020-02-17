@@ -2,10 +2,6 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-if ($^O =~ /solaris|sunos/i) {
-    exit;
-}
-
 my $pm = 'lib/JSON/Parse.pm';
 my $pod = 'lib/JSON/Parse.pod';
 my $github = 'github.com/benkasminbullock/JSON-Parse';
@@ -18,6 +14,7 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
+	'Carp' => '0',
     },
     META_MERGE => {
 	'meta-spec' => {
@@ -53,4 +50,6 @@ WriteMakefile (
 #    OPTIMIZE => '-Wall -O',
 # This achieves only small speedups with GCC.
 #    OPTIMIZE => '-O3',
+
+#    CC => 'gcc',
 );

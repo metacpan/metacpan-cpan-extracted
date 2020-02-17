@@ -14,6 +14,7 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/My/Animal.pm
 t/lib/My/Dog.pm
+t/lib/My/Human.pm
 t/lib/My/Parrot.pm
 t/lib/My/Parrot2.pm
 t/release-rinci.t

@@ -95,14 +95,14 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
- dist.ini
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: examples/bench.pl
  examples/extending-moops.pl
 Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/99threads.t

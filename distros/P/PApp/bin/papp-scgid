@@ -1,7 +1,7 @@
 #!/opt/bin/perl
 
 ##########################################################################
-## All portions of this code are copyright (c) 2003,2004 nethype GmbH   ##
+## All portions of this code are copyright (c) 2015,2016 nethype GmbH   ##
 ##########################################################################
 ## Using, reading, modifying or copying this code requires a LICENSE    ##
 ## from nethype GmbH, Franz-Werfel-Str. 11, 74078 Heilbronn,            ##
@@ -9,12 +9,28 @@
 ## license@nethype.de.                                                  ##
 ##########################################################################
 
-use Getopt::Long ();
+# modules we want in our template
 use common::sense;
 use EV;
 use AnyEvent ();
 use AnyEvent::Socket ();
 use AnyEvent::Fork ();
+
+# create master template
+use AnyEvent::Fork::Early ();
+
+# modules we only expect to need in the parent
+use Getopt::Long ();
+
+our $VERSION    = 0.1;
+
+our $LISTEN;
+our $VERBOSE      = 0;
+our $MAX_WORKERS  = 8;
+our $MAX_REQUESTS = 1000;
+our $REFRESH      = 60; # call agni_refresh every 60s
+our $RESTART      = 92707.71;
+our @MOUNT;
 
 sub usage {
    print <<EOF;
@@ -27,14 +43,18 @@ Usage: $0 [opts...]
        -l | --listen /unix/domain/socket
        -l | --listen ip:port        bind on given port
 
-       -p | --preload-obj PATH/GID  preload the given object
-       -n | --preload-ns  PATH/GID  preload objects from namespace
+       --preload-mod module         preload a perl module
+       --preload-bag PATH/GID       preload objects from container
+       --preload-obj PATH/GID       preload the given object
 
-       -r | --refresh seconds       agni refresh interval
+       -r | --refresh seconds       agni refresh interval ($REFRESH)
 
-       -m | --max-worker integer    maximum worker number
-       --max-idle integer           maximum number of idle workers
-       --idle seconds               idle timeout
+       --workers integer            maximum number of workers ($MAX_WORKERS)
+       --max-requests integer       kill workers after this many requests ($MAX_REQUESTS)
+
+       --restart integer            recreate master after this many seconds ($RESTART)
+
+       --mount PATH/GID /LOCATION   mount an agni application
 
 EOF
    exit $_[0];
@@ -42,19 +62,11 @@ EOF
 
 @ARGV or usage 0;
 
-our $VERSION    = 0.1;
-
-our $VERBOSE    = 1;
-our $MAX_WORKER = 8;
-our $IDLE_TIME  = 600;
-our $MAX_IDLE   = 2;
-our $REFRESH    = 50; # call agni_refresh every 60s
-
-our $LISTEN;
+our @PRELOAD_MOD;
 our @PRELOAD_OBJ;
-our @PRELOAD_NS;
+our @PRELOAD_BAG;
 
-Getopt::Long::Configure "bundling", "no_ignore_case";
+Getopt::Long::Configure "no_ignore_case";
 Getopt::Long::GetOptions
       "help|h"     => sub { usage 0 },
       "verbose|v"  => sub { ++$VERBOSE },
@@ -62,138 +74,112 @@ Getopt::Long::GetOptions
       "version|V"  => sub { print "$VERSION\n"; exit 0 },
 
       "listen|l=s"      => \$LISTEN,
-      "preload-obj|p=s" => \@PRELOAD_OBJ,
-      "preload-ns|n=s"  => \@PRELOAD_NS,
+      "preload-mod=s"   => \@PRELOAD_MOD,
+      "preload-bag=s"   => \@PRELOAD_BAG,
+      "preload-obj=s"   => \@PRELOAD_OBJ,
 
-      "max-worker|m=i"  => \$MAX_WORKER,
+      "workers|w=i"     => \$MAX_WORKERS,
       "refresh=i"       => \$REFRESH,
-      "max-idle=i"      => \$MAX_IDLE,
-      "idle=i"          => \$IDLE_TIME,
+      "max-requests=i"  => \$MAX_REQUESTS,
+      "restart=i"       => \$RESTART,
+      "mount=s{2}"      => \@MOUNT,
 ;
 
-my $fork;
-my $fork_refresh;
-my $idle;
-my %idle;
-my $idler;
-my $worker;
-my %worker;
-my $idlecheck;
-
-sub idlecheck {
-   print "idlecheck $idle $MAX_IDLE\n";
-   warn "[$$] run.\n";
-
-   if ($idle <= $MAX_IDLE) {
-      undef $idlecheck;
-   } else {
-      my $next = 1e99;
-
-      while (my ($k, $v) = each %idle) {
-         if ($v->[0] + $IDLE_TIME <= AE::now) {
-            print "[$$] reaping idle worker.\n" if $VERBOSE >= 2;
-            $v->[1]();
-            $next = AE::now + 1 - $IDLE_TIME;
-            keys %idle; # reset iterator
-            last;
-         } else {
-            $next = $v->[0] if $v->[0] < $next;
-         }
-      }
-
-      warn "next idlecheck in ", $next + $IDLE_TIME - AE::now;#d#
-      $idlecheck = AE::timer $next + $IDLE_TIME - AE::now, 0, \&idlecheck;
-   }
-}
-
-sub add_workers;
-
-sub add_worker {
-   if ($worker >= $MAX_WORKER) {
-      print "[$$] maximum number of workers reached.\n" if $VERBOSE;
-      return;
-   }
-
-   ++$worker;
-   ++$idle;
-
-   print "[$$] adding worker $worker, $idle.\n" if $VERBOSE >= 2;
-
-   $fork->fork->run ("PApp::SCGI::run", sub {
-      my $fh = shift
-         or die "$!: unable to start master worker.\n";
-
-      my $rw;
-      my $state = "i";
-
-      my $stop = sub {
-         print "[$$] $fh worker stopped.\n" if $VERBOSE >= 2;
-         undef $rw;
-         --$idle if delete $idle{$fh};
-         --$worker;
-      };
-
-      $idle{$fh} = [AE::now, $stop];
-
-      $rw = AE::io $fh, 0, sub {
-         if (sysread $fh, my $buf, 1) {
-            if ($state ne $buf) {
-               $state = $buf;
-
-               if ($state eq "i") {
-                  print "[$$] worker became idle.\n" if $VERBOSE >= 4;
-                  $idle{$fh} = [AE::now, $stop];
-
-                  $idlecheck ||= AE::timer $IDLE_TIME, 0, \&idlecheck
-                     if ++$idle > $MAX_IDLE;
-
-               } elsif ($state eq "b") {
-                  delete $idle{$fh};
-                  --$idle;
-                  add_workers;
-               }
-            }
-
-         } elsif ($! != Errno::EINTR) {
-            print "[$$] $fh worker error: $!.\n" if $VERBOSE;
-            $stop->();
-            add_workers;
-         }
-      };
-   });
-}
-
-sub add_workers {
-   add_worker
-      while !$idle && $worker < $MAX_WORKER;
-}
+my $listenguard;
 
 {
    my ($host, $port) = AnyEvent::Socket::parse_hostport $LISTEN
       or die "$LISTEN: cannot parse bind specification (try host:port or /unix/socket)\n";
 
-   AnyEvent::Socket::tcp_bind $host, $port, sub {
-      $LISTEN = shift;
+   $listenguard = AnyEvent::Socket::tcp_bind $host, $port, my $cv = AE::cv;
 
-      $fork = AnyEvent::Fork
-         ->new_exec
-         ->require ("PApp::SCGI")
-         ->eval ("&PApp::SCGI::master_init", $VERBOSE)
-         ->eval ("&PApp::SCGI::master_preload_obj", @PRELOAD_OBJ)
-         ->eval ("&PApp::SCGI::master_preload_ns" , @PRELOAD_NS )
-         ->send_fh ($LISTEN)
-         ->send_arg ($REFRESH);
-
-      $fork_refresh = AE::timer $REFRESH, $REFRESH, sub {
-         $fork->eval ("PApp::SCGI::master_refresh")
-      };
-
-      print "[$$] up and running.\n" if $VERBOSE;
-
-      add_workers;
-   };
+   $LISTEN = $cv->recv;
 }
 
-EV::loop;
+my $template;
+my $refresh_timer = EV::periodic 0, $REFRESH, 0, sub {
+   $template->eval ('&PApp::SCGI::Worker::refresh');
+};
+
+sub new_template {
+   $template = AnyEvent::Fork
+         ->new
+         ->require ("PApp::SCGI::Worker")
+         ->send_fh ($LISTEN)
+         ->eval ("&PApp::SCGI::Worker::init", $VERBOSE, $REFRESH, $MAX_REQUESTS)
+         ->eval ("&PApp::SCGI::Worker::preload_mod", @PRELOAD_MOD)
+         ->eval ("&PApp::SCGI::Worker::preload_bag", @PRELOAD_BAG)
+         ->eval ("&PApp::SCGI::Worker::preload_obj", @PRELOAD_OBJ)
+         ->eval ("&PApp::SCGI::Worker::mount" , @MOUNT)
+         ->eval ("&PApp::SCGI::Worker::post_init");
+}
+
+new_template;
+my $restart_timer = AE::timer $RESTART, $RESTART, sub {
+   new_template;
+};
+
+my $workers;
+my $idle;
+my $listenw;
+
+sub check;
+
+sub add_worker {
+   ++$workers;
+   ++$idle;
+
+   print "[$$] adding worker (workers $workers, idle $idle).\n" if $VERBOSE >= 2;
+
+   my $state = "-";
+
+   $template->fork->run ("PApp::SCGI::Worker::run", sub {
+      my $fh = shift
+         or die "$!: unable to start worker.\n";
+
+      my $rw; $rw = AE::io $fh, 0, sub {
+         if (defined sysread $fh, my $newstate, 1) {
+            if ($state ne $newstate) {
+               if ($newstate eq "0") {
+                  ++$idle;
+                  undef $listenw;
+               } elsif ($newstate eq "1") {
+                  --$idle;
+                  check;
+               } else {
+                  undef $rw;
+                  --$workers;
+                  --$idle if $state eq "0";
+                  print "[$$] removing worker (workers $workers, idle $idle).\n" if $VERBOSE >= 2;
+                  check;
+               }
+               $state = $newstate;
+            }
+
+         } elsif ($! != Errno::EINTR) {
+            warn "[$$] $fh worker error: $!\n";
+
+            undef $rw;
+            --$workers;
+            --$idle if $state eq "1";
+            check;
+         }
+      };
+   });
+}
+
+sub check {
+   if (!$idle && $workers < $MAX_WORKERS) {
+      $listenw ||= AE::io $LISTEN, 0, sub {
+         add_worker
+            if $workers < $MAX_WORKERS;
+         undef $listenw;
+         check;
+      };
+   }
+}
+
+check;
+EV::run;
 
 

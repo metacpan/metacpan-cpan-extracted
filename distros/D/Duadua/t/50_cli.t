@@ -30,6 +30,12 @@ use Duadua::CLI;
     system(
         $^X, (map { "-I$_" } @INC),
         $command,
+    );
+    is $?, 512, 'no args'; # as help
+
+    system(
+        $^X, (map { "-I$_" } @INC),
+        $command,
         '--help'
     );
     is $?, 256, '--help';

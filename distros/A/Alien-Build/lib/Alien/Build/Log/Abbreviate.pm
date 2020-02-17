@@ -9,7 +9,7 @@ use File::chdir;
 use base qw( Alien::Build::Log );
 
 # ABSTRACT: Log class for Alien::Build which is less verbose
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 
 sub _colored
@@ -65,7 +65,7 @@ Alien::Build::Log::Abbreviate - Log class for Alien::Build which is less verbose
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 SYNOPSIS
 

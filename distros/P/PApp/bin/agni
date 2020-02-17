@@ -393,7 +393,7 @@ sub save_image {
       print $fh "\n</o><!--$paths/$gid-->\n\n\n";
    }
    print $fh "</image>\n\n";
-   sql_exec "unlock tables"; 
+   sql_exec "unlock tables";
 }
 
 sub clear_database {

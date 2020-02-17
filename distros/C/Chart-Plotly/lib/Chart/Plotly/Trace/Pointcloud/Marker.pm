@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Pointcloud::Marker::Border;
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pointcloud.
 
@@ -88,7 +88,7 @@ Chart::Plotly::Trace::Pointcloud::Marker - This attribute is one of the possible
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

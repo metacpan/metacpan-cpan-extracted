@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Highlight;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 our @EXPORT_OK = qw/ Dump /;
 
@@ -15,7 +15,7 @@ sub Dump {
     my (@docs) = @_;
     # Dumping objects is safe, so we enable the Perl schema here
     require YAML::PP::Schema::Perl;
-    my $yp = YAML::PP->new( schema => [qw/ JSON Perl /] );
+    my $yp = YAML::PP->new( schema => [qw/ + Perl /] );
     my $yaml = $yp->dump_string(@docs);
 
     my ($error, $tokens) = YAML::PP::Parser->yaml_to_tokens(string => $yaml);

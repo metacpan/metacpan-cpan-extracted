@@ -1,4 +1,8 @@
 package myTestHelpers;
+use 5.010;
+use strict;
+use warnings;
+
 use Win32::GuiTest qw/:FUNC/;
 use Exporter 5.57 qw/import/;
 use Test::More;
@@ -8,10 +12,6 @@ use Path::Tiny 0.058 qw/path tempfile/; # 0.018 needed for rootdir and cwd; 0.05
 
 use Win32::Mechanize::NotepadPlusPlus qw/:main/;  # for %scimsg
 use Win32::Mechanize::NotepadPlusPlus::__sci_msgs;  # for %scimsg
-
-use 5.010;
-use strict;
-use warnings;
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ my $_savePID;
 BEGIN { $_savePID = $$; }
 END   { sleep($_END_DELAY) if $_savePID and $$ != $_savePID; }
 
-our @EXPORT_OK = qw/runCodeAndClickPopup saveUserSession restoreUserSession/;
+our @EXPORT_OK = qw/runCodeAndClickPopup saveUserSession restoreUserSession wrapGetLongPathName/;
 our @EXPORT = qw/runCodeAndClickPopup/;
 our %EXPORT_TAGS = (
     userSession => [qw/saveUserSession restoreUserSession/],
@@ -269,5 +269,38 @@ sub restoreUserSession {
     $saveUserSession->remove();
     note "\n\nrestoreUserSession(): Verified user session files re-loaded.\n\n";
 }
+
+=over
+
+=item   wrapGetLongPathName()
+
+    my $long = wrapGetLongPathName( $short );
+
+The Win32::GetLongPathName() occasionally/frequently returns '' if it
+is used in the test suite; I am hoping this wrapper over the kernel32.dll function
+doesn't have that same problem.
+
+=back
+
+=cut
+
+use Win32::API;
+BEGIN {
+    Win32::API::->Import("kernel32","DWORD GetLongPathNameA( LPCWSTR lpszShortPath, LPWSTR lpszLongPath, DWORD cchBuffer )") or die "GetLongPathNameA: $^E";  # uncoverable branch true
+}
+
+sub wrapGetLongPathName {
+    my $inPath = shift;
+    my $lpszShortPath = $inPath; #'\\\\?\\' . $inPath;        # prepend literal \?\ to path to remove 260-character limit
+    my ($lpszLongPath, $cchBuffer) = ("",0);
+    my $ret = GetLongPathNameA( $lpszShortPath, $lpszLongPath, $cchBuffer);
+    $lpszLongPath = "\0" x ($ret ? $ret : 1024);
+    $cchBuffer = $ret ? $ret : 1024;
+    $ret = GetLongPathNameA( $lpszShortPath, $lpszLongPath, $cchBuffer );
+    $lpszLongPath =~ s/\0*$//g;   # trim trailing NULs
+    #printf STDERR "%-07d # GetLongPathNameA( '%s', '%s', %s ) = %s\n", map $_//'<undef>', 0+$ARGV[0], $lpszShortPath, $lpszLongPath, $cchBuffer, $ret;
+    return $lpszLongPath;
+}
+
 
 1;

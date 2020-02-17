@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 
 use MooX::Press (
+	factory_package => undef,
 	role => [
 		'::FooRole' => { requires => ['foo', {}] }
 	]

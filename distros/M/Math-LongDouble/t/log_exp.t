@@ -38,7 +38,8 @@ else {
   print "not ok 4\n";
 }
 
-if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
+if(Math::LongDouble::_get_actual_ldblsize() != Math::LongDouble::_get_actual_nvsize()) {
+  # $log != log(2.0)
   if(cmp_NV($log, log(2.0))) {print "ok 5\n"}
   else {
     warn "\n\$log: ", log($two), "\nlog(2.0): ", log(2.0), "\n";
@@ -46,6 +47,7 @@ if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
   }
 }
 else {
+  # $log == log(2.0)
   unless(cmp_NV($log, log(2.0))) {print "ok 5\n"}
   else {
     warn "\n\$log: ", log($two), "\nlog(2.0): ", log(2.0), "\n";

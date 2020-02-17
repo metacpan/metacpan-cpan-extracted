@@ -3,7 +3,6 @@ abstract: 'Specify dynamic (user-side) prerequisites for your distribution'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
-  CPAN: '0'
   Capture::Tiny: '0'
   Dist::Zilla::Plugin::MakeMaker: '5.022'
   ExtUtils::MakeMaker: '6.64'
@@ -50,7 +49,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::DynamicPrereqs:
     file: lib/Dist/Zilla/Plugin/DynamicPrereqs.pm
-    version: '0.036'
+    version: '0.037'
 requires:
   Dist::Zilla::Plugin::MakeMaker: '5.022'
   Dist::Zilla::Role::AfterBuild: '0'
@@ -77,7 +76,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-DynamicPrereqs
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-DynamicPrereqs
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-DynamicPrereqs.git
-version: '0.036'
+version: '0.037'
 x_Dist_Zilla:
   perl:
     version: '5.031008'
@@ -746,7 +745,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.036
+          tag: v0.037
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -890,7 +889,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: DynamicPrereqs
-      version: '0.036'
+      version: '0.037'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Perl - Sah schemas related to Perl
 
 VERSION
-    This document describes version 0.026 of Sah::Schemas::Perl (from Perl
-    distribution Sah-Schemas-Perl), released on 2019-12-15.
+    This document describes version 0.027 of Sah::Schemas::Perl (from Perl
+    distribution Sah-Schemas-Perl), released on 2020-02-15.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -29,7 +29,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -2,8 +2,8 @@ NAME
     App::linerange - Retrieve line ranges from a filehandle
 
 VERSION
-    This document describes version 0.003 of App::linerange (from Perl
-    distribution App-linerange), released on 2019-03-21.
+    This document describes version 0.004 of App::linerange (from Perl
+    distribution App-linerange), released on 2020-02-17.
 
 FUNCTIONS
   linerange
@@ -14,6 +14,14 @@ FUNCTIONS
     Retrieve line ranges from a filehandle.
 
     Examples:
+
+    *   By default, if spec is empty, get all lines:
+
+         linerange();
+
+    *   Get every other lines:
+
+         linerange(spec => "/2");
 
     *   Get lines 1-10:
 
@@ -35,6 +43,20 @@ FUNCTIONS
 
          linerange(spec => "-10 .. -1");
 
+    *   Instead of N1-N2, you can use N1+M to mean N1-(N1+M), get 3rd line:
+
+         linerange(spec => "3+0");
+
+    *   Instead of N1-N2, you can use N1+M to mean N1-(N1+M), get 3rd to 5th
+        line:
+
+         linerange(spec => "3+2");
+
+    *   Instead of N1-N2, you can use N1+M to mean N1-(N1+M), get 3rd last
+        to last line:
+
+         linerange(spec => "-3+2");
+
     The routine performs a single pass on the filehandle, retrieving
     specified line ranges.
 
@@ -44,16 +66,18 @@ FUNCTIONS
 
     *   fh* => *filehandle*
 
-    *   spec* => *str*
+    *   spec => *str* (default: "")
 
         Line range specification.
 
-        A comma-separated list of line numbers ("N") or line ranges
-        ("N1..N2" or "N1-N2", or "N1+M" which means N2 is set to N1+M-1),
-        where N, N1, and N2 are line number specification. Line number
-        begins at 1; it can also be a negative integer (-1 means the last
-        line, -2 means second last, and so on). N1..N2 is the same as
-        N2..N1.
+        A comma-separated list of empty strings ("", which means all lines),
+        specific line numbers ("N") or line ranges ("N1..N2" or "N1-N2", or
+        "N1+M" which means N2 is set to N1+M), where N, N1, and N2 are line
+        number specification. Line number begins at 1; it can also be a
+        negative integer (-1 means the last line, -2 means second last, and
+        so on). N1..N2 is the same as N2..N1. Each line or range can
+        optionally be followed by "/M" to mean every M'th line (where M is
+        an integer starting from 1).
 
         Examples:
 
@@ -65,7 +89,7 @@ FUNCTIONS
 
         *   3+1 (third to fourth line)
 
-        *   -3+1 (third last to fourth last)
+        *   -3+1 (third last to second last)
 
         *   5..1 (first to fifth line)
 
@@ -76,6 +100,13 @@ FUNCTIONS
         *   5..-3 (fifth line to third last)
 
         *   -3..5 (fifth line to third last)
+
+        *   /3 (every 3rd line, i.e. 3, 6, 9, ...)
+
+        *   /2 (every other line, i.e. 2, 4, 6, ...)
+
+        *   2..-1/3 (every 3rd line starting from line 2, i.e. 4, 7, 10,
+            ...)
 
     Returns an enveloped result (an array).
 
@@ -107,7 +138,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

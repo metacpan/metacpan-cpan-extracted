@@ -1,5 +1,9 @@
 Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
 
+v0.001001 2020-02-15
+    - Fix some bugs in the test suite; improve diagnostics for more meaningful cpantesters reports
+    - Propagate newest signing key to keyservers
+
 v0.001 2020-02-13
     - Initial release
 

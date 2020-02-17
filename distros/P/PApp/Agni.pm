@@ -83,7 +83,7 @@ our @EXPORT = qw(
 
       %obj_cache
 
-      path_obj_by_gid gid obj_of
+      path_obj_by_gid gid obj_of obj_by_name
 
       %pathid @pathname @pathmask @subpathmask @parpathmask @parpath
 
@@ -368,6 +368,48 @@ sub path_obj_by_gid($$) {
 #   use PApp::Util; warn PApp::Util::sv_dump $ob if $gid eq "64424509652";#d#
 #   $ob
 #}#d#
+
+=item obj_by_name $spec
+
+Loads on object by name. The C<$spec> string consists of an agni I<path>
+followed by an object name, separated by a slash (C</>). An additional
+leading slash will be ignored. Object names are either a numeric GID, or a
+namespace name and an object name separated by a slash.
+
+A few examples should make it clear:
+
+   root/agni/2         # the attr object, numeric object name
+   root/agni/GID/2     # same object, with namespace syntax
+   /root/agni/GID/2    # same object, extra slash at the beginning
+   root/agni/agni/attr # same object, different namespace
+
+=cut
+
+sub obj_by_name($) {
+   my ($spec) = @_;
+
+   my ($path, $nsname, $name);
+
+   if ($spec =~ s%/(\d+)$%/%) {
+      ($path, $nsname, $name) = ($spec, GID => $1);
+      $path =~ s%/GID/$%/%;
+   } else {
+      $spec =~ s%/([^/]+)/([^/]+)$%/%
+         or croak "$spec: unable to split into path/GID or path/namespace/name parts\n";
+      ($path, $nsname, $name) = ($spec, $1, $2);
+   }
+
+   $path =~ s%^/%%;
+
+   my $pathid = $Agni::pathid{$path}
+      or croak "$path: path does not exist\n";
+
+   my $ns = (Agni::path_obj_by_gid $pathid, $Agni::OID_NAMESPACES)->lookup ($nsname)
+      or croak "$nsname: no such namespace\n";
+
+   $ns->lookup ($name)
+      or croak "$name: no such object in namespace $nsname\n"
+}
 
 # stolen & modified from Symbol::delete_package: doesn't remove the stash itself
 sub empty_package ($) {

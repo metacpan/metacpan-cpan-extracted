@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -25,7 +25,9 @@ use Carp qw/ croak /;
 sub new {
     my ($class, %args) = @_;
     my $reader = delete $args{reader} || YAML::PP::Reader->new;
+    my $default_yaml_version = delete $args{default_yaml_version};
     my $self = bless {
+        default_yaml_version => $default_yaml_version || '1.2',
         lexer => YAML::PP::Lexer->new(
             reader => $reader,
         ),
@@ -40,8 +42,8 @@ sub new {
 sub clone {
     my ($self) = @_;
     my $clone = {
-        lexer => YAML::PP::Lexer->new(
-        ),
+        default_yaml_version => $self->default_yaml_version,
+        lexer => YAML::PP::Lexer->new(),
     };
     return bless $clone, ref $self;
 }
@@ -83,6 +85,11 @@ sub tokens { return $_[0]->{tokens} }
 sub set_tokens { $_[0]->{tokens} = $_[1] }
 sub event_stack { return $_[0]->{event_stack} }
 sub set_event_stack { $_[0]->{event_stack} = $_[1] }
+sub default_yaml_version { return $_[0]->{default_yaml_version} }
+sub yaml_version { return $_[0]->{yaml_version} }
+sub set_yaml_version { $_[0]->{yaml_version} = $_[1] }
+sub yaml_version_directive { return $_[0]->{yaml_version_directive} }
+sub set_yaml_version_directive { $_[0]->{yaml_version_directive} = $_[1] }
 
 sub rule { return $_[0]->{rule} }
 sub set_rule {
@@ -103,6 +110,8 @@ sub init {
     $self->set_tokens([]);
     $self->set_rule(undef);
     $self->set_event_stack([]);
+    $self->set_yaml_version($self->default_yaml_version);
+    $self->set_yaml_version_directive(undef);
     $self->lexer->init;
 }
 
@@ -474,10 +483,13 @@ sub start_document {
     my ($self, $implicit) = @_;
     push @{ $self->events }, 'DOC';
     push @{ $self->offset }, -1;
+    my $directive = $self->yaml_version_directive;
     $self->callback->($self, 'document_start_event', {
         name => 'document_start_event',
         implicit => $implicit,
+        $directive ? (version_directive => $self->yaml_version) : (),
     });
+    $self->set_yaml_version_directive(undef);
     $self->set_rule( 'FULLNODE' );
     $self->set_new_node(1);
 }
@@ -603,11 +615,15 @@ sub end_document {
         $self->exception("Unexpected event type $last");
     }
     pop @{ $self->offset };
-    $self->set_tagmap({ '!!' => "tag:yaml.org,2002:" });
     $self->callback->($self, 'document_end_event', {
         name => 'document_end_event',
         implicit => $implicit,
     });
+    if ($self->yaml_version eq '1.2') {
+        # In YAML 1.2, directives are only for the following
+        # document. In YAML 1.1, they are global
+        $self->set_tagmap({ '!!' => "tag:yaml.org,2002:" });
+    }
     $event_types->[-1] = $next_event{ $event_types->[-1] };
     $self->set_rule('STREAM');
 }
@@ -1346,6 +1362,16 @@ sub cb_tag_directive {
 }
 
 sub cb_reserved_directive {
+}
+
+sub cb_set_yaml_version_directive {
+    my ($self, $token) = @_;
+    if ($self->yaml_version_directive) {
+        croak "Found duplicate YAML directive";
+    }
+    my ($version) = $token->{value} =~ m/^%YAML (1\.[12])/;
+    $self->set_yaml_version($version);
+    $self->set_yaml_version_directive(1);
 }
 
 1;

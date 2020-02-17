@@ -24,6 +24,7 @@ WriteMakefile(
                     'bin/papp-env',
                     'bin/papp-admin',
                     'bin/papp-httpd',
+                    'bin/papp-scgid',
                     'bin/agni',
                     'xpcse/xpcse',
                     'xpcse/run-mailcap',
@@ -61,10 +62,12 @@ WriteMakefile(
 		    'PApp/MimeType.pm'	=> '$(INST_LIB)/PApp/MimeType.pm',
 		    'PApp/XPCSE.pm'	=> '$(INST_LIB)/PApp/XPCSE.pm',
 		    'PApp/EditForm.pm'	=> '$(INST_LIB)/PApp/EditForm.pm',
+		    'PApp/SCGI.pm'	=> '$(INST_LIB)/PApp/SCGI.pm',
+		    'PApp/SCGI/Worker.pm'	=> '$(INST_LIB)/PApp/SCGI/Worker.pm',
 		    'Agni.pm'		=> '$(INST_LIB)/Agni.pm',
                    },
     'PREREQ_PM'	=> {
-                    common::sense       => 3.3,
+                    common::sense       => 3.74,
 
 		    PApp::SQL		=> 0.143,
                     Compress::LZF	=> 1.0,
@@ -79,6 +82,8 @@ WriteMakefile(
                     Digest::SHA1	=> 1.01,
                     JSON::XS		=> 2.01,
                     MIME::Base64        => 0,
+                    AnyEvent            => 7.12,
+                    AnyEvent::Fork      => 1.31,
 
                     DBD::mysql		=> 2.04,
                     Guard               => 1.0,

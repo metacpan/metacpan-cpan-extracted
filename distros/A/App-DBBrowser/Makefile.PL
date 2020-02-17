@@ -59,7 +59,7 @@ WriteMakefile(
         'String::Unescape'        => 0,
         'SQL::Type::Guess'        => 0,
         'Term::Choose'            => '1.707',
-        'Term::Choose::Util'      => '0.111',
+        'Term::Choose::Util'      => '0.113',
         'Term::Form'              => '0.524',
         'Term::TablePrint'        => '0.119',
         'Text::CSV'               => 0,

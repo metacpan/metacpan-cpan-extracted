@@ -14,6 +14,7 @@ on 'test' => sub {
   requires "Test::Fatal";
   requires "Test::More";
   requires "Test::Most";
+  requires "Test::Time";
   requires "version";
 };
 

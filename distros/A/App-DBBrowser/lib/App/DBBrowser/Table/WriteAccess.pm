@@ -300,7 +300,7 @@ sub __insert_into_stmt_columns {
     $info .= "\nSelect columns to fill:";
     my $idxs = $tu->choose_a_subset(
         [ @cols ],
-        { current_selection_label => 'Cols: ', layout => 0, order => 0, all_by_default => 1,
+        { cs_label => 'Cols: ', layout => 0, order => 0, all_by_default => 1,
           index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $info }
     );
     if ( ! defined $idxs ) {

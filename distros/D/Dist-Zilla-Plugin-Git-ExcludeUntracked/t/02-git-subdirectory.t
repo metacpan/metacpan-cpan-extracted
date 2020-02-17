@@ -33,7 +33,7 @@ my $tzil = Builder->from_config(
     }
 );
 
-chdir $tzil->tempdir->file('source');
+chdir $tzil->tempdir->child('source');
 
 silent_system 'git', 'init';
 silent_system 'git', 'add', 'dist.ini', 'lib/', '.gitignore';

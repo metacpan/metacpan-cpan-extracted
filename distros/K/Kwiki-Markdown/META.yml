@@ -1,16 +1,25 @@
-abstract: A Markdown formatter for Kwiki.
-author: Kang-min Liu <gugod@gugod.org>.
-build_requires: 
-  Test::Base: 0
-distribution_type: module
-generated_by: Module::Install version 0.60
+---
+abstract: 'A Markdown formatter for Kwiki.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>.'
+build_requires:
+  Test::Base: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.027, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
 name: Kwiki-Markdown
-no_index: 
-  directory: 
-    - inc
-    - t
-requires: 
-  Kwiki: 0.38
-  perl: 5.6.1
-version: 0.01
+provides:
+  Kwiki::Markdown:
+    file: lib/Kwiki/Markdown.pm
+    version: '0.02'
+requires:
+  Kwiki: '0'
+  Text::Markdown: '0'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

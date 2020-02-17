@@ -6,7 +6,7 @@ use Exporter;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 
-our $VERSION = '1.81';
+our $VERSION = '1.83';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported list_platforms list_family_members);
@@ -317,13 +317,15 @@ Thanks to Brian Fraser for adding Android support.
 Thanks to Dale Evans for Debian detection, a bunch of Mac OS X specific version
 detection modules, and perl 5.6 support.
 
+Thanks to Graham Knop for fixing a build bug on perl 5.8.
+
 =head1 SOURCE CODE REPOSITORY
 
 L<git://github.com/DrHyde/perl-modules-Devel-CheckOS.git>
 
 =head1 COPYRIGHT and LICENCE
 
-Copyright 2007-2012 David Cantrell
+Copyright 2007-2020 David Cantrell
 
 This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
 

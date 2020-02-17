@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core FFI plugin
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 
 sub init
@@ -34,7 +34,7 @@ Alien::Build::Plugin::Core::FFI - Core FFI plugin
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 SYNOPSIS
 

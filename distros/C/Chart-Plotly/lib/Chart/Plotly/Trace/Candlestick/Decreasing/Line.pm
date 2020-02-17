@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace candlestick.
 
@@ -58,7 +58,7 @@ Chart::Plotly::Trace::Candlestick::Decreasing::Line - This attribute is one of t
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

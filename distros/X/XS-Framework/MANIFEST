@@ -48,6 +48,7 @@ lib/XS/STL/ErrorCode.pm
 lib/XS/STL/ErrorCode.pod
 Makefile.PL
 MANIFEST			This list of files
+misc/leak1.plx
 misc/mytest.plx
 misc/trun.plx
 regerror.cc

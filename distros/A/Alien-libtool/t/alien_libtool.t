@@ -27,7 +27,7 @@ run_ok($wrapper->($_, '--version'))
 subtest 'test running out of blib' => sub {
 
   local $CWD = tempdir( CLEANUP => 1);
-  
+
   run_ok($wrapper->('libtoolize', '--copy'))
     ->success
     ->note;

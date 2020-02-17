@@ -10,7 +10,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.14';
+our $VERSION = '1.2.15';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -25,10 +25,18 @@ my $xs_mask  = '*.xs';
 my $c_mask   = '*.c *.cc *.cpp *.cxx';
 my $h_mask   = '*.h *.hh *.hpp *.hxx';
 my $map_mask = '*.map';
-my $win32    = $^O eq 'MSWin32';
-my $linux    = $^O eq 'linux';
-my $freebsd  = $^O eq 'freebsd';
-my $mac      = $^O eq 'darwin';
+
+my $win32     = $^O eq 'MSWin32';
+my $linux     = $^O eq 'linux';
+my $freebsd   = $^O eq 'freebsd';
+my $mac       = $^O eq 'darwin';
+my $dragonfly = $^O eq 'dragonfly';
+my $netbsd    = $^O eq 'netbsd';
+my $openbsd   = $^O eq 'openbsd';
+my $solaris   = $^O eq 'solaris';
+
+my $native_bsd_make = $freebsd || $dragonfly || $netbsd || $openbsd || $solaris;
+my $fix_bsd_make_j  = $freebsd || $dragonfly || $netbsd;
 
 sub write_makefile {
     _require_makemaker();
@@ -310,7 +318,7 @@ sub process_binary {
             my $cext = $params->{CPLUS} ? 'cc' : 'c';
             if ($xsfile =~ /\.xs$/) {
                 $cfile = $xsfile;
-                $cfile =~ s/\.xs$/.xs.$cext/;
+                $cfile =~ s/\.xs$/_xsgen.$cext/;
             } else {
                 $cfile = "$xsfile.$cext";
             }
@@ -387,7 +395,7 @@ sub process_CLIB {
         
         unless ($build_cmd) {
             my $make = '$(MAKE)';
-            $make = 'gmake' if $info->{GMAKE} and $^O eq 'freebsd';
+            $make = 'gmake' if $info->{GMAKE} and $native_bsd_make;
             $info->{TARGET} ||= '';
             $info->{FLAGS} ||= '';
             $build_cmd = "$make $info->{FLAGS} $info->{TARGET}";
@@ -819,7 +827,7 @@ sub c2obj_file {
             return join("\n\n", @list);
         };
         
-        if ($freebsd) { # freebsd's make has a bug: wrong value of $* when building in parallel, we use $< instead
+        if ($fix_bsd_make_j) { # bsd's make has a bug: wrong value of $* when building in parallel, we use $< instead
             *c_o = sub {
                 my $self = shift;
                 my $ret = $self->SUPER::c_o(@_);

@@ -173,3 +173,10 @@ Revision history for Keyword-Declare
       but the suggested detection mechanism is backwards compatible.
       (Sorry, Christopher!)
 
+
+
+0.001017  Sun Feb 16 23:57:31 2020
+
+    * Fixed regression that introduced spurious empty matches
+      in some repeated parameters.
+      (Thanks, Slaven!)

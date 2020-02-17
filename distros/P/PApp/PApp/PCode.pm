@@ -46,7 +46,7 @@ use utf8;
 
 use common::sense;
 
-our $VERSION = 2.1;
+our $VERSION = 2.2;
 our @EXPORT_OK = qw(pxml2pcode xml2pcode perl2pcode pcode2pxml pcode2perl);
 
 =item pxml2pcode "phtml or pxml code"

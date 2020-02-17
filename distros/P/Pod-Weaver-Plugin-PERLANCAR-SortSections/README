@@ -3,9 +3,9 @@ NAME
     PERLANCAR
 
 VERSION
-    This document describes version 0.07 of
+    This document describes version 0.081 of
     Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution
-    Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2019-09-17.
+    Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2020-02-16.
 
 SYNOPSIS
     In your weaver.ini:
@@ -30,6 +30,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Sort::Sub::pod_sections_ala_perlancar, the backend
+
     Pod::Weaver::Plugin::SortSections, the generic/configurable version
 
     Pod::Weaver::Role::SortSections
@@ -38,7 +40,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

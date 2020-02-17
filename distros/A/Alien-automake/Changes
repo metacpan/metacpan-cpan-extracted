@@ -1,5 +1,8 @@
 Revision history for Alien-automake
 
+0.15      2020-02-15 19:14:22 -0700
+  - Use https instead of http
+
 0.14      2018-02-01 13:09:06 -0500
   - Use http instead of ftp
 

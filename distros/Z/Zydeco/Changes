@@ -1,0 +1,54 @@
+Zydeco
+======
+
+Created:      2020-01-15
+Home page:    <http://zydeco.toby.ink/>
+Home page:    <https://metacpan.org/release/Zydeco>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.507	2020-02-17
+
+ - Cope when Zydeco is imported into the same package twice (but blow up if
+   it's also the same lexical scope.).
+
+0.506	2020-02-16
+
+ - Public attributes may now have private accessors and delegations.
+
+0.505	2020-02-16
+
+ [ Bug Fixes ]
+ - Fix link to website (should not be HTTPS).
+
+0.504	2020-02-16
+
+ [ Documentation ]
+ - Zydeco vs MooX::Press.
+
+ [ Packaging ]
+ - Zydeco now has a website.
+
+0.503	2020-02-15
+
+ - Allow `version`, `extends`, and `with` to be part of a
+   class/role/interface declaration instead of within the block.
+
+0.502	2020-02-15
+
+ [ Documentation ]
+ - IMPORTS should be a level 1 heading.
+
+0.501	2020-02-15
+
+ - Better defaults of `factory_package` and `prefix` in latest MooX::Press.
+ - Provide an `unimport` method.
+
+0.500	2020-02-14
+
+ [ Documentation ]
+ - Better description.
+ - Restructure documentation.
+
+ [ Packaging ]
+ - MooX::Pression is now called Zydeco.

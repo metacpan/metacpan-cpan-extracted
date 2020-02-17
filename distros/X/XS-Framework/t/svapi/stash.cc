@@ -373,6 +373,7 @@ TEST_CASE("Stash", "[Sv]") {
         o.mark_as_loaded(Stash("MyTest"));
         o.inherit(Stash("M1"));
         auto ISA = o.array("ISA");
+        REQUIRE(ISA.size() == 1);
         REQUIRE(Simple(ISA[0]) == "M1");
     }
 

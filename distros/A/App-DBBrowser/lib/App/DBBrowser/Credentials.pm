@@ -9,20 +9,24 @@ use Term::Form qw();
 
 
 sub new {
-    my ( $class, $opt ) = @_;
-    bless $opt, $class;
+    my ( $class, $info, $options ) = @_;
+    my $sf = {
+        i => $info,
+        o => $options,
+    };
+    bless $sf, $class;
 }
 
 
 sub get_login {
-    my ( $sf, $key, $info ) = @_;
-    if ( ! exists $sf->{login_data}{$key} ) {
+    my ( $sf, $key, $show_sofar, $settings ) = @_;
+    if ( ! exists $settings->{login_data}{$key} ) {
         return;
     }
-    my $default = $sf->{login_data}{$key}{default};
-    my $no_echo = $sf->{login_data}{$key}{secret};
+    my $default = $settings->{login_data}{$key}{default};
+    my $no_echo = $settings->{login_data}{$key}{secret};
     my $env_var = 'DBI_' . uc $key;
-    if ( $sf->{env_var_yes}{$env_var} && exists $ENV{$env_var} ) {
+    if ( $settings->{env_var_yes}{$env_var} && exists $ENV{$env_var} ) {
         return $ENV{$env_var}; #
     }
     elsif ( defined $default && length $default ) {
@@ -33,7 +37,7 @@ sub get_login {
         my $tf = Term::Form->new( $sf->{i}{tf_default} );
         # Readline
         my $new = $tf->readline( $prompt,
-            { info => $info, no_echo => $no_echo }
+            { info => $show_sofar, no_echo => $no_echo }
         );
         return $new;
     }

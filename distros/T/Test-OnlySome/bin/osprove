@@ -44,9 +44,11 @@ my $param = '';
 $param = '=filename,' . $args{onlysome} if $args{onlysome};
 
 # Run prove
+my $plugin_invocation = '-PTest::OnlySomeP' . $param;
+#print "# osprove: $plugin_invocation\n";   # DEBUG
 my $app = App::Prove->new;
 $app->process_args(
-    '-PTest::OnlySomeP' . $param,   # Load our plugin
+    $plugin_invocation,   # Load our plugin
     @ARGV                           # Everything else goes to App::Prove
 );
 exit( $app->run ? 0 : 1 );

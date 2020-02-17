@@ -21,6 +21,8 @@ use NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw;
 use NewsExtractor::SiteSpecificExtractor::www_setn_com;
 use NewsExtractor::SiteSpecificExtractor::news_tnn_tw;
 use NewsExtractor::SiteSpecificExtractor::turnnewsapp_com;
+use NewsExtractor::SiteSpecificExtractor::news_cts_com_tw;
+use NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
 
@@ -59,8 +61,16 @@ use constant {
         'www.setn.com' => 'NewsExtractor::SiteSpecificExtractor::www_setn_com',
         'news.tnn.tw' => 'NewsExtractor::SiteSpecificExtractor::news_tnn_tw',
         'turnnewsapp.com' => 'NewsExtractor::SiteSpecificExtractor::turnnewsapp_com',
+        'news.cts.com.tw' => 'NewsExtractor::SiteSpecificExtractor::news_cts_com_tw',
+        'estate.ltn.com.tw' => 'NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw',
     },
     CSSRuleSetByHost => {
+        'www.taiwannews.com.tw' => {
+            headline => 'h1.article-title',
+            dateline => 'div.article-date',
+            journalist => 'div.article-author',
+            content_text => 'article.article',
+        },
         'udn.com' => {
             headline   => '#story_art_title',
             dateline   => '.story_bady_info_author > span:nth-child(1)',

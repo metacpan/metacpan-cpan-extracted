@@ -32,7 +32,7 @@ BEGIN {
     Win32::API::->Import("psapi","BOOL EnumProcessModules(HANDLE  hProcess, HMODULE *lphModule, DWORD   cb, LPDWORD lpcbNeeded)") or die "EnumProcessModules: $^E";  # uncoverable branch true
 }
 
-our $VERSION = '0.001'; # auto-populated from W::M::NPP
+our $VERSION = '0.001001'; # auto-populated from W::M::NPP
 
 our @EXPORT_VARS = qw/%nppm %nppidm/;
 our @EXPORT_OK = (@EXPORT_VARS);
@@ -173,7 +173,7 @@ sub _new
 
 sub DESTROY {
     my $self = shift;
-    my $pidx = sprintf '%08x', $self->{_pid};
+    my $pidx = sprintf '%08x', $self->{_pid} // 0;
     if( exists $pid_started{$pidx} ) {
         #warn sprintf "DESTROY: perl process '%s' is killing process '%s'\n", $$, $pid_started{$pidx};
         my $pid = delete $pid_started{$pidx};
@@ -232,17 +232,17 @@ sub _hwnd_to_path
 sub _search_for_npp_exe {
     my $npp_exe;
     use File::Which 'which';
-    foreach my $try (   # priority to path, 64bit, default, then x86-specific locations
-        which('notepad++'),
-        "$ENV{ProgramW6432}/Notepad++/notepad++.exe",
-        "$ENV{ProgramFiles}/Notepad++/notepad++.exe",
-        "$ENV{'ProgramFiles(x86)'}/Notepad++/notepad++.exe",
-    )
+    # priority to path, 64bit, default, then x86-specific locations
+    my @try = ( which('notepad++') );
+    push @try, "$ENV{ProgramW6432}/Notepad++/notepad++.exe" if exists $ENV{ProgramW6432};
+    push @try, "$ENV{ProgramFiles}/Notepad++/notepad++.exe" if exists $ENV{ProgramFiles};
+    push @try, "$ENV{'ProgramFiles(x86)'}/Notepad++/notepad++.exe" if exists $ENV{'ProgramFiles(x86)'};
+    foreach my $try ( @try )
     {
         $npp_exe = $try if -x $try;
         last if defined $npp_exe;
     }
-    die "could not find an instance of notepad++; please add it to your path" unless defined $npp_exe;
+    die "could not find an instance of Notepad++; please add it to your path\n" unless defined $npp_exe;
     #print STDERR __PACKAGE__, " found '$npp_exe'\n";
     return $npp_exe;
 }

@@ -48,10 +48,19 @@ use 5.010;
         };
         # automatically determine the versions for 'provides'; MM->parse_version exists as of MM v6.31, so not a problem with >= 6.46
         #   => this comes out right when printed... but MYMETA.* shows values that look wrong
+        my $v = MM->parse_version( $mm_args{VERSION_FROM} );
         $mm_args{META_MERGE}{provides} = {
-            $mm_args{NAME} => {
-                file => $mm_args{VERSION_FROM},
-                version => MM->parse_version( $mm_args{VERSION_FROM} ),
+            'Win32::Mechanize::NotepadPlusPlus' => {
+                file => 'lib/Win32/Mechanize/NotepadPlusPlus.pm',
+                version => $v,
+            },
+            'Win32::Mechanize::NotepadPlusPlus::Notepad' => {
+                file => 'lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm',
+                version => $v,
+            },
+            'Win32::Mechanize::NotepadPlusPlus::Editor' => {
+                file => 'lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm',
+                version => $v,
             }
         };
     }

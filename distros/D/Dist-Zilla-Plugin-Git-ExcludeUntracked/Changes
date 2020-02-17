@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Git-ExcludeUntracked
 
+0.06 February 16 2020
+    - Fix tests breaking with newer Dist::Zilla
+
 0.05 January 12 2016
     - Set up deprecated metadata
 

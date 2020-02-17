@@ -1,3 +1,14 @@
+0.081   2020-02-16  Released-By: PERLANCAR; Urgency: low
+
+	- [refactor] Extract sort spec to
+	  Sort::Sub::pod_sections_ala_perlancar.
+
+
+0.080   2020-02-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Sort DEPRECATION NOTICE (before SYNOPSIS).
+
+
 0.07    2019-09-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow spelling variations: FAQ*S*, CONFIGURATION FILE*S*,

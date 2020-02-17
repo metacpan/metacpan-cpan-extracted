@@ -15,6 +15,7 @@ t/090pod.t                               Tests POD for errors
 t/098pod-coverage.t                      Tests for POD coverage
 t/quiet.t                                Test that -quiet suppresses (some) warnings
 t/too-late-quiet.t                       Test that -quiet doesn't suppress warnings about not hiding stuff
+t/lexically.t                            Test that restricting hiding to a lexical scope works
 
 t/P.pm                                   Dummy module used in tests
 t/Q.pm                                   "

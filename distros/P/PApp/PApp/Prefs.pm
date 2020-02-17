@@ -34,7 +34,7 @@ use PApp::Config qw(DBH $DBH); DBH;
 
 use base Exporter;
 
-$VERSION = 2.1;
+$VERSION = 2.2;
 @EXPORT = qw( 
    lockprefs
 );
@@ -75,7 +75,7 @@ sub lockprefs(&) {
 =item $prefs = new PApp::Prefs [$pathref]
 
 Creates a new PApp::Prefs object for the given application path. A
-reference to the path variable must be apssed in, so that changes in the
+reference to the path variable must be passed in, so that changes in the
 path can be tracked by the module.
 
 =cut

@@ -162,7 +162,7 @@ use PApp::Exception;
 BEGIN {
    our @ISA = PApp::Base::;
    unshift @PApp::ISA, __PACKAGE__;
-   $VERSION = 2.1;
+   $VERSION = 2.2;
 }
 
 *PApp::OK = sub { OK };

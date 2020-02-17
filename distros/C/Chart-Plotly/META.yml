@@ -4,6 +4,7 @@ author:
   - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
 build_requires:
   Module::Build: '0.3601'
+  PDL: '0'
   Test::Exception: '0'
   Test::File::ShareDir: '0'
   Test::More: '0'
@@ -52,7 +53,7 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
   homepage: https://github.com/pablrod/p5-Chart-Plotly
   repository: https://github.com/pablrod/p5-Chart-Plotly.git
-version: '0.037'
+version: '0.038'
 x_contributors:
   - 'Roy Storey <kiwiroy@users.noreply.github.com>'
   - 'stphnlyd <stephanloyd9@gmail.com>'

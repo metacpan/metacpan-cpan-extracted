@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+# PODNAME: git-clean-forge-fork
+# ABSTRACT: create tidy forks for pull requests
+#
+# Copyright (C) 2017, 2020 Sean Whitton
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use App::git::clean_forge_fork;
+exit App::git::clean_forge_fork->main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-clean-forge-fork - create tidy forks for pull requests
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+B<git clean-forge-fork> [B<--upstream=>I<REMOTE>]
+
+=head1 DESCRIPTION
+
+Creates a fork for proposing changes to a project hosted on a git
+forge, like GitHub or GitLab.  Also configures the fork to make it
+obvious that it only exists for submitting changes, so that the fork
+clutters up your git forge profile a bit less.  Also adds a 'fork'
+remote to which you can push your proposed changes.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--upstream=>I<REMOTE>
+
+Specify the name of the upstream git remote, i.e., what you want to
+fork.  Defaults to "origin".
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item $XDG_CONFIG_HOME/.config/gitforge/access_tokens/I<DOMAIN>
+
+Where I<DOMAIN> is the domain name of the git forge
+(e.g. "github.com", "salsa.debian.org"), this file should contain an
+API access token to log in to your account at the git forge.  If
+unset, $XDG_CONFIG_HOME defaults to ~/.config.
+
+=back
+
+=head1 SEE ALSO
+
+git-nuke-forge-fork(1), git-clean-forge-repo(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017, 2020 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

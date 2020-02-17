@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "AnyEvent" : "7.12",
+            "AnyEvent::Fork" : "1.31",
             "Compress::LZF" : "1",
             "Convert::Scalar" : "1.02",
             "Crypt::Twofish2" : "0.01",
@@ -47,10 +49,10 @@
             "URI" : "1.22",
             "XML::Parser" : "2.31",
             "XML::Sablotron" : "1.0100001",
-            "common::sense" : "3.3"
+            "common::sense" : "3.74"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 2.1
+   "version" : 2.2
 }

@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+# PODNAME: git-clean-forge-repo
+# ABSTRACT: create repos on git forges with optional features disabled
+#
+# Copyright (C) 2017, 2020 Sean Whitton
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+use App::git::clean_forge_repo;
+exit App::git::clean_forge_repo->main;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-clean-forge-repo - create repos on git forges with optional features disabled
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+B<git clean-forge-repo> [B<--remote=>I<REMOTE>]
+
+=head1 DESCRIPTION
+
+Creates repos on git forges like GitHub and GitLab, and disables all
+optional features of those forges.  Useful for when you want to use
+the forge only as an ordinary git host, and nothing more.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--remote=>I<REMOTE>
+
+Specify the name of the git remote you will use to push changes to the
+repository created by this script.  You should already have created
+this git remote; see "EXAMPLE" below.  Defaults to "origin".
+
+=back
+
+=head1 EXAMPLE
+
+=over 4
+
+    % git init
+    % # work on new project
+    % git remote add origin https://salsa.debian.org/spwhitton/foo
+    % git clean-forge-repo
+    % git push -u origin master
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item $XDG_CONFIG_HOME/.config/gitforge/access_tokens/I<DOMAIN>
+
+Where I<DOMAIN> is the domain name of the git forge
+(e.g. "github.com", "salsa.debian.org"), this file should contain an
+API access token to log in to your account at the git forge.  If
+unset, $XDG_CONFIG_HOME defaults to ~/.config.
+
+=back
+
+=head1 SEE ALSO
+
+git-clean-forge-fork(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017, 2020 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

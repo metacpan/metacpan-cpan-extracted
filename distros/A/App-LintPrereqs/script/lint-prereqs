@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.540'; # VERSION
+our $DATE = '2019-12-17'; # DATE
+our $VERSION = '0.541'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -28,7 +28,7 @@ lint-prereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.540 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2019-05-12.
+This document describes version 0.541 of lint-prereqs (from Perl distribution App-LintPrereqs), released on 2019-12-17.
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ Add extra directories to scan for test requirements (JSON-encoded).
 
 See C<--extra-test-dir>.
 
-=item B<--fix>
+=item B<--fix>, B<-F>
 
 Attempt to automatically fix the errors.
 
@@ -165,7 +165,7 @@ given some weird code.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<s>, B<-c>
 
 Set path to configuration file.
 
@@ -306,7 +306,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/lint-prereqs.conf>, F</home/s1/lint-prereqs.conf>, F</etc/lint-prereqs.conf>, or F<./lint-prereqs.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/lint-prereqs.conf>, F</home/u1/lint-prereqs.conf>, F</etc/lint-prereqs.conf>, or F<./lint-prereqs.conf>.
 
 All found files will be read and merged.
 
@@ -338,9 +338,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/lint-prereqs.conf>
+F</home/u1/.config/lint-prereqs.conf>
 
-F</home/s1/lint-prereqs.conf>
+F</home/u1/lint-prereqs.conf>
 
 F</etc/lint-prereqs.conf>
 

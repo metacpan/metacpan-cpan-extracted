@@ -1,3 +1,18 @@
+0.044		2020-02-16	T. R. Wyant
+    Replace time_gm() & time_local() with greg_time_*() from
+    Astro::Coord::ECI::Utils. The latter always interpret the year as
+    Gregorian.
+
+    Alternate macOS config location for Catalina. The problem is that
+    File::HomeDir->my_dist_config() is in ~/Documents/, and I have been
+    unable to access that from a macOS launchd job, even running as the
+    owner of the direcory. At the moment I am also looking in
+    File::HomeDir->my_dist_data(), which experimentation seems to show
+    is accessible to a launchd job. But that may not be its final
+    resting place. The my_dist_config() location will still be found --
+    this is just a band-aid for those who use this code in scheduled
+    jobs.
+
 0.043		2020-01-17	T. R. Wyant
     Fix y2020 problem when using Date::Manip for input. The ISO8601
     parser appears to be unaffected.

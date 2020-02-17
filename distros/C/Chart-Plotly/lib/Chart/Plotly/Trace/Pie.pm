@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Pie::Textfont;
 use Chart::Plotly::Trace::Pie::Title;
 use Chart::Plotly::Trace::Pie::Transform;
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 # ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
@@ -145,7 +145,7 @@ has insidetextorientation => (
     is  => "rw",
     isa => enum( [ "horizontal", "radial", "tangential", "auto" ] ),
     documentation =>
-      "Determines the orientation of text inside slices. With *auto* the texts may automatically be rotated to fit with the maximum size inside the slice. Using *horizontal* option forces text to be horizontal. Using *radial* option forces text to be radial. Using *tangential* option forces text to be tangential.",
+      "Controls the orientation of the text inside chart sectors. When set to *auto*, text may be oriented in any direction in order to be as big as possible in the middle of a sector. The *horizontal* option orients text to be parallel with the bottom of the chart, and may make text smaller in order to achieve that goal. The *radial* option orients text along the radius of the sector. The *tangential* option orients text perpendicular to the radius of the sector.",
 );
 
 has label0 => (
@@ -333,7 +333,7 @@ Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set i
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 
@@ -451,7 +451,7 @@ Sets the source reference on plot.ly for  ids .
 
 =item * insidetextorientation
 
-Determines the orientation of text inside slices. With *auto* the texts may automatically be rotated to fit with the maximum size inside the slice. Using *horizontal* option forces text to be horizontal. Using *radial* option forces text to be radial. Using *tangential* option forces text to be tangential.
+Controls the orientation of the text inside chart sectors. When set to *auto*, text may be oriented in any direction in order to be as big as possible in the middle of a sector. The *horizontal* option orients text to be parallel with the bottom of the chart, and may make text smaller in order to achieve that goal. The *radial* option orients text along the radius of the sector. The *tangential* option orients text perpendicular to the radius of the sector.
 
 =item * label0
 

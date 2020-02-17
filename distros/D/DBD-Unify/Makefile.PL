@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl -w
 
-require 5.008004;
+require 5.008006;
 
 use strict;
 
@@ -104,6 +104,7 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
 	"[-RegularExpressions::ProhibitFixedStringMatches]",	# deliberate
 	"[-Subroutines::ProhibitBuiltinHomonyms]",		# connect
 	"[-Subroutines::ProtectPrivateSubs]",
+	"[-TooMuchCode::ProhibitDuplicateSub]",	# sub private_attribute_info
 	"[-ValuesAndExpressions::ProhibitVersionStrings]",	# use 5.8.0
 	"[-Variables::ProhibitPackageVars]",			# our
 	"";
@@ -158,8 +159,9 @@ sub CheckUnify {
 	libnwrpc.a libnwstcp.a
 	libusu.a libudsu.a
 	U2000c.a U2000u.a);
-    my $localremote = prompt (
-	"Link (L)ocal-only, (R)emote-only, or (B)oth? [L/r/b] >", "L");
+    my $localremote = exists $ENV{RELEASE_DEBUG} || exists $ENV{RELEASE_OPTS}
+	? "L"
+	: prompt ("Link (L)ocal-only, (R)emote-only, or (B)oth? [L/r/b] >", "L");
     if    ($localremote =~ m/^\s*[Rr]/) {
 	@ulibs = map { s/([0s]u)\.a/$1r.a/; $_ } @ulibs;
 	}

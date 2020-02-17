@@ -5,11 +5,13 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.046';
+our $VERSION   = '0.052';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
 use Exporter::Tiny qw(mkopt);
+use Import::Into;
+use Module::Runtime qw(use_module);
 use namespace::autoclean;
 
 # Options not to carry up into subclasses;
@@ -56,22 +58,54 @@ my $_handle_list_add_nulls = sub {
 
 my %_cached_moo_helper;
 
+sub _apply_default_options {
+	my $builder = shift;
+	my $opts = $_[0];
+	
+	$opts->{toolkit} ||= $ENV{'PERL_MOOX_PRESS_TOOLKIT'} || 'Moo';
+	
+	$opts->{version} = $opts->{caller}->VERSION
+		unless exists $opts->{version};
+		
+	$opts->{authority} = do { no strict 'refs'; no warnings 'once'; ${$opts->{caller}."::AUTHORITY"} }
+		unless exists $opts->{authority};
+	
+	unless (exists $opts->{prefix}) {
+		$opts->{prefix} = $opts->{caller};
+		if ($opts->{prefix} eq 'main') {
+			$opts->{prefix} = undef;
+		}
+	}
+	
+	my $no_warn = exists($opts->{factory_package});
+	
+	$opts->{factory_package} = defined($opts->{prefix}) ? $opts->{prefix} : 'Local'
+		unless exists $opts->{factory_package};
+	
+	if (!$no_warn and defined($opts->{factory_package}) and $opts->{factory_package} eq 'Local') {
+		require FindBin;
+		if ($FindBin::Script ne '-e') {
+			require Carp;
+			Carp::carp('Using "Local" as factory; please set prefix or factory_package');
+		}
+	}
+	
+	unless (exists $opts->{type_library}) {
+		$opts->{type_library} = $builder->qualify_name('Types', $opts->{prefix});
+	}
+}
+
 sub import {
 	my $builder = shift;
 	my $caller  = caller;
 	my %opts    = @_==1 ? shift->$_handle_list_add_nulls : @_;
-	$opts{caller}  ||= $caller;
-	$opts{toolkit} ||= $ENV{'PERL_MOOX_PRESS_TOOLKIT'} || 'Moo';
+	$opts{caller}      ||= $caller;
+	$opts{caller_file} ||= [caller]->[1];
 	
-	$opts{version} = $opts{caller}->VERSION
-		unless exists $opts{version};
-	$opts{authority} = do { no strict 'refs'; no warnings 'once'; ${$opts{caller}."::AUTHORITY"} }
-		unless exists $opts{authority};
-	
-	$opts{prefix}          = $opts{caller} unless exists $opts{prefix};
-	$opts{factory_package} = $opts{prefix} unless exists $opts{factory_package};
-	
+	$builder->_apply_default_options(\%opts);
 	$builder->munge_options(\%opts);
+	
+	$builder->_mark_package_as_loaded('factory package' => $opts{factory_package}, \%opts);
 	
 	my @role_generators  = @{ mkopt $opts{role_generator} };
 	my @class_generators = @{ mkopt $opts{class_generator} };
@@ -109,11 +143,6 @@ sub import {
 		$builder->munge_class_options($pkg->[1], \%opts);
 	}
 
-	unless (exists $opts{type_library}) {
-		$opts{type_library} = 'Types';
-		$opts{type_library} = $builder->qualify_name($opts{type_library}, $opts{prefix});
-	}
-	
 	if ($opts{type_library}) {
 		$builder->prepare_type_library($opts{type_library}, %opts);
 		# no type for role generators
@@ -138,13 +167,16 @@ sub import {
 		);
 	}
 	
-	{
+	if (defined $opts{'factory_package'}) {
+		no strict 'refs';
+		
 		my %methods;
 		my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 		
 		%methods = delete($opts{factory_package_can})->$_handle_list_add_nulls;
-		$methods{qualify} ||= sub { $builder->qualify($_[1], $opts{'prefix'}) };
-		$builder->$method_installer($opts{'factory_package'}||$opts{'caller'}, \%methods) if keys %methods;
+		$methods{qualify} ||= sub { $builder->qualify($_[1], $opts{'prefix'}) }
+			unless exists &{$opts{'factory_package'}.'::qualify'};
+		$builder->$method_installer($opts{'factory_package'}, \%methods) if keys %methods;
 		
 		%methods = delete($opts{type_library_can})->$_handle_list_add_nulls;
 		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
@@ -171,6 +203,18 @@ sub import {
 	}
 	
 	%_cached_moo_helper = ();  # cleanups
+}
+
+sub _mark_package_as_loaded {
+	my $builder = shift;
+	my ($kind, $pkg, $opts) = @_;
+	defined $pkg or return;
+	$INC{Module::Runtime::module_notional_filename($pkg)} = $opts->{caller_file} || 1;
+	if (defined $opts->{factory_package}) {
+		no strict 'refs';
+		my $idx = \%{ $opts->{factory_package} . '::PACKAGES' };
+		$idx->{$pkg} = $kind;
+	}
 }
 
 sub munge_options {
@@ -219,14 +263,14 @@ sub munge_role_generator_options {
 }
 
 sub qualify_name {
-	shift;
+	my $me = shift;
 	my ($name, $prefix, $parent) = @_;
 	my $sigil = "";
 	if ($name =~ /^[@%\$]/) {
 		$sigil = substr $name, 0, 1;
 		$name  = substr $name, 1;
 	}
-	return $sigil.join("::", $parent->$_handle_list, $1) if (defined $parent and $name =~ /^\+(.+)/);
+	$name = join("::", '', $parent->$_handle_list, $1) if (defined $parent and $name =~ /^\+(.+)/);
 	return $sigil.$1 if $name =~ /^::(.+)$/;
 	$prefix ? $sigil.join("::", $prefix, $name) : $sigil.$name;
 }
@@ -234,8 +278,9 @@ sub qualify_name {
 sub type_name {
 	shift;
 	my ($name, $prefix) = @_;
+	$prefix = '' unless defined $prefix;
 	my $stub = $name;
-	if (lc substr($name, 0, length $prefix) eq lc $prefix) {
+	if (length $prefix and lc substr($name, 0, length $prefix) eq lc $prefix) {
 		$stub = substr($name, 2 + length $prefix);
 	}
 	$stub =~ s/::/_/g;
@@ -250,17 +295,18 @@ sub croak {
 
 my $none;
 sub prepare_type_library {
+	no strict 'refs';
+	no warnings 'once';
 	my $builder = shift;
 	my ($lib, %opts) = @_;
+	return if exists &{"$lib\::_mooxpress_add_type"};
 	my ($version, $authority) = ($opts{version}, $opts{authority});
 	my %types_hash;
 	require Type::Tiny::Role;
 	require Type::Tiny::Class;
 	require Type::Registry;
-	eval "package $lib; use Type::Library -base; 1"
-		or $builder->croak("Could not prepare type library $lib: $@");
-	require Module::Runtime;
-	$INC{ Module::Runtime::module_notional_filename($lib) } = __FILE__;
+	use_module('Type::Library')->import::into($lib, -base);
+	$builder->_mark_package_as_loaded('type library' => $lib, \%opts);
 	my $adder = sub {
 		my $me = shift;
 		my ($name, $kind, $target, $coercions) = @_;
@@ -305,12 +351,10 @@ sub prepare_type_library {
 				sub get_type_for_package { shift->type_library->get_type_for_package(@_) };
 				1;
 			',
-			$opts{'factory_package'}||$opts{'caller'},
+			$opts{'factory_package'},
 			B::perlstring($lib),
 		) or $builder->croak("Could not install type library methods into factory package: $@");
 	}
-	no strict 'refs';
-	no warnings 'once';
 	*{"$lib\::_mooxpress_add_type"} = $adder;
 	*{"$lib\::get_type_for_package"} = $getter;
 	${"$lib\::VERSION"} = $version if defined $version;
@@ -475,7 +519,7 @@ sub make_role {
 			Carp::croak("$kind $qname cannot have $key");
 		}
 	}
-
+	
 	$builder->_make_package($name, %opts, is_role => 1);
 }
 
@@ -526,6 +570,8 @@ sub _make_package {
 	my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
 	my $tn = $builder->type_name($qname, $opts{prefix});
 	
+	$builder->_mark_package_as_loaded(($opts{is_role} ? 'role' : 'class') => $qname, \%opts);
+	
 	if (!exists $opts{factory}) {
 		$opts{factory} = $opts{abstract} ? undef : sprintf('new_%s', lc $tn);
 	}
@@ -539,21 +585,16 @@ sub _make_package {
 	if ($opts{is_role}) {
 		no strict 'refs';
 		return if ${"$qname\::BUILT"};
-		
-		eval "package $qname; use $toolkit\::Role; use namespace::autoclean; our \$BUILT = 1"
-			or $builder->croak("Could not create package $qname: $@");
+		use_module("$toolkit\::Role")->import::into($qname);
+		use_module("namespace::autoclean")->import::into($qname);
+		${"$qname\::BUILT"} = 1;
 	}
 	else {
-		my $optthing = '';
-		if ($toolkit eq 'Moo') {
-			$optthing = ' use MooX::TypeTiny;'      if eval { require MooX::TypeTiny };
-		}
-		elsif ($toolkit eq 'Moose') {
-			$optthing = ' use MooseX::XSAccessor;'  if eval { require MooseX::XSAccessor };
-		}
-		eval "package $qname; use $toolkit;$optthing use namespace::autoclean; 1"
-			or $builder->croak("Could not create package $qname: $@");
-	
+		use_module($toolkit)->import::into($qname);
+		use_module("MooX::TypeTiny")->import::into($qname) if $toolkit eq 'Moo' && eval { require MooX::TypeTiny };
+		use_module("MooseX::XSAccessor")->import::into($qname) if $toolkit eq 'Moose' && eval { require MooseX::XSAccessor };
+		use_module("namespace::autoclean")->import::into($qname);
+		
 		my $method  = $opts{toolkit_extend_class} || ("extend_class_".lc $toolkit);
 		if (@isa) {
 			$builder->$method($qname, \@isa);
@@ -588,32 +629,34 @@ sub _make_package {
 			elsif (is_ArrayRef($imports[0])) {
 				@params = @{ shift @imports };
 			}
-			require Import::Into;
-			eval "require $import";
-			$import->import::into($qname, @params);
+			use_module($import)->import::into($qname, @params);
 		}
 	}
 	
 	if (ref $opts{'begin'}) {
 		$opts{'begin'}->($qname, $opts{is_role} ? 'role' : 'class');
 	}
-
+	
 	if ($opts{overload}) {
 		my @overloads = $opts{overload}->$_handle_list;
 		require overload;
 		require Import::Into;
 		'overload'->import::into($qname, @overloads);
 	}
-
+	
 	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	{
 		my %methods;
 		%methods = $opts{can}->$_handle_list_add_nulls;
 		$builder->$method_installer($qname, \%methods) if keys %methods;
-		%methods = $opts{factory_package_can}->$_handle_list_add_nulls;
-		$builder->$method_installer($opts{'factory_package'}||$opts{'caller'}, \%methods) if keys %methods;
-		%methods = $opts{type_library_can}->$_handle_list_add_nulls;
-		$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
+		if (defined $opts{factory_package}) {
+			%methods = $opts{factory_package_can}->$_handle_list_add_nulls;
+			$builder->$method_installer($opts{factory_package}, \%methods) if keys %methods;
+		}
+		if (defined $opts{type_library}) {
+			%methods = $opts{type_library_can}->$_handle_list_add_nulls;
+			$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
+		}
 	}
 	
 	{
@@ -748,17 +791,19 @@ sub _make_package {
 			else
 			{
 				my ($shv_toolkit, $shv_data);
+				my $lex = $builder->_pre_attribute($qname, $attrname, \%spec);
 				if ($spec{handles_via}) {
 					$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
-					eval "require $shv_toolkit" or die($@);
+					use_module($shv_toolkit);
 					$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
 				}
 				$builder->$method($qname, $attrname, \%spec);
 				$shv_toolkit->install_delegations($shv_data) if $shv_data;
+				$builder->_post_attribute($qname, $attrname, \%spec, $lex) if $lex;
 			}
 		}
 	}
-
+	
 	if ($opts{multimethod}) {
 		my $method = $opts{toolkit_install_multimethod} || 'install_multimethod';
 		my @mm = $opts{multimethod}->$_handle_list_add_nulls;
@@ -767,7 +812,7 @@ sub _make_package {
 			$builder->$method($qname, $opts{is_role}?'role':'class', $method_name, $method_spec);
 		}
 	}
-
+	
 	{
 		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
 		my @roles = $opts{with}->$_handle_list;
@@ -846,8 +891,8 @@ sub _make_package {
 			});
 		}
 		
-		if (defined $opts{'factory_package'} or not exists $opts{'factory_package'}) {
-			my $fpackage = $opts{'factory_package'} || $opts{'caller'};
+		if (defined $opts{'factory_package'}) {
+			my $fpackage = $opts{'factory_package'};
 			if ($opts{'factory'}) {
 				my @methods = $opts{'factory'}->$_handle_list;
 				if ($opts{abstract} and @methods) {
@@ -917,6 +962,8 @@ sub _make_package_generator {
 	my $qname = $builder->qualify_name($name, $opts{prefix});
 	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	
+	$builder->_mark_package_as_loaded("$kind generator" => $qname, \%opts);
+	
 	$builder->$method_installer(
 		$qname,
 		{
@@ -938,7 +985,7 @@ sub _make_package_generator {
 		'Type::Registry'->for_class($qname)->set_parent(
 			'Type::Registry'->for_class($opts{factory_package})
 		);
-
+		
 		my $tn = $builder->type_name($qname, $opts{prefix});
 		if (!exists $opts{factory}) {
 			$opts{factory} = 'generate_' . lc $tn;
@@ -1023,6 +1070,50 @@ sub _get_moo_helper {
 	);
 	die "BADNESS: couldn't get helper '$helpername' for package '$package'" unless $_cached_moo_helper{"$package\::$helpername"};
 	$_cached_moo_helper{"$package\::$helpername"};
+}
+
+sub _pre_attribute {
+	my ($builder, $target, $attrname, $spec) = @_;
+	my %lex;
+	
+	for my $thing (qw/ reader writer accessor clearer predicate /) {
+		if (is_ScalarRef $spec->{$thing}) {
+			my $rand = sprintf('__lexical_%d', 10_000_000 + int rand(89_000_000));
+			$lex{$rand}  = $spec->{$thing};
+			$spec->{$thing} = $rand;
+		}
+	}
+	
+	if (is_ArrayRef $spec->{handles}) {
+		my %new_handles;
+		my @handles = @{$spec->{handles}};
+		while (@handles) {
+			my ($src, $dst) = splice @handles, 0, 2;
+			if (is_ScalarRef $src) {
+				my $rand = sprintf('__lexical_%d', 10_000_000 + int rand(89_000_000));
+				$new_handles{$rand} = $dst;
+				$lex{$rand} = $src;
+			}
+			else {
+				$new_handles{$src} = $dst;
+			}
+		}
+		$spec->{handles} = \%new_handles;
+	}
+	
+	return unless keys %lex;
+	\%lex;
+}
+
+sub _post_attribute {
+	my ($builder, $target, $attrname, $spec) = @_;
+	my %lex = %{ +pop };
+	
+	foreach my $tmp (sort keys %lex) {
+		my $coderef = do { no strict 'refs'; \&{"$target\::$tmp"} };
+		${ $lex{$tmp} } = $coderef;
+		'namespace::clean'->clean_subroutines($target, $tmp);
+	}
 }
 
 sub make_attribute_moo {
@@ -1124,13 +1215,15 @@ sub install_multimethod {
 
 {
 	my $_process_roles = sub {
-		my ($r, $tk) = @_;
+		my ($builder, $r, $tk, $opts) = @_;
 		map {
 			my $role = $_;
 			if ($role =~ /\?$/) {
 				$role =~ s/\?$//;
-				eval "require $role; 1"
-					or eval "package $role; use $tk\::Role; 1";
+				eval "require $role; 1" or do {
+					use_module("$tk\::Role")->import::into($role);
+					$builder->_mark_package_as_loaded(role => $role, $opts);
+				};
 			}
 			$role;
 		} @$r;
@@ -1148,27 +1241,27 @@ sub install_multimethod {
 	
 	sub apply_roles_moo {
 		my $builder = shift;
-		my ($class, $kind, $roles) = @_;
+		my ($class, $kind, $roles, $opts) = @_;
 		my $helper = $builder->_get_moo_helper($class, 'with');
-		my @roles = $roles->$_process_roles('Moo');
+		my @roles = $builder->$_process_roles($roles, 'Moo', $opts);
 		$helper->(@roles);
 		$class->$_maybe_do_multimethods($kind, @roles);
 	}
 
 	sub apply_roles_moose {
 		my $builder = shift;
-		my ($class, $kind, $roles) = @_;
+		my ($class, $kind, $roles, $opts) = @_;
 		require Moose::Util;
-		my @roles = $roles->$_process_roles('Moose');
+		my @roles = $builder->$_process_roles($roles, 'Moose', $opts);
 		Moose::Util::ensure_all_roles($class, @roles);
 		$class->$_maybe_do_multimethods($kind, @roles);
 	}
 
 	sub apply_roles_mouse {
 		my $builder = shift;
-		my ($class, $kind, $roles) = @_;
+		my ($class, $kind, $roles, $opts) = @_;
 		require Mouse::Util;
-		my @roles = $roles->$_process_roles('Mouse');
+		my @roles = $builder->$_process_roles($roles, 'Mouse', $opts);
 		# this can double-apply roles? :(
 		Mouse::Util::apply_all_roles($class, @roles);
 		$class->$_maybe_do_multimethods($kind, @roles);
@@ -1647,7 +1740,8 @@ is told to create a class "Animal" and C<prefix> is set to "MyApp::OO", then
 it will create a class called "MyApp::OO::Animal".
 
 This is optional and defaults to the caller. If you wish to have no prefix,
-then pass an explicit C<< prefix => undef >> option.
+then pass an explicit C<< prefix => undef >> option. (If the caller is
+C<main>, then the prefix defaults to undef.)
 
 You can bypass the prefix for a specific class or a specific role using a
 leading double colon, like "::Animal".
@@ -1657,8 +1751,10 @@ leading double colon, like "::Animal".
 A package name to install methods like the C<new_cat> and C<new_cow> methods
 in L</SYNOPSIS>.
 
-This defaults to prefix, but may be explicitly set to undef to suppress the
-creation of such methods.
+This defaults to prefix if the prefix is defined, and "Local" otherwise, but
+may be explicitly set to undef to suppress the creation of such methods. If
+the factory_package is "Local", you'll get a warning, except in C<< perl -e >>
+one-liners.
 
 In every class (but not role) that MooX::Press builds, there will be a
 C<FACTORY> method created so that, for example
@@ -1671,6 +1767,12 @@ names.
 
   MyApp::Cow->FACTORY->qualify('Pig')     # 'MyApp::Pig'
   MyApp::Cow->FACTORY->qualify('::Pig')   # 'Pig'
+
+The factpry package will have a global variable C<< %PACKAGES >> where the
+keys are names of all the packages MooX::Press created for you, and the values
+are what kind of package they are:
+
+  say $MyApp::PACKAGES{"MyApp::Cow"};     # 'class'
 
 =item C<< type_library >> I<< (Str|Undef) >>
 
@@ -2487,11 +2589,13 @@ For private attributes, you can request an accessor as a coderef:
   );
 
 Private attributes may have defaults and builders (but they are always
-lazy!) They may also have C<handles>. (Though if the C<handles> option
-is an arrayref, it is treated slightly differently from non-private
-attributes; see L<Lexical::Accessor> for details.) You may find you can
-do everything you need with the builders and delegations, so having an
-accessor is unnecessary.
+lazy!) They may also have C<handles>. You may find you can do everything
+you need with the builders and delegations, so having an accessor is
+unnecessary.
+
+(As of version 0.050, setting C<reader>, C<writer>, C<accessor>, C<clearer>,
+or C<predicate> to a scalarref will also work for I<public> attributes
+too!)
 
 =item C<< isa >> I<< (Str|Object) >>
 
@@ -2623,6 +2727,57 @@ Mouse.)
 
 If your attribute has a C<handles_via> option, MooX::Press will load
 L<Sub::HandlesVia> for you.
+
+=item C<< handles >> I<< (ArrayRef|HashRef|RoleName) >>
+
+C<handles> is effectively a mapping of methods in the package being
+defined to methods in a target package. If C<handles> is a hashref,
+then it is obvious how that works. If C<handles> is a role name, then
+the mapping includes all the methods that are part of the role's API,
+and they map to methods of the same name in the target package.
+(Only Moose and Mouse support C<handles> being a role name.)
+
+For attributes with an enum type constraint, the special values
+C<< handles => 1 >> and C<< handles => 2 >> described above also
+work.
+
+When C<handles> is an arrayref, then the different backend modules
+would interpret it differently:
+
+  # Moo, Moose, Mouse, Sub::HandlesVia, Moo(se)X::Enumeration
+  [ "value1", "value2", "value3", "value4" ]
+  
+  # Lexical::Accessor
+  [ "key1" => "value1", "key2" => "value2" ]
+
+Since version 0.050, MooX::Press smooths over the differences between
+them by converting these arrayrefs to hashrefs. Rather surprisingly,
+I<< the Lexical::Accessor interpretation of arrayrefs is used >>. It
+is treated as a list of key-value pairs.
+
+This is because even though that's the minority interpretation, it's
+the more useful interpretation, allowing methods from the target
+package to be given a different name in the package being defined,
+or even assigned to lexical variables.
+
+  has => [
+    'ua' => {
+      is      => 'bare',
+      default => sub { HTTP::Tiny->new },
+      handles => [
+        \$get  => 'get',
+        \$post => 'post',
+      ],
+    },
+  ],
+
+Now C<< $get >> will be a coderef that you can call as a method:
+
+  $self->$get($url);   # same as $self->{ua}->get($url)
+
+If you use C<< handles => \%hash >>, you should get expected behaviour.
+If you use C<< handles => \@array >>, just be aware that your array is
+going to be interpreted like a hash from MooX::Press 0.050 onwards!
 
 =item C<< coerce >> I<< (Bool|CodeRef) >>
 

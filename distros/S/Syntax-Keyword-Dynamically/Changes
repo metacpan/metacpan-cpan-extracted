@@ -1,4 +1,15 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.03    2020-02-17 15:21:44
+        [CHANGES]
+         * Remember to add hax/*.c.inc files to MANIFEST
+
+0.02    2020-02-17 14:15:18
+        [CHANGES]
+         * Perform dynamic (and repeatable) suspend & resume around
+           async/await from Future::AsyncAwait
+         * Handle hash keys specially, deleting them again as required
+           (RT131738)
+
 0.01    2018-08-18 17:34:28
         First version, released on an unsuspecting world.

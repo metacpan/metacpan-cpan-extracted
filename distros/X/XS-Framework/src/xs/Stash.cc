@@ -103,7 +103,7 @@ void Stash::inherit (const Stash& parent) {
         auto fqn = string(name()) + "::ISA";
         ISA = GvAV(gv_fetchpvn_flags(fqn.data(), fqn.length(), GV_ADD, SVt_PVAV));
     }
-    av_push(ISA, Simple::shared(parent.name())); // can't use ISA.push() syntax, because @ISA is a magical array, otherwise MRO cache won't be cleared
+    av_push(ISA, Simple::shared(parent.name()).detach()); // can't use ISA.push() syntax, because @ISA is a magical array, otherwise MRO cache won't be cleared
 }
 
 void Stash::_throw_nomethod (const panda::string_view& name) const {

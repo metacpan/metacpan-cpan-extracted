@@ -5,7 +5,7 @@ use Math::LongDouble qw(:all);
 print "1..1\n";
 
 
-if($Math::LongDouble::VERSION eq '0.21' && Math::LongDouble::_get_xs_version() eq $Math::LongDouble::VERSION) {print "ok 1\n"}
+if($Math::LongDouble::VERSION eq '0.22' && Math::LongDouble::_get_xs_version() eq $Math::LongDouble::VERSION) {print "ok 1\n"}
 else {print "not ok 1 $Math::LongDouble::VERSION ", Math::LongDouble::_get_xs_version(), "\n"}
 
 # NAN_POW_BUG
@@ -36,4 +36,7 @@ if(Math::LongDouble::_sincosl_status() =~ /built with sincosl function/) {
 else {
   warn "SINCOSL_IS_UNAVAILABLE is defined\n";
 }
+
+warn "Actual nvsize == ", Math::LongDouble::_get_actual_nvsize(), "\n";
+warn "Actual long double size = ", Math::LongDouble::_get_actual_ldblsize(), "\n"
 

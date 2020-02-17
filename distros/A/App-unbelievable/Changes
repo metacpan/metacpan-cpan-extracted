@@ -1,0 +1,21 @@
+Revision history for Perl extension App-unbelievable
+
+v0.0.4 2020-02-16T02:22:45Z
+
+    - Change syntax highlighter to Kate since doing so reduces the
+      chance of test failures on installation of this module.
+    - Add new CLI command `aio` = build + serve.
+    - build: ignore .*
+
+v0.0.3 2020-02-02T02:42:37Z (TRIAL RELEASE)
+
+    - Add syntax-highlighted fenced code blocks using Syntax::Kamelon.
+    - Add dependency on IPC::System::Simple to fix test failures.
+
+v0.0.2 2020-01-30T02:19:51Z (TRIAL RELEASE)
+
+    - Add `serve`; update `build` accordingly.
+
+v0.0.1 2020-01-27T02:47:08Z (TRIAL RELEASE)
+
+    - original version

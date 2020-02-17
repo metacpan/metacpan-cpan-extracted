@@ -1,5 +1,6 @@
 bin/osprove
 Changes
+cpanfile
 lib/App/Prove/Plugin/Test/OnlySomeP.pm
 lib/App/Prove/Plugin/Test/OnlySomeP/Formatter.pm
 lib/Test/OnlySome.pm

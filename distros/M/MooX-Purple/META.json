@@ -4,7 +4,7 @@
       "lnation <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Keyword::Declare" : "0.001010",
+            "Keyword::Declare" : "0.001017",
             "Moo" : "2.003004",
             "MooX::LazierAttributes" : "1.07008",
             "MooX::ValidateSubs" : "1.012004",
@@ -43,5 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

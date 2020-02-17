@@ -1,0 +1,695 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/project>
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-017>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-018>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-019>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-020>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-100>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-200>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-300>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-301>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-302>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-303>, <http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-400>.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-Pression-0.001"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.002"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document issues with Perl 5.14.x and Perl 5.16.x and officially only support Perl 5.18.0 and above.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix typo in `end` keyword documentation.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow (and encourage) `from` to follow `coerce`.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better SYNOPSIS showing coercion.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document `enum`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.003"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "`class` blocks may be nested.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document +attrname.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that `begin` and `end` may only occur once per package.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.004"^^xsd:string;
+	dc:issued            "2020-01-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.022.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document integration with MooX::Enumeration.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Outline key differences with Moops.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`requires` keyword.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Recommend Perl 5.18.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.005"^^xsd:string;
+	dc:issued            "2020-01-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improvements for parsing role names and class names.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support class generators and role generators.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support plus sign prefix for class names.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.024.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.006"^^xsd:string;
+	dc:issued            "2020-01-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix small typos.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.007"^^xsd:string;
+	dc:issued            "2020-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Slurpy positional parameters in signatures.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Handle parameters passed to class/role generators properly.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix example that showed `extends` within a `role` block.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.008"^^xsd:string;
+	dc:issued            "2020-01-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.026.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.009"^^xsd:string;
+	dc:issued            "2020-01-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.030.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Tightened up grammar for parsing.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document how to achieve the singleton pattern.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document Sub::HandlesVia support.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add a `toolkit` keyword.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.010"^^xsd:string;
+	dc:issued            "2020-01-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.032.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "MooX::Pression now loads modern Perl features like `state` and `say`.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Methods can now have an :optimize attribute.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Anonymous methods.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Anonymous classes.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Anonymous roles.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Anonymous parameterized classes.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Anonymous parameterized roles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.011"^^xsd:string;
+	dc:issued            "2020-01-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Tests of () signatures for methods, method modifiers, and parameterizable classes.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixes for parsing and interpreting () signatures.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.012"^^xsd:string;
+	dc:issued            "2020-01-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Parameterizable classes can now be nested inside regular classes.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test how `sub` acts inside classes.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document how `sub` acts inside classes and roles.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.013"^^xsd:string;
+	dc:issued            "2020-01-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`multi method` keyword.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`overload` keyword.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Warn that `SUPER::` and `__SUB__` won't work the way you might expect them to work.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-014>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.014"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`abstract class` keyword.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`interface` keyword.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include simple JSON encoder using multi methods as an example.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.015"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support equals sign to provide attribute default value.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.016"^^xsd:string;
+	dc:issued            "2020-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has $foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has @foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `has %foo` because it looked like a lexical variable and could be confusing.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "For consistency with method signatures, support `has *foo` to mean the same as `has foo`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-017>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.017"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Method signatures in `requires` are no longer totally ignored.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.017.tar.gz>;
+	doap:revision        "0.017"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-018>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.018"^^xsd:string;
+	dc:issued            "2020-02-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix handling of :optimize.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include Dios in benchmarking comparison.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-019>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.019"^^xsd:string;
+	dc:issued            "2020-02-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Much improved parsing of signatures; especially type constraints within signatures.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Include Mouse in benchmarking comparison.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.019.tar.gz>;
+	doap:revision        "0.019"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-020>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.020"^^xsd:string;
+	dc:issued            "2020-02-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix issue parsing optional parameters introduced in 0.019.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better messages when encountering syntax errors.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "In some cases of otherwise ambiguous syntax, assume classes/roles/methods were not anonymous.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.020.tar.gz>;
+	doap:revision        "0.020"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.100"^^xsd:string;
+	dc:issued            "2020-02-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Major rewrite using PPR and Keyword::Simple for parsing instead of Keyword::Declare. This massively improves compile-time speed and improved compatibility with Perl 5.14 and Perl 5.16.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-200>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.200"^^xsd:string;
+	dc:issued            "2020-02-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixed over-eager regexps which weren't just matching at the start of strings.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "If Type::Params 1.009002 or above is available, allow mixed named and positional parameters in method signatures.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "mip-087-001.pl";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-300>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.300"^^xsd:string;
+	dc:issued            "2020-02-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`include` can now be used to load files.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`MooX::Pression::PACKAGE_SPEC` can be used to tweak the hashref passed to MooX::Press.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.300.tar.gz>;
+	doap:revision        "0.300"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-301>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.301"^^xsd:string;
+	dc:issued            "2020-02-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow `has`, `around`, `before`, and `after` to accept a list of attribute/method names instead of just one.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.043.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.301.tar.gz>;
+	doap:revision        "0.301"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-302>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.302"^^xsd:string;
+	dc:issued            "2020-02-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make `method`, `multi method`, `constant`, `around`, `before`, and `after` to work outside of class/role/interface blocks too.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Methods that used try/catch/finally would sometimes be unparseable; the block parser is now aware of those keywords.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that a `bare` constant is exported.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improvements to line number accounting.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.302.tar.gz>;
+	doap:revision        "0.302"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-303>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.303"^^xsd:string;
+	dc:issued            "2020-02-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.044 to avoid test failures.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.303.tar.gz>;
+	doap:revision        "0.303"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Pression/v_0-400>
+	a                    doap:Version;
+	dc:identifier        "MooX-Pression-0.400"^^xsd:string;
+	dc:issued            "2020-02-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support private/lexical attributes with `has $attr`.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support private/lexical methods with `method $name`.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Import option `keywords` to limit which keywords you import.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Pression-0.400.tar.gz>;
+	doap:revision        "0.400"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.022000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.052"^^doap-deps:CpanId ], [ doap-deps:on "PPR"^^doap-deps:CpanId ], [ doap-deps:on "Keyword::Simple"^^doap-deps:CpanId ], [
+		doap-deps:on "B::Hooks::EndOfScope 0.24"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Devel::StrictMode"^^doap-deps:CpanId ], [
+		doap-deps:on "Syntax::Keyword::Try 0.11"^^doap-deps:CpanId;
+	], [ doap-deps:on "Path::ScanINC"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>;
+	doap:created         "2020-01-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Zydeco>;
+	doap:homepage        <http://zydeco.toby.ink/>, <https://metacpan.org/release/Zydeco>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Zydeco";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-zydeco>;
+	];
+	doap:shortdesc       "Jazz up your Perl".
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.500"^^xsd:string;
+	dc:issued            "2020-02-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "MooX::Pression is now called Zydeco.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Restructure documentation.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better description.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.500.tar.gz>;
+	doap:revision        "0.500"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.501"^^xsd:string;
+	dc:issued            "2020-02-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Provide an `unimport` method.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better defaults of `factory_package` and `prefix` in latest MooX::Press.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.501.tar.gz>;
+	doap:revision        "0.501"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.502"^^xsd:string;
+	dc:issued            "2020-02-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "IMPORTS should be a level 1 heading.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.502.tar.gz>;
+	doap:revision        "0.502"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.503"^^xsd:string;
+	dc:issued            "2020-02-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow `version`, `extends`, and `with` to be part of a class/role/interface declaration instead of within the block.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.503.tar.gz>;
+	doap:revision        "0.503"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.504"^^xsd:string;
+	dc:issued            "2020-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Zydeco now has a website.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Zydeco vs MooX::Press.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.504.tar.gz>;
+	doap:revision        "0.504"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.505"^^xsd:string;
+	dc:issued            "2020-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix link to website (should not be HTTPS).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.505.tar.gz>;
+	doap:revision        "0.505"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.506"^^xsd:string;
+	dc:issued            "2020-02-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Public attributes may now have private accessors and delegations.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.506.tar.gz>;
+	doap:revision        "0.506"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.507"^^xsd:string;
+	dc:issued            "2020-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Cope when Zydeco is imported into the same package twice (but blow up if it's also the same lexical scope.).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.507.tar.gz>;
+	doap:revision        "0.507"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

@@ -7,7 +7,7 @@ use Data::Dumper;   # DEBUG
 use Carp qw(croak);
 use Keyword::Declare;   # {debug=>1};
 use List::Util::MaybeXS qw(all);
-use Scalar::Util qw(looks_like_number);
+use Scalar::Util qw(looks_like_number reftype);
 
 use vars;
 use Import::Into;
@@ -15,7 +15,7 @@ use Import::Into;
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use constant { true => !!1, false => !!0 };
 
@@ -121,6 +121,7 @@ sub _opts;
 sub _nexttestnum;
 sub _escapekit;
 sub _printtrace;
+sub _have;
 # }}}3
 # Caller-facing routines {{{1
 
@@ -326,12 +327,11 @@ C<< test_count == 1 >>.
     keyword os(String? $debug_var, Var? $opts_name, Num? $N,
                 Block|Statement $controlled)
     {
-
         # At this point, caller() is in Keyword::Declare.
         #my $target = caller(2);     # Skip past Keyword::Declare's code.
         #                            # TODO make this more robust.
 
-        if(defined $debug_var) {
+        if(length($debug_var)) {
             no strict 'refs';
             $debug_var =~ s/^['"]|['"]$//g;   # $debug_var comes with quotes
             ${$debug_var} = {opts_var_name => $opts_name, code => $controlled,
@@ -341,7 +341,7 @@ C<< test_count == 1 >>.
         }
 
         # Get the options
-        my $hrOptsName = $opts_name || '$TEST_ONLYSOME';
+        my $hrOptsName = length($opts_name) ? $opts_name : '$TEST_ONLYSOME';
 
 #        print STDERR "os: Options in $hrOptsName\n";
 #        _printtrace();
@@ -349,7 +349,7 @@ C<< test_count == 1 >>.
         croak "Need options as a scalar variable - got $hrOptsName"
             unless defined $hrOptsName && substr($hrOptsName, 0, 1) eq '$';
 
-        return _gen($hrOptsName, $controlled, $N);
+        return _gen($hrOptsName, $controlled, length($N) ? $N : undef);
     } # os() }}}2
 
 } # import()

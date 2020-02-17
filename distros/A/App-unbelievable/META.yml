@@ -1,0 +1,69 @@
+---
+abstract: 'Dancer2 static site generator'
+author:
+  - 'Chris White.'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.999, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-unbelievable
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::unbelievable:
+    file: lib/App/unbelievable.pm
+    version: v0.0.4
+  App::unbelievable::CLI:
+    file: lib/App/unbelievable/CLI.pm
+  App::unbelievable::Routes:
+    file: lib/App/unbelievable.pm
+  App::unbelievable::Util:
+    file: lib/App/unbelievable/Util.pm
+requires:
+  App::Wallflower: '0'
+  Dancer2: '0'
+  File::Find::Rule: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  Getopt::Long::Subcommand: '0'
+  IPC::System::Simple: '0'
+  Import::Into: '0'
+  JSON: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::DirIndex: '0'
+  Plack::Runner: '0'
+  Pod::Usage: '0'
+  Syntax::Highlight::Engine::Kate: '0'
+  Test::More: '0'
+  Text::FrontMatter::YAML: '0'
+  Text::MultiMarkdown: '0'
+  autodie: '0'
+  feature: '0'
+  parent: '0'
+  perl: '5.010001'
+  vars::i: '0'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/cxw42/unbelievable/issues
+  homepage: https://github.com/cxw42/unbelievable
+  repository: git://github.com/cxw42/unbelievable.git
+version: v0.0.4
+x_authority: cpan:CXW
+x_contributors:
+  - 'Chris White <cxwembedded@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

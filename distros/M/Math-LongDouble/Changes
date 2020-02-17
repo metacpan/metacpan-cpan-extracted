@@ -1,3 +1,10 @@
+ 0.22
+  - Fix t/overload.t to better handle BSD's mentally-retarded, fuck-brained bullshit.
+  - Fix cmp_NV() to correctly handle the case where the precision of the NV is greater
+    than the precision of the long double - a bug exposed by:
+    https://www.cpantesters.org/cpan/report/aa32922d-7005-1014-b734-fc97fbdab6a8
+
+
  0.21
   - Fix error in t/trig.t (in test 12 diagnostic message).
   - Prototype subroutines listed in 'use subs()'.

@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Moose" => 0,
     "Pod::Weaver::Role::Finalizer" => 0,
     "Pod::Weaver::Role::SortSections" => 0,
+    "Sort::Sub::pod_sections_ala_perlancar" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.081",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "Moose" => 0,
   "Pod::Weaver::Role::Finalizer" => 0,
   "Pod::Weaver::Role::SortSections" => 0,
+  "Sort::Sub::pod_sections_ala_perlancar" => 0,
   "Test::More" => 0,
   "namespace::autoclean" => 0
 );

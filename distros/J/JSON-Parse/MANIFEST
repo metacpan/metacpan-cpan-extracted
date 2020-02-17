@@ -33,6 +33,7 @@ MANIFEST.SKIP
 README
 script/validjson
 t/array.t
+t/bugzilla-2049.t
 t/collision.t
 t/JSON-Parse.t
 t/json-tokenize.t

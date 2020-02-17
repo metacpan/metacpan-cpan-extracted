@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 
 sub new
@@ -24,21 +24,35 @@ sub add_helper
   my $name = shift;
   my $code = shift;
 
-  if(defined $self->{helper}->{$name}->{code})
+  if(defined $self->{helper}->{$name})
   {
     require Carp;
     Carp::croak("duplicate implementation for interpolated key $name");
   }
 
-  while(@_)
+  my $require;
+
+  if(ref $_[0] eq 'CODE')
   {
-    my $module = shift;
-    my $version = shift;
-    $version ||= 0;
-    $self->{helper}->{$name}->{require}->{$module} = $version;
+    $require = shift;
+  }
+  else
+  {
+    $require = [];
+    while(@_)
+    {
+      my $module = shift;
+      my $version = shift;
+      $version ||= 0;
+      push @$require, $module => $version;
+    }
   }
 
-  $self->{helper}->{$name}->{code} = $code;
+  $self->{helper}->{$name} = Alien::Build::Helper->new(
+    $name,
+    $code,
+    $require,
+  );
 }
 
 
@@ -55,9 +69,14 @@ sub has_helper
 {
   my($self, $name) = @_;
 
-  foreach my $module (keys %{ $self->{helper}->{$name}->{require} })
+  return unless defined $self->{helper}->{$name};
+
+  my @require = $self->{helper}->{$name}->require;
+
+  while(@require)
   {
-    my $version = $self->{helper}->{$name}->{require}->{$module};
+    my $module  = shift @require;
+    my $version = shift @require;
 
     {
       my $pm = "$module.pm";
@@ -73,14 +92,14 @@ sub has_helper
         my $helpers = $module->alien_helper;
         foreach my $k (keys %$helpers)
         {
-          $self->{helper}->{$k}->{code} = $helpers->{$k};
+          $self->{helper}->{$k}->code($helpers->{$k});
         }
       }
       $self->{classes}->{$module} = 1;
     }
   }
 
-  my $code = $self->{helper}->{$name}->{code};
+  my $code = $self->{helper}->{$name}->code;
 
   return unless defined $code;
 
@@ -150,8 +169,8 @@ sub requires
 {
   my($self, $string) = @_;
   map {
-    my $name = $_;
-    map { $_ => $self->{helper}->{$name}->{require}->{$_} || 0 } keys %{ $self->{helper}->{$name}->{require} }
+    my $helper = $self->{helper}->{$_};
+    $helper ? $helper->require : ();
   } $string =~ m{(?<!\%)\%\{([a-zA-Z_][a-zA-Z_0-9]+)\}}g;
 }
 
@@ -162,17 +181,58 @@ sub clone
 
   require Storable;
 
-  my %help;
-  foreach my $helper (keys %{ $self->{helper} })
+  my %helper;
+  foreach my $name (keys %{ $self->{helper} })
   {
-    $help{$helper}->{code}    = $self->{helper}->{$helper}->{code};
-    $help{$helper}->{require} = $self->{helper}->{$helper}->{require };
+    $helper{$name} = $self->{helper}->{$name}->clone;
   }
 
   my $new = bless {
-    helper => \%help,
+    helper => \%helper,
     classes => Storable::dclone($self->{classes}),
   }, ref $self;
+}
+
+package Alien::Build::Helper;
+
+sub new
+{
+  my($class, $name, $code, $require) = @_;
+  bless {
+    name    => $name,
+    code    => $code,
+    require => $require,
+  }, $class;
+}
+
+sub name { shift->{name} }
+
+sub code
+{
+  my($self, $code) = @_;
+  $self->{code} = $code if $code;
+  $self->{code};
+}
+
+sub require
+{
+  my($self) = @_;
+  if(ref $self->{require} eq 'CODE')
+  {
+    $self->{require} = [ $self->{require}->($self) ];
+  }
+  @{ $self->{require} };
+}
+
+sub clone
+{
+  my($self) = @_;
+  my $class = ref $self;
+  $class->new(
+    $self->name,
+    $self->code,
+    [ $self->require ],
+  );
 }
 
 1;
@@ -189,7 +249,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 CONSTRUCTOR
 

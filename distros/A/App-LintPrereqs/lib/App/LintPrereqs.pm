@@ -1,7 +1,7 @@
 package App::LintPrereqs;
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.540'; # VERSION
+our $DATE = '2019-12-17'; # DATE
+our $VERSION = '0.541'; # VERSION
 
 use 5.010001;
 use strict;
@@ -260,6 +260,7 @@ _
         fix => {
             schema => 'bool',
             summary => 'Attempt to automatically fix the errors',
+            cmdline_aliases => {F=>{}},
             description => <<'_',
 
 `lint-prereqs` can attempt to automatically fix the errors by
@@ -680,7 +681,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.540 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2019-05-12.
+This document describes version 0.541 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2019-12-17.
 
 =head1 SYNOPSIS
 

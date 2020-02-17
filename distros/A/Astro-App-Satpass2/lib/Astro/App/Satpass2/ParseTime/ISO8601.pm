@@ -7,12 +7,12 @@ use Astro::App::Satpass2::Utils qw{
     back_end __back_end_class_name_of_record __parse_class_and_args
     @CARP_NOT
 };
-use Astro::Coord::ECI::Utils 0.077 qw{
-    looks_like_number SECSPERDAY time_gm time_local };
+use Astro::Coord::ECI::Utils 0.112 qw{
+    looks_like_number SECSPERDAY greg_time_gm greg_time_local };
 
 use parent qw{ Astro::App::Satpass2::ParseTime };
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 my $package = __PACKAGE__;
 
@@ -102,9 +102,9 @@ sub delegate {
 	}
 	$offset += pop @date;
 	if ( $zone ) {
-	    return time_gm( reverse @date ) + $offset;
+	    return greg_time_gm( reverse @date ) + $offset;
 	} else {
-	    return time_local( reverse @date ) + $offset;
+	    return greg_time_local( reverse @date ) + $offset;
 	}
     };
 

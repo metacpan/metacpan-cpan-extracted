@@ -52,7 +52,8 @@ else {
 $ld = sqrt($ld);
 $nv = sqrt($nv);
 
-if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
+if(Math::LongDouble::_get_actual_ldblsize() != Math::LongDouble::_get_actual_nvsize()) {
+  # $ld != $nv
   my $cmp = cmp_NV($ld, $nv);
   if($cmp) {print "ok 7\n"}
   else {
@@ -62,6 +63,7 @@ if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
   }
 }
 else {
+  # $ld == $nv
   my $cmp = cmp_NV($ld, $nv);
   if(!$cmp && defined($cmp)) {print "ok 7\n"}
   else {

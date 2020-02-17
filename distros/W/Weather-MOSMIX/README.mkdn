@@ -1,0 +1,105 @@
+[//]: # "This file is generated from the documentation in lib/Weather/MOSMIX.pm."
+[//]: # "Please edit that file instead."
+
+[![Travis Build Status](https://travis-ci.org/Corion/Weather-MOSMIX.svg?branch=master)](https://travis-ci.org/Corion/Weather-MOSMIX)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Weather-MOSMIX?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Weather-MOSMIX)
+
+# NAME
+
+Weather::MOSMIX - Reader for MOSMIX weather forecast files
+
+# SYNOPSIS
+
+## `$mosmix->locations`
+
+Lists all locations with their names and longitude/latitude. If a longitude
+/ latitude pair is passed in, the list is ordered by the distance from
+that position.
+
+# SETUP
+
+1. Install the module
+2. Create a directory for the database
+
+        mkdir ~/weather ; cd ~/weather
+
+3. Create the database
+
+        mosmix-import.pl --create
+
+4. Set up a cron job to fetch the MOSMIX forecast
+
+        01 6,12,18,0 * * * cd /home/corion/weather; mosmix-import.pl
+        15 6,12,18,0 * * * cd /home/corion/weather; mosmix-purge.pl
+
+5. Query the current forecast
+
+        cd /home/corion/weather; mosmix-query.pl
+
+# SEE ALSO
+
+German Weather Service
+
+[https://opendata.dwd.de/weather/](https://opendata.dwd.de/weather/)
+
+[https://opendata.dwd.de/weather/local\_forecasts/mos/MOSMIX\_S/all\_stations/kml/](https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_S/all_stations/kml/)
+
+Other Weather APIs
+
+[https://openweathermap.org/api](https://openweathermap.org/api) - international, signup required
+
+[https://www.weatherbit.io/api](https://www.weatherbit.io/api) - international, signup required
+
+[https://developer.accuweather.com/](https://developer.accuweather.com/) - international, signup required
+
+[https://darksky.net/dev](https://darksky.net/dev) - paid, international, signup required
+
+[http://api.weather2020.com/](http://api.weather2020.com/) - international, signup required
+
+Overview of Open Data
+
+[https://index.okfn.org/place/de/weather/](https://index.okfn.org/place/de/weather/)
+[https://index.okfn.org/place/us/weather/](https://index.okfn.org/place/us/weather/)
+[https://index.okfn.org/place/lv/weather/](https://index.okfn.org/place/lv/weather/)
+[https://index.okfn.org/place/cy/weather/](https://index.okfn.org/place/cy/weather/)
+
+Cyprus forecast
+
+[http://www.moa.gov.cy/moa/ms/ms.nsf/DMLforecast\_general\_gr/DMLforecast\_general\_gr?opendocument](http://www.moa.gov.cy/moa/ms/ms.nsf/DMLforecast_general_gr/DMLforecast_general_gr?opendocument)
+
+## Icons
+
+[https://github.com/zagortenay333/Tempestacons](https://github.com/zagortenay333/Tempestacons)
+
+[https://thenounproject.com/search/?q=weather](https://thenounproject.com/search/?q=weather)
+
+[https://undraw.co/search](https://undraw.co/search)
+
+[https://coreui.io/icons/](https://coreui.io/icons/)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/weather-mosmix](https://github.com/Corion/weather-mosmix).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Weather-MOSMIX](https://rt.cpan.org/Public/Dist/Display.html?Name=Weather-MOSMIX)
+or via mail to [www-Weather-MOSMIX@rt.cpan.org](mailto:Weather-MOSMIX@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2019-2020 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

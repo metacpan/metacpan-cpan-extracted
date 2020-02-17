@@ -19,10 +19,8 @@ sub API_read ( $self, $auth, $args ) {
     else {
 
         # filter search
-        if ( my $search = delete $args->{where}->{search} ) {
-            my $val = "%$search->[1]%";
-
-            $where &= WHERE [ '"title" ILIKE', \$val ];
+        if ( my $search = delete $args->{where}->{title} ) {
+            $where &= WHERE [ '"title" ILIKE', \$search->[1] ];
         }
 
         $where &= WHERE [ $args->{where} ];

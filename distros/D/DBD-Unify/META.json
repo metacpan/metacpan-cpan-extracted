@@ -1,80 +1,80 @@
 {
-   "dynamic_config" : 1,
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "url" : "https://github.com/perl5-dbi/DBD-Unify",
-         "type" : "git",
-         "web" : "https://github.com/perl5-dbi/DBD-Unify"
-      }
-   },
-   "generated_by" : "Author",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-   ],
-   "name" : "DBD-Unify",
-   "provides" : {
-      "DBD::Unify::GetInfo" : {
-         "file" : "lib/DBD/Unify/GetInfo.pm",
-         "version" : "0.89"
-      },
-      "DBD::Unify" : {
-         "file" : "lib/DBD/Unify.pm",
-         "version" : "0.89"
-      },
-      "DBD::Unify::TypeInfo" : {
-         "file" : "lib/DBD/Unify/TypeInfo.pm",
-         "version" : "0.89"
-      }
-   },
-   "abstract" : "DBI driver for Unify database systems",
-   "release_status" : "stable",
-   "version" : "0.89",
    "license" : [
       "perl_5"
-   ],
-   "prereqs" : {
-      "build" : {
-         "requires" : {
-            "File::Copy" : "0",
-            "File::Find" : "0",
-            "Config" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Carp" : "0",
-            "DBI" : "1.42",
-            "DynaLoader" : "0",
-            "perl" : "5.008004"
-         },
-         "recommends" : {
-            "perl" : "5.020001",
-            "DBI" : "1.637"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "DBI::DBD" : "0",
-            "Config" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "Cwd" : "0"
-         }
-      },
-      "test" : {
-         "recommends" : {
-            "Test::More" : "1.302096"
-         },
-         "requires" : {
-            "Test::Harness" : "0",
-            "Test::More" : "0.90"
-         }
-      }
-   },
+      ],
+   "version" : "0.90",
    "meta-spec" : {
       "version" : 2,
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
+   "dynamic_config" : 1,
+   "provides" : {
+      "DBD::Unify::GetInfo" : {
+         "file" : "lib/DBD/Unify/GetInfo.pm",
+         "version" : "0.90"
+         },
+      "DBD::Unify::TypeInfo" : {
+         "file" : "lib/DBD/Unify/TypeInfo.pm",
+         "version" : "0.90"
+         },
+      "DBD::Unify" : {
+         "version" : "0.90",
+         "file" : "lib/DBD/Unify.pm"
+         }
+      },
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "generated_by" : "Author",
+   "abstract" : "DBI driver for Unify database systems",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/perl5-dbi/DBD-Unify",
+         "url" : "https://github.com/perl5-dbi/DBD-Unify"
+         }
+      },
+   "name" : "DBD-Unify",
+   "release_status" : "stable",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "DynaLoader" : "0",
+            "perl" : "5.008006",
+            "DBI" : "1.42",
+            "Carp" : "0"
+            },
+         "recommends" : {
+            "DBI" : "1.643",
+            "perl" : "5.030001"
+            }
+         },
+      "test" : {
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0.90"
+            },
+         "recommends" : {
+            "Test::More" : "1.302171"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "Config" : "0",
+            "File::Find" : "0"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "DBI::DBD" : "0",
+            "Config" : "0",
+            "Cwd" : "0"
+            }
+         }
+      }
    }
-}

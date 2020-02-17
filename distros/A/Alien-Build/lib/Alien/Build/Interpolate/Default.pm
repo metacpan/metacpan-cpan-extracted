@@ -4,9 +4,11 @@ use strict;
 use warnings;
 use base qw( Alien::Build::Interpolate );
 use File::chdir;
+use File::Which qw( which );
+use Capture::Tiny qw( capture );
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 sub _config
 {
@@ -23,16 +25,47 @@ sub new
   $self->add_helper( ar => sub { _config 'ar' }, 'Config' );
 
 
-  $self->add_helper( bison => undef, 'Alien::bison' => '0.17' );
+  $self->add_helper( bison => undef, sub {
+    my $helper = shift;
+    if(which 'bison')
+    {
+      $helper->code(sub { 'bison' });
+      return  ();
+    }
+    else
+    {
+      return 'Alien::bison' => '0.17';
+    }
+  });
 
 
-  $self->add_helper( bzip2 => undef, 'Alien::Libbz2' => '0.04' );
+  $self->add_helper( bzip2 => undef, sub {
+    my $helper = shift;
+    if(which 'bzip2')
+    {
+      $helper->code( sub { 'bzip2' });
+      return ();
+    }
+    else
+    {
+      return 'Alien::Libbz2' => '0.04';
+    }
+  });
 
 
   $self->add_helper( cc => sub { _config 'cc' }, 'Config' );
 
 
-  $self->add_helper( cmake => sub { 'cmake' }, 'Alien::CMake' => '0.07' );
+  $self->add_helper( cmake => sub { 'cmake' }, sub {
+    if(which 'cmake')
+    {
+      return ();
+    }
+    else
+    {
+      return 'Alien::CMake' => '0.07';
+    }
+  });
 
 
   $self->add_helper( cp => sub { _config 'cp' }, 'Config' );
@@ -41,13 +74,24 @@ sub new
   $self->add_helper( devnull => sub { $^O eq 'MSWin32' ? 'NUL' : '/dev/null' });
 
 
-  $self->add_helper( flex => undef, 'Alien::flex' => '0.08' );
+  $self->add_helper( flex => undef, sub {
+    my $helper = shift;
+    if(which 'flex')
+    {
+      $helper->code(sub { 'flex' });
+      return  ();
+    }
+    else
+    {
+      return 'Alien::flex' => '0.08';
+    }
+  });
 
 
   $self->add_helper( gmake => undef, 'Alien::gmake' => '0.11' );
 
 
-  $self->add_helper( install => sub { 'install' }, 'Alien::MSYS' => '0.07' );
+  $self->add_helper( install => sub { 'install' });
 
 
   $self->add_helper( ld => sub { _config 'ld' }, 'Config' );
@@ -56,17 +100,99 @@ sub new
   $self->add_helper( m4 => undef, 'Alien::m4' => '0.08' );
 
 
-  $self->add_helper( make => sub { _config 'make' }, 'Config' );
+  if($^O eq 'MSWin32')
+  {
+    # TL;DR: dmake is bad, and shouldn't be used to build anything but older
+    # versions of Windows Perl that don't support gmake.
+    my $perl_make = _config 'make';
+    my $my_make;
+    $self->add_helper( make => sub {
+      return $my_make if defined $my_make;
+
+      if( $perl_make ne 'dmake' && which $perl_make )
+      {
+        # assume if it is called nmake or gmake that it really is what it
+        # says it is.
+        if( $perl_make eq 'nmake' || $perl_make eq 'gmake' )
+        {
+          return $my_make = $perl_make;
+        }
+
+        my $out = capture { system $perl_make, '--version' };
+        if( $out =~ /GNU make/i || $out =~ /Microsoft \(R\) Program Maintenance/ )
+        {
+          return $my_make = $perl_make;
+        }
+
+      }
+
+      # if we see something that looks like it might be gmake, use that.
+      foreach my $try (qw( gmake mingw32-make ))
+      {
+        return $my_make = $try if which $try;
+      }
+
+      if( which 'make' )
+      {
+        my $out = capture { system 'make', '--version' };
+        if( $out =~ /GNU make/i || $out =~ /Microsoft \(R\) Program Maintenance/ )
+        {
+          return $my_make = 'make';
+        }
+      }
+
+      # if we see something that looks like it might be nmake, use that.
+      foreach my $try (qw( nmake ))
+      {
+        return $my_make = $try if which $try;
+      }
+
+      $my_make = $perl_make;
+    });
+  }
+  else
+  {
+    $self->add_helper( make => sub { _config 'make' }, 'Config' );
+  }
 
 
   $self->add_helper( mkdir_deep => sub { $^O eq 'MSWin32' ? 'md' : 'mkdir -p'}, 'Alien::Build' => '1.04' );
   $self->add_helper( make_path  => sub { $^O eq 'MSWin32' ? 'md' : 'mkdir -p'}, 'Alien::Build' => '1.05' );
 
 
-  $self->add_helper( nasm => undef, 'Alien::nasm' => '0.11' );
+  $self->add_helper( nasm => undef, sub {
+    my $helper = shift;
+    if(which 'nasm')
+    {
+      $helper->code(sub { 'nasm' });
+      return  ();
+    }
+    else
+    {
+      return 'Alien::nasm' => '0.11';
+    }
+  });
 
 
-  $self->add_helper( patch => undef, 'Alien::patch' => '0.09' );
+  $self->add_helper( patch => undef, sub {
+    my $helper = shift;
+    if(which 'patch')
+    {
+      if($^O eq 'MSWin32')
+      {
+        $helper->code(sub { 'patch --binary' });
+      }
+      else
+      {
+        $helper->code(sub { 'patch' });
+      }
+      return  ();
+    }
+    else
+    {
+      return 'Alien::patch' => '0.09';
+    }
+  });
 
 
   $self->add_helper( perl => sub {
@@ -93,7 +219,18 @@ sub new
 
 
 
-  $self->add_helper( xz => undef, 'Alien::xz' => '0.02' );
+  $self->add_helper( xz => undef, sub {
+    my $helper = shift;
+    if(which 'xz')
+    {
+      $helper->code(sub { 'xz' });
+      return  ();
+    }
+    else
+    {
+      return 'Alien::xz' => '0.02';
+    }
+  });
 
   $self;
 }
@@ -112,7 +249,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 CONSTRUCTOR
 
@@ -132,13 +269,13 @@ The ar command.
 
  %{bison}
 
-Requires: L<Alien::bison> 0.17
+Requires: L<Alien::bison> 0.17 if not already in C<PATH>.
 
 =head2 bzip2
 
  %{bzip2}
 
-Requires: L<Alien::Libbz2> 0.04
+Requires: L<Alien::Libbz2> 0.04 if not already in C<PATH>.
 
 =head2 cc
 
@@ -150,7 +287,10 @@ The C Compiler used to build Perl
 
  %{cmake}
 
-Requires: L<Alien::CMake> 0.07
+Requires: L<Alien::CMake> 0.07 if cmake is not already in C<PATH>.
+
+Deprecated: Use the L<Alien::Build::Plugin::Build::CMake> plugin instead (which will replace
+this helper with one that works with L<Alien::cmake3> that works better).
 
 =head2 cp
 
@@ -168,7 +308,7 @@ The null device, if available.  On Unix style operating systems this will be C</
 
  %{flex}
 
-Requires: L<Alien::flex> 0.08
+Requires: L<Alien::flex> 0.08 if not already in C<PATH>.
 
 =head2 gmake
 
@@ -176,11 +316,13 @@ Requires: L<Alien::flex> 0.08
 
 Requires: L<Alien::gmake> 0.11
 
+Deprecated: use L<Alien::Build::Plugin::Build::Make> instead.
+
 =head2 install
 
  %{install}
 
-The Unix C<install> command.  On C<MSWin32> this requires L<Alien::MSYS2>.
+The Unix C<install> command.  Not normally available on Windows.
 
 =head2 ld
 
@@ -194,11 +336,15 @@ The linker used to build Perl
 
 Requires: L<Alien::m4> 0.08
 
+L<Alien::m4> should pull in a version of C<m4> that will work with Autotools.
+
 =head2 make
 
  %{make}
 
-The make program used by Perl.
+Make.  On Unix this will be the same make used by Perl.  On Windows this will be
+C<gmake> or C<nmake> if those are available, and only C<dmake> if the first two
+are not available.
 
 =head2 make_path
 
@@ -211,13 +357,15 @@ on Unix and simply C<md> on windows.
 
  %{nasm}
 
-Requires: L<Alien::nasm> 0.11
+Requires: L<Alien::nasm> 0.11 if not already in the C<PATH>.
 
 =head2 patch
 
  %{patch}
 
-Requires: L<Alien::patch> 0.09
+Requires: L<Alien::patch> 0.09 if not already in the C<PATH>.
+
+On Windows this will normally render C<patch --binary>, which makes patch work like it does on Unix.
 
 =head2 perl
 
@@ -229,7 +377,7 @@ Requires: L<Devel::FindPerl>
 
  %{pkgconf}
 
-Requires: L<Alien::pkgconf> 0.06
+Requires: L<Alien::pkgconf> 0.06.
 
 =head2 cwd
 
@@ -239,7 +387,9 @@ Requires: L<Alien::pkgconf> 0.06
 
  %{sh}
 
-Unix style command interpreter (/bin/sh).  On MSWin32 this requires L<Alien::MSYS>.
+Unix style command interpreter (/bin/sh).
+
+Deprecated: use the L<Alien::Build::Plugin::Build::MSYS> plugin instead.
 
 =head2 rm
 
@@ -251,7 +401,7 @@ The remove command
 
  %{xz}
 
-Requires: L<Alien::xz> 0.02
+Requires: L<Alien::xz> 0.02 if not already in the C<PATH>.
 
 =head1 AUTHOR
 

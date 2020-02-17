@@ -1,0 +1,19 @@
+Game::RaycastFOV - raycast field-of-view and related routines
+
+this module can be installed using cpanm:
+
+    cpanm Game::RaycastFOV
+
+
+run perldoc(1) on Game::RaycastFOV for documentation
+
+
+to install from source code, with dependencies:
+
+    git clone https://github.com/thrig/Game-RaycastFOV
+    cd Game-RaycastFOV
+    cpanm .
+
+or the manual old fashioned way:
+
+    perl Build.PL && ./Build test && ./Build install

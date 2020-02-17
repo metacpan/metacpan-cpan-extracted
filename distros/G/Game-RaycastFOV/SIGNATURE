@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 b79f838a1cccdaf4c4bc3d018d2d897907b9aca658b9ec11086f15e8058384a2 Build.PL
+SHA256 f62d5c2b7fe1d9b889ff88f38cc2b1c295575400a94f98c941906e9674c0195a Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 bd5fe911592361650f2b3e720be5f438716ca4cc158e795c12a9a923e1462b34 MANIFEST
+SHA256 926beef5d1393b928f186ed21753d350ff8acafedf9bee219a9ffb1292f43eb9 META.json
+SHA256 e43963624987afe1357f48b4862fe9c82b8515d5fcefaf4ea73440803a06839d META.yml
+SHA256 a0c6c0e297c1923d57e1f73d9be6fbeff8333a7c3b3d50edf0027641c8452fdc README
+SHA256 cdeac231195c107f457e7d933fb8babf1e4e220bcc17dbc79c522eff4b482711 eg/show-circle
+SHA256 c0f4fc1211db0acba9e2c99b6f69877ffa44216d3ce1a88e80f05b0b184194bd lib/Game/RaycastFOV.pm
+SHA256 95b8f385f12a6e2b0385259863bc720c6d7d9e89ed24e95a34562799fe3885b4 lib/Game/RaycastFOV.xs
+SHA256 c7e9384c97d8fe91617406e8a90f26a7f468c608ffd6c415c4c66794d7094e1f lib/Game/typemap
+SHA256 cc1530d0edc99db4ef25a109299014b0b7184739dc370849815ac87b8fb6b788 ppport.h
+SHA256 7aad4b3f1bcd1e9cb7a4aaed032b7517c2fb5f4a22938a919177fd11acf39b88 t/00-load.t
+SHA256 a658bc9ea04d428ce61326bb5ec3277820dbdca86a08868b872323f4873efaca t/pod-coverage.t
+SHA256 d0972c349443a4f0230a4fbba1317af939f3c35a28562a54e37a2925ceb17517 t/pod.t
+SHA256 03be14e22c7ce63cd46a157c52b95f042ba031bf856f89f19501489250b925d4 t/raycast.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJeSXR9AAoJEIGZLuHhLAOFHh0H/355/ipAXderTPZ6C+/kE2r8
+htWT0jAfIYHaDa5mTm143LWvKD6iHAZpcgQYYLWB3iTEfKjDmHzkbvh3kAOsNYRp
+lhzO9OC/c8vPfxzudnjhPH5Wnc0XSzraPJQsxlOSyWp8b+8kOmh9BFc1aPyNZO9q
+YN/bAnqSPzlDmw9cTgv4GCEvLQinnLGwgRX7LjEe+yCXAESRDpkoyDTtz51ioPU8
+xYVkLg3BkkItVYXBVbJBQnLFI9+yZKy6B18A3gg5uR1eew3C7Qomv3X7YbXNrd92
+Dl/PSH7GZa8FSSjOow3vNWPEnSmiTQ/olZXGEyWigGBgfN59WtBlPne47/oyQyY=
+=36bG
+-----END PGP SIGNATURE-----

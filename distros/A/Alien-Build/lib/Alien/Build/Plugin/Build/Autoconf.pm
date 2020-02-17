@@ -8,7 +8,7 @@ use Path::Tiny ();
 use File::Temp ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 
 has with_pic       => 1;
@@ -98,7 +98,7 @@ sub init
           }
           else
           {
-            $configure = _win ? 'sh configure' : './configure';
+            $configure = _win ? 'sh ./configure' : './configure';
           }
           $configure .= ' --prefix=' . $prefix;
           $configure .= ' --with-pic' if $self->with_pic;
@@ -165,7 +165,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 SYNOPSIS
 
@@ -238,7 +238,7 @@ can also insert your own C<site.config> in addition by using this environment va
 
 =head1 SEE ALSO
 
-L<Alien::Build::Plugin::MSYS>, L<Alien::Build::Plugin>, L<Alien::Build>, L<Alien::Base>, L<Alien>
+L<Alien::Build::Plugin::Build::MSYS>, L<Alien::Build::Plugin>, L<Alien::Build>, L<Alien::Base>, L<Alien>
 
 L<https://www.gnu.org/software/autoconf/autoconf.html>
 

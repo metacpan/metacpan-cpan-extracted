@@ -12,7 +12,6 @@ author.yml
 dist.ini
 lib/Alien/libtool.pm
 maint/cip-before-install
-maint/cip-test
 t/00_diag.t
 t/alien_libtool.t
 xt/author/eol.t

@@ -1,6 +1,6 @@
 ## no critic (RequireUseStrict)
 package Inline::Lua;
-$Inline::Lua::VERSION = '0.15';
+$Inline::Lua::VERSION = '0.16';
 ## use critic (RequireUseStrict)
 use 5.006;
 use strict;
@@ -225,7 +225,7 @@ Inline::Lua - Perl extension for embedding Lua scripts into Perl code
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

@@ -43,6 +43,11 @@ subtest 'basic usage' => sub {
   $intr->replace_helper( foo1 => sub { 'newfoo1' } );
   is( $intr->interpolate("%{foo1}"), 'newfoo1' );
 
+  is
+    [$intr->requires('%{totallybogus}')],
+    [],
+  ;
+
   eval { $intr->interpolate('%{totallybogus}') };
   my $error = $@;
   like $error, qr/no helper defined for totallybogus/;
@@ -119,6 +124,25 @@ subtest 'has_helper' => sub {
 
   is($foo->(), 'foo3');
   is($bar->(), 'bar7');
+
+};
+
+subtest 'requirement callback' => sub {
+
+  my $intr = Alien::Build::Interpolate->new;
+
+  $intr->add_helper( foo1 => undef, sub { return ( 'Alien::libfoo' => '1' ) } );
+
+  is( [$intr->requires("%{foo1}")], [ 'Alien::libfoo' => '1' ], 'requires' );
+
+  $intr->add_helper( foo2 => undef, sub {
+    my $helper = shift;
+    $helper->code(sub { 'foo2' });
+    return ();
+  });
+
+  is( [$intr->requires("%{foo2}")], [], 'requires' );
+  is( $intr->interpolate('-%{foo2}-'), '-foo2-' );
 
 };
 

@@ -1,0 +1,36 @@
+0.004   2020-02-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module from Package::CopyFrom -> Package::CopyContents.
+
+
+0.003   2020-02-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Perinci::Package::CopyFrom.
+
+
+0.002   2020-02-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible change] Remove option 'overwrite' because the default
+	  overwrite=0 behavior is very fragile (copying will depend on whether
+	  user mentions the target variable or not). We now always overwrite,
+	  and to make sure we modify subroutines/variables after copying,
+	  perform copy_from in BEGIN then declare your subroutines/variables
+	  afterwards.
+
+	- Add option 'to'.
+
+	- [internal] Add (undocumented) hook options for internal purposes:
+	  _on_skip, _before_copy, _after_copy.
+
+        - [bugfix] Forgot to implement skip_sub.
+
+        - [bugfix] Forgot to skip subpackages.
+
+        - [test] Rewrite/add tests.
+
+
+0.001   2019-02-15  Released-By: PERLANCAR
+
+        - First release.

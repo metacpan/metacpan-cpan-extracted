@@ -1,0 +1,19 @@
+Revision history for Net::DNS::Resolver::Mock
+
+1.20200215 2020-02-15 15:07:49+00:00 UTC
+  - Add missing Changelog
+  - Debugging mode with output via STDERR and method
+
+1.20200214
+  - Add Mocking of Exceptions
+
+1.20171219
+  - Add CNAME lookups
+  - Bugfix PTR lookups
+
+1.20171031
+  - Improve tests
+
+1.20170814
+  - First release
+

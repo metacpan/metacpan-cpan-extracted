@@ -58,3 +58,6 @@ Revision history for Perl extension Date::Holidays::CZ
 - CZ.pm: Add license text to main module POD
 - t/pod.t: test POD
 
+0.19 2020-02-17 12:21 CET
+- Fixed pod error as reported by CPANTS
+

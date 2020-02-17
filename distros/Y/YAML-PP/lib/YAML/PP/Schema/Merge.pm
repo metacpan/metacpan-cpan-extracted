@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Merge;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use YAML::PP::Type::MergeKey;
 
@@ -31,7 +31,8 @@ YAML::PP::Schema::Merge - Enabling YAML merge keys for mappings
 =head1 SYNOPSIS
 
     use YAML::PP;
-    my $yp = YAML::PP->new( schema => [qw/ JSON Merge /] );
+    my $yp = YAML::PP->new( schema => [qw/ + Merge /] );
+
     my $yaml = <<'EOM';
     ---
     - &CENTER { x: 1, y: 2 }

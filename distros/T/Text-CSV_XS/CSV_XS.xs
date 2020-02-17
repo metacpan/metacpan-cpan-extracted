@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007-2019 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
  *  Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
@@ -42,11 +42,19 @@
 #define HOOK_AFTER_PARSE	0x0002
 #define HOOK_BEFORE_PRINT	0x0004
 
+#ifdef __THW_370__
+#define CH_TAB		'\005'
+#define CH_NL		'\025'
+#define CH_CR		'\015'
+#define CH_SPACE	'\100'
+#define CH_DEL		'\007'
+#else
 #define CH_TAB		'\011'
 #define CH_NL		'\012'
 #define CH_CR		'\015'
 #define CH_SPACE	'\040'
 #define CH_DEL		'\177'
+#endif
 #define CH_EOLX		1215
 #define CH_EOL		*csv->eol
 #define CH_SEPX		8888
@@ -153,7 +161,7 @@ typedef struct {
 
     byte *	cache;
 
-    SV *	pself;
+    SV *	pself;	/* PL_self, for error_diag */
     HV *	self;
     SV *	bound;
 
@@ -197,7 +205,7 @@ static const xs_error_t xs_errors[] =  {
     { 1000, "INI - constructor failed"						},
     { 1001, "INI - sep_char is equal to quote_char or escape_char"		},
     { 1002, "INI - allow_whitespace with escape_char or quote_char SP or TAB"	},
-    { 1003, "INI - \r or \n in main attr not allowed"				},
+    { 1003, "INI - \\r or \\n in main attr not allowed"				},
     { 1004, "INI - callbacks should be undef or a hashref"			},
     { 1005, "INI - EOL too long"						},
     { 1006, "INI - SEP too long"						},
@@ -269,7 +277,7 @@ static SV *m_getline, *m_print;
 #define is_EOL(c) (c == CH_EOLX)
 
 #define __is_SEPX(c) (c == CH_SEP && (csv->sep_len == 0 || (\
-    csv->size - csv->used >= (STRLEN)csv->sep_len - 1				&&\
+    csv->size - csv->used >= (STRLEN)csv->sep_len - 1			&&\
     !memcmp (csv->bptr + csv->used, csv->sep + 1, csv->sep_len - 1)	&&\
     (csv->used += csv->sep_len - 1)					&&\
     (c = CH_SEPX))))
@@ -289,7 +297,7 @@ static byte _is_SEPX (unsigned int *c, csv_t *csv, int line) {
 #endif
 
 #define __is_QUOTEX(c) (CH_QUOTE && c == CH_QUOTE && (csv->quo_len == 0 || (\
-    csv->size - csv->used >= (STRLEN)csv->quo_len - 1				&&\
+    csv->size - csv->used >= (STRLEN)csv->quo_len - 1			&&\
     !memcmp (csv->bptr + csv->used, csv->quo + 1, csv->quo_len - 1)	&&\
     (csv->used += csv->quo_len - 1)					&&\
     (c = CH_QUOTEX))))
@@ -337,7 +345,8 @@ static SV *cx_SvDiag (pTHX_ int xse) {
 #define SetDiag(csv,xse)	cx_SetDiag (aTHX_ csv, xse)
 static SV *cx_SetDiag (pTHX_ csv_t *csv, int xse) {
     dSP;
-    SV *err = SvDiag (xse);
+    SV *err   = SvDiag (xse);
+    SV *pself = csv->pself;
 
     last_error = xse;
 	(void)hv_store (csv->self, "_ERROR_DIAG",  11, err,          0);
@@ -349,13 +358,17 @@ static SV *cx_SetDiag (pTHX_ csv_t *csv, int xse) {
 	}
     if (xse == 2012) /* EOF */
 	(void)hv_store (csv->self, "_EOF",          4, &PL_sv_yes,   0);
-    if (csv->pself && csv->auto_diag) {
+    if (csv->auto_diag) {
+	unless (_is_hashref (pself))
+	    pself = newRV_inc ((SV *)csv->self);
 	ENTER;
 	PUSHMARK (SP);
-	XPUSHs (csv->pself);
+	XPUSHs (pself);
 	PUTBACK;
 	call_pv ("Text::CSV_XS::error_diag", G_VOID | G_DISCARD);
 	LEAVE;
+	unless (pself == csv->pself)
+	    sv_free (pself);
 	}
     return (err);
     } /* SetDiag */

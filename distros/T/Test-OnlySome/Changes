@@ -1,5 +1,15 @@
 Revision history for Test-OnlySome
 
+0.001005    2020-02-14
+
+    - Non-TRIAL release of 0.001004.
+    - Added cpanfile for ease of dependency installation.
+
+0.001004    2020-02-07 (TRIAL RELEASE)
+
+    - Changes to support Keyword::Declare 0.001015+
+      (GH-15) and [RT#131643].  See also [RT#131661] in K::D.
+
 0.001003    2019-02-14
 
     - More robust installation process

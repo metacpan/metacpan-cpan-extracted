@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-OnlySome",
    "no_index" : {
@@ -89,7 +89,7 @@
       },
       "Test::OnlySome" : {
          "file" : "lib/Test/OnlySome.pm",
-         "version" : "0.001003"
+         "version" : "0.001005"
       },
       "Test::OnlySome::PathCapsule" : {
          "file" : "lib/Test/OnlySome/PathCapsule.pm",
@@ -108,6 +108,6 @@
          "web" : "https://github.com/cxw42/Test-OnlySome"
       }
    },
-   "version" : "0.001003",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.001005",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

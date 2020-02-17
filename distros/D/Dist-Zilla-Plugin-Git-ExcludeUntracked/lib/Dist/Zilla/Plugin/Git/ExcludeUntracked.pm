@@ -1,6 +1,6 @@
 ## no critic (RequireUseStrict)
 package Dist::Zilla::Plugin::Git::ExcludeUntracked;
-$Dist::Zilla::Plugin::Git::ExcludeUntracked::VERSION = '0.05';
+$Dist::Zilla::Plugin::Git::ExcludeUntracked::VERSION = '0.06';
 ## use critic (RequireUseStrict)
 use Moose;
 use File::Find;
@@ -70,7 +70,7 @@ Dist::Zilla::Plugin::Git::ExcludeUntracked - Excludes untracked files from your 
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -103,7 +103,7 @@ Rob Hoelz <rob@hoelz.ro>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Rob Hoelz.
+This software is copyright (c) 2020 by Rob Hoelz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -111,7 +111,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked/issues
+L<https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

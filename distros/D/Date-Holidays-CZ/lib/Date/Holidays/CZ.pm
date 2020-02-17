@@ -10,7 +10,7 @@ use Exporter qw( import );
 use POSIX qw(strftime);
 use Time::Local;
 
-
+=encoding utf8
 
 =head1 NAME
 
@@ -39,11 +39,11 @@ our @EXPORT_OK = qw( holidays );
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION   = '0.18';
+our $VERSION   = '0.19';
 
 
 

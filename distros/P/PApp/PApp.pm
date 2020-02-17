@@ -1,8 +1,3 @@
-#if (!defined $PApp::_compiled) { eval do { local $/; <DATA> }; die if $@ } 1;
-#__DATA__
-
-##line 4 "(PApp.pm)"
-
 ##########################################################################
 ## All portions of this code are copyright (c) 2003,2004 nethype GmbH   ##
 ##########################################################################
@@ -81,7 +76,7 @@ have some tutorials in sdf and html format.
 
 package PApp;
 
-use 5.006;
+use 5.010;
 
 use common::sense;
 
@@ -123,7 +118,7 @@ use PApp::DataRef ();
 use Convert::Scalar qw(:utf8 weaken);
 
 BEGIN {
-   our $VERSION = 2.1;
+   our $VERSION = 2.2;
 
    use base Exporter::;
 

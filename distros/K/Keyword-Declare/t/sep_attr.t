@@ -4,7 +4,7 @@ use strict;
 
 use Test::More;
 
-BEGIN { plan tests => 17; }
+BEGIN { plan tests => 19; }
 
 
     use Keyword::Declare;
@@ -20,19 +20,24 @@ BEGIN { plan tests => 17; }
         for my $numblock (@numblocks) {
             ok $numblock =~ $NumBlock, "$numblock->{block} is NumBlock $numblock->{num}";
         }
-        return 'ok 1, "Transformation of code";';
+        return 'ok 1, "tryall: transformation of code at line " . __LINE__ ;';
     }
 
     keyword tryany (NumBlock* $numblocks :sep(Comma)) {
         for my $numblock (split /\s*,\s*/, $numblocks) {
             ok $numblock =~ $NumBlock, "$+{block} is NumBlock $+{num}";
         }
-        return 'ok 1, "Transformation of code";';
+        return 'ok 1, "tryany: transformation of code at line " . __LINE__ ;';
     }
 
     keyword tryone (NumBlock $numblock) {
         ok $numblock =~ $NumBlock, "$numblock->{block} is NumBlock $numblock->{num}";
-        return 'ok 1, "Transformation of code";';
+        return 'ok 1, "tryone: transformation of code at line " . __LINE__ ;';
+    }
+
+    keyword trynone (NumBlock? $numblock) {
+        ok $numblock eq "", "trynone empty";
+        return 'ok 1, "trynone: transformation of code at line " . __LINE__ ;';
     }
 
     tryall
@@ -53,6 +58,8 @@ BEGIN { plan tests => 17; }
          4 { die              },
          5 { say 'four'       },
          6 { say 'five'       };
+
+    trynone;
 
 done_testing();
 

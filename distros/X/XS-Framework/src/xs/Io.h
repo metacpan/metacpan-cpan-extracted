@@ -1,6 +1,9 @@
 #pragma once
 #include <xs/Sv.h>
 
+// remove OpenBSD pollution macro
+#undef fileno
+
 namespace xs {
 
 using xs::my_perl;

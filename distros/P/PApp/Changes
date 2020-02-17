@@ -1,6 +1,15 @@
 Revision history for Perl extension PApp
 
-TODO: PApp::FormBuffer endless loop in skip_boundary calling _refill
+TODO: more xs for _obj_member_add
+
+2.2  Mon Feb 17 11:20:25 CET 2020
+	- greatly improved papp-scgid implementation and worker management.
+	- rewrite PApp::SCGI implementation.
+	- support stdin/stdout members for PApp::CGI objects.
+        - remove the eval workaround for older perls.
+        - PApp::CGI will now generate relative redirects, as per RFC 7231.
+        - implement Agni::obj_by_name and use it to allow names in more places.
+        - allow obj_by_name specs in PApp application specs.
 
 2.1  Thu Feb 11 08:18:30 CET 2016
 	- $PApp::SQL::DBH and ::Database are now set during all of the

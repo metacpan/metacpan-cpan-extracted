@@ -59,7 +59,7 @@ sub from_col_by_col {
         $sf->__print_args( $aoa );
         # Choose a number
         my $col_count = $tu->choose_a_number( 2,
-            { current_selection_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
+            { cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm', back => 'Back' }
         );
         if ( ! $col_count ) {
             return;

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.232';
+our $VERSION = '2.235';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.232
+Version 2.235
 
 =head1 SYNOPSIS
 
@@ -526,7 +526,7 @@ Transpose columns to rows.
 
 Convert fields containing an empty string to NULL (undefined).
 
-With I<Plain> and I<Copy & Paste> this filter is enabled by default.
+The default values for this filter can be set with the option L<Empty to Null>.
 
 =item Reset
 
@@ -1164,6 +1164,10 @@ eol
 Set Text::CSV options not mentioned in I<CSV settings-a>:
 
 For the meaning of the different options see L<Text::CSV>.
+
+=head3 Empty to Null
+
+Set the I<empty_to_null> defaults for the different data source types.
 
 =head3 File encoding
 

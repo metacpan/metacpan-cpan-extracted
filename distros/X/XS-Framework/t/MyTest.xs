@@ -2,6 +2,7 @@
 #include <panda/exception.h>
 
 using namespace xs;
+using panda::string;
 
 MODULE = MyTest                PACKAGE = MyTest
 PROTOTYPES: DISABLE
@@ -31,3 +32,11 @@ void throw_backtrace() {
     throw panda::exception("my-error");
 }
 
+uint64_t test_leaks1 (string cls, string meth, int cnt) {
+    RETVAL = 0;
+    for (int i = 0; i < cnt; ++i) {
+        Stash stash(cls);
+        auto ref = stash.call(meth);
+        RETVAL += (uint64_t)ref.get();
+    }
+}

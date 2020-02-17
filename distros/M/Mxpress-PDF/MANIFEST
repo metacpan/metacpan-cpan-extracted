@@ -1,11 +1,16 @@
 Changes
+ignore.txt
 lib/Mxpress/PDF.pm
 Makefile.PL
 MANIFEST			This list of files
+mxpdf
 README
 t/00-load.t
 t/01-test.t
 t/02-page.t
+t/conf.yml
+t/content.txt
+t/hand-cross.png
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

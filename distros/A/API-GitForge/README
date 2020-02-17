@@ -1,0 +1,60 @@
+API::GitForge
+-------------
+
+Generic interface to git forges (like GitHub, GitLab etc.) and some
+scripts which make use of this interface.
+
+API::GitForge -- functions to create objects which do
+                 API::GitForge::Role::GitForge
+
+git-clean-forge-fork -- create tidy forks for pull requests
+
+git-clean-forge-repo -- create repos on git forges with optional
+                        features disabled
+
+git-nuke-forge-fork -- delete forks created by git-clean-forge-fork(1)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+If you don't see Makefile.PL, it can be generated from dist.ini using
+Dist::Zilla's 'dzil' program.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module and its
+scripts with the perldoc & man commands.
+
+    % perldoc API::GitForge
+    % man git-clean-forge-fork
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (please see CONTRIBUTING.rst)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=API-GitForge
+
+    MetaCPAN
+        https://metacpan.org/release/API-GitForge
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017, 2020  Sean Whitton <spwhitton@spwhitton.name>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

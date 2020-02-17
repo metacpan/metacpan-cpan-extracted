@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -258,15 +258,19 @@ sub instance {
     return $object->isa( $class );
 }
 
-
-{
-    my %loaded;
+sub _get_my_lib {
     my $my_lib = my_dist_config();
     if ( defined $my_lib ) {
 	$my_lib = File::Spec->catdir( $my_lib, 'lib' );
 	-d $my_lib
 	    or $my_lib = undef;
     }
+    return $my_lib;
+}
+
+
+{
+    my %loaded;
 
     # CAVEAT:
     #
@@ -294,7 +298,7 @@ sub instance {
 
 	local @INC = @INC;
 
-	my $use_lib = exists $opt->{lib} ? $opt->{lib} : $my_lib;
+	my $use_lib = exists $opt->{lib} ? $opt->{lib} : _get_my_lib();
 	if ( defined $use_lib ) {
 	    require lib;
 	    lib->import( $use_lib );
@@ -377,6 +381,7 @@ sub merge_hashes {	## no critic (RequireArgUnpacking)
     return \%rslt;
 }
 
+use constant MY_PACKAGE_NAME	=> 'Astro-App-Satpass2';
 
 sub my_dist_config {
     my ( $opt ) = @_;
@@ -384,10 +389,24 @@ sub my_dist_config {
     defined $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR}
 	and return Cwd::abs_path( $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR} );
 
+    my $code = __PACKAGE__->can( "_my_dist_config_$^O" ) || \&_my_dist_config_;
+    return $code->( $opt );
+}
+
+sub _my_dist_config_ {
+    my ( $opt ) = @_;
     return File::HomeDir->my_dist_config(
-	'Astro-App-Satpass2',
+	MY_PACKAGE_NAME,
 	{ create => $opt->{'create-directory'} },
     );
+}
+
+# Called dynamically by my_dist_config() if $^O is 'darwin'.
+sub _my_dist_config_darwin {	## no critic (ProhibitUnusedPrivateSubroutines)
+    # my ( $opt ) = @_;
+    my $rslt = File::HomeDir->my_dist_data( MY_PACKAGE_NAME )
+	or goto &_my_dist_config_;
+    return $rslt;
 }
 
 sub __parse_class_and_args {
@@ -627,6 +646,23 @@ the C<File::HomeDir> C<'create'> option.
 
 If the configuration directory is found or successfully created, the
 path to it is returned. Otherwise C<undef> is returned.
+
+=head3 my_dist_config under macOS
+
+Under macOS 10.15 Catalina it has proven difficult/impossible to grant a
+launchd job access to the F<Documents/> directory, which is where
+L<File::HomeDir|File::HomeDir> puts the configuration data.
+
+To give the user a way to work around this, the C<darwin> implementation
+checks C<< File::HomeDir->my_dist_data( 'Astro-App-Satpass2' ) >> after
+the environment variable, but before the L<File::HomeDir|File::HomeDir>
+C<my_dist_config()> directory.
+
+The C<my_dist_data()> directory is
+F<~/Library/Application Support/Perl/dist/Astro-App-Satpass2/>, which is
+accessible from C<launchd> jobs, at least as of macOS 10.15 Catalina.
+This directory will B<not> be created if it does not exist, even if a
+true value was specified for the C<'create-directory'> option.
 
 =head2 __parse_class_and_args
 

@@ -1,9 +1,9 @@
 package Sah::SchemaR::perl::unqualified_funcname;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2020-02-15'; # DATE
+our $VERSION = '0.027'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\n",match=>"\\A[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, must not be qualified with a package name"}],["str"]];
+our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nThis schema includes syntax validity check only; it does not check whether the\nfunction actually exists.\n\nThis schema includes syntax validity check only; it does not check whether the\nfunction actually exists.\n\n",match=>"\\A[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, must not be qualified with a package name"}],["str"]];
 
 1;
 # ABSTRACT: Perl function name, must not be qualified with a package name
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::unqualified_funcname - Perl function name, must not be quali
 
 =head1 VERSION
 
-This document describes version 0.026 of Sah::SchemaR::perl::unqualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
+This document describes version 0.027 of Sah::SchemaR::perl::unqualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

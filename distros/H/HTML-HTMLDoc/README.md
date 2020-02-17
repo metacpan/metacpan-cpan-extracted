@@ -194,6 +194,24 @@ $htmldoc->set\_header('.', 'l', '.');
 
 Reads out a previous set logo-image. You will get the filename to the image.
 
+## set\_letterhead($image)
+
+Sets the image to use as a letter for the document. $image is the path to the image in your filesystem. 
+The image should be 72DPI, and for portrait mode, 620-650 pixels wide and 72-90 pixels tall.
+The supported formats are BMP, GIF, JPEG, and PNG.
+
+This only works when the header is set to '.L.', and this method will automatically set\_header()
+to create that settings.
+
+NOTE: This option is compatible with HTMLDOC 1.9.8 and higher. As of Feb. 14, 2020, that version is
+available from cloning (and manual compile) from the HTMLDOC Git rep: [https://github.com/michaelrsweet/htmldoc](https://github.com/michaelrsweet/htmldoc)
+
+$htmldoc->set\_letterhead('myletterhead.png');
+
+## get\_letterhead()
+
+Reads out a previous set letterhead image. You will get the filename to the image.
+
 ## set\_browserwidth($width)
 
 Specifies the browser width in pixels. The browser width is used to scale images and pixel measurements when generating PostScript and PDF files. It does not affect the font size of text.

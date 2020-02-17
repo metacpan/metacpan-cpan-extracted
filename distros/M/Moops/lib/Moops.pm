@@ -6,7 +6,7 @@ no warnings qw(void once uninitialized numeric);
 package Moops;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.037';
+our $VERSION   = '0.038';
 
 use Exporter::Tiny qw(mkopt);
 use Keyword::Simple qw();
@@ -233,9 +233,8 @@ Moops will remain on CPAN for the foreseeable future and I'll continue
 to accept patches that fix bugs, but don't expect any new features to
 be added.
 
-For a replacement, consider L<MooX::Pression>. It's not a drop-in
-replacement but it has a similar syntax to Moops, and provides many
-of the same features.
+For a replacement, consider L<Zydeco>. It's not a drop-in replacement but
+it has a similar syntax to Moops, and provides many of the same features.
 
 =head1 DESCRIPTION
 
@@ -834,6 +833,14 @@ Try installing L<Alt::Devel::CallParser::ButWorking>.
 
 Please report any other bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Moops>.
+
+=head1 GOTCHAS
+
+Certain software (like the CPAN indexer!) greps Perl source code looking
+for C<package> statements to determine which packages a module provides.
+Moops uses C<class> and C<role> keywords to declare packages, so it may
+be necessary to provide some dummy C<package> statements at the end of your
+module if you need to support such software.
 
 =head1 SUPPORT
 

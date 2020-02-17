@@ -1,3 +1,9 @@
+1.83    2020-02-15      Remove dependency on Data::Compare, which in turn
+                          depends on non-pure-perl XS in CLone.pm
+
+1.82    2020-02-15      Fix build bug affecting perl 5.8 when AUTOMATED_TESTING
+                          is set (https://github.com/DrHyde/perl-modules-Devel-CheckOS/pull/23)
+
 1.81    2018-01-23      Restore 5.6 and 5.8 compatibility;
                         Cope better in tests when @INC is humungous
 

@@ -19,6 +19,7 @@ my $ok = '';
 
 my $bizarre_perl = 0;
 if(17.1 + 0 != 17.1) { $bizarre_perl = 1 }
+if($zero + "$str" != "$str") { $bizarre_perl = 2 }
 
 # +
 

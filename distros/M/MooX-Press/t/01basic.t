@@ -24,7 +24,10 @@ use strict;
 use warnings;
 use Test::More;
 
-use_ok('MooX::Press');
+{
+	package MyApp;
+	::use_ok('MooX::Press');
+}
 
 done_testing;
 

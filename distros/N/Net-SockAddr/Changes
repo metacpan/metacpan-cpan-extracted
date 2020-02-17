@@ -1,2 +1,5 @@
+1.0.1    17.02.2020
+         - fix freebsd thread_local global destruction
+         - fix older compilers
 1.0.0    21.01.2020
          - first release

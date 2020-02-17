@@ -36,7 +36,7 @@ no bytes;
 
 use common::sense;
 
-our $VERSION = 2.1;
+our $VERSION = 2.2;
 our @EXPORT = qw(
 
       errbox
@@ -344,7 +344,7 @@ sub javascript($) {
 Create a mailto url with the specified headers (see RFC 2368). All values
 will be properly escaped for you. Example:
 
- mailto_url "schmorp@schmorp.de",
+ mailto_url "schmorp\@schmorp.de",
             subject => "Mail from me",
             body => "hello, world!";
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +18,8 @@ no_index:
     - t
     - inc
 requires:
+  AnyEvent: '7.12'
+  AnyEvent::Fork: '1.31'
   Compress::LZF: '1'
   Convert::Scalar: '1.02'
   Crypt::Twofish2: '0.01'
@@ -33,5 +35,5 @@ requires:
   URI: '1.22'
   XML::Parser: '2.31'
   XML::Sablotron: '1.0100001'
-  common::sense: '3.3'
-version: 2.1
+  common::sense: '3.74'
+version: 2.2

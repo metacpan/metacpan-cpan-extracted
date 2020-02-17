@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Scatter::Selected::Marker;
 use Chart::Plotly::Trace::Scatter::Selected::Textfont;
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatter.
 
@@ -57,7 +57,7 @@ Chart::Plotly::Trace::Scatter::Selected - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

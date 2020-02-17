@@ -1,0 +1,148 @@
+#!perl
+use strict;
+use warnings;
+use Mxpress::PDF;
+use YAML::XS qw/LoadFile/;
+use feature qw/say/;
+
+my $filename = shift or die 'no filename passed';
+my $conf = shift;
+my $content = shift;
+
+if ($conf) {
+	$conf = LoadFile($conf);
+} else {
+	$conf = {
+		page => {
+			background => '#fff',
+			padding => 5
+		},
+		title => {
+			margin_bottom => 5,
+		},
+		subtitle => {
+			margin_bottom => 5,
+		},
+		subsubtitle => {
+			margin_bottom => 5,
+		},
+		text => {
+			margin_bottom => 5,
+			align => 'justify'
+		},
+	};
+}
+
+my $file = Mxpress::PDF->new_pdf($filename, $conf);
+
+$file->page->header->add(
+	show_page_num => 'left',
+	page_num_text => "page {num}",
+	h => $file->mmp(10),
+	padding => 5
+);
+ 
+$file->page->footer->add(
+	show_page_num => 'right',
+	page_num_text => "page {num}",
+	h => $file->mmp(10),
+	padding => 5
+);
+ 
+$file->title->add(
+	'Table of Contents'
+)->toc->placeholder;
+
+my %map = (
+	'=' => ['title', sub {
+		$_[0]->toc->add(title => $_[1])
+	}],
+	'==' => ['subtitle', sub {
+		$_[0]->toc->add(subtitle => $_[1])
+	}],
+	'===' => ['subsubtitle', sub {
+		$_[0]->toc->add(subsubtitle => $_[1])
+	}],
+	'=i=' => ['image', sub {
+		$_[0]->image->add($_[1])
+	}],
+);
+
+my $reg = sprintf('^(%s)', join '|', map { quotemeta($_) } sort { length $b <=> length $a } keys %map);
+
+my $plug = sub {
+	my $line = shift;
+	$line =~ s/$reg//;
+	my $plug = $1 || 'text';
+	$map{$plug}[1]->($file, $line);
+	say 'Added: ' . $map{$plug}[0];
+};
+
+unless ($content) {
+	say 'Generate a pdf using STDIN input.';
+	say 'Input is added per STDIN line'; 
+	say 'You can prefix lines with the following markup';
+	say sprintf('%s - %s', ucfirst($map{$_}[0]),  $_) for sort keys %map;
+	say 'Waiting Input:';
+} else {
+	say 'Generate a pdf from passed content';
+}
+
+$map{text} = ['text', sub {
+	$_[0]->text->add($_[1])
+}];
+
+if ($content) {
+	open my $file, '<', $content or die;
+	while (<$file>) {$plug->($_);}
+	close $file;
+} else {
+	while (1) {
+		my $line = <STDIN>;
+		chomp $line;
+		last if $line eq 'save';
+		$plug->($line);
+	}
+}
+
+say 'Saving PDF';
+
+$file->save();
+
+=head1 NAME
+ 
+mxpdf - PDF CLA
+ 
+=head1 USAGE
+ 
+        lnation:Aloha lnation$ mxpdf pdf-name
+
+or
+
+	lnation:Aloha lnation$ mxpdf pdf-name path/to/conf
+
+or
+
+	lnation:Aloha lnation$ mxpdf pdf-name path/to/conf path/to/content
+ 
+Input is parsed per line.
+	
+You can currently prefix lines with the following markup
+
+	=Title
+	==Subtitle
+	===Subsubtitle=
+	=i=path/to/image.png
+
+The configuration file should be in yaml format.
+
+	---
+	page:
+	    background: '#f00'
+	    padding: 10	
+
+To exit from the STDIN input - type
+
+	save
+
+=cut

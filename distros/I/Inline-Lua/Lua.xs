@@ -128,7 +128,11 @@ push_ary (lua_State *L, AV *av) {
 
     for (i = 0; i <= av_len(av); i++) {
 	SV **ptr = av_fetch(av, i, FALSE);
+#if LUA_VERSION_NUM < 503
 	lua_pushnumber(L, (lua_Number)i+1);
+#else
+	lua_pushinteger(L, (lua_Integer)i+1);
+#endif
 	if (ptr)
 	    push_val(L, *ptr);
 	else
@@ -236,7 +240,11 @@ push_val (lua_State *L, SV *val) {
             if(SvROK(val)) {
                 push_ref(L, val);
             } else {
+#if LUA_VERSION_NUM < 503
                 lua_pushnumber(L, (lua_Number)SvIV(val));
+#else
+                lua_pushinteger(L, (lua_Integer)SvIV(val));
+#endif
             }
 	    return;
 	case SVt_NV:

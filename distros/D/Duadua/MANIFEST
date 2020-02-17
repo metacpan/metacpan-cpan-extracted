@@ -15,6 +15,7 @@ lib/Duadua/Parser/Bot/DuckDuckBot.pm
 lib/Duadua/Parser/Bot/FacebookCrawler.pm
 lib/Duadua/Parser/Bot/Fastladder.pm
 lib/Duadua/Parser/Bot/Feedbin.pm
+lib/Duadua/Parser/Bot/Feedeen.pm
 lib/Duadua/Parser/Bot/Feedly.pm
 lib/Duadua/Parser/Bot/Googlebot.pm
 lib/Duadua/Parser/Bot/GooglebotAd.pm
@@ -72,6 +73,7 @@ t/testset/bot/duckduckbot.yaml
 t/testset/bot/facebookcrawler.yaml
 t/testset/bot/fastladder.yaml
 t/testset/bot/feedbin.yaml
+t/testset/bot/feedeen.yaml
 t/testset/bot/feedly.yaml
 t/testset/bot/google_read.yaml
 t/testset/bot/googlebot.yaml

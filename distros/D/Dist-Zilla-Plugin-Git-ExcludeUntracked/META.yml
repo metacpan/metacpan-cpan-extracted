@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,5 +29,6 @@ resources:
   bugtracker: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked/issues
   homepage: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked
   repository: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked.git
-version: '0.05'
+version: '0.06'
 x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.70'

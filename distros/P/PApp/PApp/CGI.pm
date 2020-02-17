@@ -49,7 +49,7 @@ use Exporter;
 BEGIN {
    our @ISA = (PApp::Base::);
    unshift @PApp::ISA, __PACKAGE__;
-   our $VERSION = 2.1;
+   our $VERSION = 2.2;
 }
 
 =head2 Functions
@@ -203,7 +203,7 @@ sub warn {
 }
 
 sub new_from {
-   my ($class, $env) = @_;
+   my ($class, $env, @kv) = @_;
 
    $class = bless {
       document_root => $env->{DOCUMENT_ROOT},
@@ -240,7 +240,7 @@ sub new_from {
          auth_type		=> $env->{AUTH_TYPE},
          user			=> $env->{REMOTE_USER},
       }, PApp::CGI::Connection),
-      @_,
+      @kv,
    }, $class;
 
    $class
@@ -250,7 +250,7 @@ sub new {
    my $class = shift;
 
    if ($ENV{GATEWAY_INTERFACE} =~ /^CGI\//) {
-      $class = $class->new_from (\%ENV);
+      $class = $class->new_from (\%ENV, stdin => \*STDIN, stdout => \*STDOUT);
    } else {
       die "cgi environment currently required\n";
    }
@@ -341,7 +341,7 @@ sub content {
 }
 
 sub read {
-   CORE::read STDIN,
+   CORE::read $_[0]{stdin},
               $_[1],
               ($_[2] > $_[0]->{headers_in}{"Content-Length"}
                   ? $_[0]->{headers_in}{"Content-Length"}
@@ -390,7 +390,7 @@ sub send_http_header {
 sub print {
    use bytes;
    my $self = shift;
-   syswrite STDOUT, join "", @_
+   syswrite $self->{stdout}, join "", @_
 }
 
 =item internal_redirect "relative-url"
@@ -403,24 +403,7 @@ I<external> redirect.
 sub internal_redirect {
    my $self = shift;
    my $uri = shift;
-   # it ain't pretty, baby, but can't you feel the rythm?
-   if (defined $ENV{SSL_PROTOCOL}) {
-      $uri = "https://" .
-             ($self->{headers_in}{Host}
-              || $self->{server_hostname} .
-                    ($self->{connection}{local_port} != 443
-                        ? ":$self->{connection}{local_port}"
-                        : "")).
-             $uri;
-   } else {
-      $uri = "http://" .
-             ($self->{headers_in}{Host}
-              || $self->{server_hostname} .
-                    ($self->{connection}{local_port} != 80
-                        ? ":$self->{connection}{local_port}"
-                        : "")).
-             $uri;
-   }
+
    PApp::_gen_external_redirect $uri;
 }
 
@@ -437,7 +420,7 @@ sub send_fd {
       $len = sysread $fh, $buf, 65536;
       if (defined $len) {
          return unless $len;
-         syswrite STDOUT, $buf, $len;
+         syswrite $self->{stdout}, $buf, $len;
       } else {
          require Errno;
          die "unable to send $fh: $!" if $! != Errno::EINTR;

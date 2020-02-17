@@ -1,20 +1,20 @@
 use Test2::V0 -no_srand => 1;
 use Test::Alien;
+use Alien::m4;
 use Alien::autoconf;
 use Env qw( @PATH );
 use File::chdir;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
 
+alien_ok 'Alien::m4';
 alien_ok 'Alien::autoconf';
 
 my $wrapper;
 if($^O eq 'MSWin32')
 {
-  eval {
-    require Alien::MSYS;
-    push @PATH, Alien::MSYS::msys_path();
-  };
+  require Alien::MSYS;
+  unshift @PATH, Alien::MSYS::msys_path();
   $wrapper = sub { [ 'sh', -c => "@_" ] };
 }
 else
@@ -24,9 +24,9 @@ else
 
 my $dist_dir = path(Alien::autoconf->dist_dir);
 
-run_ok($wrapper->($_, '--version'))
+run_ok($wrapper->($_, '--version'), "test if the --version options works with $_")
   ->success
-  ->note for qw( autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames );
+  ->note for (Alien::m4->exe, qw( autoconf autoheader autom4te autoreconf autoscan autoupdate ifnames ));
 
 my $configure_ac = path('corpus/configure.ac')->absolute;
 

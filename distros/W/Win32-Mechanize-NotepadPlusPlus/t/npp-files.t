@@ -61,7 +61,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
 #       => gets us to a known state with a prebuilt session
 {
     # generate the session file on the fly, because it needs absolute directories, which I cannot have until the test suite runs
-    my @src = qw/00-load.t 10-defaults.t/;
+    my @src = qw/00-load.t 01-defaults.t/;
     $knownSession->append(qq{<NotepadPlus><Session activeView="0"><mainView activeIndex="0">\n});
     $knownSession->append(sprintf qq{<File firstVisibleLine="0" xOffset="0" filename="%s" />\n}, $_)
         for map { path($0)->sibling($_)->absolute->canonpath() } @src;

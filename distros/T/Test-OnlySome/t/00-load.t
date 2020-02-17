@@ -15,3 +15,7 @@ BEGIN {
 
     done_testing();
 }
+
+use Keyword::Declare;
+
+diag( "Keyword::Declare v $Keyword::Declare::VERSION from $INC{'Keyword/Declare.pm'}" );

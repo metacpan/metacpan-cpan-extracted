@@ -1,3 +1,8 @@
+0.027   2020-02-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: perl::release::version.
+
+
 0.026   2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add schemas: perl::funcname, perl::qualified_funcname,

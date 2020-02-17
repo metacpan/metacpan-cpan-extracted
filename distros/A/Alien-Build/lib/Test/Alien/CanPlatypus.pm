@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Skip a test file unless FFI::Platypus is available
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 
 sub skip
@@ -37,7 +37,7 @@ Test::Alien::CanPlatypus - Skip a test file unless FFI::Platypus is available
 
 =head1 VERSION
 
-version 2.04
+version 2.08
 
 =head1 SYNOPSIS
 

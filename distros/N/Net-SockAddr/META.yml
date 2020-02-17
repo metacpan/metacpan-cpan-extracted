@@ -3,26 +3,26 @@ abstract: 'Socket address OO-wrapper with Perl and C++ interface.'
 author:
   - unknown
 build_requires:
-  CPP::catch: v1.0.9
-  CPP::panda::lib: v1.3.5
-  Export::XS: v3.0.1
-  Test::Catch: v1.0.10
+  Export::XS: v3.0.3
+  Test::Catch: v1.0.13
   Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::Framework: v1.2.3
+  XS::Framework: v1.2.7
+  XS::libcatch: v1.1.0
+  XS::libpanda: v1.3.10
   next::XS: v1.0.7
 configure_requires:
-  CPP::catch: v1.0.9
-  CPP::panda::lib: v1.3.5
-  Export::XS: v3.0.1
-  Test::Catch: v1.0.10
-  XS::Framework: v1.2.3
-  XS::Install: v1.2.12
+  Export::XS: v3.0.3
+  Test::Catch: v1.0.13
+  XS::Framework: v1.2.7
+  XS::Install: v1.2.15
+  XS::libcatch: v1.1.0
+  XS::libpanda: v1.3.10
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,10 +33,10 @@ no_index:
     - t
     - inc
 requires:
-  CPP::panda::lib: v1.3.5
-  Export::XS: v3.0.1
-  XS::Framework: v1.2.3
-  XS::Install: v1.2.12
+  Export::XS: v3.0.3
+  XS::Framework: v1.2.7
+  XS::Install: v1.2.15
+  XS::libpanda: v1.3.10
   next::XS: v1.0.7
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

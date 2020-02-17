@@ -907,14 +907,19 @@ sub manage_paragraph {
 sub manage_header {
     my ($self, $el) = @_;
     # print Dumper([$el->anchors]);
-    my $body_with_no_footnotes = $el->string;
-    my $has_fn;
+
+    my ($short, $long) = split(/\s+\|\s+/, $el->string, 2);
+    unless (defined($long) and length($long)) {
+        $long = $short;
+    }
+    my $body_with_no_footnotes = $short;
     my $catch_fn = sub {
-        if ($self->document->get_footnote($_[0])) {
-            $has_fn++;
+        my $fn = $_[0];
+        # replace only real footnotes
+        if ($self->document->get_footnote($fn)) {
             return ''
         } else {
-            return $1;
+            return $fn;
         }
     };
     $body_with_no_footnotes =~ s/(
@@ -925,18 +930,13 @@ sub manage_header {
                                 /$catch_fn->($1)/gxe;
     undef $catch_fn;
     my $anchors = $self->format_anchors($el);
-    my ($body_for_toc);
-    if ($has_fn) {
-        ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1);
-    }
-    my ($body) = $self->manage_regular($el, nolinks => 1);
-    chomp $body;
-    if (defined $body_for_toc) {
-        $body_for_toc =~ s/\s+/ /g;
-        $body_for_toc =~ s/\s+\z//;
-    }
+    my ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1);
+    my ($body)         = $self->manage_regular($long, nolinks => 1);
+    $body_for_toc =~ s/\s+\z//;
+    $body =~ s/\s+\z//;
+
     my $leading = $self->blkstring(start => $el->type,
-                                   toc_entry => ($has_fn ? $body_for_toc : undef));
+                                   toc_entry => ($body ne $body_for_toc ? $body_for_toc : undef));
     my $trailing = $self->blkstring(stop => $el->type);
     if ($anchors) {
         if ($self->is_html) {
@@ -1965,6 +1965,7 @@ sub _latex_header {
     # \chapter[TOCTITLE]{TITLE}
     my ($name, %attributes) = @_;
     if (defined $attributes{toc_entry}) {
+        $attributes{toc_entry} =~ s/\s+/ /g;
         # we use the grouping here, to avoid chocking on [ ]
         return "\\" . $name . '[{' . $attributes{toc_entry} . '}]{'
     }

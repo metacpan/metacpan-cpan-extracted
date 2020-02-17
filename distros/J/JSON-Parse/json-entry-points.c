@@ -39,16 +39,16 @@ static void check_end (json_parse_t * parser)
 
 #ifndef NOPERL
 
-/* Set up the parser. */
+/* Set up "parser" with the string from "json". */
 
-#define GETSTRING							\
-    {									\
-	STRLEN length;							\
-	parser->end = parser->input =					\
-	    (unsigned char *) SvPV (json, length);			\
-	parser->length = (unsigned int) length;				\
-	parser->unicode = SvUTF8 (json) ? 1 : 0;			\
-    }
+static void getstring (SV * json, json_parse_t * parser)
+{
+    STRLEN length;
+    parser->input = (unsigned char *) SvPV (json, length);
+    parser->end = parser->input;
+    parser->length = (unsigned int) length;
+    parser->unicode = SvUTF8 (json) ? 1 : 0;
+}
 
 #endif /* ndef NOPERL */
 
@@ -79,7 +79,7 @@ json_parse_run (json_parse_t * parser, SV * json)
 
     SV * r = & PL_sv_undef;
 
-    GETSTRING;
+    getstring (json, parser);
 
     if (parser->length == 0) {
 	fail_empty (parser);
@@ -327,7 +327,7 @@ validate (SV * json, unsigned int flags)
 {
     ENTRYDECL;
 
-    GETSTRING;
+    getstring (json, parser);
 
     if (parser->length == 0) {
 	fail_empty (parser);
@@ -338,7 +338,7 @@ validate (SV * json, unsigned int flags)
 static void
 check (json_parse_t * parser, SV * json)
 {
-    GETSTRING;
+    getstring (json, parser);
     c_validate (parser);
 }
 
@@ -347,7 +347,7 @@ tokenize (SV * json)
 {
     ENTRYDECL;
 
-    GETSTRING;
+    getstring (json, parser);
 
     /* Mark this parser as being used for tokenizing to bypass the
        checks for memory leaks when the parser is freed. */

@@ -9,6 +9,7 @@ ppport.h
 README
 Unify.h
 Unify.xs
+cpanfile
 lib/DBD/Unify.pm
 lib/DBD/Unify/TypeInfo.pm
 lib/DBD/Unify/GetInfo.pm
@@ -34,6 +35,7 @@ t/40-info.t
 t/41-info.t
 t/50-trace.t
 t/99-done.t
+examples/describe.pl
 examples/row_counts
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

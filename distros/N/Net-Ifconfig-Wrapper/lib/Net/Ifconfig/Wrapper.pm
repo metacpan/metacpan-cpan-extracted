@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS @EXPORT_FAIL);
 
-$VERSION = 0.16;
+$VERSION = 0.25;
 
 require Exporter;
 
@@ -108,13 +108,15 @@ my $RunCmd = sub($$)
              $Ifconfig{$CName}{$^O}{$OsName}{$OsVers}{'ifconfig'}          :
              $Ifconfig{$CName}{$^O}{'ifconfig'}).' 2>&1';
   
-  #print "\n=== RunCmd ===\n\$CName: $CName, \$Iface: $Iface, \$Logic: $Logic, \$Addr: $Addr, \$Mask: $Mask\n";
+  $DEBUG && print STDERR "\n=== RunCmd ===\n\$CName: $CName, \$Iface: $Iface, \$Logic: $Logic, \$Addr: $Addr, \$Mask: $Mask\n";
   
   $Cmd =~ s{%Iface%}{$Iface}gsex;
   $Cmd =~ s{%Logic%}{$Logic}gsex;
   $Cmd =~ s{%Addr%}{$Addr}gsex;
   $Cmd =~ s{%Mask%}{$Mask}gsex;
   
+  $DEBUG && print STDERR "Cmd is ==$Cmd==\n";
+
   my $saveLang = $ENV{'LANG'} || '';
   $ENV{'LANG'} = 'C';
   my @Output   = `$Cmd`;
@@ -209,6 +211,9 @@ my $LinuxList = sub($$$$)
         ||
         # German locale de_DE.UTF-8
         ($_ =~ m/\A([a-z0-9]+)(?:\:(\d+))?\s+Link\s+encap\:(?:Ethernet\s+Hardware\s+Adresse\s+([a-f\d]{1,2}(?:\:[a-f\d]{1,2}){5}))?.*\n?\Z/io)
+        ||
+        # /sbin/ip on some linux systems:
+        ($_ =~ m/link\/ether\s+([a-f\d]{1,2}(?:\:[a-f\d]{1,2}){5})\s/io)
        )
       {
       $Iface = $1;
@@ -240,11 +245,21 @@ my $LinuxList = sub($$$$)
            ||
            # German locale de_DE.UTF-8
            ($_ =~ m/\A\s+inet\s+Adresse\:(\d{1,3}(?:\.\d{1,3}){3})\s+(?:.*\s)?Maske\:(\d{1,3}(?:\.\d{1,3}){3}).*\n?\Z/io)
+           ||
+           ($_ =~ m/\sinet\s+(\d{1,3}(?:\.\d{1,3}){3})\/(\d+)\s/io)
           )
       {
       my $sIP = $1;
       my $sNetmask = $2;
       $DEBUG && warn " DDD   matched 'netmask' line, sIP=$sIP, sNetmask=$sNetmask\n";
+      if ($sNetmask =~ m/\A\d+\z/)
+        {
+        # The netmask appeared as a slash/number at the end of the IP
+        # address; convert it to an IP "address" quad string:
+        use Net::Netmask;
+        my $block = new Net::Netmask("$sIP/$sNetmask");
+        $sNetmask = $block->mask();
+        } # if
       $Info->{$Iface}{'inet'}{$sIP} = $sNetmask;
       $Inet2Logic->{$Iface}{$sIP} = $Logic;
       $Logic2Inet->{$Iface}{$Logic} = $sIP;
@@ -500,12 +515,14 @@ my $Win32List = sub($$$$)
   }; # Win32List
 
 
+my $IFCONFIG = '/sbin/ifconfig';
+my $IP = '/sbin/ip';
 
-$Ifconfig{'list'} = {'solaris' => {'ifconfig' => 'LC_ALL=C /sbin/ifconfig -a',
+$Ifconfig{'list'} = {'solaris' => {'ifconfig' => qq/LC_ALL=C $IFCONFIG -a/,
                                    'function' => $SolarisList},
-                     'openbsd' => {'ifconfig' => 'LC_ALL=C /sbin/ifconfig -A',
+                     'openbsd' => {'ifconfig' => qq/LC_ALL=C $IFCONFIG -A/,
                                    'function' => $SolarisList},
-                     'linux'   => {'ifconfig' => 'LC_ALL=C /sbin/ifconfig -a',
+                     'linux'   => {'ifconfig' => -f $IFCONFIG ? qq/LC_ALL=C $IFCONFIG -a/ : qq/LC_ALL=C $IP address/,
                                    'function' => $LinuxList},
                      'MSWin32' => {'ifconfig' => '',
                                    'function' => $Win32List,},
@@ -725,7 +742,7 @@ my $Win32RemAlias = sub($$$$)
   };
 
 
-$Ifconfig{'inet'} = {'solaris' => {'ifconfig' => '/sbin/ifconfig %Iface% inet %Addr% netmask %Mask% up',
+$Ifconfig{'inet'} = {'solaris' => {'ifconfig' => $IFCONFIG .' %Iface% inet %Addr% netmask %Mask% up',
                                    'function' => $UpDown},
                      #                     'MSWin32' => {'ifconfig' => '',
                      #                                   'function' => $Win32Inet,},
@@ -737,17 +754,17 @@ $Ifconfig{'inet'}{'darwin'}  = $Ifconfig{'inet'}{'solaris'};
 
 $Ifconfig{'up'} = $Ifconfig{'inet'};
 
-$Ifconfig{'down'}{'solaris'} = {'ifconfig' => '/sbin/ifconfig %Iface% down',
-                                  'function' => $UpDown,
-                                 };
+$Ifconfig{'down'}{'solaris'} = {'ifconfig' => $IFCONFIG .' %Iface% down',
+                                'function' => $UpDown,
+                               };
 $Ifconfig{'down'}{'freebsd'} = $Ifconfig{'down'}{'solaris'};
 $Ifconfig{'down'}{'openbsd'} = $Ifconfig{'down'}{'solaris'};
 $Ifconfig{'down'}{'linux'}   = $Ifconfig{'down'}{'solaris'};
 $Ifconfig{'down'}{'darwin'}  = $Ifconfig{'down'}{'solaris'};
 
-$Ifconfig{'+alias'} = {'freebsd' => {'ifconfig' => '/sbin/ifconfig %Iface%         inet %Addr% netmask %Mask% alias',
+$Ifconfig{'+alias'} = {'freebsd' => {'ifconfig' => $IFCONFIG .' %Iface%         inet %Addr% netmask %Mask% alias',
                                      'function' => $UpDown},
-                       'solaris' => {'ifconfig' => '/sbin/ifconfig %Iface%:%Logic% inet %Addr% netmask %Mask% up',
+                       'solaris' => {'ifconfig' => $IFCONFIG .' %Iface%:%Logic% inet %Addr% netmask %Mask% up',
                                      'function' => $UpDownNewLog},
                        'MSWin32' => {'ifconfig' => '',
                                      'function' => $Win32AddAlias,},
@@ -756,16 +773,16 @@ $Ifconfig{'+alias'}{'openbsd'} = $Ifconfig{'+alias'}{'freebsd'};
 $Ifconfig{'+alias'}{'linux'}   = $Ifconfig{'+alias'}{'solaris'};
 $Ifconfig{'+alias'}{'darwin'}  = $Ifconfig{'+alias'}{'freebsd'};
 
-$Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.8'}{'ifconfig'}  = '/sbin/ifconfig %Iface%:%Logic% plumb; /sbin/ifconfig %Iface%:%Logic% inet %Addr% netmask %Mask% up';
+$Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.8'}{'ifconfig'}  = $IFCONFIG .' %Iface%:%Logic% plumb; '. $IFCONFIG .' %Iface%:%Logic% inet %Addr% netmask %Mask% up';
 $Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.9'}{'ifconfig'}  = $Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.8'}{'ifconfig'};
 $Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.10'}{'ifconfig'} = $Ifconfig{'+alias'}{'solaris'}{'SunOS'}{'5.8'}{'ifconfig'};
 
 $Ifconfig{'alias'} = $Ifconfig{'+alias'};
 
 
-$Ifconfig{'-alias'} = {'freebsd' => {'ifconfig' => '/sbin/ifconfig %Iface% inet %Addr% -alias',
+$Ifconfig{'-alias'} = {'freebsd' => {'ifconfig' => $IFCONFIG .' %Iface% inet %Addr% -alias',
                                      'function' => $UpDown},
-                       'solaris' => {'ifconfig' => '/sbin/ifconfig %Iface%:%Logic% down',
+                       'solaris' => {'ifconfig' => $IFCONFIG .' %Iface%:%Logic% down',
                                      'function' => $UpDownReqLog},
                        'MSWin32' => {'ifconfig' => '',
                                      'function' => $Win32RemAlias,},
@@ -774,7 +791,7 @@ $Ifconfig{'-alias'}{'openbsd'} = $Ifconfig{'-alias'}{'freebsd'};
 $Ifconfig{'-alias'}{'linux'}   = $Ifconfig{'-alias'}{'solaris'};
 $Ifconfig{'-alias'}{'darwin'} = $Ifconfig{'-alias'}{'freebsd'};
 
-$Ifconfig{'-alias'}{'solaris'}{'SunOS'}{'5.9'}{'ifconfig'} = '/sbin/ifconfig %Iface%:%Logic% unplumb';
+$Ifconfig{'-alias'}{'solaris'}{'SunOS'}{'5.9'}{'ifconfig'} = $IFCONFIG .' %Iface%:%Logic% unplumb';
 
 sub Ifconfig {
   my ($CName, $Iface, $Addr, $Mask) = @_;

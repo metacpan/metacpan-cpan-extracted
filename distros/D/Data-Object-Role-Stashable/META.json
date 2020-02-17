@@ -1,0 +1,58 @@
+{
+   "abstract" : "Stashable Role for Perl 5",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Object-Role-Stashable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test::Auto" : "0.05",
+            "perl" : "5.014",
+            "routines" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/data-object-role-stashable/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/data-object-role-stashable.git",
+         "web" : "https://github.com/iamalnewkirk/data-object-role-stashable"
+      }
+   },
+   "version" : "2.01",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

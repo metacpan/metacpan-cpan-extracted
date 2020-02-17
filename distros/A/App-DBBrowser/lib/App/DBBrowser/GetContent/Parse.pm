@@ -176,8 +176,8 @@ sub __parse_with_template {
             my $info = $sf->__print_template_info( \@rows, 9 );
             # Choose a number
             my $col_count = $tu->choose_a_number( 2,
-                { clear_screen => 1, info => $info, current_selection_label => 'Number of columns: ',
-                small_first => 1, confirm => 'Confirm', back => 'Back' }
+                { clear_screen => 1, info => $info, cs_label => 'Number of columns: ',
+                  small_first => 1, confirm => 'Confirm', back => 'Back' }
             );
             if ( ! $col_count ) {
                 next IRS;

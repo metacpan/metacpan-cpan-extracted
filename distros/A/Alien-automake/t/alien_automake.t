@@ -12,10 +12,8 @@ my $wrapper = sub { [@_] };
 
 if($^O eq 'MSWin32')
 {
-  eval {
-    require Alien::MSYS;
-    push @PATH, Alien::MSYS::msys_path();
-  };
+  require Alien::MSYS;
+  unshift @PATH, Alien::MSYS::msys_path();
   $wrapper = sub { [ 'sh', -c => "@_" ] };
 }
 

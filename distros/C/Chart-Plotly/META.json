@@ -72,6 +72,7 @@
       },
       "test" : {
          "requires" : {
+            "PDL" : "0",
             "Test::Exception" : "0",
             "Test::File::ShareDir" : "0",
             "Test::More" : "0",
@@ -91,7 +92,7 @@
          "web" : "https://github.com/pablrod/p5-Chart-Plotly"
       }
    },
-   "version" : "0.037",
+   "version" : "0.038",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "stphnlyd <stephanloyd9@gmail.com>",

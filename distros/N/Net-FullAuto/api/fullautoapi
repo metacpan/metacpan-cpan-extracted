@@ -62,7 +62,7 @@ stop()
 	PID=`cat "$PID_FILE"`
 	if [ -n "$PID" ]; then
 		/bin/kill "$PID" >/dev/null 2>&1
-                service memcached start
+                service memcached stop
                 /bin/rm -f /tmp/fullautoapi.socket
 		RETVAL=$?
 		if [ $RETVAL -ne 0 ]; then

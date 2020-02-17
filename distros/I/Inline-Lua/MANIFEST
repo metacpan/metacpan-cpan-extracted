@@ -4,6 +4,7 @@ Changes
 LICENSE
 Lua.xs
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README

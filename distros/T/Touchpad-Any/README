@@ -1,0 +1,143 @@
+NAME
+    Touchpad::Any - Common interface to touchpad
+
+VERSION
+    This document describes version 0.002 of Touchpad::Any (from Perl
+    distribution Touchpad-Any), released on 2019-12-01.
+
+FUNCTIONS
+  disable_touchpad
+    Usage:
+
+     disable_touchpad(%args) -> [status, msg, payload, meta]
+
+    Disable touchpad.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   method => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  enable_touchpad
+    Usage:
+
+     enable_touchpad(%args) -> [status, msg, payload, meta]
+
+    Enable touchpad.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   method => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  has_touchpad
+    Usage:
+
+     has_touchpad(%args) -> [status, msg, payload, meta]
+
+    Check whether system has touchpad device.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   method => *str*
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  touchpad_is_enabled
+    Usage:
+
+     touchpad_is_enabled(%args) -> [status, msg, payload, meta]
+
+    Check whether touchpad is enabled.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   method => *str*
+
+    *   quiet => *true*
+
+        Don't output anything on command-line, just return appropriate exit
+        code.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Touchpad-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Touchpad-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Touchpad-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::TouchpadUtils for CLIs.
+
+    Touchscreen::Any, Bluetooth::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

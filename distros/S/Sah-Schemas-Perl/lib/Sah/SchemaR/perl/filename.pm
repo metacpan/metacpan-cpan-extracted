@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::filename;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2020-02-15'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 our $rschema = ["str",[{description=>"\nString containing filename of a Perl script or module or POD. For convenience,\nwhen value is in the form of:\n\n    Foo\n    Foo.pm\n    Foo.pod\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n    Foo/Bar.pod\n\nand a matching .pod or .pm file is found in `\@INC`, then it will be coerced\n(converted) into the path of that .pod/.pm file, e.g.:\n\n    /home/ujang/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Foo/Bar.pm\n    lib/Foo/Bar.pod\n\nTo prevent such coercion, you can use prefixing path, e.g.:\n\n    ./Foo::Bar\n    ../Foo/Bar\n    /path/to/Foo/Bar\n\nThis schema comes with convenience completion too.\n\n",summary=>"Filename (Perl script/module/POD)","x.completion"=>sub{package Sah::Schema::perl::filename;require Complete::File;require Complete::Module;require Complete::Util;my(%args) = @_;my $word = $args{'word'};my @answers;push @answers, Complete::File::complete_file('word', $word);if ($word =~ m[\A\w*((?:::|/)\w+)*\z]) {push @answers, Complete::Module::complete_module('word', $word);}Complete::Util::combine_answers(@answers)},"x.perl.coerce_rules"=>["From_str::convert_perl_pm_or_pod_to_path"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::filename - Filename (Perl script/module/POD)
 
 =head1 VERSION
 
-This document describes version 0.026 of Sah::SchemaR::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
+This document describes version 0.027 of Sah::SchemaR::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

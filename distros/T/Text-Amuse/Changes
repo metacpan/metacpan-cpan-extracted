@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.40 2020-02-16
+
+ - New markup extension to support alternate versions of headers for
+   ToC
+
 1.30 2019-12-01
 
  - Fix crash with a verse followed by a "[" in LaTeX compilation

@@ -3,13 +3,13 @@ package Astro::App::Satpass2::ParseTime::Date::Manip::v6;
 use strict;
 use warnings;
 
-use Astro::Coord::ECI::Utils 0.077 qw{ looks_like_number time_gm };
+use Astro::Coord::ECI::Utils 0.112 qw{ looks_like_number greg_time_gm };
 
 use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
 use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 my $invalid;
 
@@ -40,7 +40,7 @@ BEGIN {
 	or *_normalize_zone = sub{};
 }
 
-my $epoch_offset = time_gm( 0, 0, 0, 1, 0, 1970 );
+my $epoch_offset = greg_time_gm( 0, 0, 0, 1, 0, 1970 );
 
 sub delegate {
     return __PACKAGE__;

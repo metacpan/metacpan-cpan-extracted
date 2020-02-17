@@ -63,8 +63,7 @@ if ($opt_b || $opt_a) {
 }
 
 # loop through each file, adding, moving, extracting, etc.
-my $file;
-foreach $file (@ARGV) {
+for my $file (@ARGV) {
     my $name = basename($file);
 
     # do the task
@@ -152,9 +151,8 @@ foreach $file (@ARGV) {
 # no files given.  -p, -t, and -x will apply to all in archive.
 if (!@ARGV) {
     if ($opt_p || $opt_t || $opt_x) {
-	my ($group,$name);
-	foreach $group (@$pNames) {
-	    foreach $name (@$group) {
+	for my $group (@$pNames) {
+	    for my $name (@$group) {
 		if ($opt_p) { printMember($name,$pAr,$opt_v); }
 		elsif ($opt_t) { printList($name,$pAr,$opt_v); }
 		elsif ($opt_x) { extractMember($name, $pAr, $opt_v,
@@ -225,7 +223,7 @@ sub extractMember {
 				   oct($attr->[4]), int($attr->[1]));
     }
 
-    my $out = new FileHandle ">$name" or die "$name: $!\n";
+    my $out = FileHandle->new(">$name") or die "$name: $!\n";
     binmode($out);
     $out->print($attr->[6]);
     $out->close();
@@ -244,7 +242,7 @@ sub extractMember {
 # [ undef, $modt, $uid, $gid, $mode, $sz, $data ]
 sub readFile {
     my ($file) = @_;
-    my $in = new FileHandle "< $file" or die "$file: $!\n";
+    my $in = FileHandle->new("< $file") or die "$file: $!\n";
     binmode($in);
 
     # read the data in one swell foop
@@ -271,7 +269,7 @@ sub readAr {
     # names in order in file
     my @Names = ( undef );
 
-    my $arfh = new FileHandle "< $archive" or die "$0: $archive: $!\n";
+    my $arfh = FileHandle->new("< $archive") or die "$0: $archive: $!\n";
     binmode($arfh);
 
     # read magic
@@ -335,17 +333,16 @@ sub writeAr {
 
     my $arfh;
     if (!defined($append)) {
-	$arfh = new FileHandle "> $archive" or die "$0: $archive: $!\n";
+	$arfh = FileHandle->new("> $archive") or die "$0: $archive: $!\n";
 	$arfh->print("!<arch>\n");
     }
     else {
-	$arfh = new FileHandle ">> $archive" or die "$0: $archive: $!\n";
+	$arfh = FileHandle->new(">> $archive") or die "$0: $archive: $!\n";
     }
 
     # loop through each member of the archive and write to filehandle
-    my ($group,$name);
-    foreach $group (@$pNames) {
-	foreach $name (@$group) {
+    for my $group (@$pNames) {
+	for my $name (@$group) {
 	    if ($pAr->{$name}) {
 		my $attr = $pAr->{$name};
 		my $sz = $attr->[5];

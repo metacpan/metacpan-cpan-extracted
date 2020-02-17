@@ -16,7 +16,7 @@ PApp/Admin.pm
 PApp/FormBuffer.pm
 PApp/Exception.pm
 PApp/Application.pm
-PApp/EditForm.
+PApp/EditForm.pm
 PApp/ECMAScript.pm
 PApp/Util.pm
 PApp/PCode.pm
@@ -27,6 +27,7 @@ PApp/CGI.pm
 PApp/Apache.pm
 PApp/Apache2.pm
 PApp/SCGI.pm
+PApp/SCGI/Worker.pm
 PApp/XML.pm
 PApp/XSLT.pm
 PApp/XSLT/Sablotron.pm

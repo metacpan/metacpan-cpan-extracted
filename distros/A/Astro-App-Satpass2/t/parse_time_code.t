@@ -7,7 +7,7 @@ use lib qw{ inc };
 
 use Test::More 0.88;
 
-use Astro::Coord::ECI::Utils 0.077 qw{ time_gm time_local };
+use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm greg_time_local };
 
 use My::Module::Test::App;
 
@@ -31,7 +31,7 @@ call_m 'delegate',
 
 # call_m 'use_perltime', FALSE, 'Does not use perltime';
 
-my $base = time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
+my $base = greg_time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
 use constant ONE_DAY => 86400;			# One day, in seconds.
 use constant HALF_DAY => 43200;			# 12 hours, in seconds.
 
@@ -62,77 +62,77 @@ call_m parse => '-0 12', $base - HALF_DAY,
 call_m perltime => 1, TRUE, 'Set perltime true';
 
 call_m parse => '2009-1-1',
-    time_local( 0, 0, 0, 1, 0, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q<Parse '2009-1-1'>;
 
 call_m parse => '2009-7-1',
-    time_local( 0, 0, 0, 1, 6, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
     q<Parse '2009-7-1'>;
 
 call_m perltime => 0, TRUE, 'Set perltime false';
 
 call_m parse => '2009-1-1',
-    time_local( 0, 0, 0, 1, 0, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q<Parse '2009-1-1', no help from perltime>;
 
 call_m parse => '2009-7-1',
-    time_local( 0, 0, 0, 1, 6, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
     q<Parse '2009-7-1', no help from perltime>;
 
 call_m parse => '2009-1-1Z',
-    time_gm( 0, 0, 0, 1, 0, 2009 ),
+    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q<Parse '2009-1-1Z'>;
 
 call_m parse => '2009-7-1Z',
-    time_gm( 0, 0, 0, 1, 6, 2009 ),
+    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
     q<Parse '2009-7-1Z'>;
 
 call_m parse => '2009-7-2 16:23:37',
-    time_local( 37, 23, 16, 2, 6, 2009 ),
+    greg_time_local( 37, 23, 16, 2, 6, 2009 ),
     q{Parse '2009-7-2 16:23:37'};
 
 call_m parse => '2009-7-2 16:23:37Z',
-    time_gm( 37, 23, 16, 2, 6, 2009 ),
+    greg_time_gm( 37, 23, 16, 2, 6, 2009 ),
     q{Parse '2009-7-2 16:23:37Z'};
 
 call_m parse => '2009-7-2 16:23',
-    time_local( 0, 23, 16, 2, 6, 2009 ),
+    greg_time_local( 0, 23, 16, 2, 6, 2009 ),
     q{Parse '2009-7-2 16:23'};
 
 call_m parse => '2009-7-2 16:23 Z',
-    time_gm( 0, 23, 16, 2, 6, 2009 ),
+    greg_time_gm( 0, 23, 16, 2, 6, 2009 ),
     q{Parse ISO-8601 '2009-7-2 16:23 Z'};
 
 call_m parse => '2009-7-2 16',
-    time_local( 0, 0, 16, 2, 6, 2009 ),
+    greg_time_local( 0, 0, 16, 2, 6, 2009 ),
     q{Parse '2009-7-2 16'};
 
 call_m parse => '2009-7-2 16Z',
-    time_gm( 0, 0, 16, 2, 6, 2009 ),
+    greg_time_gm( 0, 0, 16, 2, 6, 2009 ),
     q{Parse '2009-7-2 16Z'};
 
 call_m parse => '2009-7-2',
-    time_local( 0, 0, 0, 2, 6, 2009 ),
+    greg_time_local( 0, 0, 0, 2, 6, 2009 ),
     q{Parse '2009-7-2'};
 
 call_m parse => '2009-7-2 Z',
-    time_gm( 0, 0, 0, 2, 6, 2009 ),
+    greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
     q{Parse '2009-7-2 Z'};
 
 call_m parse => '2009-7',
-    time_local( 0, 0, 0, 1, 6, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
     q{Parse '2009-7'};
 
 call_m parse => '2009-7Z',
-    time_gm( 0, 0, 0, 1, 6, 2009 ),
+    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
     q{Parse '2009-7Z'};
 
 call_m parse => '2009',
-    time_local( 0, 0, 0, 1, 0, 2009 ),
+    greg_time_local( 0, 0, 0, 1, 0, 2009 ),
     q{Parse '2009'};
 
 call_m parse => '2009Z',
-    time_gm( 0, 0, 0, 1, 0, 2009 ),
+    greg_time_gm( 0, 0, 0, 1, 0, 2009 ),
     q{Parse '2009Z'};
 
 done_testing;
@@ -153,7 +153,7 @@ done_testing;
 		    and push @time, ( 0 ) x ( 6 - @time );
 		splice @time, 6;
 		--$time[1];
-		my $code = $zulu ? \&time_gm : \&time_local;
+		my $code = $zulu ? \&greg_time_gm : \&greg_time_local;
 		return $code->( reverse @time );
 	    },
 	);

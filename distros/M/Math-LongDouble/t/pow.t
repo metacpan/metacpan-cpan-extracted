@@ -9,7 +9,8 @@ my $nv_root = sqrt 2.0;
 my $ld_root = sqrt(Math::LongDouble->new(2.0));
 my $ld_pow = Math::LongDouble->new(2.0) ** Math::LongDouble->new(0.5);
 
-if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
+if(Math::LongDouble::_get_actual_ldblsize() != Math::LongDouble::_get_actual_nvsize()) {
+  # $ld_root != $nv_root
   if(cmp_NV($ld_root, $nv_root)) {print "ok 1\n"}
   else {
     warn "\n\$ld_root: $ld_root\n\$nv_root: $nv_root\n";
@@ -17,6 +18,7 @@ if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
   }
 }
 else {
+  # $ld_root == $nv_root
   unless(cmp_NV($ld_root, $nv_root)) {print "ok 1\n"}
   else {
     warn "\n\$ld_root: $ld_root\n\$nv_root: $nv_root\n";

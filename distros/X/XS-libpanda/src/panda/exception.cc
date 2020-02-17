@@ -25,6 +25,10 @@ Backtrace::Backtrace (const Backtrace& other) noexcept : buffer(other.buffer) {}
 Backtrace::Backtrace () noexcept {
     buffer.resize(max_depth);
     auto depth = ::backtrace(buffer.data(), max_depth);
+    if (depth == -1) {
+        buffer.clear();
+        return;
+    } 
     buffer.resize(depth);
 }
 

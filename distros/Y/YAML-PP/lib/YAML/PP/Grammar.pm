@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Grammar;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use base 'Exporter';
 
@@ -28,6 +28,33 @@ $GRAMMAR = {
     },
     'EOL' => {
       'new' => 'DIRECTIVE'
+    },
+    'RESERVED_DIRECTIVE' => {
+      'EOL' => {
+        'new' => 'DIRECTIVE'
+      },
+      'WS' => {
+        'new' => 'DIRECTIVE'
+      },
+      'match' => 'cb_reserved_directive'
+    },
+    'TAG_DIRECTIVE' => {
+      'EOL' => {
+        'new' => 'DIRECTIVE'
+      },
+      'WS' => {
+        'new' => 'DIRECTIVE'
+      },
+      'match' => 'cb_tag_directive'
+    },
+    'YAML_DIRECTIVE' => {
+      'EOL' => {
+        'new' => 'DIRECTIVE'
+      },
+      'WS' => {
+        'new' => 'DIRECTIVE'
+      },
+      'match' => 'cb_set_yaml_version_directive'
     }
   },
   'DOCUMENT_END' => {
@@ -1084,7 +1111,8 @@ $GRAMMAR = {
       },
       'WS' => {
         'new' => 'DIRECTIVE'
-      }
+      },
+      'match' => 'cb_set_yaml_version_directive'
     }
   }
 };
@@ -1681,6 +1709,7 @@ This is the Grammar in YAML
         EOL: { new: FULLNODE }
         WS: { new: FULLNODE }
       YAML_DIRECTIVE:
+        match: cb_set_yaml_version_directive
         EOL: { new: DIRECTIVE }
         WS: { new: DIRECTIVE }
       RESERVED_DIRECTIVE:
@@ -1704,6 +1733,19 @@ This is the Grammar in YAML
         match: cb_doc_start_explicit
         EOL: { new: FULLNODE }
         WS: { new: FULLNODE }
+    
+      YAML_DIRECTIVE:
+        match: cb_set_yaml_version_directive
+        EOL: { new: DIRECTIVE }
+        WS: { new: DIRECTIVE }
+      RESERVED_DIRECTIVE:
+        match: cb_reserved_directive
+        EOL: { new: DIRECTIVE }
+        WS: { new: DIRECTIVE }
+      TAG_DIRECTIVE:
+        match: cb_tag_directive
+        EOL: { new: DIRECTIVE }
+        WS: { new: DIRECTIVE }
     
       EOL:
         new: DIRECTIVE

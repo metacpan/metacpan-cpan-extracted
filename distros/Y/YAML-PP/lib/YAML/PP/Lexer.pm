@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -776,7 +776,7 @@ sub _fetch_next_tokens_directive {
         my $dir = $1;
         if ($$yaml =~ s/\A( )//) {
             $dir .= $1;
-            if ($$yaml =~ s/\A(1\.2$RE_WS*)//) {
+            if ($$yaml =~ s/\A(1\.[12]$RE_WS*)//) {
                 $dir .= $1;
                 push @tokens, ( YAML_DIRECTIVE => $dir, $self->line );
             }

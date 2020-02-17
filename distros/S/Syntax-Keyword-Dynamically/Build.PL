@@ -14,6 +14,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.014', # pluggable keywords, XOP
    },
+   extra_compiler_flags => [qw( -I. -Ihax -ggdb )],
    license => 'perl',
    create_license => 1,
    create_readme  => 1,
@@ -23,5 +24,14 @@ my $build = Module::Build->new(
       },
    },
 );
+
+if( eval { require Devel::MAT::Dumper::Helper and
+            Devel::MAT::Dumper::Helper->VERSION( '0.41' ) } ) {
+   Devel::MAT::Dumper::Helper->extend_module_build( $build );
+}
+
+# Much cheating
+$build->add_property( 'optimize' );
+$build->config( optimize => '' );
 
 $build->create_build_script;

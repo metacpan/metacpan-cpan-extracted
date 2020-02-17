@@ -1,0 +1,2118 @@
+NAME
+    Zydeco - Jazz up your Perl
+
+SYNOPSIS
+    MyApp.pm
+
+      use v5.14;
+      use strict;
+      use warnings;
+  
+      package MyApp {
+        use Zydeco;
+    
+        class Person {
+          has name   ( type => Str, required => true );
+          has gender ( type => Str );
+      
+          factory new_man (Str $name) {
+            return $class->new(name => $name, gender => 'male');
+          }
+      
+          factory new_woman (Str $name) {
+            return $class->new(name => $name, gender => 'female');
+          }
+      
+          method greet (Person *friend, Str *greeting = "Hello") {
+            printf("%s, %s!\n", $arg->greeting, $arg->friend->name);
+          }
+      
+          coerce from Str via from_string {
+            return $class->new(name => $_);
+          }
+        }
+      }
+
+    my_script.pl
+
+      use v5.14;
+      use strict;
+      use warnings;
+      use MyApp;
+      use MyApp::Types qw( is_Person );
+  
+      # Create a new MyApp::Person object.
+      #
+      my $alice  = MyApp->new_woman("Alice");
+      is_Person($alice) or die;
+  
+      # The string "Bob" will be coerced to a MyApp::Person.
+      #
+      $alice->greet(friend => "Bob", greeting => 'Hi');
+
+DESCRIPTION
+    Zydeco is a Perl module to jazz up your object-oriented programming. It
+    fuses together:
+
+    *   Classes, roles, and interfaces, including parameterizable classes and
+        roles (a.k.a. class generators and role generators).
+
+    *   Factories to help your objects make other objects.
+
+    *   Powerful and concise attribute definitions
+
+    *   Methods with signatures, type constraints, and coercion.
+
+    *   Method modifiers to easily wrap or override inherited methods.
+
+    *   Multimethods.
+
+    *   Powerful delegation features.
+
+    *   True private methods and attributes.
+
+    *   Syntactic sugar as sweet as pecan pie.
+
+  Important Concepts
+   The Factory Package and Prefix
+    Zydeco assumes that all the classes and roles you are building with it
+    will be defined under the same namespace prefix. For example
+    "MyApp::Person" and "MyApp::Company" are both defined under the common
+    prefix of "MyApp".
+
+    It also assumes there will be a factory package that can be used to build
+    new instances of your class. Rather than creating a new person object with
+    `MyApp::Person->new()`, you should create a new person object with
+    `MyApp->new_person()`. Calling `MyApp::Person->new()` directly is only
+    encouraged from within the "MyApp::Person" class itself, and from within
+    the factory. Everywhere else, you should call `MyApp->new_person()`
+    instead.
+
+    By default, the factory package and the prefix are the same: they are the
+    caller that you imported Zydeco into. But they can be set to whatever:
+
+      use Zydeco (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+      );
+
+    (If Zydeco is imported from `main`, then prefix defaults to undef, and
+    factory_package defaults to "Local". But you will get a warning about that
+    unless it's a `perl -e` one-liner.)
+
+    Zydeco assumes that you are defining all the classes and roles within this
+    namespace prefix in a single Perl module file. This Perl module file would
+    normally be named based on the prefix, so in the example above, it would
+    be "MyApp/Objects.pm" and in the example from the SYNOPSIS, it would be
+    "MyApp.pm".
+
+    But see also the documentation for `include`.
+
+    Of course, there is nothing to stop you from having multiple prefixes for
+    different logical parts of a larger codebase, but Zydeco assumes that if
+    it's been set up for a prefix, it owns that prefix and everything under
+    it, and it's all defined in the same Perl module.
+
+    Each object defined by Zydeco will have a `FACTORY` method, so you can do:
+
+      $person_object->FACTORY
+
+    And it will return the string "MyApp". This allows for stuff like:
+
+      class Person {
+        method give_birth {
+          return $self->FACTORY->new_person();
+        }
+      }
+
+   The Type Library
+    While building your classes and objects, Zydeco will also build type
+    constraints for each of them. So for the "MyApp::Person" class above, it
+    also builds a Person type constraint. This can be used in Moo/Moose
+    attribute definitions like:
+
+      use MyApp;
+      use MyApp::Types qw( Person );
+  
+      use Moose;
+      has boss => (is => 'rw', isa => Person);
+
+    And just anywhere a type constraint may be used generally. You should know
+    this stuff by now.
+
+    Note that we had to `use MyApp` before we could `use MyApp::Types`. This
+    is because there isn't a physical "MyApp/Types.pm" file on disk; it is
+    defined entirely by "MyApp.pm".
+
+    Your type library will be the same as your namespace prefix, with
+    "::Types" added at the end. But you can change that:
+
+      use Zydeco (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+        type_library    => 'MyApp::TypeLibrary',
+      );
+
+    It can sometimes be helpful to pre-warn Zydeco about the types you're
+    going to define before you define them, just so it is able to allow them
+    as barewords in some places...
+
+      use Zydeco (
+        prefix          => 'MyApp::Objects',
+        factory_package => 'MyApp::Makers',
+        type_library    => 'MyApp::TypeLibrary',
+        declare         => [qw( Person Company )],
+      );
+
+    See also Type::Tiny::Manual.
+
+KEYWORDS
+  `class`
+    Define a very basic class:
+
+      class Person;
+
+    Define a more complicated class:
+
+      class Person {
+        ...;
+      }
+
+    Note that for the `class` keyword without a block, it does *not* act like
+    the `package` keyword by changing the "ambient" package. It just defines a
+    totally empty class with no methods or attributes.
+
+    The prefix will automatically be added to the class name, so if the prefix
+    is MyApp, the above will create a class called MyApp::Person. It will also
+    create a factory method `MyApp->new_person`. (The name is generated by
+    stripping the prefix from the class name, replacing any "::" with an
+    underscore, lowercasing, and prefixing it with "new_".) And it will create
+    a type called Person in the type library. (Same rules to generate the name
+    apart from lowercasing and adding "new_".)
+
+    Classes can be given more complex names:
+
+      class Person::Neanderthal {
+        ...;
+      }
+
+    Will create "MyApp::Person::Neanderthal" class, a factory method called
+    `MyApp->new_person_neanderthal`, and a Person_Neanderthal type.
+
+    It is possible to create a class without the prefix:
+
+      class ::Person {
+        ...;
+      }
+
+    The class name will now be "Person" instead of "MyApp::Person"!
+
+   Nested classes
+    `class` blocks can be nested. This establishes an inheritance heirarchy.
+
+      class Animal {
+        has name;
+        class Mammal {
+          class Primate {
+            class Monkey;
+            class Gorilla;
+            class Human {
+              class Superhuman;
+            }
+          }
+        }
+        class Bird;
+        class Fish {
+          class Shark;
+        }
+      }
+  
+      my $superman = MyApp->new_superhuman( name => 'Kal El' );
+
+    See also `extends` as an alternative way of declaring inheritance.
+
+    It is possible to prefix a class name with a plus sign:
+
+      package MyApp {
+        use Zydeco;
+        class Person {
+          has name;
+          class +Employee {
+            has job_title;
+          }
+        }
+      }
+
+    Now the employee class will be named `MyApp::Person::Employee` instead of
+    the usual `MyApp::Employee`.
+
+   Abstract classes
+    Classes can be declared as abstract:
+
+      package MyApp {
+        use Zydeco;
+        abstract class Animal {
+          class Cat;
+          class Dog;
+        }
+      }
+
+    For abstract classes, there is no constructor or factory, so you cannot
+    create an Animal instance directly; but you can create instances of the
+    subclasses. It is usually better to use roles than abstract classes, but
+    sometimes the abstract class makes more intuitive sense.
+
+  `role`
+    Define a very basic role:
+
+      role Person;
+
+    Define a more complicated role:
+
+      role Person {
+        ...;
+      }
+
+    This is just the same as `class` but defines a role instead of a class.
+
+    Roles cannot be nested within each other, nor can roles be nested in
+    classes, nor classes in roles.
+
+  `interface`
+    An interface is a lightweight role. It cannot define attributes, methods,
+    multimethods, or method modifiers, but otherwise functions as a role. (It
+    may have `requires` statements and define constants.)
+
+      package MyApp;
+      use Zydeco;
+  
+      interface Serializer {
+        requires serialize;
+      }
+  
+      interface Deserializer {
+        requires deserialize;
+      }
+  
+      class MyJSON {
+        with Serializer, Deserialize;
+        method serialize   ($value) { ... } 
+        method deserialize ($value) { ... } 
+      }
+  
+      my $obj = MyApp->new_myjson;
+      $obj->does('MyApp::Serializer');   # true
+
+  `toolkit`
+    Use a different toolkit instead of Moo.
+
+      # use Mouse
+      class Foo {
+        toolkit Mouse;
+      }
+  
+      # use Moose
+      # use MooseX::Aliases
+      # use MooseX::StrictConstructor
+      class Bar {
+        toolkit Moose ( Aliases, StrictConstructor );
+      }
+
+    You can of course specify you want to use Moo:
+
+      class Baz {
+        toolkit Moo;
+      }
+
+    Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor
+    will.
+
+    Although it is not possible to use the `toolkit` keyword outside of
+    `class`, `abstract class`, `role`, and `interface` blocks, it is possible
+    to specify a default toolkit when you import Zydeco.
+
+      use Zydeco (
+        ...,
+        toolkit => 'Moose',
+      );
+
+      use Zydeco (
+        ...,
+        toolkit => 'Mouse',
+      );
+
+  `extends`
+    Defines a parent class. Only for use with `class` and `abstract class`
+    blocks.
+
+      class Person {
+        extends Animal;
+      }
+
+    This works:
+
+      class Person {
+        extends ::Animal;   # no prefix
+      }
+
+    It is possible to "lift" `extends` outside the class definition block:
+
+      class Person extends Animal {
+        ...;
+      }
+
+    If there are no methods, etc to define, you don't need the block at all:
+
+      class Person extends Animal;
+
+  `with`
+    Composes roles and interfaces.
+
+      class Person {
+        with Employable, Consumer;
+      }
+  
+      role Consumer;
+  
+      role Worker;
+  
+      role Payable;
+  
+      role Employable {
+        with Worker, Payable;
+      }
+
+    It is possible to compose a role which does not have its own definition by
+    adding a question mark to the end of the name:
+
+      class Person {
+        with Employable, Consumer?;
+      }
+  
+      role Employable {
+        with Worker?, Payable?;
+      }
+
+    This is equivalent to declaring an empty role.
+
+    The `with` keyword can only be used with `class`, `abstract class`,
+    `role`, and `interface` blocks.
+
+    Similarly to `extends`, `with` can be "lifted" outside its block:
+
+      class Company with Taxable {
+        ...;
+      }
+  
+      interface Storage with Serializer, Deserializer;
+
+    If lifting both `extends` and `with` outside a block, `extends` must come
+    first.
+
+      class Person extends Animal with Thinking::Rational {
+        ...;
+      }
+
+  `begin`
+    This code gets run early on in the definition of a class or role.
+
+      class Person {
+        begin {
+          say "Defining $package";
+        }
+      }
+
+    At the time the code gets run, none of the class's attributes or methods
+    will be defined yet.
+
+    The lexical variables $package and $kind are defined within the block.
+    $kind will be either 'class' or 'role'.
+
+    The `begin` keyword cannot be used outside of `class`, `abstract class`,
+    `role`, and `interface` blocks, though it is possible to define a global
+    default for it:
+
+      use Zydeco (
+        ...,
+        begin => sub {
+          my ($package, $kind) = @_;
+          ...;
+        },
+      );
+
+    Per-package `begin` overrides the global `begin`.
+
+    Unlike Perl's `BEGIN` keyword, a package can only have one `begin`.
+
+    If `class` definitions are nested, `begin` blocks will be inherited by
+    child classes. If a parent class is specified via `extends`, `begin`
+    blocks will not be inherited.
+
+  `end`
+    This code gets run late in the definition of a class or role.
+
+      class Person {
+        end {
+          say "Finished defining $package";
+        }
+      }
+
+    The lexical variables $package and $kind are defined within the block.
+    $kind will be either 'class' or 'role'.
+
+    The `end` keyword cannot be used outside of `class`, `abstract class`,
+    `role`, and `interface` blocks, though it is possible to define a global
+    default for it:
+
+      use Zydeco (
+        ...,
+        end => sub {
+          my ($package, $kind) = @_;
+          ...;
+        },
+      );
+
+    Per-package `end` overrides the global `end`.
+
+    Unlike Perl's `END` keyword, a package can only have one `end`.
+
+    If `class` definitions are nested, `end` blocks will be inherited by child
+    classes. If a parent class is specified via `extends`, `end` blocks will
+    not be inherited.
+
+  `has`
+    Defines an attribute.
+
+      class Person {
+        has name;
+        has age;
+      }
+  
+      my $bob = MyApp->new_person(name => "Bob", age => 21);
+
+    Cannot be used outside of `class`, `abstract class`, and `role` blocks.
+
+    Moo-style attribute specifications may be given:
+
+      class Person {
+        has name ( is => rw, type => Str, required => true );
+        has age  ( is => rw, type => Int );
+      }
+
+    Note there is no fat comma after the attribute name! It is a bareword.
+
+    Use a plus sign before an attribute name to modify an attribute defined in
+    a parent class.
+
+      class Animal {
+        has name ( type => Str, required => false );
+    
+        class Person {
+          has +name ( required => true );
+        }
+      }
+
+    `rw`, `rwp`, `ro`, `lazy`, `bare`, `private`, `true`, and `false` are
+    allowed as barewords for readability, but `is` is optional, and defaults
+    to `rw`.
+
+    The names of attributes can start with an asterisk:
+
+      has *foo;
+
+    This adds no extra meaning, but is supported for consistency with the
+    syntax of named parameters in method signatures. (Depending on your text
+    editor, it may also improve syntax highlighting.)
+
+    If you need to decide an attribute name on-the-fly, you can replace the
+    name with a block that returns the name as a string.
+
+      class Employee {
+        extends Person;
+        has {
+          $ENV{LOCALE} eq 'GB'
+            ? 'national_insurance_no'
+            : 'social_security_no'
+        } (type => Str)
+      }
+  
+      my $bob = Employee->new(
+        name               => 'Bob',
+        social_security_no => 1234,
+      );
+
+    You can think of the syntax as being kind of like `print`.
+
+      print BAREWORD_FILEHANDLE @strings;
+      print { block_returning_filehandle(); } @strings;
+
+    The block is called in scalar context, so you'll need a loop to define a
+    list like this:
+
+      class Person {
+        my @attrs = qw( name age );
+    
+        # this does not work
+        has {@attrs} ( required => true );
+    
+        # this works
+        for my $attr (@attrs) {
+          has {$attr} ( required => true );
+        }
+      }
+
+   Type constraints for attributes
+    Note `type` instead of `isa`. Any type constraints from Types::Standard,
+    Types::Common::Numeric, and Types::Common::String will be avaiable as
+    barewords. Also, any pre-declared types can be used as barewords. It's
+    possible to quote types as strings, in which case you don't need to have
+    pre-declared them.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has age    ( type => Int );
+        has spouse ( type => 'Person' );
+        has kids   (
+          is      => lazy,
+          type    => 'ArrayRef[Person]',
+          builder => sub { [] },
+        );
+      }
+
+    Note that when `type` is a string, Zydeco will consult your type library
+    to figure out what it means.
+
+    It is also possible to use `isa => 'SomeClass'` or `does => 'SomeRole'` to
+    force strings to be treated as class names or role names instead of type
+    names.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has age    ( type => Int );
+        has spouse ( isa  => 'Person' );
+        has pet    ( isa  => '::Animal' );   # no prefix
+      }
+
+    For enumerations, you can define them like this:
+
+      class Person {
+        ...;
+        has status ( enum => ['alive', 'dead', 'undead'] );
+      }
+
+   Delegation
+    Zydeco integrates support for MooX::Enumeration (and MooseX::Enumeration,
+    but MouseX::Enumeration doesn't exist).
+
+      class Person {
+        ...;
+        has status (
+          enum    => ['alive', 'dead', 'undead'],
+          default => 'alive',
+          handles => 1,
+        );
+      }
+  
+      my $bob = MyApp->new_person;
+      if ( $bob->is_alive ) {
+        ...;
+      }
+
+    `handles => 1` creates methods named `is_alive`, `is_dead`, and
+    `is_undead`, and `handles => 2` creates methods named `status_is_alive`,
+    `status_is_dead`, and `status_is_undead`.
+
+    Checking `$bob->status eq 'alvie'` is prone to typos, but
+    `$bob->status_is_alvie` will cause a runtime error because the method is
+    not defined.
+
+    Zydeco also integrates support for Sub::HandlesVia allowing you to
+    delegate certain methods to unblessed references and non-reference values.
+    For example:
+
+      class Person {
+        has age (
+          type         => 'Int',
+          default      => 0,
+          handles_via  => 'Counter',
+          handles      => {
+            birthday => 'inc',   # increment age
+          },
+        );
+        after birthday {
+          if ($self->age < 30) {
+            say "yay!";
+          }
+          else {
+            say "urgh!";
+          }
+        }
+      }
+
+    `handles` otherwise works as you'd expect from Moo and Moose.
+
+   Required versus optional attributes and defaults
+    A trailing `!` indicates a required attribute.
+
+      class Person {
+        has name!;
+      }
+
+    It is possible to give a default using an equals sign.
+
+      class WidgetCollection {
+        has name = "Widgets";
+        has count (type => Num) = 0;
+      }
+
+    Note that the default comes after the spec, so in cases where the spec is
+    long, it may be clearer to express the default inside the spec:
+
+      class WidgetCollection {
+        has name = "Widgets";
+        has count (
+          type     => Num,
+          lazy     => true,
+          required => false,
+          default  => 0,
+        );
+      }
+
+    Defaults given this way will be eager (non-lazy), but can be made lazy
+    using the spec:
+
+      class WidgetCollection {
+        has name = "Widgets";
+        has count (is => lazy) = 0;
+      }
+
+    Defaults *can* use the $self object:
+
+      class WidgetCollection {
+        has name         = "Widgets";
+        has display_name = $self->name;
+      }
+
+    Any default that includes $self will automatically be lazy, but can be
+    made eager using the spec. (It is almost certainly a bad idea to do so
+    though.)
+
+      class WidgetCollection {
+        has name = "Widgets";
+        has display_name ( lazy => false ) = $self->name;
+      }
+
+   Specifying multiple attributes at once
+    Commas may be used to separate multiple attributes:
+
+      class WidgetCollection {
+        has name, display_name ( type => Str );
+      }
+
+    The specification and defaults are applied to every attribute in the list.
+
+   Private attributes
+    If an attribute name starts with a dollar sign, it is a private (lexical)
+    attribute. Private attributes cannot be set in the constructor, and cannot
+    be directly accessed outside the class's lexical scope.
+
+      class Foo {
+        has $ua = HTTP::Tiny->new;
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->$ua->get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Note how `$self->$ua` is still called as a method. You don't just do
+    `$ua->get()`. The invocant is still required, just like it would be with a
+    normal public attribute:
+
+      class Foo {
+        has ua = HTTP::Tiny->new;
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->ua->get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Private attributes can have delegated methods (`handles`):
+
+      class Foo {
+        has $ua (
+          default => sub { HTTP::Tiny->new },
+          handles => [
+            http_get  => 'get',
+            http_post => 'post',
+          ],
+        );
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->http_get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    These can even be made lexical too:
+
+      class Foo {
+        my ($http_get, $http_post);  # predeclare
+    
+        has $ua (
+          default => sub { HTTP::Tiny->new },
+          handles => [
+            \$http_get  => 'get',
+            \$http_post => 'post',
+          ],
+        );
+    
+        method fetch_data ( Str $url ) {
+          my $response = $self->$http_get($url);
+          $response->{is_success} or confess('request failed');
+          return $response->{content};
+        }
+      }
+
+    Note how an arrayref is used for `handles` instead of a hashref. This is
+    because scalarrefs don't work as hashref keys.
+
+    Although constructors ignore private attributes, you may set them in a
+    factory method.
+
+      class Foo {
+        has $ua;
+    
+        factory new_foo (%args) {
+          my $instance = $class->new(%args);
+          $instance->$ua( HTTP::Tiny->new );
+          return $instance;
+        }
+      }
+
+    `has $foo` is just a shortcut for:
+
+      my $foo;
+      has foo => (is => "private", accessor => \$foo);
+
+    You can use `is => "private"` to create even *more* private attributes
+    without even having that lexical accessor:
+
+      has foo => (is => "private");
+
+    If it seems like an attribute that can't be set in the constructor and
+    doesn't have accessors would be useless, you're wrong. Because it can
+    still have delegations and a default value.
+
+    Private attributes use lexical variables, so are visible to subclasses
+    only if the subclass definition is nested in the base class.
+
+    From version 0.506 onwards, not only can private attributes have public
+    delegations and accessors, but public attributes can have private
+    delegations and attributes:
+
+      class Foo {
+        my ($clear_ua, $http_get, $http_post);  # predeclare
+    
+        has ua (
+          is      => ro,                        # public attribute!
+          clearer => \$clear_ua,                # private clearer
+          default => sub { HTTP::Tiny->new },
+          handles => [                          # private delegations
+            \$http_get  => 'get',               #
+            \$http_post => 'post',              #
+          ],
+        );
+    
+        ...;
+      }
+
+  `constant`
+    Defines a constant.
+
+      class Person {
+        extends Animal;
+        constant latin_name = 'Homo sapiens';
+      }
+
+    `MyApp::Person->latin_name`, `MyApp::Person::latin_name`, and
+    `$person_object->latin_name` will return 'Homo sapiens'.
+
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks, will
+    define a constant in the caller package. (That is, usually the factory.)
+
+  `method`
+    Defines a method.
+
+      class Person {
+        has spouse;
+    
+        method marry {
+          my ($self, $partner) = @_;
+          $self->spouse($partner);
+          $partner->spouse($self);
+          return $self;
+        }
+      }
+
+    `sub { ... }` will not work as a way to define methods within the class.
+    Use `method { ... }` instead.
+
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks,
+    `method` will define a method in the caller package. (Usually the
+    factory.)
+
+    The variables $self and $class will be automatically defined within all
+    methods. $self is set to $_[0] (though the invocant is not shifted off
+    @_). $class is set to `ref($self)||$self`. If the method is called as a
+    class method, both $self and $class will be the same thing: the full class
+    name as a string. If the method is called as an object method, $self is
+    the object and $class is its class.
+
+    Like with `has`, you may use a block that returns a string instead of a
+    bareword name for the method.
+
+      method {"ma"."rry"} {
+        ...;
+      }
+
+    Zydeco supports method signatures for named arguments and positional
+    arguments. A mixture of named and positional arguments is allowed, with
+    some limitations. For anything more complicates, you should define the
+    method with no signature at all, and unpack @_ within the body of the
+    method.
+
+   Signatures for Named Arguments
+      class Person {
+        has spouse;
+    
+        method marry ( Person *partner, Object *date = DateTime->now ) {
+          $self->spouse( $arg->partner );
+          $arg->partner->spouse( $self );
+          return $self;
+        }
+      }
+
+    The syntax for each named argument is:
+
+      Type *name = default
+
+    The type is a type name, which will be parsed using Type::Parser. (So it
+    can include the `~`, `|`, and `&`, operators, and can include parameters
+    in `[ ]` brackets. Type::Parser can handle whitespace in the type, but not
+    comments.
+
+    Alternatively, you can provide a block which returns a type name as a
+    string or returns a blessed Type::Tiny object. For very complex types,
+    where you're expressing additional coercions or value constraints, this is
+    probably what you want.
+
+    The asterisk indicates that the argument is named, not positional.
+
+    The name may be followed by a question mark to indicate an optional
+    argument.
+
+      method marry ( Person *partner, Object *date? ) {
+        ...;
+      }
+
+    Or it may be followed by an equals sign to set a default value.
+
+    Comments may be included in the signature, but not in the middle of a type
+    constraint.
+
+      method marry (
+        # comment here is okay
+        Person
+        # comment here is fine too
+        *partner
+        # and here
+      ) { ... }
+
+      method marry (
+        Person # comment here is not okay!
+               | Horse
+        *partner
+      ) { ... }
+
+    As with signature-free methods, $self and $class wll be defined for you in
+    the body of the method. However, when a signature has been used $self *is*
+    shifted off @_.
+
+    Also within the body of the method, a variable called $arg is provided.
+    This is a hashref of the named arguments. So you can access the partner
+    argument in the above example like this:
+
+      $arg->{partner}
+
+    But because $arg is blessed, you can also do:
+
+      $arg->partner
+
+    The latter style is encouraged as it looks neater, plus it helps catch
+    typos. (`$ars->{pratner}` for example!) However, accessing it as a plain
+    hashref is supported and shouldn't be considered to be breaking
+    encapsulation.
+
+    For optional arguments you can check:
+
+      exists($arg->{date})
+
+    Or:
+
+      $arg->has_date
+
+    For types which have a coercion defined, the value will be automatically
+    coerced.
+
+    Methods with named arguments can be called with a hash or hashref.
+
+      $alice->marry(  partner => $bob  );      # okay
+      $alice->marry({ partner => $bob });      # also okay
+
+   Signatures for Positional Arguments
+      method marry ( Person $partner, Object $date? ) {
+        $self->spouse( $partner );
+        $partner->spouse( $self );
+        return $self;
+      }
+
+    The dollar sign is used instead of an asterisk to indicate a positional
+    argument.
+
+    As with named arguments, $self is automatically shifted off @_ and $class
+    exists. Unlike named arguments, there is no $arg variable, and instead a
+    scalar variable is defined for each named argument.
+
+    Optional arguments and defaults are supported in the same way as named
+    arguments.
+
+    It is possible to include a slurpy hash or array at the end of the list of
+    positional arguments.
+
+      method marry ( $partner, $date, @vows ) {
+        ...;
+      }
+
+    If you need to perform a type check on the slurpy parameter, you should
+    pretend it is a hashref or arrayref.
+
+      method marry ( $partner, $date, ArrayRef[Str] @vows ) {
+        ...;
+      }
+
+   Signatures with Mixed Arguments
+    You may mix named and positional arguments with the following limitations:
+
+    *   Positional arguments must appear at the beginning and/or end of the
+        list. They cannot be surrounded by named arguments.
+
+    *   Positional arguments cannot be optional and cannot have a default.
+        They must be required. (Named arguments can be optional and have
+        defaults.)
+
+    *   No slurpies!
+
+      method print_html ($tag, Str $text, *htmlver?, *xml?, $fh) {
+  
+        confess "update your HTML" if $arg->htmlver < 5;
+    
+        if (length $text) {
+          print $fh "<tag>$text</tag>";
+        }
+        elsif ($arg->xml) {
+          print $fh "<tag />";
+        }
+        else {
+          print $fh "<tag></tag>";
+        }
+      }
+  
+      $obj->print_html('h1', 'Hello World', { xml => true }, \*STDOUT);
+      $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
+      $obj->print_html('h1', 'Hello World',                  \*STDOUT);
+
+    Mixed signatures are basically implemented like named signatures, but
+    prior to interpreting @_ as a hash, some parameters are spliced off the
+    head and tail. We need to know how many elements to splice off each end,
+    so that is why there are restrictions on slurpies and optional parameters.
+
+   Empty Signatures
+    There is a difference between the following two methods:
+
+      method foo {
+        ...;
+      }
+  
+      method foo () {
+        ...;
+      }
+
+    In the first, you have not provided a signature and are expected to deal
+    with @_ in the body of the method. In the second, there is a signature,
+    but it is a signature showing that the method expects no arguments (other
+    than the invocant of course).
+
+   Optimizing Methods
+    For a slight compile-time penalty, you can improve the speed which methods
+    run at using the `:optimize` attribute:
+
+      method foo :optimize (...) {
+        ...;
+      }
+
+    Optimized methods must not close over any lexical (`my` or `our`)
+    variables; they can only access the variables declared in their,
+    signature, $self, $class, @_, and globals. They cannot access private
+    attributes unless those private attributes have public accessors.
+
+   Anonymous Methods
+    It *is* possible to use `method` without a name to return an anonymous
+    method (coderef):
+
+      use Zydeco prefix => 'MyApp';
+  
+      class MyClass {
+        method get_method ($foo) {
+          method ($bar) {
+            return $foo . $bar;
+          }
+        }
+      }
+  
+      my $obj   = MyApp->new_myclass;
+      my $anon  = $obj->get_method("FOO");
+      say ref($anon);                       # CODE
+      say $obj->$anon("BAR");               # FOOBAR
+
+    Note that while $anon is a coderef, it is still a method, and still
+    expects to be passed an object as $self.
+
+    Due to limitations with Keyword::Simple, keywords are always complete
+    statements, so `method ...` has an implicit semicolon before and after it.
+    This means that this won't work:
+
+      my $x = method { ... };
+
+    Because it gets treated as:
+
+      my $x = ;
+      method { ... };
+
+    A workaround is to wrap it in a `do { ... }` block.
+
+      my $x = do { method { ... } };
+
+   Private methods
+    A shortcut for the pattern of:
+
+      my $x = do { method { ... } };
+
+    Is this:
+
+      method $x { ... }
+
+    Zydeco will declare the variable `my $x` for you, assign the coderef to
+    the variable, and you don't need to worry about a `do` block to wrap it.
+
+   Multimethods
+    Multi methods should *Just Work [tm]* if you prefix them with the keyword
+    `multi`
+
+      use Zydeco prefix => 'MyApp';
+  
+      class Widget {
+        multi method foo :alias(quux) (Any $x) {
+          say "Buzz";
+        }
+        multi method foo (HashRef $h) {
+          say "Fizz";
+        }
+      }
+  
+      my $thing = MyApp->new_widget;
+      $thing->foo( {} );       # Fizz
+      $thing->foo( 42 );       # Buzz
+  
+      $thing->quux( {} );      # Buzz
+
+    Outside of `class`, `abstract class`, `role`, and `interface` blocks,
+    `multi method` will define a multi method in the caller package. (That is,
+    usually the factory.)
+
+    Multimethods cannot be anonymous or private.
+
+  `requires`
+    Indicates that a role requires classes to fulfil certain methods.
+
+      role Payable {
+        requires account;
+        requires deposit (Num $amount);
+      }
+  
+      class Employee {
+        extends Person;
+        with Payable;
+        has account!;
+        method deposit (Num $amount) {
+          ...;
+        }
+      }
+
+    Required methods have an optional signature; this is usually ignored, but
+    if Devel::StrictMode determines that strict behaviour is being used, the
+    signature will be applied to the method via an `around` modifier.
+
+    Or to put it another way, this:
+
+      role Payable {
+        requires account;
+        requires deposit (Num $amount);
+      }
+
+    Is a shorthand for this:
+
+      role Payable {
+        requires account;
+        requires deposit;
+    
+        use Devel::StrictMode 'STRICT';
+        if (STRICT) {
+         around deposit (Num $amount) {
+           $self->$next(@_);
+         }
+        }
+      }
+
+    Can only be used in `role` and `interface` blocks.
+
+  `before`
+      before marry {
+        say "Speak now or forever hold your peace!";
+      }
+
+    As with `method`, $self and $class are defined.
+
+    As with `method`, you can provide a signature:
+
+      before marry ( Person $partner, Object $date? ) {
+        say "Speak now or forever hold your peace!";
+      }
+
+    Note that this will result in the argument types being checked/coerced
+    twice; once by the before method modifier and once by the method itself.
+    Sometimes this may be desirable, but at other times your before method
+    modifier might not care about the types of the arguments, so can omit
+    checking them.
+
+      before marry ( $partner, $date? ) {
+        say "Speak now or forever hold your peace!";
+      }
+
+    Commas may be used to modify multiple methods:
+
+      before marry, sky_dive (@args) {
+        say "wish me luck!";
+      }
+
+    The `:optimize` attribute is supported for `before`.
+
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
+
+  `after`
+    There's not much to say about `after`. It's just like `before`.
+
+      after marry {
+        say "You may kiss the bride!";
+      }
+  
+      after marry ( Person $partner, Object $date? ) {
+        say "You may kiss the bride!";
+      }
+  
+      after marry ( $partner, $date? ) {
+        say "You may kiss the bride!";
+      }
+
+    Commas may be used to modify multiple methods:
+
+      after marry, finished_school_year (@args) {
+        $self->go_on_holiday();
+      }
+
+    The `:optimize` attribute is supported for `after`.
+
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
+
+  `around`
+    The `around` method modifier is somewhat more interesting.
+
+      around marry ( Person $partner, Object $date? ) {
+        say "Speak now or forever hold your peace!";
+        my $return = $self->$next(@_);
+        say "You may kiss the bride!";
+        return $return;
+      }
+
+    The $next variable holds a coderef pointing to the "original" method that
+    is being modified. This gives your method modifier the ability to munge
+    the arguments seen by the "original" method, and munge any return values.
+    (I say "original" in quote marks because it may not really be the original
+    method but another wrapper!)
+
+    $next and $self are both shifted off @_.
+
+    If you use the signature-free version then $next and $self are not shifted
+    off @_ for you, but the variables are still defined.
+
+      around marry {
+        say "Speak now or forever hold your peace!";
+        my $return = $self->$next($_[2], $_[3]);
+        say "You may kiss the bride!";
+        return $return;
+      }
+
+    Commas may be used to modify multiple methods:
+
+      around insert, update ($dbh, @args) {
+        $dbh->begin_transaction;
+        my $return = $self->$next(@_);
+        $dbh->commit_transaction;
+        return $return;
+      }
+
+    The `:optimize` attribute is supported for `around`.
+
+    Note that `SUPER::` won't work as expected in Zydeco, so `around` should
+    be used instead.
+
+    Method modifiers do work outside of `class`, `abstract class`, `role`, and
+    `interface` blocks, modifying methods in the caller package, which is
+    usually the factory package.
+
+  `factory`
+    The `factory` keyword is used to define alternative constructors for your
+    class.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        factory new_man (Str $name) {
+          return $class->new(name => $name, gender => 'male');
+        }
+    
+        factory new_woman (Str $name) {
+          return $class->new(name => $name, gender => 'female');
+        }
+      }
+
+    But here's the twist. These methods are defined within the factory
+    package, not within the class.
+
+    So you can call:
+
+      MyApp->new_man("Bob")             # yes
+
+    But not:
+
+      MyApp::Person->new_man("Bob")     # no
+
+    Note that if your class defines *any* factory methods like this, then the
+    default factory method (in this case `MyApp->new_person` will no longer be
+    automatically created. But you can create the default one easily:
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        factory new_man (Str $name) { ... }
+        factory new_woman (Str $name) { ... }
+        factory new_person;   # no method signature or body!
+      }
+
+    Within a factory method body, the variable $class is defined, just like
+    normal methods, but $self is not defined. There is also a variable
+    $factory which is a string containing the factory package name. This is
+    because you sometimes need to create more than just one object in a
+    factory method.
+
+      class Wheel;
+  
+      class Car {
+        has wheels = [];
+    
+        factory new_three_wheeler () {
+          return $class->new(
+            wheels => [
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+            ]
+          );
+        }
+    
+        factory new_four_wheeler () {
+          return $class->new(
+            wheels => [
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+              $factory->new_wheel,
+            ]
+          );
+        }
+      }
+
+    As with `method` and the method modifiers, if you provide a signature,
+    $factory and $class will be shifted off @_. If you don't provide a
+    signature, the variables will be defined, but not shifted off @_.
+
+    An alternative way to provide additional constructors is with `method` and
+    then use `factory` to proxy them.
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        method new_guy (Str $name) { ... }
+        method new_gal (Str $name) { ... }
+    
+        factory new_person;
+        factory new_man via new_guy;
+        factory new_woman via new_gal;
+      }
+
+    Now `MyApp->new_man` will call `MyApp::Person->new_guy`.
+
+    `factory new_person` with no `via` or method body is basically like saying
+    `via new`.
+
+    The `:optimize` attribute is supported for `factory`.
+
+    The `factory` keyword can only be used inside `class` blocks.
+
+   Implementing a singleton
+    Factories make it pretty easy to implement the singleton pattern.
+
+      class AppConfig {
+        ...;
+    
+        factory get_appconfig () {
+          state $config = $class->new();
+        }
+      }
+
+    Now `MyApp->get_appconfig` will always return the same AppConfig object.
+    Because any explicit use of the `factory` keyword in a class definition
+    suppresses the automatic creation of a factory method for the class, there
+    will be no `MyApp->new_appconfig` method for creating new objects of that
+    class.
+
+    (People can still manually call `MyApp::AppConfig->new` to get a new
+    AppConfig object, but remember Zydeco discourages calling constructors
+    directly, and encourages you to use the factory package for instantiating
+    objects!)
+
+  `type_name`
+      class Homo::Sapiens {
+        type_name Human;
+      }
+
+    The class will still be called MyApp::Homo::Sapiens but the type in the
+    type library will be called Human instead of Homo_Sapiens.
+
+    Can only be used in `class`, `abstract class`, `role`, and `interface`
+    blocks.
+
+  `coerce`
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        coerce from Str via from_string {
+          $class->new(name => $_);
+        }
+      }
+  
+      class Company {
+        has owner ( type => 'Person', required => true );
+      }
+  
+      my $acme = MyApp->new_company( owner => "Bob" );
+
+    Note that the company owner is supposed to be a person object, not a
+    string, but the Person class knows how create a person object from a
+    string.
+
+    Coercions are automatically enabled in a lot of places for types that have
+    a coercion. For example, types in signatures, and types in attribute
+    definitions.
+
+    Note that the coercion body doesn't allow signatures, and the value being
+    coerced will be found in $_. If you want to have signatures, you can
+    define a coercion as a normal method first:
+
+      class Person {
+        has name   ( type => Str, required => true );
+        has gender ( type => Str );
+    
+        method from_string ( Str $name ) {
+          $class->new(name => $name);
+        }
+    
+        coerce from Str via from_string;
+      }
+
+    In both cases, a `MyApp::Person->from_string` method is generated which
+    can be called to manually coerce a string into a person object.
+
+    They keyword `from` is technically optional, but does make the statement
+    more readable.
+
+      coerce Str via from_string {      # this works
+        $class->new(name => $_);
+      }
+
+    The `:optimize` attribute is not currently supported for `coerce`.
+
+    Can only be used in `class` blocks.
+
+  `overload`
+      class Collection {
+        has items = [];
+        overload '@{}' => sub { shift->list };
+      }
+
+    The list passed to `overload` is passed to overload with no other
+    processing.
+
+    Can only be used in `class` blocks.
+
+  `version`
+      class Person {
+        version '1.0';
+      }
+
+    This just sets $MyApp::Person::VERSION.
+
+    Can only be used with `class`, `abstract class`, `role`, and `interface`
+    blocks.
+
+    You can set a default version for all packages like this:
+
+      use Zydeco (
+        ...,
+        version => 1.0,
+      );
+
+    If `class` definitions are nested, `version` will be inherited by child
+    classes. If a parent class is specified via `extends`, `version` will not
+    be inherited.
+
+    Versions may also be expressed like:
+
+      class Animal 1.0;
+  
+      class Person 1.1 extends Animal {
+        ...;
+      }
+
+  `authority`
+      class Person {
+        authority 'cpan:TOBYINK';
+      }
+
+    This just sets $MyApp::Person::AUTHORITY.
+
+    It is used to indicate who is the maintainer of the package.
+
+    Can only be used in `class`, `abstract class`, `role`, and `interface`
+    blocks.
+
+      use Zydeco (
+        ...,
+        version   => 1.0,
+        authority => 'cpan:TOBYINK',
+      );
+
+    If `class` definitions are nested, `authority` will be inherited by child
+    classes. If a parent class is specified via `extends`, `authority` will
+    not be inherited.
+
+  `include`
+    `include` is the Zydeco equivalent of Perl's `require`.
+
+      package MyApp {
+        use Zydeco;
+        include Database;
+        include Classes;
+        include Roles;
+      }
+
+    It works somewhat more crudely than `require` and `use`, evaluating the
+    included file pretty much as if it had been copy and pasted into the file
+    that included it.
+
+    The names of the files to load are processsed using the same rules for
+    prefixes as classes and roles (so MyApp::Database, etc in the example),
+    and @INC is searched just like `require` and `use` do, but instead of
+    looking for a file called "MyApp/Database.pm", Zydeco will look for
+    "MyApp/Database.pl" (yes, ".pl"). This naming convention ensures people
+    won't accidentally load MyApp::Database using `use` or `require` because
+    it isn't intended to be loaded outside the context of the MyApp package.
+
+    The file "MyApp/Database.pl" might look something like this:
+
+      class Database {
+        has dbh = DBI->connect(...);
+    
+        factory get_db {
+          state $instance = $class->new;
+        }
+      }
+
+    Note that it doesn't start with a `package` statement, nor `use Zydeco`.
+    It's just straight on to the definitions. There's no `1;` needed at the
+    end.
+
+    `use strict` and `use warnings` are safe to put in the file if you need
+    them to satisfy linters, but they're not necessary because the contents of
+    the file are evaluated as if they had been copied and pasted into the main
+    MyApp module.
+
+    There are *no* checks to prevent a file from being included more than
+    once, and there are *no* checks to deal with cyclical inclusions.
+
+    Inclusions are currently only supported at the top level, and not within
+    class and role definitions.
+
+  `Zydeco::PACKAGE_SPEC()`
+    This function can be used while a class or role is being compiled to tweak
+    the specification for the class/role.
+
+      class Foo {
+        has foo;
+        Zydeco::PACKAGE_SPEC->{has}{foo}{type} = Int;
+      }
+
+    It returns a hashref of attributes, methods, etc. MooX::Press should give
+    you an idea about how the hashref is structured, but Zydeco only supports
+    a subset of what MooX::Press supports. For example, MooX::Press allows
+    `has` to be an arrayref or a hashref, but Zydeco only supports a hashref.
+    The exact subset that Zydeco supports is subject to change without notice.
+
+    This can be used to access MooX::Press features that Zydeco doesn't
+    expose.
+
+IMPORTS
+    Zydeco also exports constants `true` and `false` into your namespace.
+    These show clearer boolean intent in code than using 1 and 0.
+
+    Zydeco exports `rw`, `ro`, `rwp`, `lazy`, `bare`, and `private` constants
+    which make your attribute specs a little cleaner looking.
+
+    Zydeco exports `blessed` from Scalar::Util because that can be handy to
+    have, and `confess` from Carp. Zydeco's copy of `confess` is super-powered
+    and runs its arguments through `sprintf`.
+
+      before vote {
+        if ($self->age < 18) {
+          confess("Can't vote, only %d", $self->age);
+        }
+      }
+
+    Zydeco turns on strict, warnings, and the following modern Perl features:
+
+      # Perl 5.14 and Perl 5.16
+      say state unicode_strings
+  
+      # Perl 5.18 or above
+      say state unicode_strings unicode_eval evalbytes current_sub fc
+
+    If you're wondering why not other features, it's because I didn't want to
+    enable any that are currently classed as experimental, nor any that
+    require a version of Perl above 5.18. The `switch` feature is mostly seen
+    as a failed experiment these days, and `lexical_subs` cannot be called as
+    methods so are less useful in object-oriented code.
+
+    You can, of course, turn on extra features yourself.
+
+      package MyApp {
+        use Zydeco;
+        use feature qw( lexical_subs postderef );
+    
+        ...;
+      }
+
+    (The `current_sub` feature is unlikely to work fully unless you have
+    `:optimize` switched on for that method, or the method does not include a
+    signature. For non-optimized methods with a signature, a wrapper is
+    installed that handles checks, coercions, and defaults. `__SUB__` will
+    point to the "inner" sub, minus the wrapper.)
+
+    Zydeco exports Syntax::Keyword::Try for you. Useful to have.
+
+    And last but not least, it exports all the types, `is_*` functions, and
+    `assert_*` functions from Types::Standard, Types::Common::String, and
+    Types::Common::Numeric.
+
+    You can choose which parts of Zydeco you import:
+
+      package MyApp {
+        use Zydeco keywords => [qw/
+          -booleans
+          -privacy
+          -utils
+          -types
+          -is
+          -assert
+          -features
+          try
+          class abstract role interface
+          include toolkit begin end extends with requires
+          has constant method multi factory before after around
+          type_name coerce
+          version authority overload
+        /];
+
+    It should mostly be obvious what they all do, but `-privacy` is `ro`,
+    `rw`, `rwp`, etc; `-types` is bareword type constraints (though even
+    without this export, they should work in method signatures), `-is` are the
+    functions like `is_NonEmptyStr` and `is_Object`, `-assert` are functions
+    like `assert_Int`, `-utils` gives you `blessed` and `confess`.
+
+    `no Zydeco` will clear up:
+
+          class abstract role interface
+          include toolkit begin end extends with requires
+          has constant method multi factory before after around
+          type_name coerce
+          version authority overload
+
+    But won't clear up things Zydeco imported for you from other packages. Use
+    `no MooX::Press::Keywords`, `no Types::Standard`, etc to do that, or just
+    use namespace::autoclean.
+
+FEATURES
+  Helper Subs
+    Earlier it was stated that `sub` cannot be used to define methods in
+    classes and roles. This is true, but that doesn't mean that it has no use.
+
+      package MyApp {
+        use Zydeco;
+    
+        sub helper_function { ... }
+    
+        class Foo {
+          method foo {
+            ...;
+            helper_function(...);
+            ...;
+          }
+        }
+    
+        class Bar {
+          sub other_helper { ... }
+          method bar {
+            ...;
+            helper_function(...);
+            other_helper(...);
+            ...;
+          }
+        }
+      }
+
+    The subs defined by `sub` end up in the "MyApp" package, not "MyApp::Foo"
+    or "MyApp::Bar". They can be called by any of the classes and roles
+    defined in MyApp. This makes them suitable for helper subs like logging,
+    List::Util/Scalar::Util sorts of functions, and so on.
+
+      package MyApp {
+        use Zydeco;
+    
+        use List::Util qw( any all first reduce );
+        # the above functions are now available within
+        # all of MyApp's classes and roles, but won't
+        # pollute any of their namespaces.
+    
+        use namespace::clean;
+        # And now they won't even pollute MyApp's namespace.
+        # Though I'm pretty sure this will also stop them
+        # from working in any methods that used ":optimize".
+    
+        class Foo { ... } 
+        role Bar { ... } 
+        role Baz { ... } 
+      }
+
+    `sub` is also usually your best option for those tiny little coderefs that
+    need to be defined here and there:
+
+      has foo (
+        is       => lazy,
+        type     => ArrayRef[Str],
+        builder  => sub {  []  },
+      );
+
+    Though consider using Sub::Quote if you're using Moo.
+
+  Anonymous Classes and Roles
+   Anonymous classes
+    It is possible to make anonymous classes:
+
+      my $class  = do { class; };
+      my $object = $class->new;
+
+    The `do { ... }` block is necessary because of a limitation in
+    Keyword::Simple, where any keywords it defines must be complete
+    statements.
+
+    Anonymous classes can have methods and attributes and so on:
+
+      my $class = do { class {
+        has foo (type => Int);
+        has bar (type => Int);
+      }};
+  
+      my $object = $class->new(foo => 1, bar => 2);
+
+    Anonymous classes *do not* implicitly inherit from their parent like named
+    nested classes do. Named classes nested inside anonymous classes *do not*
+    implicitly inherit from the anonymous class.
+
+    Having one anonymous class inherit from another can be done though:
+
+      my $base     = do { class; }
+      my $derived  = do { class {
+        extends {"::$k1"};
+      }};
+
+    This works because `extends` accepts a block which returns a string for
+    the package name, and the string needs to begin with "::" to avoid the
+    auto prefix mechanism.
+
+   Anonymous roles
+    Anonymous roles work in much the same way.
+
+  Parameterizable Classes and Roles
+   Parameterizable classes
+      package MyApp {
+        use Zydeco;
+    
+        class Animal {
+          has name;
+        }
+    
+        class Species ( Str $common_name, Str $binomial ) {
+          extends Animal;
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          extends Species('dog', 'Canis familiaris');
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
+    instances of it. It's like a template for generating classes. Then
+    "MyApp::Dog" generates a class from the template and inherits from that.
+
+      my $Cat = MyApp->generate_species('cat', 'Felis catus');
+      my $mog = $Cat->new(name => 'Mog');
+  
+      $mog->isa('MyApp::Animal');         # true
+      $mog->isa('MyApp::Species');        # false!!!
+      $mog->isa($Cat);                    # true
+
+    Because there are never any instances of "MyApp::Species", it doesn't make
+    sense to have a Species type constraint. Instead there are SpeciesClass
+    and SpeciesInstance type constraints.
+
+      use MyApp::Types -is;
+  
+      my $lassie = MyApp->new_dog;
+  
+      is_Animal( $lassie );               # true
+      is_Dog( $lassie );                  # true
+      is_SpeciesInstance( $lassie );      # true
+      is_SpeciesClass( ref($lassie) );    # true
+
+    Subclasses cannot be nested inside parameterizable classes, but
+    parameterizable classes can be nested inside regular classes, in which
+    case the classes they generate will inherit from the outer class.
+
+      package MyApp {
+        use Zydeco;
+    
+        class Animal {
+          has name;
+          class Species ( Str $common_name, Str $binomial ) {
+            constant common_name  = $common_name;
+            constant binomial     = $binomial;
+          }
+        }
+    
+        class Dog {
+          extends Species('dog', 'Canis familiaris');
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Anonymous parameterizable classes are possible:
+
+      my $generator = do { class ($footype, $bartype) {
+        has foo (type => $footype);
+        has bar (type => $bartype);
+      } };
+  
+      my $class = $generator->generate_package(Int, Num);
+  
+      my $object = $class->new(foo => 42, bar => 4.2);
+
+   Parameterizable roles
+    Often it makes more sense to parameterize roles than classes.
+
+      package MyApp {
+        use Zydeco;
+    
+        class Animal {
+          has name;
+        }
+    
+        role Species ( Str $common_name, Str $binomial ) {
+          constant common_name  = $common_name;
+          constant binomial     = $binomial;
+        }
+    
+        class Dog {
+          extends Animal;
+          with Species('dog', 'Canis familiaris'), GoodBoi?;
+          method bark () {
+            say "woof!";
+          }
+        }
+      }
+
+    Anonymous parameterizable roles are possible.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>.
+
+TODO
+  Plugin system
+    Zydeco can often load MooX/MouseX/MooseX plugins and work fine with them,
+    but some things won't work, like plugins that rely on being able to wrap
+    `has`. So it would be nice to have a plugin system that extensions can
+    hook into.
+
+    If you're interested in extending Zydeco, file a bug report about it and
+    let's have a conversation about the best way for that to happen. I
+    probably won't start a plugin API until someone actually wants to write a
+    plugin, because that will give me a better idea about what kind of API is
+    required.
+
+SEE ALSO
+    Zydeco website: <http://zydeco.toby.ink/>.
+
+    Less magic version: MooX::Press.
+
+    Important underlying technologies: Moo, Type::Tiny::Manual,
+    Sub::HandlesVia, Sub::MultiMethod, Lexical::Accessor,
+    Syntax::Keyword::Try.
+
+    Similar modules: Moops, Kavorka, Dios, MooseX::Declare.
+
+  Zydeco vs MooX::Press
+    Zydeco is mostly just a syntax wrapper over MooX::Press. You can see the
+    class and role definition that Zydeco passes to MooX::Press using:
+
+      use Zydeco debug => 1;
+
+    Rewriting your classes and roles to use MooX::Press directly would give
+    you a small speed boost, and fewer dependencies, though MooX::Press is a
+    little more frustrating to work with, needing a *lot* of punctuation.
+
+  Zydeco vs Moops
+    Because I also wrote Moops, people are likely to wonder what the
+    difference is, and why re-invent the wheel?
+
+    Zydeco has fewer dependencies than Moops, and crucially doesn't rely on
+    Package::Keyword and Devel::CallParser which have... issues. Zydeco uses
+    Damian Conway's excellent PPR to handle most parsing needs, so parsing
+    should be more predictable.
+
+    Moops is faster in most circumstances though.
+
+    Here are a few key syntax and feature differences.
+
+   Declaring a class
+    Moops and Zydeco use different logic for determining whether a class name
+    is "absolute" or "relative". In Moops, classes containing a "::" are seen
+    as absolute class names; in Zydeco, only classes *starting with* "::" are
+    taken to be absolute; all others are given the prefix.
+
+    Moops:
+
+      package MyApp {
+        use Moops;
+        class Foo {
+          class Bar {
+            class Baz {
+              # Nesting class blocks establishes a naming
+              # heirarchy so this is MyApp::Foo::Bar::Baz!
+            }
+          }
+        }
+      }
+
+    Zydeco:
+
+      package MyApp {
+        use Zydeco;
+        class Foo {
+          class Bar {
+            class Baz {
+              # This is only MyApp::Baz, but nesting
+              # establishes an @ISA chain instead.
+            }
+          }
+        }
+      }
+
+   How namespacing works
+    Moops:
+
+      use feature 'say';
+      package MyApp {
+        use Moops;
+        use List::Util qw(uniq);
+        class Foo {
+          say __PACKAGE__;         # MyApp::Foo
+          say for uniq(1,2,1,3);   # ERROR!
+          sub foo { ... }          # MyApp::Foo::foo()
+        }
+      }
+
+    Zydeco:
+
+      use feature 'say';
+      package MyApp {
+        use Zydeco;
+        use List::Util qw(uniq);
+        class Foo {
+          say __PACKAGE__;         # MyApp
+          say for uniq(1,2,1,3);   # this works fine
+          sub foo { ... }          # MyApp::foo()
+        }
+      }
+
+    This is why you can't use `sub` to define methods in Zydeco. You need to
+    use the `method` keyword. In Zydeco, all the code in the class definition
+    block is still executing in the parent package's namespace!
+
+   Multimethods
+    Moops/Kavorka multimethods are faster, but Zydeco is smarter at picking
+    the best candidate to dispatch to, and intelligently selecting candidates
+    across inheritance hierarchies and role compositions.
+
+   Other crazy Kavorka features
+    Kavorka allows you to mark certain parameters as read-only or aliases,
+    allows you to specify multiple names for named parameters, allows you to
+    rename the invocant, allows you to give methods and parameters attributes,
+    allows you to specify a method's return type, etc, etc.
+
+    Zydeco's `method` keyword is unlikely to ever offer as many features as
+    that. It is unlikely to offer many more features than it currently offers.
+
+    If you need fine-grained control over how @_ is handled, just don't use a
+    signature and unpack @_ inside your method body however you need to.
+
+   Lexical accessors
+    Zydeco has tighter integration with Lexical::Accessor, allowing you to use
+    the same keyword `has` to declare private and public attributes.
+
+   Factories
+    Zydeco puts an emphasis on having a factory package for instantiating
+    objects. Moops didn't have anything similar.
+
+   `augment` and `override`
+    These are Moose method modifiers that are not implemented by Moo. Moops
+    allows you to use these in Moose and Mouse classes, but not Moo classes.
+    Zydeco simply doesn't support them.
+
+   Type Libraries
+    Moops allowed you to declare multiple type libraries, define type
+    constraints in each, and specify for each class and role which type
+    libraries you want it to use.
+
+    Zydeco automatically creates a single type library for all your classes
+    and roles within a module to use, and automatically populates it with the
+    types it thinks you might want.
+
+    If you need to use other type constraints:
+
+      package MyApp {
+        use Zydeco;
+        # Just import types into the factory package!
+        use Types::Path::Tiny qw( Path );
+    
+        class DataSource {
+          has file => ( type => Path );
+      
+          method set_file ( Path $file ) {
+            $self->file( $file );
+          }
+        }
+      }
+  
+      my $ds = MyApp->new_datasource;
+      $ds->set_file('blah.txt');      # coerce Str to Path
+      print $ds->file->slurp_utf8;
+
+   Constants
+    Moops:
+
+      class Foo {
+        define PI = 3.2;
+      }
+
+    Zydeco:
+
+      class Foo {
+        constant PI = 3.2;
+      }
+
+   Parameterizable classes and roles
+    These were always on my todo list for Moops; I doubt they'll ever be done.
+    They work nicely in Zydeco though.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

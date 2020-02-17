@@ -24,7 +24,7 @@ name: Duadua
 provides:
   Duadua:
     file: lib/Duadua.pm
-    version: '0.06'
+    version: '0.07'
   Duadua::CLI:
     file: lib/Duadua/CLI.pm
   Duadua::Parser:
@@ -51,6 +51,8 @@ provides:
     file: lib/Duadua/Parser/Bot/Fastladder.pm
   Duadua::Parser::Bot::Feedbin:
     file: lib/Duadua/Parser/Bot/Feedbin.pm
+  Duadua::Parser::Bot::Feedeen:
+    file: lib/Duadua/Parser/Bot/Feedeen.pm
   Duadua::Parser::Bot::Feedly:
     file: lib/Duadua/Parser/Bot/Feedly.pm
   Duadua::Parser::Bot::GoogleRead:
@@ -129,5 +131,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2019 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -26,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.40";
+$VERSION   = "1.41";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load "Text::CSV_XS", $VERSION;
@@ -82,7 +82,7 @@ my %def_attr = (
     types			=> undef,
     callbacks			=> undef,
 
-    _EOF			=> 0,
+    _EOF			=> "",
     _RECNO			=> 0,
     _STATUS			=> undef,
     _FIELDS			=> undef,
@@ -641,7 +641,7 @@ sub error_diag {
 
     # Docs state to NEVER use UNIVERSAL::isa, because it will *never* call an
     # overridden isa method in any class. Well, that is exacly what I want here
-    if ($self && ref $self && # Not a class method or direct call
+    if ($self && ref $self and # Not a class method or direct call
 	 UNIVERSAL::isa ($self, __PACKAGE__) && exists $self->{_ERROR_DIAG}) {
 	$diag[0] = 0 + $self->{_ERROR_DIAG};
 	$diag[1] =     $self->{_ERROR_DIAG};
@@ -660,7 +660,7 @@ sub error_diag {
 	    $diag[4] and $msg =~ s/$/ field $diag[4]/;
 
 	    unless ($self && ref $self) {	# auto_diag
-	    	# called without args in void context
+		# called without args in void context
 		warn $msg;
 		return;
 		}
@@ -891,7 +891,7 @@ sub header {
 	elsif ($hdr =~ s/^\x84\x31\x95\x33//) { $enc = "gb-18030"   }
 	elsif ($hdr =~ s/^\x{feff}//)         { $enc = ""           }
 
-	$self->{ENCODING} = uc $enc;
+	$self->{ENCODING} = $enc ? uc $enc : undef;
 
 	$hdr eq "" and croak ($self->SetDiag (1010));
 
@@ -3676,8 +3676,7 @@ returned by L</error_diag>:
 
  my ($c, $s);
 
- sub ignore3006
- {
+ sub ignore3006 {
      my ($err, $msg, $pos, $recno, $fldno) = @_;
      if ($err == 3006) {
          # ignore this error
@@ -3709,8 +3708,7 @@ parser object and an array reference to the fields parsed.
 The return code of the callback is ignored  unless it is a reference to the
 string "skip", in which case the record will be skipped in L</getline_all>.
 
- sub add_from_db
- {
+ sub add_from_db {
      my ($csv, $row) = @_;
      $sth->execute ($row->[4]);
      push @$row, $sth->fetchrow_array;
@@ -3720,7 +3718,7 @@ string "skip", in which case the record will be skipped in L</getline_all>.
      after_parse => \&add_from_db });
 
 This hook can be used for validation:
-X<validation>
+X<data_validation>
 
 =over 2
 
@@ -3760,8 +3758,7 @@ parser object and an array reference to the fields passed.
 
 The return code of the callback is ignored.
 
- sub max_4_fields
- {
+ sub max_4_fields {
      my ($csv, $row) = @_;
      @$row > 4 and splice @$row, 4;
      } # max_4_fields
@@ -3923,6 +3920,25 @@ With the given example data, this filter would skip lines 2 through 8.
 =back
 
 =back
+
+One could also use modules like L<Types::Standard>:
+
+ use Types::Standard -types;
+
+ my $type   = Tuple[Str, Str, Int, Bool, Optional[Num]];
+ my $check  = $type->compiled_check;
+
+ # filter with compiled check and warnings
+ my $aoa = csv (
+    in     => \$data,
+    filter => {
+        0 => sub {
+            my $ok = $check->($_[1]) or
+                warn $type->get_message ($_[1]), "\n";
+            return $ok;
+            },
+        },
+    );
 
 =item after_in
 X<after_in>
@@ -4771,7 +4787,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2019 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2020 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

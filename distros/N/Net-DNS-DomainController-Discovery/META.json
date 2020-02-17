@@ -1,0 +1,51 @@
+{
+   "abstract" : "Discover Microsoft Active Directory domain controllers via DNS queries",
+   "author" : [
+      "Marcin CIESLAK <saperski@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DNS-DomainController-Discovery",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Net::DNS" : "1.21",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::Manifest" : "0",
+            "Net::DNS::Resolver::Mock" : "1.20171219",
+            "Test2::V0" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

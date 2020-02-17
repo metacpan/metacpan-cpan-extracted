@@ -44,10 +44,10 @@ sub __setting_menu_entries {
     ];
     if ( ! $all ) {
         if ( defined $sf->{i}{gc}{source_type} ) {
-            if ( $sf->{i}{gc}{source_type} =~ /file/i ) {
+            if ( $sf->{i}{gc}{source_type} eq 'file' ) {
                 splice @$options, 1, 1;
             }
-            elsif ( $sf->{i}{gc}{source_type} =~ /paste/i ) {
+            elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
                 splice @$options, 0, 1;
             }
         }
@@ -63,17 +63,18 @@ sub get_content {
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my @cu_keys = ( qw/from_plain from_file from_copy/ );
-    my %cu = ( from_plain => '- Plain',
-               from_copy  => '- Copy & Paste',
-               from_file  => '- From File',
+    my @cu = (
+        [ 'plain', '- Plain' ],
+        [ 'copy',  '- Copy & Paste' ],
+        [ 'file',  '- From File' ],
     );
     my $old_idx = 1;
 
     MENU: while ( 1 ) {
         if ( ! $goto_FILTER ) {
             my $hidden = "Choose type of data source:";
-            my $choices = [ $hidden, undef, @cu{@cu_keys} ];
+            my @pre = ( $hidden, undef );
+            my $choices = [ @pre, map { $_->[1] } @cu ];
             # Choose
             my $idx = $tc->choose(
                 $choices,
@@ -97,7 +98,7 @@ sub get_content {
                 next MENU;
             }
             else {
-                $sf->{i}{gc}{source_type} = $choices->[$idx];
+                $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
             }
             my $stmt_type = 'Insert';
             push @{$sf->{i}{stmt_types}}, $stmt_type if none { $stmt_type eq $_ } @{$sf->{i}{stmt_types}}; #
@@ -109,13 +110,13 @@ sub get_content {
                 delete $sf->{i}{ct}{default_table_name};
                 delete $sf->{i}{gc}{sheet_name};
                 my $ok;
-                if ( $sf->{i}{gc}{source_type} eq $cu{from_plain} ) {
+                if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                     ( $ok, $aoa ) = $cr->from_col_by_col( $sql );
                 }
-                elsif ( $sf->{i}{gc}{source_type} eq $cu{from_copy} ) {
+                elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_copy_and_paste( $sql );
                 }
-                elsif ( $sf->{i}{gc}{source_type} eq $cu{from_file} ) {
+                elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_file( $sql );
                 }
                 if ( ! $ok ) {
@@ -128,16 +129,16 @@ sub get_content {
             PARSE: while ( 1 ) {
                 if ( ! $goto_FILTER ) {
                     my ( $parse_mode_idx, $open_mode );
-                    if ( $sf->{i}{gc}{source_type} eq $cu{from_copy} ) {
+                    if ( $sf->{i}{gc}{source_type} eq 'copy' ) {
                         $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_copy};
                         $open_mode = '<';
                     }
-                    elsif ( $sf->{i}{gc}{source_type} eq $cu{from_file} ) {
+                    elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
                         $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
                         $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
                     }
                     $sql->{insert_into_args} = [];
-                    if ( $sf->{i}{gc}{source_type} eq $cu{from_plain} ) {
+                    if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                         $sql->{insert_into_args} = $aoa;
                     }
                     elsif ( $parse_mode_idx < 3 && -T $sf->{i}{gc}{file_fs} ) {
@@ -185,8 +186,7 @@ sub get_content {
                 $goto_FILTER = 0;
 
                 FILTER: while ( 1 ) {
-                    my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} ); ##
-                    my $ok = $cf->input_filter( $sql, 0 );
+                    my $ok = $cf->input_filter( $sql );
                     if ( ! $ok ) {
                         if ( $sf->{i}{gc}{sheet_count} >= 2 ) {
                             next PARSE;

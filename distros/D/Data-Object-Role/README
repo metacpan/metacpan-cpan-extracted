@@ -1,0 +1,144 @@
+NAME
+
+    Data::Object::Role
+
+ABSTRACT
+
+    Role Builder for Perl 5
+
+SYNOPSIS
+
+      package Identity;
+    
+      use Data::Object::Role;
+    
+      package Example;
+    
+      use Moo;
+    
+      with 'Identity';
+    
+      package main;
+    
+      my $example = Example->new;
+
+DESCRIPTION
+
+    This package modifies the consuming package making it a role.
+
+INHERITS
+
+    This package inherits behaviors from:
+
+    Moo
+
+SCENARIOS
+
+    This package supports the following scenarios:
+
+ has
+
+      package HasIdentity;
+    
+      use Data::Object::Role;
+    
+      has id => (
+        is => 'ro'
+      );
+    
+      package HasExample;
+    
+      use Moo;
+    
+      with 'HasIdentity';
+    
+      package main;
+    
+      my $example = HasExample->new;
+
+    This package supports the has keyword, which is used to declare role
+    attributes, which can be accessed and assigned to using the built-in
+    getter/setter or by the object constructor. See Moo for more
+    information.
+
+ requires
+
+      package EntityRequires;
+    
+      use Data::Object::Role;
+    
+      requires 'execute';
+    
+      package RequiresExample;
+    
+      use Moo;
+    
+      with 'EntityRequires';
+    
+      sub execute {
+    
+        # does something ...
+      }
+    
+      package main;
+    
+      my $example = RequiresExample->new;
+
+    This package supports the requires keyword, which is used to declare
+    methods which must exist in the consuming package. See Moo for more
+    information.
+
+ with
+
+      package WithEntity;
+    
+      use Data::Object::Role;
+    
+      package WithIdentity;
+    
+      use Data::Object::Role;
+    
+      with 'WithEntity';
+    
+      package WithExample;
+    
+      use Moo;
+    
+      with 'WithIdentity';
+    
+      package main;
+    
+      my $example = WithExample->new;
+
+    This package supports the with keyword, which is used to declare roles
+    to be used and compose into your role. See Moo for more information.
+
+AUTHOR
+
+    Al Newkirk, awncorp@cpan.org
+
+LICENSE
+
+    Copyright (C) 2011-2019, Al Newkirk, et al.
+
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the The Apache License, Version 2.0, as elucidated in the
+    "license file"
+    <https://github.com/iamalnewkirk/data-object-role/blob/master/LICENSE>.
+
+PROJECT
+
+    Wiki <https://github.com/iamalnewkirk/data-object-role/wiki>
+
+    Project <https://github.com/iamalnewkirk/data-object-role>
+
+    Initiatives <https://github.com/iamalnewkirk/data-object-role/projects>
+
+    Milestones
+    <https://github.com/iamalnewkirk/data-object-role/milestones>
+
+    Contributing
+    <https://github.com/iamalnewkirk/data-object-role/blob/master/CONTRIBUTE.md>
+
+    Issues <https://github.com/iamalnewkirk/data-object-role/issues>
+

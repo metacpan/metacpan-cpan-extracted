@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use strict; use warnings;
+use App::unbelievable(); our $VERSION = $App::unbelievable::VERSION;
+use App::unbelievable::CLI;
+exit App::unbelievable::CLI::run(\@ARGV);
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+unbelievable - Yet another site generator (can you believe it?)
+
+=head1 SYNOPSIS
+
+    unbelievable new <sitename>
+    cd <sitename>
+    unbelievable build
+
+Say C<unbelievable --man> for full documentation.  Available subcommands
+are C<new>, C<build>, and C<help>.
+
+=head1 DESCRIPTION
+
+C<unbelievable> makes static sites using L<Dancer2> and L<wallflower>.
+The inputs are UTF-8 encoded Markdown files, or HTML files or other assets.
+Your site is a full Dancer2 application, so can do anything you want!
+Databases, fancy templating --- the sky's the limit.
+
+To build your static site, C<unbelievable> requests every file in the
+C<public/> and C<content/> directories of your application.  C<public/>
+usually holds your static files (e.g., images and CSS), just like in a regular
+Dancer2 application.  C<content/> generally holds your Markdown files.
+For example, C<content/foo.md> will be accessible (unless you say otherwise
+in your Dancer2 code) as C</foo> and C</foo/>.
+
+For now, don't use C<request.uri_base> in your templates.  The generated
+templates assume they are mounted in C</>.  Please open an issue if that
+turns out to be a problem.
+
+=head1 SUBCOMMANDS
+
+=head2 new
+
+TODO!
+
+=head2 build
+
+=head3 Options
+
+=over
+
+=item C<-s>, C<--route-style> B<style>
+
+Request routes in B<style>.  Valid values are:
+
+=over
+
+=item C<htmlfile>
+
+Request each route as a file ending in html (e.g., C</foo.html>.
+
+=item C<dir>
+
+Request each route as a directory (e.g., C</foo/>).
+
+=back
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) 2020 Chris White.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Chris White E<lt>cxwembedded@gmail.comE<gt>
+
+=cut
+
+# vi: set fdm=marker: #

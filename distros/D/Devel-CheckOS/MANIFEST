@@ -5,7 +5,6 @@ lib/Devel/AssertOS/BeOS.pm
 lib/Devel/AssertOS/Haiku.pm
 lib/Devel/AssertOS/BSDOS.pm
 lib/Devel/AssertOS/Cygwin.pm
-lib/Devel/AssertOS/Darwin.pm~
 lib/Devel/AssertOS/DEC.pm
 lib/Devel/AssertOS/DGUX.pm
 lib/Devel/AssertOS/DragonflyBSD.pm
@@ -103,7 +102,6 @@ lib/Devel/AssertOS/Bitrig.pm
 lib/Devel/AssertOS/Android.pm
 MANIFEST.SKIP
 lib/Devel/AssertOS/Linux/Debian.pm
-t/63-kwalitee.t
 lib/Devel/AssertOS/Minix.pm
 lib/Devel/AssertOS/iOS.pm
 lib/Devel/AssertOS/Hurd.pm

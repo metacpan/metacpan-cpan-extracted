@@ -13,7 +13,7 @@ probe sub {
   my($build) = @_;
 
   my %tools;
-  
+
   foreach my $tool (qw( libtool libtoolize ))
   {
     $tools{$tool} = 0;
@@ -23,7 +23,7 @@ probe sub {
       my(undef, undef, $stdout) = capture {
         `$tool --version`;
       };
-      
+
       if($stdout =~ /GNU libtool/ && $stdout =~ /([0-9\.]+)$/)
       {
         my $version = $1;
@@ -69,13 +69,13 @@ share {
   }
 
   plugin Download => (
-    url => 'http://ftp.gnu.org/gnu/libtool',
+    url => 'https://ftp.gnu.org/gnu/libtool',
     filter => qr/^libtool-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz',
   plugin 'Build::Autoconf' => ( msys_version => '0.08' );
-  
+
   patch sub {
     my($libtoolize) = Path::Tiny->new('libtoolize.in');
     $libtoolize->edit_lines(sub {
@@ -90,7 +90,7 @@ share {
       s{\@HELP2MAN\@}{perl -e1 --}g;
     });
   };
-  
+
   meta->after_hook(
     gather_share => sub {
       my($build) = @_;

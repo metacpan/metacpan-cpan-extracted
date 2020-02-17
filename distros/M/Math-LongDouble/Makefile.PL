@@ -192,6 +192,15 @@ $defines .= ' -DMATH_LONGDOUBLE_DEBUG'
 $defines .= " -DCFG_LONGDBLKIND=$Config{longdblkind}" if( defined $Config{longdblkind} &&
                                                                   $Config{longdblkind} >= 0 );
 
+# Define ACTUAL_NVSIZE to the
+# actual size of perl's NV:
+
+my $nvsize = $Config{nvsize};
+if($nvsize > 8) {
+  $nvsize = 10 if length(sqrt(2.0)) < 30;
+}
+$defines .= " -DACTUAL_NVSIZE=$nvsize";
+
 my %options = %{
 {
   NAME => 'Math::LongDouble',

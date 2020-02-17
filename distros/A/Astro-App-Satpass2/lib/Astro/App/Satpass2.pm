@@ -25,7 +25,7 @@ use Astro::Coord::ECI::Sun 0.077;
 use Astro::Coord::ECI::TLE 0.077 qw{:constants}; # This needs at least 0.059.
 use Astro::Coord::ECI::TLE::Set 0.077;
 # The following includes @CARP_NOT.
-use Astro::Coord::ECI::Utils 0.077 qw{ :all };	# This needs at least 0.077.
+use Astro::Coord::ECI::Utils 0.112 qw{ :all };	# This needs at least 0.112.
 
 {
     local $@ = undef;
@@ -75,7 +75,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -90,7 +90,7 @@ $have_time_hires = sub {
 
 my $have_astro_spacetrack;
 $have_astro_spacetrack = sub {
-    my $value = load_package( 'Astro::SpaceTrack' ) && eval {
+    my $value = load_package( { lib => undef }, 'Astro::SpaceTrack' ) && eval {
 	Astro::SpaceTrack->VERSION( ASTRO_SPACETRACK_VERSION );
 	1;
     };
@@ -4151,7 +4151,8 @@ sub _get_today_midnight {
     my $gmt = $self->get( 'formatter' )->gmt();
     my @time = $gmt ? gmtime() : localtime();
     $time[0] = $time[1] = $time[2] = 0;
-    return $gmt ? time_gm(@time) : time_local(@time);
+    $time[5] += 1900;
+    return $gmt ? greg_time_gm(@time) : greg_time_local(@time);
 }
 
 sub _get_today_noon {
@@ -4160,7 +4161,8 @@ sub _get_today_noon {
     my @time = $gmt ? gmtime() : localtime();
     $time[0] = $time[1] = 0;
     $time[2] = 12;
-    return $gmt ? time_gm(@time) : time_local(@time);
+    $time[5] += 1900;
+    return $gmt ? greg_time_gm(@time) : greg_time_local(@time);
 }
 
 sub _get_warner_attribute {
@@ -6533,6 +6535,15 @@ C<.perl/> if L<File::HomeDir|File::HomeDir> thinks your documents
 directory is your home directory. The exception is on FreeDesktop.org
 systems (e.g. Linux), where the F<Perl/> directory is found by default
 in C<.config/> under your home directory.
+
+B<Note> that under macOS 10.15 Catalina this directory is not accessible
+by a C<launchd> job, even running as the owner of the directory. In
+order to work around this, an alternate location under macOS is
+C<< File::HomeDir->my_dist_data( 'Astro-App-Satpass2' ) >>, which will
+probably be F<~/Library/Application Support/Perl/dist/Astro-App-Satpass2/>.
+See L<my_dist_config()|Astro::App::Satpass2::Utils/my_dist_config> in
+L<Astro::App::Satpass2::Utils|Astro::App::Satpass2::Utils> for the gory
+details.
 
 There are two options to this method:
 

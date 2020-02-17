@@ -32,7 +32,7 @@ foreach my $pass (1, 2) {
     
     eval { require R }; 
     like($@, qr/^Can't locate R\.pm in \@INC/,
-        "correctly moaned about loading Q".
+        "correctly moaned about loading R".
         ($pass == 2 ? ' again' : ''));
     ok(!exists($INC{"R.pm"}), "correctly didn't load R");
 }

@@ -24,8 +24,9 @@ lib/NewsExtractor/JSONLDExtractor.pm
 lib/NewsExtractor/SiteSpecificExtractor.pm
 lib/NewsExtractor/SiteSpecificExtractor/ETtoday.pm
 lib/NewsExtractor/SiteSpecificExtractor/UDN.pm
-lib/NewsExtractor/SiteSpecificExtractor/house_ettoday_net.pm
+lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/news_cts_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm

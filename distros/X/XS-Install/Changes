@@ -1,3 +1,6 @@
+1.2.15   16.02.2020
+           - fix Makefile for various BSD systems
+           - change internal rules (.xs -> _xsgen.cc? instead of .xs -> .xs.cc?)
 1.2.14   06.02.2020
            - Add link to XS::Manifesto
 1.2.13   28.01.2020

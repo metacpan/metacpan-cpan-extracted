@@ -1,7 +1,7 @@
 package Log::ger::Output::Syslog;
 
-our $DATE = '2017-07-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-02-17'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -26,23 +26,26 @@ sub get_hooks {
     defined($ident) or die "Please specify ident";
 
     my $facility = $conf{facility} || 'user';
-    $facility =~ /\A(auth|daemon|ftp|mail|user)\z/
+    $facility =~ /\A(auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp)\z/
         or die "Invalid value for facility, please choose ".
-        "auth|daemon|ftp|mail|user";
+        "auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp";
 
     my $logopt = delete($conf{logopt});
     $logopt = "pid" unless defined $logopt;
+
+    keys %conf and die "Unknown configuration: ".join(", ", sort keys %conf);
 
     require Sys::Syslog;
     Sys::Syslog::openlog($ident, $logopt, $facility) or die;
 
     return {
         create_log_routine => [
-            __PACKAGE__, 50,
-            sub {
-                my %args = @_;
+            __PACKAGE__, # key
+            50,          # priority
+            sub {        # hook
+                my %hook_args = @_;
 
-                my $str_level = $args{str_level};
+                my $str_level = $hook_args{str_level};
                 $level_map{$str_level} or die "Don't know how to map ".
                     "Log::ger level '$str_level' to syslog level";
 
@@ -72,7 +75,7 @@ Log::ger::Output::Syslog - Send logs to syslog
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -87,6 +90,7 @@ version 0.001
 =head1 DESCRIPTION
 
 This output plugin sends logs to syslog using L<Sys::Syslog>.
+It accepts all C<syslog(3)> facilities.
 
 =for Pod::Coverage ^(.+)$
 
@@ -110,7 +114,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

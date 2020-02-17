@@ -26,7 +26,7 @@ sub new {
 
 
 sub input_filter {
-    my ( $sf, $sql, $default_e2n ) = @_;
+    my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     $sf->{i}{gc}{working} = 'Working ... ';
     my $confirm       = '     OK';
@@ -48,7 +48,8 @@ sub input_filter {
     my $fill_up_rows  = 'Fill_up_Rows';
     my $cols_to_rows  = 'Cols_to_Rows';
     my $empty_to_null = 'Empty_2_NULL';
-    $sf->{empty_to_null} = $default_e2n;
+    $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
+
     my $old_idx = 0;
 
     FILTER: while ( 1 ) {
@@ -82,7 +83,7 @@ sub input_filter {
         if ( $filter eq $reset ) {
             $sf->__print_filter_info( $sql, 3, undef );
             $sql->{insert_into_args} = [ map { [ @$_ ] } @{$sf->{i}{gc}{bu_insert_into_args}} ];
-            $sf->{empty_to_null} = $default_e2n;
+            $sf->{empty_to_null} = $sf->{o}{insert}{'empty_to_null_' . $sf->{i}{gc}{source_type}};
             next FILTER
         }
         elsif ( $filter eq $confirm ) {
@@ -217,8 +218,8 @@ sub __choose_columns {
     # Choose
     my $col_idx = $tu->choose_a_subset(
         $header,
-        { current_selection_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1,
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
+        { cs_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, index => 1,
+          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $col_idx ) {
         return;
@@ -333,9 +334,9 @@ sub __row_groups {
     my $prompt = 'Choose group:';
     my $idxs = $tu->choose_a_subset(
         \@choices_groups,
-        { info => $filter_str, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok}, back => '<<',
-          all_by_default => 1, current_selection_label => "Chosen groups:\n", current_selection_separator => "\n",
-          current_selection_end => "\n", busy_string => $sf->{i}{gc}{working} }
+        { info => $filter_str, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok},
+          back => '<<', all_by_default => 1, cs_label => "Chosen groups:\n", cs_separator => "\n",
+          cs_end => "\n", busy_string => $sf->{i}{gc}{working} }
     );
     $sf->__print_filter_info( $sql, 4 + @choices_groups, undef );
     if ( ! defined $idxs ) {
@@ -578,8 +579,8 @@ sub __search_and_replace {
         # Choose
         my $col_idx = $tu->choose_a_subset(
             $header,
-            { current_selection_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1,
-              index => 1, confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{gc}{working} }
+            { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1,
+              confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{gc}{working} }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;
@@ -631,7 +632,7 @@ sub __split_table {
     # Choose
     my $col_count = $tu->choose_a_number(
         $digits,
-        {info => $filter_str, current_selection_label => 'Number columns new table: ', small_first => 1 }
+        { info => $filter_str, cs_label => 'Number columns new table: ', small_first => 1 }
     );
     if ( ! defined $col_count ) {
         return;
@@ -692,9 +693,8 @@ sub __merge_rows {
     my $prompt = 'Choose rows:';
     my $chosen_idxs = $tu->choose_a_subset(
         \@stringified_rows,
-        { current_selection_separator => "\n", current_selection_end => "\n",
-          layout => 3, order => 0, all_by_default => 0, prompt => $prompt, index => 1,
-          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
+        { cs_separator => "\n", cs_end => "\n", layout => 3, order => 0, all_by_default => 0, prompt => $prompt,
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
@@ -745,7 +745,7 @@ sub __join_columns {
     # Choose
     my $chosen_idxs = $tu->choose_a_subset(
         $header,
-        { current_selection_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok},
+        { cs_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok},
           back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
@@ -831,6 +831,7 @@ sub __empty_to_null {
     my $tmp = { empty_to_null => $sf->{empty_to_null} };
     $tu->settings_menu(
         [ [ 'empty_to_null', "  Empty fields to NULL", [ 'NO', 'YES' ] ] ],
+        $tmp,
         { back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm} }
     );
     $sf->{empty_to_null} = $tmp->{empty_to_null};

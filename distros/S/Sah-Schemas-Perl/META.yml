@@ -3,7 +3,7 @@ abstract: 'Sah schemas related to Perl'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Data::Sah: '0.903'
+  Data::Sah: '0.907'
   Data::Sah::Coerce: '0.038'
   File::Spec: '0'
   IO::Handle: '0'
@@ -21,9 +21,10 @@ meta-spec:
   version: '1.4'
 name: Sah-Schemas-Perl
 requires:
-  Complete::File: '0'
+  Complete::File: '0.440'
   Complete::Module: '0'
-  Complete::Util: '0.603'
+  Complete::Util: '0.608'
+  Module::CoreList: '0'
   Perinci::Sub::XCompletion::perl_distname: '0'
   Perinci::Sub::XCompletion::perl_modname: '0'
   Perinci::Sub::XCompletion::perl_modname_or_prefix: '0'
@@ -35,11 +36,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl
   homepage: https://metacpan.org/release/Sah-Schemas-Perl
   repository: git://github.com/perlancar/perl-Sah-Schemas-Perl.git
-version: '0.026'
+version: '0.027'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertCodeResult
+      name: InsertCodeResult
+      version: '0.051'
     -
       class: Dist::Zilla::Plugin::Sah::Schemas
       config:
@@ -162,7 +167,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -302,11 +307,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.080'
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.04'
+              version: '0.05'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -320,7 +325,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

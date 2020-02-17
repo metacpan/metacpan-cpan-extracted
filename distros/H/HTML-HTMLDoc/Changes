@@ -1,5 +1,13 @@
 Revision history for Perl extension HTML-HTMLDoc
 
+0.15 2020-02-15T03:46:14Z
+
+    - Corrected misnamed subroutine (get_letterhead)
+
+0.14 2020-02-15T03:20:50Z
+
+    - Support for 'letterhead' option in HTMLDOC 1.9.8
+
 0.12 2020-02-13T04:22:15Z
 
     - Support for 'u' option in header and footer, and the 'L' option for header.  

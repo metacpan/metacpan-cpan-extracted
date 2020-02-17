@@ -12,7 +12,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '1.0012';
+our $VERSION = '1.0013';
 
 our $errstr;
 our @SEARCH_PATHS = qw(/usr/local/mysql);
@@ -241,6 +241,9 @@ sub setup {
             }
         }
         $cmd .= " 2>&1";
+        # The MySQL scripts are in Perl, so clear out all current Perl
+        # related environment variables before the call
+        local @ENV{ grep { /^PERL/ } keys %ENV };
         open $fh, '-|', $cmd
             or die "failed to spawn mysql_install_db:$!";
         my $output;

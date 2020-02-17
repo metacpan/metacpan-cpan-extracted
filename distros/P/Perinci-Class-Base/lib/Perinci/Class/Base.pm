@@ -75,7 +75,7 @@ Perinci::Class::Base - Base class for your Rinci-metadata-containing classes
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Class::Base (from Perl distribution Perinci-Class-Base), released on 2020-02-14.
+This document describes version 0.002 of Perinci::Class::Base (from Perl distribution Perinci-Class-Base), released on 2020-02-16.
 
 =head1 SYNOPSIS
 
@@ -162,11 +162,47 @@ To get Rinci metadata for a method:
 A more convenient syntax to define modified method metadata in F<My/Dog.pm> (the
 second argument will be merged using L<Data::ModeMerge>):
 
+ package My::Parrot2;
+ use parent 'My::Animal';
+ 
+ our %SPEC;
+ 
+ # we are modifying 'speak' metadata as we add an argument.
  __PACKAGE__->modify_rinci_meta_for(speak => {
      args => {
          word => {schema=>'str*'},
-     },,
-  });
+     },
+ });
+ sub speak {
+     my ($self, $word) = @_;
+     print "squawk! $word!\n";
+     [200];
+ }
+ 
+ 1;
+
+Another example of modifying method metadata:
+
+ package My::Human;
+ use parent 'My::Animal';
+ 
+ our %SPEC;
+ 
+ # we are modifying 'speak' metadata as we remove an argument ('word') and add
+ # another ('words').
+ __PACKAGE__->modify_rinci_meta_for(speak => {
+     args => {
+         '!word' => undef,
+         words => {schema=>'str*'},
+     },
+ });
+ sub speak {
+     my ($self, $words) = @_;
+     print "$words!\n";
+     [200];
+ }
+ 
+ 1;
 
 =head1 DESCRIPTION
 

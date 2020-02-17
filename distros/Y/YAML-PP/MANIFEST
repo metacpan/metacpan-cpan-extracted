@@ -94,6 +94,7 @@ t/47.header-footer.t
 t/48.merge.t
 t/49.include.t
 t/50.clone.t
+t/51.directives.t
 t/data/include/circular1.yaml
 t/data/include/circular2.yaml
 t/data/include/include.yaml

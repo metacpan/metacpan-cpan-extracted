@@ -164,12 +164,13 @@ typedef struct parser {
 
     unsigned int length;
 
-    /* The input. */
+    /* The input. This is fixed at the beginning throughout
+       parsing. */
 
     unsigned char * input;
 
-    /* The end-point of the parsing. This increments through
-       "input". */
+    /* The end-point of the parsing, the last parsed thing. This
+       increments through "input". */
 
     unsigned char * end;
 

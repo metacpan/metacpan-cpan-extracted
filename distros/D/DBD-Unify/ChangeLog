@@ -1,3 +1,15 @@
+0.90    - 14 Feb 2020, H.Merijn Brand
+    * It's 2018
+    * Update links
+    * It's 2019
+    * Update to Devel::PPPort-3.52
+    * Tested with perl-5.30.0
+    * Provide cpanfile
+    * It's 2020
+    * Update to Devel::PPPort-3.57
+    * Increase max number of $dbh ID's from 99 to 99999 (plus tests)
+    * Tested with 119 versions of perl (5.8.6 .. 5.31.8, threaded & unthreaded)
+
 0.89    - 14 Sep 2017, H.Merijn Brand
     * Implement dictionary introspection in HLI
       - add $dbh->func ("db_dict")

@@ -1,7 +1,7 @@
 package Kwiki::Markdown;
 use v5.6.1;
 use Text::Markdown 'markdown';
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant
     class_id     => 'formatter',
@@ -40,9 +40,11 @@ hooking on Kwiki::Formatter::* sub-classes.
 
 L<Text::Markdown>
 
-=head1 COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2006 by Kang-min Liu <gugod@gugod.org>.
+Kang-min Liu <gugod@gugod.org>.
+
+=head1 LICENCE
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

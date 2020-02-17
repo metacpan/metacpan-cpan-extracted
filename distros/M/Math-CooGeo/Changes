@@ -2,6 +2,10 @@ Revision history for Math-CooGeo
 
 All notable changes to this project will be documented in this file.
 
+1.0.7 - 2020-02-15
+
+	Fixed MPT command.
+
 1.0.6 - 2020-01-29
 
 	Removed my nickname from README.md file.

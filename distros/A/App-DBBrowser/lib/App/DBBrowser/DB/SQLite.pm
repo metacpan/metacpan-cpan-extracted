@@ -83,9 +83,9 @@ sub get_databases {
     if ( $choice eq $change ) {
         my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
         my $info = 'Curr: ' . join( ', ', @$dirs );
-        my $name = 'Dirs: ';
+        my $name = 'New : ';
         my $new_dirs = $tu->choose_directories(
-            { cs_label => $name, info => "Where to search for databases?\n" . $info }
+            { cs_label => $name, info => $info }
         );
         if ( defined $new_dirs && @$new_dirs ) {
             $dirs = $new_dirs;

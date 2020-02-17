@@ -10,7 +10,7 @@ lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
 lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README.md
 RELEASE.md
 src/convertHeaders.pl
@@ -18,9 +18,9 @@ src/menuCmdID.h
 src/Notepad_plus_msgs.h
 src/Scintilla.h
 t/00-load.t
-t/01-bits.t
+t/01-defaults.t
+t/02-bits.t
 t/09-sendMessage.t
-t/10-defaults.t
 t/11-vars-editor.t
 t/11-vars-main.t
 t/11-vars-notepad.t

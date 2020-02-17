@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+#
+# draw what raycasts various circle functions produce
+#
+#   ./show-circle circle 6
+#   ./show-circle cached_circle 6
+#   ./show-circle swing_circle 6 0.4
+
+use 5.24.0;
+use warnings;
+use Game::RaycastFOV qw(cached_circle circle raycast swing_circle);
+
+die "Usage: $0 method radius [swing]\n" unless @ARGV >= 2;
+my $method = shift;
+my $radius = shift;
+
+our @map;
+our $MAX_X = 79;
+our $MAX_Y = 24;
+for my $y (0 .. $MAX_Y) {
+    for my $x (0 .. $MAX_X) {
+        $map[$y][$x] = '.';
+    }
+}
+
+my %plotted;
+
+raycast(
+    \&{$method}, sub {
+        my ($lx, $ly) = @_;
+        return -1 if $lx < 0 or $lx >= $MAX_X or $ly < 0 or $ly >= $MAX_Y;
+        $map[$ly][$lx] = '#' unless $plotted{ $lx . ',' . $ly }++;
+        return 1;
+    }, 40, 12, $radius, $method eq 'swing_circle' ? shift() : ()
+);
+
+for my $y (0 .. $MAX_Y) { say join '', $map[$y]->@* }

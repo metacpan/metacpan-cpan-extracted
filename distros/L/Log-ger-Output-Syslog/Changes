@@ -1,3 +1,8 @@
-0.001    2017-07-12 (PERLANCAR)
+0.002   2020-02-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add all syslog(3) facilities (thanks Paulo Ferreira).
+
+
+0.001    2017-07-12  Released-By: PERLANCAR
 
          - First release.

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Binary;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use MIME::Base64 qw/ decode_base64 encode_base64 /;
 use YAML::PP::Common qw/ YAML_ANY_SCALAR_STYLE /;
@@ -60,7 +60,7 @@ YAML::PP::Schema::Binary - Schema for loading and binary data
 =head1 SYNOPSIS
 
     use YAML::PP;
-    my $yp = YAML::PP->new( schema => [qw/ JSON Binary /] );
+    my $yp = YAML::PP->new( schema => [qw/ + Binary /] );
     # or
 
     my ($binary, $same_binary) = $yp->load_string(<<'EOM');

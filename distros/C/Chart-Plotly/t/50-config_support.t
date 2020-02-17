@@ -15,7 +15,7 @@ my $plot_with_config = Chart::Plotly::Plot->new( config => $config );
 
 is_deeply( $plot_with_config->config, $config, 'Plot objects support config options' );
 
-my $hash_from_plot = from_json( $plot_with_config->TO_JSON() );
+my $hash_from_plot = from_json( $plot_with_config->to_json_text() );
 
 is_deeply( $hash_from_plot->{config}, $config, 'JSON dump from plot has config option set' );
 

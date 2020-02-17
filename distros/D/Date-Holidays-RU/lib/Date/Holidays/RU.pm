@@ -1,5 +1,5 @@
 package Date::Holidays::RU;
-$Date::Holidays::RU::VERSION = '1.2018.0';
+$Date::Holidays::RU::VERSION = '1.2020.0';
 # ABSTRACT: Determine Russian Federation official holidays and business days.
 
 
@@ -25,6 +25,7 @@ my $HOLIDAYS_VALID_SINCE = 1991;
 #my $BUSINESS_DAYS_VALID_SINCE = 2004;
 
 # sources:
+#   http://www.consultant.ru/law/ref/calendar/proizvodstvennye/
 #   http://ru.wikipedia.org/wiki/История_праздников_России
 #   http://www.consultant.ru/popular/kzot/54_6.html#p530
 #   http://www.consultant.ru/document/cons_doc_LAW_127924/?frame=17#p1681
@@ -129,6 +130,7 @@ my %HOLIDAYS_SPECIAL = (
     2017 => [ qw( 0224 0508 1106 ) ],
     2018 => [ qw( 0309 0430 0502 0611 1105 1231 ) ],
     2019 => [ qw( 0502 0503 0510 ) ],
+    2020 => [ qw( 0224 0309 0504 0505 ) ],
 );
 
 
@@ -162,6 +164,7 @@ my %SHORT_BUSINESS_DAYS = (
     2017 => [ qw( 0222 0307 1103 ) ],
     2018 => [ qw( 0222 0307 0428 0508 0609 1229 ) ],
     2019 => [ qw( 0222 0307 0430 0508 0611 1231 ) ],
+    2020 => [ qw( 0430 0508 0611 1103 1231 ) ],
 );
 
 
@@ -280,7 +283,7 @@ Date::Holidays::RU - Determine Russian Federation official holidays and business
 
 =head1 VERSION
 
-version 1.2018.0
+version 1.2020.0
 
 =head1 SYNOPSIS
 
@@ -335,7 +338,7 @@ Date::Holidays::RU
 
 =head1 VERSION
 
-version 1.2018.0
+version 1.2020.0
 
 =head1 AUTHOR
 
@@ -348,7 +351,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Alexander Nalobin.
+This software is copyright (c) 2020 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

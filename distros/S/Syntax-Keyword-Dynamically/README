@@ -53,7 +53,7 @@ KEYWORDS
        }
 
     The dynamically keyword modifies the behaviour of the following
-    expression. which must be a scalar assignemnt. Before the new value is
+    expression. which must be a scalar assignment. Before the new value is
     assigned to the lvalue, its current value is captured and stored
     internally within the Perl interpreter. When execution leaves the
     controlling block for whatever reason, as part of block scope cleanup
@@ -61,7 +61,7 @@ KEYWORDS
 
     The LVALUE may be any kind of expression that allows normal scalar
     assignment; lexical or package scalar variables, elements of arrays or
-    hashes, or the result of calling an :value function or method.
+    hashes, or the result of calling an :lvalue function or method.
 
     If the LVALUE has any GET magic associated with it (including a FETCH
     method of a tied scalar) then this will be executed exactly once when
@@ -71,6 +71,40 @@ KEYWORDS
     method of a tied scalar) then this will be executed exactly once when
     the dynamically expression is evaluated, and again a second time when
     the controlling scope is unwound.
+
+    When the LVALUE being assigned to is a hash element, e.g. one of the
+    following forms
+
+       dynamically $hash{key} = EXPR;
+       dynamically $href->{key} = EXPR;
+
+    the assignment additionally ensures to remove the key if it is
+    newly-added, and restores by adding the key back again if it had been
+    deleted in the meantime.
+
+WITH Future::AsyncAwait
+
+    As of Future::AsyncAwait version 0.32, cross-module integration tests
+    assert that the dynamically correctly works across an await boundary.
+
+       use Future::AsyncAwait;
+       use Syntax::Keyword::Dynamically;
+    
+       our $var;
+    
+       async sub trial
+       {
+          dynamically $var = "value";
+    
+          await func();
+    
+          say "Var is still $var";
+       }
+
+    When context-switching between scopes in which a variable is
+    dynamically modified, the value of the variable will be swapped in and
+    out, possibly multiple times if necessary, to ensure the visible value
+    remains as expected.
 
 AUTHOR
 

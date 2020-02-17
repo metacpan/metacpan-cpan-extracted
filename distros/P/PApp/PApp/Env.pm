@@ -49,7 +49,7 @@ use Compress::LZF ();
 
 use base Exporter;
 
-$VERSION = 2.1;
+$VERSION = 2.2;
 @EXPORT = qw(setenv getenv unsetenv modifyenv lockenv listenv);
 
 =item setenv key => value

@@ -35,7 +35,7 @@
    "provides" : {
       "Date::Holidays::CZ" : {
          "file" : "lib/Date/Holidays/CZ.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/smithfarm/date-holidays-cz.git"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

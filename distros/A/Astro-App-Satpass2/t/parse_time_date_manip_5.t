@@ -25,8 +25,8 @@ BEGIN {
 	and plan skip_all => 'Date::Manip 5 tests fail under Windows';
 
     require Astro::Coord::ECI::Utils;
-    Astro::Coord::ECI::Utils->VERSION( '0.077' );
-    Astro::Coord::ECI::Utils->import( qw{ time_gm time_local } );
+    Astro::Coord::ECI::Utils->VERSION( '0.112' );
+    Astro::Coord::ECI::Utils->import( qw{ greg_time_gm greg_time_local } );
 
 }
 
@@ -63,10 +63,10 @@ call_m 'delegate',
 call_m use_perltime => TRUE, 'Uses perltime';
 
 call_m parse => '20100202T120000Z',
-    time_gm( 0, 0, 12, 2, 1, 2010 ),
+    greg_time_gm( 0, 0, 12, 2, 1, 2010 ),
     'Parse noon on Groundhog Day 2010';
 
-my $base = time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
+my $base = greg_time_gm( 0, 0, 0, 1, 3, 2009 );	# April 1, 2009 GMT;
 use constant ONE_DAY => 86400;			# One day, in seconds.
 use constant HALF_DAY => 43200;			# 12 hours, in seconds.
 
@@ -102,12 +102,12 @@ SKIP: {
 	and skip 'Time::y2038 has problems with summer/winter time', 2;
 
     call_m parse => '20090101T000000',
-	time_local( 0, 0, 0, 1, 0, 2009 ),
+	greg_time_local( 0, 0, 0, 1, 0, 2009 ),
 	'Parse ISO-8601 20090101T000000'
 	or dump_date_manip();
 
     call_m parse => '20090701T000000',
-	time_local( 0, 0, 0, 1, 6, 2009 ),
+	greg_time_local( 0, 0, 0, 1, 6, 2009 ),
 	'Parse ISO-8601 20090701T000000'
 	or dump_date_manip();
 
@@ -115,13 +115,13 @@ SKIP: {
 
 call_m perltime => 0, TRUE, 'Set perltime false';
 
-my $time_gm = time_gm( 0, 0, 0, 1, 0, 2009 );
+my $time_gm = greg_time_gm( 0, 0, 0, 1, 0, 2009 );
 call_m parse => '20090101T000000Z',
     $time_gm,
     'Parse ISO-8601 20090101T000000Z'
     or dump_date_manip( $time_gm );
 
-$time_gm = time_gm( 0, 0, 0, 1, 6, 2009 );
+$time_gm = greg_time_gm( 0, 0, 0, 1, 6, 2009 );
 call_m parse => '20090701T000000Z',
     $time_gm,
     'Parse ISO-8601 20090701T000000Z'

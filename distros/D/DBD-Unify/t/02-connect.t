@@ -21,6 +21,26 @@ ok (!$sth->{Active},	"sth attr not Active");
 $dbh->disconnect;	# Should auto-destroy $sth;
 ok (!$dbh->ping,	"disconnected");
 
+if ($ENV{DBD_TEST_HANDLE_EXHAUSTION}) {
+    foreach my $dbhc (0 .. 99999) {
+	$dbh = DBI->connect ("dbi:Unify:", "", $schema);
+	unless ($dbhc) { # Test only once
+	    my $sth = $dbh->prepare ("select * from DIRS");
+	    is ($sth->{CursorName}, "c_sql_00001_000001", "Cursor name");
+	    $sth->finish;
+	    }
+	$dbh->disconnect;
+	}
+    ok ($dbh = DBI->connect ("dbi:Unify:", "", $schema), "Connect");
+    $dbh->{PrintWarn} = 0;
+    ok (!$dbh->prepare ("select * from DIRS"),	"Ran out of DBH ID's");
+    is ($DBI::errstr, "Cannot use DBH ID",	"Ran out of DBH ID's");
+    $dbh->disconnect;
+    }
+else {
+    diag ("Set \$DBD_TEST_HANDLE_EXHAUSTION=1 for DBH exhaustion");
+    }
+
 {   local $SIG{__WARN__} = sub {};
     $ENV{UNIFY} = undef;
     ok (!DBI->connect ("dbi:Unify:", "", $schema), "Connect \$UNIFY undef");

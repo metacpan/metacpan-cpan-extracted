@@ -249,3 +249,9 @@ Revision history for Regexp-Debugger
 
     - Added 'g' command under rxrx REPL
       (thanks, Richard!)
+
+
+0.002004  Sun Feb 16 23:58:03 2020
+
+    - Added detection of (&subpat) and (<name> ... ) errors
+      (Thanks, Hugo!)

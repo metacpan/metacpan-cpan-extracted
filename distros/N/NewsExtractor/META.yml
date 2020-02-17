@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.10.0
+    version: v0.11.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -40,10 +40,12 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/ETtoday.pm
   NewsExtractor::SiteSpecificExtractor::UDN:
     file: lib/NewsExtractor/SiteSpecificExtractor/UDN.pm
-  NewsExtractor::SiteSpecificExtractor::house_ettoday_net:
-    file: lib/NewsExtractor/SiteSpecificExtractor/house_ettoday_net.pm
+  NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::money_udn_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
+  NewsExtractor::SiteSpecificExtractor::news_cts_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/news_cts_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tnn_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw:
@@ -88,7 +90,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.10.0
+version: v0.11.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

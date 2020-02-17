@@ -55,16 +55,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "mailto" : "bug-Acme-Affinity@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-Affinity"
-      },
+      "homepage" : "https://github.com/ology/Acme-Affinity",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/ology/Acme-Affinity.git",
          "web" : "https://github.com/ology/Acme-Affinity"
       }
    },
-   "version" : "0.0104",
+   "version" : "0.0106",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -280,9 +278,9 @@
             "version" : "6.012"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaResources",
-            "name" : "MetaResources",
-            "version" : "6.012"
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
@@ -449,6 +447,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
 }
 

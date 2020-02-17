@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
 package Syntax::Keyword::Dynamically;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -79,14 +79,14 @@ scope.
    }
 
 The C<dynamically> keyword modifies the behaviour of the following expression.
-which must be a scalar assignemnt. Before the new value is assigned to the
+which must be a scalar assignment. Before the new value is assigned to the
 lvalue, its current value is captured and stored internally within the Perl
 interpreter. When execution leaves the controlling block for whatever reason,
 as part of block scope cleanup the saved value is restored.
 
 The LVALUE may be any kind of expression that allows normal scalar assignment;
 lexical or package scalar variables, elements of arrays or hashes, or the
-result of calling an C<:value> function or method.
+result of calling an C<:lvalue> function or method.
 
 If the LVALUE has any GET magic associated with it (including a C<FETCH>
 method of a tied scalar) then this will be executed exactly once when the
@@ -96,6 +96,16 @@ If the LVALUE has any SET magic associated with it (including a C<STORE>
 method of a tied scalar) then this will be executed exactly once when the
 C<dynamically> expression is evaluated, and again a second time when the
 controlling scope is unwound.
+
+When the LVALUE being assigned to is a hash element, e.g. one of the following
+forms
+
+   dynamically $hash{key} = EXPR;
+   dynamically $href->{key} = EXPR;
+
+the assignment additionally ensures to remove the key if it is newly-added,
+and restores by adding the key back again if it had been deleted in the
+meantime.
 
 =cut
 
@@ -112,13 +122,36 @@ sub import_into
    my $class = shift;
    my ( $caller, @syms ) = @_;
 
-   @syms or @syms = qw( dynamically );
-
    my %syms = map { $_ => 1 } @syms;
-   $^H{"Syntax::Keyword::Dynamically/dynamically"}++ if delete $syms{dynamically};
+   $^H{"Syntax::Keyword::Dynamically/dynamically"}++;
+
+   _enable_async_mode() if delete $syms{'-async'};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
+
+=head1 WITH Future::AsyncAwait
+
+As of L<Future::AsyncAwait> version 0.32, cross-module integration tests
+assert that the C<dynamically> correctly works across an C<await> boundary.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::Dynamically;
+
+   our $var;
+
+   async sub trial
+   {
+      dynamically $var = "value";
+
+      await func();
+
+      say "Var is still $var";
+   }
+
+When context-switching between scopes in which a variable is C<dynamically>
+modified, the value of the variable will be swapped in and out, possibly
+multiple times if necessary, to ensure the visible value remains as expected.
 
 =head1 AUTHOR
 

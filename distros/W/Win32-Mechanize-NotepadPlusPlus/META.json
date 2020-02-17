@@ -78,7 +78,15 @@
    "provides" : {
       "Win32::Mechanize::NotepadPlusPlus" : {
          "file" : "lib/Win32/Mechanize/NotepadPlusPlus.pm",
-         "version" : "0.001"
+         "version" : "0.001001"
+      },
+      "Win32::Mechanize::NotepadPlusPlus::Editor" : {
+         "file" : "lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm",
+         "version" : "0.001001"
+      },
+      "Win32::Mechanize::NotepadPlusPlus::Notepad" : {
+         "file" : "lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm",
+         "version" : "0.001001"
       }
    },
    "release_status" : "stable",
@@ -93,6 +101,6 @@
          "web" : "https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus"
       }
    },
-   "version" : "0.001",
+   "version" : "0.001001",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

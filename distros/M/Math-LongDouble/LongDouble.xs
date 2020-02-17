@@ -26,48 +26,51 @@
 #if defined(LDBL_MANT_DIG)
 #  if LDBL_MANT_DIG == 53
 #    define MATH_LONGDOUBLE_DIGITS 17
-#    define MATH_LONGDOUBLE_NVSIZE 8
-#  endif
-#  if LDBL_MANT_DIG == 64
+#    define MATH_LONGDOUBLE_SIZE 8
+#  elif LDBL_MANT_DIG == 64
 #    define MATH_LONGDOUBLE_DIGITS 21
-#    define MATH_LONGDOUBLE_NVSIZE 10
-#  endif
-#  if LDBL_MANT_DIG == 106
+#    define MATH_LONGDOUBLE_SIZE 10
+#  elif LDBL_MANT_DIG == 106
 #    define MATH_LONGDOUBLE_DIGITS 33
-#    define MATH_LONGDOUBLE_NVSIZE 16
-#  endif
-#  if LDBL_MANT_DIG == 113
+#    define MATH_LONGDOUBLE_SIZE 16
+#  elif LDBL_MANT_DIG == 113
 #    define MATH_LONGDOUBLE_DIGITS 36
-#    define MATH_LONGDOUBLE_NVSIZE 16
+#    define MATH_LONGDOUBLE_SIZE 16
+#  else
+#    define MATH_LONGDOUBLE_DIGITS 21
+#    define MATH_LONGDOUBLE_SIZE 10
 #  endif
 
 #elif defined CFG_LONGDBLKIND
 #  if CFG_LONGDBLKIND == 0
 #    define MATH_LONGDOUBLE_DIGITS 17
-#    define MATH_LONGDOUBLE_NVSIZE 8
-#  endif
-#  if CFG_LONGDBLKIND == 1 || CFG_LONGDBLKIND == 2 || CFG_LONGDBLKIND == 9
+#    define MATH_LONGDOUBLE_SIZE 8
+#  elif CFG_LONGDBLKIND == 1 || CFG_LONGDBLKIND == 2 || CFG_LONGDBLKIND == 9
 #    define MATH_LONGDOUBLE_DIGITS 36
-#    define MATH_LONGDOUBLE_NVSIZE 16
-#  endif
-#  if CFG_LONGDBLKIND == 3 || CFG_LONGDBLKIND == 4
+#    define MATH_LONGDOUBLE_SIZE 16
+#  elif CFG_LONGDBLKIND == 3 || CFG_LONGDBLKIND == 4
 #    define MATH_LONGDOUBLE_DIGITS 21
-#    define MATH_LONGDOUBLE_NVSIZE 10
-#  endif
-#  if CFG_LONGDBLKIND >= 5 && CFG_LONGDBLKIND <= 8
+#    define MATH_LONGDOUBLE_SIZE 10
+#  elif CFG_LONGDBLKIND >= 5 && CFG_LONGDBLKIND <= 8
 #    define MATH_LONGDOUBLE_DIGITS 33
-#    define MATH_LONGDOUBLE_NVSIZE 16
+#    define MATH_LONGDOUBLE_SIZE 16
+#  else
+#    define MATH_LONGDOUBLE_DIGITS 21
+#    define MATH_LONGDOUBLE_SIZE 10
 #  endif
 
 #elif defined(DBL_MANT_DIG)
 #  if DBL_MANT_DIG == 53
 #    define MATH_LONGDOUBLE_DIGITS 17
-#    define MATH_LONGDOUBLE_NVSIZE 8
+#    define MATH_LONGDOUBLE_SIZE 8
+#  else
+#    define MATH_LONGDOUBLE_DIGITS 21
+#    define MATH_LONGDOUBLE_SIZE 10
 #  endif
 
 #else
 #  define MATH_LONGDOUBLE_DIGITS 21
-#  define MATH_LONGDOUBLE_NVSIZE 10
+#  define MATH_LONGDOUBLE_SIZE 10
 #endif
 
 int _DIGITS = MATH_LONGDOUBLE_DIGITS;
@@ -1237,10 +1240,14 @@ SV * cmp_NV(pTHX_ SV * ld_obj, SV * sv) {
        if(strEQ(h, "Math::LongDouble")) {
          ld = *(INT2PTR(long double *, SvIVX(SvRV(ld_obj))));
          nv = SvNV(sv);
-
          if((ld != ld) || (nv != nv)) return &PL_sv_undef;
-         if(ld < (long double)nv) return newSViv(-1);
-         if(ld > (long double)nv) return newSViv(1);
+#if ACTUAL_NVSIZE <= MATH_LONGDOUBLE_SIZE
+         if( ld < (long double)nv ) return newSViv(-1);
+         if( ld > (long double)nv ) return newSViv(1);
+#else
+         if( (NV)ld < nv ) return newSViv(-1);
+         if( (NV)ld > nv ) return newSViv(1);
+#endif
          return newSViv(0);
        }
        croak("Invalid object supplied to Math::LongDouble::cmp_NV function");
@@ -1650,7 +1657,7 @@ SV * _ld_bytes(pTHX_ SV * arg) {
 
   long double ld;
   int i;
-  SV * ret = NEWSV(0, MATH_LONGDOUBLE_NVSIZE);
+  SV * ret = NEWSV(0, MATH_LONGDOUBLE_SIZE);
 
   if(sv_isobject(arg)) {
     const char *h = HvNAME(SvSTASH(SvRV(arg)));
@@ -1660,7 +1667,7 @@ SV * _ld_bytes(pTHX_ SV * arg) {
 
   ld = *(INT2PTR(ldbl *, SvIVX(SvRV(arg))));
 
-  sv_setpvn(ret, (char *) &ld, MATH_LONGDOUBLE_NVSIZE);
+  sv_setpvn(ret, (char *) &ld, MATH_LONGDOUBLE_SIZE);
   return ret;
 }
 
@@ -2571,9 +2578,14 @@ int _lln(pTHX_ SV * x) {
   return 0;
 }
 
-int _get_math_longdouble_nvsize(void) {
-  return MATH_LONGDOUBLE_NVSIZE;
+int _get_actual_nvsize(void) {
+  return ACTUAL_NVSIZE;
 }
+
+int _get_actual_ldblsize(void) {
+  return MATH_LONGDOUBLE_SIZE;
+}
+
 
 MODULE = Math::LongDouble  PACKAGE = Math::LongDouble
 
@@ -4318,6 +4330,10 @@ CODE:
 OUTPUT:  RETVAL
 
 int
-_get_math_longdouble_nvsize ()
+_get_actual_nvsize ()
+
+
+int
+_get_actual_ldblsize ()
 
 

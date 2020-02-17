@@ -1,7 +1,9 @@
 package Sah::Schema::perl::qualified_funcname;
 
-our $DATE = '2019-12-15'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-15'; # DATE
+our $DIST = 'Sah-Schemas-Perl'; # DIST
+our $VERSION = '0.027'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl function name, qualified with a package name',
@@ -14,6 +16,9 @@ Currently function name is restricted to this regex:
 and package name is restricted to this regex:
 
     [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*
+
+This schema includes syntax validity check only; it does not check whether the
+function actually exists.
 
 _
     match => '\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)[A-Za-z_]([A-Za-z_0-9]+)*\z',
@@ -38,7 +43,7 @@ Sah::Schema::perl::qualified_funcname - Perl function name, qualified with a pac
 
 =head1 VERSION
 
-This document describes version 0.026 of Sah::Schema::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2019-12-15.
+This document describes version 0.027 of Sah::Schema::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
 
 =head1 DESCRIPTION
 
@@ -49,6 +54,9 @@ Currently function name is restricted to this regex:
 and package name is restricted to this regex:
 
  [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*
+
+This schema includes syntax validity check only; it does not check whether the
+function actually exists.
 
 =head1 HOMEPAGE
 
@@ -78,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

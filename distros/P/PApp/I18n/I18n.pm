@@ -65,7 +65,7 @@ use PApp::Config;
 BEGIN {
    use base 'Exporter';
 
-   $VERSION = 2.1;
+   $VERSION = 2.2;
    @EXPORT = qw();
    @EXPORT_OK = qw(
          open_translator

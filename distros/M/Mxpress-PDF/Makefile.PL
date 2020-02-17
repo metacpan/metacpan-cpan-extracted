@@ -13,12 +13,13 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
+    EXE_FILES => [ 'mxpdf' ],
     TEST_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'PDF::API2' => '2.037',,
-	'MooX::Pression' => '0.303',
+	'PDF::API2' => '2.037',
+	'Zydeco' => '0.503',
 	'Colouring::In' => '0.14',
 	'Sub::MultiMethod' => '0.0008'
     },

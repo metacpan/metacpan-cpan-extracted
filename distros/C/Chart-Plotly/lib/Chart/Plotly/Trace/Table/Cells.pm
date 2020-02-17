@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Table::Cells::Fill;
 use Chart::Plotly::Trace::Table::Cells::Font;
 use Chart::Plotly::Trace::Table::Cells::Line;
 
-our $VERSION = '0.037';    # VERSION
+our $VERSION = '0.038';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace table.
 
@@ -41,7 +41,7 @@ has align => (
     is  => "rw",
     isa => union( [ enum( [ "left", "center", "right" ] ), "ArrayRef" ] ),
     documentation =>
-      "Sets the horizontal alignment of the `text` within the box. Has an effect only if `text` spans more two or more lines (i.e. `text` contains one or more <br> HTML tags) or if an explicit width is set to override the text width.",
+      "Sets the horizontal alignment of the `text` within the box. Has an effect only if `text` spans two or more lines (i.e. `text` contains one or more <br> HTML tags) or if an explicit width is set to override the text width.",
 );
 
 has alignsrc => ( is            => "rw",
@@ -122,7 +122,7 @@ Chart::Plotly::Trace::Table::Cells - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * align
 
-Sets the horizontal alignment of the `text` within the box. Has an effect only if `text` spans more two or more lines (i.e. `text` contains one or more <br> HTML tags) or if an explicit width is set to override the text width.
+Sets the horizontal alignment of the `text` within the box. Has an effect only if `text` spans two or more lines (i.e. `text` contains one or more <br> HTML tags) or if an explicit width is set to override the text width.
 
 =item * alignsrc
 

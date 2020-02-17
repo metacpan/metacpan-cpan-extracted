@@ -1,7 +1,5 @@
-package PApp::SCGI;
-
 ##########################################################################
-## All portions of this code are copyright (c) 2003,2004 nethype GmbH   ##
+## All portions of this code are copyright (c) 2015,2016 nethype GmbH   ##
 ##########################################################################
 ## Using, reading, modifying or copying this code requires a LICENSE    ##
 ## from nethype GmbH, Franz-Werfel-Str. 11, 74078 Heilbronn,            ##
@@ -9,203 +7,141 @@ package PApp::SCGI;
 ## license@nethype.de.                                                  ##
 ##########################################################################
 
+=head1 NAME
+
+PApp::SCGI - use PApp in a SCGI environment
+
+=head1 SYNOPSIS
+
+  use PApp::SCGI;
+
+  # initialize request and do initialization
+  PApp::config_eval {
+     configure PApp ...;
+     #d#
+     configured PApp;
+  };
+
+  # for every scgi request
+  PApp::SCGI::handle $fh;
+
+=head1 DESCRIPTION
+
+=cut
+
+package PApp::SCGI;
+
+our $PREFIXMATCH; # regex to find prefix
+our %PREFIX;
+
+package PApp::SCGI::PApp;
+
 use common::sense;
-use Errno ();
+use PApp ();
+use PApp::CGI (); # also modifies PApp::ISA
+
+BEGIN {
+   our @ISA = PApp::Base::;
+   unshift @PApp::ISA, __PACKAGE__;
+}
+
+#d#
+sub mount_agni_app {
+   my ($self, $pathgid, $location) = @_;
+
+   $self->mount (new PApp::Application::Agni path => $pathgid, name => $location);
+}
+
+sub mount {
+   my ($self, $papp) = @_;
+
+   $PREFIX{$papp->{name}} = $papp;
+
+   $self->SUPER::mount ($papp);
+
+}
+
+sub configured {
+   my ($self) = @_,
+
+   $PREFIXMATCH = join "|", map quotemeta, keys %PREFIX;
+   $PREFIXMATCH = qr{^($PREFIXMATCH)(/.*)$}s;
+
+   $self->SUPER::configured;
+}
+
+package PApp::SCGI;
+
+use common::sense;
 
 use EV;
 use AnyEvent;
+use AnyEvent::Socket;
 
-use Agni;
 use PApp ();
 use PApp::CGI ();
 
-our $VERBOSE;
-our $LISTEN;
-our $FH;
-our $REFRESH;
-our $CONTROL = \*STDOUT;
-our $APPID;
-our %APP; # app cache
+sub _error($$) {
+   my ($fh, $msg) = @_;
 
-sub SCGI_MAX_HEADER() { 16384 - 16 }
+   print $fh <<EOF;
+Status: 500
+Content-Type: text/plain
 
-sub error($) {
-   die shift;
-}
-
-sub run_request {
-   print $FH <<EOF
-Status: 404
-
-nope
+$msg
 EOF
+
+   0
 }
 
-sub find_app {
-   $APP{"$_[0]$_[1]"} ||= $_[0]->new (path => $_[1])
-}
+sub handle($) {
+   my ($fh) = @_;
 
-sub request {
-   # scgi headerss must be at least 29 octets long
-   # we only read 6, to limit header size to 100k
+   my $rbuf;
 
-   my $buf;
+   # the header must be at minimum length 28, which is enough to read the
+   # netstring length, so we are in no danger of over-reading. we limit
+   # ourselves to 6, to limit actual header size to 100k
+   1 while sysread $fh, $rbuf, 6 - length $rbuf, length $rbuf;
 
-   do {
-      sysread $FH, $buf, 6 - length $buf, length $buf
-         or $! == Errno::EINTR
-         or error "$! while reading scgi header length";
+   $rbuf =~ s/^(\d+)://
+      or return _error $fh, "malformed netstring length";
 
-      if ($buf =~ s/^([0-9]+:)//) {
-         my $len = $1 + 1;
+   # now we know the length of the remaining header data
+   my $len = $1 + 1;
+   1 while sysread $fh, $rbuf, $len - length $rbuf, length $rbuf;
 
-         $len <= SCGI_MAX_HEADER
-            or error "$len: scgi header too long";
+   "\x00," eq substr $rbuf, -2, 2, "" # remove and check for trailing NUL ","
+      or return _error $fh, "missing trailing comma";
 
-         do {
-            sysread $FH, $buf, $len - length $buf, length $buf
-               or $! == Errno::EINTR
-               or error "$! while reading scgi header data";
-         } while $len != length $buf;
+   my %hdr = split /\x00/, $rbuf;
 
-         (substr $buf, -2, 2, "") eq "\x00,"
-            or error "scgi header tail malformed";
+   $hdr{DOCUMENT_URI} =~ $PREFIXMATCH;
+   $hdr{SCRIPT_NAME} = $1;
+   $hdr{PATH_INFO} = $2;
 
-         my %hdr = split /\x00/, $buf;
+   my $app = $PREFIX{$1}
+      or return _error $fh, "no app mounted on $hdr{DOCUMENT_URI} ($PREFIXMATCH)";
 
-         warn "[$$] $hdr{REQUEST_METHOD} $hdr{REQUEST_SCHEME}://$hdr{HTTP_HOST}$hdr{REQUEST_URI} $VERBOSE\n"
-            if $VERBOSE >= 3;
-
-         use Data::Dump; warn Data::Dump::pp \%hdr;
-
-         $hdr{SCRIPT_FILENAME} =~ /(PApp::Application[^\/]+)(.*)$/
-            or error "SCRIPT_FILENAME must match valid papp application";
-
-         local $PApp::papp = find_app $1, $2
-            or error "$1$2: unable to resolve PApp application";
-
-         open STDIN , "<&", fileno $FH;
-         open STDOUT, ">&", fileno $FH;
-
-         $PApp::request  = new_from PApp::CGI::Request \%hdr;
-         $PApp::location = $PApp::request->{name};
-         $PApp::pathinfo = $PApp::request->{path_info};
-
-         PApp::_handler;
-
-         close STDIN;
-         close STDOUT;
-
-         shutdown $FH, 2; #d# something keeps this alive
-         undef $FH;
-
-         return;
-      }
-   } while 6 != length $buf;
-
-   error "scgi header malformed";
-}
-
-sub idle;
-sub idle {
-   my ($listen, $idle, $control);
-   
-   syswrite $CONTROL, "i";
-
-   $listen = AE::io $LISTEN, 0, sub {
-      accept $FH, $LISTEN
-         or return;
-
-      warn "[$$] accept.\n" if $VERBOSE >= 4;
-
-      ($listen, $idle, $control) = ();
-
-      AnyEvent::fh_block $FH;
-
-      syswrite $CONTROL, "b";
-      request $FH;
-      idle;
-   };
-
-   $idle = AE::timer $REFRESH, $REFRESH, sub {
-      warn "[$$] refresh.\n";#d#
-      Agni::agni_refresh;
-   };
-
-   $control = AE::io $CONTROL, 0, sub {
-      shutdown $CONTROL, 2;
-      exit;
-   };
-}
-
-sub master_init {
-   ($VERBOSE) = @_;
-
-   warn "[$$] master init @_.\n" if $VERBOSE;#d#
-
-   configure PApp;
-   configured PApp;
-   Agni::agni_refresh; # to set up database &c
-
-   $SIG{CHLD} = 'IGNORE';
-}
-
-sub master_refresh {
-   warn "[$$] master refresh.\n";#d#
-}
-
-sub load_obj {
-   my ($spec, $nsname) = @_;
-
-   $spec =~ m%^([^/].*/)([^/]+)$%
-      or die "$spec: unable to split into path/obj or path/name parts\n";
-
-   my ($path, $name) = ($1, $2);
-   my $pathid = $Agni::pathid{$path}
-      or die "$path: path does not exist\n";
-
-   $nsname = "GID" if $name =~ /^[0-9]+$/;  # gid
-   $nsname = $1    if $name =~ s/^(.*?)=//; # explicit ns
-
-   my $ns = (Agni::path_obj_by_gid $pathid, $Agni::OID_NAMESPACES)->lookup ($nsname)
-      or die "$nsname: no such namespace\n";
-
-   $ns->lookup ($name)
-      or die "$name: no such object in namespace $nsname\n"
-}
-
-sub master_preload_obj {
-   load_obj $_
-      for @_;
-}
-
-sub master_preload_ns {
-   warn "pre ns @_\n";#d#
-   for my $spec (@_) {
-      my $ns = load_obj $spec, "namespaces";
-      for (@{ $ns->contents_gid }) {
-         Agni::path_obj_by_gid $ns->{_path}, $_;
-      }
+   {
+      package PApp;
+      our $request  = new_from PApp::CGI::Request \%hdr, stdin => $fh, stdout => $fh;
+      our $location = $request->{name};
+      our $pathinfo = $request->{path_info};
+      our $papp     = $app;
+      _handler;
+      undef $request; # to free $fh
    }
-   warn "pre ns @_\n";#d#
+
+   1
 }
 
-sub run {
-   ($CONTROL, $LISTEN, $REFRESH) = @_;
+=head1 AUTHOR
 
-   warn "[$$] worker starting.\n" if $VERBOSE >= 2;
+ Marc Lehmann <schmorp@schmorp.de>
+ http://home.schmorp.de/
 
-   delete $SIG{CHLD};
-
-   PApp::post_fork_cleanup;
-   PApp->event('childinit');
-
-   idle;
-
-   EV::run;
-}
+=cut
 
 1
-
-
 

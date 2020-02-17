@@ -78,8 +78,6 @@ Categories (C<XS::STL::ErrorCategory> objects):
 
 =item XS::STL::system_category
 
-=item XS::STL::iostream_category
-
 =item XS::STL::future_category
 
 =back
@@ -102,8 +100,6 @@ See C++ C<std::errc> docs for full list and explanation
 
 Please note, some of values might be not available, if the C++ compiler does not
 export them (e.g. C<no_message> on gcc/mingw on Windows).
-
-=item XS::STL::io_errc::*
 
 =item XS::STL::future_errc::*
 

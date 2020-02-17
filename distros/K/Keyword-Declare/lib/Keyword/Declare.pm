@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001016';
+our $VERSION = '0.001017';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -870,7 +870,7 @@ sub _unpack_signature {
                                                             }
                                                         : qq{do { my \@data;
                                                                   my \$arg = shift();
-                                                                  while (\$arg =~ ${match_once}g) {
+                                                                  while (\$arg =~ /\\S/ && \$arg =~ ${match_once}g) {
                                                                       push \@data,
                                                                            Keyword::Declare::_objectify(\$&,{%+});
                                                                   }
@@ -1150,7 +1150,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001016
+This document describes Keyword::Declare version 0.001017
 
 
 =head1 STATUS

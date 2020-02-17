@@ -81,6 +81,7 @@ t/jv-boolean.t
 t/jv-const.t
 t/jv-enum.t
 t/jv-formats.t
+t/jv-if-then-else.t
 t/jv-integer.t
 t/jv-not.t
 t/jv-number.t

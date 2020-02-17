@@ -27,6 +27,7 @@ use Test::Fatal;
 
 use Types::Standard qw(Str);
 use MooX::Press (
+	factory_package => undef,
 	toolkit => 'Moo',
 	class => [
 		'::Animal' => {

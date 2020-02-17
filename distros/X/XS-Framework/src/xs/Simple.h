@@ -43,8 +43,8 @@ struct Simple : Scalar {
         return Simple(sv, NONE);
     }
 
-    static Simple shared (HEK* k)                                    { return newSVhek(k); }
-    static Simple shared (const panda::string_view& s, U32 hash = 0) { return newSVpvn_share(s.data(), s.length(), hash); }
+    static Simple shared (HEK* k)                                    { return noinc(newSVhek(k)); }
+    static Simple shared (const panda::string_view& s, U32 hash = 0) { return noinc(newSVpvn_share(s.data(), s.length(), hash)); }
 
     static Simple format (const char*const pat, ...);
 

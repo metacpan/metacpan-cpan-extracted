@@ -7,7 +7,7 @@ use lib qw{ inc };
 
 use Test::More 0.88;
 use My::Module::Test::App;
-use Astro::Coord::ECI::Utils 0.077 qw{ time_gm };
+use Astro::Coord::ECI::Utils 0.112 qw{ greg_time_gm };
 
 BEGIN {
 
@@ -30,7 +30,7 @@ call_m gmt => 1, TRUE, 'Turn on gmt attribute';
 
 call_m 'gmt', 1, 'The gmt attribute is on';
 
-my $time = time_gm( 50, 0, 0, 1, 3, 2011 );	# 1-Apr-2011 00:00:50
+my $time = greg_time_gm( 50, 0, 0, 1, 3, 2011 );	# 1-Apr-2011 00:00:50
 
 call_m format_datetime => DATE_TIME_FORMAT, $time,
     '2011/04/01 00:00:50', 'Implicit GMT time';

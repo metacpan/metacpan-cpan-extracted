@@ -42,7 +42,7 @@ provides:
     version: '0.001003'
   Test::OnlySome:
     file: lib/Test/OnlySome.pm
-    version: '0.001003'
+    version: '0.001005'
   Test::OnlySome::PathCapsule:
     file: lib/Test/OnlySome/PathCapsule.pm
     version: '0.001003'
@@ -64,5 +64,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/cxw42/Test-OnlySome.git
-version: '0.001003'
+version: '0.001005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

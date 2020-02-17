@@ -71,12 +71,13 @@ while( $cont =~ /^y/io ) {
 print "\nTHANKS FOR PLAYING!\n";
 
 sub get_a_word {
+	my $wordlist = "wordlist.txt";
 	my( $word );
 	my( $line_num ) = 1;
 	my( $random ) = rand();
 	my( $val ) = int( $random * 9151 ) + 1;
-	open( FILE, "wordlist.txt" ) || die "$!, stopped";
-	while( <FILE> ) {
+	open my $fh, '<', $wordlist or die "Could not open <$wordlist>: $!\n";
+	while( <$fh> ) {
 		if( $line_num == $val ) {
 			$word = $_;
 			chomp( $word );
@@ -106,7 +107,7 @@ sub print_noose {
 	print "\n$line_1$line_2$line_3  @y\n$line_4$line_5$line_6";
 }
 
-# POD SECTION #
+=encoding utf8
 
 =head1 NAME
 
@@ -118,15 +119,16 @@ B<hangman>
 
 =head1 DESCRIPTION
 
-In B<hangman>, the computer picks a word from the on-line, supplied word list,
-and you must try and guess it.  The computer keeps track of which letters you
-have chosen, displaying them on each pass, and how many wrong guesses you have
-made, graphically displayed via the hangman's gallows.
+In B<hangman>, the computer picks a word from the on-line, supplied
+word list, and you must try and guess it.  The computer keeps track of
+which letters you have chosen, displaying them on each pass, and how
+many wrong guesses you have made, graphically displayed via the
+hangman's gallows.
 
 =head1 FILES
 
-F<wordlist.txt> - distributed with the program, and residing in the same
-directory.
+F<wordlist.txt> - make a list of words you'd like to use and put it
+in the current directory.
 
 =head1 AUTHOR
 
@@ -135,10 +137,8 @@ mschechter@earthlink.net
 
 =head1 COPYRIGHT INFORMATION
 
-This application is distributed as part of the Perl Power Tools.  Feel free
-to copy,
-modify, delete, or whatever you would like with this file, under the
-information
-contained in the GNU GPL.
+This application is distributed as part of the Perl Power Tools.  Feel
+free to copy, modify, delete, or whatever you would like with this
+file, under the information contained in the GNU GPL.
 
 =cut

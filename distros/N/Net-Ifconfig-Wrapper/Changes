@@ -1,3 +1,9 @@
+2020-02-16  Kingpin  <martin@ubuntu>
+
+	* Wrapper.pm: fall back to /sbin/ip if /sbin/ifconfig is not installed (linux only)
+
+	* Wrapper.pm: allow IP address to be expressed as a netmask
+
 2016-02-06  Kingpin  <martin@localhost.localdomain>
 
 	* Wrapper.pm (if_ipaddr): force locale when running ifconfig command

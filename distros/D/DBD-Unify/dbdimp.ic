@@ -1,4 +1,4 @@
-/* Copyright (c) 1999-2017  H.Merijn Brand <h.m.brand@xs4all.nl>
+/* Copyright (c) 1999-2020  H.Merijn Brand <h.m.brand@xs4all.nl>
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the Perl README file.
@@ -88,7 +88,6 @@ extern char    *basename (const char *path);
 extern int	uallcgp (UTXID, UTID, int, int*, UCID **, USTATUS *);
 extern int	uinfcgp (UTXID, int, UCID *, UOPTS, UCGPINF *, USTATUS *, USTATUS *);
 
-#define MAX_SQL_LEN	4096
 #define Max(a,b)	((a)>=(b)?(a):(b))
 
 static	char		*pgm = NULL;
@@ -103,13 +102,16 @@ HV	*h_dd = NULL;
 int	dbd_st_finish	(SV *, imp_sth_t *);
 int	dbd_st_rows	(SV *, imp_sth_t *);
 
+/* Check source for use: these defines cannot be used inside EXEC SQL ! */
+#define MAX_SQL_LEN	4096
+#define MAX_NM_LEN	20
 EXEC SQL BEGIN DECLARE SECTION;
 char	u_sql_do[4096];
 char	u_sql_st[4096];
-char	u_sql_nm[16];
-char	c_sql_nm[16];
-char	o_sql_nm[16];	/* Output descriptor area	*/
-char	i_sql_nm[16];	/* Input  descriptor area	*/
+char	u_sql_nm[20];
+char	c_sql_nm[20];
+char	o_sql_nm[20];	/* Output descriptor area	*/
+char	i_sql_nm[20];	/* Input  descriptor area	*/
 int	n_sql_st;
 
 int	fix, fln, fic, ftp, fpr, fsc, fnl;
@@ -129,7 +131,7 @@ EXEC SQL END   DECLARE SECTION;
 #define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
 
 /* For more info about error handling, read
- * http://search.cpan.org/dist/DBI/lib/DBI/DBD.pm#The_dbd_drv_error_method
+ * https://metacpan.org/pod/DBI::DBD#The-dbd_drv_error-method
  */
 
 #ifdef I_STDARG
@@ -253,7 +255,9 @@ int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
     dTHX;
     char *opt;
 
+#ifndef PERL_USE_SAFE_PUTENV
     PL_use_safe_putenv = 1;
+#endif
 
     if ((opt = getenv ("DBD_TRACE"))) {
 	auto int i = 0;
@@ -1052,10 +1056,14 @@ static int use_sth_id (SV *dbh, short dbhid, short id) {
 	error (dbh, 0, "Cannot use statement ID");
 	return (0);
 	}
-    (void)sprintf (u_sql_nm, "u_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (c_sql_nm, "c_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (o_sql_nm, "o_sql_%02d_%06d", dbhid, id);
-    (void)sprintf (i_sql_nm, "i_sql_%02d_%06d", dbhid, id);
+    if (dbhid < 0 || dbhid > 99999) {
+	error (dbh, 0, "Cannot use DBH ID");
+	return (0);
+	}
+    (void)sprintf (u_sql_nm, "u_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (c_sql_nm, "c_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (o_sql_nm, "o_sql_%05d_%06d", dbhid, id);
+    (void)sprintf (i_sql_nm, "i_sql_%05d_%06d", dbhid, id);
     return (1);
     } /* use_sth_id */
 
@@ -2322,10 +2330,10 @@ SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv) {
 	}
     else
     if (kl == 10 && strEQ (key, "CursorName")) {
-	char c_nm[16];
+	char c_nm[MAX_NM_LEN];
 
 	D_imp_dbh_from_sth;
-	(void)sprintf (c_nm, "c_sql_%02d_%06d", imp_dbh->id, imp_sth->id);
+	(void)sprintf (c_nm, "c_sql_%05d_%06d", imp_dbh->id, imp_sth->id);
 	retsv = newSVpv (c_nm, 0);
 	}
     else

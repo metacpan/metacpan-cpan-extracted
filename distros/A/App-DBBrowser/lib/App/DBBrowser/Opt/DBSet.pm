@@ -145,7 +145,7 @@ sub database_setting {
                 }
                 my $choices = $tu->choose_a_subset(
                     [ sort @databases ],
-                    { current_selection_label => 'Reset DB: ' }
+                    { cs_label => 'Reset DB: ' }
                 );
                 if ( ! $choices->[0] ) {
                     next GROUP;

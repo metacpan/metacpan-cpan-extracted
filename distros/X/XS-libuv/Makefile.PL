@@ -12,6 +12,8 @@ die "could not make Makefile\n" if $result != 0;
 
 my $libs = '-lpthread';
 $libs .= ' -liphlpapi -lpsapi -luserenv' if $^O eq 'MSWin32'; 
+$libs .= ' -lkvm' if $^O eq 'netbsd';
+$libs .= ' -lrt' if $^O eq 'linux'; # some older linuxes (f.e. CentOS6) requires it
 
 my %params = (
     NAME      => 'XS::libuv',

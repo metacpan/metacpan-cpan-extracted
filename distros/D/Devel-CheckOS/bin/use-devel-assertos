@@ -6,7 +6,6 @@ use strict;
 $/ = undef;
 
 use File::Spec;
-use Data::Compare;
 
 my @files = grep { -f $_ } qw(Makefile.PL Build.PL);
 
@@ -42,9 +41,12 @@ push @files, 'Makefile.PL' unless(@files);
 # NB can't just use scalar list_platforms cos that won't tell us that,
 # eg, Linux::v2_6 also uses Linux
 foreach my $os (@oses) {
-    my $oldinc = { map { $_ => $INC{$_} } keys %INC }; # clone
+    my %oldinc = %INC;
     eval "use Devel::AssertOS qw($os)";
-    if(Compare(\%INC, $oldinc)) {
+    if(
+        join(':', map { $_ => $oldinc{$_} } sort keys %oldinc) eq 
+        join(':', map { $_ => $INC{$_}    } sort keys %INC)
+    ) {
         print STDERR "Couldn't find a module for $os\n";
         exit(1);
     }

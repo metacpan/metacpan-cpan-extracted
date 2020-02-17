@@ -53,7 +53,7 @@ sub load {
     $Filename = Test::OnlySome::PathCapsule->new(
         $args{filename} // DEFAULT_FILENAME
     )->abs();
-    #print STDERR "Output filename is $Filename\n";
+    #print STDERR "# OnlySomeP: Output filename is $Filename\n";    # DEBUG
     $prove->{app_prove}->formatter('App::Prove::Plugin::Test::OnlySomeP::Formatter');
 } #load()
 

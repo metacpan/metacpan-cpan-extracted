@@ -17,12 +17,12 @@ share {
   }
 
   plugin Download => (
-    url => 'http://ftp.gnu.org/gnu/automake',
+    url => 'https://ftp.gnu.org/gnu/automake',
     filter => qr/^automake-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz';
-  
+
   patch sub {
     my($build) = @_;
 
@@ -30,14 +30,14 @@ share {
     # bug in automake: it puts the @datadir@ in double quotes
     # in one place in bin/aclocal, which causes Perl to barf
     # if prefix has an at sign (@) in it.  This is commonly
-    # the case when using perlbrew.    
+    # the case when using perlbrew.
     Path::Tiny->new('bin/aclocal.in')->edit_lines(sub {
       s/"\@datadir\@/'\@datadir\@'."/g;
     });
-    
+
     my @in = grep { $_->basename =~ /\.in$/ } Path::Tiny->new('bin')->children;
     push @in, Path::Tiny->new('lib/Automake/Config.in');
-    
+
     foreach my $in (@in)
     {
       $in->copy($in->sibling($in->basename . '~'));
@@ -65,9 +65,9 @@ share {
       $in->spew(@preamble, @lines);
     }
   };
-  
+
   plugin 'Build::Autoconf' => ( msys_version => '0.08' );
-  
+
   build [
     '%{configure} --disable-shared',
     '%{make}',

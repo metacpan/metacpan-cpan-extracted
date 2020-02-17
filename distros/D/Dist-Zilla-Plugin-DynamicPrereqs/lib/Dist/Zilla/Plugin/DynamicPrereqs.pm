@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.035-7-g8dc8d99
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.036-2-gd15b94c
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 use Moose;
 with
@@ -409,7 +409,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 

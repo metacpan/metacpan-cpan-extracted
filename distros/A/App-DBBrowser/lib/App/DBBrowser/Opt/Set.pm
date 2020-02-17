@@ -105,6 +105,7 @@ sub _options {
             { name => '_split_config',      text => "- split settings", section => 'split'  },
             { name => '_csv_char',          text => "- CSV settings-a", section => 'csv'    },
             { name => '_csv_options',       text => "- CSV settings-b", section => 'csv'    },
+            { name => '_empty_to_null',     text => "- Empty to NULL",  section => 'insert' },
             { name => '_file_encoding',     text => "- File encoding",  section => 'insert' },
             { name => 'history_dirs',       text => "- Dir history",    section => 'insert' },
             { name => '_file_filter',       text => "- File filter",    section => 'insert' },
@@ -356,6 +357,15 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq '_empty_to_null' ) {
+                my $prompt = 'Enable "Empty to NULL" by default:';
+                my $sub_menu = [
+                    [ 'empty_to_null_plain',  "- Source type 'plain'",  [ $no, $yes ] ],
+                    [ 'empty_to_null_copy',   "- Source type 'copy'",   [ $no, $yes ] ],
+                    [ 'empty_to_null_file',   "- Source tpye 'file'",   [ $no, $yes ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq '_grid' ) {
                 my $prompt = '"Grid"';
                 my $sub_menu = [
@@ -568,7 +578,7 @@ sub __choose_a_subset_wrap {
     my $name = 'New: ';
     my $list = $tu->choose_a_subset(
         $available,
-        { prompt => $prompt, current_selection_label => $name, info => $info, prefix => '- ', keep_chosen => 0,
+        { prompt => $prompt, cs_label => $name, info => $info, prefix => '- ', keep_chosen => 0,
           index => 0, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back}, layout => 3,
           clear_screen => 1 }
     );
@@ -590,7 +600,7 @@ sub __choose_a_number_wrap {
     #$info = $prompt . "\n" . $info;
     # Choose_a_number
     my $choice = $tu->choose_a_number( $digits,
-        { prompt => $prompt, current_selection_label => $name, info => $info, small_first => $small_first, clear_screen => 1 }
+        { prompt => $prompt, cs_label => $name, info => $info, small_first => $small_first, clear_screen => 1 }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;

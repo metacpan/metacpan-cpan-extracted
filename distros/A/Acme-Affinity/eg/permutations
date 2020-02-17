@@ -17,31 +17,8 @@ my $importance = {
     'mandatory'          => 250,
 };
 
-my @responses1;
-my $q = $questions->[0];
-for my $v ( values %$q ) {
-    my @answers = variations_with_repetition( $v, 2 );
-    for my $answer ( @answers ) {
-        for my $import ( sort { $importance->{$a} <=> $importance->{$b} } keys %$importance ) {
-            push @responses1, [ @$answer, $import ];
-        }
-    }
-}
-#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@responses1);
-#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@responses1),"\n");
-
-my @responses2;
-$q = $questions->[1];
-for my $v ( values %$q ) {
-    my @answers = variations_with_repetition( $v, 2 );
-    for my $answer ( @answers ) {
-        for my $import ( sort { $importance->{$a} <=> $importance->{$b} } keys %$importance ) {
-            push @responses2, [ @$answer, $import ];
-        }
-    }
-}
-#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@responses2);
-#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@responses2),"\n");
+my @responses1 = get_responses( $questions->[0], $importance ); # 45 responses
+my @responses2 = get_responses( $questions->[1], $importance ); # "
 
 my @response_pairs;
 for my $r1 ( @responses1 ) {
@@ -49,19 +26,129 @@ for my $r1 ( @responses1 ) {
         push @response_pairs, [ $r1, $r2 ];
     }
 }
-#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@response_pairs);
-#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@response_pairs),"\n");
 
-my @variations = variations_with_repetition( \@response_pairs, 2 );
-#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$variations[0]);
-#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@variations),"\n");
+my $iter = variations_with_repetition( \@response_pairs, 2 ); # 4.1M variations
 
-for my $v ( @variations ) {
+my %scores;
+
+my $n = 0;
+
+while ( my $v = $iter->next ) {
+    $n++;
+
     my $affinity = Acme::Affinity->new(
         questions  => $questions,
         importance => $importance,
         me         => $v->[0],
         you        => $v->[1],
     );
-    print $affinity->score, "\n";
+
+#    print $n, '. ', $affinity->score, "\n";
+
+    $scores{ $affinity->score }++;
 }
+
+$n = 0;
+
+for my $score ( sort { $a <=> $b } keys %scores ) {
+    print ++$n, '. ', $score, ' => ', $scores{$score}, "\n";
+}
+
+sub get_responses {
+    my ( $question, $importance ) = @_;
+
+    my @responses;
+
+    for my $v ( values %$question ) {
+        my $iter = variations_with_repetition( $v, 2 );
+
+        while ( my $answer = $iter->next ) {
+            for my $import ( sort { $importance->{$a} <=> $importance->{$b} } keys %$importance ) {
+                push @responses, [ @$answer, $import ];
+            }
+        }
+    }
+
+    return @responses;
+}
+
+__END__
+1. 0 => 3224529
+2. 0.398406374501992 => 1296
+3. 0.883848951807801 => 2592
+4. 1.23787406856394 => 2592
+5. 1.90312273167978 => 2592
+6. 1.96078431372549 => 1296
+7. 2.57684036015037 => 5184
+8. 2.74617518190545 => 2592
+9. 3.84615384615385 => 1296
+10. 4.22200330920749 => 2592
+11. 4.46321842677452 => 10368
+12. 5.7166195047503 => 5184
+13. 5.76199021246126 => 5184
+14. 5.91312395989083 => 2592
+15. 6.01820249894957 => 2592
+16. 6.18937034281971 => 2592
+17. 6.24975587367918 => 2592
+18. 6.29935788878163 => 2592
+19. 6.31194403097803 => 25920
+20. 8.00640769025437 => 5184
+21. 9.09090909090909 => 1296
+22. 9.90147542976674 => 10368
+23. 12.3091490979333 => 5184
+24. 12.7827498141228 => 5184
+25. 13.3511467458638 => 2592
+26. 13.7308759095272 => 2592
+27. 13.864838846795 => 2592
+28. 13.8675049056307 => 10368
+29. 13.9748789763252 => 2592
+30. 14.0028008402801 => 25920
+31. 16.6666666666667 => 5184
+32. 17.9028718509858 => 5184
+33. 18.6989398001691 => 2592
+34. 19.2307692307692 => 2592
+35. 19.4183909345154 => 2592
+36. 19.5725075656075 => 2592
+37. 19.6116135138184 => 25920
+38. 21.320071635561 => 10368
+39. 27.524094128159 => 5184
+40. 28.7479787288034 => 2592
+41. 28.8675134594813 => 20736
+42. 29.5656197994541 => 2592
+43. 29.8540717013266 => 2592
+44. 30.0910124947479 => 2592
+45. 30.1511344577764 => 25920
+46. 37.2677996249965 => 10368
+47. 38.9249472080762 => 5184
+48. 40.0320384512718 => 5184
+49. 40.4226041727222 => 5184
+50. 40.7434235236188 => 5184
+51. 40.8248290463863 => 51840
+52. 50 => 20736
+53. 64.5497224367903 => 20736
+54. 67.4199862463242 => 10368
+55. 69.3375245281537 => 10368
+56. 70.0140042014005 => 10368
+57. 70.5696796172046 => 10368
+58. 70.7106781186548 => 103680
+59. 83.3333333333333 => 5184
+60. 87.0388279778489 => 5184
+61. 89.5143592549291 => 5184
+62. 90.3876907577734 => 5184
+63. 90.9090909090909 => 1296
+64. 91.1050646348754 => 5184
+65. 91.2870929175277 => 51840
+66. 93.4946990008457 => 2592
+67. 94.4068640061701 => 2592
+68. 95.1561365839888 => 2592
+69. 95.3462589245592 => 25920
+70. 96.1538461538462 => 1296
+71. 97.0919546725772 => 2592
+72. 97.8625378280374 => 2592
+73. 98.0392156862745 => 1296
+74. 98.058067569092 => 25920
+75. 98.817316904209 => 2592
+76. 99.0147542976674 => 25920
+77. 99.601593625498 => 1296
+78. 99.8005980069749 => 25920
+79. 100 => 129600

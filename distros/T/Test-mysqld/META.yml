@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Test::mysqld:
     file: lib/Test/mysqld.pm
-    version: '1.0012'
+    version: '1.0013'
 requires:
   Class::Accessor::Lite: '0'
   DBD::mysql: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kazuho/p5-test-mysqld/issues
   homepage: https://github.com/kazuho/p5-test-mysqld
   repository: git://github.com/kazuho/p5-test-mysqld.git
-version: '1.0012'
+version: '1.0013'
 x_authority: cpan:KAZUHO
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
@@ -47,6 +47,7 @@ x_contributors:
   - 'HIROSE Masaaki <hirose31@gmail.com>'
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Jason Galea <jason@lecstor.com>'
+  - 'Johan Lindstrom <johan.lindstrom@broadbean.com>'
   - 'John Napiorkowski <jjn1056@yahoo.com>'
   - 'Kazuho Oku <kazuho@li1.kazuhooku.com>'
   - 'Kazuho Oku <kazuhooku@gmail.com>'

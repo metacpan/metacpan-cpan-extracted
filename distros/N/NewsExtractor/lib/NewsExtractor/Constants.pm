@@ -72,6 +72,10 @@ use constant {
         'Taiwan News',
         '翻報',
         '翻爆 - 翻報',
+        '澎湖時報',
+        'ETtoday星光雲',
+        'TVBS新聞網',
+        '台灣時報 | 電子報',
     ],
 
     CATEGORY_NAMES => [

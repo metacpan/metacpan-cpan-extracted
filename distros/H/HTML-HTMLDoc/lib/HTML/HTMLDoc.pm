@@ -9,7 +9,7 @@ use HTML::HTMLDoc::PDF;
 use vars qw(@ISA $VERSION);
 
 @ISA = qw();
-$VERSION = '0.12';
+$VERSION = '0.15';
 my $DEBUG = 0;
 
 ###############
@@ -723,6 +723,38 @@ sub get_logoimage {
 	return $self->_get_doc_config('logoimage');
 }
 
+###############
+# takes an image-filename that is used as letterhead
+# param: image:STRING
+# return: 1/0
+###############
+sub set_letterhead {
+	my $self = shift;
+	my $image = shift;
+
+	if ( ! -f "$image" ) {
+		$self->error("Letterhead $image could not be found");
+		return 0;
+	}
+
+	$self->_set_doc_config('letterhead', $image);
+	
+	# tell htmldoc to use this letterhead
+	$self->set_header('.', 'L', '.');
+	
+	return 1;
+}
+
+###############
+# returns a previous set letterhead image
+# param: -
+# return: image:STRING
+###############
+sub get_letterhead {
+	my $self = shift;
+	return $self->_get_doc_config('letterhead');
+}
+
 
 ###############
 # set the witdh in px for the background image
@@ -1424,6 +1456,24 @@ $htmldoc-E<gt>set_header('.', 'l', '.');
 =head2 get_logoimage()
 
 Reads out a previous set logo-image. You will get the filename to the image.
+
+=head2 set_letterhead($image)
+
+Sets the image to use as a letter for the document. $image is the path to the image in your filesystem. 
+The image should be 72DPI, and for portrait mode, 620-650 pixels wide and 72-90 pixels tall.
+The supported formats are BMP, GIF, JPEG, and PNG.
+
+This only works when the header is set to '.L.', and this method will automatically set_header()
+to create that settings.
+
+NOTE: This option is compatible with HTMLDOC 1.9.8 and higher. As of Feb. 14, 2020, that version is
+available from cloning (and manual compile) from the HTMLDOC Git rep: L<https://github.com/michaelrsweet/htmldoc>
+
+$htmldoc-E<gt>set_letterhead('myletterhead.png');
+
+=head2 get_letterhead()
+
+Reads out a previous set letterhead image. You will get the filename to the image.
 
 =head2 set_browserwidth($width)
 

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.232';
+our $VERSION = '2.235';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -329,6 +329,11 @@ sub truncate {
     return "TRUNCATE($col,$precision)";
 }
 
+sub round {
+    my ( $sf, $col, $precision ) = @_;
+    return "ROUND($col,$precision)";
+}
+
 sub bit_length {
     my ( $sf, $col ) = @_;
     return "BIT_LENGTH($col)";
@@ -361,7 +366,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.232
+Version 2.235
 
 =head1 DESCRIPTION
 

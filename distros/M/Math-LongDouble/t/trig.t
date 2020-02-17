@@ -182,7 +182,7 @@ sub approx {
 }
 
 sub test_cmp {
-  if(Math::LongDouble::_long_double_size() != $Config{nvsize}) {
+  if(Math::LongDouble::_get_actual_ldblsize() != Math::LongDouble::_get_actual_nvsize()) {
     return cmp_NV($_[0], $_[1]);
   }
   else {

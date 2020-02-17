@@ -36,7 +36,12 @@ sub run {
         }
     }
 
-    print scalar(@results) == 0 ? '' : encode_json(scalar(@results) == 1 ? $results[0] : \@results);
+    if (scalar @results == 0) {
+        _show_usage(1);
+    }
+    else {
+        print encode_json(scalar @results == 1 ? $results[0] : \@results);
+    }
 }
 
 sub _is_opened_stdin { -p STDIN }
@@ -83,7 +88,7 @@ sub _get_opt {
             print "$0 $Duadua::VERSION\n";
             exit 1;
         },
-    ) or $class->_show_usage(2);
+    );
 
     if (scalar @argv > 0) {
         push @{$opt->{ua_list}}, @argv;

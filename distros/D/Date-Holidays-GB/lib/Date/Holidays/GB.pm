@@ -1,8 +1,8 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.013';
+our $VERSION = '0.015';
 
-# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2019
+# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2021
 
 use strict;
 use warnings;
@@ -15,6 +15,7 @@ our @EXPORT_OK = qw(
   holidays_ymd
   is_holiday
   is_gb_holiday
+  next_holiday
 );
 
 # See
@@ -81,7 +82,8 @@ sub holidays {
 
         if ( $args{ymd} ) {
             $return{$date} = $string;
-        } else {
+        }
+        else {
             my ( undef, $m, undef, $d ) = unpack( 'A5A2A1A2', $date );
             $return{ $m . $d } = $string;
         }
@@ -103,42 +105,58 @@ sub is_gb_holiday { return is_holiday(@_) }
 
 sub is_holiday {
     my %args
-        = $_[0] =~ m/\D/
+        = $_[0] =~ m/[^0-9-]/
         ? @_
         : ( year => $_[0], month => $_[1], day => $_[2], regions => $_[3] );
 
-    my ( $y, $m, $d ) = @args{qw/ year month day /};
-    die "Must specify year, month and day" unless $y && $m && $d;
+    my ( $y, $m, $d );
+
+    if ( $args{date} ) {
+        ( $y, $m, $d ) = $args{date} =~ m{^([0-9]{4})-([0-9]{2})-([0-9]{2})$};
+    }
+    else {
+        ( $y, $m, $d ) = @args{qw/ year month day /};
+    }
+
+    die "Must specify either 'date' or 'year', 'month' and 'day'"
+        unless $y && $m && $d;
+
+    my $date = sprintf( "%04d-%02d-%02d", $y, $m, $d );
 
     # return if empty regions list (undef gets full list)
     my @region_codes = @{ $args{regions} || REGIONS }
         or return;
 
     # return if no region has holiday
-    my $holiday = $holidays{$y}->{ sprintf( "%04d-%02d-%02d", $y, $m, $d ) }
+    my $holiday = $holidays{$y}->{$date}
         or return;
 
     return _holiday( $holiday, \@region_codes );
 }
 
 sub next_holiday {
-    my @regions = (shift) || @{+REGIONS};
+    my @regions = @_;
+
+    unless (@regions) {
+        @regions = ('all', @{ +REGIONS });
+    }
 
     my ( $d, $m, $year ) = ( localtime() )[ 3 .. 5 ];
-    my $today = sprintf( "%04d-%02d-%02d", $year + 1900, $m + 1, $d );
+    $year += 1900;
+    $m    += 1;
+    my $today = sprintf( "%04d-%02d-%02d", $year, $m, $d );
 
     my %next_holidays;
 
     foreach my $date ( sort keys %{ $holidays{$year} } ) {
-
         next unless $date gt $today;
 
         my $holiday = $holidays{$year}->{$date};
 
-        foreach my $region ( 'all', @regions ) {
+        foreach my $region (@regions) {
             my $name = $holiday->{$region} or next;
 
-            $next_holidays{$region} ||= $name;
+            $next_holidays{$region} ||= { name => $name, date => $date };
         }
 
         last if $next_holidays{all} or keys %next_holidays == @{ +REGIONS };

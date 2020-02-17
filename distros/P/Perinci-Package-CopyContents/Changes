@@ -1,0 +1,9 @@
+0.002   2020-02-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module from Perinci::Package::CopyFrom ->
+	  Perinci::Package::CopyContents.
+
+
+0.001   2019-02-16  Released-By: PERLANCAR
+
+        - First release.

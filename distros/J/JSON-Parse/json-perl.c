@@ -529,49 +529,14 @@ PREFIX (string) (json_parse_t * parser)
 
 #ifdef PERLING
 
-#if 0
-    /* This was an attempt at a speedup by copying the prefix part of
-       the string and the contents of parser->buffer sequentially into
-       an SV. This didn't result in a significant speedup. */
-    parser->end--;
-    /* Save the length of the part without escapes. */
-    prefixlen = (STRLEN) (parser->end - start);
-    len = get_string (parser);
-    if (prefixlen > 0) {
-	char * svbuf;
-	string = newSV (len + prefixlen + 1);
-	svbuf = SvPVX (string);
-	memcpy (svbuf, start, prefixlen);
-	memcpy (svbuf + prefixlen, parser->buffer, len);
-	svbuf[len + prefixlen] = '\0';
-	SvPOK_only (string);
-	SvCUR_set (string, len+prefixlen);
-    }
-    else {
-	/* Have an escape as the first character so nothing to
-	   copy. */
-	string = newSVpvn ((const char *) parser->buffer, len);
-    }
-#elif 0
-    /* This is the original method up to version 0.32, set the point
-       of parsing back to the first character of the string, then get
-       the string into an allocated buffer. */
-    parser->end = start;
-    len = get_string (parser);
-    string = newSVpvn ((const char *) parser->buffer, len);
-#else
-    /* New-fangled method, use perl_get_string which keeps the buffer
-       on the stack. Results in a minor speed increase. */
+    /* Use "perl_get_string" which keeps the buffer on the
+       stack. Results in a minor speed increase. */
     parser->end = start;
     prefixlen = (STRLEN) (parser->end - start);
     string = perl_get_string (parser, prefixlen);
-#endif
 
 #elif defined (TOKENING)
     /* Don't use "len" here since it subtracts the escapes. */
-    /*
-    printf ("New token string : <<%.*s>> <<%c>>.\n", parser->end - start, start - 1, *(parser->end));
-    */
     parser->end = start;
     len = get_string (parser);
     string = json_token_new (parser,

@@ -70,7 +70,6 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'CPAN' => '0',
                                    'Capture::Tiny' => '0',
                                    'Dist::Zilla::Plugin::MakeMaker' => '5.022',
                                    'ExtUtils::MakeMaker' => '6.64',

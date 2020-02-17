@@ -9,11 +9,6 @@ if [ "x$CIP_ENV" == "x" ]; then
   false
 fi
 
-cip exec dzil-cpanm -n Sort::Versions
-if cip exec perl -e 'exit ! ($] < 5.020)'; then
-  cip exec dzil-cpanm -n List::Util
-fi
-
 if echo $CIP_ENV | grep -q system; then
   echo use system libtool
   cip sudo apt-get update

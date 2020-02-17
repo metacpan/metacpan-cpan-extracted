@@ -2,6 +2,10 @@ Revision history for Proxy-Scraper
 
 All notable changes to this project will be documented in this file.
 
+2.1.5 - 2020-02-15
+
+	Fixed MPT command.
+
 2.1.4 - 2020-01-29
 
 	Removed my nickname from README.md file.

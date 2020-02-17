@@ -6,6 +6,41 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.052	2020-02-17
+
+ - Added: The factory package now has a %PACKAGES variable.
+
+0.051	2020-02-17
+
+ [ Bug Fixes ]
+ - Remove a debugging line that was included in 0.049.
+
+ [ Other ]
+ - Allow multiple `use MooX::Press` statements to have the same prefix.
+
+0.050	2020-02-16
+
+ - MooX::Press will now interpret `handles => ARRAYREF` as if the array
+   were a hash, instead of relying on the underlying delegation
+   implementation to interpret it.
+ - Public attribtues can now have private (lexical) accessors and
+   delegations.
+
+0.049	2020-02-16
+
+ - Module::Runtime and Import::Into were already dependencies, so make more
+   use of them instead of just putting `use` statements in stringy eval.
+
+0.048	2020-02-15
+
+ - Don't issue warning about 'Local' factory if it was specified
+   explicitly; assume they know what they're doing.
+
+0.047	2020-02-15
+
+ - Improve defaults of `prefix` and `factory_package`, especially when
+   caller is `main`.
+
 0.046	2020-02-14
 
  [ Packaging ]

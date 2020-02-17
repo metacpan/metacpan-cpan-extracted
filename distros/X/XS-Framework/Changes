@@ -1,3 +1,7 @@
+1.2.7  16.02.2020
+           - remove std::io_errc and std::iostream_category as they are not present on certain systems
+           - fix leak in Simple::shared() and Stash::inherit()
+           - fix compilation for DragonFly, NetBSD, OpenBSD
 1.2.6  07.02.2020
            - fix compilation on mingw/windows: some errc::xxxx constants does not exists on mingw, it is not exported by XS::STL::ErrorCode neither
            - add link to XS::Manifesto

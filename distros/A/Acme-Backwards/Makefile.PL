@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-		'Keyword::Declare' => '0.001010',
+		'Keyword::Declare' => '0.001017',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Acme-Backwards-*' },

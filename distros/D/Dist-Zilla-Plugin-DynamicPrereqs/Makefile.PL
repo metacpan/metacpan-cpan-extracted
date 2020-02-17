@@ -46,7 +46,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "CPAN" => 0,
     "Capture::Tiny" => 0,
     "Dist::Zilla::Plugin::MakeMaker" => "5.022",
     "ExtUtils::MakeMaker" => "6.64",
@@ -64,7 +63,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.036",
+  "VERSION" => "0.037",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +71,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "CPAN" => 0,
   "Capture::Tiny" => 0,
   "Dist::Zilla::Plugin::MakeMaker" => "5.022",
   "Dist::Zilla::Role::AfterBuild" => 0,
@@ -108,7 +106,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 requires('Dist::Zilla', '5.008') if has_module('Dist::Zilla', '5.007');
 
 
@@ -129,7 +127,7 @@ MY;
 use File::ShareDir::Install qw(postamble);
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.036
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
@@ -137,7 +135,7 @@ sub _add_prereq {
     if exists $WriteMakefileArgs{$mm_key}{$module}
       and $WriteMakefileArgs{$mm_key}{$module} ne '0'
       and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
         and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

@@ -40,9 +40,8 @@ STATUS
     accept patches that fix bugs, but don't expect any new features to be
     added.
 
-    For a replacement, consider MooX::Pression. It's not a drop-in replacement
-    but it has a similar syntax to Moops, and provides many of the same
-    features.
+    For a replacement, consider Zydeco. It's not a drop-in replacement but it
+    has a similar syntax to Moops, and provides many of the same features.
 
 DESCRIPTION
     Moops is sugar for declaring and using roles and classes in Perl.
@@ -571,6 +570,13 @@ BUGS
 
     Please report any other bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Moops>.
+
+GOTCHAS
+    Certain software (like the CPAN indexer!) greps Perl source code looking
+    for `package` statements to determine which packages a module provides.
+    Moops uses `class` and `role` keywords to declare packages, so it may be
+    necessary to provide some dummy `package` statements at the end of your
+    module if you need to support such software.
 
 SUPPORT
     IRC: support is available through in the *#moops* channel on irc.perl.org

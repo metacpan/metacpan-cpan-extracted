@@ -54,6 +54,7 @@ t/pod-coverage.t
 t/pod.t
 t/regexp.t
 t/rewrite-header.t
+t/short-titles.t
 t/splat.t
 t/splat_html.t
 t/splat_latex.t
@@ -276,6 +277,9 @@ t/testfiles/table-square-brackets.muse
 t/testfiles/table.exp.html
 t/testfiles/table.exp.ltx
 t/testfiles/table.muse
+t/testfiles/titles-short.exp.html
+t/testfiles/titles-short.exp.ltx
+t/testfiles/titles-short.muse
 t/testfiles/uneven-table.exp.html
 t/testfiles/uneven-table.exp.ltx
 t/testfiles/uneven-table.muse

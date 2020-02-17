@@ -33,9 +33,9 @@
       "runtime" : {
          "requires" : {
             "Colouring::In" : "0.14",
-            "MooX::Pression" : "0.303",
             "PDF::API2" : "2.037",
             "Sub::MultiMethod" : "0.0008",
+            "Zydeco" : "0.503",
             "perl" : "5.006"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

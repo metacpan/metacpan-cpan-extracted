@@ -1,0 +1,83 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Zydeco
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: http://zydeco.toby.ink/
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/02synopsis.t
+ t/03subclass.t
+ t/04requires.t
+ t/05slurpy.t
+ t/06try.t
+ t/07sub.t
+ t/16classgenerators.t
+ t/17rolegenerators.t
+ t/18classgenerators-nesting.t
+ t/20moosex.t
+ t/21coderef.t
+ t/22overload.t
+ t/24mm.t
+ t/25abstract.t
+ t/26accumulate.t
+ t/31lexhas.t
+ t/40loading.t
+ t/41ps.t
+ t/50complextypes.t
+ t/51mixedsigs.t
+ t/52lists.t
+ t/53outsiders.t
+ t/80lines.t
+ t/97defaults.t
+ t/98geom.t
+ t/99anonclass.t
+ t/lib/Local/Example.pm
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ examples/mip-087-001.pl
+ examples/simple-json-encoder.pl
+ t/lib/Local/Example/MoreClasses.pl
+ t/lib/Local/Example/Roles.pl
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/MooX/Pression.pm
+ lib/Zydeco.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/bench.pl
+Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2020 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2020 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

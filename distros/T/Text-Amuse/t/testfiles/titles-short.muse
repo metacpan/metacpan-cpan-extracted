@@ -1,0 +1,19 @@
+#title test
+
+* Short | Long form
+
+** Short [1] | Long form with footnotes [1]
+
+*** Short [2] |
+    This is the full title
+
+[1] This is a note
+
+[2] Second footnote
+
+* | <Weird> "\\one" [1] [2]
+
+**   | Second <Weird> "\\one" [1] [2]  
+
+
+

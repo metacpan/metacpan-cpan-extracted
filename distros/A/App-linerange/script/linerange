@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-03-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-02-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ sub parse_cmdline {
         'help|h'           => sub {
             print <<USAGE;
 Usage:
-  linerange [OPTIONS]... <RANGESPEC> [FILE]...
+  linerange [OPTIONS]... [RANGESPEC] [FILE]...
   linerange --version (or -v)
   linerange --help (or -h)
 Options:
@@ -34,8 +34,7 @@ USAGE
     if (@ARGV) {
         $Opts{spec} = shift @ARGV;
     } else {
-        die "linerange: Please specify range specification ".
-            "(e.g. 10-15 or -5..-1)\n";
+        $Opts{spec} = '';
     }
     exit 99 if !$res;
 }
@@ -71,7 +70,7 @@ linerange - Retrieve line ranges from text
 
 =head1 VERSION
 
-This document describes version 0.003 of linerange (from Perl distribution App-linerange), released on 2019-03-21.
+This document describes version 0.004 of linerange (from Perl distribution App-linerange), released on 2020-02-17.
 
 =head1 SYNOPSIS
 
@@ -80,7 +79,7 @@ This document describes version 0.003 of linerange (from Perl distribution App-l
 Examples:
 
  # get line 25 from FILE
- % linerange 15 < FILE
+ % linerange 25 < FILE
 
  # get lines from 2nd to last (a.k.a. everything but the first) from process output
  % some-process | linerange 2..-1
@@ -104,7 +103,7 @@ calculate 12-5+1. You can use B<sed> or B<awk> or B<perl>:
  % perl -ne'print if $. >= 5 && $. <= 12' FILE
 
 which is fine only if you are familiar with those programming languages. And
-they require you to type too many symbols.
+they require you to type too many symbol characters.
 
 B<linerange> offers you a dead-simple alternative:
 
@@ -120,11 +119,16 @@ multiple line ranges:
 
  % linerange 5-12,20,25-32 FILE
 
-as well as negative line numbers:
+negative line numbers:
 
  % linerange 5..-1 FILE
  % linerange -5..-1 FILE
  % linerange 5..-3 FILE
+
+and a syntax to only get every n'th line:
+
+ % linerange /2 FILE      # every 2nd line, i.e. line 2, 4, 6, ...
+ % linerange 2..-1/3 FILE # every 3rd line in the range, i.e. line 4, 7, 10, ...
 
 You can use C<..> or C<-> (they both work), you don't have to worry about
 getting the lower range and higher range mixed up (they both work), you don't
@@ -156,7 +160,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

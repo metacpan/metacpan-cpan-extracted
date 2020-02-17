@@ -34,7 +34,7 @@ use PApp::Event ();
 
 use base Exporter;
 
-$VERSION = 2.1;
+$VERSION = 2.2;
 @EXPORT = qw( 
    authen_p access_p admin_p known_user_p update_username choose_username
    update_password update_comment username user_login user_logout userid

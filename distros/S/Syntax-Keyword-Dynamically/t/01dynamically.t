@@ -57,6 +57,18 @@ subtest "hash element" => sub {
       is( $hash{key}, "new", 'new value within scope' );
    }
    is( $hash{key}, "old", 'value restored after block leave' );
+
+   {
+      dynamically $hash{newkey} = "val";
+      is( $hash{newkey}, "val", 'created key within scope' );
+   }
+   ok( !exists $hash{newkey}, 'key removed after block leave' );
+
+   {
+      dynamically $hash{key} = "new";
+      delete $hash{key};
+   }
+   is( $hash{key}, "old", 'value recreated after block leave' );
 };
 
 my $value;

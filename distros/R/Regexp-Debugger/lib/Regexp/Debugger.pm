@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002003';
+our $VERSION = '0.002004';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -434,6 +434,27 @@ sub _build_debugging_regex {
     # Describe construct...
     our $construct_desc;
     our $quantifier_desc;
+
+    # Check for likely problems in the regex...
+    our @problems = ();
+    ()= $raw_regex =~ m{
+        ( \( & [^\W\d]\w*+ \) )
+            (?{ push @problems, { line => 1 + substr($_,0,pos()-length($^N)) =~ tr/\n/\n/,
+                                  desc => $^N,
+                                  type => 'subpattern call',
+                                  dym  => "(?" . substr($^N,1)
+                                }
+            })
+        |
+        ( \( [<'] [^\W\d]\w*+ [>'] (?= \s*+ [^\s)]++ ) )
+            (?{ push @problems, { line => 1 + substr($_,0,pos()-length($^N)) =~ tr/\n/\n/,
+                                  desc => "$^N  ... )",
+                                  type => 'named capture or subpattern definition',
+                                  dym  => "(?" . substr($^N,1) . ' ... )'
+                                }
+            })
+    }xmsgc;
+    $state{$regex_ID}{regex_problems} = [@problems];
 
     # Translate each component...
     use re 'eval';
@@ -2149,6 +2170,19 @@ sub _report_event {
     my $state_ref = $state{$regex_ID};
     my $event_ref = $state_ref->{$event_ID};
 
+    # Report any problems before reporting the event....
+    if (@{ $state_ref->{regex_problems} }) {
+        for my $problem (@{$state_ref->{regex_problems}}) {
+            print { *STDERR}
+                "Possible typo in $problem->{type} at line $problem->{line} of regex:\n",
+                "    Found: $problem->{desc}\n",
+                "    Maybe: $problem->{dym}\n\n";
+        }
+        print {*STDERR} "[Press any key to continue]";
+        _interact();
+        delete $state_ref->{regex_problems};
+    }
+
     # Unpack the necessary info...
     my ($matchable, $is_capture, $event_type, $construct, $depth)
         = @{$event_ref}{qw< matchable is_capture event_type construct depth>};
@@ -3343,7 +3377,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002003
+This document describes Regexp::Debugger version 0.002004
 
 
 =head1 SYNOPSIS
@@ -3918,6 +3952,19 @@ the name of a file that can be opened for writing. You either passed
 an unopened filehandle, an unwritable filename, or something that
 wasn't a plausible file. Alternatively, if you passed a filepath,
 was the directory not accessible to, or writeable by, you?
+
+=item C<< Possible typo in %s >>
+
+Prior to executing each regex, the module checks for common regex
+problems that can be detected statically. For example, it looks for the
+two most common typos made when defining and calling independent subpatterns.
+Namely: writing C<< (<NAME>...) >> instead of C<< (?<NAME>...) >>
+and C<< (&SUBPAT) >> instead of C<< (?&SUBPAT) >>
+
+To silence these warnings, just fix the typos.
+
+Or, if the constructs are intentional, change C<< (<NAME>...) >>
+to C<< (\<NAME>...) >> and C<< (&SUBPAT) >> to C<< (\&SUBPAT) >>
 
 =back
 

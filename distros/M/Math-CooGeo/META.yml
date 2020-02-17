@@ -23,5 +23,5 @@ resources:
   bugtracker: https://gitlab.com/DeBos/Math-CooGeo/issues
   homepage: https://gitlab.com/DeBos/Math-CooGeo
   repository: https://gitlab.com/DeBos/Math-CooGeo.git
-version: v1.0.6
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

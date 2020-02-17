@@ -15,7 +15,7 @@ use PApp::SQL;
 use Compress::LZF qw(:compress :freeze);
 BEGIN { Compress::LZF::set_serializer "PApp::Storable", "PApp::Storable::net_mstore", "PApp::Storable::mretrieve" }
 
-$VERSION = 2.1;
+$VERSION = 2.2;
 
 require Exporter;
 
@@ -53,7 +53,7 @@ The standard papp library directory.
 
 =item I18NDIR
 
-The directory where translation files are being storerd (usually
+The directory where translation files are being stored (usually
 "LIBDIR/i18n").
 
 =item STATEDB

@@ -1,0 +1,64 @@
+NAME
+    Calendar::DatesRoles::ReturnDateTimeObjects - Return DateTime objects in
+    get_entries()
+
+VERSION
+    This document describes version 0.001 of
+    Calendar::DatesRoles::ReturnDateTimeObjects (from Perl distribution
+    Calendar-DatesRoles-ReturnDateTimeObjects), released on 2020-02-17.
+
+SYNOPSIS
+     # apply the role to a Calendar::Dates::* class
+     use Calendar::Dates::ID::Holiday;
+     use Role::Tiny;
+     Role::Tiny->apply_roles_to_package(
+         'Calendar::Dates::ID::Holiday',
+         'Calendar::DatesRoles::ReturnDateTimeObjects');
+
+     # use the Calendar::Dates::* module as usual
+     my $entries = Calendar::Dates::ID::Holiday->get_entries(2020);
+
+     # now the 'date' field in each entry in $entries are DateTime objects instead
+     # of 'YYYY-MM-DD' strings.
+
+DESCRIPTION
+    This is a convenience role to make "get_entries()" return DateTime
+    objects instead of 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM' or
+    'YYYY-MM-DDTHH:MM/HH:MM' or strings.
+
+    If string is in the form of 'YYYY-MM-DDTHH:MM/HH:MM' (same-day interval)
+    then "get_entries()" will return 'date' field (the interval start) and
+    'date_end' field (the interval end).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Calendar-DatesRoles-ReturnDateTimeObjects>
+    .
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Calendar-DatesRoles-ReturnDateTimeObj
+    ects>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-DatesRoles-R
+    eturnDateTimeObjects>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Calendar::Dates
+
+    Calendar::DatesRolse::ReturnTimeMomentObjects
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

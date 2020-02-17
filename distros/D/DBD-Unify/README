@@ -1,8 +1,8 @@
 DBD::Unify --  a Unify interface for Perl 5 using DBI.
 
 This is the Database Driver for the Unify family of database products.
-See http://www.unify.com/Products/DataServer/default.aspx for Unify
-DataServer products.
+See http://support.guptatechnologies.com/supportwiki/index.php/Platforms
+for Unify DataServer products.
 
 See the ChangeLog file for a complete history
 
@@ -13,28 +13,31 @@ REQUIREMENTS
     and 9.1B, but this does not mean it might not work on U2000 databases or
     other DataServer releases.
 
-    I use DBI 1.637 and perl-5.8.7 through perl5.26.0, but might get it to
-    work with DBI 0.93 or higher and perl 5.6.2 (the modern toolchain will
-    require 5.8.1 as of Apr 2013). But then again, in that case you should
-    consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
-    As of DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
+    I have tested with DBI-1.632 .. DBI 1.643 and perl-5.8.6 through 5.31.8,
+    but you might get it to work with DBI 0.93 or higher.  But then again, in
+    that case you should consider an upgrade. As of DBD-Unify-0.40 I've made
+    DBI-1.42 prerequisite.  DBD-Unify-0.70 raised the minimum supported
+    perl version to perl-5.6 and version 0.90 raised it to perl-5.8.6.
 
     The test case however uses scalarIO to catch errors, so if you use a
     perl that does not support scalarIO (e.g. perlIO enabled), you will
     have to disable the failing tests that use it yourself and hope for
     the best (or better, upgrade to a perl that supports scalarIO).
 
-    If you plan to use DataServer 8.1 or higher database in Unicode encoding
-    (UTF-8), use perl5.8.4 or up. Note that $LANG will need to match your
-    database locale. See the Unicode site for the differences between the
-    Unicode standards if you want to know what to expect
-    (http://www.unicode.org/versions/enumeratedversions.html) and
+    Don't expect anything Unicode releated DataServer data to work on perl
+    versions below 5.8.4 (if you get it to work at all).  Note that $LANG
+    will need to match your database locale. See the Unicode site for the
+    differences between the Unicode standards if you want to know what to
+    expect (http://www.unicode.org/versions/enumeratedversions.html) and
     http://www.unicode.org/history/publicationdates.html for their age.
 
       Perl version
       Stable  Devel   Unicode
-      ------  ------  -------
-              5.27.2   10.0.0  UCD 10.0.0 released 20 Jun 2017
+      ------  ------- -------
+      5.30.0  5.29.10  12.1.0  UCD 12.1.0 released 07 May 2019
+              5.29.9   12.0.0  UCD 12.0.0 released 05 Mar 2019
+              5.29.2   11.0.0  UCD 11.0.0 released 05 Jun 2018
+      5.28.0  5.27.2   10.0.0  UCD 10.0.0 released 20 Jun 2017
       5.26.0  5.25.3    9.0.0  UCD  9.0.0 released 21 Jun 2016
       5.24.0  5.23.0    8.0.0  UCD  8.0.0 released 17 Jun 2015
       5.22.0  5.21.1    7.0.0  UCD  7.0.0 released 16 Jun 2014
@@ -49,7 +52,7 @@ REQUIREMENTS
       5.8.5   5.8.5     4.0.1  UCD  4.0.1 released    Mar 2004
       5.8.1   5.8.1     4.0.0  UCD  4.0.0 released 24 Apr 2003
       5.8.0   5.8.0     3.2.0  UCD  3.2.0 released 02 Apr 2002
-      5.7.x   5.7.x     3.1.1  UCD  3.1.1 released    Aug 2001
+              5.7.x     3.1.1  UCD  3.1.1 released    Aug 2001
                         3.0.x  UCD  3.0.0 released    Sep 1999
                                UCD  1.0.0 draft was planned spring 1991 :)
 
@@ -63,7 +66,11 @@ REQUIREMENTS
     - 0.65 working on 32bit 9.0G on Linux 2.4.21-47.EL
     - 0.76 working on 32bit 9.0G on Linux 2.6.18-92.1.22.el5PAE
     - 0.77 working on 32bit 9.0G on Linux 2.6.18-128.1.14.el5PAE
-                    with GNU g++ 4.1.2, perl-5.8.8, and DBI-1.609
+		   with GNU g++ 4.1.2, perl-5.8.8, and DBI-1.609
+    - 0.89 working on 64bit 9.1D on Linux 2.6.32-642.6.2   (RHEL 6.7)
+		   with DBI 1.623
+    - 0.90 working on 64bit 9.1E on Linux 3.10.0-1062.12.1 (RHEL 7.7)
+		   with DBI 1.627 and Perl 5.16.3
 
 BUILDING, TESTING AND INSTALLING:
 
@@ -255,7 +262,7 @@ ACKNOWLEDGEMENTS
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 1999-2017  H.Merijn Brand <h.m.brand@xs4all.nl>
+    Copyright (C) 1999-2020  H.Merijn Brand <h.m.brand@xs4all.nl>
 
     This library is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself. 

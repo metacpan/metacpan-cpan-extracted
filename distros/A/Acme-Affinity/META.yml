@@ -27,9 +27,9 @@ requires:
   perl: '5.006'
   strictures: '2'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-Affinity
-  repository: https://github.com/ology/Acme-Affinity
-version: '0.0104'
+  homepage: https://github.com/ology/Acme-Affinity
+  repository: https://github.com/ology/Acme-Affinity.git
+version: '0.0106'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -198,9 +198,9 @@ x_Dist_Zilla:
       name: MetaJSON
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:

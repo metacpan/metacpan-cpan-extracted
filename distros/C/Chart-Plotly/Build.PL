@@ -22,7 +22,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.037",
+  "dist_version" => "0.038",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recommends" => {
@@ -59,6 +59,7 @@ my %module_build_args = (
     "dist" => "share"
   },
   "test_requires" => {
+    "PDL" => 0,
     "Test::Exception" => 0,
     "Test::File::ShareDir" => 0,
     "Test::More" => 0,
@@ -69,6 +70,7 @@ my %module_build_args = (
 
 my %fallback_build_requires = (
   "Module::Build" => "0.3601",
+  "PDL" => 0,
   "Test::Exception" => 0,
   "Test::File::ShareDir" => 0,
   "Test::More" => 0,

@@ -77,8 +77,10 @@ sub localpath { # Return the path to a file in the same directory as the caller 
         # Dummy filename assumed to be in cwd, if we're running from -e
         # or are otherwise without a caller.
 
-    return Test::OnlySome::PathCapsule->new($filename)->file($newfn)->abs;
+    my $retval = Test::OnlySome::PathCapsule->new($filename)->file($newfn)->abs;
         # Assume the code up to this point hasn't changed cwd
+    #diag "localpath: $retval"; # DEBUG
+    return $retval;
 } #}}}1
 
 sub import { # {{{1

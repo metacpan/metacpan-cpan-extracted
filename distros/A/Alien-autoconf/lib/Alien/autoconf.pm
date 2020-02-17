@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find autoconf
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::autoconf - Build or find autoconf
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -57,8 +57,8 @@ From your alienfile:
 
 =head1 DESCRIPTION
 
-This distribution provides autoconf so that it can be used by other Perl distributions that are on CPAN.  This is most commonly necessary when creating 
-other L<Alien>s that target a autoconf project that does not ship with a C<configure> script.  Ideally you should complain to the upstream developers, 
+This distribution provides autoconf so that it can be used by other Perl distributions that are on CPAN.  This is most commonly necessary when creating
+other L<Alien>s that target a autoconf project that does not ship with a C<configure> script.  Ideally you should complain to the upstream developers,
 but if you are not able to convince them then you have this option.  There are currently two such Aliens: L<Alien::libuv> and L<Alien::Hunspell>.
 
 =head1 METHODS
@@ -71,10 +71,10 @@ Returns a list of directories that need to be added to the C<PATH> in order to u
 
 =head1 CAVEATS
 
-This module is currently configured to I<always> do a share install.  This is because C<system> installs for this alien are not reliable.  Please see 
-this issue for details: L<https://github.com/plicease/Alien-autoconf/issues/2>.  The good news is that most of the time you shouldn't need this module 
-I<unless> you are building another alien from source.  If your system provides the package that is targeted by the upstream alien I recommend using 
-that.  If you are packaging system packages for your platform then I recommend making sure the upstream alien uses the system library so you won't need 
+This module is currently configured to I<always> do a share install.  This is because C<system> installs for this alien are not reliable.  Please see
+this issue for details: L<https://github.com/plicease/Alien-autoconf/issues/2>.  The good news is that most of the time you shouldn't need this module
+I<unless> you are building another alien from source.  If your system provides the package that is targeted by the upstream alien I recommend using
+that.  If you are packaging system packages for your platform then I recommend making sure the upstream alien uses the system library so you won't need
 to install this module.
 
 =head1 SEE ALSO

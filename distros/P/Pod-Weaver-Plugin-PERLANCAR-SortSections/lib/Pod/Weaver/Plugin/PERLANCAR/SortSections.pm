@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::PERLANCAR::SortSections;
 
-our $DATE = '2019-09-17'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-16'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-PERLANCAR-SortSections'; # DIST
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -9,6 +11,7 @@ use Moose;
 with 'Pod::Weaver::Role::Finalizer';
 with 'Pod::Weaver::Role::SortSections';
 
+use Sort::Sub::pod_sections_ala_perlancar;
 use namespace::autoclean;
 
 sub finalize_document {
@@ -16,67 +19,7 @@ sub finalize_document {
 
     $self->sort_sections(
         $document,
-        [
-            # preamble
-            'NAME',
-            'SPECIFICATION VERSION',
-            'VERSION',
-            'SYNOPSIS',
-
-            # main content
-            'DESCRIPTION',
-
-            # Bencher::Scenario::*
-            'BENCHMARKED MODULES',
-            'BENCHMARK PARTICIPANTS',
-            'BENCHMARK DATASETS',
-            'SAMPLE BENCHMARK RESULTS',
-
-            # everything else that are uncategorized go here
-            sub { 1 },
-
-            # reference section
-            'FUNCTIONS',
-            'ATTRIBUTES',
-            'METHODS',
-
-            # reference section (CLI)
-            'SUBCOMMANDS',
-            'OPTIONS',
-
-            # other content (CLI)
-            'COMPLETION',
-
-            # FAQ (after all content & references)
-            'FAQ',
-            'FAQS',
-
-            # links/pointers (CLI)
-            'CONFIGURATION FILE',
-            'CONFIGURATION FILES',
-            'ENVIRONMENT',
-            'ENVIRONMENT VARIABLES',
-            'FILES',
-
-            # todos
-            'TODO',
-            'TODOS',
-
-            # links/pointers/extra information
-            'HISTORY',
-            'HOMEPAGE',
-            'SOURCE',
-            qr/^.+'S BUGS$/i, # in a forked module, i put the original module's BUGS in ORIGMODULE'S BUGS
-            'BUGS',
-            'SEE ALSO',
-
-            # author & copyright
-            qr/^.+'S AUTHORS?$/i, # in a forked module, i put the original module's AUTHOR in ORIGMODULE'S AUTHOR
-            qr/^AUTHORS?/,
-            qr/^.+'S COPYRIGHT( AND LICENSE)?$/i, # in a forked module, i put the original module's COPYRIGHT in ORIGMODULE'S COPYRIGHT
-            'COPYRIGHT AND LICENSE',
-            'COPYRIGHT',
-        ],
+        $Sort::Sub::pod_sections_ala_perlancar::SORT_SPEC,
     );
 }
 
@@ -96,7 +39,7 @@ Pod::Weaver::Plugin::PERLANCAR::SortSections - Sort POD sections like PERLANCAR
 
 =head1 VERSION
 
-This document describes version 0.07 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2019-09-17.
+This document describes version 0.081 of Pod::Weaver::Plugin::PERLANCAR::SortSections (from Perl distribution Pod-Weaver-Plugin-PERLANCAR-SortSections), released on 2020-02-16.
 
 =head1 SYNOPSIS
 
@@ -124,6 +67,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<Sort::Sub::pod_sections_ala_perlancar>, the backend
+
 L<Pod::Weaver::Plugin::SortSections>, the generic/configurable version
 
 L<Pod::Weaver::Role::SortSections>
@@ -134,7 +79,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

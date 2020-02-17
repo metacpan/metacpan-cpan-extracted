@@ -2,7 +2,7 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use PPR;
 use Cwd qw/abs_path/;
 
@@ -351,7 +351,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 

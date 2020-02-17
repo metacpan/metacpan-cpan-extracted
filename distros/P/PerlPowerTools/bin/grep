@@ -145,7 +145,7 @@ sub parse_args {
     my $no_re = $opt{F} || ($Me =~ /\bfgrep\b/);
 
     if ($opt{f}) {                # -f patfile
-	open(PATFILE, $opt{f})		or die qq($Me: Can't open '$opt{f}': $!);
+	open PATFILE, '<', $opt{f} or die qq($Me: Can't open '$opt{f}': $!);
 
 				  # make sure each pattern in file is valid
 	while ( defined($pattern = <PATFILE>) ) {
@@ -235,22 +235,22 @@ sub parse_args {
     foreach (@patterns) { s(/)(\\/)g }
 
     if ($opt{H}) {
-	foreach $pattern (@patterns) {
+	for my $pattern (@patterns) {
 	    $match_code .= "\$Matches += s/($pattern)/${SO}\$1${SE}/g;";
 	}
     }
     elsif ($opt{v}) {
-	foreach $pattern (@patterns) {
+	for my $pattern (@patterns) {
 	    $match_code .= "\$Matches += !/$pattern/;";
 	}
     }
     elsif ($opt{C}) {
-	foreach $pattern (@patterns) {
+	for my $pattern (@patterns) {
 	    $match_code .= "\$Matches++ while /$pattern/g;";
 	}
     }
     else {
-	foreach $pattern (@patterns) {
+	for my $pattern (@patterns) {
 	    $match_code .= "\$Matches++ if /$pattern/;";
 	}
     }
@@ -337,7 +337,7 @@ FILE: while (defined ($file = shift(@_))) {
 
 	warn "$Me: checking $file\n" if $opt->{T};
 
-	unless (open(FILE, $file)) {
+	unless ( open FILE, '<', $file ) {
 	    unless ($opt->{'q'}) {
 		warn "$Me: $file: $!\n";
 		$Errors++;

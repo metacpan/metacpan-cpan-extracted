@@ -1,0 +1,23 @@
+Changes
+lib/Net/DNS/DomainController/Discovery.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-import.t
+t/02-explicitimport.t
+t/03-resolver-a.t
+t/04-resolver-srv.t
+t/05-missing-dc.t
+t/06-srv-to-name.t
+t/07-srv-fqdn-list.t
+t/08-fqdn-to-ipaddr.t
+t/09-one-dc.t
+t/10-two-dc.t
+t/11-cname-dc.t
+t/12-cname-on-srv.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

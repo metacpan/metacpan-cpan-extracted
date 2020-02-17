@@ -37,7 +37,7 @@ use Convert::Scalar ();
 
 use common::sense;
 
-our $VERSION = 2.1;
+our $VERSION = 2.2;
 
 =item $papp = new PApp::Application args...
 
@@ -213,11 +213,13 @@ package PApp::Application::Agni;
 There is another Application type, Agni, which allows you to directly mount a specific
 agni object. To do this, you have to specify the application path like this:
 
-  PApp::Application::Agni/path/gid
+  PApp::Application::<obj_by_name_spec>
 
-e.g., to mount the admin application in root/agni/, use this:
+e.g., to mount the admin application in root/agni/, use one of these
 
   PApp::Application::Agni/root/agni/4295054263
+  PApp::Application::Agni/root/agni/GID/4295054263
+  PApp::Application::Agni/root/agni/agni/application::admin
 
 =cut
 
@@ -238,17 +240,12 @@ sub new {
 
    require Agni;
 
-   $arg{path} =~ /^\/(.*\/)(\d+)$/
-      or croak "unable to parse agni path/gid from '$arg{path}'";
-   my ($path, $gid) = ($1, $2);
+   &Agni::agni_exec (sub {
+      my $obj = Agni::obj_by_name ($arg{path})
+         or croak "unable to mount object $arg{path}";
 
-   defined $Agni::pathid{$path}
-      or croak "can't resolve path '$path'";
-
-   my $obj = Agni::path_obj_by_gid($Agni::pathid{$path}, $gid)
-      or croak "unable to mount object $path$gid";
-
-   $class->SUPER::new(%arg, obj => $obj);
+      $class->SUPER::new (%arg, obj => $obj);
+   });
 }
 
 sub run {

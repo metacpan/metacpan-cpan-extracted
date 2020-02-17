@@ -1,0 +1,104 @@
+package Sah::Schema::perl::release::version;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-15'; # DATE
+our $DIST = 'Sah-Schemas-Perl'; # DIST
+our $VERSION = '0.027'; # VERSION
+
+my %all_versions;
+
+# from build version of Module::CoreList
+our @build_releases;
+@build_releases = ("5.013003","5.015","5.025006","5.029005","5.00405","5.028002","5.014000","5.027000","5.006001","5.015000","5.029002","5.027","5.014","5.017006","5.013002","5.016001","5.021000","5.030000","5.019011","5.004","5.005","5.021","5.013005","5.029003","5.016","5.012005","5.015004","5.013008","5.021009","5.019010","5.012002","5.014004","5.027004","5.01301","5.025012","5.021007","5.021001","5.016000","5.015009","5.02901","5.015001","5.006000","5.015007","5.027001","5.027007","5.014001","5.012003","5.029008","5.006","5.027009","5.021004","5.027010","5.019004","5.022","5.008007","5.008001","5.008009","5.018004","5.009001","5.023009","5.022000","5.026002","5.01","5.023001","5.023007","5.008004","5.017008","5.019007","5.019001","5.021010","5.019009","5.02501","5.020000","5.009004","5.018001","5.01701","5.025008","5.023004","5.026003","5.011003","5.019","5.029006","5.018000","5.025005","5.017002","5.020001","5.024002","5.022004","5.017005","5.025002","5.021011","5.019000","5.018","5.007003","5.00307","5.023000","5.011002","5","5.022001","5.009000","5.017003","5.024003","5.008","5.013006","5.025003","5.023","5.009","5.011005","5.008000","5.027011","5.013000","5.021002","5.025011","5.014003","5.027003","5.008006","5.012001","5.013","5.015003","5.023006","5.021005","5.017011","5.021003","5.028000","5.015005","5.019006","5.029","5.012004","5.010001","5.014002","5.027002","5.027005","5.015002","5.028","5.029000","5.027008","5.029001","5.029007","5.006002","5.029009","5.010000","5.02701","5.028001","5.002","5.00503","5.015008","5.013004","5.016003","5.029004","5.017010","5.00504","5.012","5.021008","5.000","5.012000","5.013009","5.025010","5.016002","5.013007","5.02101","5.013001","5.02","5.01901","5.025009","5.025007","5.025001","5.013010","5.022003","5.017007","5.020002","5.024001","5.017001","5.019008","5.017009","5.011004","5.026","5.025004","5.023008","5.020003","5.017004","5.024004","5.008008","5.029010","5.022002","5.026000","5.011001","5.023002","5.026001","5.011000","5.008005","5.009002","5.018003","5.009005","5.021006","5.011","5.008002","5.019003","5.023005","5.015006","5.019005","5.03","5.025","5.001","5.023003","5.018002","5.009003","5.017000","5.024000","5.013011","5.025000","5.019002","5.027006","5.008003","5.024","5.017");
+
+$all_versions{"$_"} = 1 for @build_releases;
+
+# from installed version of Module::CoreList
+require Module::CoreList;
+$all_versions{"$_"} = 1 for keys %Module::CoreList::released;
+
+# in addition to the numified (which, unfortunately, collapses 5.010000 to
+# 5.10), also provides the x.y.z representations
+my @all_versions;
+for (sort keys %all_versions) {
+    my $major = sprintf "%.0f", $_;
+    my $minor = sprintf "%.0f", ($_ - $major) * 1000;
+    my $rev   = sprintf "%.0f", ($_ - $major - $minor/1000) * 1e6;
+    my $xyz   = sprintf "%d.%d.%d", $major, $minor, $rev;
+    #print "$_ -> $xyz\n";
+    $all_versions{$xyz} = 1;
+}
+
+our $schema = [str => {
+    summary => 'One of known released versions of perl',
+    description => <<'_',
+
+The list of releases of perl is retrieved from the installed core module
+<pm:Module::CoreList> as well as the one used during build. They both might not
+be the latest so the list might not be complete.
+
+The list of version numbers include numified version (which, unfortunately,
+collapses e.g. 5.010000 into 5.010) as well as the x.y.z version (e.g. 5.10.0).
+
+_
+    in => [sort keys %all_versions],
+}, {}];
+
+1;
+# ABSTRACT: One of known released versions of perl
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sah::Schema::perl::release::version - One of known released versions of perl
+
+=head1 VERSION
+
+This document describes version 0.027 of Sah::Schema::perl::release::version (from Perl distribution Sah-Schemas-Perl), released on 2020-02-15.
+
+=head1 DESCRIPTION
+
+The list of releases of perl is retrieved from the installed core module
+L<Module::CoreList> as well as the one used during build. They both might not
+be the latest so the list might not be complete.
+
+The list of version numbers include numified version (which, unfortunately,
+collapses e.g. 5.010000 into 5.010) as well as the x.y.z version (e.g. 5.10.0).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Perl>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Perl>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Perl>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+C<perl::release::*> is namespace for schemas related to perl releases.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

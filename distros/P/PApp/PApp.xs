@@ -63,7 +63,8 @@ compute_hash (char *key, I32 len, SV **sv, U32 *hash)
   PERL_HASH (*hash, key, len);
 }
 
-static SV *obj_by_gid (SV *obj, SV *gid)
+static SV *
+obj_by_gid (SV *obj, SV *gid)
 {
   dSP;
   SV **path = hv_fetch ((HV *)SvRV (obj), "_path", 5, 0);
