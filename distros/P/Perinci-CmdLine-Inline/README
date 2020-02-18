@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.546 of Perinci::CmdLine::Inline (from
-    Perl distribution Perinci-CmdLine-Inline), released on 2020-02-06.
+    This document describes version 0.547 of Perinci::CmdLine::Inline (from
+    Perl distribution Perinci-CmdLine-Inline), released on 2020-02-18.
 
 SYNOPSIS
      % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
@@ -102,9 +102,20 @@ FUNCTIONS
         false). However, you can pass a list of modules that is allowed
         here.
 
+    *   code_add_extra_log_outputs => *str*
+
+    *   code_after_enable_logging => *str*
+
     *   code_after_end => *str*
 
+        Put at the very end of generated script.
+
     *   code_after_shebang => *str*
+
+        Put at the very beginning of generated script, after the shebang
+        line.
+
+    *   code_before_enable_logging => *str*
 
     *   code_before_parse_cmdline_options => *str*
 

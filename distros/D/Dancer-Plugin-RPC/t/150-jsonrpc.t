@@ -45,6 +45,23 @@ route_doesnt_exist([GET => '/'], "no GET /");
         POST => '/jsonrpc/api',
         {
             headers => [
+                'Content-Type' => 'application/json',
+            ],
+            body => encode_json(
+                {argument => 'uppercase'}
+            ),
+        }
+    );
+
+    is($response->{status}, 404, "Not found (not jsonrpc-body)")
+        or diag(explain($response));
+}
+
+{
+    my $response = dancer_response(
+        POST => '/jsonrpc/api',
+        {
+            headers => [
                 'Content-Type' => 'application/xmlrpc',
             ],
             body => encode_json(
@@ -59,7 +76,7 @@ route_doesnt_exist([GET => '/'], "no GET /");
     );
 
     note(explain($response));
-    is($response->{status}, 404, "Not found...");
+    is($response->{status}, 404, "Not found (not jsonrpc-content-type)");
 }
 
 {

@@ -7,7 +7,7 @@ ok(my $pdf = Mxpress::PDF->new_pdf('test',
 		background => '#000',
 		padding => 5
 	}
-)->add_page, 'add a page');
+), 'add a page');
 
 my $page = $pdf->page;
 

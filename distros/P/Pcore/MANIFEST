@@ -29,6 +29,7 @@ lib/Pcore/API/Proxy.pm
 lib/Pcore/API/Proxy/Airsocks.pm
 lib/Pcore/API/S3.pm
 lib/Pcore/API/SMTP.pm
+lib/Pcore/API/Sitemap.pm
 lib/Pcore/API/Telegram/Bot.pm
 lib/Pcore/App.pm
 lib/Pcore/App/API.pm

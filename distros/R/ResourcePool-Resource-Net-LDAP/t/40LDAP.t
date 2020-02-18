@@ -1,8 +1,8 @@
 #! /usr/bin/perl -w
 #*********************************************************************
 #*** t/40LDAP.t
-#*** Copyright (c) 2002,2003 by Markus Winand <mws@fatalmind.com>
-#*** $Id: 40LDAP.t,v 1.6 2003/09/25 17:23:52 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 use strict;
 use Test;

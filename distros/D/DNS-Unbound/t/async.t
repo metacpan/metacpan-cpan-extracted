@@ -4,8 +4,14 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::FailWarnings;
 
 use_ok('DNS::Unbound');
+
+diag( "libunbound " . DNS::Unbound::unbound_version() );
+
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
 
 for my $use_threads_yn ( 0, 1 ) {
     my $dns = DNS::Unbound->new();
@@ -31,7 +37,7 @@ for my $use_threads_yn ( 0, 1 ) {
 
         my $fd = $dns->fd();
 
-        vec( my $rin, $fd, 1 ) = 1;
+        vec( my $rin = q<>, $fd, 1 ) = 1;
         select( my $rout = $rin, undef, undef, undef );
 
         diag "Ready vvvvvvvvvvvvv";

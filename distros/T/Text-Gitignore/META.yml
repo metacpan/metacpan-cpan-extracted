@@ -26,14 +26,14 @@ no_index:
 provides:
   Text::Gitignore:
     file: lib/Text/Gitignore.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/vti/text-gitignore/issues
   homepage: https://github.com/vti/text-gitignore
   repository: git://github.com/vti/text-gitignore.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:VTI
 x_contributors:
   - 'Eric A. Zarko <ezarko@roblox.com>'

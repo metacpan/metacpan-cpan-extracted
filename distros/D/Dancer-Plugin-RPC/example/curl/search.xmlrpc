@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<methodCall>
+  <methodName>rpc.search</methodName>
+  <params>
+    <param>
+      <value>
+        <struct>
+          <member>
+            <name>query</name>
+            <value>
+              <string>distribution:V</string>
+            </value>
+          </member>
+        </struct>
+      </value>
+    </param>
+  </params>
+</methodCall>

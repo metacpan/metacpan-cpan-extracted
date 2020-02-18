@@ -8,32 +8,17 @@ log_path: .
 
 plugins:
     'RPC::RESTRPC':
-        '/rest/system':
-            'System':
-                ping:         rpc_ping
-                version:      rpc_version
-                list_methods: rpc_list_methods
-        '/rest/metacpan':
-            'MetaCpan':
+        '/metacpan':
+            'Example::API::MetaCpan':
                 search: mc_search
     'RPC::JSONRPC':
-        '/rpc/system':
-            'System':
-                ping:         rpc_ping
-                version:      rpc_version
-                list_methods: rpc_list_methods
-        '/rpc/metacpan':
-            'MetaCpan':
-                search: mc_search
+        '/metacpan':
+            'Example::API::MetaCpan':
+                rpc_search: mc_search
     'RPC::XMLRPC':
-        '/rpc/system':
-            'System':
-                ping:         rpc_ping
-                version:      rpc_version
-                list_methods: rpc_list_methods
-        '/rpc/metacpan':
-            'MetaCpan':
-                search: mc_search
+        '/metacpan':
+            'Example::API::MetaCpan':
+                'rpc.search': mc_search
 
 metacpan:
-    endpoint: https://fastapi.metacpan.org/v1/release/_search
+    base_uri: https://fastapi.metacpan.org/v1/release/_search

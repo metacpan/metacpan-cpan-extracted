@@ -170,6 +170,22 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
                         }
                     }
 
+                    elsif ( $op eq 'LIKE' ) {
+
+                        # postgres ILIKE
+                        if ( $dbh->{is_pgsql} ) {
+                            push @buf, "$quoted_field ILIKE \$" . $i->$*++;
+                        }
+
+                        # sqlite LIKE is case insensitive
+                        else {
+                            push @buf, "$quoted_field LIKE \$" . $i->$*++;
+                        }
+
+                        # escape "%", "_"
+                        push @bind, '%' . $val =~ s[(%|_)][\\$1]smgr . '%';
+                    }
+
                     # expand value
                     elsif ( !is_ref $val || is_arrayref $val) {
                         push @buf, "$quoted_field $op \$" . $i->$*++;
@@ -232,9 +248,11 @@ sub GET_SQL_QUERY ( $self, $dbh, $i ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 78                   | Subroutines::ProhibitExcessComplexity - Subroutine "GET_SQL_QUERY" with high complexity score (37)             |
+## |    3 | 78                   | Subroutines::ProhibitExcessComplexity - Subroutine "GET_SQL_QUERY" with high complexity score (40)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 154, 166, 184        | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 154, 166, 176, 200   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 186                  | RegularExpressions::ProhibitSingleCharAlternation - Use [%_] instead of %|_                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

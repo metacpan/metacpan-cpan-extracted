@@ -3,35 +3,36 @@ abstract: "Querying your filehandle's capabilities"
 author:
   - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
-  Data::Dumper: 0
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Module::Build: 0.3601
-  Test::More: 0.82
+  Data::Dumper: '0'
+  Module::Build: '0.28'
+  Test::More: '0.82'
 configure_requires:
-  Module::Build: 0.3601
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PerlIO-Layers
 provides:
   PerlIO::Layers:
     file: lib/PerlIO/Layers.pm
-    version: 0.011
+    version: '0.012'
 requires:
-  Carp: 0
-  Exporter: 5.57
-  List::Util: 0
-  PerlIO: 0
-  XSLoader: 0
+  Carp: '0'
+  Exporter: '5.57'
+  List::Util: '0'
+  PerlIO: '0'
+  XSLoader: '0'
   perl: 5.008_001
-  strict: 0
-  warnings: 0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-Layers
   repository: git://github.com/Leont/perlio-layers.git
-version: 0.011
+version: '0.012'
+x_contributors:
+  - 'Nick Morrott <knowledgejunkie@gmail.com>'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,6 +1,5 @@
 Build.PL
 Changes
-CPAN.txt
 eg/labkey_api.pl
 lib/LabKey/Query.pm
 LICENSE

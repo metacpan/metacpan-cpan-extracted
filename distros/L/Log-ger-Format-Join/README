@@ -1,0 +1,43 @@
+NAME
+    Log::ger::Format::Join - Join arguments together as string
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger::Format 'Join';
+     use Log::ger;
+
+     log_warn 'arg1';                  # becomes: arg1
+     log_warn 'arg1', 'arg2', ' arg3'; # becomes: arg1arg2 arg3
+
+    You can supply a string to join the arguments with:
+
+     use Log::ger::Format 'Join', with=>'; ';
+     use Log::ger;
+
+     log_warn 'arg1';                  # becomes: arg1
+     log_warn 'arg1', 'arg2', ' arg3'; # becomes: arg1; arg2;  arg3
+
+DESCRIPTION
+    This is an alternative format plugin if you do not like the default one.
+    It does not do any sprintf()-style formatting; it just joins the
+    arguments into a string.
+
+CONFIGURATION
+  with
+    String. Default empty string. Characters to use to join the arguments
+    with.
+
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

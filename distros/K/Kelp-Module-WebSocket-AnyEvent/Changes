@@ -1,0 +1,7 @@
+Revision history for Perl extension Kelp::Module::Websocket.
+
+1.01 tue, 18 feb 2020, 17:29:23
+	Fix missing dependency
+
+1.00 tue, 18 feb 2020, 06:32:41
+	First release

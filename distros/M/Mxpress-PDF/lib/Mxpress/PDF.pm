@@ -3,9 +3,9 @@ use strict;
 use warnings;
 
 package Mxpress::PDF {
-	our $VERSION = '0.11';
+	our $VERSION = '0.14';
 	use Zydeco (
-		version	=> '0.11',
+		version	=> '0.14',
 		authority => 'cpan:LNATION',
 	);
 	use Colouring::In;
@@ -695,8 +695,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +TOC::Outline {
-			extends Plugin::Text;
+		class +TOC::Outline extends Plugin::Text {
 			has outline (type => Object);
 			has x (type => Num);
 			has y (type => Num);
@@ -836,25 +835,27 @@ package Mxpress::PDF {
 			has width (type => Num);
 			has height (type => Num);
 			has align (type => Str);
-			has valid_mime (type => HashRef);
+			has valid_mime (type => HashRef, builder => 1);
+			method _build_valid_mime {
+				return {
+					jpeg => 'image_jpeg',
+					tiff => 'image_tiff',
+					pnm => 'image_pnm',
+					png => 'image_png',
+					gif => 'image_gif'
+				};
+			}
 			factory image (Object $file, Map %args) {
 				return $class->new(
 					file => $file,
 					padding => 0,
 					align => 'center',
-					valid_mime => {
-						jpeg => 'image_jpeg',
-						tiff => 'image_tiff',
-						pnm => 'image_pnm',
-						png => 'image_png',
-						gif => 'image_gif'
-					},
 					%args
 				);
 			}
 			multi method add (FileHandle $image, Str $type, Map %args) {
 				$self->set_attrs(%args);
-				$type = $self->valid_type->{$type};
+				$type = $self->valid_mime->{$type};
 				return $self->_add($self->file->pdf->$type($image));
 			}
 			multi method add (Str $image, Map %args) {
@@ -960,8 +961,7 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 		}
-		class +Field {
-			extends Plugin::Text;
+		class +Field extends Plugin::Text {
 			factory field (Object $file, Map %args) {
 				$args{pad} ||= '_';
 				$class->generic_new($file, %args);
@@ -1000,7 +1000,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.11
+Version 0.14
 
 =cut
 
@@ -1066,7 +1066,7 @@ This is experimental and may yet still change.
 		't/hand-cross.png'
 	)->cover->add(
 		cb => ['text', 'add', q|you're welcome|]
-	);
+	)->cover->end;
 
 	$pdf->title->add(
 		'Table Of Contents'

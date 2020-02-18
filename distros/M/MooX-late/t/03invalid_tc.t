@@ -33,7 +33,7 @@ my $e;
 	};
 };
 
-diag($e);
+#diag($e);
 
 like(
 	$e,

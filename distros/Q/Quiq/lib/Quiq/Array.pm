@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Encode ();
 use Quiq::Reference;
@@ -27,8 +27,9 @@ L<Quiq::Object>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert ein Array. Jede der Methoden kann
-sowohl auf ein Objekt der Klasse als auch per Aufruf als Klassenmethode
-auf ein ungeblesstes Perl-Array angewendet werden.
+sowohl auf ein Objekt der Klasse als auch als Klassenmethode
+auf ein ungeblesstes oder eine andere Klasse geblesstes
+Perl-Array angewendet werden.
 
 Aufruf als Objektmethode:
 
@@ -1069,7 +1070,7 @@ sub restore {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

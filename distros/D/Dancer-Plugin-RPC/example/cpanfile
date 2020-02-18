@@ -1,4 +1,5 @@
 # Example application (excluding the plugin)
+requires 'Bread::Board'               => '0.33';
 requires 'Daemon::Control'            => '0.001';
 requires 'Dancer'                     => '1.32';
 requires 'HTTP::Tiny'                 => '0.070';
@@ -10,6 +11,7 @@ requires 'Types::Standard'            => '1.00';
 requires 'RPC::XML'                   => '0.57';
 requires 'Starman'                    => '0.40';
 requires 'URI'                        => '1.60';
+requires 'namespace::autoclean'       => '0.28';
 
 # do-rpc
 requires 'Log::Log4perl'               => '1.49';

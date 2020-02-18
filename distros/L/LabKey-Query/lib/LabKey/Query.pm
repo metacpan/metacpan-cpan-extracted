@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-LabKey::Query
+LabKey::Query - For interacting with data in LabKey Server
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ use URI;
 
 use vars qw($VERSION);
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 
 
@@ -472,6 +472,7 @@ sub _postData {
 	my $json_obj = JSON->new->utf8->encode($data);
 
 	my $req = POST $url;
+	$req->content_length(length($json_obj));
 	$req->content_type('application/json');
 	$req->content($json_obj);
 	$req->authorization_basic($$ctx{auth}{'login'}, $$ctx{auth}{'password'});
@@ -627,7 +628,9 @@ L<https://www.labkey.org/home/developer/forum/project-start.view>
 =head1 COPYRIGHT
  
 Copyright (c) 2010 Ben Bimber
-Copyright (c) 2011-2018 LabKey Corporation
+Copyright (c) 2011-2020 LabKey Corporation
+
+=head1 LICENSE
 
 Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 

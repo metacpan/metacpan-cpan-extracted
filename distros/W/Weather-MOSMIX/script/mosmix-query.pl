@@ -9,7 +9,7 @@ use Time::Piece;
 use Text::Table;
 use Getopt::Long;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 GetOptions(
     'latitude=s'  => \my $latitude,

@@ -184,14 +184,14 @@ DESCRIPTION
         If you are wrapping MooX::Press, you can fake the caller by passing it
         as an option.
 
-    `end` *(CodeRef)*
+    `end` *(CodeRef|ArrayRef[CodeRef])*
         After creating each class or role, this coderef will be called. It
         will be passed two parameters; the fully-qualified package name of the
         class or role, plus the string "class" or "role" as appropriate.
 
         Optional; defaults to nothing.
 
-    `begin` *(CodeRef)*
+    `begin` *(CodeRef|ArrayRef[CodeRef])*
         Like `end`, but called before setting up any attributes, methods, or
         method modifiers. (But after loading Moo/Moose/Mouse.)
 
@@ -694,12 +694,12 @@ DESCRIPTION
 
         See "Import Options".
 
-    `end` *(CodeRef)*
+    `end` *(CodeRef|ArrayRef[CodeRef])*
         Override `end` for this class and any child classes.
 
         See "Import Options".
 
-    `begin` *(CodeRef)*
+    `begin` *(CodeRef|ArrayRef[CodeRef])*
         Override `begin` for this class and any child classes.
 
           use MooX::Press::Keywords qw( true false );
@@ -866,6 +866,12 @@ DESCRIPTION
         `requires`, `constant`, and `type_name` are allowed. `with` is
         allowed; you should only use `with` to compose other interfaces (not
         full roles) though this is not currently enforced.
+
+    `before_apply` *(CodeRef|ArrayRef[CodeRef])*
+        Coderef to pass to `before_apply` from Role::Hooks.
+
+    `after_apply` *(CodeRef|ArrayRef[CodeRef])*
+        Coderef to pass to `after_apply` from Role::Hooks.
 
    Attribute Specifications
     Attribute specifications are mostly just passed to the OO toolkit

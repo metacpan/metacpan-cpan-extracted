@@ -34,11 +34,13 @@ use MooX::Press (
 	class => [
 		'SomeClass' => { type_name => 'SomeType' },
 		'OtherClass' => {
-			begin => sub {
-				my $class = shift;
-				my $reg   = Type::Registry->for_class($class);
-				$reg->alias_type('StrLength[1]' => 'Stringo');
-			},
+			begin => [
+				sub {
+					my $class = shift;
+					my $reg   = Type::Registry->for_class($class);
+					$reg->alias_type('StrLength[1]' => 'Stringo');
+				},
+			],
 			can => {
 				'my_method' => {
 					optimize  => true,

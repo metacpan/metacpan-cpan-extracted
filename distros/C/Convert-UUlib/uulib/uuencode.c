@@ -756,13 +756,13 @@ UUEncodeMulti (FILE *outfile, FILE *infile, char *infname, int encoding,
   else if (encoding == YENC_ENCODED) {
     if (progress.fsize == -1) {
       fprintf (outfile, "=yend crc32=%08lx%s",
-	       crc,
+	       (long)crc,
 	       eolstring);
     }
     else {
       fprintf (outfile, "=yend size=%ld crc32=%08lx%s",
 	       progress.fsize,
-	       crc,
+	       (long)crc,
 	       eolstring);
     }
   }
@@ -1003,14 +1003,14 @@ UUEncodePartial (FILE *outfile, FILE *infile,
                   ? linperfile * 128
                   : (progress.totsize - (partno - 1) * linperfile * 128),
 	       partno,
-	       pcrc);
+	       (long)pcrc);
     }
     else {
       fprintf (outfile, "=yend size=%ld",
 	       progress.totsize);
     }
     if (feof (theifile))
-      fprintf (outfile, " crc32=%08lx", *crcptr);
+      fprintf (outfile, " crc32=%08lx", (long)*crcptr);
     fprintf (outfile, "%s", eolstring);
   }
 
@@ -1153,13 +1153,13 @@ UUEncodeToStream (FILE *outfile, FILE *infile,
   else if (encoding == YENC_ENCODED) {
     if (progress.fsize == -1) {
       fprintf (outfile, "=yend crc32=%08lx%s",
-	       crc,
+	       (long)crc,
 	       eolstring);
     }
     else {
       fprintf (outfile, "=yend size=%ld crc32=%08lx%s",
 	       progress.fsize,
-	       crc,
+	       (long)crc,
 	       eolstring);
     }
   }
@@ -1457,14 +1457,14 @@ UUEncodeToFile (FILE *infile, char *infname, int encoding,
 		 (part*linperfile*128) < progress.totsize ? 
 		 linperfile*128 : (progress.totsize-(part-1)*linperfile*128),
 		 part,
-		 pcrc);
+		 (long)pcrc);
       }
       else {
 	fprintf (outfile, "=yend size=%ld",
 		 progress.totsize);
       }
       if (feof (theifile))
-	fprintf (outfile, " crc32=%08lx", crc); 
+	fprintf (outfile, " crc32=%08lx", (long)crc); 
       fprintf (outfile, "%s", eolstring);
     }
 

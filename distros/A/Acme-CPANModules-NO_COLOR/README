@@ -3,9 +3,9 @@ NAME
     convention
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::NO_COLOR
+    This document describes version 0.004 of Acme::CPANModules::NO_COLOR
     (from Perl distribution Acme-CPANModules-NO_COLOR), released on
-    2018-12-22.
+    2020-02-18.
 
 DESCRIPTION
     Modules that follow the NO_COLOR convention.
@@ -41,6 +41,21 @@ INCLUDED MODULES
 
     *   Text::ANSITable
 
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries NO_COLOR | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=NO_COLOR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Acme-CPANModules-NO_COLOR>.
@@ -66,7 +81,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -3,12 +3,14 @@ use alienfile;
 plugin 'PkgConfig' => (
   pkg_name => 'hunspell',
 );
- 
+
 share {
 
   requires 'Alien::Build'     => '0.75';
   requires 'Alien::Autotools' => '1.02';
-  
+
+  plugin 'Prefer::BadVersion' => ['1.7.0'] if $^O eq 'MSWin32';
+
   plugin 'Download' => (
     url => 'https://github.com/hunspell/hunspell/releases',
     version => qr/^v([0-9\.]+)\.tar\.gz$/,
@@ -23,6 +25,7 @@ share {
   unshift @acflags, '--disable-nls' if $^O =~ /^(?:MSWin32|darwin|freebsd)/;
 
   build [
+    [ 'sh', -c => 'libtoolize', ],
     [ 'sh', -c => 'autoreconf -vfi' ],
     "%{configure} --disable-shared --enable-static @acflags",
     '%{make}',
@@ -31,6 +34,7 @@ share {
 
   ffi {
     build [
+      [ 'sh', -c => 'libtoolize', ],
       [ 'sh', -c => 'autoreconf -vfi' ],
       "%{configure} --disable-static --enable-shared --libdir=%{.install.autoconf_prefix}/dynamic @acflags",
       '%{make}',

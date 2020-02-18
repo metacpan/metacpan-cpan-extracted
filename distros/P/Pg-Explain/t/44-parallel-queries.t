@@ -28,9 +28,9 @@ is( $explain->top_node->sub_nodes->[ 0 ]->type,                                 
 is( $explain->top_node->workers,                                                                         1, 'Correct workers for topnode' );
 is( $explain->top_node->initplans->[ 0 ]->workers,                                                       1, 'Correct workers for Finalize Aggregate' );
 is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->workers,                                     1, 'Correct workers for nested Gather' );
-is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers,                   3,     'Correct workers for Partial Aggregate' );
-is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers, 3,     'Correct workers for Parallel Seq Scan' );
-is( $explain->top_node->sub_nodes->[ 0 ]->workers,                                                       3,     'Correct workers for top Parallel Seq Scan' );
+is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers,                   3, 'Correct workers for Partial Aggregate' );
+is( $explain->top_node->initplans->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->sub_nodes->[ 0 ]->workers, 3, 'Correct workers for Parallel Seq Scan' );
+is( $explain->top_node->sub_nodes->[ 0 ]->workers,                                                       3, 'Correct workers for top Parallel Seq Scan' );
 
 exit;
 

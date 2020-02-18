@@ -20,16 +20,16 @@ name: App-CSV2Chart
 provides:
   App::CSV2Chart:
     file: lib/App/CSV2Chart.pm
-    version: v0.8.2
+    version: v0.10.0
   App::CSV2Chart::API::ToXLSX:
     file: lib/App/CSV2Chart/API/ToXLSX.pm
-    version: v0.8.2
+    version: v0.10.0
   App::CSV2Chart::Command::svg:
     file: lib/App/CSV2Chart/Command/svg.pm
-    version: v0.8.2
+    version: v0.10.0
   App::CSV2Chart::Command::xlsx:
     file: lib/App/CSV2Chart/Command/xlsx.pm
-    version: v0.8.2
+    version: v0.10.0
 requires:
   App::Cmd::Setup: '0'
   Excel::Writer::XLSX: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-csv2chart/issues
   homepage: http://metacpan.org/release/App-CSV2Chart
   repository: https://github.com/shlomif/CSV2Chart.git
-version: 0.8.2
+version: 0.10.0
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -143,7 +143,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Support
               name: '@SHLOMIF/Support'
-              version: '1.012'
+              version: '1.013'
             -
               class: Pod::Weaver::Section::Authors
               name: '@SHLOMIF/Authors'

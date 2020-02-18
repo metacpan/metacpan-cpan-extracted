@@ -1,0 +1,69 @@
+NAME
+    Sort::Sub::by_dmp - Sort data structures by comparing their dump (using
+    Data::Dmp)
+
+VERSION
+    This document describes version 0.001 of Sort::Sub::by_dmp (from Perl
+    distribution Sort-Sub-by_dmp), released on 2019-12-15.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$by_dmp'; # use '$by_dmp<i>' for case-insensitive sorting, '$by_dmp<r>' for reverse sorting
+     my @sorted = sort $by_dmp ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'by_dmp<ir>';
+     my @sorted = sort {by_dmp} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::by_dmp;
+     my $sorter = Sort::Sub::by_dmp::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub by_dmp
+     % some-cmd | sortsub by_dmp --ignore-case -r
+
+DESCRIPTION
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-by_dmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-by_dmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-by_dmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::Sub::data_sruct_by_data_cmp. Most of the time, you'd probably want
+    this instead.
+
+    Sort::Sub::by_perl_function
+
+    Sort::Sub::by_perl_op
+
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

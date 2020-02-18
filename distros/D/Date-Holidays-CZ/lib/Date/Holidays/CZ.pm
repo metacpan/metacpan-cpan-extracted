@@ -39,11 +39,11 @@ our @EXPORT_OK = qw( holidays );
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION   = '0.19';
+our $VERSION   = '0.20';
 
 
 
@@ -112,7 +112,7 @@ There is, however, one "proprietary" extension to the formats of B<strftime()>:
 The format definition I<%#> will print the internal abbreviation used for each
 holiday. 
 
-  FORMAT=>"%#:%d.%m"              van1:25.12.
+  FORMAT=>"%#: %d.%m"             van1: 25.12.
 
 As the module doesn't want to deal with i18n 
 issues, you'll have to find your own way to translate the aliases into your 
@@ -146,10 +146,10 @@ To disable this behaviour, set the I<WEEKENDS> option to 0:
 Get all holidays in 2004, except those that occur on weekends.
 Return the date list in human readable format:
 
-  my $feiertage_ref = holidays( FORMAT   => "%a, %d.%m.%Y",
-                                WEEKENDS => 0,
-                                YEAR     => 2004,
-                              );
+  my $svatky_ref = holidays( FORMAT   => "%a, %d.%m.%Y",
+                             WEEKENDS => 0,
+                             YEAR     => 2004,
+                           );
 
 
 =head1 PREREQUISITES

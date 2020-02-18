@@ -11,6 +11,7 @@ t/classes.t
 t/comments.t
 t/double-glob.t
 t/empty.t
+t/falses.t
 t/glob.t
 t/leading-slash.t
 t/mix.t

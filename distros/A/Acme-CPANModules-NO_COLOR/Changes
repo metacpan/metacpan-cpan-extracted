@@ -1,15 +1,22 @@
-0.003   2018-12-22 (PERLANCAR)
+0.004   2020-02-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Update release note style in Changes.
+
+
+0.003   2018-12-22  Released-By: PERLANCAR
 
 	- Add some more modules.
 
 
-0.002   2018-12-22 (PERLANCAR)
+0.002   2018-12-22  Released-By: PERLANCAR
 
 	- Add App::hr.
 
         - Replace mention of AC:NO_COLOR::NonCompliant to AC:ColorEnv.
 
 
-0.001   2018-12-22 (PERLANCAR)
+0.001   2018-12-22  Released-By: PERLANCAR
 
         - First release.

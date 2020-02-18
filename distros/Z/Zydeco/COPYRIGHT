@@ -23,6 +23,7 @@ Files: Changes
  t/24mm.t
  t/25abstract.t
  t/26accumulate.t
+ t/27rolehooks.t
  t/31lexhas.t
  t/40loading.t
  t/41ps.t
@@ -60,12 +61,12 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: examples/bench.pl
 Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

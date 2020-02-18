@@ -54,7 +54,7 @@
    "provides" : {
       "Text::Gitignore" : {
          "file" : "lib/Text/Gitignore.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/vti/text-gitignore"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:VTI",
    "x_contributors" : [
       "Eric A. Zarko <ezarko@roblox.com>",

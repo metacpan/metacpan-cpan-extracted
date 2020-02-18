@@ -4,7 +4,7 @@ use warnings;
 
 package MooX::late;
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.100';
 
 use Moo              qw( );
 use Carp             qw( carp croak );
@@ -14,7 +14,7 @@ use Module::Runtime  qw( is_module_name );
 BEGIN {
 	package MooX::late::DefinitionContext;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.016';
+	our $VERSION   = '0.100';
 	
 	use Moo;
 	use overload (
@@ -61,7 +61,7 @@ BEGIN {
 # 
 sub _handlers
 {
-	qw( isa does lazy_build traits );
+	qw( isa does lazy_build );
 }
 
 # SUBCLASSING
@@ -77,6 +77,10 @@ sub import
 {
 	my $me = shift;
 	my $caller = caller;
+	
+	require Sub::HandlesVia;
+	require Sub::HandlesVia::Toolkit::Moo;
+	'Sub::HandlesVia::Toolkit::Moo'->setup_for($caller);
 	
 	my $install_tracked;
 	{
@@ -205,90 +209,6 @@ sub _handle_lazy_build
 	return;
 }
 
-sub _handle_traits
-{
-	my $me = shift;
-	my ($name, $spec, $context, $class) = @_;
-	
-	my @new;
-	foreach my $trait (@{ $spec->{traits} || [] })
-	{
-		my $handler = $me->can("_handletrait_$trait");
-		croak "$me cannot process trait $trait" unless $handler;
-		
-		# SUBCLASSING
-		# There is a second level of handlers for traits.
-		# Just add a method called "_handletrait_Foo"
-		# and it will be called to handle the trait "Foo".
-		# These handlers should normally return the empty
-		# list, but may return a list of strings to add to
-		# a *new* traits arrayref.
-		#
-		push @new, $me->$handler(@_);
-	}
-	
-	$spec->{traits} = \@new;
-	
-	if ($spec->{handles_via})
-	{
-		eval "require MooX::HandlesVia"
-			or croak("Requires MooX::HandlesVia for attribute trait defined at $context");
-		
-		my ($name, %spec) = MooX::HandlesVia::process_has($name, %$spec);
-		%$spec = %spec;
-	}
-	
-	return;
-}
-
-sub _handletrait_Array
-{
-	my $me = shift;
-	my ($name, $spec, $context, $class) = @_;
-	
-	$spec->{handles_via} = "Data::Perl::Collection::Array::MooseLike";
-	
-	return;
-}
-
-sub _handletrait_Hash
-{
-	my $me = shift;
-	my ($name, $spec, $context, $class) = @_;
-	
-	$spec->{handles_via} = "Data::Perl::Collection::Hash::MooseLike";
-	
-	return;
-}
-
-sub _handletrait_Code
-{
-	my $me = shift;
-	my ($name, $spec, $context, $class) = @_;
-	
-	$spec->{handles_via} = "Data::Perl::Code";
-	
-	# Special handling for execute_method!
-	while (my ($k, $v) = each %{ $spec->{handles} })
-	{
-		next unless $v eq q(execute_method);
-		
-		# MooX::HandlesVia can't handle this right yet.
-		delete $spec->{handles}{$k};
-		
-		# ... so we handle it ourselves.
-		eval qq{
-			package ${class};
-			sub ${k} {
-				my \$self = shift;
-				return \$self->${name}->(\$self, \@_);
-			}
-		};
-	}
-	
-	return;
-}
-
 1;
 
 __END__
@@ -349,13 +269,7 @@ Exports C<blessed> and C<confess> functions to your namespace.
 
 =item 5.
 
-Handles certain attribute traits. Currently C<Hash>, C<Array> and C<Code>
-are supported. This feature requires L<MooX::HandlesVia>. 
-
-C<String>, C<Number>, C<Counter> and C<Bool> are unlikely to ever be
-supported because of internal implementation details of Moo. If you need
-another attribute trait to be supported, let me know and I will consider
-it.
+Handles native attribute traits.
 
 =back
 
@@ -407,10 +321,11 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=MooX-late>.
 
 C<MooX::late> uses L<Types::Standard> to check type constraints.
 
-C<MooX::late> uses L<MooX::HandlesVia> to provide native attribute traits
+C<MooX::late> uses L<Sub::HandlesVia> to provide native attribute traits
 support.
 
-The following modules bring additional Moose functionality to Moo:
+The following modules bring additional Moose functionality to Moo,
+beyond what MooX::late offers:
 
 =over
 

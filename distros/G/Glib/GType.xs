@@ -1741,7 +1741,7 @@ gperl_type_finalize (GObject * instance)
 }
 
 static void
-gperl_type_instance_init (GObject * instance)
+gperl_type_instance_init (GObject * instance, gpointer g_class)
 {
 	/*
 	 * for new objects, this may be the place where the initial
@@ -1754,6 +1754,8 @@ gperl_type_instance_init (GObject * instance)
 	HV *stash = gperl_object_stash_from_type (G_OBJECT_TYPE (instance));
 	SV **slot;
 	g_assert (stash != NULL);
+
+	PERL_UNUSED_VAR (g_class);
 
 	/* we need to always create a wrapper, regardless of whether there is
 	 * an INIT_INSTANCE sub.  otherwise, the fallback mechanism in

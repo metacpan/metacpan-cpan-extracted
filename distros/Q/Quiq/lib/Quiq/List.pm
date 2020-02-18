@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 # -----------------------------------------------------------------------------
 
@@ -35,25 +35,33 @@ L<Quiq::Hash>
   # Füge Objekt zur Liste hinzu (am Ende)
   $obj = $lst->push($obj);
   
+  # Wähle Objekte aus
+  
+  @objects = $lst->grep(sub {
+      my ($obj,$i,@args) = @_;
+      ...
+      return $bool;
+  });
+  
   # Bilde Objekte auf Werte ab
   
-  @arr = $lst->map(sub {
-      my $obj = shift;
+  @arr = $lst->map(@args,sub {
+      my ($obj,$i,@args) = @_;
       ...
       return (...);
   };
   
-  # Über alle Objekte iterieren
+  # Iteriere über alle Objekte
   
-  $lst->loop($ref,sub {
-      my ($ref,$obj,$i) = @_
+  $lst->loop(@args,sub {
+      my ($obj,$i,@args) = @_
       ...
   });
 
 =head1 DESCRIPTION
 
-Ein Objekt der Klasse speichert eine Ansammlung von (beliebigen) Objekten.
-Mit den Methoden der Klasse kann auf dieser Ansammlung operiert werden.
+Ein Objekt der Klasse speichert eine Liste von Objekten.
+Mit den Methoden der Klasse kann auf dieser Liste operiert werden.
 
 =head1 EXAMPLES
 
@@ -76,9 +84,8 @@ Füge Werte zu einer Zeichenkette zusammen:
 
 Beides zusammen in einem Aufruf:
 
-  $lst->loop([\$sum,\$str],sub {
-      my ($ref,$obj,$i) = @_;
-      my ($sumS,$strS) = @$ref;
+  $lst->loop(\$sum,\$str,sub {
+      my ($obj,$i,$sumS,$strS) = @_;
       ...
       $$sumS += $x;
       ...
@@ -86,6 +93,20 @@ Beides zusammen in einem Aufruf:
           $$strS .= "\n";
       }
       $$strS .= $s;
+  });
+
+oder als Closure
+
+  my ($sum,$str);
+  $lst->loop(sub {
+      my ($obj,$i) = @_;
+      ...
+      $sum += $x;
+      ...
+      if ($i) {
+          $str .= "\n";
+      }
+      $str .= $s;
   });
 
 =head1 METHODS
@@ -188,19 +209,76 @@ sub elements {
 
 # -----------------------------------------------------------------------------
 
-=head3 loop() - Iteriere über allen Elementen
+=head3 grep() - Wähle Objekte aus
 
 =head4 Synopsis
 
-  $lst->loop($ref,$sub);
+  @objects | $lstNew = $lst->grep(@args,$sub);
 
 =head4 Arguments
 
 =over 4
 
-=item $ref
+=item $sub
 
-Referenz auf Struktur, die von der Schleife manipuliert wird.
+Subroutine, die für jedes Objekt prüft, ob es in der Ergebnismenge
+enthalten ist. Die Subroutine hat die Signatur
+
+  sub {
+      my ($obj,$i,@args) = @_;
+      ...
+      return $bool;
+  }
+
+=back
+
+=head4 Returns
+
+Liste von Objekten. Im Skalarkontext eine Referenz auf eine
+(neu erzeugte) Liste mit diesen Objekten.
+
+=head4 Description
+
+Rufe die Subroutine $sub für jedes Element der Liste auf. Liefert die
+Subroutine wahr, wird das betreffende Objekt in die Ergebnismenge
+übernommen, sonst nicht.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub grep {
+    my $self = shift;
+    my $sub = pop;
+    # @_: @args
+
+    my @objects;
+    my $i = 0;
+    for (@{$self->elements}) {
+        if ($sub->($_,$i++,@_)) {
+            CORE::push @objects,$_;
+        }
+    }
+
+    return wantarray? @objects: ref($self)->new(\@objects);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 loop() - Iteriere über allen Elementen
+
+=head4 Synopsis
+
+  $lst->loop(@args,$sub);
+
+=head4 Arguments
+
+=over 4
+
+=item @args
+
+Liste von Argumentn, z.B. Referenzen auf Strukturen, die von der Schleife
+manipuliert werden. Die Liste kann leer sein.
 
 =item $sub
 
@@ -208,7 +286,7 @@ Subroutine, die für jedes Objekt aufgerufen wird.
 Die Subroutine hat die Signatur
 
   sub {
-      my ($ref,$obj,$i) = @_;
+      my ($obj,$i,@refs) = @_;
       ...
   }
 
@@ -217,18 +295,21 @@ Die Subroutine hat die Signatur
 =head4 Description
 
 Rufe die Subroutine $sub für jedes Element der Liste auf. Innerhalb der
-Subroutine kann die Struktur, auf die $ref verweist, manipuliert werden.
+Subroutine können die Strukturen, auf die @args verweist, manipuliert
+werden.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub loop {
-    my ($self,$ref,$sub) = @_;
+    my $self = shift;
+    my $sub = pop;
+    # @_: @args
 
     my $i = 0;
     for (@{$self->elements}) {
-        $sub->($ref,$_,$i++);
+        $sub->($_,$i++,@_);
     }
 
     return;
@@ -240,7 +321,7 @@ sub loop {
 
 =head4 Synopsis
 
-  @arr | $arr = $lst->map($sub);
+  @arr | $arr = $lst->map(@args,$sub);
 
 =head4 Arguments
 
@@ -252,7 +333,7 @@ Subroutine, die für jedes Objekt eine Liste von Werten liefert.
 Die Subroutine hat die Signatur
 
   sub {
-      my $obj = shift;
+      my ($obj,$i,@args) = @_;
       ...
       return @arr;
   }
@@ -274,11 +355,14 @@ zurück.
 # -----------------------------------------------------------------------------
 
 sub map {
-    my ($self,$sub) = @_;
+    my $self = shift;
+    my $sub = pop;
+    # @_: @args
 
     my @arr;
+    my $i = 0;
     for (@{$self->elements}) {
-        CORE::push @arr,$sub->($_);
+        CORE::push @arr,$sub->($_,$i++,@_);
     }
 
     return wantarray? @arr: \@arr;
@@ -325,7 +409,7 @@ sub push {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

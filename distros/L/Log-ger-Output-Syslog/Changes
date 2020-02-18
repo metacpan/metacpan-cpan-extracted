@@ -1,6 +1,14 @@
-0.002   2020-02-17  Released-By: PERLANCAR; Urgency: medium
+0.003   2020-02-18  Released-By: PERLANCAR; Urgency: medium
 
-	- Add all syslog(3) facilities (thanks Paulo Ferreira).
+        - Fix configuration validation [GH #2].
+
+
+0.002   2020-02-17  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+	- Add all syslog(3) facilities (thanks Paulo Ferreira) [GH #1].
+
+        - UPDATE: this release is broken because of bug in configuration
+          validation.
 
 
 0.001    2017-07-12  Released-By: PERLANCAR

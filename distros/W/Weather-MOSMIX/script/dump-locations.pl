@@ -6,7 +6,7 @@ use JSON 'encode_json';
 use Weather::MOSMIX;
 use Getopt::Long;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 GetOptions(
     'dsn=s'   => \my $dsn,

@@ -1,7 +1,9 @@
 package Log::ger::Output::Syslog;
 
-our $DATE = '2020-02-17'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-18'; # DATE
+our $DIST = 'Log-ger-Output-Syslog'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -25,7 +27,7 @@ sub get_hooks {
     my $ident = delete($conf{ident});
     defined($ident) or die "Please specify ident";
 
-    my $facility = $conf{facility} || 'user';
+    my $facility = delete($conf{facility}) || 'user';
     $facility =~ /\A(auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp)\z/
         or die "Invalid value for facility, please choose ".
         "auth|authpriv|cron|daemon|ftp|kern|local[0-7]|lpr|mail|news|syslog|user|uucp";
@@ -43,7 +45,7 @@ sub get_hooks {
             __PACKAGE__, # key
             50,          # priority
             sub {        # hook
-                my %hook_args = @_;
+                my %hook_args = @_; # see Log::ger::Manual::Internals/"Arguments passed to hook"
 
                 my $str_level = $hook_args{str_level};
                 $level_map{$str_level} or die "Don't know how to map ".
@@ -75,7 +77,7 @@ Log::ger::Output::Syslog - Send logs to syslog
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

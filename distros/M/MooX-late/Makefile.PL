@@ -19,9 +19,13 @@ my $meta = {
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                           runtime => {
-                            recommends => { "MooX::HandlesVia" => 0.001004 },
-                            requires   => { "Moo" => "1.006000", "perl" => 5.008003, "Type::Utils" => 1.000001 },
-                            suggests   => { MooX => 0 },
+                            requires => {
+                                          "Moo" => 2,
+                                          "perl" => 5.008003,
+                                          "Sub::HandlesVia" => 0.013,
+                                          "Type::Utils" => 1.000001,
+                                        },
+                            suggests => { MooX => 0 },
                           },
                           test => {
                             requires => {
@@ -32,8 +36,8 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "MooX::late" => { file => "lib/MooX/late.pm", version => 0.016 },
-                          "MooX::late::DefinitionContext" => { file => "lib/MooX/late.pm", version => 0.016 },
+                          "MooX::late" => { file => "lib/MooX/late.pm", version => "0.100" },
+                          "MooX::late::DefinitionContext" => { file => "lib/MooX/late.pm", version => "0.100" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -47,7 +51,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-late/project",
                         },
-  "version"          => 0.016,
+  "version"          => "0.100",
   "x_static_install" => 1,
 };
 

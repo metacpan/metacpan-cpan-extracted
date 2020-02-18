@@ -1,47 +1,61 @@
-0.491   2019-06-20 (PERLANCAR)
+0.493   2020-02-18  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Add workaround to disabling [Rinci::Wrap] by setting
+	  defaults to function arguments manually.
+
+
+0.492   2019-12-09  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+	- Add # AUTHORITY in generated script.
+
+        - UPDATE 2019-12-30: this release is broken because [Rinci::Wrap] was
+          not enabled during build. Please use 0.491 for now.
+
+
+0.491   2019-06-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Update generated dependency: Perinci::CmdLine::Lite=1.820.
 
 
-0.490   2019-04-23 (PERLANCAR)
+0.490   2019-04-23  Released-By: PERLANCAR
 
 	- [bugfix][regression] Set minimum version for
 	  Perinci::CmdLine::Classic. Also set minimum version of
 	  Perinci::CmdLine::Lite when cmdline=any.
 
 
-0.489   2019-04-23 (PERLANCAR)
+0.489   2019-04-23  Released-By: PERLANCAR
 
 	- Do not add dependency to Perinci::CmdLine::Classic when
 	  cmdline=any.
 
 
-0.488   2019-04-14 (PERLANCAR)
+0.488   2019-04-14  Released-By: PERLANCAR
 
 	- Bump prereq Log::ger to 0.027 (including in generated).
 
 
-0.487   2018-11-29 (PERLANCAR)
+0.487   2018-11-29  Released-By: PERLANCAR
 
 	- Bump generated prereq version: Perinci::CmdLine::{Base,Lite}
 	  1.811 -> 1.816.
 
 
-0.486   2018-07-16 (PERLANCAR)
+0.486   2018-07-16  Released-By: PERLANCAR
 
 	- Bump generated prereq version: Perinci::CmdLine::{Base,Lite}
 	  1.810 -> 1.811.
 
 
-0.485   2018-02-25 (PERLANCAR)
+0.485   2018-02-25  Released-By: PERLANCAR
 
 	- Bump generated prereq versions: Perinci::CmdLine::Classic ->
 	  1.770, Perinci::CmdLine::{Base,Lite} 1.80 -> 1.810.
 
 
-0.484   2018-01-17 (PERLANCAR)
+0.484   2018-01-17  Released-By: PERLANCAR
 
 	- Add options: --no-copt-version-enable (to disable version),
 	  --copt-version-getopt (to change option name for version),
@@ -49,55 +63,55 @@
 	  change option name for help).
 
 
-0.483   2017-11-06 (PERLANCAR)
+0.483   2017-11-06  Released-By: PERLANCAR
 
 	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.79
 	  -> 1.80.
 
 
-0.482   2017-08-10 (PERLANCAR)
+0.482   2017-08-10  Released-By: PERLANCAR
 
 	- [Bugfix] Set script's default log level correctly.
 
 
-0.481   2017-08-09 (PERLANCAR)
+0.481   2017-08-09  Released-By: PERLANCAR
 
 	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.76
 	  -> 1.79.
 
 
-0.480   2017-08-06 (PERLANCAR)
+0.480   2017-08-06  Released-By: PERLANCAR
 
 	- Produce deps to Log::ger 0.023, not 0.
 
 
-0.47    2017-07-14 (PERLANCAR)
+0.47    2017-07-14  Released-By: PERLANCAR
 
 	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.75
 	  -> 1.76.
 
 
-0.46    2017-07-01 (PERLANCAR)
+0.46    2017-07-01  Released-By: PERLANCAR
 
         - Bump prereq version Perinci::CmdLine::Base 1.72 -> 1.75.
 
 
-0.45_001 2017-06-19 (PERLANCAR)
+0.45_001 2017-06-19  Released-By: PERLANCAR
 
         - Replace Log::Any with Log::ger.
 
 
-0.45    2017-01-29 (PERLANCAR)
+0.45    2017-01-29  Released-By: PERLANCAR
 
 	- Bump Perinci::CmdLine::{Lite,Base} version.
 
 
-0.44    2017-01-16 (PERLANCAR)
+0.44    2017-01-16  Released-By: PERLANCAR
 
 	- Add option --use-cleanser.
 
 
-0.43    2017-01-12 (PERLANCAR)
+0.43    2017-01-12  Released-By: PERLANCAR
 
 	- [ux] Add completion for --cmdline, add option aliases
           --classic/--inline/--lite.
@@ -106,23 +120,23 @@
           env).
 
 
-0.42    2017-01-11 (PERLANCAR)
+0.42    2017-01-11  Released-By: PERLANCAR
 
 	- Add option: --(no-)pod.
 
 
-0.41    2017-01-06 (PERLANCAR)
+0.41    2017-01-06  Released-By: PERLANCAR
 
 	- Add options: validate_args, pack_deps.
 
 
-0.40    2017-01-04 (PERLANCAR)
+0.40    2017-01-04  Released-By: PERLANCAR
 
 	- [Incompatible change] Make 'subcommands' argument a hash instead
 	  of array.
 
 
-0.39    2016-12-15 (PERLANCAR)
+0.39    2016-12-15  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -131,39 +145,39 @@
 	  Rinci metadata, Rinci 1.1.83).
 
 
-0.38    2016-12-15 (PERLANCAR)
+0.38    2016-12-15  Released-By: PERLANCAR
 
 	- [Bugfix] Fix setting default log level which works with
 	  Perinci::CmdLine::Lite as well as ::Classic.
 
 
-0.37    2016-12-15 (PERLANCAR)
+0.37    2016-12-15  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to set default_dry_run in one instance, derp.
 
 
-0.36    2016-12-15 (PERLANCAR)
+0.36    2016-12-15  Released-By: PERLANCAR
 
         - Add default_dry_run option (Perinci::CmdLine 1.65+).
 
 
-0.35    2016-10-27 (PERLANCAR)
+0.35    2016-10-27  Released-By: PERLANCAR
 
         - Add default_format option.
 
 
-0.34    2016-10-20 (PERLANCAR)
+0.34    2016-10-20  Released-By: PERLANCAR
 
 	- Bump prereq version of Perinci::CmdLine::Base (::Lite) from 1.44 to
           1.56.
 
 
-0.33    2016-09-25 (PERLANCAR)
+0.33    2016-09-25  Released-By: PERLANCAR
 
 	- Add options: per_arg_json, per_arg_yaml.
 
 
-0.32    2016-08-03 (PERLANCAR)
+0.32    2016-08-03  Released-By: PERLANCAR
 
 	- Allow config_filename to be array of hash (Perinci::CmdLine::Base
 	  1.57).
@@ -171,49 +185,49 @@
 	- Tweak metadata: replace x.schema.entity with schema.
 
 
-0.31    2016-06-02 (PERLANCAR)
+0.31    2016-06-02  Released-By: PERLANCAR
 
         - Add option: allow_prereq (passed to Perinci::CmdLine::Inline).
 
 
-0.30    2016-05-21 (PERLANCAR)
+0.30    2016-05-21  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to pass req_modules from Perinci::CmdLine::Inline
 	  to extra_modules.
 
 
-0.29    2016-05-21 (PERLANCAR)
+0.29    2016-05-21  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Bump prereq version Perinci::CmdLine::Inline to 0.38.
 
 
-0.28    2016-01-14 (PERLANCAR)
+0.28    2016-01-14  Released-By: PERLANCAR
 
 	- Add option: use_utf8.
 
 	- Fix logging statement.
 
 
-0.27    2016-01-07 (PERLANCAR)
+0.27    2016-01-07  Released-By: PERLANCAR
 
 	- Correct version number.
 
 
-0.26    2016-01-07 (PERLANCAR)
+0.26    2016-01-07  Released-By: PERLANCAR
 
 	- Set minimum version of Perinci::CmdLine::Lite/::Base (1.45) when
 	  multiple config_filename is specified.
 
 
-0.25    2016-01-07 (PERLANCAR)
+0.25    2016-01-07  Released-By: PERLANCAR
 
 	- [Incompatible change] Make func.extra_modules hash instead of
 	  array, to be able to specify minimum version of modules.
 
 
-0.24    2016-01-07 (PERLANCAR)
+0.24    2016-01-07  Released-By: PERLANCAR
 
 	- Add func.extra_modules result metadata.
 
@@ -226,36 +240,36 @@
 	- Bump prereq version Log::Any::IfLOG to 0.07.
 
 
-0.23    2015-10-12 (PERLANCAR)
+0.23    2015-10-12  Released-By: PERLANCAR
 
 	- [dzil] Re-add DZP:Rinci::Wrap.
 
 
-0.22    2015-10-12 (PERLANCAR)
+0.22    2015-10-12  Released-By: PERLANCAR
 
         - Split dist from App-GenPericmdScript to Perinci-CmdLine-Gen and
           App-GenPericmdScript to avoid circular dependency.
 
 
-0.21    2015-09-29 (PERLANCAR)
+0.21    2015-09-29  Released-By: PERLANCAR
 
 	- [Bugfix] script_name was not passed Perinci::CmdLine constructor.
 
 	- Add options: config_dirs, env_name.
 
 
-0.20    2015-09-28 (PERLANCAR)
+0.20    2015-09-28  Released-By: PERLANCAR
 
 	- Add option: default_subcommand.
 
 
-0.19    2015-09-28 (PERLANCAR)
+0.19    2015-09-28  Released-By: PERLANCAR
 
 	- Don't die when unable to meta url, to allow func+meta embedded in
 	  the script e.g. via code_before_instantiate_cmdline.
 
 
-0.18    2015-09-26 (PERLANCAR)
+0.18    2015-09-26  Released-By: PERLANCAR
 
 	- Add options: read_config, read_env.
 
@@ -265,18 +279,18 @@
 	- [ux] Add alias function gen_pericmd_script.
 
 
-0.17    2015-09-15 (PERLANCAR)
+0.17    2015-09-15  Released-By: PERLANCAR
 
 	- Add option: pass_cmdline_object (passed to Perinci::CmdLine
 	  constructor).
 
 
-0.16    2015-09-12 (PERLANCAR)
+0.16    2015-09-12  Released-By: PERLANCAR
 
 	- Add option: script_summary.
 
 
-0.15    2015-09-10 (PERLANCAR)
+0.15    2015-09-10  Released-By: PERLANCAR
 
         - [Incompatible change] Rename snippet_* options to code_*, to be
           consistent with Perinci::CmdLine::Inline.
@@ -284,7 +298,7 @@
         - Add option: code_after_end.
 
 
-0.14    2015-09-09 (PERLANCAR)
+0.14    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -293,7 +307,7 @@
 	  requirement.
 
 
-0.13    2015-08-17 (PERLANCAR)
+0.13    2015-08-17  Released-By: PERLANCAR
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
@@ -301,23 +315,23 @@
 	  ssl_verify_hostname explicitly set to 0.
 
 
-0.12    2015-07-08 (PERLANCAR)
+0.12    2015-07-08  Released-By: PERLANCAR
 
 	- Add option: skip_format (passed to pericmd backend).
 
 
-0.11    2015-07-06 (PERLANCAR)
+0.11    2015-07-06  Released-By: PERLANCAR
 
 	- Return result metadata: func.cmdline_module_inlined if module
 	  used is Perinci::CmdLine::Inline.
 
 
-0.10    2015-07-02 (PERLANCAR)
+0.10    2015-07-02  Released-By: PERLANCAR
 
 	- Add our signature even when we use Perinci::CmdLine::Inline.
 
 
-0.09    2015-07-02 (PERLANCAR)
+0.09    2015-07-02  Released-By: PERLANCAR
 
 	- [Bugfix] Didn't pass script_name to Perinci::CmdLine::Inline's
           program_name.
@@ -326,48 +340,48 @@
           program_version).
 
 
-0.08    2015-07-02 (PERLANCAR)
+0.08    2015-07-02  Released-By: PERLANCAR
 
 	- Add support for Perinci::CmdLine::Inline.
 
 
-0.07    2015-07-01 (PERLANCAR)
+0.07    2015-07-01  Released-By: PERLANCAR
 
 	- Add option to pass to Perinci::CmdLine object constructor:
 	  extra_urls_for_version.
 
 
-0.06    2015-07-01 (PERLANCAR)
+0.06    2015-07-01  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Re-upload.
 
 
-0.05    2015-07-01 (PERLANCAR)
+0.05    2015-07-01  Released-By: PERLANCAR
 
         - Add #DIST to generated script (for Dist::Zilla::Plugin::OurDist).
 
 
-0.04    2015-03-06 (PERLANCAR)
+0.04    2015-03-06  Released-By: PERLANCAR
 
 	- Add options: --subcommands-from-package-functions,
 	  --{include,exclude}-package-functions-match.
 
 
-0.03    2015-03-06 (PERLANCAR)
+0.03    2015-03-06  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Tweak indentation in output and POD.
 
 
-0.02    2015-03-01 (PERLANCAR)
+0.02    2015-03-01  Released-By: PERLANCAR
 
 	- Forgot to empty output if we are outputing to file instead of
 	  stdout.
 
 
-0.01    2015-03-01 (PERLANCAR)
+0.01    2015-03-01  Released-By: PERLANCAR
 
         - First release.

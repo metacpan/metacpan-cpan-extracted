@@ -1,71 +1,70 @@
 package Example;
-use warnings;
-use strict;
 use lib 'lib/';
 
+our $VERSION = '0.01';
+
 use Dancer ':syntax';
-use Dancer::Plugin::RPC::XMLRPC;
-use Dancer::Plugin::RPC::JSONRPC;
-use Dancer::Plugin::RPC::RESTRPC;
+use Example::EndpointConfig;
 
-use MetaCpanClient;
-use System;
-use MetaCpan;
-
-# Map plugin-name to protocol-tag
-my %plugin_map = (
-    'RPC::XMLRPC'  => 'xmlrpc',
-    'RPC::JSONRPC' => 'jsonrpc',
-    'RPC::RESTRPC' => 'restrpc',
-);
-# Map protocol-tag to registrar function
-my %proto_map = (
-    xmlrpc  => \&xmlrpc,
-    jsonrpc => \&jsonrpc,
-    restrpc => \&restrpc,
-);
-
-# prepare MetaCpanClient
-my $mc_client = MetaCpanClient->new(
-    endpoint => config->{metacpan}{endpoint},
-);
-# Prepare the code-wrapper for the classes
-my $code_wrapper = sub {
-    my ($code, $package, $method, @arguments) = @_;
-    my $instance = instance_for_module($package);
-    return $instance->$code(@arguments);
-};
-
-# Register all endpoints for all configured plugins
-my $plugins = config->{plugins};
-for my $plugin (keys %$plugins) {
-    next if !exists($plugin_map{$plugin});
-
-    my $registrar = $proto_map{ $plugin_map{$plugin} };
-    for my $path (keys %{ $plugins->{$plugin} }) {
-        debug("register $plugin => $path");
-
-        $registrar->(
-            $path => {
-                publish      => 'config',
-                code_wrapper => $code_wrapper,
-            }
+use Bread::Board;
+my $system_api = container 'System' => as {
+    container 'apis' => as {
+        service 'Example::API::System' => (
+            class => 'Example::API::System',
+            dependencies => {
+                app_version  => literal $VERSION,
+                app_name     => literal __PACKAGE__,
+                active_since => literal time(),
+            },
         );
+    };
+};
+my $example_api = container 'Example' => as {
+    container 'clients' => as {
+        service 'MetaCpan' => (
+            class        => 'Client::MetaCpan',
+            lifecycle    => 'Singleton',
+            dependencies => {
+                map {
+                    ( $_ => literal config->{metacpan}{$_} )
+                } keys %{ config->{metacpan} },
+            },
+        );
+    };
+    container 'apis' => as {
+        service 'Example::API::MetaCpan' => (
+            class        => 'Example::API::MetaCpan',
+            dependencies => {
+                mc_client => '../clients/MetaCpan',
+            },
+        );
+    };
+};
+no Bread::Board;
+
+{
+    my $system_config = Example::EndpointConfig->new(
+        publish          => 'pod',
+        bread_board      => $system_api,
+        plugin_arguments => {
+            arguments => ['Example::API::System'],
+        },
+    );
+    for my $plugin (qw/RPC::JSONRPC RPC::RESTRPC RPC::XMLRPC/) {
+        $system_config->register_endpoint($plugin, '/system');
     }
 }
-
-# Every class has its own instantiation
-sub instance_for_module {
-    my ($module) = @_;
-
-    my $instance;
-    if ($module eq 'MetaCpan') {
-        $instance = MetaCpan->new(mc_client => $mc_client);
+{
+    my $example_config = Example::EndpointConfig->new(
+        publish     => 'config',
+        bread_board => $example_api,
+    );
+    my $plugins = config->{plugins};
+    for my $plugin (keys %$plugins) {
+        for my $path (keys %{$plugins->{$plugin}}) {
+            $example_config->register_endpoint($plugin, $path);
+        }
     }
-    else {
-        $instance = System->new();
-    }
-    return $instance;
 }
 
 1;

@@ -443,6 +443,25 @@ sub test_arraySize : Test(3) {
 
 # -----------------------------------------------------------------------------
 
+sub test_setOrPush : Test(3) {
+    my $self = shift;
+
+    my $h = Quiq::Hash->new(a=>[1..5],b=>undef,c=>{});
+
+    $h->setOrPush(a=>10);
+    my $arr = $h->get('a');
+    $self->isDeeply($arr,[1..5,10]);
+
+    $h->setOrPush(a=>[20,30]);
+    $self->isDeeply($arr,[1..5,10,20,30]);
+
+    $h->setOrPush(b=>42);
+    my $val = $h->get('b');
+    $self->is($val,42);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_push : Test(1) {
     my $self = shift;
 

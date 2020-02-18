@@ -1,7 +1,7 @@
 package Log::ger::Output::Array;
 
-our $DATE = '2019-05-06'; # DATE
-our $VERSION = '0.028'; # VERSION
+our $DATE = '2020-02-18'; # DATE
+our $VERSION = '0.029'; # VERSION
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ sub get_hooks {
         create_log_routine => [
             __PACKAGE__, 50,
             sub {
-                my %args = @_;
+                my %hook_args = @_;
 
                 my $logger = sub {
                     my ($ctx, $msg) = @_;
@@ -41,7 +41,7 @@ Log::ger::Output::Array - Log to array
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

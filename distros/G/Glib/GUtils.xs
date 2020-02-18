@@ -195,17 +195,13 @@ const gchar* g_get_user_special_dir (GUserDirectory directory);
 
 #endif
 
-##=for apidoc __function__
-##Set GLib's global program name.  Glib will set this to the value of $0 for
-##you when it loads; this function is provided to give you a way to set the
-##internal variable used by the GLib C library, since it knows nothing about
-##$0.
-##=cut
-##gchar_own * g_get_prgname ();
-##
-##=for apidoc __function__
-##=cut
-##void g_set_prgname (const gchar *prgname);
+=for apidoc __function__
+=cut
+gchar_own * g_get_prgname ();
+
+=for apidoc __function__
+=cut
+void g_set_prgname (const gchar *prgname);
 
 #if GLIB_CHECK_VERSION(2, 2, 0)
 

@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v3.0.5';
+our $VERSION = 'v4.0.0';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -76,6 +76,29 @@ my %revisions = (
     'ConfirmRelease',
     sub { $_[0]->pluginset_releaser },
     'MetaConfig',
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    sub { $_[0]->pluginset_metaprovides },
+    'ShareDir',
+    sub { $_[0]->pluginset_execdir },
+  ],
+  4 => [
+    sub { $_[0]->pluginset_gatherer },
+    'MetaYAML',
+    'MetaJSON',
+    'License',
+    'Pod2Readme',
+    'PodSyntaxTests',
+    'Test::ReportPrereqs',
+    ['Test::Compile' => { xt_mode => 1 }],
+    sub { $_[0]->pluginset_installer },
+    'Manifest',
+    'PruneCruft',
+    'ManifestSkip',
+    'RunExtraTests',
+    sub { $_[0]->pluginset_release_management }, # before test/confirm for before-release verification
+    'TestRelease',
+    'ConfirmRelease',
+    sub { $_[0]->pluginset_releaser },
     ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
     sub { $_[0]->pluginset_metaprovides },
     'ShareDir',
@@ -220,7 +243,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   version = 0.001
   
   [@Starter]           ; all that is needed to start
-  revision = 3         ; always defaults to revision 1
+  revision = 4         ; always defaults to revision 1
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -230,7 +253,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
   [@Starter::Git]      ; drop-in variant bundle for git workflows
-  revision = 3         ; requires/defaults to revision 3
+  revision = 4         ; requires/defaults to revision 3
 
 =head1 DESCRIPTION
 
@@ -292,7 +315,7 @@ Some example F<dist.ini> configurations to get started with.
   version = 1.00
 
   [@Starter]
-  revision = 3
+  revision = 4
 
   [Prereqs / RuntimeRequires]
   perl = 5.010001
@@ -311,7 +334,7 @@ Some example F<dist.ini> configurations to get started with.
   copyright_year   = 2019
 
   [@Starter::Git]
-  revision = 3
+  revision = 4
   managed_versions = 1
   regenerate = Makefile.PL
   regenerate = META.json
@@ -332,7 +355,7 @@ Some example F<dist.ini> configurations to get started with.
   plugin = ReadmeAnyFromPod
 
   [@Starter::Git]
-  revision = 3
+  revision = 4
   installer = ModuleBuildTiny
   managed_versions = 1
   regenerate = Build.PL
@@ -360,7 +383,7 @@ configured by the composed roles, as in L</"CONFIGURING">.
 =head2 revision
 
   [@Starter]
-  revision = 2
+  revision = 4
 
 Selects the revision to use, from L</"REVISIONS">. Defaults to revision 1.
 
@@ -574,6 +597,13 @@ The L</"installer"> option is now supported to change the installer plugin.
 Revision 3 is similar to Revision 2, but additionally supports the
 L</"managed_versions"> and L</"regenerate"> options, and variant bundles like
 L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
+
+=head2 Revision 4
+
+Revision 4 is similar to Revision 3, but removes the
+L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig> plugin because it adds
+significant clutter to the generated META files without much benefit. It can
+easily be added to the F<dist.ini> if desired.
 
 =head1 CONFIGURING
 

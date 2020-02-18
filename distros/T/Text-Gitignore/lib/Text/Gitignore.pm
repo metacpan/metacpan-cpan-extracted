@@ -4,7 +4,7 @@ use warnings;
 use base 'Exporter';
 
 our @EXPORT_OK = qw(match_gitignore build_gitignore_matcher);
-our $VERSION   = "0.03";
+our $VERSION   = "0.04";
 
 sub match_gitignore {
     my ( $patterns, @paths ) = @_;
@@ -80,7 +80,7 @@ sub build_gitignore_matcher {
     return sub {
         my $path = shift;
 
-        my $match = 0;
+        my $match = undef;
 
         foreach my $pattern (@patterns_re) {
             my $re = $pattern->{re};
@@ -93,7 +93,7 @@ sub build_gitignore_matcher {
                 }
             }
             else {
-                $match = !!( $path =~ m/$re/ );
+                $match = 1 if $path =~ m/$re/;
 
                 if ( $match && !@negatives ) {
                     return $match;
@@ -152,7 +152,28 @@ Returns matched paths (if any). Accepts a string (slurped file for example), or 
     }
 
 Returns a code reference. The produced function accepts a single file as a first parameter and returns true when it was
-matched.
+matched. In case no pattern is matched, it returns a false value with the following convention:
+
+=over
+
+=item *
+
+if the no-match reason is because of a negated pattern, then a false but defined value is returned (e.g. C<0>);
+
+=item *
+
+otherwise, if the no-match reason is that no I<direct> pattern matched, then C<undef> is returned.
+
+=back
+
+The use of different false values is inspired to the C<wantarray()> built-in function.
+
+Example:
+
+    my $matcher  = build_gitignore_matcher(['f*', '!foo*', 'foobar']);
+    my $matched  = $matcher->('foobar');  # $matched set to true
+    my $ignored  = $matcher->('bar');     # $ignored set to undef
+    my $excluded = $matcher->('foolish'); # $excluded set to false but defined (e.g. 0)
 
 =head1 LICENSE
 

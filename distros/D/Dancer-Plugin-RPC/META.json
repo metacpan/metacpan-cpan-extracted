@@ -4,13 +4,13 @@
       "Abe Timmerman <abeltje@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer-Plugin-RPC",
    "no_index" : {
@@ -24,6 +24,7 @@
          "requires" : {
             "Dancer" : "1.31",
             "JSON" : "2.0",
+            "Params::Validate" : "1.08",
             "Params::ValidationCompiler" : "0.24",
             "RPC::XML" : "0.56",
             "Test::Fatal" : "0.010",
@@ -41,6 +42,7 @@
          "requires" : {
             "Dancer" : "1.31",
             "JSON" : "2.0",
+            "Params::Validate" : "1.08",
             "Params::ValidationCompiler" : "0.24",
             "RPC::XML" : "0.56",
             "Types::Standard" : "1.00",
@@ -57,5 +59,6 @@
          "web" : "https://github.com/abeltje/Dancer-Plugin-RPC"
       }
    },
-   "version" : "1.07"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -182,7 +182,7 @@ static char *
 ScanHeaderLine (FILE *datei, char *initial)
 {
   char *ptr=uuscan_shlline;
-  char *ptr2, *p1, *p2, *p3;
+  char *ptr2, *p2, *p3;
   int llength, c;
   long curpos;
 
@@ -269,10 +269,10 @@ ScanHeaderLine (FILE *datei, char *initial)
 
     if (*ptr == '=' && *(ptr+1) == '?') {
       /*
-       * Let p1 point to the charset, look for next question mark
+       * Let p2 point to the charset, look for next question mark
        */
 
-      p1 = p2 = ptr+2;
+      p2 = ptr+2;
 
       while (*p2 && *p2 != '?') {
 	p2++;
@@ -817,7 +817,8 @@ ScanData (FILE *datei, char *fname, int *errcode,
 	}
 	if ((ptr = strchr (line, ':')) != NULL) {
 	  ptr++;
-	  while (isspace (*ptr)) ptr++; p2 = ptr;
+	  while (isspace (*ptr)) ptr++;
+          p2 = ptr;
 	  while (*p2 && !isspace (*p2) && *p2 != ';') p2++;
 	  c = *p2; *p2 = '\0';
 	  if (p2 != ptr) {

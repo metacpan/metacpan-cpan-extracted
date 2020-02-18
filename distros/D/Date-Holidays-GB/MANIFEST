@@ -14,6 +14,7 @@ lib/Date/Holidays/GB/EAW.pm
 lib/Date/Holidays/GB/NIR.pm
 lib/Date/Holidays/GB/SCT.pm
 share/generate_date_holidays_gb.pl
+t/author-minimum-version.t
 t/author-pod-syntax.t
 t/next-holiday.t
 t/regions-export.t

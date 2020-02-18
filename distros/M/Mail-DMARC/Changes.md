@@ -1,7 +1,7 @@
 
-### 1.20200212
+### 1.20200214
 
-- skip DB cleanup when unable to connect to DB #175
+- move HTTP::Tiny into deps (used for PSL updates)
 
 ### 1.20200116
 

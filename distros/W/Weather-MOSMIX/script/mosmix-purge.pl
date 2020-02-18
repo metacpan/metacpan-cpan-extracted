@@ -4,7 +4,7 @@ use warnings;
 use Weather::MOSMIX::Writer;
 use Getopt::Long;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 GetOptions(
     'dsn=s'   => \my $dsn,

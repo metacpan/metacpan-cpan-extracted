@@ -1,5 +1,5 @@
 Name:           perl-Package-New
-Version:        0.08
+Version:        0.09
 Release:        1%{?dist}
 Summary:        Simple base package from which to inherit
 License:        BSD

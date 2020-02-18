@@ -1,15 +1,17 @@
-use v5.8.0;
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib/
+
 use Module::Build;
 
 my $b = Module::Build->new
  (module_name   => 'GitHub::Crud',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Create, Read, Update, Delete files on GitHub',
+  dist_abstract => 'Create, Read, Update, Delete files, issues, web hooks and commits on GitHub.',
   license       => 'perl',
-  requires      =>
-   {Carp        =>0,
+  requires      => {
+    perl               => '5.26.1',
+    Carp        =>0,
     Data::Dump  =>0,
-    Data::Table::Text=>'20180616',
+    'Data::Table::Text'              => 20200202,
     Digest::SHA1=>0,
     Storable    =>0,
     Test::More  =>0,
@@ -18,7 +20,7 @@ my $b = Module::Build->new
    },
   configure_requires => {'Module::Build' => 0.4224},
   create_readme =>  0,
-  perl          => '5.8.0',
+  perl          => '5.26.0',
  );
 
 $b->create_build_script();

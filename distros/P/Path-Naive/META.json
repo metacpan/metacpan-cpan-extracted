@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Path-Naive"
       }
    },
-   "version" : "0.042",
+   "version" : "0.043",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

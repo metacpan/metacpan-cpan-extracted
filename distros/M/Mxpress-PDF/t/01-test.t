@@ -49,6 +49,8 @@ my $pdf = Mxpress::PDF->new_pdf('test',
 
 $pdf->cover->add->title->add(
 	'Add a cover page'
+)->image->add(
+	't/hand-cross.png'
 )->cover->add(
 	cb => ['text', 'add', q|you're welcome|]
 );

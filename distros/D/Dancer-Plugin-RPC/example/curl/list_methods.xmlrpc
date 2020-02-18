@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<methodCall>
+  <methodName>list_methods</methodName>
+  <params>
+    <param>
+      <value>
+        <struct/>
+      </value>
+    </param>
+  </params>
+</methodCall>

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -ex
+
+if [ "x$CIP_ENV" == "x" ]; then
+  echo "please set CIP_ENV to one of:"
+  echo " export CIP_ENV=ALIEN_INSTALL_TYPE=share"
+  echo " export CIP_ENV=ALIEN_INSTALL_TYPE=system"
+  false
+fi
+
+if echo $CIP_ENV | grep -q system; then
+  echo use system libhunspell
+  cip sudo apt-get update
+  cip sudo apt-get -y install libhunspell-dev
+else
+  echo use internet libhunspell
+  cip sudo apt-get update
+  cip sudo apt-get -y install g++
+fi

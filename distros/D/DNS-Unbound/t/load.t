@@ -13,6 +13,9 @@ ok( DNS::Unbound->unbound_version() );
 
 diag( "Unbound version: " . DNS::Unbound->unbound_version() );
 
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
+
 my $dns = DNS::Unbound->new();
 
 eval {

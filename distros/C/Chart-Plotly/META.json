@@ -49,6 +49,7 @@
             "File::Which" : "0",
             "HTML::Show" : "0",
             "JSON" : "0",
+            "LWP::UserAgent" : "0",
             "Module::Find" : "0",
             "Module::Load" : "0",
             "Moo::Role" : "0",
@@ -92,7 +93,7 @@
          "web" : "https://github.com/pablrod/p5-Chart-Plotly"
       }
    },
-   "version" : "0.038",
+   "version" : "0.039",
    "x_contributors" : [
       "Roy Storey <kiwiroy@users.noreply.github.com>",
       "stphnlyd <stephanloyd9@gmail.com>",

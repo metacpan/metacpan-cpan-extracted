@@ -1,7 +1,9 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2019-11-14'; # DATE
-our $VERSION = '0.446'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-18'; # DATE
+our $DIST = 'WWW-PAUSE-Simple'; # DIST
+our $VERSION = '0.447'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,8 +26,20 @@ our @EXPORT_OK = qw(
 use Perinci::Object;
 
 our %SPEC;
+my $access_log = Log::ger->get_logger(category => "access");
 
 our $re_archive_ext = qr/(?:tar|tar\.(?:Z|gz|bz2|xz)|zip|rar)/;
+
+sub _access_log {
+    my ($args, $action, $obj, $description) = @_;
+    $access_log->info({
+        time => time(),
+        username => $args->{username},
+        action => $action,
+        object => $obj,
+        description => $description,
+    });
+}
 
 our %common_args = (
     username => {
@@ -262,6 +276,7 @@ sub upload_files {
     my $i = 0;
     my $prev_group = 0;
     for my $file (@$files) {
+        my $basename = File::Basename::basename($file);
         my $res;
         {
             unless (-f $file) {
@@ -283,7 +298,7 @@ sub upload_files {
                     Content => {
                         HIDDENNAME                        => $args{username},
                         CAN_MULTIPART                     => 0,
-                        pause99_add_uri_upload            => File::Basename::basename($file),
+                        pause99_add_uri_upload            => $basename,
                         SUBMIT_pause99_add_uri_httpupload => " Upload this file from my disk ",
                         pause99_add_uri_uri               => "",
                         pause99_add_uri_httpupload        => [$file],
@@ -300,8 +315,11 @@ sub upload_files {
         $res->[3] //= {};
         $res->[3]{item_id} = $file;
         log_trace("Result of upload: %s", $res);
-        log_warn("Upload of %s failed: %s - %s", $file, $res->[0], $res->[1])
-            if $res->[0] !~ /^2/;
+        if ($res->[0] =~ /^2/) {
+            _access_log(\%args, upload => {name=>$basename, size=>(-s $file), subdir=>$subdir});
+        } else {
+            log_warn("Upload of %s failed: %s - %s", $file, $res->[0], $res->[1])
+        }
         $envres->add_result($res->[0], $res->[1], $res->[3]);
 
       DELAY:
@@ -723,6 +741,7 @@ sub _delete_or_undelete_or_reindex_files {
         ],
     );
     return _htres2envres($httpres) unless $httpres->is_success;
+    _access_log(\%args, $which => {files=>\@files}) if $which =~ /delete|undelete/;
     [200,"OK", undef, {'func.files'=>\@files}];
 }
 
@@ -918,7 +937,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.446 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2019-11-14.
+This document describes version 0.447 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2020-02-18.
 
 =head1 SYNOPSIS
 
@@ -953,7 +972,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files>* => I<array[str]>
 
-File names/wildcard patterns.
+File namesE<sol>wildcard patterns.
 
 =item * B<password> => I<str>
 
@@ -964,7 +983,7 @@ not yet supported.
 
 =item * B<protect_files> => I<array[str]>
 
-Protect some files/wildcard patterns from delete/cleanup.
+Protect some filesE<sol>wildcard patterns from deleteE<sol>cleanup.
 
 =item * B<retries> => I<int> (default: 5)
 
@@ -980,6 +999,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Special arguments:
@@ -988,7 +1008,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1050,7 +1070,7 @@ not yet supported.
 
 =item * B<protect_files> => I<array[str]>
 
-Protect some files/wildcard patterns from delete/cleanup.
+Protect some filesE<sol>wildcard patterns from deleteE<sol>cleanup.
 
 =item * B<retries> => I<int> (default: 5)
 
@@ -1066,6 +1086,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Special arguments:
@@ -1074,7 +1095,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1146,6 +1167,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1185,7 +1207,7 @@ Whether to return detailed records.
 
 =item * B<files> => I<array[str]>
 
-File names/wildcard patterns.
+File namesE<sol>wildcard patterns.
 
 =item * B<mtime_max> => I<date>
 
@@ -1215,6 +1237,7 @@ PAUSE ID.
 
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
+
 
 =back
 
@@ -1251,7 +1274,7 @@ Whether to return detailed records.
 
 =item * B<modules> => I<array[str]>
 
-Module names/wildcard patterns.
+Module namesE<sol>wildcard patterns.
 
 =item * B<password> => I<str>
 
@@ -1277,6 +1300,7 @@ PAUSE ID.
 
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
+
 
 =back
 
@@ -1312,7 +1336,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files>* => I<array[str]>
 
-File names/wildcard patterns.
+File namesE<sol>wildcard patterns.
 
 =item * B<password> => I<str>
 
@@ -1335,6 +1359,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Special arguments:
@@ -1343,7 +1368,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1383,7 +1408,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files>* => I<array[str]>
 
-File names/wildcard patterns.
+File namesE<sol>wildcard patterns.
 
 =item * B<password> => I<str>
 
@@ -1406,6 +1431,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Special arguments:
@@ -1414,7 +1440,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1459,7 +1485,7 @@ files will alleviate this problem.
 
 =item * B<files>* => I<array[str]>
 
-File names/wildcard patterns.
+File namesE<sol>wildcard patterns.
 
 =item * B<password> => I<str>
 
@@ -1486,6 +1512,7 @@ PAUSE ID.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
+
 =back
 
 Special arguments:
@@ -1494,7 +1521,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1545,7 +1572,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

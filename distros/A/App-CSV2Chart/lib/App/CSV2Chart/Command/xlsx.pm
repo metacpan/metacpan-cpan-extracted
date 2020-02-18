@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.8.2';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.10.0';
 use strict;
 use warnings;
 
@@ -19,9 +19,10 @@ sub abstract
 sub opt_spec
 {
     return (
-        [ "output|o=s", "Output path" ],
-        [ "title=s",    "Chart Title" ],
-        [ 'exec|e=s@',  "Execute command on the output" ]
+        [ "chart-type=s", "Chart Type" ],
+        [ "output|o=s",   "Output path" ],
+        [ "title=s",      "Chart Title" ],
+        [ 'exec|e=s@',    "Execute command on the output" ]
     );
 }
 
@@ -36,9 +37,10 @@ sub execute
 
     App::CSV2Chart::API::ToXLSX::csv_to_xlsx(
         {
-            input_fh  => $fh,
-            output_fn => $fn,
-            title     => $opt->{title},
+            input_fh   => $fh,
+            output_fn  => $fn,
+            title      => $opt->{title},
+            chart_type => $opt->{'chart_type'},
         }
     );
     if (@$exe)
@@ -62,7 +64,7 @@ csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
 
 =head1 VERSION
 
-version 0.8.2
+version 0.10.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -85,27 +87,11 @@ L<https://metacpan.org/release/App-CSV2Chart>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-CSV2Chart>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV2Chart>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-CSV2Chart>
 
 =item *
 

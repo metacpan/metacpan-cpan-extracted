@@ -1,5 +1,8 @@
 Revision history for Perl module LabKey::Query
 
+1.07 2020-02-17
+    - Issue 39691: Explicitly add content-length header
+
 1.06 2018-12-04
     - CSRF token support
     - moved to github: https://github.com/LabKey/labkey-api-perl

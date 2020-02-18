@@ -9,6 +9,9 @@ for my $mod ( qw( AnyEvent  AnyEvent::XSPromises ) ) {
     eval "require $mod" or plan skip_all => "No $mod: $@";
 }
 
+use Data::Dumper;
+$Data::Dumper::Useqq = 1;
+
 $ENV{'DNS_UNBOUND_PROMISE_ENGINE'} = 'AnyEvent::XSPromises';
 
 use_ok('DNS::Unbound');

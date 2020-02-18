@@ -7,13 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// Perl does define a STRINGIFY macro that does the same thing,
-// but that may or may not be intended for public use. So:
-#define MY_STRINGIFY_BACKEND(s) #s
-#define MY_STRINGIFY(s) MY_STRINGIFY_BACKEND(s)
-
-#define BUILT_UNBOUND_VERSION MY_STRINGIFY(UNBOUND_VERSION_MAJOR) "." MY_STRINGIFY(UNBOUND_VERSION_MINOR) "." MY_STRINGIFY(UNBOUND_VERSION_MICRO)
-
 SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
     SV *val;
 
@@ -60,15 +53,20 @@ SV* _ub_result_to_svhv_and_free (struct ub_result* result) {
     hv_stores(rh, "bogus", val);
 
     hv_stores(rh, "why_bogus",
-#if UNBOUND_VERSION_MAJOR > 1 || UNBOUND_VERSION_MINOR > 4
+#if HAS_WHY_BOGUS
         newSVpv(result->why_bogus, 0)
 #else
         &PL_sv_undef
 #endif
     );
 
-    val = newSViv(result->ttl);
-    hv_stores(rh, "ttl", val);
+    hv_stores(rh, "ttl",
+#if HAS_TTL
+        newSViv(result->ttl)
+#else
+        &PL_sv_undef
+#endif
+    );
 
     val = newSVpvn(result->answer_packet, result->answer_len);
     hv_stores(rh, "answer_packet", val);
@@ -200,7 +198,7 @@ _ub_ctx_add_ta( struct ub_ctx *ctx, char *ta )
     OUTPUT:
         RETVAL
 
-#if UNBOUND_VERSION_MAJOR > 1 || UNBOUND_VERSION_MINOR > 5
+#if HAS_UB_CTX_ADD_TA_AUTR
 int
 _ub_ctx_add_ta_autr( struct ub_ctx *ctx, char *fname )
     CODE:
@@ -277,7 +275,7 @@ _ub_process( struct ub_ctx *ctx )
     OUTPUT:
         RETVAL
 
-#if UNBOUND_VERSION_MAJOR > 1 || UNBOUND_VERSION_MINOR > 3
+#if HAS_UB_CANCEL
 int
 _ub_cancel( struct ub_ctx *ctx, int async_id )
     CODE:
@@ -342,10 +340,8 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
 
 BOOT:
     HV *stash = gv_stashpvn("DNS::Unbound", 12, FALSE);
-#if UNBOUND_VERSION_MAJOR > 1 || UNBOUND_VERSION_MINOR > 4 || UNBOUND_VERSION_MICRO >= 15
+#if HAS_UB_VERSION
     newCONSTSUB(stash, "unbound_version", newSVpv( ub_version(), 0 ));
-#else
-    newCONSTSUB(stash, "unbound_version", newSVpv( BUILT_UNBOUND_VERSION, 0 ));
 #endif
 
 void

@@ -5,7 +5,7 @@ use Carp qw/croak carp/;
 use Scalar::Util qw/blessed weaken/;
 use Mojo::Base 'Mojo::DOM';
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 sub DESTROY;
 
@@ -178,9 +178,8 @@ sub new {
 
       # Set namespace if given
       if (my $ns = $class->_namespace) {
-	$att->{xmlns} = $ns;
+        $att->{xmlns} = $ns;
       };
-
     };
   };
 
@@ -201,9 +200,9 @@ sub add {
 
   # If node is root, use first element
   if (!$self->parent &&
-	ref($self->tree->[1]) &&
-	  ref($self->tree->[1]) eq 'ARRAY' &&
-	    $self->tree->[1]->[0] eq 'pi') {
+        ref($self->tree->[1]) &&
+        ref($self->tree->[1]) eq 'ARRAY' &&
+        $self->tree->[1]->[0] eq 'pi') {
     $self = $self->at('*');
   };
 
@@ -272,9 +271,9 @@ sub set {
 
       # Caller and class are not the same
       if ($caller ne $class && $caller->can('_prefix')) {
-	if ((my $prefix = $caller->_prefix) && $caller->_namespace) {
-	  $tag = "${prefix}:$tag";
-	};
+        if ((my $prefix = $caller->_prefix) && $caller->_namespace) {
+          $tag = "${prefix}:$tag";
+        };
       };
     };
   };
@@ -315,9 +314,9 @@ sub children {
 
   # If node is root, use first element
   if (!$self->parent &&
-	ref($self->tree->[1]) &&
-	  ref($self->tree->[1]) eq 'ARRAY' &&
-	    $self->tree->[1]->[0] eq 'pi') {
+        ref($self->tree->[1]) &&
+        ref($self->tree->[1]) eq 'ARRAY' &&
+        $self->tree->[1]->[0] eq 'pi') {
     $self = $self->at('*');
   };
 
@@ -335,13 +334,12 @@ sub children {
 
       # Type is already prefixed or element is not prefixed
       if (index($type, ':') > 0 || index($e->[1], ':') < 0) {
-	next if $e->[1] ne $type;
+        next if $e->[1] ne $type;
       }
 
       # Check, if type is valid, and ignore prefixes, cause tag is prefixed
       elsif (index($e->[1], ':') > 0) {
-	next if substr($e->[1], (index($e->[1], ':') + 1)) ne $type;
-
+        next if substr($e->[1], (index($e->[1], ':') + 1)) ne $type;
       };
     };
 
@@ -381,7 +379,7 @@ sub _add_clean {
 
       # Namespace information can be deleted
       if (my $ns = $self->namespace) {
-	delete $root_attr->{xmlns} if $root_attr->{xmlns} eq $ns;
+        delete $root_attr->{xmlns} if $root_attr->{xmlns} eq $ns;
       };
     };
 
@@ -393,7 +391,7 @@ sub _add_clean {
       my $ext = $base_root_attr->{'loy:ext'};
 
       $base_root_attr->{'loy:ext'} =
-	join('; ', $ext, split(/;\s/, delete $root_attr->{'loy:ext'}));
+        join('; ', $ext, split(/;\s/, delete $root_attr->{'loy:ext'}));
     };
 
 
@@ -549,7 +547,7 @@ sub extension {
     $ext->_on_init($self);
 
     if ((my $n_ns = $ext->_namespace) &&
-	  (my $n_pref = $ext->_prefix)) {
+    (my $n_pref = $ext->_prefix)) {
       $root->[2]->{"xmlns:$n_pref"} = $n_ns;
     };
   };
@@ -591,9 +589,6 @@ sub as {
 
   # Base object
   my $base = shift;
-
-  # New Loader
-  # my $loader = Mojo::Loader->new;
 
   # Default 'XML::Loy::' prefix
   if (index($base, '-') == 0) {
@@ -657,13 +652,12 @@ sub _render_pretty {
 
   # Element is tag
   if ($e eq 'tag') {
-    my $subtree =
+    my $subtree = [
+      @{ $tree }[ 0 .. 2 ],
       [
-	@{ $tree }[ 0 .. 2 ],
-	[
-	  @{ $tree }[ 4 .. $#$tree ]
-	]
-      ];
+        @{ $tree }[ 4 .. $#$tree ]
+      ]
+    ];
 
     return _element($i, $subtree);
   }
@@ -697,7 +691,6 @@ sub _render_pretty {
   # Element is processing instruction
   elsif ($e eq 'pi') {
     return ('  ' x $i) . '<?' . $tree->[1] . "?>\n";
-
   }
 
   # Element is root
@@ -740,34 +733,34 @@ sub _element {
       # Special content treatment
       if (exists $attr->{'loy:type'}) {
 
-	# With base64 indentation
-	if ($attr->{'loy:type'} =~ /^armour(?::(\d+))?$/i) {
-	  my $n = $1 || 60;
+        # With base64 indentation
+        if ($attr->{'loy:type'} =~ /^armour(?::(\d+))?$/i) {
+          my $n = $1 || 60;
 
-	  my $string = $child->[0]->[1];
+          my $string = $child->[0]->[1];
 
-	  # Delete whitespace
-	  $string =~ tr{\t-\x0d }{}d;
+          # Delete whitespace
+          $string =~ tr{\t-\x0d }{}d;
 
-	  # Introduce newlines after n characters
-	  $content .= "\n" . ('  ' x ($i + 1));
-	  $content .= join  "\n" . ( '  ' x ($i + 1) ), (unpack "(A$n)*", $string );
-	  $content .= "\n" . ('  ' x $i);
-	}
+          # Introduce newlines after n characters
+          $content .= "\n" . ('  ' x ($i + 1));
+          $content .= join  "\n" . ( '  ' x ($i + 1) ), (unpack "(A$n)*", $string );
+          $content .= "\n" . ('  ' x $i);
+        }
 
-	# No special treatment
-	else {
+        # No special treatment
+        else {
 
-	  # Escape
-	  $content .= b($child->[0]->[1])->trim->xml_escape;
-	};
+          # Escape
+          $content .= b($child->[0]->[1])->trim->xml_escape;
+        };
       }
 
       # No special content treatment indentation
       else {
 
-	# Escape
-	$content .= b($child->[0]->[1])->trim->xml_escape;
+        # Escape
+        $content .= b($child->[0]->[1])->trim->xml_escape;
       };
     }
 
@@ -776,37 +769,36 @@ sub _element {
 
       # Raw
       if ($attr->{'loy:type'} eq 'raw') {
+        foreach (@$child) {
 
-	foreach (@$child) {
+          # Create new dom object
+          my $dom = __PACKAGE__->new;
+          $dom->xml(1);
 
-	  # Create new dom object
-	  my $dom = __PACKAGE__->new;
-	  $dom->xml(1);
-
-	  # Print without prettifying
-	  $content .= $dom->tree($_)->to_string;
-	};
+          # Print without prettifying
+          $content .= $dom->tree($_)->to_string;
+        };
       }
 
       # Todo:
       elsif ($attr->{'loy:type'} eq 'escape') {
-	$content .= "\n";
+        $content .= "\n";
 
-	foreach (@$child) {
+        foreach (@$child) {
 
-	  # Create new dom object
-	  my $dom = __PACKAGE__->new;
-	  $dom->xml(1);
+          # Create new dom object
+          my $dom = __PACKAGE__->new;
+          $dom->xml(1);
 
-	  # Pretty print
-	  my $string = $dom->tree($_)->to_pretty_xml($i + 1);
+          # Pretty print
+          my $string = $dom->tree($_)->to_pretty_xml($i + 1);
 
-	  # Encode
-	  $content .= b($string)->xml_escape;
-	};
+          # Encode
+          $content .= b($string)->xml_escape;
+        };
 
-	# Correct Indent
-	$content .= '  ' x $i;
+        # Correct Indent
+        $content .= '  ' x $i;
       };
     }
 
@@ -817,12 +809,12 @@ sub _element {
 
       # First element is unformatted textual
       if (!exists $attr->{'loy:type'} &&
-	    $child->[0] &&
-	      $child->[0]->[0] eq 'text') {
+            $child->[0] &&
+            $child->[0]->[0] eq 'text') {
 
-	# Append directly to the last tag
-	$content .= b($child->[0]->[1])->trim->xml_escape;
-	$offset = 1;
+        # Append directly to the last tag
+        $content .= b($child->[0]->[1])->trim->xml_escape;
+        $offset = 1;
       };
 
       # Start on a new line
@@ -831,8 +823,8 @@ sub _element {
       # Loop through all child elements
       foreach (@{$child}[ $offset .. $#$child ]) {
 
-	# Render next element
-	$content .= _render_pretty( $i + 1, $_ );
+        # Render next element
+        $content .= _render_pretty( $i + 1, $_ );
       };
 
       # Correct Indent
@@ -1443,7 +1435,7 @@ L<Renée Bäcker|https://github.com/reneeb>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2020, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the same terms as Perl.

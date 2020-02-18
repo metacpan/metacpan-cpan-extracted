@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Gitignore
 
+0.04 2020-02-18T20:36:31Z
+
+    - Allow separation of "unmatched" and "excluded" by Flavio Poletti
+
 0.03 2020-01-14T17:37:54Z
 
     - ack of trailing slash should not stop recursion by Eric A. Zarko

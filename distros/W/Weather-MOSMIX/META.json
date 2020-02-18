@@ -22,13 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "5.52_01",
-            "File::ShareDir::Install" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "5.52_01",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
@@ -68,7 +68,7 @@
          "web" : "https://github.com/Corion/Weather-MOSMIX"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

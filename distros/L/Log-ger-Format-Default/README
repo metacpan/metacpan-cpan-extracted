@@ -1,0 +1,42 @@
+NAME
+    Log::ger::Format::Default - Use default Log::ger formatting style
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+     use Log::ger::Format 'Default';
+     use Log::ger;
+
+     log_debug "Printed as is";
+     # will format the log message as: Printed as is
+
+     log_debug "Data for %s is %s", "budi", {foo=>'blah', bar=>undef};
+     # will format the log message as: Data for budi is {bar=>undef,foo=>"blah"}
+
+DESCRIPTION
+    This is the default Log::ger formatter, which: 1) passes the argument
+    as-is if there is only a single argument; or, if there are more than one
+    argument, 2) treats the arguments like sprintf(), where the first
+    argument is the template and the rest are variables to be substituted to
+    the conversions inside the template. In the second case, reference
+    arguments will be dumped using Data::Dmp or Data::Dumper by default (but
+    the dumper is configurable by setting $Log::ger::_dumper; see for
+    example Log::ger::UseDataDump or Log::ger::UseDataDumpColor).
+
+    The same code is already included in Log::ger distribution (inside
+    Log::ger::Heavy); this distribution just repackages it so it's more
+    reusable. It is not part of the standard Log::ger distribution.
+
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

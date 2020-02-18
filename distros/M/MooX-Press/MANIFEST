@@ -36,5 +36,6 @@ t/23roleorder.t
 t/24mm.t
 t/25abstract.t
 t/26accumulate.t
+t/27rolehooks.t
 t/30bare.t
 t/31lexhas.t

@@ -1,4 +1,10 @@
-Overview of changes in Glib 1.3210 (stable)
+Overview of changes in Glib 1.3292 (stable)
+============================================
+
+* Fix a few compiler warnings
+* Add Glib::get_prgname and Glib::set_prgname
+
+Overview of changes in Glib 1.3291 (stable)
 ============================================
 
 * POD: add short description for Glib::VariantDict

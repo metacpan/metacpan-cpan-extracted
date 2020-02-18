@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Naive
   homepage: https://metacpan.org/release/Path-Naive
   repository: git://github.com/perlancar/perl-Path-Naive.git
-version: '0.042'
+version: '0.043'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

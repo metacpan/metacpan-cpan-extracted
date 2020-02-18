@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.507';
+our $VERSION   = '0.508';
 
 use Keyword::Simple ();
 use PPR;
@@ -155,6 +155,8 @@ our $GRAMMAR = qr{
 			(?: toolkit         (?&MxpToolkitSyntax)   )|
 			(?: begin           (?&MxpHookSyntax)      )|
 			(?: end             (?&MxpHookSyntax)      )|
+			(?: after_apply     (?&MxpHookSyntax)      )|
+			(?: before_apply    (?&MxpHookSyntax)      )|
 			(?: type_name       (?&MxpTypeNameSyntax)  )|
 			(?: extends         (?&MxpExtendsSyntax)   )|
 			(?: with            (?&MxpWithSyntax)      )|
@@ -1354,7 +1356,8 @@ my @EXPORTABLES = qw(
 	-features
 	try
 	class abstract role interface
-	include toolkit begin end extends with requires
+	begin end before_apply after_apply
+	include toolkit extends with requires
 	has constant method multi factory before after around
 	type_name coerce
 	version authority overload
@@ -1362,10 +1365,12 @@ my @EXPORTABLES = qw(
 
 sub unimport {
 	Keyword::Simple::undefine($_) for qw<
-		class abstract role interface
-		include toolkit begin end extends with requires
-		has constant method multi factory before after around
-		type_name coerce
+	class abstract role interface
+	begin end before_apply after_apply
+	include toolkit extends with requires
+	has constant method multi factory before after around
+	type_name coerce
+	version authority overload
 	>;
 	goto \&Exporter::Tiny::unimport;
 }
@@ -1545,9 +1550,15 @@ sub import {
 		}
 	} if $want{toolkit};
 
-	# `begin` and `end` keywords
+	# `begin`, `end`, `before_apply`, and `after_apply` keywords
 	#
-	for my $kw (qw/ begin end /) {
+	my %injections = (
+		begin        => [ '$package,$kind', '' ],
+		end          => [ '$package,$kind', '' ],
+		before_apply => [ '$role,$package',  'my $kind = "Role::Hooks"->is_role($package)?"role":"class";' ],
+		after_apply  => [ '$role,$package',  'my $kind = "Role::Hooks"->is_role($package)?"role":"class";' ],
+	);
+	for my $kw (qw/ begin end before_apply after_apply /) {
 		Keyword::Simple::define $kw => sub {
 			my $ref = shift;
 			
@@ -1558,7 +1569,8 @@ sub import {
 			);
 			
 			my ($pos, $capture) = ($+[0], $+{hook});
-			$me->_inject($ref, $pos, sprintf('q[%s]->_begin(sub { my ($package, $kind) = (shift, @_); do %s });', $me, $capture));
+			my $inj = sprintf('q[%s]->_%s(sub { my (%s) = @_; %s; do %s });', $me, $kw, $injections{$kw}[0], $injections{$kw}[1], $capture);
+			$me->_inject($ref, $pos, $inj);
 		} if $want{$kw};
 	}
 	
@@ -1870,12 +1882,22 @@ sub _type_name {
 sub _begin {
 	my $me = shift;
 	$OPTS{in_package} or $me->_syntax_error('begin hook', 'Not supported outside class or role (use import option instead)');
-	$OPTS{begin} = shift;
+	push @{$OPTS{begin}||=[]}, shift;
 }
 sub _end {
 	my $me = shift;
 	$OPTS{in_package} or $me->_syntax_error('end hook', 'Not supported outside class or role (use import option instead)');
-	$OPTS{end} = shift;
+	push @{$OPTS{end}||=[]}, shift;
+}
+sub _before_apply {
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('before_apply hook', 'Not supported outside role');
+	push @{$OPTS{before_apply}||=[]}, shift;
+}
+sub _after_apply {
+	my $me = shift;
+	$OPTS{in_package} or $me->_syntax_error('after_apply hook', 'Not supported outside role');
+	push @{$OPTS{after_apply}||=[]}, shift;
 }
 sub _interface {
 	shift;
@@ -1977,7 +1999,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.507';
+#	our $VERSION   = '0.508';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -1988,7 +2010,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.507';
+#	our $VERSION   = '0.508';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2001,12 +2023,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.507';
+#	our $VERSION   = '0.508';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.507';
+#	our $VERSION   = '0.508';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2020,7 +2042,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.507';
+#	our $VERSION   = '0.508';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2549,6 +2571,9 @@ be defined yet.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
+Other keywords like C<has> and C<method> cannot be used within a C<begin>
+block.
+
 The C<begin> keyword cannot be used outside of C<class>, C<abstract class>,
 C<role>, and C<interface> blocks, though it is possible to define a global
 default for it:
@@ -2562,8 +2587,6 @@ default for it:
   );
 
 Per-package C<begin> overrides the global C<begin>.
-
-Unlike Perl's C<BEGIN> keyword, a package can only have one C<begin>.
 
 If C<class> definitions are nested, C<begin> blocks will be inherited by
 child classes. If a parent class is specified via C<extends>, C<begin>
@@ -2582,6 +2605,9 @@ This code gets run late in the definition of a class or role.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
+Other keywords like C<has> and C<method> cannot be used within an C<end>
+block.
+
 The C<end> keyword cannot be used outside of C<class>, C<abstract class>,
 C<role>, and C<interface> blocks, though it is possible to define a global
 default for it:
@@ -2596,11 +2622,53 @@ default for it:
 
 Per-package C<end> overrides the global C<end>.
 
-Unlike Perl's C<END> keyword, a package can only have one C<end>.
-
 If C<class> definitions are nested, C<end> blocks will be inherited by
 child classes. If a parent class is specified via C<extends>, C<end>
 blocks will not be inherited.
+
+=head2 C<< before_apply >>
+
+Within a C<role>, a C<before_apply> block is run before applying the role
+to another package.
+
+  role MyRole {
+    before_apply {
+      say "Applying $role to $kind $package.";
+    }
+  }
+
+The lexical variables C<< $role >>, C<< $package >> and C<< $kind >> are
+defined within the block. C<< $package >> refers to the target package
+the role is being applied to. C<< $kind >> will be either 'class' or 'role',
+indicating what kind of package the role is being applied to.
+
+Other keywords like C<has> and C<method> cannot be used within a
+C<before_apply> block.
+
+Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
+will not be run for Class2.
+
+=head2 C<< after_apply >>
+
+Within a C<role>, an C<after_apply> block is run after applying the role
+to another package.
+
+  role MyRole {
+    after_apply {
+      say "Applied $role to $kind $package.";
+    }
+  }
+
+The lexical variables C<< $role >>, C<< $package >> and C<< $kind >> are
+defined within the block. C<< $package >> refers to the target package
+the role was applied to. C<< $kind >> will be either 'class' or 'role',
+indicating what kind of package the role was applied to.
+
+Other keywords like C<has> and C<method> cannot be used within an
+C<after_apply> block.
+
+Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
+will not be run for Class2.
 
 =head2 C<< has >>
 
@@ -3843,7 +3911,8 @@ You can choose which parts of Zydeco you import:
       -features
       try
       class abstract role interface
-      include toolkit begin end extends with requires
+      begin end before_apply after_apply
+      include toolkit extends with requires
       has constant method multi factory before after around
       type_name coerce
       version authority overload

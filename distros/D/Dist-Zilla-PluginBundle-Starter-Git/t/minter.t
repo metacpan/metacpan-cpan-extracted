@@ -50,7 +50,7 @@ like $pm, qr/^=head1 NAME\n\nDZT::Minty - /m, 'right name section in pod';
 like $distini, qr/^name\s*=\s*DZT-Minty$/m, 'right dist name';
 like $distini, qr/^version\s*=\s*0\.001$/m, 'dist version is set';
 like $distini, qr/^\[\@Starter::Git\]$/m, 'starter bundle included';
-like $distini, qr/^revision\s*=\s*3$/m, 'revision set to 3';
+like $distini, qr/^revision\s*=\s*4$/m, 'revision set to 4';
 
 like $gitignore, qr/^\/DZT-Minty-\*$/m, 'builds ignored in git';
 

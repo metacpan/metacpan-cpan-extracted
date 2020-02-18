@@ -1,17 +1,19 @@
 #!perl
 
-# PERICMD_INLINE_SCRIPT: {"config_filename":["pause.conf"],"env_name":"PAUSE_OPT","log":1,"pack_deps":0,"pod":0,"read_config":1,"read_env":1,"script_name":"pause","script_summary":"A CLI for PAUSE","script_version_from_main_version":1,"shebang":"#!perl","subcommands":{"cleanup":{"url":"/WWW/PAUSE/Simple/delete_old_releases"},"ls":{"url":"/WWW/PAUSE/Simple/list_files"},"ls-dists":{"url":"/WWW/PAUSE/Simple/list_dists"},"ls-mods":{"url":"/WWW/PAUSE/Simple/list_modules"},"reindex":{"url":"/WWW/PAUSE/Simple/reindex_files"},"rm":{"url":"/WWW/PAUSE/Simple/delete_files"},"undelete":{"url":"/WWW/PAUSE/Simple/undelete_files"},"upload":{"url":"/WWW/PAUSE/Simple/upload_files"}},"url":"/WWW/PAUSE/Simple/","use_cleanser":0,"validate_args":1}
+### begin code_after_shebang
+### end code_after_shebang
+# PERICMD_INLINE_SCRIPT: {"code_add_extra_log_outputs":"...","code_before_enable_logging":"...","config_filename":["pause.conf"],"env_name":"PAUSE_OPT","log":1,"pack_deps":0,"pod":0,"read_config":1,"read_env":1,"script_name":"pause","script_summary":"A CLI for PAUSE","script_version_from_main_version":1,"shebang":"#!perl","subcommands":{"cleanup":{"url":"/WWW/PAUSE/Simple/delete_old_releases"},"ls":{"url":"/WWW/PAUSE/Simple/list_files"},"ls-dists":{"url":"/WWW/PAUSE/Simple/list_dists"},"ls-mods":{"url":"/WWW/PAUSE/Simple/list_modules"},"reindex":{"url":"/WWW/PAUSE/Simple/reindex_files"},"rm":{"url":"/WWW/PAUSE/Simple/delete_files"},"undelete":{"url":"/WWW/PAUSE/Simple/undelete_files"},"upload":{"url":"/WWW/PAUSE/Simple/upload_files"}},"url":"/WWW/PAUSE/Simple/","use_cleanser":0,"validate_args":1}
 
-my $_pci_metas = do{my$a={cleanup=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},num_keep=>{cmdline_aliases=>{n=>{}},default=>1,description=>"\n1 means to only keep the newest version, 2 means to keep the newest and the\nsecond newest, and so on.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Number of new versions (including newest) to keep"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>["common"]},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>["category:filtering"],"x.name.is_plural"=>1},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>["common"]},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>["common","deprecated"]},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>["common"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>["common"]}},description=>"\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete older versions of distributions",v=>1.1},ls=>{args=>{del=>{schema=>["bool",{},{}],summary=>"Only list files which are scheduled for deletion","summary.alt.bool.not"=>"Only list files which are not scheduled for deletion",tags=>["category:filtering"]},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},files=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},mtime_max=>{schema=>["date",{req=>1,"x.perl.coerce_to"=>"float(epoch)"},{}],tags=>["category:filtering"]},mtime_min=>{schema=>["date",{req=>1,"x.perl.coerce_to"=>"float(epoch)"},{}],tags=>["category:filtering"]},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},size_max=>{schema=>["uint",{req=>1},{}],tags=>["category:filtering"]},size_min=>{schema=>["uint",{req=>1},{}],tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List files",v=>1.1},"ls-dists"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},newest=>{description=>"\nDev versions will be skipped.\n\n",schema=>["bool",{},{}],summary=>"Only show newest non-dev version"},newest_n=>{description=>"\nDev versions will be skipped.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Only show this number of newest non-dev versions"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\n",result=>{},summary=>"List distributions",v=>1.1},"ls-mods"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},modules=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Module names/wildcard patterns","summary.alt.plurality.singular"=>"Module name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},type=>{schema=>["str",{req=>1},{}],summary=>"Only list modules matching certain type",tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List modules (permissions)",v=>1.1},reindex=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},features=>{dry_run=>1},result=>{},summary=>"Force reindexing",v=>1.1},rm=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>'fix',"x.name.is_plural"=>1},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete files",v=>1.1},undelete=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Undelete files",v=>1.1},upload=>{args=>{delay=>{description=>"\nIf you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer\ncurrently might choke with SQLite database locking problem and thus fail to\nindex your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between\nfiles will alleviate this problem.\n\n",schema=>["duration",{req=>1},{}],summary=>"Pause a number of seconds between files"},files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>35,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{description=>"\nThis setting is now deprecated. Will use a constant backoff strategy of delaying\nthis many seconds. The default (when this setting is not specified) is now to\nuse an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,\n... seconds. The default `retries` of 35 makes this strategy retries for a\nlittle over a day (88941 seconds). The terminal delay setting (default 3600\nseconds) can be set via `retry_max_delay`.\n\n",schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying (deprecated)",tags=>'fix'},retry_max_delay=>{default=>3600,schema=>["duration",{req=>1},{}],summary=>"How long to wait at most before retrying",tags=>'fix'},subdir=>{default=>"",schema=>["str",{req=>1},{}],summary=>"Subdirectory to put the file(s) into"},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},args_rels=>{choose_one=>["delay"]},features=>{dry_run=>1},result=>{},summary=>"Upload file(s)",v=>1.1}};$a->{ls}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{ls}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{ls}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{ls}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{ls}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-dists"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-dists"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-dists"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-dists"}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{"ls-dists"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-mods"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-mods"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-mods"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-mods"}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{"ls-mods"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{reindex}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{reindex}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{reindex}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{reindex}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{reindex}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{rm}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{rm}{args}{protect_files}{tags}=$a->{cleanup}{args}{protect_files}{tags};$a->{rm}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{rm}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{rm}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{rm}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{undelete}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{undelete}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{undelete}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{undelete}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{undelete}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{upload}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{upload}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{upload}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{upload}{args}{retry_max_delay}{tags}=$a->{cleanup}{args}{retry_max_delay}{tags};$a->{upload}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a};
+my $_pci_metas = do{my$a={cleanup=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},num_keep=>{cmdline_aliases=>{n=>{}},default=>1,description=>"\n1 means to only keep the newest version, 2 means to keep the newest and the\nsecond newest, and so on.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Number of new versions (including newest) to keep"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>["common"]},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>["category:filtering"],"x.name.is_plural"=>1},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>["common"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>["common"]}},description=>"\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete older versions of distributions",v=>1.1},ls=>{args=>{del=>{schema=>["bool",{},{}],summary=>"Only list files which are scheduled for deletion","summary.alt.bool.not"=>"Only list files which are not scheduled for deletion",tags=>["category:filtering"]},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},files=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},mtime_max=>{schema=>["date",{req=>1,"x.perl.coerce_to"=>"float(epoch)"},{}],tags=>["category:filtering"]},mtime_min=>{schema=>["date",{req=>1,"x.perl.coerce_to"=>"float(epoch)"},{}],tags=>["category:filtering"]},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},size_max=>{schema=>["uint",{req=>1},{}],tags=>["category:filtering"]},size_min=>{schema=>["uint",{req=>1},{}],tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List files",v=>1.1},"ls-dists"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},newest=>{description=>"\nDev versions will be skipped.\n\n",schema=>["bool",{},{}],summary=>"Only show newest non-dev version"},newest_n=>{description=>"\nDev versions will be skipped.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Only show this number of newest non-dev versions"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\n",result=>{},summary=>"List distributions",v=>1.1},"ls-mods"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},modules=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Module names/wildcard patterns","summary.alt.plurality.singular"=>"Module name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},type=>{schema=>["str",{req=>1},{}],summary=>"Only list modules matching certain type",tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List modules (permissions)",v=>1.1},reindex=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},features=>{dry_run=>1},result=>{},summary=>"Force reindexing",v=>1.1},rm=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>'fix',"x.name.is_plural"=>1},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete files",v=>1.1},undelete=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Undelete files",v=>1.1},upload=>{args=>{delay=>{description=>"\nIf you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer\ncurrently might choke with SQLite database locking problem and thus fail to\nindex your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between\nfiles will alleviate this problem.\n\n",schema=>["duration",{req=>1},{}],summary=>"Pause a number of seconds between files"},files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,description=>"\nThe retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,\n3600, 3600, ... seconds.\n\n",schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},subdir=>{default=>"",schema=>["str",{req=>1},{}],summary=>"Subdirectory to put the file(s) into"},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},args_rels=>{choose_one=>["delay"]},features=>{dry_run=>1},result=>{},summary=>"Upload file(s)",v=>1.1}};$a->{ls}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{ls}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{ls}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-dists"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-dists"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-dists"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-mods"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-mods"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-mods"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{reindex}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{reindex}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{reindex}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{rm}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{rm}{args}{protect_files}{tags}=$a->{cleanup}{args}{protect_files}{tags};$a->{rm}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{rm}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{undelete}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{undelete}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{undelete}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{upload}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{upload}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{upload}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.545 on Wed Jun  5 07:31:27 2019.
+# This script is generated by Perinci::CmdLine::Inline version 0.545 on Tue Feb 18 15:53:26 2020.
 
-# Rinci metadata taken from these modules: WWW::PAUSE::Simple 0.444
+# Rinci metadata taken from these modules: WWW::PAUSE::Simple 0.446
 
 # You probably should not manually edit this file.
 
-our $DATE = '2019-06-05'; # DATE
-our $VERSION = '0.652'; # VERSION
+our $DATE = '2020-02-18'; # DATE
+our $VERSION = '0.653'; # VERSION
 # PODNAME: pause
 # ABSTRACT: A CLI for PAUSE
 
@@ -20,15 +22,12 @@ use 5.010001;
 use strict;
 #use warnings;
 
-# modules
+# load modules
 
-
-### enable logging
-require Log::ger::Output; Log::ger::Output->set("Screen", formatter => sub { "pause: " . $_[0] },);
-require Log::ger; Log::ger->import;
 
 ### declare global variables
 
+our $_pci_log_outputs = {};
 our $_pci_meta_result_stream = 0;
 our $_pci_meta_result_type;
 our $_pci_meta_result_type_is_simple;
@@ -36,6 +35,19 @@ our $_pci_meta_skip_format = 0;
 our $_pci_r = {naked_res=>0,read_config=>1,read_env=>1,subcommand_name=>""};
 our %_pci_args;
 
+### begin code_before_enable_logging
+require Log::ger::Layout::JSON;
+### end code_before_enable_logging
+### enable logging
+$_pci_log_outputs->{Screen} = { conf => { formatter => sub { "pause: " . $_[0] } } };
+#### begin code_add_extra_log_outputs
+$_pci_log_outputs->{Screen}{category_level}{access} = "off"; $_pci_log_outputs->{SimpleFile} = {conf=>{path => ($ENV{HOME} || ".")."/pause-access.log"}, level=>"off", layout=>[JSON=>{}], category_level=>{access=>"info"}}; 
+#### end code_add_extra_log_outputs
+require Log::ger::Output; Log::ger::Output->set("Composite", outputs => $_pci_log_outputs);
+require Log::ger; Log::ger->import;
+
+### begin code_after_enable_logging
+### end code_after_enable_logging
 ### declare subroutines
 
 sub _pci_err {
@@ -52,6 +64,8 @@ sub _pci_json {
     $json;
 }
 
+### begin code_before_parse_cmdline_options
+### end code_before_parse_cmdline_options
 ### get arguments (from config file, env, command-line args
 
 {
@@ -59,16 +73,16 @@ my %mentioned_args;
 require Getopt::Long::EvenLess;
 log_trace("Parsing command-line arguments ...");
 require Getopt::Long::Subcommand;
-my $help_msg = "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n";
+my $help_msg = "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n";
 my $go_spec1 = {
   'cmd=s' => sub { $_[2]{subcommand} = [$_[1]]; $_pci_r->{subcommand_name} = $_[1]; },
   'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
   'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
   'debug' => sub { require Log::ger::Util; Log::ger::Util::set_level("debug"); $_pci_r->{log_level} = "debug"; },
   'format=s' => sub { $_pci_r->{format} = $_[1]; },
-  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "cleanup") { print "pause cleanup - Delete older versions of distributions\n\nUsage:\n  pause cleanup --help (or -h, -?)\n  pause cleanup --version (or -v)\n  pause cleanup [options]\n\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\nMain options:\n  --detail, -l      Whether to return detailed records\n  --num-keep=s, -n  Number of new versions (including newest) to keep [1]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "pause ls - List files\n\nUsage:\n  pause ls --help (or -h, -?)\n  pause ls --version (or -v)\n  pause ls [options] [files] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --del          Only list files which are scheduled for deletion\n  --file=s\@      File name/wildcard pattern (=arg[0-])\n  --mtime-max=s  \n  --mtime-min=s  \n  --size-max=s   \n  --size-min=s   \n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-dists") { print "pause ls-dists - List distributions\n\nUsage:\n  pause ls-dists --help (or -h, -?)\n  pause ls-dists --version (or -v)\n  pause ls-dists [options]\n\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\nMain options:\n  --detail, -l  Whether to return detailed records\n  --newest      Only show newest non-dev version\n  --newest-n=s  Only show this number of newest non-dev versions\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-mods") { print "pause ls-mods - List modules (permissions)\n\nUsage:\n  pause ls-mods --help (or -h, -?)\n  pause ls-mods --version (or -v)\n  pause ls-mods [options] [modules] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --module=s\@  Module name/wildcard pattern (=arg[0-])\n  --type=s     Only list modules matching certain type\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "reindex") { print "pause reindex - Force reindexing\n\nUsage:\n  pause reindex --help (or -h, -?)\n  pause reindex --version (or -v)\n  pause reindex [options] <files> ...\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "rm") { print "pause rm - Delete files\n\nUsage:\n  pause rm --help (or -h, -?)\n  pause rm --version (or -v)\n  pause rm [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "undelete") { print "pause undelete - Undelete files\n\nUsage:\n  pause undelete --help (or -h, -?)\n  pause undelete --version (or -v)\n  pause undelete [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "upload") { print "pause upload - Upload file(s)\n\nUsage:\n  pause upload --help (or -h, -?)\n  pause upload --version (or -v)\n  pause upload [options] <files> ...\n\nMain options:\n  --delay=s   Pause a number of seconds between files\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n  --subdir=s  Subdirectory to put the file(s) into [\"\"]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [35]\n  --retry-delay=s                How long to wait before retrying (deprecated)\n  --retry-max-delay=s            How long to wait at most before retrying [3600]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
+  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "cleanup") { print "pause cleanup - Delete older versions of distributions\n\nUsage:\n  pause cleanup --help (or -h, -?)\n  pause cleanup --version (or -v)\n  pause cleanup [options]\n\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\nMain options:\n  --detail, -l      Whether to return detailed records\n  --num-keep=s, -n  Number of new versions (including newest) to keep [1]\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "pause ls - List files\n\nUsage:\n  pause ls --help (or -h, -?)\n  pause ls --version (or -v)\n  pause ls [options] [files] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --del          Only list files which are scheduled for deletion\n  --file=s\@      File name/wildcard pattern (=arg[0-])\n  --mtime-max=s  \n  --mtime-min=s  \n  --size-max=s   \n  --size-min=s   \n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-dists") { print "pause ls-dists - List distributions\n\nUsage:\n  pause ls-dists --help (or -h, -?)\n  pause ls-dists --version (or -v)\n  pause ls-dists [options]\n\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\nMain options:\n  --detail, -l  Whether to return detailed records\n  --newest      Only show newest non-dev version\n  --newest-n=s  Only show this number of newest non-dev versions\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-mods") { print "pause ls-mods - List modules (permissions)\n\nUsage:\n  pause ls-mods --help (or -h, -?)\n  pause ls-mods --version (or -v)\n  pause ls-mods [options] [modules] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --module=s\@  Module name/wildcard pattern (=arg[0-])\n  --type=s     Only list modules matching certain type\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "reindex") { print "pause reindex - Force reindexing\n\nUsage:\n  pause reindex --help (or -h, -?)\n  pause reindex --version (or -v)\n  pause reindex [options] <files> ...\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "rm") { print "pause rm - Delete files\n\nUsage:\n  pause rm --help (or -h, -?)\n  pause rm --version (or -v)\n  pause rm [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "undelete") { print "pause undelete - Undelete files\n\nUsage:\n  pause undelete --help (or -h, -?)\n  pause undelete --version (or -v)\n  pause undelete [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "upload") { print "pause upload - Upload file(s)\n\nUsage:\n  pause upload --help (or -h, -?)\n  pause upload --version (or -v)\n  pause upload [options] <files> ...\n\nMain options:\n  --delay=s   Pause a number of seconds between files\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n  --subdir=s  Subdirectory to put the file(s) into [\"\"]\n\nConfiguration options:\n  --config-path=s     Set path to configuration file\n  --config-profile=s  Set configuration profile to use\n  --no-config         Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
   'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
-  'log-level=s' => sub { if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace") } if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ) } if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ) } if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } $_pci_r->{log_level} = $_[1]; },
+  'log-level=s' => sub { if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace"); Log::ger::Output::Composite::set_level("trace") } if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug"); Log::ger::Output::Composite::set_level("debug") } if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ); Log::ger::Output::Composite::set_level("info")  } if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ); Log::ger::Output::Composite::set_level("warn")  } if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug"); Log::ger::Output::Composite::set_level("debug") } if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ); Log::ger::Output::Composite::set_level("off")   } if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ); Log::ger::Output::Composite::set_level("off")   } $_pci_r->{log_level} = $_[1]; },
   'naked-res' => sub { $_pci_r->{naked_res} = 1; },
   'no-config' => sub { $_pci_r->{read_config} = 0; },
   'no-env' => sub { $_pci_r->{read_env} = 0; },
@@ -77,7 +91,7 @@ my $go_spec1 = {
   'subcommands' => sub { print "Available subcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n"; exit 0 },
   'trace' => sub { require Log::ger::Util; Log::ger::Util::set_level("trace"); $_pci_r->{log_level} = "trace"; },
   'verbose' => sub { require Log::ger::Util; Log::ger::Util::set_level("info" ); $_pci_r->{log_level} = "info" ; },
-  'version|v' => sub { no warnings 'once'; require WWW::PAUSE::Simple; print "pause version ", $main::VERSION // '?', ($main::DATE ? " ($main::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.545 (2019-04-15)\n"; exit 0 },
+  'version|v' => sub { no warnings 'once'; require WWW::PAUSE::Simple; print "pause version ", $main::VERSION // '?', ($main::DATE ? " ($main::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.545 (2020-02-18)\n"; exit 0 },
 };
 my $go_spec2 = {
   options => {
@@ -166,12 +180,6 @@ my $go_spec2 = {
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
-        },
         'username=s' => {
           handler => sub { $_pci_args{'username'} = $_[1]; },
         },
@@ -218,12 +226,6 @@ my $go_spec2 = {
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
-        },
         'size-max=s' => {
           handler => sub { $_pci_args{'size_max'} = $_[1]; },
         },
@@ -267,12 +269,6 @@ my $go_spec2 = {
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
-        },
         'username=s' => {
           handler => sub { $_pci_args{'username'} = $_[1]; },
         },
@@ -304,12 +300,6 @@ my $go_spec2 = {
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
-        },
         'type=s' => {
           handler => sub { $_pci_args{'type'} = $_[1]; },
         },
@@ -331,12 +321,6 @@ my $go_spec2 = {
         },
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
-        },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
         },
         'username=s' => {
           handler => sub { $_pci_args{'username'} = $_[1]; },
@@ -363,12 +347,6 @@ my $go_spec2 = {
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
-        },
         'username=s' => {
           handler => sub { $_pci_args{'username'} = $_[1]; },
         },
@@ -387,12 +365,6 @@ my $go_spec2 = {
         },
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
-        },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
         },
         'username=s' => {
           handler => sub { $_pci_args{'username'} = $_[1]; },
@@ -415,12 +387,6 @@ my $go_spec2 = {
         },
         'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
-        },
-        'retry-delay=s' => {
-          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
-        },
-        'retry-max-delay=s' => {
-          handler => sub { $_pci_args{'retry_max_delay'} = $_[1]; },
         },
         'subdir=s' => {
           handler => sub { $_pci_args{'subdir'} = $_[1]; },
@@ -593,8 +559,6 @@ sub _pci_check_args {
         no warnings ('void');
         require Scalar::Util::Numeric::PP;
         require List::Util;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"detail"}) {
@@ -646,7 +610,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -659,7 +623,7 @@ sub _pci_check_args {
                         )}, 0..@{$args->{"protect_files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -669,39 +633,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"username"}) {
@@ -731,8 +662,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: protect_files"] if exists($args->{"protect_files"}) && !defined($args->{"protect_files"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
         [200];
@@ -750,7 +679,6 @@ sub _pci_check_args {
         require Time::Local;
         require Scalar::Util;
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"del"}) {
@@ -783,7 +711,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -803,8 +731,8 @@ sub _pci_check_args {
             
             &&
             
-            # coerce rule(s): float_epoch, obj_DateTime, obj_TimeMoment, str_iso8601 # coerce to: float(epoch)
-            (($args->{"mtime_max"} = (!ref($args->{"mtime_max"}) && $args->{"mtime_max"} =~ /\A[0-9]{8,10}(?:.[0-9]+)?\z/ && $args->{"mtime_max"} >= 10**8 && $args->{"mtime_max"} <= 2**31) ? [undef,$args->{"mtime_max"}] : ((Scalar::Util::blessed($args->{"mtime_max"}) && $args->{"mtime_max"}->isa('DateTime')) ? [undef,$args->{"mtime_max"}->epoch] : ((Scalar::Util::blessed($args->{"mtime_max"}) && $args->{"mtime_max"}->isa('Time::Moment')) ? [undef,$args->{"mtime_max"}->epoch] : ((!ref($args->{"mtime_max"}) && $args->{"mtime_max"} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\z/) ? (do { my $time; eval { $time = $4 ? ($8 ? Time::Local::timegm($7, $6, $5, $3, $2-1, $1-1900) : Time::Local::timelocal($7, $6, $5, $3, $2-1, $1-1900)) : Time::Local::timelocal(0, 0, 0, $3, $2-1, $1-1900) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid date/time: $err"] } else { [undef, $time] } }) : [undef,$args->{"mtime_max"}])))), defined($args->{"mtime_max"}->[0]) ? (($_sahv_err //= $args->{"mtime_max"}->[0]), '') : (($args->{"mtime_max"} = $args->{"mtime_max"}->[1]), 1))
+            # coerce rule(s): From_float::epoch, From_obj::datetime, From_obj::time_moment, From_str::iso8601 # coerce to: float(epoch)
+            (($args->{"mtime_max"} = (!ref($args->{"mtime_max"}) && $args->{"mtime_max"} =~ /\A[0-9]{8,10}(?:.[0-9]+)?\z/ && $args->{"mtime_max"} >= 10**8 && $args->{"mtime_max"} <= 2**31) ? [undef,$args->{"mtime_max"}] : ((Scalar::Util::blessed($args->{"mtime_max"}) && $args->{"mtime_max"}->isa('DateTime')) ? [undef,$args->{"mtime_max"}->epoch] : ((Scalar::Util::blessed($args->{"mtime_max"}) && $args->{"mtime_max"}->isa('Time::Moment')) ? [undef,$args->{"mtime_max"}->epoch] : ((!ref($args->{"mtime_max"}) && $args->{"mtime_max"} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\z/) ? (do { my $time; eval { $time = $8 ? Time::Local::timegm_modern($7, $6, $5, $3, $2-1, $1) : $4 ? Time::Local::timelocal_modern($7, $6, $5, $3, $2-1, $1) : Time::Local::timelocal_modern(0, 0, 0, $3, $2-1, $1) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid date/time: $err"] } else { [undef, $time] } }) : [undef,$args->{"mtime_max"}])))), defined($args->{"mtime_max"}->[0]) ? (($_sahv_err //= $args->{"mtime_max"}->[0]), ($args->{"mtime_max"} = $args->{"mtime_max"}->[1]), '') : (($args->{"mtime_max"} = $args->{"mtime_max"}->[1]), 1))
             
             &&
             
@@ -819,8 +747,8 @@ sub _pci_check_args {
             
             &&
             
-            # coerce rule(s): float_epoch, obj_DateTime, obj_TimeMoment, str_iso8601 # coerce to: float(epoch)
-            (($args->{"mtime_min"} = (!ref($args->{"mtime_min"}) && $args->{"mtime_min"} =~ /\A[0-9]{8,10}(?:.[0-9]+)?\z/ && $args->{"mtime_min"} >= 10**8 && $args->{"mtime_min"} <= 2**31) ? [undef,$args->{"mtime_min"}] : ((Scalar::Util::blessed($args->{"mtime_min"}) && $args->{"mtime_min"}->isa('DateTime')) ? [undef,$args->{"mtime_min"}->epoch] : ((Scalar::Util::blessed($args->{"mtime_min"}) && $args->{"mtime_min"}->isa('Time::Moment')) ? [undef,$args->{"mtime_min"}->epoch] : ((!ref($args->{"mtime_min"}) && $args->{"mtime_min"} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\z/) ? (do { my $time; eval { $time = $4 ? ($8 ? Time::Local::timegm($7, $6, $5, $3, $2-1, $1-1900) : Time::Local::timelocal($7, $6, $5, $3, $2-1, $1-1900)) : Time::Local::timelocal(0, 0, 0, $3, $2-1, $1-1900) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid date/time: $err"] } else { [undef, $time] } }) : [undef,$args->{"mtime_min"}])))), defined($args->{"mtime_min"}->[0]) ? (($_sahv_err //= $args->{"mtime_min"}->[0]), '') : (($args->{"mtime_min"} = $args->{"mtime_min"}->[1]), 1))
+            # coerce rule(s): From_float::epoch, From_obj::datetime, From_obj::time_moment, From_str::iso8601 # coerce to: float(epoch)
+            (($args->{"mtime_min"} = (!ref($args->{"mtime_min"}) && $args->{"mtime_min"} =~ /\A[0-9]{8,10}(?:.[0-9]+)?\z/ && $args->{"mtime_min"} >= 10**8 && $args->{"mtime_min"} <= 2**31) ? [undef,$args->{"mtime_min"}] : ((Scalar::Util::blessed($args->{"mtime_min"}) && $args->{"mtime_min"}->isa('DateTime')) ? [undef,$args->{"mtime_min"}->epoch] : ((Scalar::Util::blessed($args->{"mtime_min"}) && $args->{"mtime_min"}->isa('Time::Moment')) ? [undef,$args->{"mtime_min"}->epoch] : ((!ref($args->{"mtime_min"}) && $args->{"mtime_min"} =~ /\A([0-9]{4})-([0-9]{2})-([0-9]{2})(?:([T ])([0-9]{2}):([0-9]{2}):([0-9]{2})(Z?))?\z/) ? (do { my $time; eval { $time = $8 ? Time::Local::timegm_modern($7, $6, $5, $3, $2-1, $1) : $4 ? Time::Local::timelocal_modern($7, $6, $5, $3, $2-1, $1) : Time::Local::timelocal_modern(0, 0, 0, $3, $2-1, $1) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid date/time: $err"] } else { [undef, $time] } }) : [undef,$args->{"mtime_min"}])))), defined($args->{"mtime_min"}->[0]) ? (($_sahv_err //= $args->{"mtime_min"}->[0]), ($args->{"mtime_min"} = $args->{"mtime_min"}->[1]), '') : (($args->{"mtime_min"} = $args->{"mtime_min"}->[1]), 1))
             
             &&
             
@@ -839,7 +767,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -849,39 +777,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"size_max"}) {
@@ -944,8 +839,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: mtime_min"] if exists($args->{"mtime_min"}) && !defined($args->{"mtime_min"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: size_max"] if exists($args->{"size_max"}) && !defined($args->{"size_max"});
         return [400, "Missing required value for argument: size_min"] if exists($args->{"size_min"}) && !defined($args->{"size_min"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
@@ -961,8 +854,6 @@ sub _pci_check_args {
         # fill defaults from "default" property and check against schema
         no warnings ('void');
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"detail"}) {
@@ -1010,7 +901,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1020,39 +911,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"username"}) {
@@ -1081,8 +939,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: newest_n"] if exists($args->{"newest_n"}) && !defined($args->{"newest_n"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
         [200];
@@ -1098,8 +954,6 @@ sub _pci_check_args {
         no warnings ('void');
         require List::Util;
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"detail"}) {
@@ -1123,7 +977,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1147,7 +1001,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1157,39 +1011,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"type"}) {
@@ -1229,8 +1050,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: modules"] if exists($args->{"modules"}) && !defined($args->{"modules"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: type"] if exists($args->{"type"}) && !defined($args->{"type"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
@@ -1247,8 +1066,6 @@ sub _pci_check_args {
         no warnings ('void');
         require List::Util;
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"files"}) {
@@ -1268,7 +1085,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1292,7 +1109,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1302,39 +1119,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"username"}) {
@@ -1364,8 +1148,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
         [200];
@@ -1381,8 +1163,6 @@ sub _pci_check_args {
         no warnings ('void');
         require List::Util;
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"files"}) {
@@ -1402,7 +1182,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1438,7 +1218,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1451,7 +1231,7 @@ sub _pci_check_args {
                         )}, 0..@{$args->{"protect_files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1461,39 +1241,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"username"}) {
@@ -1524,8 +1271,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: protect_files"] if exists($args->{"protect_files"}) && !defined($args->{"protect_files"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
         [200];
@@ -1541,8 +1286,6 @@ sub _pci_check_args {
         no warnings ('void');
         require List::Util;
         require Scalar::Util::Numeric::PP;
-        require Time::Duration::Parse::AsHash;
-        require Scalar::Util;
         my $_sahv_dpath;
         my $_sahv_err;
         if (exists $args->{"files"}) {
@@ -1562,7 +1305,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1586,7 +1329,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1596,39 +1339,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         if (exists $args->{"username"}) {
@@ -1658,8 +1368,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
         [200];
@@ -1686,8 +1394,8 @@ sub _pci_check_args {
             
             &&
             
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"delay"} = (!ref($args->{"delay"}) && $args->{"delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"delay"}] : ((Scalar::Util::blessed($args->{"delay"}) && $args->{"delay"}->isa('DateTime::Duration')) ? [undef,($args->{"delay"}->years * 365.25*86400 + $args->{"delay"}->months * 30.4375*86400 + $args->{"delay"}->weeks * 7*86400 + $args->{"delay"}->days * 86400 + $args->{"delay"}->hours * 3600 + $args->{"delay"}->minutes * 60 + $args->{"delay"}->seconds + $args->{"delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"delay"}])))), defined($args->{"delay"}->[0]) ? (($_sahv_err //= $args->{"delay"}->[0]), '') : (($args->{"delay"} = $args->{"delay"}->[1]), 1))
+            # coerce rule(s): From_float::seconds, From_obj::datetime_duration, From_str::iso8601, From_str::human # coerce to: float(secs)
+            (($args->{"delay"} = (!ref($args->{"delay"}) && $args->{"delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"delay"}] : ((Scalar::Util::blessed($args->{"delay"}) && $args->{"delay"}->isa('DateTime::Duration')) ? [undef,($args->{"delay"}->years * 365.25*86400 + $args->{"delay"}->months * 30.4375*86400 + $args->{"delay"}->weeks * 7*86400 + $args->{"delay"}->days * 86400 + $args->{"delay"}->hours * 3600 + $args->{"delay"}->minutes * 60 + $args->{"delay"}->seconds + $args->{"delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"delay"}])))), defined($args->{"delay"}->[0]) ? (($_sahv_err //= $args->{"delay"}->[0]), ($args->{"delay"} = $args->{"delay"}->[1]), '') : (($args->{"delay"} = $args->{"delay"}->[1]), 1))
             
             &&
             
@@ -1712,7 +1420,7 @@ sub _pci_check_args {
             
             &&
             
-            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ([push(@{$_sahv_dpath}, undef), scalar(# clause: of
             ((!defined(List::Util::first(sub {!(
                         ($_sahv_dpath->[-1] = $_),
                         # req #0
@@ -1736,7 +1444,7 @@ sub _pci_check_args {
             ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
-        $args->{"retries"} //= 35;
+        $args->{"retries"} //= 5;
         if (exists $args->{"retries"}) {
             $_sahv_dpath = [];
             # req #0
@@ -1746,39 +1454,6 @@ sub _pci_check_args {
             
             # check type 'int'
             ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        if (exists $args->{"retry_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
-             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
-        } # if date arg exists
-        $args->{"retry_max_delay"} //= 3600;
-        if (exists $args->{"retry_max_delay"}) {
-            $_sahv_dpath = [];
-            # req #0
-            ((defined($args->{"retry_max_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
-            
-            &&
-            
-            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
-            (($args->{"retry_max_delay"} = (!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_max_delay"}] : ((Scalar::Util::blessed($args->{"retry_max_delay"}) && $args->{"retry_max_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_max_delay"}->years * 365.25*86400 + $args->{"retry_max_delay"}->months * 30.4375*86400 + $args->{"retry_max_delay"}->weeks * 7*86400 + $args->{"retry_max_delay"}->days * 86400 + $args->{"retry_max_delay"}->hours * 3600 + $args->{"retry_max_delay"}->minutes * 60 + $args->{"retry_max_delay"}->seconds + $args->{"retry_max_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_max_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_max_delay"}])))), defined($args->{"retry_max_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_max_delay"}->[0]), '') : (($args->{"retry_max_delay"} = $args->{"retry_max_delay"}->[1]), 1))
-            
-            &&
-            
-            # check type 'duration'
-            ((!ref($args->{"retry_max_delay"}) && $args->{"retry_max_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
              ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
         } # if date arg exists
         $args->{"subdir"} //= "";
@@ -1821,8 +1496,6 @@ sub _pci_check_args {
         return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
         return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
         return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
-        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
-        return [400, "Missing required value for argument: retry_max_delay"] if exists($args->{"retry_max_delay"}) && !defined($args->{"retry_max_delay"});
         return [400, "Missing required value for argument: subdir"] if exists($args->{"subdir"}) && !defined($args->{"subdir"});
         return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
         _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
@@ -1832,6 +1505,9 @@ sub _pci_check_args {
 1;
 
 # END Local::_pci_check_args
+
+### begin code_after_end
+### end code_after_end
 
 __END__
 
@@ -1845,7 +1521,7 @@ pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.652 of main (from Perl distribution App-pause), released on 2019-06-05.
+This document describes version 0.653 of main (from Perl distribution App-pause), released on 2020-02-18.
 
 =head1 SYNOPSIS
 
@@ -1981,7 +1657,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<s>
 
 Set path to configuration file.
 
@@ -2044,6 +1720,10 @@ Do not use any configuration file.
 
 Do not read environment for default options.
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =item B<--password>=I<s>
 
 PAUSE password.
@@ -2062,27 +1742,11 @@ Number of retries when received 5xx HTTP error from server.
 
 Default value:
 
- 35
+ 5
 
-=item B<--retry-delay>=I<s>
+The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
+3600, 3600, ... seconds.
 
-How long to wait before retrying (deprecated).
-
-This setting is now deprecated. Will use a constant backoff strategy of delaying
-this many seconds. The default (when this setting is not specified) is now to
-use an exponential backoff strategy of delaying 3, 6, 12, 24, ..., 3600, 3600,
-... seconds. The default `retries` of 35 makes this strategy retries for a
-little over a day (88941 seconds). The terminal delay setting (default 3600
-seconds) can be set via `retry_max_delay`.
-
-
-=item B<--retry-max-delay>=I<s>
-
-How long to wait at most before retrying.
-
-Default value:
-
- 3600
 
 =item B<--subcommands>
 
@@ -2391,8 +2055,6 @@ List of available configuration parameters:
  naked_res (see --naked-res)
  password (see --password)
  retries (see --retries)
- retry_delay (see --retry-delay)
- retry_max_delay (see --retry-max-delay)
  username (see --username)
 
 =head2 Configuration for subcommand cleanup
@@ -2485,7 +2147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

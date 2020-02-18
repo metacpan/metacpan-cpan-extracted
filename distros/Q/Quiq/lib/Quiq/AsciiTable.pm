@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Quiq::Unindent;
 
@@ -42,7 +42,7 @@ Eine ASCII-Tabelle hat den allgemeinen Aufbau:
 Die Tabelle besteht aus einem Tabellen-Kopf und einem
 Tabellen-Körper. Der Kopf enthält die Kolumnen-Titel und der
 Körper die Kolumnen-Daten. Die beiden Bereiche werden durch eine
-Trennzeile aus Bindestrichen (-) und Leerzeichen ( )
+Trennzeile aus Bindestrichen (-) und Leerzeichen (SPACE)
 getrennt. Außer der Trennung in Kopf und Körper definiert die
 Trennzeile durch die Bindestriche die Anzahl, Lage und
 Breite der einzelnen Kolumnen.
@@ -80,7 +80,7 @@ Die Titel sind optional, können also auch fehlen:
     321 ABC   ABC
    4321 ABCD  ABCD
 
-Die Kolumnenwerte können mehrzeilig sein:
+Die Kolumnenwerte können ebenfalls mehrzeilig sein:
 
     Right Left
   Aligned Aligned        Centered
@@ -112,14 +112,14 @@ und -Körper:
           line
   ------- -------------- --------
 
-Generell gilt ferner:
+Ferner gilt hinsichtlich der Formatierung:
 
 =over 2
 
 =item *
 
-Ist die Tabelle eingerückt, wird diese Einrückung entfernt. Die
-Einrückung muss aus Leerzeichen bestehen.
+Ist die Tabelle eingerückt, wird diese Einrückung automatisch
+entfernt. Die Einrückung muss aus Leerzeichen bestehen.
 
 =item *
 
@@ -611,7 +611,7 @@ sub asText {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

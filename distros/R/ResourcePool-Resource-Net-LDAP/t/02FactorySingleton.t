@@ -1,8 +1,8 @@
 #! /usr/bin/perl -w
 #*********************************************************************
 #*** t/02FactorySingleton.t
-#*** Copyright (c) 2002 by Markus Winand <mws@fatalmind.com>
-#*** $Id: 02FactorySingleton.t,v 1.1 2003/01/06 09:20:04 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 use strict;
 use Test;

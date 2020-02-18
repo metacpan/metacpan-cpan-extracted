@@ -8,11 +8,13 @@ use Test::More 0.98;
 
 use Path::Naive qw(
     abs_path
-    concat_path
     concat_and_normalize_path
+    concat_path
+    normalize_and_split_path
     normalize_path
     is_abs_path
     is_rel_path
+    rel_path
     split_path
               );
 
@@ -108,6 +110,30 @@ subtest normalize_path => sub {
     is(normalize_path("p/a/./..")      , "p");
     is(normalize_path("a/../q")        , "q");
     is(normalize_path("a/../.")        , ".");
+};
+
+subtest normalize_and_split_path => sub {
+    dies_ok { normalize_and_split_path() };
+    dies_ok { normalize_and_split_path(undef) };
+    dies_ok { normalize_and_split_path("") };
+    is_deeply([normalize_and_split_path("a/b/.")], ["a","b"]);
+};
+
+subtest rel_path => sub {
+    dies_ok { rel_path() };
+    dies_ok { rel_path(undef) };
+    dies_ok { rel_path("") };
+    dies_ok { rel_path("a") };
+    dies_ok { rel_path("a", "") };
+    dies_ok { rel_path("/a", "b") } "path not absolute";
+    dies_ok { rel_path("a", "/b") } "base not absolute";
+
+    is_deeply(rel_path("/a", "/b")         , "../a");
+    is_deeply(rel_path("/a", "/a")         , ".");
+    is_deeply(rel_path("/b/c", "/b/c/d/e") , "../..");
+    is_deeply(rel_path("/b/c/e", "/b/d/f") , "../../c/e");
+    is_deeply(rel_path("/b/c/e", "/b")     , "c/e");
+    is_deeply(rel_path("/b/c/e", "/b/e/.."), "c/e");
 };
 
 subtest split_path => sub {

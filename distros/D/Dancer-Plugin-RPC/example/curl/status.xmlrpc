@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<methodCall>
+  <methodName>status</methodName>
+  <params>
+    <param>
+      <value>
+        <struct/>
+      </value>
+    </param>
+  </params>
+</methodCall>

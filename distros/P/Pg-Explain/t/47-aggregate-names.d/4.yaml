@@ -1,0 +1,22 @@
+- Plan: 
+    Node Type: "Aggregate"
+    Strategy: "Hashed"
+    Partial Mode: "Simple"
+    Parallel Aware: false
+    Startup Cost: 19.79
+    Total Cost: 19.95
+    Plan Rows: 16
+    Plan Width: 13
+    Group Key: 
+      - "relnamespace"
+      - "relkind"
+    Plans: 
+      - Node Type: "Seq Scan"
+        Parent Relationship: "Outer"
+        Parallel Aware: false
+        Relation Name: "pg_class"
+        Alias: "pg_class"
+        Startup Cost: 0.00
+        Total Cost: 16.88
+        Plan Rows: 388
+        Plan Width: 5

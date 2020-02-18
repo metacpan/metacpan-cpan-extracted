@@ -1,0 +1,6 @@
+{
+   "id" : "ba55e396-d983-4fb1-803f-85a84a1e9c1f",
+   "jsonrpc" : "2.0",
+   "method" : "ping",
+   "params" : {}
+}

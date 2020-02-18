@@ -12,7 +12,7 @@ use Storable 'dclone';
 use Time::Piece;
 use Encode 'encode', 'decode';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 

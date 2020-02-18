@@ -16,7 +16,8 @@ use RPC::XML;
 use RPC::XML::ParserFactory;
 my $p = RPC::XML::ParserFactory->new();
 
-{ # default publish (config)
+{
+    note("default publish (config)");
     set(plugins => {
         'RPC::XMLRPC' => {
             '/endpoint' => {
@@ -43,6 +44,7 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Success produces HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
 
     is_deeply(
@@ -52,7 +54,8 @@ my $p = RPC::XML::ParserFactory->new();
     );
 }
 
-{ # publish is code that returns the dispatch-table
+{
+    note("publish is code that returns the dispatch-table");
     xmlrpc '/endpoint2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -81,7 +84,7 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
-    # diag(explain($response));
+    is($response->status, 200, "Success produces HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
@@ -90,7 +93,8 @@ my $p = RPC::XML::ParserFactory->new();
     );
 }
 
-{ # callback fails
+{
+    note("callback fails");
     xmlrpc '/endpoint_fail' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -122,7 +126,7 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
-    # diag(explain($response));
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
@@ -131,7 +135,8 @@ my $p = RPC::XML::ParserFactory->new();
     );
 }
 
-{ # callback dies
+{
+    note("callback dies");
     xmlrpc '/endpoint_fail2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -160,15 +165,17 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
-        {faultCode => 500, faultString =>"terrible death\n"},
+        {faultCode => -32500, faultString =>"terrible death\n"},
         "fail.ping"
     );
 }
 
-{ # code_wrapper dies
+{
+    note("code_wrapper dies");
     xmlrpc '/endpoint_fail3' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -200,15 +207,17 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
-        {faultCode => 500, faultString =>"code_wrapper died\n"},
+        {faultCode => -32500, faultString =>"code_wrapper died\n"},
         "fail.ping (code_wrapper)"
     );
 }
 
-{ # callback returns unknown object
+{
+    note("callback returns unknown object");
     xmlrpc '/endpoint_fail4' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -240,18 +249,20 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
         {
-            faultCode   => 500,
+            faultCode   => -32500,
             faultString => "Internal error: 'callback_result' wrong class SomeRandomClass"
         },
         "fail.ping (callback wrong class)"
     ) or diag(explain($result->value));
 }
 
-{ # code_wrapper returns unknown object
+{
+    note("code_wrapper returns unknown object");
     xmlrpc '/endpoint_fail5' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -283,6 +294,7 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
@@ -291,7 +303,8 @@ my $p = RPC::XML::ParserFactory->new();
     ) or diag(explain($result->value));
 }
 
-{ # rpc-call fails
+{
+    note("rpc-call fails");
     xmlrpc '/endpoint_error' => {
         publish => sub {
             return {
@@ -315,15 +328,17 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,
-        {faultCode => 500, faultString =>"Example error code\n"},
+        {faultCode => -32500, faultString =>"Example error code\n"},
         "fail.error"
     );
 }
 
-{ # return an error_response()
+{
+    note("return an error_response()");
     xmlrpc '/endpoint_fault' => {
         publish => sub {
             return {
@@ -347,6 +362,7 @@ my $p = RPC::XML::ParserFactory->new();
         }
     );
 
+    is($response->status, 200, "Errors produce HTTP 200 OK");
     my $result = $p->parse($response->{content})->value;
     is_deeply(
         $result->value,

@@ -13,11 +13,10 @@
 <http://purl.org/NET/cpan-uri/dist/MooX-late/project>
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap-deps:runtime-recommendation [
-		doap-deps:on "MooX::HandlesVia 0.001004"^^doap-deps:CpanId;
-	];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008003"^^doap-deps:CpanId ], [ doap-deps:on "Moo 2"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Utils 1.000001"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Sub::HandlesVia 0.013"^^doap-deps:CpanId;
 	];
 	doap-deps:runtime-suggestion [ doap-deps:on "MooX"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
@@ -32,7 +31,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-late";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-016>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-100>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-late>;
@@ -305,6 +304,23 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.016.tar.gz>;
 	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.100"^^xsd:string;
+	dc:issued            "2020-02-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use Sub::HandlesVia instead of MooX::HandlesVia; less translation needed because Sub::HandlesVia already understands Moose-like syntax; plus it covers more datatypes and methods.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Make Sub::HandlesVia a required dependency.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/shlomif>
 	a                    foaf:Person;

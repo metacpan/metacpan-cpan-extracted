@@ -1,6 +1,6 @@
 requires 'perl' => '5.010001';
 requires 'Dist::Zilla';
-requires 'Dist::Zilla::PluginBundle::Starter' => 'v3.0.0';
+requires 'Dist::Zilla::PluginBundle::Starter' => 'v4.0.0';
 requires 'Dist::Zilla::Plugin::Git::Check';
 requires 'Dist::Zilla::Plugin::Git::Commit';
 requires 'Dist::Zilla::Plugin::Git::GatherDir';

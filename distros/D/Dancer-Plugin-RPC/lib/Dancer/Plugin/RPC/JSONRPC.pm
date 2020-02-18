@@ -4,13 +4,18 @@ use Dancer ':syntax';
 use Dancer::Plugin;
 use Scalar::Util 'blessed';
 
+our $VERSION = '1.08';
+
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+use constant PLUGIN_NAME => 'jsonrpc';
 
 use Dancer::RPCPlugin::CallbackResult;
 use Dancer::RPCPlugin::DispatchFromConfig;
 use Dancer::RPCPlugin::DispatchFromPod;
 use Dancer::RPCPlugin::DispatchItem;
 use Dancer::RPCPlugin::DispatchMethodList;
+use Dancer::RPCPlugin::ErrorResponse;
 use Dancer::RPCPlugin::FlattenData;
 
 my %dispatch_builder_map = (
@@ -18,7 +23,7 @@ my %dispatch_builder_map = (
     config => \&build_dispatcher_from_config,
 );
 
-register jsonrpc => sub {
+register PLUGIN_NAME ,=> sub {
     my ($self, $endpoint, $arguments) = plugin_args(@_);
 
     my $publisher;
@@ -35,7 +40,7 @@ register jsonrpc => sub {
 
     my $lister = Dancer::RPCPlugin::DispatchMethodList->new();
     $lister->set_partial(
-        protocol => 'jsonrpc',
+        protocol => PLUGIN_NAME,
         endpoint => $endpoint,
         methods  => [ sort keys %{ $dispatcher } ],
     );
@@ -51,12 +56,16 @@ register jsonrpc => sub {
 
     debug("Starting jsonrpc-handler build: ", $lister);
     my $handle_call = sub {
-        if (request->content_type ne 'application/json') {
+        my ($ct) = (split /;\s*/, request->content_type, 2);
+        if ($ct ne 'application/json') {
             pass();
         }
-        debug("[handle_jsonrpc_request] Processing: ", request->body);
-
         my @requests = unjson(request->body);
+        if (!exists($requests[0]->{jsonrpc}) or $requests[0]->{jsonrpc} ne "2.0") {
+            pass();
+        }
+
+        debug("[handle_jsonrpc_request] Processing: ", request->body);
 
         content_type 'application/json';
         my @responses;
@@ -67,9 +76,9 @@ register jsonrpc => sub {
             if (!exists $dispatcher->{$method_name}) {
                 push(
                     @responses,
-                    jsonrpc_error_response(
+                    jsonrpc_response(
                         $request->{id},
-                        {
+                        error => {
                             code    => -32601,
                             message => "Method '$method_name' not found",
                         }
@@ -78,20 +87,27 @@ register jsonrpc => sub {
                 next;
             }
 
-            my @method_args = $request->{params};
+            my $method_args = $request->{params};
             my Dancer::RPCPlugin::CallbackResult $continue = eval {
+                local $Dancer::RPCPlugin::ROUTE_INFO = {
+                    plugin        => PLUGIN_NAME,
+                    endpoint      => $endpoint,
+                    rpc_method    => $method_name,
+                    full_path     => request->path,
+                    http_method   => uc(request->method),
+                };
                 $callback
-                    ? $callback->(request(), $method_name, @method_args)
+                    ? $callback->(request(), $method_name, $method_args)
                     : callback_success();
             };
 
             if (my $error = $@) {
                 push(
                     @responses,
-                    jsonrpc_error_response(
+                    jsonrpc_response(
                         $request->{id},
-                        {
-                            code    => 500,
+                        error => {
+                            code    => -32500,
                             message => $error,
                         }
                     )
@@ -99,9 +115,9 @@ register jsonrpc => sub {
                 next;
             }
             if (!blessed($continue) || !$continue->isa('Dancer::RPCPlugin::CallbackResult')) {
-                push @responses, jsonrpc_error_response(
+                push @responses, jsonrpc_response(
                     $request->{id},
-                    {
+                    error => {
                         code    => -32603,
                         message => "Internal error: 'callback_result' wrong class " . blessed($continue),
                     }
@@ -109,9 +125,9 @@ register jsonrpc => sub {
                 next;
             }
             elsif (blessed($continue) && !$continue->success) {
-                    push @responses, jsonrpc_error_response(
+                    push @responses, jsonrpc_response(
                         $request->{id},
-                        {
+                        error => {
                             code    => $continue->error_code,
                             message => $continue->error_message,
                         }
@@ -124,41 +140,50 @@ register jsonrpc => sub {
             my $package = $di->package;
 
             my $result = eval {
-                $code_wrapper->($handler, $package, $method_name, @method_args);
+                $code_wrapper->($handler, $package, $method_name, $method_args);
             };
             my $error = $@;
 
-            debug("[handeled_jsonrpc_call($method_name)] ", $result);
+            debug("[handled_jsonrpc_call($method_name)] ", flatten_data($result));
             if ($error) {
-                push @responses, jsonrpc_error_response(
+                my $error_response = blessed($error) && $error->can('as_jsonrpc_error')
+                    ? $error
+                    : error_response(
+                            error_code    => -32500,
+                            error_message => $error,
+                            error_data    => $method_args,
+                    );
+                status $error_response->return_status(PLUGIN_NAME);
+                push @responses, jsonrpc_response(
                     $request->{id},
-                    {
-                        code    => 500,
-                        message => $error,
-                    }
+                    %{ $error_response->as_jsonrpc_error },
                 );
                 next;
             }
             if (blessed($result) && $result->can('as_jsonrpc_error')) {
-                push @responses, jsonrpc_error_response(
+                push @responses, jsonrpc_response(
                     $request->{id},
-                    $result->as_jsonrpc_error->{error}
+                    %{ $result->as_jsonrpc_error }
                 );
-                next
+                next;
             }
             elsif (blessed($result)) {
                 $result = flatten_data($result);
             }
-            push @responses, jsonrpc_response($request->{id}, $result);
+            push @responses, jsonrpc_response($request->{id}, result => $result);
         }
 
         # create response
+        my $jsonise_options = {canonical => 1};
+        if (config->{encoding} && config->{encoding} =~ m{^utf-?8$}i) {
+            $jsonise_options->{utf8} = 1;
+        }
         my $response;
         if (@responses == 1) {
-            $response = to_json($responses[0]);
+            $response = to_json($responses[0], $jsonise_options);
         }
         else {
-            $response = to_json([grep {defined($_->{id})} @responses]);
+            $response = to_json([grep {defined($_->{id})} @responses], $jsonise_options);
         }
 
         return $response;
@@ -183,21 +208,12 @@ sub unjson {
 }
 
 sub jsonrpc_response {
-    my ($id, $data) = @_;
+    my ($id, $type, $data) = @_;
 
     return {
         jsonrpc => '2.0',
         id      => $id,
-        result  => $data,
-    };
-}
-
-sub jsonrpc_error_response {
-    my ($id, $error) = @_;
-    return {
-        jsonrpc => '2.0',
-        id      => $id,
-        error   => $error,
+        $type  => $data,
     };
 }
 
@@ -206,7 +222,7 @@ sub build_dispatcher_from_pod {
     debug("[build_dispatcher_from_pod]");
 
     return dispatch_table_from_pod(
-        plugin   => 'jsonrpc',
+        plugin   => PLUGIN_NAME,
         packages => $pkgs,
         endpoint => $endpoint,
     );
@@ -217,7 +233,7 @@ sub build_dispatcher_from_config {
     debug("[build_dispatcher_from_config] $endpoint");
 
     return dispatch_table_from_config(
-        plugin   => 'jsonrpc',
+        plugin   => PLUGIN_NAME,
         config   => $config,
         endpoint => $endpoint,
     );
@@ -272,7 +288,7 @@ The callback will be called just before the actual rpc-code is called from the
 dispatch table. The arguments are positional: (full_request, method_name).
 
     my Dancer::RPCPlugin::CallbackResult $continue = $callback
-        ? $callback->(request(), $method_name, @method_args)
+        ? $callback->(request(), $method_name, $method_args)
         : callback_success();
 
 The callback should return a L<Dancer::RPCPlugin::CallbackResult> instance:
@@ -382,10 +398,6 @@ actual sub-name in the current package.
 =head2 unjson
 
 Deserializes the string as Perl-datastructure.
-
-=head2 jsonrpc_error_response
-
-Returns a jsonrpc error response as a hashref.
 
 =head2 jsonrpc_response
 

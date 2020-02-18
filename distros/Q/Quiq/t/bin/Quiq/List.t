@@ -17,17 +17,25 @@ sub test_loadClass : Init(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_unitTest : Test(10) {
+sub test_unitTest : Test(13) {
     my $self = shift;
+
+    # new()
 
     my $lst = Quiq::List->new;
     $self->is(ref($lst),'Quiq::List');
 
+    # elements()
+
     my @objs = $lst->elements;
     $self->isDeeply(\@objs,[]);
 
+    # count()
+
     my $n = $lst->count;
     $self->is($n,0);
+
+    # push(), count(), elements()
 
     my $obj = $lst->push(Quiq::Hash->new(
         produkt => 'Erdbeeren',
@@ -46,6 +54,10 @@ sub test_unitTest : Test(10) {
         produkt => 'Pflaumen',
         preis => 2.99,
     ));
+    $n = $lst->count;
+    $self->is($n,2);
+
+    # map()
 
     my $str = join ',',$lst->map(sub {
         my $obj = shift;
@@ -53,9 +65,27 @@ sub test_unitTest : Test(10) {
     });
     $self->is($str,'Erdbeeren,Pflaumen');
 
+    # grep()
+
+    my @objects = $lst->grep(sub {
+        my $obj = shift;
+        return substr($obj->produkt,0,1) eq 'P'? 1: 0;
+    });
+    $self->isDeeply(\@objects,[{produkt=>'Pflaumen',preis=>2.99}]);
+
+    # loop()
+
     $lst->loop(\my $sum,sub {
-        my ($sumS,$obj,$i) = @_;
+        my ($obj,$i,$sumS) = @_;
         $$sumS += $obj->preis;
+    });
+    $self->is($sum,6.98);
+
+    # Simplere Fassung
+
+    $sum = 0;
+    $lst->loop(sub {
+        $sum += shift->preis;
     });
     $self->is($sum,6.98);
 }

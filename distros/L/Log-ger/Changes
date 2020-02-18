@@ -1,16 +1,24 @@
-0.028   2019-05-06 (PERLANCAR)
+0.029   2020-02-18  Released-By: PERLANCAR; Urgency: low
 
-	- Use Data::Dumper's Useqq=1 to avoid Data::Dumper bug in not
-	  showing \034.
+        - No functional changes.
+
+	- [dist] Mark default formatter block using # BEGIN_BLOCK .. # END_BLOCK
+          so it can be extracted by Dist::Zilla plugin
+          [InsertBlock::FromModule].
 
 
-0.027   2019-04-13 (PERLANCAR)
+0.028   2019-05-06  Released-By: PERLANCAR
+
+	- Use Data::Dumper's Useqq=1 to show unprintable characters.
+
+
+0.027   2019-04-13  Released-By: PERLANCAR
 
 	- Fix startup overhead regression by avoiding to load Sub::Name &
 	  name routines if we don't have any outputs.
 
 
-0.026   2019-04-12 (PERLANCAR)
+0.026   2019-04-12  Released-By: PERLANCAR
 
         - UPDATE 2019-04-13: This version has startup overhead regression. You
           might want to update to 0.027.
@@ -20,7 +28,7 @@
 	- Remove declaration of unneeded variable $Caller_Depth_Offset.
 
 
-0.025   2018-12-20 (PERLANCAR)
+0.025   2018-12-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -29,14 +37,14 @@
 	- [doc] Also mention speed relative to Log::Contextual.
 
 
-0.024   2018-12-20 (PERLANCAR)
+0.024   2018-12-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention that Log::ger is ~100x faster than Log::Dispatch.
 
 
-0.023   2017-08-03 (PERLANCAR)
+0.023   2017-08-03  Released-By: PERLANCAR
 
         - [Internal] Change the numeric values of level, to accomodate more room
           for custom levels.
@@ -45,14 +53,14 @@
 	  levels.
 
 
-0.022   2017-08-03 (PERLANCAR)
+0.022   2017-08-03  Released-By: PERLANCAR
 
 	- [Bugfix] Fix stupid copy-paste mistake [RT#122687].
 
 	- [doc] Fix copy-paste mistake [RT#122689].
 
 
-0.021   2017-08-02 (PERLANCAR)
+0.021   2017-08-02  Released-By: PERLANCAR
 
 	- [Bugfix] Output, Layout: set() now properly replaces hooks from
 	  previous output/layout plugin (need to remove from all phases).
@@ -60,32 +68,32 @@
         - Add output for testing: ArrayML.
 
 
-0.020   2017-07-30 (PERLANCAR)
+0.020   2017-07-30  Released-By: PERLANCAR
 
 	- [ux] Enable $Data::Dmp::OPT_REMOVE_PRAGMAS.
 
 
-0.019   2017-07-14 (PERLANCAR)
+0.019   2017-07-14  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to create preconstructed default null-loggers for
 	  object target.
 
 
-0.018   2017-07-14 (PERLANCAR)
+0.018   2017-07-14  Released-By: PERLANCAR
 
 	- 'use Log::ger::Format "Foo"' now sets for current package instead of
 	  globally (but the other plugins like Log::ger::Output or
 	  Log::ger::Layout still defaults to setting globally).
 
 
-0.017   2017-07-13 (PERLANCAR)
+0.017   2017-07-13  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [doc] Update some benchmark numbers.
 
 
-0.016   2017-07-13 (PERLANCAR)
+0.016   2017-07-13  Released-By: PERLANCAR
 
 	- Reduce startup overhead by splitting some parts of Log::ger to
 	  Log::ger::Heavy. When user loads modules that have 'use Log::ger', but
@@ -99,23 +107,23 @@
 	  Log::ger::Heavy.
 
 
-0.015   2017-07-12 (PERLANCAR)
+0.015   2017-07-12  Released-By: PERLANCAR
 
 	- [Bugfix] Used the wrong key to get per-object hooks.
 
 
-0.014   2017-07-11 (PERLANCAR)
+0.014   2017-07-11  Released-By: PERLANCAR
 
 	- Pass 'formatters' and 'layouter' arguments to
 	  before_install_routines hook.
 
 
-0.013   2017-07-11 (PERLANCAR)
+0.013   2017-07-11  Released-By: PERLANCAR
 
 	- Allow multiple formatters.
 
 
-0.012   2017-07-02 (PERLANCAR)
+0.012   2017-07-02  Released-By: PERLANCAR
 
 	- [optimize] init_target: Reuse multilevel log routine from hook
 	  for log routines of all levels.
@@ -124,7 +132,7 @@
 	  multilevel logger.
 
 
-0.011   2017-06-30 (PERLANCAR)
+0.011   2017-06-30  Released-By: PERLANCAR
 
         - [Incompatible change] In hook argument "routines", change $flags to
           $type to be more general. The value can be 'log_sub', 'log_method',
@@ -140,7 +148,7 @@
         - [Bugfix] reinit_target() didn't find the correct hash key.
 
 
-0.010   2017-06-28 (PERLANCAR)
+0.010   2017-06-28  Released-By: PERLANCAR
 
 	- [Bugfix] Don't install log methods to package (vice versa, don't
 	  install log subroutines to object package).
@@ -148,7 +156,7 @@
 	- [doc] Remove mention of filter.
 
 
-0.009   2017-06-28 (PERLANCAR)
+0.009   2017-06-28  Released-By: PERLANCAR
 
         - Remove Log::ger::Filter and 'create_filter' phase because they are
           unused.
@@ -158,24 +166,24 @@
         - Add formatter: None.
 
 
-0.008   2017-06-26 (PERLANCAR)
+0.008   2017-06-26  Released-By: PERLANCAR
 
 	- Util: Add string_level().
 
 
-0.007   2017-06-25 (PERLANCAR)
+0.007   2017-06-25  Released-By: PERLANCAR
 
 	- Add custom level test.
 
 	- Add output: Array.
 
 
-0.006   2017-06-24 (PERLANCAR)
+0.006   2017-06-24  Released-By: PERLANCAR
 
 	- [Bugfix] Use the correct package when initializing object.
 
 
-0.005   2017-06-23 (PERLANCAR)
+0.005   2017-06-23  Released-By: PERLANCAR
 
         - [Incompatible change] Another round of internal refactoring and
           interface changes. New: Log::ger::{Plugin,Format,Filter}. Every plugin
@@ -186,12 +194,12 @@
           Log-ger-Manual dist.
 
 
-0.004   2017-06-21 (PERLANCAR)
+0.004   2017-06-21  Released-By: PERLANCAR
 
 	- [Bugfix] Log::ger::Output didn't have VERSION.
 
 
-0.003   2017-06-21 (PERLANCAR)
+0.003   2017-06-21  Released-By: PERLANCAR
 
 	- Split Log::ger::Output::Screen to its own dist so this dist can be
 	  more minimalist and that module can be tested e.g. with Capture::Tiny
@@ -205,7 +213,7 @@
 	- [doc] Update module name Log::ger::LogAny -> Log::ger::Output::LogAny.
 
 
-0.002   2017-06-21 (PERLANCAR)
+0.002   2017-06-21  Released-By: PERLANCAR
 
         - [Incompatible change] Reorganize internals & fix a couple of doc
           typos.
@@ -221,6 +229,6 @@
         - Add some tests.
 
 
-0.001   2017-06-19 (PERLANCAR)
+0.001   2017-06-19  Released-By: PERLANCAR
 
         - First release.

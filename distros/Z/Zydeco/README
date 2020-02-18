@@ -428,6 +428,9 @@ KEYWORDS
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
+    Other keywords like `has` and `method` cannot be used within a `begin`
+    block.
+
     The `begin` keyword cannot be used outside of `class`, `abstract class`,
     `role`, and `interface` blocks, though it is possible to define a global
     default for it:
@@ -441,8 +444,6 @@ KEYWORDS
       );
 
     Per-package `begin` overrides the global `begin`.
-
-    Unlike Perl's `BEGIN` keyword, a package can only have one `begin`.
 
     If `class` definitions are nested, `begin` blocks will be inherited by
     child classes. If a parent class is specified via `extends`, `begin`
@@ -460,6 +461,9 @@ KEYWORDS
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
+    Other keywords like `has` and `method` cannot be used within an `end`
+    block.
+
     The `end` keyword cannot be used outside of `class`, `abstract class`,
     `role`, and `interface` blocks, though it is possible to define a global
     default for it:
@@ -474,11 +478,51 @@ KEYWORDS
 
     Per-package `end` overrides the global `end`.
 
-    Unlike Perl's `END` keyword, a package can only have one `end`.
-
     If `class` definitions are nested, `end` blocks will be inherited by child
     classes. If a parent class is specified via `extends`, `end` blocks will
     not be inherited.
+
+  `before_apply`
+    Within a `role`, a `before_apply` block is run before applying the role to
+    another package.
+
+      role MyRole {
+        before_apply {
+          say "Applying $role to $kind $package.";
+        }
+      }
+
+    The lexical variables $role, $package and $kind are defined within the
+    block. $package refers to the target package the role is being applied to.
+    $kind will be either 'class' or 'role', indicating what kind of package
+    the role is being applied to.
+
+    Other keywords like `has` and `method` cannot be used within a
+    `before_apply` block.
+
+    Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
+    will not be run for Class2.
+
+  `after_apply`
+    Within a `role`, an `after_apply` block is run after applying the role to
+    another package.
+
+      role MyRole {
+        after_apply {
+          say "Applied $role to $kind $package.";
+        }
+      }
+
+    The lexical variables $role, $package and $kind are defined within the
+    block. $package refers to the target package the role was applied to.
+    $kind will be either 'class' or 'role', indicating what kind of package
+    the role was applied to.
+
+    Other keywords like `has` and `method` cannot be used within an
+    `after_apply` block.
+
+    Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
+    will not be run for Class2.
 
   `has`
     Defines an attribute.
@@ -1678,7 +1722,8 @@ IMPORTS
           -features
           try
           class abstract role interface
-          include toolkit begin end extends with requires
+          begin end before_apply after_apply
+          include toolkit extends with requires
           has constant method multi factory before after around
           type_name coerce
           version authority overload

@@ -5,7 +5,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use DBI;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 

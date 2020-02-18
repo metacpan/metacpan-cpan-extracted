@@ -20,6 +20,7 @@ lib/DNS/Unbound/X/Base.pm
 lib/DNS/Unbound/X/ResolveError.pm
 t/async.t
 t/async_anyevent_xspromises.t
+t/async_loaded_runtime.t
 t/async_promise_xs.t
 t/asyncquery.t
 t/convenience.t

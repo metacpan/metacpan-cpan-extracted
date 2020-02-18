@@ -1,0 +1,43 @@
+NAME
+    Log::ger::Format::Hashref - Format arguments as hashref
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger::Format 'Hashref';
+     use Log::ger;
+
+     # single argument, not hashref
+     log_debug "arg";                          # becomes  : {message=>"arg"}
+
+     # single argument, hashref
+     log_debug {msg=>"arg"};                   # unchanged: {msg=>"arg"}
+
+     # multiple arguments, odd numbered
+     log_debug "arg1", "arg2", "arg3";         # dies!
+
+     # multiple arguments, even numbered
+     log_debug "arg1", "arg2", "arg3", "arg4"; # becomes  : {arg1=>"arg2", arg3=>"arg4"}
+
+     log_debug "Data for %s is %s", "budi", {foo=>'blah', bar=>undef};
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    This formatter tries to produce a single hashref from the arguments.
+
+SEE ALSO
+    Other "Log::ger::Format::*" plugins.
+
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

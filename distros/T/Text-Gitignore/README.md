@@ -40,7 +40,19 @@ Returns matched paths (if any). Accepts a string (slurped file for example), or 
     }
 
 Returns a code reference. The produced function accepts a single file as a first parameter and returns true when it was
-matched.
+matched. In case no pattern is matched, it returns a false value with the following convention:
+
+- if the no-match reason is because of a negated pattern, then a false but defined value is returned (e.g. `0`);
+- otherwise, if the no-match reason is that no _direct_ pattern matched, then `undef` is returned.
+
+The use of different false values is inspired to the `wantarray()` built-in function.
+
+Example:
+
+    my $matcher  = build_gitignore_matcher(['f*', '!foo*', 'foobar']);
+    my $matched  = $matcher->('foobar');  # $matched set to true
+    my $ignored  = $matcher->('bar');     # $ignored set to undef
+    my $excluded = $matcher->('foolish'); # $excluded set to false but defined (e.g. 0)
 
 # LICENSE
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -1101,6 +1101,52 @@ sub arraySize {
 
 # -----------------------------------------------------------------------------
 
+=head3 setOrPush() - Setze Skalare Komponente oder pushe auf Array-Komponente
+
+=head4 Synopsis
+
+  $h->setOrPush($key=>$arg);
+
+=head4 Arguments
+
+=over 4
+
+=item $key
+
+Skalare oder Array-Komponente des Hash
+
+=item $arg
+
+Skalarer Wert oder Array-Referenz
+
+=back
+
+=head4 Description
+
+Ist $key eine skalare Komponente des Hash, setze das Attribut auf $arg.
+Ist $key eine Array-Komponente des Hash, pushe $arg (wenn skalarer Wert)
+oder @$arg (wenn Array-Referenz) auf das Array.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setOrPush {
+    my ($self,$key,$arg) = @_;
+
+    my $val = $self->{$key};
+    if (ref $val) {
+        CORE::push @$val,ref $arg? @$arg: $arg;
+    }
+    else {
+        $self->{$key} = $arg;
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 push() - Füge Werte zu Arraykomponente hinzu
 
 =head4 Synopsis
@@ -1442,7 +1488,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

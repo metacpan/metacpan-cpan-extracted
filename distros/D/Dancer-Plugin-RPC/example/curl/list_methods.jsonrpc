@@ -1,0 +1,6 @@
+{
+   "id" : "e074f6a4-980f-482f-932e-f27587f95160",
+   "jsonrpc" : "2.0",
+   "method" : "list_methods",
+   "params" : {}
+}

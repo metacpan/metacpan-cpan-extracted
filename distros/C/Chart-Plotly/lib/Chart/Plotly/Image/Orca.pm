@@ -12,7 +12,7 @@ use Path::Tiny;
 use File::ShareDir qw(dist_file);
 use utf8;
 
-our $VERSION = '0.038';    # VERSION
+our $VERSION = '0.039';    # VERSION
 
 my $ORCA_COMMAND = 'orca';
 
@@ -53,7 +53,7 @@ sub orca {
         my $plotlyjs = $params{plotly} // _plotlyjs;
 
         my $tmp_json = Path::Tiny->tempfile( SUFFIX => '.json' );
-        $tmp_json->spew_raw( $plot->TO_JSON );
+        $tmp_json->spew_raw( $plot->to_json_text );
 
         # For now have to explicitly specify -d as otherwise orca would
         #  not be able to store output to a different path other than cwd.
@@ -134,7 +134,7 @@ Chart::Plotly::Image::Orca - Export static images of Plotly charts using orca
 
 =head1 VERSION
 
-version 0.038
+version 0.039
 
 =head1 SYNOPSIS
 

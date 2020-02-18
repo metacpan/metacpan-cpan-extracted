@@ -1,3 +1,42 @@
+1.174 2020-02-18
+================
+
+[Quiq::Array]
+* Doku bearbeitet
+
+[Quiq::AsciiTable]
+* Doku bearbeitet
+
+[Quiq::Axis]
+* Korrektur y-Position
+
+[Quiq::Css]
+* Doku bearbeitet
+
+[Quiq::Hash]
+* setOrPush() - Methode hinzugefügt
+
+[Quiq::Html::Component]
+* Klasse hinzugefügt
+
+[Quiq::Html::Component::Bundle]
+* Klasse hinzugefügt
+
+[Quiq::Html::Construct]
+* loadFiles() - Herausfiltern von Dubletten ergänzt
+
+[Quiq::Html::Fragment]
+* Klasse entfernt
+
+[Quiq::Html::Page]
+* Einbinden von Komponenten hinzugefügt
+
+[Quiq::JQuery::Function]
+* ready() - Erzeugung von leeren Handlern verhindert
+
+[Quiq::List]
+* grep() - Methode hinzugefügt
+
 1.173 2020-02-09
 ================
 

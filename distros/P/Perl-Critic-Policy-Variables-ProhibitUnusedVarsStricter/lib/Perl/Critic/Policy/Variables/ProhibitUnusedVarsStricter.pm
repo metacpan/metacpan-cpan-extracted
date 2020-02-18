@@ -15,7 +15,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 #-----------------------------------------------------------------------------
 
@@ -1000,7 +1000,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2019 Thomas R. Wyant, III
+Copyright (C) 2012-2020 Thomas R. Wyant, III
 
 =head1 LICENSE
 

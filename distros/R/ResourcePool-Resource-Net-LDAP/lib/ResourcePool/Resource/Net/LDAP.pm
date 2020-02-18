@@ -1,7 +1,7 @@
 #*********************************************************************
 #*** ResourcePool::Resource::Net::LDAP
-#*** Copyright (c) 2002,2003 by Markus Winand <mws@fatalmind.com>
-#*** $Id: LDAP.pm,v 1.5 2003/09/25 17:34:08 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 
 package ResourcePool::Resource::Net::LDAP;
@@ -11,7 +11,7 @@ use strict;
 use Net::LDAP qw(LDAP_SUCCESS);
 use ResourcePool::Resource;
 
-$VERSION = "1.0002";
+$VERSION = "1.0003";
 push @ISA, "ResourcePool::Resource";
 
 sub new($$$@) {

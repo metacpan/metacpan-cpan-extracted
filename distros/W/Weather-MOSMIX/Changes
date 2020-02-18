@@ -1,2 +1,5 @@
-0.01 2018-12-31
+0.02 2020-02-17
+    * Module::ShareDir::Install is a configure-time prerequisite
+
+0.01 2020-02-16
     * Released on an unsuspecting world

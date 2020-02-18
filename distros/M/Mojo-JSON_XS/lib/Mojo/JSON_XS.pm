@@ -2,26 +2,24 @@ package Mojo::JSON_XS;
 use strict;
 use warnings;
 
-our $VERSION = 1.003;
+our $VERSION = 1.011;
 # From groups.google.com/forum/#!msg/mojolicious/a4jDdz-gTH0/Exs0-E1NgQEJ
 
 use Cpanel::JSON::XS;
 use Mojo::JSON;
 use Mojo::Util 'monkey_patch';
 
-my $Binary = Cpanel::JSON::XS->new->utf8(1)->canonical(1)
-  ->allow_blessed(1)->allow_nonref(1)->allow_unknown(1)->convert_blessed(1);
-my $Text = Cpanel::JSON::XS->new->utf8(0)->canonical(1)
-  ->allow_blessed(1)->allow_nonref(1)->allow_unknown(1)->convert_blessed(1);
+my $Binary = Cpanel::JSON::XS->new->utf8;
+my $Text   = Cpanel::JSON::XS->new;
+$_->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed
+  ->stringify_infnan->escape_slash->allow_dupkeys
+  for $Binary, $Text;
 
 monkey_patch 'Mojo::JSON', encode_json => sub { $Binary->encode(shift) };
 monkey_patch 'Mojo::JSON', decode_json => sub { $Binary->decode(shift) };
 
 monkey_patch 'Mojo::JSON', to_json   => sub { $Text->encode(shift) };
 monkey_patch 'Mojo::JSON', from_json => sub { $Text->decode(shift) };
-
-monkey_patch 'Mojo::JSON', true  => sub () { Cpanel::JSON::XS::true() };
-monkey_patch 'Mojo::JSON', false => sub () { Cpanel::JSON::XS::false() };
 
 1;
 __END__
@@ -40,6 +38,11 @@ Mojo::JSON_XS - Faster JSON processing for Mojolicious
 Using Mojo::JSON_XS overrides Mojo::JSON, so your JSON processing will be done
 by compiled C code rather than pure perl.  L<Cpanel::JSON::XS> is a hard
 dependency, so is required both at installation time and run time.
+
+=head2 DEPRECATED
+
+This code was merged into Mojolicious v7.87, so it only makes sense to continue
+using this module if you are constrained to a Mojolicious earlier than that.
 
 =head1 USAGE
 

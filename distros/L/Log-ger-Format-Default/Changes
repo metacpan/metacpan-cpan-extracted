@@ -1,0 +1,12 @@
+0.002   2020-02-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Edit Changes.
+
+
+0.001    2020-02-18  Released-By: PERLANCAR
+
+         - First release, code extracted from Log::ger::Heavy. This is just a
+           repackaging of the formatter code in a proper plugin to be more
+           reusable.

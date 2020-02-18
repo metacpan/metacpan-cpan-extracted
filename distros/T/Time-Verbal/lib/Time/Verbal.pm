@@ -36,7 +36,7 @@ sub distance {
     if ($delta < 86400) {
         return $self->loc('%1 hours', int(0.5+ $delta / 3600));
     }
-    if ($delta > 86400 && $delta < 86400 * 2) {
+    if ($delta >= 86400 && $delta < 86400 * 2) {
         return $self->loc("one day");
     }
     if ($delta < 86400 * 365) {
@@ -95,7 +95,7 @@ Time::Verbal - Convert time distance to words.
 
 =head1 VERSION
 
-version 1.0.1
+version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,7 @@ Kang-min Liu <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Kang-min Liu.
+This software is Copyright (c) 2020 by Kang-min Liu.
 
 This is free software, licensed under:
 

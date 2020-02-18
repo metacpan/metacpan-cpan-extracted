@@ -10,11 +10,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,15 @@ sub normalize_node_struct {
     }
     $struct->{ 'Plans' } = $subplans;
 
+    if ( $struct->{ 'Group Key' } ) {
+        my $items = $struct->{ 'Group Key' }->{ 'Item' };
+        if ( 'ARRAY' eq ref $items ) {
+            $struct->{ 'Group Key' } = $items;
+        }
+        else {
+            $struct->{ 'Group Key' } = [ $items ];
+        }
+    }
     return $struct;
 }
 

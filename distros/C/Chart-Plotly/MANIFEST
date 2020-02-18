@@ -21,6 +21,7 @@ examples/montage_all_traces.png
 examples/morley.csv
 examples/multiple.pl
 examples/orca.pl
+examples/orca_client.pl
 examples/pdl.pl
 examples/plot.pl
 examples/plot_object.pl
@@ -171,6 +172,7 @@ lib/Chart/Plotly/Adapter.pm
 lib/Chart/Plotly/Adapter/Data/Frame.pm
 lib/Chart/Plotly/Adapter/Data/Table.pm
 lib/Chart/Plotly/Image/Orca.pm
+lib/Chart/Plotly/Image/Orca/Client.pm
 lib/Chart/Plotly/Plot.pm
 lib/Chart/Plotly/Trace/Area.pm
 lib/Chart/Plotly/Trace/Area/Hoverlabel.pm

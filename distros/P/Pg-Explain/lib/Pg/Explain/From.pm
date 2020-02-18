@@ -9,11 +9,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,14 @@ sub make_node_from {
             $use_type .= ' on ' . $struct->{ 'Relation Name' };
             $use_type .= ' ' . $struct->{ 'Alias' } if ( $struct->{ 'Alias' } ) && ( $struct->{ 'Alias' } ne $struct->{ 'Relation Name' } );
         }
+
     }
+    elsif ( $use_type eq 'Aggregate' ) {
+        my $strategy = $struct->{ 'Strategy' } || 'Plain';
+        $use_type = 'HashAggregate'  if $strategy eq 'Hashed';
+        $use_type = 'GroupAggregate' if $strategy eq 'Sorted';
+    }
+
     my $new_node = Pg::Explain::Node->new(
         'type'                   => $use_type,
         'estimated_startup_cost' => $struct->{ 'Startup Cost' },
@@ -146,6 +153,11 @@ sub make_node_from {
                 'subquery_name' => $struct->{ 'Alias' },
             }
         );
+    }
+
+    if ( $struct->{ 'Group Key' } ) {
+        my $key = join( ', ', @{ $struct->{ 'Group Key' } } );
+        $new_node->add_extra_info( 'Group Key: ' . $key );
     }
 
     $new_node->add_extra_info( 'Workers Planned: ' . $struct->{ 'Workers Planned' } ) if $struct->{ 'Workers Planned' };
@@ -225,7 +237,7 @@ sub make_node_from {
 
 =head1 AUTHOR
 
-hubert depesz lubaczewski, C<< <depesz at depesz.com> >>
+hubert depesz lubaczewski, C << <depesz at depesz.com> >>
 
 =head1 BUGS
 

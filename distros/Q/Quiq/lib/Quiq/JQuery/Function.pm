@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Quiq::Unindent;
 
@@ -299,16 +299,22 @@ L<https://api.jquery.com/ready/>
 
 sub ready {
     my $this = shift;
-    my $body = Quiq::Unindent->trim(shift);
-    $body =~ s/^/    /mg;
-    return "\$(function() {\n$body\n});"
+    my $js = shift // '';
+
+    if ($js) {
+        $js = Quiq::Unindent->trim($js);
+        $js =~ s/^/    /mg;
+        $js = "\$(function() {\n$js\n});";
+    }
+
+    return $js;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

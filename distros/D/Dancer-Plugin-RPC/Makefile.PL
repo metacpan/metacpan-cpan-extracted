@@ -7,6 +7,7 @@ use ExtUtils::MakeMaker '6.55_02';
 my $prereq_pm = {
     'Dancer'                     => '1.31',
     'JSON'                       => '2.0',
+    'Params::Validate'           => '1.08',
     'Params::ValidationCompiler' => '0.24',
     'RPC::XML'                   => '0.56',
     'Types::Standard'            => '1.00',

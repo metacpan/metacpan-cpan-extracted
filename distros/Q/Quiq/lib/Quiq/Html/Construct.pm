@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -33,15 +33,11 @@ einer eigenen Klasse rechtfertigen.
 
 =head2 Objektmethoden
 
-=head3 loadFiles()
+=head3 loadFiles() - Lade CSS- und JavaScript-Dateien
 
 =head4 Synopsis
 
   $html = $class->loadFiles(@spec);
-
-=head4 Description
-
-Siehe Basisklasse Quiq::Html::Tag.
 
 =cut
 
@@ -51,20 +47,28 @@ sub loadFiles {
     my $self = shift;
     # @_: @spec
 
-    my $html = '';
+    my (%seen,@css,@js);
     for (my $i = 0; $i < @_; $i++) {
         my $arg = $_[$i];
         if ($arg eq 'css' || $arg =~ /\.css$/) {
             if ($arg eq 'css') {
                 $i++;
             }
-            $html .= Quiq::Css->style($self,$_[$i]);
+            my $url = $_[$i];
+            if ($seen{"css|$url"}++) {
+                next;
+            }
+            push @css,Quiq::Css->style($self,$url);
         }
         elsif ($arg eq 'js' || $arg =~ /\.js$/) {
             if ($arg eq 'js') {
                 $i++;
             }
-            $html .= Quiq::JavaScript->script($self,$_[$i]);
+            my $url = $_[$i];
+            if ($seen{"js|$url"}++) {
+                next;
+            }
+            push @js,Quiq::JavaScript->script($self,$url);
         }
         else {
             $self->throw(
@@ -74,14 +78,14 @@ sub loadFiles {
         }
     }
 
-    return $html;
+    return join '',@css,@js;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

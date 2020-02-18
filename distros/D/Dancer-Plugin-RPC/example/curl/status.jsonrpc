@@ -1,0 +1,6 @@
+{
+   "id" : "827c32f1-4e3c-41f2-a0e8-86543982f60f",
+   "jsonrpc" : "2.0",
+   "method" : "status",
+   "params" : {}
+}

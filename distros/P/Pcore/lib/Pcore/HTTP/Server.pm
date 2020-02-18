@@ -32,7 +32,7 @@ has _listen_socket => ( init_arg => undef );
 sub BUILD ( $self, $args ) {
 
     # parse listen
-    $self->{listen} = P->uri( $self->{listen}, base => 'tcp:', listen => 1 ) if !is_uri $self->{listen};
+    $self->{listen} = P->net->parse_listen( $self->{listen} ) if !is_uri $self->{listen};
 
     $self->{_listen_socket} = &AnyEvent::Socket::tcp_server(          ## no critic qw[Subroutines::ProhibitAmpersandSigils]
         $self->{listen}->connect,

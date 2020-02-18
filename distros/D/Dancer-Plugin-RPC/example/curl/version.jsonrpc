@@ -1,0 +1,6 @@
+{
+   "id" : "73854a52-0eab-437f-879b-f48e1394912e",
+   "jsonrpc" : "2.0",
+   "method" : "version",
+   "params" : {}
+}

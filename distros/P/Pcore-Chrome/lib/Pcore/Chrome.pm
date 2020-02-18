@@ -1,11 +1,15 @@
-package Pcore::Chrome v0.14.1;
+package Pcore::Chrome v0.14.2;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
 use Pcore::Util::Scalar qw[weaken];
 use Pcore::Util::Data qw[from_json];
 
-has bin           => ();
+has bin => ();
+
+has listen     => ();
+has pac_listen => ();
+
 has host          => '127.0.0.1';
 has port          => 9222;
 has user_data_dir => sub { P->file1->tempdir };
@@ -36,9 +40,8 @@ around new => sub ( $orig, $self, %args ) {
 
     $self = $self->$orig(%args);
 
-    $self->{host} ||= '127.0.0.1';
-
-    $self->{port} ||= ( P->net->get_free_port( $args{host} ) or die q[Error get free port] );
+    $self->{listen}     = P->net->parse_listen( $self->{listen}     || '//127.0.0.1' );
+    $self->{pac_listen} = P->net->parse_listen( $self->{pac_listen} || '//127.0.0.1' );
 
     $self->_build_pac_func( $args{proxy} );
 
@@ -47,8 +50,8 @@ around new => sub ( $orig, $self, %args ) {
     my $cmd = [
         qq["$args{bin}"],
 
-        "--remote-debugging-address=$self->{host}",
-        "--remote-debugging-port=$self->{port}",
+        "--remote-debugging-address=$self->{listen}->{host}",
+        "--remote-debugging-port=$self->{listen}->{port}",
 
         '--disable-background-networking',
         '--disable-client-side-phishing-detection',
@@ -70,7 +73,7 @@ around new => sub ( $orig, $self, %args ) {
         '--disable-web-security',
         '--allow-running-insecure-content',
 
-        qq[--proxy-pac-url="http://$self->{_pac_server}->{listen}->{host_port}/"],
+        qq[--proxy-pac-url="http://$self->{pac_listen}->{host_port}/"],
 
         # logging
         # '--disable-logging',
@@ -198,7 +201,7 @@ sub _run_pac_server ($self) {
     weaken $self;
 
     $self->{_pac_server} = Pcore::HTTP::Server->new(
-        listen     => '//127.0.0.1:9999',
+        listen     => $self->{pac_listen},
         on_request => sub ($req) {
             return 200, [ 'Content-Type' => 'application/x-ns-proxy-autoconfig' ], $self->{_pac_func} || $EMPTY;
         }
@@ -214,9 +217,9 @@ sub _run_pac_server ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 89                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 92                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 101                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 104                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

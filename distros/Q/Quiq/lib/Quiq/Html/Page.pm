@@ -5,8 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
+use Quiq::Html::Component::Bundle;
 use Quiq::Css;
 use Quiq::JQuery::Function;
 use Quiq::JavaScript;
@@ -52,6 +53,13 @@ Gesamtseite.
 =item comment => $str (Default: undef)
 
 Kommentar am Anfang der Seite.
+
+=item components => \@components
+
+Liste der HTML-Komponenten, die in die Seite eingesetzt werden.
+Die Komponentenbestandteile werden automatisch zu den Seitenbestandteilen
+hinzugefüht. Im Seiten-HTML-Code wird der HTML-Code der Komponente
+an der Postion des Platzhalters __<NAME>__ eingesetzt.
 
 =item encoding => $charset (Default: 'utf-8')
 
@@ -154,6 +162,7 @@ sub new {
         body => '',
         bodyOnly => 0,
         comment => undef,
+        components => [],
         encoding => 'utf-8',
         head => '',
         load => [],
@@ -205,49 +214,36 @@ sub html {
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($body,$bodyOnly,$comment,$encoding,$head,$loadA,$noNewline,
-        $placeholders,$title,$javaScript,$javaScriptToHead,$readyA,
-        $styleSheet,$topIndentation) =
-        $self->get(qw/body bodyOnly comment encoding head load noNewline
-        placeholders title javaScript javaScriptToHead ready
+    my ($body,$bodyOnly,$comment,$componentA,,$encoding,$head,$loadA,
+        $noNewline,$placeholderA,$title,$jsA,$javaScriptToHead,$readyA,
+        $cssA,$topIndentation) =
+        $self->get(qw/body bodyOnly comment components encoding head load
+        noNewline placeholders title javaScript javaScriptToHead ready
         styleSheet topIndentation/);
 
-    # CSS- und JavaScript-Dateien laden (Test auf @$loadA wg. der
-    # neuen Klasse Quiq::Html::Construct - bei Feher $h auf
-    # Quiq::Html::Producer instantiieren)
+    my $b = Quiq::Html::Component::Bundle->new($componentA);
 
-    # my $loadTags = @$loadA? $h->loadFiles(@$loadA): '';
-    my $loadTags = $h->loadFiles(@$loadA);
+    # Resourcen (CSS- und JavaScript-Dateien) laden
+    my $loadTags = $h->loadFiles(@$loadA,$b->resources);
 
     # Stylesheet-Defininition(en)
-    my $styleTags = Quiq::Css->style($h,$styleSheet);
+    my $styleTags = Quiq::Css->style($h,@$cssA,$b->css);
 
     # ready-Handler
 
-    #my $readyHandlers = '';
-    #for (@$readyA) {
-    #    $readyHandlers .= Quiq::JQuery::Function->ready($_)."\n";
-    #}
-    #if ($readyHandlers) {
-    #    push @$javaScript,$readyHandlers;
-    #}
-
-    for (@$readyA) {
-        push @$javaScript,Quiq::JQuery::Function->ready($_);
+    for ($b->ready,@$readyA) {
+        push @$jsA,Quiq::JQuery::Function->ready($_);
     }
 
     # Script-Definition(en)
 
-    # my $scriptTags = Quiq::JavaScript->script($h,$javaScript);
-
     my $scriptTags;
-    for my $js (@$javaScript) {
+    for my $js ($b->js,@$jsA) {
         $scriptTags .= Quiq::JavaScript->script($h,$js);
     }
 
     # Wenn $body keinen body-Tag enthält, fügen wir ihn hinzu.
 
-    # $body = $h->cat($body);
     if ($body !~ /^<body/i) {
         $body = $h->tag('body',
             -ind => $topIndentation,
@@ -283,12 +279,12 @@ sub html {
         ),
     );
 
-    if (@$placeholders) {
-        # Platzhalter ersetzen
+    # Platzhalter ersetzen
 
+    my @placeholders = (@$placeholderA,$b->htmlPlaceholders);
+    if (@placeholders) {
         my $tpl = Quiq::Template->new('text',\$html);
-        $tpl->replace(@$placeholders);
-        $html = $tpl->asString;
+        $html = $tpl->replace(@placeholders)->asString;
     }
 
     if ($noNewline) {
@@ -302,7 +298,7 @@ sub html {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

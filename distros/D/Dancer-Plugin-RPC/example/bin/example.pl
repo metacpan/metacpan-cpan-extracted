@@ -4,8 +4,8 @@ use strict;
 use Cwd qw(abs_path);
 use Daemon::Control;
 
-my $PORT = 3000;
-my $APP = 'example';
+my $PORT = $ENV{APP_PORT} // 3000;
+my $APP  = $ENV{APP_NAME} // 'example';
 my $APP_DIR = abs_path('..') . "/$APP";
 
 # Fake the `carton exec -- ...` effect

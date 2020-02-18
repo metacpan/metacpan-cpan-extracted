@@ -1,3 +1,7 @@
+1.011 2020-02-18
+  - Avoid 'duplicate keys' bug.
+  - Add deprecation notice.
+
 1.003 2017-06-10
   - Enable more tests.
 

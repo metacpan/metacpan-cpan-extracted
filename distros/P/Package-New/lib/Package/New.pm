@@ -2,7 +2,7 @@ package Package::New;
 use strict;
 use warnings;
 
-our $VERSION='0.08';
+our $VERSION='0.09';
 
 =head1 NAME
 
@@ -63,9 +63,9 @@ I recommend Lazy Loading where you can.
 =cut
 
 sub new {
-  my $this=shift;
-  my $class=ref($this) || $this;
-  my $self={};
+  my $this  = shift;
+  my $class = ref($this) ? ref($this) : $this;
+  my $self  = {};
   bless $self, $class;
   $self->initialize(@_);
   return $self;

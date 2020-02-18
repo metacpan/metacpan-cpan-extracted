@@ -3,7 +3,7 @@ NAME
     get_entries()
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Calendar::DatesRoles::ReturnDateTimeObjects (from Perl distribution
     Calendar-DatesRoles-ReturnDateTimeObjects), released on 2020-02-17.
 
@@ -51,7 +51,7 @@ BUGS
 SEE ALSO
     Calendar::Dates
 
-    Calendar::DatesRolse::ReturnTimeMomentObjects
+    Calendar::DatesRoles::ReturnTimeMomentObjects
 
 AUTHOR
     perlancar <perlancar@cpan.org>

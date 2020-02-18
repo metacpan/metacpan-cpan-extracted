@@ -1,0 +1,7 @@
+                           QUERY PLAN                            
+-----------------------------------------------------------------
+ HashAggregate  (cost=18.82..18.86 rows=4 width=9)
+   Group Key: relkind
+   ->  Seq Scan on pg_class  (cost=0.00..16.88 rows=388 width=1)
+(3 rows)
+

@@ -40,7 +40,7 @@ my %module = (
     'LICENSE'=> 'perl',
 
     PL_FILES            => {},
-    BUILD_REQUIRES => {
+    CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => '5.52_01',
         'File::ShareDir::Install' => 0,
     },

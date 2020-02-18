@@ -2,17 +2,18 @@ NAME
     Path::Naive - Yet another abstract, Unix-like path manipulation routines
 
 VERSION
-    This document describes version 0.042 of Path::Naive (from Perl
-    distribution Path-Naive), released on 2020-02-07.
+    This document describes version 0.043 of Path::Naive (from Perl
+    distribution Path-Naive), released on 2020-02-12.
 
 SYNOPSIS
      use Path::Naive qw(
          abs_path
          concat_path
          concat_and_normalize_path
-         normalize_path
          is_abs_path
          is_rel_path
+         normalize_path
+         rel_path
          split_path
     );
 
@@ -22,6 +23,8 @@ SYNOPSIS
      @dirs = split_path("a");             # -> ("a")
      @dirs = split_path("/a");            # -> ("a")
      @dirs = split_path("/a/");           # -> ("a")
+     @dirs = split_path("/a/b/c");        # -> ("a", "b", "c")
+     @dirs = split_path("/a//b////c//");  # -> ("a", "b", "c")
      @dirs = split_path("../a");          # -> ("..", "a")
      @dirs = split_path("./a");           # -> (".", "a")
      @dirs = split_path("../../a");       # -> ("..", "..", "a")
@@ -79,6 +82,12 @@ SYNOPSIS
      $p = abs_path("a/c/..", "/b/");       # -> "/b/a"
      $p = abs_path("/a", "/b/c");          # -> "/a"
 
+     # rel_path($path, $base) makes $path relative. the opposite of abs_path().
+     $p = rel_path("a", "/b");             # dies, $path is not absolute
+     $p = rel_path("/a", "b");             # dies, $base is not absolute
+     $p = rel_path("/a", "/b");            # -> "../a"
+     $p = rel_path("/b/c/e", "/b/d/f");    # -> "../../c/e"
+
 DESCRIPTION
     This is yet another set of routines to manipulate abstract Unix-like
     paths. Abstract means not tied to actual filesystem. Unix-like means
@@ -92,12 +101,14 @@ DESCRIPTION
     where these routines are used: Config::Tree, Riap (App::riap).
 
 FUNCTIONS
-  abs_path($path) => str
+  abs_path($path, $base) => str
   concat_and_normalize_path($path1, $path2, ...) => str
   concat_path($path1, $path2, ...) => str
   is_abs_path($path) => bool
   is_rel_path($path) => bool
+  normalize_and_split_path($path) => list
   normalize_path($path) => str
+  rel_path($path, $base) => str
   split_path($path) => list
 HOMEPAGE
     Please visit the project's homepage at

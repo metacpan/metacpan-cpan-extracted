@@ -12,7 +12,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter::Git]      ; all that is needed to start
-      revision = 3         ; always defaults to revision 3
+      revision = 4         ; always defaults to revision 3
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -115,6 +115,10 @@ REVISIONS
 
     * Includes the following additional plugins: [Git::Check],
       [Git::Commit], [Git::Tag], [Git::Push].
+
+  Revision 4
+    Revision 4 has no specific differences beyond the changes in Revision 4
+    in [@Starter].
 
 BUGS
     Report any issues on the public bugtracker.

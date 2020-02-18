@@ -1,9 +1,17 @@
 Revision history for Date-Holidays-GB
 
+0.016  2020-02-18 11:07:38 GMT
+
+ [Maintenance]
+ - updating cpanfile for missing dependencies and for test failures
+
+ [Bugfix]
+ - calculate next_holiday() based only on current Europe/London timezone
+
 0.015  2020-02-17 14:08:56 GMT
 
  [Maintenance]
- - correct module abstract 
+ - correct module abstract
 
 0.014  2020-02-17 10:40:36 GMT
 

@@ -1,3 +1,10 @@
-0.001   2019-01-15 (PERLANCAR)
+0.002   2020-02-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Update release note style in Changes.
+
+
+0.001   2019-01-15  Released-By: PERLANCAR
 
         - First release.

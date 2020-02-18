@@ -32,6 +32,7 @@ t/22overload.t
 t/24mm.t
 t/25abstract.t
 t/26accumulate.t
+t/27rolehooks.t
 t/31lexhas.t
 t/40loading.t
 t/41ps.t

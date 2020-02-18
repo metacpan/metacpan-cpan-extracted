@@ -3,7 +3,7 @@ package Calendar::DatesRoles::ReturnDateTimeObjects;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-02-17'; # DATE
 our $DIST = 'Calendar-DatesRoles-ReturnDateTimeObjects'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Calendar::DatesRoles::ReturnDateTimeObjects - Return DateTime objects in get_ent
 
 =head1 VERSION
 
-This document describes version 0.001 of Calendar::DatesRoles::ReturnDateTimeObjects (from Perl distribution Calendar-DatesRoles-ReturnDateTimeObjects), released on 2020-02-17.
+This document describes version 0.002 of Calendar::DatesRoles::ReturnDateTimeObjects (from Perl distribution Calendar-DatesRoles-ReturnDateTimeObjects), released on 2020-02-17.
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ feature.
 
 L<Calendar::Dates>
 
-L<Calendar::DatesRolse::ReturnTimeMomentObjects>
+L<Calendar::DatesRoles::ReturnTimeMomentObjects>
 
 =head1 AUTHOR
 

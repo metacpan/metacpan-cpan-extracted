@@ -1,0 +1,13 @@
+Changes
+lib/Mxpress/PDF/Mechanize.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-mechanized.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+test.pdf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

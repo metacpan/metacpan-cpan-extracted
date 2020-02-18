@@ -61,3 +61,8 @@ Revision history for Perl extension Date::Holidays::CZ
 0.19 2020-02-17 12:21 CET
 - Fixed pod error as reported by CPANTS
 
+0.20 2020-02-17 17:53 CET
+- CZ.pm/POD: change "feiertage" to "svatky" in variable name
+- CZ.pm: make "van1" example look better
+- example/svatky.plx: fix "Use of uninitialized value in printf"
+

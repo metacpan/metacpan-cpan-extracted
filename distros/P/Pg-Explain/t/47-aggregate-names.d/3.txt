@@ -1,0 +1,9 @@
+                              QUERY PLAN                               
+-----------------------------------------------------------------------
+ GroupAggregate  (cost=33.56..40.39 rows=4 width=9)
+   Group Key: pg_class.relkind
+   ->  Sort  (cost=33.56..34.53 rows=388 width=1)
+         Sort Key: pg_class.relkind
+         ->  Seq Scan on pg_class  (cost=0.00..16.88 rows=388 width=1)
+(5 rows)
+

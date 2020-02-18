@@ -8,7 +8,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = 'mosmix_weathercode';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $as_emoji = "\x{fe0f}";
 

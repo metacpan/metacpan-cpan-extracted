@@ -1,12 +1,12 @@
 ---
-abstract: 'Create, Read, Update, Delete files on GitHub'
+abstract: 'Create, Read, Update, Delete files, issues, web hooks and commits on GitHub.'
 author:
   - philiprbrenan@gmail.com
 build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,20 +15,18 @@ name: GitHub-Crud
 provides:
   GitHub::Crud:
     file: lib/GitHub/Crud.pm
-    version: '20180616'
-  GitHub::Crud::Response:
-    file: lib/GitHub/Crud.pm
-  GitHub::Crud::Response::Data:
-    file: lib/GitHub/Crud.pm
+    version: '20200218'
 requires:
   Carp: '0'
   Data::Dump: '0'
-  Data::Table::Text: '20180616'
+  Data::Table::Text: '20200202'
   Digest::SHA1: '0'
   Storable: '0'
   Test2::API: '0'
   Test::More: '0'
   Time::HiRes: '0'
+  perl: v5.26.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180616'
+version: '20200218'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

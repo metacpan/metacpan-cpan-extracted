@@ -1,0 +1,55 @@
+{
+   "abstract" : "AnyEvent websocket server integration with Kelp",
+   "author" : [
+      "Bartosz Jarzyna <brtastic.dev@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Kelp-Module-WebSocket-AnyEvent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Kelp" : "1",
+            "Kelp::Module::Symbiosis" : "1",
+            "Plack::App::WebSocket" : "0.08",
+            "Try::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::WebSocket::Client" : "0",
+            "HTTP::Message" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::TCP" : "0",
+            "Twiggy::Server" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

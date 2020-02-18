@@ -3,7 +3,7 @@ package Calendar::DatesRoles::ReturnTimeMomentObjects;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-02-17'; # DATE
 our $DIST = 'Calendar-DatesRoles-ReturnTimeMomentObjects'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Calendar::DatesRoles::ReturnTimeMomentObjects - Return Time::Moment objects in g
 
 =head1 VERSION
 
-This document describes version 0.001 of Calendar::DatesRoles::ReturnTimeMomentObjects (from Perl distribution Calendar-DatesRoles-ReturnTimeMomentObjects), released on 2020-02-17.
+This document describes version 0.002 of Calendar::DatesRoles::ReturnTimeMomentObjects (from Perl distribution Calendar-DatesRoles-ReturnTimeMomentObjects), released on 2020-02-17.
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ feature.
 
 L<Calendar::Dates>
 
-L<Calendar::DatesRolse::ReturnDateTimeObjects>
+L<Calendar::DatesRoles::ReturnDateTimeObjects>
 
 =head1 AUTHOR
 

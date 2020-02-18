@@ -1,5 +1,6 @@
 #! perl -w
 use strict;
+use lib 't/lib';
 
 use Test::More;
 use Test::NoWarnings ();
@@ -63,6 +64,21 @@ use Dancer::RPCPlugin::ErrorResponse;
             }
         },
         "->as_jsonrpc_error()"
+    );
+}
+
+{
+    use SOMERPC;
+    my $err = error_response(
+        error_code => -32601,
+        error_message => 'Custom error with 403',
+    );
+    isa_ok($err, 'Dancer::RPCPlugin::ErrorResponse');
+    is($err->return_status('somerpc'), 403, "HTTPReturnCode 403");
+    is_deeply(
+        $err->as_somerpc_fault,
+        { error_message => $err->error_message },
+        "->as_somerpc_fault"
     );
 }
 

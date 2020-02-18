@@ -1,3 +1,5 @@
+0.039 2020-02-17 22:00:00+0000  
+  - Support using Orca server to export images
 0.038 2020-02-15 19:00:00+0000  
   - Update to plotly.js v1.52.2
   - TO_JSON returns a structure, for text use to_json_text

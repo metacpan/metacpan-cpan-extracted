@@ -2,7 +2,7 @@ NAME
     IMDB::TitlePage::Extract - Extract information from an IMDB title page
 
 VERSION
-    This document describes version 0.004 of IMDB::TitlePage::Extract (from
+    This document describes version 0.005 of IMDB::TitlePage::Extract (from
     Perl distribution IMDB-TitlePage-Extract), released on 2020-02-17.
 
 FUNCTIONS

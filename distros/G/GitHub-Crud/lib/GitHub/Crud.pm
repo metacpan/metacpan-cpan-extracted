@@ -1,55 +1,28 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib
 #-------------------------------------------------------------------------------
-# Create, Read, Update, Delete files on GitHub
+# Create, Read, Update, Delete files, issues, web hooks and commits on GitHub.
+# Per: https://developer.github.com/v3/
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
 #podDocumentation
-
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20180616';
+our $VERSION = 20200218;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
 use Data::Dump qw(dump);
-use Data::Table::Text qw(appendFile binModeAllUtf8 dateTimeStamp decodeBase64 decodeJson encodeBase64 encodeJson filePath filePathDir filePathExt genLValueScalarMethods makePath readFile temporaryFile writeFile xxx);
+use Data::Table::Text qw(:all !fileList);
 use Digest::SHA1 qw(sha1_hex);
-use Storable qw(store retrieve);
 use Time::HiRes qw(time);
-use utf8;
 
 sub url          { "https://api.github.com/repos" }                             # Github api url
-sub accessFolder { q(/etc/GitHubCrudPersonalAccessToken) };                     # Personal access tokens are stored in a file in this folder with the name of the userid of the GitHub repository
+sub accessFolder { q(/etc/GitHubCrudPersonalAccessToken) };                     # Personal access tokens are stored in a file in this folder with the name of the userid of the L<GitHub> repository
 
-my %shas;                                                                       # SHAs seen - used to optimize write and delete
+my %shas;                                                                       # L<SHA> digests already seen - used to optimize write and delete
 
-#1 Attributes                                                                   # Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
-
-genLValueScalarMethods(qw(body));                                               # The body of an issue
-genLValueScalarMethods(qw(branch));                                             # Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
-genLValueScalarMethods(qw(failed));                                             # Defined if the last request to Github failed else B<undef>.
-genLValueScalarMethods(qw(fileList));                                           # Reference to an array of files produced by L<list|/list>
-genLValueScalarMethods(qw(gitFile));                                            # File name on GitHub - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted
-genLValueScalarMethods(qw(gitFolder));                                          # Folder name on GitHub - this name can contain '/'
-genLValueScalarMethods(qw(logFile));                                            # The name of a local file  to which to write error messages if any errors occur.
-genLValueScalarMethods(qw(message));                                            # Optional commit message
-genLValueScalarMethods(qw(nonRecursive));                                       # Do a non recursive L<list|/list> - the default is to list all the sub folders found in a folder  but this takes too much time if you are only interested in the files in the start folder
-genLValueScalarMethods(qw(personalAccessToken));                                # A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
-genLValueScalarMethods(qw(personalAccessTokenFolder));                          # The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
-genLValueScalarMethods(qw(readData));                                           # Data produced by L<read|/read>
-genLValueScalarMethods(qw(repository));                                         # The name of your repository minus the userid - you should create this repository first manually.
-genLValueScalarMethods(qw(response));                                           # A reference to GitHub's response to the latest request
-genLValueScalarMethods(qw(secret));                                             # The secret for a web hook - this is created by the creator of the web hook and remembered by GitHuib
-genLValueScalarMethods(qw(title));                                              # The title of an issue
-genLValueScalarMethods(qw(webHookUrl));                                         # The url for a web hook
-genLValueScalarMethods(qw(utf8));                                               # Send the data as utf8 - do not use this for binary files containing images or audio, just for files containing text
-genLValueScalarMethods(qw(userid));                                             # Your userid on GitHub
-genLValueScalarMethods(qw(writeData));                                          # Data to be written by L<write|/write>
-
-# Supporting packages
-
-sub GitHub::Crud::Response::new($$)                                             # Execute a request against GitHub and decode the response
- {my ($gitHub, $request) = @_;
+sub GitHub::Crud::Response::new($$)                                             #P Execute a request against L<GitHub> and decode the response
+ {my ($gitHub, $request) = @_;                                                  # Github, request string
 
   my $R = bless {command=>$request}, "GitHub::Crud::Response";                  # Construct the response
 
@@ -77,7 +50,7 @@ sub GitHub::Crud::Response::new($$)                                             
           if ($R->can($name))
            {$R->$name = $content;
            }
-          else {$can{$name}++}                                                  # Write list of new methods required
+          else {$can{$name}++}                                                  # Update list of new methods required
          }
        }
       else
@@ -98,91 +71,83 @@ sub GitHub::Crud::Response::new($$)                                             
        }
      }
 
+    ($R->status) = split / /, $R->Status;                                       # Save response status
+
     return $gitHub->response = $R;                                              # Return successful response
    }
   else
-   {confess "Unexpected response from GitHub:\n$r\n$request\n";                   # Confess to failure
+   {confess "Unexpected response from GitHub:\n$r\n$request\n";                 # Confess to failure
    }
  }
 
-if (1)
- {package GitHub::Crud::Response;
+genHash(q(GitHub::Crud::Response),                                              # Attributes describing a response from L<GitHub>.
+  Accept_Ranges                           => undef,
+  Access_Control_Allow_Origin             => undef,
+  Access_Control_Expose_Headers           => undef,
+  Cache_Control                           => undef,
+  Connection                              => undef,
+  Content_Length                          => undef,
+  content                                 => undef,                             # The actual content of the file from L<GitHub>.
+  Content_Security_Policy                 => undef,
+  Content_Type                            => undef,
+  data                                    => undef,                             # The data received from L<GitHub>, normally in L<json> format.
+  Date                                    => undef,
+  ETag                                    => undef,
+  Expires                                 => undef,
+  Last_Modified                           => undef,
+  Location                                => undef,
+  Referrer_Policy                         => undef,
+  Server                                  => undef,
+  Source_Age                              => undef,
+  status                                  => undef,                             # Our version of Status.
+  Status                                  => undef,
+  Strict_Transport_Security               => undef,
+  Vary                                    => undef,
+  Via                                     => undef,
+  X_Accepted_OAuth_Scopes                 => undef,
+  X_Cache                                 => undef,
+  X_Cache_Hits                            => undef,
+  X_Content_Type                          => undef,
+  X_Content_Type_Options                  => undef,
+  X_Fastly_Request_ID                     => undef,
+  X_Frame_Options                         => undef,
+  X_Geo_Block_List                        => undef,
+  X_GitHub_Media_Type                     => undef,
+  X_GitHub_Request_Id                     => undef,
+  X_OAuth_Scopes                          => undef,
+  X_RateLimit_Limit                       => undef,
+  X_RateLimit_Remaining                   => undef,
+  X_RateLimit_Reset                       => undef,
+  X_Runtime_rack                          => undef,
+  X_Served_By                             => undef,
+  X_Timer                                 => undef,
+  X_XSS_Protection                        => undef,
+ );
 
-  Data::Table::Text::genLValueScalarMethods(
-qw(Accept_Ranges),
-qw(Access_Control_Allow_Origin),
-qw(Access_Control_Expose_Headers),
-qw(Cache_Control),
-qw(Connection),
-qw(Content_Length),
-qw(content),                                                                    # Output: the actual content of the file from GitHub
-qw(Content_Security_Policy),
-qw(Content_Type),
-qw(data),                                                                       # Output: the data received from GitHub, normally in json format
-qw(Date),
-qw(ETag),
-qw(Expires),
-qw(Last_Modified),
-qw(Location),
-qw(Referrer_Policy),
-qw(Server),
-qw(Source_Age),
-qw(Status),
-qw(Strict_Transport_Security),
-qw(Vary),
-qw(Via),
-qw(X_Accepted_OAuth_Scopes),
-qw(X_Cache),
-qw(X_Cache_Hits),
-qw(X_Content_Type),
-qw(X_Content_Type_Options),
-qw(X_Fastly_Request_ID),
-qw(X_Frame_Options),
-qw(X_Geo_Block_List),
-qw(X_GitHub_Media_Type),
-qw(X_GitHub_Request_Id),
-qw(X_OAuth_Scopes),
-qw(X_RateLimit_Limit),
-qw(X_RateLimit_Remaining),
-qw(X_RateLimit_Reset),
-qw(X_Runtime_rack),
-qw(X_Served_By),
-qw(X_Timer),
-qw(X_XSS_Protection),
-  );
- }
+genHash(q(GitHub::Crud::Response::Data),                                        # Response L<JSON> from GitHubExecute a request against L<GitHub> and decode the response
+  command                                 => undef,
+  content                                 => undef,
+  documentation_url                       => undef,
+  download_url                            => undef,
+  encoding                                => undef,
+  git                                     => undef,
+  git_url                                 => undef,
+  html                                    => undef,
+  html_url                                => undef,
+  _links                                  => undef,
+  message                                 => undef,
+  name                                    => undef,
+  path                                    => undef,
+  self                                    => undef,
+  sha                                     => undef,
+  size                                    => undef,
+  type                                    => undef,
+  url                                     => undef,
+ );
 
-if (1)
- {package GitHub::Crud::Response::Data;                                         # Response JSON from GitHubExecute a request against GitHub and decode the response
+sub getSha($)                                                                   #P Compute L<sha> for data after encoding any unicode characters as utf8
+ {my ($data) = @_;                                                              # String possibly containing non ascii code points
 
-  Data::Table::Text::genLValueScalarMethods(
-qw(command),                                                                    # Command used to construct this response
-qw(content),
-qw(documentation_url),
-qw(download_url),
-qw(encoding),
-qw(git),
-qw(git_url),
-qw(html),
-qw(html_url),
-qw(_links),
-qw(message),
-qw(name),
-qw(path),
-qw(self),
-qw(sha),
-qw(size),
-qw(type),
-qw(url),
-  );
- }
-
-#-------------------------------------------------------------------------------
-# Compute sha for data after encoding any unicode characters as utf8
-#-------------------------------------------------------------------------------
-
-sub getSha($)
- {my ($data) = @_;
   my $length = length($data);
   my $blob   = 'blob' . " $length\0" . $data;
   utf8::encode($blob);
@@ -191,127 +156,123 @@ sub getSha($)
   $r
  }
 
-if (0)
+if (0)                                                                          # Test L<sha>
  {my $sha = getSha("<h1>Hello World</h1>\n");
   my $Sha = "f3e333e80d224c631f2ff51b9b9f7189ad349c15";
   unless($sha eq $Sha)
    {confess "Wrong SHA: $sha".
             "Should be: $Sha";
    }
+  confess "getSha success";
  }
 
-sub shaKey($;$)                                                                 # Key to use to save/get the SHA
- {my ($gitHub, $fileData) = @_;                                                 # Github, optional fileData to specify the file incolved if not gitFile
+sub shaKey($;$)                                                                 #P Add a L<SHA> key to a L<url>
+ {my ($gitHub, $fileData) = @_;                                                 # Github, optional fileData to specify the file to use if it is not gitFile
   filePath($gitHub->repository,
    $fileData ? ($fileData->path, $fileData->name) : $gitHub->gitFile)
  }
 
-sub saveSha($$)                                                                 # Save the sha of a file
+sub saveSha($$)                                                                 #P Save the L<sha> of a file
  {my ($gitHub, $fileData) = @_;                                                 # Github, file details returned by list or exists
   $shas{$gitHub->shaKey($fileData)} = $fileData->sha;
  }
 
-sub copySha($)                                                                  # Save the sha of a file  just read to a file just about to be written
+sub copySha($)                                                                  #P Save the L<sha> of a file  just read to a file just about to be written
  {my ($gitHub) = @_;                                                            # Github
   $shas{$gitHub->shaKey}  = $gitHub->response->data->sha;
  }
 
-sub getExistingSha($)                                                           # Get the sha of a file that already exists
+sub getExistingSha($)                                                           #P Get the L<sha> of a file that already exists
  {my ($gitHub) = @_;                                                            # Github
-  my $s = $shas{$gitHub->shaKey};                                               # Get the sha from the saved SHAs if possible
-  return $s if defined $s;                                                      # A special SHA of 0 means the file was deleted
-  my $r = $gitHub->exists;                                                      # Get the sha of the file via exists if the file exists
-  return $r->sha if $r;                                                         # Sha of existing file
+  my $s = $shas{$gitHub->shaKey};                                               # Get the L<sha> from the cache
+  return $s if defined $s;                                                      # A special L<sha> of 0 means the file was deleted
+  my $r = $gitHub->exists;                                                      # Get the L<sha> of the file via exists if the file exists
+  return $r->sha if $r;                                                         # L<sha> of existing file
   undef                                                                         # Undef if no such file
  }
 
-sub deleteSha($)                                                                # Delete a SHA that is no longer valid
+sub deleteSha($)                                                                #P Delete a L<sha> that is no longer valid
  {my ($gitHub) = @_;                                                            # Github
-  $shas{$gitHub->shaKey} = undef                                                # Mark the SHA as deleted
+  $shas{$gitHub->shaKey} = undef                                                # Mark the L<sha> as deleted
  }
 
-sub qm($)                                                                       # Quotemeta extended to include undef
+sub qm($)                                                                       #P Quotemeta extended to include undef
  {my ($s) = @_;                                                                 # String to quote
   return '' unless $s;
   $s =~ s((\'|\"|\\)) (\\$1)gs;
   $s =~ s(\s) (%20)gsr;                                                         # Url encode blanks
  }
 
-#-------------------------------------------------------------------------------
-# Personal access token string
-#-------------------------------------------------------------------------------
+sub patKey($)                                                                   #P Create an authorization header by locating an appropriate personal access token
+ {my ($gitHub) = @_;                                                            # GitHub
 
-sub patRequired                                                                 ## Complain about the access token
- {confess "Personal access token required with scope \"public_repo\"".
+  $gitHub->loadPersonalAccessToken unless $gitHub->personalAccessToken;         # Load a personal access token if none has been supplied
+
+  if (my $pat = $gitHub->personalAccessToken)                                   # User supplied personal access token explicitly
+   {return "-H \"Authorization: token $pat\""
+   }
+
+  confess "Personal access token required with scope \"public_repo\"".          # We must have a personal access token to do anything useful!
           " as generated on page:\nhttps://github.com/settings/tokens";
  }
 
-sub patKey($$)
- {my ($gitHub, $required) = @_;                                                 ## GitHub, whether the personal access key is required
-  my $pat      = $gitHub->personalAccessToken;
-  if (!$pat)
-   {return '' unless $required;
-    patRequired;
-   }
-  "-H \"Authorization: token $pat\""
- }
-
-#-------------------------------------------------------------------------------
-# Ref or branch - usage appears to be inconsistent
-#-------------------------------------------------------------------------------
-
-sub refOrBranch($$)
- {my ($gitHub, $ref) = @_;                                                      ## Github, whether to use ref rather than branch
+sub refOrBranch($$)                                                             #P Add a ref or branch keyword
+ {my ($gitHub, $ref) = @_;                                                      # Github, whether to use ref rather than branch
   my $b = $gitHub->branch;
   return "?ref=$b"    if  $ref and $b;
   return "?branch=$b" if !$ref and $b;
   ''
  }
 
-#-------------------------------------------------------------------------------
-# Log an error message
-#-------------------------------------------------------------------------------
+sub gitHub(%)                                                                   #P Create a test L<GitHub> object
+ {my (%options) = @_;                                                           # Options
+  my $g             = GitHub::Crud::new(@_);
+     $g->userid     = q(philiprbrenan);
+     $g->repository = q(aaa);
 
-sub lll($$)
- {my ($gitHub, $op) = @_;
-  return unless $gitHub->failed;                                                # No error so no need to write a message
-  return unless my $log = $gitHub->logFile;                                     # Cannot log unless the caller supplied a log file
-  appendFile($log, "GitHub::Crud::$op failed:\n".dump($gitHub));
- }
-
-#-------------------------------------------------------------------------------
-# Create a test GitHub object
-#-------------------------------------------------------------------------------
-
-sub gitHub
- {my $g = GitHub::Crud::new();
-  my $credentials = 'personalAccessToken.data';                                 # This file is not shipped with the distribution as it contains user specific data
-
-  my ($pat, $testUserid, $testRepository, $testUrl, $testSecret) = sub          # A sample access token that is not included in the distribution
-   {return (undef) x 5 unless -e $credentials;
-    split /\n/, readFile($credentials);
-   }->();
-
-  $g->userid     = $testUserid;
-  $g->repository = $testRepository;
-  $g->personalAccessToken = $pat;
-  $g->webHookUrl = $testUrl;
-  $g->secret     = $testSecret;
   $g
  }
 
-#1 Methods available
+#D1 Constructor                                                                 # Create a L<github> object with the specified attributes describing the interface with L<github>.
 
-sub new                                                                         # Create a new GitHub object.
- {my $curl = qx(curl -V);                                                       # Check Curl
+sub new(@)                                                                      # Create a new L<GitHub> object with attributes as describe at: L<GitHub::Crud Definition>.
+ {my (%attributes) = @_;                                                        # Attribute values
+
+  my $curl = qx(curl -V);                                                       # Check Curl
   if ($curl =~ /command not found/)
    {confess "Command curl not found"
    }
-  return bless {personalAccessTokenFolder=>accessFolder}
+
+  my $g = genHash(__PACKAGE__,                                                  # Attributes describing the interface with L<github>.
+    body                         => undef,                                      #I The body of an issue.
+    branch                       => undef,                                      #I Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'.
+    failed                       => undef,                                      #  Defined if the last request to L<GitHub> failed else B<undef>.
+    fileList                     => undef,                                      #  Reference to an array of files produced by L<list|/list>.
+    gitFile                      => undef,                                      #I File name on L<GitHub> - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted.
+    gitFolder                    => undef,                                      #I Folder name on L<GitHub> - this name can contain '/'.
+    message                      => undef,                                      #I Optional commit message
+    nonRecursive                 => undef,                                      #I Fetch only one level of files with L<list>.
+    personalAccessToken          => undef,                                      #  A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens.
+    personalAccessTokenFolder    => accessFolder,                               #I The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
+    readData                     => undef,                                      #  Data produced by L<read|/read>.
+    repository                   => undef,                                      #I The name of the repository to be worked on minus the userid - you should create this repository first manually.
+    response                     => undef,                                      #  A reference to L<GitHub>'s response to the latest request.
+    secret                       => undef,                                      #I The secret for a web hook - this is created by the creator of the web hook and remembered by L<GitHub>,
+    title                        => undef,                                      #I The title of an issue.
+    webHookUrl                   => undef,                                      #I The url for a web hook.
+    utf8                         => undef,                                      #I Send the data as utf8 if true - do not use this for binary files containing images or audio, just for files containing text.
+    userid                       => undef,                                      #I Userid on L<GitHub> of the repository to be worked on.
+   );
+
+  $g->$_ = $attributes{$_} for sort keys %attributes;
+
+  $g
  }
 
-sub list($)                                                                     # List all the files contained in a GitHub repository or all the files below a specified folder in the repository.\mRequired parameters: L<userid|/userid>, L<repository|/repository>.\mOptional parameters: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<nonRecursive|/nonRecursive>, L<patKey|/patKey>.\mUse the L<gitFolder|/gitFolder> parameter to specify the folder to start the list from, by default, the listing will start at the root folder of your repository.\mUse the L<nonRecursive|/nonRecursive> option if you require only the files in the start folder as otherwise all the folders in the start folder will be listed as well which might take some time.\mIf the list operation is successful, L<failed|/failed> is set to false and L<fileList|/fileList> is set to refer to an array of the file names found.\mIf the list operation fails then L<failed|/failed> is set to true and L<fileList|/fileList> is set to refer to an empty array.\mReturns the list of file names found or empty list if no files were found.
- {my ($gitHub) = @_;                                                            # GitHub object
+#D1 Methods                                                                     # Actions on L<GitHub>.
+
+sub list($)                                                                     # List all the files contained in a L<GitHub> repository or all the files below a specified folder in the repository.\mRequired attributes: L<userid|/userid>, L<repository|/repository>.\mOptional attributes: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<nonRecursive|/nonRecursive>, L<patKey|/patKey>.\mUse the L<gitFolder|/gitFolder> parameter to specify the folder to start the list from, by default, the listing will start at the root folder of your repository.\mUse the L<nonRecursive|/nonRecursive> option if you require only the files in the start folder as otherwise all the folders in the start folder will be listed as well which might take some time.\mIf the list operation is successful, L<failed|/failed> is set to false and L<fileList|/fileList> is set to refer to an array of the file names found.\mIf the list operation fails then L<failed|/failed> is set to true and L<fileList|/fileList> is set to refer to an empty array.\mReturns the list of file names found or empty list if no files were found.
+ {my ($gitHub) = @_;                                                            # GitHub
   my $r = sub                                                                   # Get contents
    {my $user = qm $gitHub->userid;     $user or confess "userid required";
     my $repo = qm $gitHub->repository; $repo or confess "repository required";
@@ -324,15 +285,14 @@ sub list($)                                                                     
     GitHub::Crud::Response::new($gitHub, $s);
    }->();
 
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  $gitHub->failed = $status != 200;
-  lll($gitHub, q(list));
+  $gitHub->failed = $r->status != 200;                                          # Check response code
+# lll($gitHub, q(list));
 
-  if ($gitHub->failed)                                                          # No file list supplied
+  if ($gitHub->failed)                                                          # Failed to retrieve a list of files
    {$gitHub->fileList = [];
    }
   else
-   {for(@{$r->data})                                                            # Objectify and save SHAs
+   {for(@{$r->data})                                                            # Objectify and save L<sha> digests from file descriptions retrieved by this call
      {bless $_, "GitHub::Crud::Response::Data";
       saveSha($gitHub, $_);
      }
@@ -353,25 +313,26 @@ sub list($)                                                                     
   @{$gitHub->fileList}
  }
 
-if (0 and !caller)
- {say STDERR "list:\n", join "\n", gitHub->list;
+if (0 and !caller)                                                              # Test list
+ {confess join "\n", "list:", gitHub->list, '';
  }
 
-sub read($;$)                                                                   # Read data from a file on GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> = the file to read.\mOptional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
- {my ($gitHub, $noLog) = @_;                                                    # GitHub object, whether to log errors or not
+sub read($)                                                                     # Read data from a file on L<GitHub>.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> = the file to read.\mOptional attributes: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.\mIf the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.\mIf the read operation fails then L<failed|/failed> is set to true and L<readData|/readData> is set to B<undef>.\mReturns the data read or B<undef> if no file was found.
+ {my ($gitHub) = @_;                                                            # GitHub
+
   my $user = qm  $gitHub->userid;     $user or confess "userid required";
   my $repo = qm  $gitHub->repository; $repo or confess "repository required";
   my $file = qm $gitHub->gitFile;     $file or confess "gitFile required";
   my $bran = qm $gitHub->refOrBranch(1);
   my $pat  = $gitHub->patKey(0);
+
   my $url  = url;
   my $s = filePath(qq(curl -si $pat $url),
                    $user, $repo, qq(contents), $file.$bran);
   my $r = GitHub::Crud::Response::new($gitHub, $s);                             # Get response from GitHub
 
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  $gitHub->failed = $status != 200;
-  lll($gitHub, q(read)) unless $noLog;
+  $gitHub->failed = $r->status != 200;                                          # Check response code
+# lll($gitHub, q(read)) unless $noLog;
 
   if ($gitHub->failed)                                                          # No file list supplied
    {$gitHub->readData = undef;
@@ -383,29 +344,30 @@ sub read($;$)                                                                   
   $gitHub->readData
  }
 
-if (0 and !caller)
+if (0 and !caller)                                                              # Test read
  {my $g = gitHub;
-  $g->gitFile = q(z'2  'z"z.data);
+  $g->gitFile = my $f = q(z'2  'z"z.data);
   $g->write("aaa");
-  say STDERR "Read aaa: ", dump($g->read);
-  exit;
+  confess $g->read eq q(aaa) ? "Read passed\n" : "read FAILED\n";
  }
 
-sub write($$)                                                                   # Write data into a GitHub file, creating the file if it is not already present.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
+sub write($$)                                                                   # Write data into a L<GitHub> file, creating the file if it is not already present.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
  {my ($gitHub, $data) = @_;                                                     # GitHub object, data to be written
   defined($data) or confess "data required";
+
   my $pat  = $gitHub->patKey(1);
   my $user = qm $gitHub->userid;     $user or confess "userid required";
   my $repo = qm $gitHub->repository; $repo or confess "repository required";
   my $file = qm $gitHub->gitFile;    $file or confess "gitFile required";
   my $bran = qm $gitHub->refOrBranch(0) || '?';
   my $mess = qm $gitHub->message;
-  my $url  = url;
-  my $s    = $gitHub->getExistingSha;                                           # Get the SHA of the file if the file exists
-  my $sha = $s ? ', "sha": "'. $s .'"' : '';                                    # Sha of existing file or blank string if no existing file
 
-  if ($s and my $S = getSha($data))                                             # Sha of new data
-   {if ($s eq $S)                                                               # Duplicate if the shas match
+  my $url  = url;
+  my $s    = $gitHub->getExistingSha;                                           # Get the L<sha> of the file if the file exists
+  my $sha = $s ? ', "sha": "'. $s .'"' : '';                                    # L<sha> of existing file or blank string if no existing file
+
+  if ($s and my $S = getSha($data))                                             # L<sha> of new data
+   {if ($s eq $S)                                                               # Duplicate if the L<sha>s match
      {$gitHub->failed = undef;
       return 1;
      }
@@ -416,32 +378,34 @@ sub write($$)                                                                   
    }
   my $denc = encodeBase64($data) =~ s/\n//gsr;
 
-  writeFile(my $tmpFile = temporaryFile(),                                      # Write encoded content to temporary file
-            qq({"message": "$mess", "content": "$denc" $sha}));
+  my $tmpFile = writeFile(undef,                                                # Write encoded content to temporary file
+          qq({"message": "$mess", "content": "$denc" $sha}));
   my $d = qq(-d @).$tmpFile;
   my $u = filePath($url, $user, $repo, qw(contents), $file.$bran);
   my $c = qq(curl -si -X PUT $pat $u $d);                                       # Curl command
   my $r = GitHub::Crud::Response::new($gitHub, $c);                             # Execute command to create response
   unlink $tmpFile;                                                              # Cleanup
 
-  my ($status) = split / /, $r->Status;                                         # Check response code
-
+  my $status = $r->status;                                                      # Check response code
   my $success = $status == 200 ? 'updated' : $status == 201 ? 'created' : undef;# Updated, created
   $gitHub->failed = $success ? undef : 1;
-  lll($gitHub, q(write));
+# lll($gitHub, q(write));
 
   $success                                                                      # Return true on success
  }
 
-if (0 and !caller)                                                              # The second write should be faster because its SHA is known from the read
+if (0 and !caller)                                                              # The second write should be faster because its L<sha> is known from the read
  {my $g = gitHub;
   $g->gitFile = "zzz.data";
-  my $d = "bbb";
+
+  my $d = dateTimeStamp;
+
   if (1)
    {my $t = time();
     $g->write($d);
     say STDERR "First write time: ", time() -  $t;
    }
+
   my $r = $g->read;
   say STDERR "Write bbb: $r";
   if (1)
@@ -449,38 +413,41 @@ if (0 and !caller)                                                              
     $g->write($d);
     say STDERR "Second write time: ", time() -  $t;
    }
+  confess $g->read eq $d ? "Write passed\n" : "write FAILED\n";
  }
 
-sub copy($$)                                                                    # Copy a source file from one location to another target location in your GitHub repository, overwriting the target file if it already exists.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be copied.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
+sub copy($$)                                                                    # Copy a source file from one location to another target location in your L<GitHub> repository, overwriting the target file if it already exists.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be copied.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mIf the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
  {my ($gitHub, $target) = @_;                                                   # GitHub object, the name of the file to be created
   defined($target) or confess "Specify the name of the file to be copied to";
   my $r = $gitHub->read;                                                        # Read the content of the source file
   if (defined $r)
    {my $file = $gitHub->gitFile;                                                # Save current source file
-    my $sha  = $gitHub->response->data->sha;                                    # SHA of last file read
+    my $sha  = $gitHub->response->data->sha;                                    # L<sha> of last file read
     $gitHub->gitFile = $target;                                                 # Set target file as current file
     my $R = $gitHub->write($r);                                                 # Write content to target file
-    $gitHub->copySha;                                                           # Copy the SHA from the file just read
+    $gitHub->copySha;                                                           # Copy the L<sha> from the file just read
     $gitHub->gitFile = $file;                                                   # Restore source file
     return $R;                                                                  # Return response from write
    }
   undef                                                                         # Failed
  }
 
-if (0 and !caller)
+if (0 and !caller)                                                              # Test copy
  {my ($f1, $f2) = ("zzz.data", "zzz2.data");
   my $g = gitHub;
   $g->gitFile   = $f2; $g->delete;
   $g->gitFile   = $f1;
-  my $w = $g->write("ccc");
+  my $d = dateTimeStamp;
+  my $w = $g->write($d);
   my $r = $g->copy($f2);
   say STDERR "Copy created: $r";
   $g->gitFile   = $f2;
-  my $d = $g->read;
-  say STDERR "Read     ccc: $d";
+  my $D = $g->read;
+  say STDERR "Read     ccc: $D";
+  confess $d eq $D ? "Copy passed\n" : "copy FAILED\n";
  }
 
-sub exists($)                                                                   # Test whether a file exists on GitHub or not and returns an object including the B<sha> and B<size> fields if it does else undef.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to test.\mOptional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
+sub exists($)                                                                   # Test whether a file exists on L<GitHub> or not and returns an object including the B<sha> and B<size> fields if it does else L<undef>.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to test.\mOptional attributes: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
  {my ($gitHub) = @_;                                                            # GitHub object
   my @file = split /\//, $gitHub->gitFile;
   confess "gitFile required to name the file to be checked" unless @file;
@@ -501,16 +468,17 @@ sub exists($)                                                                   
   undef
  }
 
-if (0 and !caller)
+if (0 and !caller)                                                              # Test exists
  {my $g = gitHub;
   $g->gitFile    = "test4.html";
-  $g->write('aaa');
-  say STDERR "Exists  AAAA: ", dump($g->exists);
+  my $d = dateTimeStamp;
+  $g->write($d);
+  confess "exists FAILED" unless $g->read eq $d;
   $g->delete;
-  say STDERR "Exists undef: ", dump($g->exists);
+  confess !$g->exists ? "Exists passed\n" : "exists FAILED\n";
  }
 
-sub rename($$)                                                                  # Rename a source file on GitHub if the target file name is not already in use.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be renamed.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mReturns the new name of the file B<renamed> if the rename was successful else B<undef> if the rename failed.
+sub rename($$)                                                                  # Rename a source file on L<GitHub> if the target file name is not already in use.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be renamed.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mReturns the new name of the file B<renamed> if the rename was successful else B<undef> if the rename failed.
  {my ($gitHub, $target) = @_;                                                   # GitHub object, the new name of the file
   my $file = $gitHub->gitFile;
   $gitHub->gitFile = $target;
@@ -526,23 +494,24 @@ sub rename($$)                                                                  
   undef
  }
 
-if (0 and !caller)
+if (0 and !caller)                                                              # Test rename
  {my ($f1, $f2) = qw(zzz.data zzz2.data);
   my $g = gitHub;
+     $g->gitFile = $f2; $g->delete;
 
-  $g->gitFile  = $f2;
-  $g->delete;
-  say STDERR "Exists undef: ", dump($g->exists);
-
+  my $d = dateTimeStamp;
   $g->gitFile  = $f1;
-  $g->write('aaa');
-  say STDERR "Exists     1: ", !!$g->exists;
+  $g->write($d);
+  confess "rename FAILED" unless $g->read eq $d;
 
   $g->rename($f2);
-  say STDERR "Exists undef: ", dump($g->exists);
+  confess "rename FAILED" if $g->exists;
+
+  $g->gitFile  = $f2;
+  confess $g->read eq $d ? "Rename passed\n" : "rename FAILED\n";
  }
 
-sub delete($)                                                                   # Delete a file from GitHub.\mRequired parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be deleted.\mOptional parameters: L<refOrBranch|/refOrBranch>.\mIf the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the delete was successful else false.
+sub delete($)                                                                   # Delete a file from L<GitHub>.\mRequired attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be deleted.\mOptional attributes: L<refOrBranch|/refOrBranch>.\mIf the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the delete was successful else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat  = $gitHub->patKey(1);
   my $user = qm $gitHub->userid;     $user or confess "userid required";
@@ -551,41 +520,173 @@ sub delete($)                                                                   
   my $bran = qm $gitHub->refOrBranch(0);
   my $url  = url;
 
-  my $s = $gitHub->getExistingSha;                                              # Sha of existing file or undef
+  my $s = $gitHub->getExistingSha;                                              # L<sha> of existing file or undef
   return 2 unless $s;                                                           # File already deleted
   my $sha = ' -d \'{"message": "", "sha": "'. $s .'"}\'';
   my $u = filePath($url, $user, $repo, qw(contents), $file.$bran.$sha);
   my $d = "curl -si -X DELETE $pat $u";
   my $r = GitHub::Crud::Response::new($gitHub, $d);
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  my $success = $status == 200;
-  $gitHub->deleteSha  if $success;                                              # The SHA is no longer valid
+  my $success = $r->status == 200;                                              # Check response code
+  $gitHub->deleteSha  if $success;                                              # The L<sha> is no longer valid
   $gitHub->failed = $success ? undef : 1;
-  lll($gitHub, q(delete));
+# lll($gitHub, q(delete));
   $success ? 1 : undef                                                          # Return true on success
  }
 
-if (0 and !caller)                                                              # The second delete should be faster because the fact that the file has been deleted is held in the SHA cache
+if (0 and !caller)                                                              # The second delete should be faster because the fact that the file has been deleted is held in the L<sha> cache
  {my $g = gitHub;
+  my $d = dateTimeStamp;
   $g->gitFile = "zzz.data";
-  $g->write('aaa');
-  say STDERR "Read   aaa: ", $g->read;
+  $g->write($d);
+  confess "delete FAILED" unless $g->read eq $d;
+
   if (1)
    {my $t = time();
     my $d = $g->delete;
     say STDERR "Delete   1: ", $d;
     say STDERR "First delete: ", time() -  $t;
+    confess "delete FAILED" if $g->exists;
    }
-  say STDERR "Read undef: ", dump($g->read);
+
   if (1)
    {my $t = time();
     my $d = $g->delete;
     say STDERR "Delete   1: ", $d;
     say STDERR "Second delete: ", time() -  $t;
+    confess "delete FAILED" if $g->exists;
    }
+  confess !$g->exists ? "Delete passed\n" : "delete FAILED\n";
  }
 
-sub listWebHooks($)                                                             # List web hooks.\mRequired: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. \mIf the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the list  operation was successful else false.
+sub listCommits($)                                                              # List all the commits in a L<GitHub> repository.\mRequired attributes: L<userid|/userid>, L<repository|/repository>.
+ {my ($gitHub) = @_;                                                            # GitHub object
+
+  my $pat    = $gitHub->patKey(1);
+  my $user   = qm $gitHub->userid;     $user or confess "userid required";
+  my $repo   = qm $gitHub->repository; $repo or confess "repository required";
+  my $url    = url;
+
+  my $c = qq(curl -si $pat $url/$user/$repo/branches);
+
+  my $r = GitHub::Crud::Response::new($gitHub, $c);
+  my $success = $r->status == 200;                                              # Check response code
+
+  $r
+ }
+
+if (0 and !caller)                                                              # Test list all branches
+ {confess dump(gitHub->listCommits);
+ }
+
+sub writeCommit($$@)                                                            # Write all the named files into a L<GitHub> repository as a commit on the specified branch using a minimal number of network interactions.\mRequired attributes: L<userid|/userid>, L<repository|/repository>.\mOptional attributes: L<refOrBranch|/refOrBranch>.
+ {my ($gitHub, $folder, @files) = @_;                                           # GitHub object, file prefix to remove, files to write
+
+  my $pat    = $gitHub->patKey(1);
+  my $user   = qm $gitHub->userid;     $user or confess "userid required";
+  my $repo   = qm $gitHub->repository; $repo or confess "repository required";
+  my $bran   = $gitHub->branch;        $bran or confess "branch required";
+  my $url    = url;
+
+  my $tree = sub                                                                # Create the tree
+   {my @t;
+    for my $f(@files)                                                           # Load files into a tree
+     {my $p = swapFilePrefix($f, $folder);
+      my $c = readFile($f);
+      push @t, <<END;
+ {"path"   : "$p",
+  "mode"   : "100644",
+  "type"   : "blob",
+  "content": "$c"
+ }
+END
+     }
+
+    my $t = join ",\n", @t;                                                     # Assemble tree
+    my $f = writeFile(undef, qq({"tree" : [$t]}));                              # Write Json
+    my $c = qq(curl -si -X POST $pat -d \@$f $url/$user/$repo/git/trees);
+
+    my $r = GitHub::Crud::Response::new($gitHub, $c);
+    my $success = $r->status == 201;                                            # Check response code
+    unlink $f;                                                                  # Cleanup
+
+    $success or confess dump($r)."\nUnable to create tree\n";
+
+    $r
+   }->();
+
+  my $commit = sub                                                              # Create a commit to hold the tree
+   {my $s = $tree->data->sha;
+    my $f = writeFile(undef, <<END);
+{
+ "message": "Committed by GitHub::Crud",
+ "tree"   : "$s"
+}
+END
+
+    my $c = qq(curl -si -X POST $pat -d \@$f $url/$user/$repo/git/commits);
+
+    my $r = GitHub::Crud::Response::new($gitHub, $c);
+    my $success = $r->status == 201;                                            # Check response code
+    unlink $f;                                                                  # Cleanup
+
+    $success or confess dump($r)."\nUnable to create commit\n";
+
+    $r
+   }->();
+
+  my $branch = sub                                                              # Update branch
+   {my $s = $commit->data->sha;
+    my $f = writeFile(undef, <<END);
+{
+  "ref": "refs/heads/$bran",
+  "sha": "$s"
+}
+END
+    my $c = qq(curl -si -X POST $pat -d \@$f $url/$user/$repo/git/refs);
+    my $r = GitHub::Crud::Response::new($gitHub, $c);
+    my $success = $r->status == 201;                                            # Check response code
+    unlink $f;                                                                  # Cleanup
+
+    $r
+   }->();
+
+  my $status = $branch->status;                                                 # Creation status
+  if    ($branch->status == 201) {return $branch}                               # Branch created
+  elsif ($branch->status == 422)                                                # Update existing branch
+   {my $branchUpdate = sub
+     {my $s = $commit->data->sha;
+      my $f = writeFile(undef, <<END);
+{ "sha": "$s",
+  "force": true
+}
+END
+      my $c = qq(curl -si -X PATCH $pat -d \@$f $url/$user/$repo/git/refs/heads/$bran);
+      my $r = GitHub::Crud::Response::new($gitHub, $c);
+      my $success = $r->status == 200;                                          # Check response code
+      unlink $f;                                                                # Cleanup
+
+      $success or confess dump($r)."\nUnable to update branch\n";
+
+      $r
+     }->();
+    return $branchUpdate;
+   }
+
+  confess "Unable to create/update branch: $bran";
+ }
+
+if (0 and !caller)                                                              # Test writing a commit
+ {my $d = temporaryFolder;
+  my $D = dateTimeStamp;
+  for my $i(1..9)                                                               # Create some files to write
+   {writeFile(fpe($d, $i, qw(data)), "$i on $D\n");
+   }
+  my $g = gitHub(branch=>q(test));
+  my $r = writeCommit($g, $d, searchDirectoryTreesForMatchingFiles($d));
+  confess "Create/Update branch succeeded exit";
+ }
+
+sub listWebHooks($)                                                             # List web hooks associated with your L<GitHub> repository.\mRequired: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. \mIf the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the list  operation was successful else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat  = $gitHub->patKey(1);
   my $user = qm $gitHub->userid;     $user or confess "userid required";
@@ -596,8 +697,7 @@ sub listWebHooks($)                                                             
   my $u    = filePath($url, $user, $repo, qw(hooks));
   my $s    = "curl -si $pat $u";
   my $r    = GitHub::Crud::Response::new($gitHub, $s);
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  my $success = $status =~ m(200|201);                                          # Present or not present
+  my $success = $r->status =~ m(200|201);                                       # Present or not present
   $gitHub->failed = $success ? undef : 1;
   lll($gitHub, q(listWebHooks));
   $success ? $gitHub->response->data : undef                                    # Return reference to array of web hooks on success. If there are no web hooks set then the referenced array will be empty.
@@ -610,7 +710,7 @@ if (0 and !caller)
    }
  }
 
-sub createPushWebHook($)                                                        # Create a web hook.\mRequired: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.\mOptional: L<secret|/secret>.\mIf the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the web hook was created successfully else false.
+sub createPushWebHook($)                                                        # Create a web hook for your L<GitHub> userid.\mRequired: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.\mOptional: L<secret|/secret>.\mIf the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the web hook was created successfully else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat    = $gitHub->patKey(1);
   my $user   = qm $gitHub->userid;     $user   or confess "userid required";
@@ -624,7 +724,7 @@ sub createPushWebHook($)                                                        
   $webUrl =~ m(\Ahttps?://) or confess                                          # Check that we are using a url like thing for the web hook or complain
    "Web hook has no scheme, should start with https?:// not:\n$webUrl";
 
-  writeFile(my $tmpFile = temporaryFile(), my $json = <<END);                   # Write web hook definition
+  owf(my $tmpFile = temporaryFile(), my $json = <<END);                         # Write web hook definition
   {"name": "web", "active": true, "events": ["push"],
    "config": {"url": "$webUrl", "content_type": "json" $sj}
   }
@@ -634,8 +734,7 @@ END
   my $s = "curl -si -X POST $pat $u $d";                                        # Create url
   my $r = GitHub::Crud::Response::new($gitHub, $s);
 
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  my $success = $status == 201;
+  my $success = $r->status == 201;                                              # Check response code
   unlink $tmpFile;                                                              # Cleanup
   $gitHub->failed = $success ? undef : 1;
   lll($gitHub, q(createPushWebHooks));
@@ -648,7 +747,7 @@ if (0 and !caller)
   say STDERR "Create web hook:\n", dump($d);
  }
 
-sub createIssue($)                                                              # Create an issue.\mRequired: L<userid|/userid>, L<repository|/repository>, L<body|/body>, L<title|/title>.\mIf the operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the issue was created successfully else false.
+sub createIssue($)                                                              # Create an issue on L<GitHub>.\mRequired: L<userid|/userid>, L<repository|/repository>, L<body|/body>, L<title|/title>.\mIf the operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the issue was created successfully else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat    = $gitHub->patKey(1);
   my $user   = qm $gitHub->userid;     $user   or confess "userid required";
@@ -659,17 +758,50 @@ sub createIssue($)                                                              
   my $url    = url;
 
   my $json   = encodeJson({body=>$body,  title=>$title});                       # Issue in json
-  writeFile(my $tmpFile = temporaryFile(), $json);                              # Write issue definition
+  owf(my $tmpFile = temporaryFile(), $json);                                    # Write issue definition
   my $d = q( -d @).$tmpFile;
   my $u = filePath($url, $user, $repo, qw(issues));
   my $s = "curl -si -X POST $pat $u $d";                                        # Create url
   my $r = GitHub::Crud::Response::new($gitHub, $s);
-  my ($status) = split / /, $r->Status;                                         # Check response code
-  my $success = $status == 201;
+  my $success = $r->status == 201;                                              # Check response code
   unlink $tmpFile;                                                              # Cleanup
   $gitHub->failed = $success ? undef : 1;
   lll($gitHub, q(createIssue));
   $success ? 1 : undef                                                          # Return true on success
+ }
+
+sub createIssueFromSavedToken($$$$;$)                                           # Create an issue on L<GitHub> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.\mReturns true if the issue was created successfully else false.
+ {my ($userid, $repository, $title, $body, $accessFolder) = @_;                 # Userid on GitHub, repository name, issue title, issue body, optionally the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+  my $g = GitHub::Crud::new;
+  $g->userid     = $userid;     $userid     or confess "Userid required";
+  $g->repository = $repository; $repository or confess "Repository required";
+  $g->title      = $title;      $title      or confess "Title required";
+  $g->body       = $body;       $body       or confess "Body required";
+  $g->personalAccessTokenFolder = $accessFolder // accessFolder;
+  $g->loadPersonalAccessToken;
+  $g->createIssue;
+ }
+
+sub writeFileUsingSavedToken($$$$;$)                                            # Write to a file on L<GitHub> using a personal access token saved in a file.
+ {my ($userid, $repository, $file, $content, $accessFolder) = @_;               # Userid on GitHub, repository name, file name on github, file content, optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+  my $g = GitHub::Crud::new;
+  $g->userid     = $userid;     $userid     or confess "Userid required";
+  $g->repository = $repository; $repository or confess "Repository required";
+  $g->gitFile    = $file;       $file       or confess "File required";
+  $g->personalAccessTokenFolder = $accessFolder // accessFolder;
+  $g->loadPersonalAccessToken;
+  $g->write($content);
+ }
+
+sub writeFileFromFileUsingSavedToken($$$$;$)                                    # Copy a file to L<github>  using a personal access token saved in a file.
+ {my ($userid, $repository, $file, $localFile, $accessFolder) = @_;             # Userid on GitHub, repository name, file name on github, file content, optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+  my $g = GitHub::Crud::new;
+  $g->userid     = $userid;     $userid     or confess "Userid required";
+  $g->repository = $repository; $repository or confess "Repository required";
+  $g->gitFile    = $file;       $file       or confess "File required";
+  $g->personalAccessTokenFolder = $accessFolder // accessFolder;
+  $g->loadPersonalAccessToken;
+  $g->write(readBinaryFile($localFile));
  }
 
 if (0 and !caller)
@@ -681,30 +813,55 @@ if (0 and !caller)
   exit;
  }
 
-sub savePersonalAccessToken($)                                                  # Save the personal access token by userid in folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
+if (0 and !caller)
+ {&createIssueFromSavedToken(qw(philiprbrenan notifications Testing Hello-World));
+  exit;
+ }
+
+if (0 and !caller)
+ {&writeFileUsingSavedToken(qw(philiprbrenan notifications testReadME.md  Hello-World));
+  exit;
+ }
+
+sub savePersonalAccessToken($)                                                  # Save a L<GitHub> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $user = qm $gitHub->userid;           $user or confess "userid required";
-  my $pat  = $gitHub->personalAccessToken; $pat or patRequired;
+  my $pat  = $gitHub->personalAccessToken; $pat  or confess "personal access token required";
   my $dir  = $gitHub->personalAccessTokenFolder // accessFolder;
   my $file = filePathExt($dir, $user, q(data));
   makePath($file);
-  store {pat=>$pat}, $file;                                                     # Store personal access token
+  storeFile($file, {pat=>$pat});                                                # Store personal access token
   -e $file or confess "Unable to store personal access token in file:\n$file";  # Complain if store fails
   my $p = retrieve $file;
   $pat eq $p->{pat} or                                                          # Check file format
     confess "File contains the wrong personal access token:\n$file";
  }
 
-sub loadPersonalAccessToken($)                                                  # Load the personal access token by userid from folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
+sub loadPersonalAccessToken($)                                                  # Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $user = qm $gitHub->userid;           $user or confess "userid required";
   my $dir  = $gitHub->personalAccessTokenFolder // accessFolder;
   my $file = filePathExt($dir, $user, q(data));
-  my $p = retrieve $file;
+  my $p = retrieveFile $file;                                                   # Load personal access token
   my $a = $p->{pat} or                                                          # Check file format
     confess "File does not contain a personal access token:\n$file";
   $gitHub->personalAccessToken = $a;                                            # Retrieve token
  }
+
+#D0
+#-------------------------------------------------------------------------------
+# Export - eeee
+#-------------------------------------------------------------------------------
+
+use Exporter qw(import);
+
+use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+# containingFolder
+
+@ISA          = qw(Exporter);
+@EXPORT_OK    = qw(writeFileUsingSavedToken writeFileFromFileUsingSavedToken);
+%EXPORT_TAGS  = (all=>[@EXPORT_OK]);
 
 #-------------------------------------------------------------------------------
 # Tests
@@ -731,15 +888,14 @@ if (0 and !caller)
 
 =head1 Name
 
-GitHub::Crud - Create, Read, Update, Delete files on GitHub.
+Create, Read, Update, Delete files, issues, web hooks and commits on GitHub.
 
 =head1 Synopsis
 
-Create, Read, Update, Delete files on GitHub as described at:
+Create, Read, Update, Delete files, issues, web hooks and commits on GitHub as
+described at:
 
   https://developer.github.com/v3/repos/contents/#update-a-file
-
-and also copy files, rename files and check whether files exist.
 
 =head1 Prerequisites
 
@@ -773,131 +929,38 @@ Produces:
 
 =head1 Description
 
-Create, Read, Update, Delete files on GitHub.
+
+
+Version 20200218.
+
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 
 
-=head1 Attributes
+=head1 Constructor
 
-Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
+Create a L<GitHub|https://github.com> object with the specified attributes describing the interface with L<GitHub|https://github.com>.
 
-=head2 body :lvalue
+=head2 new(%attributes)
 
-The body of an issue
+Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
 
+     Parameter    Description
+  1  %attributes  Attribute values
 
-=head2 branch :lvalue
+=head1 Methods
 
-Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
+Actions on L<GitHub|https://github.com>.
 
+=head2 list($gitHub)
 
-=head2 failed :lvalue
+List all the files contained in a L<GitHub|https://github.com> repository or all the files below a specified folder in the repository.
 
-Defined if the last request to Github failed else B<undef>.
+Required attributes: L<userid|/userid>, L<repository|/repository>.
 
-
-=head2 fileList :lvalue
-
-Reference to an array of files produced by L<list|/list>
-
-
-=head2 gitFile :lvalue
-
-File name on GitHub - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted
-
-
-=head2 gitFolder :lvalue
-
-Folder name on GitHub - this name can contain '/'
-
-
-=head2 logFile :lvalue
-
-The name of a local file  to which to write error messages if any errors occur.
-
-
-=head2 message :lvalue
-
-Optional commit message
-
-
-=head2 nonRecursive :lvalue
-
-Do a non recursive L<list|/list> - the default is to list all the sub folders found in a folder  but this takes too much time if you are only interested in the files in the start folder
-
-
-=head2 personalAccessToken :lvalue
-
-A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
-
-
-=head2 personalAccessTokenFolder :lvalue
-
-The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
-
-
-=head2 readData :lvalue
-
-Data produced by L<read|/read>
-
-
-=head2 repository :lvalue
-
-The name of your repository minus the userid - you should create this repository first manually.
-
-
-=head2 response :lvalue
-
-A reference to GitHub's response to the latest request
-
-
-=head2 secret :lvalue
-
-The secret for a web hook - this is created by the creator of the web hook and remembered by GitHuib
-
-
-=head2 title :lvalue
-
-The title of an issue
-
-
-=head2 webHookUrl :lvalue
-
-The url for a web hook
-
-
-=head2 utf8 :lvalue
-
-Send the data as utf8 - do not use this for binary files containing images or audio, just for files containing text
-
-
-=head2 userid :lvalue
-
-Your userid on GitHub
-
-
-=head2 writeData :lvalue
-
-Data to be written by L<write|/write>
-
-
-=head1 Methods available
-
-=head2 new()
-
-Create a new GitHub object.
-
-
-=head2 list($)
-
-List all the files contained in a GitHub repository or all the files below a specified folder in the repository.
-
-Required parameters: L<userid|/userid>, L<repository|/repository>.
-
-Optional parameters: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<nonRecursive|/nonRecursive>, L<patKey|/patKey>.
+Optional attributes: L<gitFolder|/gitFolder>, L<refOrBranch|/refOrBranch>, L<nonRecursive|/nonRecursive>, L<patKey|/patKey>.
 
 Use the L<gitFolder|/gitFolder> parameter to specify the folder to start the list from, by default, the listing will start at the root folder of your repository.
 
@@ -909,16 +972,16 @@ If the list operation fails then L<failed|/failed> is set to true and L<fileList
 
 Returns the list of file names found or empty list if no files were found.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub
 
-=head2 read($$)
+=head2 read($gitHub)
 
-Read data from a file on GitHub.
+Read data from a file on L<GitHub|https://github.com>.
 
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> = the file to read.
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> = the file to read.
 
-Optional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
+Optional attributes: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
 
 If the read operation is successful, L<failed|/failed> is set to false and L<readData|/readData> is set to the data read from the file.
 
@@ -926,98 +989,119 @@ If the read operation fails then L<failed|/failed> is set to true and L<readData
 
 Returns the data read or B<undef> if no file was found.
 
-     Parameter  Description                   
-  1  $gitHub    GitHub object                 
-  2  $noLog     Whether to log errors or not  
+     Parameter  Description
+  1  $gitHub    GitHub
 
-=head2 write($$)
+=head2 write($gitHub, $data)
 
-Write data into a GitHub file, creating the file if it is not already present.
+Write data into a L<GitHub|https://github.com> file, creating the file if it is not already present.
 
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, , L<gitFile|/gitFile> = the file to be written to.
 
-Optional parameters: L<refOrBranch|/refOrBranch>.
-
-If the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
-
-Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
-
-     Parameter  Description         
-  1  $gitHub    GitHub object       
-  2  $data      Data to be written  
-
-=head2 copy($$)
-
-Copy a source file from one location to another target location in your GitHub repository, overwriting the target file if it already exists.
-
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be copied.
-
-Optional parameters: L<refOrBranch|/refOrBranch>.
+Optional attributes: L<refOrBranch|/refOrBranch>.
 
 If the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-     Parameter  Description                         
-  1  $gitHub    GitHub object                       
-  2  $target    The name of the file to be created  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $data      Data to be written
 
-=head2 exists($)
+=head2 copy($gitHub, $target)
 
-Test whether a file exists on GitHub or not and returns an object including the B<sha> and B<size> fields if it does else undef.
+Copy a source file from one location to another target location in your L<GitHub|https://github.com> repository, overwriting the target file if it already exists.
 
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to test.
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be copied.
 
-Optional parameters: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
+Optional attributes: L<refOrBranch|/refOrBranch>.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+If the write operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
-=head2 rename($$)
+Returns B<updated> if the write updated the file, B<created> if the write created the file else B<undef> if the write failed.
 
-Rename a source file on GitHub if the target file name is not already in use.
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $target    The name of the file to be created
 
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be renamed.
+=head2 exists($gitHub)
 
-Optional parameters: L<refOrBranch|/refOrBranch>.
+Test whether a file exists on L<GitHub|https://github.com> or not and returns an object including the B<sha> and B<size> fields if it does else L<undef|https://perldoc.perl.org/functions/undef.html>.
+
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<gitFile|/gitFile> file to test.
+
+Optional attributes: L<refOrBranch|/refOrBranch>, L<patKey|/patKey>.
+
+     Parameter  Description
+  1  $gitHub    GitHub object
+
+=head2 rename($gitHub, $target)
+
+Rename a source file on L<GitHub|https://github.com> if the target file name is not already in use.
+
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be renamed.
+
+Optional attributes: L<refOrBranch|/refOrBranch>.
 
 Returns the new name of the file B<renamed> if the rename was successful else B<undef> if the rename failed.
 
-     Parameter  Description               
-  1  $gitHub    GitHub object             
-  2  $target    The new name of the file  
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $target    The new name of the file
 
-=head2 delete($)
+=head2 delete($gitHub)
 
-Delete a file from GitHub.
+Delete a file from L<GitHub|https://github.com>.
 
-Required parameters: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be deleted.
+Required attributes: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>, L<gitFile|/gitFile> = the file to be deleted.
 
-Optional parameters: L<refOrBranch|/refOrBranch>.
+Optional attributes: L<refOrBranch|/refOrBranch>.
 
 If the delete operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns true if the delete was successful else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
-=head2 listWebHooks($)
+=head2 listCommits($gitHub)
 
-List web hooks.
+List all the commits in a L<GitHub|https://github.com> repository.
 
-Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. 
+Required attributes: L<userid|/userid>, L<repository|/repository>.
+
+     Parameter  Description
+  1  $gitHub    GitHub object
+
+=head2 writeCommit($gitHub, $folder, @files)
+
+Write all the named files into a L<GitHub|https://github.com> repository as a commit on the specified branch using a minimal number of network interactions.
+
+Required attributes: L<userid|/userid>, L<repository|/repository>.
+
+Optional attributes: L<refOrBranch|/refOrBranch>.
+
+     Parameter  Description
+  1  $gitHub    GitHub object
+  2  $folder    File prefix to remove
+  3  @files     Files to write
+
+=head2 listWebHooks($gitHub)
+
+List web hooks associated with your L<GitHub|https://github.com> repository.
+
+Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
 
 If the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
 
 Returns true if the list  operation was successful else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
-=head2 createPushWebHook($)
+=head2 createPushWebHook($gitHub)
 
-Create a web hook.
+Create a web hook for your L<GitHub|https://github.com> userid.
 
 Required: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.
 
@@ -1027,12 +1111,12 @@ If the create operation is successful, L<failed|/failed> is set to false otherwi
 
 Returns true if the web hook was created successfully else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
-=head2 createIssue($)
+=head2 createIssue($gitHub)
 
-Create an issue.
+Create an issue on L<GitHub|https://github.com>.
 
 Required: L<userid|/userid>, L<repository|/repository>, L<body|/body>, L<title|/title>.
 
@@ -1040,92 +1124,174 @@ If the operation is successful, L<failed|/failed> is set to false otherwise it i
 
 Returns true if the issue was created successfully else false.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+     Parameter  Description
+  1  $gitHub    GitHub object
 
-=head2 savePersonalAccessToken($)
+=head2 createIssueFromSavedToken($userid, $repository, $title, $body, $accessFolder)
 
-Save the personal access token by userid in folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
+Create an issue on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+Returns true if the issue was created successfully else false.
 
-=head2 loadPersonalAccessToken($)
+     Parameter      Description
+  1  $userid        Userid on GitHub
+  2  $repository    Repository name
+  3  $title         Issue title
+  4  $body          Issue body
+  5  $accessFolder  Optionally the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
 
-Load the personal access token by userid from folder L<personalAccessTokenFolder()|/personalAccessTokenFolder>.
+=head2 writeFileUsingSavedToken($userid, $repository, $file, $content, $accessFolder)
 
-     Parameter  Description    
-  1  $gitHub    GitHub object  
+Write to a file on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
+
+Returns true if the data was stored successfully else false.
+
+     Parameter      Description
+  1  $userid        Userid on GitHub
+  2  $repository    Repository name
+  3  $file          File name on github
+  4  $content       File content
+  5  $accessFolder  Optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+
+=head2 writeFileFromFileUsingSavedToken($userid, $repository, $file, $localFile, $accessFolder)
+
+Write to a L<GitHub|https://github.com> repository owned by B<$userid> with repository name B<$repository> writing into file B<$file> the contents of the local file B<$localFile> using L<savePersonalAccessToken|/savePersonalAccessToken>.
+
+Returns true if the data was stored successfully else false.
+
+     Parameter      Description
+  1  $userid        Userid on GitHub
+  2  $repository    Repository name
+  3  $file          File name on github
+  4  $localFile     File content
+  5  $accessFolder  Optional: the name of the folder where personal access tokens are stored if it is not the standard one specified in attribute accessFolder.
+
+=head2 savePersonalAccessToken($gitHub)
+
+Save a L<GitHub|https://github.com> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
+
+     Parameter  Description
+  1  $gitHub    GitHub object
+
+=head2 loadPersonalAccessToken($gitHub)
+
+Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
+
+     Parameter  Description
+  1  $gitHub    GitHub object
+
+
+=head2 GitHub::Crud Definition
+
+
+Attributes describing the interface with L<GitHub|https://github.com>.
+
+
+
+
+=head3 Input fields
+
+
+B<body> - The body of an issue.
+
+B<branch> - Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'.
+
+B<gitFile> - File name on L<GitHub|https://github.com> - this name can contain '/'. This is the file to be read from, written to, copied from, checked for existence or deleted.
+
+B<gitFolder> - Folder name on L<GitHub|https://github.com> - this name can contain '/'.
+
+B<message> - Optional commit message
+
+B<nonRecursive> - Fetch only one level of files with L<list>.
+
+B<personalAccessTokenFolder> - The folder into which to save personal access tokens. Set to q(/etc/GitHubCrudPersonalAccessToken) by default.
+
+B<repository> - The name of the repository to be worked on minus the userid - you should create this repository first manually.
+
+B<secret> - The secret for a web hook - this is created by the creator of the web hook and remembered by L<GitHub|https://github.com>,
+
+B<title> - The title of an issue.
+
+B<userid> - Userid on L<GitHub|https://github.com> of the repository to be worked on.
+
+B<utf8> - Send the data as utf8 if true - do not use this for binary files containing images or audio, just for files containing text.
+
+B<webHookUrl> - The url for a web hook.
+
+
+
+=head3 Output fields
+
+
+B<failed> - Defined if the last request to L<GitHub|https://github.com> failed else B<undef>.
+
+B<fileList> - Reference to an array of files produced by L<list|/list>.
+
+B<personalAccessToken> - A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens.
+
+B<readData> - Data produced by L<read|/read>.
+
+B<response> - A reference to L<GitHub|https://github.com>'s response to the latest request.
+
+
+
+=head2 GitHub::Crud::Response Definition
+
+
+Attributes describing a response from L<GitHub|https://github.com>.
+
+
+
+
+=head3 Output fields
+
+
+B<content> - The actual content of the file from L<GitHub|https://github.com>.
+
+B<data> - The data received from L<GitHub|https://github.com>, normally in L<Json|https://en.wikipedia.org/wiki/JSON> format.
+
+B<status> - Our version of Status.
+
 
 
 =head1 Index
 
 
-1 L<body|/body>
+1 L<copy|/copy> - Copy a source file from one location to another target location in your L<GitHub|https://github.com> repository, overwriting the target file if it already exists.
 
-2 L<branch|/branch>
+2 L<createIssue|/createIssue> - Create an issue on L<GitHub|https://github.com>.
 
-3 L<copy|/copy>
+3 L<createIssueFromSavedToken|/createIssueFromSavedToken> - Create an issue on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
-4 L<createIssue|/createIssue>
+4 L<createPushWebHook|/createPushWebHook> - Create a web hook for your L<GitHub|https://github.com> userid.
 
-5 L<createPushWebHook|/createPushWebHook>
+5 L<delete|/delete> - Delete a file from L<GitHub|https://github.com>.
 
-6 L<delete|/delete>
+6 L<exists|/exists> - Test whether a file exists on L<GitHub|https://github.com> or not and returns an object including the B<sha> and B<size> fields if it does else L<undef|https://perldoc.perl.org/functions/undef.html>.
 
-7 L<exists|/exists>
+7 L<list|/list> - List all the files contained in a L<GitHub|https://github.com> repository or all the files below a specified folder in the repository.
 
-8 L<failed|/failed>
+8 L<listCommits|/listCommits> - List all the commits in a L<GitHub|https://github.com> repository.
 
-9 L<fileList|/fileList>
+9 L<listWebHooks|/listWebHooks> - List web hooks associated with your L<GitHub|https://github.com> repository.
 
-10 L<gitFile|/gitFile>
+10 L<loadPersonalAccessToken|/loadPersonalAccessToken> - Load a personal access token by userid from folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-11 L<gitFolder|/gitFolder>
+11 L<new|/new> - Create a new L<GitHub|https://github.com> object with attributes as describe at: L<GitHub::Crud Definition>.
 
-12 L<list|/list>
+12 L<read|/read> - Read data from a file on L<GitHub|https://github.com>.
 
-13 L<listWebHooks|/listWebHooks>
+13 L<rename|/rename> - Rename a source file on L<GitHub|https://github.com> if the target file name is not already in use.
 
-14 L<loadPersonalAccessToken|/loadPersonalAccessToken>
+14 L<savePersonalAccessToken|/savePersonalAccessToken> - Save a L<GitHub|https://github.com> personal access token by userid in folder L<personalAccessTokenFolder|/personalAccessTokenFolder>.
 
-15 L<logFile|/logFile>
+15 L<write|/write> - Write data into a L<GitHub|https://github.com> file, creating the file if it is not already present.
 
-16 L<message|/message>
+16 L<writeCommit|/writeCommit> - Write all the named files into a L<GitHub|https://github.com> repository as a commit on the specified branch using a minimal number of network interactions.
 
-17 L<new|/new>
+17 L<writeFileFromFileUsingSavedToken|/writeFileFromFileUsingSavedToken> - Write to a L<GitHub|https://github.com> repository owned by B<$userid> with repository name B<$repository> writing into file B<$file> the contents of the local file B<$localFile> using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
-18 L<nonRecursive|/nonRecursive>
-
-19 L<personalAccessToken|/personalAccessToken>
-
-20 L<personalAccessTokenFolder|/personalAccessTokenFolder>
-
-21 L<read|/read>
-
-22 L<readData|/readData>
-
-23 L<rename|/rename>
-
-24 L<repository|/repository>
-
-25 L<response|/response>
-
-26 L<savePersonalAccessToken|/savePersonalAccessToken>
-
-27 L<secret|/secret>
-
-28 L<title|/title>
-
-29 L<userid|/userid>
-
-30 L<utf8|/utf8>
-
-31 L<webHookUrl|/webHookUrl>
-
-32 L<write|/write>
-
-33 L<writeData|/writeData>
+18 L<writeFileUsingSavedToken|/writeFileUsingSavedToken> - Write to a file on L<GitHub|https://github.com> using an access token saved in a file using L<savePersonalAccessToken|/savePersonalAccessToken>.
 
 =head1 Installation
 
@@ -1142,7 +1308,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2018 Philip R Brenan.
+Copyright (c) 2016-2019 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -1161,6 +1327,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;

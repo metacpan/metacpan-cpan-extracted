@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scattercarpet::Textfont;
 use Chart::Plotly::Trace::Scattercarpet::Transform;
 use Chart::Plotly::Trace::Scattercarpet::Unselected;
 
-our $VERSION = '0.038';    # VERSION
+our $VERSION = '0.039';    # VERSION
 
 # ABSTRACT: Plots a scatter trace on either the first carpet axis or the carpet axis with a matching `carpet` attribute.
 
@@ -337,7 +337,7 @@ Chart::Plotly::Trace::Scattercarpet - Plots a scatter trace on either the first 
 
 =head1 VERSION
 
-version 0.038
+version 0.039
 
 =head1 SYNOPSIS
 

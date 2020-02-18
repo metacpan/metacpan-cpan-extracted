@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.92    2020/02/18
+        - Recognize various Aggregate nodes from non-text explains.
+          Per bug report from RhodiumToad.
+
 0.91    2020/01/07
         - Make all times be wall-clock times. That is - take into account
           number of parallel workers

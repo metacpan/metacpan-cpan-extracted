@@ -148,12 +148,19 @@ gperl_arg_info_table_new (void)
 }
 
 static void
+free_element (gpointer element, gpointer user_data)
+{
+	PERL_UNUSED_VAR (user_data);
+	g_free (element);
+}
+
+static void
 gperl_arg_info_table_destroy (GPerlArgInfoTable *table)
 {
 	g_hash_table_destroy (table->scalar_to_info);
 
 	/* These are NULL-safe. */
-	g_slist_foreach (table->allocated_strings, (GFunc) g_free, NULL);
+	g_slist_foreach (table->allocated_strings, free_element, NULL);
 	g_slist_free (table->allocated_strings);
 
 	g_free (table);

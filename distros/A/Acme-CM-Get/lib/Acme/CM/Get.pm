@@ -1,7 +1,7 @@
 package Acme::CM::Get;
 
-our $DATE = '2019-01-15'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-02-18'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -37,7 +37,7 @@ Acme::CM::Get - Shortcut to retrieve Acme::CPANModules list
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CM::Get (from Perl distribution Acme-CM-Get), released on 2019-01-15.
+This document describes version 0.002 of Acme::CM::Get (from Perl distribution Acme-CM-Get), released on 2020-02-18.
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

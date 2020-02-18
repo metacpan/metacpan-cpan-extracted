@@ -1,12 +1,14 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 # ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2021
 
 use strict;
 use warnings;
 use utf8;
+
+use DateTime;
 
 use base qw( Date::Holidays::Super Exporter );
 our @EXPORT_OK = qw(
@@ -138,13 +140,12 @@ sub next_holiday {
     my @regions = @_;
 
     unless (@regions) {
-        @regions = ('all', @{ +REGIONS });
+        @regions = ( 'all', @{ +REGIONS } );
     }
 
-    my ( $d, $m, $year ) = ( localtime() )[ 3 .. 5 ];
-    $year += 1900;
-    $m    += 1;
-    my $today = sprintf( "%04d-%02d-%02d", $year, $m, $d );
+    my $now   = DateTime->now->set_time_zone("Europe/London");
+    my $year  = $now->year;
+    my $today = $now->ymd;
 
     my %next_holidays;
 

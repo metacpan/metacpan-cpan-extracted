@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Git::Init" => 0,
     "Dist::Zilla::Plugin::Git::Push" => 0,
     "Dist::Zilla::Plugin::Git::Tag" => 0,
-    "Dist::Zilla::PluginBundle::Starter" => "3.0.0",
+    "Dist::Zilla::PluginBundle::Starter" => "4.0.0",
     "Moose" => 0,
     "namespace::clean" => 0
   },
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::File::ShareDir::Module" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "v3.0.1",
+  "VERSION" => "v4.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +58,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Git::Init" => 0,
   "Dist::Zilla::Plugin::Git::Push" => 0,
   "Dist::Zilla::Plugin::Git::Tag" => 0,
-  "Dist::Zilla::PluginBundle::Starter" => "3.0.0",
+  "Dist::Zilla::PluginBundle::Starter" => "4.0.0",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Moose" => 0,

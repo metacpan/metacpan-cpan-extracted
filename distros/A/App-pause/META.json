@@ -29,14 +29,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Complete::Bash" : "0.27",
+            "Complete::Bash" : "0.333",
             "Getopt::Long::EvenLess" : "0.111",
             "Getopt::Long::Subcommand" : "0.102",
             "JSON::PP" : "0",
             "List::Util" : "1.45",
             "Log::ger" : "0.027",
+            "Log::ger::Layout::JSON" : "0",
             "Log::ger::Output" : "0.005",
+            "Log::ger::Output::Composite" : "0.009",
             "Log::ger::Output::Screen" : "0.007",
+            "Log::ger::Output::SimpleFile" : "0",
             "Log::ger::Util" : "0.008",
             "Perinci::CmdLine::Util::Config" : "1.722",
             "Perinci::Result::Format::Lite" : "0.273",
@@ -44,8 +47,8 @@
             "Scalar::Util::Numeric" : "0",
             "Scalar::Util::Numeric::PP" : "0",
             "Time::Duration::Parse::AsHash" : "0",
-            "Time::Local" : "0",
-            "WWW::PAUSE::Simple" : "0.41",
+            "Time::Local" : "1.27",
+            "WWW::PAUSE::Simple" : "0.447",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -72,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-App-pause"
       }
    },
-   "version" : "0.652",
+   "version" : "0.653",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -160,6 +163,11 @@
             "version" : "6.009"
          },
          {
+            "class" : "Dist::Zilla::Plugin::FileFinder::ByName",
+            "name" : "@Author::PERLANCAR/FileFinder::ByName PERLANCAR",
+            "version" : "6.009"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
             "version" : "6.009"
@@ -167,7 +175,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.596"
+            "version" : "0.599"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -218,7 +226,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -372,7 +380,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -392,7 +400,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.07"
                      }
                   ]
                }
@@ -413,17 +421,17 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
             "name" : "@Author::PERLANCAR/Rinci::AddToDb",
-            "version" : "0.01"
+            "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Rinci::Validate",
-            "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.24"
+            "class" : "Dist::Zilla::Plugin::Rinci::EmbedValidator",
+            "name" : "@Author::PERLANCAR/Rinci::EmbedValidator",
+            "version" : "0.250"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -453,9 +461,16 @@
             "version" : "2.054"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
-            "name" : "@Author::PERLANCAR/Test::Perl::Critic",
-            "version" : "3.001"
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic::Subset",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Perl::Critic::Subset" : {
+                  "finder" : [
+                     "@Author::PERLANCAR/FileFinder::ByName PERLANCAR"
+                  ]
+               }
+            },
+            "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
+            "version" : "3.001.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

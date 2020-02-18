@@ -13,8 +13,9 @@ package MyApp {
 	
 	multi method bar (ArrayRef $x) { 'ARRAY' }
 	multi method bar (HashRef $y)  { 'HASH' }
+	multi method bar (Quux $z)     { 'OBJECT' }
 	
-	before bar { ++$counter }
+	before foo, bar { ++$counter }
 	
 	constant baz = 999;
 	
@@ -27,7 +28,9 @@ is(MyApp->foo(1000), 2000);
 
 is(MyApp->bar([]), 'ARRAY');
 is(MyApp->bar({}), 'HASH');
-is($counter, 2);
+is(MyApp->bar(MyApp->new_quux), 'OBJECT');
+
+is($counter, 5);
 
 is(MyApp->baz, 999);
 

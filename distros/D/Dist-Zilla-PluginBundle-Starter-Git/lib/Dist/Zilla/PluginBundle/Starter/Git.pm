@@ -4,7 +4,7 @@ use Moose;
 extends 'Dist::Zilla::PluginBundle::Starter';
 use namespace::clean;
 
-our $VERSION = 'v3.0.1';
+our $VERSION = 'v4.0.0';
 
 has '+revision' => (
   default => sub { $_[0]->payload->{revision} // 3 },
@@ -61,7 +61,7 @@ Dist::Zilla::PluginBundle::Starter::Git - A minimal Dist::Zilla plugin bundle fo
   version = 0.001
   
   [@Starter::Git]      ; all that is needed to start
-  revision = 3         ; always defaults to revision 3
+  revision = 4         ; always defaults to revision 3
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -213,6 +213,11 @@ L<[Git::Tag]|Dist::Zilla::Plugin::Git::Tag>,
 L<[Git::Push]|Dist::Zilla::Plugin::Git::Push>.
 
 =back
+
+=head2 Revision 4
+
+Revision 4 has no specific differences beyond the changes in
+L<Revision 4 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 4">.
 
 =head1 BUGS
 

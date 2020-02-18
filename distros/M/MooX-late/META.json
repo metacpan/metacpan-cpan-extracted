@@ -31,11 +31,9 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "MooX::HandlesVia" : "0.001004"
-         },
          "requires" : {
-            "Moo" : "1.006000",
+            "Moo" : "2",
+            "Sub::HandlesVia" : "0.013",
             "Type::Utils" : "1.000001",
             "perl" : "5.008003"
          },
@@ -54,11 +52,11 @@
    "provides" : {
       "MooX::late" : {
          "file" : "lib/MooX/late.pm",
-         "version" : "0.016"
+         "version" : "0.100"
       },
       "MooX::late::DefinitionContext" : {
          "file" : "lib/MooX/late.pm",
-         "version" : "0.016"
+         "version" : "0.100"
       }
    },
    "release_status" : "stable",
@@ -77,7 +75,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-late/project"
    },
-   "version" : "0.016",
+   "version" : "0.100",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

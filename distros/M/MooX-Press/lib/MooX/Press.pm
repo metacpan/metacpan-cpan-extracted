@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.052';
+our $VERSION   = '0.053';
 
 use Types::Standard 1.008003 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -526,6 +526,28 @@ sub make_role {
 sub make_class {
 	my $builder = shift;
 	my ($name, %opts) = @_;
+	
+	if ($opts{abstract}) {
+		for my $key (qw/ factory /) {
+			if ($opts{$key}) {
+				require Carp;
+				my @isa = $opts{extends} ? $builder->_expand_isa($opts{prefix}, $opts{extends}) : ();
+				my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
+				Carp::croak("abstract class $qname cannot have $key");
+			}
+		}
+	}
+	
+	for my $key (qw/ interface before_apply after_apply requires /) {
+		if ($opts{$key}) {
+			require Carp;
+			my @isa = $opts{extends} ? $builder->_expand_isa($opts{prefix}, $opts{extends}) : ();
+			my $qname = $builder->qualify_name($name, $opts{prefix}, @isa);
+			my $kind  = $opts{abstract} ? 'abstract class' : 'class';
+			Carp::croak("$kind $qname cannot have $key");
+		}
+	}
+	
 	$builder->_make_package($name, %opts, is_role => 0);
 }
 
@@ -633,8 +655,13 @@ sub _make_package {
 		}
 	}
 	
-	if (ref $opts{'begin'}) {
-		$opts{'begin'}->($qname, $opts{is_role} ? 'role' : 'class');
+	if (my $hook = $opts{'begin'}) {
+		my @coderefs = map {
+			is_HashRef($_) ? $builder->wrap_coderef(package => $qname, %$_) : $_
+		} is_ArrayRef($hook) ? @$hook : $hook;
+		for my $cb (@coderefs) {
+			$cb->($qname, $opts{is_role} ? 'role' : 'class');
+		}
 	}
 	
 	if ($opts{overload}) {
@@ -864,8 +891,20 @@ sub _make_package {
 		}
 	}
 	
-	unless ($opts{is_role}) {
-		
+	if ($opts{is_role}) {
+		for my $event (qw/ before_apply after_apply /) {
+			if (my $hook = $opts{$event}) {
+				require Role::Hooks;
+				my @coderefs = map {
+					is_HashRef($_) ? $builder->wrap_coderef(package => $qname, %$_) : $_
+				} is_ArrayRef($hook) ? @$hook : $hook;
+				'Role::Hooks'->$event($qname, @coderefs);
+			}
+		}
+	}
+	
+	# not role
+	else {
 		if ($toolkit eq 'Moose' && !$opts{'mutable'}) {
 			require Moose::Util;
 			Moose::Util::find_meta($qname)->make_immutable;
@@ -940,8 +979,13 @@ sub _make_package {
 		}
 	}
 	
-	if (ref $opts{'end'}) {
-		$opts{'end'}->($qname, $opts{is_role} ? 'role' : 'class');
+	if (my $hook = $opts{'end'}) {
+		my @coderefs = map {
+			is_HashRef($_) ? $builder->wrap_coderef(package => $qname, %$_) : $_
+		} is_ArrayRef($hook) ? @$hook : $hook;
+		for my $cb (@coderefs) {
+			$cb->($qname, $opts{is_role} ? 'role' : 'class');
+		}
 	}
 	
 	if ($opts{type_library} and $opts{type_name}) {
@@ -1806,7 +1850,7 @@ which returns the name of the type library, so you can do:
 MooX::Press determines some things based on which package called it. If you
 are wrapping MooX::Press, you can fake the caller by passing it as an option.
 
-=item C<< end >> I<< (CodeRef) >>
+=item C<< end >> I<< (CodeRef|ArrayRef[CodeRef]) >>
 
 After creating each class or role, this coderef will be called. It will be
 passed two parameters; the fully-qualified package name of the class or role,
@@ -1814,7 +1858,7 @@ plus the string "class" or "role" as appropriate.
 
 Optional; defaults to nothing.
 
-=item C<< begin >> I<< (CodeRef) >>
+=item C<< begin >> I<< (CodeRef|ArrayRef[CodeRef]) >>
 
 Like C<end>, but called before setting up any attributes, methods, or
 method modifiers. (But after loading Moo/Moose/Mouse.)
@@ -2348,13 +2392,13 @@ Override mutability for this class and any child classes.
 
 See L</Import Options>.
 
-=item C<< end >> I<< (CodeRef) >>
+=item C<< end >> I<< (CodeRef|ArrayRef[CodeRef]) >>
 
 Override C<end> for this class and any child classes.
 
 See L</Import Options>.
 
-=item C<< begin >> I<< (CodeRef) >>
+=item C<< begin >> I<< (CodeRef|ArrayRef[CodeRef]) >>
 
 Override C<begin> for this class and any child classes.
 
@@ -2538,6 +2582,14 @@ C<after>, C<around>, C<has>, or C<multimethod> options. C<requires>,
 C<constant>, and C<type_name> are allowed. C<with> is allowed; you should
 only use C<with> to compose other interfaces (not full roles) though this
 is not currently enforced.
+
+=item C<< before_apply >> I<< (CodeRef|ArrayRef[CodeRef]) >>
+
+Coderef to pass to C<before_apply> from L<Role::Hooks>.
+
+=item C<< after_apply >> I<< (CodeRef|ArrayRef[CodeRef]) >>
+
+Coderef to pass to C<after_apply> from L<Role::Hooks>.
 
 =back
 

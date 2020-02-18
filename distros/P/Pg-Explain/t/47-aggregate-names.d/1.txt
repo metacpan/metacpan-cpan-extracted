@@ -1,0 +1,6 @@
+                           QUERY PLAN                            
+-----------------------------------------------------------------
+ Aggregate  (cost=17.85..17.86 rows=1 width=8)
+   ->  Seq Scan on pg_class  (cost=0.00..16.88 rows=388 width=0)
+(2 rows)
+

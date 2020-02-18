@@ -17,8 +17,15 @@ my $res = gen_inline_pericmd_script(
     script_name => 'pause',
     script_version_from_main_version => 1,
     use_cleanser => 0,
+    code_before_enable_logging => 'require Log::ger::Layout::JSON;',
+    code_add_extra_log_outputs => join(
+        "",
+        '$_pci_log_outputs->{Screen}{category_level}{access} = "off"; ',
+        '$_pci_log_outputs->{SimpleFile} = {conf=>{path => ($ENV{HOME} || ".")."/pause-access.log"}, level=>"off", layout=>[JSON=>{}], category_level=>{access=>"info"}}; ',
+        ),
     %App::pause::cli_attrs,
 );
+# TODO: option to customize location of access log
 die "Can't generate script: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
 

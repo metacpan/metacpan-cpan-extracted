@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Quiq::Path;
 use Quiq::String;
@@ -40,6 +40,7 @@ Format des generierten CSS-Code.
 
 =head4 Synopsis
 
+  $css = $class->new;
   $css = $class->new($format);
 
 =head4 Arguments
@@ -634,7 +635,7 @@ sub style {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

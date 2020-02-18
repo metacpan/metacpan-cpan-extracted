@@ -79,9 +79,10 @@ lib/Quiq/Hash/Db.pm
 lib/Quiq/Hash/Ordered.pm
 lib/Quiq/Hash/Persistent.pm
 lib/Quiq/Html/Base.pm
+lib/Quiq/Html/Component.pm
+lib/Quiq/Html/Component/Bundle.pm
 lib/Quiq/Html/Construct.pm
 lib/Quiq/Html/Form/Layout.pm
-lib/Quiq/Html/Fragment.pm
 lib/Quiq/Html/Image.pm
 lib/Quiq/Html/List.pm
 lib/Quiq/Html/Listing.pm
@@ -286,9 +287,10 @@ t/bin/Quiq/Hash/Db.t
 t/bin/Quiq/Hash/Ordered.t
 t/bin/Quiq/Hash/Persistent.t
 t/bin/Quiq/Html/Base.t
+t/bin/Quiq/Html/Component.t
+t/bin/Quiq/Html/Component/Bundle.t
 t/bin/Quiq/Html/Construct.t
 t/bin/Quiq/Html/Form/Layout.t
-t/bin/Quiq/Html/Fragment.t
 t/bin/Quiq/Html/Image.t
 t/bin/Quiq/Html/List.t
 t/bin/Quiq/Html/Listing.t

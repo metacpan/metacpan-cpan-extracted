@@ -1,3 +1,10 @@
+0.105		2020-02-18	T. R. Wyant
+    examples/unused-vars is now driven by options on the command line,
+    not by a configuration file.
+
+    No longer recommend Readonly::XS. Thanks to Jay Kahrman for pointing
+    out that this was no longer appropriate.
+
 0.104		2019-12-23	T. R. Wyant
     Add Boolean configuration item allow_state_in_expression, which
     allows an otherwise-unused state variable if the policy thinks the

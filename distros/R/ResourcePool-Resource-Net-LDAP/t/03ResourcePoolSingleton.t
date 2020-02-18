@@ -1,8 +1,8 @@
 #! /usr/bin/perl -w
 #*********************************************************************
 #*** t/03ResourcePoolSingleton.t
-#*** Copyright (c) 2002 by Markus Winand <mws@fatalmind.com>
-#*** $Id: 03ResourcePoolSingleton.t,v 1.1 2002/12/22 15:15:38 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 use strict;
 use Test;

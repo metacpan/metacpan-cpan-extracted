@@ -1,7 +1,7 @@
 #*********************************************************************
 #*** ResourcePool::Factory::Net::LDAP
-#*** Copyright (c) 2002,2003 by Markus Winand <mws@fatalmind.com>
-#*** $Id: LDAP.pm,v 1.5 2003/09/25 17:34:06 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 
 package ResourcePool::Factory::Net::LDAP;
@@ -12,7 +12,7 @@ use ResourcePool::Resource::Net::LDAP;
 use Data::Dumper;
 
 push @ISA, "ResourcePool::Factory";
-$VERSION = "1.0002";
+$VERSION = "1.0003";
 
 ####
 # Some notes about the singleton behavior of this class.
@@ -54,14 +54,6 @@ sub start_tls($@) {
 	my $self = shift;
 	$self->{start_tlsOptions} = [@_];
 }
-
-sub mk_singleton_key($) {
-	my $d = Data::Dumper->new([$_[0]]);
-	$d->Indent(0);
-	$d->Terse(1);
-	return $d->Dump();
-}
-
 
 sub create_resource($) {
 	my ($self) = @_;

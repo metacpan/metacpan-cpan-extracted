@@ -1,7 +1,7 @@
 package Log::ger::Heavy;
 
-our $DATE = '2019-05-06'; # DATE
-our $VERSION = '0.028'; # VERSION
+our $DATE = '2020-02-18'; # DATE
+our $VERSION = '0.029'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -33,28 +33,36 @@ package
 our %Default_Hooks = (
     create_formatter => [
         [__PACKAGE__, 90,
-         # the default formatter is sprintf-style that dumps data structures
-         # arguments as well as undef as '<undef>'.
          sub {
              my %args = @_;
 
-             my $formatter = sub {
-                 return $_[0] if @_ < 2;
-                 my $fmt = shift;
-                 my @args;
-                 for (@_) {
-                     if (!defined($_)) {
-                         push @args, '<undef>';
-                     } elsif (ref $_) {
-                         require Log::ger::Util unless $_dumper;
-                         push @args, Log::ger::Util::_dump($_);
-                     } else {
-                         push @args, $_;
+# BEGIN_BLOCK: default_formatter
+
+             my $formatter =
+
+                 # the default formatter is sprintf-style that dumps data
+                 # structures arguments as well as undef as '<undef>'.
+                 sub {
+                     return $_[0] if @_ < 2;
+                     my $fmt = shift;
+                     my @args;
+                     for (@_) {
+                         if (!defined($_)) {
+                             push @args, '<undef>';
+                         } elsif (ref $_) {
+                             require Log::ger::Util unless $Log::ger::_dumper;
+                             push @args, Log::ger::Util::_dump($_);
+                         } else {
+                             push @args, $_;
+                         }
                      }
-                 }
-                 sprintf $fmt, @args;
-             };
+                     sprintf $fmt, @args;
+                 };
+
              [$formatter];
+
+# END_BLOCK: default_formatter
+
          }],
     ],
 
@@ -399,7 +407,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.028
+version 0.029
 
 =head1 DESCRIPTION
 
@@ -412,7 +420,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

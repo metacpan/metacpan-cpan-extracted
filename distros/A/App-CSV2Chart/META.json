@@ -60,19 +60,19 @@
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.8.2"
+         "version" : "v0.10.0"
       },
       "App::CSV2Chart::API::ToXLSX" : {
          "file" : "lib/App/CSV2Chart/API/ToXLSX.pm",
-         "version" : "v0.8.2"
+         "version" : "v0.10.0"
       },
       "App::CSV2Chart::Command::svg" : {
          "file" : "lib/App/CSV2Chart/Command/svg.pm",
-         "version" : "v0.8.2"
+         "version" : "v0.10.0"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.8.2"
+         "version" : "v0.10.0"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.8.2",
+   "version" : "0.10.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -215,7 +215,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -433,7 +433,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "@SHLOMIF/Support",
-                        "version" : "1.012"
+                        "version" : "1.013"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
@@ -551,6 +551,6 @@
       }
    },
    "x_generated_by_perl" : "v5.30.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

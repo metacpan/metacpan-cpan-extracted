@@ -1,0 +1,14 @@
+{
+    "name": "Acme-NumericMethod",
+    "x_static_install": true,
+    "resources": {
+        "bugtracker": {
+            "web": "https://github.com/gugod/Acme-NumericMethod/issues"
+        },
+        "repository": {
+            "web": "https://github.com/gugod/Acme-NumericMethod",
+            "url": "https://github.com/gugod/Acme-NumericMethod.git",
+            "type": "git"
+        }
+    }
+}

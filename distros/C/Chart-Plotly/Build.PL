@@ -22,7 +22,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.038",
+  "dist_version" => "0.039",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recommends" => {
@@ -35,6 +35,7 @@ my %module_build_args = (
     "File::Which" => 0,
     "HTML::Show" => 0,
     "JSON" => 0,
+    "LWP::UserAgent" => 0,
     "Module::Find" => 0,
     "Module::Load" => 0,
     "Moo::Role" => 0,

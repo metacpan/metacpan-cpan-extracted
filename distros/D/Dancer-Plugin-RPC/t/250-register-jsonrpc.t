@@ -12,7 +12,8 @@ use Dancer::RPCPlugin::ErrorResponse;
 
 use Dancer::Test;
 
-{ # default publish => 'pod' ; Batch-mode
+{
+    note("default publish => 'pod' ; Batch-mode");
     set(plugins => {
         'RPC::JSONRPC' => {
             '/endpoint' => {
@@ -65,7 +66,8 @@ use Dancer::Test;
     ) or diag(explain(\@results));
 }
 
-{ # publish is code that returns the dispatch-table
+{
+    note("publish is code that returns the dispatch-table");
     jsonrpc '/endpoint2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -111,7 +113,8 @@ use Dancer::Test;
     );
 }
 
-{ # callback fails
+{
+    note("callback fails");
     jsonrpc '/endpoint_fail' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -156,7 +159,8 @@ use Dancer::Test;
     ) or diag($response->{content});
 }
 
-{ # callback dies
+{
+    note("callback dies");
     jsonrpc '/endpoint_fail2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -193,12 +197,13 @@ use Dancer::Test;
 
     is_deeply(
         from_json($response->{content})->{error},
-        {code => 500, message =>"terrible death\n"},
+        {code => -32500, message =>"terrible death\n"},
         "fail.ping"
     );
 }
 
-{ # code_wrapper dies
+{
+    note("code_wrapper dies");
     jsonrpc '/endpoint_fail3' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -239,12 +244,13 @@ use Dancer::Test;
     my $error = from_json($response->{content})->{error};
     is_deeply(
         $error,
-        {code => 500, message =>"code_wrapper died\n"},
+        {code => -32500, message =>"code_wrapper died\n"},
         "fail.ping (code_wrapper died)"
     ) or diag(explain($error));
 }
 
-{ # callback returns unknown object
+{
+    note("callback returns unknown object");
     jsonrpc '/endpoint_fail4' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -293,7 +299,8 @@ use Dancer::Test;
     ) or diag(explain($error));
 }
 
-{ # code_wrapper returns unknown object
+{
+    note("code_wrapper returns unknown object");
     jsonrpc '/endpoint_fail5' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -340,7 +347,8 @@ use Dancer::Test;
 }
 
 
-{ # rpc-call fails
+{
+    note("rpc-call fails");
     jsonrpc '/endpoint_error' => {
         publish => sub {
             return {
@@ -372,12 +380,13 @@ use Dancer::Test;
 
     is_deeply(
         from_json($response->{content})->{error},
-        {code => 500, message =>"Example error code\n"},
+        {code => -32500, message =>"Example error code\n"},
         "fail.error"
     );
 }
 
-{ # return an error_response()
+{
+    note("return an error_response()");
     jsonrpc '/endpoint_fault' => {
         publish => sub {
             return {

@@ -20,6 +20,7 @@ Files: Changes
  t/24mm.t
  t/25abstract.t
  t/26accumulate.t
+ t/27rolehooks.t
  t/30bare.t
  t/31lexhas.t
 Copyright: Copyright 2020 Toby Inkster.
@@ -54,12 +55,12 @@ Files: README
 Copyright: This software is copyright (c) 2019-2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2019 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: lib/MooX/Press/Keywords.pm
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL

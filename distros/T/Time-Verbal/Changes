@@ -1,3 +1,7 @@
+1.1.0:
+- Fix an edge case when 2 timestaps are exactly 86400s away from each other.
+  See: https://rt.cpan.org/Ticket/Display.html?id=121553
+
 1.0.1:
 - Remove the use of 'encodings' pragma.
 

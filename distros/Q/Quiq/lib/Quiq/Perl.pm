@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.173';
+our $VERSION = '1.174';
 
 use Quiq::Object;
 use Cwd ();
@@ -1778,7 +1778,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.173
+1.174
 
 =head1 AUTHOR
 

@@ -5,41 +5,87 @@ use 5.006001;
 use strict;
 use warnings;
 
-use File::Spec;
-use Getopt::Long 2.33;
-use Perl::Critic::Command;
+use English qw{ -no_match_vars };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Perl::Critic;
+use Perl::Critic::Utils qw{ all_perl_files };
+use Perl::Critic::Violation;
+# The following is superfluous as far as Perl::Critic is concerned, but
+# handy if we want to run the debugger.
 use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
+use Readonly;
 use Pod::Usage;
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
-my %opt;
+Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
+Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;
+Readonly::Array my @INVERTED_OPTIONS    => qw{
+    prohibit_reference_only_variables
+    prohibit_returned_lexicals
+};
 
-Getopt::Long::Configure( qw{ pass_through } );
+my %opt = map { $_ => 1 } @INVERTED_OPTIONS;
 
-GetOptions( \%opt,
-    qw{ single-policy=s },
-    'profile=s' => sub { $opt{profile} = $_[1] },
-    'noprofile' => sub { $opt{profile} = undef },
+GetOptions( \%opt, qw{
+        allow_if_computed_by|computed-by=s@
+        allow_unused_subroutine_arguments|subroutine-arguments!
+        allow_state_in_expression|state-in-expression!
+        prohibit_reference_only_variables|reference-only-variables!
+        prohibit_returned_lexicals|returned-lexicals!
+    },
+    'format=s'  => \( my $format ),
+    'verbose!'  => \( my $verbose ),
     help => sub { pod2usage( { -verbose => 2 } ) },
 ) or pod2usage( { -verbose => 0 } );
 
-$opt{'single-policy'}
-    and warn "--single-policy ignored\n";
-
-if ( ! exists $opt{profile} ) {
-    my $pf = File::Spec->catfile( $ENV{HOME}, '.perlcritic-unused-vars' );
-    -f $pf
-        and $opt{profile} = $pf;
+foreach my $key ( @INVERTED_OPTIONS ) {
+    ( $opt{$key} = ! $opt{$key} )
+        or delete $opt{$key};
 }
 
-exists $opt{profile}
-    and splice @ARGV, 0, 0, defined $opt{profile} ?
-        ( '--profile', $opt{profile} ) :
-        ( '--noprofile' );
-splice @ARGV, 0, 0, qw{ --single ProhibitUnusedVarsStricter };
+if ( ! @ARGV ) {
+    -e 'MANIFEST'
+        or die "No arguments specified and no MANIFEST found\n";
+    require ExtUtils::Manifest;
+    my $manifest = ExtUtils::Manifest::maniread();
+    @ARGV = sort all_perl_files( keys %{ $manifest } )  ## no critic (RequireLocalizedPunctuationVars)
+}
 
-Perl::Critic::Command::run();
+my $critic = Perl::Critic->new(
+    -profile    => 'NONE',
+);
+
+$critic->add_policy(
+    -policy => 'Variables::ProhibitUnusedVarsStricter',
+    -config => \%opt,
+);
+
+Perl::Critic::Violation::set_format(
+    defined $format ? $format :
+    ( @ARGV > 1 || -d $ARGV[0] ) ?
+        $DEFAULT_MULTI_FILE_FORMAT :
+        $DEFAULT_SINGLE_FILE_FORMAT
+);
+
+foreach my $fn ( @ARGV ) {
+
+    foreach my $pf ( -e $fn ? all_perl_files( $fn ) : \$fn ) {
+        my @violations = Perl::Critic::Violation::sort_by_location(
+            $critic->critique( $pf ) );
+
+        if ( @violations ) {
+            foreach ( @violations ) {
+                print;
+            }
+        } elsif ( $verbose ) {
+            local $_ = Perl::Critic::Violation::get_format();
+            local $OUTPUT_RECORD_SEPARATOR = "\n";
+            print m/ (?: \A | (?<= [^%] ) ) (?: %% )* %f /smx ?
+                "$pf source OK" : 'source OK';
+        }
+    }
+}
 
 __END__
 
@@ -56,29 +102,68 @@ unused-vars - Find unused variables in Perl code
 
 =head1 OPTIONS
 
-The following options are parsed by this script. All options not
-specifically mentioned below are passed to Perl-Critic.
+The following options are accepted by this script. They are documented
+with leading double dashes, but single dashes are accepted, as are
+unique abbreviations.
 
-=head2 -help
+=head2 --computed-by
+
+ --computed-by scope_guard
+
+Variables computed by subroutines or methods specified to this option
+are ignored. It can be specified more than once.
+
+=head2 --format
+
+ --format 5
+
+This option specifies the F<perlcritic> format to use for output. This
+corresponds to the F<perlcritic> C<--verbose> option, takes the same
+values, and has the same default.
+
+=head2 --help
 
 This option displays the documentation for this script. The script then
 exits.
 
-=head2 -noprofile
+=head2 --reference-only-variables
 
-This option specifies that no profile be used. It specifically prevents
-the use of the default profile.
+If this Boolean option is asserted, variables whose reference is taken,
+but which are otherwise unused, are permitted.
 
-=head2 -profile profile_file
+The default is C<--reference-only-variables>, but this can be overridden
+by specifying C<--no-reference-only-variables>.
 
-This option specifies the profile file to use.
+=head2 --returned-lexicals
 
-=head2 -single-policy policy_name
+If this Boolean option is asserted, otherwise-unused lexical variables
+are permitted if they are returned from a subroutine.
 
-This option exists simply to intercept any attempt to specify a policy
-other than C<Variables::ProhibitUnusedVarsStricter>.
+The default is C<--returned-lexicals>, but this can be overridden by
+specifying C<--no-returned-lexicals>.
 
-=head2 -version
+=head2 --state-in-expression
+
+If this Boolean option is asserted, otherwise-unused C<state> variables
+are allowed in expressions that appear to make used of the value of the
+variable.
+
+The default is C<--no-state-in-expression>
+
+=head2 --subroutine-arguments
+
+If this Boolean option is asserted, unused variables unpacked from
+subroutine arguments are ignored.
+
+The default is C<--no-subroutine-arguments>.
+
+=head2 --verbose
+
+If this Boolean option is asserted, files that have no violations are
+displayed as C<'OK'>. If not, files having no violations produce no
+output.
+
+=head2 --version
 
 This option displays the version of this script. The script then exits.
 
@@ -91,15 +176,8 @@ Variables::ProhibitUnusedVariables that actually has some teeth.
 If no arguments are passed, the contents of the F<MANIFEST> are scanned
 -- at least, those which appear to be Perl files.
 
-Almost all F<perlcritic> options are simply passed through. However:
-
-C<-profile> and C<-noprofile> are intercepted by this script so that if
-neither is specified it can supply its own default, which is
-F<~/.perlcritic-unused-vars>.
-
-C<-single-policy> is intercepted by this script to prevent it being
-passed to Perl-Critic. A warning is issued if this option is actually
-found.
+If an argument is passed which is not a file name, it is assumed to be
+code to critique.
 
 =head1 AUTHOR
 
@@ -107,7 +185,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2012-2019 by Thomas R. Wyant, III
+Copyright (C) 2012-2020 by Thomas R. Wyant, III
 
 =head1 LICENSE
 

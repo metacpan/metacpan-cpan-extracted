@@ -1,7 +1,7 @@
 package Acme::NumericMethod;
 use v5.8.8;
 use strict;
-our $VERSION='0.04';
+our $VERSION='0.05';
 use Lingua::EN::Words2Nums;
 
 sub import {
@@ -26,6 +26,7 @@ Acme::NumericMethod - I know numeric methods
 
   use Acme::NumericMethod;
   print one(); # 1
+  print one_million_forty_two(); # 1000042
 
 =head1 AUTHOR
 

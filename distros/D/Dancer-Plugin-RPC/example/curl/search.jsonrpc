@@ -1,0 +1,8 @@
+{
+   "id" : "b49c3eed-1f51-486e-8659-e1368ebdd2f8",
+   "jsonrpc" : "2.0",
+   "method" : "rpc_search",
+   "params" : {
+      "query" : "distribution:V"
+   }
+}

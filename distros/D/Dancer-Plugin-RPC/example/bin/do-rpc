@@ -1,6 +1,9 @@
 #! /usr/bin/perl -w
 use v5.10;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../local/lib/perl5";
+use lib "$FindBin::Bin/../lib";
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
@@ -44,7 +47,9 @@ BEGIN {
         );
         has certcheck => (
             is => 'ro',
-            isa => sub { !defined($_[0]) || $_[0] =~ /^0|1$/; },
+            isa => sub {
+                die "Invalid boolean" unless !defined($_[0]) || $_[0] =~ /^0|1$/;
+            },
             default => 1,
         );
 
@@ -97,13 +102,13 @@ BEGIN {
             my ($client, @method);
             given ($self->type) {
                 when ('jsonrpc') {
-                    $client = JSONRPCClient->new(endpoint => $self->url);
+                    $client = JSONRPCClient->new(base_uri => $self->url);
                 }
                 when ('xmlrpc')  {
-                    $client = XMLRPCClient->new(endpoint => $self->url);
+                    $client = XMLRPCClient->new(base_uri => $self->url);
                 }
                 when ('restrpc') {
-                    $client = RESTRPCClient->new(endpoint => $self->url);
+                    $client = RESTRPCClient->new(base_uri => $self->url);
                     @method = uc($self->method);
                 }
             };
@@ -121,48 +126,9 @@ BEGIN {
         1;
     }
 
-    package HTTPClient {
-        use Moo::Role;
-        use URI;
-        use HTTP::Tiny;
-        use Scalar::Util 'blessed';
-
-        with 'MooseX::Log::Log4perl::Easy';
-
-        our $VERSION = '0.90';
-
-        has endpoint => (is => 'ro', isa => sub { blessed($_[0]) eq 'URI' });
-        has client   => (is => 'lazy', isa => sub { blessed($_[0]) eq 'HTTP::Tiny' });
-        has ssl_opts => (is => 'ro', default => undef);
-        has timeout  => (is => 'ro', default => 300);
-
-        requires 'call';
-
-        around BUILDARGS => sub {
-            my $method = shift;
-            my $class  = shift;
-            my %args = @_;
-            if (ref($args{endpoint}) ne 'URI') {
-                $args{endpoint} = URI->new($args{endpoint});
-            }
-            $class->$method(%args);
-        };
-
-        sub _build_client {
-            my $self = shift;
-            return HTTP::Tiny->new(
-                agent      => "XS4ALL-do-rpc/$VERSION",
-                verify_SSL => 0,
-                timeout    => $self->timeout,
-            );
-        }
-
-        1;
-    }
-
     package JSONRPCClient {
         use Moo;
-        with 'HTTPClient';
+        with 'Client::HTTP';
         use JSON qw/encode_json decode_json/;
         use UUID::Tiny qw(UUID_V4 create_UUID_as_string);
         use Data::Dumper;
@@ -179,7 +145,7 @@ BEGIN {
             $self->log_debug(Dumper($headers));
             $self->log_debug($request);
             my $response = $self->client->request(
-                POST => $self->endpoint,
+                POST => $self->base_uri,
                 {
                     headers => $headers,
                     content => $request,
@@ -216,7 +182,7 @@ BEGIN {
 
     package XMLRPCClient {
         use Moo;
-        with 'HTTPClient';
+        with 'Client::HTTP';
         use RPC::XML;
         use RPC::XML::ParserFactory;
         use Scalar::Util 'blessed';
@@ -239,7 +205,7 @@ BEGIN {
             my $request = RPC::XML::request->new($method_name => $data)->as_string();
             $self->log_debug($request);
             my $response = $self->client->request(
-                POST => $self->endpoint,
+                POST => $self->base_uri,
                 {
                     headers => {
                         'Content-Type'   => 'text/xml',
@@ -267,7 +233,7 @@ BEGIN {
 
     package RESTRPCClient {
         use Moo;
-        with 'HTTPClient';
+        with 'Client::HTTP';
         use JSON;
         use URI;
         use Data::Dumper;
@@ -277,7 +243,7 @@ BEGIN {
             my $call = shift;
             my $http_method = shift || 'GET';
 
-            (my $endpoint = $self->endpoint->as_string) =~ s{/+$}{};
+            (my $endpoint = $self->base_uri->as_string) =~ s{/+$}{};
             $endpoint .= "/$call" if $call;
 
             my $request = @_ ? encode_json(shift) : '';

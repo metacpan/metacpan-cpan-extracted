@@ -76,7 +76,7 @@ sub BUILD ( $self, $args ) {
     };
 
     # resolve listen
-    $self->{listen} = P->uri( $self->{listen}, base => 'ws:', listen => 1 ) if !is_ref $self->{listen};
+    $self->{listen} = P->net->parse_listen( $self->{listen} ) if !is_ref $self->{listen};
 
     # generate token
     $self->{listen}->set_username(uuid_v4_str) if !defined $self->{listen}->{username};

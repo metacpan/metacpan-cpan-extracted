@@ -1,0 +1,44 @@
+                  QUERY PLAN                   
+-----------------------------------------------
+ [                                            +
+   {                                          +
+     "Plan": {                                +
+       "Node Type": "Aggregate",              +
+       "Strategy": "Sorted",                  +
+       "Partial Mode": "Simple",              +
+       "Parallel Aware": false,               +
+       "Startup Cost": 33.56,                 +
+       "Total Cost": 40.39,                   +
+       "Plan Rows": 4,                        +
+       "Plan Width": 9,                       +
+       "Group Key": ["pg_class.relkind"],     +
+       "Plans": [                             +
+         {                                    +
+           "Node Type": "Sort",               +
+           "Parent Relationship": "Outer",    +
+           "Parallel Aware": false,           +
+           "Startup Cost": 33.56,             +
+           "Total Cost": 34.53,               +
+           "Plan Rows": 388,                  +
+           "Plan Width": 1,                   +
+           "Sort Key": ["pg_class.relkind"],  +
+           "Plans": [                         +
+             {                                +
+               "Node Type": "Seq Scan",       +
+               "Parent Relationship": "Outer",+
+               "Parallel Aware": false,       +
+               "Relation Name": "pg_class",   +
+               "Alias": "pg_class",           +
+               "Startup Cost": 0.00,          +
+               "Total Cost": 16.88,           +
+               "Plan Rows": 388,              +
+               "Plan Width": 1                +
+             }                                +
+           ]                                  +
+         }                                    +
+       ]                                      +
+     }                                        +
+   }                                          +
+ ]
+(1 row)
+

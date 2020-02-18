@@ -13,7 +13,7 @@ use warnings;
 
 #########################
 
-use Test::More tests => 26;
+use Test::More tests => 28;
 BEGIN { use_ok('Glib') };
 
 #########################
@@ -51,6 +51,10 @@ SKIP: {
   Glib::set_application_name ($appname);
   is (Glib::get_application_name (), $appname);
 }
+
+is (Glib::get_prgname (), undef, 'before any calls to anything');
+Glib::set_prgname ('my_prgname');
+is (Glib::get_prgname (), 'my_prgname');
 
 SKIP: {
   skip "new 2.6 stuff", 6

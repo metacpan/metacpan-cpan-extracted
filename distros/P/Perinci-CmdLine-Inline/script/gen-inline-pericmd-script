@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.493
 
-our $DATE = '2020-02-06'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-18'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.546'; # VERSION
+our $VERSION = '0.547'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +38,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.546 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2020-02-06.
+This document describes version 0.547 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2020-02-18.
 
 =head1 SYNOPSIS
 
@@ -215,9 +216,19 @@ Do not read environment for default options.
 
 =over
 
+=item B<--code-add-extra-log-outputs>=I<s>
+
+=item B<--code-after-enable-logging>=I<s>
+
 =item B<--code-after-end>=I<s>
 
+Put at the very end of generated script.
+
 =item B<--code-after-shebang>=I<s>
+
+Put at the very beginning of generated script, after the shebang line.
+
+=item B<--code-before-enable-logging>=I<s>
 
 =item B<--code-before-parse-cmdline-options>=I<s>
 
@@ -583,8 +594,11 @@ List of available configuration parameters:
 
  actions (see --actions)
  allow_prereq (see --allow-prereq)
+ code_add_extra_log_outputs (see --code-add-extra-log-outputs)
+ code_after_enable_logging (see --code-after-enable-logging)
  code_after_end (see --code-after-end)
  code_after_shebang (see --code-after-shebang)
+ code_before_enable_logging (see --code-before-enable-logging)
  code_before_parse_cmdline_options (see --code-before-parse-cmdline-options)
  common_opts (see --common-opts)
  completion (see --completion)

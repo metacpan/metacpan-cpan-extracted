@@ -5,6 +5,7 @@ author:
 build_requires:
   Dancer: '1.31'
   JSON: '2.0'
+  Params::Validate: '1.08'
   Params::ValidationCompiler: '0.24'
   RPC::XML: '0.56'
   Test::Fatal: '0.010'
@@ -14,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.55_02
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +28,7 @@ no_index:
 requires:
   Dancer: '1.31'
   JSON: '2.0'
+  Params::Validate: '1.08'
   Params::ValidationCompiler: '0.24'
   RPC::XML: '0.56'
   Types::Standard: '1.00'
@@ -34,4 +36,5 @@ requires:
 resources:
   homepage: https://github.com/abeltje/Dancer-Plugin-RPC
   repository: git://github.com/abeltje/Dancer-Plugin-RPC.git
-version: '1.07'
+version: '1.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

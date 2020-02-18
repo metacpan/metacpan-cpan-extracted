@@ -1,3 +1,13 @@
+0.547   2020-02-18  Released-By: PERLANCAR; Urgency: medium
+
+       - Add options:
+         code_{before_enable_logging,add_extra_log_outputs,after_enable_logging}.
+
+	- [ux] Show placeholders '### code_*' in the generated code even though
+	  there is no corresponding code specified, just to show where the
+	  placeholders are.
+
+
 0.546   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to Perinci::CmdLine::Help 0.172 (must now pass

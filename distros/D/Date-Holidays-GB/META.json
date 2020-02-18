@@ -36,6 +36,9 @@
             "Cwd" : "0",
             "DateTime" : "0",
             "Dist::Milla" : "v1.0.20",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dst::Zilla::Plugin::Test::MinimumVersion" : "0",
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
@@ -44,6 +47,7 @@
             "List::Util" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
@@ -53,6 +57,7 @@
       "runtime" : {
          "requires" : {
             "Date::Holidays::Super" : "0",
+            "DateTime" : "0",
             "Exporter" : "0",
             "base" : "0",
             "constant" : "0",
@@ -74,7 +79,7 @@
             "Test::Fatal" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "Test::Time" : "0",
+            "Test::Time" : "0.07",
             "version" : "0"
          }
       }
@@ -82,19 +87,19 @@
    "provides" : {
       "Date::Holidays::GB" : {
          "file" : "lib/Date/Holidays/GB.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Date::Holidays::GB::EAW" : {
          "file" : "lib/Date/Holidays/GB/EAW.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Date::Holidays::GB::NIR" : {
          "file" : "lib/Date/Holidays/GB/NIR.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Date::Holidays::GB::SCT" : {
          "file" : "lib/Date/Holidays/GB/SCT.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -109,7 +114,7 @@
          "web" : "https://github.com/mjemmeson/Date-Holidays-GB"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_contributors" : [
       "Michael Jemmeson <michael.jemmeson@cpan.org>",
       "Peter Newman <peternewman@users.noreply.github.com>"

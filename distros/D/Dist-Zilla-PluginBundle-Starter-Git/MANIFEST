@@ -17,6 +17,7 @@ profiles/default/skel/.gitignore
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/bundle_revision_3.t
+t/bundle_revision_4.t
 t/minter.t
 t/minter/global/config.ini
 xt/author/00-compile.t

@@ -4,6 +4,8 @@
 #include <XSUB.h>
 #include <perliol.h>
 
+#include "ppport.h"
+
 #define CONSTANT(name, key, value) hv_store(get_hv("PerlIO::Layers::" #name, TRUE), key, sizeof key - 1, newSVuv(value), 0)
 
 #define INSTANCE_CONSTANT(cons) CONSTANT(FLAG_FOR, #cons, PERLIO_F_##cons)

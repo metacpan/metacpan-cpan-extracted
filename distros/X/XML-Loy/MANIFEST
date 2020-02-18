@@ -8,6 +8,7 @@ lib/XML/Loy/Atom/Threading.pm
 lib/XML/Loy/ActivityStreams.pm
 lib/XML/Loy/Date/RFC3339.pm
 lib/XML/Loy/Date/RFC822.pm
+lib/Test/XML/Loy.pm
 t/add.t
 t/add-node.t
 t/as.t
@@ -18,6 +19,7 @@ t/pretty.t
 t/pretty-special.t
 t/set.t
 t/summary.t
+t/test-loy.t
 t/Extensions/XRD.t
 t/Extensions/HostMeta.t
 t/Extensions/Atom.t

@@ -1,5 +1,14 @@
 Revision history for Perl extension Convert::UUlib.
 
+1.62 Mon Feb 17 23:19:42 CET 2020
+	- major performance improvement by simplifying code in _FP_gets
+          to not use fscanf. This might slow things down on platforms
+          with very slow fgetc.
+
+1.61 Sun Feb  9 18:38:29 CET 2020
+	- lint uulib: fix some format string type mismatches
+          and some other minor issues.
+
 1.6  Thu Oct 24 17:11:54 CEST 2019
 	- fix heap overflow (testcase by Noel Duffy, reported
           by Robert Scheck). The defense-in-depth mechanism based

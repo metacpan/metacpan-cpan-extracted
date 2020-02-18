@@ -5,7 +5,7 @@ use warnings;
 use base 'Alien::Base';
 
 # ABSTRACT: Install hunspell
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 
@@ -24,7 +24,7 @@ Alien::Hunspell - Install hunspell
 
 =head1 VERSION
 
-version 0.11
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -72,8 +72,8 @@ In your L<FFI::Platypus> script or module:
 
 =head1 DESCRIPTION
 
-This module provides the spelling library Hunspell.  It will either 
-detect it as provided by the operating system, or download the source 
+This module provides the spelling library Hunspell.  It will either
+detect it as provided by the operating system, or download the source
 from the Internet and install it for you.  It uses L<Alien::Base>.
 
 =head1 AUTHOR

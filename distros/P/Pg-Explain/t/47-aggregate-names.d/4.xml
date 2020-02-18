@@ -1,0 +1,31 @@
+<explain xmlns="http://www.postgresql.org/2009/explain">
+  <Query>
+    <Plan>
+      <Node-Type>Aggregate</Node-Type>
+      <Strategy>Hashed</Strategy>
+      <Partial-Mode>Simple</Partial-Mode>
+      <Parallel-Aware>false</Parallel-Aware>
+      <Startup-Cost>19.79</Startup-Cost>
+      <Total-Cost>19.95</Total-Cost>
+      <Plan-Rows>16</Plan-Rows>
+      <Plan-Width>13</Plan-Width>
+      <Group-Key>
+        <Item>relnamespace</Item>
+        <Item>relkind</Item>
+      </Group-Key>
+      <Plans>
+        <Plan>
+          <Node-Type>Seq Scan</Node-Type>
+          <Parent-Relationship>Outer</Parent-Relationship>
+          <Parallel-Aware>false</Parallel-Aware>
+          <Relation-Name>pg_class</Relation-Name>
+          <Alias>pg_class</Alias>
+          <Startup-Cost>0.00</Startup-Cost>
+          <Total-Cost>16.88</Total-Cost>
+          <Plan-Rows>388</Plan-Rows>
+          <Plan-Width>5</Plan-Width>
+        </Plan>
+      </Plans>
+    </Plan>
+  </Query>
+</explain>

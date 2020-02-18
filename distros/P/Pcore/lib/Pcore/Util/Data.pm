@@ -460,7 +460,7 @@ sub get_xml (@args) {
     require XML::Hash::XS;
 
     my %args = (
-        buf_size => 4096,         # buffer size for reading end encoding data
+        buf_size => 4096,         # buffer size for reading and encoding data
         content  => 'content',    # if defined that the key name for the text content(used only if use_attr=1)
         encoding => 'UTF-8',
         trim     => 1,            # trim leading and trailing whitespace from text nodes

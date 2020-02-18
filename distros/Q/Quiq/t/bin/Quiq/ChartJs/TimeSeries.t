@@ -13,7 +13,7 @@ use Quiq::FileHandle;
 use Quiq::Epoch;
 use Quiq::Html::Producer;
 use Quiq::Html::Page;
-use Quiq::Html::Fragment;
+use Quiq::Html::Component;
 use Quiq::JQuery::Function;
 use Quiq::Path;
 
@@ -90,7 +90,7 @@ sub test_unitTest: Test(2) {
         );
     }
     else {
-        $html = Quiq::Html::Fragment->html($h,
+        $html = Quiq::Html::Component->fragment($h,
             html => $h->cat(
                 $h->tag('script',
                     src => 'https://code.jquery.com/jquery-3.4.1.min.js',

@@ -4,7 +4,11 @@ use Dancer ':syntax';
 use Dancer::Plugin;
 use Scalar::Util 'blessed';
 
+our $VERSION = '1.08';
+
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+use constant PLUGIN_NAME => 'restrpc';
 
 use Dancer::RPCPlugin::CallbackResult;
 use Dancer::RPCPlugin::ErrorResponse;
@@ -19,7 +23,7 @@ my %dispatch_builder_map = (
     config => \&build_dispatcher_from_config,
 );
 
-register restrpc => sub {
+register PLUGIN_NAME ,=> sub {
     my($self, $base_url, $arguments) = plugin_args(@_);
 
     my $publisher;
@@ -37,7 +41,7 @@ register restrpc => sub {
 
     my $lister = Dancer::RPCPlugin::DispatchMethodList->new();
     $lister->set_partial(
-        protocol => 'restrpc',
+        protocol => PLUGIN_NAME,
         endpoint => $base_url,
         methods  => [ sort keys %{ $dispatcher } ],
     );
@@ -53,7 +57,8 @@ register restrpc => sub {
 
     debug("Starting restrpc-handler build: ", $lister);
     my $handle_call = sub {
-        if (request->content_type ne 'application/json') {
+        my ($ct) = (split /;\s*/, request->content_type, 2);
+        if ($ct ne 'application/json') {
             pass();
         }
         debug("[handle_restrpc_request] Processing: ", request->body);
@@ -71,28 +76,41 @@ register restrpc => sub {
             ? from_json(request->body)
             : undef;
         my Dancer::RPCPlugin::CallbackResult $continue = eval {
+            local $Dancer::RPCPlugin::ROUTE_INFO = {
+                plugin        => PLUGIN_NAME,
+                endpoint      => $base_url,
+                rpc_method    => $method_name,
+                full_path     => request->path,
+                http_method   => uc(request->method),
+            };
             $callback
                 ? $callback->(request(), $method_name, $method_args)
                 : callback_success();
         };
 
         if (my $error = $@) {
-            $response = Dancer::RPCPlugin::ErrorResponse->new(
+            my $error_response = Dancer::RPCPlugin::ErrorResponse->new(
                 error_code => 500,
                 error_message => $error,
-            )->as_restrpc_error;
+            );
+            status $error_response->return_status(PLUGIN_NAME);
+            $response = $error_response->as_restrpc_error;
         }
         elsif (!blessed($continue) || !$continue->isa('Dancer::RPCPlugin::CallbackResult')) {
-            $response = Dancer::RPCPlugin::ErrorResponse->new(
+            my $error_response = Dancer::RPCPlugin::ErrorResponse->new(
                 error_code    => 500,
                 error_message => "Internal error: 'callback_result' wrong class " . blessed($continue),
-            )->as_restrpc_error;
+            );
+            status $error_response->return_status(PLUGIN_NAME);
+            $response = $error_response->as_restrpc_error;
         }
         elsif (blessed($continue) && !$continue->success) {
-            $response = Dancer::RPCPlugin::ErrorResponse->new(
+            my $error_response = Dancer::RPCPlugin::ErrorResponse->new(
                 error_code    => $continue->error_code,
                 error_message => $continue->error_message,
-            )->as_restrpc_error;
+            );
+            status $error_response->return_status(PLUGIN_NAME);
+            $response = $error_response->as_restrpc_error;
         }
         else {
             my Dancer::RPCPlugin::DispatchItem $di = $dispatcher->{$method_name};
@@ -105,12 +123,17 @@ register restrpc => sub {
 
             debug("[handling_jsonrpc_response($method_name)] ", $response);
             if (my $error = $@) {
-                $response = Dancer::RPCPlugin::ErrorResponse->new(
-                    error_code => 500,
-                    error_message => $error,
-                )->as_restrpc_error;
+                my $error_response = blessed($error) && $error->can('as_restrpc_error')
+                    ? $error
+                    : error_response(
+                            error_code    => -32500,
+                            error_message => $error,
+                            error_data    => $method_args,
+                    );
+                status $error_response->return_status(PLUGIN_NAME);
+                $response = $error_response->as_restrpc_error;
             }
-            if (blessed($response) && $response->can('as_restrpc_error')) {
+            elsif (blessed($response) && $response->can('as_restrpc_error')) {
                $response = $response->as_restrpc_error;
             }
             elsif (blessed($response)) {
@@ -118,7 +141,11 @@ register restrpc => sub {
             }
         }
         $response = { result => $response } if !ref($response);
-        return to_json($response);
+        my $jsonise_options = {canonical => 1};
+        if (config->{encoding} && config->{encoding} =~ m{^utf-?8$}i) {
+            $jsonise_options->{utf8} = 1;
+        }
+        return to_json($response, $jsonise_options);
     };
 
     debug("setting routes (restrpc): $base_url ", $lister);

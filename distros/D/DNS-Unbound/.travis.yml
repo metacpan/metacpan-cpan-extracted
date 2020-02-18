@@ -17,14 +17,14 @@ perl:
 #  - "5.8"
 #  - "5.6"
 before_install:
-    - eval $(curl https://travis-perl.github.io/init) --auto
     - "sudo apt-get install libunbound-dev"
+    - eval $(curl https://travis-perl.github.io/init) --auto
     - "[ $TRAVIS_PERL_VERSION != '5.14' ] && [ $TRAVIS_PERL_VERSION != '5.12' ] && [ $TRAVIS_PERL_VERSION != '5.10' ] && cpanm --notest --verbose AnyEvent AnyEvent::XSPromises ||:"
     - cpanm --notest --verbose Promise::XS
     - cpanm --notest ExtUtils::MakeMaker
 install:
     - cpanm --verbose --installdeps --notest .
-matrix:
+jobs:
   include:
     - os: osx
       perl: system

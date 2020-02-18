@@ -4,13 +4,13 @@
       "LabKey Software <info@labkey.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LabKey-Query",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "LabKey::Query" : {
          "file" : "lib/LabKey/Query.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
       },
       "x_issues" : "https://www.labkey.org/home/Developer/issues/issues-list.view?issues-issues.area~eq=Perl%20Client%20API"
    },
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

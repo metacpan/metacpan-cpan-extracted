@@ -1,5 +1,5 @@
 package PerlIO::Layers;
-$PerlIO::Layers::VERSION = '0.011';
+$PerlIO::Layers::VERSION = '0.012';
 use 5.008_001;
 use strict;
 use warnings FATAL => 'all';
@@ -133,7 +133,7 @@ PerlIO::Layers - Querying your filehandle's capabilities
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -205,7 +205,7 @@ Check whether the filehandle is in line-buffering mode.
 
 =item * autoflush
 
-Checks wheter the filehandle is in unbuffering mode. Note that this is not the opposite of buffering, but more similar to autoflush, hence the name of this test.
+Checks whether the filehandle is in unbuffering mode. Note that this is not the opposite of buffering, but more similar to autoflush, hence the name of this test.
 
 =item * buffer_size
 

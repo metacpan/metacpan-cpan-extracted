@@ -13,7 +13,8 @@ use Dancer::RPCPlugin::ErrorResponse;
 use Dancer::Test;
 
 
-{ # default publish (config)
+{
+    note("default publish (config)");
     set(plugins => {
         'RPC::RESTRPC' => {
             '/rest/system' => {
@@ -45,7 +46,8 @@ use Dancer::Test;
     );
 }
 
-{ # publish is code that returns the dispatch-table
+{
+    note("publish is code that returns the dispatch-table");
     restrpc '/rest/systeem' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -80,7 +82,8 @@ use Dancer::Test;
     );
 }
 
-{ # callback fails
+{
+    note("callback fails");
     restrpc '/rest/failsystem' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -125,7 +128,8 @@ use Dancer::Test;
     );
 }
 
-{ # callback dies
+{
+    note("callback dies");
     restrpc '/rest/morefail' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -162,7 +166,8 @@ use Dancer::Test;
     );
 }
 
-{ # code_wrapper dies
+{
+    note("code_wrapper dies");
     restrpc '/rest/fail3' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -196,12 +201,13 @@ use Dancer::Test;
     my $result = from_json($response->{content});
     is_deeply(
         $result,
-        {error => {code => 500, message =>"code_wrapper died\n"}},
+        {error => {code => -32500, message =>"code_wrapper died\n"}},
         "/rest/fail3/ping (code_wrapper died)"
     ) or diag(explain($result));
 }
 
-{ # callback returns unknown object
+{
+    note("callback returns unknown object");
     restrpc '/rest/fail4' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -245,7 +251,8 @@ use Dancer::Test;
     ) or diag(explain($result));
 }
 
-{ # code_wrapper returns unknown object
+{
+    note("code_wrapper returns unknown object");
     restrpc '/rest/fail5' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -284,7 +291,8 @@ use Dancer::Test;
     ) or diag(explain($result));
 }
 
-{ # rpc-call fails
+{
+    note("rpc-call fails");
     restrpc '/rest/error' => {
         publish => sub {
             return {
@@ -310,12 +318,13 @@ use Dancer::Test;
     my $result = from_json($response->{content});
     is_deeply(
         $result,
-        {error => {code => 500, message =>"Example error code\n"}},
+        {error => {code => -32500, message =>"Example error code\n"}},
         "/rest/error/code_fail"
     );
 }
 
-{ # return an error_response()
+{
+    note("return an error_response()");
     restrpc '/rest/fault' => {
         publish => sub {
             return {

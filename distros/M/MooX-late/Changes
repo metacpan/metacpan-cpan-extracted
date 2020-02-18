@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/MooX-late>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-late>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.100	2020-02-17
+
+ [ Packaging ]
+ - Make Sub::HandlesVia a required dependency.
+
+ [ Other ]
+ - Use Sub::HandlesVia instead of MooX::HandlesVia; less translation needed
+   because Sub::HandlesVia already understands Moose-like syntax; plus it
+   covers more datatypes and methods.
+
 0.016	2019-11-18
 
  [ Test Suite ]

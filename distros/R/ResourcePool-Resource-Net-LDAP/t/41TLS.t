@@ -1,8 +1,8 @@
 #! /usr/bin/perl -w
 #*********************************************************************
 #*** t/41TLS.t
-#*** Copyright (c) 2003 by Markus Winand <mws@fatalmind.com>
-#*** $Id: 41TLS.t,v 1.3 2003/09/25 17:23:52 mws Exp $
+#*** Copyright (c) 2020 by Markus Winand <mws@fatalmind.com>
+#*** $Id$
 #*********************************************************************
 use strict;
 use Test;

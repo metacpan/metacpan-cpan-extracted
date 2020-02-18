@@ -4,7 +4,7 @@ csv2chart - command line utility to convert CSV data to a graphical chart
 
 # VERSION
 
-version 0.8.2
+version 0.10.0
 
 # SYNOPSIS
 
@@ -62,23 +62,11 @@ in addition to those websites please use your favorite search engine to discover
 
     [https://metacpan.org/release/App-CSV2Chart](https://metacpan.org/release/App-CSV2Chart)
 
-- Search CPAN
-
-    The default CPAN search engine, useful to view POD in HTML format.
-
-    [http://search.cpan.org/dist/App-CSV2Chart](http://search.cpan.org/dist/App-CSV2Chart)
-
 - RT: CPAN's Bug Tracker
 
     The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
     [https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV2Chart](https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSV2Chart)
-
-- CPAN Ratings
-
-    The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-    [http://cpanratings.perl.org/d/App-CSV2Chart](http://cpanratings.perl.org/d/App-CSV2Chart)
 
 - CPANTS
 

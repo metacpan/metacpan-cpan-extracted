@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Heatmapgl::Hoverlabel;
 use Chart::Plotly::Trace::Heatmapgl::Stream;
 use Chart::Plotly::Trace::Heatmapgl::Transform;
 
-our $VERSION = '0.038';    # VERSION
+our $VERSION = '0.039';    # VERSION
 
 # ABSTRACT: WebGL version of the heatmap trace type.
 
@@ -306,7 +306,7 @@ Chart::Plotly::Trace::Heatmapgl - WebGL version of the heatmap trace type.
 
 =head1 VERSION
 
-version 0.038
+version 0.039
 
 =head1 SYNOPSIS
 

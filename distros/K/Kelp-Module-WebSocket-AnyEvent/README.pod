@@ -1,0 +1,89 @@
+=head1 NAME
+
+Kelp::Module::WebSocket::AnyEvent - AnyEvent websocket server integration with Kelp
+
+=head1 SYNOPSIS
+
+	# in config
+	modules => [qw(Symbiosis Websocket::AnyEvent)],
+	modules_init => {
+		"Websocket::AnyEvent" => {
+			serializer => "json",
+		},
+	},
+
+	# in application's build method
+	my $ws = $self->websocket;
+	$ws->add(message => sub {
+		my ($conn, $msg) = @_;
+		$conn->send({received => $msg});
+	});
+	$self->symbiosis->mount("/ws" => $ws);
+
+	# in psgi script
+	$app = MyApp->new;
+	$app->run_all;
+
+
+=head1 DESCRIPTION
+
+This is a module that integrates a websocket instance into Kelp using L<Kelp::Module::Symbiosis>. To run it, a non-blocking Plack server based on AnyEvent is required, like L<Twiggy>. All this module does is wrap L<Plack::App::WebSocket> instance in Kelp's module, introduce a method to get this instance in Kelp and integrate it into running alongside Kelp using Symbiosis. An instance of this class will be available in Kelp under the I<websocket> method.
+
+=head1 METHODS
+
+=head2 connections
+
+	sig: connections($self)
+
+Returns a hashref containing all available L<Kelp::Module::WebSocket::AnyEvent::Connection> instances (open connections) keyed by their unique id. An id is autoincremented from 1 and guaranteed not to change and not to be replaced by a different connection unless the server restarts.
+
+=head2 middleware
+
+	sig: middleware($self)
+
+Returns an arrayref of all middlewares in format: C<[ middleware_class, [ middleware_config ] ]>.
+
+=head2 psgi
+
+	sig: psgi($self)
+
+Returns a ran instance of L<Plack::App::WebSocket>.
+
+=head2 run
+
+	sig: run($self)
+
+Same as psgi, but wraps the instance in all wanted middlewares.
+
+=head2 add
+
+	sig: add($self, $event, $handler)
+
+Registers a $handler (coderef) for websocket $event (string). Handler will be passed an instance of L<Kelp::Module::WebSocket::AnyEvent::Connection> and an incoming message. $event can be either one of: I<open close message error>. You can only specify one handler for each event type.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<Dancer2::Plugin::Websocket>, same integration for Dancer2 framework this module was inspired by
+
+=item * L<Kelp>, the framework
+
+=item * L<Twiggy>, a server capable of running this websocket
+
+=back
+
+=head1 AUTHOR
+
+Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Bartosz Jarzyna
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

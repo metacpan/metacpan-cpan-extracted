@@ -27,14 +27,13 @@ optional_features: {}
 provides:
   MooX::late:
     file: lib/MooX/late.pm
-    version: '0.016'
+    version: '0.100'
   MooX::late::DefinitionContext:
     file: lib/MooX/late.pm
-    version: '0.016'
-recommends:
-  MooX::HandlesVia: '0.001004'
+    version: '0.100'
 requires:
-  Moo: '1.006000'
+  Moo: '2'
+  Sub::HandlesVia: '0.013'
   Type::Utils: '1.000001'
   perl: '5.008003'
 resources:
@@ -43,6 +42,6 @@ resources:
   homepage: https://metacpan.org/release/MooX-late
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moox-late.git
-version: '0.016'
+version: '0.100'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

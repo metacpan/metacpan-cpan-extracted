@@ -33,13 +33,7 @@ DESCRIPTION
 
     4.  Exports `blessed` and `confess` functions to your namespace.
 
-    5.  Handles certain attribute traits. Currently `Hash`, `Array` and `Code`
-        are supported. This feature requires MooX::HandlesVia.
-
-        `String`, `Number`, `Counter` and `Bool` are unlikely to ever be
-        supported because of internal implementation details of Moo. If you
-        need another attribute trait to be supported, let me know and I will
-        consider it.
+    5.  Handles native attribute traits.
 
     Five features. It is not the aim of `MooX::late` to make every aspect of
     Moo behave exactly identically to Moose. It's just going after the
@@ -83,10 +77,11 @@ BUGS
 SEE ALSO
     `MooX::late` uses Types::Standard to check type constraints.
 
-    `MooX::late` uses MooX::HandlesVia to provide native attribute traits
+    `MooX::late` uses Sub::HandlesVia to provide native attribute traits
     support.
 
-    The following modules bring additional Moose functionality to Moo:
+    The following modules bring additional Moose functionality to Moo, beyond
+    what MooX::late offers:
 
     *   MooX::Override - support override/super
 

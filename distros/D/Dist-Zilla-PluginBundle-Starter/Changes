@@ -1,3 +1,7 @@
+v4.0.0    2020-02-17 16:34:14 EST
+  - Revision 4 added.
+    - Removed [MetaConfig] to declutter generated META files.
+
 v3.0.5    2019-09-09 20:34:12 EDT
   - Fix Dist::Zilla::Starter overview to not link to itself.
 

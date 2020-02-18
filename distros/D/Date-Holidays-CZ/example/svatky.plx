@@ -12,6 +12,7 @@ use Date::Holidays::CZ qw(holidays);
 # See the manpage for a list of all aliases.
 my %svatky_full_names = (
     'obss' => 'Restoration Day of the Independent Czech State',
+    'velk' => 'Good Friday',
     'veln' => 'Easter Sunday',
     'velp' => 'Easter Monday', 
     'svpr' => 'Labor Day', 
@@ -34,7 +35,7 @@ my $pristi = $tento + 1;
 
 # Get the list of holidays for next year
 my @svatky = @{holidays( WHERE  => ['all'], 
-                         FORMAT => "%#:%d.%m.%Y (%s seconds since the epoch)",
+                         FORMAT => "%#:%d.%m.%Y",
                          YEAR   => $pristi
              )};
 

@@ -142,7 +142,7 @@ _FP_memdup (void *ptr, int len)
 
 #ifndef FP_stricmp
 int TOOLEXPORT
-_FP_stricmp (char *str1, char *str2)
+_FP_stricmp (const char *str1, const char *str2)
 {
   if (str1==NULL || str2==NULL)
     return -1;
@@ -159,7 +159,7 @@ _FP_stricmp (char *str1, char *str2)
 
 #ifndef FP_strnicmp
 int TOOLEXPORT
-_FP_strnicmp (char *str1, char *str2, int count)
+_FP_strnicmp (const char *str1, const char *str2, int count)
 {
   if (str1==NULL || str2==NULL)
     return -1;
@@ -413,51 +413,51 @@ _FP_cutdir (char *filename)
  * properly: LF (Unix), CRLF (DOS) and CR (Mac).
  */
 /* (schmorp) the buffer is always written to, and no LF is stored at the end */
+/* also, if the buffer is too short, the remaining line is skipped */
 char * TOOLEXPORT
 _FP_fgets (char *buf, int n, FILE *stream)
 {
-  static char format[64];
-  static int format_n = 0;
-  char *cp = buf;
-  int res;
-  int c;
+  char *ptr = buf;
+  char *end = buf + n - 1;
 
   /* shield against buffer overflows caused by "255 - bytes_left"-kind of bugs when bytes_left > 255 */
   if (n <= 0)
-    return NULL;
+    return 0;
 
-  if (format_n != n)
-    {
-      sprintf (format, "%%%d[^\015\012]", n - 1);
-      format_n = n;
-    }
-
-  *buf = 0; /* fscanf return s0 on empty lines */
-  res = fscanf (stream, format, buf);
-
-  if (res == EOF)
-    return 0; /* an error occured */
-
-  /* skip line endings */
   for (;;)
     {
-      c = _FP_fgetc (stream);
+      int c = FP_fgetc (stream);
 
-      if (c == '\012') /* LF */
-        return buf;
-      else if (c == '\015') /* CR */
+      if (ecb_expect_false (c <= '\015')) /* EOF is < 0x20, too */
         {
-          c = _FP_fgetc (stream);
-          if (c != '\012') /* CR LF? */
-            ungetc (c, stream);
+          /* ctlchar */
 
-          return buf;
+          if (c == '\012')
+            /* LF, nothing following */
+            break;
+          else if (c == '\015')
+            {
+              /* CR, possibly CRLF, skip following LF */
+              c = FP_fgetc (stream);
+
+              if (c != '\012') /* CR LF? */
+                ungetc (c, stream);
+
+              break;
+            }
+          else if (c == EOF)
+            {
+              *ptr = 0;
+              return 0;
+            }
         }
-      else if (c == EOF)
-        return 0; /* error */
 
-      /* skip remaining line */
+      *ptr = c;
+      ptr += ptr < end; /* this is hopefully branch-free, and fast */
     }
+
+  *ptr = 0;
+  return buf;
 }
 
 /*

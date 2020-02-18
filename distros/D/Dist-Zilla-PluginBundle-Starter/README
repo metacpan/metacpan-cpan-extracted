@@ -11,7 +11,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter]           ; all that is needed to start
-      revision = 3         ; always defaults to revision 1
+      revision = 4         ; always defaults to revision 1
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -21,7 +21,7 @@ SYNOPSIS
       regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
       [@Starter::Git]      ; drop-in variant bundle for git workflows
-      revision = 3         ; requires/defaults to revision 3
+      revision = 4         ; requires/defaults to revision 3
 
 DESCRIPTION
     The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
@@ -80,7 +80,7 @@ EXAMPLES
       version = 1.00
 
       [@Starter]
-      revision = 3
+      revision = 4
 
       [Prereqs / RuntimeRequires]
       perl = 5.010001
@@ -98,7 +98,7 @@ EXAMPLES
       copyright_year   = 2019
 
       [@Starter::Git]
-      revision = 3
+      revision = 4
       managed_versions = 1
       regenerate = Makefile.PL
       regenerate = META.json
@@ -118,7 +118,7 @@ EXAMPLES
       plugin = ReadmeAnyFromPod
 
       [@Starter::Git]
-      revision = 3
+      revision = 4
       installer = ModuleBuildTiny
       managed_versions = 1
       regenerate = Build.PL
@@ -144,7 +144,7 @@ OPTIONS
 
   revision
       [@Starter]
-      revision = 2
+      revision = 4
 
     Selects the revision to use, from "REVISIONS". Defaults to revision 1.
 
@@ -299,6 +299,11 @@ REVISIONS
     Revision 3 is similar to Revision 2, but additionally supports the
     "managed_versions" and "regenerate" options, and variant bundles like
     [@Starter::Git].
+
+  Revision 4
+    Revision 4 is similar to Revision 3, but removes the [MetaConfig] plugin
+    because it adds significant clutter to the generated META files without
+    much benefit. It can easily be added to the dist.ini if desired.
 
 CONFIGURING
     By using the PluginRemover or Config::Slicer role options, the

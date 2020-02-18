@@ -17,12 +17,6 @@ sub API_read ( $self, $auth, $args ) {
 
     # get all matched rows
     else {
-
-        # filter search
-        if ( my $search = delete $args->{where}->{title} ) {
-            $where &= WHERE [ '"title" ILIKE', \$search->[1] ];
-        }
-
         $where &= WHERE [ $args->{where} ];
     }
 

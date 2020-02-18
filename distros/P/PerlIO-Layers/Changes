@@ -1,5 +1,8 @@
 Revision history for PerlIO-Layers
 
+0.012     2020-02-18 01:30:34+01:00 Europe/Amsterdam
+          Add ppport.h for backwards compatibility
+
 0.011     2014-03-07 15:20:03CET+0100 Europe/Amsterdam
           Got rid of natatime/List::MoreUtils
           Remove problematic test on Windows

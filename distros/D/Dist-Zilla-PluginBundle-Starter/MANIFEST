@@ -23,6 +23,7 @@ t/bundle_installer_mm_awesome.t
 t/bundle_revision_1.t
 t/bundle_revision_2.t
 t/bundle_revision_3.t
+t/bundle_revision_4.t
 t/minter.t
 t/minter/global/config.ini
 xt/author/00-compile.t

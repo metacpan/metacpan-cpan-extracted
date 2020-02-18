@@ -2,7 +2,16 @@ package Dancer::Plugin::RPC;
 use warnings;
 use strict;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
+
+# Will be set from the request-handler for the callback scope
+our $ROUTE_INFO = {
+    plugin        => undef,        # PLUGIN_NAME,
+    endpoint      => undef,        # $endpoint,
+    rpc_method    => undef,        # $method_name,
+    full_path     => undef,        # request->path,
+    http_method   => undef,        # $http_method,
+};
 
 1;
 
@@ -104,7 +113,21 @@ Returns for success: C<< callback_success() >>
 
 Returns for failure: C<< callback_fail(error_code => $code, error_message => $msg) >>
 
-This is useful for ACL checking.
+This is useful for eg ACL checking.
+
+In the scope of the callback-function you will have the variable
+C<$Dancer::RPCPlugin::ROUTE_INFO>, a hashref:
+
+    local $Dancer::RPCPlugin::ROUTE_INFO = {
+        plugin        => PLUGIN_NAME,
+        endpoint      => $endpoint,
+        rpc_method    => $method_name,
+        full_path     => request->path,
+        http_method   => $http_method,
+    };
+
+Other plugins may want to put extra information in there to help you decide if
+this request should even be honoured.
 
 =head3 code_wrapper => $coderef
 

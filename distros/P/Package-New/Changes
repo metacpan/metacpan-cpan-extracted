@@ -1,5 +1,9 @@
 Revision history for Perl module Package::New
 
+0.09 2020-02-17
+  - Updated lib/Package/New.pm - fixed testing coverage issue
+  - Updated t/002_base.t and t/003_dump.t - added testing coverage
+
 0.08 2019-12-14
   - Updated t/001_load.t - Added test cases from cpancover.com
   - Added t/004_dump.t - Added test cases from cpancover.com

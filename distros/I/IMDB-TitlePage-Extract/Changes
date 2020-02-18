@@ -1,3 +1,8 @@
+0.005   2020-02-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Extract title, countries, languages, keywords.
+
+
 0.004   2020-02-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Get genres & description from linked-data if available.
