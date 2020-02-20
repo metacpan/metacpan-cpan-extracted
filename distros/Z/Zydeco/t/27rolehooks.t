@@ -15,6 +15,10 @@ package Local {
 			push @{ $xxx{'Local::Role1'}||=[] }, [ before_apply => $role, $package, $kind ];
 		}
 		after_apply {
+			if ($kind eq 'class') {
+				has bleh;
+				constant MY_CONSTANT = 42;
+			}
 			push @{ $xxx{'Local::Role1'}||=[] }, [ after_apply  => $role, $package, $kind ];
 		}
 	}
@@ -74,5 +78,13 @@ is_deeply(\%xxx, {
 		]
 	]
 }) or diag explain(\%xxx);
+
+ok(!Local::Role1->can('MY_CONSTANT'));
+ok(!Local::Role2->can('MY_CONSTANT'));
+is(Local::Class1::MY_CONSTANT, 42);
+
+ok(!Local::Role1->can('bleh'));
+ok(!Local::Role2->can('bleh'));
+ok(Local::Class1->can('bleh'));
 
 done_testing;

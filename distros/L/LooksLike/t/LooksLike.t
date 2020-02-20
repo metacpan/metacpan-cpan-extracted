@@ -29,14 +29,16 @@ foreach my $num (@decimal) {
 }
 
 my @infs  = ( qw( inf infinity ), 1e9999 );
-my @nans  = ( qw( nan NaN ), '+inf' / '+inf' );
+diag( "1e9999 == ", $infs[-1] );
+my @nans  = ( qw( nan NaN ), $infs[-1] / $infs[-1] );
+diag( "$infs[-1]/$infs[-1] == ", $nans[-1] );
 my @odds  = ( qw(   1   23  987654321 ),   123_456_789 );
 my @evens = ( qw( 456 7890 9876543210 ), 1_234_567_890 );
 my @ints  = ( @odds, @evens );
 my @nums  = ( qw( 0.1 2.34 56.789 ), 4**4**4, 10 / 3 );
 
 my @zeroes = ( qw( 0 0.0 0e0 000 ), 0, 0.0, 0e0 );
-my @words  = (qw( notanumber infinite ));
+my @words  = (qw( infinite nano notanumber ));
 
 # These should only work on Perl 5.22 and greater.
 push @infs,
@@ -57,9 +59,9 @@ for my $num (@infs) {
     is( LooksLike::infinity($num),    1, " '$num' is infinity" );
     is( LooksLike::infinity("-$num"), 1, "'-$num' is infinity" );
 
-    my $Uc = ucfirst $num;
+    my $Uc = ucfirst "$num";
     is( LooksLike::infinity($Uc), 1, " '$Uc' is infinity" );
-    my $UC = uc $num;
+    my $UC = uc "$num";
     is( LooksLike::infinity($UC), 1, " '$UC' is infinity" );
 }
 
@@ -74,10 +76,10 @@ for my $num (@nans) {
     is( LooksLike::nan($num),    1, " '$num' is NaN" );
     is( LooksLike::nan( -$num ), 1, "'-$num' is NaN" );
 
-    my $Uc = ucfirst $num;
-    is( LooksLike::nan($Uc), 1, " '$Uc' is NaN" ) or die;
-    my $UC = uc $num;
-    is( LooksLike::nan($UC), 1, " '$UC' is NaN" ) or die;
+    my $Uc = ucfirst "$num";
+    is( LooksLike::nan($Uc), 1, " '$Uc' is NaN" );
+    my $UC = uc "$num";
+    is( LooksLike::nan($UC), 1, " '$UC' is NaN" );
 }
 
 for my $num ( qw( banana ), @infs, @ints, @nums, @words ) {
@@ -103,9 +105,9 @@ for my $num ( @ints, @nums, @zeroes ) {
     is( LooksLike::numeric($num),    1, " '$num' is numeric" );
     is( LooksLike::numeric( -$num ), 1, "'-$num' is numeric" );
 
-    my $Uc = ucfirst $num;
+    my $Uc = ucfirst "$num";
     is( LooksLike::numeric($Uc), 1, " '$Uc' is numeric" );
-    my $UC = uc $num;
+    my $UC = uc "$num";
     is( LooksLike::numeric($UC), 1, " '$UC' is numeric" );
 }
 
@@ -120,10 +122,10 @@ for my $num ( @infs, @ints, @nans, @nums, @zeroes ) {
     is( LooksLike::number($num),    1, " '$num' is a number" );
     is( LooksLike::number( -$num ), 1, "'-$num' is a number" );
 
-    my $Uc = ucfirst $num;
-    is( LooksLike::number($Uc), 1, " '$Uc' is a number" ) or die;
-    my $UC = uc $num;
-    is( LooksLike::number($UC), 1, " '$UC' is a number" ) or die;
+    my $Uc = ucfirst "$num";
+    is( LooksLike::number($Uc), 1, " '$Uc' is a number" );
+    my $UC = uc "$num";
+    is( LooksLike::number($UC), 1, " '$UC' is a number" );
 }
 
 for my $num ( qw( elderberry ), @words ) {
@@ -137,9 +139,9 @@ for my $num (@zeroes) {
     is( LooksLike::zero($num),    1, " '$num' is zero" );
     is( LooksLike::zero( -$num ), 1, "'-$num' is zero" );
 
-    my $Uc = ucfirst $num;
+    my $Uc = ucfirst "$num";
     is( LooksLike::zero($Uc), 1, " '$Uc' is zero" );
-    my $UC = uc $num;
+    my $UC = uc "$num";
     is( LooksLike::zero($UC), 1, " '$UC' is zero" );
 }
 
@@ -154,9 +156,9 @@ for my $num ( @infs, @ints, @nums ) {
     is( LooksLike::nonzero($num),    1, " '$num' is zero" );
     is( LooksLike::nonzero( -$num ), 1, "'-$num' is zero" );
 
-    my $Uc = ucfirst $num;
+    my $Uc = ucfirst "$num";
     is( LooksLike::nonzero($Uc), 1, " '$Uc' is zero" );
-    my $UC = uc $num;
+    my $UC = uc "$num";
     is( LooksLike::nonzero($UC), 1, " '$UC' is zero" );
 }
 
@@ -171,9 +173,9 @@ for my $num ( @infs, @ints, @nums ) {
     is( LooksLike::positive($num),    1,  " '$num' is positive" );
     is( LooksLike::positive( -$num ), '', "'-$num' is not positive" );
 
-    my $Uc = ucfirst $num;
+    my $Uc = ucfirst "$num";
     is( LooksLike::positive($Uc), 1, " '$Uc' is positive" );
-    my $UC = uc $num;
+    my $UC = uc "$num";
     is( LooksLike::positive($UC), 1, " '$UC' is positive" );
 }
 
@@ -188,9 +190,9 @@ for my $num ( @infs, @ints, @nums ) {
     is( LooksLike::negative( -$num ), 1,  "'-$num' is negative" );
     is( LooksLike::negative($num),    '', " '$num' is not negative" );
 
-    my $Uc = '-' . ucfirst $num;
+    my $Uc = '-' . ucfirst "$num";
     is( LooksLike::negative($Uc), 1, "'$Uc' is negative" );
-    my $UC = '-' . uc $num;
+    my $UC = '-' . uc "$num";
     is( LooksLike::negative($UC), 1, "'$UC' is negative" );
 }
 

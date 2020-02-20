@@ -35,10 +35,15 @@ $two->other = {
 	c => 'thing',
 };
 
+my $six = JSONP->new;
+$six->other = {
+	b => [qw/a b c/],
+};
+
 use Blessed::Merge;
 
 my $blessed = Blessed::Merge->new({ unique_array => 1, unique_hash => 1 });
-my $new = $blessed->merge($one, $two);
+my $new = $blessed->merge($one, $two, $six);
 
 is($new->thing->serialize, '{"array":["that","thing","other"]}');
 is($new->other->b->serialize, '["a","b","c","d","e","f"]');

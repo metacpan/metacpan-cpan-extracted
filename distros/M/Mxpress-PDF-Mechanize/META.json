@@ -32,20 +32,19 @@
       },
       "runtime" : {
          "requires" : {
-            "Module::Load" : "0.34",
-            "Mxpress::PDF" : "0.14",
-            "WWW::Mechanize::Chrome" : "0",
             "Zydeco" : "0.507",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Mxpress::PDF" : "0.14",
+            "Test::More" : "0",
+            "WWW::Mechanize::Chrome" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

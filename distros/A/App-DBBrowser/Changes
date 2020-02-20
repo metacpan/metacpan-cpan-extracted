@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.236    2020-02-19
+        - Made importing multiple sheets from a spreadsheet file more comfortable.
+
 2.235    2020-02-17
         - Option to set the default value for the 'empty_to_null' filter.
 

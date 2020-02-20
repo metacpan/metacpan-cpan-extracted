@@ -1,5 +1,11 @@
 Revision history for LooksLike.
 
+v0.20.050 2020-02-19
+
+ - Updated handling of infinity and not-a-number, to hopefully work with
+   MSWin32 environments.
+
 v0.20.045 2020-02-14
+
  - Initial release.
 

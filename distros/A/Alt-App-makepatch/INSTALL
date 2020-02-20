@@ -1,0 +1,25 @@
+INSTALLATION
+
+  - Edit Makefile.PL (if needed)
+  - Type 'perl Makefile.PL'
+  - Type 'make'
+
+    blib/script/makepatch is the makepatch program
+    blib/script/applypatch is the applypatch program
+    blib/man1/makepatch.1 is the manual page for makepatch
+    blib/man1/applypatch.1 is the manual page for applypatch
+
+  - Type 'make install' to install the program and the documentation
+    on your system. This usually requires super user privileges.
+
+REQUIREMENTS
+
+  - Perl 5.004_05 or later standard installation.
+  - For 'makepatch': the 'diff' program.
+  - For 'applypatch': the 'patch' program.
+
+For best results, use the GNU version of the diff and patch programs.
+
+For Perl older than 5.005, you may need to install the File::Spec
+module.
+

@@ -23,13 +23,15 @@ no_index:
     - lib/Mojolicious/Command/Author/generate/callbackery_app
 requires:
   Config::Grammar: '1.13'
+  JSON::Validator: '0'
   Locale::PO: '0.27'
   Mojolicious: '8.26'
   Mojolicious::Plugin::Qooxdoo: v1.0.8
+  YAML::XS: '0'
   perl: '5.022000'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.27.0
+version: v0.28.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

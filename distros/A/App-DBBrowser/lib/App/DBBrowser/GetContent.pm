@@ -108,7 +108,6 @@ sub get_content {
             my ( $aoa, $open_mode );
             if ( ! $goto_FILTER ) {
                 delete $sf->{i}{ct}{default_table_name};
-                delete $sf->{i}{gc}{sheet_name};
                 my $ok;
                 if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                     ( $ok, $aoa ) = $cr->from_col_by_col( $sql );
@@ -122,8 +121,10 @@ sub get_content {
                 if ( ! $ok ) {
                     next MENU;
                 }
-                $sf->{i}{gc}{sheet_count} = 0;
-                $sf->{i}{gc}{book} = undef;
+            }
+            my $file_fs = $sf->{i}{gc}{file_fs}; # file_fs # Create table ?
+            if ( ! defined $sf->{i}{S_R}{$file_fs//''}{book} ) {
+                delete $sf->{i}{S_R};
             }
 
             PARSE: while ( 1 ) {
@@ -141,8 +142,8 @@ sub get_content {
                     if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
                         $sql->{insert_into_args} = $aoa;
                     }
-                    elsif ( $parse_mode_idx < 3 && -T $sf->{i}{gc}{file_fs} ) {
-                        open my $fh, $open_mode, $sf->{i}{gc}{file_fs} or die $!;
+                    elsif ( $parse_mode_idx < 3 && -T $file_fs ) {
+                        open my $fh, $open_mode, $file_fs or die $!;
                         my $parse_ok;
                         if ( $parse_mode_idx == 0 ) {
                             $parse_ok = $cp->__parse_with_Text_CSV( $sql, $fh );
@@ -170,12 +171,12 @@ sub get_content {
                     }
                     else {
                         SHEET: while ( 1 ) {
-                            $sf->{i}{gc}{sheet_count} = $cp->__parse_with_Spreadsheet_Read( $sql, $sf->{i}{gc}{file_fs} );
-                            if ( ! $sf->{i}{gc}{sheet_count} ) {
+                            my $ok = $cp->__parse_with_Spreadsheet_Read( $sql, $file_fs );
+                            if ( ! $ok ) {
                                 next GET_DATA;
                             }
                             if ( ! @{$sql->{insert_into_args}} ) { #
-                                next SHEET if $sf->{i}{gc}{sheet_count} >= 2;
+                                next SHEET if $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2;
                                 next GET_DATA;
                             }
                             last SHEET;
@@ -188,13 +189,13 @@ sub get_content {
                 FILTER: while ( 1 ) {
                     my $ok = $cf->input_filter( $sql );
                     if ( ! $ok ) {
-                        if ( $sf->{i}{gc}{sheet_count} >= 2 ) {
+                        if ( $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2 ) {
                             next PARSE;
                         }
                         next GET_DATA;
                     }
                     elsif ( $ok == -1 ) {
-                        #if ( ! -T $sf->{i}{gc}{file_fs} ) {
+                        #if ( ! -T $file_fs ) {
                         #    $tc->choose(
                         #        [ 'Press ENTER' ],
                         #        { prompt => 'Not a text file: "Spreadsheet::Read" is used automatically' }

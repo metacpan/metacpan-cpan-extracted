@@ -1,5 +1,11 @@
 Change history for HTML-Form
 
+6.06      2020-02-20 14:48:37Z
+    - Change the behaviour of find_input in list context (GH#21) (E. Choroba)
+    - Pod tweaks (GH#17) (Olaf Alders)
+    - Add list context examples for find_input() (GH#20) (Olaf Alders)
+    - Modernize some tests (GH#18) (Olaf Alders)
+
 6.05      2019-10-04 20:28:20Z
     - Update pod as requested in [RT#87689] (GH#16) (Lance Wicks and Julien
       Fiegehenn)

@@ -6,6 +6,10 @@ Home page:    <http://search.cpan.org/dist/IRI/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.011  2020-02-20
+
+ - (Update) Add IRI->rel method.
+
 0.010  2019-12-26
 
  - (Update) Fix component resolution to remove dots when base resolution

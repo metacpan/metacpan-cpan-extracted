@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.008005';
+	$Type::Registry::VERSION   = '1.010000';
 }
 
 $Type::Registry::VERSION =~ tr/_//d;
@@ -65,7 +65,7 @@ sub add_types
 	my $opts = mkopt(\@_);
 	for my $opt (@$opts)
 	{
-		my ($library, $types) = @_;
+		my ($library, $types) = @$opt;
 		$library =~ s/^-/Types::/;
 		
 		{

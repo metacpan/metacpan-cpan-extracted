@@ -246,6 +246,26 @@ sub _getFragments {
 }
 ### END of SUB
 
+=head2 METHOD _getTheoricalPeaks
+
+	## Description : get the list of theorical peaks from the bank object
+	## Input : $self
+	## Output : $theoPeaks
+	## Usage : my ( $theoPeaks ) = $obank->_getTheoricalPeaks () ;
+	
+=cut
+## START of SUB
+sub _getTheoricalPeaks {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $theoPeaks ) = ( () ) ;
+    
+    $theoPeaks = $self->{_THEO_PEAK_LIST_} ;
+    
+    return ($theoPeaks) ;
+}
+### END of SUB
+
 
 =head2 METHOD __refPeak__
 
@@ -464,7 +484,7 @@ sub _getPeak_ANNOTATION_IN_NEG_MODE {
     my $ANNOTATION_IN_NEG_MODE = undef ;
     
     if ( (defined $self->{_ANNOTATION_IN_NEG_MODE_}) and ( $self->{_ANNOTATION_IN_NEG_MODE_} ne '' ) ) {	$ANNOTATION_IN_NEG_MODE = $self->{_ANNOTATION_IN_NEG_MODE_} ; }
-    else {	 $ANNOTATION_IN_NEG_MODE = 0 ; warn "[WARN] the method _getPeak_ANNOTATION_IN_NEG_MODE can't _getPeak a undef or null string value\n" ; }
+#    else {	 $ANNOTATION_IN_NEG_MODE = 0 ; warn "[WARN] the method _getPeak_ANNOTATION_IN_NEG_MODE can't _getPeak a undef or null string value\n" ; }
     
     return ( $ANNOTATION_IN_NEG_MODE ) ;
 }
@@ -550,7 +570,7 @@ sub _getPeak_ANNOTATION_IN_POS_MODE {
     my $ANNOTATION_IN_POS_MODE = undef ;
     
     if ( (defined $self->{_ANNOTATION_IN_POS_MODE_}) and ( $self->{_ANNOTATION_IN_POS_MODE_} ne '' )  ) {	$ANNOTATION_IN_POS_MODE = $self->{_ANNOTATION_IN_POS_MODE_} ; }
-    else {	 $ANNOTATION_IN_POS_MODE = 0 ; warn "[WARN] the method _getPeak_ANNOTATION_IN_POS_MODE can't _getPeak a undef or null string value\n" ; }
+#    else {	 $ANNOTATION_IN_POS_MODE = 0 ; warn "[WARN] the method _getPeak_ANNOTATION_IN_POS_MODE can't _getPeak a undef or null string value\n" ; }
     
     return ( $ANNOTATION_IN_POS_MODE ) ;
 }

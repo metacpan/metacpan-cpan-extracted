@@ -12,7 +12,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Standard::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::VERSION   = '1.008005';
+	$Types::Standard::VERSION   = '1.010000';
 }
 
 $Types::Standard::VERSION =~ tr/_//d;
@@ -309,8 +309,8 @@ my $_ref = $meta->$add_core_type({
 		return $meta->get_type('Ref') unless @_;
 		
 		my $reftype = shift;
-		Types::TypeTiny::StringLike->check($reftype)
-			or _croak("Parameter to Ref[`a] expected to be string; got $reftype");
+		$reftype =~ /^(SCALAR|ARRAY|HASH|CODE|REF|GLOB|LVALUE|FORMAT|IO|VSTRING|REGEXP|Regexp)$/i
+			or _croak("Parameter to Ref[`a] expected to be a Perl ref type; got $reftype");
 		
 		$reftype = "$reftype";
 		return sub {

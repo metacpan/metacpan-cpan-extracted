@@ -1,5 +1,5 @@
 package HTML::ParseBrowser;
-$HTML::ParseBrowser::VERSION = '1.13';
+$HTML::ParseBrowser::VERSION = '1.14';
 use 5.006;
 use strict;
 use warnings;
@@ -25,6 +25,7 @@ my %name_map =
     'Gecko'     => 'Mozilla',
     'Netscape6' => 'Netscape',
     'MSIE'      => 'Internet Explorer',
+    'Edg'       => 'Edge',
 );
 
 sub new {

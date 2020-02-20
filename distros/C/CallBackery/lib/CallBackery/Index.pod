@@ -83,6 +83,6 @@ S<Tobias Oetiker E<lt>tobi@oetiker.chE<gt>>
 
 =head1 HISTORY
 
- 2013-0312-16 to 1.0 first version
+ 2013-03-16 to 1.0 first version
 
 =cut

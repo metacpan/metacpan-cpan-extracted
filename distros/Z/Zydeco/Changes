@@ -7,6 +7,20 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Zydeco>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.509	2020-02-20
+
+ [ Bug Fixes ]
+ - More reliable parsing of aliases for multimethod candidates.
+ - Syntax rewrite in version 0.100 accidentally made the optional block
+   after a coercion declaration required. It is now optional again.
+
+ [ Documentation ]
+ - Remove pod from MooX::Pression stub module.
+
+ [ Other ]
+ - Allow a lot of keywords to appear in `begin`, `end`, `after_apply`, and
+   `before apply` hooks which previously did not work.
+
 0.508	2020-02-18
 
  - Added: Provide `before_apply` and `after_apply` hooks for roles using

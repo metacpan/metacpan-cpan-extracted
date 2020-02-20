@@ -1,3 +1,9 @@
+0.045   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- [sort-pod-headings][ux] Add shortcut aliases -S for --sort-sub,
+	  -A for --sort-arg.
+
+
 0.044   2019-12-14  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak/fix nesting with POD::Elemental::Transformer::Pod5.

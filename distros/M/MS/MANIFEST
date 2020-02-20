@@ -67,6 +67,7 @@ t/corpus/test.prot.xml.gz
 t/corpus/test2.mzid.gz
 t/corpus/test3.mzid.gz
 t/cv.t
+t/db.t
 t/imzml.t
 t/mass.t
 t/mgf.t

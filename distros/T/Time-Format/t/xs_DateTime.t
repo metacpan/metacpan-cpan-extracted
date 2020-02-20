@@ -6,12 +6,12 @@ use strict;
 use Test::More tests => 12;
 use FindBin;
 use lib $FindBin::Bin;
-use TimeFormat_MC;
 
 
 ## ----------------------------------------------------------------------------------
-## Test for availability of certain modules.
-my $dt_ok = tf_module_check('DateTime');
+## Test for availability of DateTime.
+my $dt_ok;
+BEGIN { eval { require DateTime; $dt_ok = 1} }
 
 
 ## ----------------------------------------------------------------------------------
@@ -44,6 +44,7 @@ SKIP:
 {
     skip 'DateTime not available',    11  unless $dt_ok;
     skip 'XS version not available',  11  unless defined $Time::Format_XS::VERSION;
+
     # June 5, 2003 at 1:58:09 pm
     my $t = DateTime->new (year => 2003, month => 6, day => 5, hour => 13, minute => 58, second => 9, nanosecond => 987_654_321);
 

@@ -4,7 +4,7 @@
 
 package Game::RaycastFOV;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ use Math::Trig ':pi';
 require XSLoader;
 
 our @EXPORT_OK =
-  qw(bypair cached_circle circle line raycast swing_circle %circle_points);
+  qw(bypair bypairall cached_circle circle line raycast swing_circle %circle_points);
 
 XSLoader::load('Game::RaycastFOV', $VERSION);
 
@@ -77,15 +77,14 @@ our %circle_points = (
         6,  -6, 6,  -5, 6,  -4, 7,  -4, 7,  -3, 7,  -2, 8,  -2, 8,  -1
     ],
     9 => [
-        9,  0,  9,  1,  9,  2,  9,  3,  8,  3,  8,  4,  8,  5,  7,  5,
-        7,  6,  6,  6,  6,  7,  5,  7,  5,  8,  4,  8,  3,  8,  3,  9,
-        2,  9,  1,  9,  0,  9,  -1, 9,  -2, 9,  -3, 9,  -3, 8,  -4, 8,
-        -5, 8,  -5, 7,  -6, 7,  -6, 6,  -7, 6,  -7, 5,  -8, 5,  -8, 4,
-        -8, 3,  -9, 3,  -9, 2,  -9, 1,  -9, 0,  -9, -1, -9, -2, -9, -3,
-        -8, -3, -8, -4, -8, -5, -7, -5, -7, -6, -6, -6, -6, -7, -5, -7,
-        -5, -8, -4, -8, -3, -8, -3, -9, -2, -9, -1, -9, 0,  -9, 1,  -9,
-        2,  -9, 3,  -9, 3,  -8, 4,  -8, 5,  -8, 5,  -7, 6,  -7, 6,  -6,
-        7,  -6, 7,  -5, 8,  -5, 8,  -4, 8,  -3, 9,  -3, 9,  -2, 9,  -1
+        9,  0,  9,  1,  9,  2,  9,  3,  8,  3,  8,  4,  8,  5,  7,  5,  7,  6,
+        6,  6,  6,  7,  5,  7,  5,  8,  4,  8,  3,  8,  3,  9,  2,  9,  1,  9,
+        0,  9,  -1, 9,  -2, 9,  -3, 9,  -3, 8,  -4, 8,  -5, 8,  -5, 7,  -6, 7,
+        -6, 6,  -7, 6,  -7, 5,  -8, 5,  -8, 4,  -8, 3,  -9, 3,  -9, 2,  -9, 1,
+        -9, 0,  -9, -1, -9, -2, -9, -3, -8, -3, -8, -4, -8, -5, -7, -5, -7, -6,
+        -6, -6, -6, -7, -5, -7, -5, -8, -4, -8, -3, -8, -3, -9, -2, -9, -1, -9,
+        0,  -9, 1,  -9, 2,  -9, 3,  -9, 3,  -8, 4,  -8, 5,  -8, 5,  -7, 6,  -7,
+        6,  -6, 7,  -6, 7,  -5, 8,  -5, 8,  -4, 8,  -3, 9,  -3, 9,  -2, 9,  -1
     ],
     10 => [
         10,  0,   10,  1,   10,  2,   10,  3,   9,   3,   9,   4,   9,   5,
@@ -121,16 +120,15 @@ our %circle_points = (
 # the lack of checks are for speed, use at your own risk
 sub cached_circle (&$$$) {
     my ($callback, $x, $y, $radius) = @_;
-    bypair(sub { $callback->($x + $_[0], $y + $_[1]) },
+    # process all the points on the assumption that the callback will
+    # abort say line drawing should that wander outside a level map
+    bypairall(sub { $callback->($x + $_[0], $y + $_[1]) },
         @{ $circle_points{$radius} });
 }
 
 sub raycast {
     my ($circle_cb, $line_cb, $x, $y, @rest) = @_;
-    $circle_cb->(
-        sub { line($line_cb, $x, $y, $_[0], $_[1]) },
-        $x, $y, @rest
-    );
+    $circle_cb->(sub { line($line_cb, $x, $y, $_[0], $_[1]) }, $x, $y, @rest);
 }
 
 sub swing_circle (&$$$$) {
@@ -206,6 +204,11 @@ Utility function for slicing up an arbitrary list pairwise. Sort of like
 C<pairwise> of L<List::Util> only in a void context, and that returning
 the value C<-1> from the I<callback> subroutine will abort the
 processing of subsequent items in the input list.
+
+=item B<bypairall> I<callback> I<...>
+
+Like B<bypair> but does not include code to abort processing the list.
+Since v1.01.
 
 =item B<cached_circle> I<callback> I<x> I<y> I<radius>
 

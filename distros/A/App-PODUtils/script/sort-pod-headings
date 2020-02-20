@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/PODUtils/sort_pod_headings
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-14'; # DATE
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ sort-pod-headings -
 
 =head1 VERSION
 
-This document describes version 0.044 of sort-pod-headings (from Perl distribution App-PODUtils), released on 2019-12-14.
+This document describes version 0.045 of sort-pod-headings (from Perl distribution App-PODUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Default value:
 "-" means standard input.
 
 
-=item B<--sort-args-json>=I<s>
+=item B<--sort-args-json>=I<s>, B<-A>
 
 Arguments to pass to the Sort::Sub::* routine (JSON-encoded).
 
@@ -84,7 +84,7 @@ Arguments to pass to the Sort::Sub::* routine.
 
 Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
 
-=item B<--sort-sub>=I<s>
+=item B<--sort-sub>=I<s>, B<-S>
 
 Name of a Sort::Sub::* module (without the prefix).
 

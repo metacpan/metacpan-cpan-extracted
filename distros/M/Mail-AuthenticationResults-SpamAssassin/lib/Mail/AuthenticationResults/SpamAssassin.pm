@@ -1,10 +1,9 @@
 package Mail::AuthenticationResults::SpamAssassin;
+use 5.010;
 use strict;
 use warnings;
-use feature qw(postderef);
-no warnings qw(experimental::postderef); ## no critic
 # ABSTRACT: SpamAssassin plugin for parsing Authentication-Results headers via Mail::AuthenticationResults
-our $VERSION = '1.20180927'; # VERSION
+our $VERSION = '1.20200220'; # VERSION
 
 
 use Mail::SpamAssassin::Plugin;
@@ -32,6 +31,11 @@ sub parse_config {
   if ($opts->{key} eq 'authentication_results_authserv_id') {
     my $authserv_id = quotemeta( $opts->{value} );
     $self->{'authserv-id'} = $authserv_id;
+    return 1;
+  }
+  if ($opts->{key} eq 'authentication_results_spf_keys') {
+    my @spf_keys = split( ',', $opts->{value} );
+    $self->{'spf-keys'} = \@spf_keys;
     return 1;
   }
   return 0;
@@ -77,28 +81,46 @@ sub _get_authentication_results_objects_for_key {
   return $self->_get_authentication_results_objects_for_authserv_id($per_msg_status)->search({ isa => 'entry', key => $key });
 }
 
+sub _get_authentication_results_objects_for_keys {
+  my ( $self, $per_msg_status, $keys ) = @_;
+  my $result = Mail::AuthenticationResults::Header::Group->new;
+  foreach my $key ( @$keys ) {
+    my $this_group = $self->_get_authentication_results_objects_for_authserv_id($per_msg_status)->search({ isa => 'entry', key => $key });
+    foreach my $child ( @{$this_group->children()} ) {
+      $result->add_child( $child );
+    }
+  }
+  return $result;
+}
+
 sub _entry_has_key {
   # return a count of the subentries with given key
   my ( $self, $authentication_results_object, $key ) = @_;
-  return scalar $authentication_results_object->search({ isa => 'subentry', key => $key })->children()->@*;
+  return scalar @{ $authentication_results_object->search({ isa => 'subentry', key => $key })->children() };
 }
 
 sub _entry_has_key_value {
   # return a count of the subentries with given key and value
   my ( $self, $authentication_results_object, $key, $value ) = @_;
-  return scalar $authentication_results_object->search({ isa => 'subentry', key => $key, value => $value })->children()->@*;
+  return scalar @{ $authentication_results_object->search({ isa => 'subentry', key => $key, value => $value })->children() };
 }
 
 
 sub authentication_results_has_key_value {
-  # Returns true if there was a failing sligned-from entry in the results
+  # Returns true if there was an entry with the given key and value
   my ( $self, $per_msg_status, $key, $value ) = @_;
-  return 1 if ( scalar $self->_get_authentication_results_objects_for_key_value($per_msg_status,$key,$value)->children()->@* > 0 );
+  return 1 if ( scalar @{ $self->_get_authentication_results_objects_for_key_value($per_msg_status,$key,$value)->children() } > 0 );
   return 0;
 }
 
 # Aligned From x-aligned-from
 # Possible values: error null null_smtp null_header pass domain_pass orgdomain_pass fail
+
+sub _keys_for_spf {
+  my ( $self ) = @_;
+  return $self->{'spf-keys'} if exists $self->{'spf-keys'};
+  return [ 'spf' ];
+}
 
 sub _authentication_results_spf_fail_sub {
   my ( $self, $per_msg_status, $spf_objects, $domain ) = @_;
@@ -110,12 +132,16 @@ sub _authentication_results_spf_fail_sub {
   }
   my $domainregex = quotemeta( $domain );
 
-  return 1 if scalar
-    $spf_objects->search({ isa => 'entry', key => 'spf', value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'smtp.mailfrom', value => qr{\@$domainregex$} }] })->children()->@*;
-  return 1 if scalar
-    $spf_objects->search({ isa => 'entry', key => 'spf', value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'smtp.helo', value => $domain }] })->children()->@*;
-  return 1 if scalar
-    $spf_objects->search({ isa => 'entry', key => 'spf', value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'policy.authdomain', value => $domain }] })->children()->@*;
+  foreach my $key ( @{$self->_keys_for_spf} ) {
+
+    return 1 if scalar
+      @{ $spf_objects->search({ isa => 'entry', key => $key, value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'smtp.mailfrom', value => qr{\@$domainregex$} }] })->children() };
+    return 1 if scalar
+      @{ $spf_objects->search({ isa => 'entry', key => $key, value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'smtp.helo', value => $domain }] })->children() };
+    return 1 if scalar
+      @{ $spf_objects->search({ isa => 'entry', key => $key, value => qr{^(?!fail)}, has => [{ isa => 'subentry', key => 'policy.authdomain', value => $domain }] })->children() };
+
+  }
 
   return 0;
 }
@@ -125,8 +151,8 @@ sub authentication_results_spf_fail {
   # De we have any spf fail entries which do not have a corresponding pass entry (from for example, an arc override)
   my ( $self, $per_msg_status ) = @_;
   my $pass = 1;
-  my $spf_objects = $self->_get_authentication_results_objects_for_key($per_msg_status,'spf');
-  foreach my $header_object ( $spf_objects->children()->@* ) {
+  my $spf_objects = $self->_get_authentication_results_objects_for_keys($per_msg_status,$self->_keys_for_spf);
+  foreach my $header_object ( @{ $spf_objects->children() } ) {
     next unless $header_object->value() eq 'fail';
     if ( my $authdomain = eval{ $header_object->search({ isa => 'subentry', key => 'policy.authdomain' })->children()->[0]->value() } ) {
       $pass = $pass && $self->_authentication_results_spf_fail_sub( $per_msg_status, $spf_objects, $authdomain );
@@ -147,7 +173,7 @@ sub authentication_results_spf_fail {
 
 sub authentication_results_dmarc_list_override {
   my ( $self, $per_msg_status ) = @_;
-  foreach my $header_object ( $self->_get_authentication_results_objects_for_key($per_msg_status,'dmarc')->children()->@* ) {
+  foreach my $header_object ( @{ $self->_get_authentication_results_objects_for_key($per_msg_status,'dmarc')->children() } ) {
     next unless $header_object->value() eq 'fail';
     next unless $self->_entry_has_key_value( $header_object, 'policy.arc-aware-result',      'fail' );
     next unless $self->_entry_has_key_value( $header_object, 'policy.applied-disposition',   'none' );
@@ -172,7 +198,7 @@ Mail::AuthenticationResults::SpamAssassin - SpamAssassin plugin for parsing Auth
 
 =head1 VERSION
 
-version 1.20180927
+version 1.20200220
 
 =head1 DESCRIPTION
 

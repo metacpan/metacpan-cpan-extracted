@@ -28,7 +28,6 @@ sub new {
 sub input_filter {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    $sf->{i}{gc}{working} = 'Working ... ';
     my $confirm       = '     OK';
     my $back          = '     <<';
     my $reset         = '    RESET';
@@ -151,7 +150,7 @@ sub input_filter {
 sub __print_filter_info {
     my ( $sf, $sql, $row_count, $horizontal_choices ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    print $sf->{i}{gc}{working} . "\r";
+    print $sf->{i}{working} . "\r";
     $sf->{i}{occupied_term_height} = 1; #
     #$sf->{i}{occupied_term_height} += 1; # keep bottom line empty
     $sf->{i}{occupied_term_height} += $row_count;
@@ -193,7 +192,7 @@ sub __print_filter_info {
     say "DATA:";
     say $_ for @$rows;
     say "";
-    print $sf->{i}{gc}{working} . "\r";
+    print $sf->{i}{working} . "\r";
 }
 
 
@@ -219,7 +218,7 @@ sub __choose_columns {
     my $col_idx = $tu->choose_a_subset(
         $header,
         { cs_label => 'Cols: ', layout => 0, order => 0, mark => $mark, all_by_default => 1, index => 1,
-          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
+          confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{working} }
     );
     if ( ! defined $col_idx ) {
         return;
@@ -256,7 +255,7 @@ sub __choose_rows {
         my @idx = $tc->choose(
             [ @pre, @stringified_rows ],
             { %{$sf->{i}{lyt_v}}, prompt => $prompt, info => $filter_str, meta_items => [ 0 .. $#pre ],
-              include_highlighted => 2, index => 1, undef => '<<', busy_string => $sf->{i}{gc}{working}, mark => $mark }
+              include_highlighted => 2, index => 1, undef => '<<', busy_string => $sf->{i}{working}, mark => $mark }
         );
         $sf->__print_filter_info( $sql, 2 + @$aoa, undef );
         if ( ! $idx[0] ) {
@@ -336,7 +335,7 @@ sub __row_groups {
         \@choices_groups,
         { info => $filter_str, prompt => $prompt, layout => 3, index => 1, confirm => $sf->{i}{ok},
           back => '<<', all_by_default => 1, cs_label => "Chosen groups:\n", cs_separator => "\n",
-          cs_end => "\n", busy_string => $sf->{i}{gc}{working} }
+          cs_end => "\n", busy_string => $sf->{i}{working} }
     );
     $sf->__print_filter_info( $sql, 4 + @choices_groups, undef );
     if ( ! defined $idxs ) {
@@ -580,7 +579,7 @@ sub __search_and_replace {
         my $col_idx = $tu->choose_a_subset(
             $header,
             { cs_label => 'Columns: ', info => $info, layout => 0, all_by_default => 1, index => 1,
-              confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{gc}{working} }
+              confirm => $sf->{i}{ok}, back => '<<', busy_string => $sf->{i}{working} }
         );
         if ( ! defined $col_idx ) {
             next SEARCH_AND_REPLACE;
@@ -694,7 +693,7 @@ sub __merge_rows {
     my $chosen_idxs = $tu->choose_a_subset(
         \@stringified_rows,
         { cs_separator => "\n", cs_end => "\n", layout => 3, order => 0, all_by_default => 0, prompt => $prompt,
-          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
+          index => 1, confirm => $sf->{i}{ok}, back => '<<', info => $filter_str, busy_string => $sf->{i}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
@@ -746,7 +745,7 @@ sub __join_columns {
     my $chosen_idxs = $tu->choose_a_subset(
         $header,
         { cs_label => 'Cols: ', layout => 0, order => 0, index => 1, confirm => $sf->{i}{ok},
-          back => '<<', info => $filter_str, busy_string => $sf->{i}{gc}{working} }
+          back => '<<', info => $filter_str, busy_string => $sf->{i}{working} }
     );
     if ( ! defined $chosen_idxs || ! @$chosen_idxs ) {
         return;
@@ -809,7 +808,7 @@ sub __transpose_rows_to_cols {
     my $prompt = 'Transpose columns to rows?';
     my $ok = $tc->choose(
         [ undef, '- YES' ],
-        { info => $filter_str, prompt => $prompt, index => 1, undef => '- NO', layout => 3, busy_string => $sf->{i}{gc}{working} }
+        { info => $filter_str, prompt => $prompt, index => 1, undef => '- NO', layout => 3, busy_string => $sf->{i}{working} }
     );
     $sf->__print_filter_info( $sql, 2, undef );
     if ( $ok ) {
@@ -883,7 +882,7 @@ sub __choose_a_column_idx {
     # Choose
     my $col_idx = $tc->choose(
         [ @pre, map { defined $_ ? $_ : '' } @$columns ],
-        { layout => 0, order => 0, index => 1, undef => '<<', info => $filter_str, prompt => $prompt, empty => '--', busy_string => $sf->{i}{gc}{working} } #
+        { layout => 0, order => 0, index => 1, undef => '<<', info => $filter_str, prompt => $prompt, empty => '--', busy_string => $sf->{i}{working} } #
     );
     if ( ! $col_idx ) {
         return;
@@ -903,7 +902,7 @@ sub __choose_a_row_idx {
     # Choose
     my $row_idx = $tc->choose(
         [ @pre, @stringified_rows ],
-        { layout => 3, index => 1, undef => '<<', info => $filter_str, prompt => $prompt, busy_string => $sf->{i}{gc}{working} }
+        { layout => 3, index => 1, undef => '<<', info => $filter_str, prompt => $prompt, busy_string => $sf->{i}{working} }
     );
     if ( ! $row_idx ) {
         return;

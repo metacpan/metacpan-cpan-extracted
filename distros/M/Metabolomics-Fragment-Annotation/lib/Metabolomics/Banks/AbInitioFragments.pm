@@ -25,18 +25,18 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Metabolomics::Banks::BloodExposome ':all';
+# This allows declaration	use Metabolomics::Banks::AbInitioFragments ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw( 
-	getFragmentsFromSource buildTheoPeakBankFromFragments
+	getFragmentsFromSource buildTheoPeakBankFromFragments buildTheoDimerFromMz isotopicAdvancedCalculation
 	
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( 
-	getFragmentsFromSource buildTheoPeakBankFromFragments
+	getFragmentsFromSource buildTheoPeakBankFromFragments buildTheoDimerFromMz isotopicAdvancedCalculation
 	
 );
 
@@ -46,15 +46,15 @@ my $modulePath = File::Basename::dirname( __FILE__ );
 
 =head1 NAME
 
-Metabolomics::Banks::BloodExposome - Perl extension for Ab Initio Fragments generator 
+Metabolomics::Banks::AbInitioFragments - Perl extension for Ab Initio Fragments generator 
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 
 =head1 SYNOPSIS
@@ -142,7 +142,7 @@ sub _getFragment_ANNOTATION_IN_NEG_MODE {
     my $ANNOTATION_IN_NEG_MODE = undef ;
     
     if ( (defined $self->{_ANNOTATION_IN_NEG_MODE_}) and ( $self->{_ANNOTATION_IN_NEG_MODE_} ne '' ) ) {	$ANNOTATION_IN_NEG_MODE = $self->{_ANNOTATION_IN_NEG_MODE_} ; }
-    else {	 $ANNOTATION_IN_NEG_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_NEG_MODE get a undef or null string value\n" ; }
+    #else {	 $ANNOTATION_IN_NEG_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_NEG_MODE get a undef or null string value\n" ; }
     
     return ( $ANNOTATION_IN_NEG_MODE ) ;
 }
@@ -166,7 +166,7 @@ sub _getFragment_ANNOTATION_IN_POS_MODE {
     my $ANNOTATION_IN_POS_MODE = undef ;
     
     if ( (defined $self->{_ANNOTATION_IN_POS_MODE_}) and ( $self->{_ANNOTATION_IN_POS_MODE_} ne '' ) ) {	$ANNOTATION_IN_POS_MODE = $self->{_ANNOTATION_IN_POS_MODE_} ; }
-    else {	 $ANNOTATION_IN_POS_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_POS_MODE get a undef or null string value\n" ; }
+    #else {	 $ANNOTATION_IN_POS_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_POS_MODE get a undef or null string value\n" ; }
     
     return ( $ANNOTATION_IN_POS_MODE ) ;
 }
@@ -314,7 +314,7 @@ sub getFragmentsFromSource {
 =head2 METHOD buildTheoPeakBankFromFragments
 
 	## Description : building a bank integrating each potential fragments from a parent ion
-	## Input : $refBank, $mzParent
+	## Input : $refBank, $mzParent, $mode (POSITIVE, NEGATIVE, NEUTRAL), $stateMolecule (POS, NEG, NEU)
 	## Output : $ionBank
 	## Usage : my ( $ionBank ) = buildTheoPeakBankFromFragments ( $refBank, $mzParent ) ;
 	
@@ -323,33 +323,71 @@ sub getFragmentsFromSource {
 sub buildTheoPeakBankFromFragments {
     ## Retrieve Values
     my $self = shift ;
-    my ( $mzParent ) = @_;
+    my ( $mzParent, $mode, $stateMolecule ) = @_;
 
     my $fragments = $self->_getFragments();
-    
-    my @fragmentsList = () ; 
 
     foreach my $fragment (@{$fragments}) {
     	## Addition ion mz and theo fragment and filter negative obtained mz
     	
     	my $fragMass = $fragment->_getFragment_DELTA_MASS() ;
     	
+    	my $mzToAdjust = $mzParent ;
+    	
     	# arround the result with min decimal part of the two floats. 
     	my $oUtils = Metabolomics::Utils->new() ;
     	my $decimalLength = $oUtils->getSmallestDecimalPartOf2Numbers($fragMass, $mzParent) ;
     	
-    	my $computedMass = ($mzParent + $fragMass)  ;
+    	## Manage natural charged molecules
+    	if ( (defined $mode ) and ( $mode eq 'POSITIVE') and (defined $stateMolecule ) and ($stateMolecule eq 'POSITIVE') ) {
+    		
+    		if ( $fragment->_getFragment_TYPE() eq 'pseudomolecular ion'  ) {
+    			# remove a H
+    			$mzToAdjust += sprintf("%.$decimalLength"."f", -1.0072764 ) ;	
+    		}
+
+    	}
+    	elsif ( (defined $mode ) and ( $mode eq 'NEGATIVE') and (defined $stateMolecule ) and ($stateMolecule eq 'NEGATIVE') ) {
+    		
+    		if ( $fragment->_getFragment_TYPE() eq 'pseudomolecular ion'  ) {
+    			
+    			$mzToAdjust += sprintf("%.$decimalLength"."f", 1.0072764 ) ;	
+    		}
+    	}
+    	elsif ( (defined $stateMolecule ) and ($stateMolecule eq 'NEUTRAL') ) {
+    		## Manage ionisation mode specie
+	    	# if mode == POS -> adding H+ to mzParent
+	    	# elsif mode == NEG -> remove H to mzParent
+	    	
+	    	## for every theo fragment which are not "pseudomolecular ion"
+	    	if ( $fragment->_getFragment_TYPE() ne 'pseudomolecular ion'  ) {
+	    		
+	    		if ( (defined $mode ) and ( $mode eq 'POSITIVE') ) {
+	    			$mzToAdjust += sprintf("%.$decimalLength"."f", 1.0072764 ) ;
+		    	}
+		    	elsif ( (defined $mode ) and ( $mode eq 'NEGATIVE') ) {
+		    		$mzToAdjust += sprintf("%.$decimalLength"."f", -1.0072764 ) ;
+		    	}
+	    	}
+    	}
+    	
+    	my $computedMass = ($mzToAdjust + $fragMass)  ;
     	$computedMass = sprintf("%.$decimalLength"."f", $computedMass );
     	
     	if ($computedMass > 0) {
     		my $oPeak = Metabolomics::Banks->__refPeak__() ;
 	    	$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMass );
-	    	$oPeak->_setPeak_ANNOTATION_TYPE ( $fragment->_getFragment_TYPE() );
+	    	$oPeak->_setPeak_ANNOTATION_TYPE ( $fragment->_getFragment_TYPE() ) ;
 	    	$oPeak->_setPeak_ANNOTATION_NAME ( $fragment->_getFragment_LOSSES_OR_GAINS() );
-	    	$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE ( $fragment->_getFragment_ANNOTATION_IN_NEG_MODE() ) if ($fragment->_getFragment_ANNOTATION_IN_NEG_MODE ) ;
-	    	$oPeak->_setPeak_ANNOTATION_IN_POS_MODE ( $fragment->_getFragment_ANNOTATION_IN_POS_MODE() ) if ($fragment->_getFragment_ANNOTATION_IN_POS_MODE ) ;
 	    	
-#	    	push(@fragmentsList, $oPeak) ;
+	    	# remove wrong mode annotation
+	    	if ( (defined $mode ) and ( $mode eq 'POSITIVE') ) {
+	    		$oPeak->_setPeak_ANNOTATION_IN_POS_MODE ( $fragment->_getFragment_ANNOTATION_IN_POS_MODE() ) if ($fragment->_getFragment_ANNOTATION_IN_POS_MODE ) ;
+	    	}
+	    	elsif ( (defined $mode ) and ( $mode eq 'NEGATIVE') ) {
+	    		$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE ( $fragment->_getFragment_ANNOTATION_IN_NEG_MODE() ) if ($fragment->_getFragment_ANNOTATION_IN_NEG_MODE ) ;
+	    	}
+	    	
 	    	$self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
     	}
     } ## END FOREACH
@@ -357,7 +395,183 @@ sub buildTheoPeakBankFromFragments {
 }
 ### END of SUB
 
+=head2 METHOD buildTheoDimerFromMz
 
+	## Description : build potential dimers/trimers in NEG/POS mode
+	## Input : $Mz, $mode
+	## Output : $oBank
+	## Usage : my ( $oBank ) = buildTheoDimerFromMz ( $Mz, $mode ) ;
+	
+=cut
+## START of SUB
+sub buildTheoDimerFromMz {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $Mz, $mode ) = @_;
+    
+    if ($mode eq 'POSITIVE') {
+
+		## Dimers...
+    	my %posAdducts = (
+    		'2M+H' => 1.007276 ,
+			'2M+NH4' => 18.033823,
+			'2M+Na' => 22.989218,
+			'2M+3H2O+2H' => 28.02312,
+			'2M+K' => 38.963158 ,
+			'2M+ACN+H' => 42.033823 ,
+			'2M+ACN+Na'  => 64.015765 ,
+    	) ;
+    	
+    	foreach my $adduct (keys %posAdducts) {
+    		
+    		my $adductMass = $posAdducts{$adduct} ;
+    		## Only for Dimers !!!!
+    		my $DimerMass = ($Mz * 2) ;
+    		
+    		# arround the result with min decimal part of the two floats. 
+			my $oUtils = Metabolomics::Utils->new() ;
+			my $decimalLength = $oUtils->getSmallestDecimalPartOf2Numbers($DimerMass, $adductMass) ;
+			
+			## Only for Dimers !!!!
+			my $computedMass = ($adductMass + $DimerMass)  ;
+    		$computedMass = sprintf("%.$decimalLength"."f", $computedMass );
+    		
+    		my $oPeak = Metabolomics::Banks->__refPeak__() ;
+	    	$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMass );
+	    	$oPeak->_setPeak_ANNOTATION_TYPE ( 'dimeric adduct' ) ;
+	    	$oPeak->_setPeak_ANNOTATION_NAME ( $adduct );
+			$oPeak->_setPeak_ANNOTATION_IN_POS_MODE (  $adduct ) ;
+			
+#			print Dumper $oPeak ;
+			
+			$self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
+    	}
+
+    }
+    elsif ($mode eq 'NEGATIVE') {
+    	
+    	## Dimers...
+    	my %negAdducts = (
+    		'2M-H' => -1.007276,
+			'2M+FA-H' => 44.998201,
+			'2M+Hac-H' => 59.013851 ,
+    	) ;
+    	
+    	foreach my $adduct (keys %negAdducts) {
+    		
+    		my $adductMass = $negAdducts{$adduct} ;
+    		## Only for Dimers !!!!
+    		my $DimerMass = $Mz * 2 ;
+    		
+    		# arround the result with min decimal part of the two floats. 
+			my $oUtils = Metabolomics::Utils->new() ;
+			my $decimalLength = $oUtils->getSmallestDecimalPartOf2Numbers($DimerMass, $adductMass) ;
+			
+			## Only for Dimers !!!!
+			my $computedMass = ($adductMass + $DimerMass)  ;
+    		$computedMass = sprintf("%.$decimalLength"."f", $computedMass );
+    		
+    		my $oPeak = Metabolomics::Banks->__refPeak__() ;
+	    	$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMass );
+	    	$oPeak->_setPeak_ANNOTATION_TYPE ( 'dimeric adduct' ) ;
+	    	$oPeak->_setPeak_ANNOTATION_NAME ( $adduct );
+			$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE (  $adduct ) ;
+			
+			print Dumper $oPeak ;
+			
+			$self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
+    	}
+
+    }
+    else {
+    		croak "The mode does not exist ($mode) or is not defined\n" ;
+    	}
+    
+}
+### END of SUB
+
+
+
+
+=head2 METHOD isotopicAdvancedCalculation
+
+	## Description : if a fragment is present in theorical bank, compute its isotopic couple.
+	## Input : $refBank
+	## Output : $ionBank
+	## Usage : my ( $ionBank ) = isotopicAdvancedCalculation ( $refBank ) ;
+	
+=cut
+## START of SUB
+sub isotopicAdvancedCalculation {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $mode ) = @_;
+    
+    my %isotopes = () ;
+    
+    # get fragments
+    my $fragments = $self->_getFragments();
+    my $theoPeaks = $self->_getTheoricalPeaks() ;
+    
+   	# foreach theo peak
+   	
+   	foreach my $fragment  (@{$fragments}) {
+   		if ($fragment->_getFragment_TYPE() eq 'isotope' ) {
+   			if ( ($fragment->_getFragment_LOSSES_OR_GAINS()) !~ /Ca|K|S|Cl/ ) {
+   				$isotopes{ $fragment->_getFragment_LOSSES_OR_GAINS() } = $fragment->_getFragment_DELTA_MASS() ;	
+   			}
+   			
+   		}
+   	}
+#   	print Dumper %isotopes ;
+   	
+   	foreach my $peak  (@{$theoPeaks}) {
+   	
+   		# find if it is a fragment
+   		if ( defined $peak->_getPeak_ANNOTATION_TYPE() ) {
+   			
+   			if ( ($peak->_getPeak_ANNOTATION_TYPE() eq 'fragment' ) or ($peak->_getPeak_ANNOTATION_TYPE() eq 'adduct' ) ) {
+   				
+   				my $peakMass = $peak->_getPeak_COMPUTED_MONOISOTOPIC_MASS() ;
+   				my $peakAnnotationName = $peak->_getPeak_ANNOTATION_NAME() ;
+   				
+   				my $peakAnnotationInPosMode = 'x' ;
+   				my $peakAnnotationInNegMode = 'x' ;
+   				
+   				$peakAnnotationInPosMode = $peak->_getPeak_ANNOTATION_IN_POS_MODE() if ( $peak->_getPeak_ANNOTATION_IN_POS_MODE() ) ;
+   				$peakAnnotationInNegMode = $peak->_getPeak_ANNOTATION_IN_NEG_MODE() if ( $peak->_getPeak_ANNOTATION_IN_NEG_MODE() ) ;
+   				
+   				foreach my $isotope (keys %isotopes) {
+   					
+   					my $isotopeMass = $isotopes{$isotope} ;
+   					
+   					# arround the result with min decimal part of the two floats. 
+			    	my $oUtils = Metabolomics::Utils->new() ;
+			    	my $decimalLength = $oUtils->getSmallestDecimalPartOf2Numbers($isotopeMass, $peakMass) ;
+			    	
+			    	my $computedMass = ($peakMass + $isotopeMass)  ;
+    				$computedMass = sprintf("%.$decimalLength"."f", $computedMass );
+   					
+   					my $oPeak = Metabolomics::Banks->__refPeak__() ;
+			    	$oPeak->_setPeak_COMPUTED_MONOISOTOPIC_MASS ( $computedMass );
+			    	$oPeak->_setPeak_ANNOTATION_TYPE ( 'isotopic massif' ) ;
+			    	$oPeak->_setPeak_ANNOTATION_NAME ( $peakAnnotationName.'_'.$isotope );
+			    	
+			    	# remove wrong mode annotation
+			    	if ( (defined $mode ) and ( $mode eq 'POSITIVE') ) {
+			    		$oPeak->_setPeak_ANNOTATION_IN_POS_MODE (  $peakAnnotationInPosMode.'_'.$isotope ) ;
+			    	}
+			    	elsif ( (defined $mode ) and ( $mode eq 'NEGATIVE') ) {
+			    		$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE ( $peakAnnotationInNegMode.'_'.$isotope ) ;
+			    	}
+			    	
+			    	$self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
+   				} # End foreach isotope
+   			}
+   		}		
+   	}
+}
+### END of SUB
 
 
 

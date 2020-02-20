@@ -62,6 +62,27 @@ sub all_fail : Tests {
     );
 }
 
+sub all_everything_fails : Tests {
+    my ($self) = @_;
+
+    my $p1 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $reject->(1);
+    });
+
+    my $p2 = Promise::ES6->new(sub {
+        my ($resolve, $reject) = @_;
+        $reject->({ message => 'oh my god' });
+    });
+
+    my $all = Promise::ES6->all([$p1, $p2]);
+
+    cmp_deeply(
+        exception { PromiseTest::await($all) },
+        re( qr<\A1 > ),
+    );
+}
+
 sub all_fail_then_succeed : Tests {
     my ($self) = @_;
 

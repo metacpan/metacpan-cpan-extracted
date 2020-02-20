@@ -1,30 +1,49 @@
 package App::SortSubUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-14'; # DATE
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'App-SortSubUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
 
 our %SPEC;
 
 $SPEC{list_sort_sub_modules} = {
     v => 1.1,
+    args => {
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
+    },
 };
 sub list_sort_sub_modules {
     require Module::List::Tiny;
 
     my %args = @_;
 
-    my $res = Module::List::Tiny::list_modules(
+    my $mods = Module::List::Tiny::list_modules(
         "Sort::Sub::", {list_modules=>1, recurse=>1});
     my @rows;
-    for (sort keys %$res) {
-        s/^Sort::Sub:://;
-        push @rows, $_;
+    for my $mod (sort keys %$mods) {
+        (my $name = $mod) =~ s/^Sort::Sub:://;
+        if ($args{detail}) {
+            (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+            require $mod_pm;
+            my $meta = {};
+            eval {
+                $meta = &{"$mod\::meta"};
+            };
+            push @rows, {
+                name => $name,
+                summary => $meta->{summary},
+            };
+        } else {
+            push @rows, $name;
+        }
     }
     [200, "OK", \@rows];
 }
@@ -44,7 +63,7 @@ App::SortSubUtils - CLIs related to Sort::Sub
 
 =head1 VERSION
 
-This document describes version 0.002 of App::SortSubUtils (from Perl distribution App-SortSubUtils), released on 2019-12-14.
+This document describes version 0.003 of App::SortSubUtils (from Perl distribution App-SortSubUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -65,11 +84,17 @@ This distribution contains the following CLIs related to L<Sort::Sub>:
 
 Usage:
 
- list_sort_sub_modules() -> [status, msg, payload, meta]
+ list_sort_sub_modules(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<bool>
+
+=back
 
 Returns an enveloped result (an array).
 

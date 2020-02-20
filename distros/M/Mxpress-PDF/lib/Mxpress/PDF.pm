@@ -3,16 +3,16 @@ use strict;
 use warnings;
 
 package Mxpress::PDF {
-	our $VERSION = '0.14';
-	use Zydeco (
-		version	=> '0.14',
-		authority => 'cpan:LNATION',
-	);
+	BEGIN {
+		our $VERSION = '0.17';
+		our $AUTHORITY = 'cpan:LNATION';
+	};
+	use Zydeco;
 	use Colouring::In;
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image form field annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image field annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (type => Object);
@@ -62,6 +62,17 @@ package Mxpress::PDF {
 			$self;
 		}
 		method save {
+			$self->_handle_on_save;
+			$self->pdf->saveas();
+			$self->pdf->end();
+		}
+		method stringify {
+			$self->_handle_on_save;
+			my $string = $self->pdf->stringify();
+			$self->pdf->end();
+			return $string;
+		}
+		method _handle_on_save {
 			my @pages = @{$self->pages};
 			if ($self->cover->active) {
 				$self->page(shift @pages);
@@ -79,8 +90,6 @@ package Mxpress::PDF {
 				$page->current($self->pdf->openpage($page->num));
 				$self->page($page)->run_onsave_cbs($self);
 			}
-			$self->pdf->saveas();
-			$self->pdf->end();
 		}
 		method onsave (Str $plug, Str $meth, Map %args) {
 			# todo role onsave
@@ -132,12 +141,12 @@ package Mxpress::PDF {
 				rows => 1,
 				row => 1,
 				h_offset => 0,
-				%args,
+				%args
 			);
 			for (qw/header footer/) {
 				$new_page->$_($factory->$_(
 					parent => $new_page,
-					%{$args{$_}}
+					%{$args{$_}},
 				));
 			}
 			return $new_page;
@@ -521,6 +530,7 @@ package Mxpress::PDF {
 			has indent (type => Num);
 			has pad (type => Str);
 			has pad_end (type => Str);
+			has end_w (type => Str);
 			has next_page;
 			factory text (Object $file, Map %args) {
 				$class->generic_new($file, %args);
@@ -623,6 +633,7 @@ package Mxpress::PDF {
 						if (@paragraph) {
 							$ypos -= $l if @paragraph;
 						} elsif ($self->pad) {
+							$self->end_w($xpos + $line_width);
 							my $pad_end = $self->pad_end || '';
 							my $pad = sprintf ("%s%s",
 								$self->pad x int(((
@@ -815,10 +826,13 @@ package Mxpress::PDF {
 				$self->set_attrs(%args);
 				my $placeholder = $self->toc_placeholder;
 				my ($x, $y, $w, $h) = $self->set_position(@{$placeholder->{position}});
-				# todo better
 				$args{page_offset} = 0;
 				my $one_toc_link = $self->outlines->[0]->font->size + $self->toc_line_offset/mm;
-				my $total_height = ($self->count * $one_toc_link) - ($h + ($self->file->page->h * $self->file->page->columns - 1));
+				$self->file->page($placeholder->{page});
+				my $total_height = ($self->count * $one_toc_link) - ($h + ($self->file->page->columns > 1 
+					? ($self->file->page->h * ($self->file->page->columns - $self->file->page->column)) 
+					: 0
+				));
 				while ($total_height > 0) {
 					$args{page_offset}++;
 					$self->file->add_page(num => $placeholder->{page}->num + $args{page_offset});
@@ -939,36 +953,35 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 		}
-		class +Form {
+		class +Field extends Plugin::Text {
+			use PDF::API2::Basic::PDF::Utils;
 			has xo (type => Object);
-			factory form (Object $file, Map %args) {
-				return $class->new(
-					file => $file,
-					forms => [],
-					padding => $args{padding} || 0,
-				);
+			has annotate (type => Object);
+			factory field (Object $file, Map %args) {
+				$args{pad} ||= '_';
+				$args{margin_bottom} ||= 3;
+				$class->generic_new($file, %args);
 			}
-			method add {
+			around add (Str $text, Map %args) {
+				my $annotate = $self->annotate(
+					$self->file->page->current->annotation
+				);
+				my @pos = ($self->parse_position([]));
+				my $file = $self->$next($text, %args);
 				my $form = $self->xo(
 					$self->file->pdf->xo_form()
 				);
-				$self->position([$self->parse_position([], 1)]);
-				return $self->file;
-			}
-			method end (Map %args) {
-				my $position = $self->position;
-
-				return $self->file;
-			}
-		}
-		class +Field extends Plugin::Text {
-			factory field (Object $file, Map %args) {
-				$args{pad} ||= '_';
-				$class->generic_new($file, %args);
-				# todo Attempt2 when brain != hangover |--[fillable forms]--|
-			}
-			around add (Str $text, Map %args) {
-				my $file = $self->$next($text, %args);
+				@pos = (
+					$self->end_w,
+					$pos[1] + ($self->font->line_height/2),
+					$pos[3] - $self->end_w,
+					$pos[1] - $self->font->line_height
+				);
+				$annotate->{Subtype} = PDFName('Widget');
+				$annotate->rect(@pos);
+				$annotate->{FT} = PDFName('Tx');
+				$annotate->{T} = PDFStr($text);
+				$form->bbox(@pos);
 				return $file;
 			}
 		}
@@ -976,7 +989,7 @@ package Mxpress::PDF {
 	class Factory {
 		use PDF::API2;
 		factory new_pdf (Str $name, Map %args) {
-			return $factory->generate_file( \%args )->new(
+			return $factory->generate_file(\%args)->new(
 				file_name => $name,
 				pages => [],
 				num => 0,
@@ -984,6 +997,23 @@ package Mxpress::PDF {
 				page_args => $args{page} || {},
 				pdf => PDF::API2->new( -file => sprintf("%s.pdf", $name)),
 			)->add_page;
+		}
+		factory open (Str $name, Map %args) {
+			my $pdf = PDF::API2->open($name);
+			my $file = $factory->generate_file(\%args)->new(
+				pdf => $pdf,
+				file_name => $name,
+				pages => [],
+				page_size => 'A4',
+				page_args => $args{page} || {},
+			);
+			$file->page($factory->page($pdf,
+				open => 1,
+				num => 1,
+				page_size => 'A4',
+				%{$args{page}}
+			));
+			return $file;
 		}
 	}
 }
@@ -1000,7 +1030,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.14
+Version 0.17
 
 =cut
 
@@ -1217,7 +1247,13 @@ Returns a new Mxpress::PDF::Plugin::Image Object. This object aids with adding i
 
 Returns a new Mxpress::PDF::Plugin::Annotation Object. This object aids with adding annotations to a pdf page.
 
-	my $annotation = Mxpress::PDF->annotation($file, %image_args);
+	my $annotation = Mxpress::PDF->annotation($file, %annotation_args);
+
+=head2 field
+
+Returns a new Mxpress::PDF::Plugin::Field Object. This object aids with adding fillable text fields to a pdf page.
+
+	my $field = Mxpress::PDF->field($file, %field_args);
 
 =head1 File
 
@@ -2504,6 +2540,34 @@ The following methods can be called from a Mxpress::PDF::Plugin::Annotation Obje
 Add an annotation to the current Mxpress::PDF::Page.
 
 	$annotation->add('add some text', %annotation_attrs)
+
+=head1 Field
+
+Mxpress::PDF::Plugin::Field extends Mxpress::PDF::Plugin::Text and is for adding fillable text fields to a Mxpress::PDF::Page
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		field => { %text_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->field->add(
+		%text_attrs
+	);
+
+	my $field = $pdf->field
+
+=head2 Methods
+
+The following methods can be called from a Mxpress::PDF::Plugin::Field Object.
+
+=head3 add
+
+Add a text field to the current Mxpress::PDF::Page.
+
+	$field->add('First Name:', %text_attrs)
 
 =head1 AUTHOR
 

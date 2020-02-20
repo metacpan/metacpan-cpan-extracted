@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util qw/reftype refaddr/;
 use Encode qw/decode encode/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our (%HELP, @MAYBE, $caller, $destruct);
 BEGIN {
 	%HELP = (
@@ -57,7 +57,7 @@ sub _d_recurse {
 }
 
 1;
-# one is going to re-write this.. to become more flexible but try to fix the run-away thing by setting ||
+
 __END__
 
 =head1 NAME
@@ -66,7 +66,7 @@ Struct::WOP - deeply encode/decode a struct
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -82,6 +82,14 @@ Version 0.09
 		my ($self, $hashref, $key) = @_;
 
 	}
+
+=cut
+
+=head1 Description
+
+A quick and dirty solution for when you're in a world of utf-8 pain. 
+
+The correct solution is fix the data at source, however this is not always possible/plausible.
 
 =cut
 
@@ -132,13 +140,11 @@ L<http://search.cpan.org/dist/Struct-WOP/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017-2020 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

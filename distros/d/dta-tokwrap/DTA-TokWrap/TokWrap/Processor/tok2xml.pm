@@ -201,24 +201,29 @@ sub tok2xml {
     while ($$data =~ m{<s\b[^\>]*>.*?</s>\s*}sg) {
       push(@sloc,[$-[0], $+[0]-$-[0]]);
     }
-    my $prefix = substr($$data,0,$sloc[0][0]);
-    my $suffix = substr($$data,$sloc[$#sloc][0]+$sloc[$#sloc][1]);
+    if (!@sloc) {
+      $t2x->vlog('warn', "no sentences found for '$doc->{xtokfile}' (empty document?)");
+    } else {
+      ##-- non-empty
+      my $prefix = substr($$data,0,$sloc[0][0]);
+      my $suffix = substr($$data,$sloc[$#sloc][0]+$sloc[$#sloc][1]);
 
-    ##-- parse IDs
-    my ($s,$sid);
-    my $parsed = ($prefix
-		  .join('',
-			map {
-			  ($off,$len) = @$_;
-			  $s = substr($$data,$off,$len);
-			  $s =~ s{<s([^>]*)id="[^"]*"(.*?)<a>(\w*)/(\w*)</a>}{<s${1}id="${3}"${2}<a>${3}/${4}</a>}s;
-			  $s =~ s{<w(.*?)\bid="[^"]*"(.*?)<a>\w*/(\w*)</a>}{<w${1}id="${3}"${2}}g;
-			  $s =~ s{<toka></toka>}{}g;
-			  $s =~ s{<w([^>]*)></w>}{<w$1/>}g;
-			  $s
-			} @sloc)
-		  .$suffix);
-    $$data = $parsed;
+      ##-- parse IDs
+      my ($s,$sid);
+      my $parsed = ($prefix
+		    .join('',
+			  map {
+			    ($off,$len) = @$_;
+			    $s = substr($$data,$off,$len);
+			    $s =~ s{<s([^>]*)id="[^"]*"(.*?)<a>(\w*)/(\w*)</a>}{<s${1}id="${3}"${2}<a>${3}/${4}</a>}s;
+			    $s =~ s{<w(.*?)\bid="[^"]*"(.*?)<a>\w*/(\w*)</a>}{<w${1}id="${3}"${2}}g;
+			    $s =~ s{<toka></toka>}{}g;
+			    $s =~ s{<w([^>]*)></w>}{<w$1/>}g;
+			    $s
+			  } @sloc)
+		    .$suffix);
+      $$data = $parsed;
+    }
   }
 
   ##-- finalize

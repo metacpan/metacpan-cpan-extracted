@@ -1,3 +1,7 @@
+0.28.0 2020-02-19 18:33:41 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add support for YAML based config files
+
 0.27.0 2020-01-29 14:58:18 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - stabilized reconf behavior in frontend (@zaucker)

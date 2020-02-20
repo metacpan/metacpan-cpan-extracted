@@ -10,6 +10,6 @@ WriteMakefile(
     AUTHOR        => 'Abe Timmerman <abeltje@cpan.org>',
 
     PREREQ_PM => {
-        'Dancer::Plugin::RPC' => '1.07_02',
+        'Dancer::Plugin::RPC' => '1.08',
     },
 );

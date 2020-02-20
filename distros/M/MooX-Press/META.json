@@ -46,7 +46,7 @@
             "Role::Hooks" : "0.001",
             "Sub::HandlesVia" : "0.013",
             "Sub::MultiMethod" : "0.008",
-            "Type::Tiny" : "1.008003",
+            "Type::Tiny" : "1.010000",
             "namespace::autoclean" : "0",
             "perl" : "5.008008"
          }
@@ -66,11 +66,11 @@
    "provides" : {
       "MooX::Press" : {
          "file" : "lib/MooX/Press.pm",
-         "version" : "0.053"
+         "version" : "0.055"
       },
       "MooX::Press::Keywords" : {
          "file" : "lib/MooX/Press/Keywords.pm",
-         "version" : "0.053"
+         "version" : "0.055"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Press/project"
    },
-   "version" : "0.053",
+   "version" : "0.055",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

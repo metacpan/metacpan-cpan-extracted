@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 use strict;
 
 use Cwd qw(abs_path);
@@ -9,7 +9,7 @@ my $APP  = $ENV{APP_NAME} // 'example';
 my $APP_DIR = abs_path('..') . "/$APP";
 
 # Fake the `carton exec -- ...` effect
-$ENV{'PERL5LIB'} = "$APP_DIR/local/lib/perl5";
+$ENV{'PERL5LIB'} = "$APP_DIR/local/lib/perl5:$APP_DIR/lib";
 chdir $APP_DIR or die "$APP_DIR: $!";
 
 Daemon::Control->new(

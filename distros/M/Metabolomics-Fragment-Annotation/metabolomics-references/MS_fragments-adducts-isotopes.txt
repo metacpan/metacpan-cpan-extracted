@@ -1,6 +1,4 @@
 type	losses_or_gains	delta_mass	annotation_in_pos_mode	annotation_in_neg_mode
-pseudomolecular ion	+H	1.0072764	[M+H]+	
-pseudomolecular ion	-H	-1.0072764		[M-H]-
 adduct	-2H+Na+K	59.9378259		[(M-H+Na+K)-H]-
 adduct	-H+K	37.95588165	[M+K]+	
 adduct	-H+Na	21.98194425	[M+Na]+	

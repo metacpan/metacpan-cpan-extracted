@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::RecordReader;
 #ABSTRACT: Koha biblio/authority records reader
-$Koha::Contrib::Tamil::RecordReader::VERSION = '0.062';
+$Koha::Contrib::Tamil::RecordReader::VERSION = '0.063';
 use Moose;
 
 with 'MooseX::RW::Reader';
@@ -188,10 +188,13 @@ sub get_biblio_xml {
             my $record = MARC::Record->new;
             $record->encoding('UTF-8');
             my @itemsrecord;
+            my $not_onloan_count = 0;
             foreach my $item (@items) {
+                $not_onloan_count++ unless $item->{onloan};
                 my $record = Item2Marc($item, $id);
                 push @itemsrecord, $record->field($self->itemtag);
             }
+            push @itemsrecord, MARC::Field->new('999', ' ', ' ', 'x' => $not_onloan_count);
             $record->insert_fields_ordered(@itemsrecord);
             my $itemsxml = $record->as_xml_record();
             $marcxml =
@@ -291,7 +294,7 @@ Koha::Contrib::Tamil::RecordReader - Koha biblio/authority records reader
 
 =head1 VERSION
 
-version 0.062
+version 0.063
 
 =head1 SYNOPSYS
 
@@ -320,7 +323,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Fréderic Démians.
+This software is Copyright (c) 2020 by Fréderic Démians.
 
 This is free software, licensed under:
 

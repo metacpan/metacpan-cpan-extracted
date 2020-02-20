@@ -5,7 +5,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.171.0';
+$VERSION = '0.172.0';
 
 our $STRICT_MODE;
 
@@ -30,7 +30,7 @@ sub new {
 		croak "Invalid package name $package";
 	}
 
-	unless ($package eq "CORE::GLOBAL" || $args{no_auto} || ${"$package\::VERSION"}) {
+	unless ($package eq "CORE::GLOBAL" || $package eq 'main' || $args{no_auto} || ${"$package\::VERSION"}) {
 		(my $load_package = "$package.pm") =~ s{::}{/}g;
 		TRACE("$package is empty, loading $load_package");
 		require $load_package;

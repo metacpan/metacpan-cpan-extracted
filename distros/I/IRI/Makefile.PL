@@ -27,9 +27,7 @@ resources(
 
 author_tests('xt');
 
-write_doap_changes;
-write_doap_changes_xml;
+write_doap_changes "meta/changes.ttl", "Changes", "turtle";
 
 sign;
-
 WriteAll;

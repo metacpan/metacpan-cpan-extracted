@@ -10,13 +10,13 @@ Time::Format - Easy-to-use date/time formatting.
 
 =head1 VERSION
 
-This is version 1.15 of Time::Format, July 26, 2019.
+This is version 1.16 of Time::Format, February 19, 2020.
 
 =cut
 
 use strict;
 package Time::Format;
-$Time::Format::VERSION  = '1.15';
+$Time::Format::VERSION  = '1.16';
 
 # This module claims to be compatible with the following versions
 # of Time::Format_XS.
@@ -64,7 +64,12 @@ if (!$load_perlonly)
     # Okay to use the XS version?  Great.  Wrap it.
     if (!$load_perlonly)
     {
-        *time_format = \&Time::Format_XS::time_format;
+        *time_format = sub {
+            my ($fmt, $t) = @_;
+            $t = 'time'  if not defined $t;
+            @_ = ($fmt, $t);
+            goto &Time::Format_XS::time_format;
+        };
     }
 }
 
@@ -91,6 +96,7 @@ if ($load_perlonly)
             eval $code;
             die if $@;
         }
+        *time_format = \&time_format_perlonly;
         goto &time_format_perlonly;
     };
     undef $Time::Format_XS::VERSION;    # Indicate that XS version is not available.
@@ -163,7 +169,7 @@ sub import
 # the XS version cannot handle variable argument lists.
 
 use vars qw(%time %strftime %manip);
-tie %time,     'Time::Format', sub { push @_, 'time' if @_ == 1;  goto &time_format};
+tie %time,     'Time::Format', \&time_format;
 tie %strftime, 'Time::Format', \&time_strftime;
 tie %manip,    'Time::Format', \&time_manip;
 
@@ -603,7 +609,7 @@ sub _dow
 }
 
 
-# The heart of the module.  Didja ever see so many wicked regexes in a row?
+# The heart of the module.
 
 my %disam;    # Disambiguator for 'm' format.
 $disam{$_} = "{on}" foreach qw/yy d dd ?d/;                # If year or day is nearby, it's 'month'
@@ -1090,10 +1096,10 @@ interpolated strings, otherwise you'll get something ugly like:
                                                                                .
                                                                                .
  # Rename a file based on today's date:
- rename $file, "$file_$time{yyyymmdd}";
+ rename $file, "${file}_$time{yyyymmdd}";
 
  # Rename a file based on its last-modify date:
- rename $file, "$file_$time{'yyyymmdd',(stat $file)[9]}";
+ rename $file, "${file}_$time{'yyyymmdd',(stat $file)[9]}";
 
  # stftime examples
  $strftime{'%A %B %d, %Y'}                 Thursday June 05, 2003
@@ -1143,7 +1149,7 @@ Example:
 
  use Time::Format ':all';
 
-=head1 BUGS
+=head1 LIMITATIONS
 
 The format string used by C<%time> must not have $; as a substring
 anywhere.  $; (by default, ASCII character 28, or 1C hex) is used to
@@ -1167,7 +1173,7 @@ limitation.
 
 =head1 AUTHOR / COPYRIGHT
 
-Copyright (c) 2003-2019 by Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
+Copyright (c) 2003-2020 by Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
 
 All rights reserved.
 
@@ -1196,9 +1202,9 @@ endeavor to improve the software.
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXTtSTQAKCRDChJhzmpBW
-qqmjAKCO5fIeALvd5cOw6C+o+4nqamDxagCePM3JdKVIEYuSz9VOaTWiJGVbo54=
-=drPW
+iF0EARECAB0WIQTSmjxiQX/QfjsCVJLChJhzmpBWqgUCXk1aEwAKCRDChJhzmpBW
+qu/jAKCil0ppbfA+FbEEub5E41qEWajl7wCfclrwa5dGIHb1+jL9sAVmACjvKlg=
+=pSH2
 -----END PGP SIGNATURE-----
 
 =end gpg

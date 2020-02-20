@@ -1,5 +1,10 @@
 Revision history for Alien-bison
 
+0.21      2020-02-19 20:57:01 -0500
+  - Use https instead of http
+  - Do not explicitly use Decode::Mojo
+    (it is now the default for Alien-Build)
+
 0.20      2019-06-04 08:18:31 -0700
   - Use Decode::Mojo instead of Decode::HTML
 

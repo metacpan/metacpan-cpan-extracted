@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Jasonify",
   "PREREQ_PM" => {
     "Carp" => "1.25",
-    "Datify" => 0,
+    "Datify" => "0.20.45",
     "Scalar::Util" => 0,
     "String::Tools" => 0,
     "overload" => 0,
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Carp" => "1.25",
     "Test2::V0" => 0
   },
-  "VERSION" => "v0.20.045",
+  "VERSION" => "v0.20.050",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.25",
-  "Datify" => 0,
+  "Datify" => "0.20.45",
   "Scalar::Util" => 0,
   "String::Tools" => 0,
   "Test2::V0" => 0,

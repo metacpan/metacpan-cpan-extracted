@@ -16,6 +16,8 @@ WriteMakefile(
     'Mojolicious::Plugin::Qooxdoo' => '1.0.8',
     'Config::Grammar' => '1.13',
     'Locale::PO' => '0.27',
+    'JSON::Validator' => 0,
+    'YAML::XS' => 0,
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0

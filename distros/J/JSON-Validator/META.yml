@@ -22,6 +22,7 @@ no_index:
     - examples
     - t
 requires:
+  List::Util: '1.45'
   Mojolicious: '7.28'
   perl: '5.010001'
 resources:
@@ -30,5 +31,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/json-validator.git
-version: '3.22'
+version: '3.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

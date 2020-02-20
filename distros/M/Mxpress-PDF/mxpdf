@@ -66,6 +66,12 @@ my %map = (
 	'=i=' => ['image', sub {
 		$_[0]->image->add($_[1])
 	}],
+	'=f=' => ['field', sub {
+		$_[0]->field->add($_[1])
+	}],
+	'=l=' => ['line', sub {
+		$_[0]->line->add
+	}]
 );
 
 my $reg = sprintf('^(%s)', join '|', map { quotemeta($_) } sort { length $b <=> length $a } keys %map);
@@ -131,8 +137,10 @@ You can currently prefix lines with the following markup
 
 	=Title
 	==Subtitle
-	===Subsubtitle=
+	===Subsubtitle
 	=i=path/to/image.png
+	=f=First Name:
+	=l=
 
 The configuration file should be in yaml format.
 

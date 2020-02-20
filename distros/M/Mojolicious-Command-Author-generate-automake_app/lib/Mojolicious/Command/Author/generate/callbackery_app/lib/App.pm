@@ -31,11 +31,14 @@ use our own plugin directory and our own configuration file:
 
 has config => sub {
     my $self = shift;
-    my $config = $self->SUPER::config(@_);
-    $config->file($ENV{<%= ${class} %>_CONFIG} || $self->home->rel_file('etc/<%= ${filename} %>.cfg'));
+    my $config = CallBackery::Model::ConfigJsonSchema->new(
+        app => $self,
+        file => $ENV{<%= ${class} %>_CONFIG} || $self->home->rel_file('etc/<%= ${filename} %>.yaml')
+    );
     unshift @{$config->pluginPath}, '<%= ${class} %>::GuiPlugin';
     return $config;
 };
+
 
 has database => sub {
     my $self = shift;

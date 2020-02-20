@@ -1,0 +1,61 @@
+{
+   "abstract" : "manage an entire ecosystem of Plack organisms under Kelp",
+   "author" : [
+      "Bartosz Jarzyna <brtastic.dev@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Kelp-Module-Symbiosis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Kelp" : "1",
+            "Plack" : "1",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brtastic/perl-kelp-module-symbiosis/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses"
+      ],
+      "repository" : {
+         "url" : "https://github.com/brtastic/perl-kelp-module-symbiosis"
+      }
+   },
+   "version" : "1.00"
+}

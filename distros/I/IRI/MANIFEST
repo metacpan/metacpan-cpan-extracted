@@ -1,6 +1,4 @@
 Changes
-Changes.ttl
-Changes.xml
 inc/Module/Install.pm
 inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm
@@ -15,9 +13,12 @@ lib/IRI.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+meta/changes.ttl
 t/00-simple.t
+t/base_resolution.t
 t/bugs.t
 t/coercion.t
+t/rel.t
 xt/pod-coverage.t
 xt/pod.t
 README

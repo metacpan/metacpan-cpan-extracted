@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.044 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2019-12-14.
+    This document describes version 0.045 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2019-12-15.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -75,7 +75,7 @@ FUNCTIONS
 
         Arguments to pass to the Sort::Sub::* routine.
 
-    *   sort_sub => *str*
+    *   sort_sub => *sortsub::spec*
 
         Name of a Sort::Sub::* module (without the prefix).
 

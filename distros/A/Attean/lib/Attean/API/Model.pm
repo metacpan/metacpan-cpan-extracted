@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.025
+This document describes Attean::API::Model version 0.026
 
 =head1 DESCRIPTION
 
@@ -141,11 +141,18 @@ Returns true if the algebra, evaluated with the supplied default graph(s)
 matches any data in the model, false otherwise. This is equivalent to the
 result of an ASK query over the supplied algebra.
 
+=item C<< evaluate($algebra, [ $default_graph | \@default_graphs ]) >>
+
+Returns an L<Attean::API::Iterator> of L<Attean::Result> objects which result
+from evaluating the given query algebra (e.g. one obtained from parsing a query
+with L<AtteanX::Parser::SPARQL>) with the supplied default graph(s) against data
+in the model.
+
 =cut
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.025 {
+package Attean::API::Model 0.026 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -270,6 +277,22 @@ package Attean::API::Model 0.025 {
 		return $union->grep(sub {not($seen{shift->as_string}++)});
 	}
 
+	sub evaluate {
+		my $self 	= shift;
+		my $algebra	= shift || die "No algebra available in evaluate call";
+		my $default_graphs	= shift || die "No default graphs available in evaluate call";
+		$default_graphs	= [$default_graphs] if (blessed($default_graphs));
+		
+		unless (blessed($algebra) and $algebra->does('Attean::API::Algebra')) {
+			die "Unexpected argument to evaluate: " . Dumper($algebra);
+		}
+		
+		my $planner	= Attean::IDPQueryPlanner->new();
+		my $plan	= $planner->plan_for_algebra($algebra, $self, $default_graphs);
+		my $iter	= $plan->evaluate($self);
+		return $iter;
+	}
+
 	sub algebra_holds {
 		my $self 	= shift;
 		my $algebra	= shift || die "No algebra available in algebra_holds call";
@@ -308,7 +331,7 @@ package Attean::API::Model 0.025 {
 }
 
 
-package Attean::API::MutableModel 0.025 {
+package Attean::API::MutableModel 0.026 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -401,21 +424,21 @@ package Attean::API::MutableModel 0.025 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.025 {
+package Attean::API::ETagCacheableModel 0.026 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.025 {
+package Attean::API::TimeCacheableModel 0.026 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.025 {
+package Attean::API::BulkUpdatableModel 0.026 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';

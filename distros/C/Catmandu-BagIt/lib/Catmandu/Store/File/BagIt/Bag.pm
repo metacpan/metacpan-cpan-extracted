@@ -2,7 +2,7 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.240';
+our $VERSION = '0.250';
 
 use Moo;
 use Carp;
@@ -30,7 +30,9 @@ sub _build__path {
 
 sub _build__bagit {
     my $self = shift;
-    Catmandu::BagIt->read($self->_path);
+    my $bag = Catmandu::BagIt->read($self->_path);
+    $bag->{escape} = 0 if $bag; # This implementation does its own file escaping...
+    $bag;
 }
 
 sub generator {
@@ -105,7 +107,7 @@ sub add {
 
     unless ($bagit) {
         $update = 0;
-        $bagit  = Catmandu::BagIt->new;
+        $bagit  = Catmandu::BagIt->new(algorithm => 'md5', escape => 0);
         $self->{_bagit} = $bagit;
     }
 

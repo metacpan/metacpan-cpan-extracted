@@ -1,4 +1,9 @@
 use alienfile;
+use Env::ShellWords qw( @CPPFLAGS @LDFLAGS );
+use Text::ParseWords qw( shellwords );
+use FFI::CheckLib qw( find_lib_or_die );
+
+configure { requires 'Env::ShellWords' => 0; requires 'FFI::CheckLib' => 0 };
 
 plugin 'PkgConfig' => 'libcurl';
 
@@ -7,13 +12,114 @@ plugin 'Probe::CommandLine' => (
   secondary => 1,
 ) for qw( curl-config curl );
 
+meta->around_hook(probe => sub {
+  my $orig = shift;
+  my $build = shift;
+
+  my $type = $orig->($build,@_);
+  if($type eq 'system')
+  {
+    find_lib_or_die lib => 'curl';
+  }
+  $type;
+});
+
 share {
+
+  my $alien_ssl = 'Alien::OpenSSL';
+
+  my @acflags;
+
+  # - schannel is the native SSL on windows
+  if($^O eq 'MSWin32')
+  {
+    unshift @acflags, '--with-schannel', '--without-ssl';
+    undef $alien_ssl;
+  }
+  # - libressl is the native SSL on openbsd and would be expected to be used there.
+  elsif($^O eq 'openbsd')
+  {
+    $alien_ssl = 'Alien::LibreSSL';
+    unshift @acflags, '--with-ssl';
+  }
+  # - macOS has its own native SSL implementation which is supported by curl
+  elsif($^O eq 'darwin')
+  {
+    unshift @acflags, '--with-darwinssl', '--without-ssl';
+    undef $alien_ssl;
+  }
+  # - elsewhere OpenSSL is probably a reasonable option
+  else
+  {
+    unshift @acflags, '--with-ssl';
+  }
+
+  if($alien_ssl)
+  {
+    requires $alien_ssl => 0;
+  }
 
   plugin Download => (
     url     => 'https://curl.haxx.se/download/',
     version => qr/^curl-([0-9\.]+)\.tar\.gz$/,
   );
   plugin Extract => 'tar.gz';
+
+  # make sure that curl uses the compiler / linker flags
+  # from our Alien SSL
+  meta->around_hook( build => sub {
+    my $orig = shift;
+    my $build = shift;
+    local $ENV{CPPFLAGS} = $ENV{CPPFLAGS};
+    local $ENV{LDFLAGS}  = $ENV{LDFLAGS};
+    if($alien_ssl)
+    {
+      unshift @CPPFLAGS, shellwords( $alien_ssl->cflags );
+      unshift @LDFLAGS,  grep /^-L/, shellwords( $alien_ssl->libs   );
+      log "using CPPFLAGS = $ENV{CPPFLAGS}";
+      log "using LDFLAGS = $ENV{LDFLAGS}";
+    }
+    $orig->($build, @_);
+  });
+
   plugin 'Build::Autoconf' => ();
+
+  build [
+    "%{configure} --disable-shared --enable-static @acflags",
+    '%{make}',
+    '%{make} install',
+  ];
+
+  after gather => sub {
+    my $build = shift;
+    return unless $alien_ssl;
+    $build->install_prop->{libs_static} = join(' ',
+      $build->install_prop->{libs_static},
+      grep /^-L/,
+      shellwords( $alien_ssl->libs ),
+    );
+  };
+
+  requires 'Path::Tiny';
+
+  ffi {
+    build [
+      "%{configure} --enable-shared --disable-static --libdir=%{.install.autoconf_prefix}/dynamic @acflags",
+      '%{make}',
+      '%{make} install',
+      sub {
+        my $build = shift;
+        return unless $^O eq 'MSWin32';
+        my $root = Path::Tiny->new($ENV{DESTDIR})->child($build->install_prop->{autoconf_prefix});
+        log "re-routing DLLs in $root";
+        foreach my $from (grep /\.dll$/i, $root->child('bin')->children)
+        {
+          my $to = $root->child('dynamic', $from->basename);
+          log "move $from => $to";
+          $from->move($to);
+        }
+      },
+    ];
+  };
 
 };

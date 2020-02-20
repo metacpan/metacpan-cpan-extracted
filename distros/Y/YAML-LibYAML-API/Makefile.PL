@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "YAML::PP" => "0.018",
     "blib" => "1.01"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

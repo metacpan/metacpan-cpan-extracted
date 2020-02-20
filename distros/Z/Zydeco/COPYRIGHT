@@ -8,6 +8,7 @@ Files: Changes
  META.yml
  dist.ini
  doap.ttl
+ lib/MooX/Pression.pm
  t/02synopsis.t
  t/03subclass.t
  t/04requires.t
@@ -49,7 +50,6 @@ Copyright: Unknown
 License: Unknown
 
 Files: README
- lib/MooX/Pression.pm
  lib/Zydeco.pm
  t/01basic.t
 Copyright: This software is copyright (c) 2020 by Toby Inkster.

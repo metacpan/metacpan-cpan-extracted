@@ -19,10 +19,10 @@ my $builder = Module::Build->new(
 		'Module::Build' => '0.38',
 	},
 	requires => {
-	        'perl'                => 5.006,
+	    'perl'                => 5.006,
 		'Carp'                => 0,
 		'Scalar::Util'        => 0,
-		'SUPER'               => 0,
+		'SUPER'               => '1.20',
 	},
 	build_requires => {
 		'Test::More'          => 0.88,

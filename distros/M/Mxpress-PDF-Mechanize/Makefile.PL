@@ -15,12 +15,11 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+	'Mxpress::PDF' => '0.14',
+        'WWW::Mechanize::Chrome' => 0
     },
     PREREQ_PM => {
 	'Zydeco' => '0.507',
-	'Mxpress::PDF' => '0.14',
-        'Module::Load' => '0.34',
-        'WWW::Mechanize::Chrome' => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Mxpress-PDF-Mechanize-*' },

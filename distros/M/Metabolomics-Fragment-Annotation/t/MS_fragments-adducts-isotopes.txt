@@ -1,4 +1,6 @@
 type	losses_or_gains	delta_mass	annotation_in_pos_mode	annotation_in_neg_mode
+pseudomolecular ion	+H	1.0072764	[M+H]+	
+pseudomolecular ion	-H	-1.0072764		[M-H]-
 adduct	-2H+Na+K	59.9378259		[(M-H+Na+K)-H]-
 adduct	-H+K	37.95588165	[M+K]+	
 adduct	-H+Na	21.98194425	[M+Na]+	
@@ -39,9 +41,7 @@ adduct	+2(HCOOH)	92.01095861		[M+2HCO2+H]-
 adduct	+2(HCOOH)+(HCOOK)	175.9723196		
 adduct	+2(HCOOH)+(HCOONa)	159.9983822		
 adduct	+2(HCOOK)	167.9227219		
-adduct	+2(HCOONa)	135.9748471	
-fragment	+H	1.00727600	[(M+H)]+
-fragment	-H	-1.00782504	[(M-H)]-
+adduct	+2(HCOONa)	135.9748471		
 fragment	-(C11H18O9)	-294.0950822	[(M+H)-C11H18O9]+	[(M-H)-C11H18O9]-
 fragment	-(C12H16O12)	-352.064176	[(M+H)-C12H16O12]+	[(M-H)-C12H16O12]-
 fragment	-(C12H20O9)	-308.1107322	[(M+H)-C12H20O9]+	[(M-H)-C12H20O9]-

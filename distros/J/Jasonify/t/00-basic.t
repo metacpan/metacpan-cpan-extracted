@@ -127,11 +127,13 @@ my $numf = Jasonify::Number->formatted( '%.6f', $num );
 my $inf  = 9**9**9;
 my $nan  = $inf / $inf;
 
-is( Jasonify->encode($int), '9876543210',       ' int  encodes correctly' );
-is( Jasonify->encode($num), '1234567890.12346', ' num  encodes correctly' );
-is( Jasonify->encode( -$inf ), '"-Infinity"',   '-inf  encodes correctly' );
-is( Jasonify->encode($inf),     '"Infinity"',   ' inf  encodes correctly' );
-is( Jasonify->encode($nan),     '"NaN"',        ' nan  encodes correctly' );
+my $numstr = "$num";
+
+is( Jasonify->encode($int),     '9876543210', ' int  encodes correctly' );
+is( Jasonify->encode($num),          $numstr, ' num  encodes correctly' );
+is( Jasonify->encode( -$inf ), '"-Infinity"', '-inf  encodes correctly' );
+is( Jasonify->encode($inf),     '"Infinity"', ' inf  encodes correctly' );
+is( Jasonify->encode($nan),     '"NaN"',      ' nan  encodes correctly' );
 
 is( Jasonify->encode($numf), '1234567890.123457',
     'formatted number encodes correctly' );
@@ -168,7 +170,7 @@ is( Jasonify->encode($array[-1]), $value[-1], 'array of scalar references' );
 
 push @array, [ $int, $num, $numf, $inf, $nan ];
 push @value,
-    '[9876543210, 1234567890.12346, 1234567890.123457, "Infinity", "NaN"]';
+    qq![9876543210, $numstr, 1234567890.123457, "Infinity", "NaN"]!;
 is( Jasonify->encode($array[-1]), $value[-1],
     'array of numbers encodes correctly' );
 
@@ -215,7 +217,7 @@ $hash{second} = { map { $_ => $_ } $int, $num, $numf, $inf, $nan };
 $value{second}
     = '{'
     . '"1234567890.123457" : 1234567890.123457, '
-    . '"1234567890.12346" : 1234567890.12346, '
+    . qq!"$numstr" : $numstr, !
     . '"9876543210" : 9876543210, '
     . '"Infinity" : "Infinity", '
     . '"NaN" : "NaN"'
@@ -226,7 +228,7 @@ is( Jasonify->encode( $hash{second} ), $value{second},
 $hash{third} = { map { $_ => \$_ } $int, $num, $inf, $nan };
 $value{third}
     = '{'
-    . '"1234567890.12346" : true, '
+    . qq!"$numstr" : true, !
     . '"9876543210" : true, '
     . '"Infinity" : true, '
     . '"NaN" : true'

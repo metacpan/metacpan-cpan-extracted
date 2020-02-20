@@ -1,0 +1,89 @@
+NAME
+    Data::Throttler_CHI - Data::Throttler-like throttler with CHI backend
+
+VERSION
+    This document describes version 0.003 of Data::Throttler_CHI (from Perl
+    distribution Data-Throttler_CHI), released on 2020-02-19.
+
+SYNOPSIS
+     use Data::Throttler_CHI;
+     use CHI;
+
+     my $throttler = Data::Throttler_CHI->new(
+         max_items    => 100,
+         interval     => 3600,
+         cache        => CHI->new(driver=>"Memory", datastore=>{}),
+         #nof_buckets => 100, # optional, default: int(sqrt(interval))
+     );
+
+     if ($throttle->try_push) {
+         print "Item can be pushed\n";
+     } else {
+         print "Item must wait\n";
+     }
+
+DESCRIPTION
+    EXPERIMENTAL, PROOF OF CONCEPT.
+
+    This module tries to use CHI as the backend for data throttling. It
+    presents an interface similar to, but simpler than, Data::Throttler.
+
+METHODS
+  new
+    Usage:
+
+     my $throttler = Data::Throttler_CHI->new(%args);
+
+    Known arguments ("*" means required):
+
+    *   max_items*
+
+    *   interval*
+
+    *   cache*
+
+        CHI instance.
+
+    *   nof_buckets
+
+        Optional. Int. Number of buckets. By default calculated using:
+        int(sqrt(interval)).
+
+  try_push
+    Usage:
+
+     $bool = $throttler->try_push(%args);
+
+    Return 1 if data can be pushed, or 0 if it must wait.
+
+    Known arguments:
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Throttler_CHI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Throttler_CHI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Throttler_CHI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Throttler
+
+    CHI
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -96,8 +96,9 @@ host_triplet = @host@
 target_triplet = @target@
 @HAVE_POD2TEXT_TRUE@am__append_1 = $(PODS:.pod=.txt)
 bin_PROGRAMS = dtatw-mkindex$(EXEEXT) dtatw-cx2dat$(EXEEXT) \
-	dtatw-rm-namespaces$(EXEEXT) dtatw-tokenize-dummy$(EXEEXT) \
-	dtatw-b2xb$(EXEEXT) dtatw-tok2xml$(EXEEXT)
+	dtatw-rm-namespaces$(EXEEXT) dtatw-xml-depth$(EXEEXT) \
+	dtatw-tokenize-dummy$(EXEEXT) dtatw-b2xb$(EXEEXT) \
+	dtatw-tok2xml$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_arg_distcheck.m4 \
@@ -148,6 +149,10 @@ am__dtatw_tokenize_dummy_SOURCES_DIST = dtatw-tokenize-dummy.c \
 @HAVE_FLEX_TRUE@	dtatw-tokenize-dummy.$(OBJEXT)
 dtatw_tokenize_dummy_OBJECTS = $(am_dtatw_tokenize_dummy_OBJECTS)
 dtatw_tokenize_dummy_LDADD = $(LDADD)
+am_dtatw_xml_depth_OBJECTS = dtatw-xml-depth.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2)
+dtatw_xml_depth_OBJECTS = $(am_dtatw_xml_depth_OBJECTS)
+dtatw_xml_depth_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -184,11 +189,13 @@ am__v_LEX_1 =
 YLWRAP = $(top_srcdir)/ylwrap
 SOURCES = $(dtatw_b2xb_SOURCES) $(dtatw_cx2dat_SOURCES) \
 	$(dtatw_mkindex_SOURCES) $(dtatw_rm_namespaces_SOURCES) \
-	$(dtatw_tok2xml_SOURCES) $(dtatw_tokenize_dummy_SOURCES)
+	$(dtatw_tok2xml_SOURCES) $(dtatw_tokenize_dummy_SOURCES) \
+	$(dtatw_xml_depth_SOURCES)
 DIST_SOURCES = $(dtatw_b2xb_SOURCES) $(dtatw_cx2dat_SOURCES) \
 	$(dtatw_mkindex_SOURCES) $(dtatw_rm_namespaces_SOURCES) \
 	$(dtatw_tok2xml_SOURCES) \
-	$(am__dtatw_tokenize_dummy_SOURCES_DIST)
+	$(am__dtatw_tokenize_dummy_SOURCES_DIST) \
+	$(dtatw_xml_depth_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -425,6 +432,8 @@ dtatw_cx2dat_SOURCES = dtatw-cx2dat.c $(common_deps)
 @HAVE_FLEX_TRUE@dtatw_tokenize_dummy_SOURCES = dtatw-tokenize-dummy.l
 dtatw_rm_namespaces_SOURCES = dtatw-rm-namespaces.c $(common_deps) $(expat_deps)
 dtatw_rm_namespaces_LDADD = $(EXPAT_LIBS)
+dtatw_xml_depth_SOURCES = dtatw-xml-depth.c $(common_deps) $(expat_deps)
+dtatw_xml_depth_LDADD = $(EXPAT_LIBS)
 dtatw_tok2xml_SOURCES = dtatw-tok2xml.c $(common_deps)
 dtatw_b2xb_SOURCES = dtatw-b2xb.c $(common_deps)
 all: $(BUILT_SOURCES) dtatwConfigAuto.h
@@ -544,6 +553,10 @@ dtatw-tokenize-dummy$(EXEEXT): $(dtatw_tokenize_dummy_OBJECTS) $(dtatw_tokenize_
 	@rm -f dtatw-tokenize-dummy$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(dtatw_tokenize_dummy_OBJECTS) $(dtatw_tokenize_dummy_LDADD) $(LIBS)
 
+dtatw-xml-depth$(EXEEXT): $(dtatw_xml_depth_OBJECTS) $(dtatw_xml_depth_DEPENDENCIES) $(EXTRA_dtatw_xml_depth_DEPENDENCIES) 
+	@rm -f dtatw-xml-depth$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(dtatw_xml_depth_OBJECTS) $(dtatw_xml_depth_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -556,6 +569,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatw-rm-namespaces.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatw-tok2xml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatw-tokenize-dummy.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatw-xml-depth.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatwCommon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatwExpat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dtatwUtf8.Po@am__quote@

@@ -10,7 +10,7 @@ my $deeply = \&eq_or_diff;
 use Game::RaycastFOV;
 
 can_ok('Game::RaycastFOV',
-    qw(bypair cached_circle circle line raycast swing_circle));
+    qw(bypair bypairall cached_circle circle line raycast swing_circle));
 
 # XS - bypair
 {
@@ -25,6 +25,16 @@ can_ok('Game::RaycastFOV',
     @pairs = ();
     Game::RaycastFOV::bypair { push @pairs, $_[1]; -1 } qw(1 2 3 4);
     $deeply->(\@pairs, [qw(2)]);
+}
+
+# XS - bypairall
+{
+    dies_ok { Game::RaycastFOV::bypairall {} 1 } 'wrong number of arguments';
+
+    my @pairs;
+    # should not abort on -1 (or any) return, unlike previous does
+    Game::RaycastFOV::bypairall { push @pairs, $_[1]; -1 } qw(1 2 3 4 7 6);
+    $deeply->(\@pairs, [qw(2 4 6)]);
 }
 
 # XS - circle
@@ -102,4 +112,4 @@ can_ok('Game::RaycastFOV',
     $deeply->(\@pairs, [qw/-2 2 -2 3 -2 1 -1 2 -3 2/]);
 }
 
-done_testing 15
+done_testing 17

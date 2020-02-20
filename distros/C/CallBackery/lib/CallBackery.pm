@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.27.0';
+our $VERSION = '0.28.1';
 
 use Mojo::Base 'Mojolicious';
 
@@ -52,8 +52,7 @@ has 'config' => sub {
     my $app = shift;
     my $conf = CallBackery::Config->new(
         app => $app,
-        file => $ENV{CALLBACKERY_CONF}
-            || $app->home->rel_file('etc/callbackery.cfg')
+        file => $ENV{CALLBACKERY_CONF} || $app->home->child('etc','callbackery.cfg')
     );
 };
 
@@ -242,6 +241,7 @@ S<Tobias Oetiker E<lt>tobi@oetiker.chE<gt>>
 =head1 HISTORY
 
  2013-12-06 to 1.0 first version
+ 2020-02-19 to 2.0 go REST
 
 =cut
 

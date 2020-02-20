@@ -188,8 +188,8 @@ sub __transaction {
         for my $values ( @$rows_to_execute ) {
             $sth->execute( @$values );
         }
-        if ( $stmt_type eq 'Insert' && $sf->{i}{ct}{skip_confirm_insert} ) {
-            delete $sf->{i}{ct}{skip_confirm_insert};
+        if ( $stmt_type eq 'Insert' && $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
+            # already asked for confirmation (create table + insert data) in Create_table
             $dbh->commit;
         }
 
@@ -231,8 +231,8 @@ sub __auto_commit {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $dbh = $sf->{d}{dbh};
-    if ( $stmt_type eq 'insert' && $sf->{i}{ct}{skip_confirm_insert} ) {
-        delete $sf->{i}{ct}{skip_confirm_insert};
+    if ( $stmt_type eq 'Insert' && $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
+        # already asked for confirmation (create table + insert data) in Create_table
     }
     else {
         $sf->{i}{occupied_term_height} = 3;

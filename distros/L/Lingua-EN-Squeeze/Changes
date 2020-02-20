@@ -1,5 +1,15 @@
 Revision history for Perl module Lingua::EN::Squeeze
 
+2020.02 2020-02-20 NEILB
+    - Arrgh, the doc also had a hardcoded line referring to a version,
+      which was out-of-date in 2020.01 :-(
+      I've just deleted that.
+
+2020.01 2020-02-20 NEILB
+    - Module version wasn't bumped on previous release. Letting DZ manage that now.
+      Thanks to anonymous Fastmail employee.
+    - Added a SEE ALSO section to the doc
+
 2016.01 2016-01-21 NEILB
     - Fixed the abstract line and the SYNOPSIS
     - Changed doc to have a COPYRIGHT AND LICENSE section, with the

@@ -1,0 +1,56 @@
+---
+abstract: 'Simplify management of stylesheets in your HTML'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - HTML
+  - CSS
+  - stylesheets
+  - deferable
+  - prefetch
+  - SEO
+  - web
+  - www
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-DeferableCSS
+provides:
+  HTML::DeferableCSS:
+    file: lib/HTML/DeferableCSS.pm
+    version: v0.2.0
+recommends:
+  Type::Tiny::XS: '0'
+requires:
+  Devel::StrictMode: '0'
+  File::ShareDir: '1.112'
+  List::Util: '1.45'
+  Moo: '1.006000'
+  MooX::TypeTiny: '0'
+  Path::Tiny: '0'
+  Types::Common::Numeric: '0'
+  Types::Common::String: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/robrwo/HTML-DeferableCSS/issues
+  repository: git://github.com/robrwo/HTML-DeferableCSS.git
+version: v0.2.0
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

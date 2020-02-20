@@ -6,7 +6,8 @@
 
 Test that MooX::XSConstructor compiles and works.
 
-=head1 AUTHO
+=head1 AUTHOR
+
 Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE

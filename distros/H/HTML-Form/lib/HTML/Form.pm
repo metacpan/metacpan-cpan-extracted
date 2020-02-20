@@ -6,7 +6,7 @@ use Carp ();
 use Encode ();
 
 use vars qw($VERSION);
-our $VERSION = '6.05';
+our $VERSION = '6.06';
 
 my %form_tags = map {$_ => 1} qw(input textarea button select option);
 
@@ -37,9 +37,7 @@ my %type2class = (
     number range color
 ));
 
-=head1 NAME
-
-HTML::Form - Class that represents an HTML form element
+# ABSTRACT: Class that represents an HTML form element
 
 =head1 SYNOPSIS
 
@@ -57,8 +55,8 @@ Objects of the C<HTML::Form> class represents a single HTML
 C<E<lt>formE<gt> ... E<lt>/formE<gt>> instance.  A form consists of a
 sequence of inputs that usually have names, and which can take on
 various values.  The state of a form can be tweaked and it can then be
-asked to provide C<HTTP::Request> objects that can be passed to the
-request() method of C<LWP::UserAgent>.
+asked to provide L<HTTP::Request> objects that can be passed to the
+request() method of L<LWP::UserAgent>.
 
 The following methods are available:
 
@@ -102,7 +100,7 @@ to obtain a proper value for C<base> and C<charset>:
 	charset => $response->content_charset,
     );
 
-In fact, the parse() method can parse from an C<HTTP::Response> object
+In fact, the parse() method can parse from an L<HTTP::Response> object
 directly, so the example above can be more conveniently written as:
 
     my $ua = LWP::UserAgent->new;
@@ -110,7 +108,7 @@ directly, so the example above can be more conveniently written as:
     my @forms = HTML::Form->parse($response);
 
 Note that any object that implements a decoded_content(), base() and
-content_charset() method with similar behaviour as C<HTTP::Response> will do.
+content_charset() method with similar behaviour as L<HTTP::Response> will do.
 
 Additional options might be passed in to control how the parse method
 behaves.  The following are all the options currently recognized:
@@ -371,7 +369,7 @@ sub push_input
 =item $form->method( $new_method )
 
 This method is gets/sets the I<method> name used for the
-C<HTTP::Request> generated.  It is a string like "GET" or "POST".
+L<HTTP::Request> generated.  It is a string like "GET" or "POST".
 
 =item $action = $form->action
 
@@ -484,6 +482,10 @@ sub inputs
 
 =item $input = $form->find_input( $selector, $type, $index )
 
+=item @inputs = $form->find_input( $selector )
+
+=item @inputs = $form->find_input( $selector, $type )
+
 This method is used to locate specific inputs within the form.  All
 inputs that match the arguments given are returned.  In scalar context
 only the first is returned, or C<undef> if none match.
@@ -506,7 +508,11 @@ input with the given name and/or type.
 sub find_input
 {
     my($self, $name, $type, $no) = @_;
+    die "Invalid index $no"
+        if defined $no && $no < 1;
     if (wantarray) {
+        warn "find_input called in list context with index specified\n"
+            if defined $no;
 	my @res;
 	my $c;
 	for (@{$self->{'inputs'}}) {
@@ -704,7 +710,7 @@ sub _try
 
 =item $request = $form->make_request
 
-Will return an C<HTTP::Request> object that reflects the current setting
+Will return an L<HTTP::Request> object that reflects the current setting
 of the form.  You might want to use the click() method instead.
 
 =cut
@@ -748,8 +754,8 @@ sub make_request
 =item $request = $form->click( $selector, $x, $y )
 
 Will "click" on the first clickable input (which will be of type
-C<submit> or C<image>).  The result of clicking is an C<HTTP::Request>
-object that can then be passed to C<LWP::UserAgent> if you want to
+C<submit> or C<image>).  The result of clicking is an L<HTTP::Request>
+object that can then be passed to L<LWP::UserAgent> if you want to
 obtain the server response.
 
 If a $selector is specified, we will click on the first clickable input
@@ -1404,7 +1410,7 @@ package HTML::Form::SubmitInput;
 
 Some input types (currently "submit" buttons and "images") can be
 clicked to submit the form.  The click() method returns the
-corresponding C<HTTP::Request> object.
+corresponding L<HTTP::Request> object.
 
 =cut
 

@@ -1,0 +1,14 @@
+Alt-App-makepatch-2.05.tar.gz
+CHANGES
+INSTALL
+lib/Alt/App/makepatch.pm
+Makefile.PL
+makepatch.spec
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
+script/applypatch
+script/makepatch
+t/basic.t
+try.pl

@@ -43,6 +43,8 @@
          "requires" : {
             "Catmandu" : "1.07",
             "Catmandu::FileStore" : "1.16",
+            "Digest::MD5" : "2.55",
+            "Digest::SHA" : "6.02",
             "File::Copy" : "0",
             "IO" : "0",
             "IO::String" : "0",
@@ -51,6 +53,7 @@
             "Module::Build" : "0.4229",
             "Moo" : "0",
             "Path::Iterator::Rule" : "1.0",
+            "Path::Naive" : "0.043",
             "Path::Tiny" : "0.1",
             "URI::Escape" : "0",
             "namespace::clean" : "0",
@@ -81,7 +84,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-BagIt"
       }
    },
-   "version" : "0.240",
+   "version" : "0.250",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas Franck <nicolas.franck@ugent.be>",

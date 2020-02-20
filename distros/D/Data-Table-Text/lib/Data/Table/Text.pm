@@ -17,7 +17,7 @@
 # updateDocumentation - detect parameter type mismatch between prototype and specified parameter
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20200202;                                                        # Version
+our $VERSION = 20200218;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -80,12 +80,12 @@ sub ddd(@)                                                                      
 
 sub fff($$@)                                                                    # Confess a message with a line position and a file that Geany will jump to if clicked on.
  {my ($line, $file, @m) = @_;                                                   # Line, file, messages
-  return unless (join '', @_) =~ m(\S)s;
 
   my $m = join ' ', @m;                                                         # Time stamp each message
+  return unless $m =~ m(\S)s;
+  $m =~ s(\n) ( )gs;
   $m .= " at $file line $line";
-
-  confess "  $m\n";                                                             # Confess
+  confess "$m\n";                                                               # Confess
  }
 
 my $mmm = 0;                                                                    # Time of last message
@@ -1030,10 +1030,20 @@ sub dumpFile($$)                                                                
   overWriteFile($file, dump($structure));
  } # dumpFile
 
+sub dumpTempFile($)                                                             # Dump a data structure to a temporary file and return the name of the file created
+ {my ($structure) = @_;                                                         # Data structure to write
+  writeFile(undef, dump($structure));
+ } # dumpTempFile
+
 sub dumpFileAsJson($$)                                                          # Dump to a B<$file> the referenced data B<$structure> represented as L<json> string.
  {my ($file, $structure) = @_;                                                  # File to write to or B<undef> for a temporary file,  address of data structure to write
   overWriteFile($file, encodeJson($structure));
  } # dumpFileAsJson
+
+sub dumpTempFileAsJson($)                                                       # Dump a data structure represented as L<json> string to a temporary file and return the name of the file created.
+ {my ($structure) = @_;                                                         # Data structure to write
+  writeFile(undef, encodeJson($structure));
+ } # dumpTempFileAsJson
 
 sub storeFile($$)                                                               # Store into a B<$file>, after creating a path to the file with L<makePath> if necessary, a data B<$structure> via L<Storable>.  This is much faster than L<dumpFile|/dumpFile> but the stored results are not easily modified.
  {my ($file, $structure) = @_;                                                  # File to write to or B<undef> for a temporary file,  address of data structure to write
@@ -1125,6 +1135,30 @@ sub numberOfLinesInFile($)                                                      
  {my ($file) = @_;                                                              # File
   scalar split /\n/, readFile($file);                                           # Number of lines
  } # numberOfLinesInFile
+
+sub overWriteHtmlFile($$)                                                       # Write an L<html> file to /var/www/html and make it readable
+ {my ($file, $data) = @_;                                                       # Target file relative to /var/www/html, data to write
+  my $s = writeTempFile($data);
+  my $t = fpf(q(/var/www/html/), $file);
+  xxx qq(sudo mv $s $t; chmod o+r $t);
+  unlink $s;
+ }
+
+sub overWritePerlCgiFile($$)                                                    # Write a L<Perl> file to /usr/lib/cgi-bin and make it executable after checking it for syntax errors
+ {my ($file, $data) = @_;                                                       # Target file relative to /var/www/html, data to write
+  my $s = writeTempFile($data);
+  my $r = qx(perl -c $s 2>&1);
+  if ($r =~ m(syntax OK)si)
+   {my $t = fpf(q(/usr/lib/cgi-bin/), $file);
+    say STDERR qx(sudo mv $s $t; chmod o+rx $t);
+   }
+  else
+   {my @data = map {[$_]} split m/\n/, $data;
+    say STDERR formatTable([@data]);
+    confess "Perl error:\n$r\n";
+   }
+  unlink $s;
+ }
 
 #D2 Copy                                                                        # Copy files and folders. The B<\Acopy.*Md5Normalized.*\Z> methods can be used to ensure that files have collision proof names that collapse duplicate content even when copied to another folder.
 
@@ -5768,6 +5802,7 @@ sub wellKnownUrls                                                               
     ryffine         => [q(Ryffine),                                             "http://www,ryffine.com"                                                                                                      ],
     s3Console       => [q(S3 Console),                                          "https://s3.console.aws.amazon.com/s3/home"                                                                                   ],
     s3              => [q(S3),                                                  "https://aws.amazon.com/s3/"                                                                                                  ],
+    sha             => [q(sha),                                                 "https://en.wikipedia.org/wiki/SHA-1"                                                                             ],
     shell           => [q(shell),                                               "https://en.wikipedia.org/wiki/Shell_(computing)"                                                                             ],
     sql             => [q(Structure Query Language),                            "https://en.wikipedia.org/wiki/SQL"                                                                                           ],
     spot            => [q(spot),                                                "https://aws.amazon.com/ec2/spot/"                                                                                            ],
@@ -5784,6 +5819,7 @@ sub wellKnownUrls                                                               
     taocp           => [q(The Art of Computer Programming),                     "https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"                                                               ],
     task            => [q(Dita Task),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html#task"  ],
     ubuntu          => [q(Ubuntu 18),                                           "https://ubuntu.com/download/desktop"                                                                                         ],
+    undef           => [q(undef),                                               "https://perldoc.perl.org/functions/undef.html"                                                                               ],
     unicode         => [q(Unicode),                                             "https://en.wikipedia.org/wiki/Unicode"                                                                                       ],
     url             => [q(url),                                                 "https://en.wikipedia.org/wiki/URL"                                                                                           ],
     utf8            => [q(utf8),                                                "https://en.wikipedia.org/wiki/UTF-8"                                                                                         ],
@@ -6098,7 +6134,8 @@ END
    }
 
   for my $l(keys @lines)                                                        # Extract documentation from comments
-   {my $line     = $lines[$l];                                                  # This line
+   {my $L = $l + 1;                                                             # Line number
+    my $line     = $lines[$l];                                                  # This line
     my $nextLine = $lines[$l+1];                                                # The next line
     if ($line =~ /\A#D(\d)\s+(.*?)\s*(#\s*(.+)\s*)?\Z/)                         # Sections are marked with #Dn in column 1-3 followed by title followed by optional text
      {$level = $1;
@@ -6127,9 +6164,13 @@ END
          ($1, $2, $3, $4);
       $flags //= '';                                                            # No flags found
 
-      if ($comment =~ m/\A(.*)Example:(.+?)\Z/is)                               # Extract example
+      if ($comment =~ m/\A(.*)Example:(.+?)\Z/is)                               # Extract example - in comment examples are now deprecated in favor of using tests as examples
        {$comment = $1;
        ($example, $produces) = split /:/, $2, 2;
+       }
+
+      if ($comment !~ m(\.\s*\Z)is)                                             # Check for closing full stop
+       {#fff $L, $perlModule, "Comment on line: $L does not end in a full stop\n$comment";
        }
 
       my $signature = $sub =~ s/\A\s*(\w|:)+//gsr =~                            # Signature
@@ -6635,6 +6676,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  dateStamp dateTimeStamp dateTimeStampName ddd deSquareArray decodeBase64
  decodeJson deduplicateSequentialWordsInString detagString
  downloadGitHubPublicRepo dumpFile dumpFileAsJson dumpGZipFile
+ dumpTempFile dumpTempFileAsJson
  enclosedReversedString enclosedReversedStringUndo enclosedString
  enclosedStringUndo encodeBase64 encodeJson evalFile evalGZipFile
  execPerlOnRemote expandNewLinesInDocumentation expandWellKnownUrlsInDitaFormat
@@ -6673,6 +6715,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  numberOfLinesInFile numberOfLinesInString nws
  onAws onAwsPrimary onAwsSecondary overWriteBinaryFile overWriteFile
  overrideAndReabsorbMethods owf
+ overWriteHtmlFile overWritePerlCgiFile
  pad parseCommandLineArguments parseDitaRef parseFileName
  parseIntoWordsAndStrings parseXmlDocType partitionStringsOnPrefixBySize
  powerOfTwo printQw processFilesInParallel processJavaFilesInParallel
@@ -6899,7 +6942,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20200202.
+Version 20200218.
 
 
 The following sections describe the methods in each functional area of this
@@ -8471,10 +8514,16 @@ Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> content 
 B<Example:>
 
 
-    my $f = dumpFile(undef, my $d = [qw(aaa bbb ccc)]);
-    my $s = 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲($f);
-    is_deeply $s, $d;
-    unlink $f;
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = dumpFile(undef, $d);
+    is_deeply 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲($f), $d;
+    is_deeply 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲(my $F = dumpTempFile($d)), $d;
+    unlink $f, $F;
+  
+    my $j = dumpFileAsJson(undef, $d);
+    is_deeply evalFileAsJson($j), $d;
+    is_deeply evalFileAsJson(my $J = dumpTempFileAsJson($d)), $d;
+    unlink $j, $J;
   
 
 =head3 evalFileAsJson($file)
@@ -8487,18 +8536,16 @@ Read a B<$file> containing L<Json|https://en.wikipedia.org/wiki/JSON> and return
 B<Example:>
 
 
-    my $f = dumpFileAsJson(undef, my $d = [{aaa=>'AAA', bbb=>'BBB'}]);
-    ok readFile($f) eq <<END;
-  [
-     {
-        "aaa" : "AAA",
-        "bbb" : "BBB"
-     }
-  ]
-  END
-    my $s = 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻($f);
-    is_deeply $s, $d;
-    unlink $f;
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = dumpFile(undef, $d);
+    is_deeply evalFile($f), $d;
+    is_deeply evalFile(my $F = dumpTempFile($d)), $d;
+    unlink $f, $F;
+  
+    my $j = dumpFileAsJson(undef, $d);
+    is_deeply 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻($j), $d;
+    is_deeply 𝗲𝘃𝗮𝗹𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻(my $J = dumpTempFileAsJson($d)), $d;
+    unlink $j, $J;
   
 
 =head3 evalGZipFile($file)
@@ -8855,10 +8902,38 @@ Dump to a B<$file> the referenced data B<$structure>.
 B<Example:>
 
 
-    my $f = 𝗱𝘂𝗺𝗽𝗙𝗶𝗹𝗲(undef, my $d = [qw(aaa bbb ccc)]);
-    my $s = evalFile($f);
-    is_deeply $s, $d;
-    unlink $f;
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = 𝗱𝘂𝗺𝗽𝗙𝗶𝗹𝗲(undef, $d);
+    is_deeply evalFile($f), $d;
+    is_deeply evalFile(my $F = dumpTempFile($d)), $d;
+    unlink $f, $F;
+  
+    my $j = dumpFileAsJson(undef, $d);
+    is_deeply evalFileAsJson($j), $d;
+    is_deeply evalFileAsJson(my $J = dumpTempFileAsJson($d)), $d;
+    unlink $j, $J;
+  
+
+=head3 dumpTempFile($structure)
+
+Dump a data structure to a temporary file and return the name of the file created
+
+     Parameter   Description
+  1  $structure  Data structure to write
+
+B<Example:>
+
+
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = dumpFile(undef, $d);
+    is_deeply evalFile($f), $d;
+    is_deeply evalFile(my $F = 𝗱𝘂𝗺𝗽𝗧𝗲𝗺𝗽𝗙𝗶𝗹𝗲($d)), $d;
+    unlink $f, $F;
+  
+    my $j = dumpFileAsJson(undef, $d);
+    is_deeply evalFileAsJson($j), $d;
+    is_deeply evalFileAsJson(my $J = dumpTempFileAsJson($d)), $d;
+    unlink $j, $J;
   
 
 =head3 dumpFileAsJson($file, $structure)
@@ -8872,18 +8947,38 @@ Dump to a B<$file> the referenced data B<$structure> represented as L<Json|https
 B<Example:>
 
 
-    my $f = 𝗱𝘂𝗺𝗽𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻(undef, my $d = [{aaa=>'AAA', bbb=>'BBB'}]);
-    ok readFile($f) eq <<END;
-  [
-     {
-        "aaa" : "AAA",
-        "bbb" : "BBB"
-     }
-  ]
-  END
-    my $s = evalFileAsJson($f);
-    is_deeply $s, $d;
-    unlink $f;
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = dumpFile(undef, $d);
+    is_deeply evalFile($f), $d;
+    is_deeply evalFile(my $F = dumpTempFile($d)), $d;
+    unlink $f, $F;
+  
+    my $j = 𝗱𝘂𝗺𝗽𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻(undef, $d);
+    is_deeply evalFileAsJson($j), $d;
+    is_deeply evalFileAsJson(my $J = dumpTempFileAsJson($d)), $d;
+    unlink $j, $J;
+  
+
+=head3 dumpTempFileAsJson($structure)
+
+Dump a data structure represented as L<Json|https://en.wikipedia.org/wiki/JSON> string to a temporary file and return the name of the file created.
+
+     Parameter   Description
+  1  $structure  Data structure to write
+
+B<Example:>
+
+
+    my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+    my $f = dumpFile(undef, $d);
+    is_deeply evalFile($f), $d;
+    is_deeply evalFile(my $F = dumpTempFile($d)), $d;
+    unlink $f, $F;
+  
+    my $j = dumpFileAsJson(undef, $d);
+    is_deeply evalFileAsJson($j), $d;
+    is_deeply evalFileAsJson(my $J = 𝗱𝘂𝗺𝗽𝗧𝗲𝗺𝗽𝗙𝗶𝗹𝗲𝗔𝘀𝗝𝘀𝗼𝗻($d)), $d;
+    unlink $j, $J;
   
 
 =head3 storeFile($file, $structure)
@@ -9139,6 +9234,36 @@ b
 ");                                           
   
     ok 𝗻𝘂𝗺𝗯𝗲𝗿𝗢𝗳𝗟𝗶𝗻𝗲𝘀𝗜𝗻𝗙𝗶𝗹𝗲($f) == 2;                                              
+  
+
+=head3 overWriteHtmlFile($file, $data)
+
+Write an L<html|https://en.wikipedia.org/wiki/HTML> file to /var/www/html and make it readable
+
+     Parameter  Description
+  1  $file      Target file relative to /var/www/html
+  2  $data      Data to write
+
+B<Example:>
+
+
+    𝗼𝘃𝗲𝗿𝗪𝗿𝗶𝘁𝗲𝗛𝘁𝗺𝗹𝗙𝗶𝗹𝗲   (q(index.html), q(<html><h1>Hello</h1></html>));
+    overWritePerlCgiFile(q(gen.pl),     q(...));
+  
+
+=head3 overWritePerlCgiFile($file, $data)
+
+Write a L<Perl|http://www.perl.org/> file to /usr/lib/cgi-bin and make it executable after checking it for syntax errors
+
+     Parameter  Description
+  1  $file      Target file relative to /var/www/html
+  2  $data      Data to write
+
+B<Example:>
+
+
+    overWriteHtmlFile   (q(index.html), q(<html><h1>Hello</h1></html>));
+    𝗼𝘃𝗲𝗿𝗪𝗿𝗶𝘁𝗲𝗣𝗲𝗿𝗹𝗖𝗴𝗶𝗙𝗶𝗹𝗲(q(gen.pl),     q(...));
   
 
 =head2 Copy
@@ -15641,7 +15766,7 @@ B<Example:>
   
   #D1 Samples                                                                      # Sample methods.
   
-  sub sample($@)                                                                  #R Documentation for the:  sample() method.  See also L<Data::Table::Text::sample2|/Data::Table::Text::sample2>. #Tsample
+  sub sample($@)                                                                  #R Documentation for the:  sample() method.  See also L<Data::Table::Text::sample2|/Data::Table::Text::sample2>. #Tsample .
    {my ($node, @context) = @_;                                                    # Node, optional context
     1
    }
@@ -16534,534 +16659,542 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 111 L<dumpGZipFile|/dumpGZipFile> - Write to a B<$file> a data B<$structure> through L<gzip|https://en.wikipedia.org/wiki/Gzip>.
 
-112 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
+112 L<dumpTempFile|/dumpTempFile> - Dump a data structure to a temporary file and return the name of the file created
 
-113 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
+113 L<dumpTempFileAsJson|/dumpTempFileAsJson> - Dump a data structure represented as L<Json|https://en.wikipedia.org/wiki/JSON> string to a temporary file and return the name of the file created.
 
-114 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
+114 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-115 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
+115 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-116 L<encodeBase64|/encodeBase64> - Encode an L<Ascii|https://en.wikipedia.org/wiki/ASCII> B<$string> in base 64.
+116 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-117 L<encodeJson|/encodeJson> - Convert a L<Perl|http://www.perl.org/> data B<$structure> to a L<Json|https://en.wikipedia.org/wiki/JSON> string.
+117 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-118 L<evalFile|/evalFile> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8>, L<perlfunc/eval> the content, confess to any errors and then return any result with L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> methods to access each hash element.
+118 L<encodeBase64|/encodeBase64> - Encode an L<Ascii|https://en.wikipedia.org/wiki/ASCII> B<$string> in base 64.
 
-119 L<evalFileAsJson|/evalFileAsJson> - Read a B<$file> containing L<Json|https://en.wikipedia.org/wiki/JSON> and return the corresponding L<Perl|http://www.perl.org/> data structure.
+119 L<encodeJson|/encodeJson> - Convert a L<Perl|http://www.perl.org/> data B<$structure> to a L<Json|https://en.wikipedia.org/wiki/JSON> string.
 
-120 L<evalGZipFile|/evalGZipFile> - Read a file compressed with L<gzip|https://en.wikipedia.org/wiki/Gzip> containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8>, L<perlfunc/eval> the content, confess to any errors and then return any result with L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> methods to access each hash element.
+120 L<evalFile|/evalFile> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8>, L<perlfunc/eval> the content, confess to any errors and then return any result with L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> methods to access each hash element.
 
-121 L<execPerlOnRemote|/execPerlOnRemote> - Execute some Perl B<$code> on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+121 L<evalFileAsJson|/evalFileAsJson> - Read a B<$file> containing L<Json|https://en.wikipedia.org/wiki/JSON> and return the corresponding L<Perl|http://www.perl.org/> data structure.
 
-122 L<expandNewLinesInDocumentation|/expandNewLinesInDocumentation> - Expand new lines in documentation, specifically 
+122 L<evalGZipFile|/evalGZipFile> - Read a file compressed with L<gzip|https://en.wikipedia.org/wiki/Gzip> containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8>, L<perlfunc/eval> the content, confess to any errors and then return any result with L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> methods to access each hash element.
+
+123 L<execPerlOnRemote|/execPerlOnRemote> - Execute some Perl B<$code> on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+
+124 L<expandNewLinesInDocumentation|/expandNewLinesInDocumentation> - Expand new lines in documentation, specifically 
  for new line and 
 
  for two new lines.
 
-123 L<expandWellKnownUrlsInDitaFormat|/expandWellKnownUrlsInDitaFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] in the L[Dita] B<xref>format.
+125 L<expandWellKnownUrlsInDitaFormat|/expandWellKnownUrlsInDitaFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] in the L[Dita] B<xref>format.
 
-124 L<expandWellKnownUrlsInHtmlFormat|/expandWellKnownUrlsInHtmlFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] using the html B<a> tag.
+126 L<expandWellKnownUrlsInHtmlFormat|/expandWellKnownUrlsInHtmlFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] using the html B<a> tag.
 
-125 L<expandWellKnownUrlsInHtmlFromPerl|/expandWellKnownUrlsInHtmlFromPerl> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] using the html B<a> tag.
+127 L<expandWellKnownUrlsInHtmlFromPerl|/expandWellKnownUrlsInHtmlFromPerl> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format L[url-name] using the html B<a> tag.
 
-126 L<expandWellKnownUrlsInPerlFormat|/expandWellKnownUrlsInPerlFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format LE<lt>url-nameE<gt> using the Perl POD syntax
+128 L<expandWellKnownUrlsInPerlFormat|/expandWellKnownUrlsInPerlFormat> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format LE<lt>url-nameE<gt> using the Perl POD syntax
 
-127 L<expandWellKnownUrlsInPod2Html|/expandWellKnownUrlsInPod2Html> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format =begin html format
+129 L<expandWellKnownUrlsInPod2Html|/expandWellKnownUrlsInPod2Html> - Expand short L<url|https://en.wikipedia.org/wiki/URL> names found in a string in the format =begin html format
 
-128 L<extractCodeBlock|/extractCodeBlock> - Extract the block of code delimited by B<$comment>, starting at qq($comment-begin), ending at qq($comment-end) from the named B<$file> else the current Perl program $0 and return it as a string or confess if this is not possible.
+130 L<extractCodeBlock|/extractCodeBlock> - Extract the block of code delimited by B<$comment>, starting at qq($comment-begin), ending at qq($comment-end) from the named B<$file> else the current Perl program $0 and return it as a string or confess if this is not possible.
 
-129 L<extractTest|/extractTest> - Remove example markers from test code.
+131 L<extractTest|/extractTest> - Remove example markers from test code.
 
-130 L<fe|/fe> - Get the extension of a file name.
+132 L<fe|/fe> - Get the extension of a file name.
 
-131 L<fff|/fff> - Confess a message with a line position and a file that Geany will jump to if clicked on.
+133 L<fff|/fff> - Confess a message with a line position and a file that Geany will jump to if clicked on.
 
-132 L<fileInWindowsFormat|/fileInWindowsFormat> - Convert a unix B<$file> name to windows format
+134 L<fileInWindowsFormat|/fileInWindowsFormat> - Convert a unix B<$file> name to windows format
 
-133 L<fileLargestSize|/fileLargestSize> - Return the largest B<$file>.
+135 L<fileLargestSize|/fileLargestSize> - Return the largest B<$file>.
 
-134 L<fileList|/fileList> - Files that match a given search pattern interpreted by L<perlfunc/bsd_glob>.
+136 L<fileList|/fileList> - Files that match a given search pattern interpreted by L<perlfunc/bsd_glob>.
 
-135 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum of the content of a B<$file>.
+137 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum of the content of a B<$file>.
 
-136 L<fileModTime|/fileModTime> - Get the modified time of a B<$file> as seconds since the epoch.
+138 L<fileModTime|/fileModTime> - Get the modified time of a B<$file> as seconds since the epoch.
 
-137 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub B<$make> for each source file that is missing and then again against the B<$target> file if any of the B<@source> files were missing or the $target file is older than any of the @source files or if the target does not exist.
+139 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub B<$make> for each source file that is missing and then again against the B<$target> file if any of the B<@source> files were missing or the $target file is older than any of the @source files or if the target does not exist.
 
-138 L<filePath|/filePath> - Create a file name from a list of  names.
+140 L<filePath|/filePath> - Create a file name from a list of  names.
 
-139 L<filePathDir|/filePathDir> - Create a folder name from a list of  names.
+141 L<filePathDir|/filePathDir> - Create a folder name from a list of  names.
 
-140 L<filePathExt|/filePathExt> - Create a file name from a list of  names the last of which is assumed to be the extension of the file name.
+142 L<filePathExt|/filePathExt> - Create a file name from a list of  names the last of which is assumed to be the extension of the file name.
 
-141 L<fileSize|/fileSize> - Get the size of a B<$file> in bytes.
+143 L<fileSize|/fileSize> - Get the size of a B<$file> in bytes.
 
-142 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
+144 L<findAllFilesAndFolders|/findAllFilesAndFolders> - Find all the files and folders under a folder.
 
-143 L<findDirs|/findDirs> - Find all the folders under a B<$folder> and optionally B<$filter> the selected folders with a regular expression.
+145 L<findDirs|/findDirs> - Find all the folders under a B<$folder> and optionally B<$filter> the selected folders with a regular expression.
 
-144 L<findFiles|/findFiles> - Find all the files under a B<$folder> and optionally B<$filter> the selected files with a regular expression.
+146 L<findFiles|/findFiles> - Find all the files under a B<$folder> and optionally B<$filter> the selected files with a regular expression.
 
-145 L<findFileWithExtension|/findFileWithExtension> - Find the first file that exists with a path and name of B<$file> and an extension drawn from <@ext>.
+147 L<findFileWithExtension|/findFileWithExtension> - Find the first file that exists with a path and name of B<$file> and an extension drawn from <@ext>.
 
-146 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file from B<@files> that exists or B<undef> if none of the named @files exist.
+148 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file from B<@files> that exists or B<undef> if none of the named @files exist.
 
-147 L<firstNChars|/firstNChars> - First N characters of a string.
+149 L<firstNChars|/firstNChars> - First N characters of a string.
 
-148 L<flattenArrayAndHashValues|/flattenArrayAndHashValues> - Flatten an array of scalars, array and hash references to make an array of scalars by flattening the array references and hash values.
+150 L<flattenArrayAndHashValues|/flattenArrayAndHashValues> - Flatten an array of scalars, array and hash references to make an array of scalars by flattening the array references and hash values.
 
-149 L<fn|/fn> - Remove the path and extension from a file name.
+151 L<fn|/fn> - Remove the path and extension from a file name.
 
-150 L<fne|/fne> - Remove the path from a file name.
+152 L<fne|/fne> - Remove the path from a file name.
 
-151 L<folderSize|/folderSize> - Get the size of a B<$folder> in bytes.
+153 L<folderSize|/folderSize> - Get the size of a B<$folder> in bytes.
 
-152 L<formatHtmlAndTextTables|/formatHtmlAndTextTables> - Create text and html versions of a tabular report
+154 L<formatHtmlAndTextTables|/formatHtmlAndTextTables> - Create text and html versions of a tabular report
 
-153 L<formatHtmlAndTextTablesWaitPids|/formatHtmlAndTextTablesWaitPids> - Wait on all table formatting pids to complete
+155 L<formatHtmlAndTextTablesWaitPids|/formatHtmlAndTextTablesWaitPids> - Wait on all table formatting pids to complete
 
-154 L<formatHtmlTable|/formatHtmlTable> - Format an array of arrays of scalars as an html table using the  B<%options> described in L<formatTableCheckKeys>.
+156 L<formatHtmlTable|/formatHtmlTable> - Format an array of arrays of scalars as an html table using the  B<%options> described in L<formatTableCheckKeys>.
 
-155 L<formatHtmlTablesIndex|/formatHtmlTablesIndex> - Create an index of html reports.
+157 L<formatHtmlTablesIndex|/formatHtmlTablesIndex> - Create an index of html reports.
 
-156 L<formatString|/formatString> - Format the specified B<$string> so it can be displayed in B<$width> columns.
+158 L<formatString|/formatString> - Format the specified B<$string> so it can be displayed in B<$width> columns.
 
-157 L<formatTable|/formatTable> - Format various B<$data> structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
+159 L<formatTable|/formatTable> - Format various B<$data> structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.
 
-158 L<formatTableA|/formatTableA> - Tabularize an array.
+160 L<formatTableA|/formatTableA> - Tabularize an array.
 
-159 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+161 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-160 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+162 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-161 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+163 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-162 L<formatTableCheckKeys|/formatTableCheckKeys> - Options available for formatting tables
+164 L<formatTableCheckKeys|/formatTableCheckKeys> - Options available for formatting tables
 
-163 L<formatTableClearUpLeft|/formatTableClearUpLeft> - Blank identical column values up and left
+165 L<formatTableClearUpLeft|/formatTableClearUpLeft> - Blank identical column values up and left
 
-164 L<formatTableH|/formatTableH> - Tabularize a hash.
+166 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-165 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+167 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-166 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+168 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-167 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+169 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-168 L<formattedTablesReport|/formattedTablesReport> - Report of all the reports created.
+170 L<formattedTablesReport|/formattedTablesReport> - Report of all the reports created.
 
-169 L<fp|/fp> - Get the path from a file name.
+171 L<fp|/fp> - Get the path from a file name.
 
-170 L<fpn|/fpn> - Remove the extension from a file name.
+172 L<fpn|/fpn> - Remove the extension from a file name.
 
-171 L<fullFileName|/fullFileName> - Full name of a file.
+173 L<fullFileName|/fullFileName> - Full name of a file.
 
-172 L<fullyQualifiedFile|/fullyQualifiedFile> - Check whether a B<$file> name is fully qualified or not and, optionally, whether it is fully qualified with a specified B<$prefix> or not.
+174 L<fullyQualifiedFile|/fullyQualifiedFile> - Check whether a B<$file> name is fully qualified or not and, optionally, whether it is fully qualified with a specified B<$prefix> or not.
 
-173 L<fullyQualifyFile|/fullyQualifyFile> - Return the fully qualified name of a file.
+175 L<fullyQualifyFile|/fullyQualifyFile> - Return the fully qualified name of a file.
 
-174 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
+176 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
 
-175 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+177 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-176 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+178 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-177 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+179 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-178 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+180 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue method|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-179 L<getCodeContext|/getCodeContext> - Recreate the code context for a referenced sub
+181 L<getCodeContext|/getCodeContext> - Recreate the code context for a referenced sub
 
-180 L<getSubName|/getSubName> - Returns the (package, name, file, line) of a perl B<$sub> reference.
+182 L<getSubName|/getSubName> - Returns the (package, name, file, line) of a perl B<$sub> reference.
 
-181 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
+183 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
 
-182 L<guidFromString|/guidFromString> - Create a guid representation of the L<md5 sum|https://en.wikipedia.org/wiki/MD5> of the content of a string.
+184 L<guidFromString|/guidFromString> - Create a guid representation of the L<md5 sum|https://en.wikipedia.org/wiki/MD5> of the content of a string.
 
-183 L<hashifyFolderStructure|/hashifyFolderStructure> - Hashify a list of file names to get the corresponding folder structure.
+185 L<hashifyFolderStructure|/hashifyFolderStructure> - Hashify a list of file names to get the corresponding folder structure.
 
-184 L<hexToAsciiString|/hexToAsciiString> - Decode a string of L<hexadecimal|https://en.wikipedia.org/wiki/Hexadecimal> digits as an L<Ascii|https://en.wikipedia.org/wiki/ASCII> string.
+186 L<hexToAsciiString|/hexToAsciiString> - Decode a string of L<hexadecimal|https://en.wikipedia.org/wiki/Hexadecimal> digits as an L<Ascii|https://en.wikipedia.org/wiki/ASCII> string.
 
-185 L<hostName|/hostName> - The name of the host we are running on.
+187 L<hostName|/hostName> - The name of the host we are running on.
 
-186 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+188 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-187 L<imageSize|/imageSize> - Return (width, height) of an B<$image>.
+189 L<imageSize|/imageSize> - Return (width, height) of an B<$image>.
 
-188 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+190 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-189 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list of numbers confessing to any ill defined values.
+191 L<indexOfMax|/indexOfMax> - Find the index of the maximum number in a list of numbers confessing to any ill defined values.
 
-190 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list of numbers confessing to any ill defined values.
+192 L<indexOfMin|/indexOfMin> - Find the index of the minimum number in a list of numbers confessing to any ill defined values.
 
-191 L<intersectionOfHashesAsArrays|/intersectionOfHashesAsArrays> - Form the intersection of the specified hashes B<@h> as one hash whose values are an array of corresponding values from each hash
+193 L<intersectionOfHashesAsArrays|/intersectionOfHashesAsArrays> - Form the intersection of the specified hashes B<@h> as one hash whose values are an array of corresponding values from each hash
 
-192 L<intersectionOfHashKeys|/intersectionOfHashKeys> - Form the intersection of the keys of the specified hashes B<@h> as one hash whose keys represent the intersection.
+194 L<intersectionOfHashKeys|/intersectionOfHashKeys> - Form the intersection of the keys of the specified hashes B<@h> as one hash whose keys represent the intersection.
 
-193 L<invertHashOfHashes|/invertHashOfHashes> - Invert a hash of hashes: given {a}{b} = c return {b}{c} = c
+195 L<invertHashOfHashes|/invertHashOfHashes> - Invert a hash of hashes: given {a}{b} = c return {b}{c} = c
 
-194 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+196 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-195 L<isBlank|/isBlank> - Test whether a string is blank.
+197 L<isBlank|/isBlank> - Test whether a string is blank.
 
-196 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
+198 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
 
-197 L<isSubInPackage|/isSubInPackage> - Test whether the specified B<$package> contains the subroutine <$sub>.
+199 L<isSubInPackage|/isSubInPackage> - Test whether the specified B<$package> contains the subroutine <$sub>.
 
-198 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+200 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-199 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+201 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-200 L<javaScriptExports|/javaScriptExports> - Extract the Javascript functions marked for export in a file or string.
+202 L<javaScriptExports|/javaScriptExports> - Extract the Javascript functions marked for export in a file or string.
 
-201 L<keyCount|/keyCount> - Count keys down to the specified level.
+203 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-202 L<lll|/lll> - Log messages with a time stamp and originating file and line number.
+204 L<lll|/lll> - Log messages with a time stamp and originating file and line number.
 
-203 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+205 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-204 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+206 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-205 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
+207 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
 
-206 L<loadHash|/loadHash> - Load the specified blessed B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+208 L<loadHash|/loadHash> - Load the specified blessed B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-207 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+209 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-208 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+210 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-209 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+211 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-210 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
+212 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred
 
-211 L<makePath|/makePath> - Make the path for the specified file name or folder on the local machine.
+213 L<makePath|/makePath> - Make the path for the specified file name or folder on the local machine.
 
-212 L<makePathRemote|/makePathRemote> - Make the path for the specified B<$file> or folder on the L<Amazon Web Services|http://aws.amazon.com> instance whose ip address is specified by B<$ip> or returned by L<awsIp>.
+214 L<makePathRemote|/makePathRemote> - Make the path for the specified B<$file> or folder on the L<Amazon Web Services|http://aws.amazon.com> instance whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-213 L<matchPath|/matchPath> - Return the deepest folder that exists along a given file name path.
+215 L<matchPath|/matchPath> - Return the deepest folder that exists along a given file name path.
 
-214 L<mathematicalBoldItalicString|/mathematicalBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
+216 L<mathematicalBoldItalicString|/mathematicalBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
 
-215 L<mathematicalBoldItalicStringUndo|/mathematicalBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
+217 L<mathematicalBoldItalicStringUndo|/mathematicalBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold Italic.
 
-216 L<mathematicalBoldString|/mathematicalBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
+218 L<mathematicalBoldString|/mathematicalBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
 
-217 L<mathematicalBoldStringUndo|/mathematicalBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
+219 L<mathematicalBoldStringUndo|/mathematicalBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Bold.
 
-218 L<mathematicalMonoSpaceString|/mathematicalMonoSpaceString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
+220 L<mathematicalMonoSpaceString|/mathematicalMonoSpaceString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
 
-219 L<mathematicalMonoSpaceStringUndo|/mathematicalMonoSpaceStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
+221 L<mathematicalMonoSpaceStringUndo|/mathematicalMonoSpaceStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical MonoSpace.
 
-220 L<mathematicalSansSerifBoldItalicString|/mathematicalSansSerifBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
+222 L<mathematicalSansSerifBoldItalicString|/mathematicalSansSerifBoldItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
 
-221 L<mathematicalSansSerifBoldItalicStringUndo|/mathematicalSansSerifBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
+223 L<mathematicalSansSerifBoldItalicStringUndo|/mathematicalSansSerifBoldItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold Italic.
 
-222 L<mathematicalSansSerifBoldString|/mathematicalSansSerifBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
+224 L<mathematicalSansSerifBoldString|/mathematicalSansSerifBoldString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
 
-223 L<mathematicalSansSerifBoldStringUndo|/mathematicalSansSerifBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
+225 L<mathematicalSansSerifBoldStringUndo|/mathematicalSansSerifBoldStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Bold.
 
-224 L<mathematicalSansSerifItalicString|/mathematicalSansSerifItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
+226 L<mathematicalSansSerifItalicString|/mathematicalSansSerifItalicString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
 
-225 L<mathematicalSansSerifItalicStringUndo|/mathematicalSansSerifItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
+227 L<mathematicalSansSerifItalicStringUndo|/mathematicalSansSerifItalicStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif Italic.
 
-226 L<mathematicalSansSerifString|/mathematicalSansSerifString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
+228 L<mathematicalSansSerifString|/mathematicalSansSerifString> - Convert alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
 
-227 L<mathematicalSansSerifStringUndo|/mathematicalSansSerifStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
+229 L<mathematicalSansSerifStringUndo|/mathematicalSansSerifStringUndo> - Undo alphanumerics in a string to L<Unicode|https://en.wikipedia.org/wiki/Unicode> Mathematical Sans Serif.
 
-228 L<max|/max> - Find the maximum number in a list of numbers confessing to any ill defined values.
+230 L<max|/max> - Find the maximum number in a list of numbers confessing to any ill defined values.
 
-229 L<maximumLineLength|/maximumLineLength> - Find the longest line in a B<$string>.
+231 L<maximumLineLength|/maximumLineLength> - Find the longest line in a B<$string>.
 
-230 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
+232 L<md5FromGuid|/md5FromGuid> - Recover an md5 sum from a guid.
 
-231 L<mergeFolder|/mergeFolder> - Copy the B<$source> folder into the B<$target> folder retaining any existing files not replaced by copied files.
+233 L<mergeFolder|/mergeFolder> - Copy the B<$source> folder into the B<$target> folder retaining any existing files not replaced by copied files.
 
-232 L<mergeFolderFromRemote|/mergeFolderFromRemote> - Merge the specified B<$Source> folder from the corresponding remote folder on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+234 L<mergeFolderFromRemote|/mergeFolderFromRemote> - Merge the specified B<$Source> folder from the corresponding remote folder on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-233 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge a list of hashes B<@h> by summing their values
+235 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge a list of hashes B<@h> by summing their values
 
-234 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+236 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-235 L<min|/min> - Find the minimum number in a list of numbers confessing to any ill defined values.
+237 L<min|/min> - Find the minimum number in a list of numbers confessing to any ill defined values.
 
-236 L<mmm|/mmm> - Log messages with a differential time in milliseconds and originating file and line number.
+238 L<mmm|/mmm> - Log messages with a differential time in milliseconds and originating file and line number.
 
-237 L<moveFileNoClobber|/moveFileNoClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
+239 L<moveFileNoClobber|/moveFileNoClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
 
-238 L<moveFileWithClobber|/moveFileWithClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
+240 L<moveFileWithClobber|/moveFileWithClobber> - Rename the B<$source> file, which must exist, to the B<$target> file but only if the $target file does not exist already.
 
-239 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
+241 L<nameFromFolder|/nameFromFolder> - Create a name from the last folder in the path of a file name.
 
-240 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
+242 L<nameFromString|/nameFromString> - Create a readable name from an arbitrary string of text.
 
-241 L<nameFromStringRestrictedToTitle|/nameFromStringRestrictedToTitle> - Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
+243 L<nameFromStringRestrictedToTitle|/nameFromStringRestrictedToTitle> - Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
 
-242 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+244 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-243 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+245 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-244 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+246 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-245 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+247 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-246 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+248 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-247 L<numberOfCpus|/numberOfCpus> - Number of cpus scaled by an optional factor - but only if you have nproc.
+249 L<numberOfCpus|/numberOfCpus> - Number of cpus scaled by an optional factor - but only if you have nproc.
 
-248 L<numberOfLinesInFile|/numberOfLinesInFile> - Return the number of lines in a file.
+250 L<numberOfLinesInFile|/numberOfLinesInFile> - Return the number of lines in a file.
 
-249 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+251 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-250 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+252 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-251 L<onAws|/onAws> - Returns 1 if we are on AWS else return 0.
+253 L<onAws|/onAws> - Returns 1 if we are on AWS else return 0.
 
-252 L<onAwsPrimary|/onAwsPrimary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> and we are on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on a secondary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
+254 L<onAwsPrimary|/onAwsPrimary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> and we are on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on a secondary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
 
-253 L<onAwsSecondary|/onAwsSecondary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> but we are not on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on the primary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
+255 L<onAwsSecondary|/onAwsSecondary> - Return 1 if we are on L<Amazon Web Services|http://aws.amazon.com> but we are not on the primary session instance as defined by L<awsParallelPrimaryInstanceId>, return 0 if we are on the primary session instance, else return B<undef> if we are not on L<Amazon Web Services|http://aws.amazon.com>.
 
-254 L<overrideAndReabsorbMethods|/overrideAndReabsorbMethods> - Override methods down the list of B<@packages> then reabsorb any unused methods back up the list of packages so that all the packages have the same methods as the last package with methods from packages mentioned earlier overriding methods from packages mentioned later.
+256 L<overrideAndReabsorbMethods|/overrideAndReabsorbMethods> - Override methods down the list of B<@packages> then reabsorb any unused methods back up the list of packages so that all the packages have the same methods as the last package with methods from packages mentioned earlier overriding methods from packages mentioned later.
 
-255 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+257 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-256 L<overWriteBinaryFile|/overWriteBinaryFile> - Write to B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
+258 L<overWriteBinaryFile|/overWriteBinaryFile> - Write to B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
 
-257 L<overWriteFile|/overWriteFile> - Write to a B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+259 L<overWriteFile|/overWriteFile> - Write to a B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-258 L<packBySize|/packBySize> - Given B<$N> buckets and a list B<@sizes> of ([size of file, name of file].
+260 L<overWriteHtmlFile|/overWriteHtmlFile> - Write an L<html|https://en.wikipedia.org/wiki/HTML> file to /var/www/html and make it readable
 
-259 L<pad|/pad> - Pad the specified B<$string> to a multiple of the specified B<$length>  with blanks or the specified padding character to a multiple of a specified length.
+261 L<overWritePerlCgiFile|/overWritePerlCgiFile> - Write a L<Perl|http://www.perl.org/> file to /usr/lib/cgi-bin and make it executable after checking it for syntax errors
 
-260 L<parseCommandLineArguments|/parseCommandLineArguments> - Call the specified B<$sub> after classifying the specified array of words in B<$args> into positional and keyword parameters.
+262 L<packBySize|/packBySize> - Given B<$N> buckets and a list B<@sizes> of ([size of file, name of file].
 
-261 L<parseDitaRef|/parseDitaRef> - Parse a dita reference B<$ref> into its components (file name, topic id, id) .
+263 L<pad|/pad> - Pad the specified B<$string> to a multiple of the specified B<$length>  with blanks or the specified padding character to a multiple of a specified length.
 
-262 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension) considering .
+264 L<parseCommandLineArguments|/parseCommandLineArguments> - Call the specified B<$sub> after classifying the specified array of words in B<$args> into positional and keyword parameters.
 
-263 L<parseIntoWordsAndStrings|/parseIntoWordsAndStrings> - Parse a B<$string> into words and quoted strings with an optional B<$limit>  on the number of words and strings to parse out
+265 L<parseDitaRef|/parseDitaRef> - Parse a dita reference B<$ref> into its components (file name, topic id, id) .
 
-264 L<parseS3BucketAndFolderName|/parseS3BucketAndFolderName> - Parse an L<S3|https://aws.amazon.com/s3/> bucket/folder name into a bucket and a folder name removing any initial s3://.
+266 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension) considering .
 
-265 L<parseXmlDocType|/parseXmlDocType> - Parse an L<Xml|https://en.wikipedia.org/wiki/XML> DOCTYPE and return a hash indicating its components
+267 L<parseIntoWordsAndStrings|/parseIntoWordsAndStrings> - Parse a B<$string> into words and quoted strings with an optional B<$limit>  on the number of words and strings to parse out
 
-266 L<partitionStringsOnPrefixBySize|/partitionStringsOnPrefixBySize> - Partition a hash of strings and associated sizes into partitions with either a maximum size B<$maxSize> or only one element; the hash B<%Sizes> consisting of a mapping {string=>size}; with each partition being named with the shortest string prefix that identifies just the strings in that partition.
+268 L<parseS3BucketAndFolderName|/parseS3BucketAndFolderName> - Parse an L<S3|https://aws.amazon.com/s3/> bucket/folder name into a bucket and a folder name removing any initial s3://.
 
-267 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+269 L<parseXmlDocType|/parseXmlDocType> - Parse an L<Xml|https://en.wikipedia.org/wiki/XML> DOCTYPE and return a hash indicating its components
 
-268 L<powerOfTwo|/powerOfTwo> - Test whether a number B<$n> is a power of two, return the power if it is else B<undef>.
+270 L<partitionStringsOnPrefixBySize|/partitionStringsOnPrefixBySize> - Partition a hash of strings and associated sizes into partitions with either a maximum size B<$maxSize> or only one element; the hash B<%Sizes> consisting of a mapping {string=>size}; with each partition being named with the shortest string prefix that identifies just the strings in that partition.
 
-269 L<printQw|/printQw> - Print an array of words in qw() format.
+271 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-270 L<processFilesInParallel|/processFilesInParallel> - Process files in parallel using (8 * the number of CPUs) processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
+272 L<powerOfTwo|/powerOfTwo> - Test whether a number B<$n> is a power of two, return the power if it is else B<undef>.
 
-271 L<processJavaFilesInParallel|/processJavaFilesInParallel> - Process java files of known size in parallel using (the number of CPUs) processes with the process each item is assigned to depending on the size of the java item so that each process is loaded with approximately the same number of bytes of data in total from the java files it processes.
+273 L<printQw|/printQw> - Print an array of words in qw() format.
 
-272 L<processSizesInParallel|/processSizesInParallel> - Process items of known size in parallel using (8 * the number of CPUs) processes with the process each item is assigned to depending on the size of the item so that each process is loaded with approximately the same number of bytes of data in total from the items it processes.
+274 L<processFilesInParallel|/processFilesInParallel> - Process files in parallel using (8 * the number of CPUs) processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
 
-273 L<processSizesInParallelN|/processSizesInParallelN> - Process items of known size in parallel using the specified number B<$N> processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
+275 L<processJavaFilesInParallel|/processJavaFilesInParallel> - Process java files of known size in parallel using (the number of CPUs) processes with the process each item is assigned to depending on the size of the java item so that each process is loaded with approximately the same number of bytes of data in total from the java files it processes.
 
-274 L<quoteFile|/quoteFile> - Quote a file name.
+276 L<processSizesInParallel|/processSizesInParallel> - Process items of known size in parallel using (8 * the number of CPUs) processes with the process each item is assigned to depending on the size of the item so that each process is loaded with approximately the same number of bytes of data in total from the items it processes.
 
-275 L<readBinaryFile|/readBinaryFile> - Read a binary file on the local machine.
+277 L<processSizesInParallelN|/processSizesInParallelN> - Process items of known size in parallel using the specified number B<$N> processes with the process each file is assigned to depending on the size of the file so that each process is loaded with approximately the same number of bytes of data in total from the files it processes.
 
-276 L<readFile|/readFile> - Return the content of a file residing on the local machine interpreting the content of the file as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+278 L<quoteFile|/quoteFile> - Quote a file name.
 
-277 L<readFileFromRemote|/readFileFromRemote> - Copy and read a B<$file> from the remote machine whose ip address is specified by B<$ip> or returned by L<awsIp> and return the content of $file interpreted as utf8 .
+279 L<readBinaryFile|/readBinaryFile> - Read a binary file on the local machine.
 
-278 L<readFiles|/readFiles> - Read all the files in the specified list of folders into a hash.
+280 L<readFile|/readFile> - Return the content of a file residing on the local machine interpreting the content of the file as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-279 L<readGZipFile|/readGZipFile> - Read the specified file containing compressed L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8> through L<gzip|https://en.wikipedia.org/wiki/Gzip>.
+281 L<readFileFromRemote|/readFileFromRemote> - Copy and read a B<$file> from the remote machine whose ip address is specified by B<$ip> or returned by L<awsIp> and return the content of $file interpreted as utf8 .
 
-280 L<readUtf16File|/readUtf16File> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> encoded in utf-16.
+282 L<readFiles|/readFiles> - Read all the files in the specified list of folders into a hash.
 
-281 L<rectangularArray|/rectangularArray> - Create a two dimensional rectangular array whose first dimension is B<$first> from a one dimensional linear array.
+283 L<readGZipFile|/readGZipFile> - Read the specified file containing compressed L<Unicode|https://en.wikipedia.org/wiki/Unicode> content represented as L<utf8|https://en.wikipedia.org/wiki/UTF-8> through L<gzip|https://en.wikipedia.org/wiki/Gzip>.
 
-282 L<rectangularArray2|/rectangularArray2> - Create a two dimensional rectangular array whose second dimension is B<$second> from a one dimensional linear array.
+284 L<readUtf16File|/readUtf16File> - Read a file containing L<Unicode|https://en.wikipedia.org/wiki/Unicode> encoded in utf-16.
 
-283 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Relative file from one absolute file B<$a> against another B<$b>.
+285 L<rectangularArray|/rectangularArray> - Create a two dimensional rectangular array whose first dimension is B<$first> from a one dimensional linear array.
 
-284 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+286 L<rectangularArray2|/rectangularArray2> - Create a two dimensional rectangular array whose second dimension is B<$second> from a one dimensional linear array.
 
-285 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+287 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Relative file from one absolute file B<$a> against another B<$b>.
 
-286 L<removeDuplicatePrefixes|/removeDuplicatePrefixes> - Remove duplicated leading directory names from a file name.
+288 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-287 L<removeFilePathsFromStructure|/removeFilePathsFromStructure> - Remove all file paths from a specified B<$structure> to make said $structure testable with L<Test::More/is_deeply>.
+289 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-288 L<removeFilePrefix|/removeFilePrefix> - Removes a file B<$prefix> from an array of B<@files>.
+290 L<removeDuplicatePrefixes|/removeDuplicatePrefixes> - Remove duplicated leading directory names from a file name.
 
-289 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name by ensuring it has a single trailing directory separator.
+291 L<removeFilePathsFromStructure|/removeFilePathsFromStructure> - Remove all file paths from a specified B<$structure> to make said $structure testable with L<Test::More/is_deeply>.
 
-290 L<replaceStringWithString|/replaceStringWithString> - Replace all instances in B<$string> of B<$source> with B<$target>
+292 L<removeFilePrefix|/removeFilePrefix> - Removes a file B<$prefix> from an array of B<@files>.
 
-291 L<reportAttributes|/reportAttributes> - Report the attributes present in a B<$sourceFile>
+293 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name by ensuring it has a single trailing directory separator.
 
-292 L<reportAttributeSettings|/reportAttributeSettings> - Report the current values of the attribute methods in the calling file and optionally write the report to B<$reportFile>.
+294 L<replaceStringWithString|/replaceStringWithString> - Replace all instances in B<$string> of B<$source> with B<$target>
 
-293 L<reportExportableMethods|/reportExportableMethods> - Report the exportable methods marked with #e in a B<$sourceFile>
+295 L<reportAttributes|/reportAttributes> - Report the attributes present in a B<$sourceFile>
 
-294 L<reportReplacableMethods|/reportReplacableMethods> - Report the replaceable methods marked with #r in a B<$sourceFile>
+296 L<reportAttributeSettings|/reportAttributeSettings> - Report the current values of the attribute methods in the calling file and optionally write the report to B<$reportFile>.
 
-295 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
+297 L<reportExportableMethods|/reportExportableMethods> - Report the exportable methods marked with #e in a B<$sourceFile>
 
-296 L<retrieveFile|/retrieveFile> - Retrieve a B<$file> created via L<Storable|https://metacpan.org/pod/Storable>.
+298 L<reportReplacableMethods|/reportReplacableMethods> - Report the replaceable methods marked with #r in a B<$sourceFile>
 
-297 L<runInParallel|/runInParallel> - Process the elements of an array in parallel using a maximum of B<$maximumNumberOfProcesses> processes.
+299 L<reportSettings|/reportSettings> - Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>.
 
-298 L<runInSquareRootParallel|/runInSquareRootParallel> - Process the elements of an array in square root parallel using a maximum of B<$maximumNumberOfProcesses> processes.
+300 L<retrieveFile|/retrieveFile> - Retrieve a B<$file> created via L<Storable|https://metacpan.org/pod/Storable>.
 
-299 L<s3Delete|/s3Delete> - Return an S3 --delete keyword from an S3 option set
+301 L<runInParallel|/runInParallel> - Process the elements of an array in parallel using a maximum of B<$maximumNumberOfProcesses> processes.
 
-300 L<s3DownloadFolder|/s3DownloadFolder> - Download a specified B<$folder> on S3 to a B<$local> folder using the specified B<%options> if any.
+302 L<runInSquareRootParallel|/runInSquareRootParallel> - Process the elements of an array in square root parallel using a maximum of B<$maximumNumberOfProcesses> processes.
 
-301 L<s3FileExists|/s3FileExists> - Return (name, size, date, time) for a B<$file> that exists on S3 else () using the specified B<%options> if any.
+303 L<s3Delete|/s3Delete> - Return an S3 --delete keyword from an S3 option set
 
-302 L<s3ListFilesAndSizes|/s3ListFilesAndSizes> - Return {file=>size} for all the files in a specified B<$folderOrFile> on S3 using the specified B<%options> if any.
+304 L<s3DownloadFolder|/s3DownloadFolder> - Download a specified B<$folder> on S3 to a B<$local> folder using the specified B<%options> if any.
 
-303 L<s3Profile|/s3Profile> - Return an S3 profile keyword from an S3 option set
+305 L<s3FileExists|/s3FileExists> - Return (name, size, date, time) for a B<$file> that exists on S3 else () using the specified B<%options> if any.
 
-304 L<s3ReadFile|/s3ReadFile> - Read from a B<$file> on S3 and write the contents to a local file B<$local> using the specified B<%options> if any.
+306 L<s3ListFilesAndSizes|/s3ListFilesAndSizes> - Return {file=>size} for all the files in a specified B<$folderOrFile> on S3 using the specified B<%options> if any.
 
-305 L<s3ReadString|/s3ReadString> - Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.
+307 L<s3Profile|/s3Profile> - Return an S3 profile keyword from an S3 option set
 
-306 L<s3WriteFile|/s3WriteFile> - Write to a file B<$fileS3> on S3 the contents of a local file B<$fileLocal> using the specified B<%options> if any.
+308 L<s3ReadFile|/s3ReadFile> - Read from a B<$file> on S3 and write the contents to a local file B<$local> using the specified B<%options> if any.
 
-307 L<s3WriteString|/s3WriteString> - Write to a B<$file> on S3 the contents of B<$string> using the specified B<%options> if any.
+309 L<s3ReadString|/s3ReadString> - Read from a B<$file> on S3 and return the contents as a string using specified B<%options> if any.
 
-308 L<s3ZipFolder|/s3ZipFolder> - Zip the specified B<$source> folder and write it to the named B<$target> file on S3.
+310 L<s3WriteFile|/s3WriteFile> - Write to a file B<$fileS3> on S3 the contents of a local file B<$fileLocal> using the specified B<%options> if any.
 
-309 L<s3ZipFolders|/s3ZipFolders> - Zip local folders and upload them to S3 in parallel.
+311 L<s3WriteString|/s3WriteString> - Write to a B<$file> on S3 the contents of B<$string> using the specified B<%options> if any.
 
-310 L<saveAwsIp|/saveAwsIp> - Make the server at L<Amazon Web Services|http://aws.amazon.com> with the given IP address the default primary server as used by all the methods whose names end in B<r> or B<Remote>.
+312 L<s3ZipFolder|/s3ZipFolder> - Zip the specified B<$source> folder and write it to the named B<$target> file on S3.
 
-311 L<saveCodeToS3|/saveCodeToS3> - Save source code every B<$saveCodeEvery> seconds by zipping folder B<$folder> to zip file B<$zipFileName> then saving this zip file in the specified L<S3|https://aws.amazon.com/s3/> B<$bucket> using any additional L<S3|https://aws.amazon.com/s3/> parameters in B<$S3Parms>.
+313 L<s3ZipFolders|/s3ZipFolders> - Zip local folders and upload them to S3 in parallel.
 
-312 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+314 L<saveAwsIp|/saveAwsIp> - Make the server at L<Amazon Web Services|http://aws.amazon.com> with the given IP address the default primary server as used by all the methods whose names end in B<r> or B<Remote>.
 
-313 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+315 L<saveCodeToS3|/saveCodeToS3> - Save source code every B<$saveCodeEvery> seconds by zipping folder B<$folder> to zip file B<$zipFileName> then saving this zip file in the specified L<S3|https://aws.amazon.com/s3/> B<$bucket> using any additional L<S3|https://aws.amazon.com/s3/> parameters in B<$S3Parms>.
 
-314 L<setCombination|/setCombination> - Count the elements in sets B<@s> represented as arrays of strings and/or the keys of hashes
+316 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-315 L<setFileExtension|/setFileExtension> - Given a B<$file>, change its extension to B<$extension>.
+317 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-316 L<setIntersection|/setIntersection> - Intersection of sets B<@s> represented as arrays of strings and/or the keys of hashes
+318 L<setCombination|/setCombination> - Count the elements in sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-317 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets B<@s> represented as arrays and/or hashes
+319 L<setFileExtension|/setFileExtension> - Given a B<$file>, change its extension to B<$extension>.
 
-318 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+320 L<setIntersection|/setIntersection> - Intersection of sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-319 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified level of I<$confidence**2>
+321 L<setIntersectionOverUnion|/setIntersectionOverUnion> - Returns the size of the intersection over the size of the union of one or more sets B<@s> represented as arrays and/or hashes
 
-320 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+322 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-321 L<setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel|/setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
+323 L<setPartitionOnIntersectionOverUnion|/setPartitionOnIntersectionOverUnion> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets in the partition is never less than the specified level of I<$confidence**2>
 
-322 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified I<$confidence**2>
+324 L<setPartitionOnIntersectionOverUnionOfHashStringSets|/setPartitionOnIntersectionOverUnionOfHashStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-323 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@strings>, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified I<$confidence**2>
+325 L<setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel|/setPartitionOnIntersectionOverUnionOfHashStringSetsInParallel> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<$hashSet> represented by a hash, each hash value being a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified B<$confidence**2> and the partition entries are the hash keys of the string sets.
 
-324 L<setPermissionsForFile|/setPermissionsForFile> - Apply L<chmod|https://linux.die.net/man/1/chmod> to a B<$file> to set its B<$permissions>.
+326 L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@sets> of words so that within each partition the L<setIntersectionOverUnion|/setIntersectionOverUnion> of any two sets of words in the partition is never less than the specified I<$confidence**2>
 
-325 L<setUnion|/setUnion> - Union of sets B<@s> represented as arrays of strings and/or the keys of hashes
+327 L<setPartitionOnIntersectionOverUnionOfStringSets|/setPartitionOnIntersectionOverUnionOfStringSets> - Partition, at a level of B<$confidence> between 0 and 1, a set of sets B<@strings>, each set represented by a string containing words and punctuation, each word possibly capitalized, so that within each partition the L<setPartitionOnIntersectionOverUnionOfSetsOfWords|/setPartitionOnIntersectionOverUnionOfSetsOfWords> of any two sets of words in the partition is never less than the specified I<$confidence**2>
 
-326 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+328 L<setPermissionsForFile|/setPermissionsForFile> - Apply L<chmod|https://linux.die.net/man/1/chmod> to a B<$file> to set its B<$permissions>.
 
-327 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+329 L<setUnion|/setUnion> - Union of sets B<@s> represented as arrays of strings and/or the keys of hashes
 
-328 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
+330 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-329 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+331 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-330 L<storeFile|/storeFile> - Store into a B<$file>, after creating a path to the file with L<makePath> if necessary, a data B<$structure> via L<Storable|https://metacpan.org/pod/Storable>.
+332 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
 
-331 L<stringMd5Sum|/stringMd5Sum> - Get the Md5 sum of a B<$string> that might contain L<utf8|https://en.wikipedia.org/wiki/UTF-8> code points.
+333 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-332 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+334 L<storeFile|/storeFile> - Store into a B<$file>, after creating a path to the file with L<makePath> if necessary, a data B<$structure> via L<Storable|https://metacpan.org/pod/Storable>.
 
-333 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+335 L<stringMd5Sum|/stringMd5Sum> - Get the Md5 sum of a B<$string> that might contain L<utf8|https://en.wikipedia.org/wiki/UTF-8> code points.
 
-334 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+336 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-335 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative names of B<@files> starting at the current working folder to get an absolute file name.
+337 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-336 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
+338 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-337 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+339 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative names of B<@files> starting at the current working folder to get an absolute file name.
 
-338 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+340 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
 
-339 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a B<$file> name from a B<$known> name to a B<$new> one if the file does in fact start with the $known name otherwise returns the original file name as it is.
+341 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-340 L<swapFolderPrefix|/swapFolderPrefix> - Given a B<$file>, swap the folder name of the $file from B<$known> to B<$new> if the file $file starts with the $known folder name else return the $file as it is.
+342 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-341 L<syncFromS3InParallel|/syncFromS3InParallel> - Download from L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
+343 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a B<$file> name from a B<$known> name to a B<$new> one if the file does in fact start with the $known name otherwise returns the original file name as it is.
 
-342 L<syncToS3InParallel|/syncToS3InParallel> - Upload to L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
+344 L<swapFolderPrefix|/swapFolderPrefix> - Given a B<$file>, swap the folder name of the $file from B<$known> to B<$new> if the file $file starts with the $known folder name else return the $file as it is.
 
-343 L<temporaryFile|/temporaryFile> - Create a new, empty, temporary file.
+345 L<syncFromS3InParallel|/syncFromS3InParallel> - Download from L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
 
-344 L<temporaryFolder|/temporaryFolder> - Create a new, empty, temporary folder.
+346 L<syncToS3InParallel|/syncToS3InParallel> - Upload to L<S3|https://aws.amazon.com/s3/> by using "aws s3 sync --exclude '*' --include '.
 
-345 L<timeStamp|/timeStamp> - hours:minute:seconds
+347 L<temporaryFile|/temporaryFile> - Create a new, empty, temporary file.
 
-346 L<trim|/trim> - Remove any white space from the front and end of a string.
+348 L<temporaryFolder|/temporaryFolder> - Create a new, empty, temporary folder.
 
-347 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
+349 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-348 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+350 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-349 L<Udsr::webUser|/Udsr::webUser> - Create a systemd installed server that processes http requests using a specified userid.
+351 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
 
-350 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+352 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-351 L<unbless|/unbless> - Remove the effects of bless from a L<Perl|http://www.perl.org/> data B<$structure> enabling it to be converted to L<Json|https://en.wikipedia.org/wiki/JSON>.
+353 L<Udsr::webUser|/Udsr::webUser> - Create a systemd installed server that processes http requests using a specified userid.
 
-352 L<unionOfHashesAsArrays|/unionOfHashesAsArrays> - Form the union of the specified hashes B<@h> as one hash whose values are a array of corresponding values from each hash
+354 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-353 L<unionOfHashKeys|/unionOfHashKeys> - Form the union of the keys of the specified hashes B<@h> as one hash whose keys represent the union.
+355 L<unbless|/unbless> - Remove the effects of bless from a L<Perl|http://www.perl.org/> data B<$structure> enabling it to be converted to L<Json|https://en.wikipedia.org/wiki/JSON>.
 
-354 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
+356 L<unionOfHashesAsArrays|/unionOfHashesAsArrays> - Form the union of the specified hashes B<@h> as one hash whose values are a array of corresponding values from each hash
 
-355 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+357 L<unionOfHashKeys|/unionOfHashKeys> - Form the union of the keys of the specified hashes B<@h> as one hash whose keys represent the union.
 
-356 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a B<$perlModule> and display said documentation in a web browser.
+358 L<uniqueNameFromFile|/uniqueNameFromFile> - Create a unique name from a file name and the md5 sum of its content
 
-357 L<userId|/userId> - Get or confirm the userid we are currently running under.
+359 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-358 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+360 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a B<$perlModule> and display said documentation in a web browser.
 
-359 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+361 L<userId|/userId> - Get or confirm the userid we are currently running under.
 
-360 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+362 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-361 L<wellKnownUrls|/wellKnownUrls> - Short names for some well known urls
+363 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-362 L<writeBinaryFile|/writeBinaryFile> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
+364 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-363 L<writeFile|/writeFile> - Write to a new B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+365 L<wellKnownUrls|/wellKnownUrls> - Short names for some well known urls
 
-364 L<writeFiles|/writeFiles> - Write the values of a B<$hash> reference into files identified by the key of each value using L<overWriteFile|/overWriteFile> optionally swapping the prefix of each file from B<$old> to B<$new>.
+366 L<writeBinaryFile|/writeBinaryFile> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, the binary content in B<$string>.
 
-365 L<writeFileToRemote|/writeFileToRemote> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8> then copy the $file to the remote server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+367 L<writeFile|/writeFile> - Write to a new B<$file>, after creating a path to the $file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-366 L<writeGZipFile|/writeGZipFile> - Write to a B<$file>, after creating a path to the file with L<makePath> if necessary, through L<gzip|https://en.wikipedia.org/wiki/Gzip> a B<$string> whose content is encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
+368 L<writeFiles|/writeFiles> - Write the values of a B<$hash> reference into files identified by the key of each value using L<overWriteFile|/overWriteFile> optionally swapping the prefix of each file from B<$old> to B<$new>.
 
-367 L<writeStructureTest|/writeStructureTest> - Write a test for a data B<$structure> with file names in it.
+369 L<writeFileToRemote|/writeFileToRemote> - Write to a new B<$file>, after creating a path to the file with L<makePath> if necessary, a B<$string> of L<Unicode|https://en.wikipedia.org/wiki/Unicode> content encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8> then copy the $file to the remote server whose ip address is specified by B<$ip> or returned by L<awsIp>.
 
-368 L<writeTempFile|/writeTempFile> - Write an array of strings as lines to a temporary file and return the file name.
+370 L<writeGZipFile|/writeGZipFile> - Write to a B<$file>, after creating a path to the file with L<makePath> if necessary, through L<gzip|https://en.wikipedia.org/wiki/Gzip> a B<$string> whose content is encoded as L<utf8|https://en.wikipedia.org/wiki/UTF-8>.
 
-369 L<wwwDecode|/wwwDecode> - Percent decode a L<url|https://en.wikipedia.org/wiki/URL> B<$string> per: https://en.
+371 L<writeStructureTest|/writeStructureTest> - Write a test for a data B<$structure> with file names in it.
 
-370 L<wwwEncode|/wwwEncode> - Percent encode a L<url|https://en.wikipedia.org/wiki/URL> per: https://en.
+372 L<writeTempFile|/writeTempFile> - Write an array of strings as lines to a temporary file and return the file name.
 
-371 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+373 L<wwwDecode|/wwwDecode> - Percent decode a L<url|https://en.wikipedia.org/wiki/URL> B<$string> per: https://en.
 
-372 L<xxxr|/xxxr> - Execute a command B<$cmd> via bash on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+374 L<wwwEncode|/wwwEncode> - Percent encode a L<url|https://en.wikipedia.org/wiki/URL> per: https://en.
 
-373 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+375 L<xxx|/xxx> - Execute a shell command optionally checking its response.
 
-374 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+376 L<xxxr|/xxxr> - Execute a command B<$cmd> via bash on the server whose ip address is specified by B<$ip> or returned by L<awsIp>.
+
+377 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+378 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
 
 =head1 Installation
 
@@ -17128,7 +17261,7 @@ my $localTest = ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";   
 Test::More->builder->output("/dev/null") if $localTest;                         # Reduce number of confirmation messages during testing
 
 if ($^O =~ m(bsd|linux)i)                                                       # Try removing freeBSD
- {plan tests=>644;
+ {plan tests=>645;
  }
 else
  {plan skip_all => 'Not supported';
@@ -18073,7 +18206,7 @@ package Sample::Module;
 
 !D1 Samples                                                                      ! Sample methods.
 
-sub sample($@)                                                                  !R Documentation for the:  sample() method.  See also L<Data::Table::Text::sample2|/Data::Table::Text::sample2>. !Tsample
+sub sample($@)                                                                  !R Documentation for the:  sample() method.  See also L<Data::Table::Text::sample2|/Data::Table::Text::sample2>. !Tsample .
  {my ($node, @context) = @_;                                                    ! Node, optional context
   1
  }
@@ -18101,26 +18234,17 @@ END
   ok $s =~ m/=head2 Data::Table::Text::sample2.\$sub, \@context/;               #TupdateDocumentation
  }
 
-if (1) {                                                                        #TdumpFile #TevalFile
-  my $f = dumpFile(undef, my $d = [qw(aaa bbb ccc)]);
-  my $s = evalFile($f);
-  is_deeply $s, $d;
-  unlink $f;
- }
+if (1) {                                                                        #TdumpFile #TevalFile #TdumpFileAsJson #TevalFileAsJson #TdumpTempFile #TdumpTempFileAsJson
+  my $d = [qw(aaa bbb ccc), [{aaa=>'AAA', bbb=>'BBB'}]];
+  my $f = dumpFile(undef, $d);
+  is_deeply evalFile($f), $d;
+  is_deeply evalFile(my $F = dumpTempFile($d)), $d;
+  unlink $f, $F;
 
-if (1) {                                                                        #TdumpFileAsJson #TevalFileAsJson
-  my $f = dumpFileAsJson(undef, my $d = [{aaa=>'AAA', bbb=>'BBB'}]);
-  ok readFile($f) eq <<END;
-[
-   {
-      "aaa" : "AAA",
-      "bbb" : "BBB"
-   }
-]
-END
-  my $s = evalFileAsJson($f);
-  is_deeply $s, $d;
-  unlink $f;
+  my $j = dumpFileAsJson(undef, $d);
+  is_deeply evalFileAsJson($j), $d;
+  is_deeply evalFileAsJson(my $J = dumpTempFileAsJson($d)), $d;
+  unlink $j, $J;
  }
 
 if (1) {                                                                        #TstoreFile #TretrieveFile
@@ -20027,6 +20151,11 @@ if (0) {                                                                        
   ok awsExecCli(q(aws s3 ls)) =~ m(ryffine)i;
   my $p = awsExecCliJson(q(aws ec2 describe-vpcs), region=>q(us-east-1));
   ok $p->Vpcs->[0]->VpcId =~ m(\Avpc-)i;
+ }
+
+if (0) {                                                                        #ToverWriteHtmlFile #ToverWritePerlCgiFile
+  overWriteHtmlFile   (q(index.html), q(<html><h1>Hello</h1></html>));
+  overWritePerlCgiFile(q(gen.pl),     q(...));
  }
 
 ok containingFolderName(q(/a/b/c.d)) eq q(b);                                   #TcontainingFolderName

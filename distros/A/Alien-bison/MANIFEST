@@ -11,9 +11,12 @@ alienfile
 author.yml
 dist.ini
 lib/Alien/bison.pm
+maint/cip-before-install
 patch/bison-3_0_2.diff
+perlcriticrc
 t/00_diag.t
-t/01_use.t
+t/alien_bison.t
+xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

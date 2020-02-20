@@ -1,7 +1,12 @@
 #!/perl
 
+# Test the %time tied hash (C version)
+
 use strict;
-use Test::More tests => 78;
+use Test::More tests => 102;
+use FindBin;
+use lib $FindBin::Bin;
+use TimeFormat_Minute;
 
 ## ----------------------------------------------------------------------------------
 ## Test for availability of certain modules.
@@ -37,8 +42,8 @@ if (!$lc_supported  ||  !eval
 
 SKIP:
 {
-    skip 'Time::Local not available', 77  unless $tl_ok;
-    skip 'XS version not available',  77  unless defined $Time::Format_XS::VERSION;
+    skip 'Time::Local not available', 76  unless $tl_ok;
+    skip 'XS version not available',  76  unless defined $Time::Format_XS::VERSION;
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
 
@@ -126,20 +131,44 @@ SKIP:
     is $time{'H:mm',$t},      '1:58'      => 'm test: Hour:';
     is $time{'HH:mm',$t},     '01:58'     => 'm test: hour12:';
     is $time{'?H:m',$t},      ' 1:58'     => 'm test: Hour12:';
-
-    # Current time value (1)
-    # localtime seems always to return English day/month
-    my ($m,$d) = (localtime)[4,6];
-    my $mon = (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec))[$m];
-    my $day = (qw(Sun Mon Tue Wed Thu Fri Sat))[$d];
-    is "$day $mon $time{'?d hh:mm:ss yyyy'}", scalar(localtime)  => 'current time';
-    #
-    # Note that there are two race conditions in the last section, above.
-    # 1: The day or month could change between the first localtime()
-    #         call and the second.
-    # 2: The time (especially the seconds) could change between the
-    #         %time call and the second localtime().
-    # The first is extremely rare; the second more frequent.
-
-    # Re-run the test suite if there is any doubt.
 }
+
+
+# Current-time tests (%time with no second argument).
+tf_minute_sync;
+my ($sec, $min, $hr, $day, $mon, $yr) = localtime;
+$yr += 1900;
+++$mon;
+my $h12 = ($hr % 12) || '12';
+my $y2 = $yr % 100;
+
+# Individual components (10)
+is $time{'yyyy'},      sprintf('%04d', $yr)   => '4-digit year (cur)';
+is $time{'yy'},        sprintf('%02d', $y2)   => '2-digit year (cur)';
+is $time{'mm{on}'},    sprintf('%02d', $mon)  => 'month: mm (cur)';
+is $time{'m{on}'},     sprintf('%1d', $mon)   => 'month: mm (cur)';
+is $time{'dd'},        sprintf('%02d', $day)  => '2-digit day (cur)';
+is $time{'d'},         sprintf('%1d', $day)   => '1/2-digit day (cur)';
+is $time{'hh'},        sprintf('%02d', $hr)   => '2-digit 24-hour (cur)';
+is $time{'h'},         sprintf('%1d', $hr)    => '1/2-digit 24-hour (cur)';
+is $time{'mm{in}'},    sprintf('%02d', $min)  => 'minute: mm (cur)';
+is $time{'m{in}'},     sprintf('%1d', $min)   => 'minute: m (cur)';
+
+# Month disambiguation tests (10)
+is $time{'yyyymm'},    sprintf('%04d%02d', $yr, $mon)    => 'm test: year (cur)';
+is $time{'yymm'},      sprintf('%02d%02d', $y2, $mon)    => 'm test: year2 (cur)';
+is $time{'mmdd'},      sprintf('%02d%02d', $mon, $day)   => 'm test: day (cur)';
+is $time{'yyyy/m'},    sprintf('%04d/%1d', $yr, $mon)    => 'm test: year/ (cur)';
+is $time{'yy/m'},      sprintf('%02d/%1d', $y2, $mon)    => 'm test: year2/ (cur)';
+is $time{'m/d'},       sprintf('%1d/%1d', $mon, $day)    => 'm test: /day (cur)';
+is $time{'m/dd'},      sprintf('%1d/%02d', $mon, $day)   => 'm test: /Day (cur)';
+is $time{'?d/mm'},     sprintf('%2d/%02d', $day, $mon)   => 'm test: d/m (cur)';
+is $time{'?m/yyyy'},   sprintf('%2d/%04d', $mon, $yr)    => 'm test: m/y (cur)';
+is $time{'m/yy'},      sprintf('%1d/%02d', $mon, $y2)    => 'm test: m/y2 (cur)';
+
+# Minute disambiguation tests (5)
+is $time{'hhmm'},      sprintf('%02d%02d', $hr, $min)    => 'm test: hour (cur)';
+is $time{'hh:mm'},     sprintf('%02d:%02d', $hr, $min)   => 'm test: hour: (cur)';
+is $time{'H:mm'},      sprintf('%1d:%02d', $h12, $min)   => 'm test: Hour: (cur)';
+is $time{'HH:mm'},     sprintf('%02d:%02d', $h12, $min)  => 'm test: hour12: (cur)';
+is $time{'?H:m'},      sprintf('%2d:%1d', $h12, $min)    => 'm test: Hour12: (cur)';

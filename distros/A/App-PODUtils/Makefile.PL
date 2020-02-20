@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "Pod::Elemental::Transformer::Pod5" => 0,
     "Pod::Elide" => "0.003",
     "Sah::Schema::perl::pod_filename" => 0,
+    "Sah::Schema::sortsub::spec" => 0,
     "Sort::Sub" => "0.112",
     "Sort::SubList" => 0,
     "strict" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.044",
+  "VERSION" => "0.045",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "Pod::Elemental::Transformer::Pod5" => 0,
   "Pod::Elide" => "0.003",
   "Sah::Schema::perl::pod_filename" => 0,
+  "Sah::Schema::sortsub::spec" => 0,
   "Sort::Sub" => "0.112",
   "Sort::SubList" => 0,
   "Test::More" => 0,

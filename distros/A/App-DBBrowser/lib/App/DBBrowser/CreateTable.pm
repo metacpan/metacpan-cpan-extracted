@@ -117,8 +117,8 @@ sub create_table {
                 my $ok_columns = $sf->__set_columns( $sql );
                 if ( ! $ok_columns ) {
                     $sql->{table} = '';
-                    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
-                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
+                    if ( exists $sf->{i}{ct}{shifted_header} ) {
+                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{shifted_header};
                     }
                     $count_table_name_loop++;
                     next TABLE_NAME;
@@ -126,8 +126,8 @@ sub create_table {
                 $count_table_name_loop = 0;
                 my $ok_create_table = $sf->__create( $sql, 'table' );
                 if ( ! defined $ok_create_table ) {
-                    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
-                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
+                    if ( exists $sf->{i}{ct}{shifted_header} ) {
+                        unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{shifted_header};
                     }
                     next SET_COLUMNS;
                 }
@@ -136,7 +136,6 @@ sub create_table {
                     return;
                 }
                 if ( @{$sql->{insert_into_args}} ) {
-                    $sf->{i}{ct}{skip_confirm_insert} = 1;
                     my $ok_insert = $sf->__insert_data( $sql );
                     if ( ! $ok_insert ) {
                         require App::DBBrowser::DropTable;
@@ -193,7 +192,7 @@ sub __create {
 sub __insert_data {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sf->{i}{stmt_types} = [ 'Insert' ];
+    push @{$sf->{i}{stmt_types}}, 'Insert';
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
     if ( $sf->{i}{driver} ne 'SQLite' ) {
         $sth->execute();
@@ -223,11 +222,13 @@ sub __set_table_name {
     while ( 1 ) {
         my $info;
         if ( $sf->{i}{gc}{source_type} eq 'file' ) {
-            my $file_name = basename decode( 'locale_fs', $sf->{i}{gc}{file_fs} );
+            my $file_fs = $sf->{i}{gc}{file_fs};
+            my $file_name = basename decode( 'locale_fs', $file_fs );
             $info = sprintf "File: '%s'", $file_name;
             ( $sf->{i}{ct}{default_table_name} = $file_name ) =~ s/\.[^.]{1,4}\z//;
-            if ( defined $sf->{i}{gc}{sheet_name} && length $sf->{i}{gc}{sheet_name} ) {
-                $sf->{i}{ct}{default_table_name} .= '_' . $sf->{i}{gc}{sheet_name};
+            my $sheet_name = $sf->{i}{S_R}{$file_fs}{sheet_name};
+            if ( defined $sheet_name && length $sheet_name ) {
+                $sf->{i}{ct}{default_table_name} .= '_' . $sheet_name;
             }
             $sf->{i}{ct}{default_table_name} =~ s/ /_/g;
         }
@@ -264,13 +265,13 @@ sub __set_columns {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
-        delete $sf->{i}{ct}{backup_first_table_row};
+    if ( exists $sf->{i}{ct}{shifted_header} ) {
+        delete $sf->{i}{ct}{shifted_header};
     }
 
     HEADER_ROW: while ( 1 ) {
-        if ( exists $sf->{i}{ct}{backup_first_table_row} ) {
-            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{backup_first_table_row};
+        if ( exists $sf->{i}{ct}{shifted_header} ) {
+            unshift @{$sql->{insert_into_args}}, delete $sf->{i}{ct}{shifted_header};
         }
         $sql->{create_table_cols} = [];
         $sql->{insert_into_cols}  = [];
@@ -351,7 +352,7 @@ sub __header_row {
     }
     elsif ( $choice eq $first_row ) {
         $header_row = shift @{$sql->{insert_into_args}};
-        $sf->{i}{ct}{backup_first_table_row} = $header_row;
+        $sf->{i}{ct}{shifted_header} = $header_row;
     }
     else {
         my $c = 0;

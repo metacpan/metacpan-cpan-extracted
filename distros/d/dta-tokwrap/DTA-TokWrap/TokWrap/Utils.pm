@@ -47,6 +47,18 @@ our @EXPORT_OK = @{$EXPORT_TAGS{all}};
 our $TRACE_RUNCMD = undef;
 
 ##==============================================================================
+## XML::LibXSLT limits
+
+BEGIN {
+  ##-- relax XSLT max depth - see https://stackoverflow.com/q/55813207/
+  ## + symptoms:
+  ##   > runtime error: file unknown-56471fceea80 line 48 element copy
+  ##   > xsltApplyXSLTTemplate: A potential infinite template recursion was detected.
+  ##   > You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum number of nested template calls and variables/params (currently set to 250).
+  #XML::LibXSLT->max_depth(1024);
+}
+
+##==============================================================================
 ## Utils: external programs
 
 ## $progpath_or_undef = PACKAGE::path_prog($progname,%opts)

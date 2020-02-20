@@ -2,8 +2,8 @@ NAME
     App::SortSubUtils - CLIs related to Sort::Sub
 
 VERSION
-    This document describes version 0.002 of App::SortSubUtils (from Perl
-    distribution App-SortSubUtils), released on 2019-12-14.
+    This document describes version 0.003 of App::SortSubUtils (from Perl
+    distribution App-SortSubUtils), released on 2019-12-15.
 
 SYNOPSIS
 DESCRIPTION
@@ -15,11 +15,13 @@ FUNCTIONS
   list_sort_sub_modules
     Usage:
 
-     list_sort_sub_modules() -> [status, msg, payload, meta]
+     list_sort_sub_modules(%args) -> [status, msg, payload, meta]
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
 
     Returns an enveloped result (an array).
 

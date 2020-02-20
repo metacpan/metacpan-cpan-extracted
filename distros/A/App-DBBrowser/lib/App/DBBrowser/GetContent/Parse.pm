@@ -256,10 +256,11 @@ sub __parse_with_Spreadsheet_Read {
     my $waiting = 'Parsing file ... ';
     say $waiting . "\r";
     require Spreadsheet::Read;
-    my $book = $sf->{i}{gc}{book};
+    my $book = $sf->{i}{S_R}{$file_fs}{book};
     if ( ! defined $book ) {
+        delete $sf->{i}{S_R};
         $book = Spreadsheet::Read::ReadData( $file_fs, cells => 0, attr => 0, rc => 1, strip => 0 );
-        $sf->{i}{gc}{book} = $book;
+        $sf->{i}{S_R}{$file_fs}{book} = $book;
         if ( ! defined $book ) {
             $tc->choose(
                 [ 'Press ENTER' ],
@@ -268,7 +269,8 @@ sub __parse_with_Spreadsheet_Read {
             return;
         }
     }
-    my $sheet_count = @$book - 1; # first sheet in $book contains meta info
+    $sf->{i}{S_R}{$file_fs}{sheet_count} = @$book - 1; # first sheet in $book contains meta info
+    my $sheet_count = $sf->{i}{S_R}{$file_fs}{sheet_count};
     if ( $sheet_count == 0 ) {
         $tc->choose(
             [ 'Press ENTER' ],
@@ -276,7 +278,7 @@ sub __parse_with_Spreadsheet_Read {
         );
         return;
     }
-    $sf->{i}{gc}{old_idx_sheet_menu} //= 0;
+    $sf->{i}{S_R}{$file_fs}{old_idx} //= 0;
     my $sheet_idx;
     if ( $sheet_count == 1 ) {
         $sheet_idx = 1;
@@ -288,18 +290,18 @@ sub __parse_with_Spreadsheet_Read {
         # Choose
         my $idx = $tc->choose(
             $choices,
-            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $sf->{i}{gc}{old_idx_sheet_menu},
+            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $sf->{i}{S_R}{$file_fs}{old_idx},
               undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
         }
         if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $sf->{i}{gc}{old_idx_sheet_menu} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{gc}{old_idx_sheet_menu} = 0;
-                return $sheet_count;
+            if ( $sf->{i}{S_R}{$file_fs}{old_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                $sf->{i}{S_R}{$file_fs}{old_idx} = 0;
+                return 1;
             }
-            $sf->{i}{gc}{old_idx_sheet_menu} = $idx;
+            $sf->{i}{S_R}{$file_fs}{old_idx} = $idx;
         }
         $sheet_idx = $idx - @pre + 1;
     }
@@ -309,13 +311,13 @@ sub __parse_with_Spreadsheet_Read {
             [ 'Press ENTER' ],
             { prompt => $sheet . ': empty sheet!' }
         );
-        return $sheet_count;
+        return 1;
     }
     $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
     if ( ! -T $file_fs && length $book->[$sheet_idx]{label} ) {
-        $sf->{i}{gc}{sheet_name} = $book->[$sheet_idx]{label};
+        $sf->{i}{S_R}{$file_fs}{sheet_name} = $book->[$sheet_idx]{label};
     }
-    return $sheet_count;
+    return 1;
 }
 
 

@@ -5,7 +5,7 @@ use warnings;
 package MooX::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Moo 1.006000 ();
 use Scalar::Util qw(blessed);
@@ -18,6 +18,7 @@ sub is_suitable_class {
 	my ($klass, $maybe_spec) = @_;
 	
 	my $ba = $klass->can('BUILDARGS');
+	return if !$ba;
 	return if $ba != \&Moo::Object::BUILDARGS;
 	return if $klass->can('FOREIGNBUILDARGS');
 	

@@ -77,5 +77,28 @@ use_ok( 'IRI' );
 	is($i->as_string, 'baz/quux', 'IRI string on relative IRI');
 }
 
+{
+	my $iri = IRI->new(
+		'resolved_components' => {
+			'scheme' => 'http',
+			'path' => '/',
+			'host' => 'example.com'
+		},
+	);
+	is($iri->abs, 'http://example.com/', 'IRI construction by components');
+}
+
+{
+	my $iri = IRI->new(
+		lazy => 1,
+		'resolved_components' => {
+			'scheme' => 'http',
+			'path' => '/',
+			'host' => 'example.com'
+		},
+	);
+	is($iri->abs, 'http://example.com/', 'lazy IRI construction by components');
+}
+
 done_testing();
 

@@ -1,10 +1,11 @@
 #!/perl
 
 use strict;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use FindBin;
 use lib $FindBin::Bin;
 use TimeFormat_MC;
+use TimeFormat_Minute;
 
 ## ----------------------------------------------------------------------------------
 ## Test for availability of certain modules.
@@ -33,22 +34,26 @@ if ($posix_ok)
 {
     SKIP:
     {
-        skip 'Time::Local is not available', 5  unless $tl_ok;
+        skip 'Time::Local is not available', 6  unless $tl_ok;
 
         # Be sure to use ONLY ansi standard strftime codes here,
         # otherwise the tests will fail on somebody's system somewhere.
-        is $strftime{'%d',$t},      '05'        => 'day of month';
-        is $strftime{'%m',$t},      '06'        => 'Month number';
-        is $strftime{'%M',$t},      '58'        => 'minute';
-        is $strftime{'%H',$t},      '13'        => 'hour';
-        is $strftime{'%Y',$t},      '2003'      => 'year';
+        is $strftime{'%d',$t},         '05'        => 'day of month';
+        is $strftime{'%m',$t},         '06'        => 'Month number';
+        is $strftime{'%M',$t},         '58'        => 'minute';
+        is $strftime{'%H',$t},         '13'        => 'hour';
+        is $strftime{'%Y',$t},         '2003'      => 'year';
+
+        tf_minute_sync;         # avoid race condition
+        is $strftime{'%Y-%m-%d %H:%M'}, tf_cur_minute() => 'ymd+hm';
     }
 }
 else
 {
-        is $strftime{'%d',$t},      'NO_POSIX'  => 'day of month (dummy)';
-        is $strftime{'%m',$t},      'NO_POSIX'  => 'Month number (dummy)';
-        is $strftime{'%M',$t},      'NO_POSIX'  => 'minute (dummy)';
-        is $strftime{'%H',$t},      'NO_POSIX'  => 'hour (dummy)';
-        is $strftime{'%Y',$t},      'NO_POSIX'  => 'year (dummy)';
-}
+        is $strftime{'%d',$t},          'NO_POSIX'  => 'day of month (dummy)';
+        is $strftime{'%m',$t},          'NO_POSIX'  => 'Month number (dummy)';
+        is $strftime{'%M',$t},          'NO_POSIX'  => 'minute (dummy)';
+        is $strftime{'%H',$t},          'NO_POSIX'  => 'hour (dummy)';
+        is $strftime{'%Y',$t},          'NO_POSIX'  => 'year (dummy)';
+        is $strftime{'%Y-%m-%d %H:%M'}, 'NO_POSIX'  => 'ymd+hm (dummy)';
+    }

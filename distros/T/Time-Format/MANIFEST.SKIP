@@ -1,18 +1,58 @@
-^Makefile$
-^Makefile.old$
-^blib/
-^pm_to_blib
-^blibdirs
+# Files and directories that are NOT part of the module distribution
+# (i.e., are not to be added to the distribution tarball)
+# Patterns here are Perl regexes, applied to full file paths
+# (relative to the module root directory, of course).
+# See https://metacpan.org/pod/ExtUtils::Manifest#MANIFEST.SKIP
+
+\.tar\.gz$                      # Distributions
+
+# Version control directories
+\bCVS\b
+^\.cvsignore$
+^\.git
+^\.gitignore$
+
+# Temporary build files/dirs
 ^Build$
 ^Build.bat$
+^Makefile$
+^Makefile.old$
 ^_build/
-^Time-Format-[\d.]+/
-\bCVS\b
-^.git
-project-readme
-~$
-\.tar\.gz$
-^pod.*tmp$
-^\.cvsignore$
-^cover_db
+^blib/
+^blibdirs
 ^MYMETA
+^MANIFEST.bak$
+^Time-Format-[\d.]+/
+
+# Temporary files/dirs from profiling tools
+^nytprof
+^cover_db/
+
+# Documentation temporary files/dirs
+^pm_to_blib
+^pod.*\.tmp$
+
+# Editor temp files
+~$
+^#.*#$
+^\.#
+
+# Developer notes and tools
+^project-readme
+^DEV-NOTES\.org
+^TAGS$
+build_tags\.cmd
+TAGS_expr\.txt
+
+# Windows image index files
+Thumbs\.db
+
+
+# --------------------------------
+# The following is for Emacs:
+# Local Variables:
+# mode: text
+# comment-start: "# "
+# comment-start-skip: "#+ *"
+# comment-use-syntax: nil
+# End:

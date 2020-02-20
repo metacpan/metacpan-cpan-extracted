@@ -1,10 +1,11 @@
 #!/perl
 
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 20;
 use FindBin;
 use lib $FindBin::Bin;
 use TimeFormat_MC;
+use TimeFormat_Minute;
 
 
 ## ----------------------------------------------------------------------------------
@@ -51,14 +52,19 @@ if ($tl_ok)
 
 SKIP:
 {
-    skip 'Time::Local not available', 5  unless $tl_ok;
+    skip 'Time::Local not available', 7  unless $tl_ok;
 
-    # time_format tests (5)
-    is time_format('yyyymmdd',$t),  '20030605'       => 'month: mm';
-    is time_format('hhmmss',$t),    '135809'         => 'm minute: 1';
-    is time_format('MONTH',$t),     uc $June         => 'uc month name';
-    is time_format('weekday',$t),   lc $Thursday     => 'lc weekday';
-    is time_format('yyyymmdd'),     $time{yyyymmdd}  => 'time_format equals %time';
+    # time_format tests (7)
+    is time_format('yyyymmdd',$t),       '20030605'       => 'month: mm';
+    is time_format('hhmmss',$t),         '135809'         => 'm minute: 1';
+    is time_format('MONTH',$t),          uc $June         => 'uc month name';
+    is time_format('weekday',$t),        lc $Thursday     => 'lc weekday';
+
+    tf_minute_sync;             # avoid race condition
+    my $from_func = time_format('yyyy-mm-dd hh:mm');
+    is time_format('yyyymmdd'),          $time{yyyymmdd}  => 'time_format equals %time (ymd)';
+    is time_format('hh:mm'),             $time{'hh:mm'}   => 'time_format equals %time (hm)';
+    is time_format('yyyy-mm-dd hh:mm'),  tf_cur_minute()  => 'ymd+hm';
 }
 
 
@@ -76,7 +82,9 @@ if ($posix_ok)
         is time_strftime('%M',$t),  '58'             => 'minute';
         is time_strftime('%H',$t),  '13'             => 'hour';
         is time_strftime('%Y',$t),  '2003'           => 'year';
-        is time_strftime('%M'),     $time{'mm{in}'}  => 'time_strftime equals %time';
+
+        tf_minute_sync;         # avoid race condition
+        is time_strftime('%M'),     $time{'mm{in}'}  => 'time_strftime equals %time (m)';
     }
 }
 else
@@ -103,7 +111,9 @@ if ($dm_ok  &&  $dmtz_ok)
         is time_manip('%D',$m),  '06/05/03'      => '%D';
         is time_manip('%e',$m),  ' 5'            => 'spaced day';
         is time_manip('%H',$m),  '00'            => 'hour';
-        is time_manip('%H'),     $time{'hh'}     => 'time_manip equals %time';
+
+        tf_minute_sync;         # avoid race condition
+        is time_manip('%H'),     $time{'hh'}     => 'time_manip equals %time (h)';
     }
 }
 else

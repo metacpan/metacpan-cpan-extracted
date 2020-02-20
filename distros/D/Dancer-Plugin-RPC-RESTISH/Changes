@@ -1,29 +1,36 @@
-Changes on 2019-11-27 for repository at:
+Changes on 2020-02-19 for repository at:
   Fetch URL: git@github.com:abeltje/Dancer-Plugin-RPC-RESTISH.git
   Push  URL: git@github.com:abeltje/Dancer-Plugin-RPC-RESTISH.git
 
 Enjoy!
 
-1.00 2019-11-27T15:46:59+01:00 (689da78 => Abe Timmerman)
- - (Abe Timmerman, 1 second ago) Autocommit for distribution
+1.01 2020-02-19T10:45:03+01:00 (3e78239 => Abe Timmerman)
+ - (Abe Timmerman, 3 seconds ago) Autocommit for distribution
+   Dancer::Plugin::RPC::RESTISH 1.01 (same)
+
+1.00 2019-11-27T15:46:59+01:00 (a62f656 => Abe Timmerman)
+ - (Abe Timmerman, 3 months ago) Autocommit for distribution
    Dancer::Plugin::RPC::RESTISH 1.00 (minor)
 
+ - (Abe Timmerman, 8 minutes ago) Introduce $Dancer::RPCPlugin::ROUTE_INFO
+ -     For RPC::RESTISH we want some extra information about the route.
+
 0.99_04 2019-11-27T15:42:15+01:00 (1e60b25 => Abe Timmerman)
- - (Abe Timmerman, 5 minutes ago) Autocommit for distribution
+ - (Abe Timmerman, 3 months ago) Autocommit for distribution
    Dancer::Plugin::RPC::RESTISH 0.99_04 (same)
 
 0.99_03 2019-10-15T22:19:30+02:00 (50b6878 => Abe Timmerman)
- - (Abe Timmerman, 6 weeks ago) Autocommit for distribution
+ - (Abe Timmerman, 4 months ago) Autocommit for distribution
    Dancer::Plugin::RPC::RESTISH 0.99_03 (same)
 
- - (Abe Timmerman, 6 minutes ago) Send non-references as-is
+ - (Abe Timmerman, 3 months ago) Send non-references as-is
  -     One should be able to send plain-text or PDF from a RESTISH service.
 
 0.99_02 2019-06-27T07:22:05+02:00 (20433a4 => Abe Timmerman)
- - (Abe Timmerman, 5 months ago) Autocommit for distribution
+ - (Abe Timmerman, 8 months ago) Autocommit for distribution
    Dancer::Plugin::RPC::RESTISH 0.99_02 (same)
 
- - (Abe Timmerman, 6 weeks ago) Use the new ErrorResponse from
+ - (Abe Timmerman, 4 months ago) Use the new ErrorResponse from
    Dancer::Plugin::RPC
  -     Now that we can link HTTP-response-status to RPC-error_code,
    register
@@ -36,10 +43,10 @@ Enjoy!
  -     as their first element (after the path)
 
 0.99_01 2019-05-14T15:10:24+02:00 (f5d21c7 => Abe Timmerman)
- - (Abe Timmerman, 7 months ago) Autocommit for distribution
+ - (Abe Timmerman, 9 months ago) Autocommit for distribution
    Dancer::Plugin::RPC::RESTISH 0.99_01 (test)
 
- - (Abe Timmerman, 5 months ago) Basic support for CORS
+ - (Abe Timmerman, 8 months ago) Basic support for CORS
  -     By specifying 'cors_allow_origin' as an argument in the
    configuration of
  -     the 'restish' keyword, we try to handle preflight-requests an add
@@ -47,7 +54,7 @@ Enjoy!
  -     headers for (regular) requests that send the 'Origin' header.
 
 0.00_00 2019-05-14T14:57:36+02:00 (9d6d295 => Abe Timmerman)
- - (Abe Timmerman, 7 months ago) Initial commit for
+ - (Abe Timmerman, 9 months ago) Initial commit for
    Dancer::Plugin::RPC::RESTISH
  -     A new plugin for the Dancer::Plugin::RPC framework that enables one
    to

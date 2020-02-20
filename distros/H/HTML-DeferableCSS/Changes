@@ -1,0 +1,58 @@
+Revision history for HTML-DeferableCSS:
+
+v0.2.0    2020-02-20 17:37:47+00:00 Europe/London
+  [Improvements]
+  - Allows "1" as an alias when the filename is the same as the name.
+    (You can use "1.css" if that is the name of the file.)
+
+  - False ("0", "" or undef) aliases are ignored. (You can use "0.css"
+    if that is the name of the file.)
+
+  - link_or_inline_html can accept a list of aliases.
+
+  [Bug Fixes]
+  - Use the dist_share instead of the module_share. (Basically,
+    defer_link_html did not work outside of tests.)
+
+  [Build Fixes]
+  - Added explicit minimum version of Moo.
+
+  [Documentation]
+  - Reorganised Changes file.
+
+v0.1.2    2020-02-19 21:38:14+00:00 Europe/London
+  [Improvements]
+  - Use strings instead of Path::Tiny or URI objects, since only the
+    string was needed. (This removes the need for some prereqs.)
+
+  [Build Fixes]
+  - Added explicit minimum version of File::ShareDir to the module.
+
+  - Added explicit minimum version of List::Util to the module.
+
+  [Documentation]
+  - Improved the DESCRIPTION section of the module.
+
+  - Added note about "deferrable".
+
+  - Fixed POD error.
+
+  [Other]
+  - Removed trailing whitespace and tabs from sample files used for
+    tests.
+
+  - Fixed typo in module metadata.
+
+  [Toolchain]
+  - Added author test for POD links.
+
+  - Added author test for trailing whitespace.
+
+  - Added author test for tabs.
+
+v0.1.1    2020-02-19 08:26:12+00:00 Europe/London
+  [Other]
+  - Changed licence to MIT for compatability with included JavaScript.
+
+v0.1.0    2020-02-19 00:34:23+00:00 Europe/London
+  - Initial version released.

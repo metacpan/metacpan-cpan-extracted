@@ -11,7 +11,7 @@ package LooksLike;
 use B ();
 
 
-our $VERSION = 'v0.20.045'; # VERSION
+our $VERSION = 'v0.20.050'; # VERSION
 
 
 my $digits = '[0123456789]';
@@ -79,22 +79,30 @@ sub decimal {
 
 
 
+my $infinity = 9e9999;
 my $inf = do {
     my $inf = qr/inf(?:inity)?/i;
-    if ( $^V ge v5.22.0 ) {
-        # Newer versions of Perl accept a broader
+    if ( $^O eq 'MSWin32' || $^V ge v5.22.0 ) {
+        # Some versions of Perl accept a broader
         # range of representations of infinity.
         # 1.#infinity, 1.#inf*
         my $dotinf = qr/1\.\#inf(?:inity|0*)/i;
         qr/$dotinf|$inf/;
+    } elsif ( $infinity !~ $inf ) {
+        $inf = join( '|',
+            sort { length($b) <=> length($a) } $inf, quotemeta($infinity)
+        );
+        qr/$inf/;
     } else {
         $inf;
     }
 };
 
+my $notanumber = $infinity / $infinity;
 my $nan = do {
-    if ( $^V ge v5.22.0 ) {
-        # Newer versions of Perl accept a broader
+    my $nan = qr/nan/i;
+    if ( $^O eq 'MSWin32' || $^V ge v5.22.0 ) {
+        # Some versions of Perl accept a broader
         # range of representations of NaN.
         # https://en.wikipedia.org/wiki/NaN#Display
         # nan[qs]?, [qs]nan,
@@ -105,8 +113,13 @@ my $nan = do {
         my $ind    = qr/ind0*/i;
         my $dotnan = qr/1\.\#(?:$nandig|$nan|$ind)/;
         qr/$dotnan|$nandig|$nan/
+    } elsif ( $notanumber !~ $nan ) {
+        $nan = join( '|',
+            sort { length($b) <=> length($a) } $nan, quotemeta($notanumber)
+        );
+        qr/$nan/;
     } else {
-        qr/nan/i;
+        $nan;
     }
 };
 
@@ -145,8 +158,6 @@ sub grok_number {
 # The following can be tested with mathematics or regular expressions.
 
 
-my $infinity = 9e9999;
-
 our $Infinity = qr/[+-]?$inf/;
 
 
@@ -162,8 +173,6 @@ sub infinity {
 }
 
 
-
-#my $notanumber = $infinity / $infinity;
 
 our $NaN = qr/[+-]?$nan/;
 
@@ -674,7 +683,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.045 of this module.
+This document describes version v0.20.050 of this module.
 
 =head1 AUTHOR
 

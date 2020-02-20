@@ -10,10 +10,10 @@ all-local: build
 node_modules:
 	$(NPM) i
 
-source: node_modules
+source: node_modules $(EXTRA_DIST)
 	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --feedback=false --erase
 
-source-watch: node_modules
+source-watch: node_modules $(EXTRA_DIST)
 	CALLBACKERY_QX=$(CALLBACKERY_QX) $(NPX) qx compile --watch --feedback=false --erase
 
 build: node_modules ../public/versions.json

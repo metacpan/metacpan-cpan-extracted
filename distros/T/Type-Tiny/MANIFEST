@@ -124,6 +124,7 @@ t/20-unit/Type-Library/errors.t
 t/20-unit/Type-Library/import-params.t
 t/20-unit/Type-Library/inheritance.t
 t/20-unit/Type-Library/is.t
+t/20-unit/Type-Library/recursive-type-definitions.t
 t/20-unit/Type-Library/to.t
 t/20-unit/Type-Library/types.t
 t/20-unit/Type-Params/badsigs.t

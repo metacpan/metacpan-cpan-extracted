@@ -1,5 +1,9 @@
 Revision history for Perl module YAML::LibYAML::API
 
+0.008 2020-02-19 13:55:40+01:00
+
+    - Support numeric anchors (before strings were required)
+
 0.007 2019-07-12 18:48:13+02:00
 
     - Change test to use YAML::PP::Common constants

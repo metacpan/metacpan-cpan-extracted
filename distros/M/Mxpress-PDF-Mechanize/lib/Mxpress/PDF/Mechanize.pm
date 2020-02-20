@@ -1,9 +1,10 @@
 package Mxpress::PDF::Mechanize;
-our $VERSION = '0.02';	
 use Zydeco prefix => 'Mxpress::PDF';
-use Cwd qw/getcwd/;
-use Log::Log4perl qw(:easy);
 class Mxpress::PDF::Mechanize {
+	BEGIN {
+		our $VERSION = '0.04';
+		our $AUTHORITY = 'cpan:LNATION';
+	}
 	class Plugin::Mechanize::Screenshot extends Plugin::Image {
 		has mech_class (type => Str);
 		has mech_open_args (type => HashRef);
@@ -33,7 +34,7 @@ class Mxpress::PDF::Mechanize {
 				%args
 			);
 		}
-		method take (Str $url, Map %args) { # around add 
+		method take (Str $url, Map %args) { # around add
 			$self->set_attrs(%args);
 			$self->add($self->_mechanized_screenshot($url));
 		}
@@ -55,7 +56,6 @@ class Mxpress::PDF::Mechanize {
 		}
 		has _mech (type => Object); # builder
 		method mech {
-			require $self->mech_class;
 			return $self->_mech || $self->_mech($self->mech_class->new(%{$self->mech_open_args}));
 		}
 	}
@@ -71,7 +71,7 @@ Mxpress::PDF::Mechanize - Take a screenshot and add it to the pdf
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -81,13 +81,15 @@ This is a quick example of how to expand Mxpress::PDF...
 
 	use Mxpress::PDF;
 	use Mxpress::PDF::Mechanize;
-
+	use WWW::Mechanize::Chrome;
+	use Log::Log4perl qw(:easy);
+	
 	my $file = Mxpress::PDF->new_file($file_name, 
 		plugins => [qw/screenshot/]
 	);
 
 	my $url = 'https://www.gohawaii.com/trip-planning';
-	$file->screenshot->add($url, %screenshot_args);
+	$file->screenshot->take($url, %screenshot_args);
 
 	$file->save;
 
@@ -115,7 +117,7 @@ You can pass default attributes when instantiating the file object.
 
 or when calling the objects add method.
 
-	$file->screenshot->add(
+	$file->screenshot->take(
 		%screenshot_attrs
 	);
 
@@ -185,19 +187,19 @@ Set a top offset before taking the screenshot.
 
 The width of the image added to the pdf.
 
-	$img->width($pt);
+	$screenshot->width($pt);
 
 =head3 height (type => Num);
 
 The height of the image added to the pdf.
 
-	$img->height($pt);
+	$screenshot->height($pt);
 
 =head3 align (type => Str);
 
 Align the image - fill|left|center|right
 
-	$img->align('right');
+	$screenshot->align('right');
 
 =head1 AUTHOR
 
@@ -213,7 +215,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Mxpress::PDF::Mechanize
+	perldoc Mxpress::PDF::Mechanize
 
 
 You can also look for information at:

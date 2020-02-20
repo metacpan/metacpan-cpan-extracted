@@ -13,7 +13,8 @@ use Dancer::RPCPlugin::ErrorResponse;
 
 use Dancer::Test;
 
-{ # default publish == 'config'
+{
+    note("default publish == 'config'");
     set(plugins => {
         'RPC::RESTISH' => {
             '/endpoint' => {
@@ -24,6 +25,7 @@ use Dancer::Test;
             },
         }
     });
+    set(encoding => 'utf-8');
     restish '/endpoint' => { };
 
     route_exists([GET => '/endpoint/ping'],    "GET /endpoint/ping registered");
@@ -46,7 +48,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # publish is code that returns the dispatch-table
+{
+    note("publish is code that returns the dispatch-table");
     restish '/endpoint2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -74,7 +77,8 @@ use Dancer::Test;
     );
 }
 
-{ # callback fails
+{
+    note("callback fails");
     restish '/fail1' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -116,7 +120,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # callback dies
+{
+    note("callback dies");
     restish '/fail2' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -154,7 +159,8 @@ use Dancer::Test;
     ) or diag(explain($result));
 }
 
-{ # callback returns unknown object
+{
+    note("callback returns unknown object");
     restish '/fail3' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -193,7 +199,56 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # code_wrapper dies
+{
+    note("callback checks \$Dancer::RPCPlugin::ROUTE_INFO");
+    restish '/callback' => {
+        publish => sub {
+            eval { require TestProject::SystemCalls; };
+            error("Cannot load: $@") if $@;
+            return {
+                'GET@version/:api_version' => dispatch_item(
+                    code    => \&TestProject::SystemCalls::do_version,
+                    package => 'TestProject::SystemCalls',
+                ),
+            };
+        },
+        callback => sub {
+            my ($request, $method_name, $method_args) = @_;
+
+            # Access only for 'small-letter-v' with a version
+            return $Dancer::RPCPlugin::ROUTE_INFO->{rpc_method} =~ qr{version/v\d+$}
+                ? callback_success()
+                : callback_fail(
+                    error_code    => -32601,
+                    error_message => "Access denied for $Dancer::RPCPlugin::ROUTE_INFO->{rpc_method}",
+                );
+        },
+    };
+
+    route_exists([GET => '/callback/version/v2'], "/callback/version registered");
+    my $response = dancer_response(
+        GET => '/callback/version/v2'
+    );
+    is($response->{status}, 200, "callback http-status 200") or diag(explain($response));
+
+    $response = dancer_response(GET => '/callback/version/V2');
+    is($response->{status}, 403, "'/callback/version/V2' is not valid")
+        or diag(explain($response));
+
+    my $error = from_json($response->{content});
+    is_deeply(
+        $error,
+        {
+            'error_code'    => '-32601',
+            'error_data'    => {'api_version' => 'V2'},
+            'error_message' => 'Access denied for version/V2'
+        },
+        "error-object"
+    ) or diag(explain($error));
+}
+
+{
+    note("code_wrapper dies");
     restish '/fail4' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -232,7 +287,8 @@ use Dancer::Test;
     );
 }
 
-{ # code_wrapper returns unknown object
+{
+    note("code_wrapper returns unknown object");
     restish '/fail5' => {
         publish => sub {
             eval { require TestProject::SystemCalls; };
@@ -267,7 +323,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # call fails
+{
+    note("call fails");
     restish '/fail6' => {
         publish => sub {
             return {
@@ -298,7 +355,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # call returns a error_response()
+{
+    note("call returns a error_response()");
     restish '/fail7' => {
         publish => sub {
             return {
@@ -336,7 +394,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # call throws a error_response()
+{
+    note("call throws a error_response()");
     restish '/fail8' => {
         publish => sub {
             return {
@@ -374,7 +433,8 @@ use Dancer::Test;
     ) or diag(explain($response));
 }
 
-{ # call returns non-ref
+{
+    note("call returns non-ref");
     restish '/return-text' => {
         publish => sub {
             return {

@@ -53,16 +53,6 @@ sub _test_call_again_in_callback {
         } );
     } );
 
-#    my $cv = AnyEvent->condvar();
-#
-#    my $w = AnyEvent->idle( cb => sub {
-#        if (@events == 2) {
-#            $$promise_r = undef;
-#            $cv->();
-#        }
-#    } );
-#
-#    $cv->recv();
     $class->_RESOLVE($big_promise);
 
     is( "@events", "2 1", 'then() from pre-resolved promise again' );

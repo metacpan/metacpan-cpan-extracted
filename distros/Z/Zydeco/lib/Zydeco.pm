@@ -12,13 +12,14 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.508';
+our $VERSION   = '0.509';
 
 use Keyword::Simple ();
 use PPR;
 use B::Hooks::EndOfScope;
 use Exporter::Shiny our @EXPORT = qw( version authority overload );
 use Devel::StrictMode qw(STRICT);
+use Types::Standard qw( is_HashRef is_Str );
 
 BEGIN {
 	package Zydeco::_Gather;
@@ -644,7 +645,7 @@ our $GRAMMAR = qr{
 				(?&PerlBlock)|(?&PerlIdentifier)|(?&PerlString)
 			)
 			(?&PerlOWS)
-			(?: (?&PerlBlock) )                           # CAPTURE:code
+			(?: (?&PerlBlock) )?                          # CAPTURE:code
 			(?&PerlOWS)
 		)#</MxpCoerceSyntax>
 		
@@ -1061,7 +1062,9 @@ sub _handle_multimethod_keyword {
 	my $extra_code = '';
 	for my $attr (@$attrs) {
 		$optim = 1 if $attr =~ /^:optimize\b/;
-		$extra_code .= sprintf('alias=>%s', B::perlstring($1)) if $attr =~ /^:alias\((.+)\)$/;
+		if (my ($alias) = ($attr =~ /^:alias\((.+)\)$/)) {
+			$extra_code .= sprintf('alias=>%s', B::perlstring($alias));
+		}
 	}
 	
 	if ($has_sig) {
@@ -1815,166 +1818,334 @@ sub import {
 	goto \&Exporter::Tiny::import;
 }
 
-our %OPTS;
+our $TARGET;
+our $EVENT;
+
+sub _package_callback {
+	shift;
+	my $cb = shift;
+	local $TARGET = {};
+	&$cb;
+	return $TARGET;
+}
 
 # `version` keyword
 #
 sub version {
-	$OPTS{version} = shift;
+	if (is_HashRef $TARGET) {
+		$TARGET->{version} = shift;
+		return;
+	}
+	
+	if (is_Str $TARGET) {
+		no strict 'refs';
+		${"$TARGET\::VERSION"} = shift;
+	}
+	
+	__PACKAGE__->_syntax_error('version declaration', 'Not supported outside class or role');
 }
 
 # `authority` keyword
 #
 sub authority {
-	$OPTS{authority} = shift;
+	if (is_HashRef $TARGET) {
+		$TARGET->{authority} = shift;
+		return;
+	}
+	
+	if (is_Str $TARGET) {
+		no strict 'refs';
+		${"$TARGET\::AUTHORITY"} = shift;
+	}
+	
+	__PACKAGE__->_syntax_error('authority declaration', 'Not supported outside class or role');
 }
 
 # `overload` keyword
 #
 sub overload {
+	my @args = @_;
 	if (@_ == 1 and ref($_[0]) eq 'HASH') {
-		push @{ $OPTS{overload} ||= [] }, %{+shift};
+		@args = %{+shift};
 	}
 	elsif (@_ == 1 and ref($_[0]) eq 'ARRAY') {
-		push @{ $OPTS{overload} ||= [] }, @{+shift};
+		@args = @{+shift};
 	}
-	else {
-		push @{ $OPTS{overload} ||= [] }, @_;
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{overload} ||= [] }, @args;
+		return;
 	}
+	
+	require Role::Hooks;
+	if (is_Str $TARGET and not 'Role::Hooks'->is_role($TARGET)) {
+		require overload;
+		overload->import::into($TARGET, @args);
+		return;
+	}
+	
+	__PACKAGE__->_syntax_error('overload declaration', 'Not supported outside class');
 }
 
 # `Zydeco::PACKAGE_SPEC` keyword
 #
-sub PACKAGE_SPEC { \%OPTS }
+sub PACKAGE_SPEC {
+	if (is_HashRef $TARGET) {
+		return $TARGET;
+	}
+	
+	__PACKAGE__->_syntax_error('Zydeco::PACKAGE_SPEC() function', 'Not supported outside class or role');
+}
 
 
 #
 # CALLBACKS
 #
 
-sub _package_callback {
-	shift;
-	my $cb = shift;
-	local %OPTS = (in_package => 1);
-	&$cb;
-	delete $OPTS{in_package};
-#	use Data::Dumper;
-#	$Data::Dumper::Deparse = 1;
-#	print "OPTS:".Dumper $cb, +{ %OPTS };
-	return +{ %OPTS };
-}
 sub _has {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('attribute declaration', 'Not supported outside class or role');
 	my ($attr, %spec) = @_;
-	$OPTS{has}{$attr} = \%spec;
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{has}{$attr} = \%spec;
+		return;
+	}
+
+	if (is_Str $TARGET) {
+		'MooX::Press'->install_attributes($TARGET, { $attr => \%spec });
+		return;
+	}
+
+	$me->_syntax_error('attribute declaration', 'Not supported outside class or role');
 }
+
 sub _extends {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('extends declaration', 'Not supported outside class');
-	@{ $OPTS{extends}||=[] } = @_;
+	
+	if (is_HashRef $TARGET) {
+		@{ $TARGET->{extends}||=[] } = @_;
+		return;
+	}
+	
+	$me->_syntax_error('extends declaration', 'Not supported outside class');
 }
+
 sub _type_name {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('extends declaration', 'Not supported outside class or role');
-	$OPTS{type_name} = shift;
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{type_name} = shift;
+		return;
+	}
+	
+	$me->_syntax_error('extends declaration', 'Not supported outside class or role');
 }
+
 sub _begin {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('begin hook', 'Not supported outside class or role (use import option instead)');
-	push @{$OPTS{begin}||=[]}, shift;
+	my ($coderef) = @_;
+	
+	if (is_HashRef $TARGET) {
+		my $wrapped_coderef = sub {
+			local $TARGET = $_[0];
+			local $EVENT  = 'begin';
+			&$coderef;
+		};
+		push @{$TARGET->{begin}||=[]}, $wrapped_coderef;
+		return;
+	}
+	
+	$me->_syntax_error('begin hook', 'Not supported outside class or role (use import option instead)');
 }
+
 sub _end {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('end hook', 'Not supported outside class or role (use import option instead)');
-	push @{$OPTS{end}||=[]}, shift;
+	my ($coderef) = @_;
+	
+	if (is_HashRef $TARGET) {
+		my $wrapped_coderef = sub {
+			local $TARGET = $_[0];
+			local $EVENT  = 'end';
+			&$coderef;
+		};
+		push @{$TARGET->{end}||=[]}, $wrapped_coderef;
+		return;
+	}
+	
+	$me->_syntax_error('end hook', 'Not supported outside class or role (use import option instead)');
 }
+
 sub _before_apply {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('before_apply hook', 'Not supported outside role');
-	push @{$OPTS{before_apply}||=[]}, shift;
+	my ($coderef) = @_;
+	
+	if (is_HashRef $TARGET) {
+		my $wrapped_coderef = sub {
+			local $TARGET = $_[1];
+			local $EVENT  = 'before_apply';
+			&$coderef;
+		};
+		push @{$TARGET->{before_apply}||=[]}, $wrapped_coderef;
+		return;
+	}
+	
+	$me->_syntax_error('before_apply hook', 'Not supported outside role');
 }
+
 sub _after_apply {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('after_apply hook', 'Not supported outside role');
-	push @{$OPTS{after_apply}||=[]}, shift;
+	my ($coderef) = @_;
+	
+	if (is_HashRef $TARGET) {
+		my $wrapped_coderef = sub {
+			local $TARGET = $_[1];
+			local $EVENT  = 'after_apply';
+			&$coderef;
+		};
+		push @{$TARGET->{after_apply}||=[]}, $wrapped_coderef;
+		return;
+	}
+	
+	$me->_syntax_error('after_apply hook', 'Not supported outside role');
 }
+
 sub _interface {
-	shift;
-	$OPTS{interface} = shift;
+	my $me = shift;
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{interface} = shift;
+		return;
+	}
+	
+	$me->_syntax_error('interface callback', 'Not supported outside role');
 }
+
 sub _abstract {
-	shift;
-	$OPTS{abstract} = shift;
+	my $me = shift;
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{abstract} = shift;
+		return;
+	}
+	
+	$me->_syntax_error('interface callback', 'Not supported outside role');
 }
+
 sub _with {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('with declaration', 'Not supported outside class or role');
-	push @{ $OPTS{with}||=[] }, @_;
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{with}||=[] }, @_;
+		return;
+	}
+	
+	$me->_syntax_error('with declaration', 'Not supported outside class or role');
 }
+
 sub _toolkit {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('toolkit declaration', 'Not supported outside class or role (use import option instead)');
 	my ($toolkit, @imports) = @_;
-	$OPTS{toolkit} = $toolkit;
-	push @{ $OPTS{import}||=[] }, @imports if @imports;
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{toolkit} = $toolkit;
+		push @{ $TARGET->{import}||=[] }, @imports if @imports;
+		return;
+	}
+	
+	$me->_syntax_error('toolkit declaration', 'Not supported outside class or role (use import option instead)');
 }
+
 sub _requires {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('requires declaration', 'Not supported outside role');
-	push @{ $OPTS{requires}||=[] }, @_;
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{requires}||=[] }, @_;
+		return;
+	}
+	
+	$me->_syntax_error('requires declaration', 'Not supported outside role');
 }
+
 sub _coerce {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('coercion declaration', 'Not supported outside class');
-	push @{ $OPTS{coerce}||=[] }, @_;
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{coerce}||=[] }, @_;
+		return;
+	}
+	
+	$me->_syntax_error('coercion declaration', 'Not supported outside class');
 }
+
 sub _factory {
 	my $me = shift;
-	$OPTS{in_package} or $me->_syntax_error('factory method declaration', 'Not supported outside class');
-	push @{ $OPTS{factory}||=[] }, @_;
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{factory}||=[] }, @_;
+		return;
+	}
+	
+	$me->_syntax_error('factory method declaration', 'Not supported outside class');
 }
+
 sub _constant {
 	my $me = shift;
 	my ($name, $value) = @_;
-	if (! $OPTS{in_package}) {
-		'MooX::Press'->install_constants(scalar(caller), { $name => $value });
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{constant}{$name} = $value;
 		return;
 	}
-	$OPTS{constant}{$name} = $value;
+	
+	my $target = $TARGET || caller;
+	'MooX::Press'->install_constants($target, { $name => $value });
 }
+
 sub _can {
 	my $me = shift;
 	my ($name, $code) = @_;
-	if (! $OPTS{in_package}) {
-		'MooX::Press'->install_methods(scalar(caller), { $name => $code });
+	
+	if (is_HashRef $TARGET) {
+		$TARGET->{can}{$name} = $code;
 		return;
 	}
-	$OPTS{can}{$name} = $code;
+	
+	my $target = $TARGET || caller;
+	'MooX::Press'->install_methods($target, { $name => $code })
 }
+
 sub _multimethod {
 	my $me = shift;
 	my ($name, $spec) = @_;
-	if (! $OPTS{in_package}) {
-		'MooX::Press'->install_multimethod(scalar(caller), 'class', $name, $spec);
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{multimethod} ||= [] }, $name => $spec;
 		return;
 	}
-	push @{ $OPTS{multimethod} ||= [] }, $name => $spec;
+	
+	my $target = $TARGET || caller;
+	'MooX::Press'->install_multimethod($target, 'class', $name, $spec);
 }
+
 sub _modifier {
 	my $me = shift;
 	my ($kind, @args) = @_;
-	if (! $OPTS{in_package}) {
-		my $codelike = pop @args;
-		my $coderef  = 'MooX::Press'->_prepare_method_modifier(scalar(caller), $kind, \@args, $codelike);
-		require Class::Method::Modifiers;
-		Class::Method::Modifiers::install_modifier(scalar(caller), $kind, @args, $coderef);
+	
+	if (is_HashRef $TARGET) {
+		push @{ $TARGET->{$kind} ||= [] }, @args;
+		return;
 	}
-	push @{ $OPTS{$kind} ||= [] }, @args;
+	
+	my $target = $TARGET || caller;
+	my $codelike = pop @args;
+	my $coderef  = 'MooX::Press'->_prepare_method_modifier($target, $kind, \@args, $codelike);
+	require Class::Method::Modifiers;
+	Class::Method::Modifiers::install_modifier($target, $kind, @args, $coderef);
 }
+
 sub _include {
 	my $me = shift;
-	$OPTS{in_package} and $me->_syntax_error('include directive', 'Not supported inside class or role');
+	is_HashRef($TARGET) and $me->_syntax_error('include directive', 'Not supported inside class or role');
 	
 	require Path::ScanINC;
 	my @chunks = split /::/, $_[0];
@@ -1999,7 +2170,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.508';
+#	our $VERSION   = '0.509';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2010,7 +2181,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.508';
+#	our $VERSION   = '0.509';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2023,12 +2194,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.508';
+#	our $VERSION   = '0.509';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.508';
+#	our $VERSION   = '0.509';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2042,7 +2213,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.508';
+#	our $VERSION   = '0.509';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2571,8 +2742,9 @@ be defined yet.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
-Other keywords like C<has> and C<method> cannot be used within a C<begin>
-block.
+Keywords usable within a C<begin> block include
+C<authority>, C<version>, C<overload>, C<constant>, C<has>,
+C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
 
 The C<begin> keyword cannot be used outside of C<class>, C<abstract class>,
 C<role>, and C<interface> blocks, though it is possible to define a global
@@ -2605,8 +2777,9 @@ This code gets run late in the definition of a class or role.
 The lexical variables C<< $package >> and C<< $kind >> are defined within the
 block. C<< $kind >> will be either 'class' or 'role'.
 
-Other keywords like C<has> and C<method> cannot be used within an C<end>
-block.
+Keywords usable within an C<end> block include
+C<authority>, C<version>, C<overload>, C<constant>, C<has>,
+C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
 
 The C<end> keyword cannot be used outside of C<class>, C<abstract class>,
 C<role>, and C<interface> blocks, though it is possible to define a global
@@ -2642,8 +2815,10 @@ defined within the block. C<< $package >> refers to the target package
 the role is being applied to. C<< $kind >> will be either 'class' or 'role',
 indicating what kind of package the role is being applied to.
 
-Other keywords like C<has> and C<method> cannot be used within a
-C<before_apply> block.
+Keywords usable within a C<before_apply> block include
+C<authority>, C<version>, C<overload>, C<constant>, C<has>,
+C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
+They affect the target package instead of the role.
 
 Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
 will not be run for Class2.
@@ -2664,8 +2839,10 @@ defined within the block. C<< $package >> refers to the target package
 the role was applied to. C<< $kind >> will be either 'class' or 'role',
 indicating what kind of package the role was applied to.
 
-Other keywords like C<has> and C<method> cannot be used within an
-C<after_apply> block.
+Keywords usable within an C<after_apply> block include
+C<authority>, C<version>, C<overload>, C<constant>, C<has>,
+C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
+They affect the target package instead of the role.
 
 Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
 will not be run for Class2.

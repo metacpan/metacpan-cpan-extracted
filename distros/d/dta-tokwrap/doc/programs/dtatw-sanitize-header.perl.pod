@@ -416,7 +416,8 @@ my @bibl_xpaths = (
 		   'fileDesc/sourceDesc[@n="scan"]/bibl', ##-- old:publBibl
 		   'fileDesc/sourceDesc/bibl', ##-- new|old:generic
 		   './/idno[@type="bibl"]',    ##-- flat fallback
-		   );
+		  );
+push(@{$user_xpaths{'bibl'}}, '"foo"');
 my $bibl = xpgrepval($hroot,user_xpaths('bibl'),@bibl_xpaths);
 if (!defined($bibl)) {
   $bibl = "$author: $title. $date0";

@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Discover or download and install curl + libcurl
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::curl - Discover or download and install curl + libcurl
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ In your script or module:
  use Alien::curl;
  use Env qw( @PATH );
  
- unshift @ENV, Alien::curl->bin_dir;
+ unshift @PATH, Alien::curl->bin_dir;
 
 In your Build.PL:
 
@@ -82,9 +82,9 @@ In your L<FFI::Platypus> script or module:
 
 =head1 DESCRIPTION
 
-This distribution provides curl so that it can be used by other 
-Perl distributions that are on CPAN.  It does this by first trying to 
-detect an existing install of curl on your system.  If found it 
+This distribution provides curl so that it can be used by other
+Perl distributions that are on CPAN.  It does this by first trying to
+detect an existing install of curl on your system.  If found it
 will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.

@@ -1,9 +1,9 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-14'; # DATE
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -177,6 +177,9 @@ sub _sort {
     $node->children(\@children);
 }
 
+$Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
+$Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
+
 $SPEC{sort_pod_headings} = {
     v => 1.1,
     summary => '',
@@ -222,7 +225,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.044 of App::PODUtils (from Perl distribution App-PODUtils), released on 2019-12-14.
+This document describes version 0.045 of App::PODUtils (from Perl distribution App-PODUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -309,7 +312,7 @@ Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @IN
 
 Arguments to pass to the Sort::Sub::* routine.
 
-=item * B<sort_sub> => I<str>
+=item * B<sort_sub> => I<sortsub::spec>
 
 Name of a Sort::Sub::* module (without the prefix).
 

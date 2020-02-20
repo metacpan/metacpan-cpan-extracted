@@ -1,3 +1,8 @@
+0.3.0 2020-02-19 18:37:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add support for YAML config files
+ - properly detect js file changes in frontend Makefile
+
 0.2.1 2019-12-12 13:35:16 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - do not include mini cpan anymore

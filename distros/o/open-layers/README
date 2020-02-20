@@ -1,0 +1,232 @@
+NAME
+
+    open::layers - Set default PerlIO layers
+
+SYNOPSIS
+
+      {
+        # set default layers for open() in this lexical scope
+        use open::layers r => ':encoding(UTF-8)';
+      }
+      # encoding layer no longer applied to handles opened here
+    
+      use open::layers r => ':encoding(cp1252)', w => ':encoding(UTF-8)';
+      use open::layers rw => ':encoding(UTF-8)'; # all opened handles
+    
+      # push layers on the standard handles (not lexical)
+      use open::layers STDIN => ':encoding(UTF-8)';
+      use open::layers STDOUT => ':encoding(UTF-8)', STDERR => ':encoding(UTF-8)';
+      use open::layers STDIO => ':encoding(UTF-8)'; # shortcut for all of above
+
+DESCRIPTION
+
+    This pragma is a reimagination of the core open pragma, which either
+    pushes PerlIO layers on the global standard handles, or sets default
+    PerlIO layers for handles opened in the current lexical scope (meaning,
+    innermost braces or the file scope). The interface is redesigned to be
+    more explicit and intuitive. See "COMPARISON TO open.pm" for details.
+
+ARGUMENTS
+
+    Each operation is specified in a pair of arguments. The first argument,
+    the flag, specifies the target of the operation, which may be one of:
+
+    STDIN, STDOUT, STDERR, STDIO
+
+      These strings indicate to push the layer(s) onto the associated
+      standard handle with binmode(), affecting usage of that handle
+      globally, equivalent to calling binmode() on the handle in a BEGIN
+      block. STDIO is a shortcut to operate on all three standard handles.
+
+      Note that this will also affect reading from STDIN via ARGV (empty
+      <>, <<>>, or readline()).
+
+    $handle
+
+      An arbitrary filehandle will have layer(s) pushed onto it directly,
+      affecting all usage of that handle, similarly to the operation on
+      standard handles. Handles must be passed as a glob or reference to a
+      glob, not a bareword.
+
+      Note that the handle must be opened in the compile phase (such as in
+      a preceding BEGIN block) in order to be available for this pragma to
+      operate on it.
+
+    r, w, rw
+
+      These strings indicate to set the default layer stack for handles
+      opened in the current lexical scope: r for handles opened for
+      reading, w for handles opened for writing (or O_RDWR), and rw for all
+      handles.
+
+      This lexical effect works by setting ${^OPEN}, like the open pragma
+      and -C switch. The functions open(), sysopen(), pipe(), socketpair(),
+      socket(), accept(), and readpipe() (qx or backticks) are affected by
+      this variable. Indirect calls to these functions via modules like
+      IO::Handle occur in a different lexical scope, so are not affected,
+      nor are directory handles such as opened by opendir().
+
+      Note that this will also affect implicitly opened read handles such
+      as files opened by ARGV (empty <>, <<>>, or readline()), but not
+      STDIN via ARGV, or DATA.
+
+      A three-argument open() call that specifies layers will ignore any
+      lexical defaults. A single : (colon) also does this, using the
+      default layers for the architecture.
+
+        use open::layers rw => ':encoding(UTF-8)';
+        open my $fh, '<', $file; # sets UTF-8 layer (and its implicit platform defaults)
+        open my $fh, '>:unix', $file; # ignores UTF-8 layer and sets :unix
+        open my $fh, '<:', $file; # ignores UTF-8 layer and sets platform defaults
+
+    The second argument is the layer or layers to set. Multiple layers can
+    be specified like :foo:bar, as in open() or binmode().
+
+COMPARISON TO open.pm
+
+      * Unlike open, open::layers requires that the target of the operation
+      is always specified so as to not confuse global and lexical
+      operations.
+
+      * Unlike open, open::layers can push layers to the standard handles
+      without affecting handles opened in the lexical scope.
+
+      * Unlike open, multiple layers are not required to be space
+      separated.
+
+      * Unlike open, duplicate existing encoding layers are not removed
+      from the standard handles. Either ensure that nothing else is setting
+      encoding layers on these handles, or use the :raw pseudo-layer to
+      "reset" the layers to a binary stream before applying text
+      translation layers.
+
+        use open::layers STDIO => ':raw:encoding(UTF-16BE)';
+        use open::layers STDIO => ':raw:encoding(UTF-16BE):crlf'; # on Windows 5.14+
+
+      * Unlike open, the :locale pseudo-layer is not (yet) implemented.
+      Consider installing PerlIO::locale to support this layer.
+
+PERLIO LAYERS
+
+    PerlIO layers are described in detail in the PerlIO documentation.
+    Their implementation has several historical quirks that may be useful
+    to know:
+
+      * Layers are an ordered stack; a read operation will go through the
+      layers in the order they are set (left to right), and a write
+      operation in the reverse order.
+
+      * The :unix layer implements the lowest level unbuffered I/O, even on
+      Windows. Most other layers operate on top of this and usually a
+      buffering layer like :perlio or :crlf, and these low-level layers
+      make up the platform defaults.
+
+      * Many layers are not real layers that actually implement I/O or
+      translation; these are referred to as pseudo-layers. Some (like
+      :utf8) set flags on previous layers that change how they operate.
+      Some (like :pop) simply modify the existing set of layers. Some (like
+      :raw) may do both.
+
+      * The :crlf layer is not just a translation between \n and CRLF. On
+      Windows, it is the layer that implements I/O buffering (like :perlio
+      on Unix-like systems), and operations that would remove the CRLF
+      translation (like binmode() with no layers, or pushing a :raw
+      pseudo-layer) actually just disable the CRLF translation flag on this
+      layer. Since Perl 5.14, pushing a :crlf layer on top of other
+      translation layers on Windows correctly adds a CRLF translation layer
+      in that position. (On Unix-like systems, :crlf is a mundane CRLF
+      translation layer.)
+
+      * The :utf8 pseudo-layer sets a flag that indicates the preceding
+      stack of layers will translate the input to Perl's internal upgraded
+      string format, which may resemble UTF-8 or UTF-EBCDIC, or will
+      translate the output from that format. It is not an encoding
+      translation layer, but an assumption about the byte stream; use
+      :encoding(UTF-8) or PerlIO::utf8_strict to apply a translation layer.
+      Any encoding translation layer will generally set the :utf8 flag,
+      even when the desired encoding is not UTF-8, as they translate
+      between the desired encoding and Perl's internal format. (The :bytes
+      pseudo-layer unsets this flag, which is very dangerous if encoding
+      translation layers are used.)
+
+      * I/O to an in-memory scalar variable instead of a file is
+      implemented by the :scalar layer taking the place of the platform
+      defaults, see PerlIO::scalar. The scalar is expected to act like a
+      file, i.e. only contain or store bytes.
+
+      * Layers specified when opening a handle, such as in a three-argument
+      open() or default layers set in ${^OPEN} (via the lexical usage of
+      this pragma or the open pragma), will define the complete stack of
+      layers on that handle. Certain layers implicitly include lower-level
+      layers that are needed, for example :encoding(UTF-8) will implicitly
+      prepend the platform defaults :unix:perlio (or similar).
+
+      * In contrast, when adjusting layers on an existing handle with
+      binmode() (or the non-lexical usage of this pragma or the open
+      pragma), the specified layers are pushed at the end of the handle's
+      existing layer stack, and any special operations of pseudo-layers
+      take effect. So you can open an unbuffered handle with only :unix,
+      but to remove existing layers on an already open handle, you must
+      push pseudo-layers like :pop or :raw (equivalent to calling binmode()
+      with no layers).
+
+CAVEATS
+
+    The PerlIO layers and open pragma have experienced several issues over
+    the years, most of which can't be worked around by this module. It's
+    recommended to use a recent Perl if you will be using complex layers;
+    for compatibility with old Perls, stick to binmode() (either with no
+    layers for a binary stream, or with a single :encoding layer). Here are
+    some selected issues:
+
+      * Before Perl 5.8.8, open() called with three arguments would ignore
+      ${^OPEN} and thus any lexical default layers. [perl #8168]
+      <https://github.com/Perl/perl5/issues/8168>
+
+      * Before Perl 5.8.9, the :crlf layer did not preserve the :utf8 flag
+      from an earlier encoding layer, resulting in an improper translation
+      of the bytes. This can be worked around by adding the :utf8
+      pseudo-layer after :crlf (even if it is not a UTF-8 encoding).
+
+      * Before Perl 5.14, the :crlf layer does not properly apply on top of
+      another layer, such as an encoding layer, if it had also been applied
+      earlier in the stack such as is default on Windows. Thus you could
+      not usefully use a layer like :encoding(UTF-16BE) with a following
+      :crlf. [perl #8325] <https://github.com/Perl/perl5/issues/8325>
+
+      * Before Perl 5.14, the :pop, :utf8, or :bytes pseudo-layers did not
+      allow stacking further layers, like :pop:crlf. [perl #11054]
+      <https://github.com/perl/perl5/issues/11054>
+
+      * Before Perl 5.14, the :raw pseudo-layer reset the handle to an
+      unbuffered state, rather than just removing text translation layers
+      as when calling binmode() with no layers. [perl #10904]
+      <https://github.com/perl/perl5/issues/10904>
+
+      * Before Perl 5.14, the :raw pseudo-layer did not work properly with
+      in-memory scalar handles.
+
+      * Before Perl 5.16, use and require() are affected by lexical default
+      layers when loading the source file, leading to unexpected results.
+      [perl #11541] <https://github.com/perl/perl5/issues/11541>
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    open, PerlIO
+

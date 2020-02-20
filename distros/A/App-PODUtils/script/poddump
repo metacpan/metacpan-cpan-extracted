@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/PODUtils/dump_pod_structure
 # and generated automatically using Perinci::CmdLine::Gen version 0.491
 
-our $DATE = '2019-12-14'; # DATE
+our $DATE = '2019-12-15'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ poddump - Dump POD structure using Pod::Elemental
 
 =head1 VERSION
 
-This document describes version 0.044 of poddump (from Perl distribution App-PODUtils), released on 2019-12-14.
+This document describes version 0.045 of poddump (from Perl distribution App-PODUtils), released on 2019-12-15.
 
 =head1 SYNOPSIS
 

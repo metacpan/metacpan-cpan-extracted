@@ -1,4 +1,7 @@
 Revision history for Perl module Tie::Hash::MultiValue
+1.06 Wed Feb 19 14:30:10 PDT 2020
+    - Notified that it had been removed from CPAN.
+      Almost certainly pilot error.
 
 1.05 Fri Jun 15 01:01:24 PDT 2018
     - Corrected address for the FSF in LICENSE. 

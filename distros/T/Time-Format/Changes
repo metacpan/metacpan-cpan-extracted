@@ -1,5 +1,11 @@
 >Revision history for Perl extension Time::Format.
 
+1.16  2020 February 19
+        - Fix a bug in the interface to Time::Format_XS.
+          Using the time_format function with only a format argument (i.e., to use
+          the current time) would fail (fatally) because the XS interface code for
+          time_format requires two arguments.
+
 1.15  2019 July 26
         - Fix a bug in the test suite due to floating-point rounding.  Thanks to
           Slaven Rezic (see CPAN RT bug 130150:

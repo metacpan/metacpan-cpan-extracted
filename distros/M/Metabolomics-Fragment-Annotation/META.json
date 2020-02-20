@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl extension for fragment annotation in metabolomics ",
    "author" : [
-      "Franck Giacomoni <franck.giacomoni@inra.fr>"
+      "Franck Giacomoni <franck.giacomoni@inrae.fr>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

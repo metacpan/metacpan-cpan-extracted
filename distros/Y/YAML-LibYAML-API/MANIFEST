@@ -27,4 +27,5 @@ dist.ini
 lib/YAML/LibYAML/API.pm
 t/00.compile.t
 t/10.basic.t
+t/11.anchors.t
 t/data/simple.yaml

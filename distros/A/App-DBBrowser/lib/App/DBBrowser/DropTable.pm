@@ -75,7 +75,7 @@ sub __drop {
     if ( ! $ok ) {
         return;
     }
-    $ax->print_sql( $sql, 'Computing: ... ' );
+    $ax->print_sql( $sql );
     my $prompt = '';
     if ( ! eval {
         my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );

@@ -6,6 +6,19 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.055	2020-02-20
+
+ [ Bug Fixes ]
+ - Eliminate 'used only once' warning from some roles.
+
+ [ Packaging ]
+ - Require latest stable Type::Params.
+
+0.054	2020-02-18
+
+ - Refactoring of `_make_package` to split out attribute handling into a
+   separate `install_attributes` method.
+
 0.053	2020-02-18
 
  - Added: Role::Hooks support.

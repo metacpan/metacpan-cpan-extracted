@@ -33,6 +33,7 @@ requires:
   Pod::Elemental::Transformer::Pod5: '0'
   Pod::Elide: '0.003'
   Sah::Schema::perl::pod_filename: '0'
+  Sah::Schema::sortsub::spec: '0'
   Sort::Sub: '0.112'
   Sort::SubList: '0'
   perl: '5.010001'
@@ -42,7 +43,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PODUtils
   homepage: https://metacpan.org/release/App-PODUtils
   repository: git://github.com/perlancar/perl-App-PODUtils.git
-version: '0.044'
+version: '0.045'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

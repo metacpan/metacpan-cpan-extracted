@@ -1,3 +1,6 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.github/workflows/windows.yml
 Build.PL
 Changes
 ci/Dockerfile
@@ -15,6 +18,7 @@ t/chaining.t
 t/define.t
 t/inheritance.t
 t/lib/ExampleModule.pm
+t/main.t
 t/mock_strict.t
 t/mockmodule.t
 t/pod.t

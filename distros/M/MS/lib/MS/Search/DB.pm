@@ -114,10 +114,11 @@ sub add_from_url {
     my $u = URI->new($url);
     if ($u->scheme eq 'ftp') {
         my $ftp = Net::FTP->new($u->host, Passive => 1);
-        $ftp->binary();
         $ftp->login or die "Failed login: $@\n";
+        $ftp->binary();
         $ftp->get($u->path => $tmp)
             or die "Download failed:" . $ftp->message . "\n";
+        $ftp->quit();
     }
     elsif ($u->scheme eq 'http'|| $u->scheme eq 'https') {
         my $resp = HTTP::Tiny->new->get($u, { data_callback

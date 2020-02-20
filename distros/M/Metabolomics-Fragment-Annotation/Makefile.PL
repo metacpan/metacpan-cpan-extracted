@@ -9,7 +9,7 @@ install_share dist => 'metabolomics-references';
 
 my %WriteMakefileArgs = (
     NAME             => 'Metabolomics::Fragment::Annotation',
-    AUTHOR           => q{Franck Giacomoni <franck.giacomoni@inra.fr>},
+    AUTHOR           => q{Franck Giacomoni <franck.giacomoni@inrae.fr>},
     VERSION_FROM     => 'lib/Metabolomics/Fragment/Annotation.pm',
     ABSTRACT_FROM    => 'lib/Metabolomics/Fragment/Annotation.pm',
     LICENSE          => 'open_source',

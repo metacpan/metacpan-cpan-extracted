@@ -79,39 +79,39 @@
    "provides" : {
       "HTML::Form" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::FileInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::IgnoreInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::ImageInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::Input" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::KeygenInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::ListInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::SubmitInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       },
       "HTML::Form::TextInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.05"
+         "version" : "6.06"
       }
    },
    "release_status" : "stable",
@@ -128,10 +128,10 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.05",
+   "version" : "6.06",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.030000"
       },
       "plugins" : [
          {
@@ -184,7 +184,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -215,7 +215,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -249,7 +249,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -426,7 +426,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -559,7 +559,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -576,12 +576,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.05",
+                  "tag" : "v6.06",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -631,7 +631,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -651,7 +651,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -743,6 +743,7 @@
       "David E. Wheeler <david@justatheory.com>",
       "DAVIDRW <davidrw@cpan.org>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "E. Choroba <choroba@matfyz.cz>",
       "Father Chrysostomos <sprout@cpan.org>",
       "FWILES <FWILES@cpan.org>",
       "Gavin Peters <gpeters@deepsky.com>",
@@ -787,7 +788,7 @@
       "Yuri Karaban <tech@askold.net>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14"
 }
 

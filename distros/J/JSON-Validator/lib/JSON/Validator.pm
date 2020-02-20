@@ -9,7 +9,8 @@ use JSON::Validator::Formats;
 use JSON::Validator::Joi;
 use JSON::Validator::Ref;
 use JSON::Validator::Util
-  qw(E data_checksum data_section data_type is_type json_pointer prefix_errors schema_type uniq);
+  qw(E data_checksum data_section data_type is_type json_pointer prefix_errors schema_type);
+use List::Util 'uniq';
 use Mojo::File 'path';
 use Mojo::JSON::Pointer;
 use Mojo::JSON qw(false true);
@@ -23,7 +24,7 @@ use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant YAML_SUPPORT      => eval 'use YAML::XS 0.67;1';
 
-our $VERSION = '3.22';
+our $VERSION = '3.23';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -896,10 +897,10 @@ sub _validate_type_object {
     return E $path, [object => additionalProperties => join '/', @k];
   }
 
-  for my $k (sort uniq @{$schema->{required} || []}) {
+  for my $k (sort { $a cmp $b } uniq @{$schema->{required} || []}) {
     next if exists $data->{$k};
     push @errors, E json_pointer($path, $k), [object => 'required'];
-    delete $rules{$k};    # why bother?
+    delete $rules{$k};
   }
 
   my $dependencies = $schema->{dependencies} || {};
@@ -1028,7 +1029,7 @@ JSON::Validator - Validate data against a JSON schema
 L<JSON::Validator> is a data structure validation library based around
 L<JSON Schema|https://json-schema.org/>. This module can be used directly with
 a JSON schema or you can use the elegant DSL schema-builder
-L<JSON::Validator::joi> to define the schema programmatically.
+L<JSON::Validator::Joi> to define the schema programmatically.
 
 =head2 Supported schema formats
 

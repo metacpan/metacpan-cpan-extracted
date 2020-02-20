@@ -1,0 +1,145 @@
+Changes in 2.05
+---------------
+
+Applypatch
+
+  * Prevent patch from failing if there's no patch, just file removal.
+    Thanks to Thanks to Diab Jerius for finding and fixing this.
+
+Changes in 2.04
+---------------
+
+General
+
+ * More robust determination of system locations for temp, home and
+   nul.
+
+ * Remove doc for non-existent CLO --generate.
+
+ * More MsWin line end issues.
+
+Changes in 2.03
+---------------
+
+General
+
+ * More MsWin issues.
+
+Changes in 2.02
+---------------
+
+General
+
+ * More File::Spec issues.
+
+ * More MsWin issues.
+
+Changes in 2.01
+---------------
+
+General
+
+ * Used IO::File instead of IO.
+
+ * Use binmode for all files, to prevent unicode problems with newer
+   perls. 
+
+ * Modified a few things that required Perl 5.005, so it now runs
+   under 5.004.
+
+ * Calculate separate checksums for the patch data and the whole patch
+   file. Do not complain if the checksum for the patch file is wrong,
+   if the checksum for the patch data is okay.
+   This allows modification of the preamble of the patch file without
+   affecting the integrity checking mechanism.
+
+ * Restructured the files in the kit, and added a test program.
+
+ * A warning is given when installing on Solaris, since the 'patch'
+   program on Solaris (at least the versions I have access to) is
+   buggy to the extent that it is unusable.
+
+ * Small fixes to avoid warnings under Perl 5.8.x and later.
+
+Makepatch
+
+ * Some systems need to set environment variable TMPDIR (or TEMP) to
+   designate a location for temporary files.
+
+Overall changes in makepatch version 2.0
+----------------------------------------
+
+General
+
+ * The makepatch package now consists of two programs: 'makepatch' and
+   'applypatch'. 'makepatch' generates the patch kit (using the 'diff'
+   program), 'applypatch' applies it (using the 'patch' program).
+
+Makepatch
+
+ * To avoid most common problems with buggy versions of the 'patch'
+   program, the patch data is relocated to the current directory. 
+   This obsoletes the command line options -fixpath and -fixallpath.
+
+   As a consequence, when a patch is generated from two directories,
+   e.g.:
+
+     makepatch src-1.0 src-1.1 > the-patch
+
+   it must be applied *IN* the directory src-1.0, e.g.
+
+     cd src-1.0; applypatch the-patch
+
+   When fed to patch directly, no -p option should be used:
+
+     cd src-1.0; patch < the-patch
+
+ * (Initial) program options can be specified in environment variable
+   MAKEPATCHINIT, and in preferences files /etc/makepatchrc,
+   $HOME/.makepatchrc and ./.makepatchrc. The latter file name can be
+   overridden with a '-rcfile' option in MAKEPATCHINIT.
+
+ * Makepatch can take standard source archives (.tar.gz, .tar.bz2,
+   .tar or .zip) as input instead of the sources directories.
+   The -extract command line option can be used to change or add
+   extraction rules.
+
+ * MANIFEST files are automatically used unless suppressed with the
+   new -nomanifest option.
+
+ * Files can be excluded from the process with the new command line
+   options -exclude, -exclude_regex, -exclude-vc.
+
+Applypatch
+
+ * The generated patch kit is the concatenation of
+    - a shell preamble;
+    - the actual 'patch' input;
+    - a data section for 'applypatch'.
+
+ * When applied through 'applypatch', the patch kit will be
+   extensively verified for integrity. Heuristics are applied to the
+   current directory to verify that it is indeed the expected source
+   directory. This directory is prepared for the patching, i.e. new
+   files and directories are created if required. Next, the patch data
+   is passed to the 'patch' program for the actual patching. Finally
+   file modes and timestamps are adjusted.
+
+   Example:
+     applypatch -d src-1.0 the-patch
+
+ * When the patch kit is run as a shell script, it will prepare the
+   current directory by creating / removing files and directories as
+   required. The patch kit should then be fed to the 'patch' program.
+
+   Example:
+     cd src-1.0; sh < the-patch; patch < the-patch
+
+ * When the patch kit is fed to the 'patch' program, the files in the
+   current directory will be patched. If the directory has not been
+   prepared (e.g. by running the kit as a shell script) the results
+   will very much depend on your 'patch' program.
+
+   Example:
+     patch -d src-1.0 < the-patch
+

@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Digest::MD5;
+use Digest::SHA;
 use IO::File;
 use IO::Handle;
 use IO::Pipe;
@@ -30,7 +31,7 @@ note("basic metadata");
     ok $bagit , 'new';
 
     ok !$bagit->path , 'path is null';
-    is $bagit->version , '0.97', 'version';
+    is $bagit->version , '1.0', 'version';
     is $bagit->encoding , 'UTF-8' , 'encoding';
     is $bagit->size , '0.000 KB' , 'size';
     is $bagit->payload_oxum , '0.0' , 'payload_oxum';
@@ -73,16 +74,16 @@ note("tag-sums");
     my $bagit = Catmandu::BagIt->new;
     ok $bagit , 'new';
 
-    is_deeply [sort $bagit->list_tagsum] , [qw(bag-info.txt bagit.txt manifest-md5.txt)] , 'list_tagsum';
+    is_deeply [sort $bagit->list_tagsum] , [qw(bag-info.txt bagit.txt manifest-sha512.txt)] , 'list_tagsum';
 
     my $bagit_txt =<<EOF;
-BagIt-Version: 0.97
+BagIt-Version: 1.0
 Tag-File-Character-Encoding: UTF-8
 EOF
 
     dies_ok { $bagit->get_tagsum() } 'get_tagsum without parameters dies';
 
-    is $bagit->get_tagsum('bagit.txt') , Digest::MD5::md5_hex($bagit_txt) , 'get_tagsum(bagit.txt)';
+    is $bagit->get_tagsum('bagit.txt') , Digest::SHA::sha512_hex($bagit_txt) , 'get_tagsum(bagit.txt)';
 
     my $today = strftime "%Y-%m-%d", gmtime;
     my $bag_info_txt =<<EOF;
@@ -91,10 +92,10 @@ Bag-Size: 0.000 KB
 Payload-Oxum: 0.0
 EOF
 
-    is $bagit->get_tagsum('bag-info.txt') , Digest::MD5::md5_hex($bag_info_txt) , 'get_tagsum(bag-info.txt)';
+    is $bagit->get_tagsum('bag-info.txt') , Digest::SHA::sha512_hex($bag_info_txt) , 'get_tagsum(bag-info.txt)';
 
     my $manifest_txt = "";
-    is $bagit->get_tagsum('manifest-md5.txt') , Digest::MD5::md5_hex($manifest_txt) , 'get_tagsum(manifest-md5.txt)';
+    is $bagit->get_tagsum('manifest-sha512.txt') , Digest::SHA::sha512_hex($manifest_txt) , 'get_tagsum(manifest-sha512.txt)';
 }
 
 note("checksums");
@@ -115,7 +116,6 @@ note("files");
     ok   $bagit->add_file("test1.txt","abcdefghijklmnopqrstuvwxyz") , 'add_file';
     ok ! $bagit->add_file("test1.txt","abcdefghijklmnopqrstuvwxyz") , 'add_file overwrite failed';
     ok ! $bagit->add_file("../../../etc/passwd","boo") , 'add_file illegal path';
-    ok ! $bagit->add_file("passwd | dfs ","boo") , 'add_file illegal path';
     ok   $bagit->add_file("test1.txt","abcdefghijklmnopqrstuvwxyz", overwrite => 1) , 'add_file overwrite success';
 
     ok   $bagit->is_dirty , 'bag is dirty';
@@ -334,8 +334,8 @@ note("write to disk");
     ok -d "$bag_dir/data" , "got $bag_dir/data directory";
     ok -f "$bag_dir/bagit.txt" , "got a $bag_dir/bagit.txt";
     ok -f "$bag_dir/bag-info.txt" , "got a $bag_dir/bag-info.txt";
-    ok -f "$bag_dir/manifest-md5.txt" , "got a $bag_dir/manifest-md5.txt";
-    ok -f "$bag_dir/tagmanifest-md5.txt" , "got a v/tagmanifest-md5.txt";
+    ok -f "$bag_dir/manifest-sha512.txt" , "got a $bag_dir/manifest-sha512.txt";
+    ok -f "$bag_dir/tagmanifest-sha512.txt" , "got a v/tagmanifest-sha512.txt";
 
     my $bagit2 = Catmandu::BagIt->new;
     $bagit2->add_info('Test',123);
@@ -500,7 +500,7 @@ note("pipe");
 {
   SKIP: {
       skip "ENV{PIPETEST} not set", 4 unless $ENV{PIPETEST};
-      
+
       my $pipe = new IO::Pipe;
 
       if(my $pid = fork()) { # Parent
@@ -535,7 +535,7 @@ note("supply md5");
 
     my $t_bag_dir = $bag_dir . "-supply-md5";
 
-    my $bag = Catmandu::BagIt->new();
+    my $bag = Catmandu::BagIt->new(algorithm => 'md5');
 
     ok( !($bag->add_file("hello_world.txt","hello world",md5 => "abc")), "no valid md5 sum supplied" );
 

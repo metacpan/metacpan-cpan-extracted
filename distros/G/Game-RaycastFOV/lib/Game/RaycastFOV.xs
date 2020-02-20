@@ -52,6 +52,28 @@ bypair (callback, ...)
         }
 
 void
+bypairall (callback, ...)
+    SV *callback;
+    PREINIT:
+        int i;
+        SV *x, *y;
+    PROTOTYPE: &@
+    PPCODE:
+        if (!(items & 1)) croak("uneven number of arguments");
+        dSP;
+        for (i = 1; i < items; i += 2) {
+            x = ST(i);
+            y = ST(i + 1);
+            CALLTWOUP;
+            PUSHs(x);
+            PUSHs(y);
+            PUTBACK;
+            call_sv(callback, G_DISCARD);
+            SPAGAIN;
+            TWOUPDONE;
+        }
+
+void
 circle(callback, int x0, int y0, int radius)
     SV *callback;
     PREINIT:

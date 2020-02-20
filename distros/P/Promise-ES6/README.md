@@ -57,22 +57,17 @@ function’s resolve callback itself receives another promise, e.g.:
 
 # COMPATIBILITY
 
-Right now this doesn’t interoperate directly with other promise
-classes. If that’s something you want, make a feature request. For the
-time being, of course, you can wrap one of this module’s promises in an
-instance of whatever promise class you’re using, or vice-versa, to achieve
-interoperability.
+This module considers any object that has a `then()` method to be a promise.
+Note that, in the case of [Future](https://metacpan.org/pod/Future), this will yield a “false-positive”, as
+Future is not compatible with promises.
 
-See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) if you need to interact with [Future](https://metacpan.org/pod/Future).
+(See [Promise::ES6::Future](https://metacpan.org/pod/Promise::ES6::Future) for more tools to interact with [Future](https://metacpan.org/pod/Future).)
 
 # UNHANDLED REJECTIONS
 
-As of version 0.05, unhandled rejections prompt a warning _only_ if one
-of the following is true:
-
-- 1) The unhandled rejection happens outside of the constructor.
-- 2) The unhandled rejection happens via an uncaught exception
-(even within the constructor).
+This module’s handling of unhandled rejections has changed over time.
+The current behavior is: if any rejected promise is DESTROYed without first
+having received a failure callback, a warning is thrown.
 
 # SYNCHRONOUS OPERATION
 
@@ -101,9 +96,9 @@ A key advantage of this design is that Promise::ES6 instances can abstract
 over whether a given function works synchronously or asynchronously.
 
 If you want a Promises/A+-compliant implementation, look at
-[Promise::ES6::IOAsync](https://metacpan.org/pod/Promise::ES6::IOAsync), [Promise::ES6::Mojo](https://metacpan.org/pod/Promise::ES6::Mojo),
-[Promise::ES6::AnyEvent](https://metacpan.org/pod/Promise::ES6::AnyEvent), or one of the alternatives
-that that module’s documentation suggests.
+[Promise::ES6::IOAsync](https://metacpan.org/pod/Promise::ES6::IOAsync), [Promise::ES6::Mojo](https://metacpan.org/pod/Promise::ES6::Mojo), or
+[Promise::ES6::AnyEvent](https://metacpan.org/pod/Promise::ES6::AnyEvent) in this distribution. CPAN provides other
+alternatives.
 
 # CANCELLATION
 
@@ -181,10 +176,11 @@ introductions to the topic. You might start with
 [this one](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises).
 
 [Promise::XS](https://metacpan.org/pod/Promise::XS) is a lot like this library but implemented mostly in XS for
-speed.
+speed. It derives from [AnyEvent::XSPromises](https://metacpan.org/pod/AnyEvent::XSPromises).
 
-Promise::ES6 serves much the same role as [Future](https://metacpan.org/pod/Future) but exposes
-a standard, minimal, cross-language API rather than a proprietary (large) one.
+[Promises](https://metacpan.org/pod/Promises) is another pure-Perl Promise implementation.
+
+[Future](https://metacpan.org/pod/Future) fills a role similar to that of promises.
 
 CPAN contains a number of other modules that implement promises. I think
 mine are the nicest :), but YMMV. Enjoy!

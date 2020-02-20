@@ -1,5 +1,13 @@
 Revision history for Alien-curl
 
+0.07      2020-02-19 01:12:12 -0500
+  - System install requires SSL, and dynamic libraries.
+  - Share install Builds with SSL on all platforms.
+  - Use the native SSL on macOS and Windows
+  - Use Alien::LibreSSL on OpenBSD
+  - Use Alien::OpenSSL elsewhere
+  - Share install Builds a dynamic library for use with FFI.
+
 0.06      2017-03-28 14:20:06 -0400
   - Add documentation for usability
 

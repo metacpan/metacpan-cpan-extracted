@@ -1,0 +1,19 @@
+0.003   2020-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Switch algorithm to using buckets like in Data::Throttler, because
+          recording every hit as a cache item quickly becomes too slow when the
+          number of hits reaches thousands. We are now consistently about an
+          order of magnitude slower than Data::Throttler when both are using
+          memory backend.
+
+
+0.002   2020-02-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Tweak/fix example in Synopsis.
+
+	- [optimize] No need to sprintf().
+
+
+0.001   2020-02-19  Released-By: PERLANCAR
+
+        - First release.

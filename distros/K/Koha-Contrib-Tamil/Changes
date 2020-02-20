@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.063 2020-02-20
+
+ - Indexing availability (999$x not-onloan-count)
+
 0.062 2019-01-22
 
   - Zebra DOM indexing by default since 18.11

@@ -5,7 +5,7 @@ use Tie::Hash;
 
 BEGIN {
 	use vars qw ($VERSION);
-	$VERSION     = 1.05;
+	$VERSION     = 1.06;
 }
 
 =head1 NAME
@@ -84,15 +84,15 @@ Tie::Hash, perl(1), Perl Cookbook (1st version) recipe 13.15, program 13-5.
 
 =head1 METHODS
 
-This class is a subclass of C<Tie::ExtraHash>; it needs to override the 
+This class is a subclass of C<Tie::ExtraHash>; it needs to override the
 C<TIEHASH> method to save the instance data (in $self->[1]), and the C<STORE>
 method to actually save the values in an anonymous array.
 
 =head2 TIEHASH
 
-If the 'unique' argument is supplied, we check to see if it supplies a 
-subroutine reference to be used to compare items. If it does, we store that 
-reference in the object describing this tie; if not, we supply a function 
+If the 'unique' argument is supplied, we check to see if it supplies a
+subroutine reference to be used to compare items. If it does, we store that
+reference in the object describing this tie; if not, we supply a function
 which simply uses 'eq' to test for equality.
 
 =head3 The 'unique' function
@@ -102,7 +102,7 @@ whether or not either argument is defined, nor whether these are simple
 scalars or references. You can make any of these assumptions if you choose,
 but you are responsible for checking your input.
 
-You can perform whatever tests you like in your routine; you should return 
+You can perform whatever tests you like in your routine; you should return
 a true value if the arguments are determined to be equal, and a false one
 if they are not.
 
@@ -124,7 +124,7 @@ sub TIEHASH {
       $self->[1]->{Unique} = $args{'unique'};
     }
     else {
-      $self->[1]->{Unique} = sub { 
+      $self->[1]->{Unique} = sub {
                                    my ($foo, $bar) = @_;
                                    $foo eq $bar;
                                  };
@@ -135,7 +135,7 @@ sub TIEHASH {
 
 =head2 STORE
 
-Push the value(s) supplied onto the list of values stored here. The anonymous 
+Push the value(s) supplied onto the list of values stored here. The anonymous
 array is created automatically if it doesn't yet exist.
 
 If the 'unique' argument was supplied at the time the hash was tied, we will
@@ -166,7 +166,7 @@ sub STORE {
 Fetches the current value(s) for a key, depending on the current mode
 we're in.
 
-=over 
+=over
 
 =item * 'refs' mode
 
@@ -175,10 +175,10 @@ or an empty anonymous array if there are none.
 
 =item * 'iterators' mode
 
-If there is a single entry, acts just like a normal hash fetch. If there are 
-multiple entries for a key, we automatically iterate over the items stored 
-under the key, returning undef when the last item under that key has been 
-fetched. 
+If there is a single entry, acts just like a normal hash fetch. If there are
+multiple entries for a key, we automatically iterate over the items stored
+under the key, returning undef when the last item under that key has been
+fetched.
 
 Storing more elements into a key while you're iterating over it will result
 in the new elements being returned at the end of the list. If you've turned
@@ -187,9 +187,9 @@ value list for the key.
 
 =over
 
-B<NOTE>: If you store undef in your hash, and then store other values, the 
-iterator will, when it sees your undef, return it as a normal value. This 
-means that you won't be able to tell whether that's I<your> undef, or the 
+B<NOTE>: If you store undef in your hash, and then store other values, the
+iterator will, when it sees your undef, return it as a normal value. This
+means that you won't be able to tell whether that's I<your> undef, or the
 'I have no more data here' undef. Using 'list' or 'refs' mode is strongly
 suggested if you need to store data that may include undefs.
 
@@ -228,7 +228,7 @@ sub _FETCH_iters {
   # just return undef, and don't bother iterating at all.
   return undef unless exists $self->[0]->{$key};
 
-  # Regular fetch in scalar context. If we are not yet 
+  # Regular fetch in scalar context. If we are not yet
   # iterating, set up iteration over this key.
   if (! $self->[1]->{iterators} or ! $self->[1]->{iterators}->{$key}) {
     $self->[1]->{iterators}->{$key}->{iterator_index} = 0;
@@ -255,7 +255,7 @@ sub _FETCH_iters {
 
 =head2 iterators
 
-Called on the object returned from tie(). Tells FETCH to return elements 
+Called on the object returned from tie(). Tells FETCH to return elements
 one at a time each time the key is accessed until no more element remain.
 
 =cut

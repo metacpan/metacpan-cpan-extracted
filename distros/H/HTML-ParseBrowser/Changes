@@ -1,5 +1,9 @@
 Revision history for Perl module HTML::ParseBrowser
 
+1.14 2020-02-20 NEILB
+    - Added support for Chrome-based Edge.
+      Even though the browser string says "Edg", we return the name as Edge
+
 1.13 2016-09-07 NEILB
     - Added support for iOS 10. PR from ROBN++
 

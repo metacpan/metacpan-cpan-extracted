@@ -1,0 +1,5 @@
+Revision history for Net::DNS::Resolver::DoH
+
+1.20200220 2020-02-20 01:07:19+00:00 UTC
+  - First release
+

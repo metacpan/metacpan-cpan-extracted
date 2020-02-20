@@ -1,13 +1,14 @@
 use v5.14;
 use warnings;
 
-package Jasonify v0.20.045;
+package Jasonify v0.20.050;
 # ABSTRACT: Just Another Serialized Object Notation library.
 
 
-use Carp            ();           #qw( carp );
-use Scalar::Util    ();           #qw( blessed looks_like_number reftype );
-use String::Tools qw( subst );    #qw( );
+use Carp             ();           #qw( carp );
+use Datify v0.20.045 ();
+use Scalar::Util     ();           #qw( blessed looks_like_number reftype );
+use String::Tools  qw( subst );    #qw( );
 
 use parent 'Datify';
 
@@ -996,7 +997,7 @@ L<JSON>, L<Datify>
 
 =head1 VERSION
 
-This document describes version v0.20.045 of this module.
+This document describes version v0.20.050 of this module.
 
 =head1 AUTHOR
 

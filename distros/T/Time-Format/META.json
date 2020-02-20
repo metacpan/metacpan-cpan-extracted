@@ -49,10 +49,10 @@
    "provides" : {
       "Time::Format" : {
          "file" : "lib/Time/Format.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       }
    },
    "release_status" : "stable",
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

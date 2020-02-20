@@ -27,25 +27,22 @@ Testing the daemon (with curl):
     $ cd example
 
 Any of:
-    $ curl http://localhost:3333/system/status
-    $ curl http://localhost:3333/system/methods
-    $ curl http://localhost:3333/system/methods/restish
+    $ curl -s http://localhost:3333/system/status | jq
+    $ curl -s http://localhost:3333/system/methods | jq
+    $ curl -s http://localhost:3333/system/methods/restish | jq
 
-    $ curl -XPOST -H'Content-type: application/json' http://localhost:3333/system \
+    $ curl -s -XPOST -H'Content-type: application/json' http://localhost:3333/system \
       -d'{"jsonrpc":"2.0","id":42,"method":"status"}'
-    $ curl -XPOST -H'Content-type: application/json' http://localhost:3333/system \
+    $ curl -s -XPOST -H'Content-type: application/json' http://localhost:3333/system \
       -d'{"jsonrpc":"2.0","id":42,"method":"list_methods", "params":{"plugin":"jsonrpc"}}'
 
-    $ curl -H'Content-type: application/json' http://localhost:3333/db/person \
+    $ curl -s -H'Content-type: application/json' http://localhost:3333/db/person \
       -XPUT -d'{"name":"abeltje","job":"hacker"}'
-    $ curl -H'Content-type: application/json' http://localhost:3333/db/person \
+    $ curl -s -H'Content-type: application/json' http://localhost:3333/db/person \
       -XPUT -d'{"name":"tux","job":"hacker"}'
-    $ curl http://localhost:3333/db/persons
-    $ curl -H'Content-type: application/json' http://localhost:3333/db/person/1 \
+    $ curl -s http://localhost:3333/db/persons
+    $ curl -s -H'Content-type: application/json' http://localhost:3333/db/person/1 \
       -XPOST -d'{"job":"haxor"}'
-    $ curl http://localhost:3333/db/persons 2>/dev/null | perl -MJSON -nE \
-      'BEGIN{$j=JSON->new()->pretty(1)} say $j->encode($j->decode($_))'
-
+    $ curl -s http://localhost:3333/db/persons 2>/dev/null | jq
     $ curl -H'Content-type: application/json' http://localhost:3333/db \
-      -XPOST -d'{"jsonrpc":"2.0","id":42,"method":"get_persons"}' 2>/dev/null | perl -MJSON \
-      -nE 'BEGIN{$j=JSON->new()->pretty(1)} say $j->encode($j->decode($_))'
+      -XPOST -d'{"jsonrpc":"2.0","id":42,"method":"get_persons"}' 2>/dev/null | jq

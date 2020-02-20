@@ -1,0 +1,31 @@
+---
+abstract: 'manage an entire ecosystem of Plack organisms under Kelp'
+author:
+  - 'Bartosz Jarzyna <brtastic.dev@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Request::Common: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.42, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Symbiosis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Kelp: '1'
+  Plack: '1'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/brtastic/perl-kelp-module-symbiosis/issues
+  license: https://dev.perl.org/licenses
+  repository: https://github.com/brtastic/perl-kelp-module-symbiosis
+version: '1.00'

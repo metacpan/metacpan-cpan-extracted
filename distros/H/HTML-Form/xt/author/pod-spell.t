@@ -22,6 +22,7 @@ Bill
 Bron
 Burke
 CGI
+Choroba
 Chrysostomos
 Ciornii
 DAVIDRW
@@ -105,6 +106,7 @@ at
 autocomplete
 brong
 checkbox
+choroba
 david
 davidrw
 denaxas

@@ -1,4 +1,4 @@
-Time::Format version 1.15
+Time::Format version 1.16
 =========================
 
 Time::Format provides a very easy way to format dates and times.  The
@@ -89,7 +89,7 @@ COPYRIGHT AND LICENSE
 
 Eric J. Roode, roode @ cpan . org
 
-Copyright (c) 2003-2019 by Eric J. Roode. All Rights Reserved.
+Copyright (c) 2003-2020 by Eric J. Roode. All Rights Reserved.
 This module is free software; See the copyright notice in the
 module source code for full details.
 

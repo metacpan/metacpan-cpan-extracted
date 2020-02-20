@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::RecordWriter::File::Iso2709;
-$Koha::Contrib::Tamil::RecordWriter::File::Iso2709::VERSION = '0.062';
+$Koha::Contrib::Tamil::RecordWriter::File::Iso2709::VERSION = '0.063';
 #ABSTRACT: ISO2709 MARC records writer
 use Moose;
 
@@ -43,7 +43,7 @@ Koha::Contrib::Tamil::RecordWriter::File::Iso2709 - ISO2709 MARC records writer
 
 =head1 VERSION
 
-version 0.062
+version 0.063
 
 =head1 AUTHOR
 
@@ -51,7 +51,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Fréderic Démians.
+This software is Copyright (c) 2020 by Fréderic Démians.
 
 This is free software, licensed under:
 

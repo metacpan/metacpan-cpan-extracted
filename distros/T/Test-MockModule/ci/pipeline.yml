@@ -58,7 +58,7 @@ jobs:
     serial: true
     plan:
     - do:
-      - aggregate:
+      - in_parallel:
         - { get: git, trigger: true }
       - task: testflight
         config:
@@ -200,7 +200,7 @@ jobs:
     public: true
     plan:
     - do:
-      - aggregate:
+      - in_parallel:
           - { get: git,     trigger: true,  passed: [pre] }
           - { get: version, trigger: false, params: {pre: rc} }
       - put: version
@@ -233,7 +233,7 @@ jobs:
     plan:
     - do:
       - name: inputs
-        aggregate:
+        in_parallel:
           - { get: version, passed: [rc], params: {bump: final} }
           - { get: git,     passed: [rc] }
       - name: release

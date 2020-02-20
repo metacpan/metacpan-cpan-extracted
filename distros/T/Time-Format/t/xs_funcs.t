@@ -1,19 +1,43 @@
 #!/perl
 
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 8;
+use FindBin;
+use lib $FindBin::Bin;
+use TimeFormat_Minute;
 
 # XS TEST: Only need to test the %time and time_format parts.
 
 ## ----------------------------------------------------------------------------------
-## Test for availability of certain modules.
+## Test for availability of Time::Local
 my $tl_ok;
 BEGIN {$tl_ok = eval ('use Time::Local; 1')}
 
 
+sub isx (&@)
+{
+    my ($got_block, $expected, $test_name) = @_;
+    my $got;
+
+    if (eval {$got = $got_block->(); 1})
+    {
+        is $got, $expected, $test_name;
+    }
+    else
+    {
+        my $ex = $@;
+        my ($pkg, $fname, $line) = caller;
+        diag "Failed test '$test_name";
+        diag "at $fname line $line";
+        diag "Exception: $ex";
+        fail $test_name;
+    }
+}
+
+
 ## ----------------------------------------------------------------------------------
 ## Load our module.
-BEGIN { use_ok 'Time::Format', qw(time_format time_strftime time_manip) }
+BEGIN { use_ok 'Time::Format', qw(%time time_format) }
 
 
 ## ----------------------------------------------------------------------------------
@@ -39,14 +63,19 @@ if (!$lc_supported  ||  !eval
 
 SKIP:
 {
-    skip 'Time::Local not available', 4  unless $tl_ok;
-    skip 'XS version not available',  4  unless defined $Time::Format_XS::VERSION;
+    skip 'Time::Local not available', 7  unless $tl_ok;
+    skip 'XS version not available',  7  unless defined $Time::Format_XS::VERSION;
     my $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';
 
-    # time_format tests (4)
+    # time_format tests (7)
     is time_format('yyyymmdd',$t),  '20030605'  => 'month: mm';
     is time_format('hhmmss',$t),    '135809'    => 'm minute: 1';
     is time_format('MONTH',$t),    uc $June      => 'uc month name';
     is time_format('weekday',$t),  lc $Thursday  => 'lc weekday';
+
+    tf_minute_sync;             # avoid race condition
+    isx { time_format('yyyymmdd') }          $time{yyyymmdd}  => 'time_format equals %time (ymd)';
+    isx { time_format('hh:mm') }             $time{'hh:mm'}   => 'time_format equals %time (hm)';
+    isx { time_format('yyyy-mm-dd hh:mm') }  tf_cur_minute()  => 'ymd+hm';
 }

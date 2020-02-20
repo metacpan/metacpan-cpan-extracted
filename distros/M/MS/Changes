@@ -1,5 +1,9 @@
 Revision history for MS
 
+0.204003 2020-02-18
+        Fix too-early binary mode setting with add_from_url()
+        Add tests for MS::Search::DB
+
 0.204002 2020-02-13
         Fix ImzML SHA-1 hashing on Windows (use binary mode)
         Use 'any' from List::MoreUtils to satisfy pre-5.20 perls

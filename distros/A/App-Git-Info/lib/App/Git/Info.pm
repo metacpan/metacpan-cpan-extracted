@@ -1,7 +1,5 @@
 package App::Git::Info;
-$App::Git::Info::VERSION = '0.4.1';
-# ABSTRACT: Displays a summary of information about the git repository.
-
+$App::Git::Info::VERSION = '0.6.1';
 use strict;
 use warnings;
 use 5.016;
@@ -21,31 +19,25 @@ App::Git::Info - Displays a summary of information about the git repository.
 
 =head1 VERSION
 
-version 0.4.1
+version 0.6.1
 
 =head1 SYNOPSIS
 
-=head1 NAME
-
-=head1 VERSION
-
-version 0.4.1
-
-    shlomif@telaviv1:~/conf/trunk$ git info info
+    shlomif[perl-begin]:$trunk$ git info info
     ⇒ On branch master
-     M shlomif-settings/home-bin-executables/bin/git-i
+    ⇒ Your branch is up to date with 'origin/master'.
+    ?? y.txt
     ⇒ Remotes:
-    origin  git@github.com:shlomif/shlomif-computer-settings.git (fetch)
-    origin  git@github.com:shlomif/shlomif-computer-settings.git (push)
-    shlomif@telaviv1:~/conf/trunk$
+    origin  git@github.com:shlomif/perl-begin.git (fetch)
+    origin  git@github.com:shlomif/perl-begin.git (push)
+    shlomif[perl-begin]:$trunk$
 
-=head1 METHODS
+=head1 DESCRIPTION
 
-=head2 info
+Displays a git dashboard-of-sorts with info from C<git status>,
+C<git status -s>, and C<git remote -v> .
 
-Implement the info subcommand.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -66,35 +58,11 @@ L<https://metacpan.org/release/App-Git-Info>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Git-Info>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Git-Info>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Git-Info>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Git-Info>
 
 =item *
 

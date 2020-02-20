@@ -91,10 +91,55 @@ has grammar => sub {
         _doc => 'Base class documentation string. Should be overwritten by the child class',
         _vars => [qw(tab-name)],
         _mandatory => [qw(tab-name)],
-        title => {
+        'tab-name' => {
             _doc => 'Title of the Plugin Tab'
         },
     };
+};
+
+=head2 schema
+
+A very simple minded grammar to json-schema convertor with no magic.
+Better supply a proper schema.
+
+=cut
+
+has schema => sub {
+    my $self = shift;
+    my $grammar = $self->grammar;
+    return {
+        type => 'object',
+        properties => {
+            module => {
+                type => 'string'
+            },
+            map { 
+                $_ => {
+                    type => 'string',
+                    $grammar->{$_}{_doc} ? 
+                        ( description => $grammar->{$_}{_doc} ) : (),
+                    $grammar->{$_}{_re} ? 
+                        ( pattern => $grammar->{$_}{_re} ) : (),
+                    $grammar->{$_}{_default} ? 
+                        ( default => $grammar->{$_}{_default} ) : (),
+                }
+            } @{$grammar->{_vars}},
+            map { 
+                $_ => {
+                    type => 'object',
+                    $grammar->{$_}{_doc} ? 
+                        ( description => $grammar->{$_}{_doc} ) : (),
+                }
+            } @{$grammar->{_sections}},
+        },
+        required => [
+            'module',
+            ( $grammar->{_mandatory} ? (
+                @{$grammar->{_mandatory}} ) : ()
+            )
+        ],
+        additionalProperties => false
+    }
 };
 
 =head2 controller

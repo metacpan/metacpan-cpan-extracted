@@ -1,5 +1,5 @@
 package App::Git::Info::Command::info;
-$App::Git::Info::Command::info::VERSION = '0.4.1';
+$App::Git::Info::Command::info::VERSION = '0.6.1';
 use App::Git::Info -command;
 
 use strict;
@@ -7,7 +7,10 @@ use warnings;
 use autodie;
 use 5.016;
 
-sub abstract { "verify the presence of dependencies" }
+sub abstract
+{
+    return "Displays a summary of information about the git repository.";
+}
 
 sub description { return abstract(); }
 
@@ -35,7 +38,8 @@ sub execute
     }
 
     my $ret =
-        (     $ST =~ s#\A(On branch \S+).*#⇒ $1#mrs . "\n"
+        ( $ST =~
+s#\A(On branch \S+\n)((?:\S[^\n]*\n)?).*#"⇒ $1".($2 ? "⇒ $2" : "")#emrs
             . `git status -s`
             . "⇒ Remotes:\n"
             . `git remote -v` );
@@ -53,15 +57,11 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
-
-App::Git::Info::Command::info
-
 =head1 VERSION
 
-version 0.4.1
+version 0.6.1
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -82,35 +82,11 @@ L<https://metacpan.org/release/App-Git-Info>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Git-Info>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Git-Info>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Git-Info>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Git-Info>
 
 =item *
 

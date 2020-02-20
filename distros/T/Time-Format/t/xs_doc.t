@@ -42,7 +42,7 @@ if (!$lc_supported  ||  !eval
 is ref tied %time,     'Time::Format'   =>  '%time imported';
 
 my $t;
-unless ($tl_ok)
+if ($tl_ok)
 {
     $t = timelocal(9, 58, 13, 5, 5, 103);    # June 5, 2003 at 1:58:09 pm
     $t .= '.987654321';

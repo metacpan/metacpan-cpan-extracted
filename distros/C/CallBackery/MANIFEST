@@ -71,6 +71,7 @@ lib/CallBackery/GuiPlugin/AbstractForm.pm
 lib/CallBackery/GuiPlugin/AbstractHtml.pm
 lib/CallBackery/templates/doc.html.ep
 lib/CallBackery/Config.pm
+lib/CallBackery/Model/ConfigJsonSchema.pm
 lib/CallBackery/Controller/RpcService.pm
 lib/CallBackery/Exception.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

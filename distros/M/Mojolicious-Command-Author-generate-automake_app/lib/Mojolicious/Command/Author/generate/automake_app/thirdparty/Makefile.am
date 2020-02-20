@@ -44,10 +44,10 @@ update: $(CPANSNAPV)
 
 clean-local:
 #	ls -1 | grep -v Makefile | grep -v bin | grep -v cache | xargs rm -rf
-	ls -1 | grep -v Makefile | grep -v bin | xargs rm -rf
+	ls -1 | grep -v Makefile | grep -v cpanfile | grep -v bin | xargs rm -rf
 
 distclean-local:
-	ls -1 | grep -v Makefile | xargs rm -rf
+	ls -1 | grep -v Makefile | grep -v cpanfile | xargs rm -rf
 
 install-exec-hook:
 	cp -fr lib/perl5/* $(DESTDIR)$(libdir)

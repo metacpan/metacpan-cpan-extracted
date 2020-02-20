@@ -5,6 +5,13 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.026  2020-02-20
+
+ - (Addition) Added Attean::API::Model->evaluate convenience method (#149,
+   #150).
+ - (Update) Fix typo in Attean::Plan::Service POD (#146).
+ - (Update) Improve type coercions (#148 from @kjetilk).
+
 0.025  2019-10-25
 
  - (Update) Fix Moo::Role/Role::Tiny imports (#141, #142 from @haarg).

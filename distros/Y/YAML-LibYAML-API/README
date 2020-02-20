@@ -1,9 +1,9 @@
 This archive contains the distribution YAML-LibYAML-API,
-version 0.007:
+version 0.008:
 
   Wrapper around the C libyaml library
 
-This software is copyright (c) 2019 by Tina Müller.
+This software is copyright (c) 2020 by Tina Müller.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

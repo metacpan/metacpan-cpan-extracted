@@ -5,7 +5,7 @@ use strict;
 use Test::More;
 use Time::Format;
 
-my $have_module = eval { require 'DateTime::Format::ISO8601'; 1; };
+my $have_module = eval { require DateTime::Format::ISO8601; 1; };
 
 
 # Input string, output string

@@ -5,9 +5,9 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.053';
+our $VERSION   = '0.055';
 
-use Types::Standard 1.008003 -is, -types;
+use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
 use Exporter::Tiny qw(mkopt);
 use Import::Into;
@@ -606,10 +606,10 @@ sub _make_package {
 	
 	if ($opts{is_role}) {
 		no strict 'refs';
+		no warnings 'once';
 		return if ${"$qname\::BUILT"};
 		use_module("$toolkit\::Role")->import::into($qname);
 		use_module("namespace::autoclean")->import::into($qname);
-		${"$qname\::BUILT"} = 1;
 	}
 	else {
 		use_module($toolkit)->import::into($qname);
@@ -617,10 +617,20 @@ sub _make_package {
 		use_module("MooseX::XSAccessor")->import::into($qname) if $toolkit eq 'Moose' && eval { require MooseX::XSAccessor };
 		use_module("namespace::autoclean")->import::into($qname);
 		
-		my $method  = $opts{toolkit_extend_class} || ("extend_class_".lc $toolkit);
+		my $method = "extend_class_" . lc $toolkit;
 		if (@isa) {
 			$builder->$method($qname, \@isa);
 		}
+	}
+	
+	{
+		no strict 'refs';
+		no warnings 'once';
+		${"$qname\::TOOLKIT"}  = $toolkit;
+		${"$qname\::PREFIX"}   = $opts{prefix};
+		${"$qname\::FACTORY"}  = $opts{factory_package};
+		${"$qname\::TYPES"}    = $opts{type_library};
+		${"$qname\::BUILT"}    = 1;
 	}
 	
 	my $reg;
@@ -670,178 +680,40 @@ sub _make_package {
 		require Import::Into;
 		'overload'->import::into($qname, @overloads);
 	}
-	
-	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
-	{
-		my %methods;
-		%methods = $opts{can}->$_handle_list_add_nulls;
-		$builder->$method_installer($qname, \%methods) if keys %methods;
-		if (defined $opts{factory_package}) {
-			%methods = $opts{factory_package_can}->$_handle_list_add_nulls;
-			$builder->$method_installer($opts{factory_package}, \%methods) if keys %methods;
-		}
-		if (defined $opts{type_library}) {
-			%methods = $opts{type_library_can}->$_handle_list_add_nulls;
-			$builder->$method_installer($opts{type_library}, \%methods) if keys %methods;
-		}
+
+	if (defined $opts{can}) {
+		my %methods = $opts{can}->$_handle_list_add_nulls;
+		$builder->install_methods($qname, \%methods) if keys %methods;
 	}
 	
-	{
-		my $method = $opts{toolkit_install_constants} || ("install_constants");
-		my %methods = $opts{constant}->$_handle_list_add_nulls;
-		if (keys %methods) {
-			$builder->$method($qname, \%methods);
-		}
+	if (defined $opts{factory_package_can} and defined $opts{factory_package}) {
+		my %methods = $opts{factory_package_can}->$_handle_list_add_nulls;
+		$builder->install_methods($opts{factory_package}, \%methods) if keys %methods;
 	}
 	
-	{
-		my $method = $opts{toolkit_make_attribute} || ("make_attribute_".lc $toolkit);
-		my @attrs = $opts{has}->$_handle_list_add_nulls;
-		#use Data::Dumper;
-		#warn Dumper(\@attrs);
-		while (@attrs) {
-			my ($attrname, $attrspec) = splice @attrs, 0, 2;
-			
-			my %spec_hints;
-			if ($attrname =~ /^(\+?)(\$|\%|\@)(.+)$/) {
-				$spec_hints{isa} ||= {
-					'$' => ($nondeep ||= ((~ArrayRef)&(~HashRef))),
-					'@' => ArrayLike,
-					'%' => HashLike,
-				}->{$2};
-				no warnings 'uninitialized';
-				$attrname = $1.$3; # allow plus before sigil
-			}
-			if ($attrname =~ /^(.+)\!$/) {
-				$spec_hints{required} = 1;
-				$attrname = $1;
-			}
-			
-			(my $buildername = "_build_$attrname") =~ s/\+//;
-			(my $clearername = ($attrname =~ /^_/ ? "_clear$attrname" : "clear_$attrname")) =~ s/\+//;
-			
-			my %spec =
-				is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
-				is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
-				$attrspec->$_handle_list;
-			if (is_CodeRef $spec{builder}) {
-				my $code = delete $spec{builder};
-				$spec{builder} = $buildername;
-				$builder->$method_installer($qname, { $buildername => $code });
-			}
-			if (defined $spec{clearer} and !ref $spec{clearer} and $spec{clearer} eq 1) {
-				$spec{clearer} = $clearername;
-			}
-			
-			%spec = (%spec_hints, %spec);
-			$spec{is} ||= 'rw';
-			
-			if ($spec{is} eq 'lazy') {
-				$spec{is}   = 'ro';
-				$spec{lazy} = !!1;
-				$spec{builder} ||= $buildername;
-			}
-			elsif ($spec{is} eq 'private') {
-				$spec{is}   = 'rw';
-				$spec{lazy} = !!1;
-				$spec{init_arg} = undef;
-				$spec{lexical}  = !!1;
-			}
-			
-			if ($spec{does}) {
-				my $target = $builder->qualify_name(delete($spec{does}), $opts{prefix});
-				$spec{isa} ||= do {
-					$opts{type_library}
-						? $opts{type_library}->get_type_for_package(role => $target)
-						: undef;
-				};
-				$spec{isa} ||= do {
-					ConsumerOf->of($target);
-				};
-			}
-			if ($spec{isa} && !ref $spec{isa}) {
-				my $target = $builder->qualify_name(delete($spec{isa}), $opts{prefix});
-				$spec{isa} ||= do {
-					$opts{type_library}
-						? $opts{type_library}->get_type_for_package(class => $target)
-						: undef;
-				};
-				$spec{isa} ||= do {
-					InstanceOf->of($target);
-				};
-			}
-			if ($spec{enum}) {
-				$spec{isa} = Enum->of(@{delete $spec{enum}});
-			}
-			if (is_Object($spec{type}) and $spec{type}->can('check')) {
-				$spec{isa} = delete $spec{type};
-			}
-			elsif ($spec{type}) {
-				$spec{isa} = $reg->lookup(delete $spec{type});
-			}
-			
-			if (ref $spec{isa} && !exists $spec{coerce} && $spec{isa}->has_coercion) {
-				$spec{coerce} = 1;
-			}
-			
-			if ($toolkit ne 'Moo') {
-				if (defined $spec{trigger} and !ref $spec{trigger} and $spec{trigger} eq 1) {
-					$spec{trigger} = sprintf('_trigger_%s', $attrname);
-				}
-				if (defined $spec{trigger} and !ref $spec{trigger}) {
-					my $trigger_method = delete $spec{trigger};
-					$spec{trigger} = sub { shift->$trigger_method(@_) };
-				}
-				if ($spec{is} eq 'rwp') {
-					$spec{is} = 'ro';
-					$spec{writer} = '_set_'.$attrname unless exists $spec{writer};
-				}
-			}
-			
-			if (is_CodeRef $spec{coerce}) {
-				$spec{isa}    = $spec{isa}->no_coercions->plus_coercions(Types::Standard::Any, $spec{coerce});
-				$spec{coerce} = !!1;
-			}
-			
-			if ($spec{lexical}) {
-				require Lexical::Accessor;
-				if ($spec{traits} || $spec{handles_via}) {
-					'Lexical::Accessor'->VERSION('0.010');
-				}
-				my $la = 'Lexical::Accessor'->new_from_has(
-					$attrname,
-					package => $qname,
-					%spec,
-				);
-				$la->install_accessors;
-			}
-			else
-			{
-				my ($shv_toolkit, $shv_data);
-				my $lex = $builder->_pre_attribute($qname, $attrname, \%spec);
-				if ($spec{handles_via}) {
-					$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
-					use_module($shv_toolkit);
-					$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
-				}
-				$builder->$method($qname, $attrname, \%spec);
-				$shv_toolkit->install_delegations($shv_data) if $shv_data;
-				$builder->_post_attribute($qname, $attrname, \%spec, $lex) if $lex;
-			}
-		}
+	if (defined $opts{type_library_can} and defined $opts{type_library}) {
+		my %methods = $opts{type_library_can}->$_handle_list_add_nulls;
+		$builder->install_methods($opts{type_library}, \%methods) if keys %methods;
 	}
 	
-	if ($opts{multimethod}) {
-		my $method = $opts{toolkit_install_multimethod} || 'install_multimethod';
+	if (defined $opts{constant}) {
+		my %constants = $opts{constant}->$_handle_list_add_nulls;
+		$builder->install_constants($qname, \%constants) if keys %constants;
+	}
+	
+	if (defined $opts{has}) {
+		$builder->install_attributes($qname, $opts{has}, \%opts);
+	}
+	
+	if (defined $opts{multimethod}) {
 		my @mm = $opts{multimethod}->$_handle_list_add_nulls;
 		while (@mm) {
 			my ($method_name, $method_spec) = splice(@mm, 0, 2);
-			$builder->$method($qname, $opts{is_role}?'role':'class', $method_name, $method_spec);
+			$builder->install_multimethod($qname, $opts{is_role}?'role':'class', $method_name, $method_spec);
 		}
 	}
 	
-	{
-		my $method = $opts{toolkit_apply_roles} || ("apply_roles_".lc $toolkit);
+	if (defined $opts{with}) {
 		my @roles = $opts{with}->$_handle_list;
 		if (@roles) {
 			my @processed;
@@ -867,27 +739,29 @@ sub _make_package {
 					}
 				}
 			}
-			$builder->$method($qname, $opts{is_role}?'role':'class', \@processed);
+			
+			my $installer = "apply_roles_" . lc $toolkit;
+			$builder->$installer($qname, $opts{is_role}?'role':'class', \@processed);
 		}
 	}
 	
-	if ($opts{is_role}) {
-		my $method   = $opts{toolkit_require_methods} || ("require_methods_".lc $toolkit);
-		my %requires = $opts{requires}->$_handle_list_add_nulls;
-		if (keys %requires) {
-			$builder->$method($qname, \%requires);
-		}
+	if ($opts{is_role} and defined $opts{requires}) {
+		my $installer = "require_methods_" . lc $toolkit;
+		my %requires  = $opts{requires}->$_handle_list_add_nulls;
+		$builder->$installer($qname, \%requires) if keys %requires;
 	}
 
 	for my $modifier (qw(before after around)) {
-		my $method = $opts{toolkit_modify_methods} || ("modify_method_".lc $toolkit);
-		my @methods = $opts{$modifier}->$_handle_list;
-		while (@methods) {
-			my @method_names;
-			push(@method_names, shift @methods)
-				while (@methods and not ref $methods[0]);
-			my $coderef = $builder->_prepare_method_modifier($qname, $modifier, \@method_names, shift(@methods));
-			$builder->$method($qname, $modifier, \@method_names, $coderef);
+		if (defined $opts{$modifier}) {
+			my @methods   = $opts{$modifier}->$_handle_list;
+			my $installer = "modify_method_" . lc $toolkit;
+			while (@methods) {
+				my @method_names;
+				push(@method_names, shift @methods)
+					while (@methods and not ref $methods[0]);
+				my $coderef = $builder->_prepare_method_modifier($qname, $modifier, \@method_names, shift(@methods));
+				$builder->$installer($qname, $modifier, \@method_names, $coderef);
+			}
 		}
 	}
 	
@@ -956,7 +830,7 @@ sub _make_package {
 						elsif (is_HashRef $coderef) {
 							my %meta = %$coderef;
 							$meta{curry} ||= [$qname];
-							$builder->$method_installer($fpackage, { $name => \%meta });
+							$builder->install_methods($fpackage, { $name => \%meta });
 						}
 						else {
 							die "lolwut?";
@@ -1004,11 +878,10 @@ sub _make_package_generator {
 	my $kind = $opts{is_role} ? 'role' : 'class';
 	
 	my $qname = $builder->qualify_name($name, $opts{prefix});
-	my $method_installer = $opts{toolkit_install_methods} || ("install_methods");
 	
 	$builder->_mark_package_as_loaded("$kind generator" => $qname, \%opts);
 	
-	$builder->$method_installer(
+	$builder->install_methods(
 		$qname,
 		{
 			'_generate_package_spec' => $gen,
@@ -1114,6 +987,192 @@ sub _get_moo_helper {
 	);
 	die "BADNESS: couldn't get helper '$helpername' for package '$package'" unless $_cached_moo_helper{"$package\::$helpername"};
 	$_cached_moo_helper{"$package\::$helpername"};
+}
+
+sub _detect_toolkit {
+	my ($builder, $qname) = @_;
+	{
+		no strict 'refs';
+		return ${"$qname\::TOOLKIT"} if ${"$qname\::TOOLKIT"};
+	}
+	for my $tk (qw/ Moo Moose Mouse /) {
+		return $tk if $qname->isa("$tk\::Object");
+	}
+	
+	require Role::Hooks;
+	if (my $detected = 'Role::Hooks'->is_role($qname)) {
+		return 'Moo'   if $detected eq 'Role::Tiny';
+		return 'Moo'   if $detected eq 'Moo::Role';
+		return 'Moose' if $detected eq 'Moose::Role';
+		return 'Mouse' if $detected eq 'Mouse::Role';
+	}
+	
+	'Moo'; # guess
+}
+
+sub _detect_prefix {
+	my ($builder, $qname) = @_;
+	{
+		no strict 'refs';
+		return ${"$qname\::PREFIX"} if ${"$qname\::PREFIX"};
+	}
+	return undef;
+}
+
+sub _detect_type_library {
+	my ($builder, $qname) = @_;
+	{
+		no strict 'refs';
+		return ${"$qname\::TYPES"} if ${"$qname\::TYPES"};
+	}
+	
+	my $factory = $qname->can('FACTORY');
+	$factory ||= do {
+		no strict 'refs';
+		${"$qname\::FACTORY"} || ${"$qname\::FACTORY"};
+	};
+	return $factory->type_library
+		if $factory && $factory->can('type_library');
+		
+	return undef;
+}
+
+sub install_attributes {
+	my ($builder, $qname, $has, $opts) = @_;
+	$opts ||= {};
+	
+	my $prefix    = $opts->{prefix}       || $builder->_detect_prefix($qname);
+	my $toolkit   = $opts->{toolkit}      || $builder->_detect_toolkit($qname);
+	my $types     = $opts->{type_library} || $builder->_detect_type_library($qname);
+	my $reg       = $opts->{reg}          || 'Type::Registry'->for_class($qname);
+	my $installer = 'make_attribute_' . lc $toolkit;
+	
+	my @attrs = $has->$_handle_list_add_nulls;
+	
+	while (@attrs) {
+		my ($attrname, $attrspec) = splice @attrs, 0, 2;
+		
+		my %spec_hints;
+		if ($attrname =~ /^(\+?)(\$|\%|\@)(.+)$/) {
+			$spec_hints{isa} ||= {
+				'$' => ($nondeep ||= ((~ArrayRef)&(~HashRef))),
+				'@' => ArrayLike,
+				'%' => HashLike,
+			}->{$2};
+			no warnings 'uninitialized';
+			$attrname = $1.$3; # allow plus before sigil
+		}
+		if ($attrname =~ /^(.+)\!$/) {
+			$spec_hints{required} = 1;
+			$attrname = $1;
+		}
+		
+		(my $buildername = "_build_$attrname") =~ s/\+//;
+		(my $clearername = ($attrname =~ /^_/ ? "_clear$attrname" : "clear_$attrname")) =~ s/\+//;
+		
+		my %spec =
+			is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
+			is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
+			$attrspec->$_handle_list;
+		
+		if (is_CodeRef $spec{builder}) {
+			my $code = delete $spec{builder};
+			$spec{builder} = $buildername;
+			$builder->install_methods($qname, { $buildername => $code });
+		}
+		
+		if (defined $spec{clearer} and !ref $spec{clearer} and $spec{clearer} eq 1) {
+			$spec{clearer} = $clearername;
+		}
+		
+		%spec = (%spec_hints, %spec);
+		$spec{is} ||= 'rw';
+		
+		if ($spec{is} eq 'lazy') {
+			$spec{is}   = 'ro';
+			$spec{lazy} = !!1;
+			$spec{builder} ||= $buildername;
+		}
+		elsif ($spec{is} eq 'private') {
+			$spec{is}   = 'rw';
+			$spec{lazy} = !!1;
+			$spec{init_arg} = undef;
+			$spec{lexical}  = !!1;
+		}
+		
+		if ($spec{does}) {
+			my $target = $builder->qualify_name(delete($spec{does}), $prefix);
+			$spec{isa} ||= $types->get_type_for_package(role => $target) if $types;
+			$spec{isa} ||= ConsumerOf->of($target);
+		}
+		
+		if ($spec{isa} && !ref $spec{isa}) {
+			my $target = $builder->qualify_name(delete($spec{isa}), $prefix);
+			$spec{isa} ||= $types->get_type_for_package(class => $target) if $types;
+			$spec{isa} ||= InstanceOf->of($target);
+		}
+		
+		if ($spec{enum}) {
+			$spec{isa} = Enum->of(@{delete $spec{enum}});
+		}
+		
+		if (is_Object($spec{type}) and $spec{type}->can('check')) {
+			$spec{isa} = delete $spec{type};
+		}
+		elsif ($spec{type}) {
+			$reg ||= 'Type::Registry'->for_class($qname);
+			$spec{isa} = $reg->lookup(delete $spec{type});
+		}
+		
+		if (ref $spec{isa} && !exists $spec{coerce} && $spec{isa}->has_coercion) {
+			$spec{coerce} = 1;
+		}
+		
+		if ($toolkit ne 'Moo') {
+			if (defined $spec{trigger} and !ref $spec{trigger} and $spec{trigger} eq 1) {
+				$spec{trigger} = sprintf('_trigger_%s', $attrname);
+			}
+			if (defined $spec{trigger} and !ref $spec{trigger}) {
+				my $trigger_method = delete $spec{trigger};
+				$spec{trigger} = sub { shift->$trigger_method(@_) };
+			}
+			if ($spec{is} eq 'rwp') {
+				$spec{is} = 'ro';
+				$spec{writer} = '_set_'.$attrname unless exists $spec{writer};
+			}
+		}
+		
+		if (is_CodeRef $spec{coerce}) {
+			$spec{isa}    = $spec{isa}->no_coercions->plus_coercions(Types::Standard::Any, $spec{coerce});
+			$spec{coerce} = !!1;
+		}
+		
+		if ($spec{lexical}) {
+			require Lexical::Accessor;
+			if ($spec{traits} || $spec{handles_via}) {
+				'Lexical::Accessor'->VERSION('0.010');
+			}
+			my $la = 'Lexical::Accessor'->new_from_has(
+				$attrname,
+				package => $qname,
+				%spec,
+			);
+			$la->install_accessors;
+		}
+		else
+		{
+			my ($shv_toolkit, $shv_data);
+			my $lex = $builder->_pre_attribute($qname, $attrname, \%spec);
+			if ($spec{handles_via}) {
+				$shv_toolkit = "Sub::HandlesVia::Toolkit::$toolkit";
+				use_module($shv_toolkit);
+				$shv_data = $shv_toolkit->clean_spec($qname, $attrname, \%spec);
+			}
+			$builder->$installer($qname, $attrname, \%spec);
+			$shv_toolkit->install_delegations($shv_data) if $shv_data;
+			$builder->_post_attribute($qname, $attrname, \%spec, $lex) if $lex;
+		}
+	}
 }
 
 sub _pre_attribute {

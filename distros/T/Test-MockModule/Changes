@@ -1,5 +1,10 @@
 Revision history for Test::MockModule
 
+v0.172.0
+- 7558aa9 Make sure we can redefine a function in 'main' - Nicolas R
+- 0538fe1 Plug GitHub workflow as additional CI - Nicolas R
+- 0e9d90b update parallel to use in_parallel instead ofaggregate - Geoff Franks
+
 v0.171.0
 - 89dc5c0 Fixes #25 - mocking core::global no longer fails trying to load the module - Geoff Franks
 - 9bb081a update ci for fewer infinite loops - Geoff Franks

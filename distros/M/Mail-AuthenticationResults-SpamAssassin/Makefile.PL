@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mail-AuthenticationResults-SpamAssassin",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mail::AuthenticationResults::SpamAssassin",
   "PREREQ_PM" => {
     "Mail::AuthenticationResults" => "1.20180923",
     "Mail::AuthenticationResults::Header::Group" => 0,
     "Mail::AuthenticationResults::Parser" => 0,
     "Mail::SpamAssassin::Plugin" => 0,
-    "feature" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.20180927",
+  "VERSION" => "1.20200220",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +43,6 @@ my %FallbackPrereqs = (
   "Mail::SpamAssassin" => 0,
   "Mail::SpamAssassin::Plugin" => 0,
   "Test::More" => 0,
-  "feature" => 0,
   "lib" => 0,
   "strict" => 0,
   "warnings" => 0

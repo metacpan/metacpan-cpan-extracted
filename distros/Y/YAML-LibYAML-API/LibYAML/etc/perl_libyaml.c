@@ -285,7 +285,7 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
         }
 
         val = hv_fetch(perl_event, "anchor", 6, TRUE);
-        if (val && SvOK(*val) && SvPOK( *val )) {
+        if (val && SvOK(*val) && (SvPOK( *val ) || SvIOK( *val ))) {
             anchor_name = SvPV(*val, len);
         }
 
@@ -369,7 +369,7 @@ perl_to_libyaml_event(yaml_emitter_t *emitter, HV *perl_event)
         }
         else if (strEQ(type, "alias_event")) {
             val = hv_fetch(perl_event, "value", 5, TRUE);
-            if (val && SvOK(*val) && SvPOK( *val )) {
+            if (val && SvOK(*val) && (SvPOK( *val ) || SvIOK( *val ))) {
                 scalar_value = SvPV(*val, len);
             }
             else {

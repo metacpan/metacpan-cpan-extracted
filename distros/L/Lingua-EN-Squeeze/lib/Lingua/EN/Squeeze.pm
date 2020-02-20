@@ -12,7 +12,7 @@
 #   $ perl -e 'use Pod::Html qw(pod2html); pod2html shift @ARGV' FILE.pm
 
 package Lingua::EN::Squeeze;
-
+$Lingua::EN::Squeeze::VERSION = '2020.02';
 use Scalar::Util qw/ reftype /;
 
 use 5.006;
@@ -21,7 +21,6 @@ use warnings;
 
 my $LIB = "Lingua::EN::Squeeze";        # For debug printing
 
-our $VERSION = '2015.01';
 
 # ***********************************************************************
 #
@@ -54,10 +53,6 @@ Lingua::EN::Squeeze - Shorten text to minimum syllables using hash table lookup 
         print "Original: $_\n";
         print "Squeezed: ", $squeeze->SqueezeText(lc $_);
     }
-
-=head1 VERSION
-
-This document describes version 2016.01
 
 =head1 DESCRIPTION
 
@@ -1326,6 +1321,30 @@ sub SqueezeDebug (;$$)
 # *********************************************************************
 
 =pod
+
+=head1 SEE ALSO
+
+The following modules may also be of interested.
+I haven't tested them,
+unless noted.
+
+=over 4
+
+=item
+
+L<Lingua::EN::Contraction> will contract English phrases,
+converting "I am" to "I'm", and suchlike.
+
+=item
+
+L<Lingua::EN::Fathom> measures the readability of English text.
+
+=item
+
+L<Lingua::Stem> can stem text in a range of natural languages,
+including English.
+
+=back
 
 =head1 AVAILABILITY
 

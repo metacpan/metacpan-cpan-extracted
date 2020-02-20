@@ -1,6 +1,6 @@
 package Catmandu::BagIt::Fetch;
 
-our $VERSION = '0.240';
+our $VERSION = '0.250';
 
 use Moo;
 use IO::String;

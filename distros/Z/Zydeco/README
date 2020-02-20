@@ -428,8 +428,9 @@ KEYWORDS
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
-    Other keywords like `has` and `method` cannot be used within a `begin`
-    block.
+    Keywords usable within a `begin` block include `authority`, `version`,
+    `overload`, `constant`, `has`, `method`, `multi method`, `before`,
+    `after`, and `around`.
 
     The `begin` keyword cannot be used outside of `class`, `abstract class`,
     `role`, and `interface` blocks, though it is possible to define a global
@@ -461,8 +462,9 @@ KEYWORDS
     The lexical variables $package and $kind are defined within the block.
     $kind will be either 'class' or 'role'.
 
-    Other keywords like `has` and `method` cannot be used within an `end`
-    block.
+    Keywords usable within an `end` block include `authority`, `version`,
+    `overload`, `constant`, `has`, `method`, `multi method`, `before`,
+    `after`, and `around`.
 
     The `end` keyword cannot be used outside of `class`, `abstract class`,
     `role`, and `interface` blocks, though it is possible to define a global
@@ -497,8 +499,10 @@ KEYWORDS
     $kind will be either 'class' or 'role', indicating what kind of package
     the role is being applied to.
 
-    Other keywords like `has` and `method` cannot be used within a
-    `before_apply` block.
+    Keywords usable within a `before_apply` block include `authority`,
+    `version`, `overload`, `constant`, `has`, `method`, `multi method`,
+    `before`, `after`, and `around`. They affect the target package instead of
+    the role.
 
     Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
     will not be run for Class2.
@@ -518,8 +522,10 @@ KEYWORDS
     $kind will be either 'class' or 'role', indicating what kind of package
     the role was applied to.
 
-    Other keywords like `has` and `method` cannot be used within an
-    `after_apply` block.
+    Keywords usable within an `after_apply` block include `authority`,
+    `version`, `overload`, `constant`, `has`, `method`, `multi method`,
+    `before`, `after`, and `around`. They affect the target package instead of
+    the role.
 
     Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
     will not be run for Class2.

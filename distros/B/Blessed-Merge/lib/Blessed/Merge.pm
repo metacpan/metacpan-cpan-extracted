@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 use Scalar::Util qw/reftype/;
 use Carp qw/croak/;
@@ -32,36 +32,29 @@ sub merge {
 sub _merge {
 	my ($self, $new, $merger) = @_;
 	return $new unless defined $merger;
-
 	my $new_ref = reftype($new) || '';
 	my $merger_ref = reftype($merger) || 'SCALAR';
-	if ( $merger_ref eq 'SCALAR' ) {
-		return $merger;
-	}
-	elsif ( $merger_ref eq 'HASH' ) {
+	$merger_ref eq 'HASH' ? do {
 		$new = {} if ( $new_ref ne 'HASH' );
-		return { $self->{unique_hash} 
-			? $self->_unique_merge($merger_ref, $new, $merger) 
-			: map +( $_ => $self->_merge( $new->{$_}, $merger->{$_} ) ), combine_keys($new, $merger) 
+		return { 
+			$self->{unique_hash} 
+				? $self->_unique_merge($merger_ref, $new, $merger) 
+				: map +( $_ => $self->_merge( $new->{$_}, $merger->{$_} ) ), combine_keys($new, $merger) 
 		};
-	}
-	elsif ( $merger_ref eq 'ARRAY') {
-		if ( $new_ref eq 'ARRAY' ) {
+	} : $merger_ref eq 'ARRAY' ? do {
+		$new_ref eq 'ARRAY' ? do {
 			my $length = sub {$_[0] < $_[1] ? $_[1] : $_[0]}->(scalar @{$new}, scalar @{$merger});
-			return [ $self->{unique_array} 
+			[ $self->{unique_array} 
 				? $self->_unique_merge($merger_ref, $new, $merger, $length)
 				: map { $self->_merge($new->[$_], $merger->[$_]) } 0 .. $length - 1 
 			];
-		}
-		return [ map { $self->_merge('', $_ ) } @{ $merger } ]; # destroy da references
-	}
-	return $merger;
+		} : [ map { $self->_merge('', $_ ) } @{ $merger } ]; # destroy da references
+	} : $merger;
 }
 
 sub _unique_merge {
 	my ($s, $r, $n, $m, $l) = @_;
-
-	if ($r eq 'ARRAY') {
+	($r eq 'ARRAY') && do {
 		my (@z, %u, $x1, $x2);
 		for (my $i = 0; $i < $l; $i++) {
 			my $c = grep {
@@ -77,8 +70,7 @@ sub _unique_merge {
 					: push @z, $m->[$i] if $c != 2;
 		}
 		return @z;
-	}
-		
+	};
 	my %z = %{ $n };
 	map {
 		my $x = reftype($m->{$_}) || 'SCALAR';
@@ -98,7 +90,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.10
 
 =cut
 
@@ -110,9 +102,97 @@ Version 0.07
 
 	my $world = $blessed->merge($obj1, $obj2, $obj3, $obj4, $obj5);
 
+=head1 Description
+
+Deeply merge x number of blessed references.
+
 =head2 new
 
+Instantiate a new Blessed::Merge object.
+
+	my $blessed = Blessed::Merge->new(%options);
+
+=head3 options
+
+=head4 unique_hash
+
+Setting unique_hash will only set undefined key/values in the hash.
+
+	use JSONP;
+	use overload::x qw/n/;
+
+	my $blessed = Blessed::Merge->new({ unique_hash => 1 });
+	
+	my ($one, $two) = JSONP->new() x n(2);
+	
+	$one->css = {
+		'@media only screen (min-width: 33.75em)' => {
+			'.container' => {
+				'width' => '80%'
+			}
+		}
+	};
+
+	$two->css = {
+		'@media only screen (min-width: 33.75em)' => {
+			'.container' => {
+				'width' => '100%',
+			}
+		}
+	};
+	
+	my $new = $blessed->merge($one, $two);
+	
+	$new->serialize;  # '{"css":{"@media only screen (min-width: 33.75em)":{".container":{"width":"80%"}}}}'
+
+=head4 unique_array
+
+Setting unique_array will merge arrays based on order and unique value.
+
+	my $blessed = Blessed::Merge->new({ unique_array => 1 });
+
+	my $one = JSONP->new();
+	
+	$one->graft('one', '{"b":["a", "c", "e"]}');
+	$one->graft('two', '{"b":["b", "d", "f"]}');
+	$one->graft('three', '{"b":["a", "b", "c", "d"]}');
+	
+	my $new = $blessed->merge($one->one, $one->two, $one->three);
+	
+	$new->serialize;  #'{"b":["a","b","c","d","e","f"]}'
+
+=head4 blessed
+
+Disable to return the non blessed ref.
+
+	use JSONP;
+	use overload::x qw/n/;
+
+	my $blessed = Blessed::Merge->new({ blessed => 1 });
+
+	my ($one, $two) = JSONP->new() x n(2);
+	
+	$one->graft('level', '{"b":["a", "c", "e"]}');
+	$two->graft('level', '{"b":["b", "d", "f"]}');
+	
+	my $new = $blessed->merge($one, $two);
+	
+	$new->level->b->serialize;  # ["b","d","f"]
+
+=head4 same
+
+Disable to prevent the same ref check.
+	
+	my $blessed = Blessed::Merge->new({ same => 0 });
+
+	my $foo = Foo->new;
+	my $bar = Bar->new;
+
+	my $new = $blessed->merge($foo, $bar);
+
 =head2 merge
+
+	$blessed->merge($foo x n(100000));
 
 =head1 AUTHOR
 

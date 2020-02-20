@@ -1,3 +1,9 @@
+0.003   2019-12-15  Released-By: PERLANCAR; Urgency: medium
+
+	- [list-sort-sub-modules] Read each Sort::Sub's summary from
+	  meta().
+
+
 0.002   2019-12-14  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Build fixes & updates.

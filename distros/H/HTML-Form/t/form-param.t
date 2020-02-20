@@ -1,13 +1,13 @@
-#!perl -w
+#!perl
 
 use strict;
-use Test qw(plan ok);
+use warnings;
 
-plan tests => 22;
+use HTML::Form ();
+use Test::More;
 
-use HTML::Form;
-
-my $form = HTML::Form->parse(<<"EOT", base => "http://example.com", strict => 1);
+my $form
+    = HTML::Form->parse( <<"EOT", base => "http://example.com", strict => 1 );
 <form>
 <input type="hidden" name="hidden_1">
 
@@ -23,50 +23,87 @@ my $form = HTML::Form->parse(<<"EOT", base => "http://example.com", strict => 1)
 </form>
 EOT
 
-# list names
-ok($form->param, 4);
-ok(j($form->param), "hidden_1:checkbox_1:checkbox_2:multi_select_field");
+is( $form->param, 4, '4 params' );
+is(
+    j( $form->param ), "hidden_1:checkbox_1:checkbox_2:multi_select_field",
+    'param names'
+);
 
-# get
-ok($form->param('hidden_1'), '');
-ok($form->param('checkbox_1'), 'c1_v1');
-ok(j($form->param('checkbox_1')), 'c1_v1:c1_v2');
-ok($form->param('checkbox_2'), 'c2_v1');
-ok(j($form->param('checkbox_2')), 'c2_v1');
-ok(!defined($form->param('multi_select_field')));
-ok(j($form->param('multi_select_field')), '');
-ok(!defined($form->param('unknown')));
-ok(j($form->param('unknown')), '');
+is(
+    $form->find_input('checkbox_1')->type, 'checkbox',
+    'checkbox_1 is a checkbox'
+);
+is( $form->param('hidden_1'),   '',      'hidden1 empty' );
+is( $form->param('checkbox_1'), 'c1_v1', 'checkbox_1' );
+is(
+    j( $form->param('checkbox_1') ), 'c1_v1:c1_v2',
+    'all checkbox_1 values'
+);
+is( $form->param('checkbox_2'),      'c2_v1', 'checkbox_2 value' );
+is( j( $form->param('checkbox_2') ), 'c2_v1', 'all checkbox_2 values' );
+is(
+    $form->find_input('checkbox_2')->type, 'checkbox',
+    'checkbox_2 is a checkbox'
+);
 
-# set
-eval {
-    $form->param('hidden_1', 'x');
+ok(
+    !defined( $form->param('multi_select_field') ),
+    'no multi-select field value'
+);
+is(
+    j( $form->param('multi_select_field') ), '',
+    'no multi_select_field values'
+);
+subtest 'unknown' => sub {
+    ok( !defined( $form->param('unknown') ), 'single unknown param' );
+    is( j( $form->param('unknown') ), '', 'multiple unknown params' );
 };
-ok($@, qr/readonly/);
-ok(j($form->param('hidden_1')), '');
 
-eval {
-    $form->param('checkbox_1', 'foo');
+subtest 'exceptions' => sub {
+    eval { $form->param( 'hidden_1', 'x' ); };
+    like( $@, qr/readonly/, 'error on setting readonly field' );
+    is( j( $form->param('hidden_1') ), '', 'hidden_1 empty' );
+
+    eval { $form->param( 'checkbox_1', 'foo' ); };
+    like( $@, qr/Illegal value/, 'error on setting illegal value' );
+    is(
+        j( $form->param('checkbox_1') ), 'c1_v1:c1_v2',
+        'checkbox_1 was not reset after illegal value'
+    );
 };
-ok($@, qr/Illegal value/);
-ok(j($form->param('checkbox_1')), 'c1_v1:c1_v2');
 
-$form->param('checkbox_1', 'c1_v2');
-ok(j($form->param('checkbox_1')), 'c1_v2');
-$form->param('checkbox_1', 'c1_v2');
-ok(j($form->param('checkbox_1')), 'c1_v2');
-$form->param('checkbox_1', []);
-ok(j($form->param('checkbox_1')), '');
-$form->param('checkbox_1', ['c1_v2', 'c1_v1']);
-ok(j($form->param('checkbox_1')), 'c1_v1:c1_v2');
-$form->param('checkbox_1', []);
-ok(j($form->param('checkbox_1')), '');
-$form->param('checkbox_1', 'c1_v2', 'c1_v1');
-ok(j($form->param('checkbox_1')), 'c1_v1:c1_v2');
+$form->param( 'checkbox_1', 'c1_v2' );
+is(
+    j( $form->param('checkbox_1') ), 'c1_v2',
+    'checkbox_1 set to single value'
+);
 
-$form->param('multi_select_field', 3, 2);
-ok(j($form->param('multi_select_field')), "2:3");
+is( j( $form->param('checkbox_1') ), 'c1_v2', 'checkbox_1 value reset' );
+$form->param( 'checkbox_1', [] );
+is( j( $form->param('checkbox_1') ), '', 'checkbox_1 empty' );
+$form->param( 'checkbox_1', [ 'c1_v2', 'c1_v1' ] );
+is(
+    j( $form->param('checkbox_1') ), 'c1_v1:c1_v2',
+    'multiple checkbox_1 values have been set'
+);
 
+$form->param( 'checkbox_1', [] );
+is( j( $form->param('checkbox_1') ), '', 'checkbox_1 empty again' );
+$form->param( 'checkbox_1', 'c1_v2', 'c1_v1' );
+is(
+    j( $form->param('checkbox_1') ), 'c1_v1:c1_v2',
+    'multiple checkbox_1 values again'
+);
+
+$form->param( 'multi_select_field', 3, 2 );
+is(
+    j( $form->param('multi_select_field') ), "2:3",
+    'multiple multi_select_field values'
+);
+
+# This should be replaced.  We could just be comparing arrays.
 sub j {
-    join(":", @_);
+    join( ":", @_ );
 }
+
+done_testing();

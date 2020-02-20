@@ -1,0 +1,66 @@
+DESCRIPTION
+    Testing sucks, especially when you have to deal with third-party code,
+    especially when you didn't have a choice about which third-party code
+    you are relying on.
+
+    This module solves one specific difficulty of doing so: when you have an
+    atomic operation that ends up running the same function multiple times
+    with different data.
+
+    An example you say? The rationale for writing this module was to test a
+    module that used "PATCH" in REST::Client twice in the same function, but
+    sending different data to different endpoints (because Reasons). Since
+    the function being tested could not be subdivided *by* the test, it made
+    sense to set up a sequence of expectations before the test instead.
+
+    This module, then, simply exports the "ratchet" function, which sets up
+    a queue of subrefs to handle a mocked function.
+
+    I'm sure it has other purposes too.
+
+SYNOPSIS
+        use Test::Ratchet;
+        use Test::MockModule;
+        use Test::More;
+
+        my $mock = Test::MockModule->new('Some::Module');
+        $mock->mock( magic_method => ratchet(
+            \&first_implementation,
+            \&second_implementation,
+            ...
+        ));
+
+        sub first_implementation {
+            my $self = shift;
+            my $arg1 = shift;
+
+            is $arg1, "foo", "First call passed foo to magic_method";
+
+            return { something => 'relevant' }
+        }
+
+        sub second_implementation {
+            my $self = shift;
+            my $arg1 = shift;
+
+            is $arg1, "bar", "Second call passed bar to magic_method";
+
+            return { something => 'else' }
+        }
+
+EXPORTS
+    This module exports "ratchet" by default - this is the only export.
+
+  ratchet
+    Accepts any number of subrefs, and returns a single subref that will run
+    through this queue each time it is called.
+
+    Additionally, non-refs can be used to repeat an entry rather than
+    creating multiple refs to the same thing:
+
+    N   A number will repeat the subref after it N times
+
+    *   An asterisk will repeat the subref after it indefinitely.
+
+    If the mocked sub is called and the queue has expired, it will die.
+

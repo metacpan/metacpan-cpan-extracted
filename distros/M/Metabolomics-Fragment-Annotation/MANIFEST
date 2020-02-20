@@ -40,7 +40,7 @@ t/MS_fragments-adducts-isotopes-test.txt
 t/MS_fragments-adducts-isotopes.txt
 t/out_test01.tabular
 t/pfs002787+.tsv
-t/pfs002787__ANNOTATED__.TSV
+t/pfs002787+__ANNOTATED__.TSV
 t/pfs003731.tsv
 t/pfs003731__ANNOTATED__.TSV
 t/pfs007110.tsv

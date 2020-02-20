@@ -35,6 +35,7 @@ lib/Catmandu/Store/File/BagIt.pm
 lib/Catmandu/Store/File/BagIt/Bag.pm
 lib/Catmandu/Store/File/BagIt/Index.pm
 log4perl.conf
+script/bagit.pl
 t/Catmandu-BagIt.t
 t/Catmandu-Exporter-BagIt.t
 t/Catmandu-Importer-BagIt.t

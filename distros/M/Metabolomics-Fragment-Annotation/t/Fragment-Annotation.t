@@ -23,6 +23,7 @@ use Data::Dumper ;
 
 
 
+
 #########################
 
 
@@ -31,6 +32,7 @@ BEGIN {
 	
 	my $current_test = 1 ;
 	my $modulePath = File::Basename::dirname( __FILE__ );
+	
 	
 #########################	
 	print "\n** Test $current_test FragNot package **\n" ; $current_test++ ;
@@ -616,9 +618,11 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST( 	
 		$modulePath.'/cpd-val-pro.TSV',
 		2, 
-		0.05,
+		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		214.1317,
+		'POSITIVE', #mode
+		'POSITIVE', #stateMolecule
 		$modulePath.'/_template.tabular',
 		$modulePath.'/cpd-val-pro__ANNOTATED__.TSV'),
 		$modulePath.'/cpd-val-pro__ANNOTATED__.TSV',
@@ -629,9 +633,11 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/Cmpd_4.4-Methylguanosine-298.1146.TSV',
 		2, 
-		0.05,
+		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		298.1146,
+		'POSITIVE', #mode
+		'POSITIVE', #stateMolecule
 		$modulePath.'/_template.tabular',
 		$modulePath.'/Cmpd_4.4-Methylguanosine-298.1146__ANNOTATED__.TSV'),
 		$modulePath.'/Cmpd_4.4-Methylguanosine-298.1146__ANNOTATED__.TSV',
@@ -642,12 +648,14 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs002787+.tsv',
 		3, 
-		0.05,
+		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		298.11460,
+		'POSITIVE', #mode
+		'POSITIVE', #stateMolecule
 		$modulePath.'/_template.tabular',
-		$modulePath.'/pfs002787__ANNOTATED__.TSV'),
-		$modulePath.'/pfs002787__ANNOTATED__.TSV',
+		$modulePath.'/pfs002787+__ANNOTATED__.TSV'),
+		$modulePath.'/pfs002787+__ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with a positively charged methylguanosine');
 		
 #########################	
@@ -655,23 +663,27 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs003129.tsv',
 		3, 
-		0.05,
+		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		228.14739251,
+		'NEGATIVE', #mode
+		'NEUTRAL', #stateMolecule
 		$modulePath.'/_template.tabular',
 		$modulePath.'/pfs003129__ANNOTATED__.TSV'),
 		$modulePath.'/pfs003129__ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with a dipeptide (PRO-LEU)');
 		
-
+	
 #########################	
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with L-prolyl-L-glycine (CEA)**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs003731.tsv',
 		3, 
-		0.002,
+		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		172.084792254,
+		'POSITIVE', #mode
+		'NEUTRAL', #stateMolecule
 		$modulePath.'/_template.tabular',
 		$modulePath.'/pfs003731__ANNOTATED__.TSV'),
 		$modulePath.'/pfs003731__ANNOTATED__.TSV',
@@ -682,9 +694,11 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs007110.tsv',
 		1, 
-		0.002,
+		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		172.084792254,
+		'POSITIVE', #mode
+		'NEUTRAL', #stateMolecule
 		$modulePath.'/_template.tabular',
 		$modulePath.'/pfs007110__ANNOTATED__.TSV'),
 		$modulePath.'/pfs007110__ANNOTATED__.TSV',
@@ -698,7 +712,7 @@ BEGIN {
 
 #########################	
 
-	print "\n** Test $current_test fullCompare_ExpPeakList_And_MaConDaBank_FromDataAnalysis **\n" ; $current_test++;
+	print "\n** Test $current_test fullCompare_ExpPeakList_And_MaConDaBank_FromDataAnalysis **\n" ; $current_test++ ;
 	is_deeply( fullCompare_ExpPeakList_And_MaConDaBank_FromDataAnalysis_TEST (
 		# my ($expFile, $col, $delta, $queryMode, $template, $tabular) - - using MaConDa extension database from metabolomics-references by defaut
 		$modulePath.'/in_test02_pos.tabular',
@@ -824,7 +838,7 @@ BEGIN {
 	## sub fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis
 	sub fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST {
 		# get values
-		my ($expFile, $col, $delta, $theoFile, $mzParent, $template, $tabular) = @_ ;
+		my ($expFile, $col, $delta, $theoFile, $mzParent, $mode, $stateMolecule, $template, $tabular) = @_ ;
 		
 		my $oBank = Metabolomics::Banks::AbInitioFragments->new() ;
 #		print Dumper $oBank ;
@@ -832,8 +846,10 @@ BEGIN {
 		$oBank->getFragmentsFromSource($theoFile) ;
 #		print Dumper $oBank ;
 		
-		my $nb = $oBank->buildTheoPeakBankFromFragments($mzParent) ;
+		my $nb = $oBank->buildTheoPeakBankFromFragments($mzParent, $mode, $stateMolecule) ;
 #		print Dumper $oBank ;
+
+		$oBank->isotopicAdvancedCalculation($mode) ;
 		
 		$oBank->parsingMsFragments($expFile, 'asheader', $col) ; # get mz in colunm 2
 #		print Dumper $obank ;
@@ -841,7 +857,7 @@ BEGIN {
 		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
 #		print Dumper $oAnalysis ;
 
-		$oAnalysis->compareExpMzToTheoMzList('DA', $delta) ;
+		$oAnalysis->compareExpMzToTheoMzList('PPM', $delta) ;
 #		print Dumper $oAnalysis ;
 		
 		my $tabularfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular) ;

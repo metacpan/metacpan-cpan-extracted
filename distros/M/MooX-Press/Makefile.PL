@@ -32,7 +32,7 @@ my $meta = {
                                            "Role::Hooks"          => 0.001,
                                            "Sub::HandlesVia"      => 0.013,
                                            "Sub::MultiMethod"     => 0.008,
-                                           "Type::Tiny"           => 1.008003,
+                                           "Type::Tiny"           => "1.010000",
                                          },
                                        },
                           test      => {
@@ -41,8 +41,8 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.053 },
-                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.053 },
+                          "MooX::Press" => { file => "lib/MooX/Press.pm", version => 0.055 },
+                          "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.055 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -56,7 +56,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                         },
-  "version"          => 0.053,
+  "version"          => 0.055,
   "x_static_install" => 1,
 };
 

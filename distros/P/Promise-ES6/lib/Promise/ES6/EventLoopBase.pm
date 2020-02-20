@@ -53,4 +53,18 @@ sub then {
     } );
 }
 
+sub finally {
+    my ($self, $on_finish) = @_;
+
+    my $class = ref $self;
+
+    return $class->new( sub {
+        my ($y, $n) = @_;
+
+        $class->_postpone( sub {
+            $self->SUPER::finally($on_finish)->SUPER::then($y, $n);
+        } );
+    } );
+}
+
 1;
