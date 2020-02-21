@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.191300';
+$Bio::MUST::Core::IdList::VERSION = '0.200510';
 use Moose;
 use namespace::autoclean;
 
@@ -289,7 +289,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.191300
+version 0.200510
 
 =head1 SYNOPSIS
 

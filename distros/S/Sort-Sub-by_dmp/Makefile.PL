@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Sort::Sub" => "0.07",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

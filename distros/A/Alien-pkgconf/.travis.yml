@@ -1,34 +1,38 @@
-language: perl
-
-addons:
-  apt:
-    packages:
-      - liblzma-dev
+language: minimal
+dist: xenial
+services:
+  - docker
 
 before_install:
-  - export PATH=/tmp/pkgconf/bin:$PATH
-  - export ALIEN_PKGCONF_TARBALL=/tmp/pkgconf/src/pkgconf.tar.gz
+  - curl https://raw.githubusercontent.com/plicease/cip/master/bin/travis-bootstrap | bash
+  - cip before-install
 
 install:
-  - ./maint/travis
-  - cpanm --installdeps -n -v .
+  - cip diag
+  - cip install
 
-perl:
-  - "5.8"
-  - "5.10"
-  - "5.12"
-  - "5.14"
-  - "5.16"
-  - "5.18"
-  - "5.20"
-  - "5.22"
-  - "5.24"
-  
 script:
-  - perl Makefile.PL
-  - make
-  - make test TEST_VERBOSE=1
+  - cip script
 
-env:
-  - ALIEN_INSTALL_TYPE=system
-  - ALIEN_INSTALL_TYPE=share
+jobs:
+  include:
+    - env: CIP_TAG=5.31
+    - env: CIP_TAG=5.30
+    - env: CIP_TAG=5.28
+    - env: CIP_TAG=5.26
+    - env: CIP_TAG=5.24
+    - env: CIP_TAG=5.22
+    - env: CIP_TAG=5.20
+    - env: CIP_TAG=5.18
+    - env: CIP_TAG=5.16
+    - env: CIP_TAG=5.14
+    - env: CIP_TAG=5.12
+    - env: CIP_TAG=5.10
+    - env: CIP_TAG=5.8
+  allow_failures:
+    - env: CIP_TAG=5.18
+    - env: CIP_TAG=5.16
+
+cache:
+  directories:
+    - "$HOME/.cip"

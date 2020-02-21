@@ -1,7 +1,7 @@
 # $Id: Translate.pm 542 2013-12-12 16:36:34Z oetiker $
 package CallBackery::Translate;
 
-use Mojo::Base -base;
+use Mojo::Base -base, -signatures;
 use Encode;
 use CallBackery::Exception qw(mkerror);
 
@@ -104,12 +104,37 @@ dynamically in the forntend. I<This functionality is not yet fully implemented>.
 
 # trm("Hello %1",$name);
 
-sub trm {
-    return pop @_;
+=head2 trm($str[,@args]);
+
+Make string and prepare for translation in the frontend.
+
+Note there is some major perl magic going on! by blessing the returned array into the current package, we then get to use the overload code on stringification AND Mojo::JSON gets to use the TO_JSON method when converting this into something to be transported to the frontend.
+
+=cut
+
+use overload
+    '""' => sub ($self,@args) {
+        my $ret = $self->[0];
+        $ret =~ s{%(\d+)}{$self->[$1]//''}eg;
+        return $ret;
+    };
+
+sub trm ($str,@args) {
+    return bless [$str,@args];
+}
+
+=head2 $str->TO_JSON
+
+Help L<Mojo::JSON> encode us into JSON.
+
+=cut
+
+sub TO_JSON ($self) {
+    my $ret = $#$self == 0 ? $self->[0] : [@$self];
+    return $ret;
 }
 
 1;
-
 
 
 __END__

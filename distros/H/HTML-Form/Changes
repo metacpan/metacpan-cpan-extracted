@@ -1,5 +1,8 @@
 Change history for HTML-Form
 
+6.07      2020-02-21 03:50:52Z
+    - Restore =head1 NAME section to pod for HTML::Form
+
 6.06      2020-02-20 14:48:37Z
     - Change the behaviour of find_input in list context (GH#21) (E. Choroba)
     - Pod tweaks (GH#17) (Olaf Alders)

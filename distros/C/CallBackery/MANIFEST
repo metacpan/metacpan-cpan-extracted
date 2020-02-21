@@ -16,6 +16,7 @@ lib/CallBackery/qooxdoo/callbackery/Manifest.json
 lib/CallBackery/qooxdoo/callbackery/source/resource/callbackery/spinner.gif
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/__init__.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/Application.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/locale/MTranslation.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/data/RemoteTableModel.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/data/MHistoryRelaxedEncoding.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/data/Server.js

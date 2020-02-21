@@ -13,20 +13,20 @@
  */
 qx.Class.define('callbackery.data.RemoteTableModel', {
     extend: qx.ui.table.model.Remote,
-
+    include: [callbackery.locale.MTranslation],
     /**
      * Create an instance of Rpc.
      */
     construct: function(cfg, getParentFormData) {
         this.base(arguments);
         this._getParentFormData = getParentFormData;
+        var that = this;
         var ids = [];
         var labels = [];
         var types = {};
-        var trans = qx.locale.Manager;
         cfg.table.forEach(function(col) {
             ids.push(col.key);
-            labels.push(trans['tr'](col.label));
+            labels.push(that.xtr(col.label));
             types[col.key] = col.type;
         });
         this.setColumns(labels, ids);

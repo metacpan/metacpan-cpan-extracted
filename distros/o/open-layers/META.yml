@@ -27,7 +27,7 @@ no_index:
 provides:
   open::layers:
     file: lib/open/layers.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   perl: '5.008001'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/Grinnz/open-layers/issues
   homepage: https://github.com/Grinnz/open-layers
   repository: https://github.com/Grinnz/open-layers.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -181,7 +181,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

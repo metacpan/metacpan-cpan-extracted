@@ -45,7 +45,7 @@ my %LICENSES = (
 	'Artistic-1.0-Perl OR GPL-1.0-or-later' => 'Artistic or GPL-1+',
 	PostgreSQL                              => 'PostgreSQL',
 	'QPL-1.0'                               => 'QPL-1.0',
-	SSLeay                                  => 'BSD-2-clause',
+	SSLeay                                  => 'BSD-2-clause and/or SSLeay',
 	SISSL                                   => 'UNKNOWN',
 	Zlib                                    => 'Zlib',
 );

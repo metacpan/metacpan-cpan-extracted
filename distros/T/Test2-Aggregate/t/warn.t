@@ -16,6 +16,18 @@ check_output($run, "No warning", './');
 like(
     warnings {
         Test2::Aggregate::run_tests(
+            dirs     => ['xt/aggregate'],
+            root     => $root,
+            pre_eval => 'warn "pre_eval warn"'
+        );
+    },
+    [qr/pre_eval warn/],
+    'Warning sent with pre_eval.'
+);
+
+like(
+    warnings {
+        Test2::Aggregate::run_tests(
             dirs => ['xt/aggregate'],
             root => '/xx',
             slow => 1

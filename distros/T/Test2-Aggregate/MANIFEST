@@ -7,10 +7,11 @@ README
 t/00-load.t
 t/bail.t
 t/dirs.t
-t/excludes.t
+t/file.t
 t/lists.t
 t/override.t
 t/package.t
+t/regex.t
 t/repeat.t
 t/shuffle.t
 t/slow.t

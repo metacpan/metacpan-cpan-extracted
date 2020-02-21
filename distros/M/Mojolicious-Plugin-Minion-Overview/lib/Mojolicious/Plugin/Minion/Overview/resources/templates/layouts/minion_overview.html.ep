@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Minion | Overview <%= title() %></title>
+
+    %= stylesheet 'https://use.fontawesome.com/releases/v5.9.0/css/all.css'
+    %= stylesheet 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'
+</head>
+<body class="bg-light">
+    <div class="container mb-5">
+        <div class="d-flex align-items-center py-4 border-bottom border-muted">
+            <h4 class="mb-0 ml-3"><strong>Minion</strong> | <i class="fa fa-puzzle-piece"></i> Overview</h4>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-2">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="<%= url_for('minion_overview.dashboard') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.dashboard/ ? 'active' : '' %>">
+                            <i class="fa fa-poll"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<%= url_for('minion_overview.jobs') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.jobs/ ? 'active' : '' %>">
+                            <i class="fa fa-sitemap"></i> Recent Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<%= url_for('minion_overview.failed_jobs') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.failed_jobs/ ? 'active' : '' %>">
+                            <i class="fa fa-times-circle text-danger"></i> Failed Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<%= url_for('minion_overview.metrics') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.metrics/ ? 'active' : '' %>">
+                            <i class="fa fa-chart-bar"></i> Metrics
+                        </a>
+                    </li>
+                    <!-- 
+                    <li class="nav-item">
+                        <a href="<%= url_for('minion_overview.monitoring') %>" class="nav-link <%= $self->current_route =~ m/minion\.overview\.monitoring/ ? 'active' : '' %>">
+                            <i class="fa fa-eye"></i> Monitoring
+                        </a>
+                    </li>
+                    -->
+                </ul>
+            </div>
+            <div class="col-10">
+                %= content
+            </div>
+        </div>
+    </div>
+
+    %= javascript 'https://code.jquery.com/jquery-3.4.1.slim.min.js'
+    %= javascript 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js'
+    %= content_for 'head'
+</body>
+</html>

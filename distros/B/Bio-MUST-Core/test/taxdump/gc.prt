@@ -6,6 +6,9 @@
 --    readability at the suggestion of Peter Rice, EMBL
 --  Later additions by Taxonomy Group staff at NCBI
 --
+--  Version 4.5
+--     Added Cephalodiscidae mitochondrial genetic code 33
+--
 --  Version 4.4
 --     Added GTG as start codon for genetic code 3
 --     Added Balanophoraceae plastid genetic code 32
@@ -92,6 +95,7 @@
 --
 --   id 7      id 4      - Kinetoplast code now merged in code id 4
 --   id 8      id 1      - all plant chloroplast differences due to RNA edit
+--
 --
 --*************************************************************************
 
@@ -335,6 +339,15 @@ Genetic-code-table ::= {
   id 32 ,
   ncbieaa  "FFLLSSSSYY*WCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
   sncbieaa "---M------*---*----M------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Cephalodiscidae Mitochondrial" ,
+  id 33 ,
+  ncbieaa  "FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG",
+  sncbieaa "---M-------*-------M---------------M---------------M------------"
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG

@@ -55,11 +55,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
             ['note','copyOnTap','copyFailMsg','copySuccessMsg'].forEach(function(prop){
                 if (s[prop]){
                     options[prop] = qx.lang.Type.isString(s[prop]) ?
-                        that['tr'](s[prop]) : s[prop];
+                        that.xtr(s[prop]) : s[prop];
                 }
             });
             if (s.widget == 'header') {
-                form.addGroupHeader(s.label != null ? this['tr'](s.label) : null,options);
+                form.addGroupHeader(s.label != null ? this.xtr(s.label) : null,options);
                 return;
             }
 
@@ -122,7 +122,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                         }
                     });
                     cfg.structure.forEach(function(item){
-                        item.title = item.title != null ? this['tr'](item.title) : null;
+                        item.title = item.title != null ? this.xtr(item.title) : null;
                     },this);
                     var sbModel = qx.data.marshal.Json.createModel(cfg.structure ||
                     [ {
@@ -137,7 +137,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     control = new qx.ui.form.ComboBox();
                     var ctrl = this._boxCtrl[s.key] = new qx.data.controller.List(null, control);
                     cfg.structure.forEach(function(item){
-                        item = item != null ? this['tr'](item) : null;
+                        item = item != null ? this.xtr(item) : null;
                     },this);
                     var sbModel = qx.data.marshal.Json.createModel(cfg.structure || []);
                     ctrl.setModel(sbModel);
@@ -163,16 +163,16 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     s.set.filter = RegExp(s.filter);
                 }
                 if (s.set.placeholder){
-                    s.set.placeholder = this['tr'](s.set.placeholder);
+                    s.set.placeholder = this.xtr(s.set.placeholder);
                 }
                 if (s.set.label){
-                    s.set.label = this['tr'](s.set.label);
+                    s.set.label = this.xtr(s.set.label);
                 }
                 control.set(s.set);
             }
 
             this._ctrl[s.key] = control;
-            form.add(control, s.label != null ? this['tr'](s.label) : null, null, s.key,null,options);
+            form.add(control, s.label != null ? this.xtr(s.label) : null, null, s.key,null,options);
 
             if (s.widget == 'date') {
                 formCtrl.addBindingOptions(s.key, {

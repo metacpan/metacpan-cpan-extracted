@@ -26,7 +26,12 @@ qx.Class.define("callbackery.Application", {
         main : function() {
             // Call super class
             this.base(arguments);
-
+            // include the xtr call so that we can use frontend translation
+            // on backend strings.
+            qx.Class.patch(qx.ui.table.columnmodel.Resize,
+                callbackery.locale.MTranslation);
+            qx.Class.patch(qx.ui.core.Widget,
+                    callbackery.locale.MTranslation);
             // Enable logging in debug variant
             if (qx.core.Environment.get("qx.debug")) {
                 // support native logging capabilities, e.g. Firebug for Firefox

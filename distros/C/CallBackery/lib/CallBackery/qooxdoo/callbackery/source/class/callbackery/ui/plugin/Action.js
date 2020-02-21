@@ -36,7 +36,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'dataSaved':
                 case 'showMessage':
                     if (data.title && data.message){
-                        callbackery.ui.MsgBox.getInstance().info(this['tr'](data.title),this['tr'](data.message));
+                        callbackery.ui.MsgBox.getInstance().info(this.xtr(data.title),this.xtr(data.message));
                     }
                     break;
             }
@@ -65,9 +65,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     case 'logout':
                     case 'cancel':
                     case 'download':
-                        button = new buttonClass(this['tr'](btCfg.label));
+                        button = new buttonClass(this.xtr(btCfg.label));
                         if ( btCfg.addToContextMenu ){
-                             menuButton = new qx.ui.menu.Button(this['tr'](btCfg.label));
+                             menuButton = new qx.ui.menu.Button(this.xtr(btCfg.label));
                         }
                         break;
                     case 'refresh':
@@ -113,8 +113,8 @@ qx.Class.define("callbackery.ui.plugin.Action", {
 
                             if (btCfg.action == 'submitVerify'){
                                 callbackery.ui.MsgBox.getInstance().yesno(
-                                    this['tr'](btCfg.label),
-                                    this['tr'](btCfg.question)
+                                    this.xtr(btCfg.label),
+                                    this.xtr(btCfg.question)
                                 )
                                 .addListenerOnce('choice',function(e){
                                     if (e.getData() == 'yes'){
@@ -155,7 +155,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     if (response.exception){
                                         callbackery.ui.MsgBox.getInstance().error(
                                             that.tr("Download Exception"),
-                                            that['tr'](response.exception.message) + " ("+ response.exception.code +")"
+                                            that.xtr(response.exception.message) + " ("+ response.exception.code +")"
                                         );
                                     }
                                     that.getApplicationRoot().remove(iframe);
@@ -222,10 +222,10 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             this.add(form);
             var file;
             if (btCfg.btnClass == 'toolbar') {
-                file = new uploadwidget.UploadToolbarButton('file', this['tr'](btCfg.label));
+                file = new uploadwidget.UploadToolbarButton('file', this.xtr(btCfg.label));
             }
             else {
-                file = new uploadwidget.UploadButton('file', this['tr'](btCfg.label));
+                file = new uploadwidget.UploadButton('file', this.xtr(btCfg.label));
             }
             form.add(file);
             file.addListener('execute',function(e){
@@ -266,7 +266,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 if (response.exception){
                     callbackery.ui.MsgBox.getInstance().error(
                         this.tr("Upload Exception"),
-                        this['tr'](response.exception.message) + " ("+ response.exception.code +")"
+                        this.xtr(response.exception.message) + " ("+ response.exception.code +")"
                     );
                     return;
                 }

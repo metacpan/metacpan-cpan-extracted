@@ -17,7 +17,7 @@ configure_requires:
   File::chdir: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,20 +28,24 @@ requires:
   base: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://github.com/plicease/Alien-gzip/issues
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-Alien/Alien-gzip/issues
   homepage: https://metacpan.org/pod/Alien::gzip
-  repository: git://github.com/plicease/Alien-gzip.git
-version: '0.05'
+  repository: git://github.com/Perl5-Alien/Alien-gzip.git
+version: '0.06'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.29'
   requires:
     share:
       Config: '0'
-      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mojo::DOM58: '1.00'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.31.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

@@ -15,13 +15,13 @@ GCF_000011345.1	Thermosynechococcus elongatus BP-1
 GCA_000013205.1	Synechococcus sp. JA-3-3Ab
 GCA_000014585.1	Synechococcus sp. CC9311
 GCA_000179235.1	Synechococcus sp. CB0101
-GCF_000012525.1	Synechococcus elongatus PCC 7942
+GCF_000012525.1	Synechococcus elongatus PCC 7942 = FACHB-805
 GCF_000473895.1	Rubidibacter lacunae KORDI 51-2
 GCF_000316665.1	Rivularia sp. PCC 7116
 GCA_000317105.1	Oscillatoria acuminata PCC 6304
 GCF_000196515.1	'Nostoc azollae' 0708
 GCA_000010625.1	Microcystis aeruginosa NIES-843
-GCF_000021825.1	Cyanothece sp. PCC 7424
+GCF_000021825.1	Gloeothece citriformis PCC 7424
 GCF_000317655.1	Cyanobacterium stanieri PCC 7202
 GCA_000317675.1	Cyanobacterium aponinum PCC 10605
 GCF_000317125.1	Chroococcidiopsis thermalis PCC 7203
@@ -48,13 +48,13 @@ GCA_000231365.1	Fischerella thermalis
 GCF_000332175.1	Pseudanabaena sp. PCC 6802
 GCA_000011465.1	Prochlorococcus marinus subsp. pastoris str. CCMP1986
 GCA_000309945.1	Oscillatoriales cyanobacterium JSC-12
-GCF_000009705.1	Nostoc sp. PCC 7120
+GCF_000009705.1	Nostoc sp. PCC 7120 = FACHB-418
 GCA_000169095.1	Lyngbya sp. PCC 8106
 GCF_000332095.1	Leptolyngbya sp. PCC 6406
 GCF_000380225.1	filamentous cyanobacterium ESFC-1
 GCA_000317535.1	Cylindrospermum stagnale PCC 7417
-GCA_000021805.1	Cyanothece sp. PCC 8801
-GCF_000147335.1	Cyanothece sp. PCC 7822
+GCA_000021805.1	Rippkaea orientalis PCC 8801
+GCF_000147335.1	Gloeothece verrucosa PCC 7822
 GCF_000167195.1	Crocosphaera watsonii WH 8501
 GCA_000317495.1	Crinalium epipsammum PCC 9333
 GCF_000316575.1	Calothrix sp. PCC 7507
@@ -75,7 +75,7 @@ GCA_001548115.1	Geminocystis sp. NIES-3709
 GCA_000155635.1	Cyanobium sp. PCC 7001
 GCF_000012505.1	Synechococcus sp. CC9902
 GCA_000011385.1	Gloeobacter violaceus PCC 7421
-GCA_000169335.1	Cyanothece sp. CCY0110
+GCA_000169335.1	Crocosphaera chwakensis CCY0110
 GCA_000317695.1	Anabaena cylindrica PCC 7122
 GCA_000350105.1	Richelia intracellularis HH01
 GCA_000332215.1	Pseudanabaena biceps PCC 7429
@@ -88,14 +88,14 @@ GCF_000153285.1	Synechococcus sp. WH 7805
 GCA_000153825.1	Synechococcus sp. RS9916
 GCA_000817775.1	Lyngbya confervoides BDU141951
 GCF_000763385.1	Leptolyngbya sp. KIOST-1
-GCA_000017845.1	Cyanothece sp. ATCC 51142
+GCA_000017845.1	Crocosphaera subtropica ATCC 51142
 GCF_001548095.1	Geminocystis sp. NIES-3708
 GCF_000828085.2	Scytonema tolypothrichoides VB-61278
 GCA_000485815.1	Synechococcus sp. NKBG15041c
 GCF_000760175.1	Prochlorococcus sp. MIT 0601
 GCA_000710505.1	Planktothrix agardhii NIVA-CYA 126/8
 GCF_000517105.1	Fischerella sp. PCC 9605
-GCA_001275005.1	Chrysochromulina sp. CCMP291
+GCA_001275005.1	Chrysochromulina tobinii
 GCF_000332135.1	Anabaena sp. PCC 7108
 GCA_000012465.1	Prochlorococcus marinus str. NATL2A
 GCA_000317475.1	Oscillatoria nigro-viridis PCC 7112
@@ -175,7 +175,7 @@ GCA_000634415.1	Prochlorococcus sp. scB245a_519A13
 GCF_001264245.1	Microcystis panniformis FACHB-1757
 GCF_000715475.1	Synechococcus sp. NKBG042902
 GCF_000291945.1	Prochlorococcus sp. W11
-GCF_000973065.1	Arthrospira sp. PCC 8005
+GCF_000973065.1	Limnospira indica PCC 8005
 GCA_000312165.1	Microcystis aeruginosa PCC 9717
 GCA_000312205.1	Microcystis aeruginosa PCC 7941
 GCA_000291785.1	Prochlorococcus sp. W4
@@ -202,7 +202,7 @@ GCA_000635015.1	Prochlorococcus sp. scB243_498I20
 GCA_000635455.1	Prochlorococcus sp. scB241_529J16
 GCF_000634055.1	Prochlorococcus sp. scB241_527N11
 GCA_000326085.1	Hordeum vulgare subsp. vulgare
-GCA_000024045.1	Cyanothece sp. PCC 8802
+GCA_000024045.1	Rippkaea orientalis PCC 8802
 GCF_000635815.1	Prochlorococcus sp. scB245a_520F22
 GCA_000635755.1	Prochlorococcus sp. scB245a_519G16
 GCA_000634255.1	Prochlorococcus sp. scB243_496A2

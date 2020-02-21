@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.1.102
+Version v3.2.0
 
 =cut
 
-our $VERSION = version->declare("v3.1.102");
+our $VERSION = version->declare("v3.2.0");
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,7 @@ my $Q  = '["]';          # quote
 my $QA = "\['\]";        # apostrophe
 my $QB = '["*]';         # quote or bullet
 my $SD = '[ -]';         # space or dash
+my $SL = '[/]';          # space or slash or none
 
 my @_re = (
 	[ qr/\Q$BB/, '(?:\W{0,5}\S{0,2}\W{0,3})' ],
@@ -60,6 +61,7 @@ my @_re = (
 	[ qr/\Q$Q/,  '(?:\W{0,2})' ],
 	[ qr/\Q$QB/, '(?:\W{0,2})' ],
 	[ qr/\Q$SD/, '[ –-]' ],
+	[ qr/\Q$SL/, '(?:[ /]?)' ],
 
 	[ qr/\[à\]/, '(?:[àa]?)' ],
 	[ qr/\[é\]/, '(?:[ée]?)' ],
@@ -91,7 +93,7 @@ my $cc_info_asis_discl_doc
 	. "AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER$F";
 my $cc_work_protected
 	= "THE WORK \\(?AS DEFINED BELOW\\)? IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE \\(?$Q?CCPL$Q? OR $Q?LICENSE$Q?\\)?$F "
-	. "THE WORK IS PROTECTED BY COPYRIGHT AND\/OR OTHER APPLICABLE LAW$F ";
+	. "THE WORK IS PROTECTED BY COPYRIGHT AND${SL}OR OTHER APPLICABLE LAW$F ";
 my $cc_auth_lic_prohib
 	= "ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE IS PROHIBITED$F$EE?";
 my $cc_auth_lic_copylaw_prohib
@@ -118,7 +120,7 @@ my $niv
 my $fsf_ul
 	= "$fsf gives unlimited permission to copy, distribute and modify it";
 my $fsf_ullr
-	= "$fsf gives unlimited permission to copy and/or distribute it, with or without modifications, as long as this notice is preserved";
+	= "$fsf gives unlimited permission to copy and${SL}or distribute it, with or without modifications, as long as this notice is preserved";
 
 # internal-only patterns
 # _lang is "basic variants" regex at <https://stackoverflow.com/a/48300605>
@@ -824,7 +826,7 @@ $RE{bsd_3_clause} = {
 	],
 
 	'pat.alt.subject.license.scope.multisection' =>
-		"$P{repro_copr_cond_discl}$F$EE"
+		"$P{repro_copr_cond_discl}$F?$EE"
 		. "(?:$BB \\[?(?:rescinded 22 July 1999"
 		. "|This condition was removed$F)\\]?)?"
 		. "$BB$P{nopromo_neither}",
@@ -927,20 +929,20 @@ my $credit_author_if_supplied
 	= " give the Original Author credit reasonable to the medium or means You are utilizing by conveying the name \\(or pseudonym if applicable\\) of the Original Author if supplied;";
 my $credit_author_or_designated_party
 	= " provide, reasonable to the medium or means You are utilizing:?"
-	. " \\(i\\) the name of the Original Author \\(or pseudonym, if applicable\\) if supplied, and/or"
-	. " \\(ii\\) if the Original Author and/or Licensor designate another party or parties"
+	. " \\(i\\) the name of the Original Author \\(or pseudonym, if applicable\\) if supplied, and${SL}or"
+	. " \\(ii\\) if the Original Author and${SL}or Licensor designate another party or parties"
 	. " \\(e\\.g\\. a sponsor institute, publishing entity, journal\\)"
 	. " for attribution in Licensor'?s copyright notice, terms of service or by other reasonable means,"
 	. " the name of such party or parties;";
 
-#" if the Original Author and/or Licensor designate another party or parties \\(e\\.g\\., a sponsor institute, publishing entity, journal\\) for attribution \\(\"Attribution Parties\"\\) in Licensor'?s copyright notice, terms of service or by other reasonable means, the name of such party or parties;";
+#" if the Original Author and${SL}or Licensor designate another party or parties \\(e\\.g\\., a sponsor institute, publishing entity, journal\\) for attribution \\(\"Attribution Parties\"\\) in Licensor'?s copyright notice, terms of service or by other reasonable means, the name of such party or parties;";
 #" \\(ii\\) the title of the Work if supplied;";
 my $to_extend_URI
 	= " to the extent reasonably practicable, the Uniform Resource Identifier, if any, that Licensor specifies to be associated with the Work,"
 	. " unless such URI does not refer to the copyright notice or licensing information for the Work; and";
 
 #    " (iii) to the extent reasonably practicable, the URI, if any, that Licensor specifies to be associated with the Work, unless such URI does not refer to the copyright notice or licensing information for the Work; and"
-#" (iv) , consistent with Section 3(b), in the case of an Adaptation, a credit identifying the use of the Work in the Adaptation (e.g., "French translation of the Work by Original Author," or "Screenplay based on original Work by Original Author"). The credit required by this Section 4 (b) may be implemented in any reasonable manner; provided, however, that in the case of a Adaptation or Collection, at a minimum such credit will appear, if a credit for all contributing authors of the Adaptation or Collection appears, then as part of these credits and in a manner at least as prominent as the credits for the other contributing authors. For the avoidance of doubt, You may only use the credit required by this Section for the purpose of attribution in the manner set out above and, by exercising Your rights under this License, You may not implicitly or explicitly assert or imply any connection with, sponsorship or endorsement by the Original Author, Licensor and/or Attribution Parties, as appropriate, of You or Your use of the Work, without the separate, express prior written permission of the Original Author, Licensor and/or Attribution Parties.
+#" (iv) , consistent with Section 3(b), in the case of an Adaptation, a credit identifying the use of the Work in the Adaptation (e.g., "French translation of the Work by Original Author," or "Screenplay based on original Work by Original Author"). The credit required by this Section 4 (b) may be implemented in any reasonable manner; provided, however, that in the case of a Adaptation or Collection, at a minimum such credit will appear, if a credit for all contributing authors of the Adaptation or Collection appears, then as part of these credits and in a manner at least as prominent as the credits for the other contributing authors. For the avoidance of doubt, You may only use the credit required by this Section for the purpose of attribution in the manner set out above and, by exercising Your rights under this License, You may not implicitly or explicitly assert or imply any connection with, sponsorship or endorsement by the Original Author, Licensor and${SL}or Attribution Parties, as appropriate, of You or Your use of the Work, without the separate, express prior written permission of the Original Author, Licensor and${SL}or Attribution Parties.
 
 $RE{cc_by} = {
 	name              => 'CC-BY',
@@ -1594,12 +1596,12 @@ $RE{cecill} = {
 	'pat.alt.subject.grant.scope.line.scope.sentence.version.none(fr)' =>
 		'Ce logiciel est r[é]gi par la licence CeCILL soumise',
 	'_pat.alt.subject.license.scope.line.scope.sentence(en)' => [
-		'Version 1\.1 of 10/26/2004',
+		"Version 1\\.1 of 10${SL}26${SL}2004",
 		"Version 2\\.0 dated 2006${D}09${D}05",
 		"Version 2\\.1 dated 2013${D}06${D}21",
 	],
 	'_pat.alt.subject.license.scope.line.scope.sentence(fr)' => [
-		'Version 1 du 21/06/2004',
+		"Version 1 du 21${SL}06${SL}2004",
 		"Version 2\\.0 du 2006${D}09${D}05",
 		"Version 2\\.1 du 2013${D}06${D}21",
 	],
@@ -1620,7 +1622,7 @@ $RE{cecill_1} = {
 
 	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}2(?:\.0)?",
 	'pat.alt.subject.license.scope.line.scope.sentence(fr)' =>
-		'Version 1 du 21/06/2004',
+		"Version 1 du 21${SL}06${SL}2004",
 };
 
 $RE{cecill_1_1} = {
@@ -1637,7 +1639,7 @@ $RE{cecill_1_1} = {
 
 	'pat.alt.subject.name' => "CeCILL(?: License)?${SD}1\.1",
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
-		'Version 1\.1 of 10\/26\/2004',
+		"Version 1\\.1 of 10${SL}26${SL}2004",
 	'pat.alt.subject.license.scope.sentence.part.1_initial_sw(en)' =>
 		'for the first time '
 		. 'under the terms and conditions of the Agreement',
@@ -2694,7 +2696,15 @@ $RE{ntp_disclaimer} = {
 
 =item * ofl_1
 
+=item * ofl_1_no_rfn
+
+=item * ofl_1_rfn
+
 =item * ofl_1_1
+
+=item * ofl_1_1_no_rfn
+
+=item * ofl_1_1_rfn
 
 =cut
 
@@ -2720,6 +2730,24 @@ $RE{ofl_1} = {
 		"${Q}Font Software${Q} refers to any and all of the following",
 };
 
+$RE{ofl_1_no_rfn} = {
+	name        => 'OFL-1.0-no-RFN',
+	caption     => 'SIL Open Font License 1.0 with no Reserved Font Name',
+	description => <<'END',
+Usage: Should only be used when there is no Reserved Font Name.
+END
+	tags => ['type:usage:ofl_1:no_rfn'],
+};
+
+$RE{ofl_1_rfn} = {
+	name        => 'OFL-1.0-RFN',
+	caption     => 'SIL Open Font License 1.0 with Reserved Font Name',
+	description => <<'END',
+Usage: Should only be used when a Reserved Font Name applies.
+END
+	tags => ['type:usage:ofl_1:rfn'],
+};
+
 $RE{ofl_1_1} = {
 	name    => 'OFL-1.1',
 	caption => 'SIL Open Font License 1.1',
@@ -2727,6 +2755,24 @@ $RE{ofl_1_1} = {
 
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
 		"${Q}Font Software${Q} refers to the set of files released",
+};
+
+$RE{ofl_1_1_no_rfn} = {
+	name        => 'OFL-1.1-no-RFN',
+	caption     => 'SIL Open Font License 1.1 with no Reserved Font Name',
+	description => <<'END',
+Usage: Should only be used when there is no Reserved Font Name.
+END
+	tags => ['type:usage:ofl_1_1:no_rfn'],
+};
+
+$RE{ofl_1_1_rfn} = {
+	name        => 'OFL-1.1-RFN',
+	caption     => 'SIL Open Font License 1.1 with Reserved Font Name',
+	description => <<'END',
+Usage: Should only be used when a Reserved Font Name applies.
+END
+	tags => ['type:usage:ofl_1_1:rfn'],
 };
 
 =item * openssl
@@ -2949,7 +2995,7 @@ $RE{sgi_b_1} = {
 	'pat.alt.subject.license.scope.line.scope.paragraph' =>
 		"License Grant$F Subject to the provisions",
 	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
-		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.0 1\\/25\\/2000\\)$EE${BB}Definitions$F",
+		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.0 1${SL}25${SL}2000\\)$EE${BB}Definitions$F",
 };
 
 $RE{sgi_b_1_1} = {
@@ -2960,7 +3006,7 @@ $RE{sgi_b_1_1} = {
 	'pat.alt.subject.license.scope.line.scope.sentence' =>
 		'SGI License Grant',
 	'pat.alt.subject.license.scope.multiparagraph.part.head' =>
-		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.1 02\\/22\\/2000\\)$EE${BB}Definitions$F",
+		"SGI FREE SOFTWARE LICENSE B${E}\\(Version 1\\.1 02${SL}22${SL}2000\\)$EE${BB}Definitions$F",
 };
 
 $RE{sgi_b_2} = {
@@ -2976,6 +3022,26 @@ $RE{sgi_b_2} = {
 		. "Copyright $C \\[dates of first publication\\] Silicon Graphics, Inc\\. "
 		. "All Rights Reserved$F$EE"
 		. $P{perm_granted},
+};
+
+=item * ssleay
+
+=cut
+
+$RE{ssleay} = {
+	name => 'SSLeay',
+	tags => [
+		'type:unversioned',
+		'license:contains:license:bsd_2_clause',
+		'license:is:grant'
+	],
+
+	'pat.alt.subject.license.scope.line.scope.sentence' =>
+		'If this package is used in a product',
+	'pat.alt.subject.license.scope.multisection' =>
+		"$P{repro_copr_cond_discl}$F$EE$BB$P{ad_mat_ack_ssleay}?",
+	'pat.alt.subject.license.scope.line.scope.sentence.part.clause4_2' =>
+		"The word ${Q}cryptographic$Q can be left out",
 };
 
 =item * unicode_strict
@@ -3152,12 +3218,13 @@ $RE{zlib_acknowledgement} = {
 =cut
 
 $RE{zpl} = {
-	name                        => 'ZPL',
-	'name.alt.org.wikidata'     => 'Q3780982',
-	'name.alt.org.wikipedia'    => 'Zope_Public_License',
-	caption                     => 'Zope Public License',
-	'caption.alt.org.wikipedia' => 'Zope Public License',
-	tags                        => ['type:versioned:decimal'],
+	name                                  => 'ZPL',
+	'name.alt.org.wikidata'               => 'Q3780982',
+	'name.alt.org.wikipedia'              => 'Zope_Public_License',
+	caption                               => 'Zope Public License',
+	'caption.alt.org.trove.synth.nogrant' => 'Zope Public License',
+	'caption.alt.org.wikipedia'           => 'Zope Public License',
+	tags                                  => ['type:versioned:decimal'],
 };
 
 $RE{zpl_1} = {
@@ -3165,7 +3232,6 @@ $RE{zpl_1} = {
 	'name.alt.org.fsf'       => 'ZopePLv1.0',
 	caption                  => 'Zope Public License (ZPL) Version 1.0',
 	'caption.alt.misc.plain' => 'Zope Public License 1.0',
-	'caption.alt.org.trove.synth.nogrant' => 'Zope Public License',
 	'iri.alt.archive.20000816090640' => 'http://www.zope.org/Resources/ZPL',
 	tags                             => ['type:singleversion:zpl'],
 };
@@ -3356,6 +3422,18 @@ $RE{'or_at_option'} = {
 
 	'pat.alt.subject.trait.scope.line.scope.sentence' =>
 		'(?P<_or_at_option>(?:and|or)(?: ?\(?at your (?:option|choice)\)?)?)',
+};
+
+=item * usage_rfn
+
+=cut
+
+$RE{usage_rfn} = {
+	caption => 'license usage "with Reserved Font Name" phrase',
+	tags    => ['type:trait:usage:rfn'],
+
+	'pat.alt.subject.trait.scope.line.scope.sentence' =>
+		'(?P<_usage_rfn>with Reserved Font Name)',
 };
 
 =item * version
@@ -4152,6 +4230,14 @@ License mentions name of another license.
 =item * license:is:grant
 
 License is commonly granted by stating the whole license.
+
+=item * type:usage:*:*
+
+Pattern covers a specific usage of a license.
+
+Third part is the key of the corresponding non-usage-specific pattern.
+
+Fourth part is the key of the corresponding usage trait pattern.
 
 =item * type:combo
 

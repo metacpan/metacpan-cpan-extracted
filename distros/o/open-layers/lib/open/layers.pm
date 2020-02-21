@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # series of layers delimited by colons and consisting of non-space characters
 # allow spaces before and between layers because core does, but don't require them
@@ -251,7 +251,7 @@ L<binmode()|perlfunc/binmode> (or the non-lexical usage of this pragma or the
 L<open> pragma), the specified layers are pushed at the end of the handle's
 existing layer stack, and any special operations of pseudo-layers take effect.
 So you can open an unbuffered handle with only C<:unix>, but to remove existing
-layers on an already open handle, you must push pseudo-layers like L<:pop> or
+layers on an already open handle, you must push pseudo-layers like C<:pop> or
 C<:raw> (equivalent to calling L<binmode()|perlfunc/binmode> with no layers).
 
 =back

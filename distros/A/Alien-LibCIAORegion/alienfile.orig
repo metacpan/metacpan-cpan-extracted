@@ -1,0 +1,35 @@
+#! perl
+
+use strict;
+use warnings;
+use alienfile;
+
+plugin 'Gather::IsolateDynamic';
+
+plugin 'PkgConfig' => (
+  pkg_name => 'cxcregion',
+);
+
+probe [ 'pkg-config --exists libcxcregion' ];
+
+share {
+    requires 'Alien::bison';
+    requires 'Alien::flex';
+
+    start_url 'inc/cxcregion-4.12.0.1.tar.gz';
+    plugin 'Download';
+    plugin 'Extract' => 'tar.gz';
+    plugin 'Build::Autoconf';
+
+    build [
+           '%{configure}',
+           '%{make}',
+           '%{make} install',
+          ];
+};
+
+gather [
+  [ 'pkg-config --modversion libcxcregion', \'%{.runtime.version}' ],
+  [ 'pkg-config --cflags     libcxcregion', \'%{.runtime.cflags}'  ],
+  [ 'pkg-config --libs       libcxcregion', \'%{.runtime.libs}'    ],
+];

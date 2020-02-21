@@ -28,6 +28,7 @@
          "requires" : {
             "Carp" : "1.25",
             "List::Util" : "0",
+            "LooksLike" : "0",
             "Scalar::Util" : "0",
             "String::Tools" : "v0.18.277",
             "Sub::Util" : "1.40",
@@ -49,11 +50,11 @@
    "provides" : {
       "Datify" : {
          "file" : "lib/Datify.pm",
-         "version" : "v0.20.45"
+         "version" : "v0.20.52"
       },
       "Datify::Path" : {
          "file" : "lib/Datify/Path.pm",
-         "version" : "v0.20.45"
+         "version" : "v0.20.52"
       }
    },
    "release_status" : "stable",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/rkleemann/Datify"
       }
    },
-   "version" : "v0.20.045",
+   "version" : "v0.20.052",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

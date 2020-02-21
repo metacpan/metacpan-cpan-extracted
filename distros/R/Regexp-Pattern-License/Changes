@@ -7,6 +7,19 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.2.0	2020-02-21
+
+ [ Bug Fixes ]
+ - add trove caption for zpl (not zpl_1)
+
+ [ Other ]
+ - add object ssleay
+ - add usage objects ofl_1_no_rfn ofl_1_rfn ofl_1_1_no_rfn ofl_1_1_rfn, and
+   trait object usage_rfn
+ - introduce tags type:usage:*:* type:trait:usage:rfn
+ - relax generally to treat / as optional or replaced by space
+ - relax license object bsd_3_clause to treat full-stop as optional
+
 v3.1.102	2020-02-10
 
  [ Bug Fixes ]

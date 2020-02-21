@@ -20,7 +20,7 @@ __DATA__
 #include "perl.h"
 #include "XSUB.h"
 #include <histedit.h>
-          
+
 MODULE = EditLine PACKAGE = EditLine
 
 void *

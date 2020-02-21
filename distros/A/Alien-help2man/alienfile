@@ -1,0 +1,28 @@
+use alienfile;
+
+#plugin 'Probe::CommandLine' => (
+#  command => 'help2man',
+#  args    => ['--version'],
+#  match   => qr/GNU help2man/,
+#  version => qr/GNU help2man (\S+)/,
+#);
+
+# since help2man is written in Perl
+# using the system help2man can break
+# if you have modules installed.
+probe sub { 'share' };
+
+share {
+  plugin Download => (
+    url => 'https://ftp.gnu.org/gnu/help2man',
+    filter => qr/^help2man-.*\.tar\.gz$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'tar.gz';
+  plugin 'Build::MSYS' if $^O eq 'MSWin32';
+  build [
+    'sh ./configure --prefix=%{.install.prefix}',
+    '%{make}',
+    '%{make} install',
+  ];
+};

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use feature 'state';
-use Test::Ratchet;
+use Test::Ratchet qw(ratchet);
 use Test::More;
 
 my $ratchet = ratchet(

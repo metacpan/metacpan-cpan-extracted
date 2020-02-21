@@ -1,0 +1,36 @@
+% layout 'minion_overview', title => ' | ' . $title;
+
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5><%= $title %> <span class="badge badge-secondary"><%= $query->{ total } %></span></h5>
+
+        <form method="get">
+            % for my $field (keys(%{ $query->{ where } })) {
+                %= hidden_field $field => $query->{ where }->{ $field }
+            % }
+            % for my $tag (@{ $query->{ tags } }) {
+                %= hidden_field tags => $tag
+            % }
+
+            <div class="input-group">
+                <input type="text" name="term" class="form-control" value="<%= $query->{ term } %>" placeholder="Search jobs" />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-body">
+        %= include 'minion_overview/jobs/_jobs_table', jobs => $jobs
+    </div>
+
+    % if ($query->{ next_page }->{ page } > 1) {
+        <div class="card-footer d-flex justify-content-between">
+            <a href="<%= url_for("minion_overview.$section")->query($query->{ prev_page }) %>" class="btn btn-secondary btn-md">Previous</a>
+            <a href="<%= url_for("minion_overview.$section")->query($query->{ next_page }) %>" class="btn btn-primary btn-md">Next</a>
+        </div>
+    % }
+</div>

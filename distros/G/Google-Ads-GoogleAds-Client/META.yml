@@ -23,43 +23,43 @@ name: Google-Ads-GoogleAds-Client
 provides:
   Google::Ads::GoogleAds::BaseEntity:
     file: lib/Google/Ads/GoogleAds/BaseEntity.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::BaseService:
     file: lib/Google/Ads/GoogleAds/BaseService.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Client:
     file: lib/Google/Ads/GoogleAds/Client.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Common::AuthError:
     file: lib/Google/Ads/GoogleAds/Common/AuthError.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Common::AuthHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/AuthHandlerInterface.pm
   Google::Ads::GoogleAds::Common::FieldMask:
     file: lib/Google/Ads/GoogleAds/Common/FieldMask.pm
   Google::Ads::GoogleAds::Common::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2ApplicationsHandler.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Common::OAuth2BaseHandler:
     file: lib/Google/Ads/GoogleAds/Common/OAuth2BaseHandler.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Common::OAuthApplicationsHandlerInterface:
     file: lib/Google/Ads/GoogleAds/Common/OAuthApplicationsHandlerInterface.pm
   Google::Ads::GoogleAds::Constants:
     file: lib/Google/Ads/GoogleAds/Constants.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::GoogleAdsException:
     file: lib/Google/Ads/GoogleAds/GoogleAdsException.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Logging::DetailStats:
     file: lib/Google/Ads/GoogleAds/Logging/DetailStats.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Logging::GoogleAdsLogger:
     file: lib/Google/Ads/GoogleAds/Logging/GoogleAdsLogger.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Logging::SummaryStats:
     file: lib/Google/Ads/GoogleAds/Logging/SummaryStats.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::LongRunning::CancelOperationRequest:
     file: lib/Google/Ads/GoogleAds/LongRunning/CancelOperationRequest.pm
   Google::Ads::GoogleAds::LongRunning::DeleteOperationRequest:
@@ -74,22 +74,22 @@ provides:
     file: lib/Google/Ads/GoogleAds/LongRunning/PollOperationRequest.pm
   Google::Ads::GoogleAds::OAuth2ApplicationsHandler:
     file: lib/Google/Ads/GoogleAds/OAuth2ApplicationsHandler.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Utils::FieldMasks:
     file: lib/Google/Ads/GoogleAds/Utils/FieldMasks.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Utils::GoogleAdsHelper:
     file: lib/Google/Ads/GoogleAds/Utils/GoogleAdsHelper.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Utils::MediaUtils:
     file: lib/Google/Ads/GoogleAds/Utils/MediaUtils.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Utils::PartialFailureUtils:
     file: lib/Google/Ads/GoogleAds/Utils/PartialFailureUtils.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::Utils::SearchGoogleAdsIterator:
     file: lib/Google/Ads/GoogleAds/Utils/SearchGoogleAdsIterator.pm
-    version: v2.2.6
+    version: v2.2.7
   Google::Ads::GoogleAds::V1::Common::AdImageAsset:
     file: lib/Google/Ads/GoogleAds/V1/Common/AdImageAsset.pm
   Google::Ads::GoogleAds::V1::Common::AdMediaBundleAsset:
@@ -4337,5 +4337,5 @@ requires:
   perl: v5.24.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v2.2.6
+version: v2.2.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

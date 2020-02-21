@@ -21,6 +21,7 @@ WriteMakefile(
         'strict' => '0',
         'warnings' => '0',
         'overload' => '0',
+	'smallnum' => '0.02'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Colouring-In-*' },

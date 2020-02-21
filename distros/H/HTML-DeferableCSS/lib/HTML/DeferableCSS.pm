@@ -5,7 +5,7 @@ package HTML::DeferableCSS;
 use v5.10;
 use Moo 1.006000;
 
-use Carp qw/ croak /;
+use Carp;
 use Devel::StrictMode;
 use File::ShareDir 1.112 qw/ dist_file /;
 use MooX::TypeTiny;
@@ -20,7 +20,7 @@ use Types::Standard qw/ Bool CodeRef HashRef Maybe Tuple /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.3';
 
 
 
@@ -28,6 +28,10 @@ has aliases => (
     is       => 'ro',
     isa      => STRICT ? HashRef [Maybe[SimpleStr]] : HashRef,
     required => 1,
+    coerce   => sub {
+        return { map { $_ => $_ } @{$_[0]} } if ref $_[0] eq 'ARRAY';
+        return $_[0];
+    },
 );
 
 
@@ -70,7 +74,7 @@ sub _build_css_files {
     my ($self) = @_;
 
     my $root = $self->css_root;
-    my $min  = !$self->prefer_min;
+    my $min  = $self->prefer_min;
 
     my %files;
     for my $name (keys %{ $self->aliases }) {
@@ -80,12 +84,15 @@ sub _build_css_files {
         }
         else {
             $base = $name if $base eq '1';
-            my @bases = ( $base );
-            unshift @bases, "${base}.css" unless $base =~ /\.css$/;
-            unshift @bases, "${base}.min.css" unless $min || $base =~ /\.min\.css$/;
+            $base =~ s/(?:\.min)?\.css$//;
+            my @bases = $min
+                ? ( "${base}.min.css",  "${base}.css", $base )
+                : ( "${base}.css",  "${base}.min.css", $base );
+
             my $file = first { $_->exists } map { path( $root, $_ ) } @bases;
             unless ($file) {
-                croak "alias '$name' refers to a non-existent file";
+                $self->log->( error => "alias '$name' refers to a non-existent file" );
+                next;
             }
             # PATH NAME SIZE
             $files{$name} = [ $file, $file->relative($root)->stringify, $file->stat->size ];
@@ -165,11 +172,23 @@ has asset_id => (
 );
 
 
+has log => (
+    is => 'ro',
+    isa => CodeRef,
+    builder => sub {
+        return sub {
+            my ($level, $message) = @_;
+            croak $message if ($level eq 'error');
+            carp $message;
+        };
+    },
+);
+
+
+
 sub href {
     my ($self, $name, $file) = @_;
-    croak "missing name" unless defined $name;
-    $file //= $self->css_files->{$name};
-    croak "invalid name '$name'" unless defined $file;
+    $file //= $self->_get_file($name) or return;
     if (defined $file->[PATH]) {
         my $href = $self->url_base_path . $file->[NAME];
         $href .= '?' . $self->asset_id if $self->has_asset_id;
@@ -192,31 +211,34 @@ sub link_html {
 
 sub inline_html {
     my ( $self, $name, $file ) = @_;
-    croak "missing name" unless defined $name;
-    $file //= $self->css_files->{$name};
-    croak "invalid name '$name'" unless defined $file;
+    $file //= $self->_get_file($name) or return;
     if (my $path = $file->[PATH]) {
-        return "<style>" . $file->[PATH]->slurp_raw . "</style>";
+        if ($file->[SIZE]) {
+            return "<style>" . $file->[PATH]->slurp_raw . "</style>";
+        }
+        $self->log->( warning => "empty file '$path'" );
+        return "";
     }
     else {
-        croak "'$name' refers to a URI";
+        $self->log->( error => "'$name' refers to a URI" );
+        return;
     }
 }
 
 
 sub link_or_inline_html {
     my ($self, @names ) = @_;
-    foreach my $name (@names) {
-        croak "missing name" unless defined $name;
-        my $file = $self->css_files->{$name};
-        croak "invalid name '$name'" unless defined $file;
-        if ($file->[SIZE] <= $self->inline_max) {
-            return $self->inline_html($name, $file);
+    my $buffer = "";
+    foreach my $name (uniqstr @names) {
+        my $file = $self->_get_file($name) or next;
+        if ( $file->[PATH] && ($file->[SIZE] <= $self->inline_max)) {
+            $buffer .= $self->inline_html($name, $file);
         }
         else {
-            return $self->link_html($name, $file);
+            $buffer .= $self->link_html($name, $file);
         }
     }
+    return $buffer;
 }
 
 
@@ -225,8 +247,8 @@ sub deferred_link_html {
     my $buffer = "";
     my @deferred;
     for my $name (uniqstr @names) {
-        my $file = $self->css_files->{$name} or croak "invalid name '$name'";
-        if ($file->[SIZE] <= $self->inline_max) {
+        my $file = $self->_get_file($name) or next;
+        if ($file->[PATH] && $file->[SIZE] <= $self->inline_max) {
             $buffer .= $self->inline_html($name, $file);
         }
         elsif ($self->defer_css) {
@@ -254,6 +276,23 @@ sub deferred_link_html {
     return $buffer;
 }
 
+sub _get_file {
+    my ($self, $name) = @_;
+    unless (defined $name) {
+        $self->log->( error => "missing name" );
+        return;
+    }
+    if (my $file = $self->css_files->{$name}) {
+        return $file;
+    }
+    else {
+        $self->log->( error => "invalid name '$name'" );
+        return;
+    }
+
+}
+
+
 
 1;
 
@@ -269,7 +308,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.3
 
 =head1 SYNOPSIS
 
@@ -355,7 +394,24 @@ omitted.
 
 If the name is the same as the filename (without the extension) than
 you can simply use C<1>.  (Likewise, an empty string or C<0> disables
-the alias.)
+the alias:
+
+  my $css = HTML::DeferableCSS->new(
+    aliases => {
+        reset => 1,
+        gone  => 0,       # using "gone" will throw an error
+        one   => "1.css", #
+    }
+    ...
+  );
+
+If all names are the same as their filenames, then an array reference
+can be used:
+
+  my $css = HTML::DeferableCSS->new(
+    aliases => [ qw( foo bar } ],
+    ...
+  );
 
 Absolute paths cannot be used.
 
@@ -386,11 +442,15 @@ tools for that.
 This is a hash reference used internally to translate L</aliases>
 into the actual files or URLs.
 
-If files cannot be found, then it will throw an error.
+If files cannot be found, then it will throw an error, so calling this
+attribute in void context can be used to check for any errors:
+
+  eval { $css->css_files } or die "$@";
 
 =head2 cdn_links
 
-This is a hash reference of L</aliases> to URLs.
+This is a hash reference of L</aliases> to URLs. (Only one URL per
+alias is supported.)
 
 When L</use_cdn_links> is true, then these URLs will be used instead
 of local versions.
@@ -457,6 +517,27 @@ of files.
 
 True if there is an L</asset_id>.
 
+=head2 log
+
+This is a code reference for logging errors and warnings:
+
+  $css->log->( $level => $message );
+
+By default, this is a wrapper around L<Carp> that dies when the level
+is "error", and emits a warning for everything else.
+
+You can override this so that errors are treated as warnings,
+
+  log => sub { warn $_[1] },
+
+or that warnings are fatal,
+
+  log => sub { die $_[1] },
+
+or even integrate this with your own logging system:
+
+  log => sub { $logger->log(@_) },
+
 =head1 METHODS
 
 =head2 href
@@ -484,6 +565,9 @@ This returns an embedded stylesheet referred to by C<$alias>.
 
 This returns either the link HTML markup, or the embedded stylesheet,
 if the file size is not greater than L</inline_max>.
+
+Note that a stylesheet will be inlined, even if there is are
+L</cdn_links>.
 
 =head2 deferred_link_html
 

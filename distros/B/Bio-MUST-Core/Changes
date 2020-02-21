@@ -1,3 +1,10 @@
+0.200510  2020-02-21 00:18:30+01:00 Europe/Brussels
+    - Changes
+      - Taxonomy: improved method eq_tax to optionally return both got and exp labels
+    - Fixes
+      - Taxonomy: fixed missing species ranks in GCA-based lineages
+      - Taxonomy: fixed warnings due to merged/deleted nodes when using setup-taxdir.pl
+
 0.191300  2019-05-10 08:44:29+02:00 Europe/Brussels
     - Additions
       - Ali: added method all_but_new_seqs

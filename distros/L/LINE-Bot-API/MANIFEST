@@ -49,12 +49,14 @@ lib/LINE/Bot/API/Event/Unfollow.pm
 lib/LINE/Bot/API/Response/Common.pm
 lib/LINE/Bot/API/Response/Content.pm
 lib/LINE/Bot/API/Response/Error.pm
+lib/LINE/Bot/API/Response/FriendDemographics.pm
 lib/LINE/Bot/API/Response/GroupMemberProfile.pm
 lib/LINE/Bot/API/Response/IssueLinkToken.pm
+lib/LINE/Bot/API/Response/NumberOfFollowers.pm
+lib/LINE/Bot/API/Response/NumberOfMessageDeliveries.pm
 lib/LINE/Bot/API/Response/NumberOfSentMessages.pm
 lib/LINE/Bot/API/Response/Profile.pm
 lib/LINE/Bot/API/Response/RichMenu.pm
-lib/LINE/Bot/API/Response/RichMenuImageUpload.pm
 lib/LINE/Bot/API/Response/RichMenuList.pm
 lib/LINE/Bot/API/Response/RoomMemberProfile.pm
 lib/LINE/Bot/API/Response/TargetLimit.pm
@@ -75,6 +77,8 @@ t/11_send_multiple.t
 t/12_get_number_of_send_messages.t
 t/12_multicast.t
 t/13_broadcast.t
+t/14_get_friend_demographics.t
+t/14_get_number_of_message_deliveries.t
 t/14_get_number_of_messages_sent_this_month.t
 t/15_get_target_limit_for_additional_messages.t
 t/21_get_profile.t
@@ -87,6 +91,7 @@ t/52_download_rich_menu_image.t
 t/52_rich_menu.t
 t/52_rich_menu_response.t
 t/52_upload_rich_menu_image.t
+t/PR75-get-number-of-followers.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/controller-rich-menu-image-sample.jpg

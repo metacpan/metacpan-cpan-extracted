@@ -32,9 +32,12 @@ use D;
 
   my $em1 = encode("UTF-8",'あいう');
   my $em2 = encode("UTF-8",'アイウ');
-  like( $output, qr/\s\s\'hira\'\s=>\s\'$em1\',/);
-  like( $output, qr/\s\s\'kana\'\s=>\s\'$em2\'/);
-  like( $output, qr/}\sat\st\/test\.t\sline $line./); # } at t/test.t line 24.
+  my $re1 = "  'hira' => '$em1',";
+  my $re2 = "  'kana' => '$em2'";
+  my $re3 = "} at t/test.t line $line";
+  like( $output, qr/\Q$re1/);
+  like( $output, qr/\Q$re2/);
+  like( $output, qr/\Q$re3/);
 }
 
 # run dw() test
@@ -60,9 +63,12 @@ use D;
 
   my $em1 = encode("cp932",'あいう');
   my $em2 = encode("cp932",'アイウ');
-  like( $output, qr/\s\s\'hira\'\s=>\s\'$em1\',/);
-  like( $output, qr/\s\s\'kana\'\s=>\s\'$em2\'/);
-  like( $output, qr/}\sat\st\/test\.t\sline $line./); # } at t/test.t line 44.
+  my $re1 = "  'hira' => '$em1',";
+  my $re2 = "  'kana' => '$em2'";
+  my $re3 = "} at t/test.t line $line";
+  like( $output, qr/\Q$re1/);
+  like( $output, qr/\Q$re2/);
+  like( $output, qr/\Q$re3/);
 }
 
 # run dn() test
@@ -88,9 +94,12 @@ use D;
 
   my $em1 = encode("UTF-8",'あいう');
   my $em2 = encode("UTF-8",'アイウ');
-  like( $output, qr/\s\s\'hira\'\s=>\s\'$em1\',/);
-  like( $output, qr/\s\s\'kana\'\s=>\s\'$em2\'/);
-  like( $output, qr/}\sat\st\/test\.t\sline $line./); # } at t/test.t line 64.
+  my $re1 = "  'hira' => '$em1',";
+  my $re2 = "  'kana' => '$em2'";
+  my $re3 = "} at t/test.t line $line";
+  like( $output, qr/\Q$re1/);
+  like( $output, qr/\Q$re2/);
+  like( $output, qr/\Q$re3/);
 }
 
 # run du test (array reference)
@@ -113,9 +122,12 @@ use D;
 
   my $em1 = encode("UTF-8",'あいう');
   my $em2 = encode("UTF-8",'アイウ');
-  like( $output, qr/\s\s\'$em1\',/);
-  like( $output, qr/\s\s\'$em2\'/);
-  like( $output, qr/]\sat\st\/test\.t\sline $line./); # ] at t/test.t line 81.
+  my $re1 = "  '$em1',";
+  my $re2 = "  '$em2'";
+  my $re3 = "] at t/test.t line $line";
+  like( $output, qr/\Q$re1/);
+  like( $output, qr/\Q$re2/);
+  like( $output, qr/\Q$re3/);
 }
 
 # run scalar reference test
@@ -137,7 +149,8 @@ use D;
   close $temp;
 
   my $em1 = encode("UTF-8",'あいう');
-  like( $output, qr/^\\\'$em1\'\sat\st\/test\.t\sline $line./); # \'あいう' at t/test.t line 98.
+  my $re1 = "\\'$em1' at t/test.t line $line";
+  like( $output, qr/\Q$re1/); # \'あいう' at t/test.t line 98
 }
 
 # run code reference test
@@ -160,7 +173,8 @@ use D;
   open STDERR, '>&', $temp;
   close $temp;
 
-  like( $output, qr/^sub { "DUMMY" }\sat\st\/test\.t\sline $line./);
+  my $re1 = "sub { \"DUMMY\" } at t/test.t line $line";
+  like( $output, qr/\Q$re1/);
 }
 
 {
@@ -180,7 +194,8 @@ use D;
   open STDERR, '>&', $temp;
   close $temp;
 
-  like( $output, qr/\s\s\'int\'\s=>\s1/);
+  my $re1 = "  'int' => 1";
+  like( $output, qr/\Q$re1/);
 }
 
 {
@@ -201,7 +216,8 @@ use D;
   open STDERR, '>&', $temp;
   close $temp;
 
-  like( $output, qr/\s\s\'int\'\s=>\s1/);
+  my $re1 = "  'int' => 1";
+  like( $output, qr/\Q$re1/);
 }
 
 done_testing;

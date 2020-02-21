@@ -4,7 +4,7 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -23,14 +23,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Tools::LoadModule" : "0",
+            "Test2::V0" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "List::Util" : "0",
-            "perl" : "5.008",
+            "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -39,7 +41,7 @@
    "provides" : {
       "Game::Life::Faster" : {
          "file" : "lib/Game/Life/Faster.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -57,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Game-Life-Faster"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

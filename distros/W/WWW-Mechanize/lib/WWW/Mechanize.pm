@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.95';
+our $VERSION = '1.96';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -905,7 +905,7 @@ sub tick {
     my $set = @_ ? shift : 1;  # default to 1 if not passed
 
     # loop though all the inputs
-    my $index = 0;
+    my $index = 1;
     while ( my $input = $self->current_form->find_input( $name, 'checkbox', $index ) ) {
         # Can't guarantee that the first element will be undef and the second
         # element will be the right name
@@ -1686,7 +1686,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.95
+version 1.96
 
 =head1 SYNOPSIS
 
@@ -2578,7 +2578,7 @@ tag.
 (Currently does not work for attribute C<action> due to implementation details
 of L<HTML::Form>.)
 When given more than one pair, all criteria must match.
-Using C<undef> as value means that the attribute in question may not be present.
+Using C<undef> as value means that the attribute in question must not be present.
 
 All matching forms (perhaps none) are returned as a list of L<HTML::Form> objects.
 
@@ -2589,7 +2589,7 @@ tag.
 (Currently does not work for attribute C<action> due to implementation details
 of L<HTML::Form>.)
 When given more than one pair, all criteria must match.
-Using C<undef> as value means that the attribute in question may not be present.
+Using C<undef> as value means that the attribute in question must not be present.
 
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later used with Mech's form methods such as

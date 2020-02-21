@@ -4,11 +4,17 @@ use Test2::Aggregate;
 eval "use Test2::Plugin::BailOnFail";
 plan skip_all => "Test2::Plugin::BailOnFail required for the repeat < 0 option" if $@;
 
-plan(1);
+plan(3);
 
 my $root = (grep {/^\.$/i} @INC) ? undef : './';
 
 local $ENV{AGGREGATE_TEST_FAIL} = 1;
+
+Test2::Aggregate::run_tests(
+    dirs    => ['xt/aggregate'],
+    root    => $root,
+    dry_run => 1
+);
 
 like(
     intercept {

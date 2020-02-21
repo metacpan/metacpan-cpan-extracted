@@ -4,7 +4,6 @@ AUTOMAKE_OPTIONS =  foreign
 
 THIRDPARTY_DIR := $(shell pwd)
 
-# THIRDPARTY_DIST := $(shell test -d cache && find cache -type f )
 CPANSNAPV := cpanfile-$(shell $(PERL) -MConfig -e 'print $$Config{version}').snapshot
 
 #EXTRA_DIST = $(THIRDPARTY_DIST) $(wildcard bin/cpanm)
@@ -51,4 +50,3 @@ distclean-local:
 
 install-exec-hook:
 	cp -fr lib/perl5/* $(DESTDIR)$(libdir)
-

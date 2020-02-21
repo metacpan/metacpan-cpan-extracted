@@ -7,6 +7,7 @@ build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   Module::Metadata: '0'
+  Test::Deep: '0.111'
   Test::More: '0'
   Test::Most: '0'
 configure_requires:
@@ -31,7 +32,7 @@ name: HTML-DeferableCSS
 provides:
   HTML::DeferableCSS:
     file: lib/HTML/DeferableCSS.pm
-    version: v0.2.0
+    version: v0.2.3
 recommends:
   Type::Tiny::XS: '0'
 requires:
@@ -50,7 +51,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/HTML-DeferableCSS/issues
   repository: git://github.com/robrwo/HTML-DeferableCSS.git
-version: v0.2.0
+version: v0.2.3
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

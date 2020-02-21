@@ -117,11 +117,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.44
+Version v3.0.45
 
 =cut
 
-our $VERSION = version->declare('v3.0.44');
+our $VERSION = version->declare('v3.0.45');
 
 =head1 SYNOPSIS
 
@@ -153,8 +153,21 @@ my @L_type_unversioned   = sort keys %{ $L{type}{unversioned} };
 my @L_type_combo         = sort keys %{ $L{type}{combo} };
 my @L_type_group         = sort keys %{ $L{type}{group} };
 
-my @L_tidy
-	= qw(afl agpl agpl_1 agpl_2 agpl_3 aladdin apache artistic bsl cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_nc cc_nd cc_sa cc_sp cecill cecill_b cecill_c wtfpl wtfnmfpl zpl zpl_1 zpl_1_1 zpl_2 zpl_2_1);
+my @L_contains_bsd = grep {
+	$Regexp::Pattern::License::RE{$_}{tags}
+		and grep /^license:contains:license:bsd_2_clause/,
+		@{ $Regexp::Pattern::License::RE{$_}{tags} }
+} keys(%Regexp::Pattern::License::RE);
+
+my @L_tidy = qw(afl
+	agpl agpl_1 agpl_2 agpl_3
+	aladdin apache artistic bsl
+	bsd_2_clause bsd_3_clause bsd_4_clause
+	cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa
+	cc_cc0 cc_nc cc_nd cc_sa cc_sp
+	cecill cecill_b cecill_c
+	wtfpl wtfnmfpl
+	zpl zpl_1 zpl_1_1 zpl_2 zpl_2_1);
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -310,32 +323,32 @@ sub find
 
 sub parse
 {
-	my $self = shift;
-	my $file = path(shift);
-	my $all  = $self->lines == 0;
+	my $self     = shift;
+	my $file     = path(shift);
+	my $encoding = $self->encoding;
+	my $all      = $self->lines == 0;
 
 	try {
 		return $all
-			? $self->parse_file($file)
-			: $self->parse_lines($file);
+			? $self->parse_file( $file, $encoding )
+			: $self->parse_lines( $file, $encoding );
 	}
 	catch {
-		if ( $self->encoding and /does not map to Unicode/ ) {
+		if ( $encoding and /does not map to Unicode/ ) {
 			print
-				"file $file cannot be read with $self->encoding; encoding, will try latin-1:\n$_"
+				"file $file cannot be read with $encoding->name encoding, will try iso-8859-1:\n$_"
 				if $self->verbose;
 			try {
-				$self->encoding('latin-1');
+				$encoding = find_encoding('iso-8859-1');
 				return $all
-					? $self->parse_file($file)
-					: $self->parse_lines($file);
+					? $self->parse_file( $file, $encoding )
+					: $self->parse_lines( $file, $encoding );
 			}
 			catch {
 				if (/does not map to Unicode/) {
 					print
-						"file $file cannot be read with latin-1; encoding, will try binary:\n$_"
+						"file $file cannot be read with iso-8859-1 encoding, will try binary:\n$_"
 						if $self->verbose;
-					$self->encoding(undef);
 					return $all
 						? $self->parse_file($file)
 						: $self->parse_lines($file);
@@ -353,19 +366,19 @@ sub parse
 
 sub parse_file
 {
-	my $self = shift;
-	my $file = path(shift);
+	my $self     = shift;
+	my $file     = path(shift);
+	my $encoding = shift || undef;
 
 	my $content;
 
-	given ( $self->encoding ) {
+	given ($encoding) {
 		when (undef)  { $content = $file->slurp_raw }
 		when ('utf8') { $content = $file->slurp_utf8 }
 		default {
 			$content
 				= $file->slurp(
-				{ binmode => sprintf ':encoding(%s)', $self->encoding->name }
-				)
+				{ binmode => sprintf ':encoding(%s)', $encoding->name } )
 		}
 	}
 	print qq(----- $file content -----\n$content----- end content -----\n\n)
@@ -383,20 +396,21 @@ sub parse_file
 
 sub parse_lines
 {
-	my $self    = shift;
-	my $file    = path(shift);
-	my $content = '';
+	my $self     = shift;
+	my $file     = path(shift);
+	my $encoding = shift || undef;
+	my $content  = '';
 
 	my $fh;
 	my $st = $file->stat;
 
-	given ( $self->encoding ) {
+	given ($encoding) {
 		when (undef)  { $fh = $file->openr_raw }
 		when ('utf8') { $fh = $file->openr_utf8 }
 		default {
 			$fh = $file->openr(
 				sprintf ':encoding(%s)',
-				$self->encoding->name
+				$encoding->name
 			)
 		}
 	}
@@ -559,8 +573,6 @@ sub licensepatterns
 	$list{re_grant_license}{local}{gpl}{8} = qr/$RE{TRAIT_GLOBAL_licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$list{re_name}{gpl}/i;
 	$list{re_grant_license}{local}{gpl}{9} = qr/$RE{TRAIT_GLOBAL_licensed_under}(?:version \S+ (?:\(?only\)? )?of )?$list{re_name}{gpl}$RE{TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{bsd}{1} = qr/THIS SOFTWARE IS PROVIDED .*AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/;
-	$list{re_grant_license}{local}{bsd}{5} = qr/licen[sc]e:? ?bsd-(\d)-clause/i;
-	$list{re_grant_license}{local}{bsd}{6} = qr/licen[sc]e:? ?bsd\b/i;
 	$list{re_grant_license}{local}{apache}{1} = qr/$list{re_name}{apache}$RE{TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]+\))*,? or $list{re_name}{gpl}$RE{TRAIT_KEEP_version}?/i;
 	$list{re_grant_license}{local}{apache}{2} = qr/$list{re_name}{apache}$RE{TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or(?: the)? bsd(?:[ -](\d)-clause)?\b/i;
 	$list{re_grant_license}{local}{apache}{4} = qr/$list{re_name}{apache}$RE{TRAIT_KEEP_version}?(?:(?: or)? [^ ,]*?apache[^ ,]*| \([^(),]\))*,? or $list{re_name}{mit}\b/i;
@@ -671,7 +683,7 @@ sub parse_license
 			$pos_license{ $-[0] }{$id} = $+[0];
 		}
 	}
-	foreach my $pos ( sort keys %pos_license ) {
+	foreach my $pos ( sort { $a <=> $b } keys %pos_license ) {
 		my @license = keys %{ $pos_license{$pos} };
 
 		# pick longest or most specific among matched license fulltexts
@@ -713,11 +725,15 @@ sub parse_license
 	# step-wise grant detection
 	LICENSED_UNDER:
 	foreach my $pos (
-		(   sort map { $_->end }
-			grep     { $_->name eq 'license_label_trove' } @clues
+		(   sort { $a <=> $b } map { $_->end }
+			grep { $_->name eq 'license_label_trove' } @clues
 		),
-		( sort map { $_->end } grep { $_->name eq 'license_label' } @clues ),
-		( sort map { $_->end } grep { $_->name eq 'licensed_under' } @clues ),
+		(   sort { $a <=> $b } map { $_->end }
+			grep { $_->name eq 'license_label' } @clues
+			),
+		(   sort { $a <=> $b } map { $_->end }
+			grep { $_->name eq 'licensed_under' } @clues
+			),
 		)
 	{
 		foreach my $id (@RE_NAME) {
@@ -1002,7 +1018,9 @@ sub parse_license
 	}
 
 	# BSD
-	if ( $licensetext =~ $L{re_grant_license}{local}{bsd}{1} ) {
+	if ( grep { $match{$_}{name} } @L_contains_bsd
+		and $licensetext =~ $L{re_grant_license}{local}{bsd}{1} )
+	{
 		$self->log->tracef(
 			'detected custom pattern bsd#1: %s [%s]', $-[0],
 			$file
@@ -1037,26 +1055,6 @@ sub parse_license
 			}
 		}
 	}
-	elsif ( $licensetext =~ $L{re_grant_license}{local}{bsd}{5} ) {
-		$self->log->tracef(
-			'detected custom pattern bsd#5: bsd_%s_clause: %s [%s]',
-			$1, $-[0], $file
-		);
-		$gen_license->("bsd_${1}_clause");
-	}
-	elsif ( $licensetext =~ $L{re_grant_license}{local}{bsd}{6} ) {
-		$self->log->tracef(
-			'detected custom pattern bsd#6: %s: %s [%s]',
-			'bsd', $-[0], $file
-		);
-		$gen_license->('bsd');
-	}
-	$self->log->tracef(
-		'flagged license objects: bsd_2_clause bsd_3_clause bsd_4_clause [%s]',
-		$file
-	);
-	$match{$_}{custom} = 1
-		foreach (qw(bsd_2_clause bsd_3_clause bsd_4_clause));
 
 	# Apache
 	given ($licensetext) {

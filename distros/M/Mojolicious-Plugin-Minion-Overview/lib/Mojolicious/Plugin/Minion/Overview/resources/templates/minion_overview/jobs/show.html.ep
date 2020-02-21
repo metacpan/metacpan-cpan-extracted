@@ -1,0 +1,96 @@
+% layout 'minion_overview', title => '| Jobs | #' . $job->id;
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h5><%= $job->task %> <%= overview_job_status($job->info->{ state }) %></h5>
+
+        <div class="pull-left">
+            <a href="<%= url_for('minion_overview.metrics.jobs.show', job => $job->task) %>" title="Metrics"><i class="fa fa-chart-bar"></i></a>
+            % if ($job->info->{ state } eq 'failed') {
+                <a href="<%= url_for('minion_overview.jobs.retry', id => $job->{ id }) %>" class="ml-1" title="Retry"><i class="fa fa-sync"></i></a>
+            % }
+        </div>
+    </div>
+    <div class="card-body card-bg-secondary">
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <strong>ID</strong>
+            </div>
+            <div class="col"><%= $job->id %></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <strong>Queue</strong>
+            </div>
+            <div class="col"><%= $job->info->{ queue } %></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <strong>Created At</strong>
+            </div>
+            <div class="col"><%= overview_job_date($job->info->{ created }) %></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <strong>Delayed To</strong>
+            </div>
+            <div class="col"><%= overview_job_date($job->info->{ delayed }) %></div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2">
+                <strong>Started At</strong>
+            </div>
+            <div class="col"><%= overview_job_date($job->info->{ started }) %></div>
+        </div>
+        % if ($job->info->{ retries }) {
+            <div class="row mb-2">
+                <div class="col-md-2">
+                    <strong>Retried At</strong>
+                </div>
+                <div class="col"><%= overview_job_date($job->info->{ retried }) %></div>
+            </div>
+        % }
+        <div class="row mb-2">
+            <div class="col-md-2">
+                % if ($job->info->{ state } eq 'failed') {
+                    <strong>Failed At</strong>
+                % } else {
+                    <strong>Finished At</strong>
+                % }
+            </div>
+            <div class="col"><%= overview_job_date($job->info->{ finished }) %></div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <strong>Result</strong>
+            </div>
+            <div class="col"><%= $job->info->{ result } %></div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5>Data</h5>
+    </div>
+    <div class="card-body code-bg">
+        <%= to_json($job->info->{ args }) %>
+    </div>
+</div>
+
+% if (scalar(@$children)) {
+    <div class="card mt-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <h5>Children</h5>
+        </div>
+        <div class="card-body">
+            %= include 'minion_overview/jobs/_jobs_table', jobs => $children
+        </div>
+        % if ($query->{ next_page }->{ page } > 1) {
+            <div class="card-footer d-flex justify-content-between">
+                <a href="<%= url_for('minion_overview.jobs.show', id => $job->{ id })->query($query->{ prev_page }) %>" class="btn btn-secondary btn-md">Previous</a>
+                <a href="<%= url_for('minion_overview.jobs.show', id => $job->{ id })->query($query->{ next_page }) %>" class="btn btn-primary btn-md">Next</a>
+            </div>
+        % }
+    </div>
+% }

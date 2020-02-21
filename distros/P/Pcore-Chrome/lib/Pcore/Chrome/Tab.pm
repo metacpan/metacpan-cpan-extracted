@@ -49,11 +49,11 @@ sub reload_pac ( $self ) {
 }
 
 sub close ( $self ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms NamingConventions::ProhibitAmbiguousNames]
-    return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/close/$self->{id}");
+    return P->http->get("http://$self->{chrome}->{listen}->{host_port}/json/close/$self->{id}");
 }
 
 sub activate ( $self ) {
-    return P->http->get("http://$self->{chrome}->{host}:$self->{chrome}->{port}/json/activate/$self->{id}");
+    return P->http->get("http://$self->{chrome}->{listen}->{host_port}/json/activate/$self->{id}");
 }
 
 sub listen ( $self, $event, $cb = undef ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
@@ -93,7 +93,7 @@ sub _connect ( $self ) {
     my $guard = $self->_sem->guard;
 
     return $self->{_ws} ||= Pcore::WebSocket::raw->connect(
-        "ws://$self->{chrome}->{host}:$self->{chrome}->{port}/devtools/page/$self->{id}",
+        "ws://$self->{chrome}->{listen}->{host_port}/devtools/page/$self->{id}",
         connect_timeout  => 1000,
         max_message_size => 0,
         compression      => 0,
@@ -124,7 +124,7 @@ sub _connect ( $self ) {
                     my $res;
 
                     if ( my $error = $msg->{error} ) {
-                        $res = res [ 400, "$error->{message} $error->{data}" ], $msg->{result};
+                        $res = res [ 400, $error->{message} ], $msg->{result};
                     }
                     else {
                         $res = res 200, $msg->{result};
@@ -276,6 +276,67 @@ sub navigate_to ( $self, $url, %args ) {
     $self->listen( 'Page.loadEventFired', $listener );
 
     return $res;
+}
+
+sub type_str ( $self, $str, $delay = 0.1 ) {
+    for my $char ( split //sm, $str ) {
+        $self->_call(
+            'Input.dispatchKeyEvent',
+            {   type => 'char',
+                text => $char,
+            }
+        );
+
+        Coro::sleep $delay;
+    }
+
+    return;
+}
+
+sub wait_for_selector ( $self, $selector, $timeout = 10 ) {
+    my $res = $self->_call('Runtime.enable');
+
+    my $args = {
+        selector       => $selector,
+        timeout        => $timeout * 1000,
+        check_interval => 100,
+    };
+
+    my $json = P->data->to_json($args);
+
+    $res = $self->_call(
+        'Runtime.evaluate',
+        {   returnByValue => \1,
+            awaitPromise  => \1,
+            expression    => <<"JS",
+( async function ( args ) {
+    while ( 1 ) {
+        const el = document.querySelector( args.selector );
+
+        // found
+        if ( el ) {
+            return { found: true };
+        }
+
+        if ( args.timeout <= 0 ) {
+            return { found: false };
+        }
+
+        await new Promise( ( r ) => setTimeout( r, args.check_interval ) );
+
+        args.timeout -= args.check_interval;
+    }
+} )( $json );
+JS
+        }
+    );
+
+    if ($res) {
+        return $res->{data}->{result}->{value}->{found} ? res 200 : res 404;
+    }
+    else {
+        return $res;
+    }
 }
 
 1;

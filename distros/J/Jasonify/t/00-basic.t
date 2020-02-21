@@ -127,7 +127,8 @@ my $numf = Jasonify::Number->formatted( '%.6f', $num );
 my $inf  = 9**9**9;
 my $nan  = $inf / $inf;
 
-my $numstr = "$num";
+my $numstr  = "$num";
+my $numfstr = "1234567890.123457";
 
 is( Jasonify->encode($int),     '9876543210', ' int  encodes correctly' );
 is( Jasonify->encode($num),          $numstr, ' num  encodes correctly' );
@@ -135,8 +136,7 @@ is( Jasonify->encode( -$inf ), '"-Infinity"', '-inf  encodes correctly' );
 is( Jasonify->encode($inf),     '"Infinity"', ' inf  encodes correctly' );
 is( Jasonify->encode($nan),     '"NaN"',      ' nan  encodes correctly' );
 
-is( Jasonify->encode($numf), '1234567890.123457',
-    'formatted number encodes correctly' );
+is( Jasonify->encode($numf), $numfstr, 'formatted number encodes correctly' );
 
 
 # Scalars
@@ -170,7 +170,7 @@ is( Jasonify->encode($array[-1]), $value[-1], 'array of scalar references' );
 
 push @array, [ $int, $num, $numf, $inf, $nan ];
 push @value,
-    qq![9876543210, $numstr, 1234567890.123457, "Infinity", "NaN"]!;
+    qq![9876543210, $numstr, $numfstr, "Infinity", "NaN"]!;
 is( Jasonify->encode($array[-1]), $value[-1],
     'array of numbers encodes correctly' );
 
@@ -213,12 +213,17 @@ $hash{first}  = { map { $_ => $_ } $false, $true, '', 0, 1 };
 $value{first} = '{"0" : 0, "1" : 1, "" : "", "false" : false, "true" : true}';
 is( Jasonify->encode( $hash{first} ), $value{first}, 'hash of scalars' );
 
-$hash{second} = { map { $_ => $_ } $int, $num, $numf, $inf, $nan };
+$hash{second} = { map { $_ => $_ } $int, $num, $numf };
+$value{second} = join( '',
+    map { sprintf( '"%s" : %s, ', $_, $hash{second}{$_} ) }
+        sort { $a <=> $b }
+            keys %{ $hash{second} }
+);
+$hash{second}{$inf} = $inf;
+$hash{second}{$nan} = $nan;
 $value{second}
     = '{'
-    . '"1234567890.123457" : 1234567890.123457, '
-    . qq!"$numstr" : $numstr, !
-    . '"9876543210" : 9876543210, '
+    . $value{second}
     . '"Infinity" : "Infinity", '
     . '"NaN" : "NaN"'
     . '}';

@@ -27,7 +27,9 @@ t/author-pod-syntax.t
 t/css_files.t
 t/css_href.t
 t/defer.t
+t/etc/css/0.css
 t/etc/css/1.css
+t/etc/css/bar.min.css
 t/etc/css/foo.css
 t/etc/css/reset.css
 t/etc/css/reset.min.css

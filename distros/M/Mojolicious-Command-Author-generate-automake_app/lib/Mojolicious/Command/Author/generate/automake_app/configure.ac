@@ -74,6 +74,12 @@ if test -x "$NODE"; then
   v11*)
     AC_MSG_RESULT(ok v11)
     ;;
+  v12*)
+    AC_MSG_RESULT(ok v12)
+    ;;
+  v13*)
+    AC_MSG_RESULT(ok v13)
+    ;;
   *)
     AC_MSG_RESULT(no);
     NODE=old-node

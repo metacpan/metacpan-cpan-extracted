@@ -1,7 +1,7 @@
 use v5.14;
 use warnings;
 
-package Datify::Path v0.20.045;
+package Datify::Path v0.20.052;
 # ABSTRACT: Describe structures like filesystem paths.
 # VERSION
 
@@ -318,7 +318,7 @@ feature.
 
 =head1 VERSION
 
-This document describes version v0.20.045 of this module.
+This document describes version v0.20.052 of this module.
 
 =head1 AUTHOR
 

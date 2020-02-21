@@ -3,22 +3,16 @@ package main;
 use strict;
 use warnings;
 
-use Test::More 0.88;
+use Test2::V0;
+use Test2::Tools::LoadModule;
 
-BEGIN {
-    eval {
-	require ExtUtils::Manifest;
-	1;
-    } or do {
-	plan skip_all => 'Can not load ExtUtils::Manifest';
-	exit;
-    };
-}
+load_module_or_skip_all 'ExtUtils::Manifest', undef, [
+    qw{ manicheck filecheck } ];
 
-my @got = ExtUtils::Manifest->manicheck();
+my @got = manicheck();
 ok @got == 0, 'Missing files per MANIFEST';
 
-@got = ExtUtils::Manifest->filecheck();
+@got = filecheck();
 ok @got == 0, 'Files not in MANIFEST or MANIFEST.SKIP';
 
 done_testing;

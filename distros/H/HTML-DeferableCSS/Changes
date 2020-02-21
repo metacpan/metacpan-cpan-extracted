@@ -1,5 +1,40 @@
 Revision history for HTML-DeferableCSS:
 
+v0.2.3    2020-02-21 13:50:19+00:00 Europe/London
+  [Improvements]
+  - Added the ability to override error/warning behaviour.
+
+  [Bug Fixes]
+  - css_files will not fail if prefer_min is false but there is only a
+    minimised version of the file.
+
+  [Documentation]
+  - Fixed typos in Changes.
+
+v0.2.2    2020-02-21 10:17:42+00:00 Europe/London
+  [Bug Fixes]
+  - link_or_inline_html actually handles multiple aliases.
+
+v0.2.1    2020-02-21 09:05:29+00:00 Europe/London
+  [Improvements]
+  - aliases can accept an array reference.
+
+  - Return empty string for 0-byte files instead of empty style
+    element, but warn.
+
+  [Bug Fixes]
+  - If an alias points to a URI, then link_or_inline_html and
+    deferred_link_html will return the link_html.
+
+  - link_or_inline_html didn't skip duplicate aliases.
+
+  [Build Fixes]
+  - Added minimum version of Test::Deep for tests.
+
+  [Documentation]
+  - Added more examples to POD.
+
+
 v0.2.0    2020-02-20 17:37:47+00:00 Europe/London
   [Improvements]
   - Allows "1" as an alias when the filename is the same as the name.

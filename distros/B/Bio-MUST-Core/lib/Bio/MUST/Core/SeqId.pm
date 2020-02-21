@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.191300';
+$Bio::MUST::Core::SeqId::VERSION = '0.200510';
 use Moose;
 use namespace::autoclean;
 
@@ -211,6 +211,7 @@ const my @GENERA  => qw(
     ANMV-1
     Anopheline-associated
     antibiotic-resistant
+    antimony-reducing
     Apple-associated
     Araraquara-like
     Argemone-Cactus
@@ -229,6 +230,7 @@ const my @GENERA  => qw(
     B-lymphotropic
     Bacteroides-like
     Banna-like
+    Barkedji-like
     Bas-Congo
     Bastrovirus-like_virus/VietNam/Bat/17819_21
     BD1-11
@@ -257,6 +259,7 @@ const my @GENERA  => qw(
     Blackcurrant-associated
     Bo-Circo-like
     Bombus-associated
+    Bos-associated
     Bovine-like
     Broad-leafed
     bromate-reducing
@@ -299,6 +302,8 @@ const my @GENERA  => qw(
     Buxtonella-like
     C-terminal
     C.glutamicum-E.coli
+    Cachavirus-1A
+    Cachavirus-1B
     Cafeteriavirus-dependent
     Calf-giraffe
     Calhevirus-2a
@@ -340,12 +345,15 @@ const my @GENERA  => qw(
     Counter-selectable
     Cowpox-Vaccinia
     Coxiella-like
+    Cr(VI)-reducing
+    Crane-associated
     crAss-like
     Cre-expression
     Cre-lox
     Crimean-Congo
     CRISPR-cas9
     CRISPR-mediated
+    Crow-dipper
     Cryphonectria-Endothia
     Cryptaulaxoides-like
     Ctenophore-associated
@@ -356,8 +364,8 @@ const my @GENERA  => qw(
     Cysteine-free
     Cytophaga-like
     DCM-degrading
-    deep-sea
     Deep-sea
+    deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Dendro-hypnum
@@ -371,13 +379,11 @@ const my @GENERA  => qw(
     DMSP-degrading
     DNA-binding
     Dobrava-Belgrade
-    Double-stranded
     Dragonfly-associated
     Drosophila-associated
     DSMP-degrading
     Dual-tagging
     Duck-dominant
-    Dyella-like
     EDTA-degrading
     Ehrlichia-like
     EIAV-based
@@ -405,6 +411,7 @@ const my @GENERA  => qw(
     Flavobacterium-like
     Flexibacter-like
     Flexistipes-like
+    Flying-fox
     Fonticula-like
     Food-grade
     Foot-and-mouth
@@ -415,9 +422,11 @@ const my @GENERA  => qw(
     Gardner-Arnstein
     GBV-A-like
     Gemmata-like
+    Gene-editing
     Gene-trap
     Gene-trapping
     Gill-associated
+    Ginkgoaceae-associated
     Glaucous-winged
     Glaucus-gull
     Gluconacetobacter-like
@@ -435,6 +444,7 @@ const my @GENERA  => qw(
     H-1
     H-Pelican
     H-Stinger
+    H2/CO2-metabolizing
     Hantaan-like
     Hardy-Zuckerman
     Haruka-associated
@@ -466,6 +476,7 @@ const my @GENERA  => qw(
     IncP-1
     IncP-1beta
     IncQ-like
+    Insect-associated
     iodate-reducing
     iodide-accumulating
     iodide-oxidizing
@@ -476,15 +487,18 @@ const my @GENERA  => qw(
     Janibacter-like
     jellyfish-degrading
     Jiangxi12-B14
+    Jodiemicrovirus-1
     Johnson-sea-linkia
     Juquitiba-like
     K139-like
     Kineococcus-like
     Knock-in
+    Korle-bu
     LANV-2
     Large-insert
     Leafhopper-borne
     Legionella-like
+    Leguminosae-associated
     Leptotrichia-like
     lignocellulose-degrading
     LMWdDNA-degrading
@@ -580,6 +594,7 @@ const my @GENERA  => qw(
     Nuclearia-like
     Oak-Vale
     Oceanospirillum-like
+    Ochlerotatus-associated
     Odonata-associated
     oil-degrading
     oil-susceptible
@@ -588,6 +603,7 @@ const my @GENERA  => qw(
     oral-nasopharyngeal
     Orange-breasted
     Orange-spotted
+    Ourmia-like
     oxamyl-degrading
     P-decomposing
     P-element
@@ -607,19 +623,23 @@ const my @GENERA  => qw(
     perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
+    pesticide-degrading
     Pfiesteria-like
     pharmaceutical-degrading
     phenanthrene-degrading
     phenanthrene-metabolizing
     phenol-degrading
     Phoma-like
+    phosphorous-removal
     Picorna-like
     Pig-tailed
     Pigeon-dominant
     piggyBac-based
     piggyBac-helper
     Pike-perch
+    Pink-eared
     Piscirickettsia-like
+    Pistacia-associated
     pkBIG-alpha
     pLEV-TeLS
     pnpB-pnpA
@@ -645,14 +665,16 @@ const my @GENERA  => qw(
     Raccoon-associated
     RDHV-like
     Red-bellied
+    Red-capped
     Red-crowned
     Red-faced
     Red-fronted
     Red-handed
+    Red-necked
     Red-recombineering
     Regulator-reporter
+    Reptile-associated
     Retro-megavirus
-    Retro-transcribing
     Rigidomastix-like
     RIOMV-3
     RIOMV-4
@@ -660,6 +682,7 @@ const my @GENERA  => qw(
     RML-105355
     rod-shaped
     root-associated
+    Rosaceae-associated
     Roseobacter-like
     Rous-associated
     rpL23-fusion
@@ -707,6 +730,7 @@ const my @GENERA  => qw(
     Selenomonas-like
     Self-inactivating
     Sewage-associated
+    Sharp-tailed
     Short-finned
     short-tailed
     Shuttle-expression
@@ -747,18 +771,21 @@ const my @GENERA  => qw(
     Stripa-derived
     Stx1-converting
     Stx2-converting
-    sulfate-reducing
     Sulfate-reducing
+    sulfate-reducing
     sulfide-oxidizing
     sulfite-reducing
-    sulfur-oxidizing
+    sulfo-oxidizing
     Sulfur-oxidizing
+    sulfur-oxidizing
     Sunn-hemp
     Synechococcus-like
     Synechocystis-like
     T-DNA
     T-vector
+    T4-like
     T7-like
+    Taro-associated
     Taxeobacter-like
     Temperature-sensitive
     Tent-making
@@ -770,8 +797,8 @@ const my @GENERA  => qw(
     Thrips-associated
     Ti-curing
     Tick-associated
-    tick-borne
     Tick-borne
+    tick-borne
     toluene-degrading
     Totivirus-like
     Tri-shuttle
@@ -797,6 +824,7 @@ const my @GENERA  => qw(
     Van-royena
     VDV-1/DWV
     VESV-like
+    Violaceae-associated
     Viroid-like
     Virus-associated
     Virus-induced
@@ -1050,7 +1078,6 @@ const my @SPECIES => qw(
     397_MR-2014
     39_xplvp47
     3_xplvp302
-    3A1_DGR
     4-1_YC-ZSS-LKJ-010-0902
     40_xplvp46
     41_xplvp469
@@ -1807,6 +1834,9 @@ const my @SPECIES => qw(
     Ep06i_A1B
     Ep06i_A4C
     Eptesicus/13RS384_26/Italy/2012
+    EqCoPV_11
+    EqCoPV_8
+    EqCoPV_9
     ES5_1357
     ES6_1418
     ES6_478
@@ -1844,6 +1874,13 @@ const my @SPECIES => qw(
     Fen7940_21
     FGPV_KD09.ZAF
     flour_#16
+    FMAS_AP8
+    FMAS_AP9
+    FMAS_PD2
+    FMAS_PN2
+    FMAS_PN3
+    FMAS_PN4
+    FMAS_PN5
     FR1_11-MR-2014
     FR1_16_MR-2014
     FR3_2_MR-2014
@@ -5297,6 +5334,7 @@ const my @SPECIES => qw(
     pStA0.BBa_J23113
     pStA0.BBa_J23116
     pStA0.BBa_J23118
+    pT7SA11NSP1_3xFL_UnaG
     Q_sR_OV_011
     Q_sR_OV_019
     Q_sR_OV_020
@@ -5358,6 +5396,21 @@ const my @SPECIES => qw(
     RCoV/SPB40/Liomys_spec/MEX/2011
     RCoV/TP3_22/Ban_ind/THA/2005
     RCoV/TP3_26/Rat_rat/THA/2005
+    Ri1Ps_4703
+    Ri1Ps_4749
+    Ri1Pw_5477
+    Ri1Pw_5610
+    Ri1Pw_5615
+    Ri2Ps_4855
+    Ri2Ps_4998
+    Ri2Ps_5096
+    Ri2Ps_5130
+    Ri2Pt_4001
+    Ri2Pt_4081
+    Ri2Pw_6101
+    Ri3Ps_5313
+    Ri3Pw_6170
+    Ri3Pw_6328
     RK10_tank
     RK10a_tank
     RK11_tank
@@ -5421,6 +5474,8 @@ const my @SPECIES => qw(
     RO_isolate_32
     RO_isolate_6
     RO_isolate_7
+    S1_MeH
+    S2_MeH
     S8A-217_16S
     S_A17_125
     S_A17_144
@@ -5504,6 +5559,21 @@ const my @SPECIES => qw(
     SCS_30Z1_39_2
     SCS_30Z1_4_2
     SCS_30Z1_8
+    Se1Ps_1969
+    Se1Pw_3014
+    Se1Pw_3206
+    Se2Ps_2218
+    Se2Ps_2269
+    Se2Ps_2350
+    Se2Ps_2423
+    Se2Ps_2430
+    Se2Ps_2446
+    Se2Ps_2490
+    Se2Ps_640
+    Se3Ps_2605
+    Se3Ps_2679
+    Se3Ps_2758
+    Se3Pw_3619
     SM23_31
     SM23_57
     SM_12
@@ -5522,6 +5592,16 @@ const my @SPECIES => qw(
     SNISO_I12
     SNISO_J2
     SNISO_J4
+    So1Ps_682
+    So1Pw_1092
+    So1Pw_968
+    So1Pw_972
+    So1Pw_974
+    So3Ps_1722
+    So3Ps_1723
+    So3Ps_1725
+    So3Pw_1027
+    So3Pw_2867
     SOB_395
     sp.48_UnivF-1183
     sp.R0101_021
@@ -6184,7 +6264,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.191300
+version 0.200510
 
 =head1 SYNOPSIS
 

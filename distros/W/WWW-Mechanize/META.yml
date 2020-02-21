@@ -41,13 +41,13 @@ no_index:
 provides:
   WWW::Mechanize:
     file: lib/WWW/Mechanize.pm
-    version: '1.95'
+    version: '1.96'
   WWW::Mechanize::Image:
     file: lib/WWW/Mechanize/Image.pm
-    version: '1.95'
+    version: '1.96'
   WWW::Mechanize::Link:
     file: lib/WWW/Mechanize/Link.pm
-    version: '1.95'
+    version: '1.96'
 requires:
   Carp: '0'
   Getopt::Long: '0'
@@ -72,10 +72,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize
   repository: https://github.com/libwww-perl/WWW-Mechanize.git
-version: '1.95'
+version: '1.96'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -103,9 +103,9 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/stale modules, release'
       version: '0.055'
     -
-      class: Dist::Zilla::Plugin::MAXMIND::TidyAll
-      name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      class: Dist::Zilla::Plugin::OALDERS::TidyAll
+      name: '@Author::OALDERS/OALDERS::TidyAll'
+      version: '0.000026'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -174,6 +174,10 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/ExecDir'
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::OALDERS/MojibakeTests'
+      version: '0.8'
+    -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::OALDERS/PodCoverageTests'
       version: '6.012'
@@ -181,6 +185,25 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+          trailing_whitespace: 1
+      name: '@Author::OALDERS/Test::EOL'
+      version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@Author::OALDERS/Test::Portability'
+      version: '2.001000'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
@@ -193,6 +216,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::TidyAll
       name: '@Author::OALDERS/Test::TidyAll'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::OALDERS/Test::Version'
+      version: '1.09'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -334,7 +361,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -342,7 +369,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.23.0
+          git_version: 2.25.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -437,7 +464,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -450,11 +477,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.95
+          tag: v1.96
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -491,7 +518,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -505,7 +532,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -660,6 +687,7 @@ x_contributors:
   - 'Varadinsky <varadinsky@yahoo.com>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.30.0
+  - '積丹尼 Dan Jacobson <jidanni@jidanni.org>'
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

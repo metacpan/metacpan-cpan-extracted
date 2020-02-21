@@ -1,10 +1,12 @@
 aclocal.m4
 autom4te.cache/
+<%= ${filename} %>-*/
 *.tar.gz
 /blib/
 /.build/
 _build/
 cover_db/
+/vendor/
 inc/
 Build
 !Build/

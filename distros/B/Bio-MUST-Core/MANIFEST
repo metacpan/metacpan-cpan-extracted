@@ -35,6 +35,8 @@ bin/tab2mapper.pl
 bin/tax-filter-ali.pl
 bin/tree2list.pl
 bin/tree2tpl.pl
+binstant/qual-filter-fas.pl
+binstant/tax-filter-fas.pl
 codegen/build_Factory.pl
 codegen/build_SeqId.pl
 codegen/make_seq_id_tests.pl

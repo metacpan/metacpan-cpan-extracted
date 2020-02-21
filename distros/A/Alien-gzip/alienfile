@@ -7,12 +7,19 @@ plugin 'Probe::CommandLine' => (
   version => qr/gzip ([0-9\.]+)/,
 );
 
+plugin 'Probe::CommandLine' => (
+  command        => 'gzip',
+  args           => [ '--version' ],
+  match_stderr   => qr/gzip/,
+  version_stderr => qr/gzip ([0-9\.]+)/,
+) if $^O eq 'darwin';
+
 share {
 
   meta->prop->{out_of_source} = 1;
 
   plugin Download => (
-    url     => 'http://ftp.gnu.org/gnu/gzip/',
+    url     => 'https://ftp.gnu.org/gnu/gzip/',
     filter  => qr/^gzip-.*\.tar\.xz$/,
     version => qr/([0-9\.]+)/,
   );
@@ -22,8 +29,10 @@ share {
   # anymore.  So yeah.  You need xz.  
   plugin Extract => 'tar.xz';
   
-  plugin 'Build::Autoconf' => ();
+  plugin 'Build::Autoconf' => ( with_pic => 0 );
+
+  build [ '%{configure}', '%{make}', '%{make} install' ];
   
-  test [ '%{make} check' ];
+  #test [ '%{make} check' ];
 
 };

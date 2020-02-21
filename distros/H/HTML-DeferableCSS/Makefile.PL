@@ -41,10 +41,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Spec::Functions" => 0,
     "Module::Metadata" => 0,
+    "Test::Deep" => "0.111",
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.2.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "Moo" => "1.006000",
   "MooX::TypeTiny" => 0,
   "Path::Tiny" => 0,
+  "Test::Deep" => "0.111",
   "Test::More" => 0,
   "Test::Most" => 0,
   "Types::Common::Numeric" => 0,

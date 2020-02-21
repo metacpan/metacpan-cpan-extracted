@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.1.102
+Version v3.2.0
 
 =cut
 
-our $VERSION = version->declare("v3.1.102");
+our $VERSION = version->declare("v3.2.0");
 
 =head STATUS
 
@@ -36,18 +36,19 @@ my $E  = '[ ]';         # end-of-sentence space
 my $Q  = '["]';         # quote
 my $QB = '["*]';        # quote or bullet
 my $SD = '[ -]';        # space or dash
+my $SL = '[/]';         # space or slash or none
 
 our %RE = (
 
 	# assets (original or derived)
 	doc_mat_dist => {
 		pat =>
-			'the documentation and/or other materials provided with the distribution'
+			"the documentation and${SL}or other materials provided with the distribution"
 	},
 	sw           => { pat => 'the Software' },
 	the_material => {
 		pat =>
-			"this software and(?:/or)? associated documentation files \\(?the ${Q}Materials?$Q\\)?"
+			"this software and(?:${SL}or)? associated documentation files \\(?the ${Q}Materials?$Q\\)?"
 	},
 	cp_sw => { pat => 'all copies of the Software' },
 	cp_sw_copr =>
@@ -76,7 +77,7 @@ our %RE = (
 		{ pat => 'to modify the code and to distribute modified code' },
 	to_mod_sublic => {
 		pat =>
-			'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of'
+			"to use, copy, modify, merge, publish, distribute, sublicense, and${SL}or sell copies of"
 	},
 	to_perm_pers => {
 		caption => 'to permit person',
@@ -222,9 +223,13 @@ our %RE = (
 	},
 
 	# texts
-	ack_name => {
+	ack_dev_by => {
 		pat =>
 			"the following acknowledge?ments?:?$E$Q?This product includes software developed by"
+	},
+	ack_written_by => {
+		pat =>
+			"the following acknowledge?ment:?$E$Q?This product includes(?: cryptographic)? software written by"
 	},
 	authors_copr    => { pat => 'the Authors, the Copyright' },
 	copr            => { pat => '[Tt]he above copyright notice' },
@@ -259,7 +264,9 @@ our %RE = (
 
 $RE{perm_granted}{pat} = "$RE{perm}{pat} $RE{granted}{pat}";
 $RE{ad_mat_ack_this}{pat}
-	= "All advertising materials mentioning features or use of this software must display $RE{ack_name}{pat}";
+	= "All advertising materials mentioning features or use of this software must display $RE{ack_dev_by}{pat}";
+$RE{ad_mat_ack_ssleay}{pat}
+	= "All advertising materials mentioning features or use of this software must display $RE{ack_written_by}{pat}";
 $RE{note_copr_perm}{pat}
 	= "provided that$BB? $RE{copr_perm}{pat} appear in all copies";
 $RE{note_copr_perms_deriv}{pat}
@@ -306,7 +313,7 @@ $RE{repro_copr_perm_appear_doc}{pat}
 $RE{nopromo_neither}{pat}
 	= "(?:$RE{neithername}{pat}|$RE{namenot}{pat}) $RE{used_endorse_deriv}{pat} $RE{without_prior_written}{pat}";
 $RE{redist_ack_this}{pat}
-	= "Redistributions of any form whatsoever must retain $RE{ack_name}{pat}";
+	= "Redistributions of any form whatsoever must retain $RE{ack_dev_by}{pat}";
 
 =encoding UTF-8
 

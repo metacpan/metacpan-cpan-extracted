@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => "1.25",
     "List::Util" => 0,
+    "LooksLike" => 0,
     "Scalar::Util" => 0,
     "String::Tools" => "0.18.277",
     "Sub::Util" => "1.40",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Carp" => "1.25",
     "Test2::V0" => 0
   },
-  "VERSION" => "v0.20.045",
+  "VERSION" => "v0.20.052",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.25",
   "List::Util" => 0,
+  "LooksLike" => 0,
   "Scalar::Util" => 0,
   "String::Tools" => "0.18.277",
   "Sub::Util" => "1.40",

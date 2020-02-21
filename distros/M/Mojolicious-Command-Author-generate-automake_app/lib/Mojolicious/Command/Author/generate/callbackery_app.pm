@@ -8,7 +8,7 @@ use Mojo::File;
 use POSIX qw(strftime);
 use Cwd 'getcwd';
 use File::Spec::Functions qw(catdir catfile);
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 has description => 'Generate Callbackery web application with Automake';
 has usage => sub { shift->extract_usage };
 
@@ -34,7 +34,7 @@ sub file {
         'bin/Makefile.am' => 'bin/Makefile.am',
         'thirdparty/Makefile.am' => 'thirdparty/Makefile.am',
         'etc/Makefile.am' => 'etc/Makefile.am',
-        'etc/app.cfg.dist' => 'etc/'.$self->filename.'.cfg.dist',
+        'etc/app.dist.yaml' => 'etc/'.$self->filename.'.dist.yaml',
         'bin/app.pl' => 'bin/'.$self->filename.'.pl',
         'bin/source-mode.sh' => 'bin/'.$self->filename.'-source-mode.sh',
         'lib/App.pm' => 'lib/'.$self->class_path,

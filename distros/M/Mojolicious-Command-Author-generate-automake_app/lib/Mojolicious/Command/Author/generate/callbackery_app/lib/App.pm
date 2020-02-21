@@ -1,6 +1,7 @@
 package <%= ${class} %>;
 
 use Mojo::Base 'CallBackery';
+use CallBackery::Model::ConfigJsonSchema;
 
 =head1 NAME
 

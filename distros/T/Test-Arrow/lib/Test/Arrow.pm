@@ -5,11 +5,24 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our @ISA = qw/Test::Builder::Module/;
 
-my $CLASS = __PACKAGE__;
+my $KLASS = __PACKAGE__;
+
+sub import {
+    my $pkg  = shift;
+    my %args = map { $_ => 1 } @_;
+
+    my $binary = delete $args{binary} or delete $args{binary_mode}
+                    or delete $args{not_utf8} or delete $args{'-utf8'} or delete $args{'-utf'};
+    if (!$binary) {
+        binmode $pkg->builder->$_, ':utf8' for qw(failure_output todo_output output);
+        require utf8;
+        utf8->import;
+    }
+}
 
 sub new {
     bless {}, shift;
@@ -28,13 +41,13 @@ sub _reset {
 sub pass {
     my $self = shift;
 
-    Test::Arrow->builder->ok(1, @_);
+    $KLASS->builder->ok(1, @_);
 }
 
 sub fail {
     my $self = shift;
 
-    Test::Arrow->builder->ok(0, @_);
+    $KLASS->builder->ok(0, @_);
 }
 
 sub name {
@@ -82,7 +95,7 @@ sub ok {
     my $got = $self->_specific('_got', $value);
     my $test_name = defined $name ? $name : $self->{_name};
 
-    $CLASS->builder->ok($got, $test_name);
+    $KLASS->builder->ok($got, $test_name);
 
     $self->_reset;
 
@@ -95,7 +108,7 @@ sub to_be {
     my $expected = $self->{_expected};
     my $test_name = $self->_specific('_name', $name);
 
-    my $ret = $CLASS->builder->is_eq($got, $expected, $test_name);
+    my $ret = $KLASS->builder->is_eq($got, $expected, $test_name);
 
     $self->_reset;
 
@@ -111,7 +124,7 @@ sub _test {
     my $test_name = $self->_specific('_name', $_[2]);
 
     local $Test::Builder::Level = 2;
-    my $ret = $CLASS->builder->$method($got, $expected, $test_name);
+    my $ret = $KLASS->builder->$method($got, $expected, $test_name);
 
     $self->_reset;
 
@@ -135,14 +148,14 @@ sub unlike {
     my $expected = $self->_specific('_expected', $_[1]);
     my $test_name = $self->_specific('_name', $_[2]);
 
-    my $ret = $CLASS->builder->unlike($got, $expected, $test_name);
+    my $ret = $KLASS->builder->unlike($got, $expected, $test_name);
 
     $self->_reset;
 
     return $ret if $ret eq '1';
 
     my $pos = Text::MatchedPosition->new($got, $expected);
-    return $CLASS->builder->diag( sprintf <<'DIAGNOSTIC', $pos->line, $pos->offset );
+    return $KLASS->builder->diag( sprintf <<'DIAGNOSTIC', $pos->line, $pos->offset );
           matched at line: %d, offset: %d
 DIAGNOSTIC
 }
@@ -150,7 +163,7 @@ DIAGNOSTIC
 sub diag {
     my $self = shift;
 
-    $CLASS->builder->diag(@_);
+    $KLASS->builder->diag(@_);
 
     $self;
 }
@@ -158,7 +171,7 @@ sub diag {
 sub note {
     my $self = shift;
 
-    $CLASS->builder->note(@_);
+    $KLASS->builder->note(@_);
 
     $self;
 }
@@ -172,10 +185,10 @@ sub explain {
             expected => $self->{_expected},
             name     => $self->{_name},
         };
-        $self->diag($CLASS->builder->explain($hash));
+        $self->diag($KLASS->builder->explain($hash));
     }
     else {
-        $self->diag($CLASS->builder->explain(@_));
+        $self->diag($KLASS->builder->explain(@_));
     }
 
     $self;
@@ -184,7 +197,7 @@ sub explain {
 sub done_testing {
     my $self = shift;
 
-    $CLASS->builder->done_testing(@_);
+    $KLASS->builder->done_testing(@_);
 
     $self;
 }
@@ -239,6 +252,15 @@ The opposite DSL.
 =head2 MOTIVATION
 
 B<Test::Arrow> is a testing helper as object-oriented operation. Perl5 has a lot of testing libraries. These libraries have nice DSL ways. However, sometimes we hope the Object as similar to ORM. It may slightly sound strange. But it'd be better to clarify operations and it's easy to understand what/how it is. Although there are so many arrows.
+
+
+=head1 IMPORT OPTIONS
+
+=head2 binary
+
+By default, C<Test::Arrow> sets utf8 pragma globally to avoid warnings such as "Wide charactors". If you don't want it, then you should pass 'binary' option on use.
+
+    use Test::Arrow 'binary'; # utf8 pragma off
 
 
 =head1 METHODS
@@ -296,7 +318,11 @@ Just pass or fail
 
 =head3 ok
 
-    $arr->got($true);
+    $arr->got($true)->ok;
+
+More easy,
+
+    $arr->ok($true);
 
 =head3 is
 
@@ -330,7 +356,7 @@ C<like> matches $got value against the $expected regex.
 
 =head2 UTILITIES
 
-You can call below utilities even without an instance.
+You can call below utilities methods even without an instance.
 
 =head3 diag
 
@@ -358,7 +384,7 @@ If you call C<explain> method without args, then C<explain> method outputs objec
     # }
     ok 1 - foo
 
-If you call C<explain> method with arg, then C<explain> method dumps it.
+If you call C<explain> method with arg, then C<explain> method just dumps it.
 
     $arr->expected('BAR')->got(uc 'bar')->explain({ baz => 123 })->is;
     # {
@@ -380,7 +406,7 @@ B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.03-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/build/badge.svg?_t=1582048984&branch=master"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582048984&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.05-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582302144"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582302144&branch=master"/></a>
 
 =end html
 

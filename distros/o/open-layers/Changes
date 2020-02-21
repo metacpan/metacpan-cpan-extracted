@@ -1,2 +1,5 @@
+0.002     2020-02-21 12:15:50 EST
+  - Skip safe pipe open tests on Windows which does not implement this feature.
+
 0.001     2020-02-19 19:31:52 EST
   - First release

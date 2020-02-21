@@ -46,8 +46,12 @@ my %args = (
   META_MERGE => {
     'meta-spec' => { version => 2 },
     resources => {
-      repository => "http://github.com/plicease/Alien-pkgconf",
-      bugtracker => "http://github.com/plicease/Alien-pkgconf/issues",
+      repository => {
+        type => 'git',
+        url  => "http://github.com/Perl5-Alien/Alien-pkgconf.git",
+        web  => "http://github.com/Perl5-Alien/Alien-pkgconf",
+      },
+      bugtracker => "http://github.com/Perl5-Alien/Alien-pkgconf/issues",
       x_MailingList => "https://groups.google.com/forum/#!forum/perl5-alien",
       x_IRC => "irc://irc.perl.org/#native",
     },

@@ -18,7 +18,7 @@ qx.Class.define("callbackery.ui.Popup", {
     construct : function(cfg,getParentFormData) {
         /* using syntax trick to not get a warning for translating
            a variable */
-        this.base(arguments, this['tr'](cfg.popupTitle));
+        this.base(arguments, this.xtr(cfg.popupTitle));
         this.set({
             layout: new qx.ui.layout.Grow(),
             minHeight: 600,

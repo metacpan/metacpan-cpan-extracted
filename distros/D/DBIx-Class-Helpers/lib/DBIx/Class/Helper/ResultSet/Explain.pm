@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Explain;
-$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.034002';
+$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.035000';
 # ABSTRACT: Get query plan for a ResultSet
 
 use strict;
@@ -236,13 +236,13 @@ to your entire schema.
 
  [
    [
-     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.001..0.001 rows=0 loops=1)",
+     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.002..0.002 rows=0 loops=1)",
    ],
    [
-     "Planning time: 0.126 ms",
+     "Planning time: 0.189 ms",
    ],
    [
-     "Execution time: 0.025 ms",
+     "Execution time: 0.039 ms",
    ],
  ]
 
@@ -270,7 +270,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

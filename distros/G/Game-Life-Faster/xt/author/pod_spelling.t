@@ -3,20 +3,13 @@ package main;
 use strict;
 use warnings;
 
-BEGIN {
-    eval {
-	require Test::Spelling;
-	1;
-    } or do {
-	print "1..0 # skip Test::Spelling not available.\n";
-	exit;
-    };
-    Test::Spelling->import();
-}
+use Test2::Tools::LoadModule;
 
-add_stopwords (<DATA>);
+load_module_or_skip_all 'Test::Spelling';
 
-all_pod_files_spelling_ok ();
+add_stopwords( <DATA> );
+
+all_pod_files_spelling_ok();
 
 1;
 __DATA__

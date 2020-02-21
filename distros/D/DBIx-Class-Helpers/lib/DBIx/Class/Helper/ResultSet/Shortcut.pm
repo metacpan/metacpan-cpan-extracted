@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Shortcut;
-$DBIx::Class::Helper::ResultSet::Shortcut::VERSION = '2.034002';
+$DBIx::Class::Helper::ResultSet::Shortcut::VERSION = '2.035000';
 # ABSTRACT: Shortcuts to common searches (->order_by, etc)
 
 use strict;
@@ -16,6 +16,7 @@ use parent (qw(
    DBIx::Class::Helper::ResultSet::Shortcut::OrderByMagic
    DBIx::Class::Helper::ResultSet::Shortcut::Prefetch
    DBIx::Class::Helper::ResultSet::Shortcut::LimitedPage
+   DBIx::Class::Helper::ResultSet::Shortcut::RemoveColumns
    DBIx::Class::Helper::ResultSet::Shortcut::ResultsExist
    DBIx::Class::Helper::ResultSet::Shortcut::Rows
    DBIx::Class::Helper::ResultSet::Shortcut::Page
@@ -204,6 +205,13 @@ calling C<< $rs->count >>.
  # equivalent to...
  $foo_rs->search(undef, { '+columns' => [qw/ some column names /] });
 
+=head2 remove_columns
+
+ $foo_rs->remove_columns([qw/ some column names /]);
+
+ # equivalent to...
+ $foo_rs->search(undef, { remove_columns => [qw/ some column names /] });
+
 =head2 prefetch
 
  $foo_rs->prefetch('bar');
@@ -263,7 +271,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2020 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

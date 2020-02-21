@@ -1,3 +1,6 @@
+v0.15.0 2020-02-21T13:41:24Z
+ - wait_for_selector method
+
 v0.14.2 2020-02-17T23:55:41Z
  - parse listen
 

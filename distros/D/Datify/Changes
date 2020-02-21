@@ -1,5 +1,10 @@
 Revision history for Datify.
 
+v0.20.052 2020-02-21
+
+ - Added a test for keysort.
+ - Use LooksLike::numeric where it makes sense.
+
 v0.20.045 2020-02-14
 
  - Moved %SETTINGS into a state variable, and created an accessor.

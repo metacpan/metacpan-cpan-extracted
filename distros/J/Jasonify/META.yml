@@ -17,10 +17,10 @@ name: Jasonify
 provides:
   Jasonify:
     file: lib/Jasonify.pm
-    version: v0.20.50
+    version: v0.20.52
 requires:
   Carp: '1.25'
-  Datify: v0.20.45
+  Datify: v0.20.52
   Scalar::Util: '0'
   String::Tools: '0'
   overload: '0'
@@ -29,7 +29,8 @@ requires:
   warnings: '0'
 resources:
   bugtracker: https://github.com/rkleemann/Jasonify/issues
+  homepage: http://metacpan.org/release/Jasonify/
   repository: git://github.com/rkleemann/Jasonify.git
-version: v0.20.050
+version: v0.20.052
 x_generated_by_perl: v5.18.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

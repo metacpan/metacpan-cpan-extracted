@@ -174,7 +174,7 @@ qx.Class.define("callbackery.ui.MsgBox", {
             //    },this);
             // }
             
-            this.__open(this.tr('RPC Error %1', exc.code), this['tr'](exc.message));
+            this.__open(this.tr('RPC Error %1', exc.code), this.xtr(exc.message));
             return this;
         },
 

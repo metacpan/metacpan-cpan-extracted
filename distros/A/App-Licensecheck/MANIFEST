@@ -224,7 +224,7 @@ t/grant/NTP/map.h
 t/grant/NTP/monlist.c
 t/grant/WTFPL/COPYING.WTFPL
 t/grant/misc/rpplexer.h
-t/lib/Test/Licensecheck.pm
-t/lib/Test/Licensecheck/ScanCode.pm
+t/lib/Test2/Licensecheck.pm
+t/lib/Test2/Licensecheck/ScanCode.pm
 t/lib/Test2/Require/TestCorpus.pm
 t/license.t

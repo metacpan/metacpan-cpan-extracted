@@ -1,5 +1,5 @@
 {
-   "abstract" : "Aggregate tests",
+   "abstract" : "Aggregate tests for increased speed",
    "author" : [
       "Dimitrios Kechagias <dkechag@cpan.org>"
    ],
@@ -60,6 +60,6 @@
          "web" : "https://github.com/SpareRoom/Test2-Aggregate"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

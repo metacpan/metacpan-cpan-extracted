@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.191300';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.200510';
 use Moose;
 use namespace::autoclean;
 
@@ -97,16 +97,16 @@ has '_' . $_ . '_for' => (
 ) for qw(merged misleading);
 
 
-has '_is_dupe' => (
+has '_is_' . $_ => (
     traits   => ['Hash'],
     is       => 'ro',
     isa      => 'HashRef[Bool]',
     lazy     => 1,
-    builder  => '_build_is_dupe',
+    builder  => '_build_is_' . $_,
     handles  => {
-        'is_dupe' => 'defined',
+        'is_' . $_ => 'defined',
     },
-);
+) for qw(dupe deleted);
 
 
 has '_rank_for' => (
@@ -238,6 +238,7 @@ sub _build_is_dupe {
         # similarly ignore duplicates involving phylum vs other levels
         # phyla come after classes and synonyms (and thus should win)
         next LINE     if $line =~ m/genus>/xms || $line =~ m/<phylum>/xms;
+        next LINE     if $line =~ m/<actinobacteria>/xms;   # workaround...
 
         # extract and count taxon
         chomp $line;
@@ -249,6 +250,24 @@ sub _build_is_dupe {
     my %is_dupe = map { $_ => 1 } grep { $count_for{$_} > 1 } keys %count_for;
 
     return \%is_dupe;
+}
+
+sub _build_is_deleted {
+    my $self = shift;
+
+    #### in _build_is_deleted
+
+    my %is_deleted;
+
+    my $infile = file($self->tax_dir, 'delnodes.dmp');
+    open my $in, '<', $infile;
+
+    while (my $line = <$in>) {
+        my ($taxon_id) = $line =~ m/^(\d+)/xms;
+        $is_deleted{$taxon_id} = 1;
+    }
+
+    return \%is_deleted;
 }
 
 sub _build_merged_for {
@@ -1281,17 +1300,19 @@ sub eq_tax {                                ## no critic (RequireArgUnpacking)
     my $expect     = shift;
     my $classifier = shift;
 
-    # classify got org
+    # classify got and expect orgs
     my $got_taxon = $classifier->classify($got,    @_);
-    return undef                ## no critic (ProhibitExplicitReturnUndef)
-        unless $got_taxon;
-
-    # classify expect org
     my $exp_taxon = $classifier->classify($expect, @_);
-    return undef                ## no critic (ProhibitExplicitReturnUndef)
-        unless $exp_taxon;
 
-    # compare got and expect taxa
+    # use context to decide what to return
+    # list context: return taxon labels
+    return ($got_taxon, $exp_taxon)
+        if wantarray;
+
+    # scalar context: compare taxon labels if both are defined
+    return undef                    ## no critic (ProhibitExplicitReturnUndef)
+        unless $got_taxon && $exp_taxon;
+
     return $got_taxon eq $exp_taxon;
 }
 
@@ -1483,23 +1504,21 @@ sub _make_gca_files {
             my ($accession, $taxon_id, $species_taxon_id)
                 = (split /\t/xms, $line)[0,5,6];
 
+            # update merged taxon_id (mostly from historical assembly files)
+            $taxon_id         = $tax->merged_for($taxon_id)
+                if $tax->is_merged($taxon_id);
+            $species_taxon_id = $tax->merged_for($species_taxon_id)
+                if $tax->is_merged($species_taxon_id);
+
+            # skip deleted nodes (again mostly from historical assembly files)
+            next LINE if $tax->is_deleted($taxon_id);
+
             # fetch taxonomy and org using taxon_id
-            # Note: we try to deal with occasionally out-of-sync NCBI files
-            # that spew a lot of undef warnings in Bio::LITE::Taxonomy
-            # Note: should be fixed by the removal of existing gca files
-            my @taxonomy;
-            try_fatal_warnings { @taxonomy = $tax->get_taxonomy($taxon_id) };
-            unless (@taxonomy) {
-                carp '[BMC] Warning: out-of-sync NCBI assembly reports and'
-                    . " Taxonomy for: $taxon_id; skipping $accession!";
-                next LINE;
-            }
+            my @taxonomy = $tax->get_taxonomy($taxon_id);
             my $org = $taxonomy[-1];
 
             # use parent taxon_id if no taxon_id for strain
             if ($species_taxon_id == $taxon_id) {
-                $taxon_id = $tax->merged_for($taxon_id)         # fix very
-                    if $tax->is_merged($taxon_id);              # rare undef
                 $species_taxon_id = $parent_taxid_for{$taxon_id};
                 $fix_for{$taxon_id}{name_for} = $org;
                 $fix_for{$taxon_id}{node_for} = $species_taxon_id;
@@ -1522,6 +1541,7 @@ sub _make_gca_files {
     for my $taxon_id  ( keys %fix_for  ) {
         say {$names_out} join $FS,
             $taxon_id, $fix_for{$taxon_id}{name_for}, q{}, 'scientific name';
+            $rank_for{$fix_for{$taxon_id}{name_for}} = $rank_for{$taxon_id};
     }
 
     # write nodes.dmp
@@ -1529,12 +1549,12 @@ sub _make_gca_files {
     open my $nodes_out, '>', $nodes_gca_file;
 
     for my $accession ( keys %node_for ) {
-        say {$nodes_out} join $FS,
-            $accession, $node_for{$accession}, 'no rank';
+        say {$nodes_out} join $FS, $accession, $node_for{$accession},
+            $rank_for{$name_for{$accession}} // 'no rank';
     }
     for my $taxon_id  ( keys %fix_for  ) {
-        say {$nodes_out} join $FS,
-            $taxon_id, $fix_for{$taxon_id}{node_for}, $rank_for{$taxon_id};
+        say {$nodes_out} join $FS, $taxon_id, $fix_for{$taxon_id}{node_for},
+            $rank_for{$taxon_id};
     }
 
     return;
@@ -1640,7 +1660,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.191300
+version 0.200510
 
 =head1 SYNOPSIS
 

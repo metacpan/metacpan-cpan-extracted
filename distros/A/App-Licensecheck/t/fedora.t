@@ -3,7 +3,7 @@ use strictures;
 use Test2::V0;
 
 use lib 't/lib';
-use Test::Licensecheck;
+use Test2::Licensecheck;
 
 plan 15;
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode::Factory;
 # ABSTRACT: Genetic code factory based on NCBI gc.prt file
-$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.191300';
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.200510';
 use Moose;
 use namespace::autoclean;
 
@@ -197,6 +197,9 @@ sub _get_gcprt_content {
 --    readability at the suggestion of Peter Rice, EMBL
 --  Later additions by Taxonomy Group staff at NCBI
 --
+--  Version 4.5
+--     Added Cephalodiscidae mitochondrial genetic code 33
+--
 --  Version 4.4
 --     Added GTG as start codon for genetic code 3
 --     Added Balanophoraceae plastid genetic code 32
@@ -283,6 +286,7 @@ sub _get_gcprt_content {
 --
 --   id 7      id 4      - Kinetoplast code now merged in code id 4
 --   id 8      id 1      - all plant chloroplast differences due to RNA edit
+--
 --
 --*************************************************************************
 
@@ -529,6 +533,15 @@ Genetic-code-table ::= {
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Cephalodiscidae Mitochondrial" ,
+  id 33 ,
+  ncbieaa  "FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG",
+  sncbieaa "---M-------*-------M---------------M---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
  }
 }
 
@@ -548,7 +561,7 @@ Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.pr
 
 =head1 VERSION
 
-version 0.191300
+version 0.200510
 
 =head1 SYNOPSIS
 

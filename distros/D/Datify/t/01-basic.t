@@ -7,7 +7,7 @@ use warnings;
 use Carp 1.25;
 
 use Test2::V0;
-plan 9;
+plan 10;
 
 ok require Datify, 'Required Datify';
 
@@ -22,7 +22,7 @@ can_ok 'Datify', qw(
     vstringify
     regexpify
     listify arrayify
-    keyify pairify hashify
+    keysort keyify pairify hashify
     objectify
     codeify
     refify
@@ -57,6 +57,53 @@ is(
     ),
     'Cannot call private method'
 );
+
+# 9e9999 should be infinity.
+my @list = (
+    9e9999 / 9e9999,
+    "NaN",
+    9e9999,
+    "Infinity",
+    "inf",
+    123_456_789,
+     23_456_789.01,
+      3_456_789.01_2,
+        456_789.01_23,
+         56_789.01_234,
+          6_789.01_234_5,
+            789.01_234_56,
+             89.01_234_567,
+              9.01_234_567_8,
+    "apple",
+    "Banana",
+    "CHERRY",
+);
+my @sorted = sort Datify::keysort @list;
+my @expected = (
+              9.01_234_567_8,
+             89.01_234_567,
+            789.01_234_56,
+          6_789.01_234_5,
+         56_789.01_234,
+        456_789.01_23,
+      3_456_789.01_2,
+     23_456_789.01,
+    123_456_789,
+    "apple",
+    "Banana",
+    "CHERRY",
+    9e9999,
+    "inf",
+    "Infinity",
+    "NaN",
+    9e9999 / 9e9999,
+);
+is( \@sorted, \@expected, 'List sorts sensibly' )
+    or do {
+        diag( 'List sorted oddly:' );
+        diag( '@list   = ', join( ', ', @list ) );
+        diag( '@sorted = ', join( ', ', @sorted ) );
+    };
 
 subtest get_class => \&get_class;
 

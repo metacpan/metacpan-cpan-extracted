@@ -4,13 +4,11 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
-       'develop' => {
+       'runtime' => {
                       'requires' => {
-                                      'File::Spec' => '0',
-                                      'IO::Handle' => '0',
-                                      'IPC::Open3' => '0',
-                                      'Test::More' => '0',
-                                      'Test::Pod' => '1.41'
+                                      'Data::Munge' => '0',
+                                      'Exporter::Easy' => '0',
+                                      'Scalar::Util' => '0'
                                     }
                     },
        'test' => {

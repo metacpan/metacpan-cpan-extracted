@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.14.2;
+package Pcore::Chrome v0.15.0;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Chrome::Tab;
@@ -7,11 +7,8 @@ use Pcore::Util::Data qw[from_json];
 
 has bin => ();
 
-has listen     => ();
-has pac_listen => ();
-
-has host          => '127.0.0.1';
-has port          => 9222;
+has listen        => '//127.0.0.1';
+has pac_listen    => '//127.0.0.1';
 has user_data_dir => sub { P->file1->tempdir };
 has useragent     => ();
 
@@ -40,8 +37,8 @@ around new => sub ( $orig, $self, %args ) {
 
     $self = $self->$orig(%args);
 
-    $self->{listen}     = P->net->parse_listen( $self->{listen}     || '//127.0.0.1' );
-    $self->{pac_listen} = P->net->parse_listen( $self->{pac_listen} || '//127.0.0.1' );
+    $self->{listen}     = P->net->parse_listen( $self->{listen} );
+    $self->{pac_listen} = P->net->parse_listen( $self->{pac_listen} );
 
     $self->_build_pac_func( $args{proxy} );
 
@@ -108,16 +105,16 @@ around new => sub ( $orig, $self, %args ) {
     while () {
         Coro::sleep($CHECK_PORT_TIMEOUT);
 
-        last if P->net->check_port( $self->{host}, $self->{port}, $CHECK_PORT_TIMEOUT );
+        last if P->net->check_port( $self->{listen}->{host}, $self->{listen}->{port}, $CHECK_PORT_TIMEOUT );
 
-        die qq[Unable to connect to the google chrome on $self->{host}:$self->{port}] if time > $time;
+        die qq[Unable to connect to the google chrome on $self->{listen}->{host_port}] if time > $time;
     }
 
     return $self;
 };
 
 sub tabs ( $self ) {
-    my $res = P->http->get("http://$self->{host}:$self->{port}/json");
+    my $res = P->http->get("http://$self->{listen}->{host_port}/json");
 
     my $tabs = from_json $res->{data};
 
@@ -129,7 +126,7 @@ sub tabs ( $self ) {
 }
 
 sub new_tab ( $self, $url = undef ) {
-    my $res = P->http->get( "http://$self->{host}:$self->{port}/json/new?" . ( $url // 'about:blank' ) );
+    my $res = P->http->get( "http://$self->{listen}->{host_port}/json/new?" . ( $url // 'about:blank' ) );
 
     my $data = from_json $res->{data};
 
@@ -217,9 +214,9 @@ sub _run_pac_server ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 92                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
+## |    2 | 89                   | CodeLayout::ProhibitQuotedWordLists - List of quoted literal words                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 104                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 101                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

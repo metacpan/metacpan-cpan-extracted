@@ -3,7 +3,7 @@ NAME
     Data::Dmp)
 
 VERSION
-    This document describes version 0.001 of Sort::Sub::by_dmp (from Perl
+    This document describes version 0.002 of Sort::Sub::by_dmp (from Perl
     distribution Sort-Sub-by_dmp), released on 2019-12-15.
 
 SYNOPSIS
@@ -49,8 +49,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Sort::Sub::data_sruct_by_data_cmp. Most of the time, you'd probably want
-    this instead.
+    Sort::Sub::data_struct_by_data_cmp. Most of the time, you'd probably
+    want this instead.
 
     Sort::Sub::by_perl_function
 

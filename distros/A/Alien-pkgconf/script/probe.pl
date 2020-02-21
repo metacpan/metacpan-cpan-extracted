@@ -244,7 +244,7 @@ elsif($^O eq 'MSWin32')
   }
   else
   {
-    die "do not know enough please open ticket: https://github.com/plicease/Alien-pkgconf/issues";
+    die "do not know enough please open ticket: https://github.com/Perl5-Alien/Alien-pkgconf/issues";
   }
 }
 
@@ -279,7 +279,7 @@ elsif($^O eq 'darwin')
 
 else
 {
-  die "do not know enough about this OS to probe for correct paths.  Please open a ticket https://github.com/plicease/Alien-pkgconf/issues";
+  die "do not know enough about this OS to probe for correct paths.  Please open a ticket https://github.com/Perl5-Alien/Alien-pkgconf/issues";
 }
 
 my $my_pkg_config_dir = File::Spec->catdir(@prefix, 'lib', 'pkgconfig');

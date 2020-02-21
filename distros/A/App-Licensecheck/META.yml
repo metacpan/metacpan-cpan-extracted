@@ -31,7 +31,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.0.44
+    version: v3.0.45
 requires:
   Array::IntSpan: '0'
   Encode: '0'
@@ -63,12 +63,12 @@ resources:
   homepage: https://metacpan.org/pod/App::Licensecheck
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/licensecheck.git
-version: v3.0.44
+version: v3.0.45
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - documenter
   - tester
+  - documenter
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Profiles;
 # ABSTRACT: Evolutionary profiles for sequence sites
-$Bio::MUST::Core::SeqMask::Profiles::VERSION = '0.191300';
+$Bio::MUST::Core::SeqMask::Profiles::VERSION = '0.200510';
 use Moose;
 use namespace::autoclean;
 
@@ -178,7 +178,7 @@ Bio::MUST::Core::SeqMask::Profiles - Evolutionary profiles for sequence sites
 
 =head1 VERSION
 
-version 0.191300
+version 0.200510
 
 =head1 SYNOPSIS
 

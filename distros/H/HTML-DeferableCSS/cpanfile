@@ -17,6 +17,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "File::Spec::Functions" => "0";
   requires "Module::Metadata" => "0";
+  requires "Test::Deep" => "0.111";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
 };

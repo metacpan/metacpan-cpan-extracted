@@ -1,7 +1,7 @@
 use alienfile;
 
 plugin 'Probe::GnuWin32' => (
-  registery_key_regex => qr/^flex/i,
+  registry_key_regex => qr/^flex/i,
   exe_name => 'flex',
   exe_match => qr/flex/,
   exe_version => qr/version ([0-9\.]+)/,
@@ -20,13 +20,27 @@ share {
   requires 'Alien::m4'    => '0.08';
 
   plugin 'Download' => (
-    url     => 'https://github.com/westes/flex/releases',
+    url     => 'https://github.com/westes/flex/files/981163/flex-2.6.4.tar.gz',
     version => qr/^flex-([0-9\.]+)\.tar\.gz$/,
   );
 
   plugin 'Extract' => 'tar.gz';  
-  
+
+  patch [ '%{patch} -p1 < %{.install.patch}/flex-2.6.4.diff' ];
+
   plugin 'Build::Autoconf' => ();
+
+  requires 'Path::Tiny' => 0;
+
+  build [
+    sub {
+      log 'touch doc/flex.1';
+      Path::Tiny->new('doc/flex.1')->touch,
+    },
+    '%{configure} --disable-maintainer-mode',
+    '%{make}',
+    '%{make} install',
+  ];
 
   gather sub {
     my($build) = @_;

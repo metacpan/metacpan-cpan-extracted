@@ -27,11 +27,11 @@ licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.44
+Version v3.0.45
 
 =cut
 
-our $VERSION = version->declare('v3.0.44');
+our $VERSION = version->declare('v3.0.45');
 
 my $progname = path($0)->basename;
 
@@ -72,7 +72,7 @@ my ( $opt, $usage ) = describe_options(
 		{ default => 5000 }
 	],
 	[   'encoding|e=s',
-		'try decode source files as specified codec, with latin1 as fallback; by default no decoding is done'
+		'try decode source files as specified codec, with iso-8859-1 as fallback; by default no decoding is done'
 	],
 	[],
 	[ 'verbose!',  'add header of each file to license information' ],

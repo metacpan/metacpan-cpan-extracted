@@ -1,7 +1,7 @@
 use v5.14;
 use warnings;
 
-package Datify v0.20.045;
+package Datify v0.20.052;
 # ABSTRACT: Simple stringification of data.
 
 
@@ -10,6 +10,7 @@ use overload ();        #qw( Method Overloaded );
 
 use Carp         ();    #qw( carp croak );
 use List::Util   ();    #qw( reduce sum );
+use LooksLike    ();    #qw( numeric );
 use Scalar::Util ();    #qw( blessed looks_like_number refaddr reftype );
 use String::Tools v0.18.277 ();    #qw( stitch stringify subst );
 use Sub::Util      1.40     ();    #qw( subname );
@@ -434,13 +435,7 @@ sub is_numeric {
         }
     }
 
-    # The "defined" ensures that we're not considering nan,
-    # and the tests against inf/-inf ensure that those are rejected
-    # (even though looks_like_number considers them valid)
-    return Scalar::Util::looks_like_number($_)
-        && defined( $_ <=> 0 )
-        && $_ !=  'inf'
-        && $_ != '-inf';
+    return LooksLike::numeric($_);
 }
 
 
@@ -721,17 +716,19 @@ BEGIN {
             my ( $a, $b ) = @_;
             my $numa = Datify->is_numeric($a);
             my $numb = Datify->is_numeric($b);
-            return
-                  $numa && $numb ? $a <=> $b
+            return(
+                ( $numa && $numb ? $a <=> $b
                 : $numa          ? -1
                 :          $numb ?        +1
-                :                  $a_cmp__b
-                ;
+                :                  $a_cmp__b )
+                ||                 $a cmp $b
+            );
         }
     ));
     my $a_cmp__b
-        = ( $^V >= v5.16.0 ? 'CORE::fc($a) cmp CORE::fc($b) || ' : '' )
-        . '$a cmp $b';
+        = $^V >= v5.16.0
+        ? 'CORE::fc($a) cmp CORE::fc($b)'
+        :       'lc($a) cmp lc($b)';
     $keysort = String::Tools::subst( $keysort, a_cmp__b => $a_cmp__b );
     eval($keysort) or $@ and die $@;
 }
@@ -2136,7 +2133,7 @@ L<Data::Dumper>
 
 =head1 VERSION
 
-This document describes version v0.20.045 of this module.
+This document describes version v0.20.052 of this module.
 
 =head1 AUTHOR
 

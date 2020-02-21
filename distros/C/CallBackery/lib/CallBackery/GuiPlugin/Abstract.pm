@@ -288,7 +288,9 @@ sub filterHashKey {
     my $data = shift;
     my $filterKey = shift;
     my $ref = ref $data;
-    if (not $ref or $ref eq ref true){
+    if (not $ref 
+        or $ref eq ref true 
+        or $ref eq 'CallBackery::Translate'){
         return $data;
     }
     elsif ($ref eq 'CODE'){

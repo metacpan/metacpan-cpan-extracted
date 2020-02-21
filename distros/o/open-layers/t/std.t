@@ -1,10 +1,6 @@
 use strict;
 use warnings;
 use utf8;
-
-use if $^O eq 'MSWin32' && "$]" < 5.022, 'Test::More',
-  skip_all => 'Perl 5.22 required for pipe open tests on Windows';
-
 use Test::More;
 use File::Temp;
 use open::layers;
@@ -113,6 +109,8 @@ $result = _in_fork {
 };
 is $result, '0:0:0', 'layer set on no STD handles';
 
+SKIP: { skip 'pipe open fork does not work on Windows', 12 if $^O eq 'MSWin32';
+
 my $stdout = _capture_stdout {
   open::layers->import(STDOUT => ':raw');
   print "\xE2\n";
@@ -190,5 +188,7 @@ $ords = _print_stdin {
   return sprintf '%vX', scalar readline *STDIN;
 } "\xE2\x98\x83";
 is $ords, 'E2.98.83', 'STDIN not affected by rw';
+
+} # end SKIP
 
 done_testing;

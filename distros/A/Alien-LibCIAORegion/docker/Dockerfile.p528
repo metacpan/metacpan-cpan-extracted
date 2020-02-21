@@ -1,0 +1,35 @@
+FROM debian:10
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get -y                                  \
+    install                                     \
+    m4                                          \
+    make                                        \
+    gcc                                         \
+    autoconf                                    \
+    automake                                    \
+    libtool                                     \
+    bison                                       \
+    flex                                        \
+    patch                                       \
+    perl                                        \
+    pkg-config                                  \
+    curl                                        \
+    file
+
+RUN curl -L https://raw.githubusercontent.com/tokuhirom/Perl-Build/master/perl-build | perl - --noman 5.28.2 /opt/perl_5.28.2
+ENV PATH /opt/perl_5.28.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN curl -L https://cpanmin.us | perl - App::cpanminus
+COPY Alien-LibCIAORegion-0.01.tar.gz /tmp
+
+WORKDIR /tmp
+RUN tar xf Alien-LibCIAORegion-0.01.tar.gz
+
+WORKDIR Alien-LibCIAORegion-0.01
+
+RUN cpanm -l local --installdeps . || cat ~/.cpanm/build.log
+ENV PERL5LIB local/lib/perl5
+
+CMD ["/bin/bash" ]

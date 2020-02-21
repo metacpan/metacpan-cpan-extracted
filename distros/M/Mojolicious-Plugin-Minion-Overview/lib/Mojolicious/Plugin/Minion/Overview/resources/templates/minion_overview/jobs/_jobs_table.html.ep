@@ -1,0 +1,32 @@
+<table class="table table-hover table-sm mb-0">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Queued At</th>
+            <th>Runtime</th>
+            <th class="text-center">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for my $job (@$jobs) {
+            <tr>
+                <td class="align-middle">
+                    <a href="<%= url_for('minion_overview.jobs.show', id => $job->{ id }) %>"><%= $job->{ task } %></a><br/>
+                    <small class="text-muted">Queue: <%= $job->{ queue } %></small> | 
+                    <small class="text-muted text-truncate">Args: <span class="fa fa-info-circle" title="<%= $job->{ args } %>"></span></small> |
+                    <small class="text-muted">Notes: <span class="fa fa-info-circle" title="<%= $job->{ notes } %>"></span></small><br/>
+                    <small class="text-muted">Tags: 
+                        % foreach my $tag (@{ $job->{ tags } }) {
+                            <a href="<%= url_for('minion_overview.jobs')->query(tags => $tag) %>">
+                                <span class="badge badge-secondary"><%= $tag %></span>
+                            </a>
+                        % }
+                    </small>
+                </td>
+                <td class="align-middle"><%= $job->{ created } %></td>
+                <td class="align-middle"><%= $job->{ runtime } %>s</td>
+                <td class="align-middle text-center"><%= overview_job_status($job->{ state }) %></td>
+            </tr>
+        % }
+    </tbody>
+</table>

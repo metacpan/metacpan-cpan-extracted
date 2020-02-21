@@ -1,7 +1,7 @@
 MojoliciousAutomake
 ===================
 
-[![Build Status](https://travis-ci.org/oposs/mojolicious-automake.svg?branch=master)](https://travis-ci.org/oposs/mojolicious-automake)
+![Unit Tests](https://github.com/oposs/mojolicious-automake/workflows/Unit%20Tests/badge.svg)
 
 MojoliciousAutomake is a mojolicious app skeleton generator which sets up
 mojolicious projects with automake support.

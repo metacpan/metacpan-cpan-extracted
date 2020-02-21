@@ -3,7 +3,7 @@ package WWW::Mechanize::Link;
 use strict;
 use warnings;
 
-our $VERSION = '1.95';
+our $VERSION = '1.96';
 
 #ABSTRACT: Link object for WWW::Mechanize
 
@@ -65,7 +65,7 @@ WWW::Mechanize::Link - Link object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.95
+version 1.96
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ Base URL to which the links are relative.
 
 =head2 $link->attrs()
 
-Returns hash ref of all the attributes and attribute values in the tag. 
+Returns hash ref of all the attributes and attribute values in the tag.
 
 =head2 $link->URI()
 

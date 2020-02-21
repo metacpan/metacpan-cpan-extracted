@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.2.0
+version v0.2.3
 
 # SYNOPSIS
 
@@ -73,7 +73,28 @@ omitted.
 
 If the name is the same as the filename (without the extension) than
 you can simply use `1`.  (Likewise, an empty string or `0` disables
-the alias.)
+the alias:
+
+```perl
+my $css = HTML::DeferableCSS->new(
+  aliases => {
+      reset => 1,
+      gone  => 0,       # using "gone" will throw an error
+      one   => "1.css", #
+  }
+  ...
+);
+```
+
+If all names are the same as their filenames, then an array reference
+can be used:
+
+```perl
+my $css = HTML::DeferableCSS->new(
+  aliases => [ qw( foo bar } ],
+  ...
+);
+```
 
 Absolute paths cannot be used.
 
@@ -104,11 +125,17 @@ tools for that.
 This is a hash reference used internally to translate ["aliases"](#aliases)
 into the actual files or URLs.
 
-If files cannot be found, then it will throw an error.
+If files cannot be found, then it will throw an error, so calling this
+attribute in void context can be used to check for any errors:
+
+```
+eval { $css->css_files } or die "$@";
+```
 
 ## cdn\_links
 
-This is a hash reference of ["aliases"](#aliases) to URLs.
+This is a hash reference of ["aliases"](#aliases) to URLs. (Only one URL per
+alias is supported.)
 
 When ["use\_cdn\_links"](#use_cdn_links) is true, then these URLs will be used instead
 of local versions.
@@ -175,6 +202,35 @@ of files.
 
 True if there is an ["asset\_id"](#asset_id).
 
+## log
+
+This is a code reference for logging errors and warnings:
+
+```perl
+$css->log->( $level => $message );
+```
+
+By default, this is a wrapper around [Carp](https://metacpan.org/pod/Carp) that dies when the level
+is "error", and emits a warning for everything else.
+
+You can override this so that errors are treated as warnings,
+
+```perl
+log => sub { warn $_[1] },
+```
+
+or that warnings are fatal,
+
+```perl
+log => sub { die $_[1] },
+```
+
+or even integrate this with your own logging system:
+
+```perl
+log => sub { $logger->log(@_) },
+```
+
 # METHODS
 
 ## href
@@ -210,6 +266,9 @@ my $html = $css->link_or_inline_html( @aliases );
 
 This returns either the link HTML markup, or the embedded stylesheet,
 if the file size is not greater than ["inline\_max"](#inline_max).
+
+Note that a stylesheet will be inlined, even if there is are
+["cdn\_links"](#cdn_links).
 
 ## deferred\_link\_html
 

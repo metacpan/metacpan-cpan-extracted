@@ -1,5 +1,5 @@
 ---
-abstract: 'Aggregate tests'
+abstract: 'Aggregate tests for increased speed'
 author:
   - 'Dimitrios Kechagias <dkechag@cpan.org>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/SpareRoom/Test2-Aggregate.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

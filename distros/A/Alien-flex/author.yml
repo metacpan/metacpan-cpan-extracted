@@ -3,7 +3,11 @@ pod_spelling_system:
   skip: 0
   # list of words that are spelled correctly
   # (regardless of what spell check thinks)
-  stopwords: []
+  stopwords:
+   -  DJERIUS
+   -  Diab
+   -  Jerius
+
 
 pod_coverage:
   skip: 0
@@ -11,12 +15,6 @@ pod_coverage:
   # for either Class or method.
   private:
     - Alien::flex#alien_helper
-
-unused_vars:
-  skip: 0
-  global:
-    ignore_vars: []
-  module: {}
 
 version:
   dir: lib

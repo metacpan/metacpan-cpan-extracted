@@ -1,5 +1,5 @@
 #NEXUS
 
 begin trees;
-    tree tree_1 = [&R] ((((('Hordeum_vulgare_4513@295881652':0.014000,'Triticum_aestivum_4565@302595059':0.008000)Poaceae:0.038000,'Brachypodium_distachyon_15368@357123620':0.024000)Poaceae:0.029000,('Oryza_sativa_39947@315623028':0.050000,'Sorghum_bicolor_4558@242096926':0.060000)Poaceae:0.010000)Poaceae:0.152000,('Arabidopsis_thaliana_3702@7269912':0.237000,('Vitis_vinifera_29760@296090298':0.156000,('Glycine_max_3847@356550732':0.049000,'Medicago_truncatula_3880@357479567':0.101000)Fabaceae:0.080000)Streptophytina:0.049000)Streptophytina:0.115000)Streptophytina:0.255000,'Selaginella_moellendorffii_88036@302803464':0.510000)Streptophytina;
+    tree tree_1 = [&R] ((((('Hordeum_vulgare_4513@295881652':0.014000,'Triticum_aestivum_4565@302595059':0.008000)Poaceae:0.038000,'Brachypodium_distachyon_15368@357123620':0.024000)Poaceae:0.029000,('Oryza_sativa_39947@315623028':0.050000,'Sorghum_bicolor_4558@242096926':0.060000)Poaceae:0.010000)Poaceae:0.152000,('Arabidopsis_thaliana_3702@7269912':0.237000,('Vitis_vinifera_29760@296090298':0.156000,('Glycine_max_3847@356550732':0.049000,'Medicago_truncatula_3880@357479567':0.101000)Fabaceae:0.080000)Magnoliopsida:0.049000)Magnoliopsida:0.115000)Magnoliopsida:0.255000,'Selaginella_moellendorffii_88036@302803464':0.510000)Streptophytina;
 end;

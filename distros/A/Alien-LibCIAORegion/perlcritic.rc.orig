@@ -1,0 +1,8 @@
+# severity = brutal
+
+verbose = 9
+
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+
+[-TestingAndDebugging::RequireUseStrict]
+

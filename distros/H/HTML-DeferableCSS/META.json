@@ -75,6 +75,7 @@
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
             "Module::Metadata" : "0",
+            "Test::Deep" : "0.111",
             "Test::More" : "0",
             "Test::Most" : "0"
          }
@@ -83,7 +84,7 @@
    "provides" : {
       "HTML::DeferableCSS" : {
          "file" : "lib/HTML/DeferableCSS.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.3"
       }
    },
    "release_status" : "stable",
@@ -97,7 +98,7 @@
          "web" : "https://github.com/robrwo/HTML-DeferableCSS"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"

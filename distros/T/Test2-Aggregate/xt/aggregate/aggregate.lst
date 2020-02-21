@@ -1,2 +1,3 @@
 xt/aggregate/check_env.t
 xt/aggregate/check_plan.t
+# t/dirs.t

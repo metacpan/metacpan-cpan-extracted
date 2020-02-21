@@ -1,5 +1,13 @@
 .github/ISSUE_TEMPLATE/bug_report.md
 .github/ISSUE_TEMPLATE/feature_request.md
+.idea/$PRODUCT_WORKSPACE_FILE$
+.idea/codeStyles/codeStyleConfig.xml
+.idea/google-ads-perl.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/perl5local.xml
+.idea/vcs.xml
+.idea/workspace.xml
 .perltidyrc
 Build.PL
 Changes

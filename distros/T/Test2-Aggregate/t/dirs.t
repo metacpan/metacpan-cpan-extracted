@@ -1,16 +1,18 @@
 use Test2::V0;
 use Test2::Aggregate;
 
-plan(4);
+plan(5);
 
 my $root = (grep {/^\.$/i} @INC) ? undef : './';
 
 Test2::Aggregate::run_tests();
 
-Test2::Aggregate::run_tests(
-    dirs => ['xt/aggregate'],
-    root => './'
+my $stats = Test2::Aggregate::run_tests(
+    dirs     => ['xt/aggregate'],
+    root     => './'
 );
+
+is(scalar(keys %$stats), 2, 'subtests');
 
 Test2::Aggregate::run_tests(
     dirs         => ['xt/aggregate'],

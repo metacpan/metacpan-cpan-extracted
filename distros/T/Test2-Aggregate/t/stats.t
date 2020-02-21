@@ -3,11 +3,13 @@ use Test2::Aggregate;
 use Test::Output;
 use Time::HiRes;
 
-plan(12);
-
 my $root   = (grep {/^\.$/i} @INC) ? undef : './';
 my $timest = time();
 my $pattrn = 'stats.t.*txt';
+my $tmpdir = File::Temp->newdir;
+
+plan skip_all => "Cannot create temp directory" unless -e $tmpdir;
+plan(12);
 
 foreach my $extend (0 .. 1) {
     stdout_like(sub {
@@ -26,18 +28,18 @@ foreach my $extend (0 .. 1) {
 Test2::Aggregate::run_tests(
     dirs         => ['xt/aggregate'],
     root         => $root,
-    stats_output => '/tmp'
+    stats_output => $tmpdir
 );
 
-like(find( "/tmp", $pattrn), [qr/$pattrn/], "Found stats file");
+like(find($tmpdir, $pattrn), [qr/$pattrn/], "Found stats file");
 
 Test2::Aggregate::run_tests(
     dirs         => ['xt/aggregate'],
     root         => $root,
-    stats_output => "/tmp/tmp1$timest"
+    stats_output => "$tmpdir/tmp1$timest"
 );
 
-like(find( "/tmp/tmp1$timest", '.*'), [qr/$pattrn/], "Found stats file");
+like(find( "$tmpdir/tmp1$timest", '.*'), [qr/$pattrn/], "Found stats file in subdir");
 
 sub find {
     my $dir     = shift;

@@ -1,20 +1,18 @@
 package main;
 
-use 5.008;
-
 use strict;
 use warnings;
 
-use Test::More 0.88;	# Because of done_testing();
+use Test2::V0;
+use Test2::Tools::LoadModule;
 
-eval {
-    require Test::Pod::LinkCheck::Lite;
-    1;
-} or plan skip_all => 'Unable to load Test::Pod::LinkCheck::Lite';
+BEGIN {	# Need BEGIN block so compiler sees constants.
+    load_module_or_skip_all 'Test::Pod::LinkCheck::Lite', undef, [ ':const' ];
+}
 
-Test::Pod::LinkCheck::Lite->new()->all_pod_files_ok(
-    qw{ blib eg },
-);
+Test::Pod::LinkCheck::Lite->new(
+    prohibit_redirect	=> ALLOW_REDIRECT_TO_INDEX,
+)->all_pod_files_ok();
 
 done_testing;
 

@@ -40,7 +40,7 @@ run_test('round', 10.23, 10.23, 2);
 #     HUE    #
 #################
 run_test('hue', 1, 1.9, 1, 1);
-run_test('hue', 0.22908, 0.666, 0.23, 0);
+run_test('hue', 0.23, 0.67, 0.23, 0);
 
 #################
 #     scaled    #
@@ -65,8 +65,6 @@ eval{
 };
 
 like($@, qr/hex length must be 3 or 6/);
-
-
 
 
 sub run_test {

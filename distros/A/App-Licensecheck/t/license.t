@@ -3,9 +3,9 @@ use strictures;
 use Test2::V0;
 
 use lib 't/lib';
-use Test::Licensecheck;
+use Test2::Licensecheck;
 
-plan 36;
+plan 38;
 
 license_is( 't/devscripts/academic.h',      'AFL-3.0' );
 license_is( 't/grant/Apache/one_helper.rb', 'Apache-2.0' );
@@ -17,18 +17,21 @@ license_is(
 	],
 	'Artistic-2.0'
 );
-license_is( 't/devscripts/beerware.cpp',     'Beerware' );
-license_is( 't/devscripts/bsd-1-clause-1.c', 'BSD~unspecified' );
-license_is( 't/devscripts/bsd.f',            'BSD-2-clause' );
+license_is( 't/devscripts/beerware.cpp', 'Beerware' );
+license_is( 't/devscripts/bsd-1-clause-1.c', [ 'UNKNOWN', 'BSD~1-clause' ] );
+license_is( 't/devscripts/bsd.f', 'BSD-2-clause' );
 license_is(
 	[   qw(
 			t/devscripts/bsd-3-clause.cpp
 			t/devscripts/bsd-3-clause-authorsany.c
-			t/devscripts/mame-style.c
 			t/devscripts/bsd-regents.c
 			)
 	],
 	'BSD-3-clause'
+);
+license_is(
+	[qw(	t/devscripts/mame-style.c)],
+	[ 'UNKNOWN', 'BSD-3-clause' ]
 );
 license_is( 't/devscripts/boost.h', 'BSL-1.0' );
 license_is( 't/devscripts/epl.h',   'EPL-1.0' );

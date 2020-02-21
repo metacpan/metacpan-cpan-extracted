@@ -470,7 +470,7 @@ qx.Class.define("callbackery.ui.form.DateTime",
     _applyPlaceholder : function(value, old) {
         var p = value.split("@");
 //        this.getChildControl("datefield").setPlaceholder(qx.locale.Manager.tr(p[0]));
-        this.getChildControl("datefield").setPlaceholder(this['tr'](p[0]));
+        this.getChildControl("datefield").setPlaceholder(this.xtr(p[0]));
         if (p[1] != null) {
             this.getChildControl("timefield").setPlaceholder(p[1]);
         }

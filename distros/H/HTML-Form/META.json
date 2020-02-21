@@ -79,39 +79,39 @@
    "provides" : {
       "HTML::Form" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::FileInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::IgnoreInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::ImageInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::Input" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::KeygenInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::ListInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::SubmitInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       },
       "HTML::Form::TextInput" : {
          "file" : "lib/HTML/Form.pm",
-         "version" : "6.06"
+         "version" : "6.07"
       }
    },
    "release_status" : "stable",
@@ -128,10 +128,10 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.06",
+   "version" : "6.07",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -184,7 +184,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -249,7 +249,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -449,6 +449,101 @@
             "version" : "0.029"
          },
          {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@Default/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@Default/Name",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@Default/Version",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@Default/prelude",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "SYNOPSIS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "DESCRIPTION",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "OVERVIEW",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "ATTRIBUTES",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "METHODS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "FUNCTIONS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@Default/Leftovers",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@Default/postlude",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@Default/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@Default/Legal",
+                        "version" : "4.015"
+                     }
+                  ]
+               }
+            },
+            "name" : "PodWeaver",
+            "version" : "4.008"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",
             "name" : "CheckChangeLog",
             "version" : "0.05"
@@ -576,7 +671,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.06",
+                  "tag" : "v6.07",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -788,7 +883,7 @@
       "Yuri Karaban <tech@askold.net>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

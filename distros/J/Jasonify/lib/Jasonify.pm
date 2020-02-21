@@ -1,12 +1,12 @@
 use v5.14;
 use warnings;
 
-package Jasonify v0.20.050;
+package Jasonify v0.20.052;
 # ABSTRACT: Just Another Serialized Object Notation library.
 
 
 use Carp             ();           #qw( carp );
-use Datify v0.20.045 ();
+use Datify v0.20.052 ();
 use Scalar::Util     ();           #qw( blessed looks_like_number reftype );
 use String::Tools  qw( subst );    #qw( );
 
@@ -426,13 +426,11 @@ __PACKAGE__->set(
 package
     Jasonify::Literal;
 
-use Scalar::Util ();    #qw( blessed looks_like_number );
+use Scalar::Util ();    #qw( looks_like_number );
 
 use overload
     'bool' => 'bool',
     '""'   => 'as_string',
-
-    #'cmp' => \&compare,
     ;
 
 our $null  = bless \do { my $null  = Jasonify->get('null')  }, __PACKAGE__;
@@ -483,7 +481,8 @@ use overload
     '0+'  => 'as_num',
     'neg' => 'negate',
 
-    #'<=>' => \&compare,
+    '<=>' => 'comparen',
+    'cmp' => 'compares',
     ;
 use parent -norequire => 'Jasonify::Literal';
 
@@ -507,9 +506,11 @@ my $number_regex = do {
     qr/-?$integer$decimal?(?:[Ee][+-]?$integer)?/;
 };
 
+sub comparen { ( $_[2] ? -1 : +1 ) * (    $_[0]->as_num <=> $_[1] ) }
+sub compares { ( $_[2] ? -1 : +1 ) * ( ${ $_[0] }       cmp $_[1] ) }
 sub as_num { eval ${ $_[0] } }
 sub negate {
-    my $num = ${$_[0]};
+    my $num = ${ $_[0] };
     return
           $num eq $$nan  ? $nan
         : $num eq $$inf  ? $ninf
@@ -997,7 +998,7 @@ L<JSON>, L<Datify>
 
 =head1 VERSION
 
-This document describes version v0.20.050 of this module.
+This document describes version v0.20.052 of this module.
 
 =head1 AUTHOR
 

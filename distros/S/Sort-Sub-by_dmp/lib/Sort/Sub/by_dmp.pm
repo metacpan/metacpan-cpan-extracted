@@ -3,7 +3,7 @@ package Sort::Sub::by_dmp;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2019-12-15'; # DATE
 our $DIST = 'Sort-Sub-by_dmp'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Sort::Sub::by_dmp - Sort data structures by comparing their dump (using Data::Dm
 
 =head1 VERSION
 
-This document describes version 0.001 of Sort::Sub::by_dmp (from Perl distribution Sort-Sub-by_dmp), released on 2019-12-15.
+This document describes version 0.002 of Sort::Sub::by_dmp (from Perl distribution Sort-Sub-by_dmp), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -107,8 +107,8 @@ feature.
 
 =head1 SEE ALSO
 
-L<Sort::Sub::data_sruct_by_data_cmp>. Most of the time, you'd probably want this
-instead.
+L<Sort::Sub::data_struct_by_data_cmp>. Most of the time, you'd probably want
+this instead.
 
 L<Sort::Sub::by_perl_function>
 

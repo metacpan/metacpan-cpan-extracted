@@ -58,7 +58,7 @@ EOT
 # TODO: provision phyml
 
 SKIP: {
-    skip q{Cannot find 'phyml' in $PATH}, 5;    # unless qx{which phyml};
+    skip q{Cannot find 'phyml' in $PATH}, 5 unless qx{which phyml};
 
     my $alifile = file('test', 'gb_strict.fasta');
     my $ali = Bio::MUST::Core::Ali->load($alifile);

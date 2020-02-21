@@ -2,90 +2,14 @@ use strict;
 use warnings;
 package Test::Ratchet;
 
-use Exporter::Easy ( EXPORT => [ qw/ratchet/ ] );
+use Exporter::Easy ( OK => [ qw/ratchet clank/ ] );
 use Data::Munge qw(rec);
+use Scalar::Util qw(refaddr);
+
+our $VERSION = '0.004';
 
 # ABSTRACT: Mocking helper that swaps out implementations automatically
 
-=head1 DESCRIPTION
-
-Testing sucks, especially when you have to deal with third-party code,
-especially when you didn't have a choice about which third-party code you are
-relying on.
-
-This module solves one specific difficulty of doing so: when you have an atomic
-operation that ends up running the same function multiple times with different
-data.
-
-An example you say? The rationale for writing this module was to test a module
-that used L<REST::Client/PATCH> twice in the same function, but sending
-different data to different endpoints (because Reasons). Since the function
-being tested could not be subdivided I<by> the test, it made sense to set up a
-sequence of expectations before the test instead.
-
-This module, then, simply exports the L</ratchet> function, which sets up
-a queue of subrefs to handle a mocked function.
-
-I'm sure it has other purposes too.
-
-=head1 SYNOPSIS
-
-    use Test::Ratchet;
-    use Test::MockModule;
-    use Test::More;
-
-    my $mock = Test::MockModule->new('Some::Module');
-    $mock->mock( magic_method => ratchet(
-        \&first_implementation,
-        \&second_implementation,
-        ...
-    ));
-
-    sub first_implementation {
-        my $self = shift;
-        my $arg1 = shift;
-
-        is $arg1, "foo", "First call passed foo to magic_method";
-
-        return { something => 'relevant' }
-    }
-
-    sub second_implementation {
-        my $self = shift;
-        my $arg1 = shift;
-
-        is $arg1, "bar", "Second call passed bar to magic_method";
-
-        return { something => 'else' }
-    }
-
-=head1 EXPORTS
-
-This module exports L</ratchet> by default - this is the only export.
-
-=head2 ratchet
-
-Accepts any number of subrefs, and returns a single subref that will run through
-this queue each time it is called.
-
-Additionally, non-refs can be used to repeat an entry rather than creating
-multiple refs to the same thing:
-
-=over
-
-=item N
-
-A number will repeat the subref after it N times
-
-=item Z<>*
-
-An asterisk will repeat the subref after it indefinitely.
-
-=back
-
-If the mocked sub is called and the queue has expired, it will die.
-
-=cut
 
 sub ratchet {
     my @subrefs = @_;
@@ -127,4 +51,151 @@ sub ratchet {
 }
 
 
+sub clank($) {
+    my $subref = shift;
+    my $caller = sprintf "%s, line %s", (caller)[1,2];
+    my $clank = rec { my $rec = shift; delete $Test::Ratchet::Clank::CLANK{ refaddr $rec }; &$subref };
+    $Test::Ratchet::Clank::CLANK{refaddr $clank} = $caller;
+    bless $clank, "Test::Ratchet::Clank";
+}
+
+package Test::Ratchet::Clank;
+
+use Scalar::Util qw(refaddr);
+
+our %CLANK;
+
+sub DESTROY {
+    my $self = shift;
+    require Test::More;
+    Test::More::fail("A Clank was never run! Created at " . $CLANK{refaddr $self}) if $CLANK{ refaddr $self };
+}
+
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Ratchet - Mocking helper that swaps out implementations automatically
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+    use Test::Ratchet;
+    use Test::MockModule;
+    use Test::More;
+
+    use Some::Module;
+
+    my $mock = Test::MockModule->new('Some::Module');
+    $mock->mock( magic_method => ratchet(
+        \&first_implementation,
+        \&second_implementation,
+    ));
+
+    # In reality, you will have no control over the use of this object - which
+    # is the purpose of the module in the first place! The actual use of this
+    # object would be deep in the code you are actually testing.
+    my $obj = Some::Module->new;
+
+    $obj->magic_method('foo'); # Returns { something => 'relevant' }
+    $obj->magic_method('bar'); # Returns { something => 'else' }
+
+    sub first_implementation {
+        my $self = shift;
+        my $arg1 = shift;
+
+        is $arg1, "foo", "First call passed foo to magic_method";
+
+        return { something => 'relevant' }
+    }
+
+    sub second_implementation {
+        my $self = shift;
+        my $arg1 = shift;
+
+        is $arg1, "bar", "Second call passed bar to magic_method";
+
+        return { something => 'else' }
+    }
+
+=head1 DESCRIPTION
+
+Testing sucks, especially when you have to deal with third-party code,
+especially when you didn't have a choice about which third-party code you are
+relying on.
+
+This module solves one specific difficulty of doing so: when you have an atomic
+operation that ends up running the same function multiple times with different
+data.
+
+An example you say? The rationale for writing this module was to test a module
+that used L<REST::Client/PATCH> twice in the same function, but sending
+different data to different endpoints (because Reasons). Since the function
+being tested could not be subdivided I<by> the test, it made sense to set up a
+sequence of expectations before the test instead.
+
+This module, then, simply exports the L</ratchet> function, which sets up
+a queue of subrefs to handle a mocked function.
+
+I'm sure it has other purposes too.
+
+=head1 EXPORTS
+
+This module exports L</ratchet> and L</clank> on request.
+
+=head2 ratchet
+
+Accepts any number of subrefs, and returns a single subref that will run through
+this queue each time it is called.
+
+Additionally, non-refs can be used to repeat an entry rather than creating
+multiple refs to the same thing:
+
+=over
+
+=item N
+
+A number will repeat the subref after it N times
+
+=item Z<>*
+
+An asterisk will repeat the subref after it indefinitely.
+
+=back
+
+If the mocked sub is called and the queue has expired, it will die.
+
+=head2 clank
+
+A clank is a subref that outputs a test failure if it is not run at least once
+before it goes out of scope. You can use it in your ratchet, or independently.
+
+    ratchet (
+        clank \&must_run,
+        \&might_run
+    );
+
+To keep the interface simple the test failure uses a generic message.
+
+=head1 AUTHOR
+
+Alastair Douglas <altreus@altre.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Alastair Douglas.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

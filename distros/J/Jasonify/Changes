@@ -1,5 +1,9 @@
 Revision history for Jasonify.
 
+v0.20.052 2020-02-21
+
+ - Another fix for long double support.
+
 v0.20.050 2020-02-19
 
  - Datify requirement is v0.20.045.

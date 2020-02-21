@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.12
+    version 0.14
 
 SYNOPSIS
 
@@ -14,7 +14,18 @@ SYNOPSIS
      use Env qw( @PATH );
      unshift @PATH, Alien::flex->bin_dir;  # flex is now in your path
 
-    From Alien::Base Build.PL
+    In an Alien::Build alienfile:
+
+     use alienfile;
+     
+     share {
+       ...
+       requires 'Alien::flex';
+       build [ '%{flex} ...' ];
+       ...
+     };
+
+    From Build.PL / Alien::Base::ModuleBuild:
 
      use Alien:Base::ModuleBuild;
      my $builder = Module::Build->new(
@@ -38,7 +49,11 @@ HELPERS
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Diab Jerius (DJERIUS)
 
 COPYRIGHT AND LICENSE
 

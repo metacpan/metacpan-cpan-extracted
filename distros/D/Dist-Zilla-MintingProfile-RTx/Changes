@@ -1,3 +1,7 @@
+0.14 2020-02-20
+ - Default to 4.4-5.0 compat
+ - Add "." to @INC to run Makefile.PL even without Module::Install installed
+
 0.13 2018-03-04
  - Drop 4.0 documentation and default to 4.2-4.4 compat
  - Better formatting for bugs section

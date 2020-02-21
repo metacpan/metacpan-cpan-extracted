@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build flex
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub alien_helper
@@ -29,7 +29,7 @@ Alien::flex - Find or build flex
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,18 @@ From a Perl script
  use Env qw( @PATH );
  unshift @PATH, Alien::flex->bin_dir;  # flex is now in your path
 
-From Alien::Base Build.PL
+In an L<Alien::Build> L<alienfile>:
+
+ use alienfile;
+ 
+ share {
+   ...
+   requires 'Alien::flex';
+   build [ '%{flex} ...' ];
+   ...
+ };
+
+From Build.PL / L<Alien::Base::ModuleBuild>:
 
  use Alien:Base::ModuleBuild;
  my $builder = Module::Build->new(
@@ -63,7 +74,11 @@ Returns the name of the flex command.  Usually just C<flex>.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 

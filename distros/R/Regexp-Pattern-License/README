@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.1.102
+    Version v3.2.0
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -293,7 +293,15 @@ PATTERNS
 
     *   ofl_1
 
+    *   ofl_1_no_rfn
+
+    *   ofl_1_rfn
+
     *   ofl_1_1
+
+    *   ofl_1_1_no_rfn
+
+    *   ofl_1_1_rfn
 
     *   openssl
 
@@ -318,6 +326,8 @@ PATTERNS
     *   sgi_b_1_1
 
     *   sgi_b_2
+
+    *   ssleay
 
     *   unicode_strict
 
@@ -375,6 +385,8 @@ PATTERNS
     *   licensed_under
 
     *   or_at_option
+
+    *   usage_rfn
 
     *   version
 
@@ -514,6 +526,14 @@ STRUCTURE
     *   license:is:grant
 
         License is commonly granted by stating the whole license.
+
+    *   type:usage:*:*
+
+        Pattern covers a specific usage of a license.
+
+        Third part is the key of the corresponding non-usage-specific pattern.
+
+        Fourth part is the key of the corresponding usage trait pattern.
 
     *   type:combo
 

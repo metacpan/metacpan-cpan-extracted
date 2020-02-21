@@ -7,6 +7,27 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.45	2020-02-21
+
+ [ Bug Fixes ]
+ - fix: try fallback encoding per-file (restore explicit encoding for
+   subsequent file)
+   Dominique Dumont++
+ - sort positions numerically (not alphanumerically)
+
+ [ Documentation ]
+ - fix print encoding name (not Encode object ref) if encoding fails
+ - use canonical encoding name iso-8859-1 (not latin-1)
+
+ [ Test Suite ]
+ - change namespace of local libraries to Test2::Licensecheck
+ - support fixing or skipping with Test2::Licensecheck::ScanCode skipfiles
+
+ [ Other ]
+ - streamline detection of bsd licenses
+ - update (improved but still failing) misdetection of SSLeay since
+   Regexp::Pattern::License v3.2.0
+
 v3.0.44	2020-02-10
 
  [ Test Suite ]

@@ -1,5 +1,11 @@
 Revision history for Test2-Aggregate
 
+0.12    2020-02-21
+        'dry_run' option.
+        'pre_eval' option.
+        'include' regex option, 'excludes' changed to 'exclude' for symmetry.
+        Comments in list files, POD update, test coverage.
+
 0.11    2019-12-04
         Remove duplicate tests by default, add 'unique' option.
         'excludes' option.

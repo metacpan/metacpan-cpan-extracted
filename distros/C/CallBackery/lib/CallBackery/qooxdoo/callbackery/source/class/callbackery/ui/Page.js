@@ -18,7 +18,7 @@ qx.Class.define("callbackery.ui.Page", {
     construct : function(cfg) {
         /* using syntax trick to not get a warning for translating
            a variable */
-        this.base(arguments, this['tr'](cfg.tabName));
+        this.base(arguments, this.xtr(cfg.tabName));
         this.setLayout(new qx.ui.layout.Grow());
         this.setPadding([0,0,0,0]);
         var screen = new callbackery.ui.Screen(cfg);

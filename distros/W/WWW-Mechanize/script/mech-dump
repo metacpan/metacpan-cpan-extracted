@@ -95,7 +95,7 @@ sub dump_headers {
 sub dump_forms {
     my $mech = shift;
     print "--> Forms:\n" if $all;
-    $mech->dump_forms( undef, $absolute );
+    $mech->dump_forms( undef );
     return;
 }
 
@@ -131,7 +131,7 @@ mech-dump - Dumps information about a web page
 
 =head1 VERSION
 
-version 1.95
+version 1.96
 
 =head1 SYNOPSIS
 

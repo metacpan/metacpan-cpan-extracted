@@ -33,7 +33,7 @@ subtest 'basics' => sub {
                 toRGB => 'rgb(255,0,0)',
                 toRGBA => 'rgba(255,0,0,1)',
         );
-        basic_tests(
+	basic_tests(
                 start => [ '255', '0', '0' ],
                 toCSS => '#f00',
                 toHSL => 'hsl(0,100%,50%)',
@@ -53,7 +53,6 @@ subtest 'basics' => sub {
                 toRGB => 'rgb(255,0,0)',
                 toRGBA => 'rgba(255,0,0,1)',
         );
-    
 };       
 
 sub basic_tests {

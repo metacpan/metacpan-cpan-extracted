@@ -5,7 +5,7 @@ plugin 'PkgConfig' => 'libedit';
 share {
 
   plugin Download => (
-    url     => 'http://thrysoee.dk/editline',
+    url     => 'https://thrysoee.dk/editline',
     version => qr/^libedit-([0-9\.\-]+)\.tar\.gz$/,
   );
 
