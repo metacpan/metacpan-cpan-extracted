@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 3.0.29
+version 3.0.30
 
 =head1 DESCRIPTION
 
@@ -24,19 +24,21 @@ The L<MarpaX::ESLIF::BNF> is inspired from L<Marpa::R2's DSL|https://metacpan.or
 
 =over
 
-=item native regular expression support
+=item Native regular expression support
 
-=item syntactic exception
+=item Syntactic exception
 
-=item unlimited number of sub-grammars
+=item Unlimited number of sub-grammars
 
-=item streaming compatible architecture
+=item Streaming compatible architecture
 
-=item zero-length symbols
+=item Zero-length symbols
 
-=item embedded lua language
+=item Embedded lua language
 
-=item java, lua and perl bindings
+=item Bindings to java, lua and perl
+
+=item JSON (strict and extended) grammars for decoding/encoding
 
 =back
 

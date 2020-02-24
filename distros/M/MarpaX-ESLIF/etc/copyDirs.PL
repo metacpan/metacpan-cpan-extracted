@@ -102,7 +102,7 @@ $dst = File::Spec->catdir('src', 'src', 'bindings', 'lua');
 print "... Copying directory $src to $dst\n",
 _dircopy($src, $dst);
 
-foreach (qw/bootstrap.c lua.c marpaESLIF.c/) {
+foreach (qw/bootstrap.c lua.c marpaESLIF.c json.c floattos.c/) {
   $src = File::Spec->catfile(($updir) x 3, 'src', $_);
   $dst = File::Spec->catfile('src', 'src', $_);
   print "... Copying file $src to $dst\n";
@@ -186,6 +186,7 @@ L<MarpaX::ESLIF::BNF>, L<MarpaX::ESLIF::Tutorial::Calculator>, L<PCRE2|http://ww
 
 The perl interface is using an I<all-in-one> version of the underlying L<marpaESLIF C library|https://github.com/jddurand/c-marpaESLIF>. This mean that character conversion relies on L<libiconv|https://www.gnu.org/software/libiconv> to do character translation if needed.
 TRAILER
+
 close(INTRO) || warn "Cannot close $dst, $!";
 
 exit(EXIT_SUCCESS);
@@ -196,7 +197,7 @@ exit(EXIT_SUCCESS);
 # Even if I would use Win32::LongPath, dzil would fail afterwards -;
 #
 sub _dircopy {
-    my ($srcdir, $dstdir) = @_;
+    my ($srcdir, $dstdir, @parents) = @_;
 
     if (! -d $srcdir) {
         die "$srcdir is not a directory";
@@ -272,22 +273,19 @@ sub _dircopy {
         next if $_ eq 'Testing';
         next if $_ eq 'Win32';
         next if $_ eq 'ipch';
-        next if $_ eq 'patchit';
-        next if $_ eq 'pcre2-10.22';
-        next if $_ eq 'pcre2-10.22.tar.gz';
-        next if $_ eq 'pcre2-10.23';
-        next if $_ eq 'pcre2-10.23.patchdir';
-        next if $_ eq 'pcre2-10.23.tar.gz';
+        next if $_ eq 'CMake-codecov';
+        if ($_ eq 'tar') {
+          #
+          # We skip only 'tar' directory of marpaESLIF
+          #
+          next unless @parents;
+        }
         next if $_ =~ /~$/;
 
         my $mode = $stats->{$_}->[2];
 
         if (S_ISDIR($mode)) {
-            # if ($basedir eq 'github') {
-            #     _dircopy(File::Spec->catdir($srcdir, $_), File::Spec->catdir($dstdir, $reducedLength++));
-            # } else {
-                _dircopy(File::Spec->catdir($srcdir, $_), File::Spec->catdir($dstdir, $_));
-            # }
+            _dircopy(File::Spec->catdir($srcdir, $_), File::Spec->catdir($dstdir, $_), $_, @parents);
         } else {
             my $file = File::Spec->catfile($srcdir, $_);
             print "... Copying file $file to $dstdir\n";

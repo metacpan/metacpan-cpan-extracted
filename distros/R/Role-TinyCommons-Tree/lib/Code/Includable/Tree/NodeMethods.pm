@@ -1,9 +1,9 @@
 package Code::Includable::Tree::NodeMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-07'; # DATE
+our $DATE = '2020-02-24'; # DATE
 our $DIST = 'Role-TinyCommons-Tree'; # DIST
-our $VERSION = '0.121'; # VERSION
+our $VERSION = '0.122'; # VERSION
 
 use strict;
 our $GET_PARENT_METHOD = 'parent';
@@ -261,7 +261,7 @@ Code::Includable::Tree::NodeMethods - Tree node routines
 
 =head1 VERSION
 
-This document describes version 0.121 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
+This document describes version 0.122 of Code::Includable::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
 
 =head1 DESCRIPTION
 
@@ -399,7 +399,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
 
 =head1 BUGS
 

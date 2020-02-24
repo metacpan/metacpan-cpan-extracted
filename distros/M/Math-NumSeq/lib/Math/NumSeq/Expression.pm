@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -24,7 +24,7 @@ use Math::Libm;
 use Module::Util;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -590,7 +590,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

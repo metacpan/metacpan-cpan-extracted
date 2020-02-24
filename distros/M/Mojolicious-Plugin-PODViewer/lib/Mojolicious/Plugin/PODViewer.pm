@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::PODViewer;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 # ABSTRACT: POD renderer plugin
 
 #pod =encoding utf8
@@ -278,7 +278,7 @@ Mojolicious::Plugin::PODViewer - POD renderer plugin
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -436,7 +436,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords brad CandyAngel Oleg Tekki Zoffix Znet
+=for stopwords brad CandyAngel Luc Didry Oleg Tekki Zoffix Znet
 
 =over 4
 
@@ -447,6 +447,10 @@ brad <brad@clickmagick.com>
 =item *
 
 CandyAngel <candyangel@electricjungle.org>
+
+=item *
+
+Luc Didry <luc@didry.org>
 
 =item *
 
@@ -489,13 +493,13 @@ __DATA__
     % my $path = '';
     % for my $part (split '/', $module) {
         %= '::' if $path
-        % $path .= $path ? "/$part" : $path;
-        %= link_to $part => 'plugin.podviewer', { module => $part }
+        % $path .= $path ? "/$part" : $part;
+        %= link_to $part => 'plugin.podviewer', { module => $path }
     % }
     <span class="more">
         (<%= link_to 'source' => 'plugin.podviewer',
           { module => $module, format => 'txt' } %>,
-        <%= link_to 'CPAN' => 'plugin.podviewer', { module => $module } %>)
+        <%= link_to 'CPAN' => $cpan %>)
     </span>
 </div>
 

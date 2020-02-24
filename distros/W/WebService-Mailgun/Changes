@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Mailgun
 
+0.08 2020-02-24T00:42:25Z
+    - fix event test
+
 0.07 2019-12-27T12:56:14Z
     - fix event method
     - fix version format

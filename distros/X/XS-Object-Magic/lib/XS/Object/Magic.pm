@@ -1,4 +1,5 @@
-package XS::Object::Magic;
+package XS::Object::Magic; # git description: XS-Object-Magic-0.04-6-gf4315fa
+# ABSTRACT: Opaque, extensible XS pointer backed objects using C<sv_magic>
 
 use strict;
 use warnings;
@@ -6,8 +7,7 @@ use warnings;
 require 5.008001;
 use parent qw(DynaLoader);
 
-our $VERSION = '0.04';
-$VERSION = eval $VERSION;
+our $VERSION = '0.05';
 
 sub dl_load_flags { 0x01 }
 
@@ -19,9 +19,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 XS::Object::Magic - Opaque, extensible XS pointer backed objects using C<sv_magic>
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -97,10 +103,9 @@ XS::Object::Magic - Opaque, extensible XS pointer backed objects using C<sv_magi
 			/* note that xs_object_magic_get_struct() will
 			 * still return a pointe which is now invalid */
 
+=head1 DESCRIPTION
 
-=head1 DESCRPTION
-
-This way of associating structs with Perl space objects is designed to supercede
+This way of associating structs with Perl space objects is designed to supersede
 Perl's builtin C<T_PTROBJ> with something that is designed to be:
 
 =over 4
@@ -123,6 +128,8 @@ C<T_PTROBJ> (e.g. C<$$ptr_obj = 0>).
 =back
 
 =head1 C API
+
+=for stopwords SV HV
 
 =over 4
 
@@ -197,12 +204,16 @@ side:
 
     if( $object->has_struct ) { ... }
 
-=item int xs_object_magic_detach_struct(aTHX_ SV *sv)
+=item int xs_object_magic_detach_struct(aTHX_ SV *sv, void *ptr)
 
-Removes the XS::Object::Magic magic from the given SV.  Returns 1 if
-something is removed, 0 otherwise.
+Removes the XS::Object::Magic magic with attached pointer C<ptr> from
+the given SV.  Returns the number of elements removed if something is
+removed, 0 otherwise.
 
-=item int xs_object_magic_detach_struct_rv(aTHX_ SV *self)
+Supplying NULL as C<ptr> will result in all XS::Object::Magic magic
+being removed.
+
+=item int xs_object_magic_detach_struct_rv(aTHX_ SV *self, void *ptr)
 
 Likes C<xs_object_magic_detach_struct>, but takes a reference to the
 magic-containing SV instead of the SV itself.  The reference to the SV
@@ -210,6 +221,8 @@ is typically C<$self>.
 
 Returns 0 if the SV is not a reference, otherwise returns whatever
 C<xs_object_magic_detach_struct> returns.
+
+C<ptr> is passwd to xs_object_magic_detach_struct unmodified.
 
 =back
 
@@ -235,19 +248,48 @@ and then you can use C<my_pointer_t> as the argument type of the invocant:
 Note that there is no C<OUTPUT> conversion. In order to return your object you
 need to use C<ST(0)> or some other means of getting the invocant.
 
-=head1 VERSION CONTROL
+=head1 SUPPORT
 
-L<http://github.com/nothingmuch/xs-object-magic>
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=XS-Object-Magic>
+(or L<bug-XS-Object-Magic@rt.cpan.org|mailto:bug-XS-Object-Magic@rt.cpan.org>).
 
 =head1 AUTHOR
 
-Florian Ragwitz, Yuval Kogman
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT & LICENSE
+=head1 CONTRIBUTORS
 
-	Copyright (c) 2009 Florian Ragwitz, Yuval Kogman. All rights reserved
-	This program is free software; you can redistribute
-	it and/or modify it under the same terms as Perl itself.
+=for stopwords Florian Ragwitz Jonathan Rockway Karen Etheridge Emmanuel Rodriguez Jeremiah C. Foster
+
+=over 4
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Jonathan Rockway <jon@jrock.us>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>
+
+=item *
+
+Jeremiah C. Foster <jeremiah@jeremiahfoster.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2009 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

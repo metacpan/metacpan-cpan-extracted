@@ -1,13 +1,17 @@
 ---
 abstract: 'Conditionally export subroutines'
 author:
-  - 'Larry Leszczynski <larryl@cpan.org>'
+  - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
-  Module::Build: '0'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +20,14 @@ name: Exporter-ConditionalSubs
 provides:
   Exporter::ConditionalSubs:
     file: lib/Exporter/ConditionalSubs.pm
-    version: '1.01'
+    version: v1.10.1
 requires:
-  B: '0'
   B::CallChecker: '0'
   B::Generate: '0'
-  Carp: '0'
-  Exporter: '0'
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
-version: '1.01'
+  bugtracker: https://github.com/GrantStreetGroup/Exporter-ConditionalSubs/issues
+  repository: git://github.com/GrantStreetGroup/Exporter-ConditionalSubs.git
+version: v1.10.1
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

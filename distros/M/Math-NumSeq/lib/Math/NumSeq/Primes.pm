@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -22,7 +22,7 @@ use POSIX ();
 use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -219,7 +219,7 @@ Math::NumSeq::Primes -- prime numbers
 
 The prime numbers, not divisible by anything except themselves and 1.
 
-    2, 3, 5, 7, 11, 13, 17, 19, ...
+    2, 3, 5, 7, 11, 13, 17, 19, ...         (A000040)
     starting i=1
 
 Currently this is implemented with C<Math::Prime::XS> generating blocks of
@@ -279,7 +279,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

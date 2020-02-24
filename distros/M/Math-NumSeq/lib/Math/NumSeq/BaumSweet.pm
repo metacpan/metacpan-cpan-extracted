@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION','@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -47,7 +47,8 @@ use constant characteristic_integer => 1;
 # cf A037011 "Baum Sweet cubic"
 #            a(k)=1 iff k/3 is in A003714 fibbinary
 #
-use constant oeis_anum => 'A086747'; # starting OFFSET=0 value 1
+# No longer A086747, it now has the first value wrong.
+# use constant oeis_anum => 'A086747'; # starting OFFSET=0 value 1
 
 sub ith {
   my ($self, $i) = @_;
@@ -102,6 +103,22 @@ The Baum-Sweet sequence
 where each value is 1 if the index i written in binary contains no
 odd-length run of 0-bits, or 0 if it does.
 
+=over
+
+Leonard E. Baum and Melvin M. Sweet, "Continued Fractions of Algebraic Power
+Series in Characteristic 2", Annals of Mathematics, volume 103, number 3,
+May 1976, pages 593-610.  L<href="http://www.jstor.org/stable/1970953>
+
+=back
+
+This sequence is the coefficients of a Laurent series which is the unique
+solution to
+
+    f(x)^3 + (1/x)*f(x) + 1 = 0
+
+and which they note has the bitwise interpretation above.  Their interest
+was in certain continued fractions forms for the series.
+
 =head1 FUNCTIONS
 
 See L<Math::NumSeq/FUNCTIONS> for behaviour common to all sequence classes.
@@ -141,7 +158,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2017, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -3,7 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <limits.h>
+#ifdef HAVE_LIMITS_H
+#  include <limits.h>
+#endif
 
 /* Revisit lua context that refers to values inside the lua interpreter */
 #undef MARPAESLIFLUA_CONTEXT
@@ -1158,6 +1160,13 @@ static short marpaESLIFLua_lua_gettable(int *rcp, lua_State *L, int idx)
 }
 
 /****************************************************************************/
+static short marpaESLIFLua_lua_isinteger(int *rcp, lua_State *L, int idx)
+/****************************************************************************/
+{
+  return ! luaunpanic_isinteger(rcp, L, idx);
+}
+
+/****************************************************************************/
 static short _marpaESLIFValue_lua_representationb(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp)
 /****************************************************************************/
 {
@@ -1200,6 +1209,39 @@ static short _marpaESLIFValue_lua_representationb(void *userDatavp, marpaESLIFVa
 
  err:
   LOG_LATEST_ERROR(marpaESLIFValuep);
+  rcb = 0;
+
+ done:
+  return rcb;
+}
+
+/*****************************************************************************/
+static short _marpaESLIFRecognizer_lua_eventactionb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFEvent_t *eventArrayp, size_t eventArrayl, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp)
+/*****************************************************************************/
+{
+  static const char                   *funcs = "_marpaESLIFRecognizer_lua_eventactionb";
+  marpaESLIFRecognizerEventCallback_t  eventCallbackp;
+  short                                rcb;
+
+  /* Create the lua state if needed */
+  if (! _marpaESLIFRecognizer_lua_newb(marpaESLIFRecognizerp)) {
+    goto err;
+  }
+
+  eventCallbackp = marpaESLIFLua_recognizerEventActionResolver(userDatavp, marpaESLIFRecognizerp, marpaESLIFRecognizerp->eventactions);
+  if (eventCallbackp == NULL) {
+    MARPAESLIF_ERROR(marpaESLIFRecognizerp->marpaESLIFp, "Lua bindings returned no event-action callback");
+    goto err; /* Lua will shutdown anyway */
+  }
+
+  rcb = eventCallbackp(userDatavp, marpaESLIFRecognizerp, eventArrayp, eventArrayl, marpaESLIFValueResultBoolp);
+
+  if (! rcb) goto err;
+
+  goto done;
+
+ err:
+  LOG_LATEST_ERROR(marpaESLIFRecognizerp);
   rcb = 0;
 
  done:

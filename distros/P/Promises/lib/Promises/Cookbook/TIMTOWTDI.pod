@@ -12,7 +12,7 @@ Promises::Cookbook::TIMTOWTDI - Counter examples to Promises
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 DESCRIPTION
 

@@ -26,6 +26,7 @@ no_index:
     - t
     - inc
 requires:
+  Archive::Zip: '0'
   Config: '0'
   Config::INI::Reader: '0'
   Crypt::URandom: '0'
@@ -33,6 +34,7 @@ requires:
   English: '0'
   Exporter: '0'
   Fcntl: '0'
+  File::Find: '0'
   File::Spec: '0'
   File::Temp: '0'
   FileHandle: '0'
@@ -46,5 +48,5 @@ requires:
   base: '0'
   overload: '0'
   perl: '5.006'
-version: '0.92'
+version: '0.93'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

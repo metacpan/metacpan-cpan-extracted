@@ -1,11 +1,20 @@
 Revision history for Neo4j::Driver
 
-0.14, 2019-12-21
+0.15  2020-02-20
 
- REMINDER: Neo4j::Driver 0.13 deprecated the old syntax to access nodes,
- relationships and paths. You need to use the new accessor methods introduced
- in 0.13, or else your code will fail with a future version of this software.
- 
+REMINDER: Neo4j::Driver 0.13 deprecated the old syntax to access nodes,
+relationships and paths. You need to use the new accessor methods introduced
+in 0.13, or else your code will fail with a future version of this software.
+
+ - support for secure communication using TLS encryption
+ - add stable support for the Bolt protocol
+ - remove XS dependency to support Pure Perl environments (HTTP only)
+ - improve performance of running queries over HTTP
+ - improve robustness of URL parsing
+ - deprecate experimental mutability of auth credentials after session creation
+
+0.14  2019-12-21
+
  - make Cypher type system customisable
  - add experimental filter to convert {param} to $param in Cypher queries
  - new syntax to specify the network timeout and other config options
@@ -13,7 +22,7 @@ Revision history for Neo4j::Driver
  - deprecate experimental close() method
  - deprecate experimental suppression of exceptions (die_on_error = 0)
 
-0.13, 2019-10-14
+0.13  2019-10-14
 
  - declare API stable
  - add record streaming interface to StatementResult
@@ -22,62 +31,62 @@ Revision history for Neo4j::Driver
  - change HTTP transactions to make query statistics available by default
  - experimental support for HTTPS
 
-0.12, 2019-09-23
+0.12  2019-09-23
 
  - slightly more robust Bolt support
 
-0.11, 2019-01-12
+0.11  2019-01-12
 
  - repair broken list of dependencies
 
-0.10, 2019-01-11
+0.10  2019-01-11
 
  - experimental support for Bolt
 
-0.09, 2018-12-03
+0.09  2018-12-03
 
  - implement Record->data() and StatementResult->keys()
  - security fix: move ServerInfo from ResultSummary to Session
  - change get() to warn when omitting the field parameter leads to ambiguity
  - better error message for run() if called with an unblessed reference as query
 
-0.08, 2018-11-27
+0.08  2018-11-27
 
  - track whether transactions are open or closed
  - support Perl 5.10
  - add documentation and a test suite
 
-0.07, 2018-11-19
+0.07  2018-11-19
 
  - add ResultSummary and SummaryCounters, deprecate stats()
  - deprecate get_bool()
  - improve error handling
 
-0.06, 2018-11-17
+0.06  2018-11-17
 
  - change single() to die on failure rather than return undef
  - fix size() to avoid dying on results with no rows
  - allow REST::Neo4p::Query and Neo4j::Cypher::Abstract objects as queries
 
-0.05, 2018-04-23
+0.05  2018-04-23
 
  - make HTTP timeout configurable
 
-0.04, 2018-04-23
+0.04  2018-04-23
 
  - convert into a Dist::Zilla-compatible module
  - move supporting classes into Neo4j::Driver namespace
  - allow reuse under the terms of the Artistic License 2.0
 
-0.03, 2017-07-20
+0.03  2017-07-20
 
  - improve handling of server errors
 
-0.02, 2017-01-28
+0.02  2017-01-28
 
  - add Neo4j includeStats support
  - add method to handle boolean values specially
 
-0.01, 2016-11-19
+0.01  2016-11-19
 
  - implement the Neo4j Driver API

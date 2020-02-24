@@ -17,6 +17,17 @@
 #cmakedefine HAVE_SYS_TYPES_H  @HAVE_SYS_TYPES_H@
 #cmakedefine HAVE_STDINT_H     @HAVE_STDINT_H@
 #cmakedefine HAVE_STDDEF_H     @HAVE_STDDEF_H@
+#cmakedefine HAVE_MATH_H       @HAVE_MATH_H@
+#cmakedefine HAVE_LOCALE_H     @HAVE_LOCALE_H@
+#cmakedefine HAVE_FLOAT_H      @HAVE_FLOAT_H@
+#cmakedefine HAVE_LIMITS_H     @HAVE_LIMITS_H@
+
+#cmakedefine SIZEOF_VOID_STAR  @SIZEOF_VOID_STAR@
+#cmakedefine SIZEOF_CHAR       @SIZEOF_CHAR@
+#cmakedefine SIZEOF_SHORT      @SIZEOF_SHORT@
+#cmakedefine SIZEOF_INT        @SIZEOF_INT@
+#cmakedefine SIZEOF_LONG       @SIZEOF_LONG@
+#cmakedefine SIZEOF_LONG_LONG  @SIZEOF_LONG_LONG@
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -27,7 +38,72 @@
 #ifdef HAVE_STDDEF_H
 #include <stddef.h>
 #endif
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
 
 typedef @MARPAESLIF_UINT32_T@ marpaESLIF_uint32_t;
+
+#cmakedefine C_STRTOLD @C_STRTOLD@
+#cmakedefine C_STRTOD @C_STRTOD@
+#cmakedefine C_STRTOF @C_STRTOF@
+
+/* With MSCV, long double is double */
+#ifdef _MSC_VER
+#  ifndef C_STRTOLD
+#    ifdef C_STRTOD
+#      define C_STRTOLD C_STRTOD
+#    endif
+#  endif
+#endif
+
+#ifndef C_STRTOF
+/* Use down-promotion */
+#  ifdef C_STRTOD
+#    define C_STRTOF(p,e) (float) (C_STRTOD(p,e))
+#  else
+#    ifdef C_STRTOLD
+#      define C_STRTOF(p,e) (float) (C_STRTOLD(p,e))
+#    endif
+#  endif
+#endif
+
+#ifndef C_STRTOD
+/* Use down-promotion */
+#  ifdef C_STRTOLD
+#    define C_STRTOD(p,e) (double) (C_STRTOLD(p,e))
+#  endif
+#endif
+
+#cmakedefine C_HUGE_VAL_REPLACEMENT @C_HUGE_VAL_REPLACEMENT@
+#cmakedefine C_HUGE_VAL @C_HUGE_VAL@
+
+#cmakedefine C_HUGE_VALF_REPLACEMENT @C_HUGE_VALF_REPLACEMENT@
+#cmakedefine C_HUGE_VALF @C_HUGE_VALF@
+
+#cmakedefine C_HUGE_VALL_REPLACEMENT @C_HUGE_VALL_REPLACEMENT@
+#cmakedefine C_HUGE_VALL @C_HUGE_VALL@
+
+#cmakedefine C_INFINITY_REPLACEMENT_USING_DIVISION @C_INFINITY_REPLACEMENT_USING_DIVISION@
+#cmakedefine C_INFINITY_REPLACEMENT @C_INFINITY_REPLACEMENT@
+#cmakedefine C_INFINITY @C_INFINITY@
+
+#cmakedefine C_NAN_REPLACEMENT_USING_DIVISION @C_NAN_REPLACEMENT_USING_DIVISION@
+#cmakedefine C_NAN_REPLACEMENT @C_NAN_REPLACEMENT@
+#cmakedefine C_NAN @C_NAN@
+
+#cmakedefine C_ISINF @C_ISINF@
+#cmakedefine C_ISNAN @C_ISNAN@
+
+#cmakedefine C_STRTOLL @C_STRTOLL@
+
+#cmakedefine C_FPCLASSIFY @C_FPCLASSIFY@
+#cmakedefine C_FP_NAN @C_FP_NAN@
+#cmakedefine C__FPCLASS_SNAN @C__FPCLASS_SNAN@
+#cmakedefine C__FPCLASS_QNAN @C__FPCLASS_QNAN@
+#cmakedefine C_FP_INFINITE @C_FP_INFINITE@
+#cmakedefine C__FPCLASS_NINF @C__FPCLASS_NINF@
+#cmakedefine C__FPCLASS_PINF @C__FPCLASS_PINF@
+
 
 #endif /* MARPAESLIF_CONFIG_H */

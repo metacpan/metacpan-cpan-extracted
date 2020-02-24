@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
+use Test::NoWarnings;
 
 my $s = OPCUA::Open62541::Client->new();
 ok($s, "client new");

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.14';
+$Neo4j::Driver::Type::Path::VERSION = '0.15';
 
 use Carp qw(croak);
 
@@ -49,15 +49,15 @@ Neo4j::Driver::Type::Path - Directed sequence of relationships between two nodes
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
- my $q = "MATCH p=(a:Person)-[k:KNOWS]->(b:Person) RETURN p";
- my $path = $driver->session->run($q)->list->[0]->get('p');
+ $q = "MATCH p=(a:Person)-[k:KNOWS]->(b:Person) RETURN p";
+ $path = $driver->session->run($q)->list->[0]->get('p');
  
- my ($node_a, $node_b) = $path->nodes;
- my ($relationship_k)  = $path->relationships;
+ ($node_a, $node_b) = $path->nodes;
+ ($relationship_k)  = $path->relationships;
 
 =head1 DESCRIPTION
 
@@ -74,28 +74,28 @@ L<Neo4j::Driver::Type::Path> implements the following methods.
 
 =head2 nodes
 
- my @nodes = $path->nodes;
+ @nodes = $path->nodes;
 
 Return all L<nodes|Neo4j::Driver::Type::Node> of this path.
 
 The start node of this path is the first node in the array this method
 returns, the end node is the last one.
 
- my @nodes = $path->nodes;
- my $start_node = $nodes[0];
- my $end_node   = $nodes[@nodes - 1];
+ @nodes = $path->nodes;
+ $start_node = $nodes[0];
+ $end_node   = $nodes[@nodes - 1];
 
 =head2 relationships
 
- my @rels = $path->relationships;
+ @rels = $path->relationships;
 
 Return all L<relationships|Neo4j::Driver::Type::Relationship>
 of this path.
 
 The length of a path is defined as the number of relationships.
 
- my @rels = $path->relationships;
- my $length = scalar @rels;
+ @rels = $path->relationships;
+ $length = scalar @rels;
 
 =head1 EXPERIMENTAL FEATURES
 
@@ -106,15 +106,15 @@ these features.
 
 =head2 Calling in scalar context
 
- my $nodes = $path->nodes;  # fails
- my $rels  = $path->relationships;  # fails
+ $nodes = $path->nodes;  # fails
+ $rels  = $path->relationships;  # fails
 
 The C<nodes()> and C<relationships()> methods C<die> if called in
 scalar context.
 
 =head2 Direct data structure access
 
- my $start_node = $path->[0];
+ $start_node = $path->[0];
 
 Currently, the paths's sequence may be directly accessed as if
 the path was a simple arrayref. This is a concession to backwards
@@ -126,7 +126,7 @@ Use the accessor methods C<nodes> and C<relationships> instead.
 
 =head2 Path as alternating array
 
- my $array = $path->path;
+ $array = $path->path;
 
 Return the path as an array reference, alternating between nodes
 and relationships in path sequence order. This is similar to
@@ -138,15 +138,16 @@ When paths are returned via HTTP, the objects accessible via
 C<nodes()> and C<relationships()> lack meta data for their labels
 and types. This is due to an issue in the Neo4j server.
 
-When paths are returned via Bolt, they end up as array references
-instead of L<Neo4j::Driver::Type::Path> objects. This is due to
-an issue in C<Neo4j::Bolt>
-(L<#11|https://github.com/majensen/perlbolt/issues/11>).
-
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/org/neo4j/driver/v1/types/Path.html>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Path (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Path.html>
+
+=back
 
 =head1 AUTHOR
 
@@ -154,7 +155,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

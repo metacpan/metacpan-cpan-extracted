@@ -52,6 +52,7 @@ typedef struct marpaESLIFValue           marpaESLIFValue_t;
 typedef struct marpaESLIFSymbol          marpaESLIFSymbol_t;
 typedef struct marpaESLIFValueResult     marpaESLIFValueResult_t;
 typedef enum   marpaESLIFValueResultBool marpaESLIFValueResultBool_t;
+typedef struct marpaESLIFEvent           marpaESLIFEvent_t;
 
 /* General free callback */
 typedef void  (*marpaESLIFFreeCallback_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
@@ -82,18 +83,21 @@ typedef short (*marpaESLIFReader_t)(void *userDatavp, char **inputcpp, size_t *i
 /* Recognizer callback definitions */
 typedef short (*marpaESLIFRecognizerIfCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultLexemep, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
 typedef marpaESLIFRecognizerIfCallback_t (*marpaESLIFRecognizerIfActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
+typedef short (*marpaESLIFRecognizerEventCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFEvent_t *eventArrayp, size_t eventArrayl, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
+typedef marpaESLIFRecognizerEventCallback_t (*marpaESLIFRecognizerEventActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
 
 typedef struct marpaESLIFRecognizerOption {
-  void                                  *userDatavp;          /* User specific context */
-  marpaESLIFReader_t                     readerCallbackp;     /* Reader */
-  short                                  disableThresholdb;   /* Default: 0 */
-  short                                  exhaustedb;          /* Exhaustion event. Default: 0 */
-  short                                  newlineb;            /* Count line/column numbers. Default: 0 */
-  short                                  trackb;              /* Track absolute position. Default: 0 */
-  size_t                                 bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
-  unsigned int                           buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
-  unsigned int                           bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
-  marpaESLIFRecognizerIfActionResolver_t ifActionResolverp;   /* Will return the function doing the wanted if action */
+  void                                     *userDatavp;          /* User specific context */
+  marpaESLIFReader_t                        readerCallbackp;     /* Reader */
+  short                                     disableThresholdb;   /* Default: 0 */
+  short                                     exhaustedb;          /* Exhaustion event. Default: 0 */
+  short                                     newlineb;            /* Count line/column numbers. Default: 0 */
+  short                                     trackb;              /* Track absolute position. Default: 0 */
+  size_t                                    bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
+  unsigned int                              buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
+  unsigned int                              bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
+  marpaESLIFRecognizerIfActionResolver_t    ifActionResolverp;   /* Will return the function doing the wanted if action */
+  marpaESLIFRecognizerEventActionResolver_t eventActionResolverp;   /* Will return the function doing the wanted event action */
 } marpaESLIFRecognizerOption_t;
 
 typedef enum marpaESLIFEventType {
@@ -107,13 +111,12 @@ typedef enum marpaESLIFEventType {
   MARPAESLIF_EVENTTYPE_DISCARD    = 0x40  /* Discard */
 } marpaESLIFEventType_t;
 
-typedef struct marpaESLIFEvent {
+struct marpaESLIFEvent {
   marpaESLIFEventType_t type;
   char                 *symbols; /* Symbol name, always NULL if exhausted event, always ':discard' if discard event */
   char                 *events;  /* Event name, always NULL if exhaustion eent */
-} marpaESLIFEvent_t;
+};
 
-/* Value types */
 typedef enum marpaESLIFValueType {
   MARPAESLIF_VALUE_TYPE_UNDEF = 0,
   MARPAESLIF_VALUE_TYPE_CHAR,
@@ -275,6 +278,9 @@ typedef struct marpaESLIFAction {
 typedef struct marpaESLIFGrammarDefaults {
   marpaESLIFAction_t *defaultRuleActionp;   /* Default action for rules */
   marpaESLIFAction_t *defaultSymbolActionp; /* Default action for symbols */
+  marpaESLIFAction_t *defaultEventActionp;  /* Default action for events */
+  char               *defaultEncodings;     /* Default encoding */
+  char               *fallbackEncodings;    /* Fallback encoding */
 } marpaESLIFGrammarDefaults_t;
 
 /* Rule property */
@@ -310,12 +316,15 @@ typedef struct marpaESLIFGrammarProperty {
   short                  latmb;                        /* LATM ? */
   marpaESLIFAction_t    *defaultSymbolActionp;         /* Default action for symbols - never NULL */
   marpaESLIFAction_t    *defaultRuleActionp;           /* Default action for rules - never NULL */
+  marpaESLIFAction_t    *defaultEventActionp;          /* Default action for event - can be NULL */
   int                    starti;                       /* Start symbol Id - always >= 0 */
   int                    discardi;                     /* Discard symbol Id (-1 if none) */
   size_t                 nsymboll;                     /* Number of symbols - always > 0*/
   int                   *symbolip;                     /* Array of symbols Ids - never NULL */
   size_t                 nrulel;                       /* Number of rules - always > 0*/
   int                   *ruleip;                       /* Array of rule Ids - never NULL */
+  char                  *defaultEncodings;             /* Default encoding */
+  char                  *fallbackEncodings;            /* Fallback encoding */
 } marpaESLIFGrammarProperty_t;
 
 typedef struct marpaESLIFRuleProperty {
@@ -375,6 +384,29 @@ typedef struct marpaESLIFSymbolProperty {
   marpaESLIFAction_t          *symbolActionp;          /* Symbol specific action */
   marpaESLIFAction_t          *ifActionp;              /* Symbol if action */
 } marpaESLIFSymbolProperty_t;
+
+/* For any JSON number (including +/-Infinity, +/-Nan):
+   - If marpaESLIF fails to support this floating point value, it will default to the UNDEF type
+   - If a corresponding callback is set, this will be called with:
+   * the input string (pointer and size)
+   * the proposal (can be the UNDEF type) that the user can overwrite
+
+   For a finite number, marpaESLIF will try ONLY with the DOUBLE type if it can handle correctly overflow or underflow.
+   For +/-Infinity, if marpaESLIF has support for them, it will use it in a FLOAT type.
+   For +/-NaN, if marpaESLIF has NaN support, it will use it in a FLOAT type. Signed NaN is not explicitely supported.
+*/
+typedef short (*marpaESLIFJSONProposalAction_t)(void *userDatavp, char *strings, size_t stringl, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+
+typedef struct marpaESLIFJSONDecodeOption {
+  short                                        disallowDupkeysb;                /* Do not allow duplicate key in an object */
+  size_t                                       maxDepthl;                       /* Maximum depth - 0 if no maximum */
+  short                                        noReplacementCharacterb;         /* No replacement character for invalid UTF-16 surrogates */
+  marpaESLIFJSONProposalAction_t               positiveInfinityActionp;         /* +Infinity action */
+  marpaESLIFJSONProposalAction_t               negativeInfinityActionp;         /* -Infinity action */
+  marpaESLIFJSONProposalAction_t               positiveNanActionp;              /* +Nan action */
+  marpaESLIFJSONProposalAction_t               negativeNanActionp;              /* -Nan action */
+  marpaESLIFJSONProposalAction_t               numberActionp;                   /* Number action */
+} marpaESLIFJSONDecodeOption_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -503,6 +535,39 @@ extern "C" {
 
   marpaESLIF_EXPORT void                          marpaESLIF_freev(marpaESLIF_t *marpaESLIFp);
 
+  /* --------------------- */
+  /* Embedded JSON support */
+  /* --------------------- */
+  marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFJSON_encode_newp(marpaESLIF_t *marpaESLIFp, short strictb);
+  /* When encoding, marpaESLIFValueResultp is injected as a Lexeme, so, unless the caller sets the shallow flag to a true value */
+  /* ESLIF will automatically frees marpaESLIFValueResultp content. */
+  marpaESLIF_EXPORT short                         marpaESLIFJSON_encodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueOption_t *marpaESLIFValueOptionp);
+  marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFJSON_decode_newp(marpaESLIF_t *marpaESLIFp, short strictb);
+  /* For decoding, a marpaESLIFValueOption_t* argument is required. In it the following settings will be ignored, */
+  /* being overwriten by marpaESLIFJSON_decodeb: */
+  /* symbolActionResolverp - We use the default "::transfer" */
+  /* highRankOnlyb         - Fixed to 1 */
+  /* orderByRankb          - Fixed to 1 */
+  /* ambiguousb            - Fixed to 0 */
+  /* nullb                 - Fixed to 0 */
+  /* maxParsesi            - Fixed to 0 */
+  marpaESLIF_EXPORT short                         marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaESLIFJSONDecodeOption_t *marpaESLIFJSONDecodeOptionp, marpaESLIFRecognizerOption_t *marpaESLIFRecognizerOptionp, marpaESLIFValueOption_t *marpaESLIFValueOptionp);
+
+  /* ------------------------------------- */
+  /* Value result helpers                  */
+  /* ------------------------------------- */
+  /* These mathods return a true value if the underlying float, double or long double hosts an infinity or NaN value. */
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isinfb(marpaESLIFValueResult_t *marpaESLIFValueResultp);
+  marpaESLIF_EXPORT short                         marpaESLIFValueResult_isnanb(marpaESLIFValueResult_t *marpaESLIFValueResultp);
+
+  /* ------------------------------------- */
+  /* Floating point method helpers         */
+  /* ------------------------------------- */
+  /* Note that the followings are NOT meant to be accurate, they just try to follow the "floating -> string -> floating" safe round-trip */
+  /* Returns NULL in case of failure, else an ASCII NUL terminated string that the caller will have to free(). */
+  marpaESLIF_EXPORT char                         *marpaESLIF_ftos(marpaESLIF_t *marpaESLIFp, float f);
+  marpaESLIF_EXPORT char                         *marpaESLIF_dtos(marpaESLIF_t *marpaESLIFp, double d);
+  marpaESLIF_EXPORT char                         *marpaESLIF_ldtos(marpaESLIF_t *marpaESLIFp, long double ld);
 #ifdef __cplusplus
 }
 #endif

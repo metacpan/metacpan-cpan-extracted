@@ -37,13 +37,18 @@ syntax.
 This is a rewrite of an earlier module, [Promise::Tiny](https://metacpan.org/pod/Promise::Tiny). It fixes several
 bugs and superfluous dependencies in the original.
 
+# STATUS
+
+This module is in use in production and, backed by a pretty extensive
+set of regression tests, may be considered stable.
+
 # INTERFACE NOTES
 
 - Promise resolutions and rejections accept exactly one argument,
 not a list.
 - Unhandled rejections are reported via `warn()`. (See below
 for details.)
-- The Promises/A+ test suite avoids testing the case where an “executor”
+- The [Promises/A+ test suite](https://github.com/promises-aplus/promises-tests) avoids testing the case where an “executor”
 function’s resolve callback itself receives another promise, e.g.:
 
         my $p = Promise::ES6->new( sub ($res) {
@@ -67,7 +72,7 @@ Future is not compatible with promises.
 
 This module’s handling of unhandled rejections has changed over time.
 The current behavior is: if any rejected promise is DESTROYed without first
-having received a failure callback, a warning is thrown.
+having received a catch callback, a warning is thrown.
 
 # SYNCHRONOUS OPERATION
 
@@ -103,7 +108,7 @@ alternatives.
 # CANCELLATION
 
 Promises have never provided a standardized solution for cancellation—i.e.,
-aborting an in-process operation. So, if you need this functionality, you’ll
+aborting an in-process operation. If you need this functionality, then, you’ll
 have to implement it yourself. Two ways of doing this are:
 
 - Subclass Promise::ES6 and provide cancellation logic in that
@@ -125,16 +130,17 @@ intuitive.
 It’s easy to create inadvertent memory leaks using promises in Perl.
 Here are a few “pointers” (heh) to bear in mind:
 
-- As of version 0.07, any Promise::ES6 instances that are created while
+- Any Promise::ES6 instances that are created while
 `$Promise::ES6::DETECT_MEMORY_LEAKS` is set to a truthy value are
 “leak-detect-enabled”, which means that if they survive until their original
-process’s global destruction, a warning is triggered.
+process’s global destruction, a warning is triggered. You should normally
+enable this flag in a development environment.
 - If your application needs recursive promises (e.g., to poll
 iteratively for completion of a task), the `current_sub` feature (i.e.,
 `__SUB__`) may help you avoid memory leaks. In Perl versions that don’t
-support this feature you can imitate it thus:
+support this feature (i.e., anything pre-5.16) you can imitate it thus:
 
-        use constant _has_current_sub => $^V ge v5.16.0;
+        use constant _has_current_sub => eval "use feature 'current_sub'";
 
         use if _has_current_sub(), feature => 'current_sub';
 

@@ -61,8 +61,11 @@ $t->get_ok('/empty')->status_is(200)->content_is('');
 # Default module
 $t->get_ok( '/perldoc' )->status_is( 200 )
   ->element_exists( 'h1#Default-Page' )
-  ->element_exists( '.crumbs a[href=/perldoc/MojoliciousTest]', 'parent module in crumbtrail' )
-  ->element_exists( '.crumbs a[href=/perldoc]', 'default module in crumbtrail' );
+  ->element_exists( '.crumbs > a[href=/perldoc/MojoliciousTest]', 'parent module in crumbtrail' )
+  ->element_exists( '.crumbs > a[href=/perldoc]', 'default module in crumbtrail' )
+  ->element_exists( '.crumbs .more a[href=https://metacpan.org/pod/MojoliciousTest::Default]', 'cpan link' )
+  ->element_exists( '.crumbs .more a[href=/perldoc/MojoliciousTest/Default.txt]', 'source link' )
+  ;
 
 #diag $t->tx->res->body;
 
@@ -72,6 +75,10 @@ $t->get_ok('/perldoc/MojoliciousTest/PODTest')->status_is(200)
   ->element_exists('h3#Three')->element_exists('h4#Four')
   ->element_exists('a[href=#One]')->element_exists('a[href=#Two]')
   ->element_exists('a[href=#Three]')->element_exists('a[href=#Four]')
+  ->element_exists( '.crumbs > a[href=/perldoc/MojoliciousTest]', 'parent module in crumbtrail' )
+  ->element_exists( '.crumbs > a[href=/perldoc/MojoliciousTest/PODTest]', 'current module in crumbtrail' )
+  ->element_exists( '.crumbs .more a[href=https://metacpan.org/pod/MojoliciousTest::PODTest]', 'cpan link' )
+  ->element_exists( '.crumbs .more a[href=/perldoc/MojoliciousTest/PODTest.txt]', 'source link' )
   ->text_like('pre code', qr/\$foo/);
 
 # Trailing slash

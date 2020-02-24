@@ -5,10 +5,10 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.14';
+$Neo4j::Driver::Record::VERSION = '0.15';
 
 use Carp qw(croak);
-use JSON::PP;
+use JSON::MaybeXS qw(is_bool);
 
 use Neo4j::Driver::ResultSummary;
 
@@ -48,8 +48,8 @@ sub get_bool {
 	warnings::warnif deprecated => __PACKAGE__ . "->get_bool is deprecated";
 	
 	my $value = $self->get($field);
-	return $value if ! ref $value;
-	return $value if $value != JSON::PP::false;
+	return $value if ! is_bool $value;
+	return $value if !! $value;
 	return undef;  ##no critic (ProhibitExplicitReturnUndef)
 }
 
@@ -95,21 +95,21 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $session = Neo4j::Driver->new->basic_auth(...)->session;
  
- my $query = 'MATCH (m:Movie) RETURN m.name, m.year';
- my $records = $session->run($query)->list;
- foreach my $record ( @$records ) {
+ $query = 'MATCH (m:Movie) RETURN m.name, m.year';
+ $records = $session->run($query)->list;
+ foreach $record ( @$records ) {
    say $record->get('m.name');
  }
  
  $query .= ' ORDER BY m.year LIMIT 1';
- my $record = $session->run($query)->single;
+ $record = $session->run($query)->single;
  say 'Year of oldest movie: ', $record->get(1);
 
 =head1 DESCRIPTION
@@ -125,17 +125,18 @@ L<Neo4j::Driver::Record> implements the following methods.
 
 =head2 get
 
- my $value1 = $record->get('field_key');
- my $value2 = $record->get(2);
+ $value1 = $record->get('field_key');
+ $value2 = $record->get(2);
 
 Get a value from this record, either by field key or by zero-based
 index.
 
-If there is only a single field, C<get> may be called without
-parameters.
+When called without parameters, C<get()> will return the first
+field. If there is more than a single field, a warning in the
+category `ambiguous` will be issued.
 
- my $value = $session->run('RETURN "It works!"')->single->get;
- my $value = $session->run('RETURN "two", "fields"')->single->get;  # fails
+ $value = $session->run('RETURN "It works!"')->single->get;
+ $value = $session->run('RETURN "warning", "ambiguous"')->single->get;
 
 When retrieving values from records, Neo4j types are converted to Perl
 types as shown in the following table.
@@ -168,8 +169,8 @@ with a future version of this driver.
 
 =head2 data
 
- my $hashref = $record->data;
- my $value = $hashref->{field_key};
+ $hashref = $record->data;
+ $value = $hashref->{field_key};
 
 Return the keys and values of this record as a hash reference.
 
@@ -182,7 +183,7 @@ these features.
 
 =head2 C<column_keys>
 
- my $size = $record->{column_keys}->count;
+ $size = $record->{column_keys}->count;
  $record->{column_keys}->add('new_field_key');
 
 Allows adding new columns to the record's field key / index
@@ -192,8 +193,8 @@ can then be accessed just like regular columns.
 
 =head2 C<graph>
 
- my $nodes = $record->{graph}->{nodes};
- my $rels  = $record->{graph}->{relationships};
+ $nodes = $record->{graph}->{nodes};
+ $rels  = $record->{graph}->{relationships};
 
 Allows accessing the graph response the Neo4j server can deliver via
 HTTP. Requires the C<return_graph> field to be set on the
@@ -202,20 +203,27 @@ before the statement is executed.
 
 =head2 C<meta>
 
- my $meta = $record->{meta};
+ $meta = $record->{meta};
 
 Allows accessing the entity meta data that some versions of the Neo4j
-server provide.
+server provide via HTTP.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j::Driver::Type::Node>,
-L<Neo4j::Driver::Type::Relationship>,
-L<Neo4j::Driver::Type::Path>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/Record.html>,
-L<Neo4j JavaScript Driver|https://neo4j.com/docs/api/javascript-driver/current/class/src/v1/record.js~Record.html>,
-L<Neo4j .NET Driver|https://neo4j.com/docs/api/dotnet-driver/current/html/dfbf8228-17a4-99ed-58bb-81b638ae788a.htm>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Driver::Type::B<Node>>,
+L<Neo4j::Driver::Type::B<Relationship>>,
+L<Neo4j::Driver::Type::B<Path>>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Record (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Record.html>,
+L<Record (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/record.js~Record.html>,
+L<IRecord (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/ca4ccbd1-2925-945d-fd4c-a5635f3e4b23.htm>
+
+=back
 
 =head1 AUTHOR
 
@@ -223,7 +231,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -32,7 +32,7 @@ BEGIN {
     Win32::API::->Import("psapi","BOOL EnumProcessModules(HANDLE  hProcess, HMODULE *lphModule, DWORD   cb, LPDWORD lpcbNeeded)") or die "EnumProcessModules: $^E";  # uncoverable branch true
 }
 
-our $VERSION = '0.001001'; # auto-populated from W::M::NPP
+our $VERSION = '0.001002'; # auto-populated from W::M::NPP
 
 our @EXPORT_VARS = qw/%nppm %nppidm/;
 our @EXPORT_OK = (@EXPORT_VARS);
@@ -1339,7 +1339,8 @@ sub runMenuCommand {
     # printf STDERR "__%04d__:\tcacheKey = '%s'\n", __LINE__, $cacheKey // '<undef>';
 
     my $action = _findActionInMenu( $self->{_menuID} , @_ );
-    # printf STDERR "__%04d__:\taction = '%s'\n", __LINE__, $action // '<undef>';
+    # printf STDERR "__%04d__:\taction(%s) = '%s'\n", __LINE__, $self->{_menuID} // '<undef>', $action // '<undef>';
+    return undef unless defined $action;    # pass the problem up the chain
 
     $cacheMenuCommands{$cacheKey} = $action if defined($cacheKey) and defined $action;
 

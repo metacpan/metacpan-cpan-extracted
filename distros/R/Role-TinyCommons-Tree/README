@@ -2,8 +2,8 @@ NAME
     Role::TinyCommons::Tree - Roles related to object tree
 
 VERSION
-    This document describes version 0.121 of Role::TinyCommons::Tree (from
-    Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
+    This document describes version 0.122 of Role::TinyCommons::Tree (from
+    Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
 
 DESCRIPTION
     This distribution provides several roles you can use to create a tree
@@ -36,7 +36,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
+    <https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website

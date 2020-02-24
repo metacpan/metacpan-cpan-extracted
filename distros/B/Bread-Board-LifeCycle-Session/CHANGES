@@ -1,0 +1,53 @@
+==================================================
+Changes from 2019-02-21 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version v0.900.1 at 2020-02-21 20:06:57 +0000
+---------------------------------------------
+
+  Change: a4b489667560af86a5e0a68bd0bc9e6753a50384
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-21 15:06:17 +0000
+
+    Update README 
+
+  Change: 18733756153b1405acd3f97121e9fb26782d35b0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 13:46:54 +0000
+
+    Add dependency on List::Util 1.33 
+
+  Change: 906313feda43593ec96c27600d714ffadb3371fe
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 13:16:10 +0000
+
+    Move xt tests to author tests 
+
+  Change: ea96f35f38f03c8a3b9308d99dd6a4895c09ffbc
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 13:11:42 +0000
+
+    Add dependencies 
+
+  Change: fbf828f7ade6aea62f27712ecddb03b1fa463fbe
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 13:08:52 +0000
+
+    Update distribution files 
+
+  Change: 7e41d0333df943596ce92ef08388e3c6454cf621
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 13:04:28 +0000
+
+    Switch to Dist::Zilla::PluginBundle::Author::GSG 
+
+  Change: 8f2161cb4585256713ea47e5ab2bd634a4dd0ebe
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 12:56:49 +0000
+
+    Remove dist tarball 
+
+===============================================
+Plus 1 release after 2019-02-21 00:00:00 +0000.
+===============================================

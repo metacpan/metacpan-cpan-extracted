@@ -64,6 +64,7 @@ do { my $x = {
                                       'XSLoader' => '0',
                                       'namespace::autoclean' => '0',
                                       'overload' => '0',
+                                      'parent' => '0',
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'vars' => '0',

@@ -1,0 +1,75 @@
+NAME
+    Sort::Sub::data_struct_by_data_cmp - Sort data structures by Data::Cmp
+
+VERSION
+    This document describes version 0.002 of
+    Sort::Sub::data_struct_by_data_cmp (from Perl distribution
+    Sort-Sub-data_struct_by_data_cmp), released on 2019-12-15.
+
+SYNOPSIS
+    Generate sorter (accessed as variable) via Sort::Sub import:
+
+     use Sort::Sub '$data_struct_by_data_cmp'; # use '$data_struct_by_data_cmp<i>' for case-insensitive sorting, '$data_struct_by_data_cmp<r>' for reverse sorting
+     my @sorted = sort $data_struct_by_data_cmp ('item', ...);
+
+    Generate sorter (accessed as subroutine):
+
+     use Sort::Sub 'data_struct_by_data_cmp<ir>';
+     my @sorted = sort {data_struct_by_data_cmp} ('item', ...);
+
+    Generate directly without Sort::Sub:
+
+     use Sort::Sub::data_struct_by_data_cmp;
+     my $sorter = Sort::Sub::data_struct_by_data_cmp::gen_sorter(
+         ci => 1,      # default 0, set 1 to sort case-insensitively
+         reverse => 1, # default 0, set 1 to sort in reverse order
+     );
+     my @sorted = sort $sorter ('item', ...);
+
+    Use in shell/CLI with sortsub (from App::sortsub):
+
+     % some-cmd | sortsub data_struct_by_data_cmp
+     % some-cmd | sortsub data_struct_by_data_cmp --ignore-case -r
+
+DESCRIPTION
+    Always case-sensitive; the "i" flag does not have effect.
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sort-Sub-data_struct_by_data_cmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sort-Sub-data_struct_by_data_cmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub-data_struct_
+    by_data_cmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::Sub::data_struct_by_data_cmp_numeric
+
+    Sort::Sub::data_struct_by_data_cmp_strornumeric
+
+    Data::Cmp
+
+    Sort::Sub::by_perl_function. The more generic solution.
+
+    Sort::Sub::by_perl_op
+
+    Sort::Sub
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

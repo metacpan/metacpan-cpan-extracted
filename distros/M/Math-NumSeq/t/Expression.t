@@ -22,6 +22,14 @@ use strict;
 use Test;
 plan tests => 12;
 
+# Regexp::Grammars, circa its version 1.049, spams users with messages about
+# Perl 5.18 incompatibility.  This tickles the no-warnings here, and alas to
+# no real purpose.  Could think about trying to suppress or permit.
+#
+# Language::Expr::Parser uses Regexp::Grammars and may be getting its own
+# regexp warning, unless its consequent on Regexp::Grammars.  Could again
+# think about ignoring since it doesn't do obvious harm.
+
 use lib 't';
 use MyTestHelpers;
 MyTestHelpers::nowarnings();
@@ -33,7 +41,7 @@ use Math::NumSeq::Expression;
 # VERSION
 
 {
-  my $want_version = 73;
+  my $want_version = 74;
   ok ($Math::NumSeq::Expression::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::Expression->VERSION,  $want_version,

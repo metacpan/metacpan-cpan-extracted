@@ -1,0 +1,464 @@
+# PODNAME: HealthCheck::WritingADiagnostic
+# ABSTRACT: How to write a diagnostic
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+HealthCheck::WritingADiagnostic - How to write a diagnostic
+
+=head1 VERSION
+
+version v1.5.3
+
+=head1 What is a HealthCheck Diagnostic?
+
+A health check diagnostic is a specific test that is focused on one
+area of an application's health.
+This can mean multiple things, like checking if a file exists or if
+the app can connect to a database.
+
+In technical terms, a health check diagnostic is a subroutine that
+returns a hashref adhering to the
+L<Health Check Standard|https://grantstreetgroup.github.io/HealthCheck.html>
+format. This hashref is commonly known as the C<HealthCheck Result>, or
+C<Result>.
+
+Put simply, this just means that a diagnostic must return a C<Result>
+consisting of the C<status> key. Any other key is optional, but can
+help provide additional context. For example,
+adding a message in the C<info> key of the C<Result> gives a more
+human-readable description of the test.
+
+Thus, a valid C<Result> that could be returned by a diagnostic can
+look something like this:
+
+    {   status => "OK",
+        info   => "Connecting to the database",
+    }
+
+=head1 Diagnostic methods
+
+The L<HealthCheck::Diagnostic> module provides a base for writing
+custom checks with a guarantee that the returned C<Result> conforms
+to the
+L<Health Check Standard|https://grantstreetgroup.github.io/HealthCheck.html>.
+When creating a diagnostic, a few different methods can be overridden.
+
+=head2 new
+
+This is the basic constructor method.
+It just returns the blessed object, so overriding this method allows
+for default values in the instance.
+
+Set a default label on the diagnostic instance:
+
+    sub new {
+        my ($class, @params) = @_;
+
+        # Allows your constructor to take a hashref or even-sized list
+        # of parameters similar to the parent.
+        my %params = @params == 1 && ( ref $params[0] || '' ) eq 'HASH'
+            ? %{ $params[0] } : @params;
+
+        return $class->SUPER::new(
+            label => 'default_label',
+            %params,
+        );
+    }
+
+Note that the constructor is overridden to take in a hashref or an
+even-sized list of parameters. This is the default behavior on the
+original constructor, and should be included in any subclasses for
+consistency.
+
+=head2 run
+
+This is where the check is normally implemented.
+It runs the test and returns a C<Result>.
+This method would most-likely be overridden with the actual test logic.
+
+    sub run { return { status => 'OK' } }
+
+See the note in L</check> regarding throwing exceptions in this method.
+
+=head2 summarize
+
+This performs extra logic if the diagnostic C<Result> has C<results>.
+This will squash the C<status> values in the nested structure, and
+validate that all the C<Result>s meet the specification in the
+L<Health Check Standard|https://grantstreetgroup.github.io/HealthCheck.html>.
+
+If any of the values in the C<Result> are invalid,
+an C<OK> status is converted to C<UNKNOWN> and the validation
+error is appended to the C<info>.
+
+Here is an example of a L</run> override that uses summarize:
+
+    sub run {
+        my $result1 = {
+            status => 'OK',
+            info   => 'The test passed',
+        };
+        my $result2 = {
+            status => 'CRITICAL',
+            info   => 'The test failed',
+        };
+
+        return {
+            info    => 'Uses summarize',
+            results => [ $result1, $result2 ],
+        };
+    }
+
+Which returns this C<Result> after L</check> is called on the diagnostic:
+
+    {   status  => 'CRITICAL',
+        info    => 'Uses summarize',
+        results => [ $result1, $result2 ],
+    }
+
+Note that C<summarize> is called by the default L</check> method,
+so special treatment must be made if overridding L</check> in any way.
+
+=head2 check
+
+This is the default method that is called by the HealthCheck,
+which will L</summarize> the C<Result> returned by L</run>.
+
+If the diagnostic needs to handle validation and summarization, then
+C<check> would most-likely be overridden to handle these two operations.
+
+Parameter requirements can be enforced on the diagnostic.
+This type of validation is done as follows:
+
+    sub check {
+        my ($self, %params ) = @_;
+
+        return {
+            status => 'UNKNOWN',
+            info   => 'Missing required `file` key',
+        } unless $params{file};
+
+        my $res = $self->SUPER::check( %params );
+        return $res;
+    }
+
+Without calling the parent L</check> method, it is helpful to instead
+call L</summarize> since the C<id> and C<label> are passed through that
+method.
+
+One special note to keep in mind is this method will trap any exceptions
+during the call to L</run>, set the C<status> to C<CRITICAL>
+and put the exception message into the C<info> key of the C<Result>.
+Despite this feature, L</run> should be designed to return a C<Result>
+in most cases.
+
+Parameters may need to be generated on-the-fly with a passed-in callback.
+This anonymous function requires proper exception handling.
+
+    if( ref $params{api} eq 'CODE' ) {
+        local $@;
+        $params{api} = eval {
+            local $SIG{__DIE__};
+            $params{api}->();
+        };
+        return {
+            status => 'CRITICAL',
+            info   => "Error retrieving api from callback: $@",
+        } if $@;
+    }
+
+=head1 Writing class checks and instance checks
+
+There are two different ways to create a diagnostic.
+
+In general, it is not difficult in supporting both instance-based
+and class-based checks, so consider using the L</Multi checks> pattern
+wherever possible.
+
+=head2 Instance checks
+
+Instance checks are diagnostics that are designed to be used on an
+instance.
+This implementation requires an instance with the instance values being
+used in the check.
+
+When used on an instance, L</summarize> will copy the
+C<id>, C<label>, and C<tags> from the instance to the C<Result>
+if not already included.
+
+Here is an example instance-only implementation module:
+
+    package HealthCheck::Diagnostic::TempCheck;
+    use parent 'HealthCheck::Diagnostic';
+
+    sub check_temp { .. } # Returns a hashref using $_[1] as temp limit.
+
+    sub run {
+        my ($self, %params) = @_;
+        return $self->check_temp( $self->{temp_limit} );
+    };
+
+    1;
+
+Here is an example using that module:
+
+    my $diagnostic = HealthCheck::Diagnostic::TempCheck->new(
+        temp_limit => '22',
+    );
+    $health_check->register( $diagnostic );
+    $health_check->check;
+
+It might be beneficial to override the L</check> method in the
+instance-only diagnostic module for that restriction:
+
+    sub check {
+        my ($self, @args ) = @_;
+        croak( "check cannot be called as a class method" )
+            unless ref $self;
+        return $self->SUPER::check( @args );
+    }
+
+=head2 Class checks
+
+Class check diagnostics are designed so that the diagnostic does not
+need to be an instance.
+Class diagnostics pay special attention to the parameters that are
+passed to the L</check> and L</run> methods.
+
+It might be worthwhile to disable calling L</new> for class-only
+diagnostics.
+
+Here is an example of the same diagnostic listed above as a class check:
+
+    package HealthCheck::Diagnostic::TempCheck;
+    use parent 'HealthCheck::Diagnostic';
+
+    # Don't allow instantiating an instance
+    use Carp;
+    sub new { croak(__PACKAGE__ . " does not support being an instance.") }
+
+    sub check_temp { ... } # Returns a hashref using $_[1] as temp limit.
+
+    sub run {
+        my ($class, %params) = @_;
+        return $class->check_temp( $params{temp_limit} );
+    }
+
+    1;
+
+All parameters passed to the HealthCheck instance's C<check>
+are passed the diagnostic's L</check>, which are then passed to L</run>.
+Here is an example using that module in a health-check:
+
+    $health_check->register( 'HealthCheck::Diagnostic::TempCheck' );
+    $health_check->check( temp_limit => 65 );
+
+=head2 Multi checks
+
+It is possible, and ideal, to support both instance and class checks
+in the same module.
+The diagnostic just needs to be designed so that it can handle that:
+
+    package HealthCheck::Diagnostic::TempCheck;
+    use parent 'HealthCheck::Diagnostic';
+
+    sub check_temp { ... } # Returns a hashref using $_[1] as temp limit.
+
+    sub check {
+        my ($self, %params) = @_;
+        if ( ref $self ) {
+            # Default all instance values as arguments to the `run` method.
+            $params{$_} = $self->{$_}
+                foreach grep { ! defined $params{$_} } keys %$self;
+        }
+        return $self->SUPER::check( %params );
+    }
+
+    sub run {
+        my ($self, %params) = @_;
+        return $self->check_temp( $params{temp_limit} );
+    }
+
+    1;
+
+Then, the diagnostic can be used as either an instance or a class in
+a health check:
+
+    # Register a class check that uses all the defaults.
+    $health_check->register( 'HealthCheck::Diagnostic::TempCheck' );
+
+    # Register an instance check.
+    $diagnostic = HealthCheck::Diagnostic::TempCheck->new(
+        id          => 'night_temp',
+        label       => 'Temperature is cool enough to sleep in',
+        temp_limit  => 70, # Overridden by the value passed to `check`
+    );
+    $health_check->register( $diagnostic );
+
+    # Run the checks, pretending the current temperature is 72-degrees.
+    $health_check->check();
+
+The results from that last C<check> are displayed below.
+If the class-based check defined a default temperature limit,
+the C<UNKNOWN> sub-result C<status> may have changed.
+
+    {   status  => 'CRITICAL',
+        results => [
+            {
+                status => 'UNKNOWN',
+                info   => 'The temperature limit is unknown',
+            },
+            {
+                id     => 'night_temp',
+                label  => 'Temperature is cool enough to sleep in',
+                status => 'CRITICAL',
+                info   => 'The temperature is too hot',
+            },
+        ],
+    }
+
+Now, run the check again, by overriding the default temperature limit:
+
+    # Run the checks, pretending the current temperature is 72-degrees.
+    $health_check->check( temp_limit => 77 );
+
+The results from the C<check> call are displayed below.
+Notice that everything is C<OK>, since the C<temp_limit>
+is 77 in both of the registered diagnostics.
+
+    {   status  => 'OK',
+        results => [
+            {
+                status => 'OK',
+                info   => 'The temperature is just right',
+            },
+            {
+                id     => 'night_temp',
+                label  => 'Temperature is cool enough to sleep in',
+                status => 'OK',
+                info   => 'The temperature is just right',
+            },
+        ],
+    }
+
+=head1 More in-depth example
+
+This example shows a check for a physical system.
+This sensor system can alert when to open or close the window.
+There are three sensors: inside, outside, and the window status.
+The inside sensor is used to get the indoor temperature.
+The outside sensor is used to get the outdoor temperature and weather.
+The window sensor is used to check if the window is open.
+
+The diagnostic is initialized with several different sensors and the
+ideal temperatures.
+
+    my $diagnostic = HealthCheck::Diagnostic::WindowStatus->new(
+        inside  => My::Sensor::Inside->new,
+        outside => My::Sensor::Outside->new,
+        window  => My::Sensor::Window->new,
+
+        desired_min => 20,
+        desired_max => 23,
+    );
+
+The implementation for that check might look something like this:
+
+    package HealthCheck::Diagnostic::WindowStatus;
+    use parent "HealthCheck::Diagnostic";
+    use strict;
+    use warnings;
+
+    sub run {
+        my ($self) = @_;
+
+        # Gather some data that can be returned for graphing
+        my @data = (
+            {   label => "Inside Temperature",
+                value => $self->{inside}->temp,
+            },
+            {   label => "Outside Temperature",
+                value => $self->{outside}->temp,
+            },
+            {   label => "Currently Raining",
+                value => $self->{outside}->is_raining,
+            },
+            {   label => "Window is Open",
+                value => $self->{window}->is_open,
+            },
+        );
+
+        my %res = ( status = "OK", data = \@data );
+
+        # If it's currently raining, need to close the windows
+        if ( $self->{outside}->is_raining ) {
+            if ( $self->current_state eq "open" ) {
+                $res{status} = "CRITICAL";
+                $res{info}   = "Close the window, it's raining!";
+            }
+            return \%res;
+        }
+
+        # Otherwise, see if the desired state matches the current state.
+        my $desired_state = $self->desired_state;
+        if ( $desired_state ne $self->current_state ) {
+            $res{status} = "WARNING";
+            $res{info}   = "\u$desired_state the window!";
+        }
+
+        return \%res;
+    }
+
+    sub current_state { shift->{window}->is_open ? "open" : "close" }
+
+    sub desired_state {
+        my ($self) = @_;
+
+        my $inside  = $self->{inside}->temp;
+        my $outside = $self->{outside}->temp;
+
+        # If the weather is nice outside, open the window
+        if (    $outside >= $self->{desired_min}
+            and $outside <= $self->{desired_max} )
+        {
+            return "open";
+        }
+
+        # If the outside temp is in the correct
+        # direction of our desired temp, open the window.
+        my $cold_inside    = $inside < $self->{desired_min};
+        my $hot_inside     = $inside > $self->{desired_max};
+        my $warmer_outside = $inside < $outside;
+        my $cooler_outside = $inside > $outside;
+
+        if (   ( $cold_inside and $warmer_outside )
+            or ( $hot_inside  and $cooler_outside ) )
+        {
+            return "open";
+        }
+
+        return "close";
+    }
+
+    1;
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 - 2020 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

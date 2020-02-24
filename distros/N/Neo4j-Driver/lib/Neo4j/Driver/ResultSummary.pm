@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.14';
+$Neo4j::Driver::ResultSummary::VERSION = '0.15';
 
 use Carp qw(croak);
 
@@ -93,24 +93,24 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $driver = Neo4j::Driver->new->basic_auth(...);
- my $result = $driver->session->run('MATCH (a)-[:KNOWS]-(b) RETURN a, b');
+ $driver = Neo4j::Driver->new->basic_auth(...);
+ $result = $driver->session->run('MATCH (a)-[:KNOWS]-(b) RETURN a, b');
  
- my $summary = $result->summary;
+ $summary = $result->summary;
  
  # SummaryCounters
- my $counters = $summary->counters;
+ $counters = $summary->counters;
  
  # query information
- my $query  = $summary->statement->{text};
- my $params = $summary->statement->{parameters};
- my $plan   = $summary->plan;
- my @notes  = $summary->notifications;
+ $query  = $summary->statement->{text};
+ $params = $summary->statement->{parameters};
+ $plan   = $summary->plan;
+ @notes  = $summary->notifications;
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ L<Neo4j::Driver::ResultSummary> implements the following methods.
 
 =head2 counters
 
- my $summary_counters = $summary->counters;
+ $summary_counters = $summary->counters;
 
 Returns the L<SummaryCounters|Neo4j::Driver::SummaryCounters> with
 statistics counts for operations the statement triggered.
@@ -145,6 +145,9 @@ or other valuable information that can be presented in a client.
 Unlike failures or errors, notifications do not affect the execution
 of a statement.
 
+At time of this writing, notifications are not supported on a Bolt
+connection for this driver.
+
 =head2 plan
 
  use Data::Dumper;
@@ -153,10 +156,13 @@ of a statement.
 This describes how the database will execute your statement.
 Available if this is the summary of a Cypher C<EXPLAIN> statement.
 
+At time of this writing, execution plans are not supported on a Bolt
+connection for this driver.
+
 =head2 statement
 
- my $query  = $summary->statement->{text};
- my $params = $summary->statement->{parameters};
+ $query  = $summary->statement->{text};
+ $params = $summary->statement->{parameters};
 
 The statement and parameters this summary is for.
 
@@ -169,19 +175,26 @@ these features.
 
 =head2 Calling in scalar context
 
- my $notifications = $summary->notifications;  # arrayref
+ $notifications = $summary->notifications;  # arrayref
 
 The C<notifications()> method returns an array reference if called in
 scalar context, or C<undef> if there are no notifications.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j::Driver::Session>,
-L<Neo4j::Driver::SummaryCounters>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/summary/ResultSummary.html>,
-L<Neo4j JavaScript Driver|https://neo4j.com/docs/api/javascript-driver/current/class/src/v1/result-summary.js~ResultSummary.html>,
-L<Neo4j .NET Driver|https://neo4j.com/docs/api/dotnet-driver/current/html/859dfa7c-80b8-f754-c0d3-359a0df5d33b.htm>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Driver::B<Session>>,
+L<Neo4j::Driver::B<SummaryCounters>>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/summary/ResultSummary.html>,
+L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/result-summary.js~ResultSummary.html>,
+L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
+
+=back
 
 =head1 AUTHOR
 
@@ -189,7 +202,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

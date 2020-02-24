@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '3.0.29'; # VERSION
+our $VERSION = '3.0.30'; # VERSION
 
 
 #
@@ -26,10 +26,13 @@ sub new {
                    latm                => $args{latm},
                    defaultSymbolAction => $args{defaultSymbolAction},
                    defaultRuleAction   => $args{defaultRuleAction},
+                   defaultEventAction  => $args{defaultEventAction},
                    startId             => $args{startId},
                    discardId           => $args{discardId},
                    symbolIds           => $args{symbolIds},
-                   ruleIds             => $args{ruleIds}
+                   ruleIds             => $args{ruleIds},
+                   defaultEncoding     => $args{defaultEncoding},
+                   fallbackEncoding    => $args{fallbackEncoding}
                    }, $pkg
 }
 
@@ -85,6 +88,13 @@ sub getDefaultRuleAction {
 }
 
 
+sub getDefaultEventAction {
+  my ($self) = @_;
+
+  return $self->{defaultEventAction}
+}
+
+
 sub getStartId {
   my ($self) = @_;
 
@@ -112,6 +122,20 @@ sub getRuleIds {
   return $self->{ruleIds}
 }
 
+
+sub getDefaultEncoding {
+  my ($self) = @_;
+
+  return $self->{defaultEncoding}
+}
+
+
+sub getFallbackEncoding {
+  my ($self) = @_;
+
+  return $self->{fallbackEncoding}
+}
+
 1;
 
 __END__
@@ -126,7 +150,7 @@ MarpaX::ESLIF::Grammar::Properties - ESLIF Grammar Properties
 
 =head1 VERSION
 
-version 3.0.29
+version 3.0.30
 
 =head1 SYNOPSIS
 
@@ -213,6 +237,10 @@ Grammar default symbol action
 
 Grammar default rule action
 
+=item defaultEventAction
+
+Grammar default event action
+
 =item startId
 
 Start symbol Id
@@ -228,6 +256,14 @@ Symbol Ids (array reference)
 =item ruleIds
 
 Rule Ids (array reference)
+
+=item defaultEncoding
+
+Grammar default encoding
+
+=item fallbackEncoding
+
+Grammar fallback encoding
 
 =back
 
@@ -259,6 +295,10 @@ Returns grammar's default symbol action, never null
 
 Returns grammar's default rule action, can be null
 
+=head2 $self->getDefaultEventAction
+
+Returns grammar's default event action, can be null
+
 =head2 $self->getStartId
 
 Returns grammar's start symbol id, always >= 0
@@ -274,6 +314,14 @@ Returns a reference to a list of symbol identifiers
 =head2 $self->getRuleIds
 
 Returns a reference to a list of rule identifiers
+
+=head2 $self->getDefaultEncoding
+
+Returns grammar's default encoding, can be null
+
+=head2 $self->getFallbackEncoding
+
+Returns grammar's fallback encoding, can be null
 
 =head1 AUTHOR
 

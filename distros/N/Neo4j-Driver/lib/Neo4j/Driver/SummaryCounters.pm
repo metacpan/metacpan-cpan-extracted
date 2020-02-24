@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.14';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.15';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -65,20 +65,20 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $driver = Neo4j::Driver->new->basic_auth(...);
+ $driver = Neo4j::Driver->new->basic_auth(...);
  
- my $transaction = $driver->session->begin_transaction;
+ $transaction = $driver->session->begin_transaction;
  $transaction->{return_stats} = 1;
- my $query = 'MATCH (n:Novel {name:"1984"}) SET n.writer = "Orwell"';
- my $result = $transaction->run($query);
+ $query = 'MATCH (n:Novel {name:"1984"}) SET n.writer = "Orwell"';
+ $result = $transaction->run($query);
  
- my $counters = $result->summary->counters;
- my $database_modified = $counters->contains_updates;
+ $counters = $result->summary->counters;
+ $database_modified = $counters->contains_updates;
  die "That didn't work out." unless $database_modified;
 
 =head1 DESCRIPTION
@@ -119,8 +119,14 @@ probably make more sense to run a MATCH query, tedious or not.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/summary/SummaryCounters.html>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<SummaryCounters (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/summary/SummaryCounters.html>
+
+=back
 
 =head1 AUTHOR
 
@@ -128,7 +134,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

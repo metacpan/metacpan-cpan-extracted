@@ -217,19 +217,29 @@ local $TODO = undef;
 # runMenuCommand
 {
     # for runMenuCommand, I am going to SHA-256 on active selection; which means I need a selection, and need to know what it is.
+    my $expected = 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e';
+    my $algorithm = 'SHA-256';
 
     # 1. create new file
     notepad()->newFile();
+    select undef,undef,undef,0.25;
 
     # 2. add known text
     editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, "Hello World" );
+    select undef,undef,undef,0.25;
 
     # 3. select that text
     notepad()->menuCommand('IDM_EDIT_SELECTALL');
+    select undef,undef,undef,0.25;
 
     # 4. run the menu command
-    my $ret = notepad()->runMenuCommand( 'Tools | SHA-256', 'Generate from selection into clipboard');
-    ok $ret, 'runMenuCommand(Tools | SHA-256 | Generate from selection into clipboard): retval'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+    my $ret = notepad()->runMenuCommand( "Tools | $algorithm", 'Generate from selection into clipboard');
+    unless(defined $ret) {
+        $algorithm = 'MD5';
+        $expected = 'b10a8db164e0754105b7a99be72e3fe5';
+        $ret = notepad()->runMenuCommand( "Tools | $algorithm", 'Generate from selection into clipboard');
+    }
+    ok $ret, "runMenuCommand(Tools | $algorithm | Generate from selection into clipboard): retval"; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
 
     # 5. paste the resulting text
     notepad()->menuCommand('IDM_EDIT_PASTE');
@@ -245,7 +255,7 @@ local $TODO = undef;
             $txt = '';
         };
         $txt =~ s/[\0\s]+$//;   # remove trailing spaces and nulls
-        is $txt, 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e', 'runMenuCommand(): resulting SHA-256 text'; note sprintf qq(\tsha-256 => "%s"\n), $txt // '<undef>';
+        is $txt, $expected, "runMenuCommand(): resulting $algorithm text"; note sprintf qq(\t%s => "%s"\n), $algorithm, $txt // '<undef>';
     }
 
     # 7. clear the editor, so I can close without a dialog
@@ -262,8 +272,46 @@ local $TODO = undef;
     my $ret;
     myTestHelpers->setDebugInfo(0);
     runCodeAndClickPopup( sub { $ret = notepad()->runPluginCommand( 'Plugins Admin...') }, qr/^Plugins Admin$/, 4, 1 ); # wait an extra 1s before pushing the button, which makes it more reliable
-    ok $ret, 'runPluginCommand(Plugins | Plugins Admin...): retval'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
-    # TODO = hmm, not always closing
+
+    if(defined $ret) {
+        ok $ret, 'runPluginCommand(Plugins | Plugins Admin...): retval' or diag sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+    } else {
+        use Win32::GuiTest 1.64 qw':FUNC !SendMessage';
+        diag "runPluginCommand(Plugins Admin...) didn't work, and I don't know why... Trying alternative";
+        my $menuID = notepad()->{_menuID}; note "notepad()->{_menuID} = ", $menuID//'<undef>';
+        my $count = GetMenuItemCount( $menuID ); note "GetMenuItemCount() = ", $count // '<undef>';
+        my $submenu;
+        for my $idx ( 0 .. $count-1 ) {
+            my %h = GetMenuItemInfo( $menuID, $idx );
+            if( $h{type} eq 'string' ) {
+                (my $cleanText = $h{text}) =~ s/(\&|\t.*)//;
+                note sprintf "\t%-20s | %s\n", $h{text}, $cleanText;
+                $submenu = GetSubMenu($menuID, $idx) if $cleanText eq 'Plugins';
+            }
+        }
+        note sprintf "Plugins submenu #%s#\n", $submenu // '<undef>';
+        my $does_have_folder;
+        my $does_have_admin;
+        if(defined $submenu) {
+            note "submenu GetMenuItemCount() = ", my $count = GetMenuItemCount( $submenu ) // '<undef>';
+            for my $idx ( 0 .. $count-1 ) {
+                my %h = GetMenuItemInfo( $submenu, $idx );
+                if( $h{type} eq 'string' ) {
+                    (my $cleanText = $h{text}) =~ s/(\&|\t.*)//;
+                    note sprintf "\t%-20s | %s\n", $h{text}, $cleanText;
+                    $does_have_admin = 1 if $cleanText =~ /Plugins Admin/;
+                    $does_have_folder = 1 if $cleanText =~ /Open Plugins Folder/;
+                }
+            }
+        }
+        ok !$does_have_admin, 'Plugins | Plugins Admin should not exist, because runPluginCommand(Plugins | Plugins Admin) didnt work'; diag sprintf "\tdoes have admin = %s", $does_have_admin//'<undef>';
+
+        if($does_have_folder) {
+            $ret = notepad()->runPluginCommand('Open Plugins Folder...');
+            ok $ret, 'runPluginCommand(Plugins | Open Plugins Folder...): retval' or diag sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+            diag "Sorry for opening the extra Explorer window. You may close it now.\n";
+        }
+    }
 }
 
 done_testing;

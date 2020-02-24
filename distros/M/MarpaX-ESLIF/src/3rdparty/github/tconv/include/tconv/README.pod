@@ -37,6 +37,7 @@ tconv extended API is providing more entry points to query or control how tconv 
     tconv_convert_t      *convertp;
     tconvTraceCallback_t  traceCallbackp;
     void                 *traceUserDatavp;
+    const char           *fallbacks;
   } tconv_option_t;
 
 tconv support two engine types: one for charset detection, one for character conversion. Each engine as its own option structure:
@@ -64,6 +65,10 @@ A function pointer.
 =item traceUserDatavp
 
 Function pointer opaque context.
+
+=item fallbacks
+
+Fallback charset when user gave none I<and> the guess failed.
 
 =back
 

@@ -35,7 +35,7 @@
             "Colouring::In" : "0.14",
             "PDF::API2" : "2.037",
             "Sub::MultiMethod" : "0.0008",
-            "Zydeco" : "0.503",
+            "Zydeco" : "0.509",
             "perl" : "5.006"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

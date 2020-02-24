@@ -216,6 +216,7 @@ struct marpaESLIF_grammar {
   genericStack_t        *ruleStackp;                         /* Pointer to stack of rules */
   marpaESLIFAction_t    *defaultSymbolActionp;               /* Default action for symbols - never NULL */
   marpaESLIFAction_t    *defaultRuleActionp;                 /* Default action for rules - never NULL */
+  marpaESLIFAction_t    *defaultEventActionp;                /* Default action for events - can be NULL */
   int                    starti;                             /* Default start symbol ID - filled during grammar validation */
   char                  *starts;                             /* Default start symbol name - filled during grammar validation - shallow pointer */
   int                   *ruleip;                             /* Array of rule IDs - filled by grammar validation */
@@ -225,6 +226,8 @@ struct marpaESLIF_grammar {
   unsigned int           nbupdatei;                          /* Number of updates - used in grammar ESLIF actions */
   char                  *asciishows;                         /* Grammar show (ASCII) */
   int                    discardi;                           /* Discard symbol ID - filled during grammar validation */
+  char                  *defaultEncodings;                   /* Default encoding is reader returns NULL */
+  char                  *fallbackEncodings;                  /* Fallback encoding is reader returns NULL and tconv fails to detect encoding */
 };
 
 /* ----------------------------------- */
@@ -246,9 +249,9 @@ struct marpaESLIF {
   int                     versionPatchi;               /* Patch version */
   marpaESLIFValueResult_t marpaESLIFValueResultTrue;   /* Pre-filled ::true value result */
   marpaESLIFValueResult_t marpaESLIFValueResultFalse;  /* Pre-filled ::false value result */
-  char                    float_fmts[128];            /* Pre-filled format string for floats */
-  char                    double_fmts[128];           /* Pre-filled format string for double */
-  char                    long_double_fmts[128];      /* Pre-filled format string for double */
+#ifdef HAVE_LOCALE_H
+  struct lconv           *lconvp;
+#endif
 };
 
 struct marpaESLIFGrammar {
@@ -304,6 +307,7 @@ struct marpaESLIFValue {
   genericHash_t               *beforePtrHashp;
   genericHash_t                _afterPtrHash;
   genericHash_t               *afterPtrHashp;
+  marpaESLIFRepresentation_t   proxyRepresentationp; /* Proxy representation callback, c.f. json.c for an example */
 };
 
 struct marpaESLIF_stream {
@@ -430,6 +434,11 @@ struct marpaESLIFRecognizer {
   /* For lua if-action callback */
   lua_State                   *L;
   char                        *ifactions;
+  char                        *eventactions;
+
+  /* For _marpaESLIF_flatten_pointers optimization */
+  genericStack_t               _marpaESLIFValueResultFlattenStack;
+  genericStack_t              *marpaESLIFValueResultFlattenStackp;
 };
 
 struct marpaESLIF_lexeme_data {
@@ -449,14 +458,6 @@ struct marpaESLIF_alternative {
   marpaESLIFValueResult_t marpaESLIFValueResult; /* Associated value */
   int                     grammarLengthi;        /* Length within the grammar (1 in the token-stream model) */
   short                   usedb;                 /* Is this structure in use ? */
-};
-
-marpaESLIF_alternative_t marpaESLIF_alternative_default = {
-  NULL, /* symbolp */
-  NULL, /* valuep */
-  0,    /* valuel */
-  0,    /* grammarLengthi */
-  0     /* usedb */
 };
 
 /* ------------------------------- */

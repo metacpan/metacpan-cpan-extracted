@@ -1,57 +1,72 @@
 TYPEMAP
-OPCUA_Open62541_Boolean			T_BOOL
-OPCUA_Open62541_SByte			T_IV
-OPCUA_Open62541_Byte			T_UV
-OPCUA_Open62541_Int16			T_IV
-OPCUA_Open62541_UInt16			T_UV
-OPCUA_Open62541_Int32			T_IV
-OPCUA_Open62541_UInt32			T_UV
+UA_Boolean				T_PACKED
+UA_SByte				T_PACKED
+UA_Byte					T_PACKED
+UA_Int16				T_PACKED
+UA_UInt16				T_PACKED
+UA_Int32				T_PACKED
+UA_UInt32				T_PACKED
+OPCUA_Open62541_UInt32			T_PTROBJ_OPTIONAL
 # XXX this only works for Perl on 64 bit platforms
-OPCUA_Open62541_Int64			T_IV
-OPCUA_Open62541_UInt64			T_UV
-OPCUA_Open62541_ByteString		T_UA_STRING
-OPCUA_Open62541_StatusCode		T_UV
-OPCUA_Open62541_String			T_UA_STRING
-OPCUA_Open62541_DataType		T_UA_DATATYPE
+UA_Int64				T_PACKED
+UA_UInt64				T_PACKED
+UA_Float				T_PACKED
+UA_Double				T_PACKED
+UA_StatusCode				T_PACKED
+UA_String				T_PACKED
+UA_Guid					T_PACKED
+UA_ByteString				T_PACKED
+OPCUA_Open62541_NodeIdType		T_ENUM
+UA_NodeId				T_PACKED
+UA_BrowseRequest			T_PACKED
+UA_BrowseResponse			T_PACKED
+OPCUA_Open62541_NodeId			T_PTROBJ_OPTIONAL
+UA_QualifiedName			T_PACKED
+OPCUA_Open62541_DataType		T_PACKED
 OPCUA_Open62541_Variant			T_PTROBJ_SPECIAL
-OPCUA_Open62541_VariableAttributes	T_PTROBJ_SPECIAL
+UA_VariableAttributes			T_PACKED
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_Client			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientConfig		T_PTROBJ_SPECIAL
 OPCUA_Open62541_ClientState		T_ENUM
+OPCUA_Open62541_BrowseResultMask	T_ENUM
 
 #############################################################################
 INPUT
-T_UA_STRING
-	$var.data = SvPV($arg, $var.length);
-T_UA_DATATYPE
-	{
-		UV index = SvUV($arg);
-		if (index < UA_TYPES_COUNT) {
-			$var = &UA_TYPES[index];
-		} else {
-			croak(\"unsigned value %lu not below UA_TYPES_COUNT\",
-			    index);
-		}
+T_PTROBJ_OPTIONAL
+	if (!SvOK($arg)) {
+		/* Argument is optional, do not output anything if undef. */
+		$var = NULL;
+	} else if (SvROK($arg) && sv_derived_from($arg,
+	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
+		/* Already an object pointer. */
+		$var = INT2PTR($type, SvIV(SvRV($arg)));
+	} else if (SvROK($arg) && SvTYPE(SvRV($arg)) < SVt_PVAV) {
+		/* Scalar reference, set referenced variable to pointer. */
+		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
+		if ($var == NULL)
+			croak(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
+		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
+		sv_setref_pv(SvRV($arg),
+		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
+	} else {
+		croak(\"%s: %s is not a scalar reference\",
+		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
 	}
 T_PTROBJ_SPECIAL
 	if (SvROK($arg) && sv_derived_from($arg,
 	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
-		IV tmp = SvIV((SV*)SvRV($arg));
-		$var = INT2PTR($type,tmp);
+		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
 	} else {
 		croak(\"%s: %s is not of type %s\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
 		    \"$var\", \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\");
+		/* NOTREACHED, but cppcheck does not know this. */
+		exit(255);
 	}
 
 #############################################################################
 OUTPUT
-T_UA_STRING
-	sv_setpvn($arg, $var.data, $var.length);
-T_UA_DATATYPE
-	sv_setuv($arg, $var.typeIndex);
 T_PTROBJ_SPECIAL
-	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\",
-	    (void*)$var);
+	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);

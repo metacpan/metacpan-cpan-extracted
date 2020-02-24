@@ -1,15 +1,57 @@
-Plack-Middleware-Debug-RefCounts
-================================
+==================================================
+Changes from 2019-02-21 00:00:00 +0000 to present.
+==================================================
 
-Created:         2018-09-14
-Home page:       <https://metacpan.org/release/Plack-Middleware-Debug-RefCounts>
-Bug tracker:     <https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues>
-Maintainer:      Grant Street Group <developers@grantstreet.com>
+---------------------------------------------
+version v0.910.1 at 2020-02-21 19:35:30 +0000
+---------------------------------------------
 
-0.91        2018-11-14
+  Change: 7ee71aa677af8ce5f493feb414239176b0fd0781
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-21 11:42:32 +0000
 
-    - Update requirements to include Core modules
+    Update README.md with correct new version 
 
-0.90        2018-09-14
+  Change: c80f24e93d82d576d2cf81129f7cb4a7cff35780
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:40:38 +0000
 
-    - Initial release
+    Update distribution metadata 
+
+  Change: 1aaf18933a69607401de951163c84c350454e5aa
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:40:38 +0000
+
+    Move xt tests to author tests
+
+    And remove tests that no longer matter or are covered already. 
+
+  Change: 72af7259dee197d34a310379d9191fbe9cd530af
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:40:38 +0000
+
+    Update cpanfile
+
+    With required versions from the old Makefile.PL 
+
+  Change: ac93e6ad0555da242b7b4406a4f04cc8f637f014
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:40:38 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+
+  Change: 55ced0fc55412409ccc58156259b46fa61452771
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:19:08 +0000
+
+    Remove gitc metadata 
+
+  Change: c3c83dbbf5951138eefdf8cfe5f6fa54beebc5cd
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 17:18:30 +0000
+
+    Remove stray .perl-version file 
+
+===============================================
+Plus 1 release after 2019-02-21 00:00:00 +0000.
+===============================================

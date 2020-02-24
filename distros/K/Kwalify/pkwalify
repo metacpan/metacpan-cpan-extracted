@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2015 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,15 +14,17 @@
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 use Kwalify;
 use Getopt::Long;
 
 my $schema_file;
+my $parse_mod;
 my $silent;
 my $show_version;
 GetOptions("f=s"       => \$schema_file,
+	   "m|module=s" => \$parse_mod,
 	   "s|silent"  => \$silent,
 	   "v|version" => \$show_version,
 	   "h|help"    => sub { print usage(); exit 0 },
@@ -71,35 +73,64 @@ exit $errors;
 
 sub read_file {
     my $file = shift;
-    my @data;
+
+    my @try_order;
+    if (defined $parse_mod) {
+	@try_order = ($parse_mod);
+    } elsif ($file =~ m{\.json$}i) {
+	@try_order = ('JSON::XS', 'JSON', 'YAML::Syck', 'YAML', 'YAML::XS');
+    } else { # yaml or don't know
+	@try_order = ('YAML::Syck', 'YAML', 'YAML::XS', 'JSON::XS', 'JSON');
+    }
+
     my @errors;
-    if (eval { require YAML::Syck; 1 }) {
-	@data = eval { YAML::Syck::LoadFile($file) };
-	return @data if !$@;
-	push @errors, $@;
+    for my $try (@try_order) {
+	if      ($try eq 'YAML::Syck' && eval { require YAML::Syck; 1 }) {
+	    my @data = eval { YAML::Syck::LoadFile($file) };
+	    return @data if !$@;
+	    push @errors, $@;
+	} elsif ($try eq 'YAML::XS'   && eval { require YAML::XS; 1 }) {
+	    my @data = eval { YAML::XS::LoadFile($file) };
+	    return @data if !$@;
+	    push @errors, $@;
+	} elsif ($try eq 'YAML'       && eval { require YAML; 1 }) {
+	    my @data = eval { YAML::LoadFile($file) };
+	    return @data if !$@;
+	    push @errors, $@;
+	} elsif ($try eq 'JSON::XS'   && eval { require JSON::XS; 1 }) {
+	    my @data = eval { JSON::XS::decode_json(slurp_file($file)) };
+	    return @data if !$@;
+	    push @errors, $@;
+	} elsif ($try eq 'JSON'       && eval { require JSON; 1 }) {
+	    my $data = eval {
+		my $json = slurp_file($file);
+		if (defined &JSON::from_json) {
+		    JSON::from_json($json, {utf8 => 1});
+		} else { # old style
+		    JSON::jsonToObj($json);
+		}
+	    };
+	    return ($data) if $data && !$@;
+	    push @errors, $@;
+	} else {
+	    push @errors, "Unsupported module $try";
+	}
     }
-    if (eval { require YAML; 1 }) {
-	@data = eval { YAML::LoadFile($file) };
-	return @data if !$@;
-	push @errors, $@;
+    if (!@errors) {
+	die "Cannot parse <$file>. Try to install a YAML and/or JSON parsing module first.\n";
+    } else {
+	die "Cannot parse <$file>. Cumulated errors:\n" . join("\n", @errors) . "\n";
     }
-    if (eval { require JSON; 1 }) {
-	my $data = eval {
-	    open JSON, "< $file"
-		or die "Can't open <$file>: $!";
-	    local $/ = undef;
-	    my $json = <JSON>;
-	    close JSON;
-	    if (defined &JSON::from_json) {
-		JSON::from_json($json, {utf8 => 1});
-	    } else {
-		JSON::jsonToObj($json);
-	    }
-	};
-	return ($data) if $data && !$@;
-	push @errors, $@;
-    }
-    die "Cannot parse <$file>. Cumulated errors:\n" . join("\n", @errors) . "\n";
+}
+
+sub slurp_file {
+    my $file = shift;
+    open FH, "< $file"
+	or die "Can't open <$file>: $!";
+    local $/ = undef;
+    my $json = <FH>;
+    close FH;
+    $json;
 }
 
 sub usage {
@@ -110,7 +141,7 @@ sub usage {
 	$msg = "";
     }
     <<EOF;
-${msg}usage: $0 [-v] [-s] -f schema.yml data.yml
+${msg}usage: $0 [-v] [-s] [-m parse-mod] -f schema.yml data.yml
        $0 -f schema.json data.json
 EOF
 }
@@ -133,13 +164,17 @@ pkwalify - Kwalify schema for data structures
 
 =head1 SYNOPSIS
 
-    pkwalify [-v] [-s] -f schemafile datafile
+    pkwalify [-v] [-s] [-m parse-mod] -f schemafile datafile
 
 =head1 DESCRIPTION
 
 B<pkwalify> validates the data from I<datafile> (which may be a
 L<YAML> or L<JSON> file) against a schema defined with I<schemafile>
 (which also may be a YAML or JSON file).
+
+It is required that either L<YAML>, L<YAML::XS> or L<YAML::Syck> is
+installed to parse YAML files, or either L<JSON> or L<JSON::XS> for
+JSON files. Or the module specified on the command-line.
 
 The program returns the number of errors found in the datafile. An
 exit status 0 means no errors.
@@ -151,6 +186,11 @@ exit status 0 means no errors.
 =item -f I<schemafile>
 
 Specify a schema file, either as YAML or JSON. Required.
+
+=item -m I<parse-mod>
+
+Specify the YAML or JSON Perl module to use. Valid modules are:
+L<YAML>, L<YAML::XS>, L<YAML::Syck>, L<JSON> and L<JSON::XS>.
 
 =item -s
 
@@ -164,8 +204,6 @@ Show script and module versions and exit.
 
 Show summary of options.
 
-=item 
-
 =back
 
 =head1 AUTHOR
@@ -174,7 +212,8 @@ Slaven Reziæ, E<lt>srezic@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
-L<Kwalify>, L<kwalify(1)>, L<JSON>, L<YAML>.
+L<Kwalify>, L<kwalify(1)>, L<JSON>, L<JSON::XS>, L<YAML>, L<YAML::XS>,
+L<YAML::Syck>.
 
 =cut
 

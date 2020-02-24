@@ -341,6 +341,7 @@ my $currentLevel = $eslifGrammar->currentLevel;
 ok($currentLevel >= 0, "Current level is >= 0");
 my %GRAMMAR_PROPERTIES_BY_LEVEL = (
     '0' => { defaultRuleAction   => "do_op",
+             defaultEventAction  => undef,
              defaultSymbolAction => "do_symbol",
              description         => "Grammar level 0",
              discardId           => 1,
@@ -349,8 +350,11 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              maxLevel            => 1,
              ruleIds             => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
              startId             => 0,
-             symbolIds           => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18] },
+             symbolIds           => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],
+             defaultEncoding     => "ASCII",
+             fallbackEncoding    => "UTF-8" },
     '1' => { defaultRuleAction   => "::concat",
+             defaultEventAction  => undef,
              defaultSymbolAction => "::transfer",
              description         => "Grammar level 1",
              discardId           => -1,
@@ -359,7 +363,9 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              maxLevel            => 1,
              ruleIds             => [0,1],
              startId             => 0,
-             symbolIds           => [0,1,2,3] }
+             symbolIds           => [0,1,2,3],
+             defaultEncoding     => undef,
+             fallbackEncoding    => undef }
     );
 my %RULE_PROPERTIES_BY_LEVEL = (
     '0' => {
@@ -1768,8 +1774,10 @@ sub doCmpProperties {
 
 __DATA__
 :start   ::= Expression
-:default ::=             action        => do_op
-                         symbol-action => do_symbol
+:default ::=             action            => do_op
+                         symbol-action     => do_symbol
+                         default-encoding  => ASCII
+                         fallback-encoding => UTF-8
 :discard ::= whitespaces event  => discard_whitespaces$
 :discard ::= comment     event  => discard_comment$
 

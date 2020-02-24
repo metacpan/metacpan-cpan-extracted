@@ -54,9 +54,9 @@ This package supports the following scenarios:
 
     my $example = Example::HasBld->new;
 
-This package supports the `bld` and `builder` directives, expects a coderef
-and builds the attribute value if it wasn't provided to the constructor. See
-the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
+This package supports the `bld` and `builder` directives, expects a `1`, a
+method name, or coderef and builds the attribute value if it wasn't provided to
+the constructor. See the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
 
 ## has-clr
 
@@ -77,8 +77,9 @@ the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
 
     # $example->clear_data;
 
-This package supports the `clr` and `clearer` directives expects a coderef and
-generates a clearer method. See the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
+This package supports the `clr` and `clearer` directives expects a `1` or a
+method name of the clearer method. See the [Moo](https://metacpan.org/pod/Moo) documentation for more
+details.
 
 ## has-crc
 
@@ -118,9 +119,9 @@ for more details.
 
     my $example = Example::HasDef->new;
 
-This package supports the `def` and `default` directives expects a coderef and
-is used to build a default value if one is not provided to the constructor. See
-the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
+This package supports the `def` and `default` directives expects a
+non-reference or a coderef to be used to build a default value if one is not
+provided to the constructor. See the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
 
 ## has-hnd
 
@@ -316,9 +317,9 @@ details.
 
     my $example = Example::HasPre->new(data => time);
 
-This package supports the `pre` and `predicate` directives expects a coderef
-and generates a method for checking the existance of the attribute. See the
-[Moo](https://metacpan.org/pod/Moo) documentation for more details.
+This package supports the `pre` and `predicate` directives expects a `1` or
+a method name and generates a method for checking the existance of the
+attribute. See the [Moo](https://metacpan.org/pod/Moo) documentation for more details.
 
 ## has-rdr
 
@@ -386,9 +387,9 @@ details.
 
     my $example = Example::HasTgr->new(data => time);
 
-This package supports the `tgr` and `trigger` directives expects a coderef and
-is executed whenever the attribute's value is changed. See the [Moo](https://metacpan.org/pod/Moo)
-documentation for more details.
+This package supports the `tgr` and `trigger` directives expects a `1` or a
+coderef and is executed whenever the attribute's value is changed. See the
+[Moo](https://metacpan.org/pod/Moo) documentation for more details.
 
 ## has-use
 

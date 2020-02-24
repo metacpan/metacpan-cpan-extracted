@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.14';
+$Neo4j::Driver::Transaction::VERSION = '0.15';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session Neo4j::Driver);
@@ -138,16 +138,16 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $session = Neo4j::Driver->new->basic_auth(...)->session;
  
  # Commit
- my $tx = $session->begin_transaction;
- my $node_id = $tx->run(
+ $tx = $session->begin_transaction;
+ $node_id = $tx->run(
    'CREATE (p:Person) RETURN id(p)'
  )->single->get;
  $tx->run(
@@ -157,8 +157,8 @@ version 0.14
  $tx->commit;
  
  # Rollback
- my $tx = $session->begin_transaction;
- my $tx->run('CREATE (a:Universal:Answer {value:42})');
+ $tx = $session->begin_transaction;
+ $tx->run('CREATE (a:Universal:Answer {value:42})');
  $tx->rollback;
 
 =head1 DESCRIPTION
@@ -174,25 +174,6 @@ execution of a statement to have completed, you need to use the
 L<result|Neo4j::Driver::StatementResult>, for example by calling
 one of the methods C<fetch()>, C<list()> or C<summary()>.
 
-Transactions are often wrapped in a C<try> (or C<eval>) block to
-ensure that C<commit> and C<rollback> occur correctly. Note that the
-server will automatically roll back the transaction if any database
-errors occur while executing statements.
-
- use Try::Tiny;
- try {
-   $result = $tx->run($query, \%parameters);
-   $tx->commit;
- }
- catch {
-   say "Database error: $_";
-   say "Transaction closed by server." if ! $tx->is_open;
- };
-
-After C<commit> or C<rollback>, the transaction is automatically
-closed by the server and can no longer be used. The C<is_open> method
-can be used to determine the server-side transaction status.
-
 =head1 METHODS
 
 L<Neo4j::Driver::Transaction> implements the following methods.
@@ -207,18 +188,15 @@ After committing the transaction is closed and can no longer be used.
 
 =head2 is_open
 
- my $bool = $transaction->is_open;
+ $bool = $transaction->is_open;
 
-Detect whether this transaction is still open, which means commit
+Report whether this transaction is still open, which means commit
 or rollback did not happen.
 
-Note that this method does not request the transaction status from
-the Neo4j server. Instead, it uses the status information the server
-provided along with its previous response, which may be outdated. In
-particular, a transaction can timeout on the server due to
-inactivity, in which case it may in fact be closed even though
-this method returns a true value. The Neo4j server default
-C<dbms.transaction_timeout> is 60 seconds.
+On HTTP connections, a transaction can timeout on the server due
+to inactivity. In this case, it may in fact be closed even though
+this method returns a truthy value. The Neo4j server default
+C<dbms.rest.transaction.idle_timeout> is 60 seconds.
 
 =head2 rollback
 
@@ -231,7 +209,7 @@ used.
 
 =head2 run
 
- my $result = $transaction->run($query, %params);
+ $result = $transaction->run($query, %params);
 
 Run a statement and return the L<StatementResult|Neo4j::Driver::StatementResult>.
 This method takes an optional set of parameters that will be injected
@@ -244,16 +222,16 @@ Parameters are given as Perl hashref. Alternatively, they may be
 given as a hash / balanced list.
 
  # all of these are semantically equal
- my $result = $transaction->run('...', {key => 'value'});
- my $result = $transaction->run('...',  key => 'value' );
- my %hash = (key => 'value');
- my $result = $transaction->run('...', \%hash);
- my $result = $transaction->run('...',  %hash);
+ $result = $transaction->run('...', {key => 'value'});
+ $result = $transaction->run('...',  key => 'value' );
+ %hash = (key => 'value');
+ $result = $transaction->run('...', \%hash);
+ $result = $transaction->run('...',  %hash);
 
 When used as parameters, Perl values are converted to Neo4j types as
 shown in the following example:
 
- my $parameters = {
+ $parameters = {
    number =>  0 + $scalar,
    string => '' . $scalar,
    true   => \1,
@@ -274,12 +252,14 @@ of strings using regular expressions. If necessary, you can force
 conversion of such values into the correct type using unary coercions
 as shown in the example above.
 
-Running empty queries is supported. Such queries establish a
-connection with the Neo4j server, which returns a result with zero
-records. This feature may be used to reset the transaction timeout
-or test the connection to the server.
+Running empty queries is supported. They yield an empty result
+(having zero records). With HTTP connections, the empty result is
+retrieved from the server, which resets the transaction timeout.
+This feature may also be used to test the connection to the server.
+For Bolt connections, the empty result is generated locally in the
+driver.
 
- my $result = $transaction->run;
+ $result = $transaction->run;
 
 Queries are usually strings, but may also be L<REST::Neo4p::Query> or
 L<Neo4j::Cypher::Abstract> objects. Such objects are automatically
@@ -287,6 +267,35 @@ converted to strings before they are sent to the Neo4j server.
 
  $transaction->run( REST::Neo4p::Query->new('RETURN 42') );
  $transaction->run( Neo4j::Cypher::Abstract->new->return(42) );
+
+=head1 ERROR HANDLING
+
+This driver always reports all errors using C<die()>. Error messages
+received from the Neo4j server are passed on as-is.
+
+Transactions are rolled back and closed automatically if the Neo4j
+server encounters an error when running a query. However, if an
+I<internal> error occurs in the driver or in one of its supporting
+modules, explicit transactions remain open.
+
+Typically, no particular handling of error conditions is required.
+But if you wrap your transaction in a C<try> (or C<eval>) block,
+you intend to continue using the same session even after an error
+condition, I<and> you want to be absolutely sure the session is in
+a defined state, you can roll back a failed transaction manually:
+
+ use Try::Tiny;
+ $tx = $session->begin_transaction;
+ try {
+   ...;
+   $tx->commit;
+ }
+ catch {
+   say "Database error: $_";
+   ...;
+   $tx->rollback if $tx->is_open;
+ };
+ # at this point, $session is safe to use
 
 =head1 EXPERIMENTAL FEATURES
 
@@ -297,20 +306,20 @@ these features.
 
 =head2 Calling in list context
 
- my @records = $transaction->run('...');
- my @results = $transaction->run([...]);
+ @records = $transaction->run('...');
+ @results = $transaction->run([...]);
 
 The C<run> method tries to Do What You Mean if called in list
 context.
 
 =head2 Execute multiple statements at once
 
- my $statements = [
+ $statements = [
    [ 'RETURN 42' ],
    [ 'RETURN {value}', value => 'forty-two' ],
  ];
- my $results = $transaction->run($statements);
- foreach my $result ( @$results ) {
+ $results = $transaction->run($statements);
+ foreach $result ( @$results ) {
    say $result->single->get;
  }
 
@@ -322,9 +331,9 @@ lazy execution, similar to the official Neo4j drivers.
 
 =head2 Disable obtaining query statistics
 
- my $transaction = $session->begin_transaction;
+ $transaction = $session->begin_transaction;
  $transaction->{return_stats} = 0;
- my $result = $transaction->run('...');
+ $result = $transaction->run('...');
 
 Since version 0.13, this driver requests query statistics from the
 Neo4j server by default. When using HTTP, this behaviour can be
@@ -334,11 +343,11 @@ The ability to disable the statistics may be removed in future.
 
 =head2 Return results in graph format
 
- my $transaction = $session->begin_transaction;
+ $transaction = $session->begin_transaction;
  $transaction->{return_graph} = 1;
- my $records = $transaction->run('...')->list;
+ $records = $transaction->run('...')->list;
  for $record ( @$records ) {
-   my $graph_data = $record->{graph};
+   $graph_data = $record->{graph};
    ...
  }
 
@@ -348,13 +357,21 @@ the interface is not yet finalised.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j::Driver::StatementResult>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/Transaction.html>,
-L<Neo4j JavaScript Driver|https://neo4j.com/docs/api/javascript-driver/current/class/src/v1/transaction.js~Transaction.html>,
-L<Neo4j .NET Driver|https://neo4j.com/docs/api/dotnet-driver/current/html/ec1f5ba3-57f9-bdc6-9121-f595def04a00.htm>,
-L<Neo4j Python Driver|https://neo4j.com/docs/api/python-driver/current/transactions.html>,
-L<Neo4j Transactional Cypher HTTP API|https://neo4j.com/docs/developer-manual/3.0/http-api/>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Driver::B<StatementResult>>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Transaction.html>,
+L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/transaction.js~Transaction.html>,
+L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
+L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/current/transactions.html>
+
+=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/developer-manual/3.0/http-api/>
+
+=back
 
 =head1 AUTHOR
 
@@ -362,7 +379,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

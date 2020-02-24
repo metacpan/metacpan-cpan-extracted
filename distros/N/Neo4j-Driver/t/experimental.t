@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 13;
+use Test::More 0.96 tests => 12;
 use Test::Exception;
 use Test::Warnings qw(warnings :no_end_test);
 
@@ -29,7 +29,7 @@ my ($q, $r, @a, $a);
 
 
 subtest 'wantarray' => sub {
-	plan tests => 15;
+	plan tests => 17;
 	$q = <<END;
 RETURN 7 AS n UNION RETURN 11 AS n
 END
@@ -45,8 +45,12 @@ END
 	$q = <<END;
 EXPLAIN MATCH (n), (m) RETURN n, m
 END
-	lives_ok { $a = 0;  $a = $s->run($q)->summary->notifications; } 'get notifications';
-	lives_and { is scalar @$a, 1; } 'get notifications array size';
+	lives_ok { $r = 0;  $r = $s->run($q)->summary; } 'get summary';
+	lives_ok { @a = ();  @a = $r->notifications; } 'get notifications list';
+	SKIP: { skip 'no notifications', 2 unless @a;
+		lives_ok { $a = 0;  $a = $r->notifications; } 'get notifications array';
+		lives_and { is scalar @$a, 1; } 'get notifications array size';
+	}
 	
 	# type objects
 	my $tx = $driver->session->begin_transaction;
@@ -67,17 +71,20 @@ END
 	} qr/\bscalar context\b.*\bnot supported\b/i, 'get node labels as scalar';
 	
 	# multiple statements; see below
+	SKIP: { skip '(test requires HTTP)', 2 if $Neo4j::Test::bolt;
 	$q = [
 		['RETURN 7'],
 		['RETURN 11'],
 	];
 	lives_ok { @a = $s->run($q) } 'run two statements at once';
 	lives_and { is $a[0]->single->get * $a[1]->single->get, 7 * 11 } 'retrieve values';
+	}
 };
 
 
 subtest 'multiple statements as array' => sub {
 	# the official drivers don't offer this capability to clients
+	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
 	plan tests => 7;
 	$q = [
 		['RETURN 17'],
@@ -190,23 +197,6 @@ subtest 'nested transactions: explicit (Bolt)' => sub {
 };
 
 
-subtest 'stats' => sub {
-	plan tests => 9;
-	my $t = $driver->session->begin_transaction;
-	$t->{return_stats} = 0;
-	lives_ok { $r = $s->run('RETURN 42'); } 'run normal query';
-	# deprecation warnings are expected
-	lives_and { warnings { isa_ok $r->stats, 'Neo4j::Driver::SummaryCounters', 'stats' } };
-	lives_and { warnings { isa_ok $r->single->stats, 'Neo4j::Driver::SummaryCounters', 'single stats type' } };
-	lives_and { warnings { ok ! $r->single->stats->{contains_updates} } } 'single stats value';
-	lives_ok { $r = $t->run('RETURN "no stats old syntax"'); } 'run no stats query';
-	lives_and { warnings { is ref $r->stats, 'HASH' } } 'no stats: type';
-	lives_and { warnings { is scalar keys %{$r->stats}, 0 } } 'no stats: none';
-	lives_and { warnings { is ref $r->single->stats, 'HASH' } } 'no single stats: type';
-	lives_and { warnings { is scalar keys %{$r->single->stats}, 0 } } 'no single stats: none';
-};
-
-
 subtest 'disable HTTP summary counters' => sub {
 	plan skip_all => '(Bolt always provides stats)' if $Neo4j::Test::bolt;
 	plan tests => 4 unless $Neo4j::Test::bolt;
@@ -255,6 +245,7 @@ subtest 'support for get_person in LOMS plugin' => sub {
 
 subtest 'graph queries' => sub {
 	plan tests => 7;
+	TODO: { local $TODO = 'graph response not yet implemented for Bolt' if $Neo4j::Test::bolt;
 	my $t = $driver->session->begin_transaction;
 	$t->{return_graph} = 1;
 	$q = <<END;
@@ -277,6 +268,7 @@ END
 	lives_and {
 		ok grep {$_->{properties}->{name} eq $r->get('c')->get('name')} @$n;
 	} 'node c found';
+	}
 };
 
 

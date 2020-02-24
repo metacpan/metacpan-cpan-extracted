@@ -1,12 +1,20 @@
 Revision history for Perl module Promise::ES6
 
-0.19
+0.20 Sat 22 Feb 2020
+- BREAKING CHANGE (minor): finally() callbacks now run in scalar context.
+  (The return is ignored, though, unless you return a promise that rejects.)
+- BUG FIX: finally() callbacks now handle rejected promises as returns
+  according to the ES6 specification.
+- BUG FIX: Promises that reject because a rejected promise was returned from
+  a callback will now warn if the “consequent” rejection is unhandled.
+
+0.19 Thu 20 Feb 2020
 - BREAKING CHANGE / BUG FIX: finally() now matches the ES6 standard better.
   While the erstwhile differences weren’t documented, they’re salient enough
   to be noticeable. That said, it seems unlikely that anything depended on the
   old (useless?) behavior.
     * Its callback no longer receives any arguments.
-    * Its callback runs in void context.
+    * Its callback runs in void context. (NB: Changed to scalar in 0.20.)
     * Its returned promise now duplicates the original if the callback
       succeeds. This means that unhandled rejection warnings will now fire
       correctly from finally().

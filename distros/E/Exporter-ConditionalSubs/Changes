@@ -1,8 +1,0 @@
-Revision history for Exporter-ConditionalSubs
-
-1.01    2015-05-19
-        Tweaked to work with Perl versions below v5.10
-
-1.00    2015-04-21
-        First release.
-

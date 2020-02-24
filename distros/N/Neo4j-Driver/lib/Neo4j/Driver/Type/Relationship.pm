@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.14';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.15';
 
 sub get {
 	my ($self, $property) = @_;
@@ -72,12 +72,12 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
- my $q = "MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN k";
- my $rel = $driver->session->run($q)->list->[0]->get('k');
+ $q = "MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN k";
+ $rel = $driver->session->run($q)->list->[0]->get('k');
  
  print 'Person # ', $rel->start_id;
  print ' ', $rel->type;
@@ -107,14 +107,14 @@ L<Neo4j::Driver::Type::Relationship> implements the following methods.
 
 =head2 get
 
- my $value = $relationship->get('property_key');
+ $value = $relationship->get('property_key');
 
 Retrieve the value of this relationship's property with the given key.
 If no such key exists, return C<undef>.
 
 =head2 id
 
- my $id = $relationship->id;
+ $id = $relationship->id;
 
 Return a unique ID for this relationship.
 
@@ -128,26 +128,26 @@ Nodes and relationships do not share the same ID space.
 
 =head2 properties
 
- my $hashref = $relationship->properties;
- my $value = $hashref->{property_key};
+ $hashref = $relationship->properties;
+ $value = $hashref->{property_key};
 
 Return all properties of this relationship as a hash reference.
 
 =head2 start_id
 
- my $id = $relationship->start_id;
+ $id = $relationship->start_id;
 
 Return the ID of the node where this relationship starts.
 
 =head2 end_id
 
- my $id = $relationship->end_id;
+ $id = $relationship->end_id;
 
 Return the ID of the node where this relationship ends.
 
 =head2 type
 
- my $type = $relationship->type;
+ $type = $relationship->type;
 
 Return the type of this relationship.
 
@@ -160,19 +160,19 @@ depend upon these features.
 
 =head2 Direct data structure access
 
- my $property_value = $relationship->{property_key};
+ $property_value = $relationship->{property_key};
 
 Currently, the relationship's properties may be directly accessed as
 if the relationship was a simple hashref. This is a concession to
 backwards compatibility, as the data structure only started being
 blessed as an object in version 0.13.
 
-Relying on this implementation detail is not deprecated.
+Relying on this implementation detail is now deprecated.
 Use the accessor methods C<get()> and C<properties()> instead.
 
 =head2 Deletion indicator
 
- my $node_exists = ! $relationship->deleted;
+ $node_exists = ! $relationship->deleted;
 
 In some circumstances, Cypher statements using C<DELETE> may still
 C<RETURN> relationships that were deleted. To help avoid confusion in
@@ -197,9 +197,15 @@ is returned instead.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/org/neo4j/driver/v1/types/Relationship.html>,
-L<Neo4j Python Driver|https://neo4j.com/docs/api/python-driver/current/types/graph.html#neo4j.types.graph.Relationship>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Relationship (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Relationship.html>,
+L<Relationship (Python)|https://neo4j.com/docs/api/python-driver/current/types/graph.html#neo4j.types.graph.Relationship>
+
+=back
 
 =head1 AUTHOR
 
@@ -207,7 +213,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

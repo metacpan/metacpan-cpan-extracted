@@ -1,7 +1,7 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2020-01-03'; # DATE
-our $VERSION = '0.582'; # VERSION
+our $DATE = '2020-02-23'; # DATE
+our $VERSION = '0.583'; # VERSION
 
 use 5.010001;
 use strict;
@@ -500,26 +500,19 @@ sub __parse_query {
                 ($fspecs->{$_}{include_by_default} // 1) ||
                     $args->{"with.$_"}
                 } @fields;
-            $args->{with_field_names} //= 1
-                if $args->{detail};
-        }
-
-        if ($args->{fields}) {
+            if ($args->{exclude_fields}) {
+                my @filtered_fields;
+                for my $field (@requested_fields) {
+                    next if grep { $field eq $_ } @{ $args->{exclude_fields} };
+                    push @filtered_fields, $field;
+                }
+                @requested_fields = @filtered_fields;
+            }
+            $args->{with_field_names} //= $args->{detail} ? 1:0;
+        } elsif ($args->{fields}) {
             @requested_fields = @{ $args->{fields} };
             $args->{with_field_names} //= 0;
-        }
-
-        if ($args->{exclude_fields}) {
-            my @filtered_fields;
-            for my $field (@requested_fields) {
-                next if grep { $field eq $_ } @{ $args->{exclude_fields} };
-                push @filtered_fields, $field;
-            }
-            @requested_fields = @filtered_fields;
-            $args->{with_field_names} //= 0;
-        }
-
-        unless (@requested_fields) {
+        } else {
             @requested_fields = ($table_spec->{pk});
             $args->{with_field_names} //= 0;
         }
@@ -1537,7 +1530,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.582 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-01-03.
+This document describes version 0.583 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2020-02-23.
 
 =head1 SYNOPSIS
 
@@ -1990,6 +1983,7 @@ For example, if search term is 'pine' and field value is 'green pineapple',
 search will match if word_search=false, but won't match under word_search.
 
 This will not have effect under 'custom_search'.
+
 
 =back
 

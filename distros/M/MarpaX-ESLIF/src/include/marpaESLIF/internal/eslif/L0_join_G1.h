@@ -21,5 +21,6 @@
 #define L0_JOIN_G1_META_WHITESPACE                       "whitespace"
 #define L0_JOIN_G1_META_PERL_COMMENT                     "perl comment"
 #define L0_JOIN_G1_META_CPLUSPLUS_COMMENT                "cplusplus comment"
+#define L0_JOIN_G1_META_GRAPH_ASCII_NAME                 "graph ascii name"
 
 #endif /* MARPAESLIF_INTERNAL_ESLIF_L0_JOIN_G1_H */

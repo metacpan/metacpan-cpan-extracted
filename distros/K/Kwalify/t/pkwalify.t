@@ -25,9 +25,10 @@ require blib; # just to get blib's VERSION
 my $skip_warnings_test = $blib::VERSION < 1.01;
 
 # Test cases with single documents
-my @yaml_syck_defs = (["schema05.yaml", "document05a.yaml", 1],
+my @yaml_mod_defs = (
+		      ["schema05.yaml", "document05a.yaml", 1],
 		      ["schema05.yaml", "document05b.yaml", 0],
-		     );
+		    );
 
 # Test cases with multiple documents (by combining single documents)
 my %combined_document;
@@ -65,27 +66,32 @@ my %combined_document;
     }
 }
 
-# Test cases for YAML::Syck (schema+document combinations)
-push @yaml_syck_defs, (
+# Test cases for YAML/YAML::XS/YAML::Syck (schema+document combinations)
+push @yaml_mod_defs, (
 		       [$combined_document{"invalid_schema"}, "document05a.yaml", 0],
 		       ["schema05.yaml", $combined_document{"invalid_diff"}, 0],
 		       ["schema05.yaml", $combined_document{"valid_same"}, 1],
 		       ["schema05.yaml", $combined_document{"invalid_same"}, 0],
 		      );
 
+my $can_yaml = (eval { require YAML::Syck; 1 } || eval { require YAML::XS; 1 } || eval { require YAML; 1 });
+if ($can_yaml) {
+    *YAML_LoadFile = defined &YAML::Syck::LoadFile ? \&YAML::Syck::LoadFile : defined &YAML::XS::LoadFile ? \&YAML::XS::LoadFile : \&YAML::LoadFile;
+}
+my $can_json = (eval { require JSON::XS; 1 }   || eval { require JSON; 1 });
+if ($can_json) {
+    *JSON_encode   = defined &JSON::XS::encode_json ? \&JSON::XS::encode_json : \&JSON::encode_json;
+}
+
 # Test cases for JSON (generated from YAML documents)
 my @json_defs = ();
-if (eval { require YAML::Syck; require JSON; 1 }) {
+if ($can_yaml && $can_json) {
     my %json_equivalent;
     for my $file ('schema05.yaml',  'document05a.yaml', 'document05b.yaml') {
 	my($tmpfh,$tmpfile) = File::Temp::tempfile(SUFFIX => '.json',
 						   UNLINK => 1);
-	my $data = YAML::Syck::LoadFile("$FindBin::RealBin/testdata/$file");
-	if (defined &JSON::to_json) {
-	    print $tmpfh JSON::to_json($data, {utf8 => 1});
-	} else {
-	    print $tmpfh JSON::objToJson($data);
-	}
+	my $data = YAML_LoadFile("$FindBin::RealBin/testdata/$file");
+	print $tmpfh JSON_encode($data);
 	close $tmpfh
 	    or die "Can't write JSON data to $tmpfile: $!";
 	$json_equivalent{$file} = $tmpfile;
@@ -100,23 +106,23 @@ GetOptions("v!")
     or die "usage: $0 [-v]";
 
 my $tests_per_case = 3;
-plan tests => 13 + $tests_per_case*(scalar(@yaml_syck_defs) + scalar(@json_defs));
+plan tests => 13 + $tests_per_case*(scalar(@yaml_mod_defs) + scalar(@json_defs));
 
 my $script = "$FindBin::RealBin/../blib/script/pkwalify";
 my @cmd = ($^X, "-Mblib=$FindBin::RealBin/..", $script, "-s");
 
 SKIP: {
-    skip("Need YAML::Syck for tests", $tests_per_case*scalar(@yaml_syck_defs))
-	if !eval { require YAML::Syck; 1 };
+    skip("Need YAML, YAML::XS or YAML::Syck for tests", $tests_per_case*scalar(@yaml_mod_defs))
+	if !$can_yaml;
 
-    for my $def (@yaml_syck_defs) {
+    for my $def (@yaml_mod_defs) {
 	any_test($def);
     }
 }
 
 SKIP: {
-    skip("Need JSON for tests", $tests_per_case*scalar(@json_defs))
-	if !eval { require JSON; 1 };
+    skip("Need JSON or JSON::XS for tests", $tests_per_case*scalar(@json_defs))
+	if !$can_json;
 
     for my $def (@json_defs) {
 	any_test($def);
@@ -160,8 +166,8 @@ SKIP: {
 }
 
 SKIP: {
-    skip("Need YAML::Syck for tests", 4)
-	if !eval { require YAML::Syck; 1 };
+    skip("Need YAML, YAML::XS or YAML::Syck for tests", 4)
+	if !$can_yaml;
 
     my $schema_file = "schema05.yaml";
     my $data_file   = "document05a.yaml";

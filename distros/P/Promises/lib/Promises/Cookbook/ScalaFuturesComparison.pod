@@ -12,7 +12,7 @@ Promises::Cookbook::ScalaFuturesComparison - A comparison of Scala Futures with 
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 DESCRIPTION
 

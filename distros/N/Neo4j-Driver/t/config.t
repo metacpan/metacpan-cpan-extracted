@@ -16,7 +16,7 @@ BEGIN {
 # The Neo4j::Driver package itself mostly deals with configuration
 # in the form of the server URL, auth credentials and other options.
 
-use Test::More 0.96 tests => 6 + 1;
+use Test::More 0.96 tests => 9 + 1;
 use Test::Exception;
 use Test::Warnings;
 
@@ -78,18 +78,29 @@ subtest 'config illegal args' => sub {
 
 
 subtest 'uri variants' => sub {
-	plan tests => 18;
+	plan tests => 16;
 	# http scheme (default)
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('HTTP://TEST:7474'); } 'http uppercase lives';
+	lives_and { is $d->{uri}->scheme, 'http'; } 'http uppercase scheme';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test1:9999'); } 'http full uri lives';
 	lives_and { is $d->{uri}, 'http://test1:9999'; } 'http full uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test2'); } 'http default port lives';
 	lives_and { is $d->{uri}, 'http://test2:7474'; } 'http default port';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:'); } 'http scheme only lives';
 	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'http scheme only';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://'); } 'http scheme only long lives';
+	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'http scheme only long';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('test4'); } 'host only lives';
 	lives_and { is $d->{uri}, 'http://test4:7474'; } 'host only';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('//localhost'); } 'network-path ref lives';
+	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'network-path ref only';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(''); } 'empty lives';
 	lives_and { is $d->{uri}, 'http://localhost:7474'; } 'empty';
+};
+
+
+subtest 'non-http uris' => sub {
+	plan tests => 9;
 	# https scheme
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https://test6:9993'); } 'https full uri lives';
 	lives_and { is $d->{uri}, 'https://test6:9993'; } 'https full uri';
@@ -98,6 +109,8 @@ subtest 'uri variants' => sub {
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('https:'); } 'https scheme only lives';
 	lives_and { is $d->{uri}, 'https://localhost:7473'; } 'https scheme only';
 	# bolt scheme
+	eval { $d = 0; $d = Neo4j::Driver->new('bolt://test:9997'); };
+	ok $@ =~ m/Neo4j::Bolt/ || ! $@ && $d->{uri} eq 'bolt://test:9997', 'bolt full uri';
 	eval { $d = 0; $d = Neo4j::Driver->new('bolt://test9'); };
 	ok $@ =~ m/Neo4j::Bolt/ || ! $@ && $d->{uri} eq 'bolt://test9:7687', 'bolt default port';
 	eval { $d = 0; $d = Neo4j::Driver->new('bolt:'); };
@@ -105,15 +118,67 @@ subtest 'uri variants' => sub {
 };
 
 
-subtest 'illegal uris' => sub {
-	plan tests => 2;
+subtest 'unsupported uris' => sub {
+	plan tests => 8;
+	# unimplemented scheme (Casual Clusters)
+	throws_ok {
+		Neo4j::Driver->new('bolt+routing://test12');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'bolt+routing full uri';
+	throws_ok {
+		Neo4j::Driver->new('bolt+routing:');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'bolt+routing scheme only';
+	throws_ok {
+		Neo4j::Driver->new('neo4j://test12');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'neo4j full uri';
+	throws_ok {
+		Neo4j::Driver->new('neo4j:');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'neo4j scheme only';
+	# unknown scheme
+	throws_ok {
+		Neo4j::Driver->new('unkown://test12');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'unknown full uri';
+	throws_ok {
+		Neo4j::Driver->new('unkown:');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'unknown scheme only';
 	# illegal scheme
 	throws_ok {
-		Neo4j::Driver->new('illegal://test12');
-	} qr/\bOnly\b.*\bhttp\b.*\bsupported\b/i, 'illegal full uri';
+		Neo4j::Driver->new('ille*gal://test12');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'illegal full uri';
 	throws_ok {
-		Neo4j::Driver->new('illegal:');
-	} qr/\bOnly\b.*\bhttp\b.*\bsupported\b/i, 'illegal scheme only';
+		Neo4j::Driver->new('ille*gal:');
+	} qr/\bscheme\b.*\bunsupported\b/i, 'illegal scheme only';
+};
+
+
+subtest 'uris with path/query' => sub {
+	plan tests => 8;
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://extra-slash/'); } 'path / lives';
+	lives_and { is $d->{uri}, 'http://extra-slash:7474'; } 'path / removed';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://reverse/proxy/'); } 'path /proxy/ lives';
+	lives_and { is $d->{uri}, 'http://reverse:7474/proxy/'; } 'path /proxy/ unchanged';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://reverse/?proxy'); } 'query /?proxy lives';
+	lives_and { is $d->{uri}, 'http://reverse:7474/?proxy'; } 'query /?proxy unchanged';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://host/#fragment'); } 'fragment lives';
+	lives_and { is $d->{uri}, 'http://host:7474'; } 'fragment removed';
+};
+
+
+subtest 'tls' => sub {
+	plan tests => 5;
+	lives_ok {
+		$d = Neo4j::Driver->new('https://test/')->config(tls_ca => 'foo');
+		$d->session;
+	} 'create https';
+	is $d->{tls_ca}, 'foo', 'tls_ca';
+	throws_ok {
+		Neo4j::Driver->new('https://test/')->config(tls => 0)->session;
+	} qr/\bHTTPS does not support unencrypted communication\b/i, 'no unencrypted https';
+	lives_ok {
+		Neo4j::Driver->new('https://test/')->config(tls => 1)->session;
+	} 'encrypted https';
+	throws_ok {
+		Neo4j::Driver->new('http://test/')->config(tls => 1)->session;
+	} qr/\bHTTP does not support encrypted communication\b/i, 'no encrypted http';
 };
 
 

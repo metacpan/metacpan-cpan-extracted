@@ -13,12 +13,14 @@ use Firefox::Marionette::Profile();
 use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
 use Firefox::Marionette::Exception::Response();
+use Archive::Zip();
 use Symbol();
 use JSON();
 use IPC::Open3();
 use Socket();
 use English qw( -no_match_vars );
 use POSIX();
+use File::Find();
 use File::Spec();
 use URI();
 use Time::HiRes();
@@ -41,7 +43,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -431,16 +433,9 @@ sub new {
     }
     $self->_check_timeout_parameters(%parameters);
     if ( $self->{_har} ) {
-        $self->{_har_addon_directory} = File::Temp->newdir(
-            File::Spec->catdir(
-                File::Spec->tmpdir(),
-                'firefox_marionette_har_addon_directory_XXXXXXXXXXX'
-            )
-          )
-          or Firefox::Marionette::Exception->throw(
-            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+        $self->_build_local_extension_directory();
         my $path = File::Spec->catfile(
-            $self->{_har_addon_directory},
+            $self->{_local_extension_directory},
             'har_export_trigger-0.6.1-an+fx.xpi'
         );
         my $handle = FileHandle->new(
@@ -462,12 +457,29 @@ sub new {
           or Firefox::Marionette::Exception->throw(
             "Failed to close '$path':$EXTENDED_OS_ERROR");
         $self->install( $path, 0 );
-        unlink $path
-          or Firefox::Marionette::Exception->throw(
-            "Failed to unlink '$path':$EXTENDED_OS_ERROR");
-        delete $self->{_har_addon_directory};
     }
     return $self;
+}
+
+sub _build_local_extension_directory {
+    my ($self) = @_;
+    if ( !$self->{_local_extension_directory} ) {
+        $self->{_local_extension_directory} = File::Temp->newdir(
+            File::Spec->catdir(
+                File::Spec->tmpdir(),
+                'firefox_marionette_local_extension_directory_XXXXXXXXXXX'
+            )
+          )
+          or Firefox::Marionette::Exception->throw(
+            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    }
+    return;
+}
+
+sub _clean_local_extension_directory {
+    my ($self) = @_;
+    delete $self->{_local_extension_directory};
+    return;
 }
 
 sub har {
@@ -703,7 +715,7 @@ sub _add_certificates {
             my $remote_path = $self->_remote_catfile( $self->{_cert_directory},
                 'root_ca_' . $self->{_trust_count} . '.cer' );
             my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
-              or Carp::croak(
+              or Firefox::Marionette::Exception->throw(
                 "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
             $self->_put_file_via_ssh( $handle, $remote_path, $path, );
             $path = $remote_path;
@@ -1449,6 +1461,11 @@ sub _launch_unix {
     return $pid;
 }
 
+sub _win32_firefox_directory_names {
+    return ( 'Mozilla Firefox', 'Firefox Developer Edition',
+        'Firefox Nightly', );
+}
+
 sub _binary {
     my ($self) = @_;
     my $binary = 'firefox';
@@ -1461,21 +1478,28 @@ sub _binary {
     else {
         if ( $OSNAME eq 'MSWin32' ) {
           SEARCH:
-            foreach my $possible ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
-                if (
-                    ( $ENV{$possible} )
-                    && (
-                        -e File::Spec->catfile(
-                            $ENV{$possible}, 'Mozilla Firefox',
-                            'firefox.exe'
-                        )
-                    )
-                  )
+            foreach my $env_key ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
+                foreach my $firefox_directory_name (
+                    $self->_win32_firefox_directory_names() )
                 {
-                    $binary =
-                      File::Spec->catfile( $ENV{$possible}, 'Mozilla Firefox',
-                        'firefox.exe' );
-                    last;
+                    if (
+                        ( $ENV{$env_key} )
+                        && (
+                            -e File::Spec->catfile(
+                                $ENV{$env_key}, $firefox_directory_name,
+                                'firefox.exe'
+                            )
+                        )
+                      )
+                    {
+                        $binary = Win32::GetShortPathName(
+                            File::Spec->catfile(
+                                $ENV{$env_key}, $firefox_directory_name,
+                                'firefox.exe'
+                            )
+                        );
+                        last;
+                    }
                 }
             }
         }
@@ -1483,15 +1507,21 @@ sub _binary {
             $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
         }
         elsif ( $OSNAME eq 'cygwin' ) {
-            my $windows_x86_firefox_path =
-              "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
-            my $windows_firefox_path =
-              "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
-            if ( -e $windows_x86_firefox_path ) {
-                $binary = $windows_x86_firefox_path;
+            my @base_directories;
+            if ( $ENV{PROGRAMFILES} ) {
+                push @base_directories, "$ENV{PROGRAMFILES} (x86)",
+                  $ENV{PROGRAMFILES};
             }
-            elsif ( -e $windows_firefox_path ) {
-                $binary = $windows_firefox_path;
+          SEARCH_FOR_BINARY: foreach my $base_directory (@base_directories) {
+                foreach my $firefox_directory_name (
+                    $self->_win32_firefox_directory_names() )
+                {
+                    my $possible_path =
+                      "$base_directory/$firefox_directory_name/firefox.exe";
+                    if ( -e $binary ) {
+                        last SEARCH_FOR_BINARY;
+                    }
+                }
             }
             $binary = $self->execute( {}, 'cygpath', '-s', '-m', $binary );
         }
@@ -3402,8 +3432,41 @@ sub paper_sizes {
     return @keys;
 }
 
+sub _map_deprecated_pdf_parameters {
+    my ( $self, %parameters ) = @_;
+    my %mapping = (
+        shrink_to_fit    => 'shrinkToFit',
+        print_background => 'printBackground',
+    );
+    foreach my $from ( sort { $a cmp $b } keys %mapping ) {
+        my $to = $mapping{$from};
+        if ( defined $parameters{$to} ) {
+            Carp::carp(
+"**** DEPRECATED PARAMETER - using $to as a parameter for the pdf(...) method HAS BEEN REPLACED BY the $from parameter ****"
+            );
+        }
+        elsif ( defined $parameters{$from} ) {
+            $parameters{$to} = $parameters{$from};
+            delete $parameters{$from};
+        }
+    }
+    foreach my $key ( sort { $a cmp $b } keys %parameters ) {
+        next if ( $key eq 'landscape' );
+        next if ( $key eq 'shrinkToFit' );
+        next if ( $key eq 'printBackground' );
+        next if ( $key eq 'margin' );
+        next if ( $key eq 'page' );
+        next if ( $key eq 'size' );
+        next if ( $key eq 'raw' );
+        Firefox::Marionette::Exception->throw(
+            "Unknown key $key for the pdf method");
+    }
+    return %parameters;
+}
+
 sub _initialise_pdf_parameters {
     my ( $self, %parameters ) = @_;
+    %parameters = $self->_map_deprecated_pdf_parameters(%parameters);
     foreach my $key (qw(landscape shrinkToFit printBackground)) {
         if ( defined $parameters{$key} ) {
             $parameters{$key} =
@@ -3414,7 +3477,8 @@ sub _initialise_pdf_parameters {
         foreach my $key ( sort { $a cmp $b } keys %{ $parameters{page} } ) {
             next if ( $key eq 'width' );
             next if ( $key eq 'height' );
-            Carp::croak("Unknown key $key for the page parameter");
+            Firefox::Marionette::Exception->throw(
+                "Unknown key $key for the page parameter");
         }
     }
     if ( defined $parameters{margin} ) {
@@ -3423,7 +3487,8 @@ sub _initialise_pdf_parameters {
             next if ( $key eq 'left' );
             next if ( $key eq 'bottom' );
             next if ( $key eq 'right' );
-            Carp::croak("Unknown key $key for the margin parameter");
+            Firefox::Marionette::Exception->throw(
+                "Unknown key $key for the margin parameter");
         }
     }
     if ( my $size = delete $parameters{size} ) {
@@ -3433,7 +3498,8 @@ sub _initialise_pdf_parameters {
             $parameters{page}{height} = $instance->{height};
         }
         else {
-            Carp::croak("Page size of $size is unknown");
+            Firefox::Marionette::Exception->throw(
+                "Page size of $size is unknown");
         }
     }
     return %parameters;
@@ -4598,23 +4664,102 @@ sub await {
     return $result;
 }
 
+sub nightly {
+    my ($self) = @_;
+    $self->_initialise_version();
+    if ( $self->{_initial_version}->{minor} =~ /a1$/smx ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _get_xpi_path {
+    my ( $self, $path ) = @_;
+    if ( File::Spec->file_name_is_absolute($path) ) {
+    }
+    else {
+        $path = File::Spec->rel2abs($path);
+    }
+    my $xpi_path;
+    if ( $path =~ /[.]xpi$/smx ) {
+        $xpi_path = $path;
+    }
+    else {
+        my $base_directory;
+        my ( $volume, $directories, $name );
+        if ( -d $path ) {
+            ( $volume, $directories, $name ) =
+              File::Spec->splitpath( $path, 1 );
+            $base_directory = $path;
+        }
+        else {
+            ( $volume, $directories, $name ) = File::Spec->splitpath($path);
+            $base_directory = File::Spec->catdir( $volume, $directories );
+        }
+        my @directories = File::Spec->splitdir($directories);
+        if ( $directories[-1] eq q[] ) {
+            pop @directories;
+        }
+        my $xpi_name = $directories[-1];
+        my $zip      = Archive::Zip->new();
+        File::Find::find(
+            {
+                wanted => sub {
+                    my $full_path = $File::Find::name;
+                    my ( undef, undef, $file_name ) =
+                      File::Spec->splitpath($path);
+                    if ( $file_name !~ /^[.]/smx ) {
+                        my $relative_path =
+                          File::Spec->abs2rel( $full_path, $base_directory );
+                        my $member;
+                        if ( -d $full_path ) {
+                            $member = $zip->addDirectory($relative_path);
+                        }
+                        else {
+                            $member =
+                              $zip->addFile( $full_path, $relative_path );
+                            $member->desiredCompressionMethod(
+                                Archive::Zip::COMPRESSION_DEFLATED() );
+                        }
+                    }
+
+                }
+            },
+            $base_directory
+        );
+        $self->_build_local_extension_directory();
+        $xpi_path = File::Spec->catfile( $self->{_local_extension_directory},
+            $xpi_name . '.xpi' );
+        $zip->writeToFileNamed($xpi_path) == Archive::Zip::AZ_OK()
+          or Firefox::Marionette::Exception->throw(
+            "Failed to write to $xpi_path:$EXTENDED_OS_ERROR");
+    }
+    return $xpi_path;
+}
+
 sub install {
     my ( $self, $path, $temporary ) = @_;
+    my $xpi_path = $self->_get_xpi_path($path);
     my $actual_path;
     if ( $self->_ssh() ) {
-        $self->{_addons_directory} =
-          $self->_make_remote_directory("$self->{_root_directory}/addons");
-        my ( $volume, $directories, $name ) = File::Spec->splitpath("$path");
-        my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
+        if ( !$self->{_addons_directory} ) {
+            $self->{_addons_directory} =
+              $self->_make_remote_directory("$self->{_root_directory}/addons");
+        }
+        my ( $volume, $directories, $name ) =
+          File::Spec->splitpath("$xpi_path");
+        my $handle = FileHandle->new( $xpi_path, Fcntl::O_RDONLY() )
           or Firefox::Marionette::Exception->throw(
-            "Failed to open $path for reading:$EXTENDED_OS_ERROR");
+            "Failed to open $xpi_path for reading:$EXTENDED_OS_ERROR");
         my $remote_name = File::Temp::mktemp( $name . '.XXXXXXXXXXX' );
         $actual_path =
           $self->_remote_catfile( $self->{_addons_directory}, $remote_name );
         $self->_put_file_via_ssh( $handle, $actual_path, 'addon ' . $name );
     }
     else {
-        $actual_path = "$path";
+        $actual_path = "$xpi_path";
     }
     my $message_id = $self->_new_message_id();
     $self->_send_request(
@@ -4629,6 +4774,7 @@ sub install {
         ]
     );
     my $response = $self->_get_response($message_id);
+    $self->_clean_local_extension_directory();
     return $self->_response_result_value($response);
 }
 
@@ -4892,7 +5038,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =head1 SYNOPSIS
 
@@ -5372,13 +5518,39 @@ returns the page source of the content document.  This page source can be wrappe
 
 =head2 install
 
-accepts the fully qualified path to an .xpi addon file as the first parameter and an optional true/false second parameter to indicate if the xpi addon file should be a temporary addition (just for the existance of this browser instance).  Unsigned xpi addon files may be loaded temporarily.  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
+accepts the following as the first parameter;
+
+=over 4
+
+=item * path to an L<xpi file|https://developer.mozilla.org/en-US/docs/Mozilla/XPI>.
+
+=item * path to a directory containing L<firefox extension source code|https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension>.  This directory will be packaged up as an unsigned xpi file.
+
+=item * path to a top level file (such as L<manifest.json|https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Anatomy_of_a_WebExtension#manifest.json>) in a directory containing L<firefox extension source code|https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension>.  This directory will be packaged up as an unsigned xpi file.
+
+=back
+
+and an optional true/false second parameter to indicate if the xpi file should be a L<temporary extension|https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/> (just for the existance of this browser instance).  Unsigned xpi files L<may only be loaded temporarily|https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for L<nightly firefox installations|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>).  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
 
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new();
 
     my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+
+    # OR downloading and installing source code
+
+    system { 'git' } 'git', 'clone', 'https://github.com/kkapsner/CanvasBlocker.git';
+
+    if ($firefox->nightly()) {
+
+        $extension_id = $firefox->install('./CanvasBlocker'); # permanent install for unsigned packages in nightly firefox
+
+    } else {
+
+        $extension_id = $firefox->install('./CanvasBlocker', 1); # temp install for normal firefox
+
+    }
 
 =head2 interactive
 
@@ -5540,6 +5712,10 @@ Returns the window handle for the new window.
 
 creates a new WebDriver session.  It is expected that the caller performs the necessary checks on the requested capabilities to be WebDriver conforming.  The WebDriver service offered by Marionette does not match or negotiate capabilities beyond type and bounds checks.
 
+=head2 nightly
+
+returns true if the current version of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number contain an 'a'?)
+
 =head2 paper_sizes 
 
 returns a list of all the recognised names for paper sizes, such as A4 or LEGAL.
@@ -5558,7 +5734,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * page - A hash describing the page.  The hash may have the following keys; 'height' and 'width'.  Both keys are in cm and default to US letter size.  See the 'size' key.
 
-=item * printBackground - Print background graphics.  Boolean value.  Defaults to false. 
+=item * print_background - Print background graphics.  Boolean value.  Defaults to false. 
 
 =item * raw - rather than a file handle containing the PDF, the binary PDF will be returned.
 
@@ -5566,7 +5742,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<page_sizes|Firefox::Marionette#page_sizes> method for a list of accepted page size names. 
 
-=item * shrinkToFit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
+=item * shrink_to_fit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
 
 =back
 

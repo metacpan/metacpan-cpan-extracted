@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::HTTP;
 # ABSTRACT: Adapter for the Neo4j Transactional HTTP API
-$Neo4j::Driver::Transport::HTTP::VERSION = '0.14';
+$Neo4j::Driver::Transport::HTTP::VERSION = '0.15';
 
 use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -13,17 +13,21 @@ use Try::Tiny;
 
 use URI 1.25;
 use REST::Client 134;
-use JSON::PP qw();
-use Cpanel::JSON::XS 3.0201;
+use JSON::MaybeXS qw();
 
 use Neo4j::Driver::ResultSummary;
 use Neo4j::Driver::StatementResult;
 
 
+our $JSON_CODER;
+BEGIN { $JSON_CODER = sub {
+	return JSON::MaybeXS->new(utf8 => 1, allow_nonref => 0);
+}}
+
 # https://neo4j.com/docs/http-api/current/
 our $TRANSACTION_ENDPOINT = '/db/data/transaction';
 our $COMMIT_ENDPOINT = '/db/data/transaction/commit';
-our $CONTENT_TYPE = 'application/json; charset=UTF-8';
+our $CONTENT_TYPE = 'application/json';
 
 # https://neo4j.com/docs/rest-docs/current/#rest-api-service-root
 our $SERVICE_ROOT_ENDPOINT = '/db/data/';
@@ -44,13 +48,6 @@ sub new {
 		cypher_filter => $driver->{cypher_filter},
 	}, $class;
 	
-	# If the Driver object knows how to create the REST client,
-	# we'll follow its lead. This is useful for testing.
-	if ($driver->{client_factory}) {
-		$self->{client} = $driver->{client_factory}->();
-		return $self;
-	}
-	
 	my $uri = $driver->{uri};
 	if ($driver->{auth}) {
 		croak "Only HTTP Basic Authentication is supported" if $driver->{auth}->{scheme} ne 'basic';
@@ -63,11 +60,21 @@ sub new {
 		timeout => $driver->{http_timeout},
 		follow => 1,
 	});
-	$client->setCa($driver->{ca_file}) if defined $driver->{ca_file};
+	if ($uri->scheme eq 'https') {
+		$client->setCa($driver->{tls_ca});
+		croak "HTTPS does not support unencrypted communication; use HTTP" if defined $driver->{tls} && ! $driver->{tls};
+	}
+	else {
+		croak "HTTP does not support encrypted communication; use HTTPS" if $driver->{tls};
+	}
 	$client->addHeader('Accept', $CONTENT_TYPE);
 	$client->addHeader('Content-Type', $CONTENT_TYPE);
 	$client->addHeader('X-Stream', 'true');
 	$self->{client} = $client;
+	
+	$self->{json_coder} = $JSON_CODER->();
+	
+	$driver->{client_factory}->($self) if $driver->{client_factory};  # used for testing
 	
 	return $self;
 }
@@ -90,7 +97,7 @@ sub prepare {
 	my $json = { statement => '' . $query };
 	$json->{resultDataContents} = $RESULT_DATA_CONTENTS;
 	$json->{resultDataContents} = $RESULT_DATA_CONTENTS_GRAPH if $self->{return_graph};
-	$json->{includeStats} = JSON::PP::true if $self->{return_stats};
+	$json->{includeStats} = JSON::MaybeXS::true if $self->{return_stats};
 	$json->{parameters} = $parameters if defined $parameters;
 	
 	return $json;
@@ -103,17 +110,13 @@ sub prepare {
 sub run {
 	my ($self, $tx, @statements) = @_;
 	
+	# The ordering of the $request hash's keys is significant: Neo4j
+	# requires 'statements' to be the first member in the JSON object.
+	# Luckily, in recent versions of Neo4j, it is also the only member.
 	my $request = { statements => \@statements };
 	
-	# TIMTOWTDI: REST::Neo4p::Query uses Tie::IxHash and JSON::XS, which may be faster than sorting
-	my $coder = JSON::PP->new->utf8;
-	$coder = $coder->pretty->sort_by(sub {
-		return -1 if $JSON::PP::a eq 'statements';
-		return 1 if $JSON::PP::b eq 'statements';
-		return $JSON::PP::a cmp $JSON::PP::b;  # Neo4j doesn't care, but our testing sim does
-	});
-	
-	my $response = $self->_request($tx, 'POST', $coder->encode($request));
+	my $json = $self->{json_coder}->encode($request);
+	my $response = $self->_request($tx, 'POST', $json);
 	
 	my @results = ();
 	my $result_count = defined $response->{results} ? @{$response->{results}} : 0;
@@ -153,7 +156,7 @@ sub _request {
 	}
 	if ($content_type && $content_type =~ m|^application/json\b|) {
 		try {
-			$response = decode_json $client->responseContent();
+			$response = $self->{json_coder}->decode( $client->responseContent() );
 			$tx->{commit_endpoint} = URI->new($response->{commit})->path_query if $response->{commit};
 			$tx->{commit_endpoint} = undef unless $response->{transaction};
 			$tx->{open} = 0 unless $tx->{commit_endpoint};
@@ -245,7 +248,7 @@ sub version {
 	
 	foreach my $endpoint ( '/', $SERVICE_ROOT_ENDPOINT ) {
 		my $json = $self->{client}->GET( $endpoint )->responseContent();
-		my $neo4j_version = decode_json($json)->{neo4j_version};
+		my $neo4j_version = $self->{json_coder}->decode($json)->{neo4j_version};
 		return "Neo4j/$neo4j_version" if $neo4j_version;
 	}
 }
@@ -333,7 +336,7 @@ sub _deep_bless {
 	if (ref $data eq '' && ref $rest eq '') {  # scalar
 		return $data;
 	}
-	if (ref $data eq 'JSON::PP::Boolean' && ref $rest eq 'JSON::PP::Boolean') {  # boolean
+	if ( JSON::MaybeXS::is_bool($data) && JSON::MaybeXS::is_bool($rest) ) {  # boolean
 		return $data;
 	}
 	
@@ -355,7 +358,7 @@ Neo4j::Driver::Transport::HTTP - Adapter for the Neo4j Transactional HTTP API
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -368,7 +371,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.582 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.583 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2020-01-03.
+    2020-02-23.
 
 SYNOPSIS
     In list_countries.pl:

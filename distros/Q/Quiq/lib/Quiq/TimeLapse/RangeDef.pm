@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.174';
+our $VERSION = '1.175';
 
 use Quiq::Hash::Ordered;
 use Quiq::Path;
@@ -525,7 +525,7 @@ sub expression {
 
 =head1 VERSION
 
-1.174
+1.175
 
 =head1 AUTHOR
 

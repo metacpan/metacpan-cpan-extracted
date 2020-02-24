@@ -1773,19 +1773,17 @@
     ID: 486
     Name:
         ja: レジギガス
-        en:
-    isNotAvailable: 1
+        en: Regigigas
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 220
-    Attack: 315
-    Defense: 231
+    Stamina: 221
+    Attack: 287
+    Defense: 210
     MAXCP:
-        Grown: 4955
-        Hatched:
-        Boosted:
+        Hatched: 2483
+        Boosted: 3104
 - # ギラティナ(アナザーフォルム)[487] -------------------------------------
     ID: 487
     Name:

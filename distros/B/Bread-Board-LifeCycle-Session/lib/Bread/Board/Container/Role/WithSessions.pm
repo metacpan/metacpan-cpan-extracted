@@ -1,7 +1,9 @@
 package Bread::Board::Container::Role::WithSessions;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+# ABSTRACT: Session helper methods for Bread::Board Containers
+use version;
+our $VERSION = 'v0.900.1'; # VERSION
 
 use Moose::Role;
 use namespace::autoclean;
@@ -28,7 +30,7 @@ sub flush_session_instances {
             next unless any { $service->lifecycle eq $_ } @LIFECYCLES_TO_FLUSH;
             next unless (
                 $service->can('has_instance') && $service->has_instance ||
-                $service->can('instances')    && values $service->instances
+                $service->can('instances')    && values %{$service->instances}
             );
 
             $service->flush_instance  if $service->can('flush_instance');
@@ -50,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Bread::Board::Container::Role::WithSessions
+Bread::Board::Container::Role::WithSessions - Session helper methods for Bread::Board Containers
 
 =head1 VERSION
 
-version 0.90
+version v0.900.1
 
 =head1 DESCRIPTION
 
@@ -68,3 +70,17 @@ This method clears all Session instances from the container and any sub-containe
 container, but it can be called on a sub-container, if you want to only clear out services within that container.
 
 If successful, it will return the number of services that were flushed.  Note that this may be zero.
+
+=head1 AUTHOR
+
+Grant Street Group <developers@grantstreet.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 - 2020 by Grant Street Group.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

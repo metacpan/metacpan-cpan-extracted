@@ -40,6 +40,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Zip" : "0",
             "Config" : "0",
             "Config::INI::Reader" : "0",
             "Crypt::URandom" : "0",
@@ -47,6 +48,7 @@
             "English" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
+            "File::Find" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FileHandle" : "0",
@@ -64,6 +66,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.92",
+   "version" : "0.93",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

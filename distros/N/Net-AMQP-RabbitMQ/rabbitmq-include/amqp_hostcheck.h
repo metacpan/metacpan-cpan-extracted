@@ -1,4 +1,3 @@
-/* vim:set ft=c ts=2 sw=2 sts=2 et cindent: */
 #ifndef librabbitmq_amqp_hostcheck_h
 #define librabbitmq_amqp_hostcheck_h
 
@@ -26,11 +25,24 @@
  * copyright holder.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+typedef enum {
+  AMQP_HCR_NO_MATCH = 0,
+  AMQP_HCR_MATCH = 1
+} amqp_hostcheck_result;
 
-int
-amqp_hostcheck(const char *match_pattern, const char *hostname);
+/**
+ * Determine whether hostname matches match_pattern.
+ *
+ * match_pattern may include wildcards.
+ *
+ * Match is performed based on the rules set forth in RFC6125 section 6.4.3.
+ * http://tools.ietf.org/html/rfc6125#section-6.4.3
+ *
+ * \param match_pattern RFC6125 compliant pattern
+ * \param hostname to match against
+ * \returns AMQP_HCR_MATCH if its a match, AMQP_HCR_NO_MATCH otherwise.
+ */
+amqp_hostcheck_result amqp_hostcheck(const char *match_pattern,
+                                     const char *hostname);
 
 #endif

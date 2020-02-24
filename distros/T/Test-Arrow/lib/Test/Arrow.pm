@@ -5,11 +5,12 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 our @ISA = qw/Test::Builder::Module/;
 
-my $KLASS = __PACKAGE__;
+sub PASS { 1 }
+sub FAIL { 0 }
 
 sub import {
     my $pkg  = shift;
@@ -22,11 +23,18 @@ sub import {
         require utf8;
         utf8->import;
     }
+
+    if ($] < 5.014000) {
+        require IO::Handle;
+        IO::Handle->import;
+    }
 }
 
 sub new {
     bless {}, shift;
 }
+
+sub _tb { __PACKAGE__->builder }
 
 sub _reset {
     my ($self) = @_;
@@ -38,16 +46,11 @@ sub _reset {
     $self;
 }
 
-sub pass {
-    my $self = shift;
+sub pass { shift; _tb->ok(PASS, @_) }
+sub fail { shift; _tb->ok(FAIL, @_) }
 
-    $KLASS->builder->ok(1, @_);
-}
-
-sub fail {
-    my $self = shift;
-
-    $KLASS->builder->ok(0, @_);
+sub BAIL_OUT {
+    _tb->BAIL_OUT(scalar @_ == 1 ? $_[0] : $_[1]);
 }
 
 sub name {
@@ -95,7 +98,7 @@ sub ok {
     my $got = $self->_specific('_got', $value);
     my $test_name = defined $name ? $name : $self->{_name};
 
-    $KLASS->builder->ok($got, $test_name);
+    _tb->ok($got, $test_name);
 
     $self->_reset;
 
@@ -108,7 +111,7 @@ sub to_be {
     my $expected = $self->{_expected};
     my $test_name = $self->_specific('_name', $name);
 
-    my $ret = $KLASS->builder->is_eq($got, $expected, $test_name);
+    my $ret = _tb->is_eq($got, $expected, $test_name);
 
     $self->_reset;
 
@@ -124,7 +127,7 @@ sub _test {
     my $test_name = $self->_specific('_name', $_[2]);
 
     local $Test::Builder::Level = 2;
-    my $ret = $KLASS->builder->$method($got, $expected, $test_name);
+    my $ret = _tb->$method($got, $expected, $test_name);
 
     $self->_reset;
 
@@ -148,14 +151,14 @@ sub unlike {
     my $expected = $self->_specific('_expected', $_[1]);
     my $test_name = $self->_specific('_name', $_[2]);
 
-    my $ret = $KLASS->builder->unlike($got, $expected, $test_name);
+    my $ret = _tb->unlike($got, $expected, $test_name);
 
     $self->_reset;
 
     return $ret if $ret eq '1';
 
     my $pos = Text::MatchedPosition->new($got, $expected);
-    return $KLASS->builder->diag( sprintf <<'DIAGNOSTIC', $pos->line, $pos->offset );
+    return _tb->diag( sprintf <<'DIAGNOSTIC', $pos->line, $pos->offset );
           matched at line: %d, offset: %d
 DIAGNOSTIC
 }
@@ -163,7 +166,7 @@ DIAGNOSTIC
 sub diag {
     my $self = shift;
 
-    $KLASS->builder->diag(@_);
+    _tb->diag(@_);
 
     $self;
 }
@@ -171,7 +174,7 @@ sub diag {
 sub note {
     my $self = shift;
 
-    $KLASS->builder->note(@_);
+    _tb->note(@_);
 
     $self;
 }
@@ -185,10 +188,10 @@ sub explain {
             expected => $self->{_expected},
             name     => $self->{_name},
         };
-        $self->diag($KLASS->builder->explain($hash));
+        $self->diag(_tb->explain($hash));
     }
     else {
-        $self->diag($KLASS->builder->explain(@_));
+        $self->diag(_tb->explain(@_));
     }
 
     $self;
@@ -197,9 +200,181 @@ sub explain {
 sub done_testing {
     my $self = shift;
 
-    $KLASS->builder->done_testing(@_);
+    _tb->done_testing(@_);
 
     $self;
+}
+
+# Mostly copied from Test::More::can_ok
+sub can_ok {
+    my($self, $proto, @methods) = @_;
+
+    my $class = ref $proto || $proto;
+
+    unless($class) {
+        my $ok = _tb->ok(FAIL, "->can(...)");
+        _tb->diag('    can_ok() called with empty class or reference');
+        return $ok;
+    }
+
+    unless(@methods) {
+        my $ok = _tb->ok(FAIL, "$class->can(...)");
+        _tb->diag('    can_ok() called with no methods');
+        return $ok;
+    }
+
+    my @nok = ();
+    for my $method (@methods) {
+        _tb->_try(sub { $proto->can($method) }) or push @nok, $method;
+    }
+
+    my $name = scalar @methods == 1 ? "$class->can('$methods[0]')" : "$class->can(...)";
+
+    my $ok = _tb->ok(!@nok, $name);
+
+    _tb->diag(map "    $class->can('$_') failed\n", @nok);
+
+    return $ok;
+}
+
+# Mostly copied from Test::More::isa_ok
+sub isa_ok {
+    my $self = shift;
+
+    my $got = $self->_specific('_got', $_[0]);
+    my $expected = $self->_specific('_expected', $_[1]);
+    my $test_name = $self->_specific('_name', $_[2]);
+
+    my $whatami = 'class';
+    if (!defined $got) {
+        $whatami = 'undef';
+    }
+    elsif (ref $got) {
+        $whatami = 'reference';
+
+        local($@, $!);
+        require Scalar::Util;
+        if(Scalar::Util::blessed($got)) {
+            $whatami = 'object';
+        }
+    }
+
+    # We can't use UNIVERSAL::isa because we want to honor isa() overrides
+    my ($result, $error) = _tb->_try(sub { $got->isa($expected) });
+
+    if ($error) {
+        die <<WHOA unless $error =~ /^Can't (locate|call) method "isa"/;
+WHOA! I tried to call ->isa on your $whatami and got some weird error.
+Here's the error.
+$error
+WHOA
+    }
+
+    # Special case for isa_ok( [], "ARRAY" ) and like
+    if ($whatami eq 'reference') {
+        $result = UNIVERSAL::isa($got, $expected);
+    }
+
+    my ($diag, $name) = $self->_get_isa_diag_name($whatami, $got, $expected, $test_name);
+
+    my $ok;
+    if ($result) {
+        $ok = _tb->ok(PASS, $name);
+    }
+    else {
+        $ok = _tb->ok(FAIL, $name);
+        _tb->diag("    $diag\n");
+    }
+
+    $self->_reset;
+
+    return $ok;
+}
+
+sub _get_isa_diag_name {
+    my ($self, $whatami, $got, $expected, $test_name) = @_;
+
+    my ($diag, $name);
+
+    if (defined $test_name) {
+        $name = "'$test_name' isa '$expected'";
+        $diag = defined $got ? "'$test_name' isn't a '$expected'" : "'$test_name' isn't defined";
+    }
+    elsif ($whatami eq 'object') {
+        my $my_class = ref $got;
+        $test_name = qq[An object of class '$my_class'];
+        $name = "$test_name isa '$expected'";
+        $diag = "The object of class '$my_class' isn't a '$expected'";
+    }
+    elsif ($whatami eq 'reference') {
+        my $type = ref $got;
+        $test_name = qq[A reference of type '$type'];
+        $name = "$test_name isa '$expected'";
+        $diag = "The reference of type '$type' isn't a '$expected'";
+    }
+    elsif ($whatami eq 'undef') {
+        $test_name = 'undef';
+        $name = "$test_name isa '$expected'";
+        $diag = "$test_name isn't defined";
+    }
+    elsif($whatami eq 'class') {
+        $test_name = qq[The class (or class-like) '$got'];
+        $name = "$test_name isa '$expected'";
+        $diag = "$test_name isn't a '$expected'";
+    }
+    else {
+        die;
+    }
+
+    return($diag, $name);
+}
+
+sub throw_ok {
+    my $self = shift;
+
+    eval { shift->() };
+
+    _tb->ok(!!$@, $self->_specific('_name', $_[0]));
+}
+
+sub throw {
+    my $self = shift;
+    my $code = shift;
+
+    die 'The `throw` method expects code ref.' unless ref $code eq 'CODE';
+
+    eval { $code->() };
+
+    if (my $e = $@) {
+        if (defined $_[0]) {
+            _tb->like($e, $_[0], $_[1] || 'Thrown correctly');
+            $self->_reset;
+        }
+        else {
+            $self->got($e);
+        }
+    }
+    else {
+        _tb->ok(FAIL);
+        $self->diag(q|Failed, because it's expected to throw an exeption, but not.|);
+    }
+
+    $self;
+}
+
+sub catch {
+    my $self  = shift;
+    my $regex = shift;
+
+    my $ret = _tb->like(
+        $self->_specific('_got', undef),
+        $regex,
+        $_[0] || 'Thrown correctly',
+    );
+
+    $self->_reset;
+
+    $ret;
 }
 
 1;
@@ -243,6 +418,8 @@ Test::Arrow - Object-Oriented testing library
     #                   'abc'
     #           matches '(?^:b)'
     #           matched at line: 1, offset: 2
+
+    $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
 
 
 =head1 DESCRIPTION
@@ -354,6 +531,55 @@ C<like> matches $got value against the $expected regex.
 
     $arr->expect(qr/b/)->got('abc')->like;
 
+=head3 can_ok($class, @methods)
+
+Checks to make sure the $class or $object can do these @methods
+(works with functions, too).
+
+    Test::Arrow->can_ok($class, @methods);
+    Test::Arrow->can_ok($object, @methods);
+
+=head3 isa_ok
+
+    $arr->got($got_object)->expected($class)->isa_ok;
+
+Checks to see if the given C<$got_object-&gt;isa($class)>. Also checks to make sure the object was defined in the first place.
+
+It works on references, too:
+
+    $arr->got($array_ref)->expected('ARRAY')->isa_ok;
+
+
+=head2 EXCEPTION TEST
+
+=head3 throw_ok($code_ref)
+
+It makes sure that $code_ref gets an exception.
+
+    $arr->throw_ok(sub { die 'oops' });
+
+=head3 throw($code_ref)
+
+=head3 catch($regex)
+
+The C<throw> method invokes $code_ref, and if it's certenly thrown an exception, then an exception message will be set as $got and the $regex in C<catch> method will be evaluated to $got.
+
+    $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
+
+Above test is equivalent to below
+
+    $arr->throw(sub { die 'Baz' })->expected(qr/^Ba/)->like;
+
+Actually, you can execute a test even only C<throw> method
+
+    $arr->throw(sub { die 'Baz' }, qr/^Ba/);
+
+=head2 BAIL OUT
+
+=head3 BAIL_OUT($why)
+
+Terminates tests.
+
 =head2 UTILITIES
 
 You can call below utilities methods even without an instance.
@@ -402,11 +628,22 @@ Declare of done testing.
 B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
 
+=head2 CONSTANTS
+
+=head3 PASS
+
+1
+
+=head3 FAIL
+
+0
+
+
 =head1 REPOSITORY
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.05-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582302144"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582302144&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.08-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582511878"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582511878&branch=master"/></a>
 
 =end html
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -56,7 +56,7 @@ sub want_anum {
   # return 0 unless $anum =~ /A000119/;
   # return 0 unless $anum =~ /A005228|A030124/;
   # return 0 unless $anum =~ /A177702|A102283|A131756/;
-  # return 0 unless $anum =~ /A004/;
+  # return 0 unless $anum =~ /A3/;
   return 1;
 }
 sub want_module {

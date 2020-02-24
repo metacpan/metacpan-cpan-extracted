@@ -200,6 +200,25 @@ BEGIN {
     note "\t", sprintf qq|editor()->formatRange(): warning = "%s"\n|, $ugh//'<undef>';
 }
 
+# 2020-Feb-21: issue #8 = addText() does not work
+{
+    # new file
+    notepad->newFile();
+    select undef,undef,undef,0.25;
+
+    # add known text
+    editor->addText("Hello, World");
+    select undef,undef,undef,0.25;
+
+    # verify text is added
+    my $txt = editor->getText();
+    is $txt, "Hello, World", 'addText() coverage per issue #8';
+    note "\t", sprintf qq|editor()->setText(): added text = "%s"\n|, $txt//'<undef>';
+
+    # cleanup
+    editor->undo();
+    notepad->close();
+}
 
 
 ok 1;

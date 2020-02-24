@@ -14,7 +14,7 @@ MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
 
 =head1 VERSION
 
-version 3.0.29
+version 3.0.30
 
 =head1 DESCRIPTION
 
@@ -140,15 +140,15 @@ The method C<MarpaX::ESLIF::is_bool> is used to determine the boolean nature. De
 
 =item [2]
 
-If input is a true scalar, the method C<MarpaX::ESLIF::is_int> is used to determine the integer nature. Default is to call C<Types::Standard::is_Int>. Storage is decided when comparing the size of a Perl's XS's C<IV>, and defaults to an opaque PTR that only perl will understand if not found.
+If input is a IV only scalar, storage is decided when comparing the size of a Perl's XS's C<IV>, and defaults to an opaque PTR that only perl will understand if not found.
 
 =item [3]
 
-If input is a true scalar, the method C<MarpaX::ESLIF::is_StrictNum> is used to determine the number nature. Default is to call C<Types::Standard::is_StrictNum>. Storage depends on the size of an Perl's XS's C<NV>, and defaults to an opaque PTR that only perl will understand if not found.
+If input is a NV only scalar, storage depends on the size of an Perl's XS's C<NV>, and defaults to an opaque PTR that only perl will understand if not found.
 
 =item [4]
 
-An instance of a L<MarpaX::ESLIF::String> instance or the method C<MarpaX::ESLIF::is_Str> is used to determine the string nature. Default for C<MarpaX::ESLIF::is_Str> is to call C<Types::Standard::is_Str>. If encoding information is found, then it becomes a marpaESLIF's STRING, else a marpaESLIF's ARRAY.
+An instance of L<MarpaX::ESLIF::String> becomes a marpaESLIF's STRING, else a marpaESLIF's ARRAY.
 
 When it is not a L<MarpaX::ESLIF::String> instance, only perl's C<PV> that have the UTF-8 flag set are considered to be strings, and this information is trusted. Note that it respects the existence of C<bytes> pragma, if any.
 
@@ -339,6 +339,10 @@ Table with niled values support, explicitly marked to be exported to a marpaESLI
 Table with niled values support, explicitly marked to be exported to a marpaESLIF's TABLE if it ever happens.
 
 =back
+
+=head1 NOTES
+
+Special I<infinity> and I<nan> values are handled automatically by marpaESLIF, if the underlying system supports them.
 
 =head1 SEE ALSO
 

@@ -1,4 +1,10 @@
-0.04   Mon, 06 Jun 2011 16:21:57 +0200
+Revision history for XS-Object-Magic
+
+0.05      2020-02-22 18:52:33Z
+    - convert packaging from Module::Install to Dist::Zilla
+    - documentation fixes (rafl GH#1, Jonathan Rockaway)
+
+0.04    2011-06-06 14:21:57Z
     - Add xs_object_magic_detach_struct to remove attached structs.
     - Add xs_object_magic_has_struct and xs_object_magic_has_struct_rv as
       predicate methods.
@@ -7,13 +13,13 @@
       structure. xs_object_magic_get_struct_mg, which the headers provided
       before for this porpose, never actually worked.
 
-0.03    Sun, 17 Apr 2011 17:13:41 +0200
+0.03    2011-04-17 15:13:41Z
     - Make the examples in the docs C89-compliant (Emmanuel Rodriguez).
 
-0.02
+0.02    2009-09-17
     - the header no longer includes ppport.h
     - add missing aTHX_
     - doc fixes from Jeremiah Foster
 
-0.01
+0.01    2009-09-15
     - initial release

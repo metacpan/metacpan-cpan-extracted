@@ -75,6 +75,7 @@ sub want_planepath {
   # return 0 unless $planepath =~ /SierpinskiArrowhead/;
   # return 0 unless $planepath =~ /R5DragonCurve/;
   # return 0 unless $planepath =~ /AlternateTerdragon/;
+  return 0 unless $planepath =~ /Koch/;
 
   return 0 if $planepath =~ /SquaRecurve/; # exclude
   return 0 if $planepath =~ /Cellular/; # exclude
@@ -93,7 +94,7 @@ sub want_coordinate {
   # return 0 unless $type =~ m{Turn};
   # return 0 unless $type =~ m{DiffXY/2};
   # return 0 if $type =~ /SubHeight|NumChildren|NumSibling/;
-  return 0 unless $type =~ /NotStraight/;
+  # return 0 unless $type =~ /NotStraight/;
   return 1;
 }
 

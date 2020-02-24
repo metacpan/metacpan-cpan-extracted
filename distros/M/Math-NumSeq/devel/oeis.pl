@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,16 +26,18 @@ use Smart::Comments;
 
 
 {
+  # ~/OEIS/A000110.internal.txt
+  # ~/OEIS/b000110.txt
   require Math::NumSeq::OEIS::File;
   my $seq = Math::NumSeq::OEIS::File->new(
                                           # anum => 'A007450',
                                           # anum=>'A088218',
                                           # anum=>'A000290',
 
-                                          anum=>'A191372',
-                                          _dont_use_afile=>1,
-                                          _dont_use_bfile=>1,
+                                          anum=>'A021913',
                                           _dont_use_internal=>1,
+                                          _dont_use_afile=>1,
+                                          _dont_use_bfile=>0,
                                          );
   ### $seq
   ### description: $seq->description

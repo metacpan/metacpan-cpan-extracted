@@ -136,6 +136,20 @@ void treat_affix_rule(struct flagent *cond, ichar_t *strip,
       if (i < 0)
          cond->numconds = 0;
    }
+
+   if (cond->numconds == 0 && cond->stripl < 8) {
+     int mask;
+     bzero(cond->conds, SET_SIZE + MAXSTRINGCHARS);
+     
+     for (int pos = 0; pos < cond->stripl; ++pos) {
+       mask = 1 << cond->numconds;
+       cond->numconds++;
+
+       cond->conds[cond->strip[pos]] |= mask;
+       cond->conds[mytoupper((ichar_t) cond->strip[pos])] |= mask;
+     }
+   }
+   
 }
 
 %}

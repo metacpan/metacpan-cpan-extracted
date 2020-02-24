@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.174';
+our $VERSION = '1.175';
 
 use Quiq::Udl;
 use Quiq::CommandLine;
@@ -27,7 +27,7 @@ L<Quiq::Object>
 
   use Quiq::PostgreSql::Psql;
   
-  Quiq::PostgreSql::Psql->psql($database);
+  Quiq::PostgreSql::Psql->run($database,@opt);
 
 =head1 DESCRIPTION
 
@@ -51,6 +51,25 @@ Die Klasse stellt einen Wrapper für den PostgreSQL-Client psql dar.
 
 Name der Datenbank oder der Universal Database Locator (UDL).
 Der Name muss in der Datenbank-Konfigurationsdatei definiert sein.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -command => $cmd
+
+Führe Kommando $cmd aus und terminiere die Verbindung.
+
+=item -showInternal => $bool (Default: 0)
+
+Gib die Queries aus, die psql im Zusammenhang mit Backslash-Kommandos
+intern ausführt.
+
+=item -debug => $bool (Default: 0)
+
+Gib das ausgeführte psql-Kommando auf STDOUT aus.
 
 =back
 
@@ -78,7 +97,21 @@ wurde.
 # -----------------------------------------------------------------------------
 
 sub run {
-    my ($class,$database) = @_;
+    my ($class,$database) = splice @_,0,2;
+
+    # Options
+
+    my $debug = 0;
+    my $command = undef;
+    my $showInternal = 0;
+
+    $class->parameters(\@_,
+        -command => \$command,
+        -debug => \$debug,
+        -showInternal => \$showInternal,
+    );
+
+    # Führe Operation aus
 
     my $udl = Quiq::Udl->new($database);
     if ($udl->dbms ne 'postgresql') {
@@ -96,11 +129,21 @@ sub run {
             );
         }
     }
+    $c->addBoolOption('--echo-hidden'=>$showInternal);
+    if ($command) {
+        $c->addOption(-P=>'pager=off');
+        $c->addLongOption('--command'=>$command);
+    }
+
     if (my $database = $udl->db) {
         $c->addArgument($database);
     }
 
     my $cmd = $c->command;
+    if ($debug) {
+        say $cmd;
+    }
+
     my $exp = Expect->new;
     $exp->spawn($cmd) || do {
         $class->throw(
@@ -143,7 +186,7 @@ sub run {
 
 =head1 VERSION
 
-1.174
+1.175
 
 =head1 AUTHOR
 

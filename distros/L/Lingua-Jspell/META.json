@@ -6,7 +6,7 @@
       "Ulisses Pinto"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -48,15 +48,15 @@
    "provides" : {
       "Lingua::Jspell" : {
          "file" : "lib/Lingua/Jspell.pm",
-         "version" : "1.93"
+         "version" : "1.94"
       },
       "Lingua::Jspell::DictManager" : {
          "file" : "lib/Lingua/Jspell/DictManager.pm",
-         "version" : "1.93"
+         "version" : "1.94"
       },
       "Lingua::Jspell::EAGLES" : {
          "file" : "lib/Lingua/Jspell/EAGLES.pm",
-         "version" : "1.93"
+         "version" : "1.94"
       }
    },
    "release_status" : "stable",
@@ -68,6 +68,6 @@
          "url" : "https://natura.di.uminho.pt/svn/main/Lingua/Jspell/"
       }
    },
-   "version" : "1.93",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.94",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

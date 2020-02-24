@@ -3,9 +3,17 @@
 
 [![Build Status](https://travis-ci.org/memowe/Mojo-ServeDir.svg?branch=master)](https://travis-ci.org/memowe/Mojo-ServeDir)
 
-Helper module to serve files from the current working directory
+Helper module to serve files from the current working directory. Module usage:
 
-    $ perl -Mojo::ServeDir
+```bash
+$ perl -Mojo::ServeDir
+```
+
+Command usage:
+
+```bash
+$ serve_dir DIRECTORY DAEMON_OPTIONS
+```
 
 INSTALLATION
 ------------
@@ -33,7 +41,7 @@ CONTRIBUTORS
 LICENSE AND COPYRIGHT
 ---------------------
 
-This software is Copyright (c) 2019 by [Mirko Westermeier][mirko] ([\@memowe][mgh], [mirko@westermeier.de][mmail]).
+This software is Copyright (c) by [Mirko Westermeier][mirko] ([\@memowe][mgh], [mirko@westermeier.de][mmail]).
 
 Released under the MIT (X11) license. See [LICENSE][mit] for details.
 

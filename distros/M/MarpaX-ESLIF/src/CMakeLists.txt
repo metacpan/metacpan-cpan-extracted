@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 29)
+MYPACKAGESTART (marpaESLIF 3 0 30)
 
 ###########
 # Library #
@@ -36,10 +36,6 @@ ELSE ()
   MESSAGE (STATUS ".. unsigned 32-bit integer type is ${MYPACKAGE_UINT32_TYPEDEF}")
 ENDIF ()
 SET (MARPAESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
-#
-# ... PCRE2 is always built-in, and it is built as an external project
-#
-INCLUDE(cmake/BuildPCRE2.cmake)
 #
 # ... Ok -;
 #
@@ -79,6 +75,7 @@ MYPACKAGETESTEXECUTABLE(exceptionTester4           test/exceptionTester4.c)
 # Dependencies #
 ################
 MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS LOCAL)
+MYPACKAGEDEPENDENCY (pcre2         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/untar/pcre2-10.23"    LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (genericStack  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericStack"  LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (genericHash   "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericHash"   LIBS LOCAL STATIC)
 MYPACKAGEDEPENDENCY (marpaWrapper  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/marpaWrapper"  LIBS LOCAL STATIC)
@@ -86,9 +83,6 @@ MYPACKAGEDEPENDENCY (tconv         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/
 MYPACKAGEDEPENDENCY (luaunpanic    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic"    LIBS LOCAL STATIC)
 
 #
-# pcre2 is built as an external project: we have to explicitly give the include path.
-# In addition:
-# - Using pcre2 requires setting PCRE2_CODE_UNIT_WIDTH.
 # - Embedded lua uses long double for the lua_Number
 #
 IF (HAVE_SIZEOF_LONG_LONG)
@@ -107,10 +101,15 @@ FOREACH (_luatarget luaunpanic luaunpanic_static)
   TARGET_COMPILE_DEFINITIONS (${_luatarget} PUBLIC -DLUA_INT_TYPE=${LUA_INT_TYPE} -DLUA_FLOAT_TYPE=${LUA_FLOAT_TYPE})
 ENDFOREACH ()
 FOREACH (_target marpaESLIF marpaESLIF_static)
-  ADD_DEPENDENCIES           (${_target} pcre2)
-  TARGET_INCLUDE_DIRECTORIES (${_target} PRIVATE ${PCRE2_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/output/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/lua/include")
-  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED)
-  TARGET_LINK_LIBRARIES      (${_target} PRIVATE ${PCRE2_LIBRARIES})
+  TARGET_INCLUDE_DIRECTORIES (${_target} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/include/luaunpanic/lua"
+    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/output/include/luaunpanic/lua"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/lua/include")
+  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE
+    -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ}
+    -DPCRE2_CODE_UNIT_WIDTH=8
+    -DPCRE2_STATIC=1
+    -DMARPAESLIFLUA_EMBEDDED)
 ENDFOREACH ()
 
 #########

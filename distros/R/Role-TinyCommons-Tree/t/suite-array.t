@@ -9,7 +9,6 @@ use FindBin '$Bin';
 use lib "$Bin/lib";
 
 use Test::Role::TinyCommons::Tree qw(test_role_tinycommons_tree);
-#use Test::Requires 'Class::Build::Array::Glob'; # can't be used
 BEGIN {
     unless (eval { require Tree::Object::Array::Glob; 1 }) {
         plan skip_all => "Tree::Object::Array::Glob not availalbe";

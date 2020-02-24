@@ -26,7 +26,7 @@ no_index:
 provides:
   App::unbelievable:
     file: lib/App/unbelievable.pm
-    version: v0.0.4
+    version: v0.0.5
   App::unbelievable::CLI:
     file: lib/App/unbelievable/CLI.pm
   App::unbelievable::Routes:
@@ -55,13 +55,13 @@ requires:
   feature: '0'
   parent: '0'
   perl: '5.010001'
-  vars::i: '0'
+  vars::i: '1.10'
   version: '0.77'
 resources:
   bugtracker: https://github.com/cxw42/unbelievable/issues
   homepage: https://github.com/cxw42/unbelievable
   repository: git://github.com/cxw42/unbelievable.git
-version: v0.0.4
+version: v0.0.5
 x_authority: cpan:CXW
 x_contributors:
   - 'Chris White <cxwembedded@gmail.com>'

@@ -1,7 +1,7 @@
 package XS::libcares;
 use 5.012;
 
-our $VERSION = "1.1.1.5";
+our $VERSION = "1.1.1.6";
 
 use XS::Loader;
 

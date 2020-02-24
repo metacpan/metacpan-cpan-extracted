@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009,2010 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2010,2015,2020 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -14,20 +14,13 @@
 package Kwalify;
 
 use strict;
+use warnings;
 
 use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.22';
-
-BEGIN {
-    if ($] < 5.006) {
-	$INC{"warnings.pm"} = 1;
-	*warnings::import = sub { };
-	*warnings::unimport = sub { };
-    }
-}
+$VERSION = '1.23';
 
 sub validate ($$) {
     my($schema, $data) = @_;
@@ -342,12 +335,13 @@ sub validate_map {
 	    $self->_die("Expected subschema (a hash)");
 	}
 	my $required = _get_boolean($subschema->{required});
-	if (!exists $data->{$key}) {
+	if (!defined $data->{$key}) {
 	    if ($required) {
 		$self->{path} = $path;
 		$self->_error("Expected required key '$key'");
 		next;
 	    } else {
+		$seen_key{$key}++;
 		next;
 	    }
 	}
@@ -430,7 +424,7 @@ Typically used together with YAML or JSON:
   validate(YAML::LoadFile($schema_file), YAML::LoadFile($data_file));
 
   use JSON;
-  validate(jsonToObj($schema_data), jsonToObj($data));
+  validate(decode_json($schema_data), decode_json($data));
 
 =head1 DESCRIPTION
 
@@ -546,16 +540,15 @@ Slaven ReziE<x0107>, E<lt>srezic@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006,2007,2008,2009,2010 by Slaven ReziE<x0107>
+Copyright (C) 2006,2007,2008,2009,2010,2015 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
 L<pkwalify>, L<kwalify(1)>.
 
-Other non-XML schema languages: L<http://rjbs.manxome.org/rx/>
+Other non-XML schema languages: L<http://rx.codesimply.com/>
 
 =cut

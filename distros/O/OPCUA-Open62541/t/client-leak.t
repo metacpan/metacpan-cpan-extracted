@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use OPCUA::Open62541 ':all';
 
-use Test::More tests => 4;
+use Test::More tests => 5;
+use Test::NoWarnings;
 use Test::LeakTrace;
 
 # preallocate integer variables for test result

@@ -9,7 +9,7 @@ use warnings;
 /#define\s+UA_TYPES_(\S+)\s+/
     or next;
 print <<"XSINC"
-OPCUA_Open62541_UInt16
+UA_UInt16
 TYPES_$1()
     CODE:
         RETVAL = UA_TYPES_$1;

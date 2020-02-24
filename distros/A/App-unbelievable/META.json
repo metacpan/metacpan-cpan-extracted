@@ -66,7 +66,7 @@
             "feature" : "0",
             "parent" : "0",
             "perl" : "5.010001",
-            "vars::i" : "0",
+            "vars::i" : "1.10",
             "version" : "0.77"
          }
       },
@@ -79,7 +79,7 @@
    "provides" : {
       "App::unbelievable" : {
          "file" : "lib/App/unbelievable.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       },
       "App::unbelievable::CLI" : {
          "file" : "lib/App/unbelievable/CLI.pm"
@@ -102,7 +102,7 @@
          "web" : "https://github.com/cxw42/unbelievable"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_authority" : "cpan:CXW",
    "x_contributors" : [
       "Chris White <cxwembedded@gmail.com>"

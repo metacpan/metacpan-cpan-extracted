@@ -1,3 +1,6 @@
+.DS_Store
+.tags
+.vstags
 amqp_api.c
 amqp_connection.c
 amqp_consumer.c
@@ -5,6 +8,8 @@ amqp_framing.c
 amqp_hostcheck.c
 amqp_mem.c
 amqp_openssl.c
+amqp_openssl_bio.c
+amqp_openssl_hostname_validation.c
 amqp_socket.c
 amqp_table.c
 amqp_tcp_socket.c
@@ -17,12 +22,18 @@ LICENSE-MIT
 Makefile.PL
 MANIFEST			This list of files
 manual_tests/001_dead_letter_headers.t
+Net-AMQP-RabbitMQ-2.40005/META.json
+Net-AMQP-RabbitMQ-2.40005/META.yml
+net-amqp-rabbitmq.sublime-project
+net-amqp-rabbitmq.sublime-workspace
 perl_math_int64.c
 perl_math_int64.h
 ppport.h
 rabbitmq-include/amqp.h
 rabbitmq-include/amqp_framing.h
 rabbitmq-include/amqp_hostcheck.h
+rabbitmq-include/amqp_openssl_bio.h
+rabbitmq-include/amqp_openssl_hostname_validation.h
 rabbitmq-include/amqp_private.h
 rabbitmq-include/amqp_socket.h
 rabbitmq-include/amqp_ssl_socket.h

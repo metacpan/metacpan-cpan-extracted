@@ -39,9 +39,12 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '3.0.29'; # VERSION
+    our $VERSION = '3.0.30'; # VERSION
 
     require XSLoader;
+    # Modules that we depent on bootstrap
+    use Math::BigFloat qw//;
+    use Math::BigInt qw//;
     XSLoader::load(__PACKAGE__, $VERSION);
 }
 
@@ -51,16 +54,13 @@ use MarpaX::ESLIF::Grammar;
 use MarpaX::ESLIF::Grammar::Properties;
 use MarpaX::ESLIF::Grammar::Rule::Properties;
 use MarpaX::ESLIF::Grammar::Symbol::Properties;
+use MarpaX::ESLIF::JSON;
 use MarpaX::ESLIF::Logger::Level;
 use MarpaX::ESLIF::Symbol::PropertyBitSet;
 use MarpaX::ESLIF::Symbol::EventBitSet;
 use MarpaX::ESLIF::Symbol::Type;
 use MarpaX::ESLIF::Value::Type;
 use MarpaX::ESLIF::Rule::PropertyBitSet;
-
-# Other modules
-use Math::BigFloat qw//;
-use Math::BigInt qw//;
 
 
 my @REGISTRY = ();
@@ -139,7 +139,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 3.0.29
+version 3.0.30
 
 =head1 SYNOPSIS
 

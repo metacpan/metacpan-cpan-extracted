@@ -4,15 +4,14 @@ use 5.014;
 
 use strict;
 use warnings;
-use routines;
 
 use Moo::Role;
 
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # METHODS
 
-method AUTOLOAD() {
+sub AUTOLOAD {
   require Carp;
 
   my ($package, $method) = our $AUTOLOAD =~ m[^(.+)::(.+)$];
@@ -23,14 +22,16 @@ method AUTOLOAD() {
 
   Carp::confess($error) unless $build && ref($build) eq 'CODE';
 
-  my $proxy = $build->($self, $package, $method, @_);
+  my $proxy = $build->($package, $method, @_);
 
   Carp::confess($error) unless $proxy && ref($proxy) eq 'CODE';
 
   goto &$proxy;
 }
 
-method BUILDPROXY($package, $method, @args) {
+sub BUILDPROXY {
+  my ($package, $method, $self, @args) = @_;
+
   require Carp;
 
   my $build = $self->can('build_proxy');
@@ -40,7 +41,7 @@ method BUILDPROXY($package, $method, @args) {
   Carp::confess(qq(Can't locate object method "build_proxy" via package "$package"));
 }
 
-method DESTROY() {
+sub DESTROY {
 
   return;
 }

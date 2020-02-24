@@ -59,6 +59,7 @@ subtest 'Property types: spatial type semantics' => sub {
 	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(spatial types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
 	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
+	TODO: { local $TODO = 'Spatial not supported by libneo4j-client 2.2.0' if $Neo4j::Test::bolt;
 	$q = <<END;
 RETURN point({ x:3, y:0 })
 END
@@ -68,6 +69,7 @@ END
 		is ref $r->get(0), 'Neo4j::Driver::Type::Point', 'point blessed';
 		# TODO: further tests
 	}
+	}
 };
 
 
@@ -75,6 +77,7 @@ subtest 'Property types: temporal type semantics' => sub {
 	# may fail on old Neo4j versions and over Bolt
 	plan skip_all => "(temporal types unavailable in server $ver)" if $ver lt 'Neo4j/3.4';
 	plan tests => 1 + 1 unless $ver lt 'Neo4j/3.4';
+	TODO: { local $TODO = 'Temporal not supported by libneo4j-client 2.2.0' if $Neo4j::Test::bolt;
 	$q = <<END;
 RETURN
 duration.between(date('1984-10-11'), date('2015-06-24'))
@@ -84,6 +87,7 @@ END
 		skip '(read failed)', 1 if ! $r;
 		is ref $r->get(0), 'Neo4j::Driver::Type::Temporal', 'temporal blessed';
 		# TODO: further tests
+	}
 	}
 };
 

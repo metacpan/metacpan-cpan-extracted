@@ -57,7 +57,7 @@ PushButton("OK", 0.5);
 my ($ver, $bits) = $debugInfo =~ m/^Notepad\+\+ (v[\d\.]+)\s*\((\d+)-bit\)\s*$/m;
 ok $ver, 'DebugInfo:Notepad++ ver';
 ok $bits, 'DebugInfo:Notepad++ bits';
-note sprintf "\tNotepad++ %s %s-bit", $ver//'<undef>', $bits//'<undef>';
+diag sprintf "\tNotepad++ %s %s-bit", $ver//'<undef>', $bits//'<undef>';
 
 # perl bits
 like notepad->getPerlBits(), qr/^(32|64)$/, 'getPerlBits()';

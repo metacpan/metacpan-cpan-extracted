@@ -5,13 +5,13 @@ use Module::Build;
 my $b = Module::Build->new
  (module_name   => 'GitHub::Crud',
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Create, Read, Update, Delete files, issues, web hooks and commits on GitHub.',
+  dist_abstract => 'Create, Read, Update, Delete files, commits, issues, and web hooks on GitHub.',
   license       => 'perl',
   requires      => {
-    perl               => '5.26.1',
+    perl        => '5.26.1',
     Carp        =>0,
     Data::Dump  =>0,
-    'Data::Table::Text'              => 20200202,
+    'Data::Table::Text'              => 20200221,
     Digest::SHA1=>0,
     Storable    =>0,
     Test::More  =>0,

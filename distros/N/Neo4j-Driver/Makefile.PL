@@ -17,8 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Neo4j::Driver",
   "PREREQ_PM" => {
-    "Cpanel::JSON::XS" => "3.0201",
-    "JSON::PP" => 0,
+    "JSON::MaybeXS" => 0,
     "LWP::UserAgent" => 0,
     "REST::Client" => 134,
     "Try::Tiny" => 0,
@@ -26,11 +25,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Slurp" => 0,
+    "JSON::PP" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.96",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,8 +38,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Cpanel::JSON::XS" => "3.0201",
   "File::Slurp" => 0,
+  "JSON::MaybeXS" => 0,
   "JSON::PP" => 0,
   "LWP::UserAgent" => 0,
   "REST::Client" => 134,

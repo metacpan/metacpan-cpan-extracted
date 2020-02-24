@@ -1,0 +1,9 @@
+Neo4j::Bolt - Neo4j server agent using Bolt protocol
+Requires installation of libneo4j-client (https://github.com/cleishm/libneo4j-client)
+
+To install:
+ $ perl Build.PL
+ $ ./Build
+ $ ./Build test
+ $ ./Build install
+

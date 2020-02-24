@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::LibBuilder: '0.01'
   Module::Build: '0.3603'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +25,13 @@ name: Lingua-Jspell
 provides:
   Lingua::Jspell:
     file: lib/Lingua/Jspell.pm
-    version: '1.93'
+    version: '1.94'
   Lingua::Jspell::DictManager:
     file: lib/Lingua/Jspell/DictManager.pm
-    version: '1.93'
+    version: '1.94'
   Lingua::Jspell::EAGLES:
     file: lib/Lingua/Jspell/EAGLES.pm
-    version: '1.93'
+    version: '1.94'
 requires:
   Archive::Any: '0.0932'
   Data::Compare: '1.22'
@@ -43,5 +43,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://natura.di.uminho.pt/svn/main/Lingua/Jspell/
-version: '1.93'
+version: '1.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

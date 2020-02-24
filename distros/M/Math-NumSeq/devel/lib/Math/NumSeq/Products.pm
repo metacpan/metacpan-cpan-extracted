@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -24,7 +24,7 @@ use strict;
 use Module::Load;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');

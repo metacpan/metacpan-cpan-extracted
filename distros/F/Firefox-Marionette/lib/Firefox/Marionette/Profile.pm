@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -198,6 +198,7 @@ sub new {
     $profile->set_value( 'app.normandy.enabled',               'false', 0 );
     $profile->set_value( 'media.gmp-gmpopenh264.enabled',      'false', 0 );
     $profile->set_value( 'browser.casting.enabled',            'false', 0 );
+    $profile->set_value( 'xpinstall.signatures.required',      'false', 0 );
 
     return $profile;
 }
@@ -307,7 +308,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =head1 SYNOPSIS
 

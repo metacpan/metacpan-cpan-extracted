@@ -1,0 +1,95 @@
+==================================================
+Changes from 2019-02-21 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.0.3 at 2020-02-21 18:50:15 +0000
+-------------------------------------------
+
+  Change: 68e4d0fdb3d795e9eda4614913f51f135240f947
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-13 14:56:54 +0000
+
+    Fix link to HealthCheck Standard
+
+    and regenerate README, which pulls in other documentation changes. 
+
+  Change: fb7ec08c8921022585f2381ba645e68143191e2d
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-12 20:56:56 +0000
+
+    Add link to Plack::Middleware::Conditional 
+
+  Change: 6b2db31fd780053b98ee1f648fac9a2ba72e7714
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2020-02-06 15:42:28 +0000
+
+    Add enable_if / Conditional example in SYNOPSIS 
+
+  Change: 071877ad752ba0e7335c0221d906f04c0ea9a848
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-24 16:08:37 +0000
+
+    Remove mention of GSG specific check 
+
+  Change: 40e65b1f64a6a750b75591cf9ea51b01db89b992
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 12:00:53 +0000
+
+    Convert to external PluginBundle
+
+    And update metadata 
+
+-------------------------------------------
+version v0.0.2 at 2019-11-18 19:17:01 +0000
+-------------------------------------------
+
+  Change: 8bd84d3540906a4c26607ce314314f7cc6a1c683
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-16 18:12:36 +0000
+
+    Add cover_db/ to the .gitignore 
+
+  Change: 37a32b660f8442199593d1ec30c999f6d40c1adc
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-16 18:12:03 +0000
+
+    Add missing tests to get 100% coverage. 
+
+  Change: 93e6fb8476017dadc6a64e36fb72876725ad94a0
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-12 14:17:45 +0000
+
+    Don't require "printflush" method on psgi.errors
+
+    Instead, set "autoflush" on the filehandle we attach there.
+
+    This is probably not as reliable, but probably the correct solution. 
+
+  Change: f1baa5876e00737f53642052504cee85de81e6f4
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-12 14:17:45 +0000
+
+    Initial implementation
+
+    Copied from the internal module with internal features ripped out. 
+
+-------------------------------------------
+version v0.0.1 at 2019-09-09 21:50:20 +0000
+-------------------------------------------
+
+  Change: d33ea1bbcdc42339b8cf8cf764a779fa20a5cdbf
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-09 17:50:20 +0000
+
+    Create distribution files 
+
+  Change: 70ec86016047a92e1816eeecc7ed30284860e1d7
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-09-09 17:36:33 +0000
+
+    Initial Commit 
+
+================
+End of releases.
+================

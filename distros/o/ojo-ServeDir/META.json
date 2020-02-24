@@ -46,6 +46,6 @@
          "url" : "https://github.com/memowe/Mojo-ServeDir"
       }
    },
-   "version" : "0.02",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

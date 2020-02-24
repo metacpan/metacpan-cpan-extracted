@@ -1,5 +1,9 @@
 Revision history for Perl extension Data-Pokemon-Go
 
+0.14 2020-02-23T04:48:02Z
+    - updated for Unova's available Pokemons
+    - updated for Regigigas
+
 0.13 2020-01-18T09:48:51Z
     - now we can calcurate about Unoba's available Pokemons    
 

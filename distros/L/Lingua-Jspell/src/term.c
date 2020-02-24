@@ -38,6 +38,10 @@
 #include <sys/ioctl.h>
 #endif
 
+
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include <signal.h>
 
 
@@ -254,7 +258,15 @@ retry:
 
 
 #ifdef SIGTSTP
-    sigsetmask (1<<(SIGTSTP-1) | 1<<(SIGTTIN-1) | 1<<(SIGTTOU-1));
+    {
+      // Hope I managed to implement this correctly...
+      sigset_t sigmask;
+      sigemptyset(&sigmask);
+      sigaddset(&sigmask, SIGTSTP);
+      sigaddset(&sigmask, SIGTTIN);
+      sigaddset(&sigmask, SIGTTOU);
+      sigprocmask(SIG_SETMASK, &sigmask, NULL);
+    }
 #endif
 
 #ifdef TIOCGPGRP

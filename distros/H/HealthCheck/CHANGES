@@ -1,0 +1,209 @@
+==================================================
+Changes from 2019-02-21 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v1.5.3 at 2020-02-21 18:49:29 +0000
+-------------------------------------------
+
+  Change: df272cb38f80b7e9a27bd66fa61cbfe438718156
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-21 12:39:56 +0000
+
+    Adjust more links to the Health Check Standard 
+
+  Change: 38749641cbc68ca0a0f1bff3a2f37917e6bda629
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-13 14:54:51 +0000
+
+    Fix link to the HealthCheck Standard 
+
+  Change: 28118e975a7dbccbad823764792d17bece5a721e
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-24 16:17:06 +0000
+
+    Update meta files to public versions
+
+    Somehow I missed updating the Makefile and so the other files didn't
+    update correctly. 
+
+  Change: f3a708b93f831e717e93ac1b9b1d48fcdb2d038b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-24 15:00:17 +0000
+
+    Remove internal Jenkinsfile 
+
+  Change: bbedb27828dcd3ca1a673af6c1a8cc057f07262b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 12:02:18 +0000
+
+    Update files 
+
+  Change: 0f32c00a93a99a43e6f69f67f4d8009d82ba308a
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 12:02:18 +0000
+
+    Require appropriate version of our PluginBundle
+
+    To be sure contributors don't show up. 
+
+  Change: 54cd5345d7ef138c1ee5ce79aa9a97c3a40f51b7
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-17 12:02:18 +0000
+
+    Switch to Dist::Zilla::PluginBundle::Author::GSG
+
+    To make the module public 
+
+  Change: 253e040ae7fff0e047bc1cdae7005d50e305198b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-01-08 18:47:21 +0000
+
+    Clean up cpanfile 
+
+---------------------------------------------
+version v1.5.1.1 at 2019-10-18 18:33:59 +0000
+---------------------------------------------
+
+  Change: 00ac5270b28a87e636310223126e199f903e74c2
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:33:59 +0000
+
+    Create distribution files 
+
+  Change: 8c890e4db955ee96a1df293fe3cbc56af763ea60
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:31:05 +0000
+
+    Convert to Bitbucket workflow 
+
+  Change: 401130694817da11fc8d452cff80059943fac82f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-18 14:31:04 +0000
+
+    Remove gitc metadata 
+
+---------------------------------------------
+version v1.5.1.0 at 2019-10-14 17:20:59 +0000
+---------------------------------------------
+
+  Change: e241e8910e17d6610c6017ed00247f79d1caf5ce
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-14 12:58:43 +0000
+
+    Move WritingADiagnostic docs under lib
+
+    Because it's probably useful to actually install that, and our new
+    Dist::Zilla stuff doesn't like .pod files in the root. 
+
+  Change: 90841b04b5484987d11d6a62f5d93c37c7cf120f
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-10-14 12:34:47 +0000
+
+    Add GSGBundle to cpanfile
+
+    Not that we need it, but makes things easier. 
+
+-----------------------------------------------------------------------
+dist/version v0.0.0.1802_01/master/SM-1802 at 2019-06-05 18:10:05 +0000
+-----------------------------------------------------------------------
+
+  Change: 2a27d1666ec820b3bc76961b7d4ff7f9a371738b
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-04 18:33:07 +0000
+
+    Only copy tags from the checker
+
+    But we can copy id and label from the invocant as that is part of the
+    current check.
+
+    The tags however we can inherit so we can actually check those
+    things. I believe this matches the way things worked before. 
+
+  Change: da263de260e6cb0c7aa8695c812ce36cd9349093
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-06-04 15:32:28 +0000
+
+    Another test for not copying to sub-results
+
+    Because I didn't really like it. 
+
+  Change: 466e9b5d2768b5a88e591c20dfb8d1ca427d3864
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-06-04 12:51:41 +0000
+
+    SM-1802 Update docs 
+
+  Change: 43a8524ecb8231681a6a2497a6dcf4401a9bfc16
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-06-04 12:39:14 +0000
+
+    SM-1802 Standardize inheritance further
+
+    There were three places doing very similar things - running,
+    summarizing, and tag-checking of what *should* run. They now all use
+    the same code, and results always report the tags that should be
+    there. 
+
+  Change: 114ed91c437a5361e516e52d5aa56e5b18c055e2
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-05-31 17:51:47 +0000
+
+    Copy id, label, and tags from check to result
+
+    Unless the check has them. Also look at the Invocant to see if it has
+    them.
+
+    TODO is to look at the invocant and see if it `can(thing)` and if so
+    copy it. 
+
+  Change: 3fc08e9b17b7087e70b99d5d91a3e56ad944e0c3
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-05-31 17:50:54 +0000
+
+    Fix up some documentation
+
+    I actually ran this and figured out what the results were, which were
+    not what they claimed to be. 
+
+  Change: 845262f757036aa5f0d90f575af0b937e97a9019
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-05-31 11:16:24 +0000
+
+    SM-1802 Update the docs 
+
+  Change: c32678d4efd195edb34297b3af46625346e8d22e
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-05-31 11:16:24 +0000
+
+    SM-1802 Add implicit (parent-inherited) tags 
+
+  Change: 730214d4d6c6d55fc7d450400a623faf776c03bb
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-05-31 11:16:24 +0000
+
+    SM-1802 Add explicitly specified tags 
+
+  Change: 1b1e59430417385106c31a6be30962463850113d
+  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
+  Date : 2019-05-31 11:16:18 +0000
+
+    SM-1802 Test healthchecks summarize their tags 
+
+---------------------------------------------------------------------------
+dist/version v0.0.0.11289_01/master/PEX-11289a at 2019-05-06 14:07:39 +0000
+---------------------------------------------------------------------------
+
+  Change: b65300127229f4cb74360c7129b0dc8a8648044a
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-04-30 16:32:07 +0000
+
+    PEX-11289a: Stringify errors from run calls
+
+    JSON encoding in the Plack Middleware usually doesn't have blessed
+    object encoding turned on, so stringify errors to prevent further
+    exceptions 
+
+=================================================
+Plus 50 releases after 2019-02-21 00:00:00 +0000.
+=================================================

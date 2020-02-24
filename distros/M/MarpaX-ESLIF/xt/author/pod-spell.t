@@ -13,13 +13,16 @@ __DATA__
 BNF
 Bindings
 Calculator
+Decoder
 Durand
 ESLIF
+Encoder
 Event
 EventBitSet
 Grammar
 Interface
 Introduction
+JSON
 Jean
 Level
 Logger
@@ -27,6 +30,7 @@ MarpaX
 Properties
 PropertyBitSet
 Recognizer
+RecognizerInterface
 Rule
 String
 Symbol

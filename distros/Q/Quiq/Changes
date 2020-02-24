@@ -1,3 +1,18 @@
+1.175 2020-02-22
+================
+
+[Quiq::PostgreSql::PgDump]
+* Klasse hinzugefügt
+
+[Quiq::PostgreSql::Psql]
+* run(() - Optionen -debug, -command, -showInternal hinzugefügt
+
+[Quiq::Sql]
+* commands() - Liste der Kommandos korrigiert
+
+[Quiq::Stopwatch]
+* elapsedReadable() hinzugefügt
+
 1.174 2020-02-18
 ================
 

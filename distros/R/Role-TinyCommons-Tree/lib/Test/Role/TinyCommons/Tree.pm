@@ -325,7 +325,7 @@ Test::Role::TinyCommons::Tree - Test suite for Role::TinyCommons::Tree
 
 =head1 VERSION
 
-This document describes version 0.121 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
+This document describes version 0.122 of Test::Role::TinyCommons::Tree (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
 
 =head1 DESCRIPTION
 
@@ -395,7 +395,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
 
 =head1 BUGS
 

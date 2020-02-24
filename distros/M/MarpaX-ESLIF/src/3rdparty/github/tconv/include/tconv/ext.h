@@ -126,6 +126,8 @@ typedef struct tconv_option {
   tconvTraceCallback_t  traceCallbackp;
   /* This is the tracing callback opaque data, can be NULL */
   void                 *traceUserDatavp;
+  /* Fallback charset when from charset is NULL and guess fails */
+  const char           *fallbacks;
 } tconv_option_t;
 
 tconv_EXPORT tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_t *tconvOptionp);

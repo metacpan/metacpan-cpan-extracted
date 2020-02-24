@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.2.3
+version v0.3.0
 
 # SYNOPSIS
 
@@ -24,6 +24,8 @@ my $css = HTML::DeferableCSS->new(
       jqui  => '//cdn.example.com/jquery-ui.min.css',
     },
 );
+
+$css->check or die "Something is wrong";
 
 ...
 
@@ -46,8 +48,8 @@ to something like
 ```
 
 but this is not well supported by all web browsers. So a web page
-needs some JavaScript to handle this, as well as a `noscript` block
-as a fallback.
+needs some [JavaScript](https://github.com/filamentgroup/loadCSS)
+to handle this, as well as a `noscript` block as a fallback.
 
 This module allows you to simplify the management of stylesheets for a
 web application, from development to production by
@@ -125,12 +127,8 @@ tools for that.
 This is a hash reference used internally to translate ["aliases"](#aliases)
 into the actual files or URLs.
 
-If files cannot be found, then it will throw an error, so calling this
-attribute in void context can be used to check for any errors:
-
-```
-eval { $css->css_files } or die "$@";
-```
+If files cannot be found, then it will throw an error. (See
+["check"](#check)).
 
 ## cdn\_links
 
@@ -176,6 +174,8 @@ This defaults to the same value as ["defer\_css"](#defer_css).
 
 This is the pathname of the `cssrelpreload.js` file that will be
 embedded in the resulting code.
+
+The script comes from [https://github.com/filamentgroup/loadCSS](https://github.com/filamentgroup/loadCSS).
 
 You do not need to modify this unless you want to use a different
 script from the one included with this module.
@@ -232,6 +232,16 @@ log => sub { $logger->log(@_) },
 ```
 
 # METHODS
+
+## check
+
+This method instantiates lazy attributes and performs some minimal
+checks on the data.  (This should be called instead of ["css\_files"](#css_files).)
+
+It will throw an error or return false (depending on ["log"](#log)) if there
+is something wrong.
+
+This was added in v0.3.0.
 
 ## href
 
@@ -316,9 +326,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+Please report any bugs in `cssrelpreload.js` to
+[https://github.com/filamentgroup/loadCSS/issues](https://github.com/filamentgroup/loadCSS/issues).
+
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+This module was developed from work for Science Photo Library
+[https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 `reset.css` comes from [http://meyerweb.com/eric/tools/css/reset/](http://meyerweb.com/eric/tools/css/reset/).
 

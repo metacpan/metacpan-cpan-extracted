@@ -9,7 +9,7 @@ use routines;
 
 use Moo;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 # BUILD
 
@@ -259,9 +259,9 @@ This package supports the following scenarios:
 
   my $example = Example::HasBld->new;
 
-This package supports the C<bld> and C<builder> directives, expects a coderef
-and builds the attribute value if it wasn't provided to the constructor. See
-the L<Moo> documentation for more details.
+This package supports the C<bld> and C<builder> directives, expects a C<1>, a
+method name, or coderef and builds the attribute value if it wasn't provided to
+the constructor. See the L<Moo> documentation for more details.
 
 =cut
 
@@ -284,8 +284,9 @@ the L<Moo> documentation for more details.
 
   # $example->clear_data;
 
-This package supports the C<clr> and C<clearer> directives expects a coderef and
-generates a clearer method. See the L<Moo> documentation for more details.
+This package supports the C<clr> and C<clearer> directives expects a C<1> or a
+method name of the clearer method. See the L<Moo> documentation for more
+details.
 
 =cut
 
@@ -329,9 +330,9 @@ for more details.
 
   my $example = Example::HasDef->new;
 
-This package supports the C<def> and C<default> directives expects a coderef and
-is used to build a default value if one is not provided to the constructor. See
-the L<Moo> documentation for more details.
+This package supports the C<def> and C<default> directives expects a
+non-reference or a coderef to be used to build a default value if one is not
+provided to the constructor. See the L<Moo> documentation for more details.
 
 =cut
 
@@ -543,9 +544,9 @@ details.
 
   my $example = Example::HasPre->new(data => time);
 
-This package supports the C<pre> and C<predicate> directives expects a coderef
-and generates a method for checking the existance of the attribute. See the
-L<Moo> documentation for more details.
+This package supports the C<pre> and C<predicate> directives expects a C<1> or
+a method name and generates a method for checking the existance of the
+attribute. See the L<Moo> documentation for more details.
 
 =cut
 
@@ -619,9 +620,9 @@ details.
 
   my $example = Example::HasTgr->new(data => time);
 
-This package supports the C<tgr> and C<trigger> directives expects a coderef and
-is executed whenever the attribute's value is changed. See the L<Moo>
-documentation for more details.
+This package supports the C<tgr> and C<trigger> directives expects a C<1> or a
+coderef and is executed whenever the attribute's value is changed. See the
+L<Moo> documentation for more details.
 
 =cut
 

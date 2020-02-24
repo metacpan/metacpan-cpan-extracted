@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More 0.98;
-use Test::Requires 'Moo';
+use Test::Needs 'Moo';
 
 use FindBin '$Bin';
 use lib "$Bin/lib";

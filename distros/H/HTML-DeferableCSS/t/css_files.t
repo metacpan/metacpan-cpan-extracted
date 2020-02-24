@@ -13,6 +13,8 @@ subtest "css_files" => sub {
 
     isa_ok $css, 'HTML::DeferableCSS';
 
+    ok $css->check, 'check';
+
     my $files = $css->css_files;
 
     cmp_deeply $files, {
@@ -38,6 +40,8 @@ subtest "css_files (alias => 1)" => sub {
 
     isa_ok $css, 'HTML::DeferableCSS';
 
+    ok $css->check, 'check';
+
     my $files = $css->css_files;
 
     cmp_deeply $files, {
@@ -59,6 +63,10 @@ subtest "css_files (1.css fails)" => sub {
     );
 
     isa_ok $css, 'HTML::DeferableCSS';
+
+    throws_ok {
+        $css->check;
+    } qr/alias 'one' refers to a non-existent file/;
 
     throws_ok {
         $css->css_files;
@@ -204,6 +212,10 @@ subtest "css_files (bad filename)" => sub {
     isa_ok $css, 'HTML::DeferableCSS';
 
     throws_ok {
+        $css->check
+    } qr/alias 'reset' refers to a non-existent file/;
+
+    throws_ok {
         $css->css_files
     } qr/alias 'reset' refers to a non-existent file/;
 
@@ -268,6 +280,25 @@ subtest "css_files (array ref)" => sub {
 
     is $files->{reset}->[0]->stringify => "t/etc/css/reset.min.css", "path";
     is $files->{reset}->[1]            => "reset.min.css", "filename";
+
+};
+
+subtest "css_files (no files)" => sub {
+
+    my $css = HTML::DeferableCSS->new(
+        css_root => 't/etc/css',
+        aliases  => {},
+    );
+
+    isa_ok $css, 'HTML::DeferableCSS';
+
+    throws_ok {
+        $css->check
+    } qr/no aliases/;
+
+    lives_ok {
+        $css->css_files
+    } 'css_files lives ok';
 
 };
 

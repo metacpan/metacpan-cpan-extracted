@@ -1,5 +1,12 @@
 Changelog for Mojolicious-Plugin-PODViewer
 
+0.006     2020-02-21 22:10:51-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed the CPAN and (again) breadcrumb links. This time with tests so
+    they're actually right this time. Thanks @ldidry! (Github #8)
+
 0.005     2019-11-13 12:54:35-06:00 America/Chicago
 
     [Fixed]

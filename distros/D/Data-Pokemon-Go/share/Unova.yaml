@@ -575,18 +575,17 @@
         en: Woobat
         ch: 滚滚蝙蝠
         fr: Chovsourir
-    isNotAvailable: 1
     Types:
         - エスパー
         - ひこう
     From:
     To:
-    Stamina: 65
-    Attack: 45
-    Defense: 43
+    Stamina: 163
+    Attack: 107
+    Defense: 85
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 580
+        Boosted: 726
 - # ココロモリ[528] --------------------------------------------------
     ID: 528
     Name:
@@ -594,18 +593,17 @@
         en: Swoobat
         ch: 心蝙蝠
         fr: Rhinolove
-    isNotAvailable: 1
     Types:
         - エスパー
         - ひこう
     From:
     To:
-    Stamina: 67
-    Attack: 57
-    Defense: 55
+    Stamina: 167
+    Attack: 161
+    Defense: 119
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 980
+        Boosted: 1226
 - # モグリュー[529] --------------------------------------------------
     ID: 529
     Name:
@@ -648,17 +646,16 @@
         en: Audino
         ch: 差不多娃娃
         fr: Nanméouïe
-    isNotAvailable: 1
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 103
-    Attack: 60
-    Defense: 86
+    Stamina: 230
+    Attack: 114
+    Defense: 163
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 961
+        Boosted: 1201
 - # ドッコラー[532] --------------------------------------------------
     ID: 532
     Name:
@@ -1082,17 +1079,16 @@
         en: Darumaka
         ch: 火红不倒翁
         fr: Darumarond
-    isNotAvailable: 1
     Types:
         - ほのお
     From:
     To:
-    Stamina: 70
-    Attack: 90
-    Defense: 45
+    Stamina: 172
+    Attack: 153
+    Defense: 86
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 823
+        Boosted: 1030
 - # ヒヒダルマ[555] --------------------------------------------------
     ID: 555
     Name:
@@ -1100,14 +1096,32 @@
         en: Darmanitan
         ch: 达摩狒狒
         fr: Darumacho
-    isNotAvailable: 1
     Types:
         - ほのお
     From:
     To:
-    Stamina: 105
-    Attack: 140
-    Defense: 55
+    Stamina: 233
+    Attack: 263
+    Defense: 114
+    MAXCP:
+        Hatched: 1774
+        Boosted: 2218
+- # ヒヒダルマ(ダルマモード)[555] --------------------------------------------------
+    ID: 555
+    Name:
+        ja: ヒヒダルマ
+        en: Darmanitan
+        ch: 达摩狒狒
+        fr: Darumacho
+    isNotAvailable: 1
+    Form: ダルマモード
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 233
+    Attack: 242
+    Defense: 202
     MAXCP:
         Hatched:
         Boosted:
@@ -1171,18 +1185,17 @@
         en: Scraggy
         ch: 滑滑小子
         fr: Baggiguane
-    isNotAvailable: 1
     Types:
         - あく
         - かくとう
     From:
     To:
-    Stamina: 50
-    Attack: 75
-    Defense: 70
+    Stamina: 137
+    Attack: 132
+    Defense: 132
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 784
+        Boosted: 980
 - # ズルズキン[560] --------------------------------------------------
     ID: 560
     Name:
@@ -1190,18 +1203,17 @@
         en: Scrafty
         ch: 头巾混混
         fr: Baggaïd
-    isNotAvailable: 1
     Types:
         - あく
         - かくとう
     From:
     To:
-    Stamina: 65
-    Attack: 90
-    Defense: 115
+    Stamina: 163
+    Attack: 163
+    Defense: 222
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 1304
+        Boosted: 1631
 - # シンボラー[561] --------------------------------------------------
     ID: 561
     Name:
@@ -1403,17 +1415,16 @@
         en: Minccino
         ch: 泡沫栗鼠
         fr: Chinchidou
-    isNotAvailable: 1
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 55
-    Attack: 50
-    Defense: 40
+    Stamina: 146
+    Attack: 98
+    Defense: 80
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 498
+        Boosted: 623
 - # チラチーノ[573] --------------------------------------------------
     ID: 573
     Name:
@@ -1421,17 +1432,16 @@
         en: Cinccino
         ch: 奇诺栗鼠
         fr: Pashmilla
-    isNotAvailable: 1
     Types:
         - ノーマル
     From:
     To:
-    Stamina: 75
-    Attack: 95
-    Defense: 60
+    Stamina: 181
+    Attack: 198
+    Defense: 130
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 1281
+        Boosted: 1601
 - # ゴチム[574] --------------------------------------------------
     ID: 574
     Name:
@@ -1805,17 +1815,16 @@
         en: Alomomola
         ch: 保姆曼波
         fr: Mamanbo
-    isNotAvailable: 1
     Types:
         - みず
     From:
     To:
-    Stamina: 165
-    Attack: 75
-    Defense: 80
+    Stamina: 338
+    Attack: 138
+    Defense: 131
     MAXCP:
-        Hatched:
-        Boosted:
+        Hatched: 1239
+        Boosted: 1549
 - # バチュル[595] --------------------------------------------------
     ID: 595
     Name:
@@ -2641,7 +2650,25 @@
     MAXCP:
         Hatched: 1727
         Boosted: 2159
-- # トルネロス[641] --------------------------------------------------
+- # トルネロス(けしんフォルム)[641] --------------------------------------------------
+    ID: 641
+    Name:
+        ja: トルネロス
+        en: Tornadus
+        ch: 龙卷云
+        fr: Boréas
+    Form: けしんフォルム
+    Types:
+        - ひこう
+    From:
+    To:
+    Stamina: 188
+    Attack: 266
+    Defense: 164
+    MAXCP:
+        Hatched: 1911
+        Boosted: 2389
+- # トルネロス(れいじゅうフォルム)[641] --------------------------------------------------
     ID: 641
     Name:
         ja: トルネロス
@@ -2649,6 +2676,7 @@
         ch: 龙卷云
         fr: Boréas
     isNotAvailable: 1
+    Form: れいじゅうフォルム
     Types:
         - ひこう
     From:

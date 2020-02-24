@@ -1,27 +1,31 @@
 ---
-abstract: 'reference count debugging for plack apps'
+abstract: 'Reference count debugging for Plack apps'
 author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Plack::Builder: '0'
+  Plack::Middleware::Debug: '0'
   Plack::Test: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.64'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Plack-Middleware-Debug-RefCounts
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Plack::Middleware::Debug::RefCounts:
+    file: lib/Plack/Middleware/Debug/RefCounts.pm
+    version: v0.910.1
 requires:
   Data::Dumper: '0'
   Devel::Gladiator: '0'
@@ -29,10 +33,14 @@ requires:
   Plack::Middleware::Debug::Base: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
-  perl: '5.010001'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues
-  homepage: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts
-  repository: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git
-version: '0.91'
-x_authority: cpan:GSG
+  repository: git://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git
+version: v0.910.1
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

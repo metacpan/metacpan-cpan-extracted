@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -36,7 +36,7 @@ use Math::NumSeq::Base::Digits
 
 
 use vars '$VERSION';
-$VERSION = 73;
+$VERSION = 74;
 
 # use constant name => Math::NumSeq::__('Digit Length Cumulative');
 use constant description => Math::NumSeq::__('Cumulative length of numbers 0,1,2,3,etc written out in the given radix.  For example binary 1,2,4,6,9,12,15,18,22,etc, 2 steps by 2, then 4 steps by 3, then 8 steps by 4, then 16 steps by 5, etc.');
@@ -367,7 +367,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

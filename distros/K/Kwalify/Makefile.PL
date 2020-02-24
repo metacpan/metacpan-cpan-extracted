@@ -1,7 +1,7 @@
 use 5.000;
 use ExtUtils::MakeMaker;
 
-$is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk";
+$is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
 $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
 
 if (!$eumm_recent_enough) {
@@ -35,6 +35,8 @@ sub MY::postamble {
 
     if ($is_devel_host) {
 	$postamble .= <<'EOF';
+
+PERL_TEST_DISTRIBUTION_OPTS=not podcover
 
 .include "../../perl.release.mk"
 .include "../../perl.git.mk"

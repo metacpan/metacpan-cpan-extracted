@@ -1,3 +1,6 @@
+v0.8.4 2020-02-23T19:37:40Z
+ - .gitignore
+
 v0.8.3 2019-12-06T10:47:39Z
  - gitignore updated
  - run_proc api update

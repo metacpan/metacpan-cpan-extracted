@@ -22,10 +22,10 @@ BEGIN {
     }
 }
 
-my $yaml_syck_tests;
+my $yaml_mod_tests;
 BEGIN {
-    $yaml_syck_tests = 38;
-    plan tests => 2 + $yaml_syck_tests + 40;
+    $yaml_mod_tests = 38;
+    plan tests => 2 + $yaml_mod_tests + 60;
 }
 
 BEGIN {
@@ -37,16 +37,26 @@ $SIG{__WARN__} = sub { push @w, @_ };
 
 use_ok('Schema::Kwalify');
 
+my $use_yaml_module;
+for my $mod (qw(YAML::XS YAML::PP)) { # YAML::Syck currently does not work --- https://github.com/toddr/YAML-Syck/issues/52
+    if (eval qq{ require $mod; 1 }) {
+	no strict 'refs';
+	*YAML_Load = \&{$mod . '::Load'};
+	$use_yaml_module = $mod;
+	last;
+    }
+}
+
 sub is_valid_yaml {
     my($schema, $document, $testname) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
-    ok(validate(YAML::Syck::Load($schema), YAML::Syck::Load($document)), $testname);
+    ok(validate(YAML_Load($schema), YAML_Load($document)), $testname);
 }
 
 sub is_invalid_yaml {
     my($schema, $document, $errors, $testname) = @_;
     local $Test::Builder::Level = $Test::Builder::Level+1;
-    ok(!eval { validate(YAML::Syck::Load($schema), YAML::Syck::Load($document)) }, $testname);
+    ok(!eval { validate(YAML_Load($schema), YAML_Load($document)) }, $testname);
     for my $error (@$errors) {
 	if (UNIVERSAL::isa($error, 'HASH')) {
 	    my($pattern, $testname) = @{$error}{qw(pattern testname)};
@@ -58,8 +68,8 @@ sub is_invalid_yaml {
 }
 
 SKIP: {
-    skip("Need YAML::Syck for tests", $yaml_syck_tests)
-	if !eval { require YAML::Syck; 1 };
+    skip("Need a YAML loading module for tests", $yaml_mod_tests)
+	if !$use_yaml_module;
 
     my $schema01 = <<'EOF';
 type:   seq
@@ -616,7 +626,7 @@ EOF
 }
 
 {
-    # Some validation tests
+    # Some validation tests, negative
     eval { validate({type => "text"}, [qw(a ref is not a text)]) };
     like($@, qr{Non-valid data}, "a ref is not a text");
 
@@ -631,11 +641,31 @@ EOF
 
     eval { validate({type => "str"}, 1.2) };
     like($@, qr{Non-valid data}, "a number is not a str");
+
+    eval { validate({type => "float"}, "xyz") };
+    like($@, qr{Non-valid data}, "a non-float");
+
+    eval { validate({type => "number"}, "xyz") };
+    like($@, qr{Non-valid data}, "a non-number");
+
+    eval { validate({type => "bool"}, "fasle") };
+    like($@, qr{Non-valid data}, "a non-bool");
+
+    ## Not clear what a "time" is actually...
+    #eval { validate({type => "time"}, "123:45:67") };
+    #like($@, qr{Non-valid data}, "a non-time");
 }
 
-# Missing spec for float
-# Missing spec for number
-# Missing spec for bool
+{
+    # Some validation tests, positive
+    for (0, 1, 'yes', 'no', 'true', 'false') {
+	ok validate({type => 'bool'}, $_), "validate '$_' as bool";
+    }
+
+    ok validate({type => 'float'}, 3.141592653), 'validate float';
+    ok validate({type => 'number'}, 3.141592653), 'validate number';
+    ok validate({type => 'time'}, '12:34:56'), 'validate time';
+}
 
 {
     # Various schema error conditions
@@ -675,6 +705,30 @@ EOF
 		     {foo=>{type=>"text"}}
 		    }, []) };
     like($@, qr{Non-valid data .*, expected mapping}, "expected hash in data");
+
+    eval { validate({type=>'seq'}, []) };
+    like($@, qr{'sequence' missing with 'seq' type}, 'wrong seq in schema');
+
+    eval { validate({type=>'seq',sequence=>"this is not a sequence"}, []) };
+    like($@, qr{Expected array in 'sequence'}, 'wrong seq in schema');
+
+    eval { validate({type=>'seq',sequence=>['one','two']}, []) };
+    like($@, qr{Expect exactly one element in sequence}, 'wrong seq in schema');
+
+    eval { validate({type=>'seq',sequence=>[{type => 'any'}]}, 'no array') };
+    like($@, qr{Non-valid data .*, expected sequence}, 'wrong data, no sequence');
+
+    eval { validate({type=>'map'}, []) };
+    like($@, qr{mapping' missing with 'map' type}, 'wrong map in schema');
+
+    eval { validate({type=>'map',mapping=>"this is not a mapping"}, []) };
+    like($@, qr{Expected hash in 'mapping'}, 'wrong map in schema');
+
+    eval { validate({type=>'map',mapping=>{key => {type => 'any' }}}, undef) };
+    like($@, qr{Undefined data, expected mapping}, 'wrong data, undefined');
+
+    eval { validate({type=>'map',mapping=>{key => {type => 'any' }}}, 'something else') };
+    like($@, qr{Non-valid data .*, expected mapping}, 'wrong data, no mapping');
 }
 
 {

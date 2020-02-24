@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.174';
+our $VERSION = '1.175';
 
 =encoding utf8
 
@@ -632,6 +632,10 @@ L<Quiq::PostgreSql::CopyFormat> - Erzeuge Daten für PostgreSQL COPY-Kommando
 
 =item *
 
+L<Quiq::PostgreSql::PgDump> - Wrapper für pg_dump
+
+=item *
+
 L<Quiq::PostgreSql::Psql> - Wrapper für psql
 
 =item *
@@ -846,7 +850,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.174
+1.175
 
 =head1 AUTHOR
 

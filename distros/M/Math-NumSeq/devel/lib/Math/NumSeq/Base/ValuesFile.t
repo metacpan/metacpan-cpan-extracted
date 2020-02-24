@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -35,7 +35,7 @@ use Math::NumSeq::Base::MathImageFileWriter;
 # VERSION
 
 {
-  my $want_version = 73;
+  my $want_version = 74;
   is ($Math::NumSeq::Base::MathImageFile::VERSION, $want_version,
       'VERSION variable');
   is (Math::NumSeq::Base::MathImageFile->VERSION,  $want_version,

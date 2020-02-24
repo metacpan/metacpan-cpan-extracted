@@ -1,0 +1,103 @@
+NAME
+    Bencher::Scenario::StringInterpolate - Benchmark string interpolation
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenario::StringInterpolate (from Perl distribution
+    Bencher-Scenario-StringInterpolate), released on 2019-11-25.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m StringInterpolate
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m StringInterpolate
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    String::Interpolate 0.32
+
+BENCHMARK PARTICIPANTS
+    *   String::Interpolate::interpolate (perl_code)
+
+        Function call template:
+
+         String::Interpolate::interpolate(<string>)
+
+    *   eval (perl_code)
+
+        Code template:
+
+         eval q("<string:raw>")
+
+BENCHMARK DATASETS
+    *   $main::foo $main::bar
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.04*, OS kernel: *Linux
+    version 5.0.0-31-generic*.
+
+    Benchmark with default options ("bencher -m StringInterpolate"):
+
+     #table1#
+     +----------------------------------+-----------+-----------+------------+---------+---------+
+     | participant                      | rate (/s) | time (μs) | vs_slowest |  errors | samples |
+     +----------------------------------+-----------+-----------+------------+---------+---------+
+     | eval                             |    140000 |       7   |       1    | 1.3e-08 |      20 |
+     | String::Interpolate::interpolate |    227000 |       4.4 |       1.59 | 1.7e-09 |      20 |
+     +----------------------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m StringInterpolate
+    --module-startup"):
+
+     #table2#
+     +---------------------+-----------+------------------------+------------+---------+---------+
+     | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +---------------------+-----------+------------------------+------------+---------+---------+
+     | String::Interpolate |      14.5 |                    8.2 |        1   | 1.1e-05 |      20 |
+     | perl -e1 (baseline) |       6.3 |                    0   |        2.3 | 1.3e-05 |      20 |
+     +---------------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-StringInterpolate>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-StringInterpolate>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Stri
+    ngInterpolate>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

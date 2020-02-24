@@ -1,7 +1,9 @@
 package Bread::Board::LifeCycle::Session;
 
 our $AUTHORITY = 'cpan:GSG';
-our $VERSION   = '0.90';
+# ABSTRACT: A short-lived singleton for Bread::Board
+use version;
+our $VERSION = 'v0.900.1'; # VERSION
 
 use Moose::Role;
 use Module::Runtime ();
@@ -45,11 +47,11 @@ __END__
 
 =head1 NAME
 
-Bread::Board::LifeCycle::Session
+Bread::Board::LifeCycle::Session - A short-lived singleton for Bread::Board
 
 =head1 VERSION
 
-version 0.90
+version v0.900.1
 
 =head1 SYNOPSIS
 
@@ -78,52 +80,22 @@ The L<Bread::Board::Container::Role::WithSessions> role is applied to all contai
 
 This module is similar to L<Bread::Board::LifeCycle::Request>, but has no connections to L<OX>.
 
-=head1 AUTHOR
-
-Brendan Byrd C<< <BBYRD@CPAN.org> >>
-
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Grant Street Group L<http://www.grantstreet.com> for funding development of this code.
 
 Thanks to Steve Grazzini (C<< <GRAZZ@CPAN.org> >>) for discussion of the concept.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2015 Grant Street Group
+Grant Street Group <developers@grantstreet.com>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+=head1 COPYRIGHT AND LICENSE
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+This software is Copyright (c) 2015 - 2020 by Grant Street Group.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+This is free software, licensed under:
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+  The Artistic License 2.0 (GPL Compatible)
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=cut

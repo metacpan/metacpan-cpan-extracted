@@ -34,7 +34,7 @@ $|=1;
 
 {
   my $pred_upto = 0;
-  
+
   my $values_class;
   # $values_class = $gen->values_class('Emirps');
   # $values_class = $gen->values_class('UndulatingNumbers');
@@ -177,7 +177,6 @@ $|=1;
   $values_class = 'Math::NumSeq::SumPowSub1';
   $values_class = 'Math::NumSeq::LuckyNumbers';
   $values_class = 'Math::NumSeq::ProthNumbers';
-  $values_class = 'Math::NumSeq::PlanePathTurn';
   $values_class = 'Math::NumSeq::DivisorCount';
   $values_class = 'Math::NumSeq::PowerPart';
   $values_class = 'Math::NumSeq::Abundant';
@@ -200,24 +199,25 @@ $|=1;
   $values_class = 'Math::NumSeq::Xenodromes';
   $values_class = 'Math::NumSeq::PlanePathCoord';
   $values_class = 'Math::NumSeq::HafermanCarpet';
-  
+  $values_class = 'Math::NumSeq::PlanePathTurn';
+
   eval "require $values_class; 1" or die $@;
   my $seq = $values_class->new
     (
      powerful_type => 'some',
      power => 1,
-     
+
      level => 11,
      # on_values => 'even',
      # end_type => 'to_peak',
      step_type => 'down',
-     
+
      # extract_type => 'middle_lower',
      # extract_offset => 0,
-     
+
      # abundant_type => 'primitive',
      # abundant_type => 'non-primitive',
-     
+
      # _dont_use_bfile => 1,
      # anum  => 'A000110', # 9.7mb A-file
      # anum  => 'A151725',
@@ -225,13 +225,13 @@ $|=1;
      # anum  => 'A196199', # bfile
      # anum  => 'A194831', # small bfile
      anum  => 'A102419',
-     
+
      # root_type => 'negative',
      # digit => 0,
      # radix => 3,
      # i_start => 1,
      # modulus => 2,
-     
+
      # of => 'Primorials',
      # of => 'Fibonacci',
      # of => 'Catalan',
@@ -248,10 +248,10 @@ $|=1;
      # values_type => 'log',
      # values_type => 'odd',
      # lang => 'fr',
-     
+
      # runs_type => '1to2N',
      # values_type => 'mod2',
-     
+
      # extra_multiples => 0,
      # radix => 10,
      # order => 'sorted',
@@ -267,14 +267,14 @@ $|=1;
      # on_values => 'primes',
      # level_type => 'exact',
      # stage => 1,
-     
+
      # p_or_m => '-',
      # using_values => 'primes',
      # values_type => 'radix',
      # concat_count => 3,
      # radix => 2,
      # sqrt => 120,
-     
+
      # order => 'forward',
      # fraction => '1/14',
      # from_radix => 10,
@@ -284,14 +284,14 @@ $|=1;
      # fibonacci_word_type => 'dense',
      # including_self => 0,
      # offset => 3,
-     
+
      # planepath => 'Diagonals,x_start=1,y_start=1,direction=up',
      # planepath => 'OneOfEight,parts=3side',
      # planepath => 'RationalsTree,tree_type=AYT',
      # planepath => 'Corner',
      # planepath => 'SierpinskiTriangle,align=diagonal',
      # planepath => 'DivisibleColumns,divisor_type=proper,n_start=2',
-      planepath => 'CellularRule,rule=16,n_start=0',
+     # planepath => 'CellularRule,rule=16,n_start=0',
      # planepath => 'DiagonalRationals,direction=up',
      # planepath => 'SierpinskiTriangle,align=diagonal',
      # planepath => 'RationalsTree,tree_type=L',
@@ -308,7 +308,7 @@ $|=1;
      # coordinate_type => 'NumSiblings',
      # coordinate_type => 'AbsDiff',
      coordinate_type => 'ExperimentalPairsXY',
-     
+
      # planepath => 'PythagoreanTree,coordinates=AC',
      # planepath => 'RationalsTree,tree_type=L',
      # planepath => 'R5DragonMidpoint,arms=1',
@@ -317,15 +317,15 @@ $|=1;
      # planepath => 'Columns,height=2,n_start=0',
      # planepath => 'MultipleRings,step=0,ring_shape=circle',
      # delta_type=>'dTRadius',
-     
+
      # planepath => 'MultipleRings,step=1,ring_shape=circle',
      # planepath => 'Diagonals',
      # planepath => 'PythagoreanTree,coordinates=BC',
      # planepath => 'ChanTree,k=4',
      # planepath => 'SquareSpiral',
      # planepath => 'PowerArray,radix=4',
-     # turn_type => 'SLR',
-     
+     turn_type => 'TTurn3',
+
      # planepath => 'CfracDigits',
      # planepath => 'RationalsTree',
      # planepath => 'UlamWarburton,n_start=1',
@@ -340,15 +340,16 @@ $|=1;
      # planepath => 'QuadricIslands',
      # line_type => 'Depth_start',
      # planepath => 'WythoffArray,x_start=1,y_start=1',
+     planepath => 'TerdragonCurve',
      line_type => 'X_axis',
      # line_type => 'Depth_end',
      # i_start => 1,
-     
+
      # start => 5,
      # including_repdigits => 1,
-     
+
      # i_start => 3,
-     
+
      # including_one => 1,
      # start => 1,
      # pythagorean_type => 'primitive',
@@ -357,7 +358,7 @@ $|=1;
      # pairs => 'both',
      # multiples => 1,
      # digit => 1,
-     
+
      # order => 'forward',
      # including_self => 0,
      #
@@ -374,10 +375,10 @@ $|=1;
      #
      # length => 2,
      # which => 'last',
-     
+
      # polygonal => 18,
      # pairs => 'second',
-     
+
      # including_zero => 1,
      # # divisors_type => 'proper',
      # # algorithm_type => '1/2-3/2',
@@ -385,10 +386,9 @@ $|=1;
      # lo => 0,
      # hi => 10, # 200*$rep,
      # where => 'low',
-     start
     );
   my $hi = 103;
-  
+
   my $i_start = $seq->i_start;
   print "i_start $i_start\n";
   print "anum ",($seq->oeis_anum//'[undef]'),"\n";
@@ -405,14 +405,14 @@ $|=1;
     print "planepath_object ",ref $planepath_object,"\n";
   }
   print "\n";
-  
+
   my $values_min = $seq->values_min;
   my $values_max = $seq->values_max;
   my $saw_values_min;
   my $saw_values_max;
   my $prev_value;
   my $prev_i;
-  
+
   foreach my $rep (1 .. 2) {
     ### $seq
     if (my $radix = $seq->characteristic('digits')) {
@@ -420,10 +420,10 @@ $|=1;
     }
     print "by next(): ";
     my $show_i = 1;
-    
+
     my $check_pred_upto = ! $seq->characteristic('digits')
       && ! $seq->characteristic('count');
-    
+
     foreach my $want_i ($i_start .. $i_start + $hi) {
       my @ret = $seq->next;
       my ($i,$value) = @ret;

@@ -42,6 +42,7 @@ namespace panda { namespace log {
 #define panda_log_critical(msg)        panda_log(panda::log::Critical, msg)
 #define panda_log_alert(msg)           panda_log(panda::log::Alert, msg)
 #define panda_log_emergency(msg)       panda_log(panda::log::Emergency, msg)
+
 #define panda_elog_verbose_debug(code) panda_elog(panda::log::VerboseDebug, code)
 #define panda_elog_debug(code)         panda_elog(panda::log::Debug, code)
 #define panda_elog_info(code)          panda_elog(panda::log::Info, code)
@@ -51,6 +52,16 @@ namespace panda { namespace log {
 #define panda_elog_critical(code)      panda_elog(panda::log::Critical, code)
 #define panda_elog_alert(code)         panda_elog(panda::log::Alert, code)
 #define panda_elog_emergency(code)     panda_elog(panda::log::Emergency, code)
+
+#define panda_mlog_verbose_debug(module, msg)   panda_log_m(module, panda::log::VerboseDebug, msg)
+#define panda_mlog_debug(module, msg)           panda_log_m(module, panda::log::Debug, msg)
+#define panda_mlog_info(module, msg)            panda_log_m(module, panda::log::Info, msg)
+#define panda_mlog_notice(module, msg)          panda_log_m(module, panda::log::Notice, msg)
+#define panda_mlog_warn(module, msg)            panda_log_m(module, panda::log::Warning, msg)
+#define panda_mlog_error(module, msg)           panda_log_m(module, panda::log::Error, msg)
+#define panda_mlog_critical(module, msg)        panda_log_m(module, panda::log::Critical, msg)
+#define panda_mlog_alert(module, msg)           panda_log_m(module, panda::log::Alert, msg)
+#define panda_mlog_emergency(module, msg)       panda_log_m(module, panda::log::Emergency, msg)
 
 #define panda_debug_v(var) panda_log(panda::log::Debug, #var << " = " << (var))
 

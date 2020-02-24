@@ -18,12 +18,12 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 1 + 2;
+use Test::More 0.96 tests => 1 + 4;
 use Test::Exception;
-use Test::Warnings qw(warning);
+use Test::Warnings qw(warning warnings);
 
 
-my ($w);
+my ($d, $w, $r);
 
 
 subtest 'close()' => sub {
@@ -65,6 +65,35 @@ subtest 'die_on_error = 0' => sub {
 		$d->session->run;
 	}; } 'no connection';
 	(like $w, qr/\bNetwork\b.*\bCan't connect\b/i, 'no connection warning') or diag 'got warning(s): ', explain($w);
+};
+
+
+subtest 'driver mutability (config/auth)' => sub {
+	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
+	plan tests => 5;
+	lives_ok { $d = 0; $d = Neo4j::Test->driver_maybe; } 'get driver';
+	lives_ok { $r = 0; $r = $d->basic_auth('user1', 'password')->session; } 'get auth session';
+	lives_ok { $w = warning { $r = $d->basic_auth('user2', 'password')->session }; } 'auth mutable lives';
+	(like $w, qr/\bDeprecate.*\bbasic_auth\b.*\bsession\b/i, 'auth mutable deprecated') or diag 'got warning(s): ', explain($w);
+	is $d->{auth}->{principal}, 'user2', 'auth mutable';
+};
+
+
+subtest 'stats' => sub {
+	plan skip_all => "(test requires HTTP)" if $Neo4j::Test::bolt;
+	plan tests => 9;
+	my $t = $driver->session->begin_transaction;
+	$t->{return_stats} = 0;
+	lives_ok { $r = $s->run('RETURN 42'); } 'run normal query';
+	# deprecation warnings are expected
+	lives_and { warnings { isa_ok $r->stats, 'Neo4j::Driver::SummaryCounters', 'stats' } };
+	lives_and { warnings { isa_ok $r->single->stats, 'Neo4j::Driver::SummaryCounters', 'single stats type' } };
+	lives_and { warnings { ok ! $r->single->stats->{contains_updates} } } 'single stats value';
+	lives_ok { $r = $t->run('RETURN "no stats old syntax"'); } 'run no stats query';
+	lives_and { warnings { is ref $r->stats, 'HASH' } } 'no stats: type';
+	lives_and { warnings { is scalar keys %{$r->stats}, 0 } } 'no stats: none';
+	lives_and { warnings { is ref $r->single->stats, 'HASH' } } 'no single stats: type';
+	lives_and { warnings { is scalar keys %{$r->single->stats}, 0 } } 'no single stats: none';
 };
 
 

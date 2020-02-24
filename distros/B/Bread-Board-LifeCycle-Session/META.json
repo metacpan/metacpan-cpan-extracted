@@ -1,47 +1,84 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A short-lived singleton for Bread::Board",
    "author" : [
-      "unknown"
+      "Grant Street Group <developers@grantstreet.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Bread-Board-LifeCycle-Session",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::Fatal" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "Test::Pod" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Bread::Board" : "0",
+            "Bread::Board::LifeCycle::Singleton" : "0",
+            "Bread::Board::LifeCycle::Singleton::WithParameters" : "0",
             "List::Util" : "1.33",
             "Module::Runtime" : "0",
-            "Moose" : "0",
+            "Moose::Role" : "0",
             "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Bread::Board" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moose" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "Bread::Board::Container::Role::WithSessions" : {
+         "file" : "lib/Bread/Board/Container/Role/WithSessions.pm",
+         "version" : "v0.900.1"
+      },
+      "Bread::Board::LifeCycle::Session" : {
+         "file" : "lib/Bread/Board/LifeCycle/Session.pm",
+         "version" : "v0.900.1"
+      },
+      "Bread::Board::LifeCycle::Session::WithParameters" : {
+         "file" : "lib/Bread/Board/LifeCycle/Session/WithParameters.pm",
+         "version" : "v0.900.1"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.90"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/Bread-Board-LifeCycle-Session/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/GrantStreetGroup/Bread-Board-LifeCycle-Session.git",
+         "web" : "https://github.com/GrantStreetGroup/Bread-Board-LifeCycle-Session"
+      }
+   },
+   "version" : "v0.900.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.04",
+   "x_static_install" : 1
 }
+

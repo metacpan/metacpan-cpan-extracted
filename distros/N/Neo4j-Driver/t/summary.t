@@ -45,8 +45,10 @@ END
 	lives_ok { $r = $s->run($q)->summary; } 'get summary with plan';
 	lives_and { is_deeply $r->statement->{parameters}, {} } 'no params';
 	my ($plan, @notifications);
+	TODO: { local $TODO = 'plan/notifications not yet implemented for Bolt' if $Neo4j::Test::bolt;
 	lives_and { ok $plan = $r->plan; } 'get plan';
 	lives_and { ok @notifications = $r->notifications; } 'get notifications';
+	}
 };
 
 

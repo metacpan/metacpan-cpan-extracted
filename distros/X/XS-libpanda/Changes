@@ -1,3 +1,6 @@
+1.3.11   22.02.2020
+           - additional log macro
+           - remove std::optional to prevent binary incompatibility
 1.3.10   16.02.2020
            - fix 32bit systems backtrace segv (disable backtrace for 32bit)
            - add stringized arguments field for Stackframe object

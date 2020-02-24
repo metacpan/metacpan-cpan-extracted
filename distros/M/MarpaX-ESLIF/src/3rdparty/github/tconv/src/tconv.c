@@ -55,6 +55,8 @@ struct tconv {
   tconv_convert_external_t convertExternal;
   /* 6. last error */
   char                     errors[TCONV_ERROR_SIZE];
+  /* 7. fallback charset */
+  char                    *fallbacks;
 };
 
 #ifndef TCONV_HELPER_BUFSIZ
@@ -225,6 +227,10 @@ int tconv_close(tconv_t tconvp)
         rci = -1;
       }
     }
+    if (tconvp->fallbacks != NULL) {
+      TCONV_TRACE(tconvp, "%s - freeing copy of \"fallback\" charset %s", funcs, tconvp->fallbacks);
+      TCONV_FREE(tconvp, funcs, tconvp->fallbacks);
+    }
     /* Remember the logger to log the maxiumum as possible */
     genericLoggerp = tconvp->genericLoggerp;
 #ifndef TCONV_NTRACE
@@ -282,6 +288,8 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   tconvp->errors[0] = '\0';
   /* Last byte can never change, because we do an strncpy */
   tconvp->errors[TCONV_ERROR_SIZE - 1] = '\0';
+  /* 7. fallback charset */
+  tconvp->fallbacks = NULL;
 
   /* 1. trace */
   traces                       = getenv(TCONV_ENV_TRACE);
@@ -307,13 +315,9 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   /* 2. encodings */
   if (tocodes != NULL) {
     TCONV_STRDUP(tconvp, funcs, tconvp->tocodes, tocodes);
-  } else {
-    tconvp->tocodes = NULL;
   }
   if (fromcodes != NULL) {
     TCONV_STRDUP(tconvp, funcs, tconvp->fromcodes, fromcodes);
-  } else {
-    tconvp->fromcodes = NULL;
   }
 
   /* 3. runtime */
@@ -496,6 +500,11 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         goto err;
       }
     }
+
+    if (tconvOptionp->fallbacks != NULL) {
+      TCONV_STRDUP(tconvp, funcs, tconvp->fallbacks, tconvOptionp->fallbacks);
+    }
+
   } else {
     if (_tconvDefaultCharsetAndConvertOptions(tconvp) == 0) {
       goto err;
@@ -555,11 +564,18 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
     tconvp->errors[0] = '\0';
     fromcodes = tconvp->charsetExternal.tconv_charset_runp(tconvp, charsetContextp, *inbufsp, *inbytesleftlp);
     if (fromcodes == NULL) {
-      goto err;
+      /* This is a fatal error unless a fallback is given */
+      if (tconvp->fallbacks != NULL) {
+        TCONV_TRACE(tconvp, "%s - charset detection failure, using fallback %s", funcs, tconvp->fallbacks);
+        fromcodes = tconvp->fallbacks;
+      } else {
+        TCONV_TRACE(tconvp, "%s - charset detection failure", funcs);
+        goto err;
+      }
+    } else {
+      TCONV_TRACE(tconvp, "%s - charset detection returned %s", funcs, fromcodes);
     }
-    TCONV_TRACE(tconvp, "%s - charset detection returned %s", funcs, fromcodes);
     TCONV_STRDUP(tconvp, funcs, tconvp->fromcodes, fromcodes);
-    strcpy(tconvp->fromcodes, fromcodes);
     if (tconvp->charsetExternal.tconv_charset_freep != NULL) {
       TCONV_TRACE(tconvp, "%s - ending charset detection: %p(%p, %p)", funcs, tconvp->charsetExternal.tconv_charset_freep, tconvp, charsetContextp);
       tconvp->charsetExternal.tconv_charset_freep(tconvp, charsetContextp);
@@ -568,7 +584,7 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
   }
 
   if ((tconvp->tocodes == NULL) && (tconvp->fromcodes != NULL)) {
-    TCONV_TRACE(tconvp, "%s - duplicating from charset \"%s\" into \"to\" charset", funcs, tconvp->fromcodes);
+    TCONV_TRACE(tconvp, "%s - duplicating the \"from\" charset \"%s\" into the \"to\" charset", funcs, tconvp->fromcodes);
     TCONV_STRDUP(tconvp, funcs, tconvp->tocodes, tconvp->fromcodes);
   }
 

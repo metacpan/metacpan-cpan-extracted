@@ -28,8 +28,11 @@ DESCRIPTION
 
 ARGUMENTS
 
-    Each operation is specified in a pair of arguments. The first argument,
-    the flag, specifies the target of the operation, which may be one of:
+    Each operation is specified in a pair of arguments: the flag specifying
+    the target of the operation, and the layer(s) to apply. Multiple layers
+    can be specified like :foo:bar, as in open() or binmode().
+
+    The flag may be any one of:
 
     STDIN, STDOUT, STDERR, STDIO
 
@@ -43,10 +46,9 @@ ARGUMENTS
 
     $handle
 
-      An arbitrary filehandle will have layer(s) pushed onto it directly,
-      affecting all usage of that handle, similarly to the operation on
-      standard handles. Handles must be passed as a glob or reference to a
-      glob, not a bareword.
+      An arbitrary filehandle (glob or reference to a glob, not a bareword)
+      will have layer(s) pushed onto it directly, affecting all usage of
+      that handle, similarly to the operation on standard handles.
 
       Note that the handle must be opened in the compile phase (such as in
       a preceding BEGIN block) in order to be available for this pragma to
@@ -78,9 +80,6 @@ ARGUMENTS
         open my $fh, '<', $file; # sets UTF-8 layer (and its implicit platform defaults)
         open my $fh, '>:unix', $file; # ignores UTF-8 layer and sets :unix
         open my $fh, '<:', $file; # ignores UTF-8 layer and sets platform defaults
-
-    The second argument is the layer or layers to set. Multiple layers can
-    be specified like :foo:bar, as in open() or binmode().
 
 COMPARISON TO open.pm
 

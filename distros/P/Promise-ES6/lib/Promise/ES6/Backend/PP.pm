@@ -142,16 +142,23 @@ sub _then_or_finally {
 }
 
 sub _repromise {
-    my ( $value_sr, $children_ar, $repromise_value_sr ) = @_;
+    my ( $value_sr, $children_ar, $repromise_value_sr, $orig_finally_sr ) = @_;
     $$repromise_value_sr->then(
         sub {
-            $$value_sr = $_[0];
+            if (ref $orig_finally_sr) {
+                $$value_sr = $$orig_finally_sr;
+            }
+            else {
+                $$value_sr = $_[0];
+            }
+
             bless $value_sr, _RESOLUTION_CLASS;
             $_->_settle($value_sr) for splice @$children_ar;
         },
         sub {
             $$value_sr = $_[0];
             bless $value_sr, _REJECTION_CLASS;
+            $_UNHANDLED_REJECTIONS{$value_sr} = $value_sr;
             $_->_settle($value_sr) for splice @$children_ar;
         },
     );
@@ -201,7 +208,7 @@ sub _settle {
 
         local $@;
 
-        if ( eval { $self_is_finally ? $callback->() : ($new_value = $callback->($$final_value_sr)); 1 } ) {
+        if ( eval { $new_value = $callback->($self_is_finally ? () : $$final_value_sr); 1 } ) {
 
             # The callback succeeded. If $new_value is not itself a promise,
             # then $self is now resolved. (Yay!) Note that this is true
@@ -241,7 +248,7 @@ sub _settle {
             $_UNHANDLED_REJECTIONS{ $self->[_VALUE_SR_IDX] } = $self->[_VALUE_SR_IDX];
         }
 
-        if (!$self_is_finally) {
+        if (!$self_is_finally || $value_sr_contents_is_promise) {
             ${ $self->[_VALUE_SR_IDX] } = $new_value;
         }
     }
@@ -263,7 +270,15 @@ sub _settle {
     }
 
     if ($value_sr_contents_is_promise) {
-        return _repromise( @{$self}[ _VALUE_SR_IDX, _CHILDREN_IDX, _VALUE_SR_IDX ] );
+
+        # Stash the given concrete value. If the $value_sr promise
+        # rejects, then we’ll accept that, but if it resolves, then
+        # we’ll look at this to know to discard that resolution.
+        if ($self_is_finally) {
+            $self->[_IS_FINALLY_IDX] = $final_value_sr;
+        }
+
+        return _repromise( @{$self}[ _VALUE_SR_IDX, _CHILDREN_IDX, _VALUE_SR_IDX, _IS_FINALLY_IDX ] );
     }
 
     if ( @{ $self->[_CHILDREN_IDX] } ) {

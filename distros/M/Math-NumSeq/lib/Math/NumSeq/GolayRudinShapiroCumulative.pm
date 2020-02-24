@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -179,8 +179,8 @@ GRS(0)+...+GRS(i),
     1, 2, 3, 2, 3, 4, 3, 4, 5, 6, 7, 6, 5, 4, 5, 4, ...
 
 The total is always positive, and in fact a given cumulative total k occurs
-precisely k times.  For example the three occurrences of 3 shown above are
-all the places 3 occurs.
+precisely k times (per Brillhart and Morton).  For example the three
+occurrences of 3 shown above are all the places 3 occurs.
 
 This GRS cumulative arises as in the alternate paper folding curve as the
 coordinate sum X+Y.  The way k occurs k many times has a geometric
@@ -222,7 +222,7 @@ occur, so this simply means integer C<$value E<gt>= 1>.
 The cumulative total GRS(0)+...+GRS(i-1) can be calculated from the 1-bits
 of i.  Each 1-bit becomes a value 2^floor((pos+1)/2) in the total,
 
-    bit    value
+    pos    value
     ---    -----
      0       1
      1       2
@@ -263,8 +263,8 @@ Or for example i=31 is 11111 in binary so
             7      cumulative total GRS(0)+...+GRS(30)
 
 Here at bit2 the value is -2 because there's one adjacent 11 above, not
-including bit2 itself.  Then at bit1 there's two 11 pairs above so +2, and
-at bit0 there's three so -1.
+including bit2 itself.  Then at pos=1 there's two 11 pairs above so +2, and
+at pos=0 there's three so -1.
 
 The total can be formed by examining the bits high to low and counting
 adjacent 11 bits on the way down to add or subtract.  Or it can be formed
@@ -284,7 +284,7 @@ value 1 below the least significant bit.  For example i=27 inclusive
           ----
             5      cumulative value GRS(0)+...+GRS(27)
 
-For low to high calculation this lowest +/-1 can be handled simply by
+For low to high calculation, this lowest +/-1 can be handled simply by
 starting the total at 1.  It then becomes +1 or -1 by the negations as 11s
 are encountered for the rest of the bit handling.
 
@@ -316,16 +316,23 @@ are encountered for the rest of the bit handling.
     # total=GRS(0)+...+GRS(i)
 
 This sort of calculation arises implicitly in the alternate paper folding
-curve to calculate X,Y for a given N point on the curve.  But that
-calculation does a simultaneous using the base 4 digits of N.
+curve to calculate X,Y for a given N point on the curve.  Bits of the
+cumulative GRS can be generated from base 4 digits of 2*N.  See the author's
+alternate paperfolding curve write-up for some more ("GRScumul" in the
+index)
 
-    X=GRStotal(ceil(N/2))
-    Y=GRStotal(floor(N/2))
+=over
+
+L<http://user42.tuxfamily.org/alternate/index.html>
+
+=back
 
 =cut
 
 # ENHANCE-ME: Cross-ref to AlternatePaper formulas section when its X,Y
 # calculation is described.
+
+=pod
 
 =head1 SEE ALSO
 
@@ -340,7 +347,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

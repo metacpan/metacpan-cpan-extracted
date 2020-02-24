@@ -19,7 +19,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( &toword &install_dic );
 
-our $VERSION = '1.93';
+our $VERSION = '1.94';
 
 # Preloaded methods go here.
 

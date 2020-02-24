@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use overload fallback => 1, 
 	'""' => \&num,
@@ -27,13 +27,22 @@ sub smallnum {
 }
 
 sub num {
-	my $num = ${$_[0]};
+	my $num = _sref($_[0]);
  	return $num >= 0 
 		? $precision * int(($num + ($offset * $precision)) / $precision)
 		: $precision * POSIX::ceil(($num - $offset * $precision) / $precision);
 }
 
-sub division { return num(smallnum(${$_[0]} / ${$_[1]}));}
+sub division {
+	my (@ot) = (_sref($_[0]), _sref($_[1])); 
+	return $ot[0] && $ot[1]
+		? smallnum($_[2] ? ($ot[1] / $ot[0]) : ($ot[0] / $ot[1])) 
+		: smallnum(0);
+}
+
+sub _sref { ref $_[0] ? ${$_[0]} : $_[0] }
+
+# todo
 
 =head1 NAME
 
@@ -41,27 +50,18 @@ smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
 =head1 SYNOPSIS
 
-This is an attempt to fix some test failures, for this release it's a bit of a guess.
-
 	use smallnum;
 
 	10 + 20.452433483  # 30.45
+	20.3743543 - 10.1 # 10.27
 	15 / 5.34, # 2.81
 	9 * 0.01, # 0.09
-	20.3743543 - 10.1 # 10.27
-	300 % 29  # 10
-	10 > 1  # 1
-	10 < 1, #'';
-	10 == 10 #1
-	10 != 10 #''
-	10 <= 10, #1
-	10.10 >= 10.10, #1
 
 =head1 AUTHOR
 

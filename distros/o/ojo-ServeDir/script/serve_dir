@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use Mojolicious::Commands;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+# Try to extract a given directory name
+my $dir = $ARGV[0];
+if (defined $dir and -d $dir) {
+    $ENV{SERVE_DIRECTORY} = $dir;
+    shift @ARGV;
+}
+
+Mojolicious::Commands->start_app('ojo::ServeDir::App', 'daemon', @ARGV);

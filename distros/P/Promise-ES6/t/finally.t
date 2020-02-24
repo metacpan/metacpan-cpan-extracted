@@ -38,4 +38,28 @@ sub propagate_failure_through : Tests {
     is( $got, 123, 'finally() doesn’t affect failure propgation' );
 }
 
+sub ignore_returned_resolution : Tests(1) {
+    my $p = Promise::ES6->resolve(123);
+
+    my @settled;
+    $p->finally( sub { Promise::ES6->resolve(456) } )->then(
+        sub { $settled[0] = shift },
+        sub { $settled[1] = shift },
+    );
+
+    is_deeply( \@settled, [ 123 ], 'returned resolution is thrown away' );
+}
+
+sub propagate_returned_rejection : Tests(1) {
+    my $p = Promise::ES6->resolve(123);
+
+    my @settled;
+    $p->finally( sub { Promise::ES6->reject(666) } )->then(
+        sub { $settled[0] = shift },
+        sub { $settled[1] = shift },
+    );
+
+    is_deeply( \@settled, [ undef, 666 ], 'returned reject is honored' );
+}
+
 __PACKAGE__->runtests;

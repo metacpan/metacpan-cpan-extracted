@@ -4,6 +4,7 @@
 package MyRecognizerInterface;
 use strict;
 use diagnostics;
+use Log::Any qw/$log/;
 
 sub new                    { my ($pkg, $string) = @_; bless { string => $string }, $pkg }
 sub read                   { 1 }
@@ -15,6 +16,7 @@ sub isWithDisableThreshold { 0 }
 sub isWithExhaustion       { 0 }
 sub isWithNewline          { 1 }
 sub isWithTrack            { 1 }
+sub event_action           { my ($self) = shift; $log->infof('Events: %s', \@_); 1 }
 
 package MyValueInterface;
 use strict;
@@ -54,7 +56,7 @@ Log::Any::Adapter->set('Log4perl');
 BEGIN { require_ok('MarpaX::ESLIF') };
 
 my $base_dsl = q{
-:default ::= action => ::shift
+:default ::= action => ::shift event-action => event_action
 :start       ::= XXXXXX # Replaced on-the-fly by json or object
 :discard ::= perl_comment event => perl_comment$
 perl_comment ::= /(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))/u
@@ -65,6 +67,8 @@ object       ::= LCURLY members RCURLY
                | OBJECT_FROM_INNER_GRAMMAR
 members      ::= pair*                 action => do_array separator => ','
 pair         ::= string ':' value      action => do_array
+event value$ = completed <value>
+event ^value = predicted <value>
 value        ::= string
                | object
                | number
@@ -260,6 +264,8 @@ sub doparse {
                 $marpaESLIFRecognizer->lexemeRead('RCURLY', '}', 1); # In UTF-8 '}' is one byte
                 $rc = 1;
                 goto done;
+            } elsif ($event->{event} eq '^value' || $event->{event} eq 'value$') {
+                # No op
             } else {
                 $log->errorf('Unmanaged event %s', $event);
                 goto err;

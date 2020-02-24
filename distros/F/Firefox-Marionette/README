@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.92
+    Version 0.93
 
 SYNOPSIS
 
@@ -185,7 +185,18 @@ SUBROUTINES/METHODS
     accepts a element as the first parameter and sends a 'click' to it. The
     browser will wait for any page load to complete or the session's
     page_load duration to elapse before returning, which, by default is 5
-    minutes.
+    minutes. The click method is also used to choose an option in a select
+    dropdown.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new(visible => 1)->go('https://ebay.com');
+        my $select = $firefox->find_tag('select');
+        foreach my $option ($select->find_tag('option')) {
+            if ($option->property('value') == 58058) { # Computers/Tablets & Networking
+                $option->click();
+            }
+        }
 
  close_current_chrome_window_handle
 
@@ -574,18 +585,51 @@ SUBROUTINES/METHODS
 
  install
 
-    accepts the fully qualified path to an .xpi addon file as the first
-    parameter and an optional true/false second parameter to indicate if
-    the xpi addon file should be a temporary addition (just for the
-    existance of this browser instance). Unsigned xpi addon files may be
-    loaded temporarily. It returns the GUID for the addon which may be used
-    as a parameter to the uninstall method.
+    accepts the following as the first parameter;
+
+      * path to an xpi file
+      <https://developer.mozilla.org/en-US/docs/Mozilla/XPI>.
+
+      * path to a directory containing firefox extension source code
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension>.
+      This directory will be packaged up as an unsigned xpi file.
+
+      * path to a top level file (such as manifest.json
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Anatomy_of_a_WebExtension#manifest.json>)
+      in a directory containing firefox extension source code
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension>.
+      This directory will be packaged up as an unsigned xpi file.
+
+    and an optional true/false second parameter to indicate if the xpi file
+    should be a temporary extension
+    <https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/>
+    (just for the existance of this browser instance). Unsigned xpi files
+    may only be loaded temporarily
+    <https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for
+    nightly firefox installations
+    <https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly>). It
+    returns the GUID for the addon which may be used as a parameter to the
+    uninstall method.
 
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new();
     
         my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+    
+        # OR downloading and installing source code
+    
+        system { 'git' } 'git', 'clone', 'https://github.com/kkapsner/CanvasBlocker.git';
+    
+        if ($firefox->nightly()) {
+    
+            $extension_id = $firefox->install('./CanvasBlocker'); # permanent install for unsigned packages in nightly firefox
+    
+        } else {
+    
+            $extension_id = $firefox->install('./CanvasBlocker', 1); # temp install for normal firefox
+    
+        }
 
  interactive
 
@@ -814,6 +858,61 @@ SUBROUTINES/METHODS
     performs the necessary checks on the requested capabilities to be
     WebDriver conforming. The WebDriver service offered by Marionette does
     not match or negotiate capabilities beyond type and bounds checks.
+
+ nightly
+
+    returns true if the current version of firefox is a nightly release
+    <https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does
+    the minor version number contain an 'a'?)
+
+ paper_sizes
+
+    returns a list of all the recognised names for paper sizes, such as A4
+    or LEGAL.
+
+ pdf
+
+    returns a File::Temp object containing a PDF encoded version of the
+    current page for printing.
+
+    accepts a optional hash as the first parameter with the following
+    allowed keys;
+
+      * landscape - Paper orientation. Boolean value. Defaults to false
+
+      * margin - A hash describing the margins. The hash may have the
+      following optional keys, 'top', 'left', 'right' and 'bottom'. All
+      these keys are in cm and default to 1 (~0.4 inches)
+
+      * page - A hash describing the page. The hash may have the following
+      keys; 'height' and 'width'. Both keys are in cm and default to US
+      letter size. See the 'size' key.
+
+      * print_background - Print background graphics. Boolean value.
+      Defaults to false.
+
+      * raw - rather than a file handle containing the PDF, the binary PDF
+      will be returned.
+
+      * scale - Scale of the webpage rendering. Defaults to 1.
+
+      * size - The desired size (width and height) of the pdf, specified by
+      name. See the page key for an alternative and the page_sizes method
+      for a list of accepted page size names.
+
+      * shrink_to_fit - Whether or not to override page size as defined by
+      CSS. Boolean value. Defaults to true.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        my $handle = $firefox->pdf();
+        foreach my $paper_size ($firefox->paper_sizes()) {
+                $handle = $firefox->pdf(size => $paper_size, landscape => 1, margin => { top => 0.5, left => 1.5 });
+                ...
+                print $firefox->pdf(page => { width => 21, height => 27 }, raw => 1);
+                ...
+        }
 
  property
 

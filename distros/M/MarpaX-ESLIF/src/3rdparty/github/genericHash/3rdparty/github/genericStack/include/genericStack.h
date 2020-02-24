@@ -3,6 +3,7 @@
 
 #include <stdlib.h>       /* For malloc, free */
 #include <string.h>       /* For memcpy */
+#include <errno.h>        /* For errno */
 
 /* =============== */
 /* C generic stack */
@@ -308,6 +309,8 @@ typedef struct genericStack {
 #define _GENERICSTACK_EXTEND(stackName, wantedLength) do {		\
     int _genericStackExtend_wantedLength = wantedLength;		\
     int _genericStackExtend_currentLength = GENERICSTACK_LENGTH(stackName); \
+    short _genericStackExtend_computedWantedHeapLengthOk = 1;           \
+                                                                        \
     if ((_genericStackExtend_wantedLength > GENERICSTACK_DEFAULT_LENGTH) &&	\
 	(_genericStackExtend_wantedLength > _genericStackExtend_currentLength)) { \
       int _genericStackExtend_wantedHeapLength = _genericStackExtend_wantedLength - GENERICSTACK_DEFAULT_LENGTH; \
@@ -316,40 +319,60 @@ typedef struct genericStack {
       genericStackItem_t *_genericStackExtend_heapItems = stackName->heapItems; \
       short _genericStackExtend_memsetb;				\
                                                                         \
-      if (_genericStackExtend_currentHeapLength <= 0) {			\
-        _genericStackExtend_newHeapLength = _genericStackExtend_wantedHeapLength; \
-      } else {                                                          \
-        _genericStackExtend_newHeapLength = _genericStackExtend_currentHeapLength * 2; \
-        if ((_genericStackExtend_newHeapLength < _genericStackExtend_currentHeapLength) || \
-	    (_genericStackExtend_newHeapLength < _genericStackExtend_wantedHeapLength)) { \
-          _genericStackExtend_newHeapLength = _genericStackExtend_wantedHeapLength; \
+      if (GENERICSTACK_DEFAULT_LENGTH > 0) {                            \
+        /* Note that any decent compiler will not compile this branch if GENERICSTACK_DEFAULT_LENGTH <= 0 */ \
+        /* We want _genericStackExtend_wantedHeapLength to be a multilple of GENERICSTACK_DEFAULT_LENGTH */ \
+        /* following the *= 2 convention, i.e. GENERICSTACK_DEFAULT_LENGTH, 2* GENERICSTACK_DEFAULT_LENGTH, etc... */ \
+        int _genericStackExtend_okHeapLength = GENERICSTACK_DEFAULT_LENGTH; \
+        int _genericStackExtend_okHeapLengthTmp;                        \
+                                                                        \
+        while (_genericStackExtend_okHeapLength < _genericStackExtend_wantedHeapLength) { \
+          _genericStackExtend_okHeapLengthTmp = _genericStackExtend_okHeapLength * 2; \
+          /* Turnaround ? */                                            \
+          if (_genericStackExtend_okHeapLengthTmp < _genericStackExtend_okHeapLength) { \
+            _genericStackExtend_computedWantedHeapLengthOk = 0;         \
+            break;                                                      \
+          }                                                             \
+          _genericStackExtend_okHeapLength = _genericStackExtend_okHeapLengthTmp; \
         }                                                               \
+        _genericStackExtend_newHeapLength = _genericStackExtend_okHeapLength; \
+      } else {                                                          \
+        _genericStackExtend_newHeapLength = _genericStackExtend_wantedHeapLength; \
       }                                                                 \
-      if (_genericStackExtend_heapItems == NULL) {			\
-	_GENERICSTACK_CALLOC(_genericStackExtend_memsetb, _genericStackExtend_heapItems, _genericStackExtend_newHeapLength, sizeof(genericStackItem_t)); \
-      } else {								\
-	_genericStackExtend_memsetb = 1;							\
-	_genericStackExtend_heapItems = (genericStackItem_t *) realloc(_genericStackExtend_heapItems, sizeof(genericStackItem_t) * _genericStackExtend_newHeapLength); \
+                                                                        \
+      if (! _genericStackExtend_computedWantedHeapLengthOk) {           \
+        stackName->error = 1;						\
+        errno = EINVAL;                                                 \
+      } else {                                                          \
+        if (_genericStackExtend_heapItems == NULL) {			\
+          _GENERICSTACK_CALLOC(_genericStackExtend_memsetb, _genericStackExtend_heapItems, _genericStackExtend_newHeapLength, sizeof(genericStackItem_t)); \
+        } else {                                                        \
+          _genericStackExtend_memsetb = 1;                              \
+          _genericStackExtend_heapItems = (genericStackItem_t *) realloc(_genericStackExtend_heapItems, sizeof(genericStackItem_t) * _genericStackExtend_newHeapLength); \
+        }                                                               \
+        if (_genericStackExtend_heapItems == NULL) {			\
+          stackName->error = 1;						\
+        } else {                                                        \
+          stackName->heapItems = _genericStackExtend_heapItems;		\
+          if (_genericStackExtend_memsetb != 0) {                       \
+            _GENERICSTACK_NA_MEMSET(stackName, GENERICSTACK_DEFAULT_LENGTH + stackName->heapLength, GENERICSTACK_DEFAULT_LENGTH + _genericStackExtend_newHeapLength - 1); \
+          }								\
+          stackName->heapLength = _genericStackExtend_newHeapLength;	\
+        }                                                               \
       }									\
-      if (_genericStackExtend_heapItems == NULL) {			\
-	stackName->error = 1;						\
-      } else {								\
-	stackName->heapItems = _genericStackExtend_heapItems;		\
-	if (_genericStackExtend_memsetb != 0) {                         \
-	  _GENERICSTACK_NA_MEMSET(stackName, GENERICSTACK_DEFAULT_LENGTH + stackName->heapLength, GENERICSTACK_DEFAULT_LENGTH + _genericStackExtend_newHeapLength - 1);	\
-	}								\
-	stackName->heapLength = _genericStackExtend_newHeapLength;	\
+    }                                                                   \
+    if (_genericStackExtend_computedWantedHeapLengthOk) {               \
+      /* Fill the eventual gap that is on the stack */                  \
+      if ((GENERICSTACK_DEFAULT_LENGTH > 0) && (_genericStackExtend_wantedLength > GENERICSTACK_DEFAULT_LENGTH)) { \
+        if (GENERICSTACK_USED(stackName) < GENERICSTACK_DEFAULT_LENGTH) { \
+          if (GENERICSTACK_USED(stackName) <= 0) {                      \
+            _GENERICSTACK_NA_MEMSET(stackName, 0, __genericStack_max_initial_indice); \
+          } else {							\
+            _GENERICSTACK_NA_MEMSET(stackName, GENERICSTACK_USED(stackName), __genericStack_max_initial_indice); \
+          }								\
+        }                                                               \
       }									\
-    }									\
-    if ((GENERICSTACK_DEFAULT_LENGTH > 0) && (_genericStackExtend_wantedLength > GENERICSTACK_DEFAULT_LENGTH)) { \
-      if (GENERICSTACK_USED(stackName) < GENERICSTACK_DEFAULT_LENGTH) { \
-	if (GENERICSTACK_USED(stackName) <= 0) { \
-	  _GENERICSTACK_NA_MEMSET(stackName, 0, __genericStack_max_initial_indice); \
-	} else {							\
-	  _GENERICSTACK_NA_MEMSET(stackName, GENERICSTACK_USED(stackName), __genericStack_max_initial_indice); \
-	}								\
-      }									\
-    }									\
+    }                                                                   \
   } while (0)
 
 /* ====================================================================== */
@@ -622,6 +645,7 @@ typedef struct genericStack {
     if ((stackName) != NULL) {						\
       if ((stackName)->heapItems != NULL) {				\
         free((stackName)->heapItems);					\
+        (stackName)->heapItems = NULL;                                  \
         (stackName)->heapLength = 0;					\
       }									\
       (stackName)->used = 0;						\
@@ -695,11 +719,14 @@ typedef struct genericStack {
                                                                         \
     if ((_genericStackSwitch_index1 < 0) || ((_genericStackSwitch_index1) >= (stackName)->used) || \
         (_genericStackSwitch_index2 < 0) || ((_genericStackSwitch_index2) >= (stackName)->used)) { \
-      (stackName)->error = 1;                                             \
+      (stackName)->error = 1;                                           \
     } else if (_genericStackSwitch_index1 != _genericStackSwitch_index2) { \
       genericStackItem_t _item = _GENERICSTACK_ITEM((stackName), _genericStackSwitch_index1); \
-      memcpy(_GENERICSTACK_ITEM_ADDR((stackName), _genericStackSwitch_index1), _GENERICSTACK_ITEM_ADDR((stackName), _genericStackSwitch_index2),  sizeof(genericStackItem_t)); \
-      memcpy(_GENERICSTACK_ITEM_ADDR((stackName), _genericStackSwitch_index2), &_item,  sizeof(genericStackItem_t)); \
+      void *_addr1 = (void *) _GENERICSTACK_ITEM_ADDR((stackName), _genericStackSwitch_index1); \
+      void *_addr2 = (void *) _GENERICSTACK_ITEM_ADDR((stackName), _genericStackSwitch_index2); \
+                                                                        \
+      memcpy(_addr1, _addr2,  sizeof(genericStackItem_t));              \
+      memcpy(_addr2, &_item,  sizeof(genericStackItem_t));              \
     }                                                                   \
   } while (0)
 

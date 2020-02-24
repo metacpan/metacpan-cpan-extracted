@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-AccessTable
   homepage: https://metacpan.org/release/Perinci-Sub-Gen-AccessTable
   repository: git://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable.git
-version: '0.582'
+version: '0.583'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -165,7 +165,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -301,7 +301,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.07'
+              version: '0.081'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

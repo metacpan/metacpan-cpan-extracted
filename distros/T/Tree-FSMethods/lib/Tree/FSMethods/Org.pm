@@ -1,9 +1,9 @@
 package Tree::FSMethods::Org;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-13'; # DATE
+our $DATE = '2020-02-23'; # DATE
 our $DIST = 'Tree-FSMethods'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ Tree::FSMethods::Org - Perform filesystem-like operations on Org document tree
 
 =head1 VERSION
 
-This document describes version 0.001 of Tree::FSMethods::Org (from Perl distribution Tree-FSMethods), released on 2020-02-13.
+This document describes version 0.002 of Tree::FSMethods::Org (from Perl distribution Tree-FSMethods), released on 2020-02-23.
 
 =head1 SYNOPSIS
 

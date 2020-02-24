@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transport::Bolt;
 # ABSTRACT: Adapter for Neo4j::Bolt
-$Neo4j::Driver::Transport::Bolt::VERSION = '0.14';
+$Neo4j::Driver::Transport::Bolt::VERSION = '0.15';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction);
@@ -29,9 +29,18 @@ sub new {
 		$uri->userinfo( $driver->{auth}->{principal} . ':' . $driver->{auth}->{credentials} );
 	}
 	
-	my $cxn = Neo4j::Bolt->connect("$uri");
+	my $cxn;
+	if ($driver->{tls}) {
+		$cxn = Neo4j::Bolt->connect_tls("$uri", {
+			timeout => $driver->{http_timeout},
+			ca_file => $driver->{tls_ca},
+		});
+	}
+	else {
+		$cxn = Neo4j::Bolt->connect( "$uri", $driver->{http_timeout} );
+	}
 	unless ($cxn && $cxn->connected) {
-		# libneo4j-client seems to not always report human-readable error messages, so we re-create the most important ones here
+		# Neo4j::Bolt < 0.10 didn't report human-readable error messages (perlbolt#24), so we re-create the most important ones here
 		croak 'Bolt error -13: Unknown host' if ! $cxn->errmsg && $cxn->errnum == -13;
 		croak 'Bolt error -14: Could not agree on a protocol version' if ! $cxn->errmsg && $cxn->errnum == -14;
 		croak 'Bolt error -15: Username or password is invalid' if ! $cxn->errmsg && $cxn->errnum == -15;
@@ -76,9 +85,16 @@ sub run {
 	if ($statement->[0]) {
 		$stream = $self->{connection}->run_query( @$statement );
 		
-		croak 'Bolt error ' . $self->{connection}->errnum . ' ' . $self->{connection}->errmsg unless $stream;
-		croak 'run and failure/success mismatch: ' . $stream->failure . '/' . $stream->success unless $stream->failure == -1 || $stream->success == -1 || ($stream->failure xor $stream->success);  # assertion
-		croak 'Bolt stream error: client ' . $stream->client_errnum . ' ' . $stream->client_errmsg . '; server ' . $stream->server_errcode . ' ' . $stream->server_errmsg if $stream->failure && $stream->failure != -1;
+		if (! $stream) {
+			croak sprintf "Bolt error %i: %s", $self->{connection}->errnum, $self->{connection}->errmsg;
+		}
+		if ($stream->failure) {
+			# failure() == -1 is an error condition because run_query_()
+			# always calls update_errstate_rs_obj()
+			croak sprintf "Bolt error %i: %s", $stream->client_errnum, $stream->client_errmsg unless $stream->server_errcode || $stream->server_errmsg;
+			eval { $tx->rollback; };  # if rollback fails, too, report the primary error only
+			croak sprintf "%s:\n%s\nBolt error %i: %s", $stream->server_errcode, $stream->server_errmsg, $stream->client_errnum, $stream->client_errmsg;
+		}
 		
 		if ($gather_results) {
 			$result = Neo4j::Driver::StatementResult->new({
@@ -184,13 +200,37 @@ sub address {
 sub version {
 	my ($self) = @_;
 	
-	die "Unimplemented";
+	return $self->{connection}->server_id;
 }
 
 
 sub _deep_bless {
 	my ($cypher_types, $data) = @_;
 	
+	if (ref $data eq 'Neo4j::Bolt::Node') {  # node
+		my $node = $data->{properties} // {};
+		bless $node, $cypher_types->{node};
+		$node->{_meta} = {
+			id => $data->{id},
+			labels => $data->{labels},
+		};
+		$cypher_types->{init}->($node) if $cypher_types->{init};
+		return $node;
+	}
+	if (ref $data eq 'Neo4j::Bolt::Relationship') {  # relationship
+		my $rel = $data->{properties} // {};
+		bless $rel, $cypher_types->{relationship};
+		$rel->{_meta} = {
+			id => $data->{id},
+			start => $data->{start},
+			end => $data->{end},
+			type => $data->{type},
+		};
+		$cypher_types->{init}->($rel) if $cypher_types->{init};
+		return $rel;
+	}
+	
+	# support for Neo4j::Bolt 0.01 data structures (to be phased out)
 	if (ref $data eq 'HASH' && defined $data->{_node}) {  # node
 		bless $data, $cypher_types->{node};
 		$data->{_meta} = {
@@ -212,12 +252,13 @@ sub _deep_bless {
 		return $data;
 	}
 	
-# 	if (ref $data eq 'ARRAY' && ref $rest eq 'HASH' && defined $rest->{length}) {  # path
-# 		# unimplemented:
-# 		# no discernible difference to array in Neo4j::Bolt
-# 		bless $data, 'Neo4j::Driver::Type::Path';
-# 		return;
-# 	}
+	if (ref $data eq 'Neo4j::Bolt::Path') {  # path
+		bless $data, $cypher_types->{path};
+		foreach my $i ( 0 .. $#{$data} ) {
+			$data->[$i] = _deep_bless($cypher_types, $data->[$i]);
+		}
+		return $data;
+	}
 	
 	if (ref $data eq 'ARRAY') {  # array
 		foreach my $i ( 0 .. $#{$data} ) {
@@ -233,6 +274,9 @@ sub _deep_bless {
 	}
 	
 	if (ref $data eq '') {  # scalar
+		return $data;
+	}
+	if (ref $data eq 'JSON::PP::Boolean') {  # boolean
 		return $data;
 	}
 	
@@ -254,7 +298,7 @@ Neo4j::Driver::Transport::Bolt - Adapter for Neo4j::Bolt
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -267,7 +311,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

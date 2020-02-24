@@ -1,3 +1,12 @@
+0.122   2020-02-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Downgrade requirements Class::InsideOut, Moo, Moose,
+	  Tree::Object::Array::Glob from TestRequires to TestSuggests to
+	  avoid circular dependency [RT#131944].
+
+	- [test] Replace Test::Requires with Test::Needs (familiarity).
+
+
 0.121   2020-02-07  Released-By: PERLANCAR; Urgency: medium
 
 	- NodeMethods: add check().

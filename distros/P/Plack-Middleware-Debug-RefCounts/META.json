@@ -1,48 +1,36 @@
 {
-   "abstract" : "reference count debugging for plack apps",
+   "abstract" : "Reference count debugging for Plack apps",
    "author" : [
       "Grant Street Group <developers@grantstreet.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Plack-Middleware-Debug-RefCounts",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "7.1101"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "File::Find" : "0",
             "Module::Metadata" : "1.00",
-            "Perl::PrereqScanner" : "1.023",
-            "Pod::Markdown::Github" : "0",
-            "Pod::Readme" : "v1.1.2",
-            "Test2::Suite" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test2::Require::AuthorTesting" : "0",
             "Test::CPAN::Changes" : "0",
             "Test::Pod" : "1.51",
             "Test::Pod::Coverage" : "1.10",
             "Test::Strict" : "0",
-            "Test::Version" : "2.00",
-            "perl" : "v5.10.1"
+            "Test::Version" : "2.00"
          }
       },
       "runtime" : {
@@ -53,17 +41,34 @@
             "Plack::Middleware::Debug::Base" : "0",
             "Scalar::Util" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.010001"
+            "parent" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Plack::Builder" : "0",
+            "Plack::Middleware::Debug" : "0",
             "Plack::Test" : "0",
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Debug::RefCounts" : {
+         "file" : "lib/Plack/Middleware/Debug/RefCounts.pm",
+         "version" : "v0.910.1"
       }
    },
    "release_status" : "stable",
@@ -71,13 +76,15 @@
       "bugtracker" : {
          "web" : "https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues"
       },
-      "homepage" : "https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git",
+         "url" : "git://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git",
          "web" : "https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts"
       }
    },
-   "version" : "0.91",
-   "x_authority" : "cpan:GSG"
+   "version" : "v0.910.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.04",
+   "x_static_install" : 1
 }
+

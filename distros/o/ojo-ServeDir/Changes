@@ -1,5 +1,11 @@
 Revision history for ojo-ServeDir
 
+0.11    2020-02-22
+        Release fix
+
+0.1     2020-02-20
+        Refactor, add tests, add serve_dir command
+
 0.02    2019-11-07
         Minor corrections (repository/issue links)
 

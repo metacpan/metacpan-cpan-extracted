@@ -1,11 +1,11 @@
 NAME
 
-    Plack::Middleware::Debug::RefCounts - reference count debugging for
-    plack apps
+    Plack::Middleware::Debug::RefCounts - Reference count debugging for
+    Plack apps
 
 VERSION
 
-    version 0.91
+    version v0.910.1
 
 SYNOPSIS
 
@@ -153,13 +153,11 @@ AUTHOR
 
     Grant Street Group <developers@grantstreet.com>
 
-LICENSE AND COPYRIGHT
+COPYRIGHT AND LICENSE
 
-    Copyright 2018 Grant Street Group.
+    This software is Copyright (c) 2018 - 2020 by Grant Street Group.
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the the Artistic License (2.0). You may obtain a
-    copy of the full license at:
+    This is free software, licensed under:
 
-    http://www.perlfoundation.org/artistic_license_2_0
+      The Artistic License 2.0 (GPL Compatible)
 

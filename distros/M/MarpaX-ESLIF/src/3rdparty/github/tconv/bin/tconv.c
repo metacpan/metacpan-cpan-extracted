@@ -74,7 +74,7 @@ static void _usage(char *argv0, short helpb);
 static void traceCallback(void *userDatavp, const char *msgs);
 #endif
 static void fileconvert(int outputFd, char *filenames,
-			char *tocodes, char *fromcodes,
+			char *tocodes, char *fromcodes, char *fallbacks,
                         tconv_convert_t *convertp, tconv_charset_t *charsetp,
 			short guessb,
 			size_t bufsizel,
@@ -102,6 +102,7 @@ int main(int argc, char **argv)
 #ifndef TCONV_NTRACE
   short                verbose        = 0;
 #endif
+  char                *fallbacks      = NULL;
   struct optparse_long longopts[] = {
     {       "bufsize", 'b', OPTPARSE_REQUIRED},
     {"convert-engine", 'C', OPTPARSE_REQUIRED},
@@ -110,6 +111,7 @@ int main(int argc, char **argv)
     {         "guess", 'g', OPTPARSE_OPTIONAL},
     {"charset-engine", 'G', OPTPARSE_REQUIRED},
     {          "help", 'h', OPTPARSE_OPTIONAL},
+    { "from-fallback", 'k', OPTPARSE_OPTIONAL},
     {        "output", 'o', OPTPARSE_REQUIRED},
     {       "to-code", 't', OPTPARSE_REQUIRED},
     {         "usage", 'u', OPTPARSE_OPTIONAL},
@@ -184,6 +186,9 @@ int main(int argc, char **argv)
     case 'h':
       helpb = 1;
       break;
+    case 'k':
+      fallbacks = options.optarg;
+      break;
     case 'o':
       outputs = options.optarg;
       break;
@@ -245,19 +250,19 @@ int main(int argc, char **argv)
 
   setlocale(LC_ALL, "");
 #ifndef TCONV_NTRACE
-#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb) \
-  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, verbose)
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb, verbose)
 #else
-#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb) \
-  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb)
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb)
 #endif
 
   while ((args = optparse_arg(&options)) != NULL) {
     haveoptionsb = 1;
-    TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb);
+    TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb);
   }
   if (! haveoptionsb) {
-    TCONV_FILECONVERT(outputFd, NULL, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb);
+    TCONV_FILECONVERT(outputFd, NULL, tocodes, fromcodes, fallbacks, convertp, charsetp, guessb, bufsizel, fromPrintb);
   }
 
   if ((outputFd >= 0) && (outputFd != fileno(stdout))) {
@@ -312,6 +317,7 @@ static void _usage(char *argv0, short helpb)
 #ifndef TCONV_NTRACE
     printf("  -v, --verbose               Verbose mode.\n");
 #endif
+    printf("  -k, --from-fallback         Fallback charset when --from-code is not given and guess failed exit.\n");
 
     printf("\n");
     printf("Examples:");
@@ -412,7 +418,7 @@ static short consumer(tconv_helper_t *tconv_helperp, void *voidp, char *bufp, si
 
 /*****************************************************************************/
 static void fileconvert(int outputFd, char *filenames,
-                        char *tocodes, char *fromcodes,
+                        char *tocodes, char *fromcodes, char *fallbacks,
                         tconv_convert_t *convertp, tconv_charset_t *charsetp,
                         short guessb,
                         size_t bufsizel,
@@ -459,6 +465,7 @@ static void fileconvert(int outputFd, char *filenames,
 #endif
     NULL;
   tconvOption.traceUserDatavp = NULL;
+  tconvOption.fallbacks = fallbacks;
   
 #ifndef TCONV_NTRACE
   /* For very early trace */

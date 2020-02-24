@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,6 +19,9 @@
 # http://oeis.org/wiki/Clear-cut_examples_of_keywords
 #
 # ENHANCE-ME: share most of the a-file/b-file reading with Math::NumSeq::File
+#
+# FIXME: When using a b-file only, does i_start come out right?  Meaning the
+# first index in the file.
 
 package Math::NumSeq::OEIS::File;
 use 5.004;
@@ -29,14 +32,14 @@ use File::Spec;
 use Symbol 'gensym';
 
 use vars '$VERSION','@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_to_bigint = \&Math::NumSeq::_to_bigint;
 
 use vars '$VERSION';
-$VERSION = 73;
+$VERSION = 74;
 
 eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
@@ -205,34 +208,45 @@ sub new {
 
   my $anum = $self->{'anum'};
   (my $num = $anum) =~ s/^A//;
-  foreach my $basefile ("a$num.txt",
-                        "b$num.txt") {
-    next if $afile_exclude{$basefile};
-
-    next if $self->{'_dont_use_afile'} && $basefile =~ /^a/;
-    next if $self->{'_dont_use_bfile'} && $basefile =~ /^b/;
-
-    my $filename = File::Spec->catfile (oeis_dir(), $basefile);
-    ### $filename
-    my $fh = gensym();
-    if (! open $fh, "< $filename") {
-      ### cannot open: $!
-      next;
-    }
-
+  if (defined(my $filename = $self->{'_b_filename'})) {
     $self->{'filename'} = $filename; # the B-file or A-file name
+    my $fh = gensym();
     $self->{'fh'} = $fh;
-    if (! _afile_is_good($self)) {
-      ### this afile not good ...
-      close delete $self->{'fh'};
-      delete $self->{'filename'};
-      next;
-    }
+    open $fh, "< $filename"
+      or croak "Cannot open $filename: ", $!;
     $self->{'fh_i'} = $self->i_start;  # at first entry
 
-    ### opened: $fh
-    last;
+  } else {
+    foreach my $basefile ("a$num.txt",
+                          "b$num.txt"
+                         ) {
+      next if $afile_exclude{$basefile};
+
+      next if $self->{'_dont_use_afile'} && $basefile =~ /^a/;
+      next if $self->{'_dont_use_bfile'} && $basefile =~ /^b/;
+
+      my $filename = File::Spec->catfile (oeis_dir(), $basefile);
+      ### $filename
+      my $fh = gensym();
+      if (! open $fh, "< $filename") {
+        ### cannot open: $!
+        next;
+      }
+
+      $self->{'filename'} = $filename; # the B-file or A-file name
+      $self->{'fh'} = $fh;
+      if (! _afile_is_good($self)) {
+        ### this afile not good ...
+        close delete $self->{'fh'};
+        delete $self->{'filename'};
+        next;
+      }
+      ### opened: $fh
+      $self->{'fh_i'} = $self->i_start;  # at first entry
+      last;
+    }
   }
+
 
   my $have_info = (_read_internal_txt($self, $anum)
                    || _read_internal_html($self, $anum)
@@ -542,9 +556,9 @@ sub _read_internal_txt {
 
     ### $contents
 
-    # eg. "%O A007318 0,5"
+    # eg. "%O A007318 0,5" is OFFSET=0
     my $offset;
-    if ($contents =~ /^%O\s+\Q$anum\E\s+(\d+)/im) {
+    if ($contents =~ /^%O\s+\Q$anum\E\s+(\d+)/m) {
       $offset = $1;
       ### %O line: $offset
     } else {

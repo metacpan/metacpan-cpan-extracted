@@ -1,5 +1,9 @@
 Revision history for Perl extension App-unbelievable
 
+v0.0.5 2020-02-23T01:35:00Z
+
+    - vars::i: require v1.10+ to fix cpantesters failure (#3) (SREZIC++)
+
 v0.0.4 2020-02-16T02:22:45Z
 
     - Change syntax highlighter to Kate since doing so reduces the

@@ -1,13 +1,5 @@
 #pragma once
 
-#if __cpp_lib_optional >= 201603L
-#  include <optional>
-namespace panda {
-  template <typename T>
-  using optional = std::optional<T>;
-}
-#else
-
 namespace panda {
 
 template <typename T> struct optional {
@@ -105,5 +97,3 @@ template <class T, class U> constexpr bool operator>= (const optional<T>& opt, c
 template <class T, class U> constexpr bool operator>= (const T& value, const optional<U>& opt) { return opt ? value >= *opt : true; }
 
 }
-
-#endif

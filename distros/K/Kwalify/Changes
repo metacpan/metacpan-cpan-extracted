@@ -1,30 +1,44 @@
 Revision history for Perl extension Kwalify.
 
-1.22
+1.23    2020-02-21
+	- stable release with all changes in 1.22_90
+
+1.22_90	2020-01-31
+	- change handling of required:no for existing undefined data.
+	  Now the behavior is like in the ruby implementation:
+	  hash entries with an undefined value are treated as
+	  missing, and thus pass the "required:no" rule.
+	  This addresses https://github.com/eserte/p5-Kwalify/issues/1
+	- more tests
+	- enable travis-ci and coveralls
+	- don't use YAML::Syck anymore in the tests because of
+	  https://github.com/toddr/YAML-Syck/issues/52 (use YAML::PP instead)
+
+1.22	2013-04-06
 	- cease possible "unitinialized value" warnings
 
-1.21
+1.21	2009-10-23
 	- fixed RT #48800 (unique in mappings did not work correctly)
 
-1.20
+1.20	2009-08-14
 	- test failure fix
 	- fixed RT #48714 (return early if not a hash was given)
 
-1.19
+1.19	2008-08-11
 	- allow the new "class" (previously "classname")
 	- more documentation about unclear schema definition
 	- -h/-help is not anymore "accidentaly" showing the usage
 
-1.18
+1.18	2008-07-16
 	- additional checks were not run with type 'any'
 	- ceasing a warning if undef was used in enum
 	- added warnings::compat prereq for 5.005 and older
 
-1.17
+1.17	2008-06-18
 	- documentation change: the URL of the schema user guide
 	  changed (thanks to Christoph Lamprecht for the pointer)
 
-1.16
+1.16	2007-09-22
 	- get rid of backquote in error and warning messages (after reading
 	  http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html)
 	- protect from blib warnings (perl 5.6.x) in pkwalify.t test
@@ -34,26 +48,26 @@ Revision history for Perl extension Kwalify.
 	- new -v version in pkwalify
 	- new tests
 
-1.14
+1.14	2007-02-08
 	- stricter checks if schema itself is correct
 	  (croak on unhandled keys)
 
-1.13
+1.13	2007-01-10
 	- fixed bug in range/max test
 	- fixed bug in Schema::Kwalify::validate
 	- better test coverage
 
-1.12
+1.12 (not released)
 	- added another test for older perls
 
-1.11
+1.11	2006-12-02
 	- fixed another test problem (occurred if
 	  IPC::Run was not installed)
 
-1.10
+1.10	2006-11-28
 	- just some test fixes
 
-1.09
+1.09	2006-11-28
 	- fixed endless recursion when using recursive
 	  schemas or data structures
 	- implemented -s option in pkwalify (like in
@@ -62,8 +76,9 @@ Revision history for Perl extension Kwalify.
 	- pkwalify outputs most things to STDOUT instead of
 	  STDERR
 
-1.08
+1.08	2006-11-26
 	- fixed warnings in pkwalify
 	- inc version in Kwalify.pm to force reinstalling
 
-1.07	first and maybe last version :-)
+1.07	2006-11-23
+	first and maybe last version :-)

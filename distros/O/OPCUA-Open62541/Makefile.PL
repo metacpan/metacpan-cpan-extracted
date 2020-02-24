@@ -18,7 +18,11 @@ WriteMakefile(
     },
     PREREQ_PM		=> {},
     ABSTRACT_FROM	=> 'lib/OPCUA/Open62541.pm',
-    AUTHOR		=> 'Alexander Bluhm <bluhm@genua.de>',
+    AUTHOR		=> [
+	'Alexander Bluhm <bluhm@genua.de>',
+	'Anton Borowka',
+	'Marvin Knoblauch <mknob@genua.de>',
+    ],
     LICENSE		=> 'perl_5',
     LIBS		=> ['-L/usr/local/lib -lopen62541'],
     DEFINE		=> '',
@@ -27,10 +31,13 @@ WriteMakefile(
 	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow',
     SIGN		=> 1,
     TEST_REQUIRES	=> {
+	'Test::Exception'	=> 0,
 	'Test::LeakTrace'	=> 0,
 	'Test::NoWarnings'	=> 0,
 	'Test::TCP'		=> 0,
+	'Test::Perl::Critic'	=> 0,
 	'Test::Pod'		=> '1.00',
+	'Test::Requires'	=> 0,
 	'Test::Warn'		=> 0,
     },
 );

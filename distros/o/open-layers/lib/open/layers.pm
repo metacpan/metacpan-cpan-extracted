@@ -3,8 +3,9 @@ package open::layers;
 use strict;
 use warnings;
 use Carp ();
+use Scalar::Util ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 # series of layers delimited by colons and consisting of non-space characters
 # allow spaces before and between layers because core does, but don't require them
@@ -15,7 +16,9 @@ sub import {
   my $class = shift;
   while (@_) {
     my $arg = shift;
-    if (ref $arg or ref \$arg eq 'GLOB') {
+    my $ref = Scalar::Util::reftype $arg;
+    if ((defined $ref and ($ref eq 'GLOB' or $ref eq 'IO'))
+        or (!defined $ref and Scalar::Util::reftype \$arg eq 'GLOB')) {
       Carp::croak "open::layers: No layer provided for handle $arg" unless @_;
       my $layer = shift;
       Carp::croak "open::layers: Invalid layer specification $layer" unless $layer =~ m/$LAYERS_SPEC/;
@@ -45,7 +48,7 @@ sub import {
       }
       ${^OPEN} = join "\0", $in, $out;
     } else {
-      Carp::croak "open::layers: Unknown flag $arg";
+      Carp::croak "open::layers: Unknown flag $arg (expected STD(IN|OUT|ERR|IO), r/w/rw, or filehandle)";
     }
   }
 }
@@ -82,8 +85,12 @@ intuitive. See L</"COMPARISON TO open.pm"> for details.
 
 =head1 ARGUMENTS
 
-Each operation is specified in a pair of arguments. The first argument, the
-flag, specifies the target of the operation, which may be one of:
+Each operation is specified in a pair of arguments: the flag specifying the
+target of the operation, and the layer(s) to apply. Multiple layers can be
+specified like C<:foo:bar>, as in L<open()|perlfunc/open> or
+L<binmode()|perlfunc/binmode>.
+
+The flag may be any one of:
 
 =over
 
@@ -99,9 +106,9 @@ Note that this will also affect reading from C<STDIN> via L<ARGV|perlvar/ARGV>
 
 =item $handle
 
-An arbitrary filehandle will have layer(s) pushed onto it directly, affecting
-all usage of that handle, similarly to the operation on standard handles.
-Handles must be passed as a glob or reference to a glob, B<not> a bareword.
+An arbitrary filehandle (glob or reference to a glob, B<not> a bareword) will
+have layer(s) pushed onto it directly, affecting all usage of that handle,
+similarly to the operation on standard handles.
 
 Note that the handle must be opened in the compile phase (such as in a
 preceding C<BEGIN> block) in order to be available for this pragma to operate
@@ -138,10 +145,6 @@ layers for the architecture.
   open my $fh, '<:', $file; # ignores UTF-8 layer and sets platform defaults
 
 =back
-
-The second argument is the layer or layers to set. Multiple layers can be
-specified like C<:foo:bar>, as in L<open()|perlfunc/open> or
-L<binmode()|perlfunc/binmode>.
 
 =head1 COMPARISON TO open.pm
 

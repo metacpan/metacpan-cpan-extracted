@@ -3,6 +3,8 @@ lib/OPCUA/Open62541.pm
 LICENSE
 Makefile.PL
 MANIFEST
+Open62541-accesslevelmask.xsh
+Open62541-packed.xsh
 Open62541-statuscodes.xsh
 Open62541-types.xsh
 Open62541.xs
@@ -10,11 +12,14 @@ ppport.h
 README
 script/statuscodes_h2xi.pl
 script/types_h2xi.pl
+t/client-browse-async.t
 t/client-config-default.t
 t/client-config.t
+t/client-connect-async.t
 t/client-connect.t
 t/client-leak.t
 t/client.t
+t/critic.t
 t/OPCUA-Open62541.t
 t/pod.t
 t/server-config-default.t
@@ -23,10 +28,10 @@ t/server-config.t
 t/server-iterate.t
 t/server-leak.t
 t/server-running.t
+t/server-variable.t
 t/server.t
 t/statuscodes.t
 t/types.t
-t/variable.t
 t/variant.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

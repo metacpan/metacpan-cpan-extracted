@@ -22,8 +22,8 @@ sub driver_maybe {
 	};
 	return unless $driver;
 	
-	my $user = $ENV{TEST_NEO4J_USERNAME} || 'neo4j';
-	my $pass = $ENV{TEST_NEO4J_PASSWORD};
+	my $user = $ENV{TEST_NEO4J_USERNAME} // 'neo4j';
+	my $pass = $ENV{TEST_NEO4J_PASSWORD} // '';
 	$driver->basic_auth($user, $pass);
 	$driver->config(timeout => 2);  # 2 seconds timeout may speed up testing
 	$driver->config(cypher_filter => 'params') if ($ENV{NEO4J} // 0) =~ m/^4\b/;
@@ -49,7 +49,10 @@ sub driver {
 		# the Neo4j HTTP API allows running empty statements
 		$driver->session->run('');
 	};
-	return if $@;
+	if ($@) {
+#		die $@;  # easier debugging of "no connection to Neo4j server" issues
+		return;
+	}
 	
 	return $driver;
 }
@@ -75,6 +78,7 @@ sub driver_no_auth {
 # used for the ResultSummary/ServerInfo test
 sub server_address {
 	return 'localhost:7474' unless $ENV{TEST_NEO4J_SERVER};
+	return 'localhost:7687' if $ENV{TEST_NEO4J_SERVER} =~ m{^bolt:(?://(?:localhost\b)?)?}i;
 	return '' . URI->new( $ENV{TEST_NEO4J_SERVER} )->host_port;
 }
 

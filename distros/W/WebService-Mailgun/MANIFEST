@@ -10,8 +10,7 @@ lib/WebService/Mailgun.pm
 minil.toml
 t/00_compile.t
 t/01_message.t
-t/02_list.t
+t/02_list_and_event.t
 t/03_error.t
-t/04_event.t
 META.yml
 MANIFEST

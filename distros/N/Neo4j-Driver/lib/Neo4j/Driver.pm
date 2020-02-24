@@ -5,10 +5,9 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Perl implementation of the Neo4j Driver API
-$Neo4j::Driver::VERSION = '0.14';
+$Neo4j::Driver::VERSION = '0.15';
 
 use Carp qw(croak);
-use Module::Load;
 
 use URI 1.25;
 use Neo4j::Driver::Transport::HTTP;
@@ -30,10 +29,12 @@ my %NEO4J_DEFAULT_PORT = (
 );
 
 my %OPTIONS = (
-	ca_file => 'ca_file',
+	ca_file => 'tls_ca',
 	cypher_filter => 'cypher_filter',
 	cypher_types => 'cypher_types',
 	timeout => 'http_timeout',
+	tls => 'tls',
+	tls_ca => 'tls_ca',
 );
 
 my %DEFAULTS = (
@@ -53,18 +54,21 @@ sub new {
 	
 	if ($uri) {
 		$uri =~ s|^|http://| if $uri !~ m{:|/};
-		$uri =~ s|$|//localhost| if $uri =~ m{^[a-z]+:$};
+		$uri =~ s|^|http:| if $uri =~ m{^//};
 		$uri = URI->new($uri);
 		
-		if ($uri->scheme eq 'bolt') {
-			eval { load 'Neo4j::Bolt' };
-			croak "Only the 'http' URI scheme is supported [$uri] (you may need to install the Neo4j::Bolt module)" if $@;
+		if (! $uri->scheme || $uri->scheme !~ m/^https?|bolt$/) {
+			croak sprintf "URI scheme '%s' unsupported; use 'http' or 'bolt'", $uri->scheme // "";
 		}
-		else {
-			croak "Only the 'http' URI scheme is supported [$uri]" if $uri->scheme !~ m/^https?$/;
+		if ($uri->scheme eq 'bolt') {
+			eval { require Neo4j::Bolt; };
+			croak "URI scheme 'bolt' requires Neo4j::Bolt. Can't locate Neo4j/Bolt.pm in \@INC " .
+			      "(you may need to install the Neo4j::Bolt module) (\@INC contains: @INC)" if $@;
 		}
 		
-		croak "Hostname is required [$uri]" if ! $uri->host;
+		$uri->host('localhost') unless $uri->host;
+		$uri->path('') if $uri->path_query eq '/';
+		$uri->fragment(undef);
 	}
 	else {
 		$uri = URI->new("http://localhost");
@@ -77,6 +81,8 @@ sub new {
 
 sub basic_auth {
 	my ($self, $username, $password) = @_;
+	
+	warnings::warnif deprecated => "Deprecated sequence: call basic_auth() before session()" if $self->{session};
 	
 	$self->{auth} = {
 		scheme => 'basic',
@@ -123,7 +129,7 @@ sub session {
 	
 	my $transport;
 	if ($self->{uri}->scheme eq 'bolt') {
-		load 'Neo4j::Driver::Transport::Bolt';
+		require Neo4j::Driver::Transport::Bolt;
 		$transport = Neo4j::Driver::Transport::Bolt->new($self);
 	}
 	else {
@@ -154,19 +160,20 @@ Neo4j::Driver - Perl implementation of the Neo4j Driver API
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $uri = 'http://localhost';
- my $driver = Neo4j::Driver->new($uri)->basic_auth('neo4j', 'password');
+ $uri = 'bolt://localhost';  # requires Neo4::Bolt
+ $uri = 'http://localhost';
+ $driver = Neo4j::Driver->new($uri)->basic_auth('neo4j', 'password');
  
  sub say_friends_of {
-   my $query = 'MATCH (a:Person)-[:KNOWS]->(f) '
+   $query = 'MATCH (a:Person)-[:KNOWS]->(f) '
              . 'WHERE a.name = {name} RETURN f.name';
-   my $records = $driver->session->run($query, name => shift)->list;
-   foreach my $record ( @$records ) {
+   $records = $driver->session->run($query, name => shift)->list;
+   foreach $record ( @$records ) {
      say $record->get('f.name');
    }
  }
@@ -186,6 +193,13 @@ this driver doesn't offer fully-fledged object bindings like the
 existing L<REST::Neo4p> module does. Nor does it offer any L<DBI>
 integration. However, it avoids the legacy C<cypher> endpoint,
 assuring compatibility with Neo4j versions 2.3, 3.x and 4.x.
+
+The HTTP and Bolt protocols are supported for connecting to Neo4j.
+Bolt requires installing the XS module L<Neo4j::Bolt>. Using Bolt
+is much faster than HTTP, but at time of this writing the
+L<libneo4j-client|https://neo4j-client.net/#libneo4j-client> backend
+library that L<Neo4j::Bolt> uses to connect to the database server
+only supports Neo4j version 3.x.
 
 B<As of version 0.13, the interface of this software may be
 considered stable.>
@@ -213,7 +227,7 @@ Set basic auth credentials with a given user and password. This
 method returns the modified L<Neo4j::Driver> object, so that method
 chaining is possible.
 
- my $session = $driver->basic_auth('neo4j', 'password')->session;
+ $session = $driver->basic_auth('neo4j', 'password')->session;
 
 =head2 config
 
@@ -224,7 +238,7 @@ L<Neo4j::Driver> object. The options are given in hash syntax.
 This method returns the modified object, so that method chaining
 is possible.
 
- my $session = $driver->config(timeout => 60)->session;
+ $session = $driver->config(timeout => 60)->session;
 
 See below for an explanation of
 L<all supported configuration options|/"CONFIGURATION OPTIONS">.
@@ -234,18 +248,19 @@ creating the driver's first session.
 Calling this method with just a single parameter will return the
 current value of the config option named by the parameter.
 
- my $timeout = $driver->config('timeout');
+ $timeout = $driver->config('timeout');
 
 =head2 new
 
- my $driver = Neo4j::Driver->new('http://localhost');
+ $driver = Neo4j::Driver->new('http://localhost');
 
 Construct a new L<Neo4j::Driver> object. This object holds the
 details required to establish connections with a Neo4j database,
 including server URIs, credentials and other configuration.
 
 The URI passed to this method determines the type of driver created. 
-Only the C<http> URI scheme is currently supported.
+The C<http>, C<https>, and C<bolt> URI schemes are supported.
+Use of C<bolt> URIs requires L<Neo4::Bolt> to be installed.
 
 If a part of the URI or even the entire URI is missing, suitable
 default values will be substituted. In particular, the host name
@@ -253,15 +268,15 @@ C<localhost> and the protocol C<http> will be used as defaults;
 if no port is specified, the protocol's default port will be used.
 
  # all of these are semantically equal
- my $driver = Neo4j::Driver->new;
- my $driver = Neo4j::Driver->new('http:');
- my $driver = Neo4j::Driver->new('localhost');
- my $driver = Neo4j::Driver->new('http://localhost');
- my $driver = Neo4j::Driver->new('http://localhost:7474');
+ $driver = Neo4j::Driver->new;
+ $driver = Neo4j::Driver->new('http:');
+ $driver = Neo4j::Driver->new('localhost');
+ $driver = Neo4j::Driver->new('http://localhost');
+ $driver = Neo4j::Driver->new('http://localhost:7474');
 
 =head2 session
 
- my $session = $driver->session;
+ $session = $driver->session;
 
 Creates and returns a new L<Session|Neo4j::Driver::Session>.
 
@@ -271,54 +286,6 @@ L<Neo4j::Driver> implements the following experimental features.
 These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
-
-=head2 Bolt support
-
- my $driver = Neo4j::Driver->new('bolt://localhost');
-
-Thanks to L<Neo4j::Bolt>, there is now skeletal support for the
-L<Bolt Protocol|https://boltprotocol.org/>, which can be used as
-an alternative to HTTP to connect to the Neo4j server.
-
-The design goal is for this driver to eventually offer equal support
-for Bolt and HTTP. At this time, using Bolt with this driver is not
-recommended, although it sorta-kinda works. The biggest issues
-include: Unicode is not supported in L<Neo4j::Bolt>,
-the C<libneo4j-client> backend currently doesn't support Neo4j 4,
-setting a custom timeout is not supported in L<Neo4j::Bolt>,
-C<libneo4j-client> error reporting is unreliable, summary
-information reported by L<Neo4j::Bolt> is incomplete, and graph meta
-data supplied by L<Neo4j::Bolt> is unreliable and has a different
-format than when the HTTP transport is used.
-
-Additionally, there are
-incompatibilities with other "experimental" features of this driver,
-and parts of the documentation still assume that HTTP is the only
-option.
-
-TLS encryption is disabled in early versions of L<Neo4j::Bolt>.
-If you need remote access, consider using HTTPS instead of Bolt.
-
-=head2 HTTPS support
-
- my $driver = Neo4j::Driver->new('https://localhost');
- $driver->config(ca_file => 'neo4j/certificates/neo4j.cert');
-
-Using HTTPS will result in an encrypted connection. In order to rule
-out a man-in-the-middle attack, the server's certificate must be
-verified. By default, this driver may be expected to use operating
-system default root certificates (not really tested yet). This
-will fail unless your Neo4j installation uses a key pair that is
-trusted and verifiable through the global CA infrastructure. For
-self-signed certificates (such as those automatically provided by
-some Neo4j versions), you need to specify the location of a local
-copy of the server certificate. The driver config option C<ca_file>
-may be used for this; it corresponds to C<SSL_ca_file> in
-L<LWP::UserAgent> and L<IO::Socket::SSL>.
-
-See also the
-L<Neo4j Operations Manual|https://neo4j.com/docs/operations-manual/current/security/>
-for details on Neo4j network security.
 
 =head2 Parameter syntax conversion
 
@@ -365,7 +332,7 @@ type. Direct data structure access might also work, but is unsupported
 and discouraged because it makes your code prone to fail when any
 internals change in the implementation of Neo4j::Driver. For those
 objects that are implemented as blessed hash refs, clients may use any
-hash keys that beginn with two underscores (C<__>) to store private
+hash keys that begin with two underscores (C<__>) to store private
 data. All other hash keys are reserved for use by Neo4j::Driver.
 
 =head1 CONFIGURATION OPTIONS
@@ -387,20 +354,50 @@ The old C<< $driver->{http_timeout} >> syntax remains supported
 for the time being in order to ensure backwards compatibility,
 but its use is discouraged and it may be deprecated in future.
 
+=head2 tls
+
+ $driver->config(tls => 1);
+
+Specifies whether to use secure communication using TLS. This
+L<implies|IO::Socket::SSL/"Essential Information About SSL/TLS">
+not just encryption, but also verification of the server's identity.
+
+By default, the local system's trust store will be used to verify
+the server's identity. This will fail unless your Neo4j installation
+uses a key pair that is trusted and verifiable through the global
+CA infrastructure. If that's not the case, you may need to
+additionally use the C<tls_ca> option.
+
+This option defaults to C<0> (no encryption). This is generally what
+you want if you connect to a server on C<localhost>.
+
+This option is only useful for Bolt connections. For HTTP
+connections, the use of TLS encryption is governed by the chosen
+URI scheme (C<http> / C<https>).
+
+=head2 tls_ca
+
+ $driver->config(tls_ca => 'neo4j/certificates/neo4j.cert');
+
+Specifies the path to a file containing one or more trusted TLS
+certificates. When this option is given, encrypted connections will
+only be accepted if the server's identity can be verified using the
+certificates provided.
+
+The certificates in the file must in PEM encoding. They are expected
+to be "root" certificates, S<i. e.> the S<"CA bit"> needs to be set
+and the certificate presented by the server must be signed by one of
+the certificates in this file (or by an intermediary).
+
+Self-signed certificates (such as those automatically provided by
+some Neo4j versions) should also work if their S<"CA bit"> is set.
+
 =head1 ENVIRONMENT
 
 This software currently targets Neo4j versions 2.3, 3.x and 4.x.
 
 This software requires at least Perl 5.10, though you should consider
 using Perl 5.16 or newer if you can.
-
-=head1 PERFORMANCE
-
-Preliminary testing seems to indicate the two major bottlenecks are
-the HTTP transport to and from the Neo4j server, and the JSON
-parsing. Switching to the experimental Bolt protocol support may well
-increase the speed tenfold. You are encouraged to run your own tests
-for your specific application.
 
 =head1 DIAGNOSTICS
 
@@ -429,10 +426,22 @@ driver at present.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver::Session>,
+=over
+
+=item * L<Neo4j::Driver::B<Session>>
+
+=item * Official API documentation:
 L<Neo4j Drivers Manual|https://neo4j.com/docs/driver-manual/current/>,
-L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/current/>,
+L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/current/>
+
+=item * Other modules for working with Neo4j:
+L<DBD::Neo4p>,
+L<Neo4j::Bolt>,
+L<Neo4j::Cypher::Abstract>,
+L<REST::Cypher>,
 L<REST::Neo4p>
+
+=back
 
 =head1 AUTHOR
 
@@ -440,7 +449,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

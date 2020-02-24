@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019, 2020 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -51,7 +51,7 @@ echo "DISTVNAME  $DISTVNAME"
 XS_FILES=`sed -n 's/^XS_FILES = \(.*\)/\1/p' Makefile`
 EXE_FILES=`sed -n 's/^EXE_FILES = \(.*\)/\1/p' Makefile`
 
-if test "$DISTNAME" = pngtextadd
+if test "$DISTNAME" = pngtextadd -o "$DISTNAME" = x2gpm
 then DPKG_ARCH=`dpkg --print-architecture`
 elif test -n "$XS_FILES"
 then DPKG_ARCH=`dpkg --print-architecture`
@@ -72,7 +72,7 @@ if test -n "$EXE_FILES"; then    # Perl programs
 fi
 case $DISTNAME in
   # these have EXE_FILES programs but still named lib...-perl
-  gtk2-ex-splash|wx-perl-podbrowser)
+  Gtk2-Ex-Splash|Wx-Perl-PodBrowser)
     IS_PERL_LIB=1 ;;
 esac
 if test $IS_PERL_LIB = 1; then
@@ -139,7 +139,7 @@ rm -rf $DEBNAME-$VERSION
 
 lintian -I -i \
   --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file,emacsen-common-without-dh-elpa,bugs-field-does-not-refer-to-debian-infrastructure \
-  $DEBFILE
+  ${DEBNAME}_${VERSION}*_$DPKG_ARCH.deb
 
 lintian -I -i \
   --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile,testsuite-autopkgtest-missing *.dsc

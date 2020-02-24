@@ -1,0 +1,35 @@
+---
+abstract: 'Neo4j server agent using Bolt protocol'
+author:
+  - 'Mark A. Jensen'
+build_requires:
+  Inline: '0'
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::CChecker: '0'
+  Module::Build: 0.36_14
+  Try::Tiny: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Neo4j-Bolt
+no_index:
+  package:
+    - Builder
+    - t::BoltFile
+recommends:
+  Mozilla::CA: '0'
+  Pod::Markdown: '0'
+requires:
+  Inline::C: '0'
+  JSON::PP: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/majensen/perlbolt/issues
+  license: http://www.apache.org/licenses/LICENSE-2.0.txt
+  repository: https://github.com/majensen/perlbolt.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

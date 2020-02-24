@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.174';
+our $VERSION = '1.175';
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -387,54 +387,55 @@ sub stmtListToScript {
 my %Commands = (
     Oracle => [
     ],
-    #    END
-    PostgreSQL => [qw/
-        ABORT
-        ALTER
-        ANALYZE
-        BEGIN
-        CALL
-        CHECKPOINT
-        CLOSE
-        CLUSTER
-        COMMENT
-        COMMIT
-        COPY CREATE
-        DEALLOCATE
-        DECLARE
-        DELETE
-        DISCARD
-        DO
-        DROP
-        EXECUTE
-        EXPLAIN
-        FETCH
-        GRANT
-        IMPORT FOREIGN SCHEMA
-        INSERT
-        LISTEN
-        LOAD
-        LOCK
-        MOVE
-        NOTIFY
-        PREPARE
-        REASSIGN OWNED
-        REFRESH MATERIALIZED VIEW
-        REINDEX
-        RELEASE SAVEPOINT
-        ROLLBACK
-        SAVEPOINT
-        SECURITY LABEL
-        SELECT
-        SET
-        SHOW
-        START TRANSACTION
-        TRUNCATE
-        UNLISTEN
-        UPDATE
-        VACUUM
-        VALUES
-    /],
+    PostgreSQL => [
+        'ABORT',
+        'ALTER',
+        'ANALYZE',
+        'BEGIN',
+        'CALL',
+        'CHECKPOINT',
+        'CLOSE',
+        'CLUSTER',
+        'COMMENT',
+        'COMMIT',
+        'COPY',
+        'CREATE',
+        'DEALLOCATE',
+        'DECLARE',
+        'DELETE',
+        'DISCARD',
+        'DO',
+        'DROP',
+        # 'END'
+        'EXECUTE',
+        'EXPLAIN',
+        'FETCH',
+        'GRANT',
+        'IMPORT FOREIGN SCHEMA',
+        'INSERT',
+        'LISTEN',
+        'LOAD',
+        'LOCK',
+        'MOVE',
+        'NOTIFY',
+        'PREPARE',
+        'REASSIGN OWNED',
+        'REFRESH MATERIALIZED VIEW',
+        'REINDEX',
+        'RELEASE SAVEPOINT',
+        'ROLLBACK',
+        'SAVEPOINT',
+        'SECURITY LABEL',
+        'SELECT',
+        'SET',
+        'SHOW',
+        'START TRANSACTION',
+        'TRUNCATE',
+        'UNLISTEN',
+        'UPDATE',
+        'VACUUM',
+        'VALUES',
+    ],
     SQLite => [
     ],
     MySQL => [
@@ -5388,7 +5389,7 @@ sub diff {
 
 =head1 VERSION
 
-1.174
+1.175
 
 =head1 AUTHOR
 

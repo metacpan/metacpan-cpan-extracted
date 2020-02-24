@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.174';
+our $VERSION = '1.175';
 
 use Quiq::Option;
 use Quiq::Unindent;
@@ -425,7 +425,7 @@ sub asTable {
 
 =head1 VERSION
 
-1.174
+1.175
 
 =head1 AUTHOR
 

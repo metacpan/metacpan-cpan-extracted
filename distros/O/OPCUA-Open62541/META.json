@@ -1,7 +1,9 @@
 {
    "abstract" : "Perl XS wrapper for open62541 OPC UA library",
    "author" : [
-      "Alexander Bluhm <bluhm@genua.de>"
+      "Alexander Bluhm <bluhm@genua.de>",
+      "Anton Borowka",
+      "Marvin Knoblauch <mknob@genua.de>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -35,15 +37,18 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::LeakTrace" : "0",
             "Test::NoWarnings" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.00",
+            "Test::Requires" : "0",
             "Test::TCP" : "0",
             "Test::Warn" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

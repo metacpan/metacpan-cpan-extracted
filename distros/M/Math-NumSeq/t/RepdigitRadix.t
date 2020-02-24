@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -36,7 +36,7 @@ use Math::NumSeq::RepdigitRadix;
 # VERSION
 
 {
-  my $want_version = 73;
+  my $want_version = 74;
   ok ($Math::NumSeq::RepdigitRadix::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::RepdigitRadix->VERSION,  $want_version,

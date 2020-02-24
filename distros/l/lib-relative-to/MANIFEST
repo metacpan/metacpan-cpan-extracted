@@ -1,0 +1,25 @@
+CHANGELOG
+MANIFEST
+t/fakehgrepo/t/hg-repo.t
+t/fakehgrepo/.hg/store/placeholder
+t/parentcontaining-failure.t
+GPL2.txt
+lib/lib/relative/to.pm
+lib/lib/relative/to/HgRepository.pm
+lib/lib/relative/to/ParentContaining.pm
+lib/lib/relative/to/GitRepository.pm
+Makefile.PL
+ARTISTIC.txt
+t/pod-coverage.t
+t/pod.t
+t/fakegitrepo/lib/placeholder
+t/fakehgrepo/lib/placeholder
+t/use.t
+t/fakegitrepo/t/git-repo.t
+lib/lib/relative/to/SvnCheckout.pm
+t/fakesvncheckout/trunk/t/svn-checkout.t
+t/fakesvncheckout/trunk/.svn/entries
+MANIFEST.SKIP
+t/fakesvncheckout/trunk/lib/placeholder
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

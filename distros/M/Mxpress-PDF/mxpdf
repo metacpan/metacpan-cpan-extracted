@@ -63,15 +63,25 @@ my %map = (
 	'===' => ['subsubtitle', sub {
 		$_[0]->toc->add(subsubtitle => $_[1])
 	}],
+	'=t=' => ['input', sub {
+		$_[0]->input->add($_[1])
+	}],
+	'=a=' => ['textarea', sub {
+		my ($file, $line) = @_;
+		my $lines = ($line =~ s/\((\d*)\)$// && $1);
+		$file->textarea->add($line, lines => $lines);
+	}],
 	'=i=' => ['image', sub {
 		$_[0]->image->add($_[1])
 	}],
-	'=f=' => ['field', sub {
-		$_[0]->field->add($_[1])
-	}],
 	'=l=' => ['line', sub {
 		$_[0]->line->add
-	}]
+	}],
+	'=s=' => ['select', sub {
+		my ($file, $line) = @_;
+		my @options = split ',', ($line =~ s/\((.*)\)$// && $1);
+		$file->select->add($line); 
+	}],
 );
 
 my $reg = sprintf('^(%s)', join '|', map { quotemeta($_) } sort { length $b <=> length $a } keys %map);
@@ -138,9 +148,11 @@ You can currently prefix lines with the following markup
 	=Title
 	==Subtitle
 	===Subsubtitle
+	=t=Text Field
+	=a=Textarea Field(5)
 	=i=path/to/image.png
-	=f=First Name:
 	=l=
+	=s=Select(a,b,c,d):
 
 The configuration file should be in yaml format.
 

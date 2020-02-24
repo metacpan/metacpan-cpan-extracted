@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,6 +17,9 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -42,7 +45,7 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -53,12 +56,14 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Leont/experimental.git",
-         "web" : "https://github.com/Leont/experimental"
+         "url" : "git://github.com/Dual-Life/experimental.git",
+         "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_contributors" : [
+      "brian greenfield <0briang0@gmail.com>",
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
       "Father Chrysostomos <sprout@cpan.org>",
       "Grant McLean <grant@catalyst.net.nz>",
       "gregor herrmann <gregoa@debian.org>",
@@ -67,6 +72,7 @@
       "Ricardo Signes <rjbs@cpan.org>",
       "Sawyer X <xsawyerx@cpan.org>"
    ],
+   "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

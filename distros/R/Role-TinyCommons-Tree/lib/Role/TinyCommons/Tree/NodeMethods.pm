@@ -1,7 +1,7 @@
 package Role::TinyCommons::Tree::NodeMethods;
 
-our $DATE = '2020-02-07'; # DATE
-our $VERSION = '0.121'; # VERSION
+our $DATE = '2020-02-24'; # DATE
+our $VERSION = '0.122'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -31,7 +31,7 @@ Role::TinyCommons::Tree::NodeMethods - Role that provides tree node methods
 
 =head1 VERSION
 
-This document describes version 0.121 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-07.
+This document describes version 0.122 of Role::TinyCommons::Tree::NodeMethods (from Perl distribution Role-TinyCommons-Tree), released on 2020-02-24.
 
 =head1 DESCRIPTION
 
@@ -136,7 +136,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Role-TinyC
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-Tree>.
+Source repository is at L<https://github.com/perlancar/perl-Role-TinyCommons-TreeNode>.
 
 =head1 BUGS
 
@@ -148,7 +148,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Code::Includable::Tree::FromStruct> if you want to use the routines in this
+L<Code::Includable::Tree::NodeMethods> if you want to use the routines in this
 module without consuming a role.
 
 L<Role::TinyCommons::Tree::Node>

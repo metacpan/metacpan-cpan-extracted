@@ -71,6 +71,9 @@
 #define G1_RULE_ADVERB_ITEM_16                   "G1_rule_adverb_item_16"
 #define G1_RULE_ADVERB_ITEM_17                   "G1_rule_adverb_item_17"
 #define G1_RULE_ADVERB_ITEM_18                   "G1_rule_adverb_item_18"
+#define G1_RULE_ADVERB_ITEM_19                   "G1_rule_adverb_item_19"
+#define G1_RULE_ADVERB_ITEM_20                   "G1_rule_adverb_item_20"
+#define G1_RULE_ADVERB_ITEM_21                   "G1_rule_adverb_item_21"
 #define G1_RULE_ACTION_1                         "G1_rule_action_1"
 #define G1_RULE_ACTION_2                         "G1_rule_action_2"
 #define G1_RULE_SYMBOL_ACTION_1                  "G1_rule_symbol_action_1"
@@ -177,6 +180,13 @@
 #define G1_RULE_IF_ACTION                        "G1_rule_if_action"
 #define G1_RULE_IFACTION_NAME_1                  "G1_rule_ifaction_name_1"
 #define G1_RULE_IFACTION_NAME_2                  "G1_rule_ifaction_name_2"
+#define G1_RULE_EVENT_ACTION                     "G1_rule_event_action"
+#define G1_RULE_EVENTACTION_NAME_1               "G1_rule_eventaction_name_1"
+#define G1_RULE_EVENTACTION_NAME_2               "G1_rule_eventaction_name_2"
+#define G1_RULE_DEFAULT_ENCODING                 "G1_rule_default_encoding"
+#define G1_RULE_DEFAULTENCODING_NAME             "G1_rule_defaultencoding_name"
+#define G1_RULE_FALLBACK_ENCODING                "G1_rule_fallback_encoding"
+#define G1_RULE_FALLBACKENCODING_NAME            "G1_rule_fallbackencoding_name"
 
 #define G1_ACTION_STATEMENTS                       "::undef"
 #define G1_ACTION_STATEMENT_01                     "::undef"
@@ -247,6 +257,9 @@
 #define G1_ACTION_ADVERB_ITEM_16                   "::shift" /* <adverb item> ::= <event specification> */
 #define G1_ACTION_ADVERB_ITEM_17                   "::shift" /* <adverb item> ::= <hide separator specification> */
 #define G1_ACTION_ADVERB_ITEM_18                   "::shift" /* <adverb item> ::= <if action> */
+#define G1_ACTION_ADVERB_ITEM_19                   "::shift" /* <adverb item> ::= <event action> */
+#define G1_ACTION_ADVERB_ITEM_20                   "::shift" /* <adverb item> ::= <default encoding> */
+#define G1_ACTION_ADVERB_ITEM_21                   "::shift" /* <adverb item> ::= <fallback encoding> */
 #define G1_ACTION_ACTION_1                         "G1_action_action_1"                         /* done */
 #define G1_ACTION_ACTION_2                         "G1_action_action_2"                         /* done */
 #define G1_ACTION_SYMBOLACTION_1                   "G1_action_symbolaction_1"                   /* done */
@@ -350,6 +363,13 @@
 #define G1_ACTION_IFACTION_NAME_1                  "::ascii" /* <if action name> ::= <ascii graph name> */
 #define G1_ACTION_IFACTION_NAME_2                  "::ascii" /* <if action name> ::= <lua action name> */
 #define G1_ACTION_IFACTION                         "G1_action_ifaction"                         /* done */
+#define G1_ACTION_EVENTACTION                      "G1_action_eventaction"                   /* done */
+#define G1_ACTION_EVENTACTION_NAME_1               "::ascii" /* <event action name> ::= <ascii graph name> */
+#define G1_ACTION_EVENTACTION_NAME_2               "::ascii" /* <event action name> ::= <lua identifier> */
+#define G1_ACTION_DEFAULTENCODING                  "G1_action_defaultencoding"                   /* done */
+#define G1_ACTION_DEFAULTENCODING_NAME             "::ascii" /* <default encoding name> ::= <ascii graph name> */
+#define G1_ACTION_FALLBACKENCODING                 "G1_action_fallbackencoding"                   /* done */
+#define G1_ACTION_FALLBACKENCODING_NAME            "::ascii" /* <fallback encoding name> ::= <ascii graph name> */
 
 typedef struct bootstrap_grammar_terminal {
   int                        idi;                 /* Identifier */

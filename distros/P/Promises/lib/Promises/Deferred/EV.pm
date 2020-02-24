@@ -1,7 +1,7 @@
 package Promises::Deferred::EV;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: An implementation of Promises in Perl
-$Promises::Deferred::EV::VERSION = '1.03';
+$Promises::Deferred::EV::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -47,6 +47,7 @@ sub _notify_backend {
         close($socket_recv) if defined $socket_recv;
         pipe($socket_recv, $socket_send);
         $socket_io = EV::io($socket_recv, EV::READ, \&_do_callbacks);
+        $socket_io->keepalive(0);
     }
 
     # skip signalling when there are callbacks already waiting
@@ -60,7 +61,7 @@ sub _timeout {
     my ( $self, $timeout, $callback ) = @_;
 
     my $id = EV::timer $timeout, 0, $callback;
-    
+
     return sub { undef $id };
 }
 
@@ -76,7 +77,7 @@ Promises::Deferred::EV - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

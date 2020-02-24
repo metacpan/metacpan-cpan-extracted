@@ -11,7 +11,7 @@ ok($s, "server new");
 my $c = $s->getConfig();
 ok($c, "config get");
 
-is($c->setDefault(), 0, "default status");
+is($c->setDefault(), "Good", "default status");
 
 eval { OPCUA::Open62541::ServerConfig::setDefault() };
 ok($@, "config missing");

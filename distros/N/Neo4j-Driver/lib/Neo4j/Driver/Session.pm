@@ -5,9 +5,8 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.14';
+$Neo4j::Driver::Session::VERSION = '0.15';
 
-use Cpanel::JSON::XS 3.0201 qw(decode_json);
 use URI 1.25;
 
 use Neo4j::Driver::Transaction;
@@ -68,18 +67,18 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
  use Neo4j::Driver;
- my $session = Neo4j::Driver->new->basic_auth(...)->session;
+ $session = Neo4j::Driver->new->basic_auth(...)->session;
  
  # explicit transaction
- my $transaction = $session->begin_transaction;
+ $transaction = $session->begin_transaction;
  
  # autocommit transaction
- my $result = $session->run('MATCH (m:Movie) RETURN m.name, m.year');
+ $result = $session->run('MATCH (m:Movie) RETURN m.name, m.year');
 
 =head1 DESCRIPTION
 
@@ -107,13 +106,13 @@ L<Neo4j::Driver::Session> implements the following methods.
 
 =head2 begin_transaction
 
- my $transaction = $session->begin_transaction;
+ $transaction = $session->begin_transaction;
 
 Begin a new explicit L<Transaction|Neo4j::Driver::Transaction>.
 
 =head2 run
 
- my $result = $session->run('...');
+ $result = $session->run('...');
 
 Run and commit a statement using an autocommit transaction and return
 the L<StatementResult|Neo4j::Driver::StatementResult>.
@@ -122,8 +121,8 @@ This method is semantically exactly equivalent to the following code,
 but is faster because it doesn't require an extra server roundtrip to
 commit the transaction.
 
- my $transaction = $session->begin_transaction;
- my $result = $transaction->run('...');
+ $transaction = $session->begin_transaction;
+ $result = $transaction->run('...');
  $transaction->commit;
 
 =head1 EXPERIMENTAL FEATURES
@@ -135,16 +134,16 @@ these features.
 
 =head2 Calling in list context
 
- my @records = $session->run('...');
- my @results = $session->run([...]);
+ @records = $session->run('...');
+ @results = $session->run([...]);
 
 The C<run> method tries to Do What You Mean if called in list
 context.
 
 =head2 ServerInfo
 
- my $host_port = $session->server->address;
- my $version_string = $session->server->version;
+ $host_port = $session->server->address;
+ $version_string = $session->server->version;
  say "Contacting $version_string at $host_port.";
 
 For security reasons, L<ResultSummary|Neo4j::Driver::ResultSummary>
@@ -159,9 +158,9 @@ I'm really not sure if the ensuing performance penalty is worth it.
 
 =head2 Concurrent explicit transactions
 
- my $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
- my $tx1 = $session->begin_transaction;
- my $tx2 = $session->begin_transaction;
+ $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
+ $tx1 = $session->begin_transaction;
+ $tx2 = $session->begin_transaction;
 
 Since HTTP is a stateless protocol, the Neo4j HTTP API effectively
 allows multiple concurrently open transactions without special
@@ -173,8 +172,8 @@ The Bolt protocol does not support concurrent explicit transactions.
 
 =head2 Concurrent autocommit transactions
 
- my $tx1 = $session->begin_transaction;
- my $tx2 = $session->run(...);
+ $tx1 = $session->begin_transaction;
+ $tx2 = $session->run(...);
 
 Sessions support autocommit transactions while an explicit
 transaction is open. Since it is not clear to me if this is
@@ -194,12 +193,19 @@ regard.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j::Driver::Transaction>,
-L<Neo4j::Driver::StatementResult>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/v1/Session.html>,
-L<Neo4j JavaScript Driver|https://neo4j.com/docs/api/javascript-driver/current/class/src/v1/session.js~Session.html>,
-L<Neo4j .NET Driver|https://neo4j.com/docs/api/dotnet-driver/current/html/bd812bce-8d2c-f29e-6c2a-cf93bd3d85d7.htm>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Driver::B<Transaction>>,
+L<Neo4j::Driver::B<StatementResult>>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Session (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Session.html>,
+L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/current/class/src/session.js~Session.html>,
+L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
+
+=back
 
 =head1 AUTHOR
 
@@ -207,7 +213,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

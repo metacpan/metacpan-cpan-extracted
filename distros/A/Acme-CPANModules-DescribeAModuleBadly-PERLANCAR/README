@@ -1,0 +1,82 @@
+NAME
+    Acme::CPANModules::DescribeAModuleBadly::PERLANCAR - PERLANCAR
+    describing modules badly
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::DescribeAModuleBadly::PERLANCAR (from Perl
+    distribution Acme-CPANModules-DescribeAModuleBadly-PERLANCAR), released
+    on 2020-02-23.
+
+DESCRIPTION
+    PERLANCAR describing modules badly.
+
+INCLUDED MODULES
+    *   Path::Tiny
+
+        When you're bored and want to relearn crawling, standing up, walking
+        and speech all over again when dealing with files.
+
+    *   M
+
+        Remember when you want to have more than four ways to do OO, but
+        less than six? Yeah, me neither.
+
+         (To be honest, I've used all L<Moose>, L<Mouse>, L<Moo>,
+        and L<Mo> for "real-world" purposes, and Mo is so lightweight the only way to
+        be more lightweight is to do bare OO by yourself.)
+
+    *   Dist::Zilla
+
+        An ideal distribution builder tool, particularly if you need to
+        develop dzil plugin distributions.
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries DescribeAModuleBadly::PERLANCAR | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=DescribeAModuleBadly::PERLANCAR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-DescribeAModuleBadly-PERL
+    ANCAR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-DescribeAModuleBadly
+    -PERLANCAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Desc
+    ribeAModuleBadly-PERLANCAR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+    The Acme::CPANModules::DescribeAModuleBadly namespace.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

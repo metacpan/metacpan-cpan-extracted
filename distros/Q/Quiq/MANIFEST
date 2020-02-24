@@ -152,6 +152,7 @@ lib/Quiq/PlotlyJs/TimeSeries.pm
 lib/Quiq/Pod/Generator.pm
 lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
+lib/Quiq/PostgreSql/PgDump.pm
 lib/Quiq/PostgreSql/Psql.pm
 lib/Quiq/Process.pm
 lib/Quiq/Program.pm
@@ -360,6 +361,7 @@ t/bin/Quiq/PlotlyJs/TimeSeries.t
 t/bin/Quiq/Pod/Generator.t
 t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t
+t/bin/Quiq/PostgreSql/PgDump.t
 t/bin/Quiq/PostgreSql/Psql.t
 t/bin/Quiq/Process.t
 t/bin/Quiq/Program.t

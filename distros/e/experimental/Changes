@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.021     2020-02-22 23:18:22+01:00 Europe/Amsterdam
+          - Add the isa feature
+
 0.020     2018-05-09 21:31:22+02:00 Europe/Amsterdam
           - Add the declared_refs feature
 

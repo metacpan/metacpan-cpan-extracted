@@ -1,11 +1,20 @@
 package Sort::Sub::filevercmp;
 
-our $DATE = '2019-05-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2019-12-15'; # DATE
+our $DIST = 'Sort-Sub-filevercmp'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+sub meta {
+    return {
+        v => 1,
+        summary => 'Sort using Sort::filevercmp',
+    };
+}
 
 sub gen_sorter {
     require Sort::filevercmp;
@@ -30,7 +39,7 @@ sub gen_sorter {
 }
 
 1;
-# ABSTRACT: Sort using filevercmp
+# ABSTRACT: Sort using Sort::filevercmp
 
 __END__
 
@@ -40,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Sort::Sub::filevercmp - Sort using filevercmp
+Sort::Sub::filevercmp - Sort using Sort::filevercmp
 
 =head1 VERSION
 
-This document describes version 0.001 of Sort::Sub::filevercmp (from Perl distribution Sort-Sub-filevercmp), released on 2019-05-18.
+This document describes version 0.002 of Sort::Sub::filevercmp (from Perl distribution Sort-Sub-filevercmp), released on 2019-12-15.
 
 =head1 SYNOPSIS
 
@@ -74,7 +83,7 @@ Use in shell/CLI with L<sortsub> (from L<App::sortsub>):
 
 =head1 DESCRIPTION
 
-=for Pod::Coverage ^(gen_sorter)$
+=for Pod::Coverage ^(gen_sorter|meta)$
 
 =head1 ENVIRONMENT
 

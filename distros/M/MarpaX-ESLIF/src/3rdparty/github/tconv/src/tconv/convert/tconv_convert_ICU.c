@@ -528,8 +528,8 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     }
     errno = errnol;
   }
-  TCONV_TRACE(tconvp, "%s - return -1", funcs);
-  return (void *)-1;
+  TCONV_TRACE(tconvp, "%s - return NULL", funcs);
+  return NULL;
 }
 
 enum {

@@ -1,9 +1,9 @@
 This archive contains the distribution Neo4j-Driver,
-version 0.14:
+version 0.15:
 
   Perl implementation of the Neo4j Driver API
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -145,9 +145,9 @@ details.
 
 =scenario has-bld
 
-This package supports the C<bld> and C<builder> directives, expects a coderef
-and builds the attribute value if it wasn't provided to the constructor. See
-the L<Moo> documentation for more details.
+This package supports the C<bld> and C<builder> directives, expects a C<1>, a
+method name, or coderef and builds the attribute value if it wasn't provided to
+the constructor. See the L<Moo> documentation for more details.
 
 =example has-bld
 
@@ -176,8 +176,9 @@ the L<Moo> documentation for more details.
 
 =scenario has-clr
 
-This package supports the C<clr> and C<clearer> directives expects a coderef and
-generates a clearer method. See the L<Moo> documentation for more details.
+This package supports the C<clr> and C<clearer> directives expects a C<1> or a
+method name of the clearer method. See the L<Moo> documentation for more
+details.
 
 =example has-clr
 
@@ -227,9 +228,9 @@ for more details.
 
 =scenario has-def
 
-This package supports the C<def> and C<default> directives expects a coderef and
-is used to build a default value if one is not provided to the constructor. See
-the L<Moo> documentation for more details.
+This package supports the C<def> and C<default> directives expects a
+non-reference or a coderef to be used to build a default value if one is not
+provided to the constructor. See the L<Moo> documentation for more details.
 
 =example has-def
 
@@ -383,9 +384,9 @@ new_{attribute}. This ability is not supported by the L<Moo> object superclass.
 
 =scenario has-pre
 
-This package supports the C<pre> and C<predicate> directives expects a coderef
-and generates a method for checking the existance of the attribute. See the
-L<Moo> documentation for more details.
+This package supports the C<pre> and C<predicate> directives expects a C<1> or
+a method name and generates a method for checking the existance of the
+attribute. See the L<Moo> documentation for more details.
 
 =example has-pre
 
@@ -433,9 +434,9 @@ L<Moo> documentation for more details.
 
 =scenario has-tgr
 
-This package supports the C<tgr> and C<trigger> directives expects a coderef and
-is executed whenever the attribute's value is changed. See the L<Moo>
-documentation for more details.
+This package supports the C<tgr> and C<trigger> directives expects a C<1> or a
+coderef and is executed whenever the attribute's value is changed. See the
+L<Moo> documentation for more details.
 
 =example has-tgr
 

@@ -1,3 +1,9 @@
+0.002   2020-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add methods: cd2, cwd2, ls2, mkdir2, rm2, showtree2 to manipulate
+	  the second tree.
+
+
 0.001   2020-02-13  Released-By: PERLANCAR
 
         - First release.

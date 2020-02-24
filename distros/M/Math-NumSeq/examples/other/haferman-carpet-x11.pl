@@ -38,7 +38,7 @@ use vars '%Keysyms';
 use X11::Keysyms '%Keysyms', qw(MISCELLANY LATIN1);
 
 use vars '$VERSION';
-$VERSION = 73;
+$VERSION = 74;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

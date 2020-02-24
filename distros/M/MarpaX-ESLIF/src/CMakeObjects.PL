@@ -1,7 +1,6 @@
 #!env perl
 use strict;
 use diagnostics;
-use Archive::Tar;
 use Config;
 use Config::AutoConf;
 use Config::AutoConf::INI;
@@ -12,6 +11,7 @@ use File::Find qw/find/;
 use File::Path qw/make_path/;
 use File::Copy qw/copy/;
 use File::Copy::Recursive qw/dircopy/;
+use File::Temp qw/tempfile/;
 use IPC::Run qw/run/;
 use Perl::OSType qw/is_os_type/;
 use POSIX qw/EXIT_SUCCESS strftime/;
@@ -72,8 +72,103 @@ my $config_h_in = File::Spec->catfile('include', 'config.h.in');
 my $config_h    = File::Spec->catfile('include', 'marpaESLIF', 'internal', 'config.h');
 make_path(dirname($config_h));
 
-Config::AutoConf::INI->new(logfile => 'config.log')->check;
-write_config($MARPAESLIF_VERSION, $MARPAESLIF_VERSION_MAJOR, $MARPAESLIF_VERSION_MINOR, $MARPAESLIF_VERSION_PATCH, $config_h_in, $config_h);
+{
+    my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
+    foreach (['double', ''], ['long double', 'L'], ['float', 'F']) {
+        my ($variable_type, $extension) = @{$_};
+        $ac->msg_checking("for working HUGE_VAL${extension}");
+        if (get_math_constant($variable_type, "HUGE_VAL${extension}")) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_HAVE_HUGE_VAL${extension}", 1);
+        } else {
+            $ac->msg_result('no');
+            $ac->msg_checking("for HUGE_VAL${extension} replacement");
+            if (get_math_constant($variable_type, "HUGE_VAL${extension}", '__builtin_huge_val' . lc($extension) . '()')) {
+                $ac->msg_result('yes');
+                $ac->define_var("C_HAVE_HUGE_VAL${extension}_REPLACEMENT", 1);
+            } else {
+                $ac->msg_result('no');
+            }
+        }
+    }
+
+    $ac->msg_checking("for working INFINITY");
+    if (get_math_constant('float', "INFINITY")) {
+        $ac->msg_result('yes');
+        $ac->define_var("C_HAVE_INFINITY", 1);
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_checking("for INFINITY replacement");
+        if (get_math_constant('float', "INFINITY", '__builtin_inff()')) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_HAVE_INFINITY_REPLACEMENT", 1);
+        } else {
+            $ac->msg_result('no');
+            $ac->msg_checking("for INFINITY replacement using division");
+            if (get_math_constant('float', "INFINITY", '1.0 / 0.0')) {
+                $ac->msg_result('yes');
+                $ac->define_var("C_HAVE_INFINITY_REPLACEMENT_USING_DIVISION", 1);
+            } else {
+                $ac->msg_result('no');
+            }
+        }
+    }
+
+    $ac->msg_checking("for working isinf()");
+    if (get_math_function('short', 'isinf', '(0.0)')) {
+        $ac->msg_result('yes');
+        $ac->define_var("C_HAVE_ISINF", 1);
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_checking("for isinf replacement");
+        if (get_math_function('short', 'isinf', '(0.0)', '__builtin_isinf')) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_HAVE_ISINF_REPLACEMENT", 1);
+        } else {
+            $ac->msg_result('no');
+        }
+    }
+
+    $ac->msg_checking("for working NAN");
+    if (get_math_constant('float', "NAN")) {
+        $ac->msg_result('yes');
+        $ac->define_var("C_HAVE_NAN", 1);
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_checking("for NAN replacement");
+        if (get_math_constant('float', "NAN", '__builtin_nanf("")')) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_HAVE_NAN_REPLACEMENT", 1);
+        } else {
+            $ac->msg_result('no');
+            $ac->msg_checking("for NAN replacement using division");
+            if (get_math_constant('float', "NAN", '0.0 / 0.0')) {
+                $ac->msg_result('yes');
+                $ac->define_var("C_HAVE_NAN_REPLACEMENT_USING_DIVISION", 1);
+            } else {
+                $ac->msg_result('no');
+            }
+        }
+    }
+
+    $ac->msg_checking("for isnan()");
+    if (get_math_function('short', 'isnan', '(0.0)')) {
+        $ac->msg_result('yes');
+        $ac->define_var("C_HAVE_ISNAN", 1);
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_checking("for isnan replacement");
+        if (get_math_function('short', 'isnan', '(0.0)', '__builtin_isnan')) {
+            $ac->msg_result('yes');
+            $ac->define_var("C_HAVE_ISNAN_REPLACEMENT", 1);
+        } else {
+            $ac->msg_result('no');
+        }
+    }
+
+    $ac->check;
+    write_config($MARPAESLIF_VERSION, $MARPAESLIF_VERSION_MAJOR, $MARPAESLIF_VERSION_MINOR, $MARPAESLIF_VERSION_PATCH, $config_h_in, $config_h);
+}
 # -------------
 # Fake export.h
 # -------------
@@ -87,21 +182,11 @@ close($fh) || warn "Cannot close $export_h, $!";
 my @additional_includes = ();
 my @additional_srcdir = ();
 
-# ----------------------------------------------------------------------
-# We provide ourself PCRE2 that is a special beast, compiled stand-alone
-# ----------------------------------------------------------------------
-make_path(File::Spec->catdir('output', '3rdparty'));
+# ------------------------
+# We provide ourself PCRE2
+# ------------------------
 {
-    local $CWD = File::Spec->catdir('output', '3rdparty');
-    my $pcre2_tar = File::Spec->catfile(File::Spec->updir, File::Spec->updir, '3rdparty', 'tar', 'pcre2-10.23-patched.tar.gz');
-    print "... Extracting pcre2\n";
-    my $tar=Archive::Tar->new();
-    $tar->read($pcre2_tar);
-    $tar->extract();
-    undef $tar;
-}
-{
-    local $CWD = File::Spec->catdir('output', '3rdparty', 'pcre2-10.23');
+    local $CWD = File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.23');
     print "... Compiling pcre2\n";
     my $fh;
     open($fh, '>', 'config_autoconf.ini') || die "Cannot open config_autoconf.ini, $!";
@@ -127,8 +212,14 @@ AUTOCONF
     close($fh) || warn "Cannot close config_autoconf.ini, $!";
     my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
     $ac->define_var('SUPPORT_PCRE2_8', 1);
-    $ac->define_var('SUPPORT_UNICODE', 1);
-    $ac->define_var('EBCDIC', 1) if $Config{ebcdic};
+    #
+    # SUPPORT_UNICODE and EBCDIC are not compatible
+    #
+    if ($Config{ebcdic}) {
+        $ac->define_var('EBCDIC', 1);
+    } else {
+        $ac->define_var('SUPPORT_UNICODE', 1);
+    }
     $ac->define_var('LINK_SIZE', 2);
     $ac->define_var('MATCH_LIMIT', 10000000);
     $ac->define_var('MATCH_LIMIT_RECURSION', 10000000);
@@ -191,7 +282,7 @@ AUTOCONF
 	);
   }
 }
-push(@additional_includes, File::Spec->catdir('output', '3rdparty', 'pcre2-10.23'));
+push(@additional_includes, File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.23'));
 
 # -------------------------------------------
 # marpaESLIF embeds my unpanic version of lua
@@ -345,6 +436,147 @@ typedef unsigned int marpaESLIF_uint32_t;
 #  endif
 #endif
 
+#ifdef C_HAVE_HUGE_VAL_REPLACEMENT
+# define C_HUGE_VAL_REPLACEMENT
+#endif
+#ifdef C_HAVE_HUGE_VAL
+# define C_HUGE_VAL HUGE_VAL
+#endif
+
+#ifdef C_HAVE_HUGE_VALF_REPLACEMENT
+# define C_HUGE_VALF_REPLACEMENT
+#endif
+#ifdef C_HAVE_HUGE_VALF
+# define C_HUGE_VALF HUGE_VALF
+#endif
+
+#ifdef C_HAVE_HUGE_VALL_REPLACEMENT
+# define C_HUGE_VALL_REPLACEMENT
+#endif
+#ifdef C_HAVE_HUGE_VALL
+# define C_HUGE_VALL HUGE_VALL
+#endif
+
+#ifdef C_HAVE_INFINITY_REPLACEMENT_USING_DIVISION
+#define C_INFINITY_REPLACEMENT_USING_DIVISION
+#endif
+#ifdef C_HAVE_INFINITY_REPLACEMENT
+# define C_INFINITY_REPLACEMENT
+#endif
+#ifdef C_HAVE_INFINITY
+# define C_INFINITY INFINITY
+#endif
+
+#ifdef C_HAVE_NAN_REPLACEMENT_USING_DIVISION
+#define C_NAN_REPLACEMENT_USING_DIVISION
+#endif
+#ifdef C_HAVE_NAN_REPLACEMENT
+# define C_NAN_REPLACEMENT
+#endif
+#ifdef C_HAVE_NAN
+# define C_NAN NAN
+#endif
+
+#ifdef C_HAVE_NAN_REPLACEMENT
+# define C_NAN_REPLACEMENT
+#endif
+#ifdef C_HAVE_NAN
+# define C_NAN NAN
+#endif
+
+#ifdef C_HAVE_ISINF_REPLACEMENT
+#  define C_ISINF_REPLACEMENT
+#endif
+#ifdef C_HAVE_ISINF
+#  define C_ISINF isinf
+#endif
+
+#ifdef C_HAVE_ISNAN_REPLACEMENT
+#  define C_ISNAN_REPLACEMENT
+#endif
+#ifdef C_HAVE_ISNAN
+#  define C_ISNAN isnan
+#endif
+
+#ifdef HAVE_FPCLASSIFY
+#  define C_FPCLASSIFY fpclassify
+#else
+#  ifdef HAVE__FPCLASSIFY
+#    define C_FPCLASSIFY _fpclassify
+#  else
+#    ifdef HAVE___FPCLASSIFY
+#      define C_FPCLASSIFY __fpclassify
+#    else
+#      ifdef HAVE_FPCLASS
+#        define C_FPCLASSIFY fpclass
+#      else
+#        ifdef HAVE__FPCLASS
+#          define C_FPCLASSIFY _fpclass
+#        else
+#          ifdef HAVE___FPCLASS
+#            define C_FPCLASSIFY __fpclass
+#          else
+#          endif
+#        endif
+#      endif
+#    endif
+#  endif
+#endif
+#ifdef HAVE_FP_NAN
+#  define C_FP_NAN FP_NAN
+#endif
+#ifdef HAVE__FPCLASS_SNAN
+#  define C__FPCLASS_SNAN _FPCLASS_SNAN
+#endif
+#ifdef HAVE__FPCLASS_QNAN
+#  define C__FPCLASS_QNAN _FPCLASS_QNAN
+#endif
+#ifdef HAVE_FP_INFINITE
+#  define C_FP_INFINITE FP_INFINITE
+#endif
+#ifdef HAVE__FPCLASS_NINF
+#  define C__FPCLASS_NINF _FPCLASS_NINF
+#endif
+#ifdef HAVE__FPCLASS_PINF
+#  define C__FPCLASS_PINF _FPCLASS_PINF
+#endif
+
+#ifdef HAVE_STRTOLD
+#  define C_STRTOLD strtold
+#else
+#  ifdef HAVE__STRTOLD
+#    define C_STRTOLD _strtold
+#  else
+#    ifdef HAVE___STRTOLD
+#      define C_STRTOLD __strtold
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_STRTOD
+#  define C_STRTOD strtod
+#else
+#  ifdef HAVE__STRTOD
+#    define C_STRTOD _strtod
+#  else
+#    ifdef HAVE___STRTOD
+#      define C_STRTOD __strtod
+#    endif
+#  endif
+#endif
+
+#ifdef HAVE_STRTOF
+#  define C_STRTOF strtof
+#else
+#  ifdef HAVE__STRTOF
+#    define C_STRTOF _strtof
+#  else
+#    ifdef HAVE___STRTOF
+#      define C_STRTOF __strtof
+#    endif
+#  endif
+#endif
+
 #endif /* MARPAESLIF_CONFIG_WRAPPER_H */
 CONFIG
     close($fh) || warn "Cannot close $output, $!";
@@ -360,7 +592,7 @@ sub try_compile {
     my $rc = 0;
 
     try {
-        my $cbuilder = ExtUtils::CBuilder->new();
+        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
         my $obj = basename($cbuilder->object_file($source));
         $cbuilder->compile(
             source               => $source,
@@ -370,6 +602,107 @@ sub try_compile {
         $rc = 1;
     };
     unlink $fh->filename;
+
+    return $rc;
+}
+
+sub get_math_constant {
+    my ($variable_type, $constant, $constant_replacement_value) = @_;
+
+    my $CONSTANT = uc($constant);
+    $constant = lc($constant);
+    my $extra_compiler_flags = " -DC_${CONSTANT}=${CONSTANT}";
+    if (defined($constant_replacement_value)) {
+        $extra_compiler_flags   .= " -DHAVE_${CONSTANT}_REPLACEMENT";
+    } else {
+        $constant_replacement_value = 'UNDEFINED';
+    }
+
+    my $source .= "
+#include <math.h>
+#ifdef HAVE_${CONSTANT}_REPLACEMENT
+#  undef ${CONSTANT}
+#  define ${CONSTANT} ($constant_replacement_value)
+#endif
+int main() {
+  ${variable_type} x = C_${CONSTANT};
+  return 0;
+}
+";
+    my $rc =  eval {
+        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+        my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
+        print $fh $source;
+        close($fh) || warn "Cannot close $filename, $!";
+
+        my $obj = $cbuilder->object_file($filename);
+        $cbuilder->compile(
+            source        => $filename,
+            extra_compiler_flags => $extra_compiler_flags,
+            object_file   => $obj,
+            'C++'         => 0
+            );
+        $cbuilder->link_executable(
+            module_name => 'ICONV::TEST',
+            objects => $obj
+            );
+        system($cbuilder->exe_file($obj), 'unused', 'parameter');
+        my $exitcode =  $? >> 8;
+        unlink $cbuilder->exe_file($obj);
+        unlink $obj;
+        unlink $filename;
+        $exitcode ? 0 : 1;
+    } // 0;
+
+    print $@ if $@;
+
+    return $rc;
+}
+
+sub get_math_function {
+    my ($variable_type, $function, $function_parameters, $replacement) = @_;
+
+    $replacement //= '';
+    my $FUNCTION = uc($function);
+    my $extra_compiler_flags = $replacement ? " -DHAVE_${FUNCTION}_REPLACEMENT=1" : " -DC_${FUNCTION}=${function}";
+
+    my $source .= "
+#include <math.h>
+#ifdef HAVE_${FUNCTION}_REPLACEMENT
+#  undef C_${FUNCTION}
+#  define C_${FUNCTION}(x) (${replacement}(x))
+#endif
+int main() {
+  ${variable_type} x = C_${FUNCTION}${function_parameters};
+  return 0;
+}
+";
+    my $rc =  eval {
+        my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
+        my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
+        print $fh $source;
+        close($fh) || warn "Cannot close $filename, $!";
+
+        my $obj = $cbuilder->object_file($filename);
+        $cbuilder->compile(
+            source        => $filename,
+            extra_compiler_flags => $extra_compiler_flags,
+            object_file   => $obj,
+            'C++'         => 0
+            );
+        $cbuilder->link_executable(
+            module_name => 'ICONV::TEST',
+            objects => $obj
+            );
+        system($cbuilder->exe_file($obj), 'unused', 'parameter');
+        my $exitcode =  $? >> 8;
+        unlink $cbuilder->exe_file($obj);
+        unlink $obj;
+        unlink $filename;
+        $exitcode ? 0 : 1;
+    } // 0;
+
+    print $@ if $@;
 
     return $rc;
 }

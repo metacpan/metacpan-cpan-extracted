@@ -33,7 +33,7 @@ use Math::NumSeq::DeletablePrimes;
 # VERSION
 
 {
-  my $want_version = 73;
+  my $want_version = 74;
   ok ($Math::NumSeq::DeletablePrimes::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::DeletablePrimes->VERSION,  $want_version,

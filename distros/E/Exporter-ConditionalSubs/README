@@ -1,82 +1,183 @@
-Exporter-ConditionalSubs
+NAME
 
-Allows subroutines to be conditionally exported.  If the condition
-is satisfied, the subroutine will be exported as usual.  But if not,
-the subroutine will be replaced with a stub that gets optimized away
-by the compiler.  When stubbed out, not even the arguments to the
-subroutine will get evaluated.
+    Exporter::ConditionalSubs
 
-This allows for e.g. assertion-like behavior, where subroutine calls
-can be left in the code but effectively ignored under certain conditions.
+VERSION
 
-INSTALLATION
+    version v1.10.1
 
-To install this module, run the following commands:
+SYNOPSIS
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+    Allows subroutines to be conditionally exported. If the condition is
+    satisfied, the subroutine will be exported as usual. But if not, the
+    subroutine will be replaced with a stub that gets optimized away by the
+    compiler. When stubbed out, not even the arguments to the subroutine
+    will get evaluated.
 
-SUPPORT AND DOCUMENTATION
+    This allows for e.g. assertion-like behavior, where subroutine calls
+    can be left in the code but effectively ignored under certain
+    conditions.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+    First create a module that ISA Exporter::ConditionalSubs:
 
-    perldoc Exporter::ConditionalSubs
+        package My::Assertions;
+    
+        require Exporter::ConditionalSubs;
+        our @ISA = qw( Exporter::ConditionalSubs );
+    
+        our @EXPORT    = ();
+        our @EXPORT_OK = qw( _assert_non_empty );
+    
+        sub _assert_non_empty
+        {
+            carp "Found empty value" unless length(shift // '') > 0;
+        }
 
-You can also look for information at:
+    Then, specify an -if or -unless condition when useing that module:
 
-    GitHub
-        https://github.com/GrantStreetGroup/Exporter-ConditionalSubs
+        package My::App;
+    
+        use My::Assertions qw( _assert_non_empty ), -if => $ENV{DEBUG};
+    
+        use My::MoreAssertions -unless => $ENV{RUNTIME} eq 'prod';
+    
+        # Coderefs work too:
+        use My::OtherAssertions -if => sub { ... some logic ... };
+    
+        _assert_non_empty($foo);    # this subroutine call might be a no-op
 
-    MetaCPAN
-        https://metacpan.org/pod/Exporter::ConditionalSubs
+    This is a subclass of Exporter and works just like it, with the
+    addition of support for the -if and -unless import arguments.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Exporter-ConditionalSubs
+NAME
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Exporter-ConditionalSubs
+    Exporter::ConditionalSubs - Conditionally export subroutines
 
+VERSION
+
+    Version 1.01
+
+SUBROUTINES
+
+ import
+
+    Works like the Exporter import() function, except that it checks for an
+    optional -if or -unless import arg, followed by either a boolean, or a
+    coderef that returns true/false.
+
+    If the condition evaluates to true for -if, or false for -unless, then
+    any subs are exported as-is. Otherwise, any subs in @EXPORT_OK are
+    replaced with stubs that get optimized away by the compiler.
+
+    You can specify either -if or -unless, but not both. Croaks if both are
+    specified, or if you specify the same option more than once.
+
+SEE ALSO
+
+    Exporter
+
+    B::CallChecker
+
+    B::Generate
+
+AUTHOR
+
+    Larry Leszczynski, <larryl at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests at:
+    https://github.com/GrantStreetGroup/Exporter-ConditionalSubs
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Exporter::ConditionalSubs
+
+    You can also look for information at:
+
+      * GitHub
+
+      https://github.com/GrantStreetGroup/Exporter-ConditionalSubs
+
+      * MetaCPAN
+
+      https://metacpan.org/pod/Exporter::ConditionalSubs
+
+      * AnnoCPAN, Annotated CPAN documentation
+
+      http://annocpan.org/dist/Exporter-ConditionalSubs
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Exporter-ConditionalSubs
+
+AUTHOR
+
+    Larry Leszczynski, <larryl at cpan.org>
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Grant Street Group http://www.grantstreet.com for funding
+    development of this code.
+
+    Thanks to Tom Christiansen (<tchrist@perl.com>) for help with the
+    symbol table hackery.
+
+    Thanks to Zefram (<zefram@fysh.org>) for the pointer to his Debug::Show
+    hackery.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Grant Street Group
+    Copyright 2015 Grant Street Group
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+    http://www.perlfoundation.org/artistic_license_2_0
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+AUTHOR
+
+    Grant Street Group <developers@grantstreet.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 - 2020 by Grant Street Group.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

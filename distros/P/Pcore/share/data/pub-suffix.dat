@@ -28,7 +28,6 @@
 *.er;*.er
 *.ex.futurecms.at;*.ex.futurecms.at
 *.ex.ortsinfo.at;*.ex.ortsinfo.at
-*.fj;*.fj
 *.fk;*.fk
 *.futurecms.at;*.futurecms.at
 *.hosting.myjino.ru;*.hosting.myjino.ru
@@ -148,6 +147,7 @@ ac.ci;ac.ci
 ac.cn;ac.cn
 ac.cr;ac.cr
 ac.cy;ac.cy
+ac.fj;ac.fj
 ac.gn;ac.gn
 ac.gov.br;ac.gov.br
 ac.id;ac.id
@@ -812,6 +812,7 @@ biz.bb;biz.bb
 biz.cy;biz.cy
 biz.dk;biz.dk
 biz.et;biz.et
+biz.fj;biz.fj
 biz.gl;biz.gl
 biz.id;biz.id
 biz.ki;biz.ki
@@ -1536,6 +1537,7 @@ com.ee;com.ee
 com.eg;com.eg
 com.es;com.es
 com.et;com.et
+com.fj;com.fj
 com.fr;com.fr
 com.ge;com.ge
 com.gh;com.gh
@@ -2922,6 +2924,7 @@ gov.ec;gov.ec
 gov.ee;gov.ee
 gov.eg;gov.eg
 gov.et;gov.et
+gov.fj;gov.fj
 gov.ge;gov.ge
 gov.gh;gov.gh
 gov.gi;gov.gi
@@ -3584,6 +3587,7 @@ info.co;info.co
 info.cx;info.cx
 info.ec;info.ec
 info.et;info.et
+info.fj;info.fj
 info.gu;info.gu
 info.ht;info.ht
 info.hu;info.hu
@@ -4900,6 +4904,7 @@ mil.co;mil.co
 mil.do;mil.do
 mil.ec;mil.ec
 mil.eg;mil.eg
+mil.fj;mil.fj
 mil.ge;mil.ge
 mil.gh;mil.gh
 mil.gt;mil.gt
@@ -5320,6 +5325,7 @@ name.az;name.az
 name.cy;name.cy
 name.eg;name.eg
 name.et;name.et
+name.fj;name.fj
 name.hr;name.hr
 name.jo;name.jo
 name.mk;name.mk
@@ -5457,6 +5463,7 @@ net.ec;net.ec
 net.eg;net.eg
 net.et;net.et
 net.eu.org;net.eu.org
+net.fj;net.fj
 net.ge;net.ge
 net.gg;net.gg
 net.gl;net.gl
@@ -6058,6 +6065,7 @@ org.ee;org.ee
 org.eg;org.eg
 org.es;org.es
 org.et;org.et
+org.fj;org.fj
 org.ge;org.ge
 org.gg;org.gg
 org.gh;org.gh
@@ -6490,6 +6498,7 @@ pro.az;pro.az
 pro.br;pro.br
 pro.cy;pro.cy
 pro.ec;pro.ec
+pro.fj;pro.fj
 pro.ht;pro.ht
 pro.mv;pro.mv
 pro.na;pro.na

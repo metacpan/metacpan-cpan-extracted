@@ -499,7 +499,7 @@ SKIP: {
 			ok(defined $new2->pos_y() && $new2->pos_y() == $new->pos_y(), "Window has a Y position of " . $new->pos_y());
 		}
 		TODO: {
-			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : q[];
+			local $TODO = $major_version >= 60 && $^O eq 'darwin' ? "darwin has dodgy support for \$firefox->window_rect()->width()" : $^O eq 'MSWin32' && $firefox->nightly() ? "Nightly returns incorrect values for \$firefox->window_rect()->width()" : q[];
 			ok($new2->width() == $new->width(), "Window has a width of " . $new->width() . ":" . $new2->width());
 		}
 		ok($new2->height() == $new->height(), "Window has a height of " . $new->height());
@@ -561,7 +561,8 @@ $profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0);
 $profile->set_value('distribution.fedora.bookmarksProcessed', 'false', 0); 
 $profile->set_value('startup.homepage_welcome_url', 'false', 0); 
 
-if ($ENV{RELEASE_TESTING}) {
+if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+} elsif ($ENV{RELEASE_TESTING}) {
 	eval {
 		$ca_cert_handle = File::Temp::tempfile(File::Spec->catfile(File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Carp::croak("Failed to open temporary file for writing:$!");
 		fcntl $ca_cert_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
@@ -863,11 +864,11 @@ SKIP: {
 		}
 		defined $result or die "Failed to read from File::Temp handle:$!";
 		close $handle or die "Failed to close File::Temp handle:$!";
-		diag("Window:Print command is supported for " . $capabilities->browser_version());
+		diag("WebDriver:Print command is supported for " . $capabilities->browser_version());
 		1;
 	} or do {
-		diag("Window:Print command is not supported for " . $capabilities->browser_version());
-		skip("Window:Print command is not supported for " . $capabilities->browser_version(), 2);
+		diag("WebDriver:Print command is not supported for " . $capabilities->browser_version());
+		skip("WebDriver:Print command is not supported for " . $capabilities->browser_version(), 2);
 	};
 	ok($raw_pdf =~ /^%PDF\-\d+[.]\d+/smx, "PDF is produced in file handle for pdf method");
 	eval { require PDF::API2; } or do {
@@ -881,18 +882,18 @@ SKIP: {
 	my ($llx, $lly, $urx, $ury) = $page->mediabox();
 	ok($urx == 612 && $ury == 792, "Correct page height ($ury) and width ($urx)");
 	if ($ENV{RELEASE_TESTING}) {
-		$raw_pdf = $firefox->pdf(raw => 1, landscape => 0, page => { width => 7, height => 12 });
+		$raw_pdf = $firefox->pdf(raw => 1, printBackground => 1, landscape => 0, page => { width => 7, height => 12 });
 		$pdf = PDF::API2->open_scalar($raw_pdf);
 		$page = $pdf->openpage(0);
 		($llx, $lly, $urx, $ury) = $page->mediabox();
 		ok(centimetres_to_points(7) == $urx && centimetres_to_points(12) == $ury, "Correct page height of " . centimetres_to_points(12) . " (was actually $ury) and width " . centimetres_to_points(7) . " (was actually $urx)");
-		$raw_pdf = $firefox->pdf(raw => 1, landscape => 1, page => { width => 7, height => 12 });
+		$raw_pdf = $firefox->pdf(raw => 1, shrinkToFit => 1, landscape => 1, page => { width => 7, height => 12 });
 		$pdf = PDF::API2->open_scalar($raw_pdf);
 		$page = $pdf->openpage(0);
 		($llx, $lly, $urx, $ury) = $page->mediabox();
 		ok(centimetres_to_points(12) == $urx && centimetres_to_points(7) == $ury, "Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
 		foreach my $paper_size ($firefox->paper_sizes()) {
-			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size);
+			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, print_background => 1, shrink_to_fit => 1);
 			$pdf = PDF::API2->open_scalar($raw_pdf);
 			$page = $pdf->openpage(0);
 			($llx, $lly, $urx, $ury) = $page->mediabox();
@@ -930,6 +931,12 @@ SKIP: {
 			chomp $@;
 		};
 		ok($result == 0, "Correctly throws exception for unknown page key:$@");
+		$result = undef;
+		eval { $firefox->pdf(foo => 'bar'); $result = 1; } or do {
+			$result = 0;
+			chomp $@;
+		};
+		ok($result == 0, "Correctly throws exception for unknown pdf key:$@");
 	}
 }
 
@@ -1699,7 +1706,7 @@ SKIP: {
 					||
 					(($major_version > $min_major)))
 			{
-				my $max_version = '72.0.2'; # known bad version
+				my $max_version = '73.0.1'; # known bad version
 				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
 				if ((($major_version == $max_major)
 						&& (defined $minor_version)
@@ -1719,6 +1726,8 @@ SKIP: {
 						||
 						(($major_version < $max_major)))
 				{
+					$firefox->downloads();
+					$firefox->downloading();
 					skip("Firefox $major_version.$minor_version.$patch_version crashes when downloading without xvfb", 5);
 				}
 			}
@@ -1857,27 +1866,61 @@ SKIP: {
 	my $exception = "$@";
 	chomp $exception;
 	ok($@, "Dismiss non-existant alert caused an exception to be thrown:$exception");
-	my $install_id;
-	my $install_path = Cwd::abs_path("t/addons/test.xpi");
-	if ($^O eq 'cygwin') {
-		$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
-	} elsif ($^O eq 'MSWin32') {
-		$install_path =~ s/\//\\/smxg;
-	}
-	diag("Installing extension from $install_path");
-	eval {
-		$install_id = $firefox->install($install_path, 1);
-	};
-	SKIP: {	
-		my $exception = "$@";
-		chomp $exception;
-		if ((!$install_id) && ($major_version < 52)) {
-			skip("addon:install may not be supported in firefox versions less than 52:$exception", 2);
+	$count = 0;
+	foreach my $path (qw(t/addons/test.xpi t/addons/discogs-search t/addons/discogs-search/manifest.json t/addons/discogs-search/)) {
+		$count += 1;
+		if ($major_version < 56) {
+			if ($path =~ /discogs/) {
+				next;
+			}
 		}
-		ok($install_id, "Successfully installed an extension:$install_id");
-		ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
+		my $install_id;
+		my $install_path = Cwd::abs_path($path);
+		if ($^O eq 'cygwin') {
+			$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
+		} elsif ($^O eq 'MSWin32') {
+			$install_path =~ s/\//\\/smxg;
+		}
+		diag("Installing extension from $install_path");
+		my $temporary = 1;
+		if ($firefox->nightly()) {
+			$temporary = $count % 2 ? 1 : 0;
+		}
+		eval {
+			$install_id = $firefox->install($install_path, $temporary);
+		};
+		SKIP: {	
+			my $exception = "$@";
+			chomp $exception;
+			if ((!$install_id) && ($major_version < 52)) {
+				skip("addon:install may not be supported in firefox versions less than 52:$exception", 2);
+			}
+			ok($install_id, "Successfully installed an extension:$install_id");
+			ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
+		}
+		$result = undef;
+		$install_id = undef;
+		$install_path = $path;
+		if ($^O eq 'cygwin') {
+			$install_path = $firefox->execute( 'cygpath', '-s', '-w', $install_path );
+		} elsif ($^O eq 'MSWin32') {
+			$install_path =~ s/\//\\/smxg;
+		}
+		diag("Installing extension from $install_path");
+		eval {
+			$install_id = $firefox->install($install_path, $temporary);
+		};
+		SKIP: {	
+			my $exception = "$@";
+			chomp $exception;
+			if ((!$install_id) && ($major_version < 52)) {
+				skip("addon:install may not be supported in firefox versions less than 52:$exception", 2);
+			}
+			ok($install_id, "Successfully installed an extension:$install_id");
+			ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
+		}
+		$result = undef;
 	}
-	$result = undef;
 	eval {
 		$result = $firefox->accept_connections(0);
 	};

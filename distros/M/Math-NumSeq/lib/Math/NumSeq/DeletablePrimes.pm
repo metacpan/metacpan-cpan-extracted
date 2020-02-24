@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016, 2018 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use strict;
 use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 
 use vars '$VERSION', '@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 use Math::NumSeq::Primes;

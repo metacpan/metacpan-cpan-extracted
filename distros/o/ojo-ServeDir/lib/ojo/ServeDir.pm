@@ -1,16 +1,13 @@
 package ojo::ServeDir;
 
-use 5.020;
 use strict;
 use warnings FATAL => 'all';
+use ojo::ServeDir::App;
 
-use ojo;
-
-our $VERSION = '0.02';
+our $VERSION = '0.11';
 
 sub import {
-    push @{app->static->paths}, app->home->rel_file('.');
-    app->start('daemon');
+    ojo::ServeDir::App->new->start('daemon');
 }
 
 1;
@@ -23,11 +20,19 @@ ojo::ServeDir - Helper module to serve local files
 
 =head1 VERSION
 
-Version 0.01
+Version 0.1
 
 =head1 SYNOPSIS
 
+Module import interface:
+
     $ perl -Mojo::ServeDir
+
+Command interface:
+
+    $ serve_dir DIRECTORY_NAME OPTIONS
+
+The directory name is optional (default is the current working directory), options go directly to Mojo's C<daemon> command.
 
 =head1 CONTRIBUTORS
 
@@ -43,6 +48,6 @@ Mirko Westermeier, C<< <mirko at westermeier.de> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by Mirko Westermeier.
+This software is Copyright (c) by Mirko Westermeier.
 
 Released under the MIT (X11) license. See LICENSE for details.

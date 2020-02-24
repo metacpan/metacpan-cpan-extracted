@@ -1,10 +1,10 @@
 {
    "abstract" : "Conditionally export subroutines",
    "author" : [
-      "Larry Leszczynski <larryl@cpan.org>"
+      "Grant Street Group <developers@grantstreet.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -14,37 +14,59 @@
    },
    "name" : "Exporter-ConditionalSubs",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "7.1101"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::GSG" : "0",
+            "Pod::Coverage" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "B" : "0",
             "B::CallChecker" : "0",
-            "B::Generate" : "0",
-            "Carp" : "0",
-            "Exporter" : "0"
+            "B::Generate" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Exporter::ConditionalSubs" : {
          "file" : "lib/Exporter/ConditionalSubs.pm",
-         "version" : "1.01"
+         "version" : "v1.10.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
-      ]
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/Exporter-ConditionalSubs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/GrantStreetGroup/Exporter-ConditionalSubs.git",
+         "web" : "https://github.com/GrantStreetGroup/Exporter-ConditionalSubs"
+      }
    },
-   "version" : "1.01"
+   "version" : "v1.10.1",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.04",
+   "x_static_install" : 1
 }
+

@@ -135,8 +135,8 @@ use Promise::ES6;
 
             is(
                 $finally_wantarray,
-                undef,
-                'finally() callback runs in void context',
+                q<>,
+                'finally() callback runs in scalar context',
             );
 
             cmp_deeply(
@@ -185,6 +185,30 @@ use Promise::ES6;
                 \@warnings,
                 [ re( qr<1234> ) ],
                 'finally() shoots out a warning',
+            ) or diag explain \@warnings;
+        },
+
+        sub {
+            {
+                my $p = Promise::ES6->resolve(1)->then( sub { Promise::ES6->reject(789) } );
+            }
+
+            cmp_deeply(
+                \@warnings,
+                [ re( qr<789> ) ],
+                'then() shoots out a warning from a returned rejection',
+            );
+        },
+
+        sub {
+            {
+                my $p = Promise::ES6->resolve(1)->finally( sub { Promise::ES6->reject(789) } );
+            }
+
+            cmp_deeply(
+                \@warnings,
+                [ re( qr<789> ) ],
+                'finally() shoots out a warning from a returned rejection',
             );
         },
     );

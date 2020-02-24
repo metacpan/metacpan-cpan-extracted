@@ -1,9 +1,9 @@
 package Tree::FSMethods;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-13'; # DATE
+our $DATE = '2020-02-23'; # DATE
 our $DIST = 'Tree-FSMethods'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -189,10 +189,10 @@ sub cd {
     $self->_cd(1, $path_wildcard);
 }
 
-#sub cd2 {
-#    my ($self, $path_wildcard) = @_;
-#    $self->_cd(2, $path_wildcard);
-#}
+sub cd2 {
+    my ($self, $path_wildcard) = @_;
+    $self->_cd(2, $path_wildcard);
+}
 
 sub _ls {
     my ($self, $which_obj, $path_wildcard) = @_;
@@ -216,12 +216,12 @@ sub ls {
     $self->_ls(1, $path_wildcard);
 }
 
-#sub ls2 {
-#    my ($self, $path_wildcard) = @_;
-#    $self->_ls(2, $path_wildcard);
-#}
+sub ls2 {
+    my ($self, $path_wildcard) = @_;
+    $self->_ls(2, $path_wildcard);
+}
 
-sub _showtree {
+sub _showtree0 {
     require Tree::Object::Hash;
 
     my ($self, $path, $node) = @_;
@@ -236,29 +236,31 @@ sub _showtree {
         push @children, $child;
         local $self->{_curnode} = $entry->{node};
         local $self->{_curpath} = Path::Naive::concat_path($self->{_curpath}, $entry->{name});
-        $self->_showtree("$path/$entry->{name}", $child);
+        $self->_showtree0("$path/$entry->{name}", $child);
     }
     $node->children(\@children);
     $node;
 }
 
-sub showtree {
+sub _showtree {
     require Tree::Object::Hash;
 
     my $self = shift;
+    my $which_obj = shift;
     my $starting_path = shift // '.';
 
-    my $save_curnode = $self->{_curnode};
-    my $save_curpath = $self->{_curpath};
-    $self->cd($starting_path);
+    my $tree;
+    {
+        local $self->{_curnode} = $which_obj == 1 ? $self->{_curnode} : $self->{_curnode2};
+        local $self->{_curpath} = $which_obj == 1 ? $self->{_curpath} : $self->{_curpath2};
 
-    my $node = Tree::Object::Hash->new;
-    $node->{filename} = $starting_path;
+        $self->cd($starting_path);
 
-    my $tree = $self->_showtree($starting_path, $node);
+        my $node = Tree::Object::Hash->new;
+        $node->{filename} = $starting_path;
 
-    $self->{_curnode} = $save_curnode;
-    $self->{_curpath} = $save_curpath;
+        $tree = $self->_showtree0($starting_path, $node);
+    }
 
     require Tree::ToTextLines;
     Tree::ToTextLines::render_tree_as_text({
@@ -270,18 +272,20 @@ sub showtree {
     }, $tree);
 }
 
-#sub get {
-#    my $self = shift;
-#    my $path = shift;
-#
-#    my ($node, undef) = $self->cd($path);
-#    $node;
-#}
+sub showtree {
+    my $self = shift;
+    $self->_showtree(1, @_);
+}
+
+sub showtree2 {
+    my $self = shift;
+    $self->_showtree(2, @_);
+}
 
 sub _cwd {
     my $self = shift;
-    my $which = shift;
-    $which == 1 ? $self->{_curpath} : $self->{_curpath2};
+    my $which_obj = shift;
+    $which_obj == 1 ? $self->{_curpath} : $self->{_curpath2};
 }
 
 sub cwd {
@@ -289,10 +293,10 @@ sub cwd {
     $self->_cwd(1);
 }
 
-#sub cwd2 {
-#    my $self = shift;
-#    $self->_cwd(2);
-#}
+sub cwd2 {
+    my $self = shift;
+    $self->_cwd(2);
+}
 
 sub _cp_or_mv {
     my $self = shift;
@@ -363,21 +367,29 @@ sub mv {
     $self->_cp_or_mv('mv', @_);
 }
 
-sub rm {
+sub _rm {
     my $self = shift;
+    my $which_obj = shift;
     my $path_wildcard = shift;
 
-    length($path_wildcard) or die "rm: Please specify path";
-    $self->{_curnode}      or die "rm: Please load tree first";
-
     my ($path_exists, @entries) =
-        $self->_traverse(1, $path_wildcard);
+        $self->_traverse($which_obj, $path_wildcard);
     die "rm: No such path '$path_wildcard'" unless $path_exists;
     die "rm: No matching files for '$path_wildcard'" unless @entries;
 
     for my $entry (@entries) {
         Code::Includable::Tree::NodeMethods::remove($entry->{node});
     }
+}
+
+sub rm {
+    my $self = shift;
+    $self->_rm(1, @_);
+}
+
+sub rm2 {
+    my $self = shift;
+    $self->_rm(2, @_);
 }
 
 sub _mkdir {
@@ -439,6 +451,11 @@ sub mkdir {
     $self->_mkdir(1, @_);
 }
 
+sub mkdir2 {
+    my $self = shift;
+    $self->_mkdir(2, @_);
+}
+
 1;
 # ABSTRACT: Perform filesystem-like operations on object tree(s)
 
@@ -454,7 +471,7 @@ Tree::FSMethods - Perform filesystem-like operations on object tree(s)
 
 =head1 VERSION
 
-This document describes version 0.001 of Tree::FSMethods (from Perl distribution Tree-FSMethods), released on 2020-02-13.
+This document describes version 0.002 of Tree::FSMethods (from Perl distribution Tree-FSMethods), released on 2020-02-23.
 
 =head1 SYNOPSIS
 
@@ -538,6 +555,10 @@ Usage:
 
 Change working directory. Dies on failure.
 
+=head2 cd2
+
+Just like L</cd> but for the second tree (C<tree2>).
+
 =head2 cwd
 
 Usage:
@@ -546,6 +567,10 @@ Usage:
 
 Return current working directory.
 
+=head2 cwd2
+
+Just like L</cwd> but for the second tree (C<tree2>).
+
 =head2 ls
 
 Usage:
@@ -553,6 +578,10 @@ Usage:
  my %res = $fs->ls( [ $path_wildcard, ... ]);
 
 Dies on failure (e.g. can't cd to specified path).
+
+=head2 ls2
+
+Just like L</ls> but for the second tree (C<tree2>).
 
 =head2 cp
 
@@ -576,6 +605,22 @@ Usage:
 
  $fs->mkdir([ \%opts, ] $path);
 
+Options:
+
+=over
+
+=item * parents
+
+Boolean. Just like the same --parents (-p) option in the Unix utility. If set to
+true, will create intermediate parents as necessary, and will not report error
+when the directory already exists.
+
+=back
+
+=head2 mkdir2
+
+Just like L</mkdir> but for the second tree (C<tree2>).
+
 =head2 mv
 
 Usage:
@@ -590,6 +635,10 @@ Dies on failure (e.g. can't find source or target path).
 Usage:
 
  $fs->rm($path_wildcard);
+
+=head2 rm2
+
+Just like L</rm> but for the second tree (C<tree2>).
 
 =head2 showtree
 
@@ -607,6 +656,10 @@ Like the DOS tree command, will return a visual representation of the
  |   |-- file5
  |   \-- file6
  \-- file7
+
+=head2 showtree2
+
+Just like L</showtree> but for the second tree (C<tree2>).
 
 =head1 HOMEPAGE
 

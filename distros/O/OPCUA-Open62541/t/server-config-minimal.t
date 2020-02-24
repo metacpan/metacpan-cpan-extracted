@@ -18,7 +18,7 @@ ok($@, "config missing");
 like($@, qr/Usage: OPCUA::Open62541::ServerConfig::setMinimal\(config, portNumber, certificate\) /,
     "usage error");
 
-eval { OPCUA::Open62541::ServerConfig::setMinimal(1, 1, undef) };
+eval { OPCUA::Open62541::ServerConfig::setMinimal(1, 1, "") };
 ok($@, "config type");
 like($@, qr/config is not of type OPCUA::Open62541::ServerConfig /,
     "config type error");

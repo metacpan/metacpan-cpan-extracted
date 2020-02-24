@@ -1,7 +1,7 @@
 package Promises::Deferred::AE;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: An implementation of Promises in Perl
-$Promises::Deferred::AE::VERSION = '1.03';
+$Promises::Deferred::AE::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -75,7 +75,7 @@ Promises::Deferred::AE - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

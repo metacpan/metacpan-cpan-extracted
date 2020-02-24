@@ -1,13 +1,46 @@
 =encoding utf8
 
 
-This is Perl module B<Test::Arrow>.
+This is Perl module B<Test::Arrow>. It's Object-Oriented testing library.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.05-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582302144"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582302144&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.08-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582511878"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582511878&branch=master"/></a>
 
 =end html
+
+=head1 SYNOPSIS
+
+    use Test::Arrow;
+
+    my $arr = Test::Arrow->new;
+
+    $arr->ok(1);
+    $arr->got(1)->ok;
+
+    $arr->expect(uc 'foo')->to_be('FOO');
+
+    $arr->name('Test Name')
+        ->expected('FOO')
+        ->got(uc 'foo')
+        ->is;
+
+    $arr->expected(6)
+        ->got(2 * 3)
+        ->is_num;
+
+    # `unlike` shows where a place could have matched if it's failed
+    $arr->name('Unlike Fail example')
+        ->expected(qr/b/)
+        ->got('abc')
+        ->unlike;
+    #   Failed test 'Unlike Fail example'
+    #   at t/unlike.t line 12.
+    #                   'abc'
+    #           matches '(?^:b)'
+    #           matched at line: 1, offset: 2
+
+    $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
 
 
 =head1 INSTALLATION

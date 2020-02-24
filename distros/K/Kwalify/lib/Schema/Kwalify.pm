@@ -1,10 +1,9 @@
 # -*- mode: cperl; coding: latin-2 -*-
 
 #
-# $Id: Kwalify.pm,v 1.4 2007/03/04 10:50:06 eserte Exp $
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2020 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,8 +14,10 @@
 package Schema::Kwalify;
 
 use strict;
+use warnings;
+
 use vars qw($VERSION);
-$VERSION = sprintf("%d.%02d", q$Revision: 1.4 $ =~ /(\d+)\.(\d+)/);
+$VERSION = '1.05';
 
 use Kwalify qw();
 
@@ -37,7 +38,7 @@ __END__
 
 =head1 NAME
 
-Schema::Kwalify - 
+Schema::Kwalify - Kwalify implementation in the Schema:: namespace
 
 =head1 SYNOPSIS
 

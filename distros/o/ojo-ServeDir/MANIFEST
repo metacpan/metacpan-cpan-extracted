@@ -1,8 +1,11 @@
 Changes
 lib/ojo/ServeDir.pm
+lib/ojo/ServeDir/App.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+script/serve_dir
+t/app.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

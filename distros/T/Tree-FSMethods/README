@@ -2,8 +2,8 @@ NAME
     Tree::FSMethods - Perform filesystem-like operations on object tree(s)
 
 VERSION
-    This document describes version 0.001 of Tree::FSMethods (from Perl
-    distribution Tree-FSMethods), released on 2020-02-13.
+    This document describes version 0.002 of Tree::FSMethods (from Perl
+    distribution Tree-FSMethods), released on 2020-02-23.
 
 SYNOPSIS
      use Tree::FSMethods;
@@ -81,6 +81,9 @@ METHODS
 
     Change working directory. Dies on failure.
 
+  cd2
+    Just like "cd" but for the second tree ("tree2").
+
   cwd
     Usage:
 
@@ -88,12 +91,18 @@ METHODS
 
     Return current working directory.
 
+  cwd2
+    Just like "cwd" but for the second tree ("tree2").
+
   ls
     Usage:
 
      my %res = $fs->ls( [ $path_wildcard, ... ]);
 
     Dies on failure (e.g. can't cd to specified path).
+
+  ls2
+    Just like "ls" but for the second tree ("tree2").
 
   cp
     Usage:
@@ -115,6 +124,18 @@ METHODS
 
      $fs->mkdir([ \%opts, ] $path);
 
+    Options:
+
+    *   parents
+
+        Boolean. Just like the same --parents (-p) option in the Unix
+        utility. If set to true, will create intermediate parents as
+        necessary, and will not report error when the directory already
+        exists.
+
+  mkdir2
+    Just like "mkdir" but for the second tree ("tree2").
+
   mv
     Usage:
 
@@ -127,6 +148,9 @@ METHODS
     Usage:
 
      $fs->rm($path_wildcard);
+
+  rm2
+    Just like "rm" but for the second tree ("tree2").
 
   showtree
     Usage:
@@ -143,6 +167,9 @@ METHODS
      |   |-- file5
      |   \-- file6
      \-- file7
+
+  showtree2
+    Just like "showtree" but for the second tree ("tree2").
 
 HOMEPAGE
     Please visit the project's homepage at

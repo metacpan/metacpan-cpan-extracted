@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'PDF::API2' => '2.037',
-	'Zydeco' => '0.503',
+	'Zydeco' => '0.509',
 	'Colouring::In' => '0.14',
 	'Sub::MultiMethod' => '0.0008'
     },

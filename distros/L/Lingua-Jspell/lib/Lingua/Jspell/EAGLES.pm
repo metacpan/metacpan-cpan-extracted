@@ -9,7 +9,7 @@ package Lingua::Jspell::EAGLES;
 use warnings;
 use strict;
 
-our $VERSION = '1.93';
+our $VERSION = '1.94';
 
 # modo: {I}ndicativo, {S}ubjuntivo, i{M}perativo, 
 #       i{N}finitivo, {G}erundio, {P}articipio

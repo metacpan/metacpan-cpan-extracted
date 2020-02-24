@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -22,7 +22,7 @@ use POSIX 'ceil';
 use List::Util 'max';
 
 use vars '$VERSION','@ISA';
-$VERSION = 73;
+$VERSION = 74;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -176,7 +176,7 @@ Math::NumSeq::Squares -- perfect squares
 
 The sequence of squares i**2,
 
-    0, 1, 4, 9, 16, 25, ...
+    0, 1, 4, 9, 16, 25, ...     (A000290)
 
 =head1 FUNCTIONS
 
@@ -244,7 +244,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

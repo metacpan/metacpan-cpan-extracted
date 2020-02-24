@@ -1,4 +1,4 @@
-package Pcore::PDF v0.8.3;
+package Pcore::PDF v0.8.4;
 
 use Pcore -dist, -class, -const, -res;
 use Config;

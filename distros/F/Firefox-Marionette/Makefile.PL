@@ -3,15 +3,18 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec();
 
-if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
-} elsif ($> == 0) { # see RT#131304
-	my $current = $ENV{HOME};
-	my $correct = (getpwuid($>))[7];
-	if ($current eq $correct) {
-	} else {
-		$ENV{HOME} = $correct;
-		print "Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}\n";
-	}
+if ( ( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' ) ) {
+}
+elsif ( $> == 0 ) {    # see RT#131304
+    my $current = $ENV{HOME};
+    my $correct = ( getpwuid($>) )[7];
+    if ( $current eq $correct ) {
+    }
+    else {
+        $ENV{HOME} = $correct;
+        print
+"Running as root.  Resetting HOME environment variable from $current to $ENV{HOME}\n";
+    }
 }
 
 sub last_desperate_search {
@@ -27,22 +30,26 @@ sub last_desperate_search {
     }
 }
 
+my @win32_firefox_directories =
+  ( 'Mozilla Firefox', 'Firefox Developer Edition', 'Firefox Nightly' );
 my $binary = 'firefox';
 if ( $^O eq 'MSWin32' ) {
-  SEARCH: foreach my $possible ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
-        if (
-            ( $ENV{$possible} )
-            && (
-                -e File::Spec->catfile(
-                    $ENV{$possible}, 'Mozilla Firefox',
-                    'firefox.exe'
+  SEARCH: foreach my $env_key ( 'ProgramFiles', 'ProgramFiles(x86)' ) {
+        foreach my $firefox_directory (@win32_firefox_directories) {
+            if (
+                ( $ENV{$env_key} )
+                && (
+                    -e File::Spec->catfile(
+                        $ENV{$env_key}, $firefox_directory, 'firefox.exe'
+                    )
                 )
-            )
-          )
-        {
-            $binary = File::Spec->catfile( $ENV{$possible}, 'Mozilla Firefox',
-                'firefox.exe' );
-            last;
+              )
+            {
+                $binary =
+                  File::Spec->catfile( $ENV{$env_key}, $firefox_directory,
+                    'firefox.exe' );
+                last;
+            }
         }
     }
 }
@@ -50,13 +57,17 @@ elsif ( $^O eq 'darwin' ) {
     $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
 }
 elsif ( $^O eq 'cygwin' ) {
-    if (   ( -e "$ENV{PROGRAMFILES} (x86)" )
-        && ( -e "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe" ) )
+  SEARCH:
+    foreach
+      my $base_directory ( "$ENV{PROGRAMFILES} (x86)", "$ENV{PROGRAMFILES}" )
     {
-        $binary = "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
-    }
-    elsif ( -e "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe" ) {
-        $binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
+        foreach my $firefox_directory (@win32_firefox_directories) {
+            if (   ( -e "$base_directory" )
+                && ( -e "$base_directory/$firefox_directory/firefox.exe" ) )
+            {
+                $binary = "$base_directory/$firefox_directory/firefox.exe";
+            }
+        }
     }
 }
 my $version_string = `"$binary" -version`;
@@ -146,14 +157,16 @@ WriteMakefile(
         'HTTP::Response'  => 0,
         'File::HomeDir'   => 0,
         'IO::Socket::SSL' => 0,
-	$] ge '5.010' ? ( 'PDF::API2' => 0 ) : (),
+        $] ge '5.010' ? ( 'PDF::API2' => 0 ) : (),
     },
     PREREQ_PM => {
+        'Archive::Zip'        => 0,
         'Config::INI::Reader' => 0,
         'JSON'                => 0,
         'Config'              => 0,
         'FileHandle'          => 0,
         'DirHandle'           => 0,
+        'File::Find'          => 0,
         'File::Temp'          => 0,
         'File::Spec'          => 0,
         'Socket'              => 0,

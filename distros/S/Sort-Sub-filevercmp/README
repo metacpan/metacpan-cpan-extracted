@@ -1,9 +1,9 @@
 NAME
-    Sort::Sub::filevercmp - Sort using filevercmp
+    Sort::Sub::filevercmp - Sort using Sort::filevercmp
 
 VERSION
-    This document describes version 0.001 of Sort::Sub::filevercmp (from
-    Perl distribution Sort-Sub-filevercmp), released on 2019-05-18.
+    This document describes version 0.002 of Sort::Sub::filevercmp (from
+    Perl distribution Sort-Sub-filevercmp), released on 2019-12-15.
 
 SYNOPSIS
     Generate sorter (accessed as variable) via Sort::Sub import:

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Point;
 # ABSTRACT: Represents a Neo4j spatial point value
-$Neo4j::Driver::Type::Point::VERSION = '0.14';
+$Neo4j::Driver::Type::Point::VERSION = '0.15';
 
 # may not be supported by Bolt
 
@@ -23,7 +23,7 @@ Neo4j::Driver::Type::Point - Represents a Neo4j spatial point value
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -42,9 +42,16 @@ which L<Neo4j::Bolt> depends on internally. Use HTTP instead.
 
 =head1 SEE ALSO
 
-L<Neo4j::Driver>,
-L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/org/neo4j/driver/v1/types/Point.html>,
-L<Neo4j Cypher Manual|https://neo4j.com/docs/cypher-manual/current/syntax/spatial/>
+=over
+
+=item * L<Neo4j::Driver>
+
+=item * Equivalent documentation for the official Neo4j drivers:
+L<Point (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/types/Point.html>
+
+=item * L<"Spatial values" in Neo4j Cypher Manual|https://neo4j.com/docs/cypher-manual/current/syntax/temporal/>
+
+=back
 
 =head1 AUTHOR
 
@@ -52,7 +59,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2019 by Arne Johannessen.
+This software is Copyright (c) 2016-2020 by Arne Johannessen.
 
 This is free software, licensed under:
 

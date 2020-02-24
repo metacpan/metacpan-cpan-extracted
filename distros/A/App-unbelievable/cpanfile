@@ -19,7 +19,7 @@ requires 'autodie';
 requires 'feature';
 requires 'parent';
 requires 'perl', '5.010001';
-requires 'vars::i';
+requires 'vars::i', '1.10';
 requires 'version', '0.77';
 
 on configure => sub {

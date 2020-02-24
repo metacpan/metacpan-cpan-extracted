@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
-use Cpanel::JSON::XS;
+use JSON::PP qw(decode_json);
 use Digest::MD5;
 use File::Basename qw(dirname);
 use File::Slurp;
@@ -29,7 +29,9 @@ sub factory {
 	shift;
 	my %options = (@_);
 	sub {
-		return Neo4j::Sim->new(\%options);
+		my $http = shift;
+		$http->{client} = Neo4j::Sim->new(\%options);
+		$http->{json_coder} = json_coder();
 	}
 }
 
@@ -146,6 +148,15 @@ sub request_hash ($$) {
 }
 
 
+sub json_coder () {
+	return JSON::PP->new->utf8->pretty->sort_by(sub {
+		return -1 if $JSON::PP::a eq 'statements';
+		return 1 if $JSON::PP::b eq 'statements';
+		return $JSON::PP::a cmp $JSON::PP::b;
+	});
+}
+
+
 package Neo4j::Sim::Response;
 
 sub status_line {
@@ -170,6 +181,7 @@ create an empty directory t/simulator and insert these lines of code:
 
 	use lib qw(./t/lib);
 	use Neo4j::Sim;
+	BEGIN { $JSON_CODER = sub { Neo4j::Sim::json_coder } }
 	Neo4j::Sim->store("$tx_endpoint", $content, $client->responseContent()) if $method eq 'POST';
 
 into the method:

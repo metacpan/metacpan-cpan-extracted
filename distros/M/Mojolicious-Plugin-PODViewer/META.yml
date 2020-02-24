@@ -29,7 +29,7 @@ no_index:
 provides:
   Mojolicious::Plugin::PODViewer:
     file: lib/Mojolicious/Plugin/PODViewer.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Mojolicious: '8'
   Pod::Simple: '3.09'
@@ -38,11 +38,12 @@ resources:
   bugtracker: https://github.com/preaction/Mojolicious-Plugin-PODViewer/issues
   homepage: https://github.com/preaction/Mojolicious-Plugin-PODViewer
   repository: https://github.com/preaction/Mojolicious-Plugin-PODViewer.git
-version: '0.005'
+version: '0.006'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'brad <brad@clickmagick.com>'
   - 'CandyAngel <candyangel@electricjungle.org>'
+  - 'Luc Didry <luc@didry.org>'
   - 'Oleg <verdrehung@gmail.com>'
   - 'Tekki <tekki@tekki.ch>'
   - 'Zoffix Znet <cpan@zoffix.com>'

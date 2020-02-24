@@ -121,12 +121,12 @@ sub _hwnd_to_path
 sub _search_for_npp_exe {
     my $npp_exe;
     use File::Which 'which';
-    foreach my $try (   # priority to path, 64bit, default, then x86-specific locations
-        which('notepad++'),
-        "$ENV{ProgramW6432}/Notepad++/notepad++.exe",
-        "$ENV{ProgramFiles}/Notepad++/notepad++.exe",
-        "$ENV{'ProgramFiles(x86)'}/Notepad++/notepad++.exe",
-    )
+    # priority to path, 64bit, default, then x86-specific locations
+    my @try = ( which('notepad++') );
+    push @try, "$ENV{ProgramW6432}/Notepad++/notepad++.exe" if exists $ENV{ProgramW6432};
+    push @try, "$ENV{ProgramFiles}/Notepad++/notepad++.exe" if exists $ENV{ProgramFiles};
+    push @try, "$ENV{'ProgramFiles(x86)'}/Notepad++/notepad++.exe" if exists $ENV{'ProgramFiles(x86)'};
+    foreach my $try ( @try )
     {
         $npp_exe = $try if -x $try;
         last if defined $npp_exe;

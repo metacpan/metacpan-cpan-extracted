@@ -459,6 +459,23 @@ my @statuscodes = qw(
     STATUSCODE_BADMAXCONNECTIONSREACHED
 );
 
+my @nodeidtypes = qw(
+    NODEIDTYPE_NUMERIC
+    NODEIDTYPE_STRING
+    NODEIDTYPE_GUID
+    NODEIDTYPE_BYTESTRING
+);
+
+my @accesslevelmasks = qw(
+    ACCESSLEVELMASK_READ
+    ACCESSLEVELMASK_WRITE
+    ACCESSLEVELMASK_HISTORYREAD
+    ACCESSLEVELMASK_HISTORYWRITE
+    ACCESSLEVELMASK_SEMANTICCHANGE
+    ACCESSLEVELMASK_STATUSWRITE
+    ACCESSLEVELMASK_TIMESTAMPWRITE
+);
+
 my @clientstates = qw(
     CLIENTSTATE_DISCONNECTED
     CLIENTSTATE_WAITING_FOR_ACK
@@ -469,17 +486,34 @@ my @clientstates = qw(
     CLIENTSTATE_SESSION_RENEWED
 );
 
+my @browseresultmasks = qw(
+    BROWSERESULTMASK_NONE
+    BROWSERESULTMASK_REFERENCETYPEID
+    BROWSERESULTMASK_ISFORWARD
+    BROWSERESULTMASK_NODECLASS
+    BROWSERESULTMASK_BROWSENAME
+    BROWSERESULTMASK_DISPLAYNAME
+    BROWSERESULTMASK_TYPEDEFINITION
+    BROWSERESULTMASK_ALL
+    BROWSERESULTMASK_REFERENCETYPEINFO
+    BROWSERESULTMASK_TARGETINFO
+);
+
 our %EXPORT_TAGS = (
-    'all' => [ @types, @limits, @statuscodes, @clientstates ],
+    'all' => [ @types, @limits, @statuscodes, @nodeidtypes, @accesslevelmasks,
+	@browseresultmasks, @clientstates ],
+    'accesslevelmask' => [ @accesslevelmasks ],
+    'browseresultmask' => [ @browseresultmasks ],
     'clientstate' => [ @clientstates ],
     'limit' => [ @limits ],
+    'nodeidtype' => [ @nodeidtypes ],
     'statuscode' => [ @statuscodes ],
     'type' => [ @types ],
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 require XSLoader;
 XSLoader::load('OPCUA::Open62541', $VERSION);
@@ -514,6 +548,20 @@ This module provides access to the C functionality from Perl programs.
 
 Everything of the exports below.
 
+=item :accesslevelmask
+
+    ACCESSLEVELMASK_READ
+    ACCESSLEVELMASK_WRITE
+    ...
+    ACCESSLEVELMASK_TIMESTAMPWRITE
+
+=item :browseresultmask
+
+    BROWSERESULTMASK_NONE
+    BROWSERESULTMASK_REFERENCETYPEID
+    ...
+    BROWSERESULTMASK_TARGETINFO
+
 =item :clientstate
 
     CLIENTSTATE_DISCONNECTED
@@ -531,6 +579,15 @@ types.
     SBYTE_MIN
     ...
     UINT64_MAX
+
+=item :nodeidtype
+
+Symbolic names for the OPC UA node id types.
+
+    NODEIDTYPE_NUMERIC
+    NODEIDTYPE_STRING
+    ...
+    NODEIDTYPE_BYTESTRING
 
 =item :statuscode
 
@@ -577,9 +634,12 @@ and methods.
 
 =head3 VariableAttributes
 
+This type is converted automatically from a hash.
+The key that are recognized are:
+
 =over 4
 
-=item $attr = OPCUA::Open62541::VariableAttributes->default()
+=item VariableAttributes_value
 
 =back
 
@@ -613,7 +673,7 @@ magically.
 
 =item $status_code = $server_config->setDefault()
 
-=item $status_code = $server_config->setMinimal(port, certificate)
+=item $status_code = $server_config->setMinimal($port, $certificate)
 
 =item $server_config->clean()
 
@@ -631,6 +691,10 @@ magically.
 
 =item $status_code = $client->connect($url)
 
+=item $status_code = $client->connect_async($endpointUrl, $callback, $userdata)
+
+=item $status_code = $client->run_iterate($timeout)
+
 =item $client_state = $client->getState()
 
 =item $status_code = $client->disconnect()
@@ -647,13 +711,15 @@ magically.
 
 =head1 SEE ALSO
 
-OPC UA library L<https://open62541.org/>
+OPC UA library, L<https://open62541.org/>
 
-OPC Foundation L<https://opcfoundation.org/>
+OPC Foundation, L<https://opcfoundation.org/>
 
 =head1 AUTHORS
 
-Alexander Bluhm E<lt>bluhm@genua.deE<gt>
+Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
+Anton Borowka,
+Marvin Knoblauch E<lt>mknob@genua.deE<gt>,
 
 =head1 CAVEATS
 
@@ -663,7 +729,13 @@ This interface is far from complete.
 
 Copyright (c) 2020 Alexander Bluhm E<lt>bluhm@genua.deE<gt>
 
+Copyright (c) 2020 Anton Borowka
+
+Copyright (c) 2020 Marvin Knoblauch E<lt>mknob@genua.deE<gt>
+
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+Thanks to genua GmbH, https://www.genua.de/ for sponsoring this work.
 
 =cut

@@ -7,7 +7,11 @@ my $bdir = "libcares/build";
 
 unshift @PATH, Alien::cmake3->bin_dir;
 mkdir($bdir) unless -d $bdir;
-my $flags = qq{-DCARES_STATIC=ON -DCARES_STATIC_PIC=ON -DCARES_SHARED=OFF -DCMAKE_C_FLAGS="-O2"};
+
+my $cmake_c_flags = '-O2';
+$cmake_c_flags .= ' -DCHAR_BIT=8' if $^O eq 'openbsd';
+my $flags = qq{-DCARES_STATIC=ON -DCARES_STATIC_PIC=ON -DCARES_SHARED=OFF -DCMAKE_C_FLAGS="$cmake_c_flags"};
+
 my $result = system(qq{cd $bdir && cmake .. -G "Unix Makefiles" $flags});
 die "FATAL: could not make libcares' Makefile\n" if $result != 0;
 

@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.17';
+		our $VERSION = '0.18';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -12,7 +12,7 @@ package Mxpress::PDF {
 	use constant mm => 25.4 / 72;
 	use constant pt => 1;
 	class File (HashRef $args) {
-		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image field annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
+		my @plugins = (qw/font line box circle pie ellipse text title subtitle subsubtitle toc image form input textarea select annotation cover/, ($args->{plugins} ? @{$args->{plugins}} : ()));
 		for my $p (@plugins) {
 			my $meth = sprintf('_store_%s', $p);
 			has {$meth} (type => Object);
@@ -530,6 +530,8 @@ package Mxpress::PDF {
 			has indent (type => Num);
 			has pad (type => Str);
 			has pad_end (type => Str);
+			has no_space (type => Bool);
+			has min_width (type => Num);
 			has end_w (type => Str);
 			has next_page;
 			factory text (Object $file, Map %args) {
@@ -544,6 +546,7 @@ package Mxpress::PDF {
 						$file->add_page;
 						return $file->page;
 					} },
+					min_width => 0,
 					padding => 0,
 					align => 'left',
 					font => $class->FACTORY->font(
@@ -551,11 +554,12 @@ package Mxpress::PDF {
 						%{$args{font}}
 					),
 					position => $args{position} || [],
+					no_space => 0,
 					(map {
 						defined $args{$_} ? ( $_ => $args{$_} ) : ()
 					} qw/
-						align margin_bottom margin_top indent align padding pad pad_end first_line_indent
-						first_paragraph_indent paragrah_space paragraphs_to_columns
+						align margin_bottom margin_top indent align padding pad no_space pad_end first_line_indent
+						first_paragraph_indent paragrah_space paragraphs_to_columns min_width
 					/)
 				});
 			}
@@ -628,21 +632,28 @@ package Mxpress::PDF {
 								$xpos += ($lw/2) - ($line_width / 2);
 							}
 							$text->translate($xpos, $ypos);
-							$text->text(join(' ', @line));
+							my $sep = $self->no_space ? '' : ' ';
+							$text->text(join($sep, @line));
 						}
 						if (@paragraph) {
 							$ypos -= $l if @paragraph;
-						} elsif ($self->pad) {
+						} elsif ($self->pad && $line_width < $lw) {
+                                                       	my $mw = $self->min_width ? $self->min_width/mm : 0;	
+							if ($xpos < $mw) {
+								$line_width = $self->end_w($mw);
+							} else {
+								$self->end_w($xpos + $line_width);
+							}
 							$self->end_w($xpos + $line_width);
-							my $pad_end = $self->pad_end || '';
-							my $pad = sprintf ("%s%s",
-								$self->pad x int(((
-									(((($lw + $wordspace) - $line_width) - $text->advancewidth($self->pad . $pad_end)))
-								) / $text->advancewidth($self->pad))),
-								$pad_end
-							);
-							$text->translate($xpos + ( $lw - $text->advancewidth($pad) ), $ypos);
-							$text->text($pad);
+                                                        my $pad_end = $self->pad_end || '';
+                                                        my $pad = sprintf ("%s%s",
+                                                                $self->pad x int((
+                                                                        (((($lw + $wordspace) - $line_width) - $text->advancewidth($self->pad . $pad_end)))
+                                                                ) / $text->advancewidth($self->pad)),
+                                                                $pad_end
+                                                        );
+                                                        $text->translate($xpos + ( $lw - $text->advancewidth($pad) ), $ypos) if (!$self->no_space);
+                                                        $text->text($pad);
 						}
 						$fl = 0;
 					}
@@ -673,7 +684,7 @@ package Mxpress::PDF {
 			method _calculate_widths (Str $string, Object $text) {
 				my @words = split /\s+/, $string;
 				# calculate width of space
-				my $space_width = $text->advancewidth(' ');
+				my $space_width = $self->no_space ? 0 : $text->advancewidth(' ');
 				# calculate the width of each word
 				my %width = ();
 				my $total_width = 0;
@@ -953,36 +964,151 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 		}
-		class +Field extends Plugin::Text {
+		class +Form {
 			use PDF::API2::Basic::PDF::Utils;
-			has xo (type => Object);
-			has annotate (type => Object);
-			factory field (Object $file, Map %args) {
-				$args{pad} ||= '_';
-				$args{margin_bottom} ||= 3;
-				$class->generic_new($file, %args);
+			has acro (type => Object);
+			has fields (type => ArrayRef);
+			factory form (Object $file, Map %args) {
+				return $class->new(
+					file => $file,
+					%args
+				);
 			}
-			around add (Str $text, Map %args) {
-				my $annotate = $self->annotate(
-					$self->file->page->current->annotation
-				);
-				my @pos = ($self->parse_position([]));
-				my $file = $self->$next($text, %args);
-				my $form = $self->xo(
-					$self->file->pdf->xo_form()
-				);
-				@pos = (
-					$self->end_w,
-					$pos[1] + ($self->font->line_height/2),
-					$pos[3] - $self->end_w,
-					$pos[1] - $self->font->line_height
-				);
-				$annotate->{Subtype} = PDFName('Widget');
-				$annotate->rect(@pos);
-				$annotate->{FT} = PDFName('Tx');
-				$annotate->{T} = PDFStr($text);
-				$form->bbox(@pos);
-				return $file;
+			method add (Map %args) {
+				return $self if $self->acro;
+				my $form = PDFDict();
+    				$form->{NeedAppearances} = PDFBool( 'true' );	
+				$self->acro($form);
+				$self->file->onsave('form', 'end', why => 1);
+			}
+			method end (Map %args) {
+  				$self->acro->{Fields} = PDFArray(@{$self->fields});
+    				$self->file->pdf->{catalog}->{'AcroForm'} = $self->acro;
+			}
+			method _add_to_fields (Object $field) { 
+				$self->add();
+				my $fields = $self->fields;
+				push @{$fields}, $field;
+				return $self->fields($fields);
+			}
+			class +Field extends Plugin::Text {
+				use PDF::API2::Basic::PDF::Literal;
+				use PDF::API2::Basic::PDF::Utils;
+				has xo (type => Object);
+				has annotate (type => Object);
+				has name (type => Str);
+				around add (Str $text, Map %args) {
+					return $self->$next($text, %args) if $args{noconfigure};
+					my @pos = ($self->parse_position([]));
+					$self->file->form->add; #REMOVE
+					my $form = $self->xo(
+						$self->file->pdf->xo_form()
+					);
+					my $file = $self->$next($text, %args);
+					my $annotate = $self->annotate(
+						$self->file->page->current->annotation
+					);
+					$form->{OpenAction} = PDFArray($self->annotate, PDFName('XYZ'), PDFNull, PDFNull, PDFNum(0));
+					$form->bbox(0, 0, 149.8, 14.4);
+					$annotate->{DR} = $self->font->load();
+					$annotate->{T} = PDFStr($self->name || $text);
+					$annotate->{Subtype} = PDFName('Widget');
+		 			$annotate->{P} = $self->file->page->current;
+					$args{position} ||= \@pos;
+					$self->configure(%args) if $self->can('configure');
+					$self->_set_rect(%args) if $self->can('_set_rect');
+					$self->file->form->_add_to_fields($self->annotate);
+					return $file;
+				}
+				method _set_rect (Map %args) {
+					my @pos = @{$args{position}};
+					@pos = (
+						$self->end_w + $self->text->advancewidth(' '),
+						$pos[1] + ($self->font->line_height/3),
+						$pos[2] + ($self->file->page->padding/mm),
+						$pos[1] - ($self->font->line_height*2)
+					);
+					$self->annotate->rect(@pos);
+				}
+				class +Input {
+					factory input (Object $file, Map %args) {
+						$args{pad} ||= '_';
+						$args{margin_bottom} ||= 1.7;
+						$class->generic_new($file, %args);
+					}
+					method configure (Map %args) {
+						$self->annotate->{FT} = PDFName('Tx');
+					}	
+					class +Textarea {
+						has lines (type => Num);
+						factory textarea (Object $file, Map %args) {
+							$args{pad} ||= '_';
+							$args{margin_bottom} ||= 1.7;
+							my $self = $class->generic_new($file, %args);
+							$self->lines($args{lines} ||= 4);
+							return $self;
+						}
+						around configure (Map %args) {
+							$self->$next(%args);
+							my $ew = $self->end_w;
+							my $ns = $self->no_space;
+							my $tp = $self->text->advancewidth($self->pad);
+							my $x = ($ew + $tp)*mm; 
+							for (1 .. $self->lines) {
+								$self->add(
+									' ' . $self->pad, 
+									position => [
+										$x,
+										($self->file->page->y*mm) - $self->padding,
+										(($self->file->page->w+$tp)*mm) + $self->file->page->padding +  - $x
+									], 
+									noconfigure => 1, 
+									no_space => 1
+								);
+							}
+							$self->no_space($ns);
+						}
+						method _set_rect (Map %args) {
+							my @pos = @{$args{position}};
+							@pos = (
+								$self->end_w - $self->text->advancewidth(' ' . $self->pad),
+								$pos[1] + ($self->font->line_height/3),
+								$pos[2] + ($self->file->page->padding/mm),
+								$pos[1] - ($self->font->line_height* 2 * $self->lines)
+							);
+							$self->annotate->rect(@pos);
+						}
+					}
+				}
+				class +Select {
+					factory select (Object $file, Map %args) {
+						$args{pad} ||= '_';
+						$args{margin_bottom} ||= 1.7;
+						$class->generic_new($file, %args);
+					}
+					method configure (Map %args) {
+						$self->annotate->{V} = do {
+							my $s = PDFStr('');
+							$s->{' isutf'} = PDFBool(1);
+							$s;
+						};
+						$self->annotate->{DA} = PDFStr('0 0 0 rg /F3 11 Tf');
+						$self->annotate->{DV} = $self->annotate->{V};
+						$self->annotate->{FT} = PDFName('Ch');
+						$self->annotate->{Ff} = PDFNum(393216);
+						$self->annotate->{Opt} = PDFArray(map { PDFStr($_); } @{$args{options}});
+					}
+					method _set_rect (Map %args) {
+						my @pos = @{$args{position}};
+						@pos = (
+							$self->end_w + $self->text->advancewidth($self->pad),
+							$pos[1] + ($self->font->line_height/2),
+							$pos[2] + ($self->file->page->padding/mm),
+							$pos[1] - ($self->font->line_height)
+						);
+						$self->annotate->rect(@pos);
+					}
+				}
 			}
 		}
 	}
@@ -1030,7 +1156,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -1249,11 +1375,29 @@ Returns a new Mxpress::PDF::Plugin::Annotation Object. This object aids with add
 
 	my $annotation = Mxpress::PDF->annotation($file, %annotation_args);
 
-=head2 field
+=head2 form
 
-Returns a new Mxpress::PDF::Plugin::Field Object. This object aids with adding fillable text fields to a pdf page.
+Returns a new Mxpress::PDF::Plugin::Form Object. This object is for managing the AcroForm..
 
-	my $field = Mxpress::PDF->field($file, %field_args);
+	my $form = Mxpress::PDF->form($file, %form_args);
+
+=head2 input
+
+Returns a new Mxpress::PDF::Plugin::Field::Input Object. This object aids with adding fillable text fields to a pdf page.
+
+	my $input = Mxpress::PDF->input($file, %input_args);
+
+=head2 textarea
+
+Returns a new Mxpress::PDF::Plugin::Field::Input::Textarea Object. This object aids with adding fillable milti line text fields to a pdf page.
+
+	my $textarea = Mxpress::PDF->textarea($file, %textarea_args);
+
+=head2 select
+
+Returns a new Mxpress::PDF::Plugin::Field::Select Object. This object aids with adding select fields to a pdf page.
+
+	my $select = Mxpress::PDF->select($file, %select_args);
 
 =head1 File
 
@@ -2541,9 +2685,17 @@ Add an annotation to the current Mxpress::PDF::Page.
 
 	$annotation->add('add some text', %annotation_attrs)
 
+=head1 Form
+
+Mxpress::PDF::Plugin::Form extends Mxpress::PDF::Plugin and provides access to the PDF AcroForm.
+
 =head1 Field
 
-Mxpress::PDF::Plugin::Field extends Mxpress::PDF::Plugin::Text and is for adding fillable text fields to a Mxpress::PDF::Page
+Mxpress::PDF::Plugin::Form::Field extends Mxpress::PDF::Plugin::Text and is the base class for Form 'Fields'.
+
+=head1 Input
+
+Mxpress::PDF::Plugin::Form::Field::Input extends Mxpress::PDF::Plugin::Form::Field and is for adding fillable text fields to a Mxpress::PDF::Page
 
 You can pass default attributes when instantiating the file object.
 
@@ -2553,21 +2705,77 @@ You can pass default attributes when instantiating the file object.
 
 or when calling the objects add method.
 
-	$file->field->add(
-		%text_attrs
+	$file->input->add(
+		%input_attrs
 	);
 
-	my $field = $pdf->field
+	my $input = $pdf->input
 
 =head2 Methods
 
-The following methods can be called from a Mxpress::PDF::Plugin::Field Object.
+The following methods can be called from a Mxpress::PDF::Plugin::Form::Field::Input Object.
 
 =head3 add
 
 Add a text field to the current Mxpress::PDF::Page.
 
-	$field->add('First Name:', %text_attrs)
+	$input->add('First Name:', %input_attrs)
+
+=head1 Textarea
+
+Mxpress::PDF::Plugin::Form::Field::Input::Textarea extends Mxpress::PDF::Plugin::Form::Field::Input and is for adding fillable multiline textarea fields to a Mxpress::PDF::Page
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		textarea => { %text_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->textarea->add(
+		%textarea_attrs
+	);
+
+	my $textarea = $pdf->textarea
+
+=head2 Methods
+
+The following methods can be called from a Mxpress::PDF::Plugin::Form::Field::Input::Textarea Object.
+
+=head3 add
+
+Add a text field to the current Mxpress::PDF::Page.
+
+	$textarea->add('A Textarea:', lines => 10)
+
+=head1 Select
+
+Mxpress::PDF::Plugin::Form::Field::Select extends Mxpress::PDF::Plugin::Form::Field and is for adding interactive select fields to a Mxpress::PDF::Page
+
+You can pass default attributes when instantiating the file object.
+
+	Mxpress::PDF->add_file($filename,
+		select => { %select_attrs },
+	);
+
+or when calling the objects add method.
+
+	$file->select->add(
+		%select_attrs
+	);
+
+	my $select = $pdf->select;
+
+=head2 Methods
+
+The following methods can be called from a Mxpress::PDF::Plugin::Form::Field::Select Object.
+
+=head3 add
+
+Add a text field to the current Mxpress::PDF::Page.
+
+	$select->add('A Textarea:', options => [qw/a b c/]);
 
 =head1 AUTHOR
 

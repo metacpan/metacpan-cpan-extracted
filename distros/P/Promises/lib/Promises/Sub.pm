@@ -1,7 +1,7 @@
 package Promises::Sub;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Turns functions into promises
-$Promises::Sub::VERSION = '1.03';
+$Promises::Sub::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Promises::Sub - Turns functions into promises
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

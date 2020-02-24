@@ -516,6 +516,7 @@ my %WriteMakefileArgs = (
     "XSLoader" => 0,
     "namespace::autoclean" => 0,
     "overload" => 0,
+    "parent" => 0,
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -543,7 +544,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.29",
+  "VERSION" => "3.0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -586,6 +587,7 @@ my %FallbackPrereqs = (
   "namespace::autoclean" => 0,
   "open" => 0,
   "overload" => 0,
+  "parent" => 0,
   "strict" => 0,
   "threads" => 0,
   "utf8" => 0,

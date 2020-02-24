@@ -42,6 +42,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS,
   L0_TERMINAL_LUA_ACTION_NAME,
   L0_TERMINAL_SEMICOLON,
+  L0_TERMINAL_GRAPH_ASCII_CHARACTERS,
   /* ----- Non terminals ------ */
   L0_META_WHITESPACE,
   L0_META_PERL_COMMENT,
@@ -65,7 +66,8 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_META_QUOTED_STRING,
   L0_META_QUOTED_NAME,
   L0_META_CHARACTER_CLASS,
-  L0_META_REGULAR_EXPRESSION
+  L0_META_REGULAR_EXPRESSION,
+  L0_META_GRAPH_ASCII_NAME
 } bootstrap_grammar_L0_enum_t;
 
 /* All non-terminals are listed here */
@@ -93,7 +95,8 @@ bootstrap_grammar_meta_t bootstrap_grammar_L0_metas[] = {
   { L0_META_QUOTED_STRING,                L0_JOIN_G1_META_QUOTED_STRING,               0,       0,           0,            0 },
   { L0_META_QUOTED_NAME,                  L0_JOIN_G1_META_QUOTED_NAME,                 0,       0,           0,            0 },
   { L0_META_CHARACTER_CLASS,              L0_JOIN_G1_META_CHARACTER_CLASS,             0,       0,           0,            0 },
-  { L0_META_REGULAR_EXPRESSION,           L0_JOIN_G1_META_REGULAR_EXPRESSION,          0,       0,           0,            0 }
+  { L0_META_REGULAR_EXPRESSION,           L0_JOIN_G1_META_REGULAR_EXPRESSION,          0,       0,           0,            0 },
+  { L0_META_GRAPH_ASCII_NAME,             L0_JOIN_G1_META_GRAPH_ASCII_NAME,            0,       0,           0,            0 }
 };
 
 /* Here it is very important that all the string constants are UTF-8 compatible - this is the case */
@@ -368,7 +371,11 @@ __DATA__
   { L0_TERMINAL_SEMICOLON, MARPAESLIF_TERMINAL_TYPE_STRING, NULL,
     "':'",
     NULL, NULL
-  }
+  },
+  { L0_TERMINAL_GRAPH_ASCII_CHARACTERS, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
+    "[[:graph:]]+",
+    NULL, NULL
+  },
 };
 
 bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
@@ -426,7 +433,8 @@ bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
   */
   { L0_META_REGULAR_EXPRESSION,               "regular expression 1",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_REGULAR_EXPRESSION               }, -1,                        -1,      -1,             0, NULL },
   { L0_META_REGULAR_EXPRESSION,               "regular expression 2",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 2, { L0_TERMINAL_REGULAR_EXPRESSION,
-                                                                                                                                     L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS     }, -1,                        -1,      -1,             0, NULL }
+                                                                                                                                     L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS     }, -1,                        -1,      -1,             0, NULL },
+  { L0_META_GRAPH_ASCII_NAME,                 "graph ascii name",                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_GRAPH_ASCII_CHARACTERS           }, -1,                        -1,      -1,             0, NULL }
 };
 
 #endif /* MARPAESLIF_INTERNAL_ESLIF_L0_H */
