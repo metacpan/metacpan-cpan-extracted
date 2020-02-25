@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Polygon;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Line);
 
@@ -47,7 +47,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Polygon - Chart::GGPlot's Plotly implement
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

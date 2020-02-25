@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99026';
+$Net::Whois::Raw::VERSION = '2.99027';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -481,7 +481,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99026
+version 2.99027
 
 =head1 SYNOPSIS
 
@@ -566,7 +566,7 @@ Net::Whois::Raw — Get Whois information of domains and IP addresses.
 
 =item whois( DOMAIN [, SRV [, WHICH_WHOIS]] )
 
-Returns Whois information for C<DOMAIN>.
+Returns Whois information for C<DOMAIN> in punycode.
 Without C<SRV> argument default Whois server for specified domain name
 zone will be used. Use 'www_whois' as server name to force
 WHOIS querying via HTTP (only few TLDs are supported in HTTP queries).
@@ -719,7 +719,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2019 by Alexander Nalobin.
+This software is copyright (c) 2002-2020 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

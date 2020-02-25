@@ -4,7 +4,7 @@ package Chart::GGPlot::Range::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Chart::GGPlot::Range::Continuous;
 use Chart::GGPlot::Range::Discrete;
@@ -40,7 +40,7 @@ Chart::GGPlot::Range::Functions - Function interface for range
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 FUNCTIONS
 

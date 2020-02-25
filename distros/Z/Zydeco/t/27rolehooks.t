@@ -16,7 +16,7 @@ package Local {
 		}
 		after_apply {
 			if ($kind eq 'class') {
-				has bleh;
+				has bleh (is => rw);
 				constant MY_CONSTANT = 42;
 			}
 			push @{ $xxx{'Local::Role1'}||=[] }, [ after_apply  => $role, $package, $kind ];

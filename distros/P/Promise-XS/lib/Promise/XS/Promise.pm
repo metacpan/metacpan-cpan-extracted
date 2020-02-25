@@ -39,10 +39,12 @@ but for now this is what’s what.
 =cut
 
 sub _warn_unhandled {
-    my ($promise_sv, @reasons) = @_;
+    my (@reasons) = @_;
+
+    my $class = __PACKAGE__;
 
     if (1 == @reasons) {
-        warn "$promise_sv: Unhandled rejection: $reasons[0]\n";
+        warn "$class: Unhandled rejection: $reasons[0]\n";
     }
     else {
         my $total = 0 + @reasons;
@@ -50,7 +52,7 @@ sub _warn_unhandled {
         for my $i ( 0 .. $#reasons ) {
             my $num = 1 + $i;
 
-            warn "$promise_sv: Unhandled rejection ($num of $total): $reasons[$i]\n";
+            warn "$class: Unhandled rejection ($num of $total): $reasons[$i]\n";
         }
     }
 }

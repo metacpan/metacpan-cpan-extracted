@@ -12,10 +12,11 @@ use Mojo::URL;
 use Nuvol::Test::Roles ':metadata';
 use Test::More;
 
-my $package      = 'Nuvol::Connector';
-my @constants    = qw|API_URL AUTH_URL DEFAULTS INFO_URL NAME TOKEN_URL SERVICE|;
-my @defaults     = qw|app_id redirect_uri scope|;
-my @role_methods = qw|_get_description _get_name _load_drivelist _load_metadata _update_token|;
+my $package   = 'Nuvol::Connector';
+my @constants = qw|API_URL AUTH_URL DEFAULTS INFO_URL NAME TOKEN_URL SERVICE|;
+my @defaults  = qw|app_id redirect_uri response_type scope|;
+my @role_methods
+  = qw|_build_url _do_disconnect _get_description _get_name _load_drivelist _load_metadata _update_token|;
 
 sub build_test_connector ($service) {
   note "Create test connector for $service";
@@ -45,6 +46,10 @@ sub test_basics ($connector, $service) {
 
   can_ok $connector, $_ for @constants;
   ok $connector->DEFAULTS->{$_}, "Default $_" for @defaults;
+  like $connector->DEFAULTS->{response_type}, qr/code|token/,
+    'Default for response_type is code or token';
+
+  can_ok $connector, $_ for @role_methods;
 
   test_metadata_applied $connector, $service;
 

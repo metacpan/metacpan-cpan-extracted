@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use Test::Arrow;
 
 my $got = my $expected = "same";
@@ -13,6 +10,9 @@ my $arr = Test::Arrow->new;
 $arr->pass('PASS2');
 
 # ok
+$arr->ok(Test::Arrow::PASS);
+$arr->ok(!Test::Arrow::FAIL);
+
 $arr->ok($got);
 $arr->ok($got, 'ok1');
 $arr->got($got)->ok;

@@ -538,7 +538,7 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
 	doap-deps:runtime-recommendation [ doap-deps:on "perl 5.022000"^^doap-deps:CpanId ], [ doap-deps:on "MooX::TypeTiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::XSAccessor"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.054"^^doap-deps:CpanId ], [ doap-deps:on "PPR"^^doap-deps:CpanId ], [ doap-deps:on "Keyword::Simple"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014000"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Press 0.057"^^doap-deps:CpanId ], [ doap-deps:on "PPR"^^doap-deps:CpanId ], [ doap-deps:on "Keyword::Simple"^^doap-deps:CpanId ], [
 		doap-deps:on "B::Hooks::EndOfScope 0.24"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Exporter::Tiny 1.000000"^^doap-deps:CpanId;
@@ -555,7 +555,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Zydeco";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-508>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-509>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-500>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-501>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-502>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-503>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-504>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-505>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-506>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-507>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-508>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-509>, <http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-510>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-zydeco>;
@@ -725,6 +725,26 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.509.tar.gz>;
 	doap:revision        "0.509"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Zydeco/v_0-510>
+	a                    doap:Version;
+	dc:identifier        "Zydeco-0.510"^^xsd:string;
+	dc:issued            "2020-02-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Start totally rewriting documentation.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require MooX::Press 0.057.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Default to 'ro' accessors.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Zydeco-0.510.tar.gz>;
+	doap:revision        "0.510"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

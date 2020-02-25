@@ -16,12 +16,14 @@
 	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/80043>;
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
 		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
-	], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Object::ID"^^doap-deps:CpanId ], [
+	], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Object::ID"^^doap-deps:CpanId ], [
 		doap-deps:on "Type::Tiny 1.000000"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Exporter::Tiny 0.044"^^doap-deps:CpanId;
 	];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>;
 	doap:created         "2012-10-04"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -31,7 +33,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Struct";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-017>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-015>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-016>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-017>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-018>, <http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-019>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-struct>;
@@ -354,6 +356,37 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.017.tar.gz>;
 	doap:revision        "0.017"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-018>
+	a                    doap:Version;
+	dc:identifier        "MooX-Struct-0.018"^^xsd:string;
+	dc:issued            "2020-20-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Support for Data::Printer 0.99 trial versions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Struct/v_0-019>
+	a                    doap:Version;
+	dc:identifier        "MooX-Struct-0.019"^^xsd:string;
+	dc:issued            "2020-20-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Tidy up MooX::Struct namespace using namespace::autoclean.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "The TYPE_TINY method now returns a type constraint with a coercion from ArrayRef|HashRef.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Struct-0.019.tar.gz>;
+	doap:revision        "0.019"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;

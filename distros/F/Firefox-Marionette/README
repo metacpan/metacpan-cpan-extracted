@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.93
+    Version 0.94
 
 SYNOPSIS
 
@@ -13,6 +13,8 @@ SYNOPSIS
         use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        say $firefox->find_tag('title')->property('innerHTML'); # same as $firefox->title();
     
         say $firefox->html();
     
@@ -863,7 +865,7 @@ SUBROUTINES/METHODS
 
     returns true if the current version of firefox is a nightly release
     <https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does
-    the minor version number contain an 'a'?)
+    the minor version number end with an 'a1'?)
 
  paper_sizes
 
@@ -897,7 +899,7 @@ SUBROUTINES/METHODS
       * scale - Scale of the webpage rendering. Defaults to 1.
 
       * size - The desired size (width and height) of the pdf, specified by
-      name. See the page key for an alternative and the page_sizes method
+      name. See the page key for an alternative and the paper_sizes method
       for a list of accepted page size names.
 
       * shrink_to_fit - Whether or not to override page size as defined by
@@ -928,6 +930,10 @@ SUBROUTINES/METHODS
         $element->property('value') eq '' or die "Initial property is the empty string";
         $element->type('Test::More');
         $element->property('value') eq 'Test::More' or die "This property should have changed!";
+    
+        # OR getting the innerHTML property
+    
+        my $title = $firefox->find_tag('title')->property('innerHTML'); # same as $firefox->title();
 
  quit
 

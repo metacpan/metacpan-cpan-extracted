@@ -4,7 +4,7 @@ package Chart::GGPlot::Types;
 
 use Chart::GGPlot::Setup qw(:base :pdl); 
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Ref::Util qw(is_plain_arrayref);
 use Type::Library -base, -declare => qw(
@@ -58,7 +58,7 @@ Chart::GGPlot::Types - Custom types and coercions
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

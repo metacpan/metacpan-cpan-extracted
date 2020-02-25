@@ -7,9 +7,10 @@ use constant {
   API_URL  => 'file:',
   AUTH_URL => 'auth_url',
   DEFAULTS => {
-    app_id       => 'dummy_app_id',
-    redirect_uri => 'redirect_uri',
-    scope        => 'dummy_scope',
+    app_id        => 'dummy_app_id',
+    redirect_uri  => 'redirect_uri',
+    response_type => 'code',
+    scope         => 'dummy_scope',
   },
   INFO_URL  => 'info_url',
   NAME      => 'Nuvol Dummy Connector',
@@ -25,6 +26,8 @@ sub _build_url ($self, @path) {
 
   return $url;
 }
+
+sub _do_disconnect ($self) {}
 
 sub _get_description ($self) {
   return $self->NAME . ' ' . $self->configfile;

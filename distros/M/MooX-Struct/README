@@ -188,8 +188,8 @@ DESCRIPTION
            use Moo;
            use MooX::Struct Bar => [qw( $name )];
    
-           has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY);
-           has right_bar => (is => 'rw', isa => Bar->TYPE_TINY);
+           has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY, coerce => 1);
+           has right_bar => (is => 'rw', isa => Bar->TYPE_TINY, coerce => 1);
    
            ...;
          }

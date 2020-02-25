@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.014';
+$Test::Consul::VERSION = '0.015';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -31,8 +31,8 @@ sub _unique_empty_port {
     while ($port == 0) {
         $current_port ++;
         $current_port = $start_port if $current_port > $end_port;
-        next if check_port( undef, $current_port, 'tcp' );
-        next if $udp_too and check_port( undef, $current_port, 'udp' );
+        next if check_port( $current_port, 'tcp' );
+        next if $udp_too and check_port( $current_port, 'udp' );
         $port = $current_port;
     }
 

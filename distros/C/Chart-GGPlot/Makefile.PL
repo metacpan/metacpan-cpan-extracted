@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Alt::Data::Frame::ButMore" => "0.0053",
     "Autoload::AUTOCAN" => 0,
     "Carp" => 0,
-    "Chart::Plotly" => "0.025",
+    "Chart::Plotly" => "0.039",
     "Chart::Plotly::Image::Orca" => 0,
     "Chart::Plotly::Plot" => 0,
     "Class::Method::Modifiers" => 0,
@@ -100,7 +100,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::PDL" => "0.0004",
     "Test2::V0" => 0
   },
-  "VERSION" => "0.0007",
+  "VERSION" => "0.0009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -111,7 +111,7 @@ my %FallbackPrereqs = (
   "Alt::Data::Frame::ButMore" => "0.0053",
   "Autoload::AUTOCAN" => 0,
   "Carp" => 0,
-  "Chart::Plotly" => "0.025",
+  "Chart::Plotly" => "0.039",
   "Chart::Plotly::Image::Orca" => 0,
   "Chart::Plotly::Plot" => 0,
   "Class::Method::Modifiers" => 0,

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 # VERSION
 
-version 0.000026
+version 0.000027
 
 ## configure
 

@@ -1,5 +1,5 @@
 package Template::Liquid::Condition;
-our $VERSION = '1.0.16';
+our $VERSION = '1.0.17';
 require Template::Liquid::Error;
 use base 'Template::Liquid::Block';
 use strict;
@@ -46,8 +46,11 @@ sub new {
                        parent    => $args->{'parent'}
                 }, $class;
         }
-        raise Template::Liquid::Error {type => 'Context',
-                                 message => 'Unknown operator ' . $condition};
+        raise Template::Liquid::Error {
+             type    => 'Context',
+             message => 'Unknown operator "' . $condition . '" in ' .
+                 $lval . ' ' . $condition . ' ' . (defined $rval ? $rval : '')
+        };
     }
     return
         Template::Liquid::Error->new(

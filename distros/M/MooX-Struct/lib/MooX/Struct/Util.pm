@@ -1,7 +1,7 @@
 package MooX::Struct::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.017';
+our $VERSION   = '0.019';
 
 use strict;
 use warnings;

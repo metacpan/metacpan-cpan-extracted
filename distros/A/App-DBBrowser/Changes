@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.238    2020-02-24
+        - Update documentation.
+
+2.237    2020-02-24
+        - New option 'show_table_name';
+        - Made importing multiple sheets from a spreadsheet file more comfortable.
+
 2.236    2020-02-19
         - Made importing multiple sheets from a spreadsheet file more comfortable.
 

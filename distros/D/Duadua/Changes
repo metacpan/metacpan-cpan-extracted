@@ -2,8 +2,10 @@
 
 https://github.com/bayashi/Duadua/commits/master
 
-## Show the log of each version
+## Tags
 
-Showing commit logs of tag `0.02` to `0.03` .
+https://github.com/bayashi/Duadua/tags
 
-    $ git log --graph --oneline --stat 0.02..0.03
+## Show the commit logs / diff of last tag
+
+https://github.com/bayashi/Duadua/compare/0.07...0.08

@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 extends qw(Chart::GGPlot::Geom::Rect);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -211,7 +211,7 @@ Chart::GGPlot::Geom::Boxplot - Class for boxplot geom
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

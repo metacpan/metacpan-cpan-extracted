@@ -13,24 +13,28 @@ test_basics $item, $service;
 
 my @testvalues = (
   {
-    params => {path => '/', type => 'Unknown'},
-    type   => 'Unknown',
-    url    => '',
+    params   => {path => '/', type => 'Unknown'},
+    realpath => '/',
+    type     => 'Unknown',
+    url      => '',
   },
   {
-    params => {path => 'NuvolTestfolder', type => 'Unknown'},
-    type   => 'Unknown',
-    url    => 'NuvolTestfolder',
+    params   => {path => '/Nuvol Testfolder', type => 'Unknown'},
+    realpath => '/Nuvol%20Testfolder',
+    type     => 'Unknown',
+    url      => 'Nuvol%20Testfolder',
   },
   {
-    params => {path => 'NuvolTestfolder/Subfolder', type => 'Unknown'},
-    type   => 'Unknown',
-    url    => 'NuvolTestfolder/Subfolder',
+    params   => {path => '/Nuvol Testfolder/Subfolder', type => 'Unknown'},
+    realpath => '/Nuvol%20Testfolder/Subfolder',
+    type     => 'Unknown',
+    url      => 'Nuvol%20Testfolder/Subfolder',
   },
   {
-    params => {path => 'Nuvol/Testfile.txt', type => 'Unknown'},
-    type   => 'Unknown',
-    url    => 'Nuvol/Testfile.txt',
+    params   => {path => '/Nuvol/Testfile.txt', type => 'Unknown'},
+    realpath => '/Nuvol/Testfile.txt',
+    type     => 'Unknown',
+    url      => 'Nuvol/Testfile.txt',
   },
 );
 

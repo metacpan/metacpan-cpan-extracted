@@ -55,7 +55,7 @@
          "web" : "https://github.com/Tekki/nuvol"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

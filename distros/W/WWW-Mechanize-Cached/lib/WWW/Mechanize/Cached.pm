@@ -15,9 +15,9 @@ use Carp qw( carp croak );
 use Data::Dump qw( dump );
 use Storable qw( nfreeze thaw );
 
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
-has is_cached => ( is => 'rw', isa => Maybe [Bool], default => undef );
+has is_cached        => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
 has ref_in_cache_key => ( is => 'rw', isa => Bool, default => 0 );
 has _verbose_dwarn   => ( is => 'rw', isa => Bool, default => 0 );
@@ -33,6 +33,28 @@ has cache_mismatch_content_length => (
 );
 
 has cache => ( is => 'lazy', isa => \&_isa_warn_cache );
+
+sub FOREIGNBUILDARGS {
+    my ( $class, %args ) = @_;
+
+    # WWW::Mechanize/LWP::UserAgent would complain about these
+    for my $attribute (
+        qw(
+        is_cached
+        positive_cache
+        ref_in_cach_key
+        _verbose_dwarn
+        cache_undef_content_length
+        cache_zero_content_length
+        cache_mismatch_content_length
+        cache
+        )
+    ) {
+        delete $args{$attribute};
+    }
+
+    return %args;
+}
 
 sub _isa_warn_cache {
     return
@@ -258,7 +280,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.52
+version 1.53
 
 =head1 SYNOPSIS
 
@@ -476,7 +498,7 @@ Olaf Alders <olaf@wundercounter.com> (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2004-2019 by Iain Truskett and Andy Lester.
+This software is copyright (c) 2004 by Iain Truskett and Andy Lester.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

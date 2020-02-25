@@ -15,7 +15,7 @@ package App::annex_review_unused;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_review_unused::VERSION = '0.001';
+$App::annex_review_unused::VERSION = '0.002';
 use 5.028;
 use strict;
 use warnings;
@@ -140,7 +140,6 @@ sub main {
                         system "xdg-open", $contentlocation;
                     } elsif ($response eq "b" and $i > 0) {
                         $i--;
-                        $i--;
                         pop @to_drop
                           if @to_drop
                           and $to_drop[$#to_drop] eq
@@ -199,7 +198,7 @@ App::annex_review_unused - interactively process 'git annex unused' output
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 FUNCTIONS
 

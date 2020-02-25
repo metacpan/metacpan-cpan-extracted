@@ -107,10 +107,10 @@ resources:
   bugtracker: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues
   homepage: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders
   repository: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git
-version: '0.000026'
+version: '0.000027'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::lib
@@ -148,7 +148,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OALDERS::TidyAll
       name: '@Author::OALDERS/OALDERS::TidyAll'
-      version: '0.000026'
+      version: '0.000027'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -204,7 +204,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -246,10 +246,6 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/MojibakeTests'
       version: '0.8'
     -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Author::OALDERS/PodCoverageTests'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
       version: '6.012'
@@ -272,6 +268,10 @@ x_Dist_Zilla:
           trailing_whitespace: 1
       name: '@Author::OALDERS/Test::EOL'
       version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: '@Author::OALDERS/Test::Pod::Coverage::Configurable'
+      version: '0.07'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -560,7 +560,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000026
+          tag: v0.000027
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -697,6 +697,6 @@ x_Dist_Zilla:
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

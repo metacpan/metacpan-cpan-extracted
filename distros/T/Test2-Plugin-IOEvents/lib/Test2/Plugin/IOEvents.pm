@@ -2,7 +2,7 @@ package Test2::Plugin::IOEvents;
 use strict;
 use warnings;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.001000';
 
 use Test2::Plugin::IOEvents::Tie;
 use Test2::API qw/ test2_add_callback_post_load /;

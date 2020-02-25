@@ -4,13 +4,13 @@
       "Christopher White <cxwembedded@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "List-AutoNumbered",
    "no_index" : {
@@ -35,7 +35,8 @@
       "develop" : {
          "requires" : {
             "App::RewriteVersion" : "0",
-            "Module::Metadata" : "1.000016"
+            "Module::Metadata" : "1.000016",
+            "Path::Class" : "0"
          }
       },
       "runtime" : {
@@ -62,7 +63,7 @@
    "provides" : {
       "List::AutoNumbered" : {
          "file" : "lib/List/AutoNumbered.pm",
-         "version" : "0.000007"
+         "version" : "0.000010"
       },
       "List::AutoNumbered::Skipper" : {
          "file" : "lib/List/AutoNumbered.pm"
@@ -79,6 +80,7 @@
          "web" : "https://github.com/cxw42/List-AutoNumbered"
       }
    },
-   "version" : "0.000007",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.000010",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : "1"
 }

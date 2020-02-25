@@ -1,0 +1,8 @@
+0.1.1 2020-02-25
+ 
+    - Added explicit import for File::Spec::Functions::catdir().
+    - Corrected module name in the synopsis.
+ 
+0.1.0 2020-02-24
+
+    - Initial release.

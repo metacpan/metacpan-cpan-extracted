@@ -12,6 +12,7 @@ use File::Spec::Functions qw( catfile catdir );
 
 use List::MoreUtils qw( all uniq );
 use Encode::Locale  qw();
+#use Text::CSV qw();                 # required
 
 use Term::Choose           qw();
 use Term::Choose::LineFold qw( line_fold );
@@ -54,8 +55,8 @@ sub from_col_by_col {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $aoa = [];
-    my $col_names = $sql->{insert_into_cols};
-    if ( ! @$col_names ) {
+    my $col_names;
+    if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
         $sf->__print_args( $aoa );
         # Choose a number
         my $col_count = $tu->choose_a_number( 2,
@@ -77,6 +78,9 @@ sub from_col_by_col {
         }
         $col_names = [ map { $_->[1] } @$form ]; # not quoted
         unshift @$aoa, $col_names;
+    }
+    else {
+        $col_names = $sql->{insert_into_cols};
     }
 
     ROWS: while ( 1 ) {
@@ -115,7 +119,10 @@ sub from_col_by_col {
                 if ( ! @$aoa ) {
                     return;
                 }
-                return 1, $aoa;
+                my $file_fs = $sf->{i}{f_plain};
+                require Text::CSV;
+                Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
+                return 1, $file_fs;
             }
             elsif ( $add_row eq $del ) {
                 if ( ! @$aoa ) {

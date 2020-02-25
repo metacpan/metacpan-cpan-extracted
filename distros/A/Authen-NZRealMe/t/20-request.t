@@ -42,7 +42,6 @@ is($req->destination_url, $sp->idp->single_signon_location,
 
 is($req->relay_state, undef, 'request has no default relay state');
 is($req->allow_create, 'false', 'request does not enable account creation by default');
-is($req->force_auth, 'true', 'request does force logon by default');
 
 my $strength = $req->auth_strength;
 isa_ok($strength, 'Authen::NZRealMe::LogonStrength');
@@ -87,7 +86,6 @@ ok($xml, 'extracted XML request for analysis');
 xml_found_node_ok($xml, q{/nssamlp:AuthnRequest});
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@Version} => '2.0');
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@AssertionConsumerServiceIndex} => '0');
-xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@ForceAuthn} => 'true');
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@ID} => $req_id);
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@IssueInstant} => $req->request_time);
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@Destination} => $sp->idp->single_signon_location);
@@ -101,13 +99,11 @@ xml_node_content_is($xml, q{/nssamlp:AuthnRequest/nssamlp:RequestedAuthnContext/
 
 my $req2 = $sp->new_request(
     allow_create  => 1,
-    force_auth    => 0,
     relay_state   => 'pending',
     auth_strength => 'sms',
 );
 
 is($req2->allow_create, 'true',    'request enables account creation');
-is($req2->force_auth,   'false',   'request does not force logon');
 is($req2->relay_state,  'pending', 'request has expected relay state');
 
 $strength = $req2->auth_strength;
@@ -144,7 +140,6 @@ $xml = Authen::NZRealMe::AuthenRequest->_request_from_uri($url);
 ok($xml, 'extracted XML request for analysis');
 
 xml_found_node_ok($xml, q{/nssamlp:AuthnRequest});
-xml_node_content_is($xml, q{/nssamlp:AuthnRequest/@ForceAuthn} => 'false');
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/nssamlp:NameIDPolicy/@AllowCreate} => 'true');
 xml_node_content_is($xml, q{/nssamlp:AuthnRequest/nssamlp:RequestedAuthnContext/nssaml:AuthnContextClassRef}
     => 'urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:ModStrength::OTP:Token:SMS');

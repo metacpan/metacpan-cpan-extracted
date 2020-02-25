@@ -17,11 +17,11 @@ name: Syntax-Keyword-Dynamically
 provides:
   Syntax::Keyword::Dynamically:
     file: lib/Syntax/Keyword/Dynamically.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

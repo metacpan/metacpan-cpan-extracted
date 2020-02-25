@@ -1,17 +1,27 @@
 package Nuvol::Office365::Item;
 use Mojo::Base -role, -signatures;
 
-use Mojo::File 'path';
-
 use constant SERVICE => 'Office365';
 
 # internal methods
+
+sub _build_realpath ($self) {
+  my $rv;
+  if (defined $self->{path}) {
+    $rv = $self->{path};
+  } else {
+    my $metadata = $self->metadata;
+    $rv = "$metadata->{parentReference}{path}/$metadata->{name}" =~ s|.*root:/||r;
+  }
+
+  return $rv;
+}
 
 sub _build_url ($self, @path) {
   if ($self->{id}) {
     unshift @path, 'items', $self->{id};
   } else {
-    my @parts = split '/', $self->{path};
+    my @parts = $self->realpath->@*;
     if (@parts) {
       $parts[-1] .= ':';
       unshift @path, 'root:', @parts;
@@ -34,6 +44,7 @@ sub _get_description ($self) {
 
 sub _get_name ($self) {
   my $rv;
+
   if ($self->exists) {
     $rv = $self->{metadata}{name};
   } else {
@@ -45,6 +56,7 @@ sub _get_name ($self) {
 
 sub _get_type ($self, $params) {
   my $rv;
+
   if ($params->{metadata}) {
     if ($params->{metadata}{file}) {
       $rv = 'File';
@@ -59,8 +71,9 @@ sub _get_type ($self, $params) {
 }
 
 sub _load_metadata ($self) {
-  my $res = $self->drive->connector->_ua_get($self->url);
   my $rv;
+
+  my $res = $self->drive->connector->_ua_get($self->url);
   if ($res->is_error) {
     if ($res->code == 404) {
       $rv = {};
@@ -102,30 +115,14 @@ sub _remove_item ($self) {
 
 =head1 NAME
 
-Nuvol::Office365::Item - Role for Office 365 items
-
-=head1 SYNOPSIS
-
-    use Nuvol::Connector;
-
-    my $connector = Nuvol::Connector->new($configfile, 'Office365');
-    my $item      = $connector->drive(%params)->item;
+Nuvol::Office365::Item - Internal methods for Office 365 items
 
 =head1 DESCRIPTION
 
-L<Nuvol::Office365::Item> is a role for Office 365 items.
-
-=head1 CONSTRUCTOR
-
-=head2 via Nuvol::Connector
-
-    $connector = Nuvol::Connector->new($configfile, 'Office365');
-    $item      = $connector->drive(%params)->item;
-
-Creates a L<Nuvol::Item> with applied C<Office365> role.
+L<Nuvol::Office365::Item> provides internal methods for Office 365 items.
 
 =head1 SEE ALSO
 
-L<Nuvol::Item>.
+L<Nuvol::Office365>, L<Nuvol::Item>.
 
 =cut

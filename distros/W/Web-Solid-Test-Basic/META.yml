@@ -32,10 +32,10 @@ optional_features: {}
 provides:
   Web::Solid::Test::Basic:
     file: lib/Web/Solid/Test/Basic.pm
-    version: '0.008'
+    version: '0.010'
   Web::Solid::Test::HTTPLists:
     file: lib/Web/Solid/Test/HTTPLists.pm
-    version: '0.008'
+    version: '0.010'
 requires:
   FindBin: '0'
   IO::Socket::SSL: '0'
@@ -47,13 +47,13 @@ requires:
   Test::More: '0.96'
   Test::RDF: '0'
   parent: '0'
-  perl: '5.014'
+  perl: '5.022'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/project
   bugtracker: https://github.com/kjetilk/p5-web-solid-test-basic/issues
   homepage: https://metacpan.org/release/Web-Solid-Test-Basic
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/kjetilk/p5-web-solid-test-basic.git
-version: '0.008'
+version: '0.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

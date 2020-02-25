@@ -1,6 +1,8 @@
 #!perl
 # readme_md.pl: Make README.md from a Perl file.
-# Part of Games::Dice::Tester.
+
+package # Hide from PAUSE
+    SupportReadmePL;
 
 use 5.014;
 use strict;
@@ -28,7 +30,7 @@ die "skipfrom and skipto must be used together" if (!!$skipfrom) ^ (!!$skipto);
 
 $appveyor =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--appveyor <GH username>/<GH repo>' if $appveyor;
 $appveyor_badge //= $appveyor;
-$appveyor_badge =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--appveyor <GH username>/<GH repo>' if $appveyor_badge;
+$appveyor_badge =~ m{^[A-Za-z0-9-]+/[A-Za-z0-9-]+} or die '--avbadge <GH username>/<GH repo>' if $appveyor_badge;
 
 # Load the right parser
 my $parser;

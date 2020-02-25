@@ -1,3 +1,8 @@
+0.7.1 2020-02-25
+
+    - Switching from ExtUtils::MakeMaker to Module::Build-based build
+      system thus making the build process more portable.
+
 0.7.0 2020-01-12
 
     - Acknowledging conformance to OPTiMaDe specification v1.0.0-rc.1.

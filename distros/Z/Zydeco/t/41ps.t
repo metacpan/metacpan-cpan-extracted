@@ -13,7 +13,7 @@ package MyApp {
 
 like(
 	exception { MyApp->new_foo( foo => 1.1 ) },
-	qr/did not pass type constraint "Int"/,
+	qr/type constraint/,
 );
 
 done_testing;

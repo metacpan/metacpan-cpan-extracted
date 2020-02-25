@@ -29,6 +29,7 @@ if(!GetOptions(\%opt,
     'version',
     'conf_dir|conf-dir|c=s',
     'type|t=s',
+    'acs_index|acs-index=i',
     'allow_create|allow-create',
     'resolve_flt|resolve-flt',
     'disable_ssl_verify|disable-ssl-verify',
@@ -49,14 +50,21 @@ if($opt{help} or (@ARGV && $ARGV[0] eq 'help')) {
     pod2usage(-exitstatus => 0, -verbose => 2);
 }
 
+pod2usage(
+    -exitstatus => 1, -verbose => 0,
+    -message => "No command specified\n"
+) if not @ARGV;
+
 $ARGV[0] ||= 'version' if $opt{version};
 
 my $start_dir = getcwd();
-eval { Authen::NZRealMe->run_command(\%opt, @ARGV); };
-if($@) {
-    chdir($start_dir);
-    pod2usage(-exitstatus => 1, -verbose => 0, -message => "$@");
-}
+eval {
+    Authen::NZRealMe->run_command(\%opt, @ARGV);
+    1;
+} or do {
+    warn "$@\nUse --help for more info\n";
+    exit 1;
+};
 
 exit 0;
 
@@ -84,8 +92,10 @@ nzrealme - Tools for interacting with the New Zealand 'RealMe Login' service
   Options:
 
    --conf-dir <path>  pathname of directory containing metadata & cert files
-   --allow-create     can be used with 'make-req' to allow account creation
    --type <name>      service type: "login" (default) or "assertion"
+   --acs-index <num>  index number of ACS RealMe should redirect response to
+   --allow-create     can be used with 'make-req' to allow account creation
+   --resolve-flt      get FLT for "assertion" service response
    --env <name>       target environment (must be: 'mts', 'ite' or 'prod')
    --org <name>       organisation/agency name, e.g.: "Department of Innovation"
    --org-unit <name>  organisational unit, e.g.: "Innovation Labs"
@@ -196,6 +206,20 @@ See C<< perldoc Authen::NZRealMe >> for more information about config files.
 
 Use this option to direct the request to either the "login" service (the
 default) or the "assertion" service to retrieve identity attributes.
+
+=item B<< --acs-index <num> >>
+
+Use this option with the 'make-req' command to generate a request with a
+non-default value for the 'AssertionConsumerServiceIndex' parameter.  If not
+specified, this value will default to the number 0.
+
+=item B<< --allow-create >>
+
+Use this option with the 'make-req' command to generate a request for the
+"login" service which will allow the user to create a new login for your site.
+By default, the AllowCreate flag will not be enabled in the request and logins
+will only be allowed from users who have used their RealMe account with the
+site previously.
 
 =item B<< --env <name> >>
 

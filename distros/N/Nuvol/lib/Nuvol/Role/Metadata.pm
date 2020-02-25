@@ -20,7 +20,7 @@ sub _parse_parameters ($self, $params) {
     $self->{id} = $params->{id};
   } elsif ($params->{path}) {
     $self->{path} = $params->{path};
-    $self->{path} =~ s|/$||;
+    $self->{path} =~ s|(.+)/$|$1|;
   }
 
   return $self;

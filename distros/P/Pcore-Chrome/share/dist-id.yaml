@@ -1,11 +1,11 @@
 ---
 branch: master
-date: 2020-02-21T13:41:31Z
-hash: 8f591ea64f4e16bf3a8f82b57f86512a3030fe94
-hash_short: 8f591ea
+date: 2020-02-24T14:01:21Z
+hash: 3874c20fbaf7f27c48997958b91aba106483e5ac
+hash_short: 3874c20
 is_dirty: 0
-release: v0.15.0
+release: v0.16.0
 release_distance: ~
 tags:
-- v0.15.0
+- v0.16.0
 - latest

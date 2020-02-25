@@ -12,7 +12,7 @@ use Nuvol::Test::Roles ':metadata';
 
 my $package          = 'Nuvol::Item';
 my @constants        = qw|SERVICE|;
-my @internal_methods = qw|_check_existence _get_type|;
+my @internal_methods = qw|_build_realpath _check_existence _get_type|;
 
 sub build_test_item ($service) {
   note "Create test item for $service";
@@ -22,7 +22,7 @@ sub build_test_item ($service) {
   test_metadata_prerequisites $package, $service;
 
   my $drive = build_test_drive $service;
-  ok my $object = $package->new($drive, {path => 'Nuvol Testfile.txt', type => 'Unknown'}),
+  ok my $object = $package->new($drive, {path => '/Nuvol Testfile.txt', type => 'Unknown'}),
     'Create object';
 
   return $object;
@@ -51,12 +51,22 @@ sub test_url ($item, $urls) {
   my $drive     = $item->drive;
   my $drive_url = $drive->url;
 
-  note 'URLs';
+  note 'URLs and real paths';
 
   for my $url ($urls->@*) {
+    ok my $testitem = $package->new($drive, $url->{params}), "Create test item";
+
     my $expected = $url->{url} ? "$drive_url/$url->{url}" : $drive_url;
-    is $package->new($drive, $url->{params})->url, $expected, "URL for $url->{url}";
+    is $testitem->url, $expected, "URL for $url->{url}";
+
+    next unless defined $url->{realpath};
+    ok my $realpath = $testitem->realpath, 'Get realpath';
+    isa_ok $realpath, 'Mojo::Path';
+    ok $realpath->leading_slash, 'Path is absolute';
+
+    is $realpath, $url->{realpath}, 'Path is correct';
   }
+
 }
 
 1;
@@ -106,7 +116,7 @@ Tests if the correct type is detected.
 
     test_url $item, \@urls;
 
-Tests URLs built from IDs and paths.
+Tests URLs and realpaths built from IDs and paths.
 
 =head1 SEE ALSO
 

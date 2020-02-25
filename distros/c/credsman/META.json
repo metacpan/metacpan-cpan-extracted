@@ -1,0 +1,54 @@
+{
+   "abstract" : "is a simple Pel extension to work with 'Windows Credential Manager'.  ",
+   "author" : [
+      "Rodrigo Agurto <rodagurto@aim.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "credsman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "7.12",
+            "Params::ValidationCompiler" : "0",
+            "Test::More" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::testlib" : "0",
+            "Params::ValidationCompiler" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

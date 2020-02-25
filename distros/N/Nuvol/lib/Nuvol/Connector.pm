@@ -2,6 +2,7 @@ package Nuvol::Connector;
 use Mojo::Base -base, -signatures;
 
 use Mojo::Collection;
+use Mojo::Parameters;
 use Mojo::URL;
 use Mojo::UserAgent;
 use Nuvol::Config;
@@ -23,7 +24,8 @@ sub new ($class, $configfile, $service = '', $params = {}) {
     Carp::croak 'Service missing!' unless $service;
     $self->with_roles("Nuvol::${service}::Connector");
     my %config_params = (configfile => $self->configfile, service => $self->SERVICE);
-    $config_params{$_} = $params->{$_} || $self->DEFAULTS->{$_} for qw|app_id redirect_uri scope|;
+    $config_params{$_} = $params->{$_} || $self->DEFAULTS->{$_}
+      for qw|app_id redirect_uri response_type scope|;
     Nuvol::Config->new($configfile, \%config_params);
   }
 
@@ -38,33 +40,20 @@ sub authenticate ($self) {
   my $config = $self->config;
 
   # get authorization code
-  my $url = Mojo::URL->new($self->AUTH_URL)->query(
-    client_id     => $config->app_id,
-    scope         => $config->scope,
-    response_type => 'code',
-    redirect_uri  => $config->redirect_uri,
-  );
+  my $response_type = $config->response_type;
+  my %query         = (client_id => $config->app_id, response_type => $response_type);
+  for (qw|scope redirect_uri|) {
+    $query{$_} = $config->$_ if ($config->$_ || '') ne 'none';
+  }
+  my $url = Mojo::URL->new($self->AUTH_URL)->query(\%query);
   say $self->NAME;
+  my $fn = $self->can("_auth_$response_type")
+    or Carp::croak "Unsupported response type '$response_type'!";
   say qq|Open the following link in your browser and allow the application to access your drive:\n|;
   say_info qq|$url\n|;
 
-  my $in = prompt_input 'Paste the response URL: ', -stdio;
-  my $code = Mojo::URL->new($in)->query->param('code')
-    or die color_error 'URL contains no code';
-
-  # redeem code for access tokens
-  print 'Get new token ... ';
-  my $ua   = Mojo::UserAgent->new;
-  my %form = (
-    client_id    => $config->app_id,
-    redirect_uri => $config->redirect_uri,
-    code         => $code,
-    grant_type   => 'authorization_code',
-  );
-  my $res = $ua->post($self->TOKEN_URL, form => \%form)->result;
-  die color_error $res->message if $res->is_error;
-  my $response = $res->json;
-  say_ok 'ok';
+  my $in       = prompt_input 'Paste the response URL: ', -stdio;
+  my $response = $fn->($self, $config, Mojo::URL->new($in));
 
   # update config
   print 'Update config ... ';
@@ -99,7 +88,7 @@ sub disconnect ($self) {
   return $self;
 }
 
-sub drive ($self, $path) {
+sub drive ($self, $path = '~') {
   require Nuvol::Drive;
   return Nuvol::Drive->new($self, {path => $path});
 }
@@ -119,7 +108,7 @@ sub list_drives ($self) {
 sub _access_token ($self) {
   my $config = $self->config;
 
-  if ($config->validto < time + 10) {
+  if ($config->validto && $config->validto < time + 10) {
     $self->_update_token($config);
     $config->save;
   }
@@ -127,10 +116,40 @@ sub _access_token ($self) {
   return $config->access_token;
 }
 
+sub _auth_code ($self, $config, $url) {
+  my $code = $url->query->param('code') or die color_error 'URL contains no code!';
+
+  # redeem code for access tokens
+  print 'Get new token ... ';
+  my $ua   = Mojo::UserAgent->new;
+  my %form = (
+    client_id  => $config->app_id,
+    code       => $code,
+    grant_type => 'authorization_code',
+  );
+  $form{redirect_uri} = $config->redirect_uri if $config->redirect_uri ne 'none';
+  my $res = $ua->post($self->TOKEN_URL, form => \%form)->result;
+  die color_error $res->message if $res->is_error;
+
+  my $response = $res->json;
+  say_ok 'ok';
+
+  return $response;
+}
+
 sub _auth_headers ($self, $headers = {}) {
   my $access_token = $self->_access_token;
   $headers->{Authorization} = "Bearer $access_token";
+
   return $headers;
+}
+
+sub _auth_token ($self, $config, $url) {
+  my $rv = {
+    access_token =>Mojo::Parameters->new($url->fragment)->param('access_token'),
+  };
+
+  return $rv;
 }
 
 sub _set_token ($self, $config, $params) {
@@ -142,30 +161,27 @@ sub _set_token ($self, $config, $params) {
   return $self;
 }
 
-sub _ua_delete ($self, $url) {
-  return Mojo::UserAgent->new->delete($url, $self->_auth_headers)->result;
+sub _ua_delete ($self, $url, @request) {
+  return $self->_ua_tx(DELETE => $url, @request);
 }
 
-sub _ua_get ($self, $url) {
-  return Mojo::UserAgent->new->get($url, $self->_auth_headers)->result;
+sub _ua_get ($self, $url, @request) {
+  return $self->_ua_tx(GET => $url, @request);
 }
 
-sub _ua_post ($self, $url, $json) {
-  return Mojo::UserAgent->new->post($url, $self->_auth_headers, json => $json)->result;
+sub _ua_post ($self, $url, @request) {
+  return $self->_ua_tx(POST => $url, @request);
 }
 
-sub _ua_put ($self, $url, $content, $headers = {ContentType => 'text/plain'}) {
-  return Mojo::UserAgent->new->put($url, $self->_auth_headers($headers), $content)->result;
+sub _ua_put ($self, $url, @request) {
+  return $self->_ua_tx(PUT => $url, @request);
 }
 
-sub _ua_put_asset ($self, $url, $asset, $headers = {}) {
-  my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->build_tx(PUT => $self->_auth_headers($headers));
-  $tx->req->content->asset($asset);
+sub _ua_tx ($self, $method, $url, @request) {
+  my $ua      = Mojo::UserAgent->new;
+  my $headers = $self->_auth_headers(ref $request[0] eq 'HASH' ? shift @request : {});
 
-  $ua->start($tx);
-
-  return $tx->res;
+  return $ua->start($ua->build_tx($method, $url, $headers, @request))->result;
 }
 
 sub _update_oauth_token ($self, $config) {
@@ -222,11 +238,6 @@ Nuvol::Connector - Base class for Nuvol connectors
 
 L<Nuvol::Connector> is the base class for Nuvol connectors.
 
-=head2 config file
-
-The parameters for the connection are stored in a config file. The information in this file allows
-full access to your cloud service for anyone who can read it. It should be stored at a secure place.
-
 =head1 CONSTRUCTOR
 
 =head2 via Nuvol
@@ -242,8 +253,9 @@ Connections with existing config files are opened with L<Nuvol::connect>.
     $connector = Nuvol::Connector->new($configfile, $service);
 
 To create a new file, the parameter C<$service> is required. It defines the type of service that
-will be activated. Available services are L<Dummy|Nuvol::Connector::Dummy> and
-L<Office365|Nuvol::Connector::Office365>.
+will be activated in all objects created with this connector. Available services are
+L<Dropbox|Nuvol::Connector::Dropbox>, L<Office365|Nuvol::Connector::Office365>, and
+L<Dummy|Nuvol::Connector::Dummy>
 
     %params = (
       app_id       => $app_id,
@@ -258,6 +270,10 @@ value for the scope is set during authentication.
     $connector = Nuvol::Connector->new($configfile);
 
 If the config file exists all values are read from it and additional parameters are ignored.
+ 
+    $ perl -MNuvol::Connector -E'Nuvol::Connector->new("~/.office365.conf", "Office365")->authenticate'
+
+New config files can be created and authenticated in the console.
 
 =head1 METHODS
 
@@ -316,13 +332,21 @@ Getter for the path to the configfile.
     $connector = $connector->disconnect($newvalue);
 
 Deletes the confidential information (access token, refresh token and valitidy time) from the config
-file. To use it again it has to be re-authenticated.
+file. On some services it invalidates the tokens on the server side, so it is always more secure to
+use this method instead of just deleting the file.
+
+To use a disconnected config file again it has to be re-authenticated with L</authenticate>.
 
 =head2 drive
 
     $drive = $connector->drive($path);
 
 Getter for a drive with the specified C<path>. Returns a L<Nuvol::Drive>.
+
+    $drive = $connector->drive;
+    $drive = $connector->drive('~');
+
+Called with no parameter or with C<~> as path will return the default drive.
 
 =head2 list_drives
 
@@ -334,6 +358,6 @@ with the default drive at the first position. This list may be incomplete.
 
 =head1 SEE ALSO
 
-L<Nuvol>, L<Nuvol::Drive>.
+L<Nuvol>, L<Nuvol::Config>, L<Nuvol::Drive>, L<Nuvol::Role::Metadata>.
 
 =cut

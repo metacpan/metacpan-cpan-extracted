@@ -4,7 +4,7 @@ use Test::More;
 
 my $package;
 
-my @methods = qw|drive exists type|;
+my @methods = qw|drive exists is_file is_folder realpath type|;
 my @internal_methods = qw|_load|;
 
 BEGIN {

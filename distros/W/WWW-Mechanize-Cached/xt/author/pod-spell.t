@@ -25,6 +25,7 @@ Fredric
 Gardner
 Iain
 John
+Jonathan
 July
 Kent
 Lester
@@ -33,6 +34,7 @@ Mech
 Mechanize
 Neil
 Olaf
+Rubin
 SJ
 Strand
 Truskett
@@ -44,6 +46,7 @@ bolav
 choroba
 current
 genehack
+jjr
 kentfredric
 lib
 maintainer
@@ -54,4 +57,5 @@ olaf
 original
 params
 petdance
+simbabque
 yanick

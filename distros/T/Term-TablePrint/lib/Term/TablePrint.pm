@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.119';
+our $VERSION = '0.120';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -65,6 +65,7 @@ sub _valid_options {
         binary_string     => 'Str',
         decimal_separator => 'Str',
         prompt            => 'Str',
+        table_name        => 'Str', # experimental
         undef             => 'Str',
         #thsd_sep         => 'Str',
     };
@@ -90,6 +91,7 @@ sub _defaults {
         prompt            => '',
         tab_width         => 2,
         table_expand      => 1,
+        #table_name        => undef, # experimental
         undef             => '',
         thsd_sep          => ',', #
     }
@@ -214,6 +216,20 @@ sub __recursive_code {
     my $list = $self->__cols_to_string( $w_cols ); # $self->{table_copy} is now $list
     my $table_w = sum( @$w_cols, $self->{tab_w} * $#{$w_cols} );
     my @header;
+    #$self->{info} = 'INFO'; # info info_tabs prompt_tabs
+    #$self->{prompt} = 'PROMPT';
+    #if ( length $self->{info} ) {
+    #    push @header, $self->{info};
+    #}
+    #if ( length $self->{prompt} ) {
+    #    push @header, $self->{prompt};
+    #}
+    #if ( length $self->{info} || length $self->{prompt} ) {
+    #    push @header, $self->__header_sep( $w_cols );
+    #    if ( $self->{grid} == 2 ) {
+    #        $self->{grid} = 1;
+    #    }
+    #}
     if ( length $self->{prompt} ) {
         @header = ( $self->{prompt} );
     }
@@ -253,7 +269,7 @@ sub __recursive_code {
         my $row = choose(
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
-              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
+              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer_string => $self->{table_name}, # table_name experimental
               color => $self->{color}, codepage_mapping => $self->{codepage_mapping} }
         );
         if ( ! defined $row ) {
@@ -557,7 +573,7 @@ sub __cols_to_string {
                 }
             }
             else {
-                $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] );
+                $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] ); # ###
             }
             if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) {
                 my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/msg;
@@ -725,7 +741,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.119
+Version 0.120
 
 =cut
 
@@ -1078,7 +1094,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2019 Matthäus Kiem.
+Copyright 2013-2020 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

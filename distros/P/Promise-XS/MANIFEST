@@ -18,8 +18,10 @@ t/aplus.t
 t/assets/deferred_leak.pl
 t/assets/promise_leak.pl
 t/detect_memory_leaks.t
+t/finally.t
 t/ioasync.t
 t/mojo.t
+t/multi_return.t
 t/subclass.t
 t/sync.t
 t/unhandled_rejection.t

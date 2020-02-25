@@ -1,7 +1,7 @@
 package Nuvol;
 use Mojo::Base -strict, -signatures;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # functions
 
@@ -39,22 +39,76 @@ Nuvol - A cloud toolkit
     # download
     my $downloaded = $file_2->copy_to(path 'Downloaded Text.txt');
 
+    # change the text
+    $file_2->spurt('This text was changed.');
+
+    # read it
+    my $content = $file_2->slurp;
+
+    # and delete the file
+    $file_2->remove;
+
 =head1 DESCRIPTION
 
-L<Nuvol> is a toolkit to work with cloud resources. For the beginning it supports L<Office
-365|Nuvol::Office365> and a L<Dummy service|Nuvol::Dummy> as cloud services and concentrates on files
-and folders.
+L<Nuvol> is a toolkit to manipulate files and folders on cloud services. For the beginning it
+supports L<Dropbox|Nuvol::Dropbox>, L<Office 365|Nuvol::Office365>, and a L<Dummy
+service|Nuvol::Dummy>.
+
+    Nuvol
+    └── Connector
+        ├── Config
+        │   └── config file
+        └── Drive
+            └── Item
+                ├── File
+                └── Folder
+
+The services are organized in connectors, drives, items, files, and folders. The data needed to
+access a service is stored in a config file.
+
+=over 4
+
+=item Connector
+
+The L<Connector|Nuvol::Connector> is responsible for authentication and for the connection to the
+cloud service.
+
+=item Config and config file
+
+The config file stores the tokens and other parameters used to establish a connection. Internally is
+is represented by a L<Config|Nuvol::Config> object.
+
+B<Warning:> The information in the config file allows full access to your cloud data for anyone who
+can read it. It should be stored at a secure place. Services that are no longer used should be
+disabled with L<Nuvol::Connector/disconnect>.
+
+=item Drive
+
+A L<Drive|Nuvol::Drive> is an isolated area where your data is stored. You may have a drive for your
+personal and another for your business data. Not all cloud providers support different drives.
+
+=item Item
+
+Every object in a drive is an L<Item|Nuvol::Item>. Item is just an abstract type, a real object is
+either a L<File|Nuvol::Role::File> or a L<Folder|Nuvol::Role::Folder>.
+
+The syntax for drive items is oriented at L<Mojo::File>, so anyone familiar with this module will
+recognize most of the methods.
+
+=back
 
 =head1 FUNCTIONS
 
-None of the functions is exported by default.
+None of the functions is exported.
 
 =head2 connect
 
     use Nuvol;
     $connector = Nuvol::connect($configfile);
 
-Opens a connection with an existing config file. Returns a L<Nuvol::Connector>.
+Opens a connection using an existing config file. Returns a L<Nuvol::Connector>.
+
+To create new config files L<Nuvol::Connector/new> has to be used.
 
 =head1 AUTHOR & COPYRIGHT
 

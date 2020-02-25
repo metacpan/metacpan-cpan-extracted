@@ -16,6 +16,7 @@ doap.ttl
 lib/Web/Solid/Test/Basic.pm
 lib/Web/Solid/Test/HTTPLists.pm
 t/01basic.t
+t/data/#http-put-check-acl.ttl#
 t/data/alice-token
 t/data/http-basic.ttl
 t/data/http-put-check-acl.ttl

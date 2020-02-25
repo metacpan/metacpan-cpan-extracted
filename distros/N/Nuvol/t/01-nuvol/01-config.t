@@ -20,14 +20,18 @@ note 'Constants';
 can_ok $package, $_ for qw|CONFIG_PARAMS|;
 
 is $package->CONFIG_PARAMS,
-  'access_token app_id redirect_uri refresh_token scope service validto',
+  'access_token app_id redirect_uri refresh_token response_type scope service validto',
   'Config param keys';
 
 note 'Create object';
 
-my %test_params
-  = (app_id => 'my app id', redirect_uri => 'redirect uri', scope => 'no scope',
-  service => $service);
+my %test_params = (
+  app_id        => 'my app id',
+  redirect_uri  => 'redirect uri',
+  response_type => 'response_type',
+  scope         => 'none',
+  service       => $service
+);
 
 my %config_params;
 for my $key (sort keys %test_params) {

@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 package MyApp {
-	use Zydeco;
+	use Zydeco default_is => 'rw';
 	
 	class Foo {
 		has foo;

@@ -1,5 +1,5 @@
 package Authen::NZRealMe;
-$Authen::NZRealMe::VERSION = '1.19';
+$Authen::NZRealMe::VERSION = '1.20';
 use warnings;
 use strict;
 
@@ -61,6 +61,7 @@ my %class_map = (
     identity_provider       => 'Authen::NZRealMe::IdentityProvider',
     token_generator         => 'Authen::NZRealMe::TokenGenerator',
     xml_signer              => 'Authen::NZRealMe::XMLSig',
+    xml_encrypter           => 'Authen::NZRealMe::XMLEnc',
     sp_builder              => 'Authen::NZRealMe::ServiceProvider::Builder',
     sp_cert_factory         => 'Authen::NZRealMe::ServiceProvider::CertFactory',
     resolution_request      => 'Authen::NZRealMe::ResolutionRequest',
@@ -68,6 +69,7 @@ my %class_map = (
     resolution_response     => 'Authen::NZRealMe::ResolutionResponse',
     authen_request          => 'Authen::NZRealMe::AuthenRequest',
     logon_strength          => 'Authen::NZRealMe::LogonStrength',
+    term_readline           => 'Authen::NZRealMe',
 );
 
 
@@ -161,6 +163,9 @@ sub _dispatch_make_req {
         my $allow_create = $opt->{allow_create} ? 1 : 0;
         push @req_options, allow_create => $allow_create;
     }
+    my $acs_index = $opt->{acs_index} // 0;
+    push @req_options, acs_index => $acs_index;
+
     my $req = $sp->new_request( @req_options );
 
     print "Request ID: ", $req->request_id, "\n" if -t 1;
@@ -222,10 +227,40 @@ sub _conf_dir {
     die "$cmnd command needs --conf-dir option\n";
 }
 
+
+sub init_readline {
+    require Term::ReadLine;   # Was not needed until now
+
+    my $term = Term::ReadLine->new('nzrealme');
+    if($term and $term->can('ornaments')) {
+        $term->ornaments(0);
+    }
+
+    if(not exists $INC{'Term/ReadLine/Gnu.pm'}) {
+        warn "Consider installing Term::ReadLine::Gnu for better terminal handling.\n\n";
+    }
+
+    return $term;
+}
+
+
 1;
 
 
 __END__
+
+
+=head1 IMPLEMENTATION DETAILS
+
+This module does not implement 100% of the APIs exposed by the RealMe service.
+In particular, it only implements the 'Artifact' binding and not the 'POST'
+binding.  This is simply because the 'POST' binding was made available after
+this module was initially developed and the authors have not yet had a
+requirement to implement the 'POST' binding.  Patches are welcome.
+
+The module also does not currently implement the RCMS API.  Once again, this
+is because the authors have not yet needed RCMS functionality.  Patches are
+welcome for this too.
 
 
 =head1 GETTING STARTED
@@ -235,6 +270,10 @@ authenticating users.  Your agency will need to establish a Service Provider
 role with the logon service and complete the required integration steps.  Your
 first step should be to make contact with the DIA/RealMe team and arrange a
 meeting.
+
+(Actually, it appears that you I<can> now set up a working integration with at
+least the RealMe MTS test service without having to engage formally with RealMe
+or DIA).
 
 
 =head1 CODE INTEGRATION
@@ -256,7 +295,41 @@ when the user is redirected back to your site
 =back
 
 To understand how this module must be linked into your application, it helps to
-understand the SAML protocol interaction that is followed for each user logon:
+understand the SAML protocol interaction that is followed for each user logon.
+
+The recommended use case will use the 'HTTP-POST' binding as follows:
+
+  Agency Web Site                                 RealMe login server
+
+                     .-------------------------.
+                     | 1. user visits agency   |
+               .-----|    web site and clicks  |
+               |     |   'RealMe login' button |
+               v     '-------------------------'
+  .-------------------------.
+  | 2. SAML AuthnRequest    |
+  |    passed back to user  |-------------------------.
+  |    via 302 redirect     |                         v
+  '-------------------------'           .--------------------------.
+   API call                             | 3. Logon service prompts |
+                                   .----|    for username/password |
+                                   v    '--------------------------'
+                      .------------------------.
+                      | 4. user enters         |
+                      |    username/password   |------.
+                      '------------------------'      v
+                                       .---------------------------.
+                                       | 5. SAML Response returned |
+              .------------------------|    via HTTP POST          |
+              v                        '---------------------------'
+ .-------------------------.
+ | 6. FLT to identify user |
+ |    extracted from resp. |
+ '-------------------------'
+  API call
+
+Legacy implementations will use the 'HTTP-Artifact' binding to exchange
+an 'artifact' (token) for an Assertion using SOAP over a back-channel:
 
   Agency Web Site                                 RealMe login server
 
@@ -310,7 +383,8 @@ module implements the SAML SP role on behalf of the agency web app.
 To integrate this module with your application, you need to make two calls to
 its API: the first to generate the authentication request (step 2 above) and
 the second to resolve the returned artifact and return the Federated Logon Tag
-(FLT) which identifies the user (steps 6 thru 8).
+(FLT) which identifies the user (step 6 for HTTP-POST binding or steps 6 thru
+8 for HTTP-Artifact binding).
 
 It is your responsibility to create a persistent association in your
 application data store between your user record and the RealMe FLT for that
@@ -358,37 +432,32 @@ change the C<type> parameter when creating the service_provider object:
 =head2 Artifact Resolution
 
 Once the user has provided a valid username and password to the logon service,
-they will be redirected back to your application and an 'artifact' will be
-passed in a URL parameter called 'SAMLart'.  You set up which URL you want the
-logon service to redirect back to when you generate your service provider
-metadata (see L</CONFIGURATION>).  This URL is known as the Assertion Consumer
-Service or 'ACS'.
+they will be redirected back to your application, at which point you need to
+make a second API call to resolve the assertion.
 
-A single method call is used to:
+You set up which URL you want the logon service to redirect back to when you
+generate your service provider metadata (see L</CONFIGURATION>).  This URL is
+known as the Assertion Consumer Service or 'ACS'.
 
-=over 4
+If you're using the HTTP-POST binding, you'll need to get the value of the
+'SAMLResponse' form parameter and pass it to the C<resolve_posted_assertion()>
+method (along with the original request_id retrieved from the user's session
+state).
 
-=item *
+If you're using the HTTP-Artifact binding, you'll need to get the value of
+the 'SAMLart' querystring parameter and pass it to the C<resolve_artifact()>
+method (along with the original request_id retrieved from the user's session
+state).
 
-generate a SAML ArtifactResolve message
+In either case, a SAML Assertion will be retrieved. For HTTP-POST, the API call
+will decode and decrypt the posted response.  For HTTP-Artifact, the API call
+will look after: generating a SAML ArtifactResolve message; passing it to the
+IdP over a backchannel; accepting the SAML ArtifactResponse message.
 
-=item *
-
-pass it to the IdP over a backchannel
-
-=item *
-
-accept the SAML ArtifactResponse message
-
-=item *
-
-validate the assertion
-
-=item *
-
-extract and return the attributes (or error detail) in a response object
-
-=back
+Once the SAML assertion is retrieved, the API call will also: validate the
+assertion (checking digital signature, timestamps and other validity
+constraints); extract and return the attributes (or error detail) in a response
+object
 
 The method call will return a response object containing either the attribute
 details or details of the condition which meant the logon was unsuccessful.  In
@@ -400,11 +469,15 @@ response from the assertion service may contain a number of identity attributes.
 See L<Authen::NZRealMe::ResolutionResponse> for details of methods provided to
 access the attribute values.
 
-  my $sp   = Authen::NZRealMe->service_provider( conf_dir => $path_to_config_directory );
+Sample code for processing HTTP-POST would look like this:
+
+  my $sp   = Authen::NZRealMe->service_provider(
+      conf_dir => $path_to_config_directory
+  );
   my $resp = eval {
-      $sp->resolve_artifact(
-          artifact   => $framework->param('SAMLart'),
-          request_id => $framework->get_state('login_request_id'),
+      $sp->resolve_posted_assertion(
+          saml_response => $framework->param('SAMLart'),
+          request_id    => $framework->get_state('login_request_id'),
       );
   };
   if($@) {
@@ -429,6 +502,17 @@ access the attribute values.
       # Should present $resp->status_message to user and also give contact
       # details for RealMe Help Desk
   }
+
+Sample code for HTTP-Artifact would be identical except for the 'resolve'
+method call:
+
+  my $resp = eval {
+      $sp->resolve_artifact(
+          artifact   => $framework->param('SAMLart'),
+          request_id => $framework->get_state('login_request_id'),
+      );
+  };
+  # Process response as for HTTP-POST, above
 
 Note: there are two different categories of 'error': the C<resolve_artifact()>
 method might throw an exception (caught by eval, details in $@); or a response
@@ -471,6 +555,11 @@ The login service IdP or Identity Provider metadata file will be provided to
 you by RealMe/DIA.  You will simply need to copy it to the config directory and
 give it the correct name.
 
+For example, rename this file from the MTS integration bundle:
+
+  MTSIdPLoginSAMLMetadata.xml => metadata-login-idp.xml
+
+
 =item C<metadata-assertion-sp.xml>
 
 This file is only required if you are using the assertion service and can be
@@ -491,6 +580,10 @@ omitted if you are only using the login service.
 The assertion service IdP or Identity Provider metadata file will be provided
 to you by RealMe/DIA.  You will simply need to copy it to the config directory
 and give it the correct name.
+
+For example, rename this file from the MTS integration bundle:
+
+  MTSIdPAssertSAMLMetadata.xml.xml => metadata-assertion-idp.xml
 
 =item C<metadata-icms.wsdl>
 
@@ -530,11 +623,14 @@ This private key is paired with the F<sp-ssl-crt.pem> certificate.
 You must first decide which directory your config files will be stored in.
 The examples below assume a config directory path of C</etc/nzrealme>.
 
-=head3 Certificates
+=head3 Certificate/Key pairs
 
-Once you've decided on a location, you need to generate two SSL certificates
-and their corresponding private keys.  The first will be used for signing the
-SAML AuthnRequest messages and the second will be used for mutual SSL
+Once you've decided on a location, you need to generate one or possibly two SSL
+certificates and their corresponding private keys.  The first certificate/key
+pair will be used for signing the SAML AuthnRequest messages.  If you are using
+the HTTP-POST binding, the IdP will use the public key from this same
+certificate to encrypt the SAMLResponse.  If you are using the HTTP-Artifact
+binding, you'll need a second certificate/key pair to be used for mutual SSL
 encryption of communications over the back-channel.
 
 It is not necessary to generate the certificates on the same machine where
@@ -552,31 +648,22 @@ You do not need to generate certificates at all for the MTS environment -
 simply use the files provided in the MTS integration resources pack.  Copy them
 into your config directory and rename as follows:
 
-  mts_mutualssl_saml_sp.pem => sp-sign-key.pem
-  mts_mutualssl_saml_sp.cer => sp-sign-crt.pem
-  mts_saml_sp.pem           => sp-ssl-key.pem
-  mts_saml_sp.cer           => sp-ssl-crt.pem
+  mts_mutual_ssl_sp.pem => sp-sign-key.pem
+  mts_mutual_ssl_sp.cer => sp-sign-crt.pem
+  mts_saml_sp.pem       => sp-ssl-key.pem
+  mts_saml_sp.cer       => sp-ssl-crt.pem
 
-=item ITE (Staging)
+=item ITE (Staging) and PROD (Production)
 
-For the ITE environment you can generate self-signed certs.  The C<nzrealme>
-tool can prompt you interactively for the required parameters:
-
-  nzrealme --conf-dir /etc/nzrealme make-certs
-
-or you can provide them on the command-line:
-
-  nzrealme --conf-dir /etc/nzrealme make-certs --env ITE \
-    --org="Department of Innovation" --domain="innovation.govt.nz"
-
-=item PROD (Production)
-
-For the production environment you can use the C<nzrealme> tool to generate
-Certificate Signing Requests which you will then submit to a Certification
-Authority who will issue signed certificate files.  Save them in the config
-directory using the filenames listed above.
+For both the ITE and production environments you can use the C<nzrealme> tool
+to generate Certificate Signing Requests which you will then submit to a
+Certification Authority who will issue signed certificate files.  Save them in
+the config directory using the filenames listed above.
 
   nzrealme --conf-dir /etc/nzrealme make-certs --env PROD ...
+
+(Note: it used to be possible to use self-signed certificates with ITE - this
+is no longer possible).
 
 =back
 
@@ -590,13 +677,17 @@ with the command:
 You will be prompted to provide the necessary details and can re-run the
 command to revise your answers.
 
-Note: You can't simply edit the XML metadata file, because a digital signature
-is added when the file is saved.
+Note: Whilst this command should give you a metadata file which passes
+validation it is likely that you will need to edit the file in a text editor to
+fine tune the parameters - particularly if you need more than one Assertion
+Consumer Service.
 
-You will need to provide the SP metadata file to the RealMe login service (via
-an upload to the shared workspace).  For ITE and PROD you will also need to
-provide the certificate files.  You can assemble a 'bundle' of the required
-files with this command:
+You will need to provide the SP metadata file to the RealMe login service. For
+MTS you can upload the SP metadata file directly using the menu option on the
+MTS site.  If you need to revise the file you can simply upload a new version.
+For ITE and PROD you will need to provide the metadata and also the certificate
+files to RealMe - who will schedule an upload to the relevant services.  You
+can assemble a 'bundle' of the required files with this command:
 
   nzrealme --conf-dir /etc/nzrealme make-bundle
 
@@ -632,8 +723,8 @@ command implemented by the C<nzrealme> command-line utility.
 
 This method is the main entry point for the API.  It returns a service_provider
 object that will then be used to generate AuthnRequest messages and to resolve
-the returned artifacts.  Unless you have set up alternative class mappings (see
-below), this method is a simple wrapper for the
+either an encrypted assertion or a returned artifact.  Unless you have set up
+alternative class mappings (see below), this method is a simple wrapper for the
 L<Authen::NZRealMe::ServiceProvider> constructor.
 
 =head2 class_for( identifier )
@@ -659,6 +750,11 @@ testing.
 This method is called by the C<nzrealme> command-line tool, to delegate tasks to
 the appropriate classes.  For more information about available commands, see
 C<< nzrealme --help >>
+
+=head2 init_readline( )
+
+This method is used by the implemntations of C<'make-cert'> and C<'make-meta'>
+when it is necessary to prompt the user for interactive input.
 
 =cut
 

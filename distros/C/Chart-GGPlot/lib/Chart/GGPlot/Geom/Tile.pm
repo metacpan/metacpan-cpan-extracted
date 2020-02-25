@@ -8,7 +8,7 @@ use MooseX::Singleton;
 
 with qw(Chart::GGPlot::Geom);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Layer;
@@ -125,7 +125,7 @@ Chart::GGPlot::Geom::Tile - Class for tile geom
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

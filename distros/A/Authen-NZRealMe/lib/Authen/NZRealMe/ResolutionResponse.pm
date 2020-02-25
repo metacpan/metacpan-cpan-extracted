@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ResolutionResponse;
-$Authen::NZRealMe::ResolutionResponse::VERSION = '1.19';
+$Authen::NZRealMe::ResolutionResponse::VERSION = '1.20';
 use warnings;
 use strict;
 use Carp      qw(croak);
@@ -7,10 +7,11 @@ use Carp      qw(croak);
 use Authen::NZRealMe::CommonURIs qw(URI);
 
 
-my $urn_success = URI('saml_success');
-my $urn_cancel  = URI('saml_auth_fail');
-my $urn_timeout = URI('rm_timeout');
-my $urn_not_reg = URI('saml_unkpncpl');
+my $urn_success     = URI('saml_success');
+my $urn_cancel      = URI('saml_auth_fail');
+my $urn_timeout     = URI('rm_timeout');
+my $urn_old_timeout = URI('gls_timeout');
+my $urn_not_reg     = URI('saml_unkpncpl');
 
 
 sub new {
@@ -28,7 +29,8 @@ sub status_urn        { return shift->{status_urn};               }
 sub status_message    { return shift->{status_message} || '';     }
 sub is_success        { return shift->status_urn eq $urn_success; }
 sub is_error          { return shift->status_urn ne $urn_success; }
-sub is_timeout        { return shift->status_urn eq $urn_timeout; }
+sub is_timeout        { return $_[0]->status_urn eq $urn_timeout
+                            || $_[0]->status_urn eq $urn_old_timeout; }
 sub is_cancel         { return shift->status_urn eq $urn_cancel;  }
 sub is_not_registered { return shift->status_urn eq $urn_not_reg; }
 sub flt               { return shift->{flt};                      }

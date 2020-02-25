@@ -1,7 +1,4 @@
 # Inspired by Test::More::UTF8
-use strict;
-use warnings;
-
 use Test::Arrow; # Turn on utf8 pragma.
 
 my $arr = Test::Arrow->new;

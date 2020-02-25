@@ -16,12 +16,8 @@ sub build_test_drive ($service) {
   ok my $connector = build_test_connector($service),
     'Create test connector';
 
-  note 'Illegal values';
-  eval { $connector->drive };
-  like $@, qr/Too few arguments for subroutine/, 'Can\'t create drive without parameters';
-
   note 'Create drive';
-  ok my $drive = $connector->drive('~'), 'Get default drive';
+  ok my $drive = $connector->drive, 'Get default drive';
   isa_ok $drive, 'Nuvol::Drive';
 
   return $drive;

@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/MooX-Press>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.057	2020-02-24
+
+ - Eliminate some warnings when `make_attribute` is called to add an
+   attribute to an existing class.
+
+0.056	2020-02-24
+
+ - The `is` option for attributes now defaults to 'ro', but you can change
+   the default using a `default_is` option.
+
 0.055	2020-02-20
 
  [ Bug Fixes ]

@@ -46,6 +46,9 @@ subtest "css_files (alias => 1)" => sub {
 
     cmp_deeply $files, {
         reset => [ obj_isa('Path::Tiny'), ignore(), 773 ],
+        gone1 => [ undef, undef, 0 ],
+        gone2 => [ undef, undef, 0 ],
+        gone3 => [ undef, undef, 0 ],
     }, "css_files";
 
     is $files->{reset}->[0]->stringify => "t/etc/css/reset.min.css", "path";

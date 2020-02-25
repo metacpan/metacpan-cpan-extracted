@@ -13,8 +13,8 @@ use Nuvol::Test::Roles qw|:file :metadata|;
 use Nuvol::Test::DriveLive ':build';
 use Test::More;
 
-my $testfile1     = 'Nuvol Testfile 1.txt';
-my $testfile2     = 'Nuvol Testfile 2.txt';
+my $testfile1     = '/Nuvol Testfile 1.txt';
+my $testfile2     = '/Nuvol Testfile 2.txt';
 my $host_testfile = '../resources/Testfile.txt';
 my $web_testfile  = 'https://nuvol.ch/Testfile.txt';
 my $web_content = "This file was downloaded from https://nuvol.ch.\n";
@@ -44,7 +44,6 @@ sub test_basics ($file, $service) {
   note 'Basics';
 
   test_metadata_methods $file, $service;
-  test_file_methods $file,     $service;
 }
 
 sub test_copy ($file, $service) {
@@ -86,7 +85,7 @@ sub test_crud ($file, $service) {
   my $teststring2 = 'This text was changed.';
 
   is $file->spurt($teststring1), $file, 'Write text to file';
-  ok $file->exists, 'File exists';
+  test_file_methods $file, $service;
   ok my $url = $file->download_url, 'File has a download URL';
   isa_ok $url, 'Mojo::URL';
   is $file->slurp, $teststring1, 'Read content';

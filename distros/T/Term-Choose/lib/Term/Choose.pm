@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.707';
+our $VERSION = '1.709';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -64,6 +64,7 @@ sub _defaults {
         color               => 0,
         #default            => undef,
         empty               => '<empty>',
+        #footer_string       => undef,  # experimental
         hide_cursor         => 1,
         include_highlighted => 0,
         index               => 0,
@@ -117,6 +118,7 @@ sub _valid_options {
         tabs_info           => 'ARRAY',
         tabs_prompt         => 'ARRAY',
         empty               => 'Str',
+        footer_string       => 'Str',   # experimental
         info                => 'Str',
         prompt              => 'Str',
         undef               => 'Str',
@@ -686,11 +688,16 @@ sub __prepare_promptline {
 
 sub __prepare_page_number {
     my ( $self ) = @_;
-    if ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
+    if ( ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) || defined $self->{footer_string} ) {
         my $pp_total = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
         my $pp_total_w = length $pp_total;
-        $self->{footer_fmt} = '--- Page %0' . $pp_total_w . 'd/' . $pp_total . ' ---';
-        if ( length( sprintf $self->{footer_fmt}, $pp_total ) > $self->{avail_width} ) {
+        if ( defined $self->{footer_string} ) {
+            $self->{footer_fmt} = ' %0' . $pp_total_w . 'd/' . $pp_total . ' ' . $self->{footer_string};
+        }
+        else {
+            $self->{footer_fmt} = '--- Page %0' . $pp_total_w . 'd/' . $pp_total . ' ---';
+        }
+        if ( print_columns( sprintf $self->{footer_fmt}, $pp_total ) > $self->{avail_width} ) { # color, length
             $self->{footer_fmt} = '%0' . $pp_total_w . 'd/' . $pp_total;
             if ( length( sprintf $self->{footer_fmt}, $pp_total ) > $self->{avail_width} ) {
                 $pp_total_w = $self->{avail_width} if $pp_total_w > $self->{avail_width};
@@ -742,7 +749,7 @@ sub __write_first_screen {
         $self->{avail_width} = 1;
     }
     $self->__prepare_promptline();
-    $self->{pp_row} = $self->{page} ? 1 : 0;
+    $self->{pp_row} = $self->{page} || $self->{footer_string} ? 1 : 0;
     $self->{avail_height} -= $self->{count_prompt_lines} + $self->{pp_row};
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
@@ -793,8 +800,8 @@ sub __wr_screen {
         $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
         print $pp_line;
-        $self->{i_col} += length $pp_line;
-     }
+        $self->{i_col} += print_columns( $pp_line );
+    }
     for my $row ( $self->{first_page_row} .. $self->{last_page_row} ) {
         for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
             $self->__wr_cell( $row, $col );
@@ -1189,7 +1196,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.707
+Version 1.709
 
 =cut
 
@@ -1824,7 +1831,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012-2019 Matthäus Kiem.
+Copyright (C) 2012-2020 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

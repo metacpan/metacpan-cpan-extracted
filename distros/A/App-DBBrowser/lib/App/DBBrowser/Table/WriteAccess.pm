@@ -124,7 +124,7 @@ sub commit_sql {
     my $dbh = $sf->{d}{dbh};
     my $waiting = 'DB work ... ';
     $ax->print_sql( $sql, $waiting );
-    my $stmt_type = $sf->{i}{stmt_types}[-1];
+    my $stmt_type = $sf->{i}{stmt_types}[-1]; ##
     my $rows_to_execute = [];
     my $count_affected;
     if ( $stmt_type eq 'Insert' ) {
@@ -277,7 +277,6 @@ sub __build_insert_stmt {
             return;
         }
         my $ok = $gc->get_content( $sql, 0 );
-        delete $sf->{i}{gc};
         if ( ! $ok ) {
             next REQUIRED_COLS;
         }

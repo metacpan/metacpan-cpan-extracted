@@ -1,3 +1,17 @@
+0.3.4 2020-02-25 16:05:18 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix broken dependency
+
+0.3.3 2020-02-25 15:46:44 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - improved dependency tracking for callbackery apps so that
+   public does not get rebuilt unless there is actually a source
+   change
+
+0.3.2 2020-02-24 14:34:33 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - do not distribute transpiled source files
+
 0.3.1 2020-02-21 15:40:22 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - better dependency checking in callbackery frontend makefile

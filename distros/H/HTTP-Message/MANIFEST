@@ -42,4 +42,10 @@ t/response.t
 t/status-old.t
 t/status.t
 tidyall.ini
+xt/author/00-compile.t
+xt/author/mojibake.t
+xt/author/pod-syntax.t
+xt/author/portability.t
+xt/author/test-version.t
+xt/release/changes_has_content.t
 xt/release/cpan-changes.t

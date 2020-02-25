@@ -1,0 +1,75 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual - Learn OO Programming with Zydeco
+
+=head1 MANUAL
+
+=over
+
+=item *
+
+L<Zydeco::Manual::01_ClassesRolesEtc> - Classes, roles, and interfaces
+
+=item *
+
+L<Zydeco::Manual::02_Attributes> - Powerful and concise attribute definitions
+
+=item *
+
+L<Zydeco::Manual::03_MethodsSignaturesTypesCoercion> - Methods with signatures, type constraints, and coercion
+
+=item *
+
+L<Zydeco::Manual::04_Factories> - Factories to help your objects make other objects
+
+=item *
+
+L<Zydeco::Manual::05_Multimethods> - multi methods
+
+=item *
+
+L<Zydeco::Manual::06_MethodModifiers> - Method modifiers to easily wrap or override inherited methods
+
+=item *
+
+L<Zydeco::Manual::07_Delegation> - Powerful delegation features
+
+=item *
+
+L<Zydeco::Manual::08_Privacy> - True private methods and attribute
+
+=item *
+
+L<Zydeco::Manual::09_Parameterizable> - Parameterizable classes and roles
+
+=item *
+
+L<Zydeco::Manual::10_BeyondZydeco> - Beyond Zydeco
+
+=back
+
+=head1 TODO
+
+Not covered anywhere: C<interface>, C<constant>, hooks.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

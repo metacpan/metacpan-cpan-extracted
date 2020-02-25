@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::Continuous;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::PDL qw(Piddle PiddleFromAny);
@@ -222,7 +222,7 @@ Chart::GGPlot::Scale::Continuous - Continuous scale
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 ATTRIBUTES
 

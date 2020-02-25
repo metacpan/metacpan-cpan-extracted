@@ -31,15 +31,20 @@ sub test_basics ($connector, $service) {
   test_metadata_methods $connector, $service;
 
   ok my $config = $connector->config, 'Get config';
-  my $old_access_token = $config->access_token;
-  ok $config->validto(time)->save, 'Invalidate token';
 
-  ok my $new_access_token = $connector->_access_token, 'Refresh token';
+SKIP: {
+    skip 'No refresh token available', 6 unless $config->refresh_token;
 
-  isnt $new_access_token, $old_access_token, 'Access token has changed';
-  ok $config = $connector->config, 'Get new config';
-  is $config->access_token, $new_access_token, 'New token is in config';
-  ok $connector->config->validto > time + 60, 'Token is valid';
+    my $old_access_token = $config->access_token;
+    ok $config->validto(time)->save, 'Invalidate token';
+
+    ok my $new_access_token = $connector->_access_token, 'Refresh token';
+
+    isnt $new_access_token, $old_access_token, 'Access token has changed';
+    ok $config = $connector->config, 'Get new config';
+    is $config->access_token, $new_access_token, 'New token is in config';
+    ok $connector->config->validto > time + 60, 'Token is valid';
+  }
 }
 
 sub test_drivelist ($connector) {

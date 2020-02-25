@@ -19,8 +19,7 @@ has close_on_destroy => 1;
 
 has listen => ();    # {method => callback} hook
 
-has network_enabled => ( 0, init_arg => undef );
-has page_enabled    => ( 0, init_arg => undef );
+has _components => ( init_arg => undef );
 
 has _ws  => ();                                              # websocket connection
 has _cb  => ();                                              # { msgid => callback }
@@ -147,46 +146,65 @@ sub _connect ( $self ) {
     );
 }
 
-# NETWORK
-sub network_enable ( $self ) {
-    return res 200 if $self->{network_enabled};
+# COMPONENTS
+sub is_enabled ( $self, $component ) {
+    return $self->{_components}->{$component};
+}
 
-    my $res = $self->_call('Network.enable');
+sub enable ( $self, $component ) {
+    return res 200 if $self->{_components}->{$component};
 
-    $self->{network_enabled} = 1 if $res;
+    my $res = $self->_call("$component.enable");
+
+    $self->{_components}->{$component} = 1 if $res;
 
     return $res;
 }
 
-sub network_disable ( $self ) {
-    return res 200 if !$self->{network_enabled};
+sub disable ( $self, $component ) {
+    return res 200 if !$self->{_components}->{$component};
 
-    my $res = $self->_call('Network.disable');
+    my $res = $self->_call("$component.disable");
 
-    $self->{network_enabled} = 0 if $res;
+    $self->{_components}->{$component} = 0 if $res;
 
     return $res;
+}
+
+# NETWORK
+sub network_enable ( $self ) {
+    return $self->enable('Network');
+}
+
+sub network_disable ( $self ) {
+    return $self->disable('Network');
 }
 
 # PAGE
 sub page_enable ( $self ) {
-    return res 200 if $self->{page_enabled};
-
-    my $res = $self->_call('Page.enable');
-
-    $self->{page_enabled} = 1 if $res;
-
-    return $res;
+    return $self->enable('Page');
 }
 
-sub page_disable ( $self, $cb = undef ) {
-    return res 200 if !$self->{page_enabled};
+sub page_disable ( $self ) {
+    return $self->disable('Page');
+}
 
-    my $res = $self->_call('Page.disable');
+# RUNTIME
+sub runtime_enable ( $self ) {
+    return $self->enable('Runtime');
+}
 
-    $self->{page_enabled} = 0 if $res;
+sub runtime_disable ( $self ) {
+    return $self->disable('Runtime');
+}
 
-    return $res;
+# DOM
+sub dom_enable ( $self ) {
+    return $self->enable('DOM');
+}
+
+sub dom_disable ( $self ) {
+    return $self->disable('DOM');
 }
 
 # COOKIES
@@ -251,7 +269,7 @@ sub get_screenshot ( $self, %args ) {
 # TODO !!! "Page.loadEventFired" is not fired
 sub navigate_to ( $self, $url, %args ) {
     my $listener     = $self->{listen}->{'Page.loadEventFired'};
-    my $page_enabled = $self->{page_enabled};
+    my $page_enabled = $self->is_enabled('Page');
 
     my $res;
 
@@ -278,7 +296,7 @@ sub navigate_to ( $self, $url, %args ) {
     return $res;
 }
 
-sub type_str ( $self, $str, $delay = 0.1 ) {
+sub type_str ( $self, $str, $min_delay = 0.1, $max_delay = 0.3 ) {
     for my $char ( split //sm, $str ) {
         $self->_call(
             'Input.dispatchKeyEvent',
@@ -287,14 +305,14 @@ sub type_str ( $self, $str, $delay = 0.1 ) {
             }
         );
 
-        Coro::sleep $delay;
+        Coro::sleep $min_delay + rand( $max_delay - $min_delay );
     }
 
     return;
 }
 
 sub wait_for_selector ( $self, $selector, $timeout = 10 ) {
-    my $res = $self->_call('Runtime.enable');
+    my $res = $self->runtime_enable;
 
     my $args = {
         selector       => $selector,
@@ -339,7 +357,39 @@ JS
     }
 }
 
+sub attach_util ( $self, $source_url = undef ) {
+    my $res = $self->runtime_enable;
+
+    $source_url //= 'https://www.google.com/util.js';
+
+    state $script = P->file->read_bin( $ENV->{share}->get('/Pcore-Chrome/data/util.js') );
+
+    $res = $self->_call(
+        'Runtime.compileScript',
+        {   expression    => $script,
+            sourceURL     => $source_url,
+            persistScript => \1,
+        }
+    );
+
+    return $res if !$res;
+
+    $res = $self->_call( 'Runtime.runScript', { scriptId => $res->{data}->{scriptId}, } );
+
+    return $res;
+}
+
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 299                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

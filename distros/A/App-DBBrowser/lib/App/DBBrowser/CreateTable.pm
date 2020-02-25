@@ -90,16 +90,16 @@ sub create_table {
     my $sql = {};
     $sql->{table} = '';
     $ax->reset_sql( $sql );
-    $sf->{i}{stmt_types} = [ 'Create_table' ];
-    my $goto_FILTER = 0;
+    my $skip_to = '';
 
     CREATE_TABLE: while ( 1 ) {
-        my $ok = $gc->get_content( $sql, $goto_FILTER );
+        $sf->{i}{stmt_types} = [ 'Create_table', 'Insert' ];
+        # first use of {stmt_types} in get_content/from_col_by_col
+        my $ok = $gc->get_content( $sql, $skip_to );
         if ( ! $ok ) {
-            delete $sf->{i}{gc};
             return;
         }
-        $goto_FILTER = 0;
+        $skip_to = '';
         my $count_table_name_loop = 0;
 
         TABLE_NAME: while ( 1 ) {
@@ -109,7 +109,7 @@ sub create_table {
             }
             my $ok_table_name = $sf->__set_table_name( $sql, $no_default_table_name ); # first time print_sql
             if ( ! $ok_table_name ) {
-                $goto_FILTER = 1;
+                $skip_to = 'FILTER';
                 next CREATE_TABLE;
             }
 
@@ -131,7 +131,6 @@ sub create_table {
                     }
                     next SET_COLUMNS;
                 }
-                delete $sf->{i}{gc};
                 if ( ! $ok_create_table ) {
                     return;
                 }
@@ -142,12 +141,19 @@ sub create_table {
                         my $dt = App::DBBrowser::DropTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         my $drop_ok = $dt->__drop( $sql, 'table' );
                         if ( ! $drop_ok ) {
-                            delete $sf->{i}{ct};
                             return;
                         }
                     }
                 }
-                delete $sf->{i}{ct};
+                my $file_fs = $sf->{i}{gc}{file_fs};
+                my $sheet_count;
+                if ( exists $sf->{i}{S_R}{$file_fs}{sheet_count} ) {
+                    $sheet_count = $sf->{i}{S_R}{$file_fs}{sheet_count};
+                }
+                if ( defined $sheet_count && $sheet_count > 1 ) {
+                    $skip_to = 'PARSE';
+                    next CREATE_TABLE;
+                }
                 return 1;
             }
         }
@@ -192,7 +198,6 @@ sub __create {
 sub __insert_data {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    push @{$sf->{i}{stmt_types}}, 'Insert';
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
     if ( $sf->{i}{driver} ne 'SQLite' ) {
         $sth->execute();

@@ -10,6 +10,8 @@
 
 #define MY_CXT_KEY "Promise::XS::_guts" XS_VERSION
 
+#define BASE_CLASS "Promise::XS"
+
 #define PROMISE_CLASS "Promise::XS::Promise"
 #define PROMISE_CLASS_TYPE Promise__XS__Promise
 
@@ -21,6 +23,9 @@
 #else
 #define PXS_IS_GLOBAL_DESTRUCTION PL_dirty
 #endif
+
+#define RESULT_IS_RESOLVED(result) (result->state == XSPR_RESULT_RESOLVED)
+#define RESULT_IS_REJECTED(result) (result->state == XSPR_RESULT_REJECTED)
 
 typedef struct xspr_callback_s xspr_callback_t;
 typedef struct xspr_promise_s xspr_promise_t;
@@ -41,24 +46,41 @@ typedef enum {
 } xspr_result_state_t;
 
 typedef enum {
+    // from then() or catch()
     XSPR_CALLBACK_PERL,
+
+    // from finally()
     XSPR_CALLBACK_FINALLY,
-    XSPR_CALLBACK_CHAIN
+
+
+    // from a promise returned from a then() or catch() callback
+    XSPR_CALLBACK_CHAIN,
+
+    // from a promise returned from a finally() callback
+    XSPR_CALLBACK_FINALLY_CHAIN
 } xspr_callback_type_t;
 
 struct xspr_callback_s {
     xspr_callback_type_t type;
+
     union {
         struct {
             SV* on_resolve;
             SV* on_reject;
             xspr_promise_t* next;
         } perl;
+
         struct {
             SV* on_finally;
             xspr_promise_t* next;
         } finally;
+
         xspr_promise_t* chain;
+
+        struct {
+            xspr_result_t* original_result;
+            xspr_promise_t* chain_promise;
+        } finally_chain;
     };
 };
 
@@ -67,12 +89,12 @@ struct xspr_result_s {
     SV** results;
     int count;
     int refs;
+    bool rejection_should_warn;
 };
 
 struct xspr_promise_s {
     xspr_promise_state_t state;
     pid_t detect_leak_pid;
-    xspr_result_t* unhandled_rejection;
     int refs;
     union {
         struct {
@@ -93,6 +115,7 @@ struct xspr_callback_queue_s {
 
 xspr_callback_t* xspr_callback_new_perl(pTHX_ SV* on_resolve, SV* on_reject, xspr_promise_t* next);
 xspr_callback_t* xspr_callback_new_chain(pTHX_ xspr_promise_t* chain);
+xspr_callback_t* xspr_callback_new_finally_chain(pTHX_ xspr_result_t* original_result, xspr_promise_t* next_promise);
 void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* origin);
 void xspr_callback_free(pTHX_ xspr_callback_t* callback);
 
@@ -121,7 +144,8 @@ typedef struct {
 #endif
     SV* conversion_helper;
     SV* pxs_flush_cr;
-    HV* pxs_stash;
+    HV* pxs_base_stash;
+    HV* pxs_promise_stash;
     HV* pxs_deferred_stash;
     SV* deferral_cr;
     SV* deferral_arg;
@@ -135,6 +159,8 @@ typedef struct {
     xspr_promise_t* promise;
 } PROMISE_CLASS_TYPE;
 
+//----------------------------------------------------------------------
+
 START_MY_CXT
 
 /* Process a single callback */
@@ -145,85 +171,112 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
     if (callback->type == XSPR_CALLBACK_CHAIN) {
         xspr_promise_finish(aTHX_ callback->chain, origin->finished.result);
 
-    } else if (callback->type == XSPR_CALLBACK_PERL) {
+    } else if (callback->type == XSPR_CALLBACK_FINALLY_CHAIN) {
+        xspr_promise_finish(aTHX_
+            callback->finally_chain.chain_promise,
+            RESULT_IS_REJECTED(origin->finished.result) ? origin->finished.result : callback->finally_chain.original_result
+        );
+
+    } else if (callback->type == XSPR_CALLBACK_PERL || callback->type == XSPR_CALLBACK_FINALLY) {
         SV* callback_fn;
+        xspr_promise_t* next_promise;
 
-        if (origin->finished.result->state == XSPR_RESULT_RESOLVED) {
-            callback_fn = callback->perl.on_resolve;
-        } else if (origin->finished.result->state == XSPR_RESULT_REJECTED) {
-            callback_fn = callback->perl.on_reject;
-
-            // If we got a REJECTED callback, then we’re handling the rejection.
-            // Even if not, though, we’re creating another promise, and that
-            // promise will either handle the rejection or report non-handling.
-            // So, in either case, we want to clear the unhandled rejection.
-            origin->unhandled_rejection = NULL;
+        if (callback->type == XSPR_CALLBACK_FINALLY) {
+            callback_fn = callback->finally.on_finally;
+            next_promise = callback->finally.next;
         } else {
-            callback_fn = NULL; /* Be quiet, bad compiler! */
-            assert(0);
+            next_promise = callback->perl.next;
+
+            if (RESULT_IS_RESOLVED(origin->finished.result)) {
+                callback_fn = callback->perl.on_resolve;
+            } else if (RESULT_IS_REJECTED(origin->finished.result)) {
+                callback_fn = callback->perl.on_reject;
+
+                if (callback_fn && SvOK(callback_fn)) {
+                    origin->finished.result->rejection_should_warn = false;
+                }
+
+            } else {
+                callback_fn = NULL; /* Be quiet, bad compiler! */
+                assert(0);
+            }
         }
 
         if (callback_fn != NULL) {
-            xspr_result_t* result;
-            result = xspr_invoke_perl(aTHX_
-                                      callback_fn,
-                                      origin->finished.result->results,
-                                      origin->finished.result->count
-                                      );
+            xspr_result_t* callback_result;
 
-            if (callback->perl.next != NULL) {
-                int skip_passthrough = 0;
+            if (callback->type == XSPR_CALLBACK_FINALLY) {
+                callback_result = xspr_invoke_perl(aTHX_ callback_fn, NULL, 0);
+            }
+            else {
+                callback_result = xspr_invoke_perl(aTHX_
+                    callback_fn,
+                    origin->finished.result->results,
+                    origin->finished.result->count
+                );
+            }
 
-                if (result->count == 1 && result->state == XSPR_RESULT_RESOLVED) {
-                    xspr_promise_t* promise = xspr_promise_from_sv(aTHX_ result->results[0]);
+            if (next_promise != NULL) {
+                bool finish_promise = true;
+
+                if (callback_result->count > 0 && callback_result->state == XSPR_RESULT_RESOLVED) {
+                    xspr_promise_t* promise = xspr_promise_from_sv(aTHX_ callback_result->results[0]);
+
                     if (promise != NULL) {
-                        if ( promise == callback->perl.next) {
+
+                        if (callback_result->count > 1) {
+                            warn( BASE_CLASS ": %d extra response(s) returned after promise! Treating promise like normal return.", callback_result->count - 1 );
+                        }
+                        else if (promise == next_promise) {
+                            finish_promise = false;
+
                             /* This is an extreme corner case the A+ spec made us implement: we need to reject
                             * cases where the promise created from then() is passed back to its own callback */
                             xspr_result_t* chain_error = xspr_result_from_error(aTHX_ "TypeError");
-                            xspr_promise_finish(aTHX_ callback->perl.next, chain_error);
+                            xspr_promise_finish(aTHX_ next_promise, chain_error);
 
                             xspr_result_decref(aTHX_ chain_error);
                         }
                         else {
+                            finish_promise = false;
+
                             /* Fairly normal case: we returned a promise from the callback */
-                            xspr_callback_t* chainback = xspr_callback_new_chain(aTHX_ callback->perl.next);
+                            xspr_callback_t* chainback;
+
+                            if (callback->type == XSPR_CALLBACK_FINALLY) {
+                                chainback = xspr_callback_new_finally_chain(aTHX_ origin->finished.result, next_promise);
+                            }
+                            else {
+                                chainback = xspr_callback_new_chain(aTHX_ next_promise);
+                            }
+
                             xspr_promise_then(aTHX_ promise, chainback);
-                            promise->unhandled_rejection = NULL;
                         }
 
                         xspr_promise_decref(aTHX_ promise);
-                        skip_passthrough = 1;
                     }
                 }
 
-                if (!skip_passthrough) {
-                    xspr_promise_finish(aTHX_ callback->perl.next, result);
+                if (finish_promise) {
+                    xspr_result_t* final_result;
+
+                    if ((callback->type == XSPR_CALLBACK_FINALLY) && RESULT_IS_RESOLVED(callback_result)) {
+                        final_result = origin->finished.result;
+                    }
+                    else {
+                        final_result = callback_result;
+                    }
+
+                    xspr_promise_finish(aTHX_ next_promise, final_result);
                 }
             }
 
-            xspr_result_decref(aTHX_ result);
+            xspr_result_decref(aTHX_ callback_result);
 
-        } else if (callback->perl.next) {
+        } else if (next_promise) {
             /* No callback, so we're just passing the result along. */
             xspr_result_t* result = origin->finished.result;
-            xspr_promise_finish(aTHX_ callback->perl.next, result);
-        }
-
-    } else if (callback->type == XSPR_CALLBACK_FINALLY) {
-        SV* callback_fn = callback->finally.on_finally;
-        if (callback_fn != NULL) {
-            xspr_result_t* result;
-            result = xspr_invoke_perl(aTHX_
-                                      callback_fn,
-                                      origin->finished.result->results,
-                                      origin->finished.result->count
-                                      );
-            xspr_result_decref(aTHX_ result);
-        }
-
-        if (callback->finally.next != NULL) {
-            xspr_promise_finish(aTHX_ callback->finally.next, origin->finished.result);
+            xspr_promise_finish(aTHX_ next_promise, result);
         }
 
     } else {
@@ -247,6 +300,10 @@ void xspr_callback_free(pTHX_ xspr_callback_t *callback)
         SvREFCNT_dec(callback->finally.on_finally);
         if (callback->finally.next != NULL)
             xspr_promise_decref(aTHX_ callback->finally.next);
+
+    } else if (callback->type == XSPR_CALLBACK_FINALLY_CHAIN) {
+        xspr_promise_decref(aTHX_ callback->finally_chain.chain_promise);
+        xspr_result_decref(aTHX_ callback->finally_chain.original_result);
 
     } else {
         assert(0);
@@ -422,13 +479,13 @@ xspr_result_t* xspr_invoke_perl(pTHX_ SV* perl_fn, SV** inputs, unsigned input_c
     SAVE_DEFSV;
     DEFSV_set(sv_newmortal());
 
-    count = call_sv(perl_fn, G_EVAL|G_ARRAY);
+    count = call_sv(perl_fn, G_EVAL | G_ARRAY);
 
     SPAGAIN;
-    error = ERRSV;
-    if (SvTRUE(error)) {
+
+    if (SvTRUE(ERRSV)) {
         result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, 1);
-        result->results[0] = newSVsv(error);
+        result->results[0] = newSVsv(ERRSV);
     } else {
         result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, count);
         for (i = 0; i < count; i++) {
@@ -453,6 +510,15 @@ void xspr_result_incref(pTHX_ xspr_result_t* result)
 void xspr_result_decref(pTHX_ xspr_result_t* result)
 {
     if (--(result->refs) == 0) {
+        if (RESULT_IS_REJECTED(result) && result->rejection_should_warn) {
+            SV* warn_args[result->count];
+
+            // Dupe the results to warn about:
+            Copy(result->results, warn_args, result->count, SV*);
+
+            _call_pv_with_args(aTHX_ "Promise::XS::Promise::_warn_unhandled", warn_args, result->count);
+        }
+
         unsigned i;
         for (i = 0; i < result->count; i++) {
             SvREFCNT_dec(result->results[i]);
@@ -479,16 +545,22 @@ void xspr_promise_finish(pTHX_ xspr_promise_t* promise, xspr_result_t* result)
     xspr_callback_t** pending_callbacks = promise->pending.callbacks;
     int count = promise->pending.callbacks_count;
 
-    if (count == 0 && result->state == XSPR_RESULT_REJECTED) {
-        promise->unhandled_rejection = result;
-    }
-
     promise->state = XSPR_STATE_FINISHED;
     promise->finished.result = result;
     xspr_result_incref(aTHX_ promise->finished.result);
 
     unsigned i;
     for (i = 0; i < count; i++) {
+
+        // If any of this promise’s callbacks has an on_reject, then
+        // the promise’s result is rejection-handled.
+        if (pending_callbacks[i]->type == XSPR_CALLBACK_PERL && RESULT_IS_REJECTED(result) && result->rejection_should_warn) {
+            SV* on_reject = pending_callbacks[i]->perl.on_reject;
+            if (on_reject && SvOK(on_reject)) {
+                result->rejection_should_warn = false;
+            }
+        }
+
         if (MY_CXT.deferral_cr) {
             xspr_queue_add(aTHX_ pending_callbacks[i], promise);
         }
@@ -510,6 +582,7 @@ xspr_result_t* xspr_result_new(pTHX_ xspr_result_state_t state, unsigned count)
     xspr_result_t* result;
     Newxz(result, 1, xspr_result_t);
     Newxz(result->results, count, SV*);
+    result->rejection_should_warn = true;
     result->state = state;
     result->refs = 1;
     result->count = count;
@@ -561,7 +634,6 @@ xspr_promise_t* xspr_promise_new(pTHX)
     Newxz(promise, 1, xspr_promise_t);
     promise->refs = 1;
     promise->state = XSPR_STATE_PENDING;
-    promise->unhandled_rejection = NULL;
     return promise;
 }
 
@@ -600,6 +672,18 @@ xspr_callback_t* xspr_callback_new_chain(pTHX_ xspr_promise_t* chain)
     callback->type = XSPR_CALLBACK_CHAIN;
     callback->chain = chain;
     xspr_promise_incref(aTHX_ chain);
+    return callback;
+}
+
+xspr_callback_t* xspr_callback_new_finally_chain(pTHX_ xspr_result_t* original_result, xspr_promise_t* next_promise)
+{
+    xspr_callback_t* callback;
+    Newxz(callback, 1, xspr_callback_t);
+    callback->type = XSPR_CALLBACK_FINALLY_CHAIN;
+    callback->finally_chain.original_result = original_result;
+    callback->finally_chain.chain_promise = next_promise;
+    xspr_result_incref(aTHX_ original_result);
+    xspr_promise_incref(aTHX_ next_promise);
     return callback;
 }
 
@@ -694,11 +778,19 @@ SV* _ptr_to_svrv(pTHX_ void* ptr, HV* stash) {
 }
 
 static inline xspr_promise_t* create_promise(pTHX) {
+    dMY_CXT;
+
     xspr_promise_t* promise = xspr_promise_new(aTHX);
 
-    SV *detect_leak_perl = get_sv("Promise::XS::DETECT_MEMORY_LEAKS", 0);
+    SV *detect_leak_perl;
 
-    promise->detect_leak_pid = SvTRUE(detect_leak_perl) ? getpid() : 0;
+    SV** dml_svgv = hv_fetchs( MY_CXT.pxs_base_stash, "DETECT_MEMORY_LEAKS", 0 );
+
+    if (dml_svgv) {
+        detect_leak_perl = GvSV(*dml_svgv);
+    }
+
+    promise->detect_leak_pid = detect_leak_perl && SvTRUE(detect_leak_perl) ? getpid() : 0;
 
     return promise;
 }
@@ -748,7 +840,8 @@ BOOT:
     MY_CXT.backend_scheduled = 0;
     MY_CXT.conversion_helper = NULL;
 
-    MY_CXT.pxs_stash = gv_stashpv(PROMISE_CLASS, FALSE);
+    MY_CXT.pxs_base_stash = gv_stashpv(BASE_CLASS, FALSE);
+    MY_CXT.pxs_promise_stash = gv_stashpv(PROMISE_CLASS, FALSE);
     MY_CXT.pxs_deferred_stash = gv_stashpv(DEFERRED_CLASS, FALSE);
 
     MY_CXT.deferral_cr = NULL;
@@ -805,7 +898,8 @@ CLONE(...)
             MY_CXT.deferral_arg = deferral_arg;
 
             // Clone HVs
-            MY_CXT.pxs_stash = gv_stashpv(PROMISE_CLASS, FALSE);
+            MY_CXT.pxs_base_stash = gv_stashpv(BASE_CLASS, FALSE);
+            MY_CXT.pxs_promise_stash = gv_stashpv(PROMISE_CLASS, FALSE);
             MY_CXT.pxs_deferred_stash = gv_stashpv(DEFERRED_CLASS, FALSE);
         }
 
@@ -899,7 +993,7 @@ promise(SV* self_sv)
         promise_ptr->promise = self->promise;
         xspr_promise_incref(aTHX_ promise_ptr->promise);
 
-        RETVAL = _ptr_to_svrv(aTHX_ promise_ptr, MY_CXT.pxs_stash);
+        RETVAL = _ptr_to_svrv(aTHX_ promise_ptr, MY_CXT.pxs_promise_stash);
     OUTPUT:
         RETVAL
 
@@ -959,11 +1053,20 @@ reject(SV *self_sv, ...)
     OUTPUT:
         RETVAL
 
+bool
+is_pending(SV *self_sv)
+    CODE:
+        DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
+
+        RETVAL = (self->promise->state == XSPR_STATE_PENDING);
+    OUTPUT:
+        RETVAL
+
 SV*
 clear_unhandled_rejection(SV *self_sv)
     CODE:
         DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
-        self->promise->unhandled_rejection = NULL;
+        // self->promise->unhandled_rejection = NULL;
 
         if (GIMME_V == G_VOID) {
             RETVAL = NULL;
@@ -972,15 +1075,6 @@ clear_unhandled_rejection(SV *self_sv)
             SvREFCNT_inc(self_sv);
             RETVAL = self_sv;
         }
-    OUTPUT:
-        RETVAL
-
-bool
-is_pending(SV *self_sv)
-    CODE:
-        DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
-
-        RETVAL = (self->promise->state == XSPR_STATE_PENDING);
     OUTPUT:
         RETVAL
 
@@ -1001,20 +1095,14 @@ MODULE = Promise::XS     PACKAGE = Promise::XS::Promise
 PROTOTYPES: DISABLE
 
 void
-then(SV* self_sv, ...)
+then(SV* self_sv, SV* on_resolve = NULL, SV* on_reject = NULL)
     PPCODE:
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
-        SV* on_resolve;
-        SV* on_reject;
         xspr_promise_t* next;
 
-        if (items > 3) {
-            croak_xs_usage(cv, "self, on_resolve, on_reject");
-        }
-
-        on_resolve = (items > 1) ? ST(1) : &PL_sv_undef;
-        on_reject  = (items > 2) ? ST(2) : &PL_sv_undef;
+        if (on_resolve == NULL) on_resolve = &PL_sv_undef;
+        if (on_reject == NULL) on_reject = &PL_sv_undef;
 
         next = create_next_promise_if_needed(aTHX_ self_sv, &ST(0));
 
@@ -1051,20 +1139,6 @@ void
 DESTROY(SV* self_sv)
     CODE:
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
-
-        if (self->promise->unhandled_rejection) {
-            xspr_result_t* rejection = self->promise->unhandled_rejection;
-
-            SV* warn_args[1 + rejection->count];
-            warn_args[0] = self_sv;
-
-            unsigned i;
-            for (i=0; i<rejection->count; i++) {
-                warn_args[1 + i] = rejection->results[i];
-            }
-
-            _call_pv_with_args(aTHX_ "Promise::XS::Promise::_warn_unhandled", warn_args, 1 + rejection->count);
-        }
 
         _warn_on_destroy_if_needed(aTHX_ self->promise, self_sv);
 

@@ -16,6 +16,7 @@ my @files = (
     't/005-custom-cache.t',
     't/006-cached-chi.t',
     't/007-clear-cache.t',
+    't/007-initialize-warnings.t',
     't/TestCache.pm',
     't/cache_key.t',
     't/cache_ok.t',

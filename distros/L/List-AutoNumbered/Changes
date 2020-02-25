@@ -1,25 +1,35 @@
 Revision history for List-AutoNumbered
 
+0.000010        2020-02-24
+    - Non-TRIAL release
+
+0.000009        2020-02-23  (TRIAL RELEASE)
+    - Array overload: now `for(@$list)` works (#2, #3)
+      (thanks to Dan Stewart)
+
+0.000008        2019-05-11  (TRIAL RELEASE)
+    - Add x_static_install=1
+
 0.000007        2019-04-13
     - Production release of 0.000006-TRIAL
     - Should support Perl 5.6, although I haven't been able to test that.
 
-0.000006-TRIAL  2019-04-09
+0.000006-TRIAL  2019-04-09  (TRIAL RELEASE)
     - Added `how` argument to the constructor (GH-1)
     - Added dependency on Getargs::Mixed.
 
 0.000005        2019-04-08
     Production release of 0.000004-TRIAL
 
-0.000004-TRIAL  2019-04-04
+0.000004-TRIAL  2019-04-04  (TRIAL RELEASE)
     Updated Makefile.PL to handle test_requires on older EUMMs
 
 0.000003        2019-04-03
     No changes since trial version 0.000002
 
-0.000002-TRIAL  2019-04-02
+0.000002-TRIAL  2019-04-02  (TRIAL RELEASE)
     Added missing dependency to META
 
-0.000001-TRIAL  2019-04-02
+0.000001-TRIAL  2019-04-02  (TRIAL RELEASE)
     First version, released on an unsuspecting world.
 

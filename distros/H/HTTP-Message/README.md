@@ -4,7 +4,7 @@ HTTP::Message - HTTP style message (base class)
 
 # VERSION
 
-version 6.18
+version 6.22
 
 # SYNOPSIS
 
@@ -283,7 +283,7 @@ The following methods are available:
 
 All methods unknown to `HTTP::Message` itself are delegated to the
 `HTTP::Headers` object that is part of every message.  This allows
-convenient access to these methods.  Refer to [HTTP::Headers](https://metacpan.org/pod/HTTP::Headers) for
+convenient access to these methods.  Refer to [HTTP::Headers](https://metacpan.org/pod/HTTP%3A%3AHeaders) for
 details of these methods:
 
     $mess->header( $field => $val )

@@ -1,0 +1,61 @@
+==================================================
+Changes from 2019-02-24 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.4.2 at 2020-02-24 21:35:45 +0000
+-------------------------------------------
+
+  Change: 338dfb7a2d0d889d9b6301aea40babe15ce2497e
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-02-24 14:43:44 +0000
+
+    Run make update 
+
+  Change: 782c4dc337dbc02e0379c98a2384441100a31ac5
+  Author: Mark Flickinger <mark.flickinger@grantstreet.com>
+  Date : 2020-02-24 14:42:38 +0000
+
+    Fix test count 
+
+  Change: 81b8b18ecf43ef4c149c5a6c1e1ba7509309de9f
+  Author: Steve Grazzini <steve.grazzini@grantstreet.com>
+  Date : 2016-11-28 15:34:34 +0000
+
+    Clone shared references
+
+    For backwards-compat, we need to enure that references in the YAML
+    document are cloned, not shared, in the data structure returned by
+    load_yaml. (Data::Visitor was doing this automatically.) 
+
+-------------------------------------------
+version v0.4.1 at 2020-02-21 18:56:04 +0000
+-------------------------------------------
+
+  Change: 226f433dd94737320c824d6f73a51c2a77e21a38
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-21 13:56:04 +0000
+
+    Update README 
+
+  Change: 4a34a74bff25b71ca70c71956f25c6a5e9164a52
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 18:43:01 +0000
+
+    Update distribution files 
+
+  Change: 024a780859f467793bc8f2d76b027a38ba4d610b
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 18:40:05 +0000
+
+    Add dependencies to cpanfile 
+
+  Change: 27613e1d5a4a251dd680ccf47b756dbba9d281ba
+  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
+  Date : 2020-02-18 18:38:35 +0000
+
+    Convert to Dist::Zilla::PluginBundle::GSG 
+
+================================================
+Plus 2 releases after 2019-02-24 00:00:00 +0000.
+================================================

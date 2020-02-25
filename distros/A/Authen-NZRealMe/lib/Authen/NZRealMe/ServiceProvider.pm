@@ -1,7 +1,8 @@
 package Authen::NZRealMe::ServiceProvider;
-$Authen::NZRealMe::ServiceProvider::VERSION = '1.19';
+$Authen::NZRealMe::ServiceProvider::VERSION = '1.20';
 use strict;
 use warnings;
+use autodie;
 
 require XML::LibXML;
 require XML::LibXML::XPathContext;
@@ -13,8 +14,10 @@ use URI::Escape  qw(uri_escape uri_unescape);
 use POSIX        qw(strftime);
 use Date::Parse  qw();
 use File::Spec   qw();
+use MIME::Base64 qw();
 
 use Authen::NZRealMe::CommonURIs qw(URI NS_PAIR);
+use Authen::NZRealMe::Asserts    qw(assert_is_base64);
 
 use WWW::Curl::Easy qw(
     CURLOPT_URL
@@ -47,6 +50,7 @@ my $ns_ds         = [ NS_PAIR('ds') ];
 my $ns_saml       = [ NS_PAIR('saml') ];
 my $ns_samlp      = [ NS_PAIR('samlp') ];
 my $ns_soap11     = [ NS_PAIR('soap11') ];
+my $ns_xenc       = [ NS_PAIR('xenc') ];
 my $ns_xpil       = [ NS_PAIR('xpil') ];
 my $ns_xal        = [ NS_PAIR('xal') ];
 my $ns_xnl        = [ NS_PAIR('xnl') ];
@@ -117,13 +121,10 @@ sub new_defaults {
 sub conf_dir               { shift->{conf_dir};               }
 sub type                   { shift->{type};                   }
 sub entity_id              { shift->{entity_id};              }
-sub url_single_logout      { shift->{url_single_logout};      }
-sub url_assertion_consumer { shift->{url_assertion_consumer}; }
+sub acs_list               { @{ shift->{acs_list} // [] };    }
 sub organization_name      { shift->{organization_name};      }
 sub organization_url       { shift->{organization_url};       }
 sub contact_company        { shift->{contact_company};        }
-sub contact_first_name     { shift->{contact_first_name};     }
-sub contact_surname        { shift->{contact_surname};        }
 sub _x                     { shift->{x};                      }
 sub nameid_format          { return $urn_nameid_format{ shift->type };         }
 sub signing_cert_pathname  { shift->{conf_dir} . '/' . $signing_cert_filename; }
@@ -239,20 +240,27 @@ sub _read_metadata_from_file {
     my $metadata_file = $self->_metadata_pathname;
     die "File does not exist: $metadata_file\n" unless -e $metadata_file;
 
-    my $xc = $self->_xpath_context_dom($metadata_file, $ns_samlmd);
+    my $xc = $self->_xpath_context_dom($metadata_file, $ns_samlmd, $ns_ds);
 
     my %params;
     foreach (
         [ id                     => q{/samlmd:EntityDescriptor/@ID} ],
         [ entity_id              => q{/samlmd:EntityDescriptor/@entityID} ],
-        [ url_single_logout      => q{/samlmd:EntityDescriptor/samlmd:SPSSODescriptor/samlmd:SingleLogoutService/@Location} ],
-        [ url_assertion_consumer => q{/samlmd:EntityDescriptor/samlmd:SPSSODescriptor/samlmd:AssertionConsumerService/@Location} ],
         [ organization_name      => q{/samlmd:EntityDescriptor/samlmd:Organization/samlmd:OrganizationName} ],
         [ organization_url       => q{/samlmd:EntityDescriptor/samlmd:Organization/samlmd:OrganizationURL} ],
         [ contact_company        => q{/samlmd:EntityDescriptor/samlmd:ContactPerson/samlmd:Company} ],
     ) {
         $params{$_->[0]} = $xc->findvalue($_->[1]);
     }
+
+    my @acs_list =
+        map {
+            $self->_parse_acs($_);
+        } $xc->findnodes(
+            q{/samlmd:EntityDescriptor/samlmd:SPSSODescriptor/samlmd:AssertionConsumerService}
+        )
+            or die "No AssertionConsumerService elements defined";
+    $params{acs_list} = \@acs_list;
 
     my $cache_key = $self->conf_dir . '-' . $self->type;
     $metadata_cache{$cache_key} = \%params;
@@ -265,6 +273,47 @@ sub _read_metadata_from_file {
 
     return \%params;
 }
+
+sub _parse_acs {
+    my ($self, $el) = @_;
+
+    my $acs = {};
+
+    my $index = $el->{index};
+    if(defined($index)) {
+        die qq{Invalid AssertionConsumerService index="$index"}
+            unless $index =~ /^[0-9]+$/;
+        $acs->{index} = $index;
+    }
+    else {
+        die "AssertionConsumerService is missing 'index'"
+    }
+
+    if(my $binding = $el->{Binding}) {
+        if(
+            $binding ne URI('saml_binding_artifact')
+            and $binding ne URI('saml_binding_post')
+        ) {
+            die qq{Invalid AssertionConsumerService binding="$binding"}
+        }
+        $acs->{binding} = $binding;
+    }
+    else {
+        die "AssertionConsumerService is missing 'Binding'"
+    }
+
+    $acs->{location} = $el->{Location}
+        or die "AssertionConsumerService is missing 'Location'";
+
+    if(my $default = $el->{isDefault}) {
+        if($default eq 'true') {
+            $acs->{is_default} = 1;
+        }
+    }
+
+    return $acs;
+}
+
 
 sub _parse_icms_wsdl {
     my ($self) = @_;
@@ -334,9 +383,24 @@ sub _xpath_context_dom {
 }
 
 
+sub select_acs_by_index {
+    my $self  = shift;
+    my $index = shift // '0';
+
+    my @match = grep { $_->{index} eq $index } $self->acs_list
+        or die qq{Unable to find <AssertionConsumerService> with index="$index"};
+    my $count = @match;
+    die qq{$count <AssertionConsumerService> elements have index="$index"}
+        unless $count == 1;
+    return $match[0];
+}
+
+
 sub new_request {
     my $self = shift;
 
+    my %opt = @_;
+    my $acs = $self->select_acs_by_index($opt{acs_index});
     my $req = Authen::NZRealMe->class_for('authen_request')->new($self, @_);
     return $req;
 }
@@ -404,6 +468,71 @@ sub _signer {
 }
 
 
+sub _encrypter {
+    my($self, %options) = @_;
+
+    my $key_path = $self->signing_key_pathname
+        or die "No path to signing key file";
+
+    return Authen::NZRealMe->class_for('xml_encrypter')->new(
+        pub_cert_file => $self->signing_cert_pathname,
+        key_file      => $key_path,
+        %options,
+    );
+}
+
+
+sub resolve_posted_assertion {
+    my($self, %args) = @_;
+
+    my $post_param = $args{saml_response}
+        or die "No saml_response value was supplied to resolve_posted_assertion()";
+
+    $post_param =~ s/\s+//g;
+
+    assert_is_base64($post_param, '$args{saml_response}');
+    my $xml = MIME::Base64::decode_base64($post_param);
+    $xml = $self->decrypt_assertion($xml);
+
+    my $response = $self->_verify_assertion($xml, %args);
+
+    if($response->is_success) {
+        if($self->type eq 'assertion'  and  $args{resolve_flt}) {
+             $self->_resolve_flt($response, %args);
+        }
+    }
+
+    return $response;
+}
+
+
+sub decrypt_assertion {
+    my($self, $xml) = @_;
+
+    $self->_reject_unencrypted_assertions($xml);
+
+    # Replace any <EncryptedData> elements with their unencrypted contents
+
+    my $encrypter = $self->_encrypter();
+    return $encrypter->decrypt_encrypted_data_elements($xml);
+}
+
+
+sub _reject_unencrypted_assertions {
+    my($self, $xml) = @_;
+
+    # This is a security mitigation - there should not be any <Assertion>
+    # elements before decryption.  If there are, it is most likely an attempt
+    # to spoof a SAML response.
+
+    my $xc = $self->_xpath_context_dom($xml, $ns_samlp, $ns_saml, $ns_ds);
+
+    my @assertions = $xc->findnodes(q{//saml:Assertion});
+    die "SamlResponse contained an unencrypted <Assertion> element"
+        if @assertions;
+}
+
+
 sub resolve_artifact {
     my($self, %args) = @_;
 
@@ -413,9 +542,6 @@ sub resolve_artifact {
     if($artifact =~ m{\bSAMLart=(.*?)(?:&|$)}) {
         $artifact = uri_unescape($1);
     }
-
-    die "Can't resolve artifact without original request ID\n"
-        unless $args{request_id};
 
     my $request   = Authen::NZRealMe->class_for('resolution_request')->new($self, $artifact);
     my $url       = $request->destination_url;
@@ -573,20 +699,35 @@ sub _https_post {
 sub _verify_assertion {
     my($self, $xml, %args) = @_;
 
-    my $xc = $self->_xpath_context_dom($xml, $ns_soap11, $ns_saml, $ns_samlp);
+    my $request_id = $args{request_id}
+        or die "Can't resolve to assertion without original request ID\n";
+
+    my $binding = $args{saml_response} ? 'http_post' : 'http_artifact';
+
+    my @ns_prefs = ($ns_soap11, $ns_saml, $ns_samlp, $ns_xenc);
+    my $xc = $self->_xpath_context_dom($xml, @ns_prefs);
+
+    my $encrypted = $binding eq 'http_post';
+    if($xc->findnodes('//saml:EncryptedAssertion/xenc:EncryptedData')) {
+        $encrypted = 1;
+        $xml = $self->decrypt_assertion($xml);
+        $xc = $self->_xpath_context_dom($xml, @ns_prefs);
+    }
 
     # Check for SOAP error
 
-    if(my($error) = $xc->findnodes('//soap11:Fault')) {
-        my $code   = $xc->findvalue('./faultcode',   $error) || 'Unknown';
-        my $string = $xc->findvalue('./faultstring', $error) || 'Unknown';
-        die "SOAP protocol error:\n  Fault Code: $code\n  Fault String: $string\n";
+    if($binding eq 'http_artifact') {
+        if(my($error) = $xc->findnodes('//soap11:Fault')) {
+            my $code   = $xc->findvalue('./faultcode',   $error) || 'Unknown';
+            my $string = $xc->findvalue('./faultstring', $error) || 'Unknown';
+            die "SOAP protocol error:\n  Fault Code: $code\n  Fault String: $string\n";
+        }
     }
 
 
     # Extract the SAML result code
 
-    my $response = $self->_build_resolution_response($xc, $xml);
+    my $response = $self->_build_resolution_response($xc, $xml, $binding);
     return $response if $response->is_error;
 
 
@@ -598,15 +739,23 @@ sub _verify_assertion {
 
     # Look for the SAML Response Subject payload in a signed section
 
-    my $subj_xp =
-        '//samlp:ArtifactResponse/samlp:Response/saml:Assertion/saml:Subject';
-    my($subject) = $verifier->find_verified_element($xc, $subj_xp);
+    my $transport_prefix =  $binding eq 'http_post'
+        ? '/samlp:Response'
+        : '/soap11:Envelope/soap11:Body/samlp:ArtifactResponse/samlp:Response';
+
+    my $encrypted_prefix = $encrypted
+        ? '/saml:EncryptedAssertion'
+        : '';
+
+    my $subj_xpath = $transport_prefix . $encrypted_prefix
+        . '/saml:Assertion/saml:Subject';
+    my($subject) = $verifier->find_verified_element($xc, $subj_xpath);
     my $assertion = $subject->parentNode();
 
 
     # Confirm that subject is valid for our SP
 
-    $self->_check_subject_confirmation($xc, $subject, $args{request_id});
+    $self->_check_subject_confirmation($xc, $subject, $request_id);
 
 
     # Check that it was generated by the expected IdP
@@ -692,14 +841,16 @@ sub _verify_assertion_signature {
 
 
 sub _build_resolution_response {
-    my($self, $xc, $xml) = @_;
+    my($self, $xc, $xml, $binding) = @_;
 
     my $response = Authen::NZRealMe->class_for('resolution_response')->new($xml);
     $response->set_service_type( $self->type );
 
-    my($status_code) = $xc->findnodes(
-        '//samlp:ArtifactResponse/samlp:Response/samlp:Status/samlp:StatusCode'
-    ) or die "Could not find a SAML status code\n$xml\n";
+    my $status_xpath = $binding eq 'http_post'
+        ? '/samlp:Response/samlp:Status/samlp:StatusCode'
+        : '//samlp:ArtifactResponse/samlp:Response/samlp:Status/samlp:StatusCode';
+    my($status_code) = $xc->findnodes($status_xpath)
+        or die "Could not find a SAML status code\n$xml\n";
 
     # Recurse down to find the most specific status code
 
@@ -716,10 +867,12 @@ sub _build_resolution_response {
 
     return $response if $response->is_success;
 
-    my $message = $xc->findvalue(
-        '//samlp:ArtifactResponse/samlp:Response/samlp:Status/samlp:StatusMessage'
-    ) || '';
-    $message =~ s{^\[.*\]}{};    # Strip off [SP EntityID] prefix
+    my $message_xpath = $binding eq 'http_post'
+        ? '/samlp:Response/samlp:Status/samlp:StatusMessage'
+        : '//samlp:ArtifactResponse/samlp:Response/samlp:Status/samlp:StatusMessage';
+    my $message = $xc->findvalue($message_xpath) || '';
+    $message =~ s{(\A\s+|\s+\z)}{}g; # Strip off leading and trailing whitespace
+    $message =~ s{^\[.*\]\s*}{};     # Strip off [SP EntityID] prefix
     $response->set_status_message($message) if $message;
 
     return $response
@@ -841,6 +994,7 @@ sub _extract_assertion_payload {
         my $name  = $xc->findvalue('./@Name', $attr) or next;
         my $value = $xc->findvalue('./saml:AttributeValue', $attr) || '';
         if($name =~ /:safeb64:/) {
+            assert_is_base64($value, $attribute_selector);
             $value = MIME::Base64::decode_base64url($value);
         }
         if($name eq $urn_attr_name{fit}) {
@@ -981,7 +1135,7 @@ sub _to_xml_string {
 
     # Use a default namespace, so no prefix required on individual elements
     my $x = XML::Generator->new(':pretty',
-        #namespace => [ '#default' => URI('samlmd') ],
+        namespace => [ '#default' => URI('samlmd') ],
     );
     $self->{x} = $x;
 
@@ -1026,27 +1180,31 @@ sub _gen_sp_sso_descriptor {
     my $self = shift;
     my $x    = $self->_x;
 
+    my @acs_elements = map {
+        $self->_gen_svc_assertion_consumer($_);
+    } $self->acs_list;
+
     return $x->SPSSODescriptor(
         {
             AuthnRequestsSigned        => 'true',
             WantAssertionsSigned       => 'true',
             protocolSupportEnumeration => 'urn:oasis:names:tc:SAML:2.0:protocol',
         },
-        $self->_gen_signing_key(),
-        #$self->_gen_svc_logout(),      # No longer required
-        $self->_name_id_format(),
-        $self->_gen_svc_assertion_consumer(),
+        $self->_gen_key_info('signing'),
+        $self->_gen_key_info('encryption'),
+        @acs_elements,
     );
 }
 
 
-sub _gen_signing_key {
-    my $self = shift;
-    my $x    = $self->_x;
+sub _gen_key_info {
+    my $self  = shift;
+    my $usage = shift;
+    my $x     = $self->_x;
 
     return $x->KeyDescriptor(
         {
-            use => 'signing',
+            use => $usage,
         },
         $x->KeyInfo($ns_ds,
             $x->X509Data($ns_ds,
@@ -1059,46 +1217,20 @@ sub _gen_signing_key {
 }
 
 
-sub _name_id_format {
-    my $self = shift;
-    my $x    = $self->_x;
-
-    my @formats = (
-        $x->NameIDFormat( $self->nameid_format )
-    );
-
-    if($self->type eq 'assertion') {
-        push @formats, $x->NameIDFormat( $urn_nameid_format{unspec} );
-    }
-
-    return @formats;
-}
-
-
-sub _gen_svc_logout {
-    my $self = shift;
-    my $x    = $self->_x;
-
-    my $single_logout_url = $self->url_single_logout or return;
-    return $x->SingleLogoutService(
-        {
-            Binding          => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-            Location         => $single_logout_url,
-        },
-    );
-}
-
-
 sub _gen_svc_assertion_consumer {
-    my $self = shift;
-    my $x    = $self->_x;
+    my($self, $acs) = @_;
+    my $x = $self->_x;
+
+    my @is_default = $acs->{is_default}
+        ? (isDefault => 'true')
+        : ();
 
     return $x->AssertionConsumerService(
         {
-            Binding          => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
-            Location         => $self->url_assertion_consumer,
-            index            => 0,
-            isDefault        => 'true',
+            Binding   => $acs->{binding},
+            Location  => $acs->{location},
+            index     => $acs->{index},
+            @is_default
         },
     );
 }
@@ -1225,15 +1357,10 @@ Accessor for the C<conf_dir> parameter passed in to the constructor.
 
 Accessor for the C<entityID> parameter in the Service Provider metadata file.
 
-=head2 url_single_logout
+=head2 acs_list
 
-Accessor for the C<SingleLogoutService> parameter in the Service Provider
-metadata file.
-
-=head2 url_assertion_consumer
-
-Accessor for the C<AssertionConsumerService> parameter in the Service Provider
-metadata file.
+Accessor for the details from the C<AssertionConsumerService> parameters in the
+Service Provider metadata file.  This method returns a list of hashes.
 
 =head2 organization_name
 
@@ -1248,16 +1375,6 @@ Service Provider metadata file.
 =head2 contact_company
 
 Accessor for the C<Company> component of the C<ContactPerson> parameter in the
-Service Provider metadata file.
-
-=head2 contact_first_name
-
-Accessor for the C<GivenName> component of the C<ContactPerson> parameter in the
-Service Provider metadata file.
-
-=head2 contact_surname
-
-Accessor for the C<SurName> component of the C<ContactPerson> parameter in the
 Service Provider metadata file.
 
 =head2 signing_cert_pathname
@@ -1345,12 +1462,6 @@ Controls whether the user should be allowed to create a new account on the
 "login" service IdP.  Not used when talking to the "assertion service".
 Default: false.
 
-=item force_auth => boolean
-
-Controls whether the user will be forced to log in, rather than allowing the
-reuse of an existing logon session on the IdP.  Not useful, as the login
-service ignores this option anyway.  Default: true.
-
 =item auth_strength => string
 
 The logon strength required.  May be supplied as a URN, or as keyword ('low',
@@ -1374,7 +1485,40 @@ EntityDescriptor metadata document.
 Used by the L<Authen::NZRealMe::AuthenRequest> class to create a digital
 signature for the AuthnRequest HTTP-Redirect URL.
 
+=head2 resolve_posted_assertion
+
+Used to resolve the SAML response when the HTTP-POST binding is being used.
+
+Takes the value of the SAMLResponse from the IdP's HTTP-POST response; validates
+the contents and return an L<Authen::NZRealMe::ResolutionResponse> object.
+
+Parameters (including the original request_id) must be supplied as key => value
+pairs, for example:
+
+  my $resp = $sp->resolve_artifact(
+      saml_response   => $framework->param('SAMLResponse'),
+      request_id      => $framework->state('login_request_id'),
+      logon_strength  => 'low',        # optional
+      strength_match  => 'minimum',    # optional - default: 'minimum'
+  );
+
+Recognised parameter names are:
+
+=over 4
+
+=item saml_response
+
+The contents of the 'SMLResponse' parameter in the HTTP POST request from the
+IdP.  This will be a Base-64 encoded string, but it should simply be passed on
+without any processing.
+
+=item see "Common resolver parameters" below
+
+=back
+
 =head2 resolve_artifact
+
+Used to resolve the SAML response when the HTTP-Artifact binding is being used.
 
 Takes an artifact (either the whole URL or just the C<SAMLart> parameter) and
 contacts the Identity Provider to resolve it to a set of attributes.  An
@@ -1410,11 +1554,34 @@ Recognised parameter names are:
 Either the whole URL of the client request to the ACS, or just the C<SAMLart>
 parameter from the querystring.
 
+=item see "Common resolver parameters" below
+
+=back
+
+=head2 I<Common resolver parameters>
+
+The following parameters can be used with both the resolve_posted_assertion()
+method (for HTTP-POST binding) and the resolve_artifact() method (for
+HTTP-Artifact binding).
+
+=over 4
+
 =item request_id
 
 The C<request_id> returned in the original call to C<new_request>.  Your
 application will need to store this in session state when initiating the
 dialogue with the IdP and retrieve it from state when resolving the artifact.
+
+=item acs_index
+
+Optional parameter which may be used to specify the numeric index of the
+Assertion Consumer Service you would like the response sent to.  This would
+normally be ommitted, resulting in the default value (0) being used.  Currently
+the primary reason for specifying this value is if your metadata defines one or
+more ACS entries using the HTTP-Artefact binding and one or more which use the
+HTTP-POST binding. This parameter will allow you to tell the server which
+binding to use - which may be useful while transitioning your system from one
+binding to another.
 
 =item logon_strength
 
@@ -1437,6 +1604,19 @@ service will be returned and no attempt will be made to connect to the iCMS
 service.
 
 =back
+
+=head2 decrypt_assertion( $xml_string )
+
+Called by C<resolve_posted_assertion> (or optionally by C<resolve_artifact> if
+an encrypted assertion was returned) to replace any <EncryptedData> elements
+with their unencrypted contents.
+
+As a security precuation, this method will die if any unencrypted
+C<< <Assertion> >> elements are present in the supplied XML.
+
+=head2 select_acs_by_index ( $index )
+
+Used by C<new_request> to validate the requested acs_index value.
 
 =head2 now_as_iso
 

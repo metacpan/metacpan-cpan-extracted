@@ -17,13 +17,14 @@ on 'test' => sub {
   requires "Cache::FileCache" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "Find::Lib" => "0";
   requires "HTTP::Request" => "0";
-  requires "Path::Class" => "0";
+  requires "Path::Tiny" => "0";
   requires "Test::Fatal" => "0";
   requires "Test::More" => "0";
   requires "Test::Requires" => "0";
   requires "Test::RequiresInternet" => "0";
+  requires "Test::Warnings" => "0";
+  requires "URI::file" => "0";
   requires "constant" => "0";
   requires "lib" => "0";
   requires "perl" => "5.008";
@@ -60,6 +61,7 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.014";
   requires "Test::Version" => "1";
+  requires "Test::Warn" => "0.36";
 };
 
 on 'develop' => sub {

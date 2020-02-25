@@ -113,11 +113,11 @@ Getter for the connector. Returns a L<Nuvol::Connector>.
   
 Getter for an item with the specified C<path>. Returns a L<Nuvol::Item>.
 
-    $file   = $drive->item('path/to/file');
-    $folder = $drive->item('path/to/folder/');
+    $file   = $drive->item('/path/to/file');
+    $folder = $drive->item('/path/to/folder/');
 
-Paths with trailing slash are interpreted as L<folders|Nuvol::Role::Folder>, without slash as
-L<files|Nuvol::Role::File>.
+Paths must be absolute (starting with a slash). Paths with trailing slash are interpreted as
+L<folders|Nuvol::Role::Folder>, without slash as L<files|Nuvol::Role::File>.
 
 =head1 SEE ALSO
 

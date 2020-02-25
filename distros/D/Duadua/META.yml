@@ -24,7 +24,7 @@ name: Duadua
 provides:
   Duadua:
     file: lib/Duadua.pm
-    version: '0.07'
+    version: '0.08'
   Duadua::CLI:
     file: lib/Duadua/CLI.pm
   Duadua::Parser:
@@ -131,5 +131,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

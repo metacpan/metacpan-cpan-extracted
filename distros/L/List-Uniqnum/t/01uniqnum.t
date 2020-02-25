@@ -147,14 +147,18 @@ if( $Config{ivsize} == 8 && $Config{nvsize} == 8 ) {
      # Each of these values is exactly representable
      # as either a UV or an NV.
 
-     push @in, ( 9223372036854774784,  9.223372036854774784e+18,
+     push @in, ( 9007199254740991,     9.007199254740991e+15,
+                 9007199254740992,     9.007199254740992e+15,
+                 9223372036854774784,  9.223372036854774784e+18,
                  18446744073709549568, 1.8446744073709549568e+19,
                  18446744073709139968, 1.8446744073709139968e+19,
                  100000000000262144,   1.00000000000262144e+17,
                  100000000001310720,   1.0000000000131072e+17,
                  144115188075593728,   1.44115188075593728e+17 );
 
-     push @correct, ( 9223372036854774784,
+     push @correct, ( 9007199254740991,
+                      9007199254740992,
+                      9223372036854774784,
                       18446744073709549568,
                       18446744073709139968,
                       100000000000262144,
@@ -259,16 +263,19 @@ is( scalar( uniqnum qw( 1 2 3 4.5 5 ) ), 5, 'uniqnum() in scalar context' );
     sub new { bless { num => $_[1] }, $_[0] }
 
     package main;
-    use Scalar::Util qw( refaddr );
+    eval { require Scalar::Util;};
 
-    my @nums = map { Numify->new( $_ ) } qw( 2 2 5 );
+    if($@) { ok(1 == 1, 'skipping "uniqnum respects numify overload"') }
+    else {
+      my @nums = map { Numify->new( $_ ) } qw( 2 2 5 );
 
-    # is_deeply wants to use eq overloading
-    my @ret = uniqnum @nums;
-    ok( scalar @ret == 2 &&
-        refaddr $ret[0] == refaddr $nums[0] &&
-        refaddr $ret[1] == refaddr $nums[2],
-               'uniqnum respects numify overload' );
+      # is_deeply wants to use eq overloading
+      my @ret = uniqnum @nums;
+      ok( scalar @ret == 2 &&
+          Scalar::Util::refaddr($ret[0]) == Scalar::Util::refaddr($nums[0]) &&
+          Scalar::Util::refaddr($ret[1]) == Scalar::Util::refaddr($nums[2]),
+                 'uniqnum respects numify overload' );
+   }
 }
 
 {

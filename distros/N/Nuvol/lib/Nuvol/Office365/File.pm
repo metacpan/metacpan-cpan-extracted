@@ -2,8 +2,9 @@ package Nuvol::Office365::File;
 use Mojo::Base -role, -signatures;
 
 use Mojo::Asset::File;
-use Mojo::File 'path';
 use Mojo::UserAgent;
+
+use constant {BIG_FILE => 4 * 1024**2, FRAGMENT_SIZE => 10 * 1024**2,};
 
 # internal methods
 
@@ -28,12 +29,13 @@ sub _do_spurt ($self, @data) {
 }
 
 sub _from_file ($self, $source) {
+
   # issue copy command
   my %target = (
-    parentReference                     => $self->_parent_reference,
-    name                                => $self->name,
+    parentReference => $self->_parent_reference,
+    name            => $self->name,
   );
-  my $res    = $source->drive->connector->_ua_post($source->url('copy'), \%target);
+  my $res = $source->drive->connector->_ua_post($source->url('copy'), json => \%target);
   Carp::confess $res->message if $res->is_error;
   my $location = $res->headers->location;
   my $ua       = Mojo::UserAgent->new;
@@ -53,7 +55,7 @@ sub _from_file ($self, $source) {
 
 sub _from_host ($self, $source) {
   my $asset = Mojo::Asset::File->new(path => $source);
-  if ($asset->size < 4 * 1024**2) {
+  if ($asset->size < BIG_FILE) {
     $self->_upload_small($asset);
   } else {
     $self->_upload_large($asset);
@@ -88,15 +90,18 @@ sub _upload_large ($self, $asset) {
 
   # upload portions
   my $size     = $asset->size;
-  my $fragment = 10 * 1024**2;
 
-  for my $portion (1 .. ceil($size / $fragment)) {
-    my $from = ($portion - 1) * $fragment;
-    my $to   = $portion * $fragment;
+  for my $portion (1 .. ceil($size / FRAGMENT_SIZE)) {
+    my $from = ($portion - 1) * FRAGMENT_SIZE;
+    my $to   = $portion * FRAGMENT_SIZE;
     $to = $size if $to > $size;
     $to--;
 
-    $res = $connector->_ua_put($upload_url, {'Content-Range' => "bytes $from-$to/$size"});
+    $res = $connector->_ua_put(
+      $upload_url,
+      {'Content-Range' => "bytes $from-$to/$size"},
+      $asset->get_chunk($from, FRAGMENT_SIZE)
+    );
     Carp::confess $res->message if $res->is_error;
   }
 

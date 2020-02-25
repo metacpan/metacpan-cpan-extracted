@@ -5,7 +5,7 @@ package Chart::GGPlot::ScalesList;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use List::AllUtils qw(pairmap pairkeys);
 use Types::Standard qw(Any ArrayRef Object);
@@ -192,7 +192,7 @@ Chart::GGPlot::ScalesList - Encapsulation multiple scale objects
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 ATTRIBUTES
 

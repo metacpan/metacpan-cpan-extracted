@@ -5,7 +5,7 @@ package Chart::GGPlot::Range;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Types::PDL qw(Piddle PiddleFromAny);
 
@@ -43,7 +43,7 @@ Chart::GGPlot::Range - The role for range
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

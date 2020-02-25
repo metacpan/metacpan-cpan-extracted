@@ -77,4 +77,9 @@ is_deeply($dut->arr, [
     ], 'Accepts references'
 );
 
+# Array deref
+$dut = $DUT->new;
+$dut->load(21)->(22)->(23);
+is_deeply([ @$dut ], [ [1,21], [2,22], [3,23] ], 'Overloads array dereference');
+
 done_testing;

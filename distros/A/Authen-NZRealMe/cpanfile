@@ -11,6 +11,7 @@ requires 'Date::Parse';
 requires 'Digest::SHA';
 requires 'IO::Compress::RawDeflate';
 requires 'Data::UUID';
+requires 'CryptX';
 
 on 'test' => sub {
     requires 'Test::More', '0.88';

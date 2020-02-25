@@ -23,7 +23,8 @@ Don't run these tests if you don't understand what they are doing.
 The tests are skipped if the environment variables for the different services are not set or don't
 point to an existing file. The variable names are C<NUVOL_DUMMY_LIVE>, C<NUVOL_OFFICE365_LIVE>.
 
-To create new config files, call L<Nuvol::Connector/authenticate> from the command line.
+To create new config files, call L<Nuvol::Connector/new> and L<Nuvol::Connector/authenticate> from
+the command line.
 
     $ export NUVOL_OFFICE365_LIVE=/path/to/config
     $ perl -MNuvol::Connector -E"Nuvol::Connector->new('$NUVOL_OFFICE365_LIVE', 'Office365')->authenticate"

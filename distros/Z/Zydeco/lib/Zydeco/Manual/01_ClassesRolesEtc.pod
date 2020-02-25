@@ -1,0 +1,362 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual::01_ClassesRolesEtc - Classes, roles, and abstract classes
+
+=head1 SYNOPSIS
+
+  package Farming {
+    use Zydeco;
+    
+    class Animal {
+      has name;
+    }
+    
+    role Milkable {
+      method milk {
+        say "giving milk...";
+      }
+    }
+    
+    class Cow extends Animal with Milkable;
+  }
+  
+  my $daisy = Farming->new_cow(name => "Daisy");
+  $daisy->milk();
+
+=head1 MANUAL
+
+The object-oriented programming paradigm, is based on the concept of "objects"
+which are structures representing real-world things or abstract ideas,
+containing data (a.k.a. I<attributes>) and the code (a.k.a. I<methods>) needed
+to operate on this data.
+
+=head2 Classes
+
+Most object-oriented programming languages, including Perl, are class-based.
+Each object is a member of a class, and it is the class where these attributes
+and methods are defined.
+
+In Zydeco, you can create a class with the C<class> keyword. The simplest
+class definition consists of C<class> followed by a name for the class:
+
+  class Bucket;
+
+It is possible to create a class without specifying a name, in which case
+Zydeco will think of a name and return it. However, as the C<class> keyword
+is always a complete statement, you cannot do:
+
+  my $Bucket = class;
+
+Instead you must wrap it in a C<do> block:
+
+  my $Bucket = do { class; };
+
+This is called an anonymous class.
+
+=head3 Naming
+
+Zydeco prefixes your class names with the package name.
+
+  package MyApp {
+    use Zydeco;
+    class Foo;          # class name is "MyApp::Foo"
+    class Foo::Bar;     # class name is "MyApp::Foo::Bar"
+  }
+
+Prefixing a class name with "::" avoids this.
+
+  package MyApp {
+    use Zydeco;
+    class ::Foo;        # class name is "Foo"
+    class ::Foo::Bar;   # class name is "Foo::Bar"
+  }
+
+=head2 Objects
+
+When you've created a class, the next thing to do is create objects of that
+class. The class "Bucket" represents the concept of buckets, but objects of
+that class represent individual buckets.
+
+For named classes in Perl, the typical way to create an object of class
+"Bucket" would be:
+
+  my $red_bucket = Bucket->new;
+
+Zydeco does things a little differently though. Zydeco defines classes within
+"factory packages". Rather than asking the "Bucket" class for a new bucket
+object, you ask your factory package for a new bucket object.
+
+  package Farming {
+    use Zydeco;
+    class Bucket;
+  }
+  
+  my $red_bucket = Farming->new_bucket;
+
+For anonymous classes, the factory does not know how to make them, so to
+instantiate them ("instantiate" means "create an instance of"), you call
+C<new> on the class directly.
+
+  my $Bucket      = do { class; };
+  my $red_bucket  = $Bucket->new;
+
+You can check to see if an object is a Bucket using the C<isa> method.
+
+  if ( $object->isa("Farming::Bucket") ) {
+    ...;
+  }
+
+But notice this hard-codes the name of your package ("Farming"). We don't
+like hard-coding stuff, so a better way is to make use of the
+"Farming::Types" type library. While you define the "Farming" factory
+package, Zydeco will be at work in the background, defining "Farming::Types".
+
+  use Farming;
+  use Farming::Types -is;
+  
+  if ( is_Bucket $object ) {
+    ...;
+  }
+
+With anonymous classes, you need to stick with C<isa> though.
+
+  if ( $object->isa($Bucket) ) {
+    ...;
+  }
+
+=head2 Roles
+
+A role is a way to bundle up a collection of behaviours that can then be
+imported (a.k.a. I<consumed>) by a class. Goats, sheep, and cows are all
+milkable, so in our farming example, we might want to define the behaviour
+for a milkable animal in a "Milkable" role which the "Cow", "Goat", and
+"Sheep" classes can all consume.
+
+Roles are defined with the C<role> keyword which mostly uses the same
+syntax as the C<class> keyword.
+
+  package Farming {
+    use Zydeco;
+    role Milkable;
+    
+    class Cow with Milkable;
+    class Goat with Milkable;
+    class Sheep with Milkable;
+  }
+
+Roles cannot be instantiated like classes can. You can create a new "Cow"
+object which will be "Milkable", but you can't directly create a "Milkable"
+object.
+
+Anonymous roles are possible.
+
+  my $Milkable = do { role; };
+
+Consuming anonymous roles is a little tricky.
+
+  class Cow {
+    with {"::$Milkable"};
+  }
+
+The braces mean that the role should be evaluated as a block. The leading
+"::" is required because you don't want the prefix to be added to the role
+name.
+
+The equivalent of C<isa> for roles is C<does>.
+
+  if ( $daisy->does("Farming::Milkable") ) {
+    ...;
+  }
+
+But like with checking C<isa>, it's desirable to avoid hard-coding that
+"Farming" everywhere. Better to use a type check.
+
+  use Farming;
+  use Farming::Types -is;
+  
+  if ( is_Milkable $daisy ) {
+    ...;
+  }
+
+The type check functions look so much more elegant anyway.
+
+If you have a role name as a string, you can consume it by putting it in
+braces.
+
+=head2 Tag Roles
+
+For some roles, there may not be any real "behaviour" associated with them.
+For example, piglets and rabbits are adorable.
+
+  package Farming {
+    class Piglet with Adorable?;
+    class Rabbit with Adorable?;
+  }
+
+This just tags the "Rabbit" and "Piglet" classes with the "Adorable" role
+which can be checked using C<does> or C<is_Adorable>, without us having to
+declare the "Adorable" role explicitly. It's just a shortcut for:
+
+  package Farming {
+    role Adorable;
+    class Piglet with Adorable;
+    class Rabbit with Adorable;
+  }
+
+=head2 Inheritance
+
+Inheritance allows you make one class into a subclass of another.
+
+For example, all piglets are pigs, so if we have an existing "Pig" class, we
+can say that "Piglet" is a subclass of that.
+
+  package Farming {
+    class Pig;
+    class Piglet extends Pig;
+  }
+
+Objects of class Piglet are also objects of class Pig.
+
+  use Farming;
+  use Farming::Types -is;
+  
+  my $oinker = Farming->new_piglet;
+  
+  is_Piglet($oinker);     # ==> true
+  is_Pig($oinker);        # ==> true
+
+Any behaviours defined by the "Pig" class will be inherited by the Piglet
+class, but the "Piglet" class may define its own unique behaviours too, or
+override behaviour from the parent class.
+
+It is possible to both inherit and consume at the same time:
+
+  class Piglet extends Pig with Adorable?;
+
+Extending anonymous classes is much like consuming anonymous roles.
+
+  class Piglet {
+    extends { "::" . "Pig" };
+  }
+
+=head2 Abstract Classes
+
+It it possible to mark a class as abstract. An abstract class is one that,
+like a role, cannot be instantiated, but can be inherited from.
+
+For example, it may be desirable to have an abstract class "Animal" for
+our farmyward, which all other animals inherit from, but disallow creating
+"Animal" objects directly. We do this using the C<abstract> keyword, which
+is just a prefix for C<class>.
+
+  package Farming {
+    use Zydeco;
+    role Milkable;
+    abstract class Animal;
+    class Horse extends Animal;
+    class Cow extends Animal with Milkable;
+    class Pig extends Animal;
+    class Piglet extends Pig with Adorable?;
+    class Sheep extends Animal with Milkable;
+    class Goat extends Animal with Milkable;
+    class Rabbit extends Animal with Adorable?
+  }
+
+=head2 Nesting Classes
+
+You might notice this getting a little repetitive.  Zydeco allows you to
+nest subclass definitions within their parent class as a shortcut.
+
+  package Farming {
+    use Zydeco;
+    
+    role Milkable;
+    
+    abstract class Animal {
+      class Horse;
+      class Cow with Milkable;
+      class Pig {
+        class Piglet with Adorable?;
+      }
+      class Sheep with Milkable;
+      class Goat with Milkable;
+      class Rabbit with Adorable?
+    }
+  }
+
+=head3 Plus-Sign Prefix
+
+If you prefix a class name with a plus sign, the class name will be
+prefixed with its parent class.
+
+  package MyApp {
+    class Foo {          # class name is "MyApp::Foo"
+      class +Bar {       # class name is "MyApp::Foo::Bar"
+        class +Baz::Bat; # class name is "MyApp::Foo::Bar::Baz::Bat"
+      }
+    }
+  }
+
+This even works with C<extends>.
+
+  package MyApp {
+    class Foo;               # class name is "MyApp::Foo"
+    class +Bar extends Foo;  # class name is "MyApp::Foo::Bar"
+  }
+
+=head1 KEYWORDS
+
+In this chapter, we looked at the following keywords:
+
+=over
+
+=item C<< class >>
+
+=item C<< role >>
+
+=item C<< with >>
+
+=item C<< extends >>
+
+=item C<< abstract class >>
+
+=back
+
+=head1 TODO
+
+This page should probably detail C<version>, C<authority>, and C<toolkit>.
+
+=head1 NEXT STEPS
+
+The structure and behaviour of objects is defined by classes. In the next
+chapter we will see how classes can define the structure of their objects.
+
+=over
+
+=item *
+
+L<Zydeco::Manual::02_Attributes> - Powerful and concise attribute definitions
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

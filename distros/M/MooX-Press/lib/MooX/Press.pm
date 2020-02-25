@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.055';
+our $VERSION   = '0.057';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -61,6 +61,8 @@ my %_cached_moo_helper;
 sub _apply_default_options {
 	my $builder = shift;
 	my $opts = $_[0];
+	
+	$opts->{default_is} ||= 'ro';
 	
 	$opts->{toolkit} ||= $ENV{'PERL_MOOX_PRESS_TOOLKIT'} || 'Moo';
 	
@@ -622,17 +624,7 @@ sub _make_package {
 			$builder->$method($qname, \@isa);
 		}
 	}
-	
-	{
-		no strict 'refs';
-		no warnings 'once';
-		${"$qname\::TOOLKIT"}  = $toolkit;
-		${"$qname\::PREFIX"}   = $opts{prefix};
-		${"$qname\::FACTORY"}  = $opts{factory_package};
-		${"$qname\::TYPES"}    = $opts{type_library};
-		${"$qname\::BUILT"}    = 1;
-	}
-	
+		
 	my $reg;
 	if ($opts{factory_package}) {
 		require Type::Registry;
@@ -642,14 +634,24 @@ sub _make_package {
 		$reg = 'Type::Registry'->for_class($qname);
 	}
 	
-	for my $var (qw/VERSION AUTHORITY/) {
-		if (defined $opts{lc $var}) {
-			no strict 'refs';
-			no warnings 'once';
-			${"$qname\::$var"} = $opts{lc $var};
+	{
+		no strict 'refs';
+		no warnings 'once';
+		${"$qname\::TOOLKIT"}  = $toolkit;
+		${"$qname\::PREFIX"}   = $opts{prefix};
+		${"$qname\::FACTORY"}  = $opts{factory_package};
+		${"$qname\::TYPES"}    = $opts{type_library};
+		${"$qname\::BUILT"}    = 1;
+		&Internals::SvREADONLY(\${"$qname\::$_"}, 1)
+			for qw/TOOLKIT PREFIX FACTORY TYPES BUILT/;
+		for my $var (qw/VERSION AUTHORITY/) {
+			if (defined $opts{lc $var}) {
+				${"$qname\::$var"} = $opts{lc $var};
+				&Internals::SvREADONLY(\${"$qname\::$var"}, 1);
+			}
 		}
 	}
-	
+		
 	if (defined $opts{'import'}) {
 		my @imports = $opts{'import'}->$_handle_list;
 		while (@imports) {
@@ -727,6 +729,7 @@ sub _make_package {
 					my $role_qname = $builder->qualify_name(shift(@roles), $opts{prefix});
 					push @processed, $role_qname;
 					no strict 'refs';
+					no warnings 'once';
 					if ( $role_qname !~ /\?$/ and not ${"$role_qname\::BUILT"} ) {
 						my ($role_dfn) = grep { $_->[0] eq "::$role_qname" } @{$opts{_roles}};
 						$builder->make_role(
@@ -1071,8 +1074,8 @@ sub install_attributes {
 		(my $clearername = ($attrname =~ /^_/ ? "_clear$attrname" : "clear_$attrname")) =~ s/\+//;
 		
 		my %spec =
-			is_CodeRef($attrspec) ? (is => 'rw', lazy => 1, builder => $attrspec, clearer => $clearername) :
-			is_Object($attrspec) && $attrspec->can('check') ? (is => 'rw', isa => $attrspec) :
+			is_CodeRef($attrspec) ? (is => $opts->{default_is}, lazy => 1, builder => $attrspec, clearer => $clearername) :
+			is_Object($attrspec) && $attrspec->can('check') ? (is => $opts->{default_is}, isa => $attrspec) :
 			$attrspec->$_handle_list;
 		
 		if (is_CodeRef $spec{builder}) {
@@ -1086,7 +1089,7 @@ sub install_attributes {
 		}
 		
 		%spec = (%spec_hints, %spec);
-		$spec{is} ||= 'rw';
+		$spec{is} ||= ($opts->{default_is} || 'ro');
 		
 		if ($spec{is} eq 'lazy') {
 			$spec{is}   = 'ro';
@@ -1324,8 +1327,7 @@ sub install_multimethod {
 			if ($role =~ /\?$/) {
 				$role =~ s/\?$//;
 				eval "require $role; 1" or do {
-					use_module("$tk\::Role")->import::into($role);
-					$builder->_mark_package_as_loaded(role => $role, $opts);
+					$builder->make_role("::$role", %$opts, toolkit => $tk);
 				};
 			}
 			$role;
@@ -1939,7 +1941,12 @@ Hashref of additional subs to install into the factory package.
 
 =item C<< type_library_can >> I<< (HashRef[CodeRef]) >>
 
-Hashref of additional subs to install into the factory package.
+Hashref of additional subs to install into the type library package.
+
+=item C<< default_is >>
+
+The default for the C<is> option when defining attributes. The default
+C<default_is> is "ro".
 
 =back
 
@@ -2062,12 +2069,12 @@ type constraint objects, or builder coderefs.
 
   # These mean the same thing...
   "name!" => Str,
-  "name"  => { is => "rw", required => 1, isa => Str },
+  "name"  => { is => "ro", required => 1, isa => Str },
 
   # These mean the same thing...
   "age"   => sub { return 0 },
   "age"   => {
-    is         => "rw",
+    is         => "ro",
     lazy       => 1,
     builder    => sub { return 0 },
     clearer    => "clear_age",
@@ -2451,6 +2458,12 @@ Override mutability for this class and any child classes.
 
 See L</Import Options>.
 
+=item C<< default_is >> I<< (Str) >>
+
+Override default_is for this class and any child classes.
+
+See L</Import Options>.
+
 =item C<< end >> I<< (CodeRef|ArrayRef[CodeRef]) >>
 
 Override C<end> for this class and any child classes.
@@ -2668,8 +2681,8 @@ The following are exceptions:
 
 =item C<< is >> I<< (Str) >>
 
-This is optional rather than being required, and defaults to "rw".
-(Yes, I prefer "ro" generally, but whatever.)
+This is optional rather than being required, and defaults to "ro" (or
+to C<default_is> if you defined that).
 
 MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
 will translate them if you're using Moose or Mouse.
@@ -2677,13 +2690,13 @@ will translate them if you're using Moose or Mouse.
 There is a special value C<< is => "private" >> to create private
 attributes. These attributes cannot be set by the constructor
 (they always have C<< init_arg => undef >>) and do not have accessor
-methods. They are stored inside-out, so cannot even be accessed using
-direct hashref access of the object. If you're thinking this makes them
-totally inaccessible, and therefore useless, think again.
+methods by default. They are stored inside-out, so cannot even be accessed
+using direct hashref access of the object. If you're thinking this makes
+them totally inaccessible, and therefore useless, think again.
 
 For private attributes, you can request an accessor as a coderef:
 
-  my $my_attr;
+  my $my_attr;             # pre-declare lexical!
   use MooX::Press (
     'class:Foo' => {
       has => {

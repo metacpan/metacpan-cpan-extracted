@@ -43,7 +43,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1864,7 +1864,9 @@ sub _make_remote_directory {
 
 sub _setup_new_profile {
     my ( $self, $profile ) = @_;
-    if ( $self->_ssh() ) {
+    if ( ($profile) && ( $profile->download_directory() ) ) {
+    }
+    elsif ( $self->_ssh() ) {
         $self->{_remote_tmp_directory} = $self->_get_remote_tmp_directory();
         my $name = File::Temp::mktemp('firefox_marionette_remote_XXXXXXXXXXX');
         $self->{_root_directory} = $self->_make_remote_directory(
@@ -1907,13 +1909,14 @@ sub _setup_new_profile {
     }
     $self->{profile_path} = $profile_path;
     if ($profile) {
+        if ( !$profile->download_directory() ) {
+            $profile->download_directory( $self->{_download_directory} );
+        }
     }
     else {
-        my %parameters = (
-            download_directory => $self->{_download_directory},
-            marionette         => $self
-        );
+        my %parameters = ( marionette => $self );
         $profile = Firefox::Marionette::Profile->new(%parameters);
+        $profile->download_directory( $self->{_download_directory} );
     }
     my $mime_types = join q[,], $self->mime_types();
     $profile->set_value( 'browser.helperApps.neverAsk.saveToDisk',
@@ -5038,7 +5041,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.93
+Version 0.94
 
 =head1 SYNOPSIS
 
@@ -5046,6 +5049,8 @@ Version 0.93
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    say $firefox->find_tag('title')->property('innerHTML'); # same as $firefox->title();
 
     say $firefox->html();
 
@@ -5714,7 +5719,7 @@ creates a new WebDriver session.  It is expected that the caller performs the ne
 
 =head2 nightly
 
-returns true if the current version of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number contain an 'a'?)
+returns true if the current version of firefox is a L<nightly release|https://www.mozilla.org/en-US/firefox/channel/desktop/#nightly> (does the minor version number end with an 'a1'?)
 
 =head2 paper_sizes 
 
@@ -5740,7 +5745,7 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * scale - Scale of the webpage rendering.  Defaults to 1.
 
-=item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<page_sizes|Firefox::Marionette#page_sizes> method for a list of accepted page size names. 
+=item * size - The desired size (width and height) of the pdf, specified by name.  See the page key for an alternative and the L<paper_sizes|Firefox::Marionette#paper_sizes> method for a list of accepted page size names. 
 
 =item * shrink_to_fit - Whether or not to override page size as defined by CSS.  Boolean value.  Defaults to true. 
 
@@ -5768,6 +5773,10 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
     $element->property('value') eq '' or die "Initial property is the empty string";
     $element->type('Test::More');
     $element->property('value') eq 'Test::More' or die "This property should have changed!";
+
+    # OR getting the innerHTML property
+
+    my $title = $firefox->find_tag('title')->property('innerHTML'); # same as $firefox->title();
 
 =head2 quit
 

@@ -14,4 +14,7 @@
 
        I still don't know if "1900" is correct. I believe that the correct
        figure is greater than 1600 and less than or equal to 1924, but
-       I haven't yet narrowed it down further.     
+       I haven't yet narrowed it down further.
+
+0.06 - Further improvements to uniqnum().
+     - Remove t/02old_uniqnum.t (no longer relevant).     

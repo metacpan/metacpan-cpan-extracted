@@ -1,5 +1,10 @@
 Revision history for HTML-DeferableCSS:
 
+v0.3.1    2020-02-24 15:14:09+00:00 Europe/London
+  [Improvements]
+  - Setting an alias to an undef value now means the stylesheet will
+    be ignored instead of throwing an error.
+
 v0.3.0    2020-02-22 14:41:19+00:00 Europe/London
   [Improvements]
   - Added check method as a wrapper around lazy attributes, but also

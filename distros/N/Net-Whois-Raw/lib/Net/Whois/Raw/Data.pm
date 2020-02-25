@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99026';
+$Net::Whois::Raw::Data::VERSION = '2.99027';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -4585,7 +4585,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99026
+version 2.99027
 
 =head1 AUTHOR
 
@@ -4593,7 +4593,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2019 by Alexander Nalobin.
+This software is copyright (c) 2002-2020 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

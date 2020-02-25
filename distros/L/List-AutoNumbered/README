@@ -13,6 +13,7 @@ NAME
             ("d");                                          # line 6
 
         # Now $list->arr is [ [3,"a"], [4,"b"], [5,"c"], [6,"d"] ]
+        # and @$list is ( [3,"a"] ... ).
 
     In general, you can pass any number to the constructor.  For example:
 
@@ -76,6 +77,12 @@ METHODS
     Returns a reference to the array being built.  Please do not modify this
     array directly until you are done loading it.  List::AutoNumbered may not
     work if you do.
+
+    This can also be called by using the List::AutoNumbered object as an
+    array:
+
+        my $list = List::AutoNumbered->new...;
+        foreach my $item (@$list) { ... }    # Instead of my $item (@{$list->arr})
 
   last_number
     Returns the current number stored by the instance.  This is the number of
@@ -162,9 +169,9 @@ SUPPORT
 
         <https://metacpan.org/pod/List::AutoNumbered>
 
-    *   CPAN Ratings
+    *   Appveyor (CI builds)
 
-        <https://cpanratings.perl.org/d/List-AutoNumbered>
+        <https://ci.appveyor.com/project/cxw42/list-autonumbered>
 
 ACKNOWLEDGEMENTS
     Thanks to zdim <https://stackoverflow.com/users/4653379/zdim> for
@@ -172,8 +179,10 @@ ACKNOWLEDGEMENTS
     <https://stackoverflow.com/q/50510809/2877364> that was the starting point
     for this module.
 
+    Thanks to Dan Stewart for code contributions.
+
 LICENSE AND COPYRIGHT
-    Copyright 2019 Christopher White.
+    Copyright 2019--2020 Christopher White.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published by

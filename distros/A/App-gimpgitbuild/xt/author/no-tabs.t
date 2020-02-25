@@ -11,6 +11,7 @@ my @files = (
     'lib/App/gimpgitbuild.pm',
     'lib/App/gimpgitbuild/API/GitBuild.pm',
     'lib/App/gimpgitbuild/Command/build.pm',
+    'lib/App/gimpgitbuild/Command/env.pm',
     't/00-compile.t'
 );
 

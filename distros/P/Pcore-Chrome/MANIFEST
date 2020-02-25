@@ -8,6 +8,7 @@ cpanfile
 lib/Build.PL
 lib/Pcore/Chrome.pm
 lib/Pcore/Chrome/Tab.pm
+share/data/util.js
 share/dist-id.yaml
 share/dist.yaml
 t/001.t

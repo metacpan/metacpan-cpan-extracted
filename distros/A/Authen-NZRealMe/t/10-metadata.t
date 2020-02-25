@@ -24,14 +24,21 @@ isa_ok($sp, 'Authen::NZRealMe::ServiceProvider');
 is($sp->conf_dir, $conf_dir, "SP's conf_dir looks good");
 is($sp->entity_id, 'https://www.example.govt.nz/app/sample-login',
     "SP EntityID loaded from metadata looks good");
-is($sp->url_assertion_consumer, 'https://www.example.govt.nz/app/sample/login-acs',
-    "SP ACS URL from metadata looks good");
 is($sp->organization_name, 'Department of Examples (login)',
     "SP OrganizationName loaded from metadata looks good");
 is($sp->organization_url, 'https://www.example.govt.nz/',
     "SP OrganizationURL loaded from metadata looks good");
 is($sp->contact_company, 'Department of Examples Login Services',
     "SP contact company name loaded from metadata looks good");
+
+my @acs_list = $sp->acs_list;
+is(scalar(@acs_list), 1, 'one Assertion Consumer service is defined');
+my($acs1) = @acs_list;
+is($acs1->{location}, 'https://www.example.govt.nz/app/sample/login-acs',
+    "ACS URL from metadata looks good");
+is($acs1->{index}, '0', "ACS index");
+is($acs1->{is_default}, '1', "ACS index");
+is($acs1->{binding}, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact', "ACS index");
 
 # Load IdP metadata for login service
 
@@ -54,14 +61,18 @@ isa_ok($sp, 'Authen::NZRealMe::ServiceProvider');
 is($sp->conf_dir, $conf_dir, "SP's conf_dir looks good");
 is($sp->entity_id, 'https://www.example.govt.nz/app/sample-identity',
     "SP EntityID loaded from metadata looks good");
-is($sp->url_assertion_consumer, 'https://www.example.govt.nz/app/sample/identity-acs',
-    "SP ACS URL from metadata looks good");
 is($sp->organization_name, 'Department of Examples (identity)',
     "SP OrganizationName loaded from metadata looks good");
 is($sp->organization_url, 'https://www.example.govt.nz/',
     "SP OrganizationURL loaded from metadata looks good");
 is($sp->contact_company, 'Department of Examples Identity Services',
     "SP contact company name loaded from metadata looks good");
+
+@acs_list = $sp->acs_list;
+is(scalar(@acs_list), 1, 'one Assertion Consumer service is defined');
+($acs1) = @acs_list;
+is($acs1->{location}, 'https://www.example.govt.nz/app/sample/identity-acs',
+    "ACS URL from metadata looks good");
 
 # Load IdP metadata for login service
 

@@ -10,7 +10,7 @@ use Types::PDL -types;
 
 use Chart::GGPlot::Util qw(:all);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 
 has name      => ( is => 'ro', isa => Str,     required => 1 );
@@ -60,7 +60,7 @@ Chart::GGPlot::Trans - Transformation class
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

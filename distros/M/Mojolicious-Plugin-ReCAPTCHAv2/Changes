@@ -1,4 +1,27 @@
 
+1.04      2020-02-24 17:27:07+01:00 Europe/Berlin
+    - No differences to trial release 1.03
+	- Thanks LEEJO for reminding me to release this (RT#131221)
+
+1.03      2019-05-11 19:00:34+02:00 Europe/Berlin (TRIAL RELEASE)
+	- Adapt a few more test cases (RT#129176)
+
+1.02      2019-05-05 19:30:24+02:00 Europe/Berlin (TRIAL RELEASE)
+	- Use less strict test as the result sometimes came out as 0
+	  and other times as '0' (RT#129176)
+
+1.01      2019-04-14 13:41:52+02:00 Europe/Berlin (TRIAL RELEASE)
+	- Fixed warning when checking for Mojo::JSON oo interface
+	  (GH#3, GH#4) - gmorten1
+	- Added async recaptcha_verify_p using Mojo::Promise
+	  (GH#5) - pink-mist
+	- Added optional callback to recaptcha_verify for
+	  asynchronous processing
+	- BREAKING: removed method 'recaptcha_get_errors' which
+	  could be subject to race conditions when running recaptcha_verify
+	  asynchronously
+	- Reorganised git repo structure
+
 0.4       2016-01-20 23:22:22+01:00 Europe/Berlin
 	  - Make sure the internal template is always processed with 
 	    EPRenderer and not by whatever template engine the

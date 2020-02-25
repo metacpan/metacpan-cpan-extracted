@@ -15,6 +15,7 @@ subtest "deferred_link_html with defer and inline disabled" => sub {
         aliases  => {
             reset => 'reset',
             test  => 'foo',
+            nope  => undef,
         },
         inline_max => 0,
         defer_css  => 0,
@@ -22,10 +23,12 @@ subtest "deferred_link_html with defer and inline disabled" => sub {
 
     isa_ok $css, 'HTML::DeferableCSS';
 
+    is $css->deferred_link_html('nope'), "", "disabled link";
+
     is $css->deferred_link_html('test'), $css->link_html('test'),
         'deferred_link_html';
 
-    is $css->deferred_link_html('test', 'test'), $css->link_html('test'),
+    is $css->deferred_link_html('test', 'test', 'nope'), $css->link_html('test'),
         'deferred_link_html (duplicates removed)';
 
 };

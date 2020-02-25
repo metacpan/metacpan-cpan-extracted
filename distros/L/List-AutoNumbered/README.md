@@ -1,5 +1,7 @@
 # List::AutoNumbered - Add sequential numbers to lists while creating them
 
+[![Appveyor Badge](https://ci.appveyor.com/api/projects/status/github/cxw42/list-autonumbered?svg=true)](https://ci.appveyor.com/project/cxw42/list-autonumbered)
+
 
 
 This module adds sequential numbers to lists of lists so you don't have to
@@ -14,6 +16,7 @@ to lists of testcases.  For example:
         ("d");                                          # line 6
 
     # Now $list->arr is [ [3,"a"], [4,"b"], [5,"c"], [6,"d"] ]
+    # and @$list is ( [3,"a"] ... ).
 
 In general, you can pass any number to the constructor.  For example:
 
@@ -83,6 +86,11 @@ Returns the index of the last element in the array.  Like `$#array`.
 Returns a reference to the array being built.  Please do not modify this
 array directly until you are done loading it.  List::AutoNumbered may not
 work if you do.
+
+This can also be called by using the List::AutoNumbered object as an array:
+
+    my $list = List::AutoNumbered->new...;
+    foreach my $item (@$list) { ... }    # Instead of my $item (@{$list->arr})
 
 ## last\_number
 
@@ -180,9 +188,9 @@ You can also look for information at:
 
     [https://metacpan.org/pod/List::AutoNumbered](https://metacpan.org/pod/List::AutoNumbered)
 
-- CPAN Ratings
+- Appveyor (CI builds)
 
-    [https://cpanratings.perl.org/d/List-AutoNumbered](https://cpanratings.perl.org/d/List-AutoNumbered)
+    [https://ci.appveyor.com/project/cxw42/list-autonumbered](https://ci.appveyor.com/project/cxw42/list-autonumbered)
 
 # ACKNOWLEDGEMENTS
 
@@ -191,9 +199,11 @@ for discussion and ideas in the
 [Stack Overflow question](https://stackoverflow.com/q/50510809/2877364)
 that was the starting point for this module.
 
+Thanks to Dan Stewart for code contributions.
+
 # LICENSE AND COPYRIGHT
 
-Copyright 2019 Christopher White.
+Copyright 2019--2020 Christopher White.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

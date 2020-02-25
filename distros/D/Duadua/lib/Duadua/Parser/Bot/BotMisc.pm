@@ -45,6 +45,17 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
+    elsif ( index($d->ua, 'MixnodeCache/') > -1 ) {
+        $h = {
+            name   => 'mixnode.com',
+            is_bot => 1,
+        };
+
+        if ($d->opt_version) {
+            my ($version) = ($d->ua =~ m!^MixnodeCache/([\d.]+)!);
+            $h->{version} = $version if $version;
+        }
+    }
 
     return $h;
 }

@@ -104,10 +104,10 @@ testhere:   # Run the tests from lib rather than blib
 \tprove -lj4
 
 README.md: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md
+\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f md --appveyor cxw42/list-autonumbered
 
 README: @{[$VERSION_FROM]} Makefile.PL $make_readme_md
-\t"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text
+\t-"$secure_perl_path" "$make_readme_md" -i "\$<" -o "\$@" -f text --appveyor cxw42/list-autonumbered
 
 all :: README.md README
 dist :: README.md README
@@ -189,9 +189,18 @@ my %opts = (
                 requires => {
                     'App::RewriteVersion' => '0',   # for perl-bump-version
                     'Module::Metadata' => '1.000016',
+                    'Path::Class' => '0',           # for support/readme.pl
                 },
             },
         },
+
+        # The gymnastics in this file are primarily for developer
+        # convenience.  The actual dist, if processed by an installer
+        # new enough to support x_static_install, doesn't need any of
+        # the above processing for a plain installation.  Therefore,
+        # x_static_install is OK.  For more, see
+        # http://blogs.perl.org/users/shoichi_kaji1/2017/03/make-your-cpan-module-static-installable.html
+        "x_static_install" => "1",
 
         @provides,
 

@@ -64,9 +64,6 @@ ECMAScript promises work:
 
 =over
 
-=item * Promise resolutions and rejections consist of I<lists>, not
-single values.
-
 =item * Neither the C<resolve()> method of deferred objects
 nor the C<resolved()> convenience function define behavior when given
 a promise object.
@@ -81,14 +78,53 @@ call “array references”). So whereas in ECMAScript you do:
 
     Promise::XS::all( $promise1, $promise2 );
 
+=item * Promise resolutions and rejections may contain multiple values.
+(But see L</AVOID MULTIPLES> below.)
+
 =back
 
 See L<Promise::ES6> for an interface that imitates ECMAScript promises
 more closely.
 
+=head1 AVOID MULTIPLES
+
+For compatibility with preexisting Perl promise libraries, Promise::XS
+allows a promise to resolve or reject with multiple values. This behavior,
+while eminently “perlish”, allows for some weird cases where the relevant
+standards don’t apply: for example, what happens if multiple promises are
+returned from a promise callback? Or even just a single promise plus extra
+returns?
+
+Promise::XS tries to help you catch such cases by throwing a warning
+if multiple return values from a callback contain a promise as the
+first member. For best results, though—and consistency with promise
+implementations outside Perl—resolve/reject all promises with I<single>
+values.
+
+=head1 DIFFERENCES FROM L<Promises> ET AL.
+
+This module implements ECMAScript’s C<finally()> interface, which differs
+from that in some other Perl promise implementations.
+
+Given the following …
+
+    my $new = $p->finally( $callback );
+
+=over
+
+=item * C<$callback> is given no arguments.
+
+=item * If C<$callback> returns anything but a single, rejected promise,
+C<$new> has the same status as C<$p>.
+
+=item * If C<$callback> throws or returns a single, rejected promise,
+C<$new> is rejected with C<$callback>’s exception.
+
+=back
+
 =head1 EVENT LOOPS
 
-This library, by default, uses no event loop. This is a perfectly usable
+By default this library uses no event loop. This is a perfectly usable
 configuration; however, it’ll be a bit different from how promises usually
 work in evented contexts (e.g., JavaScript) because callbacks will execute
 immediately rather than at the end of the event loop as the Promises/A+
@@ -263,8 +299,6 @@ sub race {
     };
 
     for my $given_promise (@_) {
-        last if $is_done;
-
         $given_promise->then($on_resolve_cr, $on_reject_cr);
     }
 

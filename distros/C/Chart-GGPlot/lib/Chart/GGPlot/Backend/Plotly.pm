@@ -5,11 +5,11 @@ package Chart::GGPlot::Backend::Plotly;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 with qw(Chart::GGPlot::Backend);
 
-use Chart::Plotly 0.025 qw(show_plot);
+use Chart::Plotly 0.039 qw(show_plot);
 use Chart::Plotly::Plot;
 use Chart::Plotly::Image::Orca;
 
@@ -536,6 +536,7 @@ method _to_plotly ($plot_built) {
 
     #$log->trace( "plotly html:\n" . $plotly->html ) if $log->is_trace;
 
+    $plotly->{config}{responsive} = JSON::true;
     return $plotly;
 }
 
@@ -547,6 +548,14 @@ method ggplotly ($ggplot) {
 
 method show ($ggplot, HashRef $opts={}) {
     my $plotly = $self->ggplotly($ggplot);
+    if ( $opts->{width} or $opts->{height} ) {
+        $plotly->{layout}{width}  = $opts->{width}  if ( $opts->{width} );
+        $plotly->{layout}{height} = $opts->{height} if ( $opts->{height} );
+        $plotly->{config}{responsive} = JSON::false;
+    }
+    else {
+        $plotly->{config}{responsive} = JSON::true;
+    }
     show_plot( $plotly );
 }
 
@@ -587,7 +596,7 @@ Chart::GGPlot::Backend::Plotly - Plotly backend for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 
@@ -614,6 +623,25 @@ C<BROWSER> to force a browser command on your system, for example,
 
     export BROWSER=chromium-browser
 
+Below options are supported for C<$opts>:
+
+=over 4
+
+=item *
+
+width: plot width in pixel
+
+=item *
+
+height: plot height in pixel
+
+=back
+
+If neither C<width> or C<height> is not specified, the plotly shown in browser
+will use L<fluid layout|https://plot.ly/javascript/responsive-fluid-layout/>,
+that is, figure size will be automatically resized when browser window size
+changes.
+
 =head2 save
 
     save($ggplot, $filename, HashRef $opts={})
@@ -627,11 +655,11 @@ Below options are supported for C<$opts>:
 
 =item *
 
-width
+width: plot width in pixel
 
 =item *
 
-height
+height: plot height in pixel
 
 =back
 

@@ -14,12 +14,13 @@ my %constants = (
   INFO_URL  => 'https://graph.microsoft.com/v1.0/me',
   NAME      => 'Nuvol Office 365 Connector',
   TOKEN_URL => 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-  SERVICE      => 'Office365',
+  SERVICE   => 'Office365',
 );
 my %defaults = (
-  app_id       => '6bdc6780-1c1c-4f59-83f8-1b931306f556',
-  redirect_uri => 'https://login.microsoftonline.com/common/oauth2/nativeclient',
-  scope        => 'Files.ReadWrite Files.ReadWrite.All User.Read offline_access',
+  app_id        => '6bdc6780-1c1c-4f59-83f8-1b931306f556',
+  redirect_uri  => 'https://login.microsoftonline.com/common/oauth2/nativeclient',
+  response_type => 'code',
+  scope         => 'Files.ReadWrite Files.ReadWrite.All User.Read offline_access',
 );
 my %tokens = (
   access_token  => 'new access token',
@@ -40,7 +41,7 @@ note 'Open existing config';
 
 ok $connector = $package->new($connector->configfile), 'Re-open from existing config';
 
-test_basics $connector, $service;
+test_basics $connector,       $service;
 test_authenticate $connector, \%tokens;
 test_disconnect $connector;
 

@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(pairwise);
@@ -193,7 +193,7 @@ Chart::GGPlot::Stat::Boxplot - Statistic method that gets the statistics data fo
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

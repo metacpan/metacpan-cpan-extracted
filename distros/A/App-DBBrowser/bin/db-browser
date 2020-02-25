@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.236';
+our $VERSION = '2.238';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.236
+Version 2.238
 
 =head1 SYNOPSIS
 
@@ -961,6 +961,10 @@ the output.
 =head3 Squash spaces
 
 If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are removed.
+
+=head3 Show table name
+
+If enabled, the table name is displayed in the lower left corner of the terminal behind the page number.
 
 =head3 Set string
 

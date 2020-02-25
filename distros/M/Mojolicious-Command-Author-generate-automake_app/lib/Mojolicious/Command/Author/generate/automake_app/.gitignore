@@ -32,4 +32,5 @@ nytprof.out
 /config.*
 *~
 /.vscode/perl-lang/
+node_modules
 /configure

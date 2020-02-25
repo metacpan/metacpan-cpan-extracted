@@ -1,18 +1,16 @@
 package Nuvol::Dummy::Item;
 use Mojo::Base -role, -signatures;
 
-use Mojo::File 'path';
-
 use constant SERVICE => 'Dummy';
 
 # internal methods
 
+sub _build_realpath ($self) {
+  return $self->{path} // unpack('u', $self->{id}) =~ s/^p://r;
+}
+
 sub _build_url ($self, @path) {
-  if ($self->{id}) {
-    unshift @path, unpack('u', $self->{id}) =~ s/^p://r;
-  } else {
-    unshift @path, split '/', $self->{path};
-  }
+  unshift @path, $self->realpath->@*;
   return $self->drive->url(@path);
 }
 
@@ -21,7 +19,7 @@ sub _check_existence ($self) {
 }
 
 sub _path ($self) {
-  return path($self->url->path->to_route);
+  return Mojo::File->new($self->url->path->to_route);
 }
 
 sub _get_description ($self) {
@@ -29,7 +27,7 @@ sub _get_description ($self) {
 }
 
 sub _get_name ($self) {
-  return $self->metadata->{path} || 'Root Folder';
+  return $self->metadata->{path};
 }
 
 sub _get_type ($self, $params) {

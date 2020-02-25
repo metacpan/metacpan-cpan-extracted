@@ -53,6 +53,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.707",
+   "version" : "1.709",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

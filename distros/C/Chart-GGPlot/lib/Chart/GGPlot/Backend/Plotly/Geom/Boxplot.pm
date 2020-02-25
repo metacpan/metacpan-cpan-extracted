@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Boxplot;
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
@@ -133,7 +133,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Boxplot - Chart::GGPlot's Plotly implement
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

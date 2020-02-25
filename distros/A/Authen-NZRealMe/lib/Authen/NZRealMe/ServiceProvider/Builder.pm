@@ -1,16 +1,16 @@
 package Authen::NZRealMe::ServiceProvider::Builder;
-$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.19';
+$Authen::NZRealMe::ServiceProvider::Builder::VERSION = '1.20';
 use warnings;
 use strict;
 use feature "switch";
 
-use Term::ReadLine  qw();
 use File::Path      qw(rmtree);
 use File::Copy      qw(copy);
 use Cwd             qw(getcwd);
 
-my $prog_name = 'nzrealme';
-my $term      = undef;
+use Authen::NZRealMe::CommonURIs qw(URI);
+
+my $term = undef;
 
 my @fields = (
 
@@ -23,13 +23,8 @@ service. The format for this value is:
   https://<sp-domain>/<privacy-realm>/<application-name>
 EOF
 
-    url_assertion_consumer => <<EOF,
-After a user has logged on, which URL on your site should the IdP redirect
-the user back to?
-EOF
-
     organization_name => <<EOF,
-What is the name of the agency/company?
+What is the name of the agency/organization?
 EOF
 
     organization_url => <<EOF,
@@ -50,7 +45,7 @@ sub build {
 
     _check_conf($opt{conf_dir});
 
-    _init_term();
+    $term = Authen::NZRealMe->class_for('term_readline')->init_readline();
     my $scope = $class->_prompt_builder_scope() || return;
 
     if($scope =~ /login/) {
@@ -62,20 +57,15 @@ sub build {
 }
 
 
-sub _init_term {
-    $term = Term::ReadLine->new($prog_name);
-    if($term->Attribs and $term->Attribs->can('ornaments')) {
-        $term->Attribs->ornaments(0);
-    }
-    else {
-        warn "Consider installing Term::ReadLine::Gnu for better terminal handling.\n\n";
-    }
+sub _new_block {
+    print "\n", '=' x 78, "\n\n";
 }
 
 
 sub _prompt_builder_scope {
     my($class) = @_;
 
+    _new_block;
     print <<EOF;
 This tool allows you to generate or edit the Service Provider metadata
 required to integrate with the login service or the assertion service.
@@ -104,8 +94,17 @@ sub _build_meta {
     _check_idp_metadata($conf_dir, $type);
 
     my $sp    = $class->_init_sp($sp_class, $conf_dir, $conf_path, $type);
-    my $args  = $class->_prompt_field_values($sp);
-    $sp->{$_} = $args->{$_} foreach @field_names;
+    TRY: while(1) {
+        my $args  = $class->_prompt_field_values($sp);
+        $sp->{$_} = $args->{$_} foreach @field_names;
+
+        my @acs_list = $class->_prompt_for_acs($sp);
+        $sp->{acs_list} = \@acs_list;
+
+        last TRY if _prompt_yes_no('Do you wish to save the results? (y/n) ', '');
+        redo TRY if _prompt_yes_no('Do you wish to try again? (y/n) ', '');
+        exit 1;
+    }
 
     print "\nSaving metadata file: $conf_path\n\n";
     $sp->_write_file($conf_path, $sp->metadata_xml() . "\n");
@@ -138,25 +137,20 @@ sub _prompt_field_values {
 
     my $args = { map { $_ => $sp->{$_} } @field_names };
 
-    TRY: while(1) {
-        for(my $i = 0; $i <= $#fields; $i += 2) {
-            my $key    = $fields[$i];
-            my $prompt = $fields[$i + 1];
+    for(my $i = 0; $i <= $#fields; $i += 2) {
+        my $key    = $fields[$i];
+        my $prompt = $fields[$i + 1];
 
-            print "\n$prompt\n";
-            my $field_ok = 0;
-            my $value = $args->{$key};
-            do {
-                $value = $term->readline("$key> ", $value);
-                my $method = "_validate_$key";
-                $field_ok = $class->can($method) ? $class->$method($value) : 1;
-            } until $field_ok;
-            $args->{$key} = $value;
-        }
-
-        last TRY if _prompt_yes_no('Do you wish to save the results? (y/n) ', '');
-        redo TRY if _prompt_yes_no('Do you wish to try again? (y/n) ', '');
-        exit 1;
+        _new_block;
+        print "$prompt\n";
+        my $field_ok = 0;
+        my $value = $args->{$key};
+        do {
+            $value = $term->readline("$key> ", $value);
+            my $method = "_validate_$key";
+            $field_ok = $class->can($method) ? $class->$method($value) : 1;
+        } until $field_ok;
+        $args->{$key} = $value;
     }
 
     return $args;
@@ -194,6 +188,135 @@ sub _validate_id {
 }
 
 
+sub _prompt_for_acs {
+    my($class, $sp) = @_;
+    my $dir = $sp->conf_dir or die "conf_dir not defined\n";
+
+    _new_block;
+    my $no_ssl_keypair = ! _key_pair_exists($dir, 'ssl');
+    if($no_ssl_keypair) {
+        print
+            "WARNING: If you wish to use the HTTP-Artifact binding, you must\n"
+          . "first generate another SSL certificate/key pair and save to the\n"
+          . "following files:\n\n"
+          . " * $dir/sp-ssl-key.pem\n"
+          . " * $dir/sp-ssl-crt.pem\n\n"
+          . "If you only wish to use the HTTP-POST binding, you can ignore\n"
+          . "the above warning.\n\n";
+    }
+    my @acs_list =  $sp->acs_list;
+    while(1) {
+        if(!@acs_list) {
+            print "Adding a new Assertion Consumer Service entry ...\n\n";
+            push @acs_list, _new_acs_entry($no_ssl_keypair);
+        }
+        _list_current_acs_entries(@acs_list); # Will normalise index sequence
+        print
+            "Select 'a' to add an ACS; the index number to edit an ACS;\n"
+          . "d<index> to delete an entry; or 'c' to continue.\n\n";
+        my @options = ('a', map { $_->{index} } @acs_list);
+        my $prompt_opt = join('/', @options);
+        my $pattern = '^(' . join('|', @options) . '|d\d+|c)$';
+        my $resp = lc(_menu_prompt("Select ($prompt_opt/d<n>/c)> ", $pattern));
+        if($resp eq 'a') {
+            push @acs_list, _new_acs_entry($no_ssl_keypair);
+        }
+        elsif($resp =~ /^\d+$/) {
+            my($acs) = grep { $_->{index} == $resp } @acs_list
+                or die "Can't find ACS with index=$resp\n";
+            _edit_acs_entry($acs, $no_ssl_keypair);
+        }
+        elsif(my($unwanted) = $resp =~ /^d(\d+)$/) {
+            print "Deleting ACS with index=$unwanted ...\n\n";
+            @acs_list = grep { $_->{index} != $unwanted } @acs_list;
+        }
+        else {
+            last;
+        }
+    }
+
+    return @acs_list;
+}
+
+
+sub _list_current_acs_entries {
+    my(@acs_list) = @_;
+
+    my $i = 0;
+    if(@acs_list) {
+        print "Current Assertion Consumer Service (ACS) definitions:\n\n";
+        foreach my $acs (@acs_list) {
+            $acs->{index} = $i++;
+            print
+                "  Index:    $acs->{index}\n"
+              . "  Binding:  $acs->{binding}\n"
+              . "  Location: $acs->{location}\n\n"
+        }
+    }
+    else {
+        print "No Assertion Consumer Service (ACS) definitions yet.\n\n";
+    }
+}
+
+
+sub _new_acs_entry {
+    my($no_ssl_keypair) = @_;
+
+    return {
+        binding  => _acs_binding_choice('', $no_ssl_keypair),
+        location => _acs_location(''),
+    };
+}
+
+
+sub _edit_acs_entry {
+    my($acs, $no_ssl_keypair) = @_;
+
+    $acs->{binding}  = _acs_binding_choice($acs->{binding}, $no_ssl_keypair);
+    $acs->{location} = _acs_location($acs->{location});
+}
+
+
+sub _acs_binding_choice {
+    my($curr_value, $no_ssl_keypair) = @_;
+
+    if($no_ssl_keypair) {
+        print "Assuming HTTP-POST binding due to no mutual SSL key pair.\n\n";
+        return URI('saml_binding_post');
+    }
+
+    my $choice = '';
+    if($curr_value eq URI('saml_binding_artifact')) {
+        $choice = 'a'
+    }
+    elsif($curr_value eq URI('saml_binding_post')) {
+        $choice = 'p'
+    }
+    $choice = _menu_prompt(
+        'Binding (a=HTTP-Artifact, p = HTTP-POST)> ',
+        qr(^[ap]$),
+        $choice
+    );
+
+    return $choice eq 'a' ? URI('saml_binding_artifact') : URI('saml_binding_post');
+}
+
+
+sub _acs_location {
+    my($value) = @_;
+
+    print
+        "The ACS URL is the URL on your system that users should be redirected\n"
+      . "back to after completing a login\n\n";
+    $value = _menu_prompt(
+        'ACS URL> ',
+        qr{^https?://\S+$},
+        $value
+    );
+    return $value;
+}
+
+
 sub _validate_entity_id {
     my($class, $value) = @_;
 
@@ -215,29 +338,36 @@ sub _check_conf {
 
     die "Config directory '$dir' does not exist\n" unless -d "$dir/.";
 
-    my @missing = map {  -e "$dir/$_" ? () : "$dir/$_" } qw(
-        sp-sign-crt.pem sp-sign-key.pem sp-ssl-crt.pem sp-ssl-key.pem
-    );
-    if(@missing) {
-        my $hint = "Use 'nzrealme make-certs' to generate certificates";
-        if(not grep /-key.pem/, @missing  and  -e "$dir/sp-sign.csr") {
-            $hint = "You must save the signed certificate files you received "
-                  . "from the CA\n(Certification Authority) using the "
-                  . "filenames listed above.";
-        }
-        die join("\n",
-            "The following key-pair files are missing:",
-            map { " * $_" } @missing,
-        ) . "\n\n$hint\n\n"
+    if(not _key_pair_exists($dir, 'sign')) {
+        die "Signing key pair files are missing from the config directory.\n\n"
+          . "For MTS, use the files from the integration bundle ZIP file.\n"
+          . "For ITE/Prod you can use 'nzrealme make-certs' to generate a key\n"
+          . "and CSR.  When you receive the certificate file from the CA\n"
+          . "the key and certificate should be saved as:\n\n"
+          . " * $dir/sp-sign-key.pem\n"
+          . " * $dir/sp-sign-crt.pem\n\n"
+          . "You must correct this error before metadata can be generated\n\n";
     }
 }
 
 
+sub _key_pair_exists {
+    my($dir, $type) = @_;
+
+    if(-e "$dir/sp-$type-key.pem" and -e "$dir/sp-$type-crt.pem") {
+        return 1;
+    }
+    return 0;
+}
+
+
 sub _menu_prompt {
-    my($prompt, $regex) = @_;
+    my $prompt = shift;
+    my $regex  = shift;
+    my $old_value = shift // '';
 
     while(1) {
-        my $resp = $term->readline($prompt);
+        my $resp = $term->readline($prompt, $old_value);
         return $resp if $resp =~ $regex;
     }
 }

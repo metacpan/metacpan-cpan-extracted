@@ -5,9 +5,10 @@ use constant {
   AUTH_URL => 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
   API_URL  => 'https://graph.microsoft.com/v1.0',
   DEFAULTS => {
-    app_id       => '6bdc6780-1c1c-4f59-83f8-1b931306f556',
-    redirect_uri => 'https://login.microsoftonline.com/common/oauth2/nativeclient',
-    scope        => 'Files.ReadWrite Files.ReadWrite.All User.Read offline_access',
+    app_id        => '6bdc6780-1c1c-4f59-83f8-1b931306f556',
+    redirect_uri  => 'https://login.microsoftonline.com/common/oauth2/nativeclient',
+    response_type => 'code',
+    scope         => 'Files.ReadWrite Files.ReadWrite.All User.Read offline_access',
   },
   INFO_URL  => 'https://graph.microsoft.com/v1.0/me',
   NAME      => 'Nuvol Office 365 Connector',
@@ -23,6 +24,8 @@ sub _build_url ($self, @path) {
 
   return $url;
 }
+
+sub _do_disconnect ($self) {}
 
 sub _get_name ($self) {
   return $self->metadata->{displayName};

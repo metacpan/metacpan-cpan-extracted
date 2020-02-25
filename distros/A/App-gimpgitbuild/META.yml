@@ -20,15 +20,19 @@ name: App-gimpgitbuild
 provides:
   App::gimpgitbuild:
     file: lib/App/gimpgitbuild.pm
-    version: v0.0.2
+    version: v0.4.0
   App::gimpgitbuild::API::GitBuild:
     file: lib/App/gimpgitbuild/API/GitBuild.pm
-    version: v0.0.2
+    version: v0.4.0
   App::gimpgitbuild::Command::build:
     file: lib/App/gimpgitbuild/Command/build.pm
-    version: v0.0.2
+    version: v0.4.0
+  App::gimpgitbuild::Command::env:
+    file: lib/App/gimpgitbuild/Command/env.pm
+    version: v0.4.0
 requires:
   App::Cmd::Setup: '0'
+  Moo: '0'
   Path::Tiny: '0'
   Term::ANSIColor: '0'
   perl: '5.014'
@@ -38,7 +42,7 @@ resources:
   bugtracker: https://github.com/shlomif/App-gimpgitbuild/issues
   homepage: http://metacpan.org/release/App-gimpgitbuild
   repository: git://github.com/shlomif/App-gimpgitbuild.git
-version: 0.0.2
+version: 0.4.0
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -139,7 +143,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'

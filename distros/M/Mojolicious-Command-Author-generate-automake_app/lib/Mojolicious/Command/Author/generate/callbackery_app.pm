@@ -8,7 +8,7 @@ use Mojo::File;
 use POSIX qw(strftime);
 use Cwd 'getcwd';
 use File::Spec::Functions qw(catdir catfile);
-our $VERSION = '0.3.1';
+our $VERSION = '0.3.4';
 has description => 'Generate Callbackery web application with Automake';
 has usage => sub { shift->extract_usage };
 
@@ -27,6 +27,7 @@ sub file {
         'README.md' => 'README.md',
         'AUTHORS' => 'AUTHORS',
         '.gitignore' => '.gitignore',
+        '.github/workflows/unit-tests.yaml' => '.github/workflows/unit-tests.yaml',
         'LICENSE' => 'LICENSE',
         'COPYRIGHT' => 'COPYRIGHT',
         'CHANGES' => 'CHANGES',

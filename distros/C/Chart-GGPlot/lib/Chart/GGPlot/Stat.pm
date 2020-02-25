@@ -5,7 +5,7 @@ package Chart::GGPlot::Stat;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
@@ -117,7 +117,7 @@ Chart::GGPlot::Stat - The stat role
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

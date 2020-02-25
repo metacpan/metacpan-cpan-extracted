@@ -9,13 +9,14 @@ build_requires:
   Cache::FileCache: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Find::Lib: '0'
   HTTP::Request: '0'
-  Path::Class: '0'
+  Path::Tiny: '0'
   Test::Fatal: '0'
   Test::More: '0'
   Test::Requires: '0'
   Test::RequiresInternet: '0'
+  Test::Warnings: '0'
+  URI::file: '0'
   constant: '0'
   lib: '0'
   perl: '5.008'
@@ -53,10 +54,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize-Cached/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize-Cached
   repository: https://github.com/libwww-perl/WWW-Mechanize-Cached.git
-version: '1.52'
+version: '1.53'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::RemovePrereqs
@@ -65,6 +66,14 @@ x_Dist_Zilla:
           modules_to_remove:
             - TestCache
       name: RemovePrereqs
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -118,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -174,7 +183,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::OALDERS/InstallGuide'
       version: '1.200013'
@@ -212,10 +221,6 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/MojibakeTests'
       version: '0.8'
     -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Author::OALDERS/PodCoverageTests'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
       version: '6.012'
@@ -238,6 +243,10 @@ x_Dist_Zilla:
           trailing_whitespace: 1
       name: '@Author::OALDERS/Test::EOL'
       version: '0.19'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: '@Author::OALDERS/Test::Pod::Coverage::Configurable'
+      version: '0.07'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -410,7 +419,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -418,7 +427,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.23.0
+          git_version: 2.25.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -513,7 +522,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -526,11 +535,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.52
+          tag: v1.53
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -567,7 +576,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -581,7 +590,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.23.0
+          git_version: 2.25.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -634,11 +643,13 @@ x_contributors:
   - 'Bjorn-Olav Strand <bolav@ikke.no>'
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'John SJ Anderson <genehack@genehack.org>'
+  - 'Jonathan Rubin <jjr.spam@gmail.com>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Mark Gardner <mjg@ziprecruiter.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'simbabque <simbabque@cpan.org>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

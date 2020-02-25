@@ -21,7 +21,7 @@ my ($next_ok, $any, $finally_called, $reached_end);
 for (1..1) {
     my $final= $promise->then(
         sub {
-            ok(1);
+            ok(1, 'start');
             $any= 1;
             return (123, 456);
         },

@@ -1,5 +1,14 @@
 Revision history for Perl extension Promise::XS:
 
+0.08 Mon 24 Feb 2020
+- BREAKING CHANGE (minor): finally() is now closer to ECMAScript’s
+  specification. Toward that end, finally() callbacks no longer receive
+  arguments, and they handle exceptions and returned rejected promises as
+  ECMAScript’s finally() callbacks handle them.
+- A warning is now thrown if a promise is the first of multiple returns from
+  a promise callback.
+- Speed up memory-leak detection on promise creation.
+
 0.07 Tue 11 Feb 2020
 - Support old event loop versions that lack zero-timer methods.
 - Report event loop versions in distribution tests.

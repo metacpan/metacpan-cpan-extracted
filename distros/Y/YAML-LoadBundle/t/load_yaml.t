@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 30;
 use Test::Exception;
 use Fcntl qw(:seek);
 use File::Temp qw(:POSIX);
@@ -65,28 +65,37 @@ lives_ok { load_yaml($yaml) } 'trailing space removed';
 $yaml = <<'...';
 ---
 foo:
-  export: &foo { x: 1 }
-  y: 2
+  export: &foo { x: [one] }
+  y: two
 
 bar:
   import: *foo
-  export: &bar { z: 3 }
+  export: &bar { z: three }
 
 baz:
+  nested: *foo
   import: [ *foo, *bar ]
-  export: &baz { x: overridden }
+  export: &baz { x: [overridden] }
 ...
 
 $ref = load_yaml($yaml);
 is_deeply(
     $ref,
     {
-        foo => { x => 1, y => 2 },
-        bar => { x => 1, z => 3 },
-        baz => { x => 'overridden', z => 3 },
+        foo => { x => ['one'], y => 'two' },
+        bar => { x => ['one'], z => 'three' },
+        baz => { x => ['overridden'], 
+                 z => 'three', 
+                 nested => { x => ['one'] } 
+               },
     },
     'reference-flattening',
 );
+
+$ref->{foo}{x}[0] =~ s/one/ONE/;
+is $ref->{foo}{x}[0], 'ONE',         "If we modify an exported node...";
+is $ref->{bar}{x}[0], 'one',         "... the change isn't shared with imported nodes";
+is $ref->{baz}{nested}{x}[0], 'one', "... nor references.";
 
 is_deeply(
     load_yaml(<<'...'),
@@ -185,6 +194,49 @@ importer:
         importer    => { x => 1, y => 2, z => 3 },
     },
     'multi-step export/import',
+);
+
+# nested special keys
+is_deeply(
+    load_yaml(<<'...'),
+default: &default
+    development: &default_dev
+        goodness: BAD
+        env: DEV
+    production:
+        -merge: *default_dev
+
+specific: &specific
+    -merge: *default
+    development: &specific_dev
+        goodness: GOOD
+    production:
+        -merge:  *specific_dev
+        env: PROD
+...
+    {
+        default => {
+            development => {
+                goodness => 'BAD',
+                env => 'DEV',
+            },
+            production => {
+                goodness => 'BAD',
+                env => 'DEV',
+            },
+        },
+        specific => {
+            development => {
+                goodness => 'GOOD',
+                env => 'DEV',
+            },
+            production => {
+                goodness => 'GOOD',
+                env => 'PROD',
+            },
+        },
+    },
+    'nested -merge paths work',
 );
 
 # YAML that looks like a pseudo-hash shouldn't generate any warnings

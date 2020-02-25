@@ -5,7 +5,7 @@ package Chart::GGPlot::Plot;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Autoload::AUTOCAN;
 use Data::Frame::Types qw(DataFrame);
@@ -277,7 +277,7 @@ Chart::GGPlot::Plot - ggplot class
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

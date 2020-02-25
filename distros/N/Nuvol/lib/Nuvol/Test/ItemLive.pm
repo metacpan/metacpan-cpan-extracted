@@ -10,7 +10,7 @@ use Nuvol::Test::Roles ':metadata';
 use Nuvol::Test::DriveLive ':build';
 use Test::More;
 
-sub build_test_item ($service) {
+sub build_test_item ($service, $path = '/') {
   note "Create test item for $service";
 
   ok my $drive = build_test_drive($service), 'Create test drive';
@@ -20,7 +20,7 @@ sub build_test_item ($service) {
   like $@, qr/Too few arguments for subroutine/, 'Can\'t create item without parameters';
 
   note 'Create item';
-  ok my $item = $drive->item('/'), 'Get root folder';
+  ok my $item = $drive->item($path), "Get item '$path'";
   isa_ok $item, 'Nuvol::Item';
 
   return $item;
@@ -36,6 +36,7 @@ sub test_basics ($item, $service) {
   ok $item->description, 'Item has a description';
   ok $item->name,        'Item has a name';
   ok $item->metadata,    'Item has metadata';
+  ok $item->realpath,    'Item has a realpath';
   ok $item->exists,      'Item exists';
 }
 
@@ -71,9 +72,10 @@ tests.
 =head2 build_test_item
 
     $item = build_test_item $service;
+    $item = build_test_item $service, $path;    # default '/'
 
 Returns a L<Nuvol::Item> for the specified service, using the config file defined in the environment
-variable.
+variable. If no path is provided, the test item will be the root folder.
 
 =head2 test_basics
 

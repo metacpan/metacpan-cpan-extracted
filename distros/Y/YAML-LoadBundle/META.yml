@@ -4,40 +4,31 @@ author:
   - 'Grant Street Group <developers@grantstreet.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Fcntl: '0'
   File::Spec: '0'
-  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
   Test::More: '0'
-  Time::HiRes: '0'
-  blib: '1.01'
-  perl: v5.10.0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-  perl: '5.008'
+  ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: YAML-LoadBundle
-no_index: {}
+provides:
+  YAML::LoadBundle:
+    file: lib/YAML/LoadBundle.pm
+    version: v0.4.2
 requires:
-  Carp: '0'
-  Cwd: '0'
   Digest::SHA1: '0'
-  Exporter: '0'
-  File::Find: '0'
   Hash::Merge::Simple: '0'
-  Scalar::Util: '0'
-  Storable: '0'
   YAML::XS: '0'
-  base: '0'
-  perl: v5.10.0
-  strict: '0'
-  warnings: '0'
-version: '0.003'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/p5-YAML-LoadBundle/issues
+  repository: git://github.com/GrantStreetGroup/p5-YAML-LoadBundle.git
+version: v0.4.2
 x_serialization_backend: 'YAML::Tiny version 1.69'
+x_static_install: 1

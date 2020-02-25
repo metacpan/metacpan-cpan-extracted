@@ -30,7 +30,8 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'Test::Warn' => '0.36'
                                     }
                     },
        'runtime' => {
@@ -61,13 +62,14 @@ do { my $x = {
                                    'Cache::FileCache' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Find::Lib' => '0',
                                    'HTTP::Request' => '0',
-                                   'Path::Class' => '0',
+                                   'Path::Tiny' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',
                                    'Test::Requires' => '0',
                                    'Test::RequiresInternet' => '0',
+                                   'Test::Warnings' => '0',
+                                   'URI::file' => '0',
                                    'constant' => '0',
                                    'lib' => '0',
                                    'perl' => '5.008'

@@ -7,7 +7,7 @@ use Mojo::JSON qw|decode_json encode_json|;
 # constants
 
 use constant CONFIG_PARAMS =>
-  'access_token app_id redirect_uri refresh_token scope service validto';
+  'access_token app_id redirect_uri refresh_token response_type scope service validto';
 
 # constructor
 
@@ -26,7 +26,7 @@ sub new ($class, $configfile, $params = {}) {
   } else {
 
     # check params
-    for (qw|app_id redirect_uri scope service|) {
+    for (qw|app_id redirect_uri response_type scope service|) {
       Carp::croak "Parameter $_ missing!" unless $params->{$_};
     }
 
@@ -43,10 +43,11 @@ sub new ($class, $configfile, $params = {}) {
 
 has [qw|access_token hash refresh_token scope validto|];
 
-sub app_id ($self)       { return $self->{app_id}; }
-sub digest ($self)       { return $self->{digest}; }
-sub file ($self)         { return $self->{file}; }
-sub redirect_uri ($self) { return $self->{redirect_uri}; }
+sub app_id ($self)        { return $self->{app_id}; }
+sub digest ($self)        { return $self->{digest}; }
+sub file ($self)          { return $self->{file}; }
+sub redirect_uri ($self)  { return $self->{redirect_uri}; }
+sub response_type ($self) { return $self->{response_type}; }
 
 sub save ($self) {
   my $file = $self->file;
@@ -154,6 +155,12 @@ Getter for the redirect URI.
     $config        = $config->refresh_token($new_refresh_token);
 
 Getter and setter for the refresh token.
+
+=head2 response_type
+
+    $response_type = $config->response_type;
+
+Getter for the authentication response type.
 
 =head2 save
 

@@ -1,13 +1,13 @@
 package Template::Liquid::Utility;
 use strict;
 use warnings;
-our $VERSION         = '1.0.16';
+our $VERSION         = '1.0.17';
 our $FilterSeparator = qr[\s*\|\s*]o;
 my $ArgumentSeparator = qr[,]o;
 our $FilterArgumentSeparator    = qr[\s*:\s*]o;
 our $VariableAttributeSeparator = qr[\.]o;
 our $TagStart                   = qr[(?:\s*{%-\s*|{%\s*)]o;
-our $TagEnd                     = qr[(?:\s*-%}\s+?|\s*%})]o;
+our $TagEnd                     = qr[(?:\s*-%}\s*|\s*%})]o;
 our $VariableSignature          = qr{\(?[\w\-\.\[\]]\)?}o;
 my $VariableSegment = qr[[\w\-]\??]ox;
 our $VariableStart = qr[(?:\s*\{\{-\s*|\{\{-?\s*)]o;

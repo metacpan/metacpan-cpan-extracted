@@ -1,4 +1,10 @@
 Revision history for perl distribution Nuvol
 
+0.02 2020-02-24T06:48:10+0100
+  - Support for Dropbox
+  - Method for realpath
+  - Paths are absolute
+  - Type flags renamed to is_file and is_folder
+
 0.01 2020-02-12T17:56:13+0100
   - First Release with basic functionality for Office 365

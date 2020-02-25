@@ -1,5 +1,5 @@
 package Authen::NZRealMe::AuthenRequest;
-$Authen::NZRealMe::AuthenRequest::VERSION = '1.19';
+$Authen::NZRealMe::AuthenRequest::VERSION = '1.20';
 use strict;
 use warnings;
 
@@ -11,6 +11,7 @@ use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError);
 use IO::Compress::RawDeflate   qw(rawdeflate $RawDeflateError);
 
 use Authen::NZRealMe::CommonURIs qw(NS_PAIR);
+use Authen::NZRealMe::Asserts    qw(assert_is_base64);
 
 my $ns_saml  = [ NS_PAIR('saml') ];
 my $ns_samlp = [ NS_PAIR('samlp') ];
@@ -22,8 +23,8 @@ sub new {
 
     my $self = bless {
         allow_create    => 'false',
-        force_auth      => 'true',
         auth_strength   => 'low',
+        acs_index       => 0,
         @_,
     }, $class;
     return $self->_init($sp);
@@ -57,8 +58,8 @@ sub request_time    { shift->{request_time};        }
 sub destination_url { shift->{destination_url};     }
 sub saml_request    { shift->{saml_request};        }
 sub relay_state     { shift->{relay_state};         }
+sub acs_index       { shift->{acs_index};           }
 sub allow_create    { shift->_bool('allow_create'); }
-sub force_auth      { shift->_bool('force_auth');   }
 sub auth_strength   { shift->{auth_strength};       }
 sub _query_string   { shift->{query_string};        }
 sub _nameid_format  { shift->{nameid_format};       }
@@ -108,10 +109,7 @@ sub _generate_authn_request_doc {
             ID                            => $self->request_id(),
             IssueInstant                  => $self->request_time(),
             Destination                   => $self->destination_url(),
-            $self->service_type eq 'login'
-                ? (ForceAuthn             => $self->force_auth() )
-                : (),
-            AssertionConsumerServiceIndex => '0',
+            AssertionConsumerServiceIndex => $self->acs_index(),
         },
         $self->_issuer(),
         $self->_nameid_policy(),
@@ -221,6 +219,8 @@ sub _request_from_uri_param {
     my($class, $data) = @_;
 
     $data = uri_unescape($data);
+
+    assert_is_base64($data, 'SAMLRequest');
     $data = decode_base64($data);
 
     my($xml, $status);
@@ -254,7 +254,6 @@ method on the service provider object.
 The following named parameters are recognised:
 
   allow_create     boolean       (default: false)
-  force_auth       boolean       (default: true)
   relay_state      short string  (default: none)
   auth_strength    see below     (default: 'low')
 
@@ -284,6 +283,11 @@ this request will be sent.
 
 Accessor for the XML document containing the SAML2 AuthenRequest.
 
+=head2 acs_index
+
+Accessor for the C<acs_index> parameter optionally passed to the constructor.
+If not provided, a default ACS index of 0 will be used.
+
 =head2 relay_state
 
 Accessor for the C<relay_state> parameter optionally passed to the constructor.
@@ -293,11 +297,6 @@ If not provided, no relay state will be passed to the Identity Provider.
 
 Accessor for the C<allow_create> parameter optionally passed to the constructor.
 If not provided, this parameter will default to 'false'.
-
-=head2 force_auth
-
-Accessor for the C<force_auth> parameter optionally passed to the constructor.
-If not provided, this parameter will default to 'true'.
 
 =head2 auth_strength
 

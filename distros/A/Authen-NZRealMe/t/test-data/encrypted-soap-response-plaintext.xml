@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap-env:Body>
+        <samlp:ArtifactResponse
+                xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                ID="s10137d357b58974680b7a8fbbddd6f0197fb62cac999"
+                InResponseTo="e723a1eae542bc5e2f214fa9b49909b0bfa3d0f9a"
+                Version="2.0"
+                IssueInstant="2020-01-30T22:19:09Z"
+                Destination="https://www.example.govt.nz/app/sample/login-acs">
+            <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+            <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+                <samlp:StatusCode
+                        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                        Value="urn:oasis:names:tc:SAML:2.0:status:Success"
+                > </samlp:StatusCode>
+            </samlp:Status>
+            <samlp:Response
+                    xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                    ID="s21b7c6a1e5688feb36fb8345e66ca2f10305bf3d3"
+                    InResponseTo="fdaeb8f254369ef21ba2e4230a24371b0f6a7df01"
+                    Version="2.0"
+                    IssueInstant="2020-01-30T22:19:09Z"
+                    Destination="https://www.example.govt.nz/app/sample/login-acs">
+                <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+                <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+                    <samlp:StatusCode
+                            xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                            Value="urn:oasis:names:tc:SAML:2.0:status:Success"
+                    > </samlp:StatusCode>
+                </samlp:Status>
+                <saml:EncryptedAssertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+                    <saml:Assertion
+                            ID="sa5856952693ea21cb1a76b25b7ed1c7e74cb982ad"
+                            IssueInstant="2020-01-30T22:19:09Z"
+                            Version="2.0">
+                        <saml:Issuer>https://test.fakeme.govt.nz/saml2</saml:Issuer>
+                        <saml:Subject>
+                            <saml:NameID
+                                    Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+                                    NameQualifier="https://test.fakeme.govt.nz/saml2"
+                                    SPNameQualifier="https://www.example.govt.nz/app/sample-login"
+                            >CHCC4E6AB97B57DCB57267B3D4387782F1D</saml:NameID>
+                            <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+                                <saml:SubjectConfirmationData
+                                        InResponseTo="fdaeb8f254369ef21ba2e4230a24371b0f6a7df01"
+                                        NotOnOrAfter="2020-01-30T22:29:09Z"
+                                        Recipient="https://www.example.govt.nz/app/sample/login-acs"/>
+                            </saml:SubjectConfirmation>
+                        </saml:Subject>
+                        <saml:Conditions NotBefore="2020-01-30T22:09:09Z" NotOnOrAfter="2020-01-30T22:29:09Z">
+                            <saml:AudienceRestriction>
+                                <saml:Audience>https://www.example.govt.nz/app/sample-login</saml:Audience>
+                            </saml:AudienceRestriction>
+                        </saml:Conditions>
+                        <saml:AuthnStatement
+                                AuthnInstant="2020-01-30T22:19:09Z"
+                                SessionIndex="s999147c13a6fee43f245ad52bc90456d2012fbf6ea9c">
+                            <saml:AuthnContext>
+                                <saml:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:LowStrength</saml:AuthnContextClassRef>
+                            </saml:AuthnContext>
+                        </saml:AuthnStatement>
+                    </saml:Assertion>
+                </saml:EncryptedAssertion>
+            </samlp:Response>
+        </samlp:ArtifactResponse>
+    </soap-env:Body>
+</soap-env:Envelope>

@@ -345,12 +345,22 @@ static void S_suspendhook(pTHX_ U8 phase, CV *cv, HV *modhookdata)
   }
 }
 
+/* STARTDYN is the primary op that makes this work. It is used in two ways:
+ *   With OPf_STACKED it takes an optree, which pushes an SV to the stack.
+ *   Without OPf_STACKED it uses op->op_targ to select a lexical
+ * Either way, it saves the current value of the SV and arranges for that
+ * value to be assigned back in on scope exit
+ *
+ * This op is _not_ used for dynamic assignments to hash elements; for that
+ * see HELEMDYN
+ */
+
 static XOP xop_startdyn;
 
 static OP *pp_startdyn(pTHX)
 {
   dSP;
-  SV *var = TOPs;
+  SV *var = (PL_op->op_flags & OPf_STACKED) ? TOPs : PAD_SV(PL_op->op_targ);
 
   if(is_async) {
     pushdyn(SvREFCNT_inc(var));
@@ -364,13 +374,18 @@ static OP *pp_startdyn(pTHX)
   return cUNOP->op_next;
 }
 
-#define newSTARTDYNOP(expr)  MY_newSTARTDYNOP(aTHX_ expr)
-static OP *MY_newSTARTDYNOP(pTHX_ OP *expr)
+#define newSTARTDYNOP(flags, expr)  MY_newSTARTDYNOP(aTHX_ flags, expr)
+static OP *MY_newSTARTDYNOP(pTHX_ I32 flags, OP *expr)
 {
-  OP *ret = newUNOP(OP_CUSTOM, 0, expr);
+  OP *ret = newUNOP(OP_CUSTOM, flags, expr);
   cUNOPx(ret)->op_ppaddr = &pp_startdyn;
   return ret;
 }
+
+/* HELEMDYN is a variant of core's HELEM op which arranges for the existing
+ * value (or absence of) the key in the hash to be restored again on scope
+ * exit. It copes with missing keys by deleting them again to "restore".
+ */
 
 static XOP xop_helemdyn;
 
@@ -424,6 +439,26 @@ static int dynamically_keyword(pTHX_ OP **op)
 
   aop = parse_termexpr(0);
 
+  /* While most scalar assignments become OP_SASSIGN, some cases of assignment
+   * from a binary operator into a pad lexical instead set OPpTARGET_MY and use
+   * op->op_targ instead.
+   */
+  if((PL_opargs[aop->op_type] & OA_TARGLEX) && (aop->op_private & OPpTARGET_MY)) {
+    /* dynamically LEXVAR = EXPR */
+
+    /* Since LEXVAR is a pad lexical we can generate a non-stacked STARTDYN
+     * and set the same targ on it, then perform that just before the
+     * otherwise-unmodified op
+     */
+    OP *dynop = newSTARTDYNOP(0, newOP(OP_NULL, 0));
+    dynop->op_targ = aop->op_targ;
+
+    *op = op_prepend_elem(OP_LINESEQ,
+      dynop, aop);
+
+    return KEYWORD_PLUGIN_EXPR;
+  }
+
   if(aop->op_type != OP_SASSIGN)
     croak("Expected scalar assignment for 'dynamically'");
 
@@ -431,6 +466,8 @@ static int dynamically_keyword(pTHX_ OP **op)
   lvalop = cBINOPx(aop)->op_last;
 
   if(lvalop->op_type == OP_HELEM) {
+    /* dynamically $h{key} = EXPR */
+
     /* In order to handle with the added complexities around delete $h{key}
      * we need to use our special version of OP_HELEM here instead of simply
      * calling STARTDYN on the fetched SV
@@ -444,16 +481,17 @@ static int dynamically_keyword(pTHX_ OP **op)
     *op = aop;
   }
   else {
-    /* Steal the lvalue / rvalue optrees from the op and destroy it, creating
-     * a new tree instead */
-    /* op_free will destroy the entire optree so replace the child ops first */
-    cBINOPx(aop)->op_first = newOP(OP_NULL, 0);
-    cBINOPx(aop)->op_last = newOP(OP_NULL, 0);
-    op_free(aop);
+    /* dynamimcally LEXPR = EXPR */
 
-    *op = newBINOP(OP_SASSIGN, 0,
+    /* Rather than splicing in STARTDYN op, we'll just make a new optree */
+    *op = newBINOP(aop->op_type, aop->op_flags,
       rvalop,
-      newSTARTDYNOP(lvalop));
+      newSTARTDYNOP(aop->op_flags & OPf_STACKED, lvalop));
+
+    /* op_free will destroy the entire optree so replace the child ops first */
+    cBINOPx(aop)->op_first = NULL;
+    cBINOPx(aop)->op_last = NULL;
+    op_free(aop);
   }
 
   return KEYWORD_PLUGIN_EXPR;

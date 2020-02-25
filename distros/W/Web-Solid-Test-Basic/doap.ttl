@@ -19,7 +19,10 @@
 		doap-deps:on "LWP::Protocol::https"^^doap-deps:CpanId;
 	], [ doap-deps:on "IO::Socket::SSL"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [
 		doap-deps:on "Test::FITesque::Fixture"^^doap-deps:CpanId;
-	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ];
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+		doap-deps:on "perl 5.022"^^doap-deps:CpanId;
+		rdfs:comment "Should run down to 5.14, but there are various bugs that cause test failures with 5.18 and 5.20"@en;
+	];
 	doap-deps:test-requirement [ doap-deps:on "Net::EmptyPort"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [
 		doap-deps:on "HTTP::Server::Simple::PSGI"^^doap-deps:CpanId;
 	], [ doap-deps:on "Web::Simple"^^doap-deps:CpanId ], [ doap-deps:on "Plack"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "URI"^^doap-deps:CpanId ], [
@@ -34,7 +37,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/kjetilk>;
 	doap:name            "Web-Solid-Test-Basic";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-008>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-010>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/kjetilk/p5-web-solid-test-basic>;
@@ -144,6 +147,25 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.008.tar.gz>;
 	doap:revision        "0.008"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-010>
+	a                    doap:Version;
+	rdfs:label           "Improve support when using regular expressions";
+	dc:identifier        "Web-Solid-Test-Basic-0.010"^^xsd:string;
+	dc:issued            "2020-02-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Use regular expression matching for status codes";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Allow for more tests in regexp reuser.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Web-Solid-Test-Basic/v_0-008>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/kjetilk>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/Web-Solid-Test-Basic-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/kjetilk>
 	a                    foaf:Person;
 	foaf:mbox            <mailto:kjetilk@cpan.org>;
@@ -169,6 +191,9 @@
 	owl:sameAs           <http://purl.org/NET/cpan-uri/person/kjetilk>, <https://solid.kjernsmo.net/profile/card#me>;
 	rdfs:seeAlso         <http://www.kjetil.kjernsmo.net/foaf>, <https://solid.kjernsmo.net/profile/card>;
 	wot:hasKey           _:B1.
+
+<http://www.opensource.org/licenses/mit-license.php>
+	dc:title             "The MIT License"@en.
 
 _:B1
 	a                    wot:PubKey;

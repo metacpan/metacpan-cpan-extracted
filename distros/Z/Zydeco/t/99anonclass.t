@@ -4,7 +4,7 @@ use Test::More;
 use Test::Fatal;
 
 package MyApp {
-	use Zydeco;
+	use Zydeco default_is => 'rw';
 	
 	class Foo {
 		type_name Foozle;

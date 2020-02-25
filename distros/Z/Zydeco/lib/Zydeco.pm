@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.509';
+our $VERSION   = '0.510';
 
 use Keyword::Simple ();
 use PPR;
@@ -2170,7 +2170,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.509';
+#	our $VERSION   = '0.510';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2181,7 +2181,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.509';
+#	our $VERSION   = '0.510';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2194,12 +2194,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.509';
+#	our $VERSION   = '0.510';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.509';
+#	our $VERSION   = '0.510';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2213,7 +2213,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.509';
+#	our $VERSION   = '0.510';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2336,12 +2336,7 @@ It fuses together:
 
 =item *
 
-Classes, roles, and interfaces, including parameterizable classes and roles
-(a.k.a. class generators and role generators).
-
-=item *
-
-Factories to help your objects make other objects.
+Classes, roles, and interfaces
 
 =item *
 
@@ -2349,1731 +2344,515 @@ Powerful and concise attribute definitions
 
 =item *
 
-Methods with signatures, type constraints, and coercion.
+Methods with signatures, type constraints, and coercion
 
 =item *
 
-Method modifiers to easily wrap or override inherited methods.
+Factories to help your objects make other objects
 
 =item *
 
-Multimethods.
+Multimethods
 
 =item *
 
-Powerful delegation features.
+Method modifiers to easily wrap or override inherited methods
 
 =item *
 
-True private methods and attributes.
+Powerful delegation features
 
 =item *
 
-Syntactic sugar as sweet as pecan pie.
+True private methods and attributes
+
+=item *
+
+Parameterizable classes and roles
+
+=item *
+
+Syntactic sugar as sweet as pecan pie
 
 =back
 
-=head2 Important Concepts
-
-=head3 The Factory Package and Prefix
-
-Zydeco assumes that all the classes and roles you are building
-with it will be defined under the same namespace B<prefix>. For example
-"MyApp::Person" and "MyApp::Company" are both defined under the common
-prefix of "MyApp".
-
-It also assumes there will be a B<< factory package >> that can be used
-to build new instances of your class. Rather than creating a new person
-object with C<< MyApp::Person->new() >>, you should create a new person
-object with C<< MyApp->new_person() >>. Calling C<< MyApp::Person->new() >>
-directly is only encouraged from within the "MyApp::Person" class itself,
-and from within the factory. Everywhere else, you should call
-C<< MyApp->new_person() >> instead.
-
-By default, the factory package and the prefix are the same: they are
-the caller that you imported Zydeco into. But they can be set
-to whatever:
-
-  use Zydeco (
-    prefix          => 'MyApp::Objects',
-    factory_package => 'MyApp::Makers',
-  );
-
-(If Zydeco is imported from C<main>, then prefix defaults to undef,
-and factory_package defaults to "Local". But you will get a warning
-about that unless it's a C<< perl -e >> one-liner.)
-
-Zydeco assumes that you are defining all the classes and roles
-within this namespace prefix in a single Perl module file. This Perl
-module file would normally be named based on the prefix, so in the
-example above, it would be "MyApp/Objects.pm" and in the example from
-the SYNOPSIS, it would be "MyApp.pm".
-
-But see also the documentation for C<include>.
-
-Of course, there is nothing to stop you from having multiple prefixes
-for different logical parts of a larger codebase, but Zydeco
-assumes that if it's been set up for a prefix, it owns that prefix and
-everything under it, and it's all defined in the same Perl module.
-
-Each object defined by Zydeco will have a C<FACTORY> method,
-so you can do:
-
-  $person_object->FACTORY
-
-And it will return the string "MyApp". This allows for stuff like:
-
-  class Person {
-    method give_birth {
-      return $self->FACTORY->new_person();
-    }
-  }
-
-=head3 The Type Library
-
-While building your classes and objects, Zydeco will also build
-type constraints for each of them. So for the "MyApp::Person" class
-above, it also builds a B<Person> type constraint. This can be used
-in Moo/Moose attribute definitions like:
-
-  use MyApp;
-  use MyApp::Types qw( Person );
-  
-  use Moose;
-  has boss => (is => 'rw', isa => Person);
-
-And just anywhere a type constraint may be used generally. You should
-know this stuff by now.
-
-Note that we had to C<use MyApp> before we could C<use MyApp::Types>.
-This is because there isn't a physical "MyApp/Types.pm" file on disk;
-it is defined entirely by "MyApp.pm".
-
-Your type library will be the same as your namespace prefix, with
-"::Types" added at the end. But you can change that:
-
-  use Zydeco (
-    prefix          => 'MyApp::Objects',
-    factory_package => 'MyApp::Makers',
-    type_library    => 'MyApp::TypeLibrary',
-  );
-
-It can sometimes be helpful to pre-warn Zydeco about the
-types you're going to define before you define them, just so it
-is able to allow them as barewords in some places...
-
-  use Zydeco (
-    prefix          => 'MyApp::Objects',
-    factory_package => 'MyApp::Makers',
-    type_library    => 'MyApp::TypeLibrary',
-    declare         => [qw( Person Company )],
-  );
-
-See also L<Type::Tiny::Manual>.
+L<Zydeco::Manual> is probably the best place to start.
 
 =head1 KEYWORDS
 
 =head2 C<< class >>
 
-Define a very basic class:
-
-  class Person;
-
-Define a more complicated class:
-
-  class Person {
-    ...;
-  }
-
-Note that for the C<class> keyword without a block, it does I<not> act like
-the C<package> keyword by changing the "ambient" package. It just defines a
-totally empty class with no methods or attributes.
-
-The prefix will automatically be added to the class name, so if the prefix
-is MyApp, the above will create a class called MyApp::Person. It will also
-create a factory method C<< MyApp->new_person >>. (The name is generated by
-stripping the prefix from the class name, replacing any "::" with an
-underscore, lowercasing, and prefixing it with "new_".) And it will create
-a type called B<Person> in the type library. (Same rules to generate the
-name apart from lowercasing and adding "new_".)
-
-Classes can be given more complex names:
-
-  class Person::Neanderthal {
-    ...;
-  }
-
-Will create "MyApp::Person::Neanderthal" class, a factory method called
-C<< MyApp->new_person_neanderthal >>, and a B<Person_Neanderthal> type.
-
-It is possible to create a class without the prefix:
-
-  class ::Person {
-    ...;
-  }
-
-The class name will now be "Person" instead of "MyApp::Person"!
-
-=head3 Nested classes
-
-C<class> blocks can be nested. This establishes an inheritance heirarchy.
-
-  class Animal {
-    has name;
-    class Mammal {
-      class Primate {
-        class Monkey;
-        class Gorilla;
-        class Human {
-          class Superhuman;
-        }
-      }
-    }
-    class Bird;
-    class Fish {
-      class Shark;
-    }
+  class MyClass;
+  
+  class MyClass { ... }
+  
+  class BaseClass {
+    class SubClass;
   }
   
-  my $superman = MyApp->new_superhuman( name => 'Kal El' );
+  class MyGenerator (@args) { ... }
+  my $class = MyApp->generate_mygenerator(...);
+  
+  my $class = do { class; };
+  
+  my $class = do { class { ... } };
+  
+  my $generator = do { class (@args) { ... } };
+  my $class = $generator->generate_package(...);
 
-See also C<extends> as an alternative way of declaring inheritance.
+=head2 C<< abstract class >>
 
-It is possible to prefix a class name with a plus sign:
-
-  package MyApp {
-    use Zydeco;
-    class Person {
-      has name;
-      class +Employee {
-        has job_title;
-      }
-    }
+  abstract class MyClass;
+  
+  abstract class MyClass { ... }
+  
+  abstract class BaseClass {
+    class SubClass;
   }
-
-Now the employee class will be named C<MyApp::Person::Employee> instead of
-the usual C<MyApp::Employee>.
-
-=head3 Abstract classes
-
-Classes can be declared as abstract:
-
-  package MyApp {
-    use Zydeco;
-    abstract class Animal {
-      class Cat;
-      class Dog;
-    }
-  }
-
-For abstract classes, there is no constructor or factory, so you cannot create
-an Animal instance directly; but you can create instances of the subclasses.
-It is usually better to use roles than abstract classes, but sometimes the
-abstract class makes more intuitive sense.
-
+  
+  my $class = do { abstract class; };
+  
+  my $class = do { abstract class { ... } };
+  
 =head2 C<< role >>
 
-Define a very basic role:
-
-  role Person;
-
-Define a more complicated role:
-
-  role Person {
-    ...;
-  }
-
-This is just the same as C<class> but defines a role instead of a class.
-
-Roles cannot be nested within each other, nor can roles be nested in classes,
-nor classes in roles.
+  role MyRole;
+  
+  role MyRole { ... }
+  
+  role MyGenerator (@args) { ... }
+  my $role = MyApp->generate_mygenerator(...);
+  
+  my $role = do { role; };
+  
+  my $role = do { role { ... } };
+  
+  my $generator = do { role (@args) { ... } };
+  my $role = $generator->generate_package(...);
 
 =head2 C<< interface >>
 
-An interface is a lightweight role. It cannot define attributes, methods,
-multimethods, or method modifiers, but otherwise functions as a role.
-(It may have C<requires> statements and define constants.)
-
-  package MyApp;
-  use Zydeco;
+  interface MyIface;
   
-  interface Serializer {
-    requires serialize;
-  }
+  interface MyIface { ... }
   
-  interface Deserializer {
-    requires deserialize;
-  }
+  interface MyGenerator (@args) { ... }
+  my $interface = MyApp->generate_mygenerator(...);
   
-  class MyJSON {
-    with Serializer, Deserialize;
-    method serialize   ($value) { ... } 
-    method deserialize ($value) { ... } 
-  }
+  my $iface = do { interface; };
   
-  my $obj = MyApp->new_myjson;
-  $obj->does('MyApp::Serializer');   # true
+  my $iface = do { interface { ... } };
+  
+  my $generator = do { interface (@args) { ... } };
+  my $iface = $generator->generate_package(...);
 
 =head2 C<< toolkit >>
 
-Use a different toolkit instead of Moo.
-
-  # use Mouse
-  class Foo {
+  class MyClass {
+    toolkit Moose;
+  }
+  
+  class MyClass {
     toolkit Mouse;
   }
   
-  # use Moose
-  # use MooseX::Aliases
-  # use MooseX::StrictConstructor
-  class Bar {
-    toolkit Moose ( Aliases, StrictConstructor );
-  }
-
-You can of course specify you want to use Moo:
-
-  class Baz {
+  class MyClass {
     toolkit Moo;
   }
+  
+  class MyClass {
+    toolkit Moose (StrictConstructor);
+  }
 
-Not all MooseX/MouseX/MooX packages will work, but *X::StrictConstructor will.
-
-Although it is not possible to use the C<toolkit> keyword outside of
-C<class>, C<abstract class>, C<role>, and C<interface> blocks, it is
-possible to specify a default toolkit when you import Zydeco.
-
-  use Zydeco (
-    ...,
-    toolkit => 'Moose',
-  );
-
-  use Zydeco (
-    ...,
-    toolkit => 'Mouse',
-  );
+Modules in parentheses are prefixed by C<< "$toolkit\::X" >> unless they start
+with "::" and loaded. Not all modules are useful to load this way because they
+are loaded too late to have a lexical effect, and because code inside the
+class will not be able to see functions exported into the class.
 
 =head2 C<< extends >>
 
-Defines a parent class. Only for use with C<class> and C<abstract class>
-blocks.
-
-  class Person {
-    extends Animal;
+  class MyClass extends BaseClass;
+  
+  class MyClass extends BaseClass, OtherClass;
+  
+  class MyClass {
+    extends BaseClass;
   }
-
-This works:
-
-  class Person {
-    extends ::Animal;   # no prefix
+  
+  class MyClass {
+    extends BaseClass, OtherClass;
   }
-
-It is possible to "lift" C<extends> outside the class definition block:
-
-  class Person extends Animal {
-    ...;
-  }
-
-If there are no methods, etc to define, you don't need the block at all:
-
-  class Person extends Animal;
 
 =head2 C<< with >>
 
-Composes roles and interfaces.
-
-  class Person {
-    with Employable, Consumer;
+  class MyClass with SomeRole;
+  
+  class MyClass with SomeRole, OtherRole;
+  
+  class MyClass extends BaseClass with SomeRole, OtherRole;
+  
+  class MyClass {
+    with SomeRole;
   }
   
-  role Consumer;
-  
-  role Worker;
-  
-  role Payable;
-  
-  role Employable {
-    with Worker, Payable;
-  }
-
-It is possible to compose a role which does not have its own definition by
-adding a question mark to the end of the name:
-
-  class Person {
-    with Employable, Consumer?;
+  class MyClass {
+    with SomeRole, OtherRole;
   }
   
-  role Employable {
-    with Worker?, Payable?;
+  class MyClass {
+    with RoleGenerator(@args), OtherRole;
   }
-
-This is equivalent to declaring an empty role.
-
-The C<with> keyword can only be used with C<class>, C<abstract class>,
-C<role>, and C<interface> blocks.
-
-Similarly to C<extends>, C<with> can be "lifted" outside its block:
-
-  class Company with Taxable {
+  
+  class MyClass {
+    with TagRole?, OtherTagRole?;
+  }
+  
+  role MyRole {
+    with OtherRole;
+  }
+  
+  role MyRole with OtherRole {
     ...;
   }
   
-  interface Storage with Serializer, Deserializer;
-
-If lifting both C<extends> and C<with> outside a block, C<extends> must
-come first.
-
-  class Person extends Animal with Thinking::Rational {
-    ...;
-  }
+  role MyRole with SomeRole, OtherRole;
 
 =head2 C<< begin >>
 
-This code gets run early on in the definition of a class or role.
-
-  class Person {
-    begin {
-      say "Defining $package";
-    }
+  class MyClass {
+    begin { say "defining $kind $package"; }
   }
-
-At the time the code gets run, none of the class's attributes or methods will
-be defined yet.
-
-The lexical variables C<< $package >> and C<< $kind >> are defined within the
-block. C<< $kind >> will be either 'class' or 'role'.
-
-Keywords usable within a C<begin> block include
-C<authority>, C<version>, C<overload>, C<constant>, C<has>,
-C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
-
-The C<begin> keyword cannot be used outside of C<class>, C<abstract class>,
-C<role>, and C<interface> blocks, though it is possible to define a global
-default for it:
-
-  use Zydeco (
-    ...,
-    begin => sub {
-      my ($package, $kind) = @_;
-      ...;
-    },
-  );
-
-Per-package C<begin> overrides the global C<begin>.
-
-If C<class> definitions are nested, C<begin> blocks will be inherited by
-child classes. If a parent class is specified via C<extends>, C<begin>
-blocks will not be inherited.
+  
+  role MyRole {
+    begin { say "defining $kind $package"; }
+  }
 
 =head2 C<< end >>
 
-This code gets run late in the definition of a class or role.
-
-  class Person {
-    end {
-      say "Finished defining $package";
-    }
+  class MyClass {
+    end { say "finished defining $kind $package"; }
   }
-
-The lexical variables C<< $package >> and C<< $kind >> are defined within the
-block. C<< $kind >> will be either 'class' or 'role'.
-
-Keywords usable within an C<end> block include
-C<authority>, C<version>, C<overload>, C<constant>, C<has>,
-C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
-
-The C<end> keyword cannot be used outside of C<class>, C<abstract class>,
-C<role>, and C<interface> blocks, though it is possible to define a global
-default for it:
-
-  use Zydeco (
-    ...,
-    end => sub {
-      my ($package, $kind) = @_;
-      ...;
-    },
-  );
-
-Per-package C<end> overrides the global C<end>.
-
-If C<class> definitions are nested, C<end> blocks will be inherited by
-child classes. If a parent class is specified via C<extends>, C<end>
-blocks will not be inherited.
+  
+  role MyRole {
+    end { say "finished defining $kind $package"; }
+  }
 
 =head2 C<< before_apply >>
 
-Within a C<role>, a C<before_apply> block is run before applying the role
-to another package.
-
   role MyRole {
-    before_apply {
-      say "Applying $role to $kind $package.";
-    }
+    before_apply { say "applying $role to $package"; }
   }
-
-The lexical variables C<< $role >>, C<< $package >> and C<< $kind >> are
-defined within the block. C<< $package >> refers to the target package
-the role is being applied to. C<< $kind >> will be either 'class' or 'role',
-indicating what kind of package the role is being applied to.
-
-Keywords usable within a C<before_apply> block include
-C<authority>, C<version>, C<overload>, C<constant>, C<has>,
-C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
-They affect the target package instead of the role.
-
-Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
-will not be run for Class2.
 
 =head2 C<< after_apply >>
 
-Within a C<role>, an C<after_apply> block is run after applying the role
-to another package.
-
   role MyRole {
-    after_apply {
-      say "Applied $role to $kind $package.";
-    }
+    after_apply { say "finished applying $role to $package"; }
   }
-
-The lexical variables C<< $role >>, C<< $package >> and C<< $kind >> are
-defined within the block. C<< $package >> refers to the target package
-the role was applied to. C<< $kind >> will be either 'class' or 'role',
-indicating what kind of package the role was applied to.
-
-Keywords usable within an C<after_apply> block include
-C<authority>, C<version>, C<overload>, C<constant>, C<has>,
-C<method>, C<< multi method >>, C<before>, C<after>, and C<around>.
-They affect the target package instead of the role.
-
-Note that if Class1 consumes Role1, and Class2 extends Class1, this hook
-will not be run for Class2.
 
 =head2 C<< has >>
 
-Defines an attribute.
-
-  class Person {
-    has name;
-    has age;
+  class MyClass {
+    has foo;
   }
   
-  my $bob = MyApp->new_person(name => "Bob", age => 21);
-
-Cannot be used outside of C<class>, C<abstract class>, and C<role> blocks.
-
-Moo-style attribute specifications may be given:
-
-  class Person {
-    has name ( is => rw, type => Str, required => true );
-    has age  ( is => rw, type => Int );
-  }
-
-Note there is no fat comma after the attribute name! It is a bareword.
-
-Use a plus sign before an attribute name to modify an attribute defined
-in a parent class.
-
-  class Animal {
-    has name ( type => Str, required => false );
-    
-    class Person {
-      has +name ( required => true );
+  class MyClass {
+    has foo;
+    class MySubClass {
+      has +foo;
     }
-  }
-
-C<rw>, C<rwp>, C<ro>, C<lazy>, C<bare>, C<private>, C<true>, and C<false>
-are allowed as barewords for readability, but C<is> is optional, and defaults
-to C<rw>.
-
-The names of attributes can start with an asterisk:
-
-  has *foo;
-
-This adds no extra meaning, but is supported for consistency with the syntax
-of named parameters in method signatures. (Depending on your text editor, it
-may also improve syntax highlighting.)
-
-If you need to decide an attribute name on-the-fly, you can replace the
-name with a block that returns the name as a string.
-
-  class Employee {
-    extends Person;
-    has {
-      $ENV{LOCALE} eq 'GB'
-        ? 'national_insurance_no'
-        : 'social_security_no'
-    } (type => Str)
   }
   
-  my $bob = Employee->new(
-    name               => 'Bob',
-    social_security_no => 1234,
-  );
-
-You can think of the syntax as being kind of like C<print>.
-
-  print BAREWORD_FILEHANDLE @strings;
-  print { block_returning_filehandle(); } @strings;
-
-The block is called in scalar context, so you'll need a loop to define a list
-like this:
-
-  class Person {
-    my @attrs = qw( name age );
-    
-    # this does not work
-    has {@attrs} ( required => true );
-    
-    # this works
-    for my $attr (@attrs) {
-      has {$attr} ( required => true );
-    }
-  }
-
-=head3 Type constraints for attributes
-
-Note C<type> instead of C<isa>. Any type constraints from L<Types::Standard>,
-L<Types::Common::Numeric>, and L<Types::Common::String> will be avaiable as
-barewords. Also, any pre-declared types can be used as barewords. It's
-possible to quote types as strings, in which case you don't need to have
-pre-declared them.
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has age    ( type => Int );
-    has spouse ( type => 'Person' );
-    has kids   (
-      is      => lazy,
-      type    => 'ArrayRef[Person]',
-      builder => sub { [] },
-    );
-  }
-
-Note that when C<type> is a string, Zydeco will consult your
-type library to figure out what it means.
-
-It is also possible to use C<< isa => 'SomeClass' >> or
-C<< does => 'SomeRole' >> to force strings to be treated as class names
-or role names instead of type names.
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has age    ( type => Int );
-    has spouse ( isa  => 'Person' );
-    has pet    ( isa  => '::Animal' );   # no prefix
-  }
-
-For enumerations, you can define them like this:
-
-  class Person {
-    ...;
-    has status ( enum => ['alive', 'dead', 'undead'] );
-  }
-
-=head3 Delegation
-
-Zydeco integrates support for L<MooX::Enumeration> (and
-L<MooseX::Enumeration>, but MouseX::Enumeration doesn't exist).
-
-  class Person {
-    ...;
-    has status (
-      enum    => ['alive', 'dead', 'undead'],
-      default => 'alive',
-      handles => 1,
-    );
+  class MyClass {
+    has foo, bar;
   }
   
-  my $bob = MyApp->new_person;
-  if ( $bob->is_alive ) {
-    ...;
+  class MyClass {
+    has foo!, bar;
   }
-
-C<< handles => 1 >> creates methods named C<is_alive>, C<is_dead>, and
-C<is_undead>, and C<< handles => 2 >> creates methods named
-C<status_is_alive>, C<status_is_dead>, and C<status_is_undead>.
-
-Checking C<< $bob->status eq 'alvie' >> is prone to typos, but
-C<< $bob->status_is_alvie >> will cause a runtime error because the
-method is not defined.
-
-Zydeco also integrates support for L<Sub::HandlesVia> allowing
-you to delegate certain methods to unblessed references and non-reference
-values. For example:
-
-  class Person {
-    has age (
-      type         => 'Int',
-      default      => 0,
-      handles_via  => 'Counter',
-      handles      => {
-        birthday => 'inc',   # increment age
-      },
-    );
-    after birthday {
-      if ($self->age < 30) {
-        say "yay!";
-      }
-      else {
-        say "urgh!";
-      }
-    }
+  
+  class MyClass {
+    has { "fo" . "o" };
   }
-
-C<handles> otherwise works as you'd expect from Moo and Moose.
-
-=head3 Required versus optional attributes and defaults
-
-A trailing C<< ! >> indicates a required attribute.
-
-  class Person {
-    has name!;
+  
+  class MyClass {
+    has $foo;  # private attribute withg lexical accessor
   }
-
-It is possible to give a default using an equals sign.
-
-  class WidgetCollection {
-    has name = "Widgets";
-    has count (type => Num) = 0;
+  
+  class MyClass {
+    has foo ( is => ro, type => Int, default => 1 ) ;
   }
-
-Note that the default comes after the spec, so in cases where the spec is
-long, it may be clearer to express the default inside the spec:
-
-  class WidgetCollection {
-    has name = "Widgets";
-    has count (
-      type     => Num,
-      lazy     => true,
-      required => false,
-      default  => 0,
-    );
-  }
-
-Defaults given this way will be eager (non-lazy), but can be made lazy using
-the spec:
-
-  class WidgetCollection {
-    has name = "Widgets";
-    has count (is => lazy) = 0;
-  }
-
-Defaults I<can> use the C<< $self >> object:
-
-  class WidgetCollection {
-    has name         = "Widgets";
-    has display_name = $self->name;
-  }
-
-Any default that includes C<< $self >> will automatically be lazy, but can be
-made eager using the spec. (It is almost certainly a bad idea to do so though.)
-
-  class WidgetCollection {
-    has name = "Widgets";
-    has display_name ( lazy => false ) = $self->name;
-  }
-
-=head3 Specifying multiple attributes at once
-
-Commas may be used to separate multiple attributes:
-
-  class WidgetCollection {
-    has name, display_name ( type => Str );
-  }
-
-The specification and defaults are applied to every attribute in the list.
-
-=head3 Private attributes
-
-If an attribute name starts with a dollar sign, it is a private (lexical)
-attribute. Private attributes cannot be set in the constructor, and cannot
-be directly accessed outside the class's lexical scope.
-
-  class Foo {
-    has $ua = HTTP::Tiny->new;
-    
-    method fetch_data ( Str $url ) {
-      my $response = $self->$ua->get($url);
-      $response->{is_success} or confess('request failed');
-      return $response->{content};
-    }
-  }
-
-Note how C<< $self->$ua >> is still called as a method. You don't just do
-C<< $ua->get() >>. The invocant is still required, just like it would be
-with a normal public attribute:
-
-  class Foo {
-    has ua = HTTP::Tiny->new;
-    
-    method fetch_data ( Str $url ) {
-      my $response = $self->ua->get($url);
-      $response->{is_success} or confess('request failed');
-      return $response->{content};
-    }
-  }
-
-Private attributes can have delegated methods (C<handles>):
-
-  class Foo {
-    has $ua (
-      default => sub { HTTP::Tiny->new },
-      handles => [
-        http_get  => 'get',
-        http_post => 'post',
-      ],
-    );
-    
-    method fetch_data ( Str $url ) {
-      my $response = $self->http_get($url);
-      $response->{is_success} or confess('request failed');
-      return $response->{content};
-    }
-  }
-
-These can even be made lexical too:
-
-  class Foo {
-    my ($http_get, $http_post);  # predeclare
-    
-    has $ua (
-      default => sub { HTTP::Tiny->new },
-      handles => [
-        \$http_get  => 'get',
-        \$http_post => 'post',
-      ],
-    );
-    
-    method fetch_data ( Str $url ) {
-      my $response = $self->$http_get($url);
-      $response->{is_success} or confess('request failed');
-      return $response->{content};
-    }
-  }
-
-Note how an arrayref is used for C<handles> instead of a hashref. This
-is because scalarrefs don't work as hashref keys.
-
-Although constructors ignore private attributes, you may set them in a
-factory method.
-
-  class Foo {
-    has $ua;
-    
-    factory new_foo (%args) {
-      my $instance = $class->new(%args);
-      $instance->$ua( HTTP::Tiny->new );
-      return $instance;
-    }
-  }
-
-C<< has $foo >> is just a shortcut for:
-
-  my $foo;
-  has foo => (is => "private", accessor => \$foo);
-
-You can use C<< is => "private" >> to create even I<more> private attributes
-without even having that lexical accessor:
-
-  has foo => (is => "private");
-
-If it seems like an attribute that can't be set in the constructor and
-doesn't have accessors would be useless, you're wrong. Because it can still
-have delegations and a default value.
-
-Private attributes use lexical variables, so are visible to subclasses
-only if the subclass definition is nested in the base class.
-
-From version 0.506 onwards, not only can private attributes have public
-delegations and accessors, but public attributes can have private
-delegations and attributes:
-
-  class Foo {
-    my ($clear_ua, $http_get, $http_post);  # predeclare
-    
-    has ua (
-      is      => ro,                        # public attribute!
-      clearer => \$clear_ua,                # private clearer
-      default => sub { HTTP::Tiny->new },
-      handles => [                          # private delegations
-        \$http_get  => 'get',               #
-        \$http_post => 'post',              #
-      ],
-    );
-    
-    ...;
+  
+  class MyClass {
+    has name     = "Anonymous";
+    has uc_name  = uc($self->name);
   }
 
 =head2 C<< constant >>
 
-Defines a constant.
-
-  class Person {
-    extends Animal;
-    constant latin_name = 'Homo sapiens';
+  class MyClass {
+    constant PI = 3.2;
   }
-
-C<< MyApp::Person->latin_name >>, C<< MyApp::Person::latin_name >>, and
-C<< $person_object->latin_name >> will return 'Homo sapiens'.
-
-Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
-will define a constant in the caller package. (That is, usually the factory.)
+  
+  interface Serializable {
+    requires serialize;
+    constant PRETTY    = 1;
+    constant UTF8      = 2;
+    constant CANONICAL = 4;
+  }
 
 =head2 C<< method >>
 
-Defines a method.
-
-  class Person {
-    has spouse;
-    
-    method marry {
-      my ($self, $partner) = @_;
-      $self->spouse($partner);
-      $partner->spouse($self);
-      return $self;
-    }
-  }
-
-C<< sub { ... } >> will not work as a way to define methods within the
-class. Use C<< method { ... } >> instead.
-
-Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
-C<method> will define a method in the caller package. (Usually the factory.)
-
-The variables C<< $self >> and C<< $class >> will be automatically defined
-within all methods. C<< $self >> is set to C<< $_[0] >> (though the invocant
-is not shifted off C<< @_ >>). C<< $class >> is set to C<< ref($self)||$self >>.
-If the method is called as a class method, both C<< $self >> and C<< $class >>
-will be the same thing: the full class name as a string. If the method is
-called as an object method, C<< $self >> is the object and C<< $class >> is
-its class.
-
-Like with C<has>, you may use a block that returns a string instead of a
-bareword name for the method.
-
-  method {"ma"."rry"} {
-    ...;
-  }
-
-Zydeco supports method signatures for named arguments and
-positional arguments. A mixture of named and positional arguments
-is allowed, with some limitations. For anything more complicates,
-you should define the method with no signature at all, and unpack
-C<< @_ >> within the body of the method.
-
-=head3 Signatures for Named Arguments
-
-  class Person {
-    has spouse;
-    
-    method marry ( Person *partner, Object *date = DateTime->now ) {
-      $self->spouse( $arg->partner );
-      $arg->partner->spouse( $self );
-      return $self;
-    }
-  }
-
-The syntax for each named argument is:
-
-  Type *name = default
-
-The type is a type name, which will be parsed using L<Type::Parser>.
-(So it can include the C<< ~ >>, C<< | >>, and C<< & >>, operators,
-and can include parameters in C<< [ ] >> brackets. Type::Parser can
-handle whitespace in the type, but not comments.
-
-Alternatively, you can provide a block which returns a type name as a string
-or returns a blessed Type::Tiny object. For very complex types, where you're
-expressing additional coercions or value constraints, this is probably what
-you want.
-
-The asterisk indicates that the argument is named, not positional.
-
-The name may be followed by a question mark to indicate an optional
-argument.
-
-  method marry ( Person *partner, Object *date? ) {
-    ...;
-  }
-
-Or it may be followed by an equals sign to set a default value.
-
-Comments may be included in the signature, but not in the middle of
-a type constraint.
-
-  method marry (
-    # comment here is okay
-    Person
-    # comment here is fine too
-    *partner
-    # and here
-  ) { ... }
-
-  method marry (
-    Person # comment here is not okay!
-           | Horse
-    *partner
-  ) { ... }
-
-As with signature-free methods, C<< $self >> and C<< $class >> wll be
-defined for you in the body of the method. However, when a signature
-has been used C<< $self >> I<is> shifted off C<< @_ >>.
-
-Also within the body of the method, a variable called C<< $arg >>
-is provided. This is a hashref of the named arguments. So you can
-access the partner argument in the above example like this:
-
-  $arg->{partner}
-
-But because C<< $arg >> is blessed, you can also do:
-
-  $arg->partner
-
-The latter style is encouraged as it looks neater, plus it helps
-catch typos. (C<< $ars->{pratner} >> for example!) However, accessing
-it as a plain hashref is supported and shouldn't be considered to be
-breaking encapsulation.
-
-For optional arguments you can check:
-
-  exists($arg->{date})
-
-Or:
-
-  $arg->has_date
-
-For types which have a coercion defined, the value will be automatically
-coerced.
-
-Methods with named arguments can be called with a hash or hashref.
-
-  $alice->marry(  partner => $bob  );      # okay
-  $alice->marry({ partner => $bob });      # also okay
-
-=head3 Signatures for Positional Arguments
-
-  method marry ( Person $partner, Object $date? ) {
-    $self->spouse( $partner );
-    $partner->spouse( $self );
-    return $self;
-  }
-
-The dollar sign is used instead of an asterisk to indicate a positional
-argument.
-
-As with named arguments, C<< $self >> is automatically shifted off C<< @_ >>
-and C<< $class >> exists. Unlike named arguments, there is no C<< $arg >>
-variable, and instead a scalar variable is defined for each named argument.
-
-Optional arguments and defaults are supported in the same way as named
-arguments.
-
-It is possible to include a slurpy hash or array at the end of the list
-of positional arguments.
-
-  method marry ( $partner, $date, @vows ) {
-    ...;
-  }
-
-If you need to perform a type check on the slurpy parameter, you should
-pretend it is a hashref or arrayref.
-
-  method marry ( $partner, $date, ArrayRef[Str] @vows ) {
-    ...;
-  }
-
-=head3 Signatures with Mixed Arguments
-
-You may mix named and positional arguments with the following limitations:
-
-=over
-
-=item *
-
-Positional arguments must appear at the beginning and/or end of the list.
-They cannot be surrounded by named arguments.
-
-=item *
-
-Positional arguments cannot be optional and cannot have a default. They
-must be required. (Named arguments can be optional and have defaults.)
-
-=item *
-
-No slurpies!
-
-=back
-
-  method print_html ($tag, Str $text, *htmlver?, *xml?, $fh) {
-  
-    confess "update your HTML" if $arg->htmlver < 5;
-    
-    if (length $text) {
-      print $fh "<tag>$text</tag>";
-    }
-    elsif ($arg->xml) {
-      print $fh "<tag />";
-    }
-    else {
-      print $fh "<tag></tag>";
-    }
-  }
-  
-  $obj->print_html('h1', 'Hello World', { xml => true }, \*STDOUT);
-  $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
-  $obj->print_html('h1', 'Hello World',                  \*STDOUT);
-
-Mixed signatures are basically implemented like named signatures, but
-prior to interpreting C<< @_ >> as a hash, some parameters are spliced
-off the head and tail. We need to know how many elements to splice off
-each end, so that is why there are restrictions on slurpies and optional
-parameters.
-
-=head3 Empty Signatures
-
-There is a difference between the following two methods:
-
-  method foo {
+  method myfunc {
     ...;
   }
   
-  method foo () {
+  method myfunc ( Int $x, ArrayRef $y ) {
+    ...;
+  }
+  
+  method myfunc ( HashRef *collection, Int *index ) {
+    ...;
+  }
+  
+  method myfunc :optimize ( Int $x, ArrayRef $y ) {
+    ...;
+  }
+  
+  my $myfunc = do { method () {
+    ...;
+  }};
+  
+  method $myfunc () {   # lexical method
     ...;
   }
 
-In the first, you have not provided a signature and are expected to
-deal with C<< @_ >> in the body of the method. In the second, there
-is a signature, but it is a signature showing that the method expects
-no arguments (other than the invocant of course).
+=head2 C<< multi method >>
 
-=head3 Optimizing Methods
-
-For a slight compile-time penalty, you can improve the speed which
-methods run at using the C<< :optimize >> attribute:
-
-  method foo :optimize (...) {
+  multi method myfunc {
     ...;
   }
-
-Optimized methods must not close over any lexical (C<my> or C<our>)
-variables; they can only access the variables declared in their,
-signature, C<< $self >>, C<< $class >>, C<< @_ >>, and globals.
-They cannot access private attributes unless those private attributes
-have public accessors.
-
-=head3 Anonymous Methods
-
-It I<is> possible to use C<method> without a name to return an
-anonymous method (coderef):
-
-  use Zydeco prefix => 'MyApp';
   
-  class MyClass {
-    method get_method ($foo) {
-      method ($bar) {
-        return $foo . $bar;
-      }
-    }
+  multi method myfunc ( Int $x, ArrayRef $y ) {
+    ...;
   }
   
-  my $obj   = MyApp->new_myclass;
-  my $anon  = $obj->get_method("FOO");
-  say ref($anon);                       # CODE
-  say $obj->$anon("BAR");               # FOOBAR
-
-Note that while C<< $anon >> is a coderef, it is still a method, and
-still expects to be passed an object as C<< $self >>.
-
-Due to limitations with L<Keyword::Simple>, keywords are always
-complete statements, so C<< method ... >> has an implicit semicolon
-before and after it. This means that this won't work:
-
-  my $x = method { ... };
-
-Because it gets treated as:
-
-  my $x = ;
-  method { ... };
-
-A workaround is to wrap it in a C<< do { ... } >> block.
-
-  my $x = do { method { ... } };
-
-=head3 Private methods
-
-A shortcut for the pattern of:
-
-  my $x = do { method { ... } };
-
-Is this:
-
-  method $x { ... }
-
-Zydeco will declare the variable C<< my $x >> for you, assign the
-coderef to the variable, and you don't need to worry about a C<do> block
-to wrap it.
-
-=head3 Multimethods
-
-Multi methods should I<< Just Work [tm] >> if you prefix them with the
-keyword C<multi>
-
-  use Zydeco prefix => 'MyApp';
-  
-  class Widget {
-    multi method foo :alias(quux) (Any $x) {
-      say "Buzz";
-    }
-    multi method foo (HashRef $h) {
-      say "Fizz";
-    }
+  multi method myfunc ( HashRef *collection, Int *index ) {
+    ...;
   }
-  
-  my $thing = MyApp->new_widget;
-  $thing->foo( {} );       # Fizz
-  $thing->foo( 42 );       # Buzz
-  
-  $thing->quux( {} );      # Buzz
-
-Outside of C<class>, C<abstract class>, C<role>, and C<interface> blocks,
-C<multi method> will define a multi method in the caller package. (That is,
-usually the factory.)
-
-Multimethods cannot be anonymous or private.
 
 =head2 C<< requires >>
 
-Indicates that a role requires classes to fulfil certain methods.
-
-  role Payable {
-    requires account;
-    requires deposit (Num $amount);
+  role MyRole {
+    requires serialize;
+    requires deserialize (Str $input);
   }
-  
-  class Employee {
-    extends Person;
-    with Payable;
-    has account!;
-    method deposit (Num $amount) {
-      ...;
-    }
-  }
-
-Required methods have an optional signature; this is usually ignored, but
-if L<Devel::StrictMode> determines that strict behaviour is being used,
-the signature will be applied to the method via an C<around> modifier.
-
-Or to put it another way, this:
-
-  role Payable {
-    requires account;
-    requires deposit (Num $amount);
-  }
-
-Is a shorthand for this:
-
-  role Payable {
-    requires account;
-    requires deposit;
-    
-    use Devel::StrictMode 'STRICT';
-    if (STRICT) {
-     around deposit (Num $amount) {
-       $self->$next(@_);
-     }
-    }
-  }
-
-Can only be used in C<role> and C<interface> blocks.
 
 =head2 C<< before >>
 
-  before marry {
-    say "Speak now or forever hold your peace!";
+  before myfunc {
+    ...;
   }
-
-As with C<method>, C<< $self >> and C<< $class >> are defined.
-
-As with C<method>, you can provide a signature:
-
-  before marry ( Person $partner, Object $date? ) {
-    say "Speak now or forever hold your peace!";
+  
+  before myfunc ( Int $x, ArrayRef $y ) {
+    ...;
   }
-
-Note that this will result in the argument types being checked/coerced twice;
-once by the before method modifier and once by the method itself. Sometimes
-this may be desirable, but at other times your before method modifier might
-not care about the types of the arguments, so can omit checking them.
-
-  before marry ( $partner, $date? ) {
-    say "Speak now or forever hold your peace!";
-  }
-
-Commas may be used to modify multiple methods:
-
-  before marry, sky_dive (@args) {
-    say "wish me luck!";
-  }
-
-The C<< :optimize >> attribute is supported for C<before>.
-
-Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
-and C<interface> blocks, modifying methods in the caller package, which is
-usually the factory package.
 
 =head2 C<< after >>
 
-There's not much to say about C<after>. It's just like C<before>.
-
-  after marry {
-    say "You may kiss the bride!";
+  after myfunc {
+    ...;
   }
   
-  after marry ( Person $partner, Object $date? ) {
-    say "You may kiss the bride!";
+  after myfunc ( Int $x, ArrayRef $y ) {
+    ...;
   }
-  
-  after marry ( $partner, $date? ) {
-    say "You may kiss the bride!";
-  }
-
-Commas may be used to modify multiple methods:
-
-  after marry, finished_school_year (@args) {
-    $self->go_on_holiday();
-  }
-
-The C<< :optimize >> attribute is supported for C<after>.
-
-Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
-and C<interface> blocks, modifying methods in the caller package, which is
-usually the factory package.
 
 =head2 C<< around >>
 
-The C<around> method modifier is somewhat more interesting.
-
-  around marry ( Person $partner, Object $date? ) {
-    say "Speak now or forever hold your peace!";
+  around myfunc {
+    ...;
+    my $return = $self->$next( @_[2..$#_] );
+    ...;
+    return $return;
+  }
+  
+  around myfunc ( Int $x, ArrayRef $y ) {
+    ...;
     my $return = $self->$next(@_);
-    say "You may kiss the bride!";
+    ...;
     return $return;
   }
-
-The C<< $next >> variable holds a coderef pointing to the "original" method
-that is being modified. This gives your method modifier the ability to munge
-the arguments seen by the "original" method, and munge any return values.
-(I say "original" in quote marks because it may not really be the original
-method but another wrapper!)
-
-C<< $next >> and C<< $self >> are both shifted off C<< @_ >>.
-
-If you use the signature-free version then C<< $next >> and C<< $self >>
-are not shifted off C<< @_ >> for you, but the variables are still defined.
-
-  around marry {
-    say "Speak now or forever hold your peace!";
-    my $return = $self->$next($_[2], $_[3]);
-    say "You may kiss the bride!";
-    return $return;
-  }
-
-Commas may be used to modify multiple methods:
-
-  around insert, update ($dbh, @args) {
-    $dbh->begin_transaction;
-    my $return = $self->$next(@_);
-    $dbh->commit_transaction;
-    return $return;
-  }
-
-The C<< :optimize >> attribute is supported for C<around>.
-
-Note that C<< SUPER:: >> won't work as expected in Zydeco, so
-C<around> should be used instead.
-
-Method modifiers do work outside of C<class>, C<abstract class>, C<role>,
-and C<interface> blocks, modifying methods in the caller package, which is
-usually the factory package.
 
 =head2 C<< factory >>
 
-The C<factory> keyword is used to define alternative constructors for
-your class.
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has gender ( type => Str );
-    
-    factory new_man (Str $name) {
-      return $class->new(name => $name, gender => 'male');
-    }
-    
-    factory new_woman (Str $name) {
-      return $class->new(name => $name, gender => 'female');
+  class MyThing {
+    factory new_thing {
+      ...;
     }
   }
-
-But here's the twist. These methods are defined within the factory
-package, not within the class.
-
-So you can call:
-
-  MyApp->new_man("Bob")             # yes
-
-But not:
-
-  MyApp::Person->new_man("Bob")     # no
-
-Note that if your class defines I<any> factory methods like this, then the
-default factory method (in this case C<< MyApp->new_person >> will no longer
-be automatically created. But you can create the default one easily:
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has gender ( type => Str );
-    
-    factory new_man (Str $name) { ... }
-    factory new_woman (Str $name) { ... }
-    factory new_person;   # no method signature or body!
-  }
-
-Within a factory method body, the variable C<< $class >> is defined, just
-like normal methods, but C<< $self >> is not defined. There is also a
-variable C<< $factory >> which is a string containing the factory
-package name. This is because you sometimes need to create more than
-just one object in a factory method.
-
-  class Wheel;
   
-  class Car {
-    has wheels = [];
-    
-    factory new_three_wheeler () {
-      return $class->new(
-        wheels => [
-          $factory->new_wheel,
-          $factory->new_wheel,
-          $factory->new_wheel,
-        ]
-      );
-    }
-    
-    factory new_four_wheeler () {
-      return $class->new(
-        wheels => [
-          $factory->new_wheel,
-          $factory->new_wheel,
-          $factory->new_wheel,
-          $factory->new_wheel,
-        ]
-      );
+  class MyThing {
+    factory new_thing ( Int $x, ArrayRef $y ) {
+      ...;
     }
   }
-
-As with C<method> and the method modifiers, if you provide a signature,
-C<< $factory >> and C<< $class >> will be shifted off C<< @_ >>. If you
-don't provide a signature, the variables will be defined, but not shifted
-off C<< @_ >>.
-
-An alternative way to provide additional constructors is with C<method>
-and then use C<factory> to proxy them.
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has gender ( type => Str );
-    
-    method new_guy (Str $name) { ... }
-    method new_gal (Str $name) { ... }
-    
-    factory new_person;
-    factory new_man via new_guy;
-    factory new_woman via new_gal;
-  }
-
-Now C<< MyApp->new_man >> will call C<< MyApp::Person->new_guy >>.
-
-C<< factory new_person >> with no C<via> or method body is basically
-like saying C<< via new >>.
-
-The C<< :optimize >> attribute is supported for C<factory>.
-
-The C<factory> keyword can only be used inside C<class> blocks.
-
-=head3 Implementing a singleton
-
-Factories make it pretty easy to implement the singleton pattern.
-
-  class AppConfig {
-    ...;
-    
-    factory get_appconfig () {
-      state $config = $class->new();
+  
+  class MyThing {
+    factory  new_thing ( HashRef *collection, Int *index ) {
+      ...;
     }
   }
-
-Now C<< MyApp->get_appconfig >> will always return the same AppConfig object.
-Because any explicit use of the C<factory> keyword in a class definition
-suppresses the automatic creation of a factory method for the class, there
-will be no C<< MyApp->new_appconfig >> method for creating new objects
-of that class.
-
-(People can still manually call C<< MyApp::AppConfig->new >> to get a new
-AppConfig object, but remember Zydeco discourages calling constructors
-directly, and encourages you to use the factory package for instantiating
-objects!)
+  
+  class MyThing {
+    method _make_thing {
+      ...;
+    }
+    factory new_thing via _make_thing;
+  }
+  
+  class MyThing {
+    factory new_thing;
+  }
 
 =head2 C<< type_name >>
 
-  class Homo::Sapiens {
-    type_name Human;
+  class Person {
+    type_name Hooman;
   }
-
-The class will still be called L<MyApp::Homo::Sapiens> but the type in the
-type library will be called B<Human> instead of B<Homo_Sapiens>.
-
-Can only be used in C<class>, C<abstract class>, C<role>, and C<interface>
-blocks.
+  
+  role Serializer {
+    type_name Ser;
+  }
 
 =head2 C<< coerce >>
 
-  class Person {
-    has name   ( type => Str, required => true );
-    has gender ( type => Str );
+  class Widget {
+    has id (type => Int);
     
-    coerce from Str via from_string {
-      $class->new(name => $_);
+    coerce from Int via from_id {
+      $class->new(id => $_);
     }
   }
   
-  class Company {
-    has owner ( type => 'Person', required => true );
-  }
-  
-  my $acme = MyApp->new_company( owner => "Bob" );
-
-Note that the company owner is supposed to be a person object, not a string,
-but the Person class knows how create a person object from a string.
-
-Coercions are automatically enabled in a lot of places for types that have
-a coercion. For example, types in signatures, and types in attribute
-definitions.
-
-Note that the coercion body doesn't allow signatures, and the value being
-coerced will be found in C<< $_ >>. If you want to have signatures, you
-can define a coercion as a normal method first:
-
-  class Person {
-    has name   ( type => Str, required => true );
-    has gender ( type => Str );
+  class Widget {
+    has id (type => Int);
     
-    method from_string ( Str $name ) {
-      $class->new(name => $name);
+    coerce from Int via from_id;
+    
+    method from_id ($id) {
+      $class->new(id => $id);
     }
-    
-    coerce from Str via from_string;
   }
-
-In both cases, a C<< MyApp::Person->from_string >> method is generated
-which can be called to manually coerce a string into a person object.
-
-They keyword C<< from >> is technically optional, but does make the
-statement more readable.
-
-  coerce Str via from_string {      # this works
-    $class->new(name => $_);
-  }
-
-The C<< :optimize >> attribute is not currently supported for C<coerce>.
-
-Can only be used in C<class> blocks.
 
 =head2 C<< overload >>
 
-  class Collection {
-    has items = [];
-    overload '@{}' => sub { shift->list };
+  class Person {
+    has name (type => Str);
+    overload(q[""] => 'name', fallback => true);
   }
-
-The list passed to C<overload> is passed to L<overload> with no other
-processing.
-
-Can only be used in C<class> blocks.
 
 =head2 C<< version >>
 
-  class Person {
+  class MyClass 1.0;
+  
+  class MyClass {
     version '1.0';
   }
 
-This just sets C<< $MyApp::Person::VERSION >>.
-
-Can only be used with C<class>, C<abstract class>, C<role>, and C<interface>
-blocks.
-
-You can set a default version for all packages like this:
-
-  use Zydeco (
-    ...,
-    version => 1.0,
-  );
-
-If C<class> definitions are nested, C<version> will be inherited by
-child classes. If a parent class is specified via C<extends>, C<version>
-will not be inherited.
-
-Versions may also be expressed like:
-
-  class Animal 1.0;
-  
-  class Person 1.1 extends Animal {
-    ...;
-  }
 
 =head2 C<< authority >>
 
-  class Person {
+  class MyClass {
     authority 'cpan:TOBYINK';
   }
 
-This just sets C<< $MyApp::Person::AUTHORITY >>.
-
-It is used to indicate who is the maintainer of the package.
-
-Can only be used in C<class>, C<abstract class>, C<role>, and C<interface>
-blocks.
-
-  use Zydeco (
-    ...,
-    version   => 1.0,
-    authority => 'cpan:TOBYINK',
-  );
-
-If C<class> definitions are nested, C<authority> will be inherited by
-child classes. If a parent class is specified via C<extends>, C<authority>
-will not be inherited.
-
 =head2 C<< include >>
-
-C<include> is the Zydeco equivalent of Perl's C<require>.
 
   package MyApp {
     use Zydeco;
-    include Database;
-    include Classes;
     include Roles;
+    include Classes;
   }
-
-It works somewhat more crudely than C<require> and C<use>, evaluating
-the included file pretty much as if it had been copy and pasted into the
-file that included it.
-
-The names of the files to load are processsed using the same rules for
-prefixes as classes and roles (so MyApp::Database, etc in the example),
-and C<< @INC >> is searched just like C<require> and C<use> do, but
-instead of looking for a file called "MyApp/Database.pm", Zydeco
-will look for "MyApp/Database.pl" (yes, ".pl"). This naming convention
-ensures people won't accidentally load MyApp::Database using C<use>
-or C<require> because it isn't intended to be loaded outside the context
-of the MyApp package.
-
-The file "MyApp/Database.pl" might look something like this:
-
-  class Database {
-    has dbh = DBI->connect(...);
-    
-    factory get_db {
-      state $instance = $class->new;
-    }
-  }
-
-Note that it doesn't start with a C<package> statement, nor
-C<use Zydeco>. It's just straight on to the definitions.
-There's no C<< 1; >> needed at the end.
-
-C<< use strict >> and C<< use warnings >> are safe to put in the
-file if you need them to satisfy linters, but they're not necessary
-because the contents of the file are evaluated as if they had been
-copied and pasted into the main MyApp module.
-
-There are I<no> checks to prevent a file from being included more than
-once, and there are I<no> checks to deal with cyclical inclusions.
-
-Inclusions are currently only supported at the top level, and not within
-class and role definitions.
+  
+  # MpApp/Roles.pl
+  role Foo;
+  role Bar;
+  
+  # MyApp/Classes.pl
+  class Foo::Bar with Foo, Bar;
 
 =head2 C<< Zydeco::PACKAGE_SPEC() >>
 
-This function can be used while a class or role is being compiled to
-tweak the specification for the class/role.
-
-  class Foo {
-    has foo;
-    Zydeco::PACKAGE_SPEC->{has}{foo}{type} = Int;
-  }
-
-It returns a hashref of attributes, methods, etc. L<MooX::Press> should
-give you an idea about how the hashref is structured, but Zydeco only
-supports a subset of what MooX::Press supports. For example, MooX::Press
-allows C<has> to be an arrayref or a hashref, but Zydeco only supports
-a hashref. The exact subset that Zydeco supports is subject to change
-without notice.
-
-This can be used to access MooX::Press features that Zydeco doesn't
-expose.
-
-=head1 IMPORTS
-
-Zydeco also exports constants C<true> and C<false> into your
-namespace. These show clearer boolean intent in code than using 1 and 0.
-
-Zydeco exports C<rw>, C<ro>, C<rwp>, C<lazy>, C<bare>, and C<private>
-constants which make your attribute specs a little cleaner looking.
-
-Zydeco exports C<blessed> from L<Scalar::Util> because that can be
-handy to have, and C<confess> from L<Carp>. Zydeco's copy of C<confess>
-is super-powered and runs its arguments through C<sprintf>.
-
-  before vote {
-    if ($self->age < 18) {
-      confess("Can't vote, only %d", $self->age);
+  package MyApp {
+    use Zydeco;
+    
+    class MyClass {
+      has name;
+      Zydeco::PACKAGE_SPEC()->{has}{name}{required} = true;
     }
   }
 
-Zydeco turns on strict, warnings, and the following modern Perl
-features:
+=head1 IMPORTS
 
+Booleans:
+
+=over
+
+=item C<< true >>
+
+=item C<< false >>
+
+=back
+
+Attribute privacy:
+
+=over
+
+=item C<< rw >>
+
+=item C<< rwp >>
+
+=item C<< ro >>
+
+=item C<< lazy >>
+
+=item C<< bare >>
+
+=item C<< private >>
+
+=back
+
+Utilities:
+
+=over
+
+=item C<< blessed($var) >>
+
+=item C<< confess($format, @args) >>
+
+=back
+
+Types:
+
+  use Types::Standard         qw( -types -is -assert );
+  use Types::Common::Numeric  qw( -types -is -assert );
+  use Types::Common::String   qw( -types -is -assert );
+
+Pragmas:
+
+  use strict;
+  use warnings;
+  
   # Perl 5.14 and Perl 5.16
-  say state unicode_strings
+  use feature qw( say state unicode_strings );
   
   # Perl 5.18 or above
-  say state unicode_strings unicode_eval evalbytes current_sub fc
+  use feature qw( say state unicode_strings
+                  unicode_eval evalbytes current_sub fc );
 
-If you're wondering why not other features, it's because I didn't want to
-enable any that are currently classed as experimental, nor any that require
-a version of Perl above 5.18. The C<switch> feature is mostly seen as a
-failed experiment these days, and C<lexical_subs> cannot be called as methods
-so are less useful in object-oriented code.
+Zydeco also imports L<Syntax::Keyword::Try>.
 
-You can, of course, turn on extra features yourself.
-
-  package MyApp {
-    use Zydeco;
-    use feature qw( lexical_subs postderef );
-    
-    ...;
-  }
-
-(The C<current_sub> feature is unlikely to work fully unless you
-have C<:optimize> switched on for that method, or the method does not
-include a signature. For non-optimized methods with a signature, a
-wrapper is installed that handles checks, coercions, and defaults.
-C<< __SUB__ >> will point to the "inner" sub, minus the wrapper.)
-
-Zydeco exports L<Syntax::Keyword::Try> for you. Useful to have.
-
-And last but not least, it exports all the types, C<< is_* >> functions,
-and C<< assert_* >> functions from L<Types::Standard>,
-L<Types::Common::String>, and L<Types::Common::Numeric>.
+=head2 Selective Import
 
 You can choose which parts of Zydeco you import:
 
@@ -4095,12 +2874,7 @@ You can choose which parts of Zydeco you import:
       version authority overload
     /];
 
-It should mostly be obvious what they all do, but C<< -privacy >> is
-C<ro>, C<rw>, C<rwp>, etc; C<< -types >> is bareword type constraints
-(though even without this export, they should work in method signatures),
-C<< -is >> are the functions like C<is_NonEmptyStr> and C<is_Object>,
-C<< -assert >> are functions like C<assert_Int>, C<< -utils >> gives
-you C<blessed> and C<confess>.
+=head2 Unimport
 
 C<< no Zydeco >> will clear up: 
 
@@ -4113,225 +2887,6 @@ C<< no Zydeco >> will clear up:
 But won't clear up things Zydeco imported for you from other packages.
 Use C<< no MooX::Press::Keywords >>, C<< no Types::Standard >>, etc to
 do that, or just use L<namespace::autoclean>.
-
-=head1 FEATURES
-
-=head2 Helper Subs
-
-Earlier it was stated that C<sub> cannot be used to define methods in
-classes and roles. This is true, but that doesn't mean that it has no
-use.
-
-  package MyApp {
-    use Zydeco;
-    
-    sub helper_function { ... }
-    
-    class Foo {
-      method foo {
-        ...;
-        helper_function(...);
-        ...;
-      }
-    }
-    
-    class Bar {
-      sub other_helper { ... }
-      method bar {
-        ...;
-        helper_function(...);
-        other_helper(...);
-        ...;
-      }
-    }
-  }
-
-The subs defined by C<sub> end up in the "MyApp" package, not
-"MyApp::Foo" or "MyApp::Bar". They can be called by any of the classes
-and roles defined in MyApp. This makes them suitable for helper subs
-like logging, L<List::Util>/L<Scalar::Util> sorts of functions, and
-so on.
-
-  package MyApp {
-    use Zydeco;
-    
-    use List::Util qw( any all first reduce );
-    # the above functions are now available within
-    # all of MyApp's classes and roles, but won't
-    # pollute any of their namespaces.
-    
-    use namespace::clean;
-    # And now they won't even pollute MyApp's namespace.
-    # Though I'm pretty sure this will also stop them
-    # from working in any methods that used ":optimize".
-    
-    class Foo { ... } 
-    role Bar { ... } 
-    role Baz { ... } 
-  }
-
-C<sub> is also usually your best option for those tiny little
-coderefs that need to be defined here and there:
-
-  has foo (
-    is       => lazy,
-    type     => ArrayRef[Str],
-    builder  => sub {  []  },
-  );
-
-Though consider using L<Sub::Quote> if you're using Moo.
-
-=head2 Anonymous Classes and Roles
-
-=head3 Anonymous classes
-
-It is possible to make anonymous classes:
-
-  my $class  = do { class; };
-  my $object = $class->new;
-
-The C<< do { ... } >> block is necessary because of a limitation in
-L<Keyword::Simple>, where any keywords it defines must be complete
-statements.
-
-Anonymous classes can have methods and attributes and so on:
-
-  my $class = do { class {
-    has foo (type => Int);
-    has bar (type => Int);
-  }};
-  
-  my $object = $class->new(foo => 1, bar => 2);
-
-Anonymous classes I<do not> implicitly inherit from their parent like
-named nested classes do. Named classes nested inside anonymous classes
-I<do not> implicitly inherit from the anonymous class.
-
-Having one anonymous class inherit from another can be done though:
-
-  my $base     = do { class; }
-  my $derived  = do { class {
-    extends {"::$k1"};
-  }};
-
-This works because C<extends> accepts a block which returns a string for
-the package name, and the string needs to begin with "::" to avoid the
-auto prefix mechanism.
-
-=head3 Anonymous roles
-
-Anonymous roles work in much the same way.
-
-=head2 Parameterizable Classes and Roles
-
-=head3 Parameterizable classes
-
-  package MyApp {
-    use Zydeco;
-    
-    class Animal {
-      has name;
-    }
-    
-    class Species ( Str $common_name, Str $binomial ) {
-      extends Animal;
-      constant common_name  = $common_name;
-      constant binomial     = $binomial;
-    }
-    
-    class Dog {
-      extends Species('dog', 'Canis familiaris');
-      method bark () {
-        say "woof!";
-      }
-    }
-  }
-
-Here, "MyApp::Species" isn't a class in the usual sense; you cannot create
-instances of it. It's like a template for generating classes. Then 
-"MyApp::Dog" generates a class from the template and inherits from that.
-
-  my $Cat = MyApp->generate_species('cat', 'Felis catus');
-  my $mog = $Cat->new(name => 'Mog');
-  
-  $mog->isa('MyApp::Animal');         # true
-  $mog->isa('MyApp::Species');        # false!!!
-  $mog->isa($Cat);                    # true
-
-Because there are never any instances of "MyApp::Species", it doesn't
-make sense to have a B<Species> type constraint. Instead there are
-B<SpeciesClass> and B<SpeciesInstance> type constraints.
-
-  use MyApp::Types -is;
-  
-  my $lassie = MyApp->new_dog;
-  
-  is_Animal( $lassie );               # true
-  is_Dog( $lassie );                  # true
-  is_SpeciesInstance( $lassie );      # true
-  is_SpeciesClass( ref($lassie) );    # true
-
-Subclasses cannot be nested inside parameterizable classes, but
-parameterizable classes can be nested inside regular classes, in
-which case the classes they generate will inherit from the outer
-class.
-
-  package MyApp {
-    use Zydeco;
-    
-    class Animal {
-      has name;
-      class Species ( Str $common_name, Str $binomial ) {
-        constant common_name  = $common_name;
-        constant binomial     = $binomial;
-      }
-    }
-    
-    class Dog {
-      extends Species('dog', 'Canis familiaris');
-      method bark () {
-        say "woof!";
-      }
-    }
-  }
-
-Anonymous parameterizable classes are possible:
-
-  my $generator = do { class ($footype, $bartype) {
-    has foo (type => $footype);
-    has bar (type => $bartype);
-  } };
-  
-  my $class = $generator->generate_package(Int, Num);
-  
-  my $object = $class->new(foo => 42, bar => 4.2);
-
-=head3 Parameterizable roles
-
-Often it makes more sense to parameterize roles than classes.
-
-  package MyApp {
-    use Zydeco;
-    
-    class Animal {
-      has name;
-    }
-    
-    role Species ( Str $common_name, Str $binomial ) {
-      constant common_name  = $common_name;
-      constant binomial     = $binomial;
-    }
-    
-    class Dog {
-      extends Animal;
-      with Species('dog', 'Canis familiaris'), GoodBoi?;
-      method bark () {
-        say "woof!";
-      }
-    }
-  }
-
-Anonymous parameterizable roles are possible.
 
 =head1 BUGS
 
@@ -4355,198 +2910,22 @@ of API is required.
 
 =head1 SEE ALSO
 
+Zydeco manual:
+L<Zydeco::Manual>.
+
 Zydeco website:
 L<http://zydeco.toby.ink/>.
 
 Less magic version:
 L<MooX::Press>.
+(Zydeco is just a wrapper around MooX::Press, providing a nicer syntax.)
 
 Important underlying technologies:
 L<Moo>, L<Type::Tiny::Manual>, L<Sub::HandlesVia>, L<Sub::MultiMethod>,
-L<Lexical::Accessor>, L<Syntax::Keyword::Try>.
+L<Lexical::Accessor>, L<Syntax::Keyword::Try>, L<Role::Hooks>.
 
 Similar modules:
 L<Moops>, L<Kavorka>, L<Dios>, L<MooseX::Declare>.
-
-=head2 Zydeco vs MooX::Press
-
-Zydeco is mostly just a syntax wrapper over L<MooX::Press>. You can see the
-class and role definition that Zydeco passes to MooX::Press using:
-
-  use Zydeco debug => 1;
-
-Rewriting your classes and roles to use MooX::Press directly would give you
-a small speed boost, and fewer dependencies, though MooX::Press is a little
-more frustrating to work with, needing a I<lot> of punctuation.
-
-=head2 Zydeco vs Moops
-
-Because I also wrote Moops, people are likely to wonder what the difference
-is, and why re-invent the wheel?
-
-Zydeco has fewer dependencies than Moops, and crucially doesn't rely on
-L<Package::Keyword> and L<Devel::CallParser> which have... issues.
-Zydeco uses Damian Conway's excellent L<PPR> to handle most parsing
-needs, so parsing should be more predictable.
-
-Moops is faster in most circumstances though.
-
-Here are a few key syntax and feature differences.
-
-=head3 Declaring a class
-
-Moops and Zydeco use different logic for determining whether a class
-name is "absolute" or "relative". In Moops, classes containing a "::" are seen
-as absolute class names; in Zydeco, only classes I<starting with> "::"
-are taken to be absolute; all others are given the prefix.
-
-Moops:
-
-  package MyApp {
-    use Moops;
-    class Foo {
-      class Bar {
-        class Baz {
-          # Nesting class blocks establishes a naming
-          # heirarchy so this is MyApp::Foo::Bar::Baz!
-        }
-      }
-    }
-  }
-
-Zydeco:
-
-  package MyApp {
-    use Zydeco;
-    class Foo {
-      class Bar {
-        class Baz {
-          # This is only MyApp::Baz, but nesting
-          # establishes an @ISA chain instead.
-        }
-      }
-    }
-  }
-
-=head3 How namespacing works
-
-Moops:
-
-  use feature 'say';
-  package MyApp {
-    use Moops;
-    use List::Util qw(uniq);
-    class Foo {
-      say __PACKAGE__;         # MyApp::Foo
-      say for uniq(1,2,1,3);   # ERROR!
-      sub foo { ... }          # MyApp::Foo::foo()
-    }
-  }
-
-Zydeco:
-
-  use feature 'say';
-  package MyApp {
-    use Zydeco;
-    use List::Util qw(uniq);
-    class Foo {
-      say __PACKAGE__;         # MyApp
-      say for uniq(1,2,1,3);   # this works fine
-      sub foo { ... }          # MyApp::foo()
-    }
-  }
-
-This is why you can't use C<sub> to define methods in Zydeco.
-You need to use the C<method> keyword. In Zydeco, all the code
-in the class definition block is still executing in the parent
-package's namespace!
-
-=head3 Multimethods
-
-Moops/Kavorka multimethods are faster, but Zydeco is smarter at
-picking the best candidate to dispatch to, and intelligently selecting
-candidates across inheritance hierarchies and role compositions.
-
-=head3 Other crazy Kavorka features
-
-Kavorka allows you to mark certain parameters as read-only or aliases,
-allows you to specify multiple names for named parameters, allows you
-to rename the invocant, allows you to give methods and parameters
-attributes, allows you to specify a method's return type, etc, etc.
-
-Zydeco's C<method> keyword is unlikely to ever offer as many
-features as that. It is unlikely to offer many more features than it
-currently offers.
-
-If you need fine-grained control over how C<< @_ >> is handled, just
-don't use a signature and unpack C<< @_ >> inside your method body
-however you need to.
-
-=head3 Lexical accessors
-
-Zydeco has tighter integration with L<Lexical::Accessor>,
-allowing you to use the same keyword C<has> to declare private
-and public attributes.
-
-=head3 Factories
-
-Zydeco puts an emphasis on having a factory package for instantiating
-objects. Moops didn't have anything similar.
-
-=head3 C<augment> and C<override>
-
-These are L<Moose> method modifiers that are not implemented by L<Moo>.
-Moops allows you to use these in Moose and Mouse classes, but not Moo
-classes. Zydeco simply doesn't support them.
-
-=head3 Type Libraries
-
-Moops allowed you to declare multiple type libraries, define type
-constraints in each, and specify for each class and role which type
-libraries you want it to use.
-
-Zydeco automatically creates a single type library for all
-your classes and roles within a module to use, and automatically
-populates it with the types it thinks you might want.
-
-If you need to use other type constraints:
-
-  package MyApp {
-    use Zydeco;
-    # Just import types into the factory package!
-    use Types::Path::Tiny qw( Path );
-    
-    class DataSource {
-      has file => ( type => Path );
-      
-      method set_file ( Path $file ) {
-        $self->file( $file );
-      }
-    }
-  }
-  
-  my $ds = MyApp->new_datasource;
-  $ds->set_file('blah.txt');      # coerce Str to Path
-  print $ds->file->slurp_utf8;
-
-=head3 Constants
-
-Moops:
-
-  class Foo {
-    define PI = 3.2;
-  }
-
-Zydeco:
-
-  class Foo {
-    constant PI = 3.2;
-  }
-
-=head3 Parameterizable classes and roles
-
-These were always on my todo list for Moops; I doubt they'll ever be done.
-They work nicely in Zydeco though.
 
 =head1 AUTHOR
 

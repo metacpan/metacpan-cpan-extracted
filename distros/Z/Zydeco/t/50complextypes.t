@@ -16,6 +16,15 @@ class Bar {
 	) {
 		1;
 	}
+	
+	method baz ( Ints $z ) {
+		return $z;
+	}
+	
+	begin {
+		my $t = Type::Registry->for_class($package);
+		$t->add_type(ArrayRef[Int] => 'Ints');
+	}
 }
 
 my $bar = Local->new_bar;
@@ -32,6 +41,13 @@ ok( $bar->bar( [qw/ x y z /, { quux => \1 }] ) );
 
 isnt( 
 	exception { $bar->bar( [qw/ x y z /, { quux => 42 }] ) },
+	undef,
+);
+
+is_deeply( $bar->baz([1,2,3]), [1,2,3] );
+
+isnt( 
+	exception { $bar->baz(2) },
 	undef,
 );
 

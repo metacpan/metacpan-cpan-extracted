@@ -1,5 +1,19 @@
 Revision history for Authen-NZRealMe
 
+1.20      2020-02-25 13:07:33+13:00 Pacific/Auckland
+    - implement HTTP-POST binding through new resolve_posted_assertion()
+      method in ServiceProvider.pm
+    - as RealMe's HTTP-POST assertions are all encrypted, support has been
+      added for XML encryption; and the new 'CryptX' dependency is added for
+      the required AES128-CBC cipher
+    - revised SP metadata generation and editing to support multiple ACS
+      entries with support for HTTP-POST vs HTTP-Artifact bindings
+    - allow initial request to specify the index of the ACS to which the
+      response should be sent
+    - removed support for "force_auth" parameter to new_request
+    - fix missing namespace when generating SP metadata file
+    - add some asserts to sanity check user input
+
 1.19      2019-02-20 19:11:05+13:00 Pacific/Auckland
     - further improvements around the use of find_verified_element()
     - fix handling of skip_signature_check option

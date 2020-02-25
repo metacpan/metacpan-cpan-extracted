@@ -1,5 +1,5 @@
 package Consul::ACL;
-$Consul::ACL::VERSION = '0.026';
+$Consul::ACL::VERSION = '0.027';
 use namespace::autoclean;
 
 use Moo;

@@ -1,4 +1,5 @@
 use Test2::V0;
+require IO::Handle;
 
 BEGIN {
     if (eval { require Capture::Tiny; 1 }) {
@@ -50,8 +51,10 @@ like(
 );
 
 my $fh = \*STDOUT;
-$fh->autoflush(1);
-is($fh->autoflush, 1, "set autoflush");
+if (IO::Handle->can('autoflush')) {
+    $fh->autoflush(1);
+    is($fh->autoflush, 1, "set autoflush");
+}
 
 is(syswrite(STDOUT, ""), 0, "syswrite works");
 
@@ -65,13 +68,12 @@ if (CAPTURE_TINY()) {
     is($stderr, "Hello STDERR\n", "captured stderr");
 }
 
-
 ok(open(my $fh1, '>&', STDOUT), "Can clone STDOUT", $!);
 
-open(STDOUT, '>', *STDERR) or die "Could not change STDOUT: $!";
+open(STDOUT, '>&', *STDERR) or die "Could not change STDOUT: $!";
 is(fileno(STDOUT), 1, "kept filehandle");
 
-open(STDOUT, '>', $fh1) or die "Could not change STDOUT: $!";
+open(STDOUT, '>&', $fh1) or die "Could not change STDOUT: $!";
 is(fileno(STDOUT), 1, "kept filehandle");
 close($fh1);
 

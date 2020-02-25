@@ -1188,10 +1188,11 @@ SKIP: {
 		if ((!$autofocus) && ($major_version < 50)) {
 			chomp $@;
 			diag("The property method is not supported for $major_version.$minor_version.$patch_version:$@");
-			skip("The property method is not supported for $major_version.$minor_version.$patch_version", 2);
+			skip("The property method is not supported for $major_version.$minor_version.$patch_version", 3);
 		}
 		ok($autofocus, "The value of the autofocus property is '$autofocus'");
 		ok($firefox->find_by_class('main-content')->find('//input[@id="search-input"]')->property('id') eq 'search-input', "Correctly found nested element with find");
+		ok($firefox->title() eq $firefox->find_tag('title')->property('innerHTML'), "\$firefox->title() is the same as \$firefox->find_tag('title')->property('innerHTML')");
 	}
 	my $count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list('//input[@id="search-input"]')) {
@@ -1685,53 +1686,6 @@ SKIP: {
 		if ($major_version < 45) {
 			skip("Firefox below 45 (at least 24) does not support the getContext method", 5);
 		}
-		if (!$firefox->xvfb()) {
-			my $min_version = '68.0.2';
-			my ($min_major, $min_minor, $min_patch) = split /[.]/, $min_version;
-			if ((($major_version == $min_major)
-					&& (defined $minor_version)
-					&& ($minor_version == $min_minor)
-					&& (defined $patch_version)
-					&& ($patch_version == $min_patch)) 
-					||
-					(($major_version == $min_major)
-					&& (defined $minor_version)
-					&& ($minor_version > $min_minor))
-					||
-					(($major_version == $min_major)
-					&& (defined $minor_version)
-					&& ($minor_version == $min_minor)
-					&& (defined $patch_version)
-					&& ($patch_version > $min_patch)) 
-					||
-					(($major_version > $min_major)))
-			{
-				my $max_version = '73.0.1'; # known bad version
-				my ($max_major, $max_minor, $max_patch) = split /[.]/, $max_version;
-				if ((($major_version == $max_major)
-						&& (defined $minor_version)
-						&& ($minor_version == $max_minor)
-						&& (defined $patch_version)
-						&& ($patch_version == $max_patch)) 
-						||
-						(($major_version == $max_major)
-						&& (defined $minor_version)
-						&& ($minor_version < $max_minor))
-						||
-						(($major_version == $max_major)
-						&& (defined $minor_version)
-						&& ($minor_version == $max_minor)
-						&& (defined $patch_version)
-						&& ($patch_version < $max_patch)) 
-						||
-						(($major_version < $max_major)))
-				{
-					$firefox->downloads();
-					$firefox->downloading();
-					skip("Firefox $major_version.$minor_version.$patch_version crashes when downloading without xvfb", 5);
-				}
-			}
-		}
 		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download'); })->click(), "Clicked on the download link");
 		diag("Clicked download link");
 		while(!$firefox->downloads()) {
@@ -1744,15 +1698,23 @@ SKIP: {
 		my $download_path;
 		foreach my $path ($firefox->downloads()) {
 			diag("Downloaded $path");
-			$download_path = $path;
-			$count += 1;
+			if ($path =~ /Test\-Simple/) { # dodging possible Devel::Cover messages
+				$download_path = $path;
+				$count += 1;
+			} elsif ($INC{'Devel/Cover.pm'}) {
+			} else {
+				$count += 1;
+			}
 		}
 		ok($count == 1, "Downloaded 1 files:$count");
 		my $handle = $firefox->download($download_path);
 		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->download(\$path)");
 		my $result = sysread $handle, my $buffer, 2;
 		ok($result == 2, "Read data from GLOB:$!");
-		ok($buffer eq "\x1f\x8b", "Downloaded file is gzipped");
+		if ($INC{'Devel/Cover.pm'}) {
+		} else {
+			ok($buffer eq "\x1f\x8b", "Downloaded file is gzipped");
+		}
 	}
 
 	my $alert_text = 'testing alert';

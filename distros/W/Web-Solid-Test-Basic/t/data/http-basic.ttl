@@ -4,6 +4,7 @@
 @prefix http: <http://www.w3.org/2007/ont/http#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 @prefix nfo:  <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix dqm:  <http://purl.org/dqm-vocabulary/v1/dqm#> .
 @prefix :     <http://example.org/test#> .
 
 :test_list a test:FixtureTable ;
@@ -42,7 +43,8 @@
     http:requestURI </public/verypublic/foobar.ttl> .
 
 :public_writeread_unauthn_alt_put_res a http:ResponseMessage ;
-    http:status 201 .
+    http:status "201|204"^^dqm:regex .
+
 
 :public_writeread_unauthn_alt_get_req a http:RequestMessage ;
     http:method "GET" ;

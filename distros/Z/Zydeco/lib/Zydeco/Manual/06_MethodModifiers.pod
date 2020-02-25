@@ -1,0 +1,69 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual::06_MethodModifiers - Method modifiers to easily wrap or override inherited methods
+
+=head1 SYNOPSIS
+
+  package MyApp {
+    use Zydeco;
+    
+    class Event {
+      has date;
+      method occur () {
+        ...;
+      }
+    }
+    
+    class Wedding extends Event {
+      before occur {
+        say "Speak now or forever hold your peace";
+      }
+      after occur {
+        say "You may kiss the bride";
+      }
+    }
+  }
+
+=head1 MANUAL
+
+TODO.
+
+=head1 KEYWORDS
+
+In this chapter, we looked at the following keywords:
+
+=over
+
+=item C<< before >>
+
+=item C<< after >>
+
+=item C<< around >>
+
+=back
+
+=head1 NEXT STEPS
+
+TODO.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

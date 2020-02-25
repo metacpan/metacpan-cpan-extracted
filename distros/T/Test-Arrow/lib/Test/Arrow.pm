@@ -5,7 +5,7 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @ISA = qw/Test::Builder::Module/;
 
@@ -16,17 +16,43 @@ sub import {
     my $pkg  = shift;
     my %args = map { $_ => 1 } @_;
 
-    my $binary = delete $args{binary} or delete $args{binary_mode}
-                    or delete $args{not_utf8} or delete $args{'-utf8'} or delete $args{'-utf'};
-    if (!$binary) {
-        binmode $pkg->builder->$_, ':utf8' for qw(failure_output todo_output output);
-        require utf8;
-        utf8->import;
-    }
+    $pkg->_import_option_no_strict(\%args);
+    $pkg->_import_option_no_warnings(\%args);
+    $pkg->_import_option_binary(\%args);
 
     if ($] < 5.014000) {
         require IO::Handle;
         IO::Handle->import;
+    }
+}
+
+sub _import_option_no_strict {
+    my ($pkg, $args) = @_;
+
+    my $no_strict = delete $args->{no_strict} or delete $args->{'-strict'};
+    if (!$no_strict) {
+        strict->import;
+    }
+}
+
+sub _import_option_no_warnings {
+    my ($pkg, $args) = @_;
+
+    my $no_warnings = delete $args->{no_warnings} or delete $args->{'-warnings'};
+    if (!$no_warnings) {
+        warnings->import;
+    }
+}
+
+sub _import_option_binary {
+    my ($pkg, $args) = @_;
+
+    my $binary = delete $args->{binary} or delete $args->{binary_mode}
+                    or delete $args->{not_utf8} or delete $args->{'-utf8'} or delete $args->{'-utf'};
+    if (!$binary) {
+        binmode $pkg->builder->$_, ':utf8' for qw(failure_output todo_output output);
+        require utf8;
+        utf8->import;
     }
 }
 
@@ -433,11 +459,21 @@ B<Test::Arrow> is a testing helper as object-oriented operation. Perl5 has a lot
 
 =head1 IMPORT OPTIONS
 
+=head2 no_strict / no_warnings
+
+By default, C<Test::Arrow> imports C<strict> and C<warnings> pragma automatically. If you don't want it, then you should pass 'no_strict' or 'no_warnings' option on use.
+
+    use Test::Arrow; # Just use Test::Arrow, automatically turn on 'strict' and 'warnings'
+
+Turn off 'strict' and 'warnings';
+
+    use Test::Arrow qw/no_strict no_warnings/;
+
 =head2 binary
 
 By default, C<Test::Arrow> sets utf8 pragma globally to avoid warnings such as "Wide charactors". If you don't want it, then you should pass 'binary' option on use.
 
-    use Test::Arrow 'binary'; # utf8 pragma off
+    use Test::Arrow qw/binary/; # utf8 pragma off
 
 
 =head1 METHODS
@@ -643,7 +679,7 @@ B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.08-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582511878"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582511878&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.09-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582638671"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582638671&branch=master"/></a>
 
 =end html
 

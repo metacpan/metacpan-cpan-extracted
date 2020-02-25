@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use Test::Arrow;
 
 my $arr = Test::Arrow->new;

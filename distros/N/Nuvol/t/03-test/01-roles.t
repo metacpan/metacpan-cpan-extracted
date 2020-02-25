@@ -5,8 +5,8 @@ use Test::More;
 my $package;
 
 my @functions = (
-  qw|test_file_applied test_file_methods test_file_prerequisites|,
-  qw|test_folder_applied test_folder_methods test_folder_prerequisites|,
+  qw|test_file_applied test_file_prerequisites|,
+  qw|test_folder_applied test_folder_prerequisites|,
   qw|test_metadata_applied test_metadata_methods test_metadata_prerequisites|,
 );
 

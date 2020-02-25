@@ -1,3 +1,7 @@
+0.027     2020-02-25 20:50:51+11:00 Australia/Melbourne
+- Make Session.Checks optional to work around possible bugs in consul
+  >= 1.7 (see https://github.com/hashicorp/consul/issues/7341)
+
 0.026     2019-09-05 18:52:05+10:00 Australia/Melbourne
 - Test updates for Test::Consul 0.14
 

@@ -52,8 +52,19 @@ sub dispatch_request {
 	 'GET + /public/**'=> sub {
     [ 200, [ 'Content-type', 'text/turtle' ], [ '</public/verypublic/foobar.ttl#dahut> a <http://example.org/Cryptid> .' ] ]
   },
+  'GET + /public/**/'=> sub {
+    [ 200, [ 'Content-type', 'text/turtle' ], [ '</public/verypublic/foobar.ttl#dahut> a <http://example.org/Cryptid> .' ] ]
+  },
   'PUT + /**' => sub {
     [ 201, [ 'Content-type', 'text/turtle' ], [ '' ] ]
+  },
+  'POST + /public/' => sub {
+    [ 201, [ 'Content-type', 'text/turtle',
+				 'Location', '/public/sluggish/'
+			  ], [ '' ] ]
+  },
+  'DELETE + /public/sluggish/' => sub {
+    [ 204, [ '' ], [ '' ] ]
   },
   '' => sub {
     [ 405, [ 'Content-type', 'text/plain' ], [ 'Method not allowed' ] ]

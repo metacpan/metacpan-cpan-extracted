@@ -10,6 +10,7 @@
 :test_list a test:FixtureTable ;
     test:fixtures (
         :check_acl_location
+        :post_slug_get_delete
     ) .
 
 <http://example.org/httplist#http_req_res_list_regex_reuser> a nfo:SoftwareItem ;
@@ -60,3 +61,50 @@ acl:mode acl:Read. """ .
 
 
 
+:post_slug_get_delete a test:AutomatedTest ;
+    test:purpose "Write resource using Slug, verify presence, finally delete"@en ;
+    test:test_script <http://example.org/httplist#http_req_res_list_regex_reuser> ;
+    test:params [
+        test:steps (
+            [
+                test:request :post_slug_slash_no_link_req  ;
+                test:response_assertion :post_slug_slash_ok_res
+            ]
+            [
+                test:request :get_slug_req  ;
+                test:response_assertion :ok_res
+            ]
+            [
+                test:request :delete_slug_req  ;
+                test:response_assertion :deleted_ok_res
+            ]
+        )
+    ] .
+
+:post_slug_slash_no_link_req a http:RequestMessage ;
+    http:method "POST" ;
+    http:requestURI </public/> ;
+    httph:slug "sluggish/" ;
+    httph:content_type "text/turtle";
+    http:content """@prefix dc: <http://purl.org/dc/terms/>.
+@prefix ldp: <http://www.w3.org/ns/ldp#>.
+<> a ldp:BasicContainer ;
+   dc:title "No link-created container."@en .""" .
+
+:post_slug_slash_ok_res a http:ResponseMessage ;
+    rdfs:comment "Verifies that the Location URL ends with sluggish/ and extracts for the next GET"@en ;
+    httph:location '(.*?sluggish/$)'^^dqm:regex ;
+    http:status 201 .
+
+:get_slug_req a http:RequestMessage ;
+    rdfs:comment "Verify that the resource can be accessed, the test script will use the regexp from the previous response"@en ;
+    http:method "GET" .
+
+:ok_res a http:ResponseMessage ;
+    http:status 200 .
+
+:delete_slug_req a http:RequestMessage ;
+    http:method "DELETE" .
+
+:deleted_ok_res a http:ResponseMessage ;
+    http:status "200|204"^^dqm:regex .

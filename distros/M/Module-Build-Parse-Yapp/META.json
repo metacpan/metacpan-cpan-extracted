@@ -1,0 +1,48 @@
+{
+   "abstract" : "build Parse::Yapp parsers from source",
+   "author" : [
+      "Andrius Merkys <merkys@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Build-Parse-Yapp",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Module::Build" : "0",
+            "Parse::Yapp" : "0",
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/merkys/module-build-parse-yapp/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/merkys/module-build-parse-yapp.git",
+         "web" : "https://github.com/merkys/module-build-parse-yapp"
+      }
+   },
+   "version" : "0.1.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -1,5 +1,6 @@
 .editorconfig
 Changes
+cpanfile
 lib/List/AutoNumbered.pm
 Makefile.PL
 MANIFEST			This list of files

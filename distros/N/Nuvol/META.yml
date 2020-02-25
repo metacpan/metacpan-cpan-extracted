@@ -27,6 +27,6 @@ resources:
   bugtracker: https://github.com/Tekki/nuvol/issues
   homepage: https://github.com/Tekki/nuvol
   repository: https://github.com/Tekki/nuvol.git
-version: '0.01'
+version: '0.02'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

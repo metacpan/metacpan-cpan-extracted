@@ -15,6 +15,7 @@ t/03_binary.t
 t/04_can_ok.t
 t/05_isa.t
 t/06_throw.t
+t/07_strict_warnings.t
 xt/01_perlcritic.t
 xt/02_pod-coverage.t
 xt/03_pod.t

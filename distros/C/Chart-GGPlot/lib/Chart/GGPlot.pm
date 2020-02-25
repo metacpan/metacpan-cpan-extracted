@@ -4,7 +4,7 @@ package Chart::GGPlot;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Data::Munge qw(elem);
 use Data::Frame::Types qw(DataFrame);
@@ -134,7 +134,7 @@ Chart::GGPlot - ggplot2 port in Perl
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 STATUS
 

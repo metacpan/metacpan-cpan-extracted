@@ -4,9 +4,9 @@ use warnings;
 # For more info on why these tests are important, see RT #56757 and RT #5705
 
 use File::Spec;
-use Find::Lib;
-use Path::Class qw(file);
+use Path::Tiny qw(path);
 use Test::More;
+use URI::file qw();
 use WWW::Mechanize::Cached;
 
 use lib 't';
@@ -51,10 +51,7 @@ sub check_cache {
 }
 
 sub page_url {
-    my $i      = shift;
-    my $prefix = 'file://';
-    $prefix .= '/' if $^O =~ m{Win};
-    return $prefix
-        . File::Spec->catfile( Find::Lib::base(), 'pages', "$i.html" );
+    my $i = shift;
+    return URI::file->new( path( 't', 'pages', "$i.html" )->absolute );
 }
 

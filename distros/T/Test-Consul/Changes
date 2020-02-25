@@ -1,3 +1,6 @@
+0.015     2020-02-24 22:09:12+11:00 Australia/Melbourne
+ - bug fix: call Net::EmptyPort::check_port correctly
+
 0.014     2019-05-12 21:48:08+10:00 Australia/Melbourne
  - generate and cycle node names
  - document node_name and datacenter attributes

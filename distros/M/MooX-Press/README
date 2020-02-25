@@ -210,7 +210,11 @@ DESCRIPTION
         Hashref of additional subs to install into the factory package.
 
     `type_library_can` *(HashRef[CodeRef])*
-        Hashref of additional subs to install into the factory package.
+        Hashref of additional subs to install into the type library package.
+
+    `default_is`
+        The default for the `is` option when defining attributes. The default
+        `default_is` is "ro".
 
     At this top level, a shortcut is available for the 'class' and 'role'
     keys. Rather than:
@@ -318,12 +322,12 @@ DESCRIPTION
 
           # These mean the same thing...
           "name!" => Str,
-          "name"  => { is => "rw", required => 1, isa => Str },
+          "name"  => { is => "ro", required => 1, isa => Str },
 
           # These mean the same thing...
           "age"   => sub { return 0 },
           "age"   => {
-            is         => "rw",
+            is         => "ro",
             lazy       => 1,
             builder    => sub { return 0 },
             clearer    => "clear_age",
@@ -694,6 +698,11 @@ DESCRIPTION
 
         See "Import Options".
 
+    `default_is` *(Str)*
+        Override default_is for this class and any child classes.
+
+        See "Import Options".
+
     `end` *(CodeRef|ArrayRef[CodeRef])*
         Override `end` for this class and any child classes.
 
@@ -885,22 +894,22 @@ DESCRIPTION
     The following are exceptions:
 
     `is` *(Str)*
-        This is optional rather than being required, and defaults to "rw".
-        (Yes, I prefer "ro" generally, but whatever.)
+        This is optional rather than being required, and defaults to "ro" (or
+        to `default_is` if you defined that).
 
         MooX::Press supports the Moo-specific values of "rwp" and "lazy", and
         will translate them if you're using Moose or Mouse.
 
         There is a special value `is => "private"` to create private
         attributes. These attributes cannot be set by the constructor (they
-        always have `init_arg => undef`) and do not have accessor methods.
-        They are stored inside-out, so cannot even be accessed using direct
-        hashref access of the object. If you're thinking this makes them
-        totally inaccessible, and therefore useless, think again.
+        always have `init_arg => undef`) and do not have accessor methods by
+        default. They are stored inside-out, so cannot even be accessed using
+        direct hashref access of the object. If you're thinking this makes
+        them totally inaccessible, and therefore useless, think again.
 
         For private attributes, you can request an accessor as a coderef:
 
-          my $my_attr;
+          my $my_attr;             # pre-declare lexical!
           use MooX::Press (
             'class:Foo' => {
               has => {

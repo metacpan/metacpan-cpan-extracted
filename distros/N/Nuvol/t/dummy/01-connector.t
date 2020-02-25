@@ -17,9 +17,10 @@ my %constants = (
   SERVICE   => 'Dummy',
 );
 my %defaults = (
-  app_id       => 'dummy_app_id',
-  redirect_uri => 'redirect_uri',
-  scope        => 'dummy_scope',
+  app_id        => 'dummy_app_id',
+  redirect_uri  => 'redirect_uri',
+  response_type => 'code',
+  scope         => 'dummy_scope',
 );
 my %tokens = (
   access_token  => 'new access token',

@@ -1,0 +1,571 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual::03_MethodsSignaturesTypesCoercion - Methods with signatures, type constraints, and coercion
+
+=head1 SYNOPSIS
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name = "Anonymous";
+      
+      method greet ( Person $friend ) {
+        printf("Hello %s, I am %s.\n", $friend->name, $self->name);
+      }
+    }
+  }
+  
+  my $alice = MyApp->new_person(name => "Alice");
+  my $bob   = MyApp->new_person(name => "Bob");
+  
+  $alice->greet($bob);  # ==> "Hello Bob, I am Alice."
+
+=head1 MANUAL
+
+The main way of interacting with objects is calling their methods. Methods
+are defined in the object's class, plus any roles that are consumed by the
+class.
+
+=head2 Simple Methods
+
+You can define a method within a class or role using the C<method> keyword.
+
+  package Farming {
+    use Zydeco;
+    
+    class Cow {
+      method make_sound {
+        say "moo";
+      }
+    }
+  }
+  
+  MyApp->new_cow->make_sound();     # ==> "moo"
+
+Within C<method>, the arguments passed to the method are available in an
+array called C<< @_ >>.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Announcer {
+      method announce {
+        for my $arg ( @_ ) {
+          say $arg;
+        }
+      }
+    }
+  }
+  
+  my $ann = MyApp->new_announcer();
+  $ann->announce("Hello", "World");
+
+If you run the above code, you'll notice before it announces "Hello", it will
+announce a line like:
+
+  MyApp::Announcer=HASH(0x55746c744c58)
+
+This is a string representation of the object itself. The first item in the
+C<< @_ >> array is the object itself.
+
+The object itself is also available as a variable C<< $self >> within the
+method.
+
+  package Farming {
+    use Zydeco;
+    
+    class Cow {
+      has noise = "moo";
+      method make_sound {
+        say $self->noise();
+      }
+    }
+  }
+  
+  MyApp->new_cow->make_sound();     # ==> "moo"
+
+Another special variable available within methods is C<< $class >> which
+contains the object's class as a string. Because of inheritance, this might
+not be the same class the method was defined in but a subclass.
+
+=head2 Required Methods in Roles
+
+A role can indicate that it requires classes that consume it to provide
+certain methods.
+
+  package Farming {
+    use Zydeco;
+    
+    role Noisy {
+      requires noise;
+      
+      method make_sound {
+        say $self->noise();
+      }
+    }
+    
+    class Cow with Noisy {
+      has noise = "moo";
+    }
+  }
+  
+  MyApp->new_cow->make_sound();     # ==> "moo"
+
+If the "Cow" class didn't provide a "noise" method, then "Noisy" would
+complain about that. (And yes, "Cow" does provide a "noise" method because
+the "noise" attribute has an accessor method!)
+
+=head2 Method Signatures
+
+It is possible to provide a signature for a method; a list of what parameters
+it expects.
+
+  package Farming {
+    use Zydeco;
+    use List::Util qw( min );
+    
+    class Bucket {
+      has capacity!;
+      has level = 0;
+      
+      method empty () {
+        $self->level( 0 );
+        return $self;
+      }
+      
+      method remaining_space () {
+        if ($self->level >= $self->capacity) {
+          return 0; # already overfull
+        }
+        
+        return $self->capacity - $self->level;
+      }
+      
+      method add ( $given ) {
+        my $take = min($given, $self->remaining_space);
+        $self->level( $self->level + $take );
+        return $given - $take;
+      }
+    }
+  }
+  
+  # New 10 litre bucket
+  my $bucket = MyApp->new_bucket(capacity => 10);
+  
+  $bucket->add(6);    # Add 6 litres to bucket.
+  $bucket->add(6);    # Try to add another 6 litres, but
+                      # only takes 4 and returns 2.
+
+The "empty" and "remaining" methods don't take any parameters, so their
+signature is the empty signature C<< () >>. If you try to call them with
+a parameter, they'll throw an error:
+
+  $bucket->empty();                   # ok
+  $bucket->empty( "some string" );    # error
+
+An empty signature of C<< () >> is different from a method with no signature
+at all. If there is no signature at all, Zydeco will do nothing to check
+your method's parameters at all, and you are expected to deal with C<< @_ >>
+yourself.
+
+The C<< @_ >> array is still available in methods which have signatures
+but does I<not> include C<< $self >>. For methods which have signatures,
+C<< @_ >> corresponds to the parameters in the signature.
+
+=head3 Optional Parameters
+
+Method parameters are required by default. Missing or unknown parameters
+result in an error
+
+  $bucket->add(6);     # okay
+  $bucket->add();      # throws an error because $given missing
+  $bucket->add(3, 3);  # throws an error because extra parameter
+
+Parameters can be made optional by suffixing them with a question mark.
+
+  method add ( $given, $substance? ) {
+    my $take = min($given, $self->remaining_space);
+    $self->level( $self->level + $take );
+    return $given - $take;
+  }
+  
+  $bucket->add(2, "vodka");          # okay
+  $bucket->add(2, "schnapps");       # okay
+  $bucket->add(5, "orange juice");   # okay
+  $bucket->add(1);                   # okay
+
+Currently, required parameters must precede optional parameters, but future
+releases of Zydeco may also allow required parameters at the end of the
+signature.
+
+An alternative to making a parameter optional is to provide a default for
+it.
+
+  method add ( $given, $substance = "Water" ) {
+    my $take = min($given, $self->remaining_space);
+    $self->level( $self->level + $take );
+    return $given - $take;
+  }
+
+=head3 Slurpy Parameters
+
+Parameters starting with C<< @ >> or C<< % >> are slurpy parameters and
+eat up all the remaining values passed to the method.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Announcer {
+      method announce ( $intro, @messages ) {
+        say $intro;
+        for my $msg ( @messages ) {
+          say $msg;
+        }
+      }
+    }
+  }
+  
+  my $intro = "Hello world!";
+  my $ann = MyApp->new_announcer();
+  $ann->announce($intro, "Hello", "World");
+
+Slurpy parameters must follow any required or optional parameters.
+Slurpies are always effectively optional in that they may eat up
+zero values, and cannot have a default.
+
+=head3 Named Parameters
+
+Especially if there are more than three or four parameters, positional
+parameters can get confusing. You can forget which order they come in
+and what each parameter means. Named parameters can make things more
+readable.
+
+  method schedule_meeting ( *room, *date, *start_time, *end_time? ) {
+    ...;
+    
+    say "Scheduled meeting at ", $arg->start_time;
+  }
+  
+  $dept->schedule_meeting(
+    date        => "2020-02-22",
+    start_time  => "15:00",
+    end_time    => "16:30",
+    room        => "A113",
+  );
+  
+  # or...
+  $dept->schedule_meeting({
+    date        => "2020-02-22",
+    start_time  => "15:00",
+    end_time    => "16:30",
+    room        => "A113",
+  });
+
+Named parameters use an asterisk instead of a dollar sign. For methods
+using named parameters, a variable C<< $arg >> is available within the
+method body. This provides access to all the named parameters.
+
+  $arg->room;           # ==> "A113"
+  $arg->date;           # ==> "2020-02-22"
+  $arg->start_time;     # ==> "15:00"
+  $arg->end_time;       # ==> "16:30"
+  $arg->has_end_time;   # ==> true
+
+The C<< $arg >> variable is an object itself which you get parameter values
+from by calling methods. It can also be accessed as a hashref though.
+
+=head3 Mixed Parameters
+
+It is possible to mix positional and named parameters under certain
+conditions.
+
+=over
+
+=item *
+
+Positional arguments must appear at the beginning and/or end of the list.
+They cannot be surrounded by named arguments.
+
+=item *
+
+Positional arguments cannot be optional and cannot have a default. They
+must be required. (Named arguments can be optional and have defaults.)
+
+=item *
+
+No slurpies!
+
+=back
+
+  method print_html ( $tag, $text, *htmlver = 5, *xml?, $fh ) {
+    
+    warn "update your HTML" if $arg->htmlver < 5;
+    
+    if (length $text) {
+      print $fh "<tag>$text</tag>";
+    }
+    elsif ($arg->xml) {
+      print $fh "<tag />";
+    }
+    else {
+      print $fh "<tag></tag>";
+    }
+  }
+  
+  $obj->print_html('h1', 'Hello World', { xml => true }, \*STDOUT);
+  $obj->print_html('h1', 'Hello World',   xml => true  , \*STDOUT);
+  $obj->print_html('h1', 'Hello World',                  \*STDOUT);
+
+=head2 Types
+
+Type constraints may be used to ensure that values are of the correct type.
+
+  class Calculator {
+    method add ( Num $x, $Num $y ) {
+      return $x + $y;
+    }
+  }
+
+You may use any type from L<Types::Standard>, L<Types::Common::String>,
+or L<Types::Common::Numeric>, plus any role type or class type that you
+define via Zydeco.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      ...;
+    }
+    
+    class Company {
+      has employees = [];
+      method hire ( Person $employee ) {
+        push @{ $self->employees }, $employee;
+      }
+    }
+  }
+
+As type constraints are designed to operate on scalars rather than arrays
+or hashes, if you need to type check a slurpy parameter, pretend it's a
+reference.
+
+  method hire ( ArrayRef[Person] @new_employees ) {
+    push @{ $self->employees }, @new_employees;
+  }
+
+=head3 Choosing a Type Name for Your Class
+
+Zydeco usually names types with names that closely correspond to your
+classes and roles.
+
+  class Foo;            # type name: Foo
+  role Bar;             # type name: Bar
+  class Foo::Bar;       # type name: Foo_Bar
+
+You can choose a different type name if you prefer:
+
+  class Person {
+    type_name Hooman;
+  }
+
+If you choose a custom type name, remember to use that, and not the class
+name, in places where Zydeco expects a type.
+
+  method hire ( Hooman $employee ) {
+    ...;
+  }
+
+=head3 Using Type Constraints for Attributes
+
+As well as in signatures, type constraints can be used in attribute
+definitions.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name      ( type => Str );
+      has children  ( type => 'ArrayRef[Person]' );
+    }
+  }
+
+Types can optionally be quoted; in the above example this is done because
+at the point where the attribute definitions are being compiled, the
+B<Person> type hasn't been defined yet, so cannot be used as a bareword.
+You can pre-declare it if you like.
+
+  package MyApp {
+    use Zydeco declare => ['Person'];
+    
+    class Person {
+      has name      ( type => Str );
+      has children  ( type => ArrayRef[Person] );
+    }
+  }
+
+=head3 Defining Custom Types in a Class
+
+Sometimes you need additional type constraints. The easiest way to do that
+is to define a type library using L<Type::Library> and import it.
+
+  package MyApp {
+    use Zydeco;
+    use My::Custom::Types -all;
+    
+    ...;
+  }
+
+These types will now be available to all of MyApp's classes and roles.
+
+It is possible to also define a custom type within a single class or role.
+
+  package MyApp {
+    use Zydeco declare => ['Person'];
+    
+    begin {
+      my $registry = Type::Registry->for_class($package);
+      $registry->add_type( ArrayRef[Person] => 'People' );
+    }
+    
+    class Person {
+      has name      ( type => Str );
+      has children  ( type => 'People' );
+    }
+  }
+
+=head2 Coercions
+
+Type coercions (also called type conversion, type casting, or type juggling)
+allows you to automatically convert a value of one type into another.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name = "Anonymous";
+      
+      method greet ( Person $friend ) {
+        printf("Hello %s, I am %s.\n", $friend->name, $self->name);
+      }
+    }
+  }
+  
+  my $alice = MyApp->new_person(name => "Alice");
+  my $bob   = MyApp->new_person(name => "Bob");
+  
+  $alice->greet($bob);  # ==> "Hello Bob, I am Alice."
+
+The "greet" method expects to be passed a Person object, but what if we
+wanted to allow it to also accept a string, the person's name?
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name = "Anonymous";
+      
+      coerce from Str via from_string {
+        $class->new(name => $_);
+      }
+      
+      method greet ( Person $friend ) {
+        printf("Hello %s, I am %s.\n", $friend->name, $self->name);
+      }
+    }
+  }
+  
+  my $alice = MyApp->new_person(name => "Alice");
+  
+  $alice->greet("Bob");  # ==> "Hello Bob, I am Alice."
+
+Now the Person class has a "from_string" method, and anywhere the Person
+type constraint is used, a string will now be accepted and "upgraded" to
+a Person object via that method.
+
+An alternative technique would be to use a signature that accepted both
+strings and Person objects.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name = "Anonymous";
+      
+      method greet ( Person|Str $friend ) {
+        my $friend_name = is_Str($friend) ? $friend : $friend->name;
+        printf("Hello %s, I am %s.\n", $friend_name, $self->name);
+      }
+    }
+  }
+  
+  my $alice = MyApp->new_person(name => "Alice");
+  
+  $alice->greet("Bob");  # ==> "Hello Bob, I am Alice."
+
+=head2 Optimization
+
+Adding C<< :optimize >> to a method instructs Zydeco to perform additional
+optimizations at compile-time to improve its run-time speed.
+
+  method foobar :optimize ( $foo, $bar ) {
+    ...;
+  }
+
+In optimized methods you cannot close over variables.
+
+=head1 KEYWORDS
+
+In this chapter, we looked at the following keywords:
+
+=over
+
+=item C<< method >>
+
+=item C<< requires >>
+
+=item C<< type_name >>
+
+=item C<< coerce >>
+
+=back
+
+=head1 TODO
+
+This page should probably detail C<overload>.
+
+=head1 NEXT STEPS
+
+This chapter covered some very big topics; methods, signatures, and type
+constraints and coercions. Signatures and types will be used quite a lot
+in the next three chapters as well.
+
+=over
+
+=item *
+
+L<Zydeco::Manual::04_Factories> - Factories to help your objects make other objects
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

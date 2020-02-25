@@ -11,6 +11,9 @@ use Encode;
 use Net::IDN::Punycode qw( :all );
 use utf8;
 
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
 my $help;
 my $do_strip;
 my $do_strip_more;
@@ -39,8 +42,8 @@ GetOptions(
     'return_all|A'     => \$return_all,
 ) or die;
 
-if ($help || !@ARGV) {
-    print <<EOM;
+if ( $help || !@ARGV ) {
+    print q{
 Usage:	$0 [ -s ] [ -c ] [ -d ] [ -T <timeout> ] [ -a <src_ip> ] [ -t ] [ -F | -L | -A ] <domain> [ <server> ]
 
 Switches:
@@ -53,7 +56,7 @@ Switches:
 -F	returns results of the first query of recursive whois requests
 -L	returns results of the last query of recursive whois requests (the default)
 -A	returns results of the all queries of recursive whois requests
-EOM
+};
     exit;
 }
 
@@ -61,10 +64,10 @@ $Net::Whois::Raw::DEBUG      = $debug;
 $Net::Whois::Raw::OMIT_MSG   = $do_strip     ? 1 : 0;
 $Net::Whois::Raw::CHECK_FAIL = $do_checkfail ? 1 : 0;
 $Net::Whois::Raw::TIMEOUT    = $timeout;
-@Net::Whois::Raw::SRC_IPS    = @source_addresses if @source_addresses;
+@Net::Whois::Raw::SRC_IPS    = @source_addresses  if @source_addresses;
 
-if ($enable_caching) {
-    if ($^O eq 'MSWin32') {
+if ( $enable_caching ) {
+    if ( $^O eq 'MSWin32' ) {
         $Net::Whois::Raw::CACHE_DIR = $ENV{TEMP} || "C:\\temp";
     }
     else {
@@ -77,54 +80,56 @@ else {
 
 my ( $input_cp, $output_cp ) = detect_encodings();
 
-my $dom = $ARGV[0];
-my $server = $ARGV[1];
+my ( $query, $server ) = @ARGV;
 
-$dom = prepare_domain($dom, $input_cp);
+$query = decode_query( $query, $input_cp );
 
-unless (validate_domain($dom)) {
-    print encode_output("\nIncorrect domain name:\n$dom\n", $output_cp);
+# Split domain name and optional part prepended by '?' character.
+my ( $dname, $options ) = split /[?]/, $query;
+
+unless ( validate_domain_name( $dname ) ) {
+    print encode_output( "\nIncorrect dname:\n$dname\n", $output_cp );
     exit -1;
 }
 
-$dom = to_punycode($dom);
+$query = to_punycode( $dname );
+
+$query .= '?' . $options  if defined $options;
+
+my ( $result, $result_server );
+my $which_whois =
+    $return_first ? 'QRY_FIRST' :
+    $return_all   ? 'QRY_ALL'   : 'QRY_LAST';
 
 eval {
-    my ($result, $result_server);
-    my $which_whois =
-        $return_first ? 'QRY_FIRST' :
-        $return_all   ? 'QRY_ALL'   : 'QRY_LAST';
+    ( $result, $result_server ) = Net::Whois::Raw::get_whois( $query, $server, $which_whois );
 
-    ($result, $result_server) =
-        Net::Whois::Raw::get_whois( $dom, $server, $which_whois );
-
-    if ($result and ref $result eq 'ARRAY') {
-        make_output($_->{text}, $_->{srv}, $output_cp) for @{$result};
-    }
-    elsif ($result) {
-        make_output($result, $result_server, $output_cp);
-    }
-    else {
-        print STDERR "Failed.\n";
-    }
-};
-
-if ($@) {
+    1;
+} or do {
     my $err = $@;
 
     $err =~ s/\s+at \S+ line \d+\.$//;
     print "\nWhois information could not be fetched:\n$err\n";
     exit -1;
+};
+
+if ( $result && ref $result eq 'ARRAY' ) {
+    make_output( $_->{text}, $_->{srv}, $output_cp ) for @$result;
+}
+elsif ( $result ) {
+    make_output( $result, $result_server, $output_cp );
+}
+else {
+    print STDERR "Failed.\n";
 }
 
 # Prepare and print output
 sub make_output {
-    my ($result, $server, $cp) = @_;
+    my ( $result, $server, $cp ) = @_;
 
     $result = encode_output( $result, $cp );
 
-    print "[$server]\n";
-    print $result, "\n";
+    print "[$server]\n", $result, "\n";
 }
 
 # Encode output
@@ -146,22 +151,28 @@ sub detect_encodings {
     my ( $input_cp, $output_cp );
 
     if ( $^O =~ /Win/ ) {
+
         # Read encoding from registry
         require Win32API::Registry;
         Win32API::Registry->import( qw( :ALL ) );
 
         my ( $key, $type, $data );
         RegOpenKeyEx( HKEY_LOCAL_MACHINE(), 'SYSTEM\\CurrentControlSet\\Control\\Nls\\CodePage', 0, KEY_READ(), $key )
-            or die "Can't read system encodings from registry: ".regLastError();
+            or die "Can't read system encodings from registry: " . regLastError();
+
         RegQueryValueEx( $key, 'ACP', [], $type, $data, [] )
-            or die "Can't read system encodings from registry: ".regLastError();
-        $input_cp = 'cp'.$data;
+            or die "Can't read system encodings from registry: " . regLastError();
+        $input_cp = 'cp' . $data;
+
         RegQueryValueEx( $key, 'OEMCP', [], $type, $data, [] )
-            or die "Can't read system encodings from registry: ".regLastError();
-        $output_cp = 'cp'.$data;
-    } else {
+            or die "Can't read system encodings from registry: " . regLastError();
+
+        $output_cp = 'cp' . $data;
+    }
+    else {
         # Read encoding from environment
         my $cp = $ENV{LANG};
+
         if ( $cp ) {
             $cp =~ s/^[a-z]{2}_[A-Z]{2}[.]//;
         }
@@ -175,55 +186,45 @@ sub detect_encodings {
     return $input_cp, $output_cp;
 }
 
-# Prepare domain name
-sub prepare_domain {
-    my ($dom, $input_cp) = @_;
+sub decode_query {
+    my ( $query, $input_cp ) = @_;
 
-    # Decode command-line input
-    $dom = decode($input_cp, $dom);
+    $query = decode( $input_cp, $query );
 
     # Lowercase latin and cyrillic characters
-    $dom =~ tr/A-ZА-ЯЁ\xAA\xA5\xB2\xAF/a-zа-яё\xBA\xB4\xB3\xBF/;
+    $query =~ tr/A-ZА-ЯЁ\xAA\xA5\xB2\xAF/a-zа-яё\xBA\xB4\xB3\xBF/;
 
-    return $dom;
+    return $query;
 }
 
 # Decode domain name to punycode if needed
 sub to_punycode {
-    my ($dom) = @_;
+    my ( $dname ) = @_;
 
-    unless ($dom =~ /^[a-z0-9.\-]*$/) {
-        # Convert to Punycode
-        my @parts;
-        foreach my $part (split /\./, $dom) {
-            $part = 'xn--'.Net::IDN::Punycode::encode_punycode( $part )
-                unless $part =~ /^[a-z0-9.-]*$/;
-            push @parts, $part;
-        }
-        $dom = join('.', @parts);
-    }
+    return $dname  if $dname =~ /^[a-z0-9.\-]*$/;
 
-    return $dom;
+    return join '.', 
+           map { /^[a-z0-9.-]*$/ ? $_ : 'xn--' . Net::IDN::Punycode::encode_punycode( $_ ) }
+           split /[.]/, $dname;
 }
 
-# Validate domain name
-sub validate_domain {
-    my ($dom) = @_;
+sub validate_domain_name {
+    my ( $dname ) = @_;
 
-    return 0 unless $dom;
+    return 0  unless $dname;
 
-    $dom =~ /(.+?)\.([^.]+)$/;
-    my ($name, $tld) = ($1, $2);
+    $dname =~ /(.+?)\.([^.]+)$/;
+    my ( $name, $tld ) = ( $1, $2 );
 
     # query with tld only
-    return 1 unless $name;
+    return 1  unless $name;
 
-    return 0 if $name =~ /^-/;
-    return 0 if $name =~ /-$/;
-    return 0 if $name =~ /^..--/ && $dom !~ /^xn--/;
+    return 0  if $name =~ /^-/;
+    return 0  if $name =~ /-$/;
+    return 0  if $name =~ /^..--/ && $dname !~ /^xn--/;
 
     # Only latin and cyrillic characters allowed now
-    # return 0 if $dom =~ m/[^-a-z0-9\.ёа-я\xAA\xBA\xB4\xB2\xB3\xAF\xBF\xA1\xA2]/;
+    # return 0 if $dname =~ m/[^-a-z0-9\.ёа-я\xAA\xBA\xB4\xB2\xB3\xAF\xBF\xA1\xA2]/;
 
     return 1;
 }
@@ -240,7 +241,7 @@ phwois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99026
+version 2.99027
 
 =head1 SYNOPSIS
 
@@ -275,8 +276,9 @@ pwhois   - Perl written whois client
 =head1 AUTHORS
 
 Ariel Brosh B<schop@cpan.org>
+Walery Studennikov B<despair@cpan.org>
 
-Current Maintainer: Walery Studennikov B<despair@cpan.org>
+Current Maintainer: Alexander Nalobin B<nalobin@cpan.org>
 
 =head1 SEE ALSO
 
@@ -288,7 +290,7 @@ Alexander Nalobin <alexander@nalobin.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2002-2019 by Alexander Nalobin.
+This software is copyright (c) 2002-2020 by Alexander Nalobin.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

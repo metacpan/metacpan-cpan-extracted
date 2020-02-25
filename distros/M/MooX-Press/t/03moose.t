@@ -61,7 +61,7 @@ sub does_ok {
 					'name!'  => Str,
 					'colour',
 					'age'    => Num,
-					'status' => { enum => ['alive', 'dead'], default => 'alive' },
+					'status' => { enum => ['alive', 'dead'], default => 'alive', is => 'rw' },
 				],
 				coerce => [
 					Str, 'from_name' => sub {

@@ -28,6 +28,17 @@ sub new {
 }
 
 
+sub __parse_plain {
+    my ( $sf, $sql, $fh ) = @_;
+    my $rows_of_cols = [];
+    my $file_fs = $sf->{i}{f_plain};
+    require Text::CSV;
+    $rows_of_cols = Text::CSV::csv( in => $file_fs ) or die Text::CSV->error_diag;
+    $sql->{insert_into_args} = $rows_of_cols;
+    return 1;
+}
+
+
 sub __parse_with_Text_CSV {
     my ( $sf, $sql, $fh ) = @_;
     my $waiting = 'Parsing file ... ';
@@ -278,7 +289,6 @@ sub __parse_with_Spreadsheet_Read {
         );
         return;
     }
-    $sf->{i}{S_R}{$file_fs}{old_idx} //= 0;
     my $sheet_idx;
     if ( $sheet_count == 1 ) {
         $sheet_idx = 1;
@@ -287,23 +297,30 @@ sub __parse_with_Spreadsheet_Read {
         my @sheets = map { '- ' . ( length $book->[$_]{label} ? $book->[$_]{label} : 'sheet_' . $_ ) } 1 .. $#$book;
         my @pre = ( undef );
         my $choices = [ @pre, @sheets ];
-        # Choose
-        my $idx = $tc->choose(
-            $choices,
-            { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $sf->{i}{S_R}{$file_fs}{old_idx},
-              undef => '  <=' }
-        );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
-            return;
-        }
-        if ( $sf->{o}{G}{menu_memory} ) {
-            if ( $sf->{i}{S_R}{$file_fs}{old_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
-                $sf->{i}{S_R}{$file_fs}{old_idx} = 0;
-                return 1;
+        my $old_idx = $sf->{i}{S_R}{$file_fs}{old_idx} // 0;
+
+        SHEET: while ( 1 ) {
+            # Choose
+            my $idx = $tc->choose(
+                $choices,
+                { %{$sf->{i}{lyt_v}}, prompt => 'Choose a sheet', index => 1, default => $old_idx,
+                undef => '  <=' }
+            );
+            if ( ! defined $idx || ! defined $choices->[$idx] ) {
+                return;
             }
-            $sf->{i}{S_R}{$file_fs}{old_idx} = $idx;
+            if ( $sf->{o}{G}{menu_memory} ) {
+                if ( $sf->{i}{S_R}{$file_fs}{old_idx} == $idx && ! $ENV{TC_RESET_AUTO_UP} ) {
+                    $old_idx = 0;
+                    next SHEET;
+                }
+                $old_idx = $idx;
+                $sf->{i}{S_R}{$file_fs}{old_idx} = $idx;
+                # save the last active user chosen idx as the old_idx and not the auto-jumped idx (0)
+            }
+            $sheet_idx = $idx - @pre + 1;
+            last SHEET;
         }
-        $sheet_idx = $idx - @pre + 1;
     }
     if ( $book->[$sheet_idx]{maxrow} == 0 ) {
         my $sheet = length $book->[$sheet_idx]{label} ? $book->[$sheet_idx]{label} : 'sheet_' . $_;

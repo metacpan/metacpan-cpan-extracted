@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.3.0
+version v0.3.1
 
 # SYNOPSIS
 
@@ -81,7 +81,7 @@ the alias:
 my $css = HTML::DeferableCSS->new(
   aliases => {
       reset => 1,
-      gone  => 0,       # using "gone" will throw an error
+      gone  => 0,       # "gone" will be silently ignored
       one   => "1.css", #
   }
   ...
@@ -97,6 +97,15 @@ my $css = HTML::DeferableCSS->new(
   ...
 );
 ```
+
+If an alias is disabled, then it will simply be ignored, e.g.
+
+```
+$css->deferred_link_html('gone')
+```
+
+Returns an empty string.  This allows you to disable a stylesheet in
+your configuration without having to remove all references to it.
 
 Absolute paths cannot be used.
 

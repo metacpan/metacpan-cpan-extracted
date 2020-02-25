@@ -5,7 +5,7 @@ package Chart::GGPlot::Coord::Flip;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 extends qw(Chart::GGPlot::Coord::Cartesian); 
 
@@ -56,7 +56,7 @@ Chart::GGPlot::Coord::Flip - Cartesian coordinates with x and y flipped
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.0.2';
+$App::gimpgitbuild::Command::build::VERSION = '0.4.0';
 use strict;
 use warnings;
 use 5.014;
@@ -7,6 +7,8 @@ use 5.014;
 use App::gimpgitbuild -command;
 
 use Path::Tiny qw/ path tempdir tempfile cwd /;
+
+use App::gimpgitbuild::API::GitBuild ();
 
 sub description
 {
@@ -76,30 +78,24 @@ sub execute
     my $output_fn = $opt->{output};
     my $exe       = $opt->{exec} // [];
 
-    my $fh = \*STDIN;
+    my $fh  = \*STDIN;
+    my $obj = App::gimpgitbuild::API::GitBuild->new;
 
-    my $HOME      = $ENV{HOME};
-    my $gegl_p    = "$HOME/apps/graphics/gegl";
-    my $babl_p    = "$HOME/apps/graphics/babl";
-    my $mypaint_p = "$HOME/apps/graphics/libmypaint";
-    $ENV{PATH}            = "$gegl_p/bin:$ENV{PATH}";
-    $ENV{PKG_CONFIG_PATH} = join(
-        ":",
-        (
-            map {
-                my $p = $_;
-                map { "$p/$_/pkgconfig" } qw# share lib64 lib  #
-            } ( $babl_p, $gegl_p, $mypaint_p )
-        ),
-        ( $ENV{PKG_CONFIG_PATH} // '' )
-    );
-    $ENV{XDG_DATA_DIRS} =
-"$gegl_p/share:$mypaint_p/share:$mypaint_p/share/pkgconfig:$babl_p/share:$ENV{XDG_DATA_DIRS}";
+    my $HOME             = $obj->home_dir;
+    my $install_base_dir = $obj->install_base_dir;
+    my $gegl_p           = "$install_base_dir/gegl";
+    my $babl_p           = "$install_base_dir/babl";
+    my $mypaint_p        = "$install_base_dir/libmypaint";
+    my $env              = $obj->new_env;
+    $ENV{PATH}            = $env->{PATH};
+    $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
+    $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
+    my $base_src_dir = $obj->base_git_clones_dir;
 
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
     _git_build(
         {
-            git_co    => "$HOME/Download/unpack/graphics/gimp/babl/git/babl",
+            git_co    => "$base_src_dir/babl/git/babl",
             url       => "$GNOME_GIT/babl",
             prefix    => "$babl_p",
             use_meson => 1,
@@ -107,7 +103,7 @@ sub execute
     );
     _git_build(
         {
-            git_co    => "$HOME/Download/unpack/graphics/gimp/gegl/git/gegl",
+            git_co    => "$base_src_dir/gegl/git/gegl",
             url       => "$GNOME_GIT/gegl",
             prefix    => "$gegl_p",
             use_meson => 1,
@@ -115,8 +111,7 @@ sub execute
     );
     _git_build(
         {
-            git_co =>
-                "$HOME/Download/unpack/graphics/gimp/libmypaint/git/libmypaint",
+            git_co    => "$base_src_dir/libmypaint/git/libmypaint",
             url       => "https://github.com/mypaint/libmypaint.git",
             prefix    => "$mypaint_p",
             use_meson => 0,
@@ -126,8 +121,7 @@ sub execute
     );
     _git_build(
         {
-            git_co =>
-"$HOME/Download/unpack/graphics/gimp/libmypaint/git/mypaint-brushes",
+            git_co    => "$base_src_dir/libmypaint/git/mypaint-brushes",
             url       => "https://github.com/Jehan/mypaint-brushes.git",
             prefix    => "$mypaint_p",
             use_meson => 0,
@@ -135,12 +129,12 @@ sub execute
         }
     );
 
-# autoconf_git_build "$HOME/Download/unpack/graphics/gimp/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
+# autoconf_git_build "$base_src_dir/git/gimp" "$GNOME_GIT"/gimp "$HOME/apps/gimp-devel"
     _git_build(
         {
-            git_co    => "$HOME/Download/unpack/graphics/gimp/git/gimp",
+            git_co    => "$base_src_dir/git/gimp",
             url       => "$GNOME_GIT/gimp",
-            prefix    => "$HOME/apps/gimp-devel",
+            prefix    => $obj->gimp_p,
             use_meson => 1,
         }
     );
@@ -161,7 +155,7 @@ __END__
 
 =head1 VERSION
 
-version 0.0.2
+version 0.4.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

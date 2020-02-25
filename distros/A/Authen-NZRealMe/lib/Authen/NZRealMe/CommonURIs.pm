@@ -1,5 +1,5 @@
 package Authen::NZRealMe::CommonURIs;
-$Authen::NZRealMe::CommonURIs::VERSION = '1.19';
+$Authen::NZRealMe::CommonURIs::VERSION = '1.20';
 use strict;
 use warnings;
 
@@ -119,6 +119,7 @@ Sources for these URIs:
   WS_TRUST    http://docs.oasis-open.org/ws-sx/ws-trust/v1.4/ws-trust.html#_Toc325658925
   WS_SEC      http://docs.oasis-open.org/wss-m/wss/v1.1.1/os/wss-SOAPMessageSecurity-v1.1.1-os.html#_Toc307407921
   WS_SEC2     http://docs.oasis-open.org/wss-m/wss/v1.1.1/os/wss-SOAPMessageSecurity-v1.1.1-os.html#_Toc307407949
+  XENC        https://www.w3.org/TR/xmlenc-core1/
   RM_LOGIN    https://developers.realme.govt.nz/how-realme-works/
   RM_ASSERT   https://developers.realme.govt.nz/how-realme-works/
   RM_ICMS     RealMe iCMS docs
@@ -152,6 +153,28 @@ Exclusive XML Canonicalization 1.0 (omit comments) transform.  Source: [DSIG_ALG
 =item ec14n_wc => http://www.w3.org/2001/10/xml-exc-c14n#WithComments
 
 Exclusive XML Canonicalization 1.0 (with comments) transform.  Source: [DSIG_ALG].
+
+=item xenc => http://www.w3.org/2001/04/xmlenc#
+
+XML Encryption Syntax and Processing.  Source: [XENC].
+
+=item xenc_type_element => http://www.w3.org/2001/04/xmlenc#Element
+
+URI indicating that the encrypted data represents an element.  Source: [XENC].
+
+=item xenc_rsa15 => http://www.w3.org/2001/04/xmlenc#rsa-1_5
+
+URI for XML Encryption block encryption algorithm "RSAES-PKCS1-v1_5".  Source:
+[XENC].
+
+=item xenc_aes128cbc => http://www.w3.org/2001/04/xmlenc#aes128-cbc
+
+URI for XML Encryption block encryption algorithm "AES128-CBC".  Source: [XENC].
+
+=item rsa_1_5 => http://www.w3.org/2001/04/xmlenc#rsa-1_5
+
+URI for XML Encryption key transport encryption algorithm "RSA Version 1.5".
+Source: [XENC].
 
 =item sha1 => http://www.w3.org/2000/09/xmldsig#sha1
 
@@ -245,6 +268,14 @@ Namespace used for SAML 2.0 protocol elements.  Source [SAML2].
 
 Identifier type used for SAML 2.0 binding type references.  Source [SAML2].
 
+=item saml_binding_artifact => urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact
+
+Indentifier type used for SAML 2.0 HTTP-Artifact binding.  Source [SAML2].
+
+=item saml_binding_post => urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+
+Indentifier type used for SAML 2.0 HTTP-POST binding.  Source [SAML2].
+
 =item saml_success => urn:oasis:names:tc:SAML:2.0:status:Success
 
 Identifier type used for SAML 2.0 response success status references.  Source
@@ -263,6 +294,11 @@ references.  Source [SAML2].
 =item rm_timeout => urn:nzl:govt:ict:stds:authn:deployment:RealMe:SAML:2.0:status:Timeout
 
 Identifier type used by RealMe for SAML 2.0 response timeout status references.
+Source [RM_LOGIN].
+
+=item gls_timeout => urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:status:Timeout
+
+Identifier type used by GLS for SAML 2.0 response timeout status references.
 Source [RM_LOGIN].
 
 =item xpil => urn:oasis:names:tc:ciq:xpil:3

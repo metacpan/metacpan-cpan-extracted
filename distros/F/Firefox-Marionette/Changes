@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.94  Tue Feb 25 17:09:00 2020
+       Fix a profile bug preventing remote downloads.
+
 0.93  Sun Feb 23 20:22:00 2020
        Allow install method to package source code directories.
 

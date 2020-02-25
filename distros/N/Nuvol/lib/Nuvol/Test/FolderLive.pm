@@ -10,7 +10,7 @@ use Nuvol::Test::Roles qw|:folder :metadata|;
 use Nuvol::Test::DriveLive ':build';
 use Test::More;
 
-my $testfolder = 'Nuvol Testfolder';
+my $testfolder = '/Nuvol Testfolder/';
 
 sub build_test_folder ($service) {
   note "Create test folder for $service";
@@ -18,13 +18,13 @@ sub build_test_folder ($service) {
   ok my $drive = build_test_drive($service), 'Create test drive';
 
   note 'Cleanup';
-  ok my $old_folder = $drive->item("$testfolder/"), "Look for old '$testfolder'";
+  ok my $old_folder = $drive->item($testfolder), "Look for old '$testfolder'";
   if ($old_folder->exists) {
     is $old_folder->remove, $old_folder, "Remove '$testfolder'";
   }
 
   note 'Create folder';
-  ok my $folder = $drive->item("$testfolder/"), 'Get test folder';
+  ok my $folder = $drive->item($testfolder), 'Get test folder';
   isa_ok $folder, 'Nuvol::Item';
   test_folder_applied $folder, $service; 
 
@@ -35,14 +35,14 @@ sub test_basics ($folder, $service) {
   note 'Basics';
 
   test_metadata_methods $folder, $service;
-  test_folder_methods $folder, $service;
 }
 
 sub test_cd ($folder, $service) {
   note 'CD';
 
   is $folder->make_path, $folder, 'Create folder';
-  ok $folder->exists, 'Folder exists';
+  test_folder_methods $folder, $service;
+
   is $folder->remove_tree, $folder, 'Remove folder';
   ok !$folder->exists, 'Folder doesn\'t exist';
 }

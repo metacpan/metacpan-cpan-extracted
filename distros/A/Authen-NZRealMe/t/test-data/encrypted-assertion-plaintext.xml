@@ -1,0 +1,42 @@
+<samlp:Response
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        ID="s2fc7571f69a1e731b0f03f80d394ab340432918dc"
+        InResponseTo="b8b06432d1578d26828f429d03eee1b63a460e58f"
+        Version="2.0"
+        IssueInstant="2020-01-21T09:15:35Z"
+        Destination="https://www.example.govt.nz/app/sample/login-acs">
+    <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://test.fakeme.govt.nz/saml2</saml:Issuer>
+    <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+        <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" Value="urn:oasis:names:tc:SAML:2.0:status:Success"></samlp:StatusCode>
+    </samlp:Status>
+    <saml:EncryptedAssertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"><saml:Assertion
+            xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+            ID="e8d5cceba9d7a33ddcd239df0c358a2c6df326f04"
+            IssueInstant="2020-01-21T09:15:35Z" Version="2.0">
+        <saml:Issuer>https://test.fakeme.govt.nz/saml2</saml:Issuer>
+        <saml:Subject>
+            <saml:NameID
+                Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+                NameQualifier="https://test.fakeme.govt.nz/saml2"
+                SPNameQualifier="https://www.example.govt.nz/app/sample-login"
+            >CHCBD4387DCB7782F1D97B5C4E6A57267B3</saml:NameID>
+            <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+                <saml:SubjectConfirmationData
+                    InResponseTo="28f429d03eeb8b06432d1578d268e1b63a460e58f"
+                    NotOnOrAfter="2020-01-21T09:25:35Z"
+                    Recipient="https://www.example.govt.nz/app/sample/login-acs"
+                />
+            </saml:SubjectConfirmation>
+        </saml:Subject>
+        <saml:Conditions NotBefore="2020-01-21T09:05:35Z" NotOnOrAfter="2020-01-21T09:25:35Z">
+            <saml:AudienceRestriction>
+                <saml:Audience>https://www.example.govt.nz/app/sample-login</saml:Audience>
+            </saml:AudienceRestriction>
+        </saml:Conditions>
+        <saml:AuthnStatement AuthnInstant="2020-01-21T09:05:35Z" SessionIndex="s2eaf1b611941eb721cb879b4bb530dfdfaa358001">
+            <saml:AuthnContext>
+                <saml:AuthnContextClassRef>urn:nzl:govt:ict:stds:authn:deployment:GLS:SAML:2.0:ac:classes:LowStrength</saml:AuthnContextClassRef>
+            </saml:AuthnContext>
+        </saml:AuthnStatement>
+    </saml:Assertion></saml:EncryptedAssertion>
+</samlp:Response>

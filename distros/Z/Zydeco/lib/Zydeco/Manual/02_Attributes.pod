@@ -1,0 +1,433 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual::02_Attributes - Powerful and concise attribute definitions
+
+=head1 SYNOPSIS
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name, age;
+    }
+    
+    class Employee extends Person;
+    
+    class Department {
+      has name;
+      has manager;
+    }
+  }
+  
+  my $rd = MyApp->new_department(
+    name     => "Research & Development",
+    manager  => MyApp->new_person(name => "Bob"),
+  );
+
+=head1 MANUAL
+
+Objects store their data in attributes. Attributes in Perl are a slightly
+fuzzy concept, consisting of three interlinked components:
+
+=over
+
+=item *
+
+A slot to store per-object data.
+
+=item *
+
+Optionally, a parameter passed when instantiating the object to set the
+initial value for the data.
+
+=item *
+
+Optionally, methods to call to get/set the value of the data.
+
+=back
+
+=head2 Declaring a Basic Attribute
+
+To declare an attribute, use the C<has> keyword.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name ( is => rw );
+    }
+  }
+
+This creates a slot for the person's name. When you instantiate a Person
+object, you can pass in the name:
+
+  my $bob = MyApp->new_person( name => "Robert" );
+
+The Person object will have a method called C<name> allowing you to get the
+person's name:
+
+  say $bob->name();
+
+If passed a parameter, it will set a new name for the person:
+
+  $bob->name( "Bobby" );
+
+In the above example, the slot, the parameter, and the accessor method all
+are all called "name". But it's possible to give the parameter and accessor
+method different names.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name ( init_arg => "moniker", accessor => "fullname" );
+    }
+  }
+  
+  my $bob = MyApp->new_person( moniker => "Robert Jones" );
+  
+  say $bob->fullname();
+
+It's possible to declare different method names for the getter and setter
+methods:
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name (
+        init_arg => "moniker",
+        reader   => "get_fullname",
+        writer   => "set_fullname",
+      );
+    }
+  }
+  
+  my $bob = MyApp->new_person();
+  $bob->set_fullname( "Robert Jones" );
+  say $bob->get_fullname();
+
+The C<is> option provides shortcuts for C<init_arg>, C<accessor>, C<reader>,
+and C<writer>.
+
+  # init_arg => "foo",  accessor => "foo"
+  has foo ( is => rw );
+
+  # init_arg => "foo",  reader => "foo"
+  has foo ( is => ro );
+
+  # init_arg => "foo",  reader => "foo", writer => "_set_foo"
+  has foo ( is => rwp );
+
+  # init_arg => "foo",
+  has foo ( is => bare );
+
+  # no init_arg or accessor methods created!
+  has foo ( is => private );
+
+Zydeco defaults to C<< is => ro >>. Making attributes read-only can save many
+headaches.
+
+=head2 Required Attributes
+
+An attribute may be marked as required using an exclamation mark.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name!;
+    }
+  }
+
+This is a shorthand for the longer:
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name ( required => true );
+    }
+  }
+
+When multiple attributes are declared with a single C<has> keyword, the
+specification in parentheses applies to them all.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      # name and age are both required
+      has name, age ( required => true );
+    }
+  }
+
+Using the exclamation mark allows you to declare a mixture of required and
+non-required attributes with a single C<has> statement.
+
+If an attribute is required, then you must provide a value for it when
+instantiating the object. This does not mean that the data cannot be cleared
+later.
+
+=head2 Predicates and Clearers
+
+As well as getter/setter accessors, it's possible to create predicate and
+clearer accessors.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name (
+        reader    => "get_name",
+        writer    => "set_name",
+        predicate => "has_name",
+        clearer   => "clear_name",
+      );
+    }
+  }
+
+If C<< $bob->clear_name >> is called, C<< $bob->get_name >> will no longer
+have a name, and C<< $bob->get_name >> will return C<undef>.
+
+There is a difference between:
+
+  $bob->clear_name;
+  $bob->set_name( undef );
+
+In the second case, C<< $bob >> still has a name, even if that name is an
+undefined value. C<< $bob->get_name >> will return C<undef> for both, but
+C<< $bob->has_name >> will return true in the second case.
+
+As implied earlier, with a C<clearer>, even a required attribute's value can
+be cleared.
+
+Zydeco offers shortcuts C<< clearer => true >> and C<< predicate => true >>
+to use default names for clearer and predicate methods. These are just the
+same as the attribute name, but with "clear_" and "has_" prefixed.
+
+=head2 Defaults and Builders
+
+It is possible to set a default value for an attribute.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name ( is => rw ) = "Anonymous";
+    }
+  }
+  
+  my $bob = MyApp->new_person;
+  say $bob->name;             # ==> Anonymous
+  $bob->name( "Robert" );
+  say $bob->name;             # ==> Bob
+
+There are two main styles of defaults: eager and lazy. Eager defaults will
+be applied when the object is instantiated. Lazy defaults will be applied
+when the attribute is first read.
+
+If an attribute is cleared with the clearer, a lazy default will be applied
+again next time it is read, but an eager default will not.
+
+Predicates (like C<has_name>) will return false for a lazy attribute if the
+default has not been applied yet.
+
+Zydeco allows defaults to be given in a variety of ways. The basic way is
+to set a C<default> option in the attribute specification. This only works
+for non-reference values (undef, numbers, and strings).
+
+  class Person {
+    has name (
+      is      => rw,
+      default => "Anonymous",
+    );
+  }
+
+For more complex values, that needs to be wrapped in a coderef.
+
+  class Person {
+    has name_parts (
+      is      => rw,
+      default => sub { return ["Joe", "Anonymous"] },
+    );
+  }
+
+A common pattern is to use one attribute to help set the default for another.
+
+  class Person {
+    has name! ( is => rw );
+    has name_parts (
+      is      => rw,
+      lazy    => true,
+      default => sub {
+        my $self = shift;
+        return [ split / /, $self->name ];
+      },
+    );
+  }
+
+Note that during object instatiation, there is no guaranteed order which
+attributes will be processed, so to prevent C<name_parts>'s default from
+being processed before C<name> is ready, it is made lazy.
+
+As a shortcut, Zydeco allows defaults to be given using an equals sign.
+
+  class Person {
+    has name!;
+    has name_parts = [split / /, $self->name];
+  }
+
+In this case, Zydeco will automatically decide whether your default needs
+to be lazy, and if usually correct in its choice, however you can override
+it.
+
+  class Person {
+    has name!;
+    has name_parts ( lazy => false ) = [split / /, $self->name];
+  }
+
+A common pattern is to use a method call to build the default:
+
+  class Person {
+    has name!;
+    has name_parts = $self->_build_name_parts;
+    
+    method _build_name_parts {
+      return [ split / /, $self->name ];
+    }
+  }
+
+This pattern is useful because a subclass of "Person" can override the
+"_build_name_parts" method easily.
+
+Because this pattern is useful, there's a shortcut for it:
+
+  class Person {
+    has name!;
+    has name_parts ( builder => "_build_name_parts", lazy => true );
+    method _build_name_parts { ... }
+  }
+
+Or if you are happy to rely on the default name (prefix "_build_"):
+
+  class Person {
+    has name!;
+    has name_parts ( builder => true, lazy => true );
+    method _build_name_parts { ... }
+  }
+
+Or even just:
+
+  class Person {
+    has name!;
+    has name_parts ( is => lazy );
+    method _build_name_parts { ... }
+  }
+
+=head2 Triggers
+
+Notice that in the above examples, "name_parts" is built from "name".
+If the person's name is changed, their name_parts are no longer correct.
+We can fix this using a trigger on "name". A trigger is a coderef that
+gets called when the value of an attribute is set.
+
+  class Person {
+    has name (
+      is       => rw,
+      required => true,
+      trigger  => sub {
+        my $self = shift;
+        $self->clear_name_parts;
+      }
+    );
+    
+    has name_parts ( is => lazy, clearer => true );
+    
+    method _build_name_parts {
+      return [ split / /, $self->name ];
+    }
+  }
+
+You can use a method for a trigger.
+
+  class Person {
+    has name (
+      is       => rw,
+      required => true,
+      trigger  => "_trigger_name"
+    );
+    
+    has name_parts ( is => lazy, clearer => true );
+    
+    method _trigger_name {
+      $self->clear_name_parts;
+    }
+    
+    method _build_name_parts {
+      return [ split / /, $self->name ];
+    }
+  }
+
+The C<< trigger => true >> shortcut works if you're happy to rely on the
+default method name for a trigger. (Prefix "_trigger_".)
+
+=head2 Attributes in Roles
+
+It is worth mentioning that roles can have attributes too.
+
+  role Nameable {
+    has name ( is => lazy );
+  }
+  
+  class Person with Nameable {
+    method _build_name {
+      return "Anonymous";
+    }
+  }
+
+=head1 KEYWORDS
+
+In this chapter, we looked at the following keywords:
+
+=over
+
+=item C<< has >>
+
+=back
+
+=head1 NEXT STEPS
+
+We have already introduced a few methods into our classes as builders
+and triggers. In the next chapter we dive further into adding
+methods to give our objects behaviours.
+
+=over
+
+=item *
+
+L<Zydeco::Manual::03_MethodsSignaturesTypesCoercion> - Methods with signatures, type constraints, and coercion
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

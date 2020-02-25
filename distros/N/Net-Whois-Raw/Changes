@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99027  Feb 24 2020 Alexander Nalobin
+    - pwhois script refactoring
+    - Can pass arbitrary query part to pwhois script
+
 2.99026  Oct 25 2019 Alexander Nalobin
     - Change whois.rightside.co whois server to whois.donuts.co
 

@@ -1,0 +1,262 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Zydeco::Manual::05_Multimethods - multi methods
+
+=head1 SYNOPSIS
+
+  package MyApp {
+    use Zydeco;
+     
+    class JSON::Encoder {
+      multi method stringify (Undef $value) {
+        'null';
+      }
+      multi method stringify (ScalarRef[Bool] $value) {
+        $$value ? 'true' : 'false';
+      }
+      multi method stringify (Num $value) {
+        $value;
+      }
+      multi method stringify :alias(quote_str) (Str $value)  {
+        sprintf(q<"%s">, quotemeta $value);
+      }
+      multi method stringify (ArrayRef $arr) {
+        sprintf(
+          q<[%s]>,
+          join(q<,>, map($self->stringify($_), @$arr))
+        );
+      }
+      multi method stringify (HashRef $hash) {
+        sprintf(
+          q<{%s}>,
+          join(
+            q<,>,
+            map sprintf(
+              q<%s:%s>,
+              $self->quote_str($_),
+              $self->stringify($hash->{$_}),
+            ), sort keys %$hash
+          ),
+        );
+      }
+    }
+  }
+
+=head1 MANUAL
+
+It is pretty common within a method to accept two different kinds of inputs
+and process them in different ways depending on their type.
+
+  method foobar ( Str|ArrayRef $x ) {
+    if (is_Str $x) {
+      ...;
+    }
+    else {
+      ...;
+    }
+  }
+
+The C<< multi method >> keyword can make this a little more concise and
+readable.
+
+  multi method foobar ( Str $x ) {
+    ...;
+  }
+  
+  multi method foobar ( ArrayRef $x ) {
+    ...;
+  }
+
+Multimethods can have different numbers of arguments, named arguments,
+etc.
+
+  multi method print_name () {
+    print $self->name, "\n";
+  }
+  
+  multi method print_name ( FileHandle $fh ) {
+    print {$fh} $self->name, "\n";
+  }
+  
+  multi method print_name ( Str $format, $fh= \*STDOUT ) {
+    printf {$arg->fh} $format, $self->name;
+  }
+  
+  $person->print_name;
+  $person->print_name( \*STDERR );
+  $person->print_name( format => "NAME: %\n" );
+
+=head2 Multimethods and Inheritance
+
+It is possible for child classes to add additional "candidates" to a
+multimethod.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Foo {
+      multi method foobar ( Str $x ) {
+        ...;
+      }
+    }
+    
+    class Bar extends Foo {
+      multi method foobar ( ArrayRef $x ) {
+        ...;
+      }
+    }
+  }
+
+The method "foobar" on objects of the "Foo" class will only accept strings.
+Calling it on a "Bar" object will allow arrayrefs or strings.
+
+=head2 Multimethods and Roles
+
+Multimethods can be defined in roles and will compose together into the
+classes that consume them.
+
+  package MyApp {
+    use Zydeco;
+    
+    role Foo {
+      multi method foobar ( Str $x ) {
+        ...;
+      }
+    }
+    
+    role Bar {
+      multi method foobar ( HashRef $x ) {
+        ...;
+      }
+      multi method foobar ( ArrayRef $x ) {
+        ...;
+      }
+    }
+    
+    class Foo::Bar with Foo, Bar {
+      multi method foobar ( ArrayRef $x ) {
+        ...;
+      }
+    }
+  }
+
+The "foobar" method in "Foo::Bar" will accept strings, arrayrefs, and
+hashrefs. Its own implementation for arrayrefs will override the one
+found in the "Bar" role.
+
+=head2 Multimethod Candidate Selection
+
+Sometimes multiple candidates will match the given parameters.
+
+  multi method foobar ( Num $x ) {
+    ...;
+  }
+  
+  multi method foobar ( Int $x ) {
+    ...;
+  }
+  
+  $object->foobar(123);
+
+The number 123 is both an integer and a number, so which one "wins"?
+C<< Int >> wins because it's a more specific type constraint.
+
+In general:
+
+=over
+
+=item *
+
+More specific type constraints beat more general type constraints.
+
+=item *
+
+Candidates in subclasses beat candidates inherited from parent classes.
+
+=item *
+
+Candidates defined directly in a class beat those imported from roles.
+
+=item *
+
+Candidates declared earlier beat candidates declared later.
+
+=back
+
+For all the gory details, see L<Sub::MultiMethod>.
+
+=head2 Multi... Factories?
+
+There is no C<< multi factory >>, but you can use proxying to achieve
+the same effect.
+
+  package MyApp {
+    use Zydeco;
+    
+    class Person {
+      has name, age;
+      
+      multi method _new_person ( Str $name ) {
+        $class->new( name => $name );
+      }
+      
+      multi method _new_person ( Str $name, Num $age ) {
+        $class->new( name => $name, age => $age );
+      }
+      
+      multi method _new_person ( HashRef $args ) {
+        $class->new( %$args );
+      }
+      
+      factory new_person via _new_person;
+    }
+  }
+  
+  my $alice  = MyApp->new_person("Alice");
+  my $bob    = MyApp->new_person("Bob", 49);
+  my $carol  = MyApp->new_person({ name => "Carol" });
+
+=head1 KEYWORDS
+
+In this chapter, we looked at the following keyword:
+
+=over
+
+=item C<< multi method >>
+
+=back
+
+=head1 NEXT STEPS
+
+We have looked at three ways to define methods: C<method>, C<factory>, and
+C<< multi method >>. Now let's look at how to modify existing methods.
+
+=over
+
+=item *
+
+L<Zydeco::Manual::06_MethodModifiers> - Method modifiers to easily wrap or override inherited methods
+
+=back
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

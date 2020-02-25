@@ -9,6 +9,7 @@ subtest "inline" => sub {
         aliases  => {
             test  => 'foo',
             reset => 1,
+            ignore => 0,
         },
         inline_max => 512, # ensure reset not inlined
     );
@@ -25,7 +26,7 @@ subtest "inline" => sub {
     is $css->inline_html('test'), "<style>$cdata</style>", "inline";
 
 
-    is $css->link_or_inline_html(qw[test reset]),
+    is $css->link_or_inline_html(qw[test reset ignore]),
         $css->inline_html('test') . $link,
         "link_or_inline";
 
@@ -80,6 +81,7 @@ subtest "inline (0-byte file)" => sub {
         css_root => 't/etc/css',
         aliases  => {
             test => '0.css',
+            ignore => 0,
         },
     );
 
@@ -93,7 +95,7 @@ subtest "inline (0-byte file)" => sub {
         is $css->inline_html('test'), "", "inline";
     } qr/empty file/, 'warning';
 
-    is $css->link_or_inline_html('test'), "", "link_or_inline";
+    is $css->link_or_inline_html('ignore', 'test'), "", "link_or_inline";
 
 };
 

@@ -1,5 +1,5 @@
 package Template::Liquid::Filters;
-our $VERSION = '1.0.16';
+our $VERSION = '1.0.17';
 use strict;
 use warnings;
 
@@ -939,6 +939,7 @@ commonly used to convert comma-separated items from a string to an array.
 
 sub split {
     my ($x, $y) = @_;
+    return [] if !defined $x;
     [split $y, $x];
 }
 

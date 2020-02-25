@@ -19,6 +19,8 @@ sub expect_resolve {
     $_[0]->then(sub {
         1;
     }, sub {
+        diag( 'Expected resolution but got:' );
+        diag explain \@_;
         fail;
     });
 }
@@ -99,7 +101,7 @@ my %tests= (
         expect_reject(rejected->catch("main::fail"));
     },
     finally_with_garbage => sub {
-        expect_resolve(resolved->finally(123));
+        expect_reject(resolved->finally(123));
     },
     pass_value_to_callback => sub {
         expect_resolve(
@@ -374,7 +376,11 @@ my %tests= (
         })->then(sub {
             fail;
         }, sub {
-            is($_[0], 1);
+
+            # Old behavior that threw away finally rejections:
+            # is($_[0], 1);
+
+            like($_[0], qr<\A123 >);
         })
     },
 
@@ -428,7 +434,7 @@ collect(@promises)->then(sub {
     die "Not good";
 })->finally($cv);
 
-is($cv->recv, 1);
+$cv->recv;
 done_testing;
 
 package MyBadCode;

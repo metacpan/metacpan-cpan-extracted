@@ -5,7 +5,7 @@ package Chart::GGPlot::Guides;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use List::AllUtils qw(uniq);
 use Module::Load;
@@ -125,7 +125,7 @@ Chart::GGPlot::Guides - The container of guides
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 METHODS
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Data::Frame;
 use Data::Munge qw(elem);
@@ -251,7 +251,7 @@ Chart::GGPlot::Backend::Plotly::Util - Utilities used by Chart::GGPlot::Backend:
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 FUNCTIONS
 

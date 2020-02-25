@@ -1,5 +1,9 @@
 Revision history for Chart::GGPlot
 
+0.0009      2020-02-24
+  - For plotly backend's show() in browser method, use fluid layout by
+    default. Also allows specifying width and height.
+
 0.0007      2019-09-15
   - Bump Alt::Data::Frame::ButMore requirement, to drop use of
     Moose::Autobox.

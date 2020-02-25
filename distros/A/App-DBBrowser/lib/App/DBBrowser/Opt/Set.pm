@@ -89,15 +89,16 @@ sub _options {
             { name => 'max_rows',                text => "- Max Rows",       section => 'G'      },
         ],
         group_output => [
-            { name => 'min_col_width',       text => "- Colwidth",       section => 'table' },
-            { name => 'progress_bar',        text => "- ProgressBar",    section => 'table' },
-            { name => 'tab_width',           text => "- Tabwidth",       section => 'table' },
-            { name => '_grid',               text => "- Grid",           section => 'table' },
-            { name => '_color',              text => "- Color",          section => 'table' },
-            { name => '_binary_filter',      text => "- Binary filter",  section => 'table' },
-            { name => '_squash_spaces',      text => "- Squash spaces",  section => 'table' },
-            { name => '_set_string',         text => "- Set string",     section => 'table' },
-            { name => '_file_find_warnings', text => "- Warnings",       section => 'G'     },
+            { name => 'min_col_width',       text => "- Colwidth",        section => 'table' },
+            { name => 'progress_bar',        text => "- ProgressBar",     section => 'table' },
+            { name => 'tab_width',           text => "- Tabwidth",        section => 'table' },
+            { name => '_grid',               text => "- Grid",            section => 'table' },
+            { name => '_color',              text => "- Color",           section => 'table' },
+            { name => '_binary_filter',      text => "- Binary filter",   section => 'table' },
+            { name => '_squash_spaces',      text => "- Squash spaces",   section => 'table' },
+            { name => '_show_table_name',    text => "- Show table name", section => 'G'     },
+            { name => '_set_string',         text => "- Set string",      section => 'table' },
+            { name => '_file_find_warnings', text => "- Warnings",        section => 'G'     },
         ],
         group_insert => [
             { name => '_parse_file',        text => "- Parse file",     section => 'insert' },
@@ -389,9 +390,16 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_squash_spaces' ) {
-                my $prompt = '"Remove leading and trailing spaces and squash consecutive spaces"';
+                my $prompt = 'Remove leading and trailing spaces and squash consecutive spaces';
                 my $sub_menu = [
                     [ 'squash_spaces', "- Squash spaces", [ $no, $yes ] ]
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_show_table_name' ) {
+                my $prompt = 'Show the table name in the bottom left corner';
+                my $sub_menu = [
+                    [ 'show_table_name', "- Show the table name", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

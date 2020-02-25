@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Web-Solid-Test-Basic>
 Bug tracker:  <https://github.com/kjetilk/p5-web-solid-test-basic/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.010	2020-02-24	Improve support when using regular expressions
+
+ - Added: Allow for more tests in regexp reuser.
+ - Added: Use regular expression matching for status codes
+
 0.008	2019-11-20	Ensure that IO::Socket::SSL can be used
 
  [ Documentation ]

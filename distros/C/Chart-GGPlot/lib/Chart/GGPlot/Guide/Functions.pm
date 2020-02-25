@@ -4,7 +4,7 @@ package Chart::GGPlot::Guide::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Chart::GGPlot::Guide::Legend;
 
@@ -38,7 +38,7 @@ Chart::GGPlot::Guide::Functions - Function interface for guides
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 FUNCTIONS
 

@@ -20,7 +20,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 
-use if !eval{ require Data::Printer; $Data::Printer::VERSION >= 0.36 },
+use if !eval{ require Data::Printer; $Data::Printer::VERSION ge '0.36' },
 	'Test::More', skip_all => 'need Data::Printer';
 
 use Test::More;

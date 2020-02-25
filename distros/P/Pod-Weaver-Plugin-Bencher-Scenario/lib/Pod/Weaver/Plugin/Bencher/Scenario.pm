@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-10-20'; # DATE
-our $VERSION = '0.244'; # VERSION
+our $DATE = '2019-12-17'; # DATE
+our $VERSION = '0.245'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -401,7 +401,8 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             push @pod, " [".join(", ", @{$p0->{tags}})."]" if $p0->{tags};
             push @pod, "\n\n";
             if ($p0->{summary}) {
-                push @pod, $p0->{summary}, ".\n\n";
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($p0->{summary}), ".\n\n";
             }
             if ($p->{cmdline}) {
                 push @pod, "Command line:\n\n", " $p->{cmdline}\n\n";
@@ -617,7 +618,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.244 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-10-20.
+This document describes version 0.245 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-12-17.
 
 =head1 SYNOPSIS
 
@@ -632,7 +633,7 @@ This plugin is to be used when building C<Bencher::Scenario::*> distribution. It
 can also be used for C<Acme::CPANModules::*> distribution which contain
 benchmarking information. Currently it does the following:
 
-For each C<lib/Bencher/Scenario/*> or C<lib/Acme/CPANModules/*> module files:
+For each C<lib/Bencher/Scenario/*> or C<lib/Acme/CPANModules/*> module file:
 
 =over
 
@@ -663,7 +664,7 @@ alternatives.
 
 =back
 
-For each C<lib/Bencher/Scenarios/*> module files:
+For each C<lib/Bencher/Scenarios/*> module file:
 
 =over
 

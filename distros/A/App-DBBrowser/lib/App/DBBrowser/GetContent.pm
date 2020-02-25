@@ -5,7 +5,6 @@ use warnings;
 use strict;
 use 5.010001;
 
-use List::MoreUtils qw( none );
 use Encode::Locale  qw();
 
 use Term::Choose qw();
@@ -58,7 +57,7 @@ sub __setting_menu_entries {
 
 
 sub get_content {
-    my ( $sf, $sql, $goto_FILTER ) = @_;
+    my ( $sf, $sql, $skip_to ) = @_;
     my $cr = App::DBBrowser::GetContent::Read->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cp = App::DBBrowser::GetContent::Parse->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $cf = App::DBBrowser::GetContent::Filter->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -71,7 +70,7 @@ sub get_content {
     my $old_idx = 1;
 
     MENU: while ( 1 ) {
-        if ( ! $goto_FILTER ) {
+        if ( ! $skip_to ) {
             my $hidden = "Choose type of data source:";
             my @pre = ( $hidden, undef );
             my $choices = [ @pre, map { $_->[1] } @cu ];
@@ -97,20 +96,17 @@ sub get_content {
                 $opt_set->set_options( $sf->__setting_menu_entries( 1 ), $info );
                 next MENU;
             }
-            else {
-                $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
-            }
-            my $stmt_type = 'Insert';
-            push @{$sf->{i}{stmt_types}}, $stmt_type if none { $stmt_type eq $_ } @{$sf->{i}{stmt_types}}; #
+            $sf->{i}{gc}{source_type} = $cu[$idx-@pre][0];
         }
 
         GET_DATA: while ( 1 ) {
             my ( $aoa, $open_mode );
-            if ( ! $goto_FILTER ) {
+            if ( ! $skip_to ) {
                 delete $sf->{i}{ct}{default_table_name};
+                #$sf->{i}{gc}{previous_file_fs} = $sf->{i}{gc}{file_fs} // ''; # DBBrowser.pm 635
                 my $ok;
                 if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
-                    ( $ok, $aoa ) = $cr->from_col_by_col( $sql );
+                    ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_col_by_col( $sql );
                 }
                 elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
                     ( $ok, $sf->{i}{gc}{file_fs} ) = $cr->from_copy_and_paste( $sql );
@@ -122,15 +118,19 @@ sub get_content {
                     next MENU;
                 }
             }
-            my $file_fs = $sf->{i}{gc}{file_fs}; # file_fs # Create table ?
-            if ( ! defined $sf->{i}{S_R}{$file_fs//''}{book} ) {
+            my $file_fs = $sf->{i}{gc}{file_fs};
+            if ( ! defined $sf->{i}{S_R}{$file_fs}{book} ) {
                 delete $sf->{i}{S_R};
             }
 
             PARSE: while ( 1 ) {
-                if ( ! $goto_FILTER ) {
+                if ( ! $skip_to || $skip_to eq 'PARSE' ) {
                     my ( $parse_mode_idx, $open_mode );
-                    if ( $sf->{i}{gc}{source_type} eq 'copy' ) {
+                    if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
+                        $parse_mode_idx = -1;
+                        $open_mode = '<';
+                    }
+                    elsif ( $sf->{i}{gc}{source_type} eq 'copy' ) {
                         $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_copy};
                         $open_mode = '<';
                     }
@@ -139,13 +139,13 @@ sub get_content {
                         $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
                     }
                     $sql->{insert_into_args} = [];
-                    if ( $sf->{i}{gc}{source_type} eq 'plain' ) {
-                        $sql->{insert_into_args} = $aoa;
-                    }
-                    elsif ( $parse_mode_idx < 3 && -T $file_fs ) {
+                    if ( $parse_mode_idx < 3 && -T $file_fs ) {
                         open my $fh, $open_mode, $file_fs or die $!;
                         my $parse_ok;
-                        if ( $parse_mode_idx == 0 ) {
+                        if ( $parse_mode_idx == -1 ) {
+                            $parse_ok = $cp->__parse_plain( $sql, $fh );
+                        }
+                        elsif ( $parse_mode_idx == 0 ) {
                             $parse_ok = $cp->__parse_with_Text_CSV( $sql, $fh );
                         }
                         elsif ( $parse_mode_idx == 1 ) {
@@ -173,10 +173,12 @@ sub get_content {
                         SHEET: while ( 1 ) {
                             my $ok = $cp->__parse_with_Spreadsheet_Read( $sql, $file_fs );
                             if ( ! $ok ) {
+                                $skip_to = '';
                                 next GET_DATA;
                             }
                             if ( ! @{$sql->{insert_into_args}} ) { #
                                 next SHEET if $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2;
+                                $skip_to = '';
                                 next GET_DATA;
                             }
                             last SHEET;
@@ -184,12 +186,14 @@ sub get_content {
                     }
                     $sf->{i}{gc}{bu_insert_into_args} = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
                 }
-                $goto_FILTER = 0;
+                $skip_to = '';
 
                 FILTER: while ( 1 ) {
                     my $ok = $cf->input_filter( $sql );
                     if ( ! $ok ) {
-                        if ( $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2 ) {
+                        if (    exists $sf->{i}{S_R}{$file_fs}{sheet_count}
+                            && defined $sf->{i}{S_R}{$file_fs}{sheet_count}
+                            && $sf->{i}{S_R}{$file_fs}{sheet_count} >= 2 ) {
                             next PARSE;
                         }
                         next GET_DATA;

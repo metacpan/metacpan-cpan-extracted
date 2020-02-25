@@ -1,43 +1,56 @@
-Contributing to p5-YAML-LoadBundle
-==================================
+Contributing to Grant Street Group Open Source Projects
+=======================================================
 
-We welcome contributions, whether they be pull requests, documentation fixes,
-new issues, or even publicity.
+Grant Street Group welcomes contributions, whether they be pull requests,
+documentation fixes, new issues, or even publicity.
 
-The YAML::LoadBundle distribution is managed by [Dist::Zilla](http://dzil.org)
-this provides a lot of benefits for managing releases and modules at the
-expense of longer a learning curve.
+Our Open Source code lives on GitHub at https://github.com/GrantStreetGroup
+
+The Grant Street code on GitHub follows the standard [GitHub Flow](https://help.github.com/en/articles/github-flow).  This means forking the repo, creating a branch, making commits, and creating a Pull Request.  We also welcome new GitHub Issues for any of our projects.
+
+If you have any questions about things that aren't covered here, we can hopefully provide more help if you email <developers@grantstreet.com>.
 
 ## Getting Started
 
-To get started, we recommend that you use
-[App::Plenv](https://github.com/tokuhirom/plenv)
-and the [perl-build](https://github.com/tokuhirom/perl-build) plugin
-to install a recent version of perl to test with.
+If you have carton available you should just be able to
+clone this repo, change to the directory, and run `make test`.
 
-Once you have plenv and the perl-build plugin installed,
-you can install a version of perl to use for development.
+### Installing dependencies
 
-    plenv install 5.24.0 --as=YAML-LoadBundle
+The dependencies for this project are listed in its `cpanfile`,
+this file is usually handled by [Carton](https://metacpan.org/pod/Carton).
 
-In your p5-YAML-LoadBundle checkout, you can specify to use that perl install:
+Installing Carton can be done with any CPAN client into whichever version of perl you want to use.
 
-    cd p5-YAML-LoadBundle/
-    plenv local YAML-LoadBundle
+If you don't have permission, or just don't want to install things into your system perl, you can use [App::Plenv](https://github.com/tokuhirom/plenv) and the [perl-build](https://github.com/tokuhirom/perl-build) plugin, or [Perlbrew](https://perlbrew.pl/) to install different versions of perl.
 
-You can then install cpanm, Dist::Zilla and the required dzil plugins:
+Once you have a version of perl to use for testing this, if you don't have a preference for a CPAN client, we recommend you use [cpanminus](https://metacpan.org/pod/App::cpanminus#Installing-to-system-perl).
 
-    plenv install-cpanm
-    dzil authordeps | cpanm -n
+With `plenv` you are able to get cpanminus with `plenv install-cpanm`.
 
-And the dependencies to use YAML::LoadBundle
+Otherwise, quoting the cpanminus quickstart instructions:
 
-    dzil listdeps | cpanm -n
+> Quickstart: Run the following command and it will install itself for you.
+> You might want to run it as a root with sudo if you want to
+> install to places like /usr/local/bin.
+>
+>   `% curl -L https://cpanmin.us | perl - App::cpanminus`
+>
+> If you don't have curl but wget, replace `curl -L` with `wget -O -`.
 
-You can test that it works now with:
+Once you have cpanminus, you can install Carton with:
 
-    dzil test
+    cpanm Carton
 
-From then on you can use the github contribution workflow.
-Forking the repo, making commits with good commit messages and submitting
-a pull request.
+With `carton` available, you can run `make test` and make sure tests pass.  If they do, you're ready to start making changes and get ready to create a Pull Request.
+
+### Using Dist::Zilla
+
+The release of this distribution is managed by [Dist::Zilla](http://dzil.org) which provides a lot of benefits for managing releases and modules at the expense of longer a learning curve.
+
+However, you probably don't need it unless you want to build a release or run author tests.
+
+In order to work with Dist::Zilla's `dzil` you will need to run `carton install` manually as the Makefile uses `--without develop` to avoid unnecessary dependencies.
+
+Once those dependencies are installed, you need to use `carton exec dzil` so it can find them.
+

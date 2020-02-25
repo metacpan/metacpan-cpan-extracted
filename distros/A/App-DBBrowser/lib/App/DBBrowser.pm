@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.236';
+our $VERSION = '2.238';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -85,7 +85,8 @@ sub __init {
     $sf->{i}{f_attached_db} = catfile $app_dir, 'attached_DB.json';
     $sf->{i}{f_dir_history} = catfile $app_dir, 'dir_history.json';
     $sf->{i}{f_subqueries}  = catfile $app_dir, 'subqueries.json';
-    $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_copy_and_paste.csv';
+    $sf->{i}{f_copy_paste}  = catfile $app_dir, 'tmp_file_copy_and_paste.csv';
+    $sf->{i}{f_plain}       = catfile $app_dir, 'tmp_file_plain.csv';
 }
 
 
@@ -133,6 +134,9 @@ sub run {
     local $SIG{INT} = sub {
         if ( defined $sf->{i}{f_copy_paste} && -e $sf->{i}{f_copy_paste} ) {
             unlink $sf->{i}{f_copy_paste};
+        }
+        if ( defined $sf->{i}{f_plain} && -e $sf->{i}{f_plain} ) {
+            unlink $sf->{i}{f_plain};
         }
         exit;
     };
@@ -237,7 +241,6 @@ sub run {
                 else {
                     $back = $auto_one ? $sf->{i}{quit} : $sf->{i}{back};
                 }
-                # ### if sqlite ...
                 my $prompt = 'Choose Database:';
                 my $choices_db = [ undef, @databases ];
                 # Choose
@@ -564,10 +567,14 @@ sub __browse_the_table {
         if ( ! defined $all_arrayref ) {
             last PRINT_TABLE;
         }
+        if ( $sf->{o}{G}{show_table_name} ) {
+            $sf->{o}{table}{table_name} = '- ' . $sf->{d}{table};
+        }
 
         print_table( $all_arrayref, $sf->{o}{table} );
 
-        delete $sf->{o}{table}{max_rows};
+        delete $sf->{o}{table}{max_rows}   if exists $sf->{o}{table}{max_rows};
+        delete $sf->{o}{table}{table_name} if exists $sf->{o}{table}{table_name};
     }
 }
 
@@ -625,6 +632,11 @@ sub __create_drop_or_attach {
                     $ax->print_error_message( $@ );
                 }
             }
+            #my $file_fs = $sf->{i}{gc}{file_fs} // $sf->{i}{gc}{previous_file_fs};
+            #my $book = $sf->{i}{S_R}{$file_fs}{book};
+            #if ( defined $sf->{i}{S_R}{$file_fs}{book} && -s $file_fs > 50_000_000 ) {
+            #    delete $sf->{i}{S_R};
+            #}
         }
         elsif ( $choice =~ /^-\ Drop/i ) {
             require App::DBBrowser::DropTable;
@@ -713,7 +725,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.236
+Version 2.238
 
 =head1 DESCRIPTION
 

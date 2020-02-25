@@ -6,7 +6,8 @@ use Mojo::File 'tempdir';
 my $package;
 
 my @methods = qw|authenticate authenticated config configfile disconnect drive list_drives|;
-my @internal_methods = qw|_access_token _set_token _ua_delete _ua_get _ua_put _update_oauth_token|;
+my @internal_methods
+  = qw|_access_token _auth_code _auth_headers _set_token _ua_delete _ua_get _ua_put _ua_tx _update_oauth_token|;
 
 BEGIN {
   $package = 'Nuvol::Connector';

@@ -1,5 +1,5 @@
 package Authen::NZRealMe::LogonStrength;
-$Authen::NZRealMe::LogonStrength::VERSION = '1.19';
+$Authen::NZRealMe::LogonStrength::VERSION = '1.20';
 use strict;
 use warnings;
 use Carp;

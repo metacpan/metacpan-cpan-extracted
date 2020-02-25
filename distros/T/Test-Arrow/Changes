@@ -6,8 +6,6 @@ https://github.com/bayashi/Test-Arrow/commits/master
 
 https://github.com/bayashi/Test-Arrow/tags
 
-## Show the log of each version
+## Show the commit logs / diff of last tag
 
-Showing commit logs of tag `0.02` to `0.03` .
-
-    $ git log --graph --oneline --stat 0.02..0.03
+https://github.com/bayashi/Test-Arrow/compare/0.08...0.09

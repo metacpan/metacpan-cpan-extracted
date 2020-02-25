@@ -10,15 +10,23 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
                                       'Test::CPAN::Changes' => '0.19',
-                                      'Test::More' => '0.96'
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Version' => '1',
+                                      'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
                                       'Compress::Raw::Zlib' => '0',
-                                      'Encode' => '2.21',
+                                      'Encode' => '3.01',
                                       'Encode::Locale' => '1',
                                       'Exporter' => '5.57',
                                       'HTTP::Date' => '6',

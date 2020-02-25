@@ -1,5 +1,11 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.04    2020-02-25 18:00:37
+        [BUGFIXES]
+         * Support various operators assigning into pad lexicals which the
+           peephole optimiser turns into OPpTARGET_MY-using ops instead of
+           OP_SASSIGN.
+
 0.03    2020-02-17 15:21:44
         [CHANGES]
          * Remember to add hax/*.c.inc files to MANIFEST

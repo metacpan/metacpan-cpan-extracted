@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Path;
 
 use Chart::GGPlot::Class qw(:pdl);
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 with qw(Chart::GGPlot::Backend::Plotly::Geom);
 
@@ -109,7 +109,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Path - Chart::GGPlot's Plotly implementati
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 SEE ALSO
 

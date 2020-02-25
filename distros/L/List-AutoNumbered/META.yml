@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   List::AutoNumbered:
     file: lib/List/AutoNumbered.pm
-    version: '0.000007'
+    version: '0.000010'
   List::AutoNumbered::Skipper:
     file: lib/List/AutoNumbered.pm
 requires:
@@ -41,5 +41,6 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/List-AutoNumbered/issues
   repository: https://github.com/cxw42/List-AutoNumbered.git
-version: '0.000007'
+version: '0.000010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: '1'

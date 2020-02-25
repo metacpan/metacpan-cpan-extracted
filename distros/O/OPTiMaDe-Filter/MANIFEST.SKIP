@@ -1,0 +1,4 @@
+GNUmakefile
+Makeconf
+Makelocal-*
+tests

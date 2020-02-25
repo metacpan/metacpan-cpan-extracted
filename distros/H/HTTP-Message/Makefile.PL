@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Compress::Raw::Zlib" => 0,
-    "Encode" => "2.21",
+    "Encode" => "3.01",
     "Encode::Locale" => 1,
     "Exporter" => "5.57",
     "HTTP::Date" => 6,
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "6.18",
+  "VERSION" => "6.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Compress::Raw::Zlib" => 0,
-  "Encode" => "2.21",
+  "Encode" => "3.01",
   "Encode::Locale" => 1,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,

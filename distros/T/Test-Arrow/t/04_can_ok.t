@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-
 use Test::Arrow;
 
 Test::Arrow->can_ok('Test::Arrow', 'ok');

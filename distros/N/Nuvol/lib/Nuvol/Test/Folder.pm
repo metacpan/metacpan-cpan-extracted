@@ -22,7 +22,7 @@ sub build_test_folder ($service) {
   test_folder_prerequisites $service;
 
   my $drive = build_test_drive $service;
-  ok my $object = $package->new($drive, {path => 'Nuvol Testfolder', type => $package_role}),
+  ok my $object = $package->new($drive, {path => '/Nuvol Testfolder/', type => $package_role}),
     'Create object';
 
   return $object;

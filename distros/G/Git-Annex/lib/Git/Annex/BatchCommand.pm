@@ -15,7 +15,7 @@ package Git::Annex::BatchCommand;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$Git::Annex::BatchCommand::VERSION = '0.001';
+$Git::Annex::BatchCommand::VERSION = '0.002';
 
 use 5.028;
 use strict;
@@ -96,7 +96,7 @@ Git::Annex::BatchCommand - Perl interface to git-annex --batch commands
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ version 0.001
 
   # see git-annex-find(1) -- `git annex find --batch --not --in here`
   # prints an empty string for each file which is not present
-  say "foo/bar is not present in this repo" if $batch->say("foo/bar");
+  say "foo/bar is not present in this repo" unless $batch->ask("foo/bar");
 
 =head1 DESCRIPTION
 

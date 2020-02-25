@@ -7,14 +7,15 @@ use utf8;
 
 BEGIN {
 	$MooX::Struct::AUTHORITY = 'cpan:TOBYINK';
-	$MooX::Struct::VERSION   = '0.017';
+	$MooX::Struct::VERSION   = '0.019';
 }
 
 use Moo 1.000;
 use Types::TypeTiny 1.000 qw( HashLike ArrayLike );
-use Types::Standard 1.000 qw( HashRef ArrayRef Num Ref );
+use Types::Standard 1.000 qw( HashRef ArrayRef Num Ref InstanceOf );
+use namespace::autoclean;
 
-my $HashLike  = HashLike | Ref['HASH'];
+my $HashLike  = HashLike  | Ref['HASH'];
 my $ArrayLike = ArrayLike | Ref['ARRAY'];
 
 use overload
@@ -34,7 +35,12 @@ METHODS: {
 	sub TO_STRING   { join q[ ], @{ $_[0]->TO_ARRAY } };
 	sub CLONE       { my $s = shift; ref($s)->new(%{$s->TO_HASH}, @_) };
 	sub CLASSNAME   { ref($_[0]) or $_[0] };
-	sub TYPE_TINY   { Types::Standard::InstanceOf->parameterize(shift->CLASSNAME) };
+	
+	my %_cache;
+	sub TYPE_TINY {
+		my $class = shift->CLASSNAME;
+		$_cache{$class} ||= (InstanceOf[$class])->plus_constructors(HashRef|ArrayRef, 'new');
+	}
 };
 
 sub BUILDARGS
@@ -100,20 +106,27 @@ sub EXTEND
 	bless $invocant => $new_class;
 }
 
-# This could do with some improvement from a Data::Printer expert.
-#
 my $done = 0;
 sub _data_printer
 {
-	require Data::Printer::Filter;
-	require Term::ANSIColor;
-	my $self   = shift;
+	my ($self, $ddp) = @_;
 	
-	my @values = map { scalar &Data::Printer::p(\$_, return_value => 'dump') } @$self;
-	my $label  = Term::ANSIColor::colored($self->TYPE||'struct', 'bright_yellow');
-
-	if (grep /\n/, @values)
+	my @values;
+	my $label;
+	
+	if ($Data::Printer::VERSION lt '0.90') {
+		require Data::Printer::Filter;
+		require Term::ANSIColor;
+		@values = map scalar(&Data::Printer::p(\$_, return_value => 'dump')), @$self;
+		$label  = Term::ANSIColor::colored($self->TYPE||'struct', 'bright_yellow');
+	}
+	else
 	{
+		@values = map $ddp->parse(\$_), @$self;
+		$label  = $ddp->maybe_colorize($self->TYPE||'struct', 'MooX::Struct', 'bright_yellow');
+	}
+
+	if (grep /\n/, @values) {
 		return sprintf(
 			"%s[\n\t%s,\n]",
 			$label,
@@ -130,7 +143,7 @@ BEGIN {
 	{
 		no warnings;
 		our $AUTHORITY = 'cpan:TOBYINK';
-		our $VERSION   = '0.017';
+		our $VERSION   = '0.019';
 	}
 	
 	sub _uniq { my %seen; grep { not $seen{$_}++ } @_ };
@@ -453,7 +466,6 @@ sub import
 	"$class\::Processor"->new->process($caller, @_);
 }
 
-no Moo;
 1;
 
 __END__
@@ -670,8 +682,8 @@ suitable for a Moose/Moo C<isa>.
    use Moo;
    use MooX::Struct Bar => [qw( $name )];
    
-   has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY);
-   has right_bar => (is => 'rw', isa => Bar->TYPE_TINY);
+   has left_bar  => (is => 'rw', isa => Bar->TYPE_TINY, coerce => 1);
+   has right_bar => (is => 'rw', isa => Bar->TYPE_TINY, coerce => 1);
    
    ...;
  }

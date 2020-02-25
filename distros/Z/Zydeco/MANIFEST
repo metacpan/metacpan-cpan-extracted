@@ -16,6 +16,17 @@ examples/mip-087-001.pl
 examples/simple-json-encoder.pl
 lib/MooX/Pression.pm
 lib/Zydeco.pm
+lib/Zydeco/Manual.pod
+lib/Zydeco/Manual/01_ClassesRolesEtc.pod
+lib/Zydeco/Manual/02_Attributes.pod
+lib/Zydeco/Manual/03_MethodsSignaturesTypesCoercion.pod
+lib/Zydeco/Manual/04_Factories.pod
+lib/Zydeco/Manual/05_Multimethods.pod
+lib/Zydeco/Manual/06_MethodModifiers.pod
+lib/Zydeco/Manual/07_Delegation.pod
+lib/Zydeco/Manual/08_Privacy.pod
+lib/Zydeco/Manual/09_Parameterizable.pod
+lib/Zydeco/Manual/10_BeyondZydeco.pod
 t/01basic.t
 t/02synopsis.t
 t/03subclass.t

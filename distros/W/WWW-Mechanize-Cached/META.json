@@ -54,7 +54,8 @@
             "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
             "Test::Vars" : "0.014",
-            "Test::Version" : "1"
+            "Test::Version" : "1",
+            "Test::Warn" : "0.36"
          }
       },
       "runtime" : {
@@ -85,13 +86,14 @@
             "Cache::FileCache" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Find::Lib" : "0",
             "HTTP::Request" : "0",
-            "Path::Class" : "0",
+            "Path::Tiny" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
             "Test::Requires" : "0",
             "Test::RequiresInternet" : "0",
+            "Test::Warnings" : "0",
+            "URI::file" : "0",
             "constant" : "0",
             "lib" : "0",
             "perl" : "5.008"
@@ -110,10 +112,10 @@
          "web" : "https://github.com/libwww-perl/WWW-Mechanize-Cached"
       }
    },
-   "version" : "1.52",
+   "version" : "1.53",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -126,6 +128,17 @@
                }
             },
             "name" : "RemovePrereqs",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "requires"
+               }
+            },
+            "name" : "DevelopRequires",
             "version" : "6.012"
          },
          {
@@ -196,7 +209,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.13"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -267,7 +280,7 @@
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -318,11 +331,6 @@
             "version" : "0.8"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
-            "name" : "@Author::OALDERS/PodCoverageTests",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::OALDERS/PodSyntaxTests",
             "version" : "6.012"
@@ -352,6 +360,11 @@
             },
             "name" : "@Author::OALDERS/Test::EOL",
             "version" : "0.19"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
+            "name" : "@Author::OALDERS/Test::Pod::Coverage::Configurable",
+            "version" : "0.07"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Portability",
@@ -573,7 +586,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -584,7 +597,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -708,7 +721,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -725,12 +738,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.52",
+                  "tag" : "v1.53",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -780,7 +793,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -800,7 +813,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.23.0",
+                  "git_version" : "2.25.0",
                   "repo_root" : "."
                }
             },
@@ -870,14 +883,16 @@
       "Bjorn-Olav Strand <bolav@ikke.no>",
       "E. Choroba <choroba@matfyz.cz>",
       "John SJ Anderson <genehack@genehack.org>",
+      "Jonathan Rubin <jjr.spam@gmail.com>",
       "Kent Fredric <kentfredric@gmail.com>",
       "Mark Gardner <mjg@ziprecruiter.com>",
       "Neil Bowers <neil@bowers.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
+      "simbabque <simbabque@cpan.org>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.14",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10",
    "x_static_install" : 1
 }
 

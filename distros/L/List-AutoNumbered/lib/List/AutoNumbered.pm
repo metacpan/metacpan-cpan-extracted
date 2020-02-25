@@ -3,8 +3,10 @@ package List::AutoNumbered;
 use 5.006;
 use strict;
 use warnings;
+use overload
+    '@{}' => \&arr;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000010';
 
 # Exports
 use parent 'Exporter';
@@ -41,6 +43,7 @@ to lists of testcases.  For example:
         ("d");                                          # line 6
 
     # Now $list->arr is [ [3,"a"], [4,"b"], [5,"c"], [6,"d"] ]
+    # and @$list is ( [3,"a"] ... ).
 
 In general, you can pass any number to the constructor.  For example:
 
@@ -160,6 +163,11 @@ sub last { shift->size-1; }
 Returns a reference to the array being built.  Please do not modify this
 array directly until you are done loading it.  List::AutoNumbered may not
 work if you do.
+
+This can also be called by using the List::AutoNumbered object as an array:
+
+    my $list = List::AutoNumbered->new...;
+    foreach my $item (@$list) { ... }    # Instead of my $item (@{$list->arr})
 
 =cut
 
@@ -344,9 +352,9 @@ You can also look for information at:
 
 L<https://metacpan.org/pod/List::AutoNumbered>
 
-=item * CPAN Ratings
+=item * Appveyor (CI builds)
 
-L<https://cpanratings.perl.org/d/List-AutoNumbered>
+L<https://ci.appveyor.com/project/cxw42/list-autonumbered>
 
 =back
 
@@ -357,9 +365,11 @@ for discussion and ideas in the
 L<Stack Overflow question|https://stackoverflow.com/q/50510809/2877364>
 that was the starting point for this module.
 
+Thanks to Dan Stewart for code contributions.
+
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Christopher White.
+Copyright 2019--2020 Christopher White.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

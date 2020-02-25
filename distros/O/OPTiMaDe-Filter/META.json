@@ -1,33 +1,29 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "OPTiMaDe filter language parser/composer",
    "author" : [
-      "unknown"
+      "Andrius Merkys <merkys@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "lgpl_3_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OPTiMaDe-Filter",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.28",
+            "Module::Build::Parse::Yapp" : "0"
          }
       },
       "runtime" : {
@@ -38,11 +34,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.7.0",
-   "x_repository" : {
-      "type" : "git",
-      "url" : "https://github.com/Materials-Consortia/OPTiMaDe-Filter.git",
-      "web" : "https://github.com/Materials-Consortia/OPTiMaDe-Filter"
-   },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.7.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
+

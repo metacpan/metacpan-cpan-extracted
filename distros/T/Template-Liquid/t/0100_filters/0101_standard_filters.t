@@ -637,9 +637,8 @@ is( Template::Liquid->parse(q[{{ values | split: ',' | last }}])
     q[{{ values | split: ',' | last}}]
 );
 is(Template::Liquid->parse(<<'END')->render, <<'OUT', q[...split: ', ' ]);
-{% assign beatles = "John, Paul, George, Ringo" | split: ', ' -%}
-{% for member in beatles -%}
- a. {{ member }}
+{%- assign beatles = "John, Paul, George, Ringo" | split: ', ' -%}
+{%- for member in beatles %} a. {{ member }}
 {% endfor -%}
 END
  a. John
@@ -648,9 +647,8 @@ END
  a. Ringo
 OUT
 is(Template::Liquid->parse(<<'END')->render, <<'OUT', q[...split: ", " ]);
-{% assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
-{% for member in beatles -%}
- b. {{ member }}
+{%- assign beatles = "John, Paul, George, Ringo" | split: ", " -%}
+{%- for member in beatles %} b. {{ member }}
 {% endfor -%}
 END
  b. John
@@ -842,8 +840,7 @@ All products:
 - {{ product.title }}
 {% endfor -%}
 
-{%- assign kitchen_products = products | where: "type", "kitchen" -%}
-
+{%- assign kitchen_products = products | where: "type", "kitchen" %}
 Kitchen products:
 {% for product in kitchen_products -%}
 - {{ product.title }}
@@ -874,8 +871,7 @@ All products:
 - {{ product.title }}
 {% endfor -%}
 
-{%- assign available_products = products | where: "available" -%}
-
+{%- assign available_products = products | where: "available" %}
 Available products:
 {% for product in available_products -%}
 - {{ product.title }}

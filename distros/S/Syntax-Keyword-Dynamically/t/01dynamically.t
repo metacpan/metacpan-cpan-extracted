@@ -39,6 +39,22 @@ subtest "lexical variable" => sub {
    is( $lvar, "old", 'value restored after eval die' );
 };
 
+subtest "lexical with target" => sub {
+   my $lvar = 42;
+
+   {
+      dynamically $lvar = $lvar + 1;
+      is( $lvar, 43, 'new value from BINOP within scope' );
+   }
+   is( $lvar, 42, 'value resored after block leave from BINOP' );
+
+   {
+      dynamically $lvar = sin($lvar);
+      is( $lvar, sin(42), 'new value from UNOP within scope' );
+   }
+   is( $lvar, 42, 'value resored after block leave from UNOP' );
+};
+
 subtest "array element" => sub {
    my @arr = qw( a old c );
 

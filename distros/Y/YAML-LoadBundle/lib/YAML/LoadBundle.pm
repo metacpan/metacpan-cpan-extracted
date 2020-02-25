@@ -1,6 +1,8 @@
 package YAML::LoadBundle;
 # ABSTRACT: Load a directory of YAML files as a bundle
-$YAML::LoadBundle::VERSION = '0.003';
+use version;
+our $VERSION = 'v0.4.2'; # VERSION
+
 use base qw(Exporter);
 use warnings;
 use strict;
@@ -11,7 +13,7 @@ use Digest::SHA1        qw( sha1_hex sha1 );
 use File::Find          qw( find );
 use Hash::Merge::Simple ();
 use Scalar::Util        qw( reftype refaddr );
-use Storable            qw( freeze );
+use Storable            qw( freeze dclone );
 use YAML::XS            qw(Load);
 
 our @EXPORT_OK = qw(
@@ -50,11 +52,17 @@ sub remove_yaml_observer {
     } @load_yaml_observers;
 }
 
+our %seen;
+
 sub load_yaml {
     my ($arg, $dont_cache) = @_;
     my @yaml;
     my $cache_mtime;
     my %params;
+
+    # We clone references that appear more than once in the data
+    # structure. (For compatibility with Data::Visitor.)
+    local %seen = ();
 
     if (ref $arg) {
         @yaml = <$arg>;
@@ -147,6 +155,8 @@ sub _unravel {
     my $data = shift;
 
     if (ref $data) {
+        $data = dclone($data) if $seen{$data}++;
+
         if (reftype $data eq 'HASH') {
             return _unravel_hash($data);
         }
@@ -169,6 +179,13 @@ sub _unravel_hash {
     my $data = shift;
     
     while (my @keys = grep { exists $data->{$_} } @SPECIAL) {
+        # Make sure that deeper -merges and such will be handled first
+        for my $key ( grep { ! $SPECIAL{ $_ } } keys %$data ) {
+            # False values can be skipped for performance
+            next unless $data->{$key};
+            $data->{$key} = _unravel($data->{$key})
+        }
+
         for my $key (@keys) {
             my $handler = $SPECIAL{$key};
             my $val = delete $data->{$key};
@@ -192,9 +209,9 @@ sub _unravel_hash {
         $elt = _unravel($elt) if ref($elt);
     }
 
+    $data = dclone($data) if $seen{$data}++;
     return $data;
 }
-
 
 
 {
@@ -457,7 +474,7 @@ YAML::LoadBundle - Load a directory of YAML files as a bundle
 
 =head1 VERSION
 
-version 0.003
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -702,9 +719,10 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2007-2016 by Grant Street Group.
+This software is Copyright (c) 2016 - 2020 by Grant Street Group.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

@@ -16,17 +16,21 @@ my $obj_regex = qr/^Nuvol::([^:_]*)/;
 
 # File
 
-my @file_required = qw|_do_remove _do_slurp _do_spurt _from_file _from_host _from_url _get_download_url _to_host|;
+my @file_methods = qw|exists realpath|;
+my @file_required
+  = qw|_do_remove _do_slurp _do_spurt _from_file _from_host _from_url _get_download_url _to_host|;
 
-sub test_file_applied ($object, $service) {
+sub test_file_applied ($file, $service) {
   my $role = "Nuvol::${service}::File";
 
   note 'File role';
 
-  is $object->SERVICE, $service, "Service is $service";
-  is $object->type, 'File', 'Type is File';
-  ok $object->does($role), "Role $role applied";
-  ok $object->does('Nuvol::Role::File'), 'File role applied';
+  is $file->SERVICE, $service, "Service is $service";
+  is $file->type, 'File', 'Type is File';
+  ok $file->is_file, 'It is a file';
+  ok !$file->is_folder, 'It is not a folder';
+  ok $file->does($role), "Role $role applied";
+  ok $file->does('Nuvol::Role::File'), 'File role applied';
 }
 
 sub test_file_prerequisites ($service) {
@@ -38,23 +42,26 @@ sub test_file_prerequisites ($service) {
   can_ok $role, $_ for @file_required;
 }
 
-sub test_file_methods ($object, $service) {
-  note 'File';
+sub test_file_methods ($file, $service) {
+  ok $file->$_, "$_ returns a value" for @file_methods;
 }
 
 # Folder
 
+my @folder_methods  = qw|exists realpath|;
 my @folder_required = qw|_do_make_path _do_remove_tree|;
 
-sub test_folder_applied ($object, $service) {
+sub test_folder_applied ($folder, $service) {
   my $role = "Nuvol::${service}::Folder";
 
   note 'Folder role';
 
-  is $object->SERVICE, $service, "Service is $service";
-  is $object->type, 'Folder', 'Type is Folder';
-  ok $object->does($role), "Role $role applied";
-  ok $object->does('Nuvol::Role::Folder'), 'Folder role applied';
+  is $folder->SERVICE, $service, "Service is $service";
+  is $folder->type, 'Folder', 'Type is Folder';
+  ok $folder->is_folder, 'It is a folder';
+  ok !$folder->is_file, 'It is not a file';
+  ok $folder->does($role), "Role $role applied";
+  ok $folder->does('Nuvol::Role::Folder'), 'Folder role applied';
 }
 
 sub test_folder_prerequisites ($service) {
@@ -66,8 +73,8 @@ sub test_folder_prerequisites ($service) {
   can_ok $role, $_ for @folder_required;
 }
 
-sub test_folder_methods ($object, $service) {
-  note 'Folder';
+sub test_folder_methods ($folder, $service) {
+  ok $folder->$_, "$_ returns a value" for @folder_methods;
 }
 
 # Metadata

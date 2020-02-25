@@ -6,7 +6,7 @@ package Chart::GGPlot::Util::_Labeling;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 use Chart::GGPlot::Util::_Base qw(:all);
 
@@ -182,7 +182,7 @@ Chart::GGPlot::Util::_Labeling - R 'labeling' package functions used by Chart::G
 
 =head1 VERSION
 
-version 0.0007
+version 0.0009
 
 =head1 AUTHOR
 

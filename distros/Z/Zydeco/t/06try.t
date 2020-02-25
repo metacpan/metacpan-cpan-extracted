@@ -21,7 +21,7 @@ try {
 }
 catch {
 	my $e = $@;
-	like($e, qr/required arguments/);
+	like($e, qr/required/);
 }
 
 done_testing;

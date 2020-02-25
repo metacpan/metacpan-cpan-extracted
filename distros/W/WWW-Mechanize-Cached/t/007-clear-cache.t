@@ -12,7 +12,7 @@ use constant {
 };
 
 use Test::RequiresInternet (ADDRESS) => 443,
-    (DIFFERENT_ADDRESS) => 443;
+    (DIFFERENT_ADDRESS)              => 443;
 
 use WWW::Mechanize::Cached;
 

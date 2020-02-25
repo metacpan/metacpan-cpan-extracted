@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.120   2020-02-24
+        - Experimental option 'table_name'.
+
 0.119   2019-11-24
         - Update option 'color'.
 

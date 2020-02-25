@@ -1,5 +1,11 @@
 Revision history for Perl module WWW::Mechanize::Cached
 
+1.53      2020-02-24 21:07:31Z
+    - Remove warnings on new() (GH#15) (Jonathan Rubin, simbabque)
+    - Remove new warnings (GH#22) (Julien Fiegehenn)
+    - Add Test::Warn to develop requirements (GH#21) (Olaf Alders)
+    - Remove Find::Lib and Path::Class from deps (GH#19) (Olaf Alders)
+
 1.52      2019-11-18 14:15:37Z
     - Implement invalidate_last_request to remove the last request from the
       cache (GH#18) (E. Choroba)
