@@ -1,4 +1,4 @@
-# AWS::EC2::Instance generated from spec 9.1.0
+# AWS::EC2::Instance generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::Instance',
@@ -405,6 +405,27 @@ package Cfn::Resource::Properties::AWS::EC2::Instance::LaunchTemplateSpecificati
   has LaunchTemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+
+subtype 'Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptionsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptionsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Configured => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAccelerator',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -597,7 +618,9 @@ package Cfn::Resource::Properties::AWS::EC2::Instance {
   has EbsOptimized => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Conditional');
   has ElasticGpuSpecifications => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::Instance::ElasticGpuSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ElasticInferenceAccelerators => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAccelerator', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has HibernationOptions => (isa => 'Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has HostId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Conditional');
+  has HostResourceGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has IamInstanceProfile => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ImageId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has InstanceInitiatedShutdownBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

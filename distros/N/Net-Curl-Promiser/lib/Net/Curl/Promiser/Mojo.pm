@@ -121,7 +121,7 @@ sub _io {
     my ($self, $fd, $read_yn, $write_yn) = @_;
 
     my $socket = $self->{'_watched_sockets'}{$fd} ||= do {
-        my $s = $self->{'_fhstore'}->get_checked($fd);
+        my $s = $self->{'_fhstore'}->get_fh($fd);
 
         Mojo::IOLoop->singleton->reactor->io(
             $s,

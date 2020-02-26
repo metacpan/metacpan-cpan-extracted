@@ -1,4 +1,4 @@
-# AWS::Config::ConfigurationAggregator generated from spec 2.25.0
+# AWS::Config::ConfigurationAggregator generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::ConfigurationAggregator',
@@ -96,6 +96,7 @@ package Cfn::Resource::Properties::AWS::Config::ConfigurationAggregator {
   has AccountAggregationSources => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Config::ConfigurationAggregator::AccountAggregationSource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ConfigurationAggregatorName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has OrganizationAggregationSource => (isa => 'Cfn::Resource::Properties::AWS::Config::ConfigurationAggregator::OrganizationAggregationSource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

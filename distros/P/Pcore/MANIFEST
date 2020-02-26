@@ -10,6 +10,8 @@ lib/Pcore.pm
 lib/Pcore/API/AntiCaptcha.pm
 lib/Pcore/API/AntiCaptcha/Captcha.pm
 lib/Pcore/API/Bitbucket.pm
+lib/Pcore/API/Chrome.pm
+lib/Pcore/API/Chrome/Tab.pm
 lib/Pcore/API/Client.pm
 lib/Pcore/API/Cloudflare.pm
 lib/Pcore/API/Docker/Engine.pm
@@ -25,8 +27,11 @@ lib/Pcore/API/GitHub.pm
 lib/Pcore/API/Google/FCM.pm
 lib/Pcore/API/Google/OAuth.pm
 lib/Pcore/API/PAUSE.pm
+lib/Pcore/API/PDF.pm
 lib/Pcore/API/Proxy.pm
 lib/Pcore/API/Proxy/Airsocks.pm
+lib/Pcore/API/Proxy/Luminati.pm
+lib/Pcore/API/Proxy/Server.pm
 lib/Pcore/API/S3.pm
 lib/Pcore/API/SMTP.pm
 lib/Pcore/API/Sitemap.pm
@@ -252,6 +257,7 @@ script/pcore-vim-rpc.pl
 script/src
 script/update-pcore-share.pl
 share/data/cacert.pem
+share/data/chrome/util.js
 share/data/dhparam-2048.pem
 share/data/dhparam-4096.pem
 share/data/dhparam-8192.pem

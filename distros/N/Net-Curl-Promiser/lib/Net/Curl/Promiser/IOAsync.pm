@@ -102,7 +102,7 @@ sub _get_handle {
     my ($self, $fd) = @_;
 
     return $self->{'_handle'}{$fd} ||= do {
-        my $s = $self->{'_fhstore'}->get_checked($fd);
+        my $s = $self->{'_fhstore'}->get_fh($fd);
 
         my $handle = IO::Async::Handle->new(
             read_handle => $s,

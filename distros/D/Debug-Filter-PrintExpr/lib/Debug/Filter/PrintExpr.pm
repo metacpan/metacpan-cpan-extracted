@@ -7,10 +7,11 @@ use Exporter::Tiny;
 
 use Filter::Simple;
 use Scalar::Util qw(isdual blessed);
+use List::Util 'pairs';
 use Data::Dumper;
 
 our
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 our @EXPORT_OK = qw(isnumeric isstring);
 our @ISA = qw(Exporter::Tiny);
@@ -32,16 +33,19 @@ BEGIN {*import = \&Exporter::Tiny::import;}
 our $handle = *STDERR;
 
 # generate a prefix containing line number or custom label
+# consume first three args, return number of printed chars
+# if no expression is present
 sub _genprefix {
-	my ($self, $label, $line, $expr, $value) = @_;
+	my ($label, $line, $expr, $pos) = splice @_, 0, 3;
 	local ($,, $\);
-	print $handle $label ? $label : "line $line:";
-	print $handle " $expr = " if $expr;
+	printf $handle "%s%n", $label || "L$line:", $pos;
+	print $handle $expr ? " $expr = " : " ";
+	return $expr ? undef : $pos + 1;
 }
 
+# create representation of single value
 sub _singlevalue {
-	my $val = shift;
-	my ($str, $num);
+	my ($val, $str, $num) = shift;
 	my $isdual = isdual($val);
 	my $isnumeric = isnumeric($val);
 	$str = "$val" if defined $val;
@@ -53,7 +57,7 @@ sub _singlevalue {
 	} elsif (ref($val)) {
 		return $val;
 	} elsif ($isdual) {
-		return "'$str' : $num";
+		return "dualvar($num, '$str')";
 	} elsif ($isnumeric) {
 		return $num;
 	} else {
@@ -70,131 +74,86 @@ sub _valuescalar {
 # print out an expression in list context
 sub _valuearray {
 	local ($,, $\);
-	print $handle join(', ', map({_singlevalue($_)} @_));
+	print $handle '(', join(', ',
+		map({_singlevalue($_)} @_)), ");\n";
 }
 
-# print out an key-value pair, prefixed by a seperator
+# print out an expression as key-value pairs
 sub _valuehash {
-	our $sep;
 	local ($,, $\);
-	local *sep = \$_[0];
-	shift;
-	my ($key, $value) = @_;
-	print $handle $sep || '',
-		"'$key' => ", _singlevalue($value);
-	$sep = ', ';
+	print $handle '(', join(", ",
+		map(
+		{"'$_->[0]' => " . _singlevalue($_->[1])}
+		pairs(@_))), ");\n";
 }
 
-# print opening before list/hash data
-sub _genopen {
+# process a scalar debug statement
+sub _print_scalar {
 	local ($,, $\);
-	print $handle '(';
-}
-
-# print closing after list/hash data
-sub _genclose {
-	local ($,, $\);
-	print $handle ");\n";
-}
-
-# process a complete scalar debug statement
-sub _printscalar {
-	my ($self, $label, $line, $expr, $value) = @_;
-	local ($,, $\);
-	_genprefix @_;
-	_valuescalar($_[4]) if $expr;
-	print $handle ';' if $expr;
+	unless (&_genprefix) {
+		_valuescalar($_[0]);
+		print $handle ';';
+	}
 	print $handle "\n";
 }
 
-sub _printstr {
-	my ($self, $label, $line, $expr, $value) = @_;
-	_printscalar($self, $label, $line, $expr, "$value");
+# process a string scalar debug statement
+sub _print_str {
+	my $val = $_[3];
+	splice @_, 3, 1, "$val";
+	goto &_print_scalar;
 }
 
-sub _printnum {
+# process a numeric scalar debug statement
+sub _print_num {
 	no warnings qw(numeric);
-	my ($self, $label, $line, $expr, $value) = @_;
-	_printscalar($self, $label, $line, $expr, $value+0);
+	my $val = $_[3];
+	splice @_, 3, 1, $val + 0;
+	goto &_print_scalar;
 }
 
-
-# process a complete array debug statement
-sub _printarray {
-	my ($self, $label, $line, $expr, @value) = @_;
-	_genprefix @_;
-	_genopen;
-	_valuearray @value;
-	_genclose;
+# process an array debug statement
+sub _print_array {
+	&_genprefix;
+	goto &_valuearray;
 }
 
-# start a hash debug statement
-sub _printhashopen {
-	my ($self, $label, $line, $expr) = @_;
-	_genprefix @_;
-	_genopen;
+# process a hash debug statement
+sub _print_hash {
+	&_genprefix;
+	goto &_valuehash;
 }
 
-# process a single iteration of a key-value pair
-sub _printhashitem {
-	my ($sep, $key, $value) = @_;
-	_valuehash @_;
-}
-
-# end a hash debug statement
-sub _printhashclose {
-	_genclose;
-}
-
-# process a complete reference debug statement
-sub _printref {
-	my ($self, $label, $line, $expr, @value) = @_;
+# process a reference debug statement
+sub _print_ref {
+	my $expr = splice @_, 2, 1, undef;
+	my $skip = &_genprefix;
 	local ($,, $\);
-	print $handle $label ? $label : "line $line:", " dump($expr);";
-	my $d = Data::Dumper->new([@value]);
-	my @names;
-	push @names, "_[$_]" foreach 0 .. $#value;
-	$d->Names(\@names);
-	print $handle "\n", $d->Dump;
+	print $handle "dump($expr);\n";
+	print $handle 
+		Data::Dumper->new([@_], [map("_[$_]", (0 .. $#_))])
+		->Pad(' ' x $skip)->Dump;
 }
 
-# process a debug statement
+# type classifications: print function suffix + is scalar
+my %type_defs = (
+	'$' => ['scalar', 1],
+	'"' => ['str', 1],
+	'#' => ['num', 1],
+	'@' => ['array', 0],
+	'%' => ['hash', 0],
+	'\\' => ['ref', 0],
+);
+
+# process a debug statement, runs in filter context
 sub _gen_print {
-	my ($self, $type, $label, $expr) = @_;
-	$label ||= '';
-	if ($type eq '$') {
-		my $print = $self . "::_printscalar";
-		$expr ||= '';
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar(($expr)));}];
-	} elsif ($type eq '"') {
-		my $print = $self . "::_printstr";
-		$expr ||= '';
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar($expr));}];
-	} elsif ($type eq '#') {
-		my $print = $self . "::_printnum";
-		$expr ||= '';
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, scalar($expr));}];
-	} elsif ($type eq '@') {
-		my $print = $self . "::_printarray";
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, $expr);}];
-	} elsif ($type eq '%') {
-		my $printopen = $self . '::_printhashopen';
-		my $printitem = $self . '::_printhashitem';
-		my $printclose = $self . '::_printhashclose';
-		my $sep = '$' . $self . '::sep';
-		my $pair = '@' . $self . '::pair';
-		my $stmt = qq[{local ($sep, $pair); ];
-		$stmt .= qq[$printopen("$self", "$label", __LINE__, q{$expr}); ];
-		$stmt .= qq[$printitem($sep, $pair) ];
-		$stmt .= qq[while $pair = each($expr); ];
-		$stmt .= qq[$printclose;}];
-		return $stmt;
-	} elsif ($type eq '\\') {
-		my $print = $self . "::_printref";
-		return qq[{$print("$self", "$label", __LINE__, q{$expr}, $expr);}];
-	} else {
-		return '# type unknown';
-	}
+	my ($type, $label, $expr) = map $_ // '', @_;
+	my $val = $_[2] // '()';
+	my ($ptype, $scalar) = @{$type_defs{$type}};
+	my $print = __PACKAGE__ . "::_print_$ptype";
+	return qq[{$print("$label", __LINE__, q{$expr}, ] .
+		($scalar ? qq[scalar($val)] : qq[$val]) .
+		q[)}];
 }
 
 # source code processing happens here
@@ -209,14 +168,14 @@ FILTER {
 	$debug ||= grep /^-debug$/, @args;
 	$nofilter ||= grep /^-nofilter$/, @args;
 	s/
-		^\h*\#
+		^\h*+\#
 		(?<type>[%@\$\\#"])
-		\{\h*
-		(?<label>[[:alpha:]_]\w*:)?
-		\h*
-		(?<expr>\V+)?
-		\}\h*\r?$
-	/ _gen_print($self, $+{type}, $+{label}, $+{expr}) /gmex
+		\{\h*+
+		(?<label>[[:alpha:]_]\w*+:)?
+		\h*+
+		(?<expr>\V*[^\s])?\h*
+		\}\h*+\r?$
+	/ _gen_print($+{type}, $+{label}, $+{expr}) /gmex
 		unless $nofilter;
 	print STDERR if $debug;
 };
@@ -247,19 +206,19 @@ Debug::Filter::PrintExpr - Convert comment lines to debug print statements
 	#${ calc: @a * 2 }
 	#\{$ref}
 
-This program produces an output like this:
+This produces an output like:
 
-	line 13: $s = 'a scalar';
-	line 14: @a = ('this', 'is', 'an', 'array');
-	line 15: %h = ('' => 'empty', 'key1' => 'value1', 'key2' => 'value2', 'undef' => undef);
-	calc: @a * 2  = 8;
-	line 17: dump($ref);
-	$_[0] = {
-	          '' => 'empty',
-	          'key1' => 'value1',
-	          'key2' => 'value2',
-	          'undef' => undef
-	        };
+	L13: $s = 'a scalar';
+	L14: @a = ('this', 'is', 'an', 'array');
+	L15: %h = ('' => 'empty', 'key1' => 'value1', 'key2' => 'value2', 'undef' => undef);
+	calc: @a * 2 = 8;
+	L17: dump($ref);
+	     $_[0] = {
+	               '' => 'empty',
+	               'key1' => 'value1',
+	               'key2' => 'value2',
+	               'undef' => undef
+	             };
 
 =head1 DESCRIPTION
 
@@ -320,7 +279,7 @@ or more formally must be matched by the following regexp:
 where C<type> represents the sigil, C<label> an optional label and
 C<expr> an optional expression.
 
-If the label is omitted, it defaults to C<line nnn:>, where nnn is the
+If the label is omitted, it defaults to C<LI<n>:>, where n is the
 line number in the program.
 
 The sigil determines the evaluation context for the given expression
@@ -332,31 +291,13 @@ and the output format of the result:
 
 The expression is evaluated in scalar context. Strings are printed
 inside single quotes, integer and floating point numbers are
-printed unquoted and dual valued variables are shown in both
-representations seperated by a colon.
+printed unquoted and dual valued variables are shown in the form
+C<dualvar(I<numval>, 'I<stringval>')>.
 Undefined values are represented by the unquoted string C<undef>.
 Hash and array references are shown in their usual string representation
 as e.g. C<ARRAY(0x19830d0)> or C<HASH(0xccba88)>.
 Blessed references are shown by the class they are belong to as
 C<< blessed(class) >>.
-
-=item C<@>
-
-The expression is evaluated in list context and the elements of the
-list are printed like single scalars, separated by commas and gathered
-in parentheses.
-
-=item C<%>
-
-The expression is used as argument in a while-each loop and the output
-consists of pairs of the form 'key' => I<value> inside parentheses.
-I<value> is formatted like a single scalar.
-
-=item C<\>
-
-The expression shall evaluate to a list of references.
-These will be evaluated using L<Data::Dumper> as if used as
-parameter list to a subroutine call, i.e. named as C<$_[$i]>.
 
 =item C<">
 
@@ -366,21 +307,39 @@ The expression is evaluated in scalar context as a string.
 
 The expression is evaluated in scalar context as a numeric value.
 
+=item C<@>
+
+The expression is evaluated in list context and the elements of the
+list are printed like single scalars, separated by commas and gathered
+in parentheses.
+
+=item C<%>
+
+The expression is evaluated as a list of key-value pairs
+and is presented in the form 'key' => I<value>,... inside parentheses.
+I<value> is formatted like a single scalar.
+
+=item C<\>
+
+The expression shall evaluate to a list of references.
+These will be evaluated using L<Data::Dumper> and named
+like parameters in a subroutine, i.e. C<$_[I<n>]>.
+
 =back
 
 The usage and difference between C<#${}>, C<#"{}> and C<##{}> is
 best described by example:
 
 	my $dt = DateTime->now;
-	#${$dt}		# line nn: $dt = blessed(DateTime);
-	#"{$dt}		# line nn: $dt = '2019-10-27T15:54:28';
+	#${$dt}		# Ln: $dt = blessed(DateTime);
+	#"{$dt}		# Ln: $dt = '2019-10-27T15:54:28';
 
 	my $num = ' 42 ';
-	#${$num}	# line nn: $num = ' 42 ';
+	#${$num}	# Ln: $num = ' 42 ';
 	$num + 0;
-	#${$num}	# line nn: $num = ' 42 ' : 42;
-	#"{$num}	# line nn: $num = ' 42 ';
-	##{$num}	# line nn: $num = 42;
+	#${$num}	# Ln: $num = dualvar(42, ' 42 ');
+	#"{$num}	# Ln: $num = ' 42 ';
+	##{$num}	# Ln: $num = 42;
 
 
 The forms #${}, #"{}, ##{} and #@{} may be used for any type of expression
@@ -391,14 +350,12 @@ to use:
 	#@{scalar_as_array: $s}
 	#${array_as_scalar :@a}
 	#@{hash_as_array: %h}
-	#%{array_as_hash: @a}
 
 and produce these results:
 
 	scalar_as_array: $s = ('this is a scalar');
 	array_as_scalar: @a = 4;
 	hash_as_array: %h = ('k1', 'v1', 'k2', 'v2');
-	array_as_hash: @a = ('0' => 'this', '1' => 'is', '2' => 'an', '3' => 'array');
 	
 Regular expressions may be evaluated too:
 
@@ -406,7 +363,7 @@ Regular expressions may be evaluated too:
 
 gives:
 
-	line nn: "a<b>c<d><e>f<g>h" =~ /\w*<(\w+)>/g = ('b', 'd', 'e', 'g');
+	Ln: "a<b>c<d><e>f<g>h" =~ /\w*<(\w+)>/g = ('b', 'd', 'e', 'g');
 
 If the expression is omitted, only the label will be printed.
 The sigil C<$> should be used in this case.
@@ -421,8 +378,8 @@ It must be a valid Perl expression.
 
 =item *
 
-In case of the #%{}-form, it must be a valid argument to the
-each() builtin function, i.e. it should resolve to an array or hash.
+In case of the #%{}-form, it must evaluate to a list of pairs, e.g.
+a hash.
 
 =back
 
@@ -531,7 +488,7 @@ Always print the literal expression along with its evaluation.
 
 Give a defined context where the expression is evaluated.
 Especially provide scalar and list context or perform an iteration
-over a while-each-loop.
+over the key-value pairs of a hash.
 The usage of L<Data::Dumper> was adopted later from Damian's
 implementation.
 
@@ -576,6 +533,5 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See L<http://dev.perl.org/licenses/> for more information.
-
 
 =cut

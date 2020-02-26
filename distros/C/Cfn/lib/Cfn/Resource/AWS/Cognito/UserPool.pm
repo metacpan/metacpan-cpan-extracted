@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPool generated from spec 9.1.0
+# AWS::Cognito::UserPool generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool',
@@ -40,6 +40,50 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool::StringAttributeConstr
   
   has MaxLength => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinLength => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOptionValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOptionValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::PasswordPolicy',
@@ -137,6 +181,27 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTe
   has EmailSubject => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EmailSubjectByLink => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SmsMessage => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfigurationValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfigurationValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CaseSensitive => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UserPoolAddOns',
@@ -352,11 +417,33 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool::AdminCreateUserConfig
   has UnusedAccountValidityDays => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySetting',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySetting',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySettingValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySettingValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has RecoveryMechanisms => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::Cognito::UserPool {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has AccountRecoverySetting => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySetting', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AdminCreateUserConfig => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AdminCreateUserConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AliasAttributes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AutoVerifiedAttributes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -376,6 +463,7 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool {
   has UserPoolName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UserPoolTags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UsernameAttributes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UsernameConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VerificationMessageTemplate => (isa => 'Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTemplate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

@@ -7,7 +7,7 @@ use Cwd ();
 use File::Basename ();
 use Sub::Util ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub THISFILE () { Cwd::abs_path((caller)[1]) }
 sub THISDIR () {
@@ -81,6 +81,15 @@ Path::This - Path to this source file or directory
   use Path::This '$THISDIR';
   use lib "$THISDIR/../lib";
 
+  # using core modules - use constant or BEGIN to resolve __FILE__ at compile time
+  use Cwd 'abs_path';
+  use File::Basename 'dirname';
+  use constant THISFILE => abs_path __FILE__;
+  use constant THISDIR => dirname abs_path __FILE__;
+  my ($THISFILE, $THISDIR);
+  BEGIN { $THISFILE = abs_path __FILE__ }
+  BEGIN { $THISDIR = dirname abs_path __FILE__ }
+
 =head1 DESCRIPTION
 
 Exports package variables by request that represent the current source file or
@@ -90,6 +99,9 @@ requested. Paths will be absolute with symlinks resolved.
 Note that the package variable or constant sub will be exported to the current
 package globally. If the same package will be used in multiple files, use the
 dynamic sub export so the file path will be calculated when the sub is called.
+
+For cases where this module cannot be loaded beforehand, the last section of
+the L</"SYNOPSIS"> shows how to perform the same task with core modules.
 
 =head1 EXPORTS
 

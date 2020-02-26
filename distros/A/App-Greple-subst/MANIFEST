@@ -6,6 +6,8 @@ README.md
 cpanfile
 lib/App/Greple/subst.pm
 minil.toml
+share/jtca-katakana-guide-3.dict
+share/jtca-katakana-guide-3.pl
 t/00_compile.t
 META.yml
 MANIFEST

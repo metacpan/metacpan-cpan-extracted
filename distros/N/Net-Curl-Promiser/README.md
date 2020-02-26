@@ -156,6 +156,10 @@ given to `process()` and returns a reference to a hash of
 `Net::Curl::Multi::CURL_CSELECT_OUT()`, depending on which events
 are available.
 
+**IMPORTANT:** Your event loop **MUST** **NOT** close file descriptors. This means
+that, if you create Perl filehandles from the file descriptors, you need to
+prevent Perl from closing the underlying file descriptors.
+
 # EXAMPLES
 
 See the distribution’s `/examples` directory.

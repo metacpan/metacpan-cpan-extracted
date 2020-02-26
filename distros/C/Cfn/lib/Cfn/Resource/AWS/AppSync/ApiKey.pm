@@ -1,4 +1,4 @@
-# AWS::AppSync::ApiKey generated from spec 2.25.0
+# AWS::AppSync::ApiKey generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::ApiKey',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::ApiKey {
     [ 'ApiKey','Arn' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-southeast-2','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-southeast-2','cn-north-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

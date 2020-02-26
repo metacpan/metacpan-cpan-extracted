@@ -3,9 +3,9 @@ NAME
     modules
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Pod::Weaver::Plugin::PatchModule (from Perl distribution
-    Pod-Weaver-Plugin-PatchModule), released on 2019-12-09.
+    Pod-Weaver-Plugin-PatchModule), released on 2019-12-17.
 
 SYNOPSIS
     In weaver.ini:

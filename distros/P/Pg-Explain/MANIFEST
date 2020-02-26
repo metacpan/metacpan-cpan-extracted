@@ -225,6 +225,9 @@ t/47-aggregate-names.d/4.json
 t/47-aggregate-names.d/4.txt
 t/47-aggregate-names.d/4.xml
 t/47-aggregate-names.d/4.yaml
+t/47-aggregate-names.d/5.json
+t/47-aggregate-names.d/5.txt
+t/47-aggregate-names.d/5.yaml
 t/47-aggregate-names.t
 t/99-manifest.t
 t/perlcriticrc

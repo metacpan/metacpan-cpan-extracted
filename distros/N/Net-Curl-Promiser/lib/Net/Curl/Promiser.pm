@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =encoding utf-8
 
@@ -347,6 +347,10 @@ C<Net::Curl::Multi::CURL_CSELECT_OUT()>, depending on which events
 are available.
 
 =back
+
+B<IMPORTANT:> Your event loop B<MUST> B<NOT> close file descriptors. This means
+that, if you create Perl filehandles from the file descriptors, you need to
+prevent Perl from closing the underlying file descriptors.
 
 =cut
 

@@ -1,4 +1,4 @@
-# AWS::Glue::MLTransform generated from spec 9.1.0
+# AWS::Glue::MLTransform generated from spec 10.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Glue::MLTransform',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Glue::MLTransform {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

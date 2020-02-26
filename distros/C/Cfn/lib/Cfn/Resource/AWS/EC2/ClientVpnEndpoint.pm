@@ -1,4 +1,4 @@
-# AWS::EC2::ClientVpnEndpoint generated from spec 7.4.0
+# AWS::EC2::ClientVpnEndpoint generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::ClientVpnEndpoint',
@@ -188,6 +188,7 @@ package Cfn::Resource::Properties::AWS::EC2::ClientVpnEndpoint {
   has SplitTunnel => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TagSpecifications => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::ClientVpnEndpoint::TagSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has TransportProtocol => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has VpnPort => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

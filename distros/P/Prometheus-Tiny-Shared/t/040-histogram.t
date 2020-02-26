@@ -54,7 +54,7 @@ h_bucket{le="5"} 4
 h_bucket{le="7.5"} 4
 h_bucket{le="+Inf"} 4
 h_count 4
-h_sum 2
+h_sum 2.0
 EOF
 }
 
@@ -73,7 +73,7 @@ h_bucket{le="4"} 4
 h_bucket{le="5"} 4
 h_bucket{le="+Inf"} 4
 h_count 4
-h_sum 8
+h_sum 8.0
 EOF
 }
 done_testing;

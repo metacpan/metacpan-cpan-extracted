@@ -2,7 +2,7 @@ package Test2::Plugin::MemUsage;
 use strict;
 use warnings;
 
-our $VERSION = '0.002002';
+our $VERSION = '0.002003';
 
 use Test2::API qw/test2_add_callback_exit/;
 
@@ -32,10 +32,13 @@ sub send_mem_event {
 
     return unless $stats;
 
-    my %mem;
+    my %mem = (peak => ['NA', ''], size => ['NA', ''], rss  => ['NA', '']);
     $mem{peak} = [$1, $2] if $stats =~ m/VmPeak:\s+(\d+) (\S+)/;
     $mem{size} = [$1, $2] if $stats =~ m/VmSize:\s+(\d+) (\S+)/;
     $mem{rss}  = [$1, $2] if $stats =~ m/VmRSS:\s+(\d+) (\S+)/;
+
+    return unless grep { $_[0] ne 'NA' } values %mem;
+
     $mem{details} = "rss:  $mem{rss}->[0]$mem{rss}->[1]\nsize: $mem{size}->[0]$mem{size}->[1]\npeak: $mem{peak}->[0]$mem{peak}->[1]";
 
     $ctx->send_ev2(

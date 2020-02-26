@@ -3,7 +3,7 @@ package Object::Lazy; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Carp qw(confess);
 use Try::Tiny;
@@ -47,12 +47,12 @@ my $build_object = sub {
 sub DESTROY {} # is not AUTOLOAD
 
 sub AUTOLOAD { ## no critic (Autoloading ArgUnpacking)
-    my ($self, @params) =  @_;
+    my $self = $_[0];
 
     my $method = substr our $AUTOLOAD, 2 + length __PACKAGE__;
     my $built_object = $build_object->($self, \$_[0]);
 
-    return $built_object->$method(@params);
+    return $built_object->$method( @_[1 .. $#_] );
 }
 
 sub isa { ## no critic (ArgUnpacking)
@@ -143,7 +143,7 @@ Object::Lazy - create objects late from non-owned (foreign) classes
 
 =head1 VERSION
 
-0.15
+0.16
 
 =head1 SYNOPSIS
 
@@ -443,7 +443,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2007 - 2015,
+Copyright (c) 2007 - 2020,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

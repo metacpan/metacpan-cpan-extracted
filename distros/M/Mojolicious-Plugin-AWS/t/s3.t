@@ -4,29 +4,34 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-plugin 'Mojolicious::Plugin::AWS';
-
-my $t = Test::Mojo->new;
-
 ## s3 object lifecycle tests
 ## FIXME: put v1, put v2, get v2, delete v2, get v1, delete v1, get (no version) == 404
-if ($ENV{AWS_REGION} && $ENV{AWS_S3_BUCKET} && $ENV{AWS_S3_OBJECT} && $ENV{AWS_ACCESS_KEY} && $ENV{AWS_SECRET_KEY}) {
-    my $aws_region = $ENV{AWS_REGION};
-    my $access_key = $ENV{AWS_ACCESS_KEY};
-    my $secret_key = $ENV{AWS_SECRET_KEY};
-    my $s3_bucket  = $ENV{AWS_S3_BUCKET};
-    my $s3_object  = $ENV{AWS_S3_OBJECT};
+if (   $ENV{AWS_REGION}
+    && $ENV{AWS_S3_BUCKET}
+    && $ENV{AWS_S3_OBJECT}
+    && $ENV{AWS_ACCESS_KEY}
+    && $ENV{AWS_SECRET_KEY})
+{
+
+    plugin 'Mojolicious::Plugin::AWS' => {
+        region     => $ENV{AWS_REGION},
+        access_key => $ENV{AWS_ACCESS_KEY},
+        secret_key => $ENV{AWS_SECRET_KEY},
+    };
+
+    my $t = Test::Mojo->new;
+
+    my $s3_bucket = $ENV{AWS_S3_BUCKET};
+    my $s3_object = $ENV{AWS_S3_OBJECT};
 
     my $obj_version = '';
     my $obj_etag    = '';
     $t->app->s3_put_object(
-        region     => $aws_region,
-        access_key => $access_key,
-        secret_key => $secret_key,
-        bucket     => $s3_bucket,
-        object     => $s3_object,
+        bucket         => $s3_bucket,
+        object         => $s3_object,
         signed_headers => {'Content-Type' => 'application/json; charset=utf-8'},
-        payload    => [json => { root => { widget_label => 'socks' }, other => { damage_control => 'off' } }]
+        payload =>
+          [json => {root => {widget_label => 'socks'}, other => {damage_control => 'off'}}]
     )->then(
         sub {
             my $tx = shift;
@@ -49,13 +54,7 @@ if ($ENV{AWS_REGION} && $ENV{AWS_S3_BUCKET} && $ENV{AWS_S3_OBJECT} && $ENV{AWS_A
         }
     )->wait;
 
-    $t->app->s3_get_object(
-        region     => $aws_region,
-        access_key => $access_key,
-        secret_key => $secret_key,
-        bucket     => $s3_bucket,
-        object     => $s3_object,
-    )->then(
+    $t->app->s3_get_object(bucket => $s3_bucket, object => $s3_object,)->then(
         sub {
             my $tx = shift;
             ok $tx->res->headers->header('x-amz-request-id'), 'request id header'
@@ -73,13 +72,7 @@ if ($ENV{AWS_REGION} && $ENV{AWS_S3_BUCKET} && $ENV{AWS_S3_OBJECT} && $ENV{AWS_A
         }
     )->wait;
 
-    $t->app->s3_get_object_acl(
-        region     => $aws_region,
-        access_key => $access_key,
-        secret_key => $secret_key,
-        bucket     => $s3_bucket,
-        object     => $s3_object,
-    )->then(
+    $t->app->s3_get_object_acl(bucket => $s3_bucket, object => $s3_object,)->then(
         sub {
             my $tx = shift;
             ok $tx->res->headers->header('x-amz-version-id'), 'response has version id header'
@@ -96,12 +89,9 @@ if ($ENV{AWS_REGION} && $ENV{AWS_S3_BUCKET} && $ENV{AWS_S3_OBJECT} && $ENV{AWS_A
     )->wait;
 
     $t->app->s3_delete_object(
-        region     => $aws_region,
-        access_key => $access_key,
-        secret_key => $secret_key,
-        bucket     => $s3_bucket,
-        object     => $s3_object,
-        query      => { VersionId => $obj_version },
+        bucket => $s3_bucket,
+        object => $s3_object,
+        query  => {VersionId => $obj_version},
     )->then(
         sub {
             my $tx = shift;
@@ -117,13 +107,7 @@ if ($ENV{AWS_REGION} && $ENV{AWS_S3_BUCKET} && $ENV{AWS_S3_OBJECT} && $ENV{AWS_A
         }
     )->wait;
 
-    $t->app->s3_get_object(
-        region     => $aws_region,
-        access_key => $access_key,
-        secret_key => $secret_key,
-        bucket     => $s3_bucket,
-        object     => $s3_object,
-    )->then(
+    $t->app->s3_get_object(bucket => $s3_bucket, object => $s3_object,)->then(
         sub {
             my $tx = shift;
             ok $tx->res->headers->header('x-amz-request-id'), 'request id header'

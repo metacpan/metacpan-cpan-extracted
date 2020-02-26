@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Error;
 # ABSTRACT: Class to model an error
-our $VERSION = '1.20200214'; # VERSION
+our $VERSION = '1.20200226'; # VERSION
 use 5.20.0;
 use Moo::Role;
 use Types::Standard qw{Str HashRef ArrayRef};

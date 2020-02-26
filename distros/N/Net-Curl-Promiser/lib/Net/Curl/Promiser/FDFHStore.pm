@@ -9,8 +9,9 @@ package Net::Curl::Promiser::FDFHStore;
 #
 # So we keep a reference to each created socket via this object.
 #
-# The above problem appears to affect IO::Async as well,
-# but not AnyEvent.
+# The above problem appears to affect IO::Async as well—even if
+# you give file descriptors to IO::Async::Loop—but does not appear
+# to affect AnyEvent.
 
 sub new { bless {}, shift }
 
@@ -19,28 +20,12 @@ sub _create {
     $s;
 }
 
-sub get_checked {
-    if (my $s = $_[0]->{ $_[1] }) {
+sub get_fh {
 
-        # What if libcurl has closed the underlying file descriptor, though?
-        # We need to ensure that that hasn’t happened; if it has, then
-        # get rid of the filehandle and create a new one. This incurs an
-        # unfortunate overhead, but is there a better way?
-        return $s if _fh_is_active($s);
-    }
-
-    return $_[0]->{ $_[1] } = _create( $_[1] );
-}
-
-sub _fh_is_active {
-    local $!;
-
-    stat $_[0] or do {
-        return 0 if $!{'EBADF'};
-        die "stat() on socket: $!";
-    };
-
-    return 1;
+    # This used to stat() to ensure that the file descriptor wasn’t closed.
+    # But even if the FD had been closed and reopened, that would be
+    # transparent to Perl. So the stat() check shouldn’t be needed.
+    return $_[0]->{ $_[1] } ||= _create( $_[1] );
 }
 
 1;

@@ -51,12 +51,12 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

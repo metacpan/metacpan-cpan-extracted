@@ -36,10 +36,10 @@ resources:
   bugtracker: https://github.com/rjbs/Getopt-Long-Descriptive/issues
   homepage: https://github.com/rjbs/Getopt-Long-Descriptive
   repository: https://github.com/rjbs/Getopt-Long-Descriptive.git
-version: '0.104'
+version: '0.105'
 x_Dist_Zilla:
   perl:
-    version: '5.026003'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -152,7 +152,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.25.0
           repo_root: .
       name: '@RJBS/Git::NextVersion'
       version: '2.046'
@@ -296,7 +296,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.25.0
           repo_root: .
       name: '@RJBS/@Git/Check'
       version: '2.046'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -326,11 +326,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.104'
+          tag: '0.105'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.25.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -345,7 +345,7 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.25.0
           repo_root: .
       name: '@RJBS/@Git/Push'
       version: '2.046'
@@ -353,7 +353,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.20.1
+          git_version: 2.25.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -372,7 +372,7 @@ x_Dist_Zilla:
             - Moose::Conflicts
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
@@ -432,11 +432,12 @@ x_contributors:
   - 'Harley Pig <harleypig@gmail.com>'
   - 'hdp@cpan.org <hdp@cpan.org@fc0e91e4-031c-0410-8307-be39b06d7656>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Michael McClimon <michael@mcclimon.org>'
   - 'Niels Thykier <niels@thykier.net>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Roman Hubacek <roman.hubacek@centrum.cz>'
   - 'Smylers <SMYLERS@cpan.fsck.com>'
   - 'Thomas Neumann <blacky+perl@fluffbunny.de>'
   - 'zhouzhen1 <zhouzhen1@gmail.com>'
-x_generated_by_perl: v5.26.3
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

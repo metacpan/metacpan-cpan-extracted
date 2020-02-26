@@ -1,10 +1,12 @@
+=encoding utf8
+
 =head1 NAME
 
 subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.06
+Version 2.07
 
 =head1 SYNOPSIS
 
@@ -14,6 +16,8 @@ greple -Msubst --dict I<dictionary> [ options ]
   --select=N
   --linefold
   --stat
+  --with-stat
+  --stat-style=[default,dict]
   --diff
   --diffcmd command
   --replace
@@ -23,26 +27,11 @@ greple -Msubst --dict I<dictionary> [ options ]
 
 =head1 DESCRIPTION
 
-This B<greple> module supports search and substitution for text based
-on dictionary file.
-
-=begin comment
-
-Substitution can be indicated by option B<--subst-from> and
-B<--subst-to>, or specification file.
-
-Next command replaces all string "FROM" to "TO".
-
-  greple -Msubst --subst-from FROM --subst-to TO FROM
-
-Of course, you should rather use B<sed> in this case.  Option
-B<--subst-from> and B<--subst-to> can be repeated, and substitution is
-done in order.
-
-=end comment
+This B<greple> module supports check and substitution of text file
+using a dictionary file.
 
 Dictionary file is given by B<--dict> option and contains pattern and
-correct string pairs.
+expected string pairs.
 
     greple -Msubst --dict DICT
 
@@ -51,8 +40,8 @@ If the dictionary file contains following data:
     colou?r      color
     cent(er|re)  center
 
-Then above command find first pattern which does not match to second
-string, that is "colour" and "centre" in this case.
+Then above command find the first pattern which does not match the
+second string, that is "colour" and "centre" in this case.
 
 Field "//" in dictionary file is ignored, so this file can be written
 like this:
@@ -64,28 +53,6 @@ You can use same file by B<greple>'s B<-f> option and string after
 "//" is ignored as a comment in that case.
 
     greple -f DICT ...
-
-=begin comment
-
-Actually, it takes the second last field as a target, and the last
-field as a substitution string.  All other fields are ignored.  This
-behavior is useful when the pattern requires longer text than the
-string to be converted.  See the next example:
-
-    Black-\KMonday  // Monday  Friday
-
-Pattern matches to string "Monday", but requires string "Black-" is
-preceding to it.  Substitution is done just for string "Monday",
-which does not match to the original pattern.  As a matter of fact,
-look-ahead and look-behind pattern is removed automatically, next
-example works as expected.
-
-    (?<=Black-)Monday  // Friday
-
-Combining with B<greple>'s other options, it is possible to convert
-strings in the specific area of the target files.
-
-=end comment
 
 =head2 Overlapped pattern
 
@@ -101,17 +68,18 @@ warned (B<--warn-overlap> by default) and ignored.
 
 =over 7
 
-=item B<--check>=I<ng>|I<ok>|I<any>|I<outstand>|I<all>|I<none>
+=item B<--check>=I<outstand>|I<ng>|I<ok>|I<any>|I<all>|I<none>
 
 Option B<--check> takes argument from I<ng>, I<ok>, I<any>,
 I<outstand>, I<all> and I<none>.
 
 With default value I<outstand>, command will show information about
-correct and incorrect words only when incorrect word was found in the
-same file.
+both expected and unexpected words only when unexpected word was found
+in the same file.
 
-With value I<ng>, command will show information only about incorrect
-word.  If you want to get data for correct word, use I<ok> or I<any>.
+With value I<ng>, command will show information about unexpected
+words.  With value I<ok>, you will get information about expected
+words.  Both with value I<any>.
 
 Value I<all> and I<none> make sense only when used with B<--stat>
 option, and display information about never matched pattern.
@@ -120,7 +88,7 @@ option, and display information about never matched pattern.
 
 Select I<N>th entry from the dictionary.  Argument is interpreted by
 L<Getopt::EX::Numbers> module.  Range can be defined like
-B<--select>=I<1:3,7:9>.
+B<--select>=I<1:3,7:9>.  You can get numbers by B<--stat> option.
 
 =item B<--linefold>
 
@@ -133,15 +101,20 @@ confuses regex behavior somewhat, avoid to use if possible.
 
 =item B<--with-stat>
 
-Print statistical information.  By default, it only prints information
-about incorrect words.  Works with B<--check> option.
+Print statistical information.  Works with B<--check> option.
 
 Option B<--with-stat> print statistics after normal output, while
 B<--stat> print only statistics.
 
+=item B<--stat-style>=[I<default>|I<dict>]
+
+Using B<--stat-style=dict> option with B<--stat> and B<--check=any>,
+you can get dictionary style output for your working document.
+
 =item B<--subst>
 
-Substitute matched pattern to correct string.  Pattern without
+Substitute unexpected matched pattern to expected string.  Newline
+character in the matched string is ignored.  Pattern without
 replacement string is not changed.
 
 =item B<--diff>
@@ -175,6 +148,44 @@ Default off.
 
 =back
 
+=head1 DICTIONARY
+
+This module includes example dictionaries.  They are installed share
+directory and accessed by B<--exdict> option.
+
+    greple -Msubst --exdict katakana-guide-3.dict
+
+=over 7
+
+=item B<--exdict> I<dictionary>
+
+=item B<--exdictdir>
+
+Use I<dictionary> flie in the distribution as a dictionary file.
+
+=item B<--jtca-katakana-guide>
+
+Shortcut for "B<--exdict> L<jtca-katakana-guide-3.dict>".
+
+Created from following guideline document.
+
+    外来語（カタカナ）表記ガイドライン 第3版
+    制定：2015年8月
+    発行：2015年9月
+    一般財団法人テクニカルコミュニケーター協会 
+    Japan Technical Communicators Association
+    https://www.jtca.org/standardization/katakana_guide_3_20171222.pdf
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::subst
+    or
+    $ curl -sL http://cpanmin.us | perl - App::Greple::subst
+
 =head1 LICENSE
 
 Copyright (C) Kazumasa Utashiro.
@@ -197,7 +208,7 @@ Kazumasa Utashiro
 
 package App::Greple::subst;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 use v5.14;
 use strict;
@@ -207,6 +218,7 @@ use open IO => ':utf8';
 
 use Exporter 'import';
 our @EXPORT      = qw(
+    &subst_initialize
     &subst_begin
     &subst_diff
     &subst_create
@@ -223,6 +235,9 @@ use Getopt::EX::Numbers;
 use Getopt::EX::Module; # to avoid error. why?
 use App::Greple::Common;
 use App::Greple::Pattern;
+
+use File::Share qw(:all);
+$ENV{GREPLE_SUBST_DICT} //= dist_dir 'App-Greple-subst';
 
 # oo interface
 our @ISA = 'App::Greple::Pattern';
@@ -259,6 +274,8 @@ our $opt_subst = 0;
 our @opt_subst_from;
 our @opt_subst_to;
 our @opt_dictfile;
+our $opt_printdict;
+our $opt_dictname;
 our $opt_subst_diffcmd = "diff -u";
 our $opt_U;
 our $opt_check = 'outstand';
@@ -269,8 +286,8 @@ our $opt_subst_select;
 our $opt_linefold;
 our $opt_warn_overlap = 1;
 our $opt_warn_include = 0;
+our $opt_stat_style = "default";
 
-my $initialized;
 my $current_file;
 my $contents;
 my @fromto;
@@ -281,6 +298,8 @@ sub debug {
 }
 
 sub subst_initialize {
+
+    state $once_called++ and return;
 
     $ss_check = bless \$opt_check, "App::Greple::subst::SmartString";
 
@@ -312,19 +331,17 @@ sub subst_initialize {
 	    @result;
 	}->(@fromto);
     }
-
-    $initialized = 1;
 }
 
 sub subst_begin {
     my %arg = @_;
     $current_file = delete $arg{&FILELABEL} or die;
     $contents = $_ if $remember_data;
-
-    local $_; # for safety
-    subst_initialize if not $initialized;
 }
 
+#
+# define &divert_stdout and &recover_stdout
+#
 {
     my $diverted = 0;
 
@@ -332,7 +349,7 @@ sub subst_begin {
 	$diverted = $diverted == 0 ? 1 : return;
 	open  SUBST_STDOUT, '>&', \*STDOUT or die "open: $!";
 	close STDOUT;
-	open  STDOUT, '>/dev/null' or die "open: $!";
+	open  STDOUT, '>', '/dev/null' or die "open: $!";
     }
 
     sub recover_stdout {
@@ -347,7 +364,7 @@ use Text::VisualPrintf qw(vprintf vsprintf);
 use List::Util qw(max);
 
 sub vwidth {
-    if (not defined $_[0] or length $_[0] eq 0) {
+    if (not defined $_[0] or length $_[0] == 0) {
 	return 0;
     }
     Text::VisualWidth::PP::width $_[0];
@@ -371,23 +388,26 @@ sub subst_show_stat {
 	my @ok = grep { $_ eq $to } @keys;
 	if      (is $ss_check 'none') {
 	    next if @keys;
-	}
-	elsif (is $ss_check 'any') {
+	} elsif (is $ss_check 'any') {
 	    next unless @keys;
 	} elsif (is $ss_check 'ng', 'outstand') {
 	    next unless @ng;
 	} elsif (is $ss_check 'ok') {
 	    next unless @ok;
 	}
-	vprintf("%3d: %${from_max}s => %-${to_max}s",
-		$i + 1, $from_re // '', $to // '');
-	for my $key ((sort { $hash->{$b} <=> $hash->{$a} }
-		      grep { $_ ne $to } @keys),
-		     (grep { $_ eq $to } @keys)) {
-	    my $index = $key eq $to ? $i * 2 + 1 : $i * 2;
-	    printf(" %s(%d)",
-		   main::index_color($index, $key),
-		   $hash->{$key});
+	if ($opt_stat_style eq 'dict') {
+	    vprintf("%-${from_max}s // %s", $from_re // '', $to // '');
+	} else {
+	    vprintf("%3d: %${from_max}s => %-${to_max}s",
+		    $i + 1, $from_re // '', $to // '');
+	    for my $key ((sort { $hash->{$b} <=> $hash->{$a} }
+			  grep { $_ ne $to } @keys),
+			 (grep { $_ eq $to } @keys)) {
+		my $index = $key eq $to ? $i * 2 + 1 : $i * 2;
+		printf(" %s(%d)",
+		       main::index_color($index, $key),
+		       $hash->{$key});
+	    }
 	}
 	print "\n";
     }
@@ -398,12 +418,15 @@ sub subst_show_stat {
 sub read_dict {
     my $dict = shift;
 
+    say $dict if $opt_dictname;
+
     open DICT, $dict or die "$dict: $!\n";
 
     local $_;
     my $flag = FLAG_REGEX;
     $flag |= FLAG_COOK if $opt_linefold;
     while (<DICT>) {
+	print if $opt_printdict;
 	chomp;
 	s/^\s*#.*//;
 	/\S/ or next;
@@ -420,12 +443,12 @@ sub mix_regions {
     my $option = ref $_[0] eq 'HASH' ? shift : {};
     my($old, $new) = @_;
     return () if @$new == 0;
-    my @old = $option->{destructive} ? @_ : map { [ @$_ ] } @{$old};
-    my @new = $option->{destructive} ? @_ : map { [ @$_ ] } @{$new};
+    my @old = $option->{destructive} ? @{$old} : map [ @$_ ], @{$old};
+    my @new = $option->{destructive} ? @{$new} : map [ @$_ ], @{$new};
     unless ($option->{nosort}) {
 	@new = sort({$a->[0] <=> $b->[0] || $b->[1] <=> $a->[1]
-			 ||  (@$a > 2 ? $a->[2] <=> $b->[2] : 0)
-		    } @new);
+			 ||  (@$a > 2 ? $a->[2] <=> $b->[2] : 0) }
+		    @new);
     }
     my @out;
     my($include, $overlap) = @{$option}{qw(include overlap)};
@@ -460,11 +483,11 @@ sub subst_search {
     for my $index (0 .. $#fromto) {
 	my $p = $fromto[$index] // next;
 	my($from_re, $to) = ($p->string, $p->correct // '');
-	my @match = match_regions(pattern => $p->regex);
+	my @match = match_regions pattern => $p->regex;
 	next if @match == 0 and $opt_check ne 'all';
 	my $callback = sub {
 	    my($ms, $me, $i, $matched) = @_;
-	    my $s = $matched =~ s/\R//rg;
+	    my $s = $matched =~ s/\R//gr;
 	    $match_list[$index]->{$s}++;
 	    my $format = @opt_format[ $i % @opt_format ];
 	    sprintf($format,
@@ -473,7 +496,7 @@ sub subst_search {
 	};
 	my(@ok, @ng);
 	for (@match) {
-	    my $matched = substr($text, $_->[0], $_->[1] - $_->[0]);
+	    my $matched = substr $text, $_->[0], $_->[1] - $_->[0];
 	    if ($matched =~ s/\R//gr ne $to) {
 		$_->[2] = $index * 2;
 		push @ng, $_;
@@ -492,7 +515,7 @@ sub subst_search {
 	mix_regions {
 	    overlap => ( my $overlap = [] ),
 	    include => ( my $include = [] ),
-	    nosort => 1
+	    nosort  => 1,
 	}, \@matched, $mix;
 	##
 	## Warning
@@ -582,19 +605,23 @@ sub subst_create {
 
 __DATA__
 
-builtin dict|subst-file=s  @opt_dictfile
-builtin subst-format=s     @opt_format
-builtin subst!             $opt_subst
-builtin diffcmd=s          $opt_subst_diffcmd
-builtin U=i                $opt_U
-builtin check=s            $opt_check
-builtin select=s           $opt_subst_select
-builtin linefold!          $opt_linefold
-builtin remember!          $remember_data
-builtin warn-overlap!      $opt_warn_overlap
-builtin warn-include!      $opt_warn_include
+builtin dict=s         @opt_dictfile
+builtin stat-style=s   $opt_stat_style
+builtin printdict!     $opt_printdict
+builtin dictname!      $opt_dictname
+builtin subst-format=s @opt_format
+builtin subst!         $opt_subst
+builtin diffcmd=s      $opt_subst_diffcmd
+builtin U=i            $opt_U
+builtin check=s        $opt_check
+builtin select=s       $opt_subst_select
+builtin linefold!      $opt_linefold
+builtin remember!      $remember_data
+builtin warn-overlap!  $opt_warn_overlap
+builtin warn-include!  $opt_warn_include
 
 option default \
+	--prologue subst_initialize \
 	--begin subst_begin \
 	--le &subst_search --no-regioncolor \
 	--subst-color
@@ -636,6 +663,18 @@ option  --subst-color \
         --cm 555D/212,K/545 \
         --cm 555D/221,K/554 \
         --cm 555D/222,K/L23
+
+##
+## Handle included sample dictionaries.
+##
+
+option --exdict  --dict $ENV{GREPLE_SUBST_DICT}/$<shift>
+
+option --exdictdir --prologue 'sub{ say "$ENV{GREPLE_SUBST_DICT}"; exit }'
+
+option --jtca-katakana-guide --exdict jtca-katakana-guide-3.dict
+
+option --dumpdict --printdict --prologue 'sub{exit}'
 
 #  LocalWords:  subst Greple greple ng ok outstand linefold dict diff
 #  LocalWords:  regex Kazumasa Utashiro

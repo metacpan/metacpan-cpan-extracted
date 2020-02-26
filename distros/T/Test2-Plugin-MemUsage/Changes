@@ -1,3 +1,7 @@
+0.002003  2020-02-26 08:09:20-08:00 America/Los_Angeles
+
+    - Avoid warnings when info is missing
+
 0.002002  2019-08-19 10:57:16-07:00 America/Los_Angeles
 
     - Add harness_job_fields

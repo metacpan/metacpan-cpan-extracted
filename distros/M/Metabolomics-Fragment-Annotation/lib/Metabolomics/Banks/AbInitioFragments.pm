@@ -422,7 +422,7 @@ sub buildTheoDimerFromMz {
 			'2M+ACN+Na'  => 64.015765 ,
     	) ;
     	
-    	foreach my $adduct (keys %posAdducts) {
+    	foreach my $adduct ( sort {lc $a cmp lc $b} keys %posAdducts) {
     		
     		my $adductMass = $posAdducts{$adduct} ;
     		## Only for Dimers !!!!
@@ -457,7 +457,7 @@ sub buildTheoDimerFromMz {
 			'2M+Hac-H' => 59.013851 ,
     	) ;
     	
-    	foreach my $adduct (keys %negAdducts) {
+    	foreach my $adduct (sort {lc $a cmp lc $b} keys %negAdducts) {
     		
     		my $adductMass = $negAdducts{$adduct} ;
     		## Only for Dimers !!!!
@@ -477,7 +477,7 @@ sub buildTheoDimerFromMz {
 	    	$oPeak->_setPeak_ANNOTATION_NAME ( $adduct );
 			$oPeak->_setPeak_ANNOTATION_IN_NEG_MODE (  $adduct ) ;
 			
-			print Dumper $oPeak ;
+#			print Dumper $oPeak ;
 			
 			$self->_addPeakList('_THEO_PEAK_LIST_', $oPeak) ;
     	}
@@ -530,7 +530,7 @@ sub isotopicAdvancedCalculation {
    		# find if it is a fragment
    		if ( defined $peak->_getPeak_ANNOTATION_TYPE() ) {
    			
-   			if ( ($peak->_getPeak_ANNOTATION_TYPE() eq 'fragment' ) or ($peak->_getPeak_ANNOTATION_TYPE() eq 'adduct' ) ) {
+   			if ( ($peak->_getPeak_ANNOTATION_TYPE() eq 'fragment' ) or ($peak->_getPeak_ANNOTATION_TYPE() eq 'adduct' ) or ($peak->_getPeak_ANNOTATION_TYPE() eq 'dimeric adduct' ) ) {
    				
    				my $peakMass = $peak->_getPeak_COMPUTED_MONOISOTOPIC_MASS() ;
    				my $peakAnnotationName = $peak->_getPeak_ANNOTATION_NAME() ;
@@ -541,7 +541,7 @@ sub isotopicAdvancedCalculation {
    				$peakAnnotationInPosMode = $peak->_getPeak_ANNOTATION_IN_POS_MODE() if ( $peak->_getPeak_ANNOTATION_IN_POS_MODE() ) ;
    				$peakAnnotationInNegMode = $peak->_getPeak_ANNOTATION_IN_NEG_MODE() if ( $peak->_getPeak_ANNOTATION_IN_NEG_MODE() ) ;
    				
-   				foreach my $isotope (keys %isotopes) {
+   				foreach my $isotope ( sort {lc $a cmp lc $b} keys %isotopes) {
    					
    					my $isotopeMass = $isotopes{$isotope} ;
    					

@@ -1,4 +1,3 @@
-.travis.yml
 bin/efa
 Build.PL
 Changelog
@@ -11,9 +10,6 @@ lib/Travel/Routing/DE/VRR.pm
 MANIFEST			This list of files
 provides/zsh/completions/_efa
 README
-t/00-compile-pm.t
-t/01-compile-pl.t
-t/10-pod.t
 t/20-vrr.t
 t/21-vrr.t
 t/in/ambiguous
@@ -37,6 +33,9 @@ t/out/e_hbf_mh_hbf
 t/out/e_hbf_mh_hbf.ignore_none
 t/out/e_martinstr_e_florastr
 t/out/e_werden_e_hbf
+xt/00-compile-pm.t
+xt/01-compile-pl.t
+xt/10-pod.t
 META.yml
 META.json
 SIGNATURE    Added here by Module::Build

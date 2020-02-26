@@ -23,7 +23,8 @@ t/10_ref.t
 t/11_logger.t
 t/12_no_ref.t
 t/13_wrapped.t
-t/14_test_examples.t
+t/14_call_by_reference.t
+t/15_test_examples.t
 t/chars.t
 t/perl_critic.t
 t/pod.t

@@ -1,4 +1,4 @@
-# AWS::Transfer::User generated from spec 5.3.0
+# AWS::Transfer::User generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Transfer::User',
@@ -61,6 +61,50 @@ package Cfn::Resource::Properties::AWS::Transfer::User::SshPublicKeyValue {
   extends 'Cfn::Value::TypedValue';
   
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntryValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntryValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Entry => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Target => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 package Cfn::Resource::Properties::AWS::Transfer::User {
   use Moose;
@@ -68,6 +112,8 @@ package Cfn::Resource::Properties::AWS::Transfer::User {
   extends 'Cfn::Resource::Properties';
   
   has HomeDirectory => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HomeDirectoryMappings => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Transfer::User::HomeDirectoryMapEntry', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HomeDirectoryType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Policy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Role => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServerId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

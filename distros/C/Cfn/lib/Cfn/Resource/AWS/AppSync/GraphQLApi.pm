@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLApi generated from spec 5.3.0
+# AWS::AppSync::GraphQLApi generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::GraphQLApi {
     [ 'ApiId','Arn','GraphQLUrl' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -189,6 +189,7 @@ package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi {
   has OpenIDConnectConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::Tags', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has UserPoolConfig => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has XrayEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

@@ -26,7 +26,7 @@ no_index:
 provides:
   Path::This:
     file: lib/Path/This.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -37,10 +37,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Path-This/issues
   homepage: https://github.com/Grinnz/Path-This
   repository: https://github.com/Grinnz/Path-This.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
-    version: '5.030000'
+    version: '5.030001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -89,7 +89,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.21.0
+          git_version: 2.21.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -117,7 +117,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.21.1
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
       version: '2.046'
@@ -170,7 +170,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.21.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -183,11 +183,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.21.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -218,7 +218,7 @@ x_Dist_Zilla:
             - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.21.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -232,7 +232,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.21.0
+          git_version: 2.21.1
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
       version: '2.046'
@@ -409,5 +409,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.30.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

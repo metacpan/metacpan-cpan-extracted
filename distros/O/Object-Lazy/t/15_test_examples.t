@@ -35,8 +35,8 @@ EOT
 condition = 0
 object = Object::Lazy=HASH(...)
 Data::Dumper object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
+\tObject::Lazy::try {...} () called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
 \tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
 \tObject::Lazy::BUILD_OBJECT(Data::Dumper=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 53
 \tObject::Lazy::AUTOLOAD(Data::Dumper=HASH(...)) called at 02_extended_constructor.pl line 29
@@ -54,8 +54,8 @@ EOT
 1 = $object->isa('RealClass');
 1 = $object->isa('BaseClassOfRealClass');
 RealClass object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
+\tObject::Lazy::try {...} () called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
 \tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
 \tObject::Lazy::BUILD_OBJECT(RealClass=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 53
 \tObject::Lazy::AUTOLOAD(RealClass=HASH(...)) called at 03_isa.pl line 38
@@ -70,8 +70,8 @@ EOT
 1 = $object->DOES('RealClass');
 1 = $object->DOES('Role');
 RealClass object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
+\tObject::Lazy::try {...} () called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
 \tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
 \tObject::Lazy::BUILD_OBJECT(RealClass=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 53
 \tObject::Lazy::AUTOLOAD(RealClass=HASH(...)) called at 04_DOES.pl line 39
@@ -86,14 +86,10 @@ EOT
 Data::Dumper version 9999 required--this is only version ... at ../lib/Object/Lazy.pm line 124.
 11.12.13 = $object_2->VERSION( qv(11.12.13') )
 Real object 1 object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
-\tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
-\tObject::Lazy::BUILD_OBJECT(Data::Dumper=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 53
-\tObject::Lazy::AUTOLOAD(Data::Dumper=HASH(...)) called at 05_VERSION.pl line 50
-Real object 2 object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
+\tObject::Lazy::try {...} () called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
+\tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
 \tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
 \tObject::Lazy::BUILD_OBJECT(Data::Dumper=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 53
 \tObject::Lazy::AUTOLOAD(Data::Dumper=HASH(...)) called at 05_VERSION.pl line 51
@@ -106,8 +102,8 @@ EOT
         result => <<'EOT',
 RealClass = ref $object;
 RealClass object built at ../lib/Object/Lazy.pm line 35.
-\tObject::Lazy::try {...} () called at D:/Perl/site/lib/Try/Tiny.pm line 81
-\teval {...} called at D:/Perl/site/lib/Try/Tiny.pm line 72
+\tObject::Lazy::try {...} () called at Perl/site/lib/Try/Tiny.pm line
+\teval {...} called at Perl/site/lib/Try/Tiny.pm line
 \tTry::Tiny::try(CODE(...), Try::Tiny::Catch=REF(...)) called at ../lib/Object/Lazy.pm line 39
 \tObject::Lazy::BUILD_OBJECT(RealClass=HASH(...), REF(...)) called at ../lib/Object/Lazy.pm line 110
 \tObject::Lazy::can(RealClass=HASH(...), "new") called at 06_ref.pl line 27
@@ -138,9 +134,15 @@ for my $data (@data) {
     }
     {$1 ...}xms;
 
+    # ignore Try::Tiny line numbers
+    $result =~ s{ ( \Q/lib/Try/Tiny.pm line\E ) \s+ \d+ }{$1}xmsg;
+
+    # ignore Perl root path
+    $result =~ s{ ( \Qcalled at\E \s+ ) .*? [/] ( Perl/ ) }{$1$2}xmsg;
+
     # interpolate tab only
     $data->{result} =~ s{\\t}{\t}xmsg;
-
+    
     SKIP: {
         if ( UNIVERSAL->can('DOES') ) {
             eq_or_diff(

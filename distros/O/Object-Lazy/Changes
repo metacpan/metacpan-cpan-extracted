@@ -1,5 +1,8 @@
 Revision history for Perl extension Object::Lazy.
 
+0.16  Wed Feb 26 00:23:38 2020
+- https://rt.cpan.org/Ticket/Display.html?id=131817
+
 0.15  Mon Jul  6 22:51:19 2015
 - fixed POD errors, thanks MAUKE
 

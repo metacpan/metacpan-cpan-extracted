@@ -12,6 +12,9 @@ lib/Cfn.pm
 lib/Cfn/Crawler.pm
 lib/Cfn/Dependencies.pm
 lib/Cfn/Diff.pm
+lib/Cfn/Resource/AWS/ACMPCA/Certificate.pm
+lib/Cfn/Resource/AWS/ACMPCA/CertificateAuthority.pm
+lib/Cfn/Resource/AWS/ACMPCA/CertificateAuthorityActivation.pm
 lib/Cfn/Resource/AWS/AccessAnalyzer/Analyzer.pm
 lib/Cfn/Resource/AWS/AmazonMQ/Broker.pm
 lib/Cfn/Resource/AWS/AmazonMQ/Configuration.pm
@@ -49,6 +52,11 @@ lib/Cfn/Resource/AWS/ApiGatewayV2/Model.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Route.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/RouteResponse.pm
 lib/Cfn/Resource/AWS/ApiGatewayV2/Stage.pm
+lib/Cfn/Resource/AWS/AppConfig/Application.pm
+lib/Cfn/Resource/AWS/AppConfig/ConfigurationProfile.pm
+lib/Cfn/Resource/AWS/AppConfig/Deployment.pm
+lib/Cfn/Resource/AWS/AppConfig/DeploymentStrategy.pm
+lib/Cfn/Resource/AWS/AppConfig/Environment.pm
 lib/Cfn/Resource/AWS/AppMesh/Mesh.pm
 lib/Cfn/Resource/AWS/AppMesh/Route.pm
 lib/Cfn/Resource/AWS/AppMesh/VirtualNode.pm
@@ -100,6 +108,7 @@ lib/Cfn/Resource/AWS/CloudWatch/AnomalyDetector.pm
 lib/Cfn/Resource/AWS/CloudWatch/Dashboard.pm
 lib/Cfn/Resource/AWS/CloudWatch/InsightRule.pm
 lib/Cfn/Resource/AWS/CodeBuild/Project.pm
+lib/Cfn/Resource/AWS/CodeBuild/ReportGroup.pm
 lib/Cfn/Resource/AWS/CodeBuild/SourceCredential.pm
 lib/Cfn/Resource/AWS/CodeCommit/Repository.pm
 lib/Cfn/Resource/AWS/CodeDeploy/Application.pm
@@ -126,8 +135,10 @@ lib/Cfn/Resource/AWS/Config/AggregationAuthorization.pm
 lib/Cfn/Resource/AWS/Config/ConfigRule.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationAggregator.pm
 lib/Cfn/Resource/AWS/Config/ConfigurationRecorder.pm
+lib/Cfn/Resource/AWS/Config/ConformancePack.pm
 lib/Cfn/Resource/AWS/Config/DeliveryChannel.pm
 lib/Cfn/Resource/AWS/Config/OrganizationConfigRule.pm
+lib/Cfn/Resource/AWS/Config/OrganizationConformancePack.pm
 lib/Cfn/Resource/AWS/Config/RemediationConfiguration.pm
 lib/Cfn/Resource/AWS/DAX/Cluster.pm
 lib/Cfn/Resource/AWS/DAX/ParameterGroup.pm
@@ -159,10 +170,13 @@ lib/Cfn/Resource/AWS/EC2/EIP.pm
 lib/Cfn/Resource/AWS/EC2/EIPAssociation.pm
 lib/Cfn/Resource/AWS/EC2/EgressOnlyInternetGateway.pm
 lib/Cfn/Resource/AWS/EC2/FlowLog.pm
+lib/Cfn/Resource/AWS/EC2/GatewayRouteTableAssociation.pm
 lib/Cfn/Resource/AWS/EC2/Host.pm
 lib/Cfn/Resource/AWS/EC2/Instance.pm
 lib/Cfn/Resource/AWS/EC2/InternetGateway.pm
 lib/Cfn/Resource/AWS/EC2/LaunchTemplate.pm
+lib/Cfn/Resource/AWS/EC2/LocalGatewayRoute.pm
+lib/Cfn/Resource/AWS/EC2/LocalGatewayRouteTableVPCAssociation.pm
 lib/Cfn/Resource/AWS/EC2/NatGateway.pm
 lib/Cfn/Resource/AWS/EC2/NetworkAcl.pm
 lib/Cfn/Resource/AWS/EC2/NetworkAclEntry.pm
@@ -244,6 +258,8 @@ lib/Cfn/Resource/AWS/EventSchemas/Schema.pm
 lib/Cfn/Resource/AWS/Events/EventBus.pm
 lib/Cfn/Resource/AWS/Events/EventBusPolicy.pm
 lib/Cfn/Resource/AWS/Events/Rule.pm
+lib/Cfn/Resource/AWS/FMS/NotificationChannel.pm
+lib/Cfn/Resource/AWS/FMS/Policy.pm
 lib/Cfn/Resource/AWS/FSx/FileSystem.pm
 lib/Cfn/Resource/AWS/GameLift/Alias.pm
 lib/Cfn/Resource/AWS/GameLift/Build.pm
@@ -499,6 +515,7 @@ lib/Cfn/Resource/AWS/WAFv2/IPSet.pm
 lib/Cfn/Resource/AWS/WAFv2/RegexPatternSet.pm
 lib/Cfn/Resource/AWS/WAFv2/RuleGroup.pm
 lib/Cfn/Resource/AWS/WAFv2/WebACL.pm
+lib/Cfn/Resource/AWS/WAFv2/WebACLAssociation.pm
 lib/Cfn/Resource/AWS/WorkSpaces/Workspace.pm
 lib/Cfn/Resource/Alexa/ASK/Skill.pm
 lib/Cfn/ResourceModules.pm

@@ -1,5 +1,9 @@
 Revision history for Assert-Refute-T-Array
 
+0.17    Wed Feb 26 2020
+        - Remove "experimental" disclaimer
+        - Make map_subtest automatically pass under Test::More
+
 0.16    Thu Nov 22 2018
         - Split away from Assert::Refute
         - has array_of, is_sorted, map_subtest, reduce_subtest

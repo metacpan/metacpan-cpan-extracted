@@ -1,71 +1,78 @@
 package Pcore::API::Proxy;
 
-use Pcore -const, -class, -res, -export;
+use Pcore -const, -class, -res;
 use Pcore::Util::Scalar qw[is_ref];
 
-our $EXPORT = { PROXY_TYPE => [qw[$PROXY_TYPE_HTTP $PROXY_TYPE_CONNECT $PROXY_TYPE_SOCKS4 $PROXY_TYPE_SOCKS4A $PROXY_TYPE_SOCKS5]] };
+has uri => ( required => 1 );    # InstanceOf['Pcore::Util::URI']
 
-has uri        => ( required => 1 );    # InstanceOf['Pcore::Util::URI']
 has is_http    => ();
-has is_connect => ();
+has is_socks   => ();
 has is_socks4  => ();
 has is_socks4a => ();
 has is_socks5  => ();
 
-has pool => ();                         # Maybe [Object]
-
-has threads => ( 0, init_arg => undef );
-
-const our $PROXY_TYPE_HTTP    => 1;
-const our $PROXY_TYPE_CONNECT => 2;
-const our $PROXY_TYPE_SOCKS4  => 3;
-const our $PROXY_TYPE_SOCKS4A => 4;
-const our $PROXY_TYPE_SOCKS5  => 5;
-
 around new => sub ( $orig, $self, $uri ) {
-    my $args;
+    if ( !is_ref $uri) {
+        $uri = "http://$uri" if $uri !~ m[//]sm;
 
-    $args->{uri} = is_ref $uri ? $uri : P->uri($uri);
-
-    my $scheme = $args->{uri}->{scheme};
-
-    if ( $scheme eq 'http' ) {
-        $args->{is_http} = 1;
+        $uri = P->uri($uri);
     }
-    elsif ( $scheme eq 'connect' ) {
-        $args->{is_connect} = 1;
+    else {
+        return $uri if $uri->isa('Pcore::API::Proxy');
+    }
+
+    $self = $self->$orig( uri => $uri );
+
+    $self->{uri} = $uri;
+
+    my $scheme = $uri->{scheme};
+
+    if ( !$scheme || $scheme eq 'http' ) {
+        $self->{is_http} = 1;
+    }
+    elsif ( $scheme eq 'socks' || $scheme eq 'socks5' ) {
+        $self->{is_socks}  = 1;
+        $self->{is_socks5} = 1;
     }
     elsif ( $scheme eq 'socks4' ) {
-        $args->{is_socks4} = 1;
+        $self->{is_socks}  = 1;
+        $self->{is_socks4} = 1;
     }
     elsif ( $scheme eq 'socks4a' ) {
-        $args->{is_socks4a} = 1;
+        $self->{is_socks}   = 1;
+        $self->{is_socks4a} = 1;
     }
-    elsif ( $scheme eq 'socks5' ) {
-        $args->{is_socks5} = 1;
+    else {
+        die 'Invalid proxy scheme';
     }
 
-    return $self->$orig($args);
+    return $self;
 };
 
 sub connect ( $self, $uri, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     $uri = P->uri($uri) if !is_ref $uri;
 
-    my $type;
+    my $connect_method;
 
     if ( $uri->{is_http} ) {
-        $type = 'http'    if !$uri->{is_secure} && $self->{is_http};
-        $type = 'connect' if !$type             && $self->{is_connect};
+        if ( $self->{is_http} ) {
+            if ( $uri->{is_secure} ) {
+                $connect_method = 'connect';
+            }
+            else {
+                $connect_method = 'http';
+            }
+        }
+        else {
+            $connect_method = 'socks';
+        }
+    }
+    else {
+        $connect_method = 'socks';
     }
 
-    if ( !$type ) {
-        if    ( $self->{is_socks4} )  { $type = 'socks4' }
-        elsif ( $self->{is_socks4a} ) { $type = 'socks4a' }
-        elsif ( $self->{is_socks5} )  { $type = 'socks5' }
-    }
-
-    if ($type) {
-        my $method = "connect_$type";
+    if ($connect_method) {
+        my $method = "connect_$connect_method";
 
         return $self->$method( $uri, @args );
     }
@@ -77,27 +84,19 @@ sub connect ( $self, $uri, @args ) {    ## no critic qw[Subroutines::ProhibitBui
 sub connect_http ( $self, $uri, @args ) {
     $uri = P->uri($uri) if !is_ref $uri;
 
-    # TODO
-    # $self->start_thread;
-    # $self->finish_thread;
-
     my $h = P->handle( $self->{uri}, @args );
 
     # connect error
     return $h if !$h;
 
-    $h->{proxy}      = $self;
-    $h->{proxy_type} = $PROXY_TYPE_HTTP;
+    $h->{proxy}         = $self;
+    $h->{proxy_is_http} = 1;
 
     return $h;
 }
 
 sub connect_connect ( $self, $uri, @args ) {
     $uri = P->uri($uri) if !is_ref $uri;
-
-    # TODO
-    # $self->start_thread;
-    # $self->finish_thread;
 
     my $h = P->handle( $self->{uri}, @args );
 
@@ -121,19 +120,28 @@ sub connect_connect ( $self, $uri, @args ) {
         return $h;
     }
 
-    $h->{proxy}      = $self;
-    $h->{proxy_type} = $PROXY_TYPE_CONNECT;
-    $h->{peername}   = $uri->{host};
+    $h->{proxy}    = $self;
+    $h->{peername} = $uri->{host};
 
     return $h;
 }
 
+sub connect_socks ( $self, $uri, @args ) {
+    if ( $self->{is_socks5} || !$self->{is_socks} ) {
+        return $self->connect_socks5( $uri, @args );
+    }
+    elsif ( $self->{is_socks4a} ) {
+        return $self->connect_socks4a( $uri, @args );
+    }
+    elsif ( $self->{is_socks4} ) {
+        return $self->connect_socks4( $uri, @args );
+    }
+
+    return;
+}
+
 sub connect_socks4 ( $self, $uri, @args ) {
     $uri = P->uri($uri) if !is_ref $uri;
-
-    # TODO
-    # $self->start_thread;
-    # $self->finish_thread;
 
     my $h = P->handle( $self->{uri}, @args );
 
@@ -166,9 +174,8 @@ sub connect_socks4 ( $self, $uri, @args ) {
 
     # request granted
     if ( $rep == 90 ) {
-        $h->{proxy}      = $self;
-        $h->{proxy_type} = $PROXY_TYPE_SOCKS4;
-        $h->{peername}   = $uri->{host};
+        $h->{proxy}    = $self;
+        $h->{peername} = $uri->{host};
     }
 
     # request rejected or failed, tunnel creation error
@@ -194,12 +201,13 @@ sub connect_socks4 ( $self, $uri, @args ) {
     return $h;
 }
 
+# TODO
+sub connect_socks4a ( $self, $uri, @args ) {
+    ...;
+}
+
 sub connect_socks5 ( $self, $uri, @args ) {
     $uri = P->uri($uri) if !is_ref $uri;
-
-    # TODO
-    # $self->start_thread;
-    # $self->finish_thread;
 
     my $h = P->handle( $self->{uri}, @args );
 
@@ -296,9 +304,8 @@ sub _socks5_establish_tunnel ( $self, $h, $uri ) {
             my $ip_port = $h->read_chunk(6) or return $h;
 
             # connected
-            $h->{proxy}      = $self;
-            $h->{proxy_type} = $PROXY_TYPE_SOCKS5;
-            $h->{peername}   = $uri->{host};
+            $h->{proxy}    = $self;
+            $h->{peername} = $uri->{host};
 
             return $h;
         }
@@ -313,9 +320,8 @@ sub _socks5_establish_tunnel ( $self, $h, $uri ) {
             my $host_port = $h->read_chunk( unpack( 'C', $len->$* ) + 2 ) or return $h;
 
             # connected
-            $h->{proxy}      = $self;
-            $h->{proxy_type} = $PROXY_TYPE_SOCKS5;
-            $h->{peername}   = $uri->{host};
+            $h->{proxy}    = $self;
+            $h->{peername} = $uri->{host};
 
             return $h;
         }
@@ -327,9 +333,8 @@ sub _socks5_establish_tunnel ( $self, $h, $uri ) {
             $chunk = $h->read_chunk(18) or return $h;
 
             # connected
-            $h->{proxy}      = $self;
-            $h->{proxy_type} = $PROXY_TYPE_SOCKS5;
-            $h->{peername}   = $uri->{host};
+            $h->{proxy}    = $self;
+            $h->{peername} = $uri->{host};
 
             return $h;
         }
@@ -340,22 +345,6 @@ sub _socks5_establish_tunnel ( $self, $h, $uri ) {
     return $h;
 }
 
-sub start_thread ($self) {
-    $self->{threads}++;
-
-    $self->{pool}->start_thread($self) if defined $self->{pool};
-
-    return;
-}
-
-sub finish_thread ($self) {
-    $self->{threads}--;
-
-    $self->{pool}->finish_thread($self) if defined $self->{pool};
-
-    return;
-}
-
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -363,7 +352,9 @@ sub finish_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 165, 273, 278, 283   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    3 | 206                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 173, 281, 286, 291   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

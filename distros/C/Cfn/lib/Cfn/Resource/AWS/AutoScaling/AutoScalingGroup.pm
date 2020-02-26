@@ -1,4 +1,4 @@
-# AWS::AutoScaling::AutoScalingGroup generated from spec 5.3.0
+# AWS::AutoScaling::AutoScalingGroup generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup',
@@ -84,6 +84,7 @@ package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTem
   extends 'Cfn::Value::TypedValue';
   
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WeightedCapacity => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplate',

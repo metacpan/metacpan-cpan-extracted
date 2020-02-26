@@ -1,4 +1,4 @@
-# AWS::FSx::FileSystem generated from spec 10.0.0
+# AWS::FSx::FileSystem generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem',
@@ -93,9 +93,11 @@ package Cfn::Resource::Properties::AWS::FSx::FileSystem::LustreConfigurationValu
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has DeploymentType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ExportPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ImportedFileChunkSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ImportPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PerUnitStorageThroughput => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has WeeklyMaintenanceStartTime => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

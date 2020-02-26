@@ -41,7 +41,7 @@ use Exception::Class (
 	},
 );
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 sub set_time {
 	my ( $self, %conf ) = @_;
@@ -839,13 +839,15 @@ sub check_ambiguous_xml {
 	if ( $s_place eq 'notidentified' ) {
 		Travel::Routing::DE::EFA::Exception::Setup->throw(
 			option => 'place',
-			error  => 'unknown place (typo?)'
+			error  => 'unknown place',
+			have   => ( $e_place->findnodes($xp_place_input) )[0]->textContent,
 		);
 	}
 	if ( $s_name eq 'notidentified' ) {
 		Travel::Routing::DE::EFA::Exception::Setup->throw(
 			option => 'name',
-			error  => 'unknown name (typo?)'
+			error  => 'unknown name',
+			have   => ( $e_name->findnodes($xp_name_input) )[0]->textContent,
 		);
 	}
 
@@ -882,6 +884,11 @@ sub get_efa_urls {
 			url       => 'http://efa.vor.at/wvb/XSLT_TRIP_REQUEST2',
 			name      => 'Verkehrsverbund Ost-Region',
 			shortname => 'VOR',
+		},
+		{
+			url  => 'https://projekte.kvv-efa.de/sl3-alone/XSLT_TRIP_REQUEST2',
+			name => 'Karlsruher Verkehrsverbund',
+			shortname => 'KVV',
 		},
 
 		# Returns broken Unicode which makes Encode::decode die()
@@ -936,11 +943,6 @@ sub get_efa_urls {
 			shortname => 'VMV',
 		},
 		{
-			url       => 'http://213.144.24.66/kvv2/XML_TRIP_REQUEST2',
-			name      => 'Karlsruher Verkehrsverbund',
-			shortname => 'KVV',
-		},
-		{
 			url =>
 			  'http://www.travelineeastmidlands.co.uk/em/XSLT_TRIP_REQUEST2',
 			name      => 'Traveline East Midlands',
@@ -991,7 +993,7 @@ Travel::Routing::DE::EFA - unofficial interface to EFA-based itinerary services
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 DESCRIPTION
 

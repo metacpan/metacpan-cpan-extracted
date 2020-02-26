@@ -4,6 +4,8 @@ author:
   - 'Jörg Sommrey <git@sommrey.de>'
 build_requires:
   IO::String: '0'
+  List::Util: '0'
+  Scalar::Util: '1.26'
   Test2::V0: '0'
   Test::More: '0'
 configure_requires:
@@ -23,9 +25,8 @@ requires:
   Data::Dumper: '0'
   Exporter::Tiny: '0.025'
   Filter::Simple: '0'
-  Scalar::Util: '1.26'
   perl: '5.01'
 resources:
   bugtracker: https://github.com/jo-37/debug-filter-printexpr/issues
   repository: git://github.com/jo-37/debug-filter-printexpr.git
-version: '0.13'
+version: '0.14'

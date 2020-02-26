@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A tiny Prometheus client backed by a shared memory region",
+  "ABSTRACT" => "A tiny Prometheus client with a shared database behind it",
   "AUTHOR" => "Rob N \x{2605} <robn\@robn.io>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,19 +16,25 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Prometheus::Tiny::Shared",
   "PREREQ_PM" => {
-    "Cache::FastMmap" => 0,
+    "Carp" => 0,
+    "DBD::SQLite" => 0,
+    "DBI" => 0,
     "Prometheus::Tiny" => "0.004",
+    "Sereal" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Random" => 0,
     "File::Temp" => 0,
     "HTTP::Request::Common" => 0,
     "Plack::Test" => 0,
+    "Test::Differences" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,11 +42,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Cache::FastMmap" => 0,
+  "Carp" => 0,
+  "DBD::SQLite" => 0,
+  "DBI" => 0,
+  "Data::Random" => 0,
   "File::Temp" => 0,
   "HTTP::Request::Common" => 0,
   "Plack::Test" => 0,
   "Prometheus::Tiny" => "0.004",
+  "Sereal" => 0,
+  "Test::Differences" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,

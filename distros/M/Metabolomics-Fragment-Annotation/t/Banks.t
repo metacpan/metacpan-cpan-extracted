@@ -18,7 +18,7 @@ use Metabolomics::Banks::BloodExposome qw( :all ) ;
 use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
 
-use Test::More tests =>  23 ;
+use Test::More tests =>  25 ;
 use Data::Dumper ;
 
 
@@ -406,6 +406,570 @@ BEGIN {
 		## Eval
 			'Method \'buildTheoPeakBankFromFragments\' works with a refFragments object');
 
+
+#########################	
+	print "\n** Test $current_test buildTheoDimerFromMz **\n" ; $current_test++;
+	is_deeply( buildTheoDimerFromMzTest(
+		## Argts
+			bless( {
+                 '_DATABASE_URL_' => 'database_url',
+                 '_THEO_PEAK_LIST_' => [
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 159.93784,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 137.95589,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-H+K'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 100.50169,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '13C db ',
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_PPM_ERROR_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '15N',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 100.99704
+                                                }, 'Metabolomics::Banks' )
+                                       ],
+                 '_FRAGMENTS_' => [
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '-2H+Na+K',
+                                             '_TYPE_' => 'adduct',
+                                             '_DELTA_MASS_' => '59.9378259'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_DELTA_MASS_' => '37.95588165',
+                                             '_TYPE_' => 'adduct',
+                                             '_LOSSES_OR_GAINS_' => '-H+K',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_ANNOTATION_IN_NEG_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_TYPE_' => 'isotope',
+                                             '_LOSSES_OR_GAINS_' => '13C db ',
+                                             '_DELTA_MASS_' => '0.501677419',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_DELTA_MASS_' => '0.997034893',
+                                             '_LOSSES_OR_GAINS_' => '15N',
+                                             '_TYPE_' => 'isotope'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_LOSSES_OR_GAINS_' => '-(C11H18O9)',
+                                             '_TYPE_' => 'fragment',
+                                             '_DELTA_MASS_' => '-294.0950822',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_TYPE_' => 'fragment',
+                                             '_LOSSES_OR_GAINS_' => '-(C12H16O12)',
+                                             '_DELTA_MASS_' => '-352.064176'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' )
+                                  ],
+                 '_DATABASE_ENTRIES_' => [],
+                 '_DATABASE_ENTRIES_NB_' => 'database_entries_nb',
+                 '_EXP_PEAK_LIST_' => [],
+                 '_DATABASE_VERSION_' => '1.0',
+                 '_DATABASE_DOI_' => 'database_doi',
+                 '_DATABASE_NAME_' => 'Ab Initio Fragments'
+               }, 'Metabolomics::Banks' ),
+			100.00001,
+			'POSITIVE'),
+		## Expected
+			bless( {
+                 '_DATABASE_VERSION_' => '1.0',
+                 '_DATABASE_NAME_' => 'Ab Initio Fragments',
+                 '_DATABASE_DOI_' => 'database_doi',
+                 '_DATABASE_ENTRIES_NB_' => 'database_entries_nb',
+                 '_THEO_PEAK_LIST_' => [
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '159.93784',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'adduct'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '137.95589',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_NAME_' => '-H+K',
+                                                  '_ID_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '13C db ',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ID_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '100.50169',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '15N',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '100.99704',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '228.02314',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+3H2O+2H',
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '2M+3H2O+2H',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '242.03384',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+ACN+H',
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ID_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_NAME_' => '2M+ACN+H'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+ACN+Na',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '264.01578',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_NAME_' => '2M+ACN+Na',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '201.00730',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+H',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '2M+H',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ID_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '2M+K',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '238.96318',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+K'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+Na',
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '222.98924',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_NAME_' => '2M+Na',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_TYPE_' => 'dimeric adduct',
+                                                  '_ANNOTATION_IN_POS_MODE_' => '2M+NH4',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '218.03384',
+                                                  '_ID_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_NAME_' => '2M+NH4',
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
+                                                }, 'Metabolomics::Banks' )
+                                       ],
+                 '_DATABASE_ENTRIES_' => [],
+                 '_FRAGMENTS_' => [
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_DELTA_MASS_' => '59.9378259',
+                                             '_TYPE_' => 'adduct',
+                                             '_LOSSES_OR_GAINS_' => '-2H+Na+K',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_LOSSES_OR_GAINS_' => '-H+K',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'adduct',
+                                             '_DELTA_MASS_' => '37.95588165',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '13C db ',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'isotope',
+                                             '_DELTA_MASS_' => '0.501677419'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_DELTA_MASS_' => '0.997034893',
+                                             '_TYPE_' => 'isotope',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '15N',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '-(C11H18O9)',
+                                             '_DELTA_MASS_' => '-294.0950822',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'fragment'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_DELTA_MASS_' => '-352.064176',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'fragment',
+                                             '_LOSSES_OR_GAINS_' => '-(C12H16O12)'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' )
+                                  ],
+                 '_EXP_PEAK_LIST_' => [],
+                 '_DATABASE_URL_' => 'database_url'
+               }, 'Metabolomics::Banks' ),
+		## Eval
+			'Method \'buildTheoDimerFromMz\' works with a oBank object' );
+
+
+#########################	
+	print "\n** Test $current_test isotopicAdvancedCalculation **\n" ; $current_test++;
+	is_deeply( isotopicAdvancedCalculationTest(
+		## Argts
+			bless( {
+                 '_DATABASE_URL_' => 'database_url',
+                 '_THEO_PEAK_LIST_' => [
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 159.93784,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 137.95589,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-H+K'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 100.50169,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_NAME_' => '13C db ',
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_PPM_ERROR_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '15N',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => 100.99704
+                                                }, 'Metabolomics::Banks' )
+                                       ],
+                 '_FRAGMENTS_' => [
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '-2H+Na+K',
+                                             '_TYPE_' => 'adduct',
+                                             '_DELTA_MASS_' => '59.9378259'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_DELTA_MASS_' => '37.95588165',
+                                             '_TYPE_' => 'adduct',
+                                             '_LOSSES_OR_GAINS_' => '-H+K',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_ANNOTATION_IN_NEG_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_TYPE_' => 'isotope',
+                                             '_LOSSES_OR_GAINS_' => '13C db ',
+                                             '_DELTA_MASS_' => '0.501677419',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_DELTA_MASS_' => '0.997034893',
+                                             '_LOSSES_OR_GAINS_' => '15N',
+                                             '_TYPE_' => 'isotope'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_LOSSES_OR_GAINS_' => '-(C11H18O9)',
+                                             '_TYPE_' => 'fragment',
+                                             '_DELTA_MASS_' => '-294.0950822',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_TYPE_' => 'fragment',
+                                             '_LOSSES_OR_GAINS_' => '-(C12H16O12)',
+                                             '_DELTA_MASS_' => '-352.064176'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' )
+                                  ],
+                 '_DATABASE_ENTRIES_' => [],
+                 '_DATABASE_ENTRIES_NB_' => 'database_entries_nb',
+                 '_EXP_PEAK_LIST_' => [],
+                 '_DATABASE_VERSION_' => '1.0',
+                 '_DATABASE_DOI_' => 'database_doi',
+                 '_DATABASE_NAME_' => 'Ab Initio Fragments'
+               }, 'Metabolomics::Banks' ),
+			'POSITIVE'),
+		## Expected
+			bless( {
+                 '_FRAGMENTS_' => [
+                                    bless( {
+                                             '_DELTA_MASS_' => '59.9378259',
+                                             '_LOSSES_OR_GAINS_' => '-2H+Na+K',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'adduct'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'adduct',
+                                             '_DELTA_MASS_' => '37.95588165',
+                                             '_LOSSES_OR_GAINS_' => '-H+K',
+                                             '_ANNOTATION_IN_POS_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '13C db ',
+                                             '_DELTA_MASS_' => '0.501677419',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_TYPE_' => 'isotope'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_DELTA_MASS_' => '0.997034893',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '15N',
+                                             '_TYPE_' => 'isotope',
+                                             '_ANNOTATION_IN_NEG_MODE_' => ''
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_TYPE_' => 'fragment',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '-(C11H18O9)',
+                                             '_DELTA_MASS_' => '-294.0950822'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' ),
+                                    bless( {
+                                             '_TYPE_' => 'fragment',
+                                             '_ANNOTATION_IN_NEG_MODE_' => '',
+                                             '_ANNOTATION_IN_POS_MODE_' => '',
+                                             '_LOSSES_OR_GAINS_' => '-(C12H16O12)',
+                                             '_DELTA_MASS_' => '-352.064176'
+                                           }, 'Metabolomics::Banks::AbInitioFragments' )
+                                  ],
+                 '_DATABASE_ENTRIES_NB_' => 'database_entries_nb',
+                 '_DATABASE_VERSION_' => '1.0',
+                 '_DATABASE_ENTRIES_' => [],
+                 '_EXP_PEAK_LIST_' => [],
+                 '_THEO_PEAK_LIST_' => [
+                                         bless( {
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '159.93784',
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '137.95589',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'adduct',
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_NAME_' => '-H+K'
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '100.50169',
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_NAME_' => '13C db ',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_TYPE_' => 'isotope',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
+                                                  '_ANNOTATION_NAME_' => '15N',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '100.99704',
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '160.43952',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_ANNOTATION_IN_POS_MODE_' => 'x_13C db ',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotopic massif',
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K_13C db ',
+                                                  '_MMU_ERROR_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-2H+Na+K_15N',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ANNOTATION_IN_POS_MODE_' => 'x_15N',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotopic massif',
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '160.93487',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_IN_POS_MODE_' => 'x_13C db ',
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotopic massif',
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-H+K_13C db ',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_PPM_ERROR_' => 0,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '138.45757',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef
+                                                }, 'Metabolomics::Banks' ),
+                                         bless( {
+                                                  '_ANNOTATION_ONLY_IN_' => undef,
+                                                  '_ANNOTATION_NAME_' => '-H+K_15N',
+                                                  '_MMU_ERROR_' => 0,
+                                                  '_ID_' => undef,
+                                                  '_ANNOTATION_TYPE_' => 'isotopic massif',
+                                                  '_ANNOTATION_IN_POS_MODE_' => 'x_15N',
+                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
+                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '138.95292',
+                                                  '_MESURED_MONOISOTOPIC_MASS_' => 0,
+                                                  '_PPM_ERROR_' => 0
+                                                }, 'Metabolomics::Banks' )
+                                       ],
+                 '_DATABASE_URL_' => 'database_url',
+                 '_DATABASE_DOI_' => 'database_doi',
+                 '_DATABASE_NAME_' => 'Ab Initio Fragments'
+               }, 'Metabolomics::Banks' ),
+		## Eval
+			'Method \'isotopicAdvancedCalculation\' works with a oBank object' );
 
 ## #################################################################################################################################
 ##
@@ -1174,10 +1738,35 @@ BEGIN {
 		$oBank->getFragmentsFromSource($source) ;
 		
 		my $nb = $oBank->buildTheoPeakBankFromFragments($mzParent) ;
-		print Dumper $oBank ;
+#		print Dumper $oBank ;
 		
 		return ($oBank) ;
 	}
+	
+	
+	## SUB TEST for 
+	sub buildTheoDimerFromMzTest {
+	    # get values
+	    my ( $oBank, $MassParent, $mode ) = @_;
+	    
+	    $oBank->buildTheoDimerFromMz($MassParent, $mode) ;
+#	    print Dumper $oBank ;
+	    
+	    return($oBank) ;
+	}
+	## End SUB
+	
+	## SUB TEST for 
+	sub isotopicAdvancedCalculationTest {
+	    # get values
+	    my ( $oBank, $mode ) = @_;
+	    
+	    $oBank->isotopicAdvancedCalculation($mode) ;
+#	    print Dumper $oBank ;
+	    
+	    return($oBank) ;
+	}
+	## End SUB
 
 ##
 #########################	######################### 	MACONDA TESTS SUB	 #########################  ####################

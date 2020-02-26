@@ -37,7 +37,7 @@
             "Moo" : "1.000000",
             "Object::ID" : "0",
             "Type::Tiny" : "1.000000",
-            "namespace::autoclean" : "0",
+            "namespace::autoclean" : "0.19",
             "perl" : "5.008"
          }
       },
@@ -51,15 +51,15 @@
    "provides" : {
       "MooX::Struct" : {
          "file" : "lib/MooX/Struct.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "MooX::Struct::Processor" : {
          "file" : "lib/MooX/Struct.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "MooX::Struct::Util" : {
          "file" : "lib/MooX/Struct/Util.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project"
    },
-   "version" : "0.019",
+   "version" : "0.020",
    "x_contributors" : [
       "NOBODY"
    ],

@@ -1,4 +1,8 @@
-0.11
+0.12
+  - Documented Cfn::ResourceLoaders
+  - Implements the resources in CloudFormation spec 11.1.0 (published as of 2020-02-25)
+
+0.11 2019-12-12
   - Implements the resources in CloudFormation spec 10.0.0 (published as of 2019-12-10)
 
 0.10 2019-10-14

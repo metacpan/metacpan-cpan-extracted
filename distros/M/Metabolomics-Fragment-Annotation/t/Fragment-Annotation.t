@@ -218,7 +218,7 @@ BEGIN {
                                                  '_MESURED_MONOISOTOPIC_MASS_' => '358.0924 ',
                                                  '_ID_' => undef,
                                                  '_ANNOTATION_IN_POS_MODE_' => undef,
-                                                 '_PPM_ERROR_' => '112',
+                                                 '_PPM_ERROR_' => '111.7',
                                                  '_ANNOTATION_NAME_' => '-2H+Na+K',
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_ANNOTATION_TYPE_' => 'adduct',
@@ -330,7 +330,7 @@ BEGIN {
                                                  '_ID_' => 'CON00004',
                                                  '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                  '_COMPUTED_MONOISOTOPIC_MASS_' => '102.0549554',
-                                                 '_PPM_ERROR_' => '0',
+                                                 '_PPM_ERROR_' => 0.1,
                                                  '_ANNOTATION_ONLY_IN_' => undef,
                                                  '_ANNOTATION_TYPE_' => 'Solvent',
                                                  '_ANNOTATION_IN_POS_MODE_' => '[M+H]+',
@@ -617,8 +617,8 @@ BEGIN {
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis **\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST( 	
 		$modulePath.'/cpd-val-pro.TSV',
-		2, 
-		5, #ppm
+		1, 
+		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		214.1317,
 		'POSITIVE', #mode
@@ -633,7 +633,7 @@ BEGIN {
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/Cmpd_4.4-Methylguanosine-298.1146.TSV',
 		2, 
-		5, #ppm
+		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		298.1146,
 		'POSITIVE', #mode
@@ -647,7 +647,7 @@ BEGIN {
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with a positively charged methylguanosine**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs002787+.tsv',
-		3, 
+		1, 
 		5, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		298.11460,
@@ -662,8 +662,8 @@ BEGIN {
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with with a dipeptide (PRO-LEU)e**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs003129.tsv',
-		3, 
-		5, #ppm
+		1, 
+		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		228.14739251,
 		'NEGATIVE', #mode
@@ -678,7 +678,7 @@ BEGIN {
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with L-prolyl-L-glycine (CEA)**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs003731.tsv',
-		3, 
+		1, 
 		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		172.084792254,
@@ -688,13 +688,14 @@ BEGIN {
 		$modulePath.'/pfs003731__ANNOTATED__.TSV'),
 		$modulePath.'/pfs003731__ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with L-prolyl-L-glycine (CEA)');
+		
 
 #########################	
 	print "\n** Test $current_test fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis on PeakForest Data with L-prolyl-L-glycine (TOXALIM)**\n" ; $current_test++;
 	is_deeply( fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
 		$modulePath.'/pfs007110.tsv',
 		1, 
-		5, #ppm
+		10, #ppm
 		$modulePath.'/MS_fragments-adducts-isotopes.txt',
 		172.084792254,
 		'POSITIVE', #mode
@@ -847,6 +848,9 @@ BEGIN {
 #		print Dumper $oBank ;
 		
 		my $nb = $oBank->buildTheoPeakBankFromFragments($mzParent, $mode, $stateMolecule) ;
+#		print Dumper $oBank ;
+
+		$oBank->buildTheoDimerFromMz($mzParent, $mode) ;
 #		print Dumper $oBank ;
 
 		$oBank->isotopicAdvancedCalculation($mode) ;

@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.93    2020/02/26
+        - Add handling for MixedAggregate to json/yaml formats.
+          Per gripe from RhodiumToad.
+
 0.92    2020/02/18
         - Recognize various Aggregate nodes from non-text explains.
           Per bug report from RhodiumToad.

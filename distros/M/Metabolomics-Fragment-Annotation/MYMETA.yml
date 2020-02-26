@@ -23,5 +23,5 @@ requires:
   Text::CSV: '2.0'
   XML::Twig: '3.48'
   perl: '5.006'
-version: '0.4'
+version: v0.5.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

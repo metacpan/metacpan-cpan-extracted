@@ -11,11 +11,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 

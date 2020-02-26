@@ -4,127 +4,176 @@ use warnings;
 no warnings qw(void numeric);
 use utf8;
 
+#use Debug::Filter::PrintExpr -debug;
 use Debug::Filter::PrintExpr;
 use Test2::V0;
 use IO::String;
-use Scalar::Util qw/dualvar/;
+use Scalar::Util qw/dualvar isdual/;
 
 # get the filehandle ref into our namespace and close it
 our $handle;
 *handle = *Debug::Filter::PrintExpr::handle;
 close $handle;
 
+my $result;
+
+$\ = "\n";
+$, = ',';
+
+sub prepare {
+	seek $handle, 0, 0;
+	truncate $handle, 0;
+	$result = '';
+}
 
 # capture debug output into $result
-my $result = '';
 $handle = IO::String->new($result);
 my $n = 37;
 #${$n}
-like $result, qr/^line \d+: \$n = $n;$/, 'numeric scalar';
+like $result, qr/^L\d+: \$n = $n;$/, 'numeric scalar';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $s = 'xxx';
 #${$s}
-like $result, qr/^line \d+: \$s = '$s';$/, 'string scalar';
+like $result, qr/^L\d+: \$s = '$s';$/, 'string scalar';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $t = 2;
 {
 	no warnings 'void';
 	#${$s, $t}
 }
-like $result, qr/^line \d+: \$s, \$t = $t;$/, 'list in scalar context';
+like $result, qr/^L\d+: \$s, \$t = $t;$/, 'list in scalar context';
 
-$handle = IO::String->new($result = '');
+prepare;
 my @a = qw{a b};
 #@{@a}
 my $res = join(', ', map("'$_'", @a));
-like $result, qr/^line \d+: \@a = \($res\);$/, 'array';
+like $result, qr/^L\d+: \@a = \($res\);$/, 'array';
 
-$handle = IO::String->new($result = '');
+prepare;
 #${@a}
 $res = scalar(@a);
-like $result, qr/^line \d+: \@a = $res;$/, 'array as scalar';
+like $result, qr/^L\d+: \@a = $res;$/, 'array as scalar';
 
-$handle = IO::String->new($result = '');
+prepare;
 my %h = (k1 => 'v1', k2 => 'v2');
 #%{%h}
-like $result, qr/^line \d+: \%h = \(/, 'hash prefix';
+like $result, qr/^L\d+: \%h = \(/, 'hash prefix';
 like $result, qr/'$_' => '$h{$_}'/, 'hash item' foreach keys %h;
 like $result, qr/\);$/, 'hash suffix';
 
-$handle = IO::String->new($result = '');
+prepare;
 #\{\%h}
-like $result, qr/^line \d+: dump\(\\\%h\);$/m, 'ref prefix';
-like $result, qr/\$_\[0\] = \{$/m, 'ref expr';
+like $result, qr/^L\d+: dump\(\\\%h\);$/m, 'ref prefix';
+like $result, qr/^\s+\$_\[0\] = \{$/m, 'ref expr';
 like $result, qr/^\s+'$_' => '$h{$_}',?$/m, 'ref item' foreach keys %h;
-like $result, qr/^\s*\};$/m, 'ref suffix';
+like $result, qr/^\s+\};$/m, 'ref suffix';
 
-$handle = IO::String->new($result = '');
+prepare;
 #\{\@a, \%h}
-like $result, qr/^line \d+: dump\(\\\@a, \\\%h\);$/m, 'ref list prefix';
-like $result, qr/^\$_\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
-like $result, qr/^\s*\};$/m, 'ref list suffix';
+like $result, qr/^L\d+: dump\(\\\@a, \\\%h\);$/m, 'ref list prefix';
+like $result, qr/^\s+\$_\[$_\] = [[{]$/m, 'ref list expr' foreach (0..1);
+like $result, qr/^\s+\};$/m, 'ref list suffix';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $s1 = '1';
 #${custom: $s1}
 like $result, qr/^custom: \$s1 = '$s1';$/, 'custom label';
 
-$handle = IO::String->new($result = '');
+prepare;
 #${custom:}
 like $result, qr/^custom:\s*$/, 'empty expr';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $lineno = __LINE__ + 1;
 #${}
-like $result, qr/^line $lineno:\s*$/, 'lineno';
+like $result, qr/^L$lineno:\s*$/, 'lineno';
 
-$handle = IO::String->new($result = '');
+prepare;
 #${localtime}
-like $result, qr/^line \d+: localtime = '\w{3} \w{3} [ 0-9:]{16}';$/, 'sub in scalar context';
+like $result, qr/^L\d+: localtime = '\w{3} \w{3} [ 0-9:]{16}';$/, 'sub in scalar context';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $empty = '';
 #${$empty}
-like $result, qr/^line \d+: \$empty = '';$/, 'empty string';
+like $result, qr/^L\d+: \$empty = '';$/, 'empty string';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $zero = 0;
 #${$zero}
-like $result, qr/^line \d+: \$zero = 0;$/, 'zero';
+like $result, qr/^L\d+: \$zero = 0;$/, 'zero';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $int = 42;
 #${$int}
-like $result, qr/^line \d+: \$int = 42;$/, 'integer value';
+like $result, qr/^L\d+: \$int = 42;$/, 'integer value';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $dual = dualvar(42, 'the answer');
 #${$dual}
-like $result, qr/^line \d+: \$dual = 'the answer' : 42;$/, 'dual values';
+like $result, qr/^L\d+: \$dual = dualvar\(42, 'the answer'\);$/, 'dual values';
 
-$handle = IO::String->new($result = '');
+prepare;
 #"{$dual}
-like $result, qr/^line \d+: \$dual = 'the answer';$/, 'string value';
+like $result, qr/^L\d+: \$dual = 'the answer';$/, 'string value';
 
-$handle = IO::String->new($result = '');
+prepare;
+#${$dual}
+like $result, qr/^L\d+: \$dual = dualvar\(42, 'the answer'\);$/, 'dual values untouched';
+
+prepare;
 ##{$dual}
-like $result, qr/^line \d+: \$dual = 42;$/, 'numeric value';
+like $result, qr/^L\d+: \$dual = 42;$/, 'numeric value';
 
-$handle = IO::String->new($result = '');
+prepare;
+#${$dual}
+like $result, qr/^L\d+: \$dual = dualvar\(42, 'the answer'\);$/, 'dual values untouched';
+
+prepare;
+my $sd = "1";
+##{$sd}
+is isdual($sd), F(), "don't dualize string";
+
+prepare;
+my $nd = 2;
+#"{$nd}
+is isdual($nd), F(), "don't dualize number";
+
+prepare;
 my $fstring = '3.1415962';
 #${$fstring}
-like $result, qr/^line \d+: \$fstring = '$fstring';$/, 'fp string';
+like $result, qr/^L\d+: \$fstring = '$fstring';$/, 'fp string';
 
-$handle = IO::String->new($result = '');
+prepare;
 my $float = 3.1415962;
 #${$float}
-like $result, qr/^line \d+: \$float = $float;$/, 'floating point number';
+like $result, qr/^L\d+: \$float = $float;$/, 'floating point number';
 
-$handle = IO::String->new($result = '');
-
+prepare;
 #${undef}
-like $result, qr/^line \d+: undef = undef;$/, 'undef';
+like $result, qr/^L\d+: undef = undef;$/, 'undef';
+
+prepare;
+#@{}
+like $result, qr/^L\d+: \(\);$/, 'empty array';
+
+prepare;
+#%{}
+like $result, qr/^L\d+: \(\);$/, 'empty hash';
+
+prepare;
+ ##$()
+is $result, '', 'has prefix';
+#${};
+is $result, '', 'has suffix';
+
+prepare;
+#${ $s  }
+like $result, qr/^L\d+: \$s = 'xxx';$/, 'braces and spaces';
+
+prepare;
+#${ $h{k1} }
+like $result, qr/^L\d+: \$h\{k1\} = 'v1';$/, 'braces and spaces';
 
 done_testing;

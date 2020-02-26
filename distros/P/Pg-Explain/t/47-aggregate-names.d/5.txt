@@ -1,0 +1,4 @@
+MixedAggregate  (cost=0.00..0.04 rows=2 width=12)
+  Hash Key: 1
+  Group Key: ()
+  ->  Result  (cost=0.00..0.01 rows=1 width=4)

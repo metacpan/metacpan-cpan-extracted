@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::Resolver;
 # ABSTRACT: Class to model a DNS resolver
-our $VERSION = '1.20200214'; # VERSION
+our $VERSION = '1.20200226'; # VERSION
 use 5.20.0;
 use Moo::Role;
 use Types::Standard qw{Str HashRef ArrayRef};

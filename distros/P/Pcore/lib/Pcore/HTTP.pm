@@ -6,7 +6,7 @@ use Pcore::Handle qw[:ALL];
 use Pcore::HTTP::Response;
 use Pcore::HTTP::Cookies;
 use Pcore::Util::HTTP;
-use Pcore::API::Proxy qw[:PROXY_TYPE];
+use Pcore::API::Proxy;
 
 our $EXPORT = {
     METHODS => [],
@@ -345,7 +345,7 @@ sub _request ($args) {
 sub _write_headers ( $h, $args, $res ) {
     my ( $request_path, @headers );
 
-    if ( $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP ) {
+    if ( $h->{proxy_is_http} ) {
         $request_path = $res->{url}->{uri};
 
         push @headers, 'Proxy-Authorization', 'Basic ' . $h->{proxy}->{uri}->userinfo_b64 if $h->{proxy}->{uri}->{userinfo};

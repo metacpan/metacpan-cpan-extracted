@@ -1,4 +1,4 @@
-# AWS::Pinpoint::PushTemplate generated from spec 7.4.0
+# AWS::Pinpoint::PushTemplate generated from spec 10.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate',
@@ -108,8 +108,10 @@ package Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate {
   has APNS => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate::APNSPushNotificationTemplate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Baidu => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate::AndroidPushNotificationTemplate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Default => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate::DefaultPushNotificationTemplate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefaultSubstitutions => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GCM => (isa => 'Cfn::Resource::Properties::AWS::Pinpoint::PushTemplate::AndroidPushNotificationTemplate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TemplateDescription => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$MooX::Struct::AUTHORITY = 'cpan:TOBYINK';
-	$MooX::Struct::VERSION   = '0.019';
+	$MooX::Struct::VERSION   = '0.020';
 }
 
 use Moo 1.000;
@@ -143,7 +143,7 @@ BEGIN {
 	{
 		no warnings;
 		our $AUTHORITY = 'cpan:TOBYINK';
-		our $VERSION   = '0.019';
+		our $VERSION   = '0.020';
 	}
 	
 	sub _uniq { my %seen; grep { not $seen{$_}++ } @_ };

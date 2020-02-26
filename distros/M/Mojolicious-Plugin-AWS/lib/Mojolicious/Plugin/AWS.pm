@@ -4,15 +4,15 @@ use Mojo::JSON 'encode_json';
 use Mojo::AWS;
 use Mojo::AWS::S3;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub register {
-    my ($self, $app) = @_;
+    my ($self, $app, $conf) = @_;
 
     $app->helper(
         sns_publish => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             $args{datetime} ||= Mojo::Date->new(time)->to_datetime;
             $args{url}      ||= Mojo::URL->new("https://sns.$args{region}.amazonaws.com");
@@ -53,7 +53,7 @@ sub register {
     $app->helper(
         s3__url => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             my $url = Mojo::URL->new->scheme("https")->host("$args{bucket}.s3.amazonaws.com")
               ->path($args{object});
@@ -66,7 +66,7 @@ sub register {
     $app->helper(
         s3__aws => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             return Mojo::AWS::S3->new(
                 transactor => $c->ua->transactor,
@@ -81,7 +81,7 @@ sub register {
     $app->helper(
         s3_get_object => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             $args{datetime} ||= Mojo::Date->new(time)->to_datetime;
             $args{url}      ||= $c->s3__url(
@@ -109,7 +109,7 @@ sub register {
     $app->helper(
         s3_get_object_acl => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             $args{url}
               ||= $c->s3__url(bucket => $args{bucket}, object => $args{object})->query('acl');
@@ -121,7 +121,7 @@ sub register {
     $app->helper(
         s3_put_object => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             $args{datetime} ||= Mojo::Date->new(time)->to_datetime;
             $args{url}      ||= $c->s3__url(
@@ -151,7 +151,7 @@ sub register {
     $app->helper(
         s3_delete_object => sub {
             my $c    = shift;
-            my %args = @_;
+            my %args = (%$conf, @_);
 
             $args{datetime} ||= Mojo::Date->new(time)->to_datetime;
             $args{url}      ||= $c->s3__url(
@@ -220,9 +220,10 @@ below.
 =head1 CAVEATS
 
 This module is alpha quality. This means that its interface will likely change
-in backward-incompatible ways, that its performance is unreliable, and that
-the code quality is only meant as a proof-of-concept. Its use is discouraged
-except for experimental, non-production deployments.
+in backward-incompatible ways, that its performance is unreliable, that the
+example code snippets may be wrong or out of date, and that the code quality
+is only meant as a proof-of-concept. Its use is discouraged except for
+experimental, non-production deployments.
 
 =head1 HELPERS
 

@@ -1,4 +1,4 @@
-# AWS::WAFv2::WebACL generated from spec 10.0.0
+# AWS::WAFv2::WebACL generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL',
@@ -14,31 +14,11 @@ package Cfn::Resource::AWS::WAFv2::WebACL {
     [ 'Arn','Capacity','Id' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
 
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::UriPath',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::UriPath',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::UriPathValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::UriPathValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -80,90 +60,35 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformationValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleQueryArgument',
+subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleQueryArgument',
+coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleQueryArgumentValue->new( %$_ );
+       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleQueryArgumentValue {
+package Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleHeader',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleHeader',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleHeaderValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleHeaderValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::QueryString',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::QueryString',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::QueryStringValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::QueryStringValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Method',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Method',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::MethodValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::MethodValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
+  has AllQueryArguments => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Body => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Method => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has QueryString => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SingleHeader => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SingleQueryArgument => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UriPath => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRule',
      as 'Cfn::Value',
@@ -206,137 +131,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRuleValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Body',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Body',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::BodyValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::BodyValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllQueryArguments',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllQueryArguments',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllQueryArgumentsValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllQueryArgumentsValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformationsValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformationsValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has AllQueryArguments => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllQueryArguments', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Body => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Body', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Method => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Method', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has QueryString => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::QueryString', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SingleHeader => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleHeader', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SingleQueryArgument => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SingleQueryArgument', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has UriPath => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::UriPath', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRules',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRules',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRulesValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRulesValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has ExcludedRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountryCodes',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountryCodes',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountryCodesValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountryCodesValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has CountryCodes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatement',
@@ -357,8 +152,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatementValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TextTransformations => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SqliMatchStatement',
@@ -379,8 +174,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SqliMatchStatementValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TextTransformations => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SizeConstraintStatement',
@@ -401,10 +196,10 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SizeConstraintStatementVa
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has ComparisonOperator => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TextTransformations => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ComparisonOperator => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleGroupReferenceStatement',
@@ -425,8 +220,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleGroupReferenceStateme
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has ExcludedRules => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRules', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludedRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RegexPatternSetReferenceStatement',
@@ -447,9 +242,9 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RegexPatternSetReferenceS
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TextTransformations => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ManagedRuleGroupStatement',
@@ -470,9 +265,9 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ManagedRuleGroupStatement
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has ExcludedRules => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRules', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has VendorName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExcludedRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VendorName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetReferenceStatement',
@@ -493,7 +288,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetReferenceStatementVa
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatement',
@@ -514,7 +309,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatementValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has CountryCodes => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountryCodes', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CountryCodes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatement',
@@ -535,11 +330,11 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatementValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has PositionalConstraint => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SearchString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PositionalConstraint => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SearchString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SearchStringBase64 => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TextTransformations => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformations', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree',
      as 'Cfn::Value',
@@ -593,27 +388,6 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThreeValue {
   has XssMatchStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThrees',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThrees',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThreesValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThreesValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has StatementThrees => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementTwo',
      as 'Cfn::Value';
 
@@ -632,8 +406,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementTwoValu
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ScopeDownStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -655,7 +429,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementTwoValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statements => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThrees', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Statements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementTwo',
@@ -676,7 +450,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementTwoValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementTwo',
@@ -697,7 +471,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementTwoValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statements => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThrees', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Statements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo',
      as 'Cfn::Value',
@@ -755,27 +529,6 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwoValue {
   has XssMatchStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwos',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwos',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwosValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwosValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has StatementTwos => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementOne',
      as 'Cfn::Value';
 
@@ -794,8 +547,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementOneValu
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ScopeDownStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -817,7 +570,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementOneValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statements => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwos', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Statements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementOne',
@@ -838,67 +591,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementOneValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NoneAction',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NoneAction',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::NoneActionValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::NoneActionValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountAction',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountAction',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountActionValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountActionValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockAction',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockAction',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockActionValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockActionValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
+  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementOne',
@@ -919,27 +612,7 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementOneValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Statements => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwos', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowAction',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowAction',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowActionValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowActionValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
+  has Statements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig',
@@ -960,9 +633,9 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfigValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has CloudWatchMetricsEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has MetricName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SampledRequestsEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CloudWatchMetricsEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MetricName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SampledRequestsEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOne',
@@ -1016,9 +689,9 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleActionValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Allow => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Block => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Count => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Allow => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Block => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Count => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideAction',
@@ -1039,8 +712,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideActionValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Count => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::CountAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has None => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NoneAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Count => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has None => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::Rule',
      as 'Cfn::Value',
@@ -1084,53 +757,11 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleValue {
   extends 'Cfn::Value::TypedValue';
   
   has Action => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OverrideAction => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOne', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has VisibilityConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TagList',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TagList',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::TagListValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::TagListValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has TagList => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-}
-
-subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Rules',
-     as 'Cfn::Value';
-
-coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Rules',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RulesValue->new( %$_ );
-     }
-   };
-
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RulesValue {
-  use Moose;
-  use MooseX::StrictConstructor;
-  extends 'Cfn::Value::TypedValue';
-  
-  has Rules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::Rule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Statement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOne', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VisibilityConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultAction',
@@ -1151,8 +782,8 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultActionValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Allow => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AllowAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Block => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::BlockAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Allow => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Block => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::WAFv2::WebACL {
@@ -1160,13 +791,13 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has DefaultAction => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultAction', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefaultAction => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultAction', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Rules => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Rules', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Rules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::Rule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Scope => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TagList', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has VisibilityConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has VisibilityConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

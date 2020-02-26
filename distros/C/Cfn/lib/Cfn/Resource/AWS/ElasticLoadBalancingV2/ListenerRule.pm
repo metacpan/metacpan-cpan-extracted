@@ -1,4 +1,4 @@
-# AWS::ElasticLoadBalancingV2::ListenerRule generated from spec 5.3.0
+# AWS::ElasticLoadBalancingV2::ListenerRule generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule',
@@ -19,6 +19,72 @@ package Cfn::Resource::AWS::ElasticLoadBalancingV2::ListenerRule {
 }
 
 
+subtype 'ArrayOfCfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTupleValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTupleValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has TargetGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Weight => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has DurationSeconds => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringKeyValue',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -217,6 +283,28 @@ package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ho
   has Values => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfigValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfigValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has TargetGroups => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetGroupStickinessConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfig',
      as 'Cfn::Value';
 
@@ -392,6 +480,7 @@ package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ac
   has AuthenticateCognitoConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateCognitoConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AuthenticateOidcConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateOidcConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FixedResponseConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ForwardConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Order => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RedirectConfig => (isa => 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::RedirectConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

@@ -1,4 +1,4 @@
-# AWS::SES::ConfigurationSet generated from spec 2.25.0
+# AWS::SES::ConfigurationSet generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SES::ConfigurationSet',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::SES::ConfigurationSet {
     [  ]
   }
   sub supported_regions {
-    [ 'eu-west-1','us-east-1','us-west-2' ]
+    [ 'ap-south-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

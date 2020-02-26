@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::PatchModule;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-09'; # DATE
+our $DATE = '2019-12-17'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-PatchModule'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -60,7 +60,10 @@ sub _process_module {
             my $sch = normalize_schema($c->{schema});
 
             push @pod, "=item * $cname => $sch->[0]\n\n";
-            push @pod, "$c->{summary}.\n\n" if $c->{summary};
+            if ($c->{summary}) {
+                require String::PodQuote;
+                push @pod, String::PodQuote::pod_quote($c->{summary}), ".\n\n";
+            }
             if ($c->{description}) {
                 require Markdown::To::POD;
                 my $pod = Markdown::To::POD::markdown_to_pod($c->{description});
@@ -119,7 +122,7 @@ Pod::Weaver::Plugin::PatchModule - Plugin to use when building patch modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::Weaver::Plugin::PatchModule (from Perl distribution Pod-Weaver-Plugin-PatchModule), released on 2019-12-09.
+This document describes version 0.003 of Pod::Weaver::Plugin::PatchModule (from Perl distribution Pod-Weaver-Plugin-PatchModule), released on 2019-12-17.
 
 =head1 SYNOPSIS
 

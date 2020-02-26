@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-subst
 
+2.07 2020-02-26T08:39:27Z
+
+    - Example dictionary support: share/jtca-katakana-guide
+
 2.06 2019-12-17T05:34:48Z
 
     - Fix bug of --check=none was not handled.

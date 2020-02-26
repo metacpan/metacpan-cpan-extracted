@@ -1,4 +1,4 @@
-# AWS::PinpointEmail::DedicatedIpPool generated from spec 3.3.0
+# AWS::PinpointEmail::DedicatedIpPool generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::DedicatedIpPool',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::PinpointEmail::DedicatedIpPool {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-south-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1' ]
+    [ 'ap-south-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

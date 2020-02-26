@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.104';
+$Getopt::Long::Descriptive::VERSION = '0.105';
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
@@ -378,6 +378,10 @@ sub _build_describe_options {
           }
           $one_opt->{constraint}->{one_of} = $opt->{name};
           push @opts, $one_opt;
+
+          # Ensure that we generate accessors for all one_of sub-options
+          $method_map{ $one_opt->{name} } = undef
+            unless $one_opt->{desc} eq 'spacer';
         }
       }
 
@@ -698,7 +702,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SYNOPSIS
 
@@ -988,7 +992,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Niels Thykier Olaf Alders Roman Hubacek Smylers Thomas Neumann zhouzhen1
+=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Roman Hubacek Smylers Thomas Neumann zhouzhen1
 
 =over 4
 
@@ -1023,6 +1027,10 @@ hdp@cpan.org <hdp@cpan.org@fc0e91e4-031c-0410-8307-be39b06d7656>
 =item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Michael McClimon <michael@mcclimon.org>
 
 =item *
 

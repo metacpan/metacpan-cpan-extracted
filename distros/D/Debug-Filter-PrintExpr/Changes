@@ -1,4 +1,14 @@
 Revision history for Debug-Filter-PrintExpr
+0.14	Wed Feb 26 14:51:09 2020 +0100
+		[feature]
+		simplify several code parts
+
+		change format of line labels
+
+		switch from "each" to "pairs" for hashes
+
+		remove trailing whitespace from expression
+
 0.13	Fri Feb 7 18:17:25 2020 +0100
 		[fix]
 		corrected usage of Data::Dumper

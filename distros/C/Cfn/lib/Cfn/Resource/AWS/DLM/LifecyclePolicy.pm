@@ -1,4 +1,4 @@
-# AWS::DLM::LifecyclePolicy generated from spec 9.1.0
+# AWS::DLM::LifecyclePolicy generated from spec 10.2.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy',
@@ -20,6 +20,28 @@ package Cfn::Resource::AWS::DLM::LifecyclePolicy {
 
 
 
+subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRetainRule',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRetainRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRetainRuleValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRetainRuleValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Interval => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IntervalUnit => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRule',
      as 'Cfn::Value';
 
@@ -38,7 +60,9 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRuleValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Interval => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IntervalUnit => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRule',
@@ -60,7 +84,56 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRuleVal
   extends 'Cfn::Value::TypedValue';
   
   has AvailabilityZones => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Interval => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IntervalUnit => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRuleValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRuleValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CmkArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CopyTags => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Encrypted => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RetainRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRetainRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetRegion => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CreateRule',
@@ -128,6 +201,7 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::ScheduleValue {
   
   has CopyTags => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CreateRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CreateRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CrossRegionCopyRules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::CrossRegionCopyRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FastRestoreRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::FastRestoreRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetainRule => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::RetainRule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -176,9 +250,9 @@ package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::PolicyDetailsValue
   
   has Parameters => (isa => 'Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Parameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PolicyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has ResourceTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Schedules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Schedule', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has TargetTags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ResourceTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Schedules => (isa => 'ArrayOfCfn::Resource::Properties::AWS::DLM::LifecyclePolicy::Schedule', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetTags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::DLM::LifecyclePolicy {

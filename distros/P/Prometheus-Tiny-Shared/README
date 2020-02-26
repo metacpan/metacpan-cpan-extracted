@@ -1,7 +1,7 @@
 This archive contains the distribution Prometheus-Tiny-Shared,
-version 0.002:
+version 0.010:
 
-  A tiny Prometheus client backed by a shared memory region
+  A tiny Prometheus client with a shared database behind it
 
 This software is copyright (c) 2018 by Rob N ★.
 

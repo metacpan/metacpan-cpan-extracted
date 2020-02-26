@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Opts;
 # ABSTRACT: object representing command line switches
-$Getopt::Long::Descriptive::Opts::VERSION = '0.104';
+$Getopt::Long::Descriptive::Opts::VERSION = '0.105';
 use Scalar::Util qw(blessed weaken);
 
 #pod =head1 DESCRIPTION
@@ -145,7 +145,7 @@ Getopt::Long::Descriptive::Opts - object representing command line switches
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 DESCRIPTION
 

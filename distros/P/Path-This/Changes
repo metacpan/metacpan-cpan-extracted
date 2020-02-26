@@ -1,3 +1,6 @@
+0.004     2020-02-25 17:32:00 EST
+  - Add equivalent code using core modules to synopsis
+
 0.003     2019-12-23 11:51:19 EST
   - Fix tests on Windows again
 

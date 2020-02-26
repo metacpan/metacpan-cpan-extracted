@@ -23,7 +23,7 @@ my $meta = {
                               "B::Hooks::EndOfScope" => 0,
                               "Exporter::Tiny" => 0.044,
                               "Moo" => "1.000000",
-                              "namespace::autoclean" => 0,
+                              "namespace::autoclean" => 0.19,
                               "Object::ID" => 0,
                               "perl" => 5.008,
                               "Type::Tiny" => "1.000000",
@@ -32,9 +32,9 @@ my $meta = {
                           test => { requires => { "Moo" => "1.006000", "Test::More" => 0.61 } },
                         },
   "provides"         => {
-                          "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => 0.019 },
-                          "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => 0.019 },
-                          "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => 0.019 },
+                          "MooX::Struct"            => { file => "lib/MooX/Struct.pm", version => "0.020" },
+                          "MooX::Struct::Processor" => { file => "lib/MooX/Struct.pm", version => "0.020" },
+                          "MooX::Struct::Util"      => { file => "lib/MooX/Struct/Util.pm", version => "0.020" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -48,7 +48,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Struct/project",
                         },
-  "version"          => 0.019,
+  "version"          => "0.020",
   "x_contributors"   => ["NOBODY"],
   "x_static_install" => 1,
 };

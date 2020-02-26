@@ -1,5 +1,10 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.010     2020-02-26 21:45:37+11:00 Australia/Melbourne
+- Change to using SQLite for the backing store, fixing the situation where
+  metrics could be lost if there were lots of them. Minor change to the
+  constructor parameters, please check the docs.
+
 0.002     2019-12-22 13:08:58+11:00 Australia/Melbourne
 - Update for Prometheus::Tiny 0.004 internals changes, including timestamp and
   histogram support

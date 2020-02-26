@@ -8,12 +8,10 @@ use Test::More;
 use Prometheus::Tiny::Shared;
 use File::Temp qw(tmpnam);
 
-my $cache_args = {
-  share_file => scalar tmpnam(),
-};
+my $filename = scalar tmpnam();
 
-my $p1 = Prometheus::Tiny::Shared->new(cache_args => $cache_args);
-my $p2 = Prometheus::Tiny::Shared->new(cache_args => $cache_args);
+my $p1 = Prometheus::Tiny::Shared->new(filename => $filename);
+my $p2 = Prometheus::Tiny::Shared->new(filename => $filename);
 
 # set things on the first one
 $p1->set('some_metric', 5);
@@ -32,7 +30,7 @@ other_metric 8
 some_metric 5
 EOF
 
-my $p3 = Prometheus::Tiny::Shared->new(cache_args => $cache_args);
+my $p3 = Prometheus::Tiny::Shared->new(filename => $filename);
 is $p3->format, <<EOF, 'format on late client 3';
 other_metric 8
 some_metric 5

@@ -1,4 +1,4 @@
-# AWS::EC2::LaunchTemplate generated from spec 5.3.0
+# AWS::EC2::LaunchTemplate generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::EC2::LaunchTemplate {
     [ 'DefaultVersionNumber','LatestVersionNumber' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -246,6 +246,9 @@ package Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::PlacementValue {
   has AvailabilityZone => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HostId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HostResourceGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has PartitionNumber => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SpreadDomain => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tenancy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::LaunchTemplate::NetworkInterface',
@@ -323,6 +326,29 @@ package Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MonitoringValue {
   extends 'Cfn::Value::TypedValue';
   
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MetadataOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MetadataOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MetadataOptionsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MetadataOptionsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has HttpEndpoint => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HttpPutResponseHopLimit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HttpTokens => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::LaunchTemplate::LicenseSpecification',
      as 'Cfn::Value',
@@ -408,6 +434,7 @@ package Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::LaunchTemplateElast
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has Count => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -665,6 +692,7 @@ package Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::LaunchTemplateDataV
   has KernelId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KeyName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LicenseSpecifications => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::LaunchTemplate::LicenseSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MetadataOptions => (isa => 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::MetadataOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Monitoring => (isa => 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::Monitoring', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has NetworkInterfaces => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::LaunchTemplate::NetworkInterface', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Placement => (isa => 'Cfn::Resource::Properties::AWS::EC2::LaunchTemplate::Placement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

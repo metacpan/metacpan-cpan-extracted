@@ -9,11 +9,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =cut
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,7 @@ sub make_node_from {
         my $strategy = $struct->{ 'Strategy' } || 'Plain';
         $use_type = 'HashAggregate'  if $strategy eq 'Hashed';
         $use_type = 'GroupAggregate' if $strategy eq 'Sorted';
+        $use_type = 'MixedAggregate' if $strategy eq 'Mixed';
     }
 
     my $new_node = Pg::Explain::Node->new(
@@ -158,6 +159,17 @@ sub make_node_from {
     if ( $struct->{ 'Group Key' } ) {
         my $key = join( ', ', @{ $struct->{ 'Group Key' } } );
         $new_node->add_extra_info( 'Group Key: ' . $key );
+    }
+
+    if ( $struct->{ 'Grouping Sets' } ) {
+        for my $set ( @{ $struct->{ 'Grouping Sets' } } ) {
+            for my $hk ( @{ $set->{ 'Hash Keys' } } ) {
+                $new_node->add_extra_info( 'Hash Key: ' . join( ', ', @{ $hk } ) );
+            }
+            for my $gk ( @{ $set->{ 'Group Keys' } } ) {
+                $new_node->add_extra_info( 'Group Key: (' . join( ', ', @{ $gk } ) . ')' );
+            }
+        }
     }
 
     $new_node->add_extra_info( 'Workers Planned: ' . $struct->{ 'Workers Planned' } ) if $struct->{ 'Workers Planned' };

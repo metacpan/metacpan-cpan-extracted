@@ -1,4 +1,4 @@
-# AWS::MediaLive::Channel generated from spec 4.1.0
+# AWS::MediaLive::Channel generated from spec 11.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel',
@@ -507,6 +507,28 @@ package Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputDestinationSet
   has Url => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Username => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+
+subtype 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MultiplexProgramChannelDestinationSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MultiplexProgramChannelDestinationSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::AWS::MediaLive::Channel::MultiplexProgramChannelDestinationSettingsValue->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::AWS::MediaLive::Channel::MultiplexProgramChannelDestinationSettingsValue {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has MultiplexId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ProgramName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 subtype 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::MediaPackageOutputDestinationSettings',
      as 'Cfn::Value',
   where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
@@ -622,6 +644,7 @@ package Cfn::Resource::Properties::AWS::MediaLive::Channel::OutputDestinationVal
   
   has Id => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MediaPackageSettings => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::MediaPackageOutputDestinationSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MultiplexSettings => (isa => 'Cfn::Resource::Properties::AWS::MediaLive::Channel::MultiplexProgramChannelDestinationSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Settings => (isa => 'ArrayOfCfn::Resource::Properties::AWS::MediaLive::Channel::OutputDestinationSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

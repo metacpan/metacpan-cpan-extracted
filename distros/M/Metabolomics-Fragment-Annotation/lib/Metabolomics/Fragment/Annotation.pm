@@ -50,16 +50,40 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 =head1 VERSION
 
-Version 0.4
+Version 0.5.2
 
 =cut
 
-our $VERSION = '0.4';
+our $VERSION = '0.5.2';
 
 
 =head1 SYNOPSIS
 
-    use Metabolomics::Fragment::Annotation;
+	Note that this documentation is intended as a reference to the module.
+
+    Metabolomics::Banks::MaConDa is allowing to build a contaminant database usefull to clean your LC-MS filtered peak list:
+    	my $oBank = Metabolomics::Banks::MaConDa->new() ;								# init the bank object
+		$oBank->getContaminantsExtensiveFromSource() ;									# get theorical contaminants from the extensive version of MaConDa database
+		$oNewBank->buildTheoPeakBankFromContaminants($queryMode) ; 						# build theorical bank (ION | NEUTRAL)
+    
+    Metabolomics::Banks::BloodExposome is giving access to a local Blood Exposome database (Cf publication here L<https://doi.org/10.1289/EHP4713>):
+    	my $oBank = Metabolomics::Banks::BloodExposome->new() ;							# init the bank object
+		$oBank->getMetabolitesFromSource($source) ;										# get theorical metabolites from local database version
+	    $oBank->buildTheoPeakBankFromEntries($IonMode) ;								# produce the new theorical bank depending of chosen acquisition mode
+    
+    Metabolomics::Banks::AbInitioFragments is used abinitio fragment, adduct and isotope annotation:
+    
+    	my $oBank = Metabolomics::Banks::AbInitioFragments->new() ;						# init the bank object
+		$oBank->getFragmentsFromSource() ;												# get theorical fragment/adduct/isotopes loses or adds
+		$oBank->buildTheoPeakBankFromFragments($mzMolecule, $mode, $stateMolecule) ;	# produce the new theorical bank from neutral (or not) molecule mass
+		
+		
+	When resources are built, Metabolomics::Fragment::Annotation drive the annotation process:
+		$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ; 					# get exprimental mz listing to annotate
+		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;				# init analysis object
+		$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;						# compare theorical bank vs experimental bank
+    
+=encoding utf8
 
 =head1 DESCRIPTION
 
@@ -125,7 +149,11 @@ sub compareExpMzToTheoMzList {
     		my $fragMz = $expFrag->_getPeak_MESURED_MONOISOTOPIC_MASS();
     		my ($min, $max) = _mz_delta_conversion (\$fragMz, \$deltaType, \$deltaValue) ; 
     		
-#    		print "FOR frag $fragMz - MIN is: $$min and MAX is: $$max\n" ;
+#    		print "\nFOR frag $fragMz - MIN is: $$min and MAX is: $$max\n" ;
+    		
+    		my ($currentPpmError, $currentDeltaErrorMmu) = (undef, undef) ;
+    		my ($currentAnnotName, $currentComputedMz, $currentAnnotType, $currentAnnotID, $currentAnnotInNegMode, $currentAnnotInPosMode) = (undef, undef, undef, undef, undef, undef) ;
+    		my ($annotName, $computedMz, $annotType, $annotID, $annotInNegMode, $annotInPosMode, $deltaErrorMmu, $deltaErrorPpm) = (undef, undef, undef, undef, undef, undef, 0) ;
     		
     		foreach my $theoFrag (@{$theoFragments}) {
     			
@@ -133,7 +161,7 @@ sub compareExpMzToTheoMzList {
     			
     			if (  ($motifMz > $$min ) and ($motifMz < $$max)  ) {
     				
-#    				print "OK -> $motifMz MATCHING WITH $fragMz\n" ;
+    				
     				my $annotName = $theoFrag-> _getPeak_ANNOTATION_NAME();
     				my $computedMz = $theoFrag->_getPeak_COMPUTED_MONOISOTOPIC_MASS();
     				my $annotType = $theoFrag->_getPeak_ANNOTATION_TYPE() ;
@@ -145,30 +173,62 @@ sub compareExpMzToTheoMzList {
 #    				print $annotInNegMode if $annotInNegMode ;
 #    				print $annotInPosMode if $annotInPosMode ;
     				
-    				my $deltaError = 0 ;
     				# compute error 
-    				$deltaError = _computeMzDeltaInMmu($fragMz, $motifMz) ;
-    				$expFrag-> _setPeak_ANNOTATION_DA_ERROR( $deltaError );
+    				$deltaErrorMmu = _computeMzDeltaInMmu($fragMz, $motifMz) ;
+    				$deltaErrorPpm = _computeMzDeltaInPpm($fragMz, $deltaErrorMmu) ;
     				
-    				my $deltaErrorMmu = _computeMzDeltaInMmu($fragMz, $motifMz) ;
-    				$deltaError = _computeMzDeltaInPpm($fragMz, $deltaErrorMmu) ;
     				
-    				$expFrag-> _setPeak_ANNOTATION_PPM_ERROR( $deltaError );
+    				if (!defined $currentPpmError) {
+    					
+    					$currentDeltaErrorMmu = $deltaErrorMmu ;
+    					$currentPpmError = $deltaErrorPpm ;
+						$currentAnnotName =  $annotName ;
+						$currentComputedMz = $computedMz ;
+						$currentAnnotType = $annotType ;
+						$currentAnnotID = $annotID ;
+						$currentAnnotInNegMode = $annotInNegMode ;
+						$currentAnnotInPosMode = $annotInPosMode ;
+	    				
+    				}
+    				else {
+    					
+    					if ($currentPpmError < $deltaErrorPpm ) {
+    						next ;
+    					}
+    					elsif ($currentPpmError > $deltaErrorPpm ) {
+    						$currentDeltaErrorMmu = $deltaErrorMmu ;
+    						$currentPpmError = $deltaErrorPpm ;
+							$currentAnnotName =  $annotName ;
+							$currentComputedMz = $computedMz ;
+							$currentAnnotType = $annotType ;
+							$currentAnnotID = $annotID ;
+							$currentAnnotInNegMode = $annotInNegMode ;
+							$currentAnnotInPosMode = $annotInPosMode ;
+    					}
+    					elsif ($currentPpmError == $deltaErrorPpm ) {
+    						next ;
+    					}
+    				}
     				
-    				$expFrag-> _setPeak_ANNOTATION_NAME( $annotName );
-    				$expFrag-> _setPeak_COMPUTED_MONOISOTOPIC_MASS( $computedMz );
-    				$expFrag-> _setPeak_ANNOTATION_TYPE( $annotType ) if (defined $annotType);
-    				$expFrag-> _setPeak_ANNOTATION_ID( $annotID ) if (defined $annotID);
+				## Keep the best hit (lower ppm error) and set annotation 
+    			$expFrag-> _setPeak_ANNOTATION_DA_ERROR( $currentDeltaErrorMmu );
+    			$expFrag-> _setPeak_ANNOTATION_PPM_ERROR( $currentPpmError );
     				
-    				$expFrag->_setPeak_ANNOTATION_IN_NEG_MODE($annotInNegMode) if (defined $annotInNegMode);
-    				$expFrag->_setPeak_ANNOTATION_IN_POS_MODE($annotInPosMode) if (defined $annotInPosMode);
+    			$expFrag-> _setPeak_ANNOTATION_NAME( $currentAnnotName );
+    			$expFrag-> _setPeak_COMPUTED_MONOISOTOPIC_MASS( $currentComputedMz );
+    			$expFrag-> _setPeak_ANNOTATION_TYPE( $currentAnnotType ) if (defined $currentAnnotType);
+    			$expFrag-> _setPeak_ANNOTATION_ID( $currentAnnotID ) if (defined $currentAnnotID);
     				
-    				## TODO...
-    			}
+    			$expFrag->_setPeak_ANNOTATION_IN_NEG_MODE($currentAnnotInNegMode) if (defined $currentAnnotInNegMode);
+    			$expFrag->_setPeak_ANNOTATION_IN_POS_MODE($currentAnnotInPosMode) if (defined $currentAnnotInPosMode);
+    			
+#    			print "\tOK -> $motifMz MATCHING WITH $fragMz and ppm error of $currentPpmError ($currentAnnotInPosMode)\n" ;
+
+    			} ## Matching !!
     			else {
 #    				print "KO -> $motifMz DON'T MATCHING WITH $fragMz\n" ;
     				next ;
-    			}	
+    			} ## No Matching
     		}
     	} ## END foreach
     }
@@ -518,7 +578,7 @@ sub _computeMzDeltaInPpm {
 #    	print "\t$mzDeltaPpm\n";
     	
     	my $oUtils = Metabolomics::Utils->new() ;
-    	$mzDeltaPpmRounded = $oUtils->roundFloat($mzDeltaPpm, 0) ;
+    	$mzDeltaPpmRounded = $oUtils->roundFloat($mzDeltaPpm, 1) ;
     	
     }
     else {
