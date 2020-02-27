@@ -14,13 +14,14 @@ BEGIN {
     };
 }
 
-add_stopwords (<DATA>);
+add_stopwords( <DATA> );
 
-all_pod_files_spelling_ok ();
+all_pod_files_spelling_ok();
 
 1;
 __DATA__
 Autoconf
+CharClass
 charnames
 errstr
 expl

@@ -2,14 +2,14 @@ package Test2::Plugin::IOEvents::Tie;
 use strict;
 use warnings;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001';
 
 use Test2::API qw/context/;
 use Carp qw/croak/;
 
 sub TIEHANDLE {
     my $class = shift;
-    my ($name, $fn, $fh) = @_;
+    my ($name, $fn, $fh, $inode) = @_;
 
     unless ($fn && $fh) {
         if ($fn) {
@@ -17,15 +17,18 @@ sub TIEHANDLE {
         }
         elsif ($name eq 'STDOUT') {
             $fn = fileno(STDOUT);
+            (undef, $inode) = stat(STDOUT);
             open($fh, '>&', STDOUT);
         }
         elsif ($name eq 'STDERR') {
             $fn = fileno(STDERR);
+            (undef, $inode) = stat(STDERR);
             open($fh, '>&', STDERR);
         }
     }
 
-    return bless([$name, $fn, $fh], $class);
+
+    return bless([$name, $fn, $fh, $inode], $class);
 }
 
 sub OPEN {
@@ -43,18 +46,46 @@ sub OPEN {
     return;
 }
 
-sub PRINT {
-    my $self = shift;
-    my ($name) = @$self;
+sub _check_for_change {
+    if ($_[0]->[0] eq 'STDOUT') {
+        my (undef, $inode) = stat(STDOUT);
+        if ($inode ne $_[0]->[3]) {
+            untie(*STDOUT);
+            return 1;
+        }
+    }
+    elsif ($_[0]->[0] eq 'STDERR') {
+        my (undef, $inode) = stat(STDERR);
+        if ($inode ne $_[0]->[3]) {
+            untie(*STDERR);
+            return 1;
+        }
+    }
 
-    my $output = defined($,) ? join( $,, @_) : join('', @_);
+    return 0;
+}
+
+sub PRINT {
+    my (undef, @args) = @_;
+
+    my $name = $_[0]->[0];
+    if ($_[0]->_check_for_change()) {
+        if ($name eq 'STDOUT') {
+            return print STDOUT @args;
+        }
+        elsif ($name eq 'STDERR') {
+            return print STDERR @args;
+        }
+    }
+
+    my $output = defined($,) ? join( $,, @args) : join('', @args);
 
     return unless length($output);
 
     my $ctx = context();
     $ctx->send_ev2_and_release(
         info => [
-            {tag => $name, details => $output, $name eq 'STDERR' ? (debug => 1) : ()},
+            {tag => $_[0]->[0], details => $output, $_[0]->[0] eq 'STDERR' ? (debug => 1) : ()},
         ]
     );
 }
@@ -65,9 +96,19 @@ sub FILENO {
 }
 
 sub PRINTF {
+    my (undef, @list) = @_;
+    my $name = $_[0]->[0];
+    if ($_[0]->_check_for_change()) {
+        if ($name eq 'STDOUT') {
+            return printf STDOUT @list;
+        }
+        elsif ($name eq 'STDERR') {
+            return printf STDERR @list;
+        }
+    }
+
     my $self = shift;
-    my ($format, @list) = @_;
-    my ($name) = @$self;
+    my $format = shift @list;
 
     my $output = sprintf($format, @list);
     return unless length($output);
@@ -80,20 +121,55 @@ sub PRINTF {
     );
 }
 
-sub CLOSE { 1 }
+sub CLOSE {
+    if ($_[0]->[0] eq 'STDOUT') {
+        untie(*STDOUT);
+        return close(STDOUT);
+    }
+    elsif ($_[0]->[0] eq 'STDERR') {
+        untie(*STDERR);
+        return close(STDERR);
+    }
+}
 
 sub WRITE {
-    my $self = shift;
-    my ($buf, $len, $offset) = @_;
-    return syswrite($self->[2], $buf) if @_ == 1;
-    return syswrite($self->[2], $buf, $len) if @_ == 2;
-    return syswrite($self->[2], $buf, $len, $offset);
+    my (undef, $buf, $len, $offset) = @_;
+    my $fh;
+    my $name = $_[0]->[0];
+    if ($_[0]->_check_for_change()) {
+        if ($name eq 'STDOUT') {
+            $fh = \*STDOUT;
+        }
+        elsif ($name eq 'STDERR') {
+            $fh = \*STDERR;
+        }
+    }
+    else {
+        $fh = $_[0]->[2];
+    }
+
+    return syswrite($fh, $buf) if @_ == 2;
+    return syswrite($fh, $buf, $len) if @_ == 3;
+    return syswrite($fh, $buf, $len, $offset);
 }
 
 sub BINMODE {
-    my $self = shift;
-    return binmode($self->[2]) unless @_;
-    return binmode($self->[2], $_[0]);
+    my $fh;
+    my $name = $_[0]->[0];
+    if ($_[0]->_check_for_change()) {
+        if ($name eq 'STDOUT') {
+            $fh = \*STDOUT;
+        }
+        elsif ($name eq 'STDERR') {
+            $fh = \*STDERR;
+        }
+    }
+    else {
+        $fh = $_[0]->[2];
+    }
+
+    return binmode($fh) unless @_ > 1;
+    return binmode($fh, $_[1]);
 }
 
 sub autoflush {

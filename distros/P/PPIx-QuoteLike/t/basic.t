@@ -48,6 +48,37 @@ my $dmp = eval { PPIx::QuoteLike::Dumper->new( q<''> ) };
 isa_ok $dmp, 'PPIx::QuoteLike::Dumper'
     or BAIL_OUT $@;
 
+foreach my $class ( qw{
+	PPI::Token::Quote
+	PPI::Token::QuoteLike::Backtick
+	PPI::Token::QuoteLike::Command
+	PPI::Token::QuoteLike::Readline
+	PPI::Token::HereDoc
+    } ) {
+    my $obj = bless {}, $class;
+    # Force scalar context so returning nothing is interpreted as a
+    # false value.
+    ok scalar PPIx::QuoteLike::Utils::is_ppi_quotelike_element( $obj ),
+	"$class is a quotelike element"
+	or BAIL_OUT;
+}
+
+foreach my $class ( qw{
+    PPI::Token::QuoteLike::Words
+    PPI::Token::QuoteLike::Regexp
+    } ) {
+    my $obj = bless {}, $class;
+    ok !PPIx::QuoteLike::Utils::is_ppi_quotelike_element( $obj ),
+	"$class is not a quotelike element"
+	or BAIL_OUT;
+}
+
+foreach my $class ( Fubar => [] ) {
+    ok !PPIx::QuoteLike::Utils::is_ppi_quotelike_element( $class ),
+	"$class is not a quotelike element"
+	or BAIL_OUT;
+}
+
 done_testing;
 
 1;

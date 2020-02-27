@@ -163,14 +163,27 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Node };
 
-use PPIx::Regexp::Constant qw{ @CARP_NOT };
+use Carp;
+use PPIx::Regexp::Constant qw{
+    ARRAY_REF
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
+    @CARP_NOT
+};
 use PPIx::Regexp::Lexer ();
 use PPIx::Regexp::Token::Modifier ();	# For its modifier manipulations.
 use PPIx::Regexp::Tokenizer;
-use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
+use PPIx::Regexp::Util qw{
+    __choose_tokenizer_class
+    __instance
+};
 use Scalar::Util qw{ refaddr };
+use Text::Tabs ();
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 =head2 new
 
@@ -225,6 +238,28 @@ string before it tokenizes it. For example:
  my $re = PPIx::Regexp->new( '/foo/',
      encoding => 'iso-8859-1',
  );
+
+=item index_locations boolean
+
+This Boolean option specifies whether the locations of the elements in
+the regular expression should be indexed.
+
+If unspecified or specified as C<undef> a default value is used. This
+default is true if the argument is a L<PPI::Element|PPI::Element> or the
+C<location> option was specified. Otherwise the default is false.
+
+=item location array_reference
+
+This option specifies the location of the new object in the document
+from which it was created. It is a reference to a five-element array
+compatible with that returned by the C<location()> method of
+L<PPI::Element|PPI::Element>.
+
+If not specified, the location of the original string is used if it was
+specified as a L<PPI::Element|PPI::Element>.
+
+If no location can be determined, the various C<location()> methods will
+return C<undef>.
 
 =item parse parse_type
 
@@ -298,6 +333,11 @@ is it supported.
 	my ( $class, $content, %args ) = @_;
 	ref $class and $class = ref $class;
 
+	# We have to do this very early so the tokenizer can see it.
+	defined $args{index_locations}
+	    or $args{index_locations} = (
+	    !! $args{location} || __instance( $content, 'PPI::Element' ) );
+
 	$errstr = undef;
 
 	# As of 0.068_01 this either fails or returns
@@ -313,10 +353,20 @@ is it supported.
 	my $lexer = PPIx::Regexp::Lexer->new( $tokenizer, %args );
 	my @nodes = $lexer->lex();
 	my $self = $class->SUPER::__new( @nodes );
+	$self->{index_locations} = $args{index_locations};
 	$self->{source} = $content;
 	$self->{failures} = $lexer->failures();
 	$self->{effective_modifiers} =
 	    $tokenizer->__effective_modifiers();
+	if ( $args{location} ) {
+	    ARRAY_REF eq ref $args{location}
+		or croak q<Argument 'location' must be an array reference>;
+	    foreach my $inx ( 0 .. 3 ) {
+		$args{location}[$inx] =~ m/ [^0-9] /smx
+		    and croak "Argument 'location' element $inx must be an unsigned integer";
+	    }
+	    $self->{location} = $args{location};
+	}
 	return $self;
     }
 

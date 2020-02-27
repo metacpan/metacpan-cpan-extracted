@@ -177,10 +177,10 @@ sub parseopt {
 
     my $bucket = eval { $obj->load_module($mod) } or do {
 	if ($!{ENOENT}) {
-	    if ($obj->{IGNORE_NO_MODULE}) {
+	    if ($obj->{IGNORE_NO_MODULE} and $@ =~ /need to install the (\w+::)*$mod/) {
 		return undef;
 	    } else {
-		die "$mod: module not found\n";
+		die;
 	    }
 	} else {
 	    die $@;

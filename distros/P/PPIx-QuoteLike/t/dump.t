@@ -39,19 +39,19 @@ EOF
     <<'EOF',
 
 'buzz' ? line 4 column 11
-PPIx::QuoteLike	'...'	failures=0	interpolates=0	5.000 <= $]	
+PPIx::QuoteLike	'...'	failures=0	interpolates=0	5.000 <= $]
   PPIx::QuoteLike::Token::String	'buzz'	5.000 <= $]
 
 "Burfle" ? line 5 column 11
-PPIx::QuoteLike	"..."	failures=0	interpolates=1	5.000 <= $]	
+PPIx::QuoteLike	"..."	failures=0	interpolates=1	5.000 <= $]
   PPIx::QuoteLike::Token::String	'Burfle'	5.000 <= $]
 
 q <Bright> ? line 6 column 12
-PPIx::QuoteLike	q<...>	failures=0	interpolates=0	5.000 <= $]	
+PPIx::QuoteLike	q<...>	failures=0	interpolates=0	5.000 <= $]
   PPIx::QuoteLike::Token::String	'Bright'	5.000 <= $]
 
 qq{light} ? line 7 column 13
-PPIx::QuoteLike	qq{...}	failures=0	interpolates=1	5.000 <= $]	
+PPIx::QuoteLike	qq{...}	failures=0	interpolates=1	5.000 <= $]
   PPIx::QuoteLike::Token::String	'light'	5.000 <= $]
 
 "foo$bar->@*\F$baz\E\n" ? line 9 column 7

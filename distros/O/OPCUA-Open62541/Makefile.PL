@@ -21,6 +21,7 @@ WriteMakefile(
     AUTHOR		=> [
 	'Alexander Bluhm <bluhm@genua.de>',
 	'Anton Borowka',
+	'Arne Becker',
 	'Marvin Knoblauch <mknob@genua.de>',
     ],
     LICENSE		=> 'perl_5',

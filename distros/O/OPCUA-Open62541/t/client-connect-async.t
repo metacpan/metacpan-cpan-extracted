@@ -3,47 +3,15 @@ use warnings;
 use OPCUA::Open62541 ':all';
 use POSIX qw(sigaction SIGALRM);
 
-use Net::EmptyPort qw(empty_port);
 use Scalar::Util qw(looks_like_number);
-use Test::More tests => 27;
+use OPCUA::Open62541::Test::Server;
+use Test::More tests => 31;
 use Test::NoWarnings;
 use Test::LeakTrace;
 
-# initialize the server
-
-my $s = OPCUA::Open62541::Server->new();
-ok($s, "server");
-
-my $sc = $s->getConfig();
-ok($s, "config server");
-
-my $port = empty_port();
-my $r = $sc->setMinimal($port, "");
-is($r, STATUSCODE_GOOD, "minimal server config");
-
-my $pid = fork // die "Unable to fork: $!\n";
-
-if ( !$pid ) {
-    my $running = 1;
-    sub handler {
-	$running = 0;
-    }
-
-    # Perl signal handler only works between perl statements.
-    # Use the real signal handler to interrupt the OPC UA server.
-    # This is not signal safe, best effort is good enough for a test.
-    my $sigact = POSIX::SigAction->new(\&handler)
-	or die "could not create POSIX::SigAction";
-    sigaction(SIGALRM, $sigact)
-	or die "sigaction failed: $!";
-    alarm(1)
-	// die "alarm failed: $!";
-
-    # run server and stop after one second
-    $s->run($running);
-
-    POSIX::_exit 0;
-}
+my $server = OPCUA::Open62541::Test::Server->new();
+$server->start();
+my $port = $server->port();
 
 my @testdesc = (
     ['client', 'client creation'],
@@ -64,6 +32,7 @@ my %testok = map { $_ => 0 } map { $_->[0] } @testdesc;
 
 no_leaks_ok {
     my $c;
+    my $r;
     my $data = ['foo'];
     {
 	$c = OPCUA::Open62541::Client->new();
@@ -109,9 +78,7 @@ no_leaks_ok {
 
 ok($testok{$_->[0]}, $_->[1]) for (@testdesc);
 
-waitpid $pid, 0;
-
-is($?, 0, "server finished");
+$server->stop();
 
 my $c = OPCUA::Open62541::Client->new();
 ok($c, "client new");
@@ -119,7 +86,7 @@ ok($c, "client new");
 my $cc = $c->getConfig();
 ok($cc, "client config");
 
-$r = $cc->setDefault();
+my $r = $cc->setDefault();
 is($r, STATUSCODE_GOOD, "client config default");
 
 eval { $c->connect_async("opc.tcp://localhost:$port", "", undef) };

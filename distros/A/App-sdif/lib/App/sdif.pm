@@ -8,7 +8,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.13.3";
+our $VERSION = "4.13.4";
 
 use Pod::Usage;
 
@@ -65,7 +65,7 @@ See individual manual of each command for detail.
 =head2 GIT
 
 Those are sample configurations using B<sdif> family in git
-environment.  You need install B<mecab> command to use B<--mecab>
+environment.  You need to install B<mecab> command to use B<--mecab>
 option.
 
 	~/.gitconfig
@@ -84,6 +84,11 @@ option.
 		export LESS="-cR"
 		export LESSANSIENDCHARS="mK"
 
+You can write everything in ~/.gitconfig:
+
+        log  = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
+        show = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
+        diff = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
 
 =head1 SEE ALSO
 

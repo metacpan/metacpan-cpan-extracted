@@ -1,3 +1,7 @@
+0.29.2 2020-02-27 14:14:03 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix popup instanciation with new YAML config
+
 0.29.1 2020-02-21 16:55:09 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - callbackery.locale.MTranslation was missing from MANIFEST and

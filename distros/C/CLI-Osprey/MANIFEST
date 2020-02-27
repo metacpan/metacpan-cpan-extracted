@@ -14,3 +14,9 @@ lib/CLI/Osprey/Descriptive.pm
 lib/CLI/Osprey/Descriptive/Usage.pm
 lib/CLI/Osprey/InlineSubcommand.pm
 lib/CLI/Osprey/Role.pm
+t/basic.t
+t/lib/MyTest/Class/Basic.pm
+t/lib/MyTest/Class/Basic/Yell.pm
+t/lib/PodApp.pm
+t/pod_generation.t
+t/usage_api.t

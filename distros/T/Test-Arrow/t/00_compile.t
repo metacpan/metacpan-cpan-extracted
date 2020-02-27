@@ -1,6 +1,9 @@
-use strict;
-use Test::More tests => 1;
+eval {
+    require Test::Arrow;
+    Test::Arrow->import;
+};
 
-BEGIN {
-    use_ok 'Test::Arrow';
-}
+Test::Arrow->new->ok(!$@)
+    or Test::Arrow->diag($@);
+
+Test::Arrow->done;

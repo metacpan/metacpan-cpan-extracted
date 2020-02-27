@@ -21,9 +21,10 @@ UA_NodeId				T_PACKED
 UA_BrowseRequest			T_PACKED
 UA_BrowseResponse			T_PACKED
 OPCUA_Open62541_NodeId			T_PTROBJ_OPTIONAL
+OPCUA_Open62541_LocalizedText		T_PTROBJ_REFERENCE
 UA_QualifiedName			T_PACKED
 OPCUA_Open62541_DataType		T_PACKED
-OPCUA_Open62541_Variant			T_PTROBJ_SPECIAL
+OPCUA_Open62541_Variant			T_PTROBJ_REFERENCE
 UA_VariableAttributes			T_PACKED
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL
@@ -54,6 +55,23 @@ T_PTROBJ_OPTIONAL
 		croak(\"%s: %s is not a scalar reference\",
 		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
 	}
+T_PTROBJ_REFERENCE
+	if (SvROK($arg) && sv_derived_from($arg,
+	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
+		/* Already an object pointer. */
+		$var = INT2PTR($type, SvIV(SvRV($arg)));
+	} else if (SvROK($arg) && SvTYPE(SvRV($arg)) < SVt_PVAV) {
+		/* Scalar reference, set referenced variable to pointer. */
+		$var = UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new();
+		if ($var == NULL)
+			croak(\"UA_${(my $ntt=${ntype})=~s/.*_//g;\$ntt}_new\");
+		DPRINTF(\"${(my $ntt=lc(${ntype}))=~s/.*_//g;\$ntt} %p\", $var);
+		sv_setref_pv(SvRV($arg),
+		    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
+	} else {
+		croak(\"%s: %s is not a scalar reference\",
+		    ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
+	}
 T_PTROBJ_SPECIAL
 	if (SvROK($arg) && sv_derived_from($arg,
 	    \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\")) {
@@ -68,5 +86,7 @@ T_PTROBJ_SPECIAL
 
 #############################################################################
 OUTPUT
+T_PTROBJ_REFERENCE
+	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);
 T_PTROBJ_SPECIAL
 	sv_setref_pv($arg, \"${(my $ntt=${ntype})=~s/_/::/g;\$ntt}\", $var);

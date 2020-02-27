@@ -1,3 +1,7 @@
+0.001001  2020-02-26 14:55:47-08:00 America/Los_Angeles
+
+    - Fix open($fh, '-|')
+
 0.001000  2020-02-24 14:47:33-08:00 America/Los_Angeles
 
     - Bump version (Apparently I had an old module with this name)

@@ -1,26 +1,37 @@
-Revision history for Complete-TZ
+0.081   2020-02-27  Released-By: PERLANCAR; Urgency: medium
 
-0.07    2015-11-29 (PERLANCAR)
+	- Move list of string offsets to Sah::Schema::date::tz_offset.
+
+
+0.080   2020-02-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible] Rename complete_tz to complete_tz_name (old name still
+	  provided).
+
+	- Add complete_tz_offset().
+
+
+0.07    2015-11-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Complete::Common 0.21.
 
 
-0.06    2015-09-18 (PERLANCAR)
+0.06    2015-09-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Tweak Rinci metadata for CLI convenience.
 
 
-0.05    2015-09-17 (PERLANCAR)
+0.05    2015-09-17  Released-By: PERLANCAR
 
 	- Adjust to Complete::Util 0.36 (complete_file() split to
 	  Complete-File).
 
 
-0.04    2015-09-09 (PERLANCAR)
+0.04    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -29,7 +40,7 @@ Revision history for Complete-TZ
 	  requirement.
 
 
-0.03    2015-09-03 (PERLANCAR)
+0.03    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -38,11 +49,11 @@ Revision history for Complete-TZ
 	  requirement.
 
 
-0.02    2015-04-03 (PERLANCAR)
+0.02    2015-04-03  Released-By: PERLANCAR
 
 	- Add path_sep to completion answer so it behaves like path.
 
 
-0.01    2015-04-03 (PERLANCAR)
+0.01    2015-04-03  Released-By: PERLANCAR
 
         - First release.

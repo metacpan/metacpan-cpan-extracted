@@ -3,12 +3,14 @@ use strict;
 use warnings;
 
 # ABSTRACT: MooX::Options + MooX::Cmd + Sanity
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Carp 'croak';
 use Module::Runtime 'use_module';
 use Scalar::Util qw(reftype);
+
+use Moo::Role qw(); # only want class methods, not setting up a role
 
 use CLI::Osprey::InlineSubcommand ();
 
@@ -29,9 +31,7 @@ sub import {
   my $around = $target->can('around');
   my $has = $target->can('has');
 
-  my @target_isa = do { no strict 'refs'; @{"${target}::ISA"} };
-  
-  if (@target_isa) { # not in a role
+  if ( ! Moo::Role->is_role( $target ) ) { # not in a role
     eval "package $target;\n" . q{
       sub _osprey_options {
         my $class = shift;
@@ -162,7 +162,7 @@ CLI::Osprey - MooX::Options + MooX::Cmd + Sanity
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -577,7 +577,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Andrew Rodland.
+This software is copyright (c) 2020 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

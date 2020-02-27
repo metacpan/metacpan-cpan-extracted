@@ -43,7 +43,7 @@ use Carp qw{ confess };
 use List::Util qw{ first };
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -135,6 +135,16 @@ sub is_relative {
     my ( $self ) = @_;
     return $self->{is_relative};
 }
+
+=head2 is_matcher
+
+This method returns a true value because, although we do not actually
+perform an analysis on the referred-to entity, we presume it matches
+something.
+
+=cut
+
+sub is_matcher { return 1; }
 
 =head2 name
 

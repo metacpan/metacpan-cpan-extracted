@@ -1,5 +1,5 @@
 name = "Getopt-EX"
 authority = "cpan:UTASHIRO"
-# badges = ["travis"]
+badges = ['travis-ci.com', 'metacpan']
 module_maker="ModuleBuildTiny"
 

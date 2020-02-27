@@ -47,10 +47,16 @@ use warnings;
 use base qw{ PPIx::Regexp::Token };
 
 use PPI::Document;
-use PPIx::Regexp::Constant qw{ COOKIE_REGEX_SET @CARP_NOT };
+use PPIx::Regexp::Constant qw{
+    COOKIE_REGEX_SET
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
+    @CARP_NOT
+};
 use PPIx::Regexp::Util qw{ __instance };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 use constant VERSION_WHEN_IN_REGEX_SET => undef;
@@ -94,10 +100,25 @@ sub explain {
     return 'Perl expression';
 }
 
+=head2 is_matcher
+
+This method returns C<undef> because a static analysis can not in
+general tell whether an interpolated value matches anything.
+
+=cut
+
+sub is_matcher { return undef; }	## no critic (ProhibitExplicitReturnUndef)
+
 =head2 ppi
 
 This convenience method returns the L<PPI::Document|PPI::Document>
 representing the content. This document should be considered read only.
+
+B<Note> that if the location of the invocant is available the PPI
+document will have stuff prefixed to it to make the location of the
+tokens in the new document consistent with the location. This "stuff"
+will include at least a C<#line> directive, and maybe leading white
+space.
 
 =cut
 
@@ -106,11 +127,57 @@ sub ppi {
     if ( exists $self->{ppi} ) {
 	return $self->{ppi};
     } elsif ( exists $self->{content} ) {
-	return ( $self->{ppi} = PPI::Document->new(
-		\($self->{content}), readonly => 1 ) );
+	my $content;
+	my $location = $self->{location};
+	if ( $location ) {
+	    my $fn;
+	    if( defined( $fn = $location->[LOCATION_LOGICAL_FILE] ) ) {
+		$fn =~ s/ (?= [\\"] ) /\\/smxg;
+		$content = qq{#line $location->[LOCATION_LOGICAL_LINE] "$fn"\n};
+	    } else {
+		$content = qq{#line $location->[LOCATION_LOGICAL_LINE]\n};
+	    }
+	    $content .= ' ' x ( $location->[LOCATION_COLUMN] - 1 );
+	}
+
+	$content .= $self->__ppi_normalize_content();
+
+	$self->{ppi} = PPI::Document->new( \$content );
+
+	if ( $location ) {
+	    # Generate locations now.
+	    $self->{ppi}->location();
+	    # Remove the stuff we originally injected. NOTE that we can
+	    # only get away with doing this if the removal does not
+	    # invalidate the locations of the other tokens that we just
+	    # generated.
+	    my $elem;
+	    # Remove the '#line' directive if we find it
+	    $elem = $self->{ppi}->child( 0 )
+		and $elem->isa( 'PPI::Token::Comment' )
+		and $elem->content() =~ m/ \A \#line\b /smx
+		and $elem->remove();
+	    # Remove the white space if we find it, and if it in fact
+	    # represents only the white space we injected to get the
+	    # column numbers right.
+	    my $wid = $location->[LOCATION_COLUMN] - 1;
+	    $wid
+		and $elem = $self->{ppi}->child( 0 )
+		and $elem->isa( 'PPI::Token::Whitespace' )
+		and $wid == length $elem->content()
+		and $elem->remove();
+	}
+
+	return $self->{ppi};
+
     } else {
 	return;
     }
+}
+
+sub __ppi_normalize_content {
+    my ( $self ) = @_;
+    return $self->{content};
 }
 
 # Return true if the token can be quantified, and false otherwise

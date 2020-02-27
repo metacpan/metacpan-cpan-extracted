@@ -2,8 +2,8 @@ package Getopt::Long::Complete;
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
-our $DATE = '2017-12-20'; # DATE
-our $VERSION = '0.310'; # VERSION
+our $DATE = '2020-02-27'; # DATE
+our $VERSION = '0.311'; # VERSION
 
 use 5.010001;
 use strict;
@@ -131,7 +131,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.310 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2017-12-20.
+This document describes version 0.311 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-02-27.
 
 =head1 SYNOPSIS
 
@@ -230,11 +230,17 @@ Because we are "bound" by providing a Getopt::Long-compatible function
 interface, these variables exist to allow configuring Getopt::Long::GetOptions.
 You can use Perl's C<local> to localize the effect.
 
-=head2 $opt_permute => bool (default: 1 or 0 if POSIXLY_CORRECT)
+=head2 $opt_permute
 
-=head2 $opt_pass_through => bool (default: 0)
+Bool. Default: 1 (or 0 if POSIXLY_CORRECT).
 
-=head2 $opt_bundling => bool (default: 1)
+=head2 $opt_pass_through
+
+Bool. Default: 0.
+
+=head2 $opt_bundling
+
+Bool. Default: 1.
 
 =head1 INCOMPATIBILITIES
 
@@ -259,7 +265,11 @@ C<HelpMessage>, C<VersionMessage>.
 
 =head1 FUNCTIONS
 
-=head2 GetOptions([\%hash, ]@spec)
+=head2 GetOptions
+
+Usage:
+
+ GetOptions([ \%hash, ] @spec)
 
 Will call Getopt::Long's GetOptions, except when COMP_LINE environment variable
 is defined, in which case will print completion reply to STDOUT and exit.
@@ -270,7 +280,11 @@ environment is false). I believe this a sane default.> You can turn off bundling
 via C<$opt_bundling>. You can turn on/off permute explicitly by via
 C<$opt_permute>. You can turn on pass_through via C<$opt_pass_through>.
 
-=head2 GetOptionsWithCompletion(\&completion, [\%hash, ]@spec)
+=head2 GetOptionsWithCompletion
+
+Usage:
+
+ GetOptionsWithCompletion(\&completion, [ \%hash, ] @spec)
 
 Just like C<GetOptions>, except that it accepts an extra first argument
 C<\&completion> containing completion routine for completing option I<values>
@@ -301,8 +315,8 @@ L<Getopt::Long::More>, another drop-in replacement for Getopt::Long with tab
 completion support and more stuffs: default value, required value, summary in
 auto_help.
 
-L<Complete::Getopt::Long> (the backend for this module), C<Complete::Bash>,
-C<Complete::Tcsh>.
+L<Complete::Getopt::Long> (the backend for this module), L<Complete::Bash>,
+L<Complete::Tcsh>.
 
 Other option-processing modules featuring shell tab completion:
 L<Getopt::Complete>.
@@ -320,7 +334,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

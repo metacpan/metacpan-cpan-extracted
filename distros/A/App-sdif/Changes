@@ -1,5 +1,11 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.13.4 2020-02-27T06:29:08Z
+
+    - Set $Getopt::EX::Colormap::NO_RESET_EL not to produce ERASE LINE
+      sequence with RESET.  With option --mark=side or --mark=right,
+      rightmost column is vanished on some terminal app.
+
 4.13.3 2020-01-18T02:45:49Z
 
     - Require Getopt-EX v1.15.2 to not produce Erase Line sequence.

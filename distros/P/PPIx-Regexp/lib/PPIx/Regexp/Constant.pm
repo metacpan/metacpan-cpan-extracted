@@ -8,7 +8,7 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
@@ -24,6 +24,11 @@ our @EXPORT_OK = qw{
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
     LITERAL_LEFT_CURLY_REMOVED_PHASE_3
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
     MINIMUM_PERL
     MODIFIER_GROUP_MATCH_SEMANTICS
     MSG_PROHIBITED_BY_STRICT
@@ -139,6 +144,13 @@ use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_2	=> undef;	# x{ 5.30
 # where the entire regex is delimited by parens -- they are still legal
 # there.
 use constant LITERAL_LEFT_CURLY_REMOVED_PHASE_3	=> undef;	# ({ 5.32
+
+# Location constants. Must align with PPI
+use constant LOCATION_LINE         => 0;
+use constant LOCATION_CHARACTER    => 1;
+use constant LOCATION_COLUMN       => 2;
+use constant LOCATION_LOGICAL_LINE => 3;
+use constant LOCATION_LOGICAL_FILE => 4;
 
 use constant MINIMUM_PERL	=> '5.000';
 

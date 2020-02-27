@@ -7,7 +7,6 @@ use utf8;
 #use Debug::Filter::PrintExpr -debug;
 use Debug::Filter::PrintExpr;
 use Test2::V0;
-use IO::String;
 use Scalar::Util qw/dualvar isdual/;
 
 # get the filehandle ref into our namespace and close it
@@ -27,7 +26,7 @@ sub prepare {
 }
 
 # capture debug output into $result
-$handle = IO::String->new($result);
+open $handle, '>', \$result or die 'cannot open memory file';
 my $n = 37;
 #${$n}
 like $result, qr/^L\d+: \$n = $n;$/, 'numeric scalar';

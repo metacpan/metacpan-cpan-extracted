@@ -28,13 +28,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Data::Random" => 0,
     "File::Temp" => 0,
+    "File::stat" => 0,
     "HTTP::Request::Common" => 0,
     "Plack::Test" => 0,
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "DBI" => 0,
   "Data::Random" => 0,
   "File::Temp" => 0,
+  "File::stat" => 0,
   "HTTP::Request::Common" => 0,
   "Plack::Test" => 0,
   "Prometheus::Tiny" => "0.004",

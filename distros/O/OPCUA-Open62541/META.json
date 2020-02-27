@@ -3,6 +3,7 @@
    "author" : [
       "Alexander Bluhm <bluhm@genua.de>",
       "Anton Borowka",
+      "Arne Becker",
       "Marvin Knoblauch <mknob@genua.de>"
    ],
    "dynamic_config" : 1,
@@ -49,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

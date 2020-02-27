@@ -10,8 +10,10 @@ use overload (
 
 use Getopt::Long::Descriptive::Usage ();
 
+*option_text = \&Getopt::Long::Descriptive::Usage::option_text;
+
 # ABSTRACT: Produce usage information for CLI::Osprey apps
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 my %format_doc = (
@@ -261,7 +263,7 @@ sub option_help {
 sub option_pod {
   my ($self) = @_;
 
-  my %osprey_config = $self->target->_osprey_options;
+  my %osprey_config = $self->target->_osprey_config;
 
   my @descs = $self->describe_options;
   my @pod;
@@ -272,7 +274,7 @@ sub option_pod {
   push @pod, $self->{prog_name} . ($osprey_config{desc} ? " - " . $osprey_config{desc} : "" );
 
   push @pod, "=head1 SYNOPSIS";
-  push @pod, "B<< $self->{prog_name} >> " 
+  push @pod, "B<< $self->{prog_name} >> "
     . join(" ", map "S<<< $_->{podshort} >>>", grep !$_->{spacer}, @descs);
 
   if ($osprey_config{description_pod}) {
@@ -318,6 +320,16 @@ sub option_pod {
   return join("\n\n", @pod);
 }
 
+sub die  {
+  my $self = shift;
+  my $arg  = shift || {};
+
+  die(
+    join q{}, grep { defined } $arg->{pre_text}, $self->text, $arg->{post_text}
+  );
+}
+
+sub warn { warn shift->text }
 
 1;
 
@@ -333,7 +345,7 @@ CLI::Osprey::Descriptive::Usage - Produce usage information for CLI::Osprey apps
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 
@@ -341,7 +353,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Andrew Rodland.
+This software is copyright (c) 2020 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::JSON;
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/
@@ -121,7 +121,7 @@ sub represent_undef {
 
 sub represent_literal {
     my ($rep, $node) = @_;
-    $node->{style} = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+    $node->{style} ||= YAML_SINGLE_QUOTED_SCALAR_STYLE;
     $node->{data} = "$node->{value}";
     return 1;
 }

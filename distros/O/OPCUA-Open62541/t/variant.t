@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541 qw(:type :limit);
 
-use Test::More tests => 77;
+use Test::More tests => 75;
 use Test::LeakTrace;
 use Test::NoWarnings;
 use Test::Warn;
@@ -35,10 +35,6 @@ warnings_like { $variant->setScalar("", TYPES_SBYTE) }
 
 warnings_like { $variant->setScalar(1, "") }
     (qr/Argument "" isn't numeric in subroutine entry/, "type string warn");
-
-eval { $variant->setScalar("", TYPES_EVENTNOTIFICATIONLIST) };
-ok($@, "scalar TYPES_EVENTNOTIFICATIONLIST");
-like($@, qr/type EventNotificationList .* not implemented/, "not implemented");
 
 eval { $variant->setScalar("", OPCUA::Open62541::TYPES_COUNT) };
 ok($@, "scalar TYPES_COUNT");

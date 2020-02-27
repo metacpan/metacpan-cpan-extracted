@@ -49,7 +49,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -297,6 +297,25 @@ sub first_element {
     return $self->{children}[0];
 }
 
+=head2 first_token
+
+This method returns the first token in the node. If there is none, it
+returns nothing.
+
+=cut
+
+sub first_token {
+    my ( $self ) = @_;
+    my $elem = $self->first_element()
+	or return;
+    my $token;
+    while ( ! ( $token = $elem->first_token() ) ) {
+	$elem = $elem->next_element()
+	    or return;
+    }
+    return $token;
+}
+
 =head2 last_element
 
 This method returns the last element in the node.
@@ -306,6 +325,52 @@ This method returns the last element in the node.
 sub last_element {
     my ( $self ) = @_;
     return $self->{children}[-1];
+}
+
+=head2 last_token
+
+This method returns the last token in the node. If there is none, it
+returns nothing.
+
+=cut
+
+sub last_token {
+    my ( $self ) = @_;
+    my $elem = $self->last_element()
+	or return;
+    my $token;
+    while ( ! ( $token = $elem->last_token() ) ) {
+	$elem = $elem->previous_element()
+	    or return;
+    }
+    return $token;
+}
+
+sub location {
+    my ( $self ) = @_;
+    my $token = $self->first_token()
+	or return undef;	## no critic (ProhibitExplicitReturnUndef)
+    return $token->location();
+}
+
+=head2 is_matcher
+
+This method returns a true value if any of the node's children does.
+Otherwise it returns C<undef> if any of the node's children does.
+Otherwise it returns a false (but defined) value.
+
+=cut
+
+sub is_matcher {
+    my ( $self ) = @_;
+    my $rslt = 0;
+    foreach my $kid ( @{ $self->{children} } ) {
+	my $kid_rslt = $kid->is_matcher()
+	    and return 1;
+	defined $kid_rslt
+	    or $rslt = $kid_rslt;
+    }
+    return $rslt;
 }
 
 =head2 perl_version_introduced
@@ -402,7 +467,8 @@ sub schild {
 
 =head2 schildren
 
-This method returns the significant children of the node.
+This method returns the significant children of the Node. If called in
+scalar context it returns the number of significant children.
 
 =cut
 

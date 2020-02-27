@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/kaz-utashiro/sdif-tools.svg?branch=master)](https://travis-ci.com/kaz-utashiro/sdif-tools) [![MetaCPAN Release](https://badge.fury.io/pl/App-sdif.svg)](https://metacpan.org/release/App-sdif)
 # NAME
 
 App::sdif - sdif and family tools, cdif and watchdiff
@@ -38,7 +39,7 @@ See individual manual of each command for detail.
 ## GIT
 
 Those are sample configurations using **sdif** family in git
-environment.  You need install **mecab** command to use **--mecab**
+environment.  You need to install **mecab** command to use **--mecab**
 option.
 
         ~/.gitconfig
@@ -56,6 +57,12 @@ option.
         ~/.profile
                 export LESS="-cR"
                 export LESSANSIENDCHARS="mK"
+
+You can write everything in ~/.gitconfig:
+
+        log  = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
+        show = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
+        diff = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
 
 # SEE ALSO
 

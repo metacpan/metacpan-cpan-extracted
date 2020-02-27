@@ -12,7 +12,7 @@ build_requires:
   Test::More: 0
   Test::Pod: 1.22
   Test::Pod::Coverage: 1.08
-  YAML::XS: 0
+  YAML::XS: 0.81
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -37,4 +37,4 @@ requires:
   YAML::XS: 0
   overload: 0
   perl: 5.010000
-version: 0.15
+version: 0.16

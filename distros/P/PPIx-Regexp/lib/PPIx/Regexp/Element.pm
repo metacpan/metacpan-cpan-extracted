@@ -44,13 +44,18 @@ use Scalar::Util qw{ refaddr weaken };
 use PPIx::Regexp::Constant qw{
     FALSE
     LITERAL_LEFT_CURLY_REMOVED_PHASE_1
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
     MINIMUM_PERL
     TOKEN_UNKNOWN
     TRUE
     @CARP_NOT
 };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 =head2 accepts_perl
 
@@ -144,6 +149,18 @@ C<ref $self>.
 sub class {
     my ( $self ) = @_;
     return ref $self;
+}
+
+=head2 column_number
+
+This method returns the column number of the first character in the
+element, or C<undef> if that can not be determined.
+
+=cut
+
+sub column_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_CHARACTER];
 }
 
 =head2 comment
@@ -243,6 +260,65 @@ sub error {
     return $self->{error};
 }
 
+=begin comment
+
+=head2 first_element
+
+This method throws an exception saying that it must be overridden.
+
+=end comment
+
+=cut
+
+sub first_element {
+    confess 'Bug - first_element must be overridden';
+}
+
+=begin comment
+
+=head2 first_token
+
+This method throws an exception saying that it must be overridden.
+
+=end comment
+
+=cut
+
+sub first_token {
+    confess 'Bug - first_token must be overridden';
+}
+
+=head2 is_matcher
+
+This method reports on whether the element potentially matches
+something. Possible returns are a true value if it does, a false (but
+defined) value if it does not, or C<undef> if this can not be
+determined.
+
+The idea is to classify elements based on whether they potentially match
+something in the target string.
+
+This method is overridden to return C<undef> in
+L<PPIx::Regexp::Token::Code|PPIx::Regexp::Token::Code/is_matcher>,
+L<PPIx::Regexp::Token::Interpolation|PPIx::Regexp::Token::Interpolation/is_matcher>, and
+L<PPIx::Regexp::Token::Unknown|PPIx::Regexp::Token::Unknown/is_matcher>.
+
+This method is overridden to return a true value in
+L<PPIx::Regexp::Token::Assertion|PPIx::Regexp::Token::Assertion/is_matcher>,
+L<PPIx::Regexp::Token::CharClass|PPIx::Regexp::Token::CharClass/is_matcher>,
+L<PPIx::Regexp::Token::Literal|PPIx::Regexp::Token::Literal/is_matcher>,
+and
+L<PPIx::Regexp::Token::Reference|PPIx::Regexp::Token::Reference/is_matcher>.
+
+For L<PPIx::Regexp::Node|PPIx::Regexp::Node/is_matcher>, this method is
+overridden to return a value computed from the node's children.
+
+For anything else this method returns a false (but defined) value.
+
+=cut
+
+sub is_matcher { return 0; }
+
 =head2 in_regex_set
 
 This method returns a true value if the invocant is contained in an
@@ -277,6 +353,90 @@ greediness token is possible.
 =cut
 
 sub is_quantifier { return; }
+
+=begin comment
+
+=head2 last_element
+
+This method throws an exception saying that it must be overridden.
+
+=end comment
+
+=cut
+
+sub last_element {
+    confess 'Bug - last_element must be overridden';
+}
+
+=begin comment
+
+=head2 last_token
+
+This method throws an exception saying that it must be overridden.
+
+=end comment
+
+=cut
+
+sub last_token {
+    confess 'Bug - last_token must be overridden';
+}
+
+=head2 line_number
+
+This method returns the line number of the first character in the
+element, or C<undef> if that can not be determined.
+
+=cut
+
+sub line_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LINE];
+}
+
+=head2 location
+
+This method returns a reference to an array describing the position of
+the element in the regular expression, or C<undef> if locations were not
+indexed.
+
+The array is compatible with the corresponding
+L<PPI::Element|PPI::Element> method.
+
+=cut
+
+sub location {
+    my ( $self ) = @_;
+    return $self->{location} ? [ @{ $self->{location} } ] : undef;
+}
+
+=pod
+
+=head2 logical_filename
+
+This method returns the logical file name (taking C<#line> directives
+into account) of the file containing first character in the element, or
+C<undef> if that can not be determined.
+
+=cut
+
+sub logical_filename {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LOGICAL_FILE];
+}
+
+=head2 logical_line_number
+
+This method returns the logical line number (taking C<#line> directives
+into account) of the first character in the element, or C<undef> if that
+can not be determined.
+
+=cut
+
+sub logical_line_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LOGICAL_LINE];
+}
 
 =head2 main_structure
 
@@ -371,6 +531,25 @@ sub next_sibling {
     my ( $method, $inx ) = $self->__my_nav()
 	or return;
     return $self->_parent()->$method( $inx + 1 );
+}
+
+=head2 next_token
+
+This method returns the next token, or nothing if there is none.
+
+Unlike L<next_element()|/next_element>, this will walk the parse tree.
+
+=cut
+
+sub next_token {
+    my ( $self ) = @_;
+    if ( my $next = $self->next_element() ) {
+	return $next->first_token();
+    } elsif ( my $parent = $self->parent() ) {
+	return $parent->next_token();
+    } else {
+	return;
+    }
 }
 
 =head2 parent
@@ -473,6 +652,25 @@ sub previous_sibling {
 	or return;
     $inx or return;
     return $self->_parent()->$method( $inx - 1 );
+}
+
+=head2 previous_token
+
+This method returns the previous token, or nothing if there is none.
+
+Unlike L<previous_element()|/previous_element>, this will walk the parse tree.
+
+=cut
+
+sub previous_token {
+    my ( $self ) = @_;
+    if ( my $previous = $self->previous_element() ) {
+	return $previous->last_token();
+    } elsif ( my $parent = $self->parent() ) {
+	return $parent->previous_token();
+    } else {
+	return;
+    }
 }
 
 =head2 remove_insignificant
@@ -662,6 +860,39 @@ sub sprevious_sibling {
     return;
 }
 
+=head2 statement
+
+This method returns the L<PPI::Statement|PPI::Statement> that contains
+this element, or nothing if the statement can not be determined.
+
+In general this method will return something only under the following
+conditions:
+
+=over
+
+=item * The element is contained in a L<PPIx::Regexp|PPIx::Regexp> object;
+
+=item * That object was initialized from a L<PPI::Element|PPI::Element>;
+
+=item * The L<PPI::Element|PPI::Element> is contained in a statement.
+
+=back
+
+=cut
+
+sub statement {
+    my ( $self ) = @_;
+    my $top = $self->top()
+	or return;
+    $top->can( 'source' )
+	or return;
+    my $source = $top->source()
+	or return;
+    $source->can( 'statement' )
+	or return;
+    return $source->statement();
+}
+
 # NOTE: This method is to be used ONLY for requirements_for_perl(). I
 # _may_ eventually expose it, but at the moment I do not consider it
 # stable. The exposure would be
@@ -746,6 +977,19 @@ This method returns the content of the element, unescaped.
 
 sub unescaped_content {
     return;
+}
+
+=head2 visual_column_number
+
+This method returns the visual column number (taking tabs into account)
+of the first character in the element, or C<undef> if that can not be
+determined.
+
+=cut
+
+sub visual_column_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_COLUMN];
 }
 
 =head2 whitespace

@@ -1,5 +1,11 @@
 Revision history for App-gimpgitbuild
 
+0.6.0   2020-02-27
+    - Use Git::Sync::App instead of git-s.
+        - git-s may not be installed by default.
+        - See https://mail.gnome.org/archives/gimp-developer-list/2020-February/msg00016.html
+        - Thanks to Owen
+
 0.4.0   2020-02-25
     - Support GIMPGITBUILD__BASE_INSTALL_DIR
     and GIMPGITBUILD__BASE_CLONES_DIR env vars

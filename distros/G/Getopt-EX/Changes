@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX
 
+v1.15.3 2020-02-27T06:19:37Z
+
+    - Introduce $NO_RESET_EL and $ENV{GETOPTEX_NO_RESET_EL} to control
+      ERASE LINE with RESET, and recover default behavior.
+
 v1.15.2 2019-12-21T00:58:41Z
 
     - Do not produce ERASE LINE sequence in normal case.

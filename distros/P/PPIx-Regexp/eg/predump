@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.069';
+$VERSION = '0.070';
 
 my %opt = (
     default_modifiers => [],
@@ -38,8 +38,8 @@ GetOptions( \%opt,
     qw{
         default_modifiers|default-modifiers=s@
 	encoding=s explain! files!
-	indent=i margin=i objectify! ordinal! perl_version!
-	postderef!  significant! strict!
+	indent=i locations! margin=i objectify! ordinal! perl_version!
+	postderef! ppi! significant! strict!
 	test! tokens! trace+ unescape! verbose+
     } )
     and @ARGV
@@ -84,7 +84,6 @@ foreach my $re ( process_args( \%opt, @ARGV ) ) {
 
 		my $doc = PPI::Document->new( $datum, readonly => 1 )
 		    or die "Can not make PPI::Document from file '$datum'\n";
-		$doc->index_locations();
 		push @docs, $doc;
 		push @rslt, extract_res( $doc, $opt );
 		$file{ refaddr( $doc ) } = {

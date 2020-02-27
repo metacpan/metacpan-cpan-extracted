@@ -1,0 +1,155 @@
+NAME
+    File::Find::Rule::BOM - Common rules for searching for BOM in files.
+
+SYNOPSIS
+     use File::Find::Rule;
+     use File::Find::Rule::BOM;
+
+     my @files = File::Find::Rule->bom->in($dir);
+     my @files = File::Find::Rule->bom_utf8->in($dir);
+     my @files = File::Find::Rule->bom_utf16->in($dir);
+     my @files = File::Find::Rule->bom_utf32->in($dir);
+
+DESCRIPTION
+    This Perl module contains File::Find::Rule rules for detecting Byte
+    Order Mark in files.
+
+    BOM (Byte Order Mark) is a particular usage of the special Unicode
+    character, U+FEFF BYTE ORDER MARK, whose appearance as a magic number at
+    the start of a text stream can signal several things to a program
+    reading the text.
+
+    See Byte order mark on Wikipedia.
+
+SUBROUTINES
+  "bom"
+     my @files = File::Find::Rule->bom->in($dir);
+
+    The "bom()" rule detect files with BOM.
+
+  "bom_utf8"
+     my @files = File::Find::Rule->bom_utf8->in($dir);
+
+    The "bom_utf8()" rule detect files with UTf-8 BOM.
+
+  "bom_utf16"
+     my @files = File::Find::Rule->bom_utf16->in($dir);
+
+    The "bom_utf16()" rule detect files with UTF-16 BOM.
+
+  "bom_utf32"
+     my @files = File::Find::Rule->bom_utf32->in($dir);
+
+    The "bom_utf32()" rule detect files with UTF-32 BOM.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::BOM;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all files with BOM in directory.
+     foreach my $file (File::Find::Rule->bom->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::BOM;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all files with UTF-8 BOM in directory.
+     foreach my $file (File::Find::Rule->bom_utf8->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::BOM;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all files with UTF-16 BOM in directory.
+     foreach my $file (File::Find::Rule->bom_utf16->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::BOM;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all files with UTF-32 BOM in directory.
+     foreach my $file (File::Find::Rule->bom_utf32->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+DEPENDENCIES
+    File::Find::Rule, String::BOM.
+
+SEE ALSO
+    File::Find::Rule
+        Alternative interface to File::Find
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/File-Find-Rule-BOM>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2015-2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -9,13 +9,13 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use PPIx::QuoteLike::Dumper;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 my %opt;
 
 GetOptions( \%opt,
     qw{
-	encoding=s indent=i margin=i
+	encoding=s indent=i locations! margin=i
 	perl_version|perl-version! ppi! significant!
 	tokens! variables!
     },
@@ -30,7 +30,7 @@ defined $opt{encoding}
     and binmode STDOUT, ":encoding($opt{encoding})";
 
 my @dumper_arg = map { $_ => $opt{$_} } qw{
-    encoding indent margin perl_version ppi
+    encoding indent locations margin perl_version ppi
     significant tokens variables
 };
 
@@ -76,6 +76,11 @@ This option controls the number of spaces each level of structure is
 indented.
 
 The default is C<-indent 2>.
+
+=head2 -locations
+
+If this Boolean option is true the locations of the tokens will be
+dumped.
 
 =head2 -margin
 
@@ -148,7 +153,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

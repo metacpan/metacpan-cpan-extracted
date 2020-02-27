@@ -45,7 +45,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -65,6 +65,14 @@ sub __new {
 sub explain {
     return 'Literal character';
 }
+
+=head2 is_matcher
+
+This method returns a true value because a literal matches itself.
+
+=cut
+
+sub is_matcher { return 1; }
 
 sub perl_version_introduced {
     my ( $self ) = @_;

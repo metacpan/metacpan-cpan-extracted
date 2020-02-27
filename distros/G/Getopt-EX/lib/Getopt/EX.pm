@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.15.2");
+use version; our $VERSION = version->declare("v1.15.3");
 
 
 1;
@@ -12,7 +12,7 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.15.2
+Version v1.15.3
 
 
 =head1 DESCRIPTION
@@ -211,7 +211,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright (C) 2015-2019 Kazumasa Utashiro
+Copyright (C) 2015-2020 Kazumasa Utashiro
 
 =head1 LICENSE
 

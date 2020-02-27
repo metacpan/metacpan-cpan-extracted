@@ -1,5 +1,14 @@
 Revision history for Carp-Proxy
 
+0.16    26 Feb 2020
+        t/30-attr-as_yaml.t stopped working because YAML::XS::Load
+        no longer automatically blesses results as a security measure.
+        Test now localizes $YAML::XS::LoadBlessed.  Updated docs
+        with a section on propagating errors up from child process.
+
+0.15    02 Mar 2015
+        More changes to tests around pod2usage()
+
 0.14    02 Mar 2015
         The format produced by pod2usage() has changed, causing tests to
         fail.  Tests now employ a regex that accepts either form.  Small

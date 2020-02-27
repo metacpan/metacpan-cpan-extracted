@@ -53,7 +53,7 @@ use base qw{PPIx::Regexp::Element};
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 0;
 
@@ -82,6 +82,28 @@ sub __new {
 sub content {
     my ( $self ) = @_;
     return $self->{content};
+}
+
+=head2 first_token
+
+This method returns its invocant.
+
+=cut
+
+sub first_token {
+    my ( $self ) = @_;
+    return $self;
+}
+
+=head2 last_token
+
+This method returns its invocant.
+
+=cut
+
+sub last_token {
+    my ( $self ) = @_;
+    return $self;
 }
 
 sub perl_version_introduced {

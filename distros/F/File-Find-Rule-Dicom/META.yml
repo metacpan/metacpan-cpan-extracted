@@ -1,7 +1,7 @@
 ---
 abstract: 'Common rules for searching for DICOM things.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
   File::Object: 0.08
@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ requires:
   perl: 5.6.2
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Find-Rule-Dicom
-  homepage: https://github.com/tupinek/File-Find-Rule-Dicom
+  homepage: https://github.com/michal-josef-spacek/File-Find-Rule-Dicom
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/File-Find-Rule-Dicom
-version: '0.04'
+  repository: git://github.com/michal-josef-spacek/File-Find-Rule-Dicom
+version: '0.05'

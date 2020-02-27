@@ -7,8 +7,16 @@ use warnings;
 
 use Carp;
 use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL @CARP_NOT };
+use PPIx::QuoteLike::Utils qw{
+    column_number
+    line_number
+    logical_filename
+    logical_line_number
+    statement
+    visual_column_number
+};
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 # Private to this package.
 sub __new {
@@ -26,6 +34,11 @@ sub content {
 sub error {
     my ( $self ) = @_;
     return $self->{error};
+}
+
+sub location {
+    my ( $self ) = @_;
+    return $self->{location} ? [ @{ $self->{location} } ] : undef;
 }
 
 sub parent {
@@ -88,6 +101,19 @@ sub sprevious_sibling {
     return;
 }
 
+sub top {
+    my ( $self ) = @_;
+    my $kid = $self;
+    while ( defined ( my $parent = $kid->parent() ) ) {
+	$kid = $parent;
+    }
+    return $kid;
+}
+
+sub variables {
+    return;
+}
+
 1;
 
 __END__
@@ -120,6 +146,11 @@ L<PPIx::QuoteLike::Token::Whitespace|PPIx::QuoteLike::Token::Whitespace>.
 
 This class supports the following public methods:
 
+=head2 column_number
+
+This method returns the column number of the first character in the
+element, or C<undef> if that can not be determined.
+
 =head2 content
 
  say $token->content();
@@ -132,6 +163,31 @@ This method returns the text that makes up the token.
 
 This method returns the error text. This will be C<undef> unless the
 token actually represents an error.
+
+=head2 line_number
+
+This method returns the line number of the first character in the
+element, or C<undef> if that can not be determined.
+
+=head2 location
+
+This method returns a reference to an array describing the position of
+the element in the string, or C<undef> if the location is unavailable.
+
+The array is compatible with the corresponding
+L<PPI::Element|PPI::Element> method.
+
+=head2 logical_filename
+
+This method returns the logical file name (taking C<#line> directives
+into account) of the file containing first character in the element, or
+C<undef> if that can not be determined.
+
+=head2 logical_line_number
+
+This method returns the logical line number (taking C<#line> directives
+into account) of the first character in the element, or C<undef> if that
+can not be determined.
 
 =head2 parent
 
@@ -202,6 +258,45 @@ if there is none.
 This method returns the significant token before the invocant, or
 nothing if there is none.
 
+=head2 statement
+
+This method returns the L<PPI::Statement|PPI::Statement> that
+contains this token, or nothing if the statement can not be
+determined.
+
+In general this method will return something only under the following
+conditions:
+
+=over
+
+=item * The token is contained in a L<PPIx::QuoteLike|PPIx::QuoteLike> object;
+
+=item * That object was initialized from a L<PPI::Element|PPI::Element>;
+
+=item * The L<PPI::Element|PPI::Element> is contained in a statement.
+
+=back
+
+=head2 top
+
+This method returns the top of the hierarchy.
+
+=head2 variables
+
+ say "Interpolates $_" for $elem->variables();
+
+This convenience method returns all interpolated variables. Each is
+returned only once, and they are returned in no particular order.
+
+B<NOTE> that because this class does not represent an interpolation,
+this method returns nothing.
+
+=head2 visual_column_number
+
+This method returns the visual column number (taking tabs into account)
+of the first character in the element, or C<undef> if that can not be
+determined.
+
 =head1 SEE ALSO
 
 L<PPIx::QuoteLike|PPIx::QuoteLike>.
@@ -209,7 +304,7 @@ L<PPIx::QuoteLike|PPIx::QuoteLike>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -217,7 +312,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

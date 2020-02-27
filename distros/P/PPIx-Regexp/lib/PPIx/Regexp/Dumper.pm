@@ -48,7 +48,9 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
+
+use constant LOCATION_WIDTH	=> 19;
 
 =head2 new
 
@@ -117,6 +119,10 @@ displayed.
 If true, postfix dereferences are recognized in code and interpolations.
 See the tokenizer's L<new()|PPIx::Regexp::Tokenizer/new> for details.
 
+=item ppi boolean
+
+If true, any Perl code contained in the object will be dumped.
+
 =item strict boolean
 
 This option is passed on to the parser, where it specifies whether the
@@ -182,9 +188,11 @@ ignored.
     my %default = (
 	explain	=> 0,
 	indent	=> 2,
+	locations	=> 0,
 	margin	=> 0,
 	ordinal	=> 0,
 	perl_version => 0,
+	ppi	=> 0,
 	significant => 0,
 	test	=> 0,
 	tokens	=> 0,
@@ -228,10 +236,14 @@ ignored.
 	} elsif ( $self->{tokens} ) {
 	    my $tokenizer_class = __choose_tokenizer_class( $re, \%args )
 		or croak 'Unsupported data type';
+	    __instance( $re, 'PPI::Element' )
+		or $args{location} = [ 1, 1, 1, 1, undef ];
 	    $self->{object} =
 		$tokenizer_class->new( $re, %args )
 		    or Carp::croak( $tokenizer_class->errstr() );
 	} else {
+	    __instance( $re, 'PPI::Element' )
+		or $args{location} = [ 1, 1, 1, 1, undef ];
 	    $self->{object} =
 		PPIx::Regexp->new( $re, %args )
 		    or Carp::croak( PPIx::Regexp->errstr() );
@@ -344,6 +356,32 @@ sub _perl_version {
     return $elem->requirements_for_perl();
 }
 
+sub _ppi {
+    my ( $self, $elem ) = @_;
+
+    $self->{ppi}
+	and $elem->can( 'ppi' )
+	or return;
+
+    require PPI::Dumper;
+
+    # PPI::Dumper reports line_number(), but I want
+    # logical_line_number(). There is no configuration for this, but the
+    # interface is public, so I mung it to do what I want.
+    my $locn = PPI::Element->can( 'location' );
+    local *PPI::Element::location = sub {
+	my $loc = $locn->( @_ );
+	$loc->[0] = $loc->[3];
+	return $loc;
+    };
+
+    my $dumper = PPI::Dumper->new( $elem->ppi(),
+	map { $_ => $self->{$_} } qw{ indent locations },
+    );
+
+    return $dumper->list();
+}
+
 sub _content {
     my ( $self, $elem, $dflt ) = @_;
     defined $dflt or $dflt = '';
@@ -361,14 +399,14 @@ sub _content {
 }
 
 sub _tokens_dump {
-    my ( $self, $elem ) = @_;
+    my ( $self, $elem, $depth ) = @_;
 
     not $self->{significant} or $elem->significant() or return;
 
     my @rslt;
     foreach my $token ( $elem->tokens() ) {
 	not $self->{significant} or $token->significant() or next;
-	push @rslt, $token->__PPIX_DUMPER__dump( $self );
+	push @rslt, $token->__PPIX_DUMPER__dump( $self, $depth );
     }
     return @rslt;
 }
@@ -385,6 +423,13 @@ sub _format_default_modifiers {
 	push @arg, "$attr => @{[ $self->_safe( $val ) ]}";
     }
     return sprintf '%-8s( %s );', $subr, join ', ', @arg;
+}
+
+sub _format_matcher_dump {
+    my ( undef, $elem ) = @_;
+    my $value = $elem->is_matcher();
+    return sprintf 'is_matcher=%s',
+	$value ? 'true' : defined $value ?  'false' : 'undef';
 }
 
 sub _format_modifiers_dump {
@@ -462,10 +507,12 @@ sub PPIx::Regexp::__PPIX_DUMPER__test {
 }
 
 sub PPIx::Regexp::Node::__PPIX_DUMPER__dump {
-    my ( $self, $dumper ) = @_;
+    my ( $self, $dumper, $depth ) = @_;
+
+    $depth ||= 0;
 
     $dumper->{tokens}
-	and return $dumper->_tokens_dump( $self );
+	and return $dumper->_tokens_dump( $self, $depth );
 
     not $dumper->{significant} or $self->significant() or return;
 
@@ -475,6 +522,11 @@ sub PPIx::Regexp::Node::__PPIX_DUMPER__dump {
 	    ? sprintf "\tfailures=%d\tmax_capture_number=%d",
 		$self->failures(), $self->max_capture_number()
 	    : sprintf "\tfailures=%d", $self->failures();
+
+    substr $rslt[0], 0, 0, ' ' x ( $depth * $dumper->{indent} );
+
+    $dumper->{locations}
+	and substr $rslt[0], 0, 0, ' ' x LOCATION_WIDTH;
 
     $dumper->{perl_version}
 	and $rslt[-1] .= "\t" . $dumper->_perl_version( $self );
@@ -487,9 +539,9 @@ sub PPIx::Regexp::Node::__PPIX_DUMPER__dump {
 		$dumper, pop @rslt );
     }
 
-    my $indent = ' ' x $dumper->{indent};
+    $depth++;
     foreach my $elem ( $self->children() ) {
-	push @rslt, map { $indent . $_ } $elem->__PPIX_DUMPER__dump( $dumper );
+	push @rslt, $elem->__PPIX_DUMPER__dump( $dumper, $depth );
     }
     return @rslt;
 }
@@ -547,7 +599,9 @@ sub _format_value {
     );
 
     sub PPIx::Regexp::Structure::__PPIX_DUMPER__dump {
-	my ( $self, $dumper ) = @_;
+	my ( $self, $dumper, $depth ) = @_;
+
+	$depth ||= 0;
 
 	not $dumper->{significant} or $self->significant() or return;
 
@@ -557,6 +611,11 @@ sub _format_value {
 	    push @delim, @elem ? $dumper->_content( \@elem ) : $dflt{$method};
 	}
 	my @rslt = ( ref $self, "$delim[0]$delim[1] ... $delim[2]" );
+
+	substr $rslt[0], 0, 0, ' ' x ( $depth * $dumper->{indent} );
+
+	$dumper->{locations}
+	    and substr $rslt[0], 0, 0, ' ' x LOCATION_WIDTH;
 
 	$dumper->{perl_version}
 	    and push @rslt, $dumper->_perl_version( $self );
@@ -574,6 +633,8 @@ sub _format_value {
 	    $self->isa( 'PPIx::Regexp::Structure::Modifier' )
 		and push @rslt, $dumper->_format_modifiers_dump(
 		$self->type( 0 ) );
+
+	    push @rslt, $dumper->_format_matcher_dump( $self );
 	}
 
 	foreach my $method ( 'start', undef, 'finish' ) {
@@ -591,10 +652,9 @@ sub _format_value {
 	    and push @rslt, $self->__PPIX_DUMPER__dump_explanation(
 		$dumper, pop @rslt );
 
-	my $indent = ' ' x $dumper->{indent};
+	$depth++;
 	foreach my $elem ( $self->children() ) {
-	    push @rslt, map { $indent . $_ }
-		$elem->__PPIX_DUMPER__dump( $dumper );
+	    push @rslt, $elem->__PPIX_DUMPER__dump( $dumper, $depth );
 	}
 	return @rslt;
     }
@@ -639,9 +699,11 @@ sub PPIx::Regexp::Structure::__PPIX_DUMPER__test {
 }
 
 sub PPIx::Regexp::Tokenizer::__PPIX_DUMPER__dump {
-    my ( $self, $dumper ) = @_;
+    my ( $self, $dumper, $depth ) = @_;
 
-    return $dumper->_tokens_dump( $self );
+    $depth ||= 0;
+
+    return $dumper->_tokens_dump( $self, $depth );
 
 }
 
@@ -652,13 +714,36 @@ sub PPIx::Regexp::Tokenizer::__PPIX_DUMPER__test {
 }
 
 sub PPIx::Regexp::Token::__PPIX_DUMPER__dump {
-    my ( $self, $dumper ) = @_;
+    my ( $self, $dumper, $depth ) = @_;
+
+    $depth ||= 0;
 
     not $dumper->{significant}
 	or $self->significant()
 	or return;
 
     my @rslt = ( ref $self, $dumper->_safe( $self ) );
+
+    substr $rslt[0], 0, 0, ' ' x ( $depth * $dumper->{indent} );
+
+    $dumper->{locations}
+	and substr $rslt[0], 0, 0,
+		sprintf '[ % 4d, % 3d, % 3d ] ',
+		    $self->logical_line_number(),
+		    $self->column_number(),
+		    $self->visual_column_number();
+
+    my @ppi;
+    @ppi = $dumper->_ppi( $self )
+	and shift @ppi;	# Ignore PPI::Document
+    foreach ( @ppi ) {
+	if ( $dumper->{locations} ) {
+	    s/ ( [0-9]+ \s+ \] ) /$1  /smxg
+		or substr $_, 0, 0, '  ';
+	} else {
+	    substr $_, 0, 0, '  ';
+	}
+    }
 
     $dumper->{perl_version}
 	and push @rslt, $dumper->_perl_version( $self );
@@ -700,6 +785,7 @@ sub PPIx::Regexp::Token::__PPIX_DUMPER__dump {
 		push @rslt, $dumper->_format_modifiers_dump( $self );
 	    }
 
+	    push @rslt, $dumper->_format_matcher_dump( $self );
 	}
 
 	@rslt = ( join "\t", @rslt );
@@ -707,6 +793,8 @@ sub PPIx::Regexp::Token::__PPIX_DUMPER__dump {
 	$dumper->{explain}
 	    and push @rslt, $self->__PPIX_DUMPER__dump_explanation(
 		$dumper, pop @rslt );
+
+	push @rslt, @ppi;
 
 	return @rslt;
     }

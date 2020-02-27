@@ -18,12 +18,13 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-gimpgitbuild",
-  "dist_version" => "0.4.0",
+  "dist_version" => "0.6.0",
   "license" => "apache",
   "module_name" => "App::gimpgitbuild",
   "recursive_test_files" => 1,
   "requires" => {
     "App::Cmd::Setup" => 0,
+    "Git::Sync::App" => 0,
     "Moo" => 0,
     "Path::Tiny" => 0,
     "Term::ANSIColor" => 0,

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Moose;
 
@@ -1873,7 +1873,8 @@ operation.
 
 When I<as_yaml> is True message text is a B<YAML::Dump()> of the
 B<Carp::Proxy> object.  Serialization via YAML makes it possible to
-propagate exceptions up from child processes.
+propagate exceptions up from child processes.  See the section on
+L<PROPAGATION|/PROPAGATION>.
 
 =over 4
 
@@ -3412,6 +3413,31 @@ As alluded to above, we want our GUI program to use conventional STDERR
 based messages during initialization, but once the GUI is up we want
 future messages to go to a dialog widget.
 
+=head1 PROPAGATION
+
+The I<as_yaml> attribute controls stringification of the Proxy object.
+In its normal state of false (0), I<as_yaml> produces the formatted
+error message.  When true (1), I<as_yaml> instead produces a YAML Dump()
+of the proxy object.
+
+Newer versions of YAML do not bless reconstituted objects as a security
+precaution, so if you want to propagate errors up from child processes
+you will need to specifically allow it.
+
+    # 'cmd' here throws a fatal() with as_yaml set to 1
+    $output = qx{ cmd 2>&1 1>/dev/null };
+ 
+    if ( $CHILD_ERROR ) {
+ 
+        my $kids_proxy;
+        {
+            local $YAML::XS::LoadBlessed = 1;
+            $kids_proxy = YAML::XS::Load( $output );
+        }
+        do_something( $kids_proxy )
+    }
+
+
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to C<bug-carp-proxy at
@@ -3505,7 +3531,7 @@ B<Carp>'s B<longmess()> or B<longmess_heavy()> may prove useful.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2015 Paul Liebert.
+Copyright 2014-2020 Paul Liebert.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

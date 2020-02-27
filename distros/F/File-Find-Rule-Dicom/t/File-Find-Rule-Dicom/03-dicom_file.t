@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Find::Rule;
 use File::Find::Rule::Dicom;
 use File::Object;

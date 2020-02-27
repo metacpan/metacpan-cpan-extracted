@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-12-20'; # DATE
-our $VERSION = '0.310'; # VERSION
+our $DATE = '2020-02-27'; # DATE
+our $VERSION = '0.311'; # VERSION
 
 use 5.010;
 use strict;
@@ -98,7 +98,7 @@ demo-getopt-long-complete - Script to demonstrate Getopt::Long::Complete
 
 =head1 VERSION
 
-This document describes version 0.310 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2017-12-20.
+This document describes version 0.311 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2020-02-27.
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

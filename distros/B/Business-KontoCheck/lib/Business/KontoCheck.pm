@@ -47,7 +47,7 @@ our @EXPORT_OK = qw(kto_check kto_check_str kto_check_blz
 
 our @EXPORT = qw( lut_init kto_check kto_check_blz kto_check_at %kto_retval );
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
 
 require XSLoader;
 XSLoader::load('Business::KontoCheck', $VERSION);
@@ -2741,7 +2741,7 @@ Michael Plugge, E<lt>m.plugge@hs-mannheim.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2012 by Michael Plugge
+Copyright (C) 2007-2020 by Michael Plugge
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.8.8 or, at your option,

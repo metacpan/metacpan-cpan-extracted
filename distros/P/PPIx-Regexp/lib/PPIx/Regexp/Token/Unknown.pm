@@ -40,7 +40,7 @@ use base qw{ PPIx::Regexp::Token };
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -68,6 +68,15 @@ sub explain {
     my ( $self ) = @_;
     return $self->{explanation};
 }
+
+=head2 is_matcher
+
+This method returns C<undef> because, since we could not identify the
+token, we have no idea whether it matches anything.
+
+=cut
+
+sub is_matcher { return undef; }	## no critic (ProhibitExplicitReturnUndef)
 
 =head2 ordinal
 

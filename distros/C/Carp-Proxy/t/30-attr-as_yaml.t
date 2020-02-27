@@ -8,6 +8,8 @@ use Test::More;
 use Test::Exception;
 use YAML::XS qw( Load );
 
+$YAML::XS::LoadBlessed = 1;
+
 BEGIN {
     use_ok( 'Carp::Proxy',
             fatal      => {},

@@ -7,12 +7,12 @@ use warnings;
 
 use Carp;
 use PPI::Document;
-use PPI::Dumper;
 use PPIx::QuoteLike;
 use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
+use PPIx::QuoteLike::Utils qw{ __instance };
 use Scalar::Util ();
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use constant SCALAR_REF	=> ref \0;
 
@@ -21,6 +21,7 @@ use constant SCALAR_REF	=> ref \0;
 	encoding	=> undef,
 	file		=> undef,
 	indent		=> 2,
+	locations	=> 0,
 	margin		=> 0,
 	perl_version	=> 0,
 	ppi		=> 0,
@@ -45,6 +46,10 @@ use constant SCALAR_REF	=> ref \0;
 
 	$self->{object} = _isa( $source, 'PPIx::QuoteLike' ) ? $source :
 	    PPIx::QuoteLike->new( $source,
+		__instance( $source, 'PPI::Element' ) ? () : (
+		    location	=> [ 1, 1, 1, 1, -f $source ? $source :
+			undef ],
+		),
 		map { $_ => $arg{$_} } qw{ encoding postderef },
 	    )
 	    or return;
@@ -77,9 +82,7 @@ sub dump : method {	## no critic (ProhibitBuiltinHomonyms)
 }
 
 sub list {
-    my ( $self, $split ) = @_;
-    __PACKAGE__ eq caller	# Only this package is allowed to
-	or $split = undef;	# set the $split argument.
+    my ( $self ) = @_;
     my $indent;
     my $obj = $self->{object};
     my @rslt;
@@ -106,6 +109,14 @@ sub list {
 	$self->{significant}
 	    and not $elem->significant()
 	    and next;
+	my $locn = $self->{locations} ?
+	    __instance( $elem, 'PPIx::QuoteLike::Token' ) ?
+		sprintf '[ % 4d, % 3d, % 3d ] ',
+		    $elem->logical_line_number(),
+		    $elem->column_number(),
+		    $elem->visual_column_number() :
+		' ' x 19 :
+	    '';
 	my @line = (
 	    ref $elem,
 	    _quote( $elem->content() ),
@@ -113,9 +124,22 @@ sub list {
 	    $self->_variables( $elem ),
 	);
 	my @ppi;
-	@ppi = $self->_ppi( $elem, $split )
-	    and push @line, shift @ppi;
-	push @rslt, map { "$indent$_" } join( "\t", @line ), @ppi;
+	@ppi = $self->_ppi( $elem )
+	    and shift @ppi;	# Ignore PPI::Document
+	foreach ( @ppi ) {
+	    if ( $self->{locations} ) {
+		s/ ( [0-9]+ \s+ \] ) /$1  /smxg
+		    or substr $_, 0, 0, '  ';
+	    } else {
+		substr $_, 0, 0, '  ';
+	    }
+	}
+	my $leader = "$locn$indent";
+	foreach ( join( "\t", @line ), @ppi ) {
+	    push @rslt, "$leader$_";
+	    # $locn = $self->{locations} ? ' ' x 19 : '';
+	    $leader = '';
+	}
     }
     return @rslt;
 }
@@ -129,7 +153,7 @@ sub print : method {	## no critic (ProhibitBuiltinHomonyms)
 sub string {
     my ( $self ) = @_;
     my $margin = ' ' x $self->{margin};
-    return join '', map { "$margin$_\n" } $self->list( 1 );
+    return join '', map { "$margin$_\n" } $self->list();
 }
 
 {
@@ -145,7 +169,6 @@ sub string {
 	    or return;
 	ref $path
 	    or $arg{file} = $path;
-	$doc->index_locations();
 	return map { $class->new( $_, %arg ) }
 	    @{ $doc->find( 'PPI::Token' ) || [] };
     }
@@ -196,23 +219,29 @@ sub _perl_version {
 }
 
 sub _ppi {
-    my ( $self, $elem, $split ) = @_;
+    my ( $self, $elem ) = @_;
 
     $self->{ppi}
 	and $elem->can( 'ppi' )
 	or return;
 
+    require PPI::Dumper;
+
+    # PPI::Dumper reports line_number(), but I want
+    # logical_line_number(). There is no configuration for this, but the
+    # interface is public, so I mung it to do what I want.
+    my $locn = PPI::Element->can( 'location' );
+    local *PPI::Element::location = sub {
+	my $loc = $locn->( @_ );
+	$loc->[0] = $loc->[3];
+	return $loc;
+    };
+
     my $dumper = PPI::Dumper->new( $elem->ppi(),
-	map { $_ => $self->{$_} } qw{ indent },
+	map { $_ => $self->{$_} } qw{ indent locations },
     );
 
-    my $str = $dumper->string();
-    chomp $str;
-
-    $split
-	and return split qr{ \n }smx, $str;
-
-    return $str;
+    return $dumper->list();
 }
 
 sub _quote {
@@ -285,10 +314,12 @@ sub _variables {
     my ( $self, $elem ) = @_;
 
     $self->{variables}
-	and $elem->can( 'variables' )
 	or return;
 
-    return join ',', sort $elem->variables();
+    my @var = $elem->variables()
+	or return;
+
+    return join ',', sort @var;
 }
 
 1;
@@ -454,14 +485,6 @@ specified when the dumper was instantiated.
 
 This method simply prints the result of L</string> to standard out.
 
-=cut
-
-sub print : method {	## no critic (ProhibitBuiltinHomonyms)
-    my ( $self ) = @_;
-    print $self->string();
-    return;
-}
-
 =head2 string
 
  print $dumper->string();
@@ -474,7 +497,7 @@ concatenates the result into a single string, and returns that string.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -482,7 +505,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

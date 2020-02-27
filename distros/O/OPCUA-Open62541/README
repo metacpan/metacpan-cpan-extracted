@@ -24,9 +24,9 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2020 Alexander Bluhm <bluhm@genua.de>
+Copyright (c) 2020 Alexander Bluhm
 Copyright (c) 2020 Anton Borowka
-Copyright (c) 2020 Marvin Knoblauch <mknob@genua.de>
+Copyright (c) 2020 Marvin Knoblauch
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,7 @@
+0.02 2020-02-27T22:39:39+01:00
+ - Add sort of output files in test. Maybe fixes #131997.
+ - Fix dependencies.
+ - Sort dependencies in doc.
+
+0.01 2020-02-27T13:18:17+01:00
+ - First version.

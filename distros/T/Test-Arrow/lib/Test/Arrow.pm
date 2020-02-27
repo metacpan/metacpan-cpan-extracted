@@ -5,7 +5,7 @@ use Test::Builder::Module;
 use Test::Name::FromLine;
 use Text::MatchedPosition;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 our @ISA = qw/Test::Builder::Module/;
 
@@ -96,8 +96,6 @@ sub expected {
 
     $self;
 }
-
-sub expect { shift->expected(@_) }
 
 sub got {
     my ($self, $value) = @_;
@@ -361,6 +359,10 @@ sub throw_ok {
     eval { shift->() };
 
     _tb->ok(!!$@, $self->_specific('_name', $_[0]));
+
+    $self->_reset;
+
+    $self;
 }
 
 sub throw {
@@ -395,12 +397,77 @@ sub catch {
     my $ret = _tb->like(
         $self->_specific('_got', undef),
         $regex,
-        $_[0] || 'Thrown correctly',
+        $self->_specific('_name', $_[0]),
     );
 
     $self->_reset;
 
     $ret;
+}
+
+sub warnings_ok {
+    my ($self, $code, $name) = @_;
+
+    my $warn = 0;
+    eval {
+        local $SIG{__WARN__} = sub { $warn++ };
+        $code->();
+    };
+    if (my $e = $@) {
+        _tb->ok(FAIL);
+        $self->diag("An exception happened: $e");
+    }
+
+    _tb->ok($warn > 0, $self->_specific('_name', $name));
+
+    $self->_reset;
+
+    $self;
+}
+
+sub warnings {
+    my ($self, $code, $regex, $name) = @_;
+
+    die 'The `warn` method expects code ref.' unless ref $code eq 'CODE';
+
+    my @warns;
+    eval {
+        local $SIG{__WARN__} = sub { push @warns, shift };
+        $code->();
+    };
+    if (my $e = $@) {
+        _tb->ok(FAIL);
+        $self->diag("An exception happened: $e");
+    }
+
+    if (scalar @warns > 0) {
+        my $warn = join "\t", @warns;
+        if (defined $regex) {
+            _tb->like($warn, $regex, $self->_specific('_name', $name));
+            $self->_reset;
+        }
+        else {
+            $self->got($warn);
+        }
+    }
+    else {
+        _tb->ok(FAIL);
+        $self->diag(q|Failed, because there is no warnings.|);
+    }
+
+    $self;
+}
+
+{
+    no warnings 'once';
+    *expect = *expected;
+
+    *warn_ok    = *warnings_ok;
+    *warning_ok = *warnings_ok;
+
+    *warning = *warnings;
+
+    *done = *done_testing;
 }
 
 1;
@@ -434,6 +501,10 @@ Test::Arrow - Object-Oriented testing library
         ->got(2 * 3)
         ->is_num;
 
+    $arr->expected(qr/^ab/)
+        ->got('abc')
+        ->like;
+
     # `unlike` shows where a place could have matched if it's failed
     $arr->name('Unlike Fail example')
         ->expected(qr/b/)
@@ -445,6 +516,7 @@ Test::Arrow - Object-Oriented testing library
     #           matches '(?^:b)'
     #           matched at line: 1, offset: 2
 
+    $arr->warnings(sub { warn 'Bar' })->catch(qr/^Ba/);
     $arr->throw(sub { die 'Baz' })->catch(qr/^Ba/);
 
 
@@ -523,9 +595,9 @@ The test name is taken from the first line of each test.
 
 =head2 TEST EXECUTERS
 
-=head3 pass
+=head3 pass($test_name)
 
-=head3 fail
+=head3 fail($test_name)
 
 Just pass or fail
 
@@ -579,7 +651,7 @@ Checks to make sure the $class or $object can do these @methods
 
     $arr->got($got_object)->expected($class)->isa_ok;
 
-Checks to see if the given C<$got_object-&gt;isa($class)>. Also checks to make sure the object was defined in the first place.
+Checks to see if the given C<$got_object-E<gt>isa($class)>. Also checks to make sure the object was defined in the first place.
 
 It works on references, too:
 
@@ -609,6 +681,22 @@ Above test is equivalent to below
 Actually, you can execute a test even only C<throw> method
 
     $arr->throw(sub { die 'Baz' }, qr/^Ba/);
+
+=head3 warnings_ok($code_ref)
+
+It makes sure that $code_ref gets warnings.
+
+    $arr->warnings_ok(sub { warn 'heads up' });
+
+There are aliases of C<warnings_ok> method: C<warning_ok>, C<warn_ok>.
+
+=head3 warnings($code_ref)
+
+C<warnings> method is called like below:
+
+    $arr->warnings(sub { warn 'heads up' })->catch(qr/^heads/);
+
+C<warning> is an alias of C<warnings>.
 
 =head2 BAIL OUT
 
@@ -663,23 +751,22 @@ Declare of done testing.
 
 B<Note> that you must never put C<done_testing> inside an C<END { ... }> block.
 
+=head3 done
+
+Alias of C<done_testing>
 
 =head2 CONSTANTS
 
-=head3 PASS
+=head3 PASS = 1
 
-1
-
-=head3 FAIL
-
-0
+=head3 FAIL = 0
 
 
 =head1 REPOSITORY
 
 =begin html
 
-<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.09-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582638671"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582638671&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-Arrow/blob/master/README.pod"><img src="https://img.shields.io/badge/Version-0.11-green?style=flat"></a> <a href="https://github.com/bayashi/Test-Arrow/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-Arrow/actions"><img src="https://github.com/bayashi/Test-Arrow/workflows/master/badge.svg?_t=1582822443"/></a> <a href="https://coveralls.io/r/bayashi/Test-Arrow"><img src="https://coveralls.io/repos/bayashi/Test-Arrow/badge.png?_t=1582822443&branch=master"/></a>
 
 =end html
 
@@ -699,7 +786,7 @@ L<Test::More>
 
 L<Test::Kantan> - A behavior-driven development framework
 
-L<Test::Builder::Module>
+L<Test::Builder>
 
 L<Test::Name::FromLine>
 

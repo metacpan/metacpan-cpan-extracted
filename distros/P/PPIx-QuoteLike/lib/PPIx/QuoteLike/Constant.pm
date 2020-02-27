@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use base qw{ Exporter };
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 our @CARP_NOT = qw{
     PPIx::QuoteLike
@@ -26,12 +26,20 @@ our @CARP_NOT = qw{
 };
 
 our @EXPORT_OK = qw{
+    ARRAY_REF
     MINIMUM_PERL
     HAVE_PPIX_REGEXP
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
     SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
     VARIABLE_RE
     @CARP_NOT
 };
+
+use constant ARRAY_REF	=> ref [];
 
 # We can't depend on PPIx::Regexp without getting into a circular
 # dependency. I think. But we can sure use it if we can come by it.
@@ -42,6 +50,13 @@ use constant HAVE_PPIX_REGEXP	=> do {
 	1;
     };
 };
+
+# Location constants. Must align with PPI
+use constant LOCATION_LINE         => 0;
+use constant LOCATION_CHARACTER    => 1;
+use constant LOCATION_COLUMN       => 2;
+use constant LOCATION_LOGICAL_LINE => 3;
+use constant LOCATION_LOGICAL_FILE => 4;
 
 use constant MINIMUM_PERL	=> '5.000';
 
@@ -90,6 +105,10 @@ This global variable contains the names of all modules in the package.
 It's not a constant in the sense of C<use constant>, but needs to live
 here for heredity reasons.
 
+=head2 ARRAY_REF
+
+This manifest constant contains the value of C<ref []>, i.e. C<'ARRAY'>.
+
 =head2 MINIMUM_PERL
 
 The minimum version of Perl understood by this parser, as a string. It
@@ -113,7 +132,7 @@ names, without the leading sigil. Nothing is captured.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -121,7 +140,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

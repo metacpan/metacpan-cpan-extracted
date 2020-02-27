@@ -44,7 +44,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use constant VERSION_WHEN_IN_REGEX_SET => '5.017009';
 
@@ -58,6 +58,15 @@ sub __new {
 
     return $self;
 }
+
+=head2 is_matcher
+
+This method returns C<undef> because a static analysis can not in
+general tell whether a piece of code matches anything.
+
+=cut
+
+sub is_matcher { return undef; }	## no critic (ProhibitExplicitReturnUndef)
 
 # Return true if the token can be quantified, and false otherwise
 # This can be quantified because it might interpolate a quantifiable
@@ -74,35 +83,12 @@ sub perl_version_introduced {
     return $self->{perl_version_introduced};
 }
 
-=head2 ppi
-
-This convenience method returns the L<PPI::Document|PPI::Document>
-representing the content. This document should be considered read only.
-
-Note that the content of the returned L<PPI::Document|PPI::Document> may
-not be the same as the content of the original
-C<PPIx::Regexp::Token::Interpolation>. This can happen because
-interpolated variable names may be enclosed in curly brackets, but this
-does not happen in normal code. For example, in C</${foo}bar/>, the
-content of the C<PPIx::Regexp::Token::Interpolation> object will be
-C<'${foo}'>, but the content of the C<PPI::Document> will be C<'$foo'>.
-
-=cut
-
-sub ppi {
+sub __ppi_normalize_content {
     my ( $self ) = @_;
-    if ( exists $self->{ppi} ) {
-	return $self->{ppi};
-    } elsif ( exists $self->{content} ) {
-	( my $code = $self->{content} ) =~
-	    s/ \A ( [\@\$] ) [{] ( .* ) [}] \z /$1$2/smx;
-	return ( $self->{ppi} = PPI::Document->new(
-		\$code, readonly => 1 ) );
-    } else {
-	return;
-    }
+    ( my $content = $self->{content} ) =~
+	s/ \A ( [\@\$] ) [{] ( .* ) [}] \z /$1$2/smx;
+    return $content;
 }
-
 
 # Match the beginning of an interpolation.
 

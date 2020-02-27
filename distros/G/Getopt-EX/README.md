@@ -1,10 +1,11 @@
+[![Build Status](https://travis-ci.com/kaz-utashiro/Getopt-EX.svg?branch=master)](https://travis-ci.com/kaz-utashiro/Getopt-EX) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-EX.svg)](https://metacpan.org/release/Getopt-EX)
 # NAME
 
 Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.15.2
+Version v1.15.3
 
 # DESCRIPTION
 
@@ -201,7 +202,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright (C) 2015-2019 Kazumasa Utashiro
+Copyright (C) 2015-2020 Kazumasa Utashiro
 
 # LICENSE
 

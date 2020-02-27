@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 31 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 38 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_int/From_str/convert_en_dow_name_to_num.pm',
     'Data/Sah/Coerce/perl/To_int/From_str/convert_en_month_name_to_num.pm',
+    'Data/Sah/Coerce/perl/To_int/From_str/tz_offset_strings.pm',
     'Perinci/Sub/XCompletion/date_dow_num.pm',
     'Perinci/Sub/XCompletion/date_dow_nums.pm',
     'Perinci/Sub/XCompletion/date_month_num.pm',
@@ -26,6 +27,9 @@ my @module_files = (
     'Sah/Schema/date/month_num.pm',
     'Sah/Schema/date/month_nums.pm',
     'Sah/Schema/date/second.pm',
+    'Sah/Schema/date/tz_name.pm',
+    'Sah/Schema/date/tz_offset.pm',
+    'Sah/Schema/date/tz_offset_lax.pm',
     'Sah/Schema/date/year.pm',
     'Sah/SchemaR/date/day.pm',
     'Sah/SchemaR/date/dow_name/en.pm',
@@ -38,6 +42,9 @@ my @module_files = (
     'Sah/SchemaR/date/month_num.pm',
     'Sah/SchemaR/date/month_nums.pm',
     'Sah/SchemaR/date/second.pm',
+    'Sah/SchemaR/date/tz_name.pm',
+    'Sah/SchemaR/date/tz_offset.pm',
+    'Sah/SchemaR/date/tz_offset_lax.pm',
     'Sah/SchemaR/date/year.pm',
     'Sah/Schemas/Date.pm'
 );

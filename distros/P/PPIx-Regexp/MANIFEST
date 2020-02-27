@@ -86,6 +86,7 @@ META.yml
 README
 t/basic.t
 t/fuzz.t
+t/locations.t
 t/parse.t
 t/unit.t
 t/unit-adhoc.t

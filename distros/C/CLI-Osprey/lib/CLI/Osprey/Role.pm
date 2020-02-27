@@ -8,7 +8,7 @@ use Scalar::Util qw(blessed);
 use CLI::Osprey::Descriptive;
 
 # ABSTRACT: Role for CLI::Osprey applications
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 sub _osprey_option_to_getopt {
@@ -152,9 +152,9 @@ sub new_with_options {
 
   my %merged_params;
   if ($config{prefer_commandline}) {
-    %merged_params = (%$parsed_params, %params);
-  } else {
     %merged_params = (%params, %$parsed_params);
+  } else {
+    %merged_params = (%$parsed_params, %params);
   }
 
   my %subcommands = $class->_osprey_subcommands;
@@ -340,7 +340,7 @@ CLI::Osprey::Role - Role for CLI::Osprey applications
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 
@@ -348,7 +348,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Andrew Rodland.
+This software is copyright (c) 2020 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,21 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.004 2020-02-27
+    - Use perlcritic and perltidy.
+    - Test that adding a node in the server and reading its value
+      from the client works.
+    - Use an efficient way to export constants in Perl namespace.
+    - Implement UA_Client_readValueAttribute().
+    - Use a function jump table for packing all variant types.
+    - Make this module run on multi threaded Perl by sprinkling dTHX
+      into the XS file.
+    - UA_DiscoveryConfiguration and UA_FilterOperand croak when
+      trying to pack them.
+    - Implement all missing packed functions for builtin types.
+    - To test client and server easily, implement
+      OPCUA::Open62541::Test::Server and OPCUA::Open62541::Test::Client
+      to handle the other end.
+
 0.003 2020-02-21
     - OPCUA::Open62541::sendAsyncBrowseRequest() uses optional output
       variable for request id.

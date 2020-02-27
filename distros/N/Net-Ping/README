@@ -126,7 +126,9 @@ DESCRIPTION
         of data bytes is ignored if the protocol is "tcp". The minimum (and
         default) number of data bytes is 1 if the protocol is "udp" and 0
         otherwise. The maximum number of data bytes that can be specified is
-        1024.
+        65535, but staying below the MTU (1472 bytes for ICMP) is
+        recommended. Many small devices cannot deal with fragmented ICMP
+        packets.
 
         If "device" is given, this device is used to bind the source
         endpoint before sending the ping packet. I believe this only works

@@ -1,15 +1,12 @@
 package File::Find::Rule::Dicom;
 
-# Pragmas.
 use base qw(File::Find::Rule);
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::File::Detect qw(dicom_detect_file);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Detect DICOM file.
 sub File::Find::Rule::dicom_file {
@@ -37,6 +34,7 @@ File::Find::Rule::Dicom - Common rules for searching for DICOM things.
 
  use File::Find::Rule;
  use File::Find::Rule::Dicom;
+
  my @files = File::Find::Rule->dicom_file->in($dir);
 
 =head1 DESCRIPTION
@@ -65,11 +63,9 @@ See L<DICOM on Wikipedia|https://en.wikipedia.org/wiki/DICOM>.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Find::Rule;
  use File::Find::Rule::Dicom;
 
@@ -105,21 +101,21 @@ Alternative interface to File::Find
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/File-Find-Rule-Dicom>
+L<https://github.com/michal-josef-spacek/File-Find-Rule-Dicom>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2014-2015
+ © Michal Josef Špaček 2014-2020
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

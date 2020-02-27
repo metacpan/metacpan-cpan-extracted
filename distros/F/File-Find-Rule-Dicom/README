@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
      use File::Find::Rule;
      use File::Find::Rule::Dicom;
+
      my @files = File::Find::Rule->dicom_file->in($dir);
 
 DESCRIPTION
@@ -24,11 +25,9 @@ ERRORS
                      Cannot open file '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Find::Rule;
      use File::Find::Rule::Dicom;
 
@@ -55,17 +54,17 @@ SEE ALSO
         Alternative interface to File::Find
 
 REPOSITORY
-    <https://github.com/tupinek/File-Find-Rule-Dicom>
+    <https://github.com/michal-josef-spacek/File-Find-Rule-Dicom>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2014-2015
+     © Michal Josef Špaček 2014-2020
      BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

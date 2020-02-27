@@ -1,3 +1,10 @@
+0.05 2020-02-27T12:16:42+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update author github username.
+ - Update copyright years.
+
 0.04 2015-09-28T11:28:15+02:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SEE ALSO section in doc.

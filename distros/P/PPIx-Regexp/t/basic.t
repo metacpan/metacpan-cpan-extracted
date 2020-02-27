@@ -23,7 +23,7 @@ class_isa_ok( 'PPIx::Regexp', 'PPIx::Regexp::Node' ) or BAIL_OUT;
 require_ok( 'PPIx::Regexp::Constant' );
 class_isa_ok( 'PPIx::Regexp::Constant', 'Exporter' );
 
-require_ok( 'PPIx::Regexp::Dumper' );
+require_ok( 'PPIx::Regexp::Dumper' ) or BAIL_OUT;
 class_isa_ok( 'PPIx::Regexp::Dumper', 'PPIx::Regexp::Support' );
 isa_ok( PPIx::Regexp::Dumper->new( 'xyzzy' ), 'PPIx::Regexp::Dumper' );
 

@@ -1,0 +1,104 @@
+NAME
+    File::Find::Rule::DMIDecode - Common rules for searching for dmidecode
+    files.
+
+SYNOPSIS
+     use File::Find::Rule;
+     use File::Find::Rule::DMIDecode;
+
+     my @files = File::Find::Rule->dmidecode_file->in($dir);
+     my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
+
+DESCRIPTION
+    This Perl module contains File::Find::Rule rules for detecting dmidecode
+    files.
+
+    dmidecode text file is output of dmidecode tool, which prints
+    information about DMI.
+
+    DMI (Desktop Management Interface) generates a standard framework for
+    managing and tracking components in a desktop, notebook or server
+    computer, by abstracting these components from the software that manages
+    them. See DMI on Wikipedia
+    <https://en.wikipedia.org/wiki/Desktop_Management_Interface>.
+
+SUBROUTINES
+  "dmidecode_file"
+     my @files = File::Find::Rule->dmidecode_file->in($dir);
+
+    The "dmidecode_file()" rule detect dmidecode files by parsing of
+    structure.
+
+  "dmidecode_handle"
+     my @files = File::Find::Rule->dmidecode_handle($handle)->in($dir);
+
+    The "dmidecode_handle($handle)" rule detect dmidecode handle in file.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DMIDecode;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 dir\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+
+     # Print all dmidecode files in directory.
+     foreach my $file (File::Find::Rule->dmidecode_file->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use File::Find::Rule;
+     use File::Find::Rule::DMIDecode;
+
+     # Arguments.
+     if (@ARGV < 2) {
+             print STDERR "Usage: $0 dir handle\n";
+             exit 1;
+     }
+     my $dir = $ARGV[0];
+     my $handle = $ARGV[1];
+
+     # Print all dmidecode handles in directory.
+     foreach my $file (File::Find::Rule->dmidecode_handle($handle)->in($dir)) {
+             print "$file\n";
+     }
+
+     # Output like:
+     # Usage: qr{[\w\/]+} dir
+
+DEPENDENCIES
+    File::Find::Rule, List::MoreUtils, Parse::DMIDecode, Perl6::Slurp.
+
+SEE ALSO
+    File::Find::Rule
+        Alternative interface to File::Find
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/File-Find-Rule-DMIDecode>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

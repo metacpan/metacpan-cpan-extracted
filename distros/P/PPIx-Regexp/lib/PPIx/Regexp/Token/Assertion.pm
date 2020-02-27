@@ -58,7 +58,7 @@ use PPIx::Regexp::Constant qw{
 
 use constant KEEP_EXPLANATION	=> 'In s///, keep everything before the \\K';
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -71,6 +71,15 @@ my @braced_assertions = (
 	{ error => 'Unknown bound type' },
     ],
 );
+
+=head2 is_matcher
+
+This method returns a true value because an assertion actually matches
+something.
+
+=cut
+
+sub is_matcher { return 1; }
 
 sub perl_version_introduced {
     my ( $self ) = @_;

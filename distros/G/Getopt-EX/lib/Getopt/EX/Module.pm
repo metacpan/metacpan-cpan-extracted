@@ -65,7 +65,8 @@ sub configure {
 	    my $mod = $base ? "${base}::${module}" : $module;
 	    eval "package $pkg; use $mod;";
 	    if ($@) {
-		next if @base;
+		my $path = $mod =~ s{::}{/}gr . ".pm";
+		next if @base and $@ =~ /Can't locate \Q$path\E/;
 		croak "$mod: $@";
 	    }
 	    $obj->module($mod);

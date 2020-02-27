@@ -3,10 +3,9 @@ package OPCUA::Open62541;
 use 5.026001;
 use strict;
 use warnings;
+use parent 'Exporter';
 
-require Exporter;
-
-our @ISA = qw(Exporter);
+our $VERSION = '0.004';
 
 my @types = qw(
     TYPES_BOOLEAN
@@ -513,7 +512,6 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '0.003';
 
 require XSLoader;
 XSLoader::load('OPCUA::Open62541', $VERSION);
@@ -521,6 +519,7 @@ XSLoader::load('OPCUA::Open62541', $VERSION);
 # Preloaded methods go here.
 
 1;
+
 __END__
 
 =head1 NAME
@@ -719,19 +718,26 @@ OPC Foundation, L<https://opcfoundation.org/>
 
 Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
 Anton Borowka,
+Arne Becker,
 Marvin Knoblauch E<lt>mknob@genua.deE<gt>,
 
 =head1 CAVEATS
 
 This interface is far from complete.
 
+UA_Int64 and UA_UInt64 are implemented as Perl IV respectively IV.
+This only works for Perl that is compiled on a 64 bit platform.
+32 bit platforms are currently not supported.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Alexander Bluhm E<lt>bluhm@genua.deE<gt>
+Copyright (c) 2020 Alexander Bluhm
 
 Copyright (c) 2020 Anton Borowka
 
-Copyright (c) 2020 Marvin Knoblauch E<lt>mknob@genua.deE<gt>
+Copyright (c) 2020 Arne Becker
+
+Copyright (c) 2020 Marvin Knoblauch
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

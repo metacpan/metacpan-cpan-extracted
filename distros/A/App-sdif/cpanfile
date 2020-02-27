@@ -1,6 +1,6 @@
 requires 'perl', '5.014';
 
-requires 'Getopt::EX', 'v1.15.2';
+requires 'Getopt::EX', 'v1.15.3';
 requires 'List::Util', '1.45';
 requires 'Text::VisualWidth::PP', '0.05';
 requires 'Unicode::EastAsianWidth::Detect';

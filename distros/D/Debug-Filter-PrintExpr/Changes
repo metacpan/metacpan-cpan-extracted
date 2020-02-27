@@ -1,4 +1,16 @@
 Revision history for Debug-Filter-PrintExpr
+0.17	Thu Feb 27 22:43:50 2020 +0100
+		[fix]
+		remove IO::String from tests
+
+0.16	Thu Feb 27 21:12:07 2020 +0100
+		[meta]
+		fix dependencies
+
+0.15	Thu Feb 27 09:18:36 2020 +0100
+		[fix]
+		specify version for List::Util
+
 0.14	Wed Feb 26 14:51:09 2020 +0100
 		[feature]
 		simplify several code parts

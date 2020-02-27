@@ -15,7 +15,7 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -35,8 +35,10 @@ our @EXPORT_OK = qw{
     false
     finis
     equals
+    is
     navigate
     note
+    ok
     parse
     pass
     plan

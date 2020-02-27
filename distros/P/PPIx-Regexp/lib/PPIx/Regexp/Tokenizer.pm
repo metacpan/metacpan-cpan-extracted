@@ -10,6 +10,10 @@ use PPIx::Regexp::Constant qw{
     ARRAY_REF
     CODE_REF
     HASH_REF
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
     MINIMUM_PERL
     REGEXP_REF
     TOKEN_LITERAL
@@ -46,10 +50,14 @@ use PPIx::Regexp::Token::Recursion		();
 use PPIx::Regexp::Token::Structure		();
 use PPIx::Regexp::Token::Unknown		();
 use PPIx::Regexp::Token::Whitespace		();
-use PPIx::Regexp::Util qw{ is_ppi_regexp_element __instance };
+use PPIx::Regexp::Util qw{
+    is_ppi_regexp_element
+    __instance
+};
+
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -123,6 +131,7 @@ defined $DEFAULT_POSTDEREF
 	    };
 
 	my $self = {
+	    index_locations => $args{index_locations},	# Index locations
 	    capture => undef,	# Captures from find_regexp.
 	    content => undef,	# The string we are tokenizing.
 	    cookie => {},	# Cookies
@@ -142,6 +151,7 @@ defined $DEFAULT_POSTDEREF
 	    failures => 0,	# Number of parse failures.
 	    find => undef,	# String for find_regexp
 	    known => {},	# Known tokenizers, by mode.
+	    location => $args{location},
 	    match => undef,	# Match from find_regexp.
 	    mode => 'init',	# Initialize
 	    modifiers => [{}],	# Modifier hash.
@@ -413,6 +423,9 @@ sub make_token {
 	%{ $arg || {} } )
 	or return;
 
+    $self->{index_locations}
+	and $self->_update_location( $token );
+
     $token->significant()
 	and $self->{expect} = undef;
 
@@ -573,10 +586,16 @@ sub prior_significant_token {
 	my ( $self, $token, $iterator ) = @_;
 	$self->{postderef}
 	    or return;
+
 	# Note that if ppi() gets called I have to hold a reference to
 	# the returned object until I am done with all its children.
 	my $ppi;
 	if ( ! defined $iterator ) {
+
+	    # This MUST be done before ppi() is called.
+	    $self->{index_locations}
+		and $self->_update_location( $token );
+
 	    $ppi = $token->ppi();
 	    my @ops = grep { '->' eq $_->content() } @{
 		$ppi->find( 'PPI::Token::Operator' ) || [] };
@@ -817,6 +836,45 @@ sub __init_error {
     );
 }
 
+sub _update_location {
+    my ( $self, $token ) = @_;
+    $token->{location}	# Idempotent
+	and return;
+    my $loc = $self->{_location} ||= do {
+	my %loc = (
+	    line_content	=> '',
+	    location	=> $self->{location},
+	);
+	if ( __instance( $self->{source}, 'PPI::Element' ) ) {
+	    $loc{location} ||= $self->{source}->location();
+	    if ( my $doc = $self->{source}->document() ) {
+		$loc{tab_width} = $doc->tab_width();
+	    }
+	}
+	$loc{tab_width} ||= 1;
+	\%loc;
+    };
+    $loc->{location}
+	or return;
+    $token->{location} = [ @{ $loc->{location} } ];
+    if ( defined( my $content = $token->content() ) ) {
+	if ( my $newlines = $content =~ tr/\n/\n/ ) {
+	    $loc->{location}[LOCATION_LINE] += $newlines;
+	    $loc->{location}[LOCATION_LOGICAL_LINE] += $newlines;
+	    $content =~ s/ .* \n //smx;
+	    $loc->{location}[LOCATION_CHARACTER] =
+		$loc->{location}[LOCATION_COLUMN] = 1;
+	    $loc->{line_content} = '';
+	}
+	$loc->{location}[LOCATION_CHARACTER] += length $content;
+	$loc->{line_content} .= $content;
+	local $Text::Tabs::tabstop = $loc->{tab_width};
+	$loc->{location}[LOCATION_COLUMN] = 1 + length Text::Tabs::expand(
+	    $loc->{line_content} );
+    }
+    return;
+}
+
 sub __PPIX_TOKENIZER__init {
     my ( $self ) = @_;
 
@@ -929,6 +987,13 @@ sub __PPIX_TOKENIZER__init {
     }
 
     {
+	# We have to instantiate the trailing tokens now so we can
+	# figure out what modifiers are in effect. But we can't
+	# index their locations (if desired) because they are being
+	# instantiated out of order
+
+	local $self->{index_locations} = 0;
+
 	my @mods = @{ $self->{default_modifiers} };
 	pos $self->{content} = $self->{cursor_modifiers};
 	local $self->{cursor_curr} = $self->{cursor_modifiers};
@@ -1105,8 +1170,8 @@ sub __PPIX_TOKENIZER__finish {
 
 	# We are out of string. Add the trailing tokens (created when we
 	# did the initial bracket scan) and close up shop.
-
-	push @tokens, @{ delete $self->{trailing_tokens} };
+	
+	push @tokens, $self->_get_trailing_tokens();
 
 	$self->_set_mode( 'kaput' );
 
@@ -1164,7 +1229,7 @@ sub __PPIX_TOKENIZER__finish {
 	    $self->{cursor_limit} = length $self->{content};
 	    push @tokens, $self->make_token( 1,
 		'PPIx::Regexp::Token::Delimiter' ),
-		@{ delete $self->{trailing_tokens} };
+		$self->_get_trailing_tokens();
 	    $self->_set_mode( 'kaput' );
 	} else {
 	    # Put our mode to replacement.
@@ -1175,6 +1240,19 @@ sub __PPIX_TOKENIZER__finish {
 
     return @tokens;
 
+}
+
+# To common processing on trailing tokens.
+sub _get_trailing_tokens {
+    my ( $self ) = @_;
+    if ( $self->{index_locations} ) {
+	# We turned off index_locations when these were created, because
+	# they were done out of order. Fix that now.
+	foreach my $token ( @{ $self->{trailing_tokens} } ) {
+	    $self->_update_location( $token );
+	}
+    }
+    return @{ delete $self->{trailing_tokens} };
 }
 
 1;
@@ -1233,6 +1311,11 @@ the details.
 This option specifies the encoding of the string to be tokenized. If
 specified, an C<Encode::decode> is done on the string (or the C<content>
 of the PPI class) before it is tokenized.
+
+=item index_locations
+
+This Boolean option specifies that the locations of the generated tokens
+are to be computed.
 
 =item postderef boolean
 

@@ -41,7 +41,7 @@ use base qw{ PPIx::Regexp::Token };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -59,6 +59,15 @@ our $VERSION = '0.069';
 ##sub is_case_sensitive {
 ##    return;
 ##}
+
+=head2 is_matcher
+
+This method returns a true value because a character class actually
+matches something.
+
+=cut
+
+sub is_matcher { return 1; }
 
 1;
 

@@ -3,15 +3,15 @@ package Debug::Filter::PrintExpr;
 use strict;
 use warnings;
  
+use 5.010;
 use Exporter::Tiny;
-
 use Filter::Simple;
 use Scalar::Util qw(isdual blessed);
 use List::Util 'pairs';
 use Data::Dumper;
 
 our
-$VERSION = '0.14';
+$VERSION = '0.18';
 
 our @EXPORT_OK = qw(isnumeric isstring);
 our @ISA = qw(Exporter::Tiny);
@@ -23,8 +23,6 @@ our %EXPORT_TAGS = (
 
 require XSLoader;
 XSLoader::load('Debug::Filter::PrintExpr', $VERSION);
-
-local ($,, $\);
 
 # Make Exporter::Tiny::import ours, so this will be called by Filter::Simple
 BEGIN {*import = \&Exporter::Tiny::import;}

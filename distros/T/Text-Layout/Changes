@@ -1,8 +1,8 @@
 Revision history for Text::Layout
 
-0.018	2020-02-06
+0.018.1	2020-02-27
 
-0.012	2020-02-06
+0.018	2020-02-06
 
 	Add support for HB Shaper features. Requires HarfBuzz::Shaper
 	0.019 or later.

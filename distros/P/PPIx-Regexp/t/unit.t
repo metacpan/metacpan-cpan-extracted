@@ -2051,6 +2051,88 @@ value	( requirements_for_perl => [],
     value	( scontent => [], '/[fg]oobar/' );
 }
 
+{
+    parse	( '/^(?i:foo)$/' );
+    navigate	( 'first_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( '' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Delimiter' );
+    content	( '/' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Assertion' );
+    content	( '^' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( '(' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::GroupType::Modifier' );
+    content	( '?i:' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'f' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'o' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'o' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( ')' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Assertion' );
+    content	( '$' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Delimiter' );
+    content	( '/' );
+    navigate	( 'next_token' );
+    klass	( 'PPIx::Regexp::Token::Modifier' );
+    content	( '' );
+    ok ! navigate( 'next_token' ), 'There is no next token';
+}
+
+{
+    parse	( '/^(?i:foo)$/' );
+    navigate	( 'last_token' );
+    klass	( 'PPIx::Regexp::Token::Modifier' );
+    content	( '' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Delimiter' );
+    content	( '/' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Assertion' );
+    content	( '$' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( ')' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'o' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'o' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Literal' );
+    content	( 'f' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::GroupType::Modifier' );
+    content	( '?i:' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( '(' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Assertion' );
+    content	( '^' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Delimiter' );
+    content	( '/' );
+    navigate	( 'previous_token' );
+    klass	( 'PPIx::Regexp::Token::Structure' );
+    content	( '' );
+    ok ! navigate( 'previous_token' ), 'There is no next token';
+}
+
 SKIP: {
     $is_ascii
 	or skip(
@@ -2076,19 +2158,19 @@ EOD
     dump_result( verbose => 1,
 	<<'EOD', q<Verbose parse of '/(foo[a-z\\d])/x'> );
 PPIx::Regexp	failures=0	max_capture_number=1
-  PPIx::Regexp::Token::Structure	''	significant
-  PPIx::Regexp::Structure::Regexp	/ ... /	max_capture_number=1
-    PPIx::Regexp::Structure::Capture	( ... )	number=1	name=undef	can_be_quantified
-      PPIx::Regexp::Token::Literal	'f'	0x66	significant	can_be_quantified
-      PPIx::Regexp::Token::Literal	'o'	0x6f	significant	can_be_quantified
-      PPIx::Regexp::Token::Literal	'o'	0x6f	significant	can_be_quantified
-      PPIx::Regexp::Structure::CharClass	[ ... ]	can_be_quantified
+  PPIx::Regexp::Token::Structure	''	significant	is_matcher=false
+  PPIx::Regexp::Structure::Regexp	/ ... /	max_capture_number=1	is_matcher=true
+    PPIx::Regexp::Structure::Capture	( ... )	number=1	name=undef	can_be_quantified	is_matcher=true
+      PPIx::Regexp::Token::Literal	'f'	0x66	significant	can_be_quantified	is_matcher=true
+      PPIx::Regexp::Token::Literal	'o'	0x6f	significant	can_be_quantified	is_matcher=true
+      PPIx::Regexp::Token::Literal	'o'	0x6f	significant	can_be_quantified	is_matcher=true
+      PPIx::Regexp::Structure::CharClass	[ ... ]	can_be_quantified	is_matcher=true
         PPIx::Regexp::Node::Range
-          PPIx::Regexp::Token::Literal	'a'	0x61	significant	can_be_quantified
-          PPIx::Regexp::Token::Operator	'-'	significant	can_be_quantified
-          PPIx::Regexp::Token::Literal	'z'	0x7a	significant	can_be_quantified
-        PPIx::Regexp::Token::CharClass::Simple	'\\d'	significant	can_be_quantified
-  PPIx::Regexp::Token::Modifier	'x'	significant	x
+          PPIx::Regexp::Token::Literal	'a'	0x61	significant	can_be_quantified	is_matcher=true
+          PPIx::Regexp::Token::Operator	'-'	significant	can_be_quantified	is_matcher=false
+          PPIx::Regexp::Token::Literal	'z'	0x7a	significant	can_be_quantified	is_matcher=true
+        PPIx::Regexp::Token::CharClass::Simple	'\\d'	significant	can_be_quantified	is_matcher=true
+  PPIx::Regexp::Token::Modifier	'x'	significant	x	is_matcher=false
 EOD
 
     parse   ( '/(?<foo>\\d+)/' );

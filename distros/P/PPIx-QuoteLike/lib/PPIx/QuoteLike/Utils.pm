@@ -8,19 +8,66 @@ use warnings;
 use base qw{ Exporter };
 
 use Carp;
-use PPIx::QuoteLike::Constant qw{ HAVE_PPIX_REGEXP VARIABLE_RE @CARP_NOT };
+use PPIx::QuoteLike::Constant qw{
+    HAVE_PPIX_REGEXP
+    LOCATION_LINE
+    LOCATION_CHARACTER
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
+    VARIABLE_RE
+    @CARP_NOT
+};
 use Scalar::Util ();
 
 use constant LEFT_CURLY		=> q<{>;
 use constant RIGHT_CURLY	=> q<}>;
 
-our @EXPORT_OK = qw{ __variables };
+our @EXPORT_OK = qw{
+    column_number
+    is_ppi_quotelike_element
+    line_number
+    logical_filename
+    logical_line_number
+    statement
+    visual_column_number
+    __instance
+    __variables
+};
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
-require PPIx::QuoteLike;
+sub column_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_CHARACTER];
+}
 
 {
+
+    my @relevant_ppi_classes = qw{
+	PPI::Token::Quote
+	PPI::Token::QuoteLike::Backtick
+	PPI::Token::QuoteLike::Command
+	PPI::Token::QuoteLike::Readline
+	PPI::Token::HereDoc
+    };
+
+    sub is_ppi_quotelike_element {
+	my ( $elem ) = @_;
+
+	ref $elem
+	    or return;
+
+	Scalar::Util::blessed( $elem )
+	    or return;
+
+	foreach my $class ( @relevant_ppi_classes ) {
+	    $elem->isa( $class )
+		and return 1;
+	}
+
+	return;
+    }
 
     # TODO make these state varables once we can require Perl 5.10.
     my $postderef = { map { $_ => 1 } qw{ @* %* } };
@@ -30,6 +77,9 @@ require PPIx::QuoteLike;
 
     sub __variables {
 	my ( $ppi ) = @_;
+
+	# In case we need to manufacture any.
+	require PPIx::QuoteLike;
 
 	Scalar::Util::blessed( $ppi )
 	    or croak 'Argument must be an object';
@@ -173,13 +223,7 @@ require PPIx::QuoteLike;
 
 	# Yes, we might have nested string literals, like
 	# "... @{[ qq<$foo> ]} ..."
-	foreach my $class ( qw{
-		PPI::Token::Quote
-		PPI::Token::QuoteLike::Backtick
-		PPI::Token::QuoteLike::Command
-		PPI::Token::QuoteLike::Readline
-		PPI::Token::HereDoc
-	    } ) {
+	foreach my $class ( @relevant_ppi_classes ) {
 	    foreach my $elem ( _find( $ppi, $class ) ) {
 
 		my $ql = PPIx::QuoteLike->new( $elem )
@@ -230,6 +274,12 @@ sub _find {
     return;
 }
 
+sub __instance {
+    my ( $object, $class ) = @_;
+    Scalar::Util::blessed( $object ) or return;
+    return $object->isa( $class );
+}
+
 # The problem this solves is that PPI can parse '{_}' as containing a
 # PPI::Token::Magic (which is a PPI::Token::Symbol), not a
 # PPI::Token::Word. This code also returns true for '${_}', which is not
@@ -255,6 +305,39 @@ sub _is_bareword_subscript {
 	and q<{> eq $start->content()
 	or return;
     return 1;
+}
+
+sub line_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LINE];
+}
+
+sub logical_filename {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LOGICAL_FILE];
+}
+
+sub logical_line_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_LOGICAL_LINE];
+}
+
+sub statement {
+    my ( $self ) = @_;
+    my $top = $self->top()
+	or return;
+    $top->can( 'source' )
+	or return;
+    my $source = $top->source()
+	or return;
+    $source->can( 'statement' )
+	or return;
+    return $source->statement();
+}
+
+sub visual_column_number {
+    my ( $self ) = @_;
+    return ( $self->location() || [] )->[LOCATION_COLUMN];
 }
 
 # This handles two known cases where PPI misparses bracketed variable
@@ -349,6 +432,67 @@ did not seem to fit anywhere else.
 
 This module supports the following public subroutines:
 
+=head2 column_number
+
+This subroutine/method returns the column number of the first character
+in the element, or C<undef> if that can not be determined.
+
+=head2 is_ppi_quotelike_element
+
+This subroutine returns true if its argument is a
+L<PPI::Element|PPI::Element> that this package is capable of dealing
+with. That is, one of the following:
+
+    PPI::Token::Quote
+    PPI::Token::QuoteLike::Backtick
+    PPI::Token::QuoteLike::Command
+    PPI::Token::QuoteLike::Readline
+    PPI::Token::HereDoc
+
+It returns false for unblessed references and for non-references.
+
+=head2 line_number
+
+This subroutine/method returns the line number of the first character in
+the element, or C<undef> if that can not be determined.
+
+=head2 logical_filename
+
+This subroutine/method returns the logical file name (taking C<#line>
+directives into account) of the file containing first character in the
+element, or C<undef> if that can not be determined.
+
+=head2 logical_line_number
+
+This subroutine/method returns the logical line number (taking C<#line>
+directives into account) of the first character in the element, or
+C<undef> if that can not be determined.
+
+=head2 statement
+
+This subroutine/method returns the L<PPI::Statement|PPI::Statement> that
+contains this element, or nothing if the statement can not be
+determined.
+
+In general this method will return something only under the following
+conditions:
+
+=over
+
+=item * The element is contained in a L<PPIx::Regexp|PPIx::Regexp> object;
+
+=item * That object was initialized from a L<PPI::Element|PPI::Element>;
+
+=item * The L<PPI::Element|PPI::Element> is contained in a statement.
+
+=back
+
+=head2 visual_column_number
+
+This subroutine/method returns the visual column number (taking tabs
+into account) of the first character in the element, or C<undef> if that
+can not be determined.
+
 =head2 __variables
 
  say for __variables( PPI::Document->new( \'$foo' );
@@ -384,7 +528,7 @@ module, because of the possibility of a circular dependency.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -392,7 +536,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

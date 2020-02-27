@@ -120,20 +120,17 @@ sub postProcessCfg ($self,$cfg) {
         Mojo::Exception->throw(join "\n",@errors);
     }
     my @pluginOrder;
-
-    for my $item (@{$cfg->{PLUGIN}}) {
+    my $PLUGIN = delete $cfg->{PLUGIN};
+    $cfg->{PLUGIN}{prototype} = \%pluginMap;
+    for my $item (@$PLUGIN) {
         my ($name) = keys %$item;
-        push @pluginOrder, $name;
+        push @{$cfg->{PLUGIN}{list}}, $name;
         my $obj = $pluginMap{$name};
         $obj->config($item->{$name});
         $obj->name($name);
         $obj->app($self->app);
-        $obj->massageConfig($obj->config);
+        $obj->massageConfig($cfg);
     }
-    $cfg->{PLUGIN} = {
-        list => \@pluginOrder,
-        prototype => \%pluginMap
-    };
     $cfg->{FRONTEND}{TRANSLATIONS} = $self->getTranslations();
     return $cfg;
 }

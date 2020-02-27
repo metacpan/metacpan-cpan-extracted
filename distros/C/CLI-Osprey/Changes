@@ -1,3 +1,14 @@
+Version 0.05: 2020-02-27
+  * Fix "prefer_commandline" import option to work properly (thanks ufoboat).
+  * Use Moo::Role->is_role to check whether we're being used in a role
+    (thanks djerius).
+  * Add missing methods to CLI::Osprey::Descriptive::Usage
+    (fixes 'Can't locate object method 'die'") (thanks djerius).
+  * Remove test dependency on Test2 for lighter installs.
+  * Fix "description_pod" and "extra_pod" import options (thanks yanick).
+  * Fix a cpanfile version req that didn't match the "use" version req 
+    (thanks yanick).
+
 Version 0.04: 2018-07-22
   * Fix "added_order" option.
 

@@ -4,15 +4,32 @@
 ##################################################################################
 #                                                                                #
 # Autor             : Michael Plugge <m.plugge@hs-mannheim.de>                   #
-# Version           : 6.06                                                       #
-# Datum             : 29.11.2018                                                 #
+# Version           : 6.12                                                       #
+# Datum             : 27.02.2020                                                 #
 ##################################################################################
+
+##################################################################################
+###                      27.02.20 Version 6.12                                 ###
+##################################################################################
+
+   - Korrektur in den Testdateien für Perl
+
+   Die Prüfziffermethoden und IBAN-Regeln sind unverändert, nur die Datendatei
+   blz.lut hat sich geändert.
+
+##################################################################################
+###                      08.12.19 Version 6.11                                 ###
+##################################################################################
+
+   - Korrektur in den Testdateien für Perl
+   - main.c: Option -gs hinzugefügt (SCL-Blocks zur LUT-Datei hinzufügen)
 
 ##################################################################################
 ###                      15.08.19 Version 6.10                                 ###
 ##################################################################################
 
    - Korrektur in den Testdateien für Perl
+   - AWK-Port für gawk 5.0.1
    - neue Funktion lut_valid_date(), um die Gültigkeitsdaten einer LUT-Datei zu
      bestimmen (nur in C und PHP)
 

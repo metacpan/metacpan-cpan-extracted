@@ -35,6 +35,7 @@
          "requires" : {
             "Data::Random" : "0",
             "File::Temp" : "0",
+            "File::stat" : "0",
             "HTTP::Request::Common" : "0",
             "Plack::Test" : "0",
             "Test::Differences" : "0",
@@ -55,7 +56,7 @@
          "web" : "https://github.com/robn/Prometheus-Tiny-Shared"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -237,7 +238,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.010",
+                  "tag" : "0.011",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

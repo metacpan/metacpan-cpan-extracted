@@ -3,8 +3,8 @@ NAME
     shell tab completion
 
 VERSION
-    This document describes version 0.310 of Getopt::Long::Complete (from
-    Perl distribution Getopt-Long-Complete), released on 2017-12-20.
+    This document describes version 0.311 of Getopt::Long::Complete (from
+    Perl distribution Getopt-Long-Complete), released on 2020-02-27.
 
 SYNOPSIS
   First example (simple)
@@ -101,9 +101,15 @@ VARIABLES
     Getopt::Long::GetOptions. You can use Perl's "local" to localize the
     effect.
 
-  $opt_permute => bool (default: 1 or 0 if POSIXLY_CORRECT)
-  $opt_pass_through => bool (default: 0)
-  $opt_bundling => bool (default: 1)
+  $opt_permute
+    Bool. Default: 1 (or 0 if POSIXLY_CORRECT).
+
+  $opt_pass_through
+    Bool. Default: 0.
+
+  $opt_bundling
+    Bool. Default: 1.
+
 INCOMPATIBILITIES
     Although you can use Getopt::Long::Complete (GLC) as a drop-in
     replacement for Getopt::Long (GL) most of the time, there are some
@@ -121,7 +127,11 @@ INCOMPATIBILITIES
         "Configure", "HelpMessage", "VersionMessage".
 
 FUNCTIONS
-  GetOptions([\%hash, ]@spec)
+  GetOptions
+    Usage:
+
+     GetOptions([ \%hash, ] @spec)
+
     Will call Getopt::Long's GetOptions, except when COMP_LINE environment
     variable is defined, in which case will print completion reply to STDOUT
     and exit.
@@ -133,7 +143,11 @@ FUNCTIONS
     explicitly by via $opt_permute. You can turn on pass_through via
     $opt_pass_through.
 
-  GetOptionsWithCompletion(\&completion, [\%hash, ]@spec)
+  GetOptionsWithCompletion
+    Usage:
+
+     GetOptionsWithCompletion(\&completion, [ \%hash, ] @spec)
+
     Just like "GetOptions", except that it accepts an extra first argument
     "\&completion" containing completion routine for completing option
     *values* and arguments. This will be passed as "completion" argument to
@@ -161,8 +175,8 @@ SEE ALSO
     tab completion support and more stuffs: default value, required value,
     summary in auto_help.
 
-    Complete::Getopt::Long (the backend for this module), "Complete::Bash",
-    "Complete::Tcsh".
+    Complete::Getopt::Long (the backend for this module), Complete::Bash,
+    Complete::Tcsh.
 
     Other option-processing modules featuring shell tab completion:
     Getopt::Complete.
@@ -178,7 +192,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

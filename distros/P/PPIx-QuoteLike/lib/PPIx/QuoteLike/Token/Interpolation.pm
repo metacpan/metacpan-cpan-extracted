@@ -7,26 +7,78 @@ use warnings;
 
 use Carp;
 use PPI::Document;
-use PPIx::QuoteLike::Constant qw{ VARIABLE_RE @CARP_NOT };
+use PPIx::QuoteLike::Constant qw{
+    LOCATION_COLUMN
+    LOCATION_LOGICAL_LINE
+    LOCATION_LOGICAL_FILE
+    VARIABLE_RE
+    @CARP_NOT
+};
 use PPIx::QuoteLike::Utils qw{ __variables };
 
 use base qw{ PPIx::QuoteLike::Token };
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 sub ppi {
     my ( $self ) = @_;
     unless ( $self->{ppi} ) {
+	my $content;
+	my $location = $self->{location};
+	if ( $location ) {
+	    my $fn;
+	    if( defined( $fn = $location->[LOCATION_LOGICAL_FILE] ) ) {
+		$fn =~ s/ (?= [\\"] ) /\\/smxg;
+		$content = qq{#line $location->[LOCATION_LOGICAL_LINE] "$fn"\n};
+	    } else {
+		$content = qq{#line $location->[LOCATION_LOGICAL_LINE]\n};
+	    }
+	    $content .= ' ' x ( $location->[LOCATION_COLUMN] - 1 );
+	}
+
 ##	The following code is tempting, but I really, really want to
 ##	avoid enabling it, because I may hit uses of ${something} that
 ##	it does not cover.
-##	( my $content = $self->content() ) =~
+##	( $content = $self->content() ) =~
 ##	    s/ \A ( [\$\@] (?: \# \$? | \$* ) )
 ##	    \{ ( @{[ VARIABLE_RE ]} ) \} \z /$1$2/smxo;
-	my $content = $self->content();
-	$self->{ppi} = PPI::Document->new( \$content, readonly => 1 );
+	$content .= $self->content();
+
+	$self->{ppi} = PPI::Document->new( \$content );
+
+	if ( $location ) {
+	    # Generate locations now.
+	    $self->{ppi}->location();
+	    # Remove the stuff we originally injected. NOTE that we can
+	    # only get away with doing this if the removal does not
+	    # invalidate the locations of the other tokens that we just
+	    # generated.
+	    my $elem;
+	    # Remove the '#line' directive if we find it
+	    $elem = $self->{ppi}->child( 0 )
+		and $elem->isa( 'PPI::Token::Comment' )
+		and $elem->content() =~ m/ \A \#line\b /smx
+		and $elem->remove();
+	    # Remove the white space if we find it, and if it in fact
+	    # represents only the white space we injected to get the
+	    # column numbers right.
+	    my $wid = $location->[LOCATION_COLUMN] - 1;
+	    $wid
+		and $elem = $self->{ppi}->child( 0 )
+		and $elem->isa( 'PPI::Token::Whitespace' )
+		and $wid == length $elem->content()
+		and $elem->remove();
+	}
     }
     return $self->{ppi};
+}
+
+# For the moment this is package-private and subject to change or
+# retraction without notice. If there is need, it will be made public
+# by stripping the leading underscores and documenting it.
+sub __purge_ppi {
+    my ( $self ) = @_;
+    return delete $self->{ppi};
 }
 
 sub variables {
@@ -101,7 +153,7 @@ L<PPIx::QuoteLike::Token|PPIx::QuoteLike::Token>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org>, or in electronic mail to the author.
 
 =head1 AUTHOR
 
@@ -109,7 +161,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Thomas R. Wyant, III
+Copyright (C) 2016-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

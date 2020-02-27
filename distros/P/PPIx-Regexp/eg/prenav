@@ -86,16 +86,14 @@ while ( defined ( my $buffer = $tr->readline( 'prenav> ' ) ) ) {
     '#' eq substr $buffer, 0, 1 and next;
     my ( $method, $arg ) = split qr{\s+}smx, $buffer, 2;
     'exit' eq $method and last;
-    my $temp = eval {
-	$internal{$method} ?
+    my $temp;
+    eval {
+	$temp = $internal{$method} ?
 	    $internal{$method}->( $arg ) :
 	    $obj->$method( $arg );
+	1;
     } or do {
-	if ( $@ ) {
-	    warn $@;
-	} else {
-	    print "undef\n";
-	}
+	warn $@;
 	next;
     };
 
@@ -130,11 +128,13 @@ sub _format {
 	    $rslt .= _format( @{ $thing } );
 	} elsif ( SCALAR_REF eq ref $thing ) {
 	    $rslt .= ${ $thing };
-	} else {
+	} elsif ( defined $thing ) {
 	    $rslt .= $thing =~ m/ \n /smx ? $thing :
 		$thing =~ m/ \A ' /smx ? "$thing\n" :
 		$thing =~ m/ \D /smx ? "'$thing'\n" :
 					"$thing\n";
+	} else {
+	    $rslt .= "undef\n";
 	}
     }
 

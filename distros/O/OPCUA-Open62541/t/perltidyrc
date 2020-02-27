@@ -1,0 +1,40 @@
+# Keine Fehlermeldungen oder Syntaxchecks
+-q
+# Maximale Zeilenlaenge 80
+-l=80
+# 8 Spaces durch Tabs ersetzen
+-et=8
+# Einrueckung um 8 Zeichen
+-i=4
+# Einrueckung fuer continuation
+-ci=4
+# Keine Spaces vor Semikola
+-nsfs
+# indent-spaced-block-comments
+-isbc
+# cuddled-else
+-ce
+# opening-brace-always-on-right
+-bar
+
+# Einstellungen aus Perl Best Practices
+# Lange Zeilen nicht ausruecken
+-nolq
+
+# Ausgabe an STDOUT
+-st
+
+# Fehler nach STDERR
+-se
+
+# Kein Zeilenumbruch nach oeffnendem Token
+-vt=0
+
+# Keine Spaces innerhalb von Klammern
+-pt=2
+-bt=2
+-sbt=2
+-bbt=2
+
+# Schliessende Tokens nicht extra einruecken
+-cti=0

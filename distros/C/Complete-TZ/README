@@ -1,4 +1,71 @@
+NAME
+    Complete::TZ - Timezone-related completion routines
+
+VERSION
+    This document describes version 0.081 of Complete::TZ (from Perl
+    distribution Complete-TZ), released on 2020-02-27.
+
 DESCRIPTION
+FUNCTIONS
+  complete_tz_name
+    Usage:
+
+     complete_tz_name(%args) -> array
+
+    Complete from list of timezone names.
+
+    Currently implemented via looking at "/usr/share/zoneinfo", so this only
+    works on systems that have that.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_tz_offset
+    Usage:
+
+     complete_tz_offset(%args) -> array
+
+    Complete from list of existing timezone offsets (in the form of
+    -HH:MM(:SS)? or +HH:MM(:SS)?).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-TZ>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Complete-TZ>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-TZ>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -19,5 +19,7 @@ t/030-psgi.t
 t/040-histogram.t
 t/100-shared.t
 t/110-store-stress.t
+t/150-init-file.pl
+t/160-fork.t
 t/200-no-cache-args.t
 t/900-regression.t

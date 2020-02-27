@@ -1,5 +1,3 @@
-/* Generated at 2020-02-21 01:52:43 */
-
 /* Boolean */
 static void XS_pack_UA_Boolean(SV *out, UA_Boolean in)  __attribute__((unused));
 static UA_Boolean XS_unpack_UA_Boolean(SV *in)  __attribute__((unused));
@@ -78,15 +76,7 @@ static UA_ByteString XS_unpack_UA_ByteString(SV *in)  __attribute__((unused));
 /* XmlElement */
 static void XS_pack_UA_XmlElement(SV *out, UA_XmlElement in)  __attribute__((unused));
 static UA_XmlElement XS_unpack_UA_XmlElement(SV *in)  __attribute__((unused));
-static void XS_pack_UA_XmlElement(SV *out, UA_XmlElement in)
-{
-	/* TODO Implement builtin type conversion */
-}
-static UA_XmlElement
-XS_unpack_UA_XmlElement(SV *in)
-{
-	/* TODO Implement builtin type conversion */
-}
+/* implemented in Open62541.xs */
 
 /* NodeId */
 static void XS_pack_UA_NodeId(SV *out, UA_NodeId in)  __attribute__((unused));
@@ -96,15 +86,7 @@ static UA_NodeId XS_unpack_UA_NodeId(SV *in)  __attribute__((unused));
 /* ExpandedNodeId */
 static void XS_pack_UA_ExpandedNodeId(SV *out, UA_ExpandedNodeId in)  __attribute__((unused));
 static UA_ExpandedNodeId XS_unpack_UA_ExpandedNodeId(SV *in)  __attribute__((unused));
-static void XS_pack_UA_ExpandedNodeId(SV *out, UA_ExpandedNodeId in)
-{
-	/* TODO Implement builtin type conversion */
-}
-static UA_ExpandedNodeId
-XS_unpack_UA_ExpandedNodeId(SV *in)
-{
-	/* TODO Implement builtin type conversion */
-}
+/* implemented in Open62541.xs */
 
 /* StatusCode */
 static void XS_pack_UA_StatusCode(SV *out, UA_StatusCode in)  __attribute__((unused));
@@ -124,15 +106,7 @@ static UA_LocalizedText XS_unpack_UA_LocalizedText(SV *in)  __attribute__((unuse
 /* ExtensionObject */
 static void XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)  __attribute__((unused));
 static UA_ExtensionObject XS_unpack_UA_ExtensionObject(SV *in)  __attribute__((unused));
-static void XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
-{
-	/* TODO Implement builtin type conversion */
-}
-static UA_ExtensionObject
-XS_unpack_UA_ExtensionObject(SV *in)
-{
-	/* TODO Implement builtin type conversion */
-}
+/* implemented in Open62541.xs */
 
 /* DataValue */
 static void XS_pack_UA_DataValue(SV *out, UA_DataValue in)  __attribute__((unused));
@@ -147,21 +121,14 @@ static UA_Variant XS_unpack_UA_Variant(SV *in)  __attribute__((unused));
 /* DiagnosticInfo */
 static void XS_pack_UA_DiagnosticInfo(SV *out, UA_DiagnosticInfo in)  __attribute__((unused));
 static UA_DiagnosticInfo XS_unpack_UA_DiagnosticInfo(SV *in)  __attribute__((unused));
-static void XS_pack_UA_DiagnosticInfo(SV *out, UA_DiagnosticInfo in)
-{
-	/* TODO Implement builtin type conversion */
-}
-static UA_DiagnosticInfo
-XS_unpack_UA_DiagnosticInfo(SV *in)
-{
-	/* TODO Implement builtin type conversion */
-}
+/* implemented in Open62541.xs */
 
 /* NodeClass */
 static void XS_pack_UA_NodeClass(SV *out, UA_NodeClass in)  __attribute__((unused));
 static void
 XS_pack_UA_NodeClass(SV *out, UA_NodeClass in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -169,6 +136,7 @@ static UA_NodeClass XS_unpack_UA_NodeClass(SV *in)  __attribute__((unused));
 static UA_NodeClass
 XS_unpack_UA_NodeClass(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -177,6 +145,7 @@ static void XS_pack_UA_Argument(SV *out, UA_Argument in)  __attribute__((unused)
 static void
 XS_pack_UA_Argument(SV *out, UA_Argument in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -196,7 +165,7 @@ XS_pack_UA_Argument(SV *out, UA_Argument in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.arrayDimensionsSize);
-	for(i = 0; i < in.arrayDimensionsSize; i++) {
+	for (i = 0; i < in.arrayDimensionsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.arrayDimensions[i]);
 		av_push(av, sv);
@@ -214,6 +183,7 @@ static UA_Argument XS_unpack_UA_Argument(SV *in)  __attribute__((unused));
 static UA_Argument
 XS_unpack_UA_Argument(SV *in)
 {
+	dTHX;
 	UA_Argument out;
 	SV **svp;
 	AV *av;
@@ -250,7 +220,7 @@ XS_unpack_UA_Argument(SV *in)
 		if (out.arrayDimensions == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.arrayDimensions[i] = XS_unpack_UA_UInt32(*svp);
@@ -271,6 +241,7 @@ static void XS_pack_UA_EnumValueType(SV *out, UA_EnumValueType in)  __attribute_
 static void
 XS_pack_UA_EnumValueType(SV *out, UA_EnumValueType in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -293,6 +264,7 @@ static UA_EnumValueType XS_unpack_UA_EnumValueType(SV *in)  __attribute__((unuse
 static UA_EnumValueType
 XS_unpack_UA_EnumValueType(SV *in)
 {
+	dTHX;
 	UA_EnumValueType out;
 	SV **svp;
 	HV *hv;
@@ -324,6 +296,7 @@ static void XS_pack_UA_Duration(SV *out, UA_Duration in)  __attribute__((unused)
 static void
 XS_pack_UA_Duration(SV *out, UA_Duration in)
 {
+	dTHX;
 	XS_pack_UA_Double(out, in);
 }
 
@@ -331,6 +304,7 @@ static UA_Duration XS_unpack_UA_Duration(SV *in)  __attribute__((unused));
 static UA_Duration
 XS_unpack_UA_Duration(SV *in)
 {
+	dTHX;
 	return XS_unpack_UA_Double(in);
 }
 
@@ -339,6 +313,7 @@ static void XS_pack_UA_UtcTime(SV *out, UA_UtcTime in)  __attribute__((unused));
 static void
 XS_pack_UA_UtcTime(SV *out, UA_UtcTime in)
 {
+	dTHX;
 	XS_pack_UA_DateTime(out, in);
 }
 
@@ -346,6 +321,7 @@ static UA_UtcTime XS_unpack_UA_UtcTime(SV *in)  __attribute__((unused));
 static UA_UtcTime
 XS_unpack_UA_UtcTime(SV *in)
 {
+	dTHX;
 	return XS_unpack_UA_DateTime(in);
 }
 
@@ -354,6 +330,7 @@ static void XS_pack_UA_LocaleId(SV *out, UA_LocaleId in)  __attribute__((unused)
 static void
 XS_pack_UA_LocaleId(SV *out, UA_LocaleId in)
 {
+	dTHX;
 	XS_pack_UA_String(out, in);
 }
 
@@ -361,6 +338,7 @@ static UA_LocaleId XS_unpack_UA_LocaleId(SV *in)  __attribute__((unused));
 static UA_LocaleId
 XS_unpack_UA_LocaleId(SV *in)
 {
+	dTHX;
 	return XS_unpack_UA_String(in);
 }
 
@@ -369,6 +347,7 @@ static void XS_pack_UA_ApplicationType(SV *out, UA_ApplicationType in)  __attrib
 static void
 XS_pack_UA_ApplicationType(SV *out, UA_ApplicationType in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -376,6 +355,7 @@ static UA_ApplicationType XS_unpack_UA_ApplicationType(SV *in)  __attribute__((u
 static UA_ApplicationType
 XS_unpack_UA_ApplicationType(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -384,6 +364,7 @@ static void XS_pack_UA_ApplicationDescription(SV *out, UA_ApplicationDescription
 static void
 XS_pack_UA_ApplicationDescription(SV *out, UA_ApplicationDescription in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -415,7 +396,7 @@ XS_pack_UA_ApplicationDescription(SV *out, UA_ApplicationDescription in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.discoveryUrlsSize);
-	for(i = 0; i < in.discoveryUrlsSize; i++) {
+	for (i = 0; i < in.discoveryUrlsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.discoveryUrls[i]);
 		av_push(av, sv);
@@ -429,6 +410,7 @@ static UA_ApplicationDescription XS_unpack_UA_ApplicationDescription(SV *in)  __
 static UA_ApplicationDescription
 XS_unpack_UA_ApplicationDescription(SV *in)
 {
+	dTHX;
 	UA_ApplicationDescription out;
 	SV **svp;
 	AV *av;
@@ -477,7 +459,7 @@ XS_unpack_UA_ApplicationDescription(SV *in)
 		if (out.discoveryUrls == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.discoveryUrls[i] = XS_unpack_UA_String(*svp);
@@ -494,6 +476,7 @@ static void XS_pack_UA_RequestHeader(SV *out, UA_RequestHeader in)  __attribute_
 static void
 XS_pack_UA_RequestHeader(SV *out, UA_RequestHeader in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -532,6 +515,7 @@ static UA_RequestHeader XS_unpack_UA_RequestHeader(SV *in)  __attribute__((unuse
 static UA_RequestHeader
 XS_unpack_UA_RequestHeader(SV *in)
 {
+	dTHX;
 	UA_RequestHeader out;
 	SV **svp;
 	HV *hv;
@@ -579,6 +563,7 @@ static void XS_pack_UA_ResponseHeader(SV *out, UA_ResponseHeader in)  __attribut
 static void
 XS_pack_UA_ResponseHeader(SV *out, UA_ResponseHeader in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -602,7 +587,7 @@ XS_pack_UA_ResponseHeader(SV *out, UA_ResponseHeader in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.stringTableSize);
-	for(i = 0; i < in.stringTableSize; i++) {
+	for (i = 0; i < in.stringTableSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.stringTable[i]);
 		av_push(av, sv);
@@ -620,6 +605,7 @@ static UA_ResponseHeader XS_unpack_UA_ResponseHeader(SV *in)  __attribute__((unu
 static UA_ResponseHeader
 XS_unpack_UA_ResponseHeader(SV *in)
 {
+	dTHX;
 	UA_ResponseHeader out;
 	SV **svp;
 	AV *av;
@@ -660,7 +646,7 @@ XS_unpack_UA_ResponseHeader(SV *in)
 		if (out.stringTable == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.stringTable[i] = XS_unpack_UA_String(*svp);
@@ -681,6 +667,7 @@ static void XS_pack_UA_ServiceFault(SV *out, UA_ServiceFault in)  __attribute__(
 static void
 XS_pack_UA_ServiceFault(SV *out, UA_ServiceFault in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -695,6 +682,7 @@ static UA_ServiceFault XS_unpack_UA_ServiceFault(SV *in)  __attribute__((unused)
 static UA_ServiceFault
 XS_unpack_UA_ServiceFault(SV *in)
 {
+	dTHX;
 	UA_ServiceFault out;
 	SV **svp;
 	HV *hv;
@@ -718,6 +706,7 @@ static void XS_pack_UA_FindServersRequest(SV *out, UA_FindServersRequest in)  __
 static void
 XS_pack_UA_FindServersRequest(SV *out, UA_FindServersRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -733,7 +722,7 @@ XS_pack_UA_FindServersRequest(SV *out, UA_FindServersRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.localeIdsSize);
-	for(i = 0; i < in.localeIdsSize; i++) {
+	for (i = 0; i < in.localeIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.localeIds[i]);
 		av_push(av, sv);
@@ -742,7 +731,7 @@ XS_pack_UA_FindServersRequest(SV *out, UA_FindServersRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverUrisSize);
-	for(i = 0; i < in.serverUrisSize; i++) {
+	for (i = 0; i < in.serverUrisSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.serverUris[i]);
 		av_push(av, sv);
@@ -756,6 +745,7 @@ static UA_FindServersRequest XS_unpack_UA_FindServersRequest(SV *in)  __attribut
 static UA_FindServersRequest
 XS_unpack_UA_FindServersRequest(SV *in)
 {
+	dTHX;
 	UA_FindServersRequest out;
 	SV **svp;
 	AV *av;
@@ -788,7 +778,7 @@ XS_unpack_UA_FindServersRequest(SV *in)
 		if (out.localeIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.localeIds[i] = XS_unpack_UA_String(*svp);
@@ -808,7 +798,7 @@ XS_unpack_UA_FindServersRequest(SV *in)
 		if (out.serverUris == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverUris[i] = XS_unpack_UA_String(*svp);
@@ -825,6 +815,7 @@ static void XS_pack_UA_FindServersResponse(SV *out, UA_FindServersResponse in)  
 static void
 XS_pack_UA_FindServersResponse(SV *out, UA_FindServersResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -836,7 +827,7 @@ XS_pack_UA_FindServersResponse(SV *out, UA_FindServersResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serversSize);
-	for(i = 0; i < in.serversSize; i++) {
+	for (i = 0; i < in.serversSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ApplicationDescription(sv, in.servers[i]);
 		av_push(av, sv);
@@ -850,6 +841,7 @@ static UA_FindServersResponse XS_unpack_UA_FindServersResponse(SV *in)  __attrib
 static UA_FindServersResponse
 XS_unpack_UA_FindServersResponse(SV *in)
 {
+	dTHX;
 	UA_FindServersResponse out;
 	SV **svp;
 	AV *av;
@@ -878,7 +870,7 @@ XS_unpack_UA_FindServersResponse(SV *in)
 		if (out.servers == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.servers[i] = XS_unpack_UA_ApplicationDescription(*svp);
@@ -895,6 +887,7 @@ static void XS_pack_UA_ServerOnNetwork(SV *out, UA_ServerOnNetwork in)  __attrib
 static void
 XS_pack_UA_ServerOnNetwork(SV *out, UA_ServerOnNetwork in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -914,7 +907,7 @@ XS_pack_UA_ServerOnNetwork(SV *out, UA_ServerOnNetwork in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverCapabilitiesSize);
-	for(i = 0; i < in.serverCapabilitiesSize; i++) {
+	for (i = 0; i < in.serverCapabilitiesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.serverCapabilities[i]);
 		av_push(av, sv);
@@ -928,6 +921,7 @@ static UA_ServerOnNetwork XS_unpack_UA_ServerOnNetwork(SV *in)  __attribute__((u
 static UA_ServerOnNetwork
 XS_unpack_UA_ServerOnNetwork(SV *in)
 {
+	dTHX;
 	UA_ServerOnNetwork out;
 	SV **svp;
 	AV *av;
@@ -964,7 +958,7 @@ XS_unpack_UA_ServerOnNetwork(SV *in)
 		if (out.serverCapabilities == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverCapabilities[i] = XS_unpack_UA_String(*svp);
@@ -981,6 +975,7 @@ static void XS_pack_UA_FindServersOnNetworkRequest(SV *out, UA_FindServersOnNetw
 static void
 XS_pack_UA_FindServersOnNetworkRequest(SV *out, UA_FindServersOnNetworkRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1000,7 +995,7 @@ XS_pack_UA_FindServersOnNetworkRequest(SV *out, UA_FindServersOnNetworkRequest i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverCapabilityFilterSize);
-	for(i = 0; i < in.serverCapabilityFilterSize; i++) {
+	for (i = 0; i < in.serverCapabilityFilterSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.serverCapabilityFilter[i]);
 		av_push(av, sv);
@@ -1014,6 +1009,7 @@ static UA_FindServersOnNetworkRequest XS_unpack_UA_FindServersOnNetworkRequest(S
 static UA_FindServersOnNetworkRequest
 XS_unpack_UA_FindServersOnNetworkRequest(SV *in)
 {
+	dTHX;
 	UA_FindServersOnNetworkRequest out;
 	SV **svp;
 	AV *av;
@@ -1050,7 +1046,7 @@ XS_unpack_UA_FindServersOnNetworkRequest(SV *in)
 		if (out.serverCapabilityFilter == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverCapabilityFilter[i] = XS_unpack_UA_String(*svp);
@@ -1067,6 +1063,7 @@ static void XS_pack_UA_FindServersOnNetworkResponse(SV *out, UA_FindServersOnNet
 static void
 XS_pack_UA_FindServersOnNetworkResponse(SV *out, UA_FindServersOnNetworkResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1082,7 +1079,7 @@ XS_pack_UA_FindServersOnNetworkResponse(SV *out, UA_FindServersOnNetworkResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serversSize);
-	for(i = 0; i < in.serversSize; i++) {
+	for (i = 0; i < in.serversSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ServerOnNetwork(sv, in.servers[i]);
 		av_push(av, sv);
@@ -1096,6 +1093,7 @@ static UA_FindServersOnNetworkResponse XS_unpack_UA_FindServersOnNetworkResponse
 static UA_FindServersOnNetworkResponse
 XS_unpack_UA_FindServersOnNetworkResponse(SV *in)
 {
+	dTHX;
 	UA_FindServersOnNetworkResponse out;
 	SV **svp;
 	AV *av;
@@ -1128,7 +1126,7 @@ XS_unpack_UA_FindServersOnNetworkResponse(SV *in)
 		if (out.servers == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.servers[i] = XS_unpack_UA_ServerOnNetwork(*svp);
@@ -1145,6 +1143,7 @@ static void XS_pack_UA_MessageSecurityMode(SV *out, UA_MessageSecurityMode in)  
 static void
 XS_pack_UA_MessageSecurityMode(SV *out, UA_MessageSecurityMode in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -1152,6 +1151,7 @@ static UA_MessageSecurityMode XS_unpack_UA_MessageSecurityMode(SV *in)  __attrib
 static UA_MessageSecurityMode
 XS_unpack_UA_MessageSecurityMode(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -1160,6 +1160,7 @@ static void XS_pack_UA_UserTokenType(SV *out, UA_UserTokenType in)  __attribute_
 static void
 XS_pack_UA_UserTokenType(SV *out, UA_UserTokenType in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -1167,6 +1168,7 @@ static UA_UserTokenType XS_unpack_UA_UserTokenType(SV *in)  __attribute__((unuse
 static UA_UserTokenType
 XS_unpack_UA_UserTokenType(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -1175,6 +1177,7 @@ static void XS_pack_UA_UserTokenPolicy(SV *out, UA_UserTokenPolicy in)  __attrib
 static void
 XS_pack_UA_UserTokenPolicy(SV *out, UA_UserTokenPolicy in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -1205,6 +1208,7 @@ static UA_UserTokenPolicy XS_unpack_UA_UserTokenPolicy(SV *in)  __attribute__((u
 static UA_UserTokenPolicy
 XS_unpack_UA_UserTokenPolicy(SV *in)
 {
+	dTHX;
 	UA_UserTokenPolicy out;
 	SV **svp;
 	HV *hv;
@@ -1244,6 +1248,7 @@ static void XS_pack_UA_EndpointDescription(SV *out, UA_EndpointDescription in)  
 static void
 XS_pack_UA_EndpointDescription(SV *out, UA_EndpointDescription in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1271,7 +1276,7 @@ XS_pack_UA_EndpointDescription(SV *out, UA_EndpointDescription in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.userIdentityTokensSize);
-	for(i = 0; i < in.userIdentityTokensSize; i++) {
+	for (i = 0; i < in.userIdentityTokensSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UserTokenPolicy(sv, in.userIdentityTokens[i]);
 		av_push(av, sv);
@@ -1293,6 +1298,7 @@ static UA_EndpointDescription XS_unpack_UA_EndpointDescription(SV *in)  __attrib
 static UA_EndpointDescription
 XS_unpack_UA_EndpointDescription(SV *in)
 {
+	dTHX;
 	UA_EndpointDescription out;
 	SV **svp;
 	AV *av;
@@ -1337,7 +1343,7 @@ XS_unpack_UA_EndpointDescription(SV *in)
 		if (out.userIdentityTokens == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.userIdentityTokens[i] = XS_unpack_UA_UserTokenPolicy(*svp);
@@ -1362,6 +1368,7 @@ static void XS_pack_UA_GetEndpointsRequest(SV *out, UA_GetEndpointsRequest in)  
 static void
 XS_pack_UA_GetEndpointsRequest(SV *out, UA_GetEndpointsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1377,7 +1384,7 @@ XS_pack_UA_GetEndpointsRequest(SV *out, UA_GetEndpointsRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.localeIdsSize);
-	for(i = 0; i < in.localeIdsSize; i++) {
+	for (i = 0; i < in.localeIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.localeIds[i]);
 		av_push(av, sv);
@@ -1386,7 +1393,7 @@ XS_pack_UA_GetEndpointsRequest(SV *out, UA_GetEndpointsRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.profileUrisSize);
-	for(i = 0; i < in.profileUrisSize; i++) {
+	for (i = 0; i < in.profileUrisSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.profileUris[i]);
 		av_push(av, sv);
@@ -1400,6 +1407,7 @@ static UA_GetEndpointsRequest XS_unpack_UA_GetEndpointsRequest(SV *in)  __attrib
 static UA_GetEndpointsRequest
 XS_unpack_UA_GetEndpointsRequest(SV *in)
 {
+	dTHX;
 	UA_GetEndpointsRequest out;
 	SV **svp;
 	AV *av;
@@ -1432,7 +1440,7 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 		if (out.localeIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.localeIds[i] = XS_unpack_UA_String(*svp);
@@ -1452,7 +1460,7 @@ XS_unpack_UA_GetEndpointsRequest(SV *in)
 		if (out.profileUris == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.profileUris[i] = XS_unpack_UA_String(*svp);
@@ -1469,6 +1477,7 @@ static void XS_pack_UA_GetEndpointsResponse(SV *out, UA_GetEndpointsResponse in)
 static void
 XS_pack_UA_GetEndpointsResponse(SV *out, UA_GetEndpointsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1480,7 +1489,7 @@ XS_pack_UA_GetEndpointsResponse(SV *out, UA_GetEndpointsResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.endpointsSize);
-	for(i = 0; i < in.endpointsSize; i++) {
+	for (i = 0; i < in.endpointsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_EndpointDescription(sv, in.endpoints[i]);
 		av_push(av, sv);
@@ -1494,6 +1503,7 @@ static UA_GetEndpointsResponse XS_unpack_UA_GetEndpointsResponse(SV *in)  __attr
 static UA_GetEndpointsResponse
 XS_unpack_UA_GetEndpointsResponse(SV *in)
 {
+	dTHX;
 	UA_GetEndpointsResponse out;
 	SV **svp;
 	AV *av;
@@ -1522,7 +1532,7 @@ XS_unpack_UA_GetEndpointsResponse(SV *in)
 		if (out.endpoints == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.endpoints[i] = XS_unpack_UA_EndpointDescription(*svp);
@@ -1539,6 +1549,7 @@ static void XS_pack_UA_RegisteredServer(SV *out, UA_RegisteredServer in)  __attr
 static void
 XS_pack_UA_RegisteredServer(SV *out, UA_RegisteredServer in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1554,7 +1565,7 @@ XS_pack_UA_RegisteredServer(SV *out, UA_RegisteredServer in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverNamesSize);
-	for(i = 0; i < in.serverNamesSize; i++) {
+	for (i = 0; i < in.serverNamesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_LocalizedText(sv, in.serverNames[i]);
 		av_push(av, sv);
@@ -1571,7 +1582,7 @@ XS_pack_UA_RegisteredServer(SV *out, UA_RegisteredServer in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.discoveryUrlsSize);
-	for(i = 0; i < in.discoveryUrlsSize; i++) {
+	for (i = 0; i < in.discoveryUrlsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.discoveryUrls[i]);
 		av_push(av, sv);
@@ -1593,6 +1604,7 @@ static UA_RegisteredServer XS_unpack_UA_RegisteredServer(SV *in)  __attribute__(
 static UA_RegisteredServer
 XS_unpack_UA_RegisteredServer(SV *in)
 {
+	dTHX;
 	UA_RegisteredServer out;
 	SV **svp;
 	AV *av;
@@ -1625,7 +1637,7 @@ XS_unpack_UA_RegisteredServer(SV *in)
 		if (out.serverNames == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverNames[i] = XS_unpack_UA_LocalizedText(*svp);
@@ -1653,7 +1665,7 @@ XS_unpack_UA_RegisteredServer(SV *in)
 		if (out.discoveryUrls == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.discoveryUrls[i] = XS_unpack_UA_String(*svp);
@@ -1678,6 +1690,7 @@ static void XS_pack_UA_RegisterServerRequest(SV *out, UA_RegisterServerRequest i
 static void
 XS_pack_UA_RegisterServerRequest(SV *out, UA_RegisterServerRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -1696,6 +1709,7 @@ static UA_RegisterServerRequest XS_unpack_UA_RegisterServerRequest(SV *in)  __at
 static UA_RegisterServerRequest
 XS_unpack_UA_RegisterServerRequest(SV *in)
 {
+	dTHX;
 	UA_RegisterServerRequest out;
 	SV **svp;
 	HV *hv;
@@ -1723,6 +1737,7 @@ static void XS_pack_UA_RegisterServerResponse(SV *out, UA_RegisterServerResponse
 static void
 XS_pack_UA_RegisterServerResponse(SV *out, UA_RegisterServerResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -1737,6 +1752,7 @@ static UA_RegisterServerResponse XS_unpack_UA_RegisterServerResponse(SV *in)  __
 static UA_RegisterServerResponse
 XS_unpack_UA_RegisterServerResponse(SV *in)
 {
+	dTHX;
 	UA_RegisterServerResponse out;
 	SV **svp;
 	HV *hv;
@@ -1760,13 +1776,16 @@ static void XS_pack_UA_DiscoveryConfiguration(SV *out, UA_DiscoveryConfiguration
 static void
 XS_pack_UA_DiscoveryConfiguration(SV *out, UA_DiscoveryConfiguration in)
 {
-
+	dTHX;
+	croak("%s: conversion for type not implemented", __func__);
 }
 
 static UA_DiscoveryConfiguration XS_unpack_UA_DiscoveryConfiguration(SV *in)  __attribute__((unused));
 static UA_DiscoveryConfiguration
 XS_unpack_UA_DiscoveryConfiguration(SV *in)
 {
+	dTHX;
+	croak("%s: conversion for type not implemented", __func__);
 }
 
 /* MdnsDiscoveryConfiguration */
@@ -1774,6 +1793,7 @@ static void XS_pack_UA_MdnsDiscoveryConfiguration(SV *out, UA_MdnsDiscoveryConfi
 static void
 XS_pack_UA_MdnsDiscoveryConfiguration(SV *out, UA_MdnsDiscoveryConfiguration in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1785,7 +1805,7 @@ XS_pack_UA_MdnsDiscoveryConfiguration(SV *out, UA_MdnsDiscoveryConfiguration in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverCapabilitiesSize);
-	for(i = 0; i < in.serverCapabilitiesSize; i++) {
+	for (i = 0; i < in.serverCapabilitiesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.serverCapabilities[i]);
 		av_push(av, sv);
@@ -1799,6 +1819,7 @@ static UA_MdnsDiscoveryConfiguration XS_unpack_UA_MdnsDiscoveryConfiguration(SV 
 static UA_MdnsDiscoveryConfiguration
 XS_unpack_UA_MdnsDiscoveryConfiguration(SV *in)
 {
+	dTHX;
 	UA_MdnsDiscoveryConfiguration out;
 	SV **svp;
 	AV *av;
@@ -1827,7 +1848,7 @@ XS_unpack_UA_MdnsDiscoveryConfiguration(SV *in)
 		if (out.serverCapabilities == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverCapabilities[i] = XS_unpack_UA_String(*svp);
@@ -1844,6 +1865,7 @@ static void XS_pack_UA_RegisterServer2Request(SV *out, UA_RegisterServer2Request
 static void
 XS_pack_UA_RegisterServer2Request(SV *out, UA_RegisterServer2Request in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1859,7 +1881,7 @@ XS_pack_UA_RegisterServer2Request(SV *out, UA_RegisterServer2Request in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.discoveryConfigurationSize);
-	for(i = 0; i < in.discoveryConfigurationSize; i++) {
+	for (i = 0; i < in.discoveryConfigurationSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ExtensionObject(sv, in.discoveryConfiguration[i]);
 		av_push(av, sv);
@@ -1873,6 +1895,7 @@ static UA_RegisterServer2Request XS_unpack_UA_RegisterServer2Request(SV *in)  __
 static UA_RegisterServer2Request
 XS_unpack_UA_RegisterServer2Request(SV *in)
 {
+	dTHX;
 	UA_RegisterServer2Request out;
 	SV **svp;
 	AV *av;
@@ -1905,7 +1928,7 @@ XS_unpack_UA_RegisterServer2Request(SV *in)
 		if (out.discoveryConfiguration == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.discoveryConfiguration[i] = XS_unpack_UA_ExtensionObject(*svp);
@@ -1922,6 +1945,7 @@ static void XS_pack_UA_RegisterServer2Response(SV *out, UA_RegisterServer2Respon
 static void
 XS_pack_UA_RegisterServer2Response(SV *out, UA_RegisterServer2Response in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -1933,7 +1957,7 @@ XS_pack_UA_RegisterServer2Response(SV *out, UA_RegisterServer2Response in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.configurationResultsSize);
-	for(i = 0; i < in.configurationResultsSize; i++) {
+	for (i = 0; i < in.configurationResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.configurationResults[i]);
 		av_push(av, sv);
@@ -1942,7 +1966,7 @@ XS_pack_UA_RegisterServer2Response(SV *out, UA_RegisterServer2Response in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -1956,6 +1980,7 @@ static UA_RegisterServer2Response XS_unpack_UA_RegisterServer2Response(SV *in)  
 static UA_RegisterServer2Response
 XS_unpack_UA_RegisterServer2Response(SV *in)
 {
+	dTHX;
 	UA_RegisterServer2Response out;
 	SV **svp;
 	AV *av;
@@ -1984,7 +2009,7 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 		if (out.configurationResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.configurationResults[i] = XS_unpack_UA_StatusCode(*svp);
@@ -2004,7 +2029,7 @@ XS_unpack_UA_RegisterServer2Response(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -2021,6 +2046,7 @@ static void XS_pack_UA_SecurityTokenRequestType(SV *out, UA_SecurityTokenRequest
 static void
 XS_pack_UA_SecurityTokenRequestType(SV *out, UA_SecurityTokenRequestType in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -2028,6 +2054,7 @@ static UA_SecurityTokenRequestType XS_unpack_UA_SecurityTokenRequestType(SV *in)
 static UA_SecurityTokenRequestType
 XS_unpack_UA_SecurityTokenRequestType(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -2036,6 +2063,7 @@ static void XS_pack_UA_ChannelSecurityToken(SV *out, UA_ChannelSecurityToken in)
 static void
 XS_pack_UA_ChannelSecurityToken(SV *out, UA_ChannelSecurityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2062,6 +2090,7 @@ static UA_ChannelSecurityToken XS_unpack_UA_ChannelSecurityToken(SV *in)  __attr
 static UA_ChannelSecurityToken
 XS_unpack_UA_ChannelSecurityToken(SV *in)
 {
+	dTHX;
 	UA_ChannelSecurityToken out;
 	SV **svp;
 	HV *hv;
@@ -2097,6 +2126,7 @@ static void XS_pack_UA_OpenSecureChannelRequest(SV *out, UA_OpenSecureChannelReq
 static void
 XS_pack_UA_OpenSecureChannelRequest(SV *out, UA_OpenSecureChannelRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2131,6 +2161,7 @@ static UA_OpenSecureChannelRequest XS_unpack_UA_OpenSecureChannelRequest(SV *in)
 static UA_OpenSecureChannelRequest
 XS_unpack_UA_OpenSecureChannelRequest(SV *in)
 {
+	dTHX;
 	UA_OpenSecureChannelRequest out;
 	SV **svp;
 	HV *hv;
@@ -2174,6 +2205,7 @@ static void XS_pack_UA_OpenSecureChannelResponse(SV *out, UA_OpenSecureChannelRe
 static void
 XS_pack_UA_OpenSecureChannelResponse(SV *out, UA_OpenSecureChannelResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2200,6 +2232,7 @@ static UA_OpenSecureChannelResponse XS_unpack_UA_OpenSecureChannelResponse(SV *i
 static UA_OpenSecureChannelResponse
 XS_unpack_UA_OpenSecureChannelResponse(SV *in)
 {
+	dTHX;
 	UA_OpenSecureChannelResponse out;
 	SV **svp;
 	HV *hv;
@@ -2235,6 +2268,7 @@ static void XS_pack_UA_CloseSecureChannelRequest(SV *out, UA_CloseSecureChannelR
 static void
 XS_pack_UA_CloseSecureChannelRequest(SV *out, UA_CloseSecureChannelRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2249,6 +2283,7 @@ static UA_CloseSecureChannelRequest XS_unpack_UA_CloseSecureChannelRequest(SV *i
 static UA_CloseSecureChannelRequest
 XS_unpack_UA_CloseSecureChannelRequest(SV *in)
 {
+	dTHX;
 	UA_CloseSecureChannelRequest out;
 	SV **svp;
 	HV *hv;
@@ -2272,6 +2307,7 @@ static void XS_pack_UA_CloseSecureChannelResponse(SV *out, UA_CloseSecureChannel
 static void
 XS_pack_UA_CloseSecureChannelResponse(SV *out, UA_CloseSecureChannelResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2286,6 +2322,7 @@ static UA_CloseSecureChannelResponse XS_unpack_UA_CloseSecureChannelResponse(SV 
 static UA_CloseSecureChannelResponse
 XS_unpack_UA_CloseSecureChannelResponse(SV *in)
 {
+	dTHX;
 	UA_CloseSecureChannelResponse out;
 	SV **svp;
 	HV *hv;
@@ -2309,6 +2346,7 @@ static void XS_pack_UA_SignedSoftwareCertificate(SV *out, UA_SignedSoftwareCerti
 static void
 XS_pack_UA_SignedSoftwareCertificate(SV *out, UA_SignedSoftwareCertificate in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2327,6 +2365,7 @@ static UA_SignedSoftwareCertificate XS_unpack_UA_SignedSoftwareCertificate(SV *i
 static UA_SignedSoftwareCertificate
 XS_unpack_UA_SignedSoftwareCertificate(SV *in)
 {
+	dTHX;
 	UA_SignedSoftwareCertificate out;
 	SV **svp;
 	HV *hv;
@@ -2354,6 +2393,7 @@ static void XS_pack_UA_SignatureData(SV *out, UA_SignatureData in)  __attribute_
 static void
 XS_pack_UA_SignatureData(SV *out, UA_SignatureData in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2372,6 +2412,7 @@ static UA_SignatureData XS_unpack_UA_SignatureData(SV *in)  __attribute__((unuse
 static UA_SignatureData
 XS_unpack_UA_SignatureData(SV *in)
 {
+	dTHX;
 	UA_SignatureData out;
 	SV **svp;
 	HV *hv;
@@ -2399,6 +2440,7 @@ static void XS_pack_UA_CreateSessionRequest(SV *out, UA_CreateSessionRequest in)
 static void
 XS_pack_UA_CreateSessionRequest(SV *out, UA_CreateSessionRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2445,6 +2487,7 @@ static UA_CreateSessionRequest XS_unpack_UA_CreateSessionRequest(SV *in)  __attr
 static UA_CreateSessionRequest
 XS_unpack_UA_CreateSessionRequest(SV *in)
 {
+	dTHX;
 	UA_CreateSessionRequest out;
 	SV **svp;
 	HV *hv;
@@ -2500,6 +2543,7 @@ static void XS_pack_UA_CreateSessionResponse(SV *out, UA_CreateSessionResponse i
 static void
 XS_pack_UA_CreateSessionResponse(SV *out, UA_CreateSessionResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -2531,7 +2575,7 @@ XS_pack_UA_CreateSessionResponse(SV *out, UA_CreateSessionResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverEndpointsSize);
-	for(i = 0; i < in.serverEndpointsSize; i++) {
+	for (i = 0; i < in.serverEndpointsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_EndpointDescription(sv, in.serverEndpoints[i]);
 		av_push(av, sv);
@@ -2540,7 +2584,7 @@ XS_pack_UA_CreateSessionResponse(SV *out, UA_CreateSessionResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.serverSoftwareCertificatesSize);
-	for(i = 0; i < in.serverSoftwareCertificatesSize; i++) {
+	for (i = 0; i < in.serverSoftwareCertificatesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_SignedSoftwareCertificate(sv, in.serverSoftwareCertificates[i]);
 		av_push(av, sv);
@@ -2562,6 +2606,7 @@ static UA_CreateSessionResponse XS_unpack_UA_CreateSessionResponse(SV *in)  __at
 static UA_CreateSessionResponse
 XS_unpack_UA_CreateSessionResponse(SV *in)
 {
+	dTHX;
 	UA_CreateSessionResponse out;
 	SV **svp;
 	AV *av;
@@ -2610,7 +2655,7 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 		if (out.serverEndpoints == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverEndpoints[i] = XS_unpack_UA_EndpointDescription(*svp);
@@ -2630,7 +2675,7 @@ XS_unpack_UA_CreateSessionResponse(SV *in)
 		if (out.serverSoftwareCertificates == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.serverSoftwareCertificates[i] = XS_unpack_UA_SignedSoftwareCertificate(*svp);
@@ -2655,6 +2700,7 @@ static void XS_pack_UA_UserIdentityToken(SV *out, UA_UserIdentityToken in)  __at
 static void
 XS_pack_UA_UserIdentityToken(SV *out, UA_UserIdentityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2669,6 +2715,7 @@ static UA_UserIdentityToken XS_unpack_UA_UserIdentityToken(SV *in)  __attribute_
 static UA_UserIdentityToken
 XS_unpack_UA_UserIdentityToken(SV *in)
 {
+	dTHX;
 	UA_UserIdentityToken out;
 	SV **svp;
 	HV *hv;
@@ -2692,6 +2739,7 @@ static void XS_pack_UA_AnonymousIdentityToken(SV *out, UA_AnonymousIdentityToken
 static void
 XS_pack_UA_AnonymousIdentityToken(SV *out, UA_AnonymousIdentityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2706,6 +2754,7 @@ static UA_AnonymousIdentityToken XS_unpack_UA_AnonymousIdentityToken(SV *in)  __
 static UA_AnonymousIdentityToken
 XS_unpack_UA_AnonymousIdentityToken(SV *in)
 {
+	dTHX;
 	UA_AnonymousIdentityToken out;
 	SV **svp;
 	HV *hv;
@@ -2729,6 +2778,7 @@ static void XS_pack_UA_UserNameIdentityToken(SV *out, UA_UserNameIdentityToken i
 static void
 XS_pack_UA_UserNameIdentityToken(SV *out, UA_UserNameIdentityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2755,6 +2805,7 @@ static UA_UserNameIdentityToken XS_unpack_UA_UserNameIdentityToken(SV *in)  __at
 static UA_UserNameIdentityToken
 XS_unpack_UA_UserNameIdentityToken(SV *in)
 {
+	dTHX;
 	UA_UserNameIdentityToken out;
 	SV **svp;
 	HV *hv;
@@ -2790,6 +2841,7 @@ static void XS_pack_UA_X509IdentityToken(SV *out, UA_X509IdentityToken in)  __at
 static void
 XS_pack_UA_X509IdentityToken(SV *out, UA_X509IdentityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2808,6 +2860,7 @@ static UA_X509IdentityToken XS_unpack_UA_X509IdentityToken(SV *in)  __attribute_
 static UA_X509IdentityToken
 XS_unpack_UA_X509IdentityToken(SV *in)
 {
+	dTHX;
 	UA_X509IdentityToken out;
 	SV **svp;
 	HV *hv;
@@ -2835,6 +2888,7 @@ static void XS_pack_UA_IssuedIdentityToken(SV *out, UA_IssuedIdentityToken in)  
 static void
 XS_pack_UA_IssuedIdentityToken(SV *out, UA_IssuedIdentityToken in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -2857,6 +2911,7 @@ static UA_IssuedIdentityToken XS_unpack_UA_IssuedIdentityToken(SV *in)  __attrib
 static UA_IssuedIdentityToken
 XS_unpack_UA_IssuedIdentityToken(SV *in)
 {
+	dTHX;
 	UA_IssuedIdentityToken out;
 	SV **svp;
 	HV *hv;
@@ -2888,6 +2943,7 @@ static void XS_pack_UA_ActivateSessionRequest(SV *out, UA_ActivateSessionRequest
 static void
 XS_pack_UA_ActivateSessionRequest(SV *out, UA_ActivateSessionRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -2903,7 +2959,7 @@ XS_pack_UA_ActivateSessionRequest(SV *out, UA_ActivateSessionRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.clientSoftwareCertificatesSize);
-	for(i = 0; i < in.clientSoftwareCertificatesSize; i++) {
+	for (i = 0; i < in.clientSoftwareCertificatesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_SignedSoftwareCertificate(sv, in.clientSoftwareCertificates[i]);
 		av_push(av, sv);
@@ -2912,7 +2968,7 @@ XS_pack_UA_ActivateSessionRequest(SV *out, UA_ActivateSessionRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.localeIdsSize);
-	for(i = 0; i < in.localeIdsSize; i++) {
+	for (i = 0; i < in.localeIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_String(sv, in.localeIds[i]);
 		av_push(av, sv);
@@ -2934,6 +2990,7 @@ static UA_ActivateSessionRequest XS_unpack_UA_ActivateSessionRequest(SV *in)  __
 static UA_ActivateSessionRequest
 XS_unpack_UA_ActivateSessionRequest(SV *in)
 {
+	dTHX;
 	UA_ActivateSessionRequest out;
 	SV **svp;
 	AV *av;
@@ -2966,7 +3023,7 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 		if (out.clientSoftwareCertificates == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.clientSoftwareCertificates[i] = XS_unpack_UA_SignedSoftwareCertificate(*svp);
@@ -2986,7 +3043,7 @@ XS_unpack_UA_ActivateSessionRequest(SV *in)
 		if (out.localeIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.localeIds[i] = XS_unpack_UA_String(*svp);
@@ -3011,6 +3068,7 @@ static void XS_pack_UA_ActivateSessionResponse(SV *out, UA_ActivateSessionRespon
 static void
 XS_pack_UA_ActivateSessionResponse(SV *out, UA_ActivateSessionResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -3026,7 +3084,7 @@ XS_pack_UA_ActivateSessionResponse(SV *out, UA_ActivateSessionResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -3035,7 +3093,7 @@ XS_pack_UA_ActivateSessionResponse(SV *out, UA_ActivateSessionResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -3049,6 +3107,7 @@ static UA_ActivateSessionResponse XS_unpack_UA_ActivateSessionResponse(SV *in)  
 static UA_ActivateSessionResponse
 XS_unpack_UA_ActivateSessionResponse(SV *in)
 {
+	dTHX;
 	UA_ActivateSessionResponse out;
 	SV **svp;
 	AV *av;
@@ -3081,7 +3140,7 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -3101,7 +3160,7 @@ XS_unpack_UA_ActivateSessionResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -3118,6 +3177,7 @@ static void XS_pack_UA_CloseSessionRequest(SV *out, UA_CloseSessionRequest in)  
 static void
 XS_pack_UA_CloseSessionRequest(SV *out, UA_CloseSessionRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3136,6 +3196,7 @@ static UA_CloseSessionRequest XS_unpack_UA_CloseSessionRequest(SV *in)  __attrib
 static UA_CloseSessionRequest
 XS_unpack_UA_CloseSessionRequest(SV *in)
 {
+	dTHX;
 	UA_CloseSessionRequest out;
 	SV **svp;
 	HV *hv;
@@ -3163,6 +3224,7 @@ static void XS_pack_UA_CloseSessionResponse(SV *out, UA_CloseSessionResponse in)
 static void
 XS_pack_UA_CloseSessionResponse(SV *out, UA_CloseSessionResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3177,6 +3239,7 @@ static UA_CloseSessionResponse XS_unpack_UA_CloseSessionResponse(SV *in)  __attr
 static UA_CloseSessionResponse
 XS_unpack_UA_CloseSessionResponse(SV *in)
 {
+	dTHX;
 	UA_CloseSessionResponse out;
 	SV **svp;
 	HV *hv;
@@ -3200,6 +3263,7 @@ static void XS_pack_UA_NodeAttributesMask(SV *out, UA_NodeAttributesMask in)  __
 static void
 XS_pack_UA_NodeAttributesMask(SV *out, UA_NodeAttributesMask in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -3207,6 +3271,7 @@ static UA_NodeAttributesMask XS_unpack_UA_NodeAttributesMask(SV *in)  __attribut
 static UA_NodeAttributesMask
 XS_unpack_UA_NodeAttributesMask(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -3215,6 +3280,7 @@ static void XS_pack_UA_NodeAttributes(SV *out, UA_NodeAttributes in)  __attribut
 static void
 XS_pack_UA_NodeAttributes(SV *out, UA_NodeAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3245,6 +3311,7 @@ static UA_NodeAttributes XS_unpack_UA_NodeAttributes(SV *in)  __attribute__((unu
 static UA_NodeAttributes
 XS_unpack_UA_NodeAttributes(SV *in)
 {
+	dTHX;
 	UA_NodeAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3284,6 +3351,7 @@ static void XS_pack_UA_ObjectAttributes(SV *out, UA_ObjectAttributes in)  __attr
 static void
 XS_pack_UA_ObjectAttributes(SV *out, UA_ObjectAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3318,6 +3386,7 @@ static UA_ObjectAttributes XS_unpack_UA_ObjectAttributes(SV *in)  __attribute__(
 static UA_ObjectAttributes
 XS_unpack_UA_ObjectAttributes(SV *in)
 {
+	dTHX;
 	UA_ObjectAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3361,6 +3430,7 @@ static void XS_pack_UA_VariableAttributes(SV *out, UA_VariableAttributes in)  __
 static void
 XS_pack_UA_VariableAttributes(SV *out, UA_VariableAttributes in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -3400,7 +3470,7 @@ XS_pack_UA_VariableAttributes(SV *out, UA_VariableAttributes in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.arrayDimensionsSize);
-	for(i = 0; i < in.arrayDimensionsSize; i++) {
+	for (i = 0; i < in.arrayDimensionsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.arrayDimensions[i]);
 		av_push(av, sv);
@@ -3430,6 +3500,7 @@ static UA_VariableAttributes XS_unpack_UA_VariableAttributes(SV *in)  __attribut
 static UA_VariableAttributes
 XS_unpack_UA_VariableAttributes(SV *in)
 {
+	dTHX;
 	UA_VariableAttributes out;
 	SV **svp;
 	AV *av;
@@ -3486,7 +3557,7 @@ XS_unpack_UA_VariableAttributes(SV *in)
 		if (out.arrayDimensions == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.arrayDimensions[i] = XS_unpack_UA_UInt32(*svp);
@@ -3519,6 +3590,7 @@ static void XS_pack_UA_MethodAttributes(SV *out, UA_MethodAttributes in)  __attr
 static void
 XS_pack_UA_MethodAttributes(SV *out, UA_MethodAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3557,6 +3629,7 @@ static UA_MethodAttributes XS_unpack_UA_MethodAttributes(SV *in)  __attribute__(
 static UA_MethodAttributes
 XS_unpack_UA_MethodAttributes(SV *in)
 {
+	dTHX;
 	UA_MethodAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3604,6 +3677,7 @@ static void XS_pack_UA_ObjectTypeAttributes(SV *out, UA_ObjectTypeAttributes in)
 static void
 XS_pack_UA_ObjectTypeAttributes(SV *out, UA_ObjectTypeAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3638,6 +3712,7 @@ static UA_ObjectTypeAttributes XS_unpack_UA_ObjectTypeAttributes(SV *in)  __attr
 static UA_ObjectTypeAttributes
 XS_unpack_UA_ObjectTypeAttributes(SV *in)
 {
+	dTHX;
 	UA_ObjectTypeAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3681,6 +3756,7 @@ static void XS_pack_UA_VariableTypeAttributes(SV *out, UA_VariableTypeAttributes
 static void
 XS_pack_UA_VariableTypeAttributes(SV *out, UA_VariableTypeAttributes in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -3720,7 +3796,7 @@ XS_pack_UA_VariableTypeAttributes(SV *out, UA_VariableTypeAttributes in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.arrayDimensionsSize);
-	for(i = 0; i < in.arrayDimensionsSize; i++) {
+	for (i = 0; i < in.arrayDimensionsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.arrayDimensions[i]);
 		av_push(av, sv);
@@ -3738,6 +3814,7 @@ static UA_VariableTypeAttributes XS_unpack_UA_VariableTypeAttributes(SV *in)  __
 static UA_VariableTypeAttributes
 XS_unpack_UA_VariableTypeAttributes(SV *in)
 {
+	dTHX;
 	UA_VariableTypeAttributes out;
 	SV **svp;
 	AV *av;
@@ -3794,7 +3871,7 @@ XS_unpack_UA_VariableTypeAttributes(SV *in)
 		if (out.arrayDimensions == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.arrayDimensions[i] = XS_unpack_UA_UInt32(*svp);
@@ -3815,6 +3892,7 @@ static void XS_pack_UA_ReferenceTypeAttributes(SV *out, UA_ReferenceTypeAttribut
 static void
 XS_pack_UA_ReferenceTypeAttributes(SV *out, UA_ReferenceTypeAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3857,6 +3935,7 @@ static UA_ReferenceTypeAttributes XS_unpack_UA_ReferenceTypeAttributes(SV *in)  
 static UA_ReferenceTypeAttributes
 XS_unpack_UA_ReferenceTypeAttributes(SV *in)
 {
+	dTHX;
 	UA_ReferenceTypeAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3908,6 +3987,7 @@ static void XS_pack_UA_DataTypeAttributes(SV *out, UA_DataTypeAttributes in)  __
 static void
 XS_pack_UA_DataTypeAttributes(SV *out, UA_DataTypeAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -3942,6 +4022,7 @@ static UA_DataTypeAttributes XS_unpack_UA_DataTypeAttributes(SV *in)  __attribut
 static UA_DataTypeAttributes
 XS_unpack_UA_DataTypeAttributes(SV *in)
 {
+	dTHX;
 	UA_DataTypeAttributes out;
 	SV **svp;
 	HV *hv;
@@ -3985,6 +4066,7 @@ static void XS_pack_UA_ViewAttributes(SV *out, UA_ViewAttributes in)  __attribut
 static void
 XS_pack_UA_ViewAttributes(SV *out, UA_ViewAttributes in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4023,6 +4105,7 @@ static UA_ViewAttributes XS_unpack_UA_ViewAttributes(SV *in)  __attribute__((unu
 static UA_ViewAttributes
 XS_unpack_UA_ViewAttributes(SV *in)
 {
+	dTHX;
 	UA_ViewAttributes out;
 	SV **svp;
 	HV *hv;
@@ -4070,6 +4153,7 @@ static void XS_pack_UA_AddNodesItem(SV *out, UA_AddNodesItem in)  __attribute__(
 static void
 XS_pack_UA_AddNodesItem(SV *out, UA_AddNodesItem in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4108,6 +4192,7 @@ static UA_AddNodesItem XS_unpack_UA_AddNodesItem(SV *in)  __attribute__((unused)
 static UA_AddNodesItem
 XS_unpack_UA_AddNodesItem(SV *in)
 {
+	dTHX;
 	UA_AddNodesItem out;
 	SV **svp;
 	HV *hv;
@@ -4155,6 +4240,7 @@ static void XS_pack_UA_AddNodesResult(SV *out, UA_AddNodesResult in)  __attribut
 static void
 XS_pack_UA_AddNodesResult(SV *out, UA_AddNodesResult in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4173,6 +4259,7 @@ static UA_AddNodesResult XS_unpack_UA_AddNodesResult(SV *in)  __attribute__((unu
 static UA_AddNodesResult
 XS_unpack_UA_AddNodesResult(SV *in)
 {
+	dTHX;
 	UA_AddNodesResult out;
 	SV **svp;
 	HV *hv;
@@ -4200,6 +4287,7 @@ static void XS_pack_UA_AddNodesRequest(SV *out, UA_AddNodesRequest in)  __attrib
 static void
 XS_pack_UA_AddNodesRequest(SV *out, UA_AddNodesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4211,7 +4299,7 @@ XS_pack_UA_AddNodesRequest(SV *out, UA_AddNodesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToAddSize);
-	for(i = 0; i < in.nodesToAddSize; i++) {
+	for (i = 0; i < in.nodesToAddSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_AddNodesItem(sv, in.nodesToAdd[i]);
 		av_push(av, sv);
@@ -4225,6 +4313,7 @@ static UA_AddNodesRequest XS_unpack_UA_AddNodesRequest(SV *in)  __attribute__((u
 static UA_AddNodesRequest
 XS_unpack_UA_AddNodesRequest(SV *in)
 {
+	dTHX;
 	UA_AddNodesRequest out;
 	SV **svp;
 	AV *av;
@@ -4253,7 +4342,7 @@ XS_unpack_UA_AddNodesRequest(SV *in)
 		if (out.nodesToAdd == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToAdd[i] = XS_unpack_UA_AddNodesItem(*svp);
@@ -4270,6 +4359,7 @@ static void XS_pack_UA_AddNodesResponse(SV *out, UA_AddNodesResponse in)  __attr
 static void
 XS_pack_UA_AddNodesResponse(SV *out, UA_AddNodesResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4281,7 +4371,7 @@ XS_pack_UA_AddNodesResponse(SV *out, UA_AddNodesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_AddNodesResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -4290,7 +4380,7 @@ XS_pack_UA_AddNodesResponse(SV *out, UA_AddNodesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -4304,6 +4394,7 @@ static UA_AddNodesResponse XS_unpack_UA_AddNodesResponse(SV *in)  __attribute__(
 static UA_AddNodesResponse
 XS_unpack_UA_AddNodesResponse(SV *in)
 {
+	dTHX;
 	UA_AddNodesResponse out;
 	SV **svp;
 	AV *av;
@@ -4332,7 +4423,7 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_AddNodesResult(*svp);
@@ -4352,7 +4443,7 @@ XS_unpack_UA_AddNodesResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -4369,6 +4460,7 @@ static void XS_pack_UA_AddReferencesItem(SV *out, UA_AddReferencesItem in)  __at
 static void
 XS_pack_UA_AddReferencesItem(SV *out, UA_AddReferencesItem in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4403,6 +4495,7 @@ static UA_AddReferencesItem XS_unpack_UA_AddReferencesItem(SV *in)  __attribute_
 static UA_AddReferencesItem
 XS_unpack_UA_AddReferencesItem(SV *in)
 {
+	dTHX;
 	UA_AddReferencesItem out;
 	SV **svp;
 	HV *hv;
@@ -4446,6 +4539,7 @@ static void XS_pack_UA_AddReferencesRequest(SV *out, UA_AddReferencesRequest in)
 static void
 XS_pack_UA_AddReferencesRequest(SV *out, UA_AddReferencesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4457,7 +4551,7 @@ XS_pack_UA_AddReferencesRequest(SV *out, UA_AddReferencesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.referencesToAddSize);
-	for(i = 0; i < in.referencesToAddSize; i++) {
+	for (i = 0; i < in.referencesToAddSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_AddReferencesItem(sv, in.referencesToAdd[i]);
 		av_push(av, sv);
@@ -4471,6 +4565,7 @@ static UA_AddReferencesRequest XS_unpack_UA_AddReferencesRequest(SV *in)  __attr
 static UA_AddReferencesRequest
 XS_unpack_UA_AddReferencesRequest(SV *in)
 {
+	dTHX;
 	UA_AddReferencesRequest out;
 	SV **svp;
 	AV *av;
@@ -4499,7 +4594,7 @@ XS_unpack_UA_AddReferencesRequest(SV *in)
 		if (out.referencesToAdd == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.referencesToAdd[i] = XS_unpack_UA_AddReferencesItem(*svp);
@@ -4516,6 +4611,7 @@ static void XS_pack_UA_AddReferencesResponse(SV *out, UA_AddReferencesResponse i
 static void
 XS_pack_UA_AddReferencesResponse(SV *out, UA_AddReferencesResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4527,7 +4623,7 @@ XS_pack_UA_AddReferencesResponse(SV *out, UA_AddReferencesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -4536,7 +4632,7 @@ XS_pack_UA_AddReferencesResponse(SV *out, UA_AddReferencesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -4550,6 +4646,7 @@ static UA_AddReferencesResponse XS_unpack_UA_AddReferencesResponse(SV *in)  __at
 static UA_AddReferencesResponse
 XS_unpack_UA_AddReferencesResponse(SV *in)
 {
+	dTHX;
 	UA_AddReferencesResponse out;
 	SV **svp;
 	AV *av;
@@ -4578,7 +4675,7 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -4598,7 +4695,7 @@ XS_unpack_UA_AddReferencesResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -4615,6 +4712,7 @@ static void XS_pack_UA_DeleteNodesItem(SV *out, UA_DeleteNodesItem in)  __attrib
 static void
 XS_pack_UA_DeleteNodesItem(SV *out, UA_DeleteNodesItem in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4633,6 +4731,7 @@ static UA_DeleteNodesItem XS_unpack_UA_DeleteNodesItem(SV *in)  __attribute__((u
 static UA_DeleteNodesItem
 XS_unpack_UA_DeleteNodesItem(SV *in)
 {
+	dTHX;
 	UA_DeleteNodesItem out;
 	SV **svp;
 	HV *hv;
@@ -4660,6 +4759,7 @@ static void XS_pack_UA_DeleteNodesRequest(SV *out, UA_DeleteNodesRequest in)  __
 static void
 XS_pack_UA_DeleteNodesRequest(SV *out, UA_DeleteNodesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4671,7 +4771,7 @@ XS_pack_UA_DeleteNodesRequest(SV *out, UA_DeleteNodesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToDeleteSize);
-	for(i = 0; i < in.nodesToDeleteSize; i++) {
+	for (i = 0; i < in.nodesToDeleteSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DeleteNodesItem(sv, in.nodesToDelete[i]);
 		av_push(av, sv);
@@ -4685,6 +4785,7 @@ static UA_DeleteNodesRequest XS_unpack_UA_DeleteNodesRequest(SV *in)  __attribut
 static UA_DeleteNodesRequest
 XS_unpack_UA_DeleteNodesRequest(SV *in)
 {
+	dTHX;
 	UA_DeleteNodesRequest out;
 	SV **svp;
 	AV *av;
@@ -4713,7 +4814,7 @@ XS_unpack_UA_DeleteNodesRequest(SV *in)
 		if (out.nodesToDelete == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToDelete[i] = XS_unpack_UA_DeleteNodesItem(*svp);
@@ -4730,6 +4831,7 @@ static void XS_pack_UA_DeleteNodesResponse(SV *out, UA_DeleteNodesResponse in)  
 static void
 XS_pack_UA_DeleteNodesResponse(SV *out, UA_DeleteNodesResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4741,7 +4843,7 @@ XS_pack_UA_DeleteNodesResponse(SV *out, UA_DeleteNodesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -4750,7 +4852,7 @@ XS_pack_UA_DeleteNodesResponse(SV *out, UA_DeleteNodesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -4764,6 +4866,7 @@ static UA_DeleteNodesResponse XS_unpack_UA_DeleteNodesResponse(SV *in)  __attrib
 static UA_DeleteNodesResponse
 XS_unpack_UA_DeleteNodesResponse(SV *in)
 {
+	dTHX;
 	UA_DeleteNodesResponse out;
 	SV **svp;
 	AV *av;
@@ -4792,7 +4895,7 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -4812,7 +4915,7 @@ XS_unpack_UA_DeleteNodesResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -4829,6 +4932,7 @@ static void XS_pack_UA_DeleteReferencesItem(SV *out, UA_DeleteReferencesItem in)
 static void
 XS_pack_UA_DeleteReferencesItem(SV *out, UA_DeleteReferencesItem in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -4859,6 +4963,7 @@ static UA_DeleteReferencesItem XS_unpack_UA_DeleteReferencesItem(SV *in)  __attr
 static UA_DeleteReferencesItem
 XS_unpack_UA_DeleteReferencesItem(SV *in)
 {
+	dTHX;
 	UA_DeleteReferencesItem out;
 	SV **svp;
 	HV *hv;
@@ -4898,6 +5003,7 @@ static void XS_pack_UA_DeleteReferencesRequest(SV *out, UA_DeleteReferencesReque
 static void
 XS_pack_UA_DeleteReferencesRequest(SV *out, UA_DeleteReferencesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4909,7 +5015,7 @@ XS_pack_UA_DeleteReferencesRequest(SV *out, UA_DeleteReferencesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.referencesToDeleteSize);
-	for(i = 0; i < in.referencesToDeleteSize; i++) {
+	for (i = 0; i < in.referencesToDeleteSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DeleteReferencesItem(sv, in.referencesToDelete[i]);
 		av_push(av, sv);
@@ -4923,6 +5029,7 @@ static UA_DeleteReferencesRequest XS_unpack_UA_DeleteReferencesRequest(SV *in)  
 static UA_DeleteReferencesRequest
 XS_unpack_UA_DeleteReferencesRequest(SV *in)
 {
+	dTHX;
 	UA_DeleteReferencesRequest out;
 	SV **svp;
 	AV *av;
@@ -4951,7 +5058,7 @@ XS_unpack_UA_DeleteReferencesRequest(SV *in)
 		if (out.referencesToDelete == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.referencesToDelete[i] = XS_unpack_UA_DeleteReferencesItem(*svp);
@@ -4968,6 +5075,7 @@ static void XS_pack_UA_DeleteReferencesResponse(SV *out, UA_DeleteReferencesResp
 static void
 XS_pack_UA_DeleteReferencesResponse(SV *out, UA_DeleteReferencesResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -4979,7 +5087,7 @@ XS_pack_UA_DeleteReferencesResponse(SV *out, UA_DeleteReferencesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -4988,7 +5096,7 @@ XS_pack_UA_DeleteReferencesResponse(SV *out, UA_DeleteReferencesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -5002,6 +5110,7 @@ static UA_DeleteReferencesResponse XS_unpack_UA_DeleteReferencesResponse(SV *in)
 static UA_DeleteReferencesResponse
 XS_unpack_UA_DeleteReferencesResponse(SV *in)
 {
+	dTHX;
 	UA_DeleteReferencesResponse out;
 	SV **svp;
 	AV *av;
@@ -5030,7 +5139,7 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -5050,7 +5159,7 @@ XS_unpack_UA_DeleteReferencesResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -5067,6 +5176,7 @@ static void XS_pack_UA_BrowseDirection(SV *out, UA_BrowseDirection in)  __attrib
 static void
 XS_pack_UA_BrowseDirection(SV *out, UA_BrowseDirection in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -5074,6 +5184,7 @@ static UA_BrowseDirection XS_unpack_UA_BrowseDirection(SV *in)  __attribute__((u
 static UA_BrowseDirection
 XS_unpack_UA_BrowseDirection(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -5082,6 +5193,7 @@ static void XS_pack_UA_ViewDescription(SV *out, UA_ViewDescription in)  __attrib
 static void
 XS_pack_UA_ViewDescription(SV *out, UA_ViewDescription in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5104,6 +5216,7 @@ static UA_ViewDescription XS_unpack_UA_ViewDescription(SV *in)  __attribute__((u
 static UA_ViewDescription
 XS_unpack_UA_ViewDescription(SV *in)
 {
+	dTHX;
 	UA_ViewDescription out;
 	SV **svp;
 	HV *hv;
@@ -5135,6 +5248,7 @@ static void XS_pack_UA_BrowseDescription(SV *out, UA_BrowseDescription in)  __at
 static void
 XS_pack_UA_BrowseDescription(SV *out, UA_BrowseDescription in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5169,6 +5283,7 @@ static UA_BrowseDescription XS_unpack_UA_BrowseDescription(SV *in)  __attribute_
 static UA_BrowseDescription
 XS_unpack_UA_BrowseDescription(SV *in)
 {
+	dTHX;
 	UA_BrowseDescription out;
 	SV **svp;
 	HV *hv;
@@ -5212,6 +5327,7 @@ static void XS_pack_UA_BrowseResultMask(SV *out, UA_BrowseResultMask in)  __attr
 static void
 XS_pack_UA_BrowseResultMask(SV *out, UA_BrowseResultMask in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -5219,6 +5335,7 @@ static UA_BrowseResultMask XS_unpack_UA_BrowseResultMask(SV *in)  __attribute__(
 static UA_BrowseResultMask
 XS_unpack_UA_BrowseResultMask(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -5227,6 +5344,7 @@ static void XS_pack_UA_ReferenceDescription(SV *out, UA_ReferenceDescription in)
 static void
 XS_pack_UA_ReferenceDescription(SV *out, UA_ReferenceDescription in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5265,6 +5383,7 @@ static UA_ReferenceDescription XS_unpack_UA_ReferenceDescription(SV *in)  __attr
 static UA_ReferenceDescription
 XS_unpack_UA_ReferenceDescription(SV *in)
 {
+	dTHX;
 	UA_ReferenceDescription out;
 	SV **svp;
 	HV *hv;
@@ -5312,6 +5431,7 @@ static void XS_pack_UA_BrowseResult(SV *out, UA_BrowseResult in)  __attribute__(
 static void
 XS_pack_UA_BrowseResult(SV *out, UA_BrowseResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5327,7 +5447,7 @@ XS_pack_UA_BrowseResult(SV *out, UA_BrowseResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.referencesSize);
-	for(i = 0; i < in.referencesSize; i++) {
+	for (i = 0; i < in.referencesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ReferenceDescription(sv, in.references[i]);
 		av_push(av, sv);
@@ -5341,6 +5461,7 @@ static UA_BrowseResult XS_unpack_UA_BrowseResult(SV *in)  __attribute__((unused)
 static UA_BrowseResult
 XS_unpack_UA_BrowseResult(SV *in)
 {
+	dTHX;
 	UA_BrowseResult out;
 	SV **svp;
 	AV *av;
@@ -5373,7 +5494,7 @@ XS_unpack_UA_BrowseResult(SV *in)
 		if (out.references == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.references[i] = XS_unpack_UA_ReferenceDescription(*svp);
@@ -5390,6 +5511,7 @@ static void XS_pack_UA_BrowseRequest(SV *out, UA_BrowseRequest in)  __attribute_
 static void
 XS_pack_UA_BrowseRequest(SV *out, UA_BrowseRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5409,7 +5531,7 @@ XS_pack_UA_BrowseRequest(SV *out, UA_BrowseRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToBrowseSize);
-	for(i = 0; i < in.nodesToBrowseSize; i++) {
+	for (i = 0; i < in.nodesToBrowseSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowseDescription(sv, in.nodesToBrowse[i]);
 		av_push(av, sv);
@@ -5423,6 +5545,7 @@ static UA_BrowseRequest XS_unpack_UA_BrowseRequest(SV *in)  __attribute__((unuse
 static UA_BrowseRequest
 XS_unpack_UA_BrowseRequest(SV *in)
 {
+	dTHX;
 	UA_BrowseRequest out;
 	SV **svp;
 	AV *av;
@@ -5459,7 +5582,7 @@ XS_unpack_UA_BrowseRequest(SV *in)
 		if (out.nodesToBrowse == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToBrowse[i] = XS_unpack_UA_BrowseDescription(*svp);
@@ -5476,6 +5599,7 @@ static void XS_pack_UA_BrowseResponse(SV *out, UA_BrowseResponse in)  __attribut
 static void
 XS_pack_UA_BrowseResponse(SV *out, UA_BrowseResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5487,7 +5611,7 @@ XS_pack_UA_BrowseResponse(SV *out, UA_BrowseResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowseResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -5496,7 +5620,7 @@ XS_pack_UA_BrowseResponse(SV *out, UA_BrowseResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -5510,6 +5634,7 @@ static UA_BrowseResponse XS_unpack_UA_BrowseResponse(SV *in)  __attribute__((unu
 static UA_BrowseResponse
 XS_unpack_UA_BrowseResponse(SV *in)
 {
+	dTHX;
 	UA_BrowseResponse out;
 	SV **svp;
 	AV *av;
@@ -5538,7 +5663,7 @@ XS_unpack_UA_BrowseResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_BrowseResult(*svp);
@@ -5558,7 +5683,7 @@ XS_unpack_UA_BrowseResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -5575,6 +5700,7 @@ static void XS_pack_UA_BrowseNextRequest(SV *out, UA_BrowseNextRequest in)  __at
 static void
 XS_pack_UA_BrowseNextRequest(SV *out, UA_BrowseNextRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5590,7 +5716,7 @@ XS_pack_UA_BrowseNextRequest(SV *out, UA_BrowseNextRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.continuationPointsSize);
-	for(i = 0; i < in.continuationPointsSize; i++) {
+	for (i = 0; i < in.continuationPointsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ByteString(sv, in.continuationPoints[i]);
 		av_push(av, sv);
@@ -5604,6 +5730,7 @@ static UA_BrowseNextRequest XS_unpack_UA_BrowseNextRequest(SV *in)  __attribute_
 static UA_BrowseNextRequest
 XS_unpack_UA_BrowseNextRequest(SV *in)
 {
+	dTHX;
 	UA_BrowseNextRequest out;
 	SV **svp;
 	AV *av;
@@ -5636,7 +5763,7 @@ XS_unpack_UA_BrowseNextRequest(SV *in)
 		if (out.continuationPoints == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.continuationPoints[i] = XS_unpack_UA_ByteString(*svp);
@@ -5653,6 +5780,7 @@ static void XS_pack_UA_BrowseNextResponse(SV *out, UA_BrowseNextResponse in)  __
 static void
 XS_pack_UA_BrowseNextResponse(SV *out, UA_BrowseNextResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5664,7 +5792,7 @@ XS_pack_UA_BrowseNextResponse(SV *out, UA_BrowseNextResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowseResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -5673,7 +5801,7 @@ XS_pack_UA_BrowseNextResponse(SV *out, UA_BrowseNextResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -5687,6 +5815,7 @@ static UA_BrowseNextResponse XS_unpack_UA_BrowseNextResponse(SV *in)  __attribut
 static UA_BrowseNextResponse
 XS_unpack_UA_BrowseNextResponse(SV *in)
 {
+	dTHX;
 	UA_BrowseNextResponse out;
 	SV **svp;
 	AV *av;
@@ -5715,7 +5844,7 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_BrowseResult(*svp);
@@ -5735,7 +5864,7 @@ XS_unpack_UA_BrowseNextResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -5752,6 +5881,7 @@ static void XS_pack_UA_RelativePathElement(SV *out, UA_RelativePathElement in)  
 static void
 XS_pack_UA_RelativePathElement(SV *out, UA_RelativePathElement in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5778,6 +5908,7 @@ static UA_RelativePathElement XS_unpack_UA_RelativePathElement(SV *in)  __attrib
 static UA_RelativePathElement
 XS_unpack_UA_RelativePathElement(SV *in)
 {
+	dTHX;
 	UA_RelativePathElement out;
 	SV **svp;
 	HV *hv;
@@ -5813,6 +5944,7 @@ static void XS_pack_UA_RelativePath(SV *out, UA_RelativePath in)  __attribute__(
 static void
 XS_pack_UA_RelativePath(SV *out, UA_RelativePath in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5820,7 +5952,7 @@ XS_pack_UA_RelativePath(SV *out, UA_RelativePath in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.elementsSize);
-	for(i = 0; i < in.elementsSize; i++) {
+	for (i = 0; i < in.elementsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_RelativePathElement(sv, in.elements[i]);
 		av_push(av, sv);
@@ -5834,6 +5966,7 @@ static UA_RelativePath XS_unpack_UA_RelativePath(SV *in)  __attribute__((unused)
 static UA_RelativePath
 XS_unpack_UA_RelativePath(SV *in)
 {
+	dTHX;
 	UA_RelativePath out;
 	SV **svp;
 	AV *av;
@@ -5858,7 +5991,7 @@ XS_unpack_UA_RelativePath(SV *in)
 		if (out.elements == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.elements[i] = XS_unpack_UA_RelativePathElement(*svp);
@@ -5875,6 +6008,7 @@ static void XS_pack_UA_BrowsePath(SV *out, UA_BrowsePath in)  __attribute__((unu
 static void
 XS_pack_UA_BrowsePath(SV *out, UA_BrowsePath in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5893,6 +6027,7 @@ static UA_BrowsePath XS_unpack_UA_BrowsePath(SV *in)  __attribute__((unused));
 static UA_BrowsePath
 XS_unpack_UA_BrowsePath(SV *in)
 {
+	dTHX;
 	UA_BrowsePath out;
 	SV **svp;
 	HV *hv;
@@ -5920,6 +6055,7 @@ static void XS_pack_UA_BrowsePathTarget(SV *out, UA_BrowsePathTarget in)  __attr
 static void
 XS_pack_UA_BrowsePathTarget(SV *out, UA_BrowsePathTarget in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -5938,6 +6074,7 @@ static UA_BrowsePathTarget XS_unpack_UA_BrowsePathTarget(SV *in)  __attribute__(
 static UA_BrowsePathTarget
 XS_unpack_UA_BrowsePathTarget(SV *in)
 {
+	dTHX;
 	UA_BrowsePathTarget out;
 	SV **svp;
 	HV *hv;
@@ -5965,6 +6102,7 @@ static void XS_pack_UA_BrowsePathResult(SV *out, UA_BrowsePathResult in)  __attr
 static void
 XS_pack_UA_BrowsePathResult(SV *out, UA_BrowsePathResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -5976,7 +6114,7 @@ XS_pack_UA_BrowsePathResult(SV *out, UA_BrowsePathResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.targetsSize);
-	for(i = 0; i < in.targetsSize; i++) {
+	for (i = 0; i < in.targetsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowsePathTarget(sv, in.targets[i]);
 		av_push(av, sv);
@@ -5990,6 +6128,7 @@ static UA_BrowsePathResult XS_unpack_UA_BrowsePathResult(SV *in)  __attribute__(
 static UA_BrowsePathResult
 XS_unpack_UA_BrowsePathResult(SV *in)
 {
+	dTHX;
 	UA_BrowsePathResult out;
 	SV **svp;
 	AV *av;
@@ -6018,7 +6157,7 @@ XS_unpack_UA_BrowsePathResult(SV *in)
 		if (out.targets == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.targets[i] = XS_unpack_UA_BrowsePathTarget(*svp);
@@ -6035,6 +6174,7 @@ static void XS_pack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *out, UA_Translat
 static void
 XS_pack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *out, UA_TranslateBrowsePathsToNodeIdsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6046,7 +6186,7 @@ XS_pack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *out, UA_TranslateBrowsePaths
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.browsePathsSize);
-	for(i = 0; i < in.browsePathsSize; i++) {
+	for (i = 0; i < in.browsePathsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowsePath(sv, in.browsePaths[i]);
 		av_push(av, sv);
@@ -6060,6 +6200,7 @@ static UA_TranslateBrowsePathsToNodeIdsRequest XS_unpack_UA_TranslateBrowsePaths
 static UA_TranslateBrowsePathsToNodeIdsRequest
 XS_unpack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *in)
 {
+	dTHX;
 	UA_TranslateBrowsePathsToNodeIdsRequest out;
 	SV **svp;
 	AV *av;
@@ -6088,7 +6229,7 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsRequest(SV *in)
 		if (out.browsePaths == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.browsePaths[i] = XS_unpack_UA_BrowsePath(*svp);
@@ -6105,6 +6246,7 @@ static void XS_pack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *out, UA_Transla
 static void
 XS_pack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *out, UA_TranslateBrowsePathsToNodeIdsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6116,7 +6258,7 @@ XS_pack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *out, UA_TranslateBrowsePath
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_BrowsePathResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -6125,7 +6267,7 @@ XS_pack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *out, UA_TranslateBrowsePath
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -6139,6 +6281,7 @@ static UA_TranslateBrowsePathsToNodeIdsResponse XS_unpack_UA_TranslateBrowsePath
 static UA_TranslateBrowsePathsToNodeIdsResponse
 XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 {
+	dTHX;
 	UA_TranslateBrowsePathsToNodeIdsResponse out;
 	SV **svp;
 	AV *av;
@@ -6167,7 +6310,7 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_BrowsePathResult(*svp);
@@ -6187,7 +6330,7 @@ XS_unpack_UA_TranslateBrowsePathsToNodeIdsResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -6204,6 +6347,7 @@ static void XS_pack_UA_RegisterNodesRequest(SV *out, UA_RegisterNodesRequest in)
 static void
 XS_pack_UA_RegisterNodesRequest(SV *out, UA_RegisterNodesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6215,7 +6359,7 @@ XS_pack_UA_RegisterNodesRequest(SV *out, UA_RegisterNodesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToRegisterSize);
-	for(i = 0; i < in.nodesToRegisterSize; i++) {
+	for (i = 0; i < in.nodesToRegisterSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_NodeId(sv, in.nodesToRegister[i]);
 		av_push(av, sv);
@@ -6229,6 +6373,7 @@ static UA_RegisterNodesRequest XS_unpack_UA_RegisterNodesRequest(SV *in)  __attr
 static UA_RegisterNodesRequest
 XS_unpack_UA_RegisterNodesRequest(SV *in)
 {
+	dTHX;
 	UA_RegisterNodesRequest out;
 	SV **svp;
 	AV *av;
@@ -6257,7 +6402,7 @@ XS_unpack_UA_RegisterNodesRequest(SV *in)
 		if (out.nodesToRegister == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToRegister[i] = XS_unpack_UA_NodeId(*svp);
@@ -6274,6 +6419,7 @@ static void XS_pack_UA_RegisterNodesResponse(SV *out, UA_RegisterNodesResponse i
 static void
 XS_pack_UA_RegisterNodesResponse(SV *out, UA_RegisterNodesResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6285,7 +6431,7 @@ XS_pack_UA_RegisterNodesResponse(SV *out, UA_RegisterNodesResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.registeredNodeIdsSize);
-	for(i = 0; i < in.registeredNodeIdsSize; i++) {
+	for (i = 0; i < in.registeredNodeIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_NodeId(sv, in.registeredNodeIds[i]);
 		av_push(av, sv);
@@ -6299,6 +6445,7 @@ static UA_RegisterNodesResponse XS_unpack_UA_RegisterNodesResponse(SV *in)  __at
 static UA_RegisterNodesResponse
 XS_unpack_UA_RegisterNodesResponse(SV *in)
 {
+	dTHX;
 	UA_RegisterNodesResponse out;
 	SV **svp;
 	AV *av;
@@ -6327,7 +6474,7 @@ XS_unpack_UA_RegisterNodesResponse(SV *in)
 		if (out.registeredNodeIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.registeredNodeIds[i] = XS_unpack_UA_NodeId(*svp);
@@ -6344,6 +6491,7 @@ static void XS_pack_UA_UnregisterNodesRequest(SV *out, UA_UnregisterNodesRequest
 static void
 XS_pack_UA_UnregisterNodesRequest(SV *out, UA_UnregisterNodesRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6355,7 +6503,7 @@ XS_pack_UA_UnregisterNodesRequest(SV *out, UA_UnregisterNodesRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToUnregisterSize);
-	for(i = 0; i < in.nodesToUnregisterSize; i++) {
+	for (i = 0; i < in.nodesToUnregisterSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_NodeId(sv, in.nodesToUnregister[i]);
 		av_push(av, sv);
@@ -6369,6 +6517,7 @@ static UA_UnregisterNodesRequest XS_unpack_UA_UnregisterNodesRequest(SV *in)  __
 static UA_UnregisterNodesRequest
 XS_unpack_UA_UnregisterNodesRequest(SV *in)
 {
+	dTHX;
 	UA_UnregisterNodesRequest out;
 	SV **svp;
 	AV *av;
@@ -6397,7 +6546,7 @@ XS_unpack_UA_UnregisterNodesRequest(SV *in)
 		if (out.nodesToUnregister == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToUnregister[i] = XS_unpack_UA_NodeId(*svp);
@@ -6414,6 +6563,7 @@ static void XS_pack_UA_UnregisterNodesResponse(SV *out, UA_UnregisterNodesRespon
 static void
 XS_pack_UA_UnregisterNodesResponse(SV *out, UA_UnregisterNodesResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -6428,6 +6578,7 @@ static UA_UnregisterNodesResponse XS_unpack_UA_UnregisterNodesResponse(SV *in)  
 static UA_UnregisterNodesResponse
 XS_unpack_UA_UnregisterNodesResponse(SV *in)
 {
+	dTHX;
 	UA_UnregisterNodesResponse out;
 	SV **svp;
 	HV *hv;
@@ -6451,6 +6602,7 @@ static void XS_pack_UA_FilterOperator(SV *out, UA_FilterOperator in)  __attribut
 static void
 XS_pack_UA_FilterOperator(SV *out, UA_FilterOperator in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -6458,6 +6610,7 @@ static UA_FilterOperator XS_unpack_UA_FilterOperator(SV *in)  __attribute__((unu
 static UA_FilterOperator
 XS_unpack_UA_FilterOperator(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -6466,6 +6619,7 @@ static void XS_pack_UA_ContentFilterElement(SV *out, UA_ContentFilterElement in)
 static void
 XS_pack_UA_ContentFilterElement(SV *out, UA_ContentFilterElement in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6477,7 +6631,7 @@ XS_pack_UA_ContentFilterElement(SV *out, UA_ContentFilterElement in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.filterOperandsSize);
-	for(i = 0; i < in.filterOperandsSize; i++) {
+	for (i = 0; i < in.filterOperandsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ExtensionObject(sv, in.filterOperands[i]);
 		av_push(av, sv);
@@ -6491,6 +6645,7 @@ static UA_ContentFilterElement XS_unpack_UA_ContentFilterElement(SV *in)  __attr
 static UA_ContentFilterElement
 XS_unpack_UA_ContentFilterElement(SV *in)
 {
+	dTHX;
 	UA_ContentFilterElement out;
 	SV **svp;
 	AV *av;
@@ -6519,7 +6674,7 @@ XS_unpack_UA_ContentFilterElement(SV *in)
 		if (out.filterOperands == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.filterOperands[i] = XS_unpack_UA_ExtensionObject(*svp);
@@ -6536,6 +6691,7 @@ static void XS_pack_UA_ContentFilter(SV *out, UA_ContentFilter in)  __attribute_
 static void
 XS_pack_UA_ContentFilter(SV *out, UA_ContentFilter in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6543,7 +6699,7 @@ XS_pack_UA_ContentFilter(SV *out, UA_ContentFilter in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.elementsSize);
-	for(i = 0; i < in.elementsSize; i++) {
+	for (i = 0; i < in.elementsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ContentFilterElement(sv, in.elements[i]);
 		av_push(av, sv);
@@ -6557,6 +6713,7 @@ static UA_ContentFilter XS_unpack_UA_ContentFilter(SV *in)  __attribute__((unuse
 static UA_ContentFilter
 XS_unpack_UA_ContentFilter(SV *in)
 {
+	dTHX;
 	UA_ContentFilter out;
 	SV **svp;
 	AV *av;
@@ -6581,7 +6738,7 @@ XS_unpack_UA_ContentFilter(SV *in)
 		if (out.elements == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.elements[i] = XS_unpack_UA_ContentFilterElement(*svp);
@@ -6598,13 +6755,16 @@ static void XS_pack_UA_FilterOperand(SV *out, UA_FilterOperand in)  __attribute_
 static void
 XS_pack_UA_FilterOperand(SV *out, UA_FilterOperand in)
 {
-
+	dTHX;
+	croak("%s: conversion for type not implemented", __func__);
 }
 
 static UA_FilterOperand XS_unpack_UA_FilterOperand(SV *in)  __attribute__((unused));
 static UA_FilterOperand
 XS_unpack_UA_FilterOperand(SV *in)
 {
+	dTHX;
+	croak("%s: conversion for type not implemented", __func__);
 }
 
 /* ElementOperand */
@@ -6612,6 +6772,7 @@ static void XS_pack_UA_ElementOperand(SV *out, UA_ElementOperand in)  __attribut
 static void
 XS_pack_UA_ElementOperand(SV *out, UA_ElementOperand in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -6626,6 +6787,7 @@ static UA_ElementOperand XS_unpack_UA_ElementOperand(SV *in)  __attribute__((unu
 static UA_ElementOperand
 XS_unpack_UA_ElementOperand(SV *in)
 {
+	dTHX;
 	UA_ElementOperand out;
 	SV **svp;
 	HV *hv;
@@ -6649,6 +6811,7 @@ static void XS_pack_UA_LiteralOperand(SV *out, UA_LiteralOperand in)  __attribut
 static void
 XS_pack_UA_LiteralOperand(SV *out, UA_LiteralOperand in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -6663,6 +6826,7 @@ static UA_LiteralOperand XS_unpack_UA_LiteralOperand(SV *in)  __attribute__((unu
 static UA_LiteralOperand
 XS_unpack_UA_LiteralOperand(SV *in)
 {
+	dTHX;
 	UA_LiteralOperand out;
 	SV **svp;
 	HV *hv;
@@ -6686,6 +6850,7 @@ static void XS_pack_UA_AttributeOperand(SV *out, UA_AttributeOperand in)  __attr
 static void
 XS_pack_UA_AttributeOperand(SV *out, UA_AttributeOperand in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -6716,6 +6881,7 @@ static UA_AttributeOperand XS_unpack_UA_AttributeOperand(SV *in)  __attribute__(
 static UA_AttributeOperand
 XS_unpack_UA_AttributeOperand(SV *in)
 {
+	dTHX;
 	UA_AttributeOperand out;
 	SV **svp;
 	HV *hv;
@@ -6755,6 +6921,7 @@ static void XS_pack_UA_SimpleAttributeOperand(SV *out, UA_SimpleAttributeOperand
 static void
 XS_pack_UA_SimpleAttributeOperand(SV *out, UA_SimpleAttributeOperand in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6766,7 +6933,7 @@ XS_pack_UA_SimpleAttributeOperand(SV *out, UA_SimpleAttributeOperand in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.browsePathSize);
-	for(i = 0; i < in.browsePathSize; i++) {
+	for (i = 0; i < in.browsePathSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_QualifiedName(sv, in.browsePath[i]);
 		av_push(av, sv);
@@ -6788,6 +6955,7 @@ static UA_SimpleAttributeOperand XS_unpack_UA_SimpleAttributeOperand(SV *in)  __
 static UA_SimpleAttributeOperand
 XS_unpack_UA_SimpleAttributeOperand(SV *in)
 {
+	dTHX;
 	UA_SimpleAttributeOperand out;
 	SV **svp;
 	AV *av;
@@ -6816,7 +6984,7 @@ XS_unpack_UA_SimpleAttributeOperand(SV *in)
 		if (out.browsePath == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.browsePath[i] = XS_unpack_UA_QualifiedName(*svp);
@@ -6841,6 +7009,7 @@ static void XS_pack_UA_ContentFilterElementResult(SV *out, UA_ContentFilterEleme
 static void
 XS_pack_UA_ContentFilterElementResult(SV *out, UA_ContentFilterElementResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6852,7 +7021,7 @@ XS_pack_UA_ContentFilterElementResult(SV *out, UA_ContentFilterElementResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.operandStatusCodesSize);
-	for(i = 0; i < in.operandStatusCodesSize; i++) {
+	for (i = 0; i < in.operandStatusCodesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.operandStatusCodes[i]);
 		av_push(av, sv);
@@ -6861,7 +7030,7 @@ XS_pack_UA_ContentFilterElementResult(SV *out, UA_ContentFilterElementResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.operandDiagnosticInfosSize);
-	for(i = 0; i < in.operandDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.operandDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.operandDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -6875,6 +7044,7 @@ static UA_ContentFilterElementResult XS_unpack_UA_ContentFilterElementResult(SV 
 static UA_ContentFilterElementResult
 XS_unpack_UA_ContentFilterElementResult(SV *in)
 {
+	dTHX;
 	UA_ContentFilterElementResult out;
 	SV **svp;
 	AV *av;
@@ -6903,7 +7073,7 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 		if (out.operandStatusCodes == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.operandStatusCodes[i] = XS_unpack_UA_StatusCode(*svp);
@@ -6923,7 +7093,7 @@ XS_unpack_UA_ContentFilterElementResult(SV *in)
 		if (out.operandDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.operandDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -6940,6 +7110,7 @@ static void XS_pack_UA_ContentFilterResult(SV *out, UA_ContentFilterResult in)  
 static void
 XS_pack_UA_ContentFilterResult(SV *out, UA_ContentFilterResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -6947,7 +7118,7 @@ XS_pack_UA_ContentFilterResult(SV *out, UA_ContentFilterResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.elementResultsSize);
-	for(i = 0; i < in.elementResultsSize; i++) {
+	for (i = 0; i < in.elementResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ContentFilterElementResult(sv, in.elementResults[i]);
 		av_push(av, sv);
@@ -6956,7 +7127,7 @@ XS_pack_UA_ContentFilterResult(SV *out, UA_ContentFilterResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.elementDiagnosticInfosSize);
-	for(i = 0; i < in.elementDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.elementDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.elementDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -6970,6 +7141,7 @@ static UA_ContentFilterResult XS_unpack_UA_ContentFilterResult(SV *in)  __attrib
 static UA_ContentFilterResult
 XS_unpack_UA_ContentFilterResult(SV *in)
 {
+	dTHX;
 	UA_ContentFilterResult out;
 	SV **svp;
 	AV *av;
@@ -6994,7 +7166,7 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 		if (out.elementResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.elementResults[i] = XS_unpack_UA_ContentFilterElementResult(*svp);
@@ -7014,7 +7186,7 @@ XS_unpack_UA_ContentFilterResult(SV *in)
 		if (out.elementDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.elementDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -7031,6 +7203,7 @@ static void XS_pack_UA_TimestampsToReturn(SV *out, UA_TimestampsToReturn in)  __
 static void
 XS_pack_UA_TimestampsToReturn(SV *out, UA_TimestampsToReturn in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -7038,6 +7211,7 @@ static UA_TimestampsToReturn XS_unpack_UA_TimestampsToReturn(SV *in)  __attribut
 static UA_TimestampsToReturn
 XS_unpack_UA_TimestampsToReturn(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -7046,6 +7220,7 @@ static void XS_pack_UA_ReadValueId(SV *out, UA_ReadValueId in)  __attribute__((u
 static void
 XS_pack_UA_ReadValueId(SV *out, UA_ReadValueId in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -7072,6 +7247,7 @@ static UA_ReadValueId XS_unpack_UA_ReadValueId(SV *in)  __attribute__((unused));
 static UA_ReadValueId
 XS_unpack_UA_ReadValueId(SV *in)
 {
+	dTHX;
 	UA_ReadValueId out;
 	SV **svp;
 	HV *hv;
@@ -7107,6 +7283,7 @@ static void XS_pack_UA_ReadRequest(SV *out, UA_ReadRequest in)  __attribute__((u
 static void
 XS_pack_UA_ReadRequest(SV *out, UA_ReadRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7126,7 +7303,7 @@ XS_pack_UA_ReadRequest(SV *out, UA_ReadRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToReadSize);
-	for(i = 0; i < in.nodesToReadSize; i++) {
+	for (i = 0; i < in.nodesToReadSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ReadValueId(sv, in.nodesToRead[i]);
 		av_push(av, sv);
@@ -7140,6 +7317,7 @@ static UA_ReadRequest XS_unpack_UA_ReadRequest(SV *in)  __attribute__((unused));
 static UA_ReadRequest
 XS_unpack_UA_ReadRequest(SV *in)
 {
+	dTHX;
 	UA_ReadRequest out;
 	SV **svp;
 	AV *av;
@@ -7176,7 +7354,7 @@ XS_unpack_UA_ReadRequest(SV *in)
 		if (out.nodesToRead == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToRead[i] = XS_unpack_UA_ReadValueId(*svp);
@@ -7193,6 +7371,7 @@ static void XS_pack_UA_ReadResponse(SV *out, UA_ReadResponse in)  __attribute__(
 static void
 XS_pack_UA_ReadResponse(SV *out, UA_ReadResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7204,7 +7383,7 @@ XS_pack_UA_ReadResponse(SV *out, UA_ReadResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DataValue(sv, in.results[i]);
 		av_push(av, sv);
@@ -7213,7 +7392,7 @@ XS_pack_UA_ReadResponse(SV *out, UA_ReadResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -7227,6 +7406,7 @@ static UA_ReadResponse XS_unpack_UA_ReadResponse(SV *in)  __attribute__((unused)
 static UA_ReadResponse
 XS_unpack_UA_ReadResponse(SV *in)
 {
+	dTHX;
 	UA_ReadResponse out;
 	SV **svp;
 	AV *av;
@@ -7255,7 +7435,7 @@ XS_unpack_UA_ReadResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_DataValue(*svp);
@@ -7275,7 +7455,7 @@ XS_unpack_UA_ReadResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -7292,6 +7472,7 @@ static void XS_pack_UA_WriteValue(SV *out, UA_WriteValue in)  __attribute__((unu
 static void
 XS_pack_UA_WriteValue(SV *out, UA_WriteValue in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -7318,6 +7499,7 @@ static UA_WriteValue XS_unpack_UA_WriteValue(SV *in)  __attribute__((unused));
 static UA_WriteValue
 XS_unpack_UA_WriteValue(SV *in)
 {
+	dTHX;
 	UA_WriteValue out;
 	SV **svp;
 	HV *hv;
@@ -7353,6 +7535,7 @@ static void XS_pack_UA_WriteRequest(SV *out, UA_WriteRequest in)  __attribute__(
 static void
 XS_pack_UA_WriteRequest(SV *out, UA_WriteRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7364,7 +7547,7 @@ XS_pack_UA_WriteRequest(SV *out, UA_WriteRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.nodesToWriteSize);
-	for(i = 0; i < in.nodesToWriteSize; i++) {
+	for (i = 0; i < in.nodesToWriteSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_WriteValue(sv, in.nodesToWrite[i]);
 		av_push(av, sv);
@@ -7378,6 +7561,7 @@ static UA_WriteRequest XS_unpack_UA_WriteRequest(SV *in)  __attribute__((unused)
 static UA_WriteRequest
 XS_unpack_UA_WriteRequest(SV *in)
 {
+	dTHX;
 	UA_WriteRequest out;
 	SV **svp;
 	AV *av;
@@ -7406,7 +7590,7 @@ XS_unpack_UA_WriteRequest(SV *in)
 		if (out.nodesToWrite == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.nodesToWrite[i] = XS_unpack_UA_WriteValue(*svp);
@@ -7423,6 +7607,7 @@ static void XS_pack_UA_WriteResponse(SV *out, UA_WriteResponse in)  __attribute_
 static void
 XS_pack_UA_WriteResponse(SV *out, UA_WriteResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7434,7 +7619,7 @@ XS_pack_UA_WriteResponse(SV *out, UA_WriteResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -7443,7 +7628,7 @@ XS_pack_UA_WriteResponse(SV *out, UA_WriteResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -7457,6 +7642,7 @@ static UA_WriteResponse XS_unpack_UA_WriteResponse(SV *in)  __attribute__((unuse
 static UA_WriteResponse
 XS_unpack_UA_WriteResponse(SV *in)
 {
+	dTHX;
 	UA_WriteResponse out;
 	SV **svp;
 	AV *av;
@@ -7485,7 +7671,7 @@ XS_unpack_UA_WriteResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -7505,7 +7691,7 @@ XS_unpack_UA_WriteResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -7522,6 +7708,7 @@ static void XS_pack_UA_CallMethodRequest(SV *out, UA_CallMethodRequest in)  __at
 static void
 XS_pack_UA_CallMethodRequest(SV *out, UA_CallMethodRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7537,7 +7724,7 @@ XS_pack_UA_CallMethodRequest(SV *out, UA_CallMethodRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.inputArgumentsSize);
-	for(i = 0; i < in.inputArgumentsSize; i++) {
+	for (i = 0; i < in.inputArgumentsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_Variant(sv, in.inputArguments[i]);
 		av_push(av, sv);
@@ -7551,6 +7738,7 @@ static UA_CallMethodRequest XS_unpack_UA_CallMethodRequest(SV *in)  __attribute_
 static UA_CallMethodRequest
 XS_unpack_UA_CallMethodRequest(SV *in)
 {
+	dTHX;
 	UA_CallMethodRequest out;
 	SV **svp;
 	AV *av;
@@ -7583,7 +7771,7 @@ XS_unpack_UA_CallMethodRequest(SV *in)
 		if (out.inputArguments == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.inputArguments[i] = XS_unpack_UA_Variant(*svp);
@@ -7600,6 +7788,7 @@ static void XS_pack_UA_CallMethodResult(SV *out, UA_CallMethodResult in)  __attr
 static void
 XS_pack_UA_CallMethodResult(SV *out, UA_CallMethodResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7611,7 +7800,7 @@ XS_pack_UA_CallMethodResult(SV *out, UA_CallMethodResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.inputArgumentResultsSize);
-	for(i = 0; i < in.inputArgumentResultsSize; i++) {
+	for (i = 0; i < in.inputArgumentResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.inputArgumentResults[i]);
 		av_push(av, sv);
@@ -7620,7 +7809,7 @@ XS_pack_UA_CallMethodResult(SV *out, UA_CallMethodResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.inputArgumentDiagnosticInfosSize);
-	for(i = 0; i < in.inputArgumentDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.inputArgumentDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.inputArgumentDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -7629,7 +7818,7 @@ XS_pack_UA_CallMethodResult(SV *out, UA_CallMethodResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.outputArgumentsSize);
-	for(i = 0; i < in.outputArgumentsSize; i++) {
+	for (i = 0; i < in.outputArgumentsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_Variant(sv, in.outputArguments[i]);
 		av_push(av, sv);
@@ -7643,6 +7832,7 @@ static UA_CallMethodResult XS_unpack_UA_CallMethodResult(SV *in)  __attribute__(
 static UA_CallMethodResult
 XS_unpack_UA_CallMethodResult(SV *in)
 {
+	dTHX;
 	UA_CallMethodResult out;
 	SV **svp;
 	AV *av;
@@ -7671,7 +7861,7 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		if (out.inputArgumentResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.inputArgumentResults[i] = XS_unpack_UA_StatusCode(*svp);
@@ -7691,7 +7881,7 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		if (out.inputArgumentDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.inputArgumentDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -7711,7 +7901,7 @@ XS_unpack_UA_CallMethodResult(SV *in)
 		if (out.outputArguments == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.outputArguments[i] = XS_unpack_UA_Variant(*svp);
@@ -7728,6 +7918,7 @@ static void XS_pack_UA_CallRequest(SV *out, UA_CallRequest in)  __attribute__((u
 static void
 XS_pack_UA_CallRequest(SV *out, UA_CallRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7739,7 +7930,7 @@ XS_pack_UA_CallRequest(SV *out, UA_CallRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.methodsToCallSize);
-	for(i = 0; i < in.methodsToCallSize; i++) {
+	for (i = 0; i < in.methodsToCallSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_CallMethodRequest(sv, in.methodsToCall[i]);
 		av_push(av, sv);
@@ -7753,6 +7944,7 @@ static UA_CallRequest XS_unpack_UA_CallRequest(SV *in)  __attribute__((unused));
 static UA_CallRequest
 XS_unpack_UA_CallRequest(SV *in)
 {
+	dTHX;
 	UA_CallRequest out;
 	SV **svp;
 	AV *av;
@@ -7781,7 +7973,7 @@ XS_unpack_UA_CallRequest(SV *in)
 		if (out.methodsToCall == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.methodsToCall[i] = XS_unpack_UA_CallMethodRequest(*svp);
@@ -7798,6 +7990,7 @@ static void XS_pack_UA_CallResponse(SV *out, UA_CallResponse in)  __attribute__(
 static void
 XS_pack_UA_CallResponse(SV *out, UA_CallResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -7809,7 +8002,7 @@ XS_pack_UA_CallResponse(SV *out, UA_CallResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_CallMethodResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -7818,7 +8011,7 @@ XS_pack_UA_CallResponse(SV *out, UA_CallResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -7832,6 +8025,7 @@ static UA_CallResponse XS_unpack_UA_CallResponse(SV *in)  __attribute__((unused)
 static UA_CallResponse
 XS_unpack_UA_CallResponse(SV *in)
 {
+	dTHX;
 	UA_CallResponse out;
 	SV **svp;
 	AV *av;
@@ -7860,7 +8054,7 @@ XS_unpack_UA_CallResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_CallMethodResult(*svp);
@@ -7880,7 +8074,7 @@ XS_unpack_UA_CallResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -7897,6 +8091,7 @@ static void XS_pack_UA_MonitoringMode(SV *out, UA_MonitoringMode in)  __attribut
 static void
 XS_pack_UA_MonitoringMode(SV *out, UA_MonitoringMode in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -7904,6 +8099,7 @@ static UA_MonitoringMode XS_unpack_UA_MonitoringMode(SV *in)  __attribute__((unu
 static UA_MonitoringMode
 XS_unpack_UA_MonitoringMode(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -7912,6 +8108,7 @@ static void XS_pack_UA_DataChangeTrigger(SV *out, UA_DataChangeTrigger in)  __at
 static void
 XS_pack_UA_DataChangeTrigger(SV *out, UA_DataChangeTrigger in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -7919,6 +8116,7 @@ static UA_DataChangeTrigger XS_unpack_UA_DataChangeTrigger(SV *in)  __attribute_
 static UA_DataChangeTrigger
 XS_unpack_UA_DataChangeTrigger(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -7927,6 +8125,7 @@ static void XS_pack_UA_DeadbandType(SV *out, UA_DeadbandType in)  __attribute__(
 static void
 XS_pack_UA_DeadbandType(SV *out, UA_DeadbandType in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -7934,6 +8133,7 @@ static UA_DeadbandType XS_unpack_UA_DeadbandType(SV *in)  __attribute__((unused)
 static UA_DeadbandType
 XS_unpack_UA_DeadbandType(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -7942,6 +8142,7 @@ static void XS_pack_UA_DataChangeFilter(SV *out, UA_DataChangeFilter in)  __attr
 static void
 XS_pack_UA_DataChangeFilter(SV *out, UA_DataChangeFilter in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -7964,6 +8165,7 @@ static UA_DataChangeFilter XS_unpack_UA_DataChangeFilter(SV *in)  __attribute__(
 static UA_DataChangeFilter
 XS_unpack_UA_DataChangeFilter(SV *in)
 {
+	dTHX;
 	UA_DataChangeFilter out;
 	SV **svp;
 	HV *hv;
@@ -7995,6 +8197,7 @@ static void XS_pack_UA_EventFilter(SV *out, UA_EventFilter in)  __attribute__((u
 static void
 XS_pack_UA_EventFilter(SV *out, UA_EventFilter in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8002,7 +8205,7 @@ XS_pack_UA_EventFilter(SV *out, UA_EventFilter in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.selectClausesSize);
-	for(i = 0; i < in.selectClausesSize; i++) {
+	for (i = 0; i < in.selectClausesSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_SimpleAttributeOperand(sv, in.selectClauses[i]);
 		av_push(av, sv);
@@ -8020,6 +8223,7 @@ static UA_EventFilter XS_unpack_UA_EventFilter(SV *in)  __attribute__((unused));
 static UA_EventFilter
 XS_unpack_UA_EventFilter(SV *in)
 {
+	dTHX;
 	UA_EventFilter out;
 	SV **svp;
 	AV *av;
@@ -8044,7 +8248,7 @@ XS_unpack_UA_EventFilter(SV *in)
 		if (out.selectClauses == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.selectClauses[i] = XS_unpack_UA_SimpleAttributeOperand(*svp);
@@ -8065,6 +8269,7 @@ static void XS_pack_UA_AggregateConfiguration(SV *out, UA_AggregateConfiguration
 static void
 XS_pack_UA_AggregateConfiguration(SV *out, UA_AggregateConfiguration in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8095,6 +8300,7 @@ static UA_AggregateConfiguration XS_unpack_UA_AggregateConfiguration(SV *in)  __
 static UA_AggregateConfiguration
 XS_unpack_UA_AggregateConfiguration(SV *in)
 {
+	dTHX;
 	UA_AggregateConfiguration out;
 	SV **svp;
 	HV *hv;
@@ -8134,6 +8340,7 @@ static void XS_pack_UA_AggregateFilter(SV *out, UA_AggregateFilter in)  __attrib
 static void
 XS_pack_UA_AggregateFilter(SV *out, UA_AggregateFilter in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8160,6 +8367,7 @@ static UA_AggregateFilter XS_unpack_UA_AggregateFilter(SV *in)  __attribute__((u
 static UA_AggregateFilter
 XS_unpack_UA_AggregateFilter(SV *in)
 {
+	dTHX;
 	UA_AggregateFilter out;
 	SV **svp;
 	HV *hv;
@@ -8195,6 +8403,7 @@ static void XS_pack_UA_EventFilterResult(SV *out, UA_EventFilterResult in)  __at
 static void
 XS_pack_UA_EventFilterResult(SV *out, UA_EventFilterResult in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8202,7 +8411,7 @@ XS_pack_UA_EventFilterResult(SV *out, UA_EventFilterResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.selectClauseResultsSize);
-	for(i = 0; i < in.selectClauseResultsSize; i++) {
+	for (i = 0; i < in.selectClauseResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.selectClauseResults[i]);
 		av_push(av, sv);
@@ -8211,7 +8420,7 @@ XS_pack_UA_EventFilterResult(SV *out, UA_EventFilterResult in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.selectClauseDiagnosticInfosSize);
-	for(i = 0; i < in.selectClauseDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.selectClauseDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.selectClauseDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -8229,6 +8438,7 @@ static UA_EventFilterResult XS_unpack_UA_EventFilterResult(SV *in)  __attribute_
 static UA_EventFilterResult
 XS_unpack_UA_EventFilterResult(SV *in)
 {
+	dTHX;
 	UA_EventFilterResult out;
 	SV **svp;
 	AV *av;
@@ -8253,7 +8463,7 @@ XS_unpack_UA_EventFilterResult(SV *in)
 		if (out.selectClauseResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.selectClauseResults[i] = XS_unpack_UA_StatusCode(*svp);
@@ -8273,7 +8483,7 @@ XS_unpack_UA_EventFilterResult(SV *in)
 		if (out.selectClauseDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.selectClauseDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -8294,6 +8504,7 @@ static void XS_pack_UA_MonitoringParameters(SV *out, UA_MonitoringParameters in)
 static void
 XS_pack_UA_MonitoringParameters(SV *out, UA_MonitoringParameters in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8324,6 +8535,7 @@ static UA_MonitoringParameters XS_unpack_UA_MonitoringParameters(SV *in)  __attr
 static UA_MonitoringParameters
 XS_unpack_UA_MonitoringParameters(SV *in)
 {
+	dTHX;
 	UA_MonitoringParameters out;
 	SV **svp;
 	HV *hv;
@@ -8363,6 +8575,7 @@ static void XS_pack_UA_MonitoredItemCreateRequest(SV *out, UA_MonitoredItemCreat
 static void
 XS_pack_UA_MonitoredItemCreateRequest(SV *out, UA_MonitoredItemCreateRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8385,6 +8598,7 @@ static UA_MonitoredItemCreateRequest XS_unpack_UA_MonitoredItemCreateRequest(SV 
 static UA_MonitoredItemCreateRequest
 XS_unpack_UA_MonitoredItemCreateRequest(SV *in)
 {
+	dTHX;
 	UA_MonitoredItemCreateRequest out;
 	SV **svp;
 	HV *hv;
@@ -8416,6 +8630,7 @@ static void XS_pack_UA_MonitoredItemCreateResult(SV *out, UA_MonitoredItemCreate
 static void
 XS_pack_UA_MonitoredItemCreateResult(SV *out, UA_MonitoredItemCreateResult in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8446,6 +8661,7 @@ static UA_MonitoredItemCreateResult XS_unpack_UA_MonitoredItemCreateResult(SV *i
 static UA_MonitoredItemCreateResult
 XS_unpack_UA_MonitoredItemCreateResult(SV *in)
 {
+	dTHX;
 	UA_MonitoredItemCreateResult out;
 	SV **svp;
 	HV *hv;
@@ -8485,6 +8701,7 @@ static void XS_pack_UA_CreateMonitoredItemsRequest(SV *out, UA_CreateMonitoredIt
 static void
 XS_pack_UA_CreateMonitoredItemsRequest(SV *out, UA_CreateMonitoredItemsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8504,7 +8721,7 @@ XS_pack_UA_CreateMonitoredItemsRequest(SV *out, UA_CreateMonitoredItemsRequest i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.itemsToCreateSize);
-	for(i = 0; i < in.itemsToCreateSize; i++) {
+	for (i = 0; i < in.itemsToCreateSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_MonitoredItemCreateRequest(sv, in.itemsToCreate[i]);
 		av_push(av, sv);
@@ -8518,6 +8735,7 @@ static UA_CreateMonitoredItemsRequest XS_unpack_UA_CreateMonitoredItemsRequest(S
 static UA_CreateMonitoredItemsRequest
 XS_unpack_UA_CreateMonitoredItemsRequest(SV *in)
 {
+	dTHX;
 	UA_CreateMonitoredItemsRequest out;
 	SV **svp;
 	AV *av;
@@ -8554,7 +8772,7 @@ XS_unpack_UA_CreateMonitoredItemsRequest(SV *in)
 		if (out.itemsToCreate == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.itemsToCreate[i] = XS_unpack_UA_MonitoredItemCreateRequest(*svp);
@@ -8571,6 +8789,7 @@ static void XS_pack_UA_CreateMonitoredItemsResponse(SV *out, UA_CreateMonitoredI
 static void
 XS_pack_UA_CreateMonitoredItemsResponse(SV *out, UA_CreateMonitoredItemsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8582,7 +8801,7 @@ XS_pack_UA_CreateMonitoredItemsResponse(SV *out, UA_CreateMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_MonitoredItemCreateResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -8591,7 +8810,7 @@ XS_pack_UA_CreateMonitoredItemsResponse(SV *out, UA_CreateMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -8605,6 +8824,7 @@ static UA_CreateMonitoredItemsResponse XS_unpack_UA_CreateMonitoredItemsResponse
 static UA_CreateMonitoredItemsResponse
 XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 {
+	dTHX;
 	UA_CreateMonitoredItemsResponse out;
 	SV **svp;
 	AV *av;
@@ -8633,7 +8853,7 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_MonitoredItemCreateResult(*svp);
@@ -8653,7 +8873,7 @@ XS_unpack_UA_CreateMonitoredItemsResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -8670,6 +8890,7 @@ static void XS_pack_UA_MonitoredItemModifyRequest(SV *out, UA_MonitoredItemModif
 static void
 XS_pack_UA_MonitoredItemModifyRequest(SV *out, UA_MonitoredItemModifyRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8688,6 +8909,7 @@ static UA_MonitoredItemModifyRequest XS_unpack_UA_MonitoredItemModifyRequest(SV 
 static UA_MonitoredItemModifyRequest
 XS_unpack_UA_MonitoredItemModifyRequest(SV *in)
 {
+	dTHX;
 	UA_MonitoredItemModifyRequest out;
 	SV **svp;
 	HV *hv;
@@ -8715,6 +8937,7 @@ static void XS_pack_UA_MonitoredItemModifyResult(SV *out, UA_MonitoredItemModify
 static void
 XS_pack_UA_MonitoredItemModifyResult(SV *out, UA_MonitoredItemModifyResult in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -8741,6 +8964,7 @@ static UA_MonitoredItemModifyResult XS_unpack_UA_MonitoredItemModifyResult(SV *i
 static UA_MonitoredItemModifyResult
 XS_unpack_UA_MonitoredItemModifyResult(SV *in)
 {
+	dTHX;
 	UA_MonitoredItemModifyResult out;
 	SV **svp;
 	HV *hv;
@@ -8776,6 +9000,7 @@ static void XS_pack_UA_ModifyMonitoredItemsRequest(SV *out, UA_ModifyMonitoredIt
 static void
 XS_pack_UA_ModifyMonitoredItemsRequest(SV *out, UA_ModifyMonitoredItemsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8795,7 +9020,7 @@ XS_pack_UA_ModifyMonitoredItemsRequest(SV *out, UA_ModifyMonitoredItemsRequest i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.itemsToModifySize);
-	for(i = 0; i < in.itemsToModifySize; i++) {
+	for (i = 0; i < in.itemsToModifySize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_MonitoredItemModifyRequest(sv, in.itemsToModify[i]);
 		av_push(av, sv);
@@ -8809,6 +9034,7 @@ static UA_ModifyMonitoredItemsRequest XS_unpack_UA_ModifyMonitoredItemsRequest(S
 static UA_ModifyMonitoredItemsRequest
 XS_unpack_UA_ModifyMonitoredItemsRequest(SV *in)
 {
+	dTHX;
 	UA_ModifyMonitoredItemsRequest out;
 	SV **svp;
 	AV *av;
@@ -8845,7 +9071,7 @@ XS_unpack_UA_ModifyMonitoredItemsRequest(SV *in)
 		if (out.itemsToModify == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.itemsToModify[i] = XS_unpack_UA_MonitoredItemModifyRequest(*svp);
@@ -8862,6 +9088,7 @@ static void XS_pack_UA_ModifyMonitoredItemsResponse(SV *out, UA_ModifyMonitoredI
 static void
 XS_pack_UA_ModifyMonitoredItemsResponse(SV *out, UA_ModifyMonitoredItemsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8873,7 +9100,7 @@ XS_pack_UA_ModifyMonitoredItemsResponse(SV *out, UA_ModifyMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_MonitoredItemModifyResult(sv, in.results[i]);
 		av_push(av, sv);
@@ -8882,7 +9109,7 @@ XS_pack_UA_ModifyMonitoredItemsResponse(SV *out, UA_ModifyMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -8896,6 +9123,7 @@ static UA_ModifyMonitoredItemsResponse XS_unpack_UA_ModifyMonitoredItemsResponse
 static UA_ModifyMonitoredItemsResponse
 XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 {
+	dTHX;
 	UA_ModifyMonitoredItemsResponse out;
 	SV **svp;
 	AV *av;
@@ -8924,7 +9152,7 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_MonitoredItemModifyResult(*svp);
@@ -8944,7 +9172,7 @@ XS_unpack_UA_ModifyMonitoredItemsResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -8961,6 +9189,7 @@ static void XS_pack_UA_SetMonitoringModeRequest(SV *out, UA_SetMonitoringModeReq
 static void
 XS_pack_UA_SetMonitoringModeRequest(SV *out, UA_SetMonitoringModeRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -8980,7 +9209,7 @@ XS_pack_UA_SetMonitoringModeRequest(SV *out, UA_SetMonitoringModeRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.monitoredItemIdsSize);
-	for(i = 0; i < in.monitoredItemIdsSize; i++) {
+	for (i = 0; i < in.monitoredItemIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.monitoredItemIds[i]);
 		av_push(av, sv);
@@ -8994,6 +9223,7 @@ static UA_SetMonitoringModeRequest XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 static UA_SetMonitoringModeRequest
 XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 {
+	dTHX;
 	UA_SetMonitoringModeRequest out;
 	SV **svp;
 	AV *av;
@@ -9030,7 +9260,7 @@ XS_unpack_UA_SetMonitoringModeRequest(SV *in)
 		if (out.monitoredItemIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.monitoredItemIds[i] = XS_unpack_UA_UInt32(*svp);
@@ -9047,6 +9277,7 @@ static void XS_pack_UA_SetMonitoringModeResponse(SV *out, UA_SetMonitoringModeRe
 static void
 XS_pack_UA_SetMonitoringModeResponse(SV *out, UA_SetMonitoringModeResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9058,7 +9289,7 @@ XS_pack_UA_SetMonitoringModeResponse(SV *out, UA_SetMonitoringModeResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -9067,7 +9298,7 @@ XS_pack_UA_SetMonitoringModeResponse(SV *out, UA_SetMonitoringModeResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -9081,6 +9312,7 @@ static UA_SetMonitoringModeResponse XS_unpack_UA_SetMonitoringModeResponse(SV *i
 static UA_SetMonitoringModeResponse
 XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 {
+	dTHX;
 	UA_SetMonitoringModeResponse out;
 	SV **svp;
 	AV *av;
@@ -9109,7 +9341,7 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -9129,7 +9361,7 @@ XS_unpack_UA_SetMonitoringModeResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -9146,6 +9378,7 @@ static void XS_pack_UA_SetTriggeringRequest(SV *out, UA_SetTriggeringRequest in)
 static void
 XS_pack_UA_SetTriggeringRequest(SV *out, UA_SetTriggeringRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9165,7 +9398,7 @@ XS_pack_UA_SetTriggeringRequest(SV *out, UA_SetTriggeringRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.linksToAddSize);
-	for(i = 0; i < in.linksToAddSize; i++) {
+	for (i = 0; i < in.linksToAddSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.linksToAdd[i]);
 		av_push(av, sv);
@@ -9174,7 +9407,7 @@ XS_pack_UA_SetTriggeringRequest(SV *out, UA_SetTriggeringRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.linksToRemoveSize);
-	for(i = 0; i < in.linksToRemoveSize; i++) {
+	for (i = 0; i < in.linksToRemoveSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.linksToRemove[i]);
 		av_push(av, sv);
@@ -9188,6 +9421,7 @@ static UA_SetTriggeringRequest XS_unpack_UA_SetTriggeringRequest(SV *in)  __attr
 static UA_SetTriggeringRequest
 XS_unpack_UA_SetTriggeringRequest(SV *in)
 {
+	dTHX;
 	UA_SetTriggeringRequest out;
 	SV **svp;
 	AV *av;
@@ -9224,7 +9458,7 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 		if (out.linksToAdd == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.linksToAdd[i] = XS_unpack_UA_UInt32(*svp);
@@ -9244,7 +9478,7 @@ XS_unpack_UA_SetTriggeringRequest(SV *in)
 		if (out.linksToRemove == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.linksToRemove[i] = XS_unpack_UA_UInt32(*svp);
@@ -9261,6 +9495,7 @@ static void XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse i
 static void
 XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9272,7 +9507,7 @@ XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.addResultsSize);
-	for(i = 0; i < in.addResultsSize; i++) {
+	for (i = 0; i < in.addResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.addResults[i]);
 		av_push(av, sv);
@@ -9281,7 +9516,7 @@ XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.addDiagnosticInfosSize);
-	for(i = 0; i < in.addDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.addDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.addDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -9290,7 +9525,7 @@ XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.removeResultsSize);
-	for(i = 0; i < in.removeResultsSize; i++) {
+	for (i = 0; i < in.removeResultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.removeResults[i]);
 		av_push(av, sv);
@@ -9299,7 +9534,7 @@ XS_pack_UA_SetTriggeringResponse(SV *out, UA_SetTriggeringResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.removeDiagnosticInfosSize);
-	for(i = 0; i < in.removeDiagnosticInfosSize; i++) {
+	for (i = 0; i < in.removeDiagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.removeDiagnosticInfos[i]);
 		av_push(av, sv);
@@ -9313,6 +9548,7 @@ static UA_SetTriggeringResponse XS_unpack_UA_SetTriggeringResponse(SV *in)  __at
 static UA_SetTriggeringResponse
 XS_unpack_UA_SetTriggeringResponse(SV *in)
 {
+	dTHX;
 	UA_SetTriggeringResponse out;
 	SV **svp;
 	AV *av;
@@ -9341,7 +9577,7 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		if (out.addResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.addResults[i] = XS_unpack_UA_StatusCode(*svp);
@@ -9361,7 +9597,7 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		if (out.addDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.addDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -9381,7 +9617,7 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		if (out.removeResults == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.removeResults[i] = XS_unpack_UA_StatusCode(*svp);
@@ -9401,7 +9637,7 @@ XS_unpack_UA_SetTriggeringResponse(SV *in)
 		if (out.removeDiagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.removeDiagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -9418,6 +9654,7 @@ static void XS_pack_UA_DeleteMonitoredItemsRequest(SV *out, UA_DeleteMonitoredIt
 static void
 XS_pack_UA_DeleteMonitoredItemsRequest(SV *out, UA_DeleteMonitoredItemsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9433,7 +9670,7 @@ XS_pack_UA_DeleteMonitoredItemsRequest(SV *out, UA_DeleteMonitoredItemsRequest i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.monitoredItemIdsSize);
-	for(i = 0; i < in.monitoredItemIdsSize; i++) {
+	for (i = 0; i < in.monitoredItemIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.monitoredItemIds[i]);
 		av_push(av, sv);
@@ -9447,6 +9684,7 @@ static UA_DeleteMonitoredItemsRequest XS_unpack_UA_DeleteMonitoredItemsRequest(S
 static UA_DeleteMonitoredItemsRequest
 XS_unpack_UA_DeleteMonitoredItemsRequest(SV *in)
 {
+	dTHX;
 	UA_DeleteMonitoredItemsRequest out;
 	SV **svp;
 	AV *av;
@@ -9479,7 +9717,7 @@ XS_unpack_UA_DeleteMonitoredItemsRequest(SV *in)
 		if (out.monitoredItemIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.monitoredItemIds[i] = XS_unpack_UA_UInt32(*svp);
@@ -9496,6 +9734,7 @@ static void XS_pack_UA_DeleteMonitoredItemsResponse(SV *out, UA_DeleteMonitoredI
 static void
 XS_pack_UA_DeleteMonitoredItemsResponse(SV *out, UA_DeleteMonitoredItemsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9507,7 +9746,7 @@ XS_pack_UA_DeleteMonitoredItemsResponse(SV *out, UA_DeleteMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -9516,7 +9755,7 @@ XS_pack_UA_DeleteMonitoredItemsResponse(SV *out, UA_DeleteMonitoredItemsResponse
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -9530,6 +9769,7 @@ static UA_DeleteMonitoredItemsResponse XS_unpack_UA_DeleteMonitoredItemsResponse
 static UA_DeleteMonitoredItemsResponse
 XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 {
+	dTHX;
 	UA_DeleteMonitoredItemsResponse out;
 	SV **svp;
 	AV *av;
@@ -9558,7 +9798,7 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -9578,7 +9818,7 @@ XS_unpack_UA_DeleteMonitoredItemsResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -9595,6 +9835,7 @@ static void XS_pack_UA_CreateSubscriptionRequest(SV *out, UA_CreateSubscriptionR
 static void
 XS_pack_UA_CreateSubscriptionRequest(SV *out, UA_CreateSubscriptionRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -9633,6 +9874,7 @@ static UA_CreateSubscriptionRequest XS_unpack_UA_CreateSubscriptionRequest(SV *i
 static UA_CreateSubscriptionRequest
 XS_unpack_UA_CreateSubscriptionRequest(SV *in)
 {
+	dTHX;
 	UA_CreateSubscriptionRequest out;
 	SV **svp;
 	HV *hv;
@@ -9680,6 +9922,7 @@ static void XS_pack_UA_CreateSubscriptionResponse(SV *out, UA_CreateSubscription
 static void
 XS_pack_UA_CreateSubscriptionResponse(SV *out, UA_CreateSubscriptionResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -9710,6 +9953,7 @@ static UA_CreateSubscriptionResponse XS_unpack_UA_CreateSubscriptionResponse(SV 
 static UA_CreateSubscriptionResponse
 XS_unpack_UA_CreateSubscriptionResponse(SV *in)
 {
+	dTHX;
 	UA_CreateSubscriptionResponse out;
 	SV **svp;
 	HV *hv;
@@ -9749,6 +9993,7 @@ static void XS_pack_UA_ModifySubscriptionRequest(SV *out, UA_ModifySubscriptionR
 static void
 XS_pack_UA_ModifySubscriptionRequest(SV *out, UA_ModifySubscriptionRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -9787,6 +10032,7 @@ static UA_ModifySubscriptionRequest XS_unpack_UA_ModifySubscriptionRequest(SV *i
 static UA_ModifySubscriptionRequest
 XS_unpack_UA_ModifySubscriptionRequest(SV *in)
 {
+	dTHX;
 	UA_ModifySubscriptionRequest out;
 	SV **svp;
 	HV *hv;
@@ -9834,6 +10080,7 @@ static void XS_pack_UA_ModifySubscriptionResponse(SV *out, UA_ModifySubscription
 static void
 XS_pack_UA_ModifySubscriptionResponse(SV *out, UA_ModifySubscriptionResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -9860,6 +10107,7 @@ static UA_ModifySubscriptionResponse XS_unpack_UA_ModifySubscriptionResponse(SV 
 static UA_ModifySubscriptionResponse
 XS_unpack_UA_ModifySubscriptionResponse(SV *in)
 {
+	dTHX;
 	UA_ModifySubscriptionResponse out;
 	SV **svp;
 	HV *hv;
@@ -9895,6 +10143,7 @@ static void XS_pack_UA_SetPublishingModeRequest(SV *out, UA_SetPublishingModeReq
 static void
 XS_pack_UA_SetPublishingModeRequest(SV *out, UA_SetPublishingModeRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9910,7 +10159,7 @@ XS_pack_UA_SetPublishingModeRequest(SV *out, UA_SetPublishingModeRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.subscriptionIdsSize);
-	for(i = 0; i < in.subscriptionIdsSize; i++) {
+	for (i = 0; i < in.subscriptionIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.subscriptionIds[i]);
 		av_push(av, sv);
@@ -9924,6 +10173,7 @@ static UA_SetPublishingModeRequest XS_unpack_UA_SetPublishingModeRequest(SV *in)
 static UA_SetPublishingModeRequest
 XS_unpack_UA_SetPublishingModeRequest(SV *in)
 {
+	dTHX;
 	UA_SetPublishingModeRequest out;
 	SV **svp;
 	AV *av;
@@ -9956,7 +10206,7 @@ XS_unpack_UA_SetPublishingModeRequest(SV *in)
 		if (out.subscriptionIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.subscriptionIds[i] = XS_unpack_UA_UInt32(*svp);
@@ -9973,6 +10223,7 @@ static void XS_pack_UA_SetPublishingModeResponse(SV *out, UA_SetPublishingModeRe
 static void
 XS_pack_UA_SetPublishingModeResponse(SV *out, UA_SetPublishingModeResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -9984,7 +10235,7 @@ XS_pack_UA_SetPublishingModeResponse(SV *out, UA_SetPublishingModeResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -9993,7 +10244,7 @@ XS_pack_UA_SetPublishingModeResponse(SV *out, UA_SetPublishingModeResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -10007,6 +10258,7 @@ static UA_SetPublishingModeResponse XS_unpack_UA_SetPublishingModeResponse(SV *i
 static UA_SetPublishingModeResponse
 XS_unpack_UA_SetPublishingModeResponse(SV *in)
 {
+	dTHX;
 	UA_SetPublishingModeResponse out;
 	SV **svp;
 	AV *av;
@@ -10035,7 +10287,7 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -10055,7 +10307,7 @@ XS_unpack_UA_SetPublishingModeResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -10072,6 +10324,7 @@ static void XS_pack_UA_NotificationMessage(SV *out, UA_NotificationMessage in)  
 static void
 XS_pack_UA_NotificationMessage(SV *out, UA_NotificationMessage in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10087,7 +10340,7 @@ XS_pack_UA_NotificationMessage(SV *out, UA_NotificationMessage in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.notificationDataSize);
-	for(i = 0; i < in.notificationDataSize; i++) {
+	for (i = 0; i < in.notificationDataSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_ExtensionObject(sv, in.notificationData[i]);
 		av_push(av, sv);
@@ -10101,6 +10354,7 @@ static UA_NotificationMessage XS_unpack_UA_NotificationMessage(SV *in)  __attrib
 static UA_NotificationMessage
 XS_unpack_UA_NotificationMessage(SV *in)
 {
+	dTHX;
 	UA_NotificationMessage out;
 	SV **svp;
 	AV *av;
@@ -10133,7 +10387,7 @@ XS_unpack_UA_NotificationMessage(SV *in)
 		if (out.notificationData == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.notificationData[i] = XS_unpack_UA_ExtensionObject(*svp);
@@ -10150,6 +10404,7 @@ static void XS_pack_UA_MonitoredItemNotification(SV *out, UA_MonitoredItemNotifi
 static void
 XS_pack_UA_MonitoredItemNotification(SV *out, UA_MonitoredItemNotification in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10168,6 +10423,7 @@ static UA_MonitoredItemNotification XS_unpack_UA_MonitoredItemNotification(SV *i
 static UA_MonitoredItemNotification
 XS_unpack_UA_MonitoredItemNotification(SV *in)
 {
+	dTHX;
 	UA_MonitoredItemNotification out;
 	SV **svp;
 	HV *hv;
@@ -10195,6 +10451,7 @@ static void XS_pack_UA_EventFieldList(SV *out, UA_EventFieldList in)  __attribut
 static void
 XS_pack_UA_EventFieldList(SV *out, UA_EventFieldList in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10206,7 +10463,7 @@ XS_pack_UA_EventFieldList(SV *out, UA_EventFieldList in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.eventFieldsSize);
-	for(i = 0; i < in.eventFieldsSize; i++) {
+	for (i = 0; i < in.eventFieldsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_Variant(sv, in.eventFields[i]);
 		av_push(av, sv);
@@ -10220,6 +10477,7 @@ static UA_EventFieldList XS_unpack_UA_EventFieldList(SV *in)  __attribute__((unu
 static UA_EventFieldList
 XS_unpack_UA_EventFieldList(SV *in)
 {
+	dTHX;
 	UA_EventFieldList out;
 	SV **svp;
 	AV *av;
@@ -10248,7 +10506,7 @@ XS_unpack_UA_EventFieldList(SV *in)
 		if (out.eventFields == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.eventFields[i] = XS_unpack_UA_Variant(*svp);
@@ -10265,6 +10523,7 @@ static void XS_pack_UA_StatusChangeNotification(SV *out, UA_StatusChangeNotifica
 static void
 XS_pack_UA_StatusChangeNotification(SV *out, UA_StatusChangeNotification in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10283,6 +10542,7 @@ static UA_StatusChangeNotification XS_unpack_UA_StatusChangeNotification(SV *in)
 static UA_StatusChangeNotification
 XS_unpack_UA_StatusChangeNotification(SV *in)
 {
+	dTHX;
 	UA_StatusChangeNotification out;
 	SV **svp;
 	HV *hv;
@@ -10310,6 +10570,7 @@ static void XS_pack_UA_SubscriptionAcknowledgement(SV *out, UA_SubscriptionAckno
 static void
 XS_pack_UA_SubscriptionAcknowledgement(SV *out, UA_SubscriptionAcknowledgement in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10328,6 +10589,7 @@ static UA_SubscriptionAcknowledgement XS_unpack_UA_SubscriptionAcknowledgement(S
 static UA_SubscriptionAcknowledgement
 XS_unpack_UA_SubscriptionAcknowledgement(SV *in)
 {
+	dTHX;
 	UA_SubscriptionAcknowledgement out;
 	SV **svp;
 	HV *hv;
@@ -10355,6 +10617,7 @@ static void XS_pack_UA_PublishRequest(SV *out, UA_PublishRequest in)  __attribut
 static void
 XS_pack_UA_PublishRequest(SV *out, UA_PublishRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10366,7 +10629,7 @@ XS_pack_UA_PublishRequest(SV *out, UA_PublishRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.subscriptionAcknowledgementsSize);
-	for(i = 0; i < in.subscriptionAcknowledgementsSize; i++) {
+	for (i = 0; i < in.subscriptionAcknowledgementsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_SubscriptionAcknowledgement(sv, in.subscriptionAcknowledgements[i]);
 		av_push(av, sv);
@@ -10380,6 +10643,7 @@ static UA_PublishRequest XS_unpack_UA_PublishRequest(SV *in)  __attribute__((unu
 static UA_PublishRequest
 XS_unpack_UA_PublishRequest(SV *in)
 {
+	dTHX;
 	UA_PublishRequest out;
 	SV **svp;
 	AV *av;
@@ -10408,7 +10672,7 @@ XS_unpack_UA_PublishRequest(SV *in)
 		if (out.subscriptionAcknowledgements == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.subscriptionAcknowledgements[i] = XS_unpack_UA_SubscriptionAcknowledgement(*svp);
@@ -10425,6 +10689,7 @@ static void XS_pack_UA_PublishResponse(SV *out, UA_PublishResponse in)  __attrib
 static void
 XS_pack_UA_PublishResponse(SV *out, UA_PublishResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10440,7 +10705,7 @@ XS_pack_UA_PublishResponse(SV *out, UA_PublishResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.availableSequenceNumbersSize);
-	for(i = 0; i < in.availableSequenceNumbersSize; i++) {
+	for (i = 0; i < in.availableSequenceNumbersSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.availableSequenceNumbers[i]);
 		av_push(av, sv);
@@ -10457,7 +10722,7 @@ XS_pack_UA_PublishResponse(SV *out, UA_PublishResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -10466,7 +10731,7 @@ XS_pack_UA_PublishResponse(SV *out, UA_PublishResponse in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -10480,6 +10745,7 @@ static UA_PublishResponse XS_unpack_UA_PublishResponse(SV *in)  __attribute__((u
 static UA_PublishResponse
 XS_unpack_UA_PublishResponse(SV *in)
 {
+	dTHX;
 	UA_PublishResponse out;
 	SV **svp;
 	AV *av;
@@ -10512,7 +10778,7 @@ XS_unpack_UA_PublishResponse(SV *in)
 		if (out.availableSequenceNumbers == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.availableSequenceNumbers[i] = XS_unpack_UA_UInt32(*svp);
@@ -10540,7 +10806,7 @@ XS_unpack_UA_PublishResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -10560,7 +10826,7 @@ XS_unpack_UA_PublishResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -10577,6 +10843,7 @@ static void XS_pack_UA_RepublishRequest(SV *out, UA_RepublishRequest in)  __attr
 static void
 XS_pack_UA_RepublishRequest(SV *out, UA_RepublishRequest in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10599,6 +10866,7 @@ static UA_RepublishRequest XS_unpack_UA_RepublishRequest(SV *in)  __attribute__(
 static UA_RepublishRequest
 XS_unpack_UA_RepublishRequest(SV *in)
 {
+	dTHX;
 	UA_RepublishRequest out;
 	SV **svp;
 	HV *hv;
@@ -10630,6 +10898,7 @@ static void XS_pack_UA_RepublishResponse(SV *out, UA_RepublishResponse in)  __at
 static void
 XS_pack_UA_RepublishResponse(SV *out, UA_RepublishResponse in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10648,6 +10917,7 @@ static UA_RepublishResponse XS_unpack_UA_RepublishResponse(SV *in)  __attribute_
 static UA_RepublishResponse
 XS_unpack_UA_RepublishResponse(SV *in)
 {
+	dTHX;
 	UA_RepublishResponse out;
 	SV **svp;
 	HV *hv;
@@ -10675,6 +10945,7 @@ static void XS_pack_UA_DeleteSubscriptionsRequest(SV *out, UA_DeleteSubscription
 static void
 XS_pack_UA_DeleteSubscriptionsRequest(SV *out, UA_DeleteSubscriptionsRequest in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10686,7 +10957,7 @@ XS_pack_UA_DeleteSubscriptionsRequest(SV *out, UA_DeleteSubscriptionsRequest in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.subscriptionIdsSize);
-	for(i = 0; i < in.subscriptionIdsSize; i++) {
+	for (i = 0; i < in.subscriptionIdsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_UInt32(sv, in.subscriptionIds[i]);
 		av_push(av, sv);
@@ -10700,6 +10971,7 @@ static UA_DeleteSubscriptionsRequest XS_unpack_UA_DeleteSubscriptionsRequest(SV 
 static UA_DeleteSubscriptionsRequest
 XS_unpack_UA_DeleteSubscriptionsRequest(SV *in)
 {
+	dTHX;
 	UA_DeleteSubscriptionsRequest out;
 	SV **svp;
 	AV *av;
@@ -10728,7 +11000,7 @@ XS_unpack_UA_DeleteSubscriptionsRequest(SV *in)
 		if (out.subscriptionIds == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.subscriptionIds[i] = XS_unpack_UA_UInt32(*svp);
@@ -10745,6 +11017,7 @@ static void XS_pack_UA_DeleteSubscriptionsResponse(SV *out, UA_DeleteSubscriptio
 static void
 XS_pack_UA_DeleteSubscriptionsResponse(SV *out, UA_DeleteSubscriptionsResponse in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -10756,7 +11029,7 @@ XS_pack_UA_DeleteSubscriptionsResponse(SV *out, UA_DeleteSubscriptionsResponse i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.resultsSize);
-	for(i = 0; i < in.resultsSize; i++) {
+	for (i = 0; i < in.resultsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_StatusCode(sv, in.results[i]);
 		av_push(av, sv);
@@ -10765,7 +11038,7 @@ XS_pack_UA_DeleteSubscriptionsResponse(SV *out, UA_DeleteSubscriptionsResponse i
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -10779,6 +11052,7 @@ static UA_DeleteSubscriptionsResponse XS_unpack_UA_DeleteSubscriptionsResponse(S
 static UA_DeleteSubscriptionsResponse
 XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 {
+	dTHX;
 	UA_DeleteSubscriptionsResponse out;
 	SV **svp;
 	AV *av;
@@ -10807,7 +11081,7 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 		if (out.results == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.results[i] = XS_unpack_UA_StatusCode(*svp);
@@ -10827,7 +11101,7 @@ XS_unpack_UA_DeleteSubscriptionsResponse(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -10844,6 +11118,7 @@ static void XS_pack_UA_BuildInfo(SV *out, UA_BuildInfo in)  __attribute__((unuse
 static void
 XS_pack_UA_BuildInfo(SV *out, UA_BuildInfo in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -10878,6 +11153,7 @@ static UA_BuildInfo XS_unpack_UA_BuildInfo(SV *in)  __attribute__((unused));
 static UA_BuildInfo
 XS_unpack_UA_BuildInfo(SV *in)
 {
+	dTHX;
 	UA_BuildInfo out;
 	SV **svp;
 	HV *hv;
@@ -10921,6 +11197,7 @@ static void XS_pack_UA_RedundancySupport(SV *out, UA_RedundancySupport in)  __at
 static void
 XS_pack_UA_RedundancySupport(SV *out, UA_RedundancySupport in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -10928,6 +11205,7 @@ static UA_RedundancySupport XS_unpack_UA_RedundancySupport(SV *in)  __attribute_
 static UA_RedundancySupport
 XS_unpack_UA_RedundancySupport(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -10936,6 +11214,7 @@ static void XS_pack_UA_ServerState(SV *out, UA_ServerState in)  __attribute__((u
 static void
 XS_pack_UA_ServerState(SV *out, UA_ServerState in)
 {
+	dTHX;
 	sv_setiv(out, in);
 }
 
@@ -10943,6 +11222,7 @@ static UA_ServerState XS_unpack_UA_ServerState(SV *in)  __attribute__((unused));
 static UA_ServerState
 XS_unpack_UA_ServerState(SV *in)
 {
+	dTHX;
 	return SvIV(in);
 }
 
@@ -10951,6 +11231,7 @@ static void XS_pack_UA_ServerDiagnosticsSummaryDataType(SV *out, UA_ServerDiagno
 static void
 XS_pack_UA_ServerDiagnosticsSummaryDataType(SV *out, UA_ServerDiagnosticsSummaryDataType in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -11009,6 +11290,7 @@ static UA_ServerDiagnosticsSummaryDataType XS_unpack_UA_ServerDiagnosticsSummary
 static UA_ServerDiagnosticsSummaryDataType
 XS_unpack_UA_ServerDiagnosticsSummaryDataType(SV *in)
 {
+	dTHX;
 	UA_ServerDiagnosticsSummaryDataType out;
 	SV **svp;
 	HV *hv;
@@ -11076,6 +11358,7 @@ static void XS_pack_UA_ServerStatusDataType(SV *out, UA_ServerStatusDataType in)
 static void
 XS_pack_UA_ServerStatusDataType(SV *out, UA_ServerStatusDataType in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -11110,6 +11393,7 @@ static UA_ServerStatusDataType XS_unpack_UA_ServerStatusDataType(SV *in)  __attr
 static UA_ServerStatusDataType
 XS_unpack_UA_ServerStatusDataType(SV *in)
 {
+	dTHX;
 	UA_ServerStatusDataType out;
 	SV **svp;
 	HV *hv;
@@ -11153,6 +11437,7 @@ static void XS_pack_UA_Range(SV *out, UA_Range in)  __attribute__((unused));
 static void
 XS_pack_UA_Range(SV *out, UA_Range in)
 {
+	dTHX;
 	SV *sv;
 	HV *hv = newHV();
 
@@ -11171,6 +11456,7 @@ static UA_Range XS_unpack_UA_Range(SV *in)  __attribute__((unused));
 static UA_Range
 XS_unpack_UA_Range(SV *in)
 {
+	dTHX;
 	UA_Range out;
 	SV **svp;
 	HV *hv;
@@ -11198,6 +11484,7 @@ static void XS_pack_UA_DataChangeNotification(SV *out, UA_DataChangeNotification
 static void
 XS_pack_UA_DataChangeNotification(SV *out, UA_DataChangeNotification in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -11205,7 +11492,7 @@ XS_pack_UA_DataChangeNotification(SV *out, UA_DataChangeNotification in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.monitoredItemsSize);
-	for(i = 0; i < in.monitoredItemsSize; i++) {
+	for (i = 0; i < in.monitoredItemsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_MonitoredItemNotification(sv, in.monitoredItems[i]);
 		av_push(av, sv);
@@ -11214,7 +11501,7 @@ XS_pack_UA_DataChangeNotification(SV *out, UA_DataChangeNotification in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.diagnosticInfosSize);
-	for(i = 0; i < in.diagnosticInfosSize; i++) {
+	for (i = 0; i < in.diagnosticInfosSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_DiagnosticInfo(sv, in.diagnosticInfos[i]);
 		av_push(av, sv);
@@ -11228,6 +11515,7 @@ static UA_DataChangeNotification XS_unpack_UA_DataChangeNotification(SV *in)  __
 static UA_DataChangeNotification
 XS_unpack_UA_DataChangeNotification(SV *in)
 {
+	dTHX;
 	UA_DataChangeNotification out;
 	SV **svp;
 	AV *av;
@@ -11252,7 +11540,7 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 		if (out.monitoredItems == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.monitoredItems[i] = XS_unpack_UA_MonitoredItemNotification(*svp);
@@ -11272,7 +11560,7 @@ XS_unpack_UA_DataChangeNotification(SV *in)
 		if (out.diagnosticInfos == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.diagnosticInfos[i] = XS_unpack_UA_DiagnosticInfo(*svp);
@@ -11289,6 +11577,7 @@ static void XS_pack_UA_EventNotificationList(SV *out, UA_EventNotificationList i
 static void
 XS_pack_UA_EventNotificationList(SV *out, UA_EventNotificationList in)
 {
+	dTHX;
 	SV *sv;
 	AV *av;
 	size_t i;
@@ -11296,7 +11585,7 @@ XS_pack_UA_EventNotificationList(SV *out, UA_EventNotificationList in)
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.eventsSize);
-	for(i = 0; i < in.eventsSize; i++) {
+	for (i = 0; i < in.eventsSize; i++) {
 		sv = newSV(0);
 		XS_pack_UA_EventFieldList(sv, in.events[i]);
 		av_push(av, sv);
@@ -11310,6 +11599,7 @@ static UA_EventNotificationList XS_unpack_UA_EventNotificationList(SV *in)  __at
 static UA_EventNotificationList
 XS_unpack_UA_EventNotificationList(SV *in)
 {
+	dTHX;
 	UA_EventNotificationList out;
 	SV **svp;
 	AV *av;
@@ -11334,7 +11624,7 @@ XS_unpack_UA_EventNotificationList(SV *in)
 		if (out.events == NULL) {
 			croak("%s: calloc", __func__);
 		}
-		for(i = 0; i <= top; i++) {
+		for (i = 0; i <= top; i++) {
 			svp = av_fetch(av, i, 0);
 			if (svp != NULL) {
 				out.events[i] = XS_unpack_UA_EventFieldList(*svp);

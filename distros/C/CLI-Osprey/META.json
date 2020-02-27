@@ -13,6 +13,11 @@
       "version" : 2
    },
    "name" : "CLI-Osprey",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -21,11 +26,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::Long::Descriptive" : "0",
+            "Getopt::Long::Descriptive" : "0.100",
             "Module::Runtime" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "Path::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "1"
          }
       }
    },
@@ -45,8 +57,8 @@
          "web" : "http://github.com/arodland/CLI-Osprey"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:ARODLAND",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

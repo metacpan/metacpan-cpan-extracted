@@ -11,5 +11,6 @@ cpanfile
 dist.ini
 lib/Test2/Plugin/IOEvents.pm
 lib/Test2/Plugin/IOEvents/Tie.pm
+t/pipe.t
 t/test.t
 xt/author/pod-syntax.t

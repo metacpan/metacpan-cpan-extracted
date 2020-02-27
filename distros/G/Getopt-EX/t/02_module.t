@@ -4,6 +4,7 @@ use utf8;
 use Test::More;
 use File::Spec;
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 
 my $lib = File::Spec->rel2abs('lib');
 my $t = File::Spec->rel2abs('t');
@@ -18,6 +19,7 @@ unshift @INC, $app_lib;
 ## deal_with
 ##
 {
+    local %INC = %INC;
     my $rcloader = new Getopt::EX::Loader
 	BASECLASS => "App::example";
     my @argv = qw(-Mexample_test --drink-me arg1);
@@ -35,13 +37,12 @@ for my $param (
     [ "array w/empty base", [ '', 'App::example' ] ],
     )
 {
-    delete $INC{"App/example/example_test"};
-
+    local %INC = %INC;
     my($comment, $baseclass) = @$param;
     my $rcloader = new Getopt::EX::Loader
 	BASECLASS => $baseclass;
     my $mod = $rcloader->load_module('example_test');
-    is ($mod->{Module}, "App::example::example_test", $comment);
+    is($mod->{Module}, "App::example::example_test", $comment);
 }
 
-done_testing;
+done_testing();

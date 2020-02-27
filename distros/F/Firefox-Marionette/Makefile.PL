@@ -157,7 +157,7 @@ WriteMakefile(
         'HTTP::Response'  => 0,
         'File::HomeDir'   => 0,
         'IO::Socket::SSL' => 0,
-        $] ge '5.010' ? ( 'PDF::API2' => 0 ) : (),
+        $] ge '5.010' ? ( 'PDF::API2' => 2.036 ) : (),
     },
     PREREQ_PM => {
         'Archive::Zip'        => 0,

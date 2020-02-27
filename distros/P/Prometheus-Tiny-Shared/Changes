@@ -1,5 +1,10 @@
 Revision history for Prometheus-Tiny-Shared
 
+0.011     2020-02-27 16:17:58+11:00 Australia/Melbourne
+- Make it work under Perl < 5.24 again (no postderef)
+- Add init_file option to recreate the underlying file at object construction.
+- Make objects reusable across forks
+
 0.010     2020-02-26 21:45:37+11:00 Australia/Melbourne
 - Change to using SQLite for the backing store, fixing the situation where
   metrics could be lost if there were lots of them. Minor change to the

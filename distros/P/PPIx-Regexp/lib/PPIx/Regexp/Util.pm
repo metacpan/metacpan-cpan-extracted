@@ -6,19 +6,24 @@ use strict;
 use warnings;
 
 use Carp;
-use PPIx::Regexp::Constant qw{ @CARP_NOT };
+use PPIx::Regexp::Constant qw{
+    @CARP_NOT
+};
 use Scalar::Util qw{ blessed };
+use Text::Tabs ();
 
 use base qw{ Exporter };
 
 our @EXPORT_OK = qw{
     is_ppi_regexp_element
-    __choose_tokenizer_class __instance
+    __choose_tokenizer_class
+    __instance
     __is_ppi_regexp_element
-    __ns_can __to_ordinal_en
+    __ns_can
+    __to_ordinal_en
 };
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;

@@ -1,4 +1,11 @@
-0.310   2017-12-20 (PERLANCAR)
+0.311   2020-02-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Some POD formatting fixes/tweaks.
+
+
+0.310   2017-12-20  Released-By: PERLANCAR
 
 	- Bugfix: handle case where option spec might have handler, even
 	  though the first argument is a hashref (RT#123857, thanks
@@ -7,71 +14,71 @@
 	- Fix example, thanks SREZIC.
 
 
-0.30    2016-12-03 (PERLANCAR)
+0.30    2016-12-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Getopt::Long::More.
 
 
-0.29    2016-12-03 (PERLANCAR)
+0.29    2016-12-03  Released-By: PERLANCAR
 
 	- Set Getopt::Long configuration: gnu_compat and no_getopt_compat.
 
 
-0.28    2016-10-22 (PERLANCAR)
+0.28    2016-10-22  Released-By: PERLANCAR
 
 	- Add support for fish & zsh (via Complete::Fish & Complete::Zsh).
 
 
-0.27    2016-02-03 (PERLANCAR)
+0.27    2016-02-03  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.27.
 
 
-0.26    2015-12-30 (PERLANCAR)
+0.26    2015-12-30  Released-By: PERLANCAR
 
 	- [ux] Use Complete::Bash's new truncate_current_word option for
 	  convenience, like in Perinci::Sub::Complete.
 
 
-0.25    2015-04-30 (PERLANCAR)
+0.25    2015-04-30  Released-By: PERLANCAR
 
 	- Document incompatibilities with Getopt::Long [RT#104086].
 
 	- New Complete::Bash no longer has 3rd parameter (word_breaks).
 
 
-0.24    2015-02-15 (PERLANCAR)
+0.24    2015-02-15  Released-By: PERLANCAR
 
 	- Support turning off bundling.
 
 
-0.23    2015-01-02 (PERLANCAR)
+0.23    2015-01-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] Oops, typo, should've taken hashref instead of arrayref.
 
 
-0.22    2015-01-02 (PERLANCAR)
+0.22    2015-01-02  Released-By: PERLANCAR
 
 	- [Bugfix] Comply with Getopt::Long: if first argument is a hash,
 	  options spec is an array not hash.
 
 
-0.21    2014-12-29 (PERLANCAR)
+0.21    2014-12-29  Released-By: PERLANCAR
 
 	- Adjust to Complete::Bash 0.14 which contains workaround for the
 	  annoyance of completing word containing ':' in bash.
 
 
-0.20    2014-12-29 (PERLANCAR)
+0.20    2014-12-29  Released-By: PERLANCAR
 
 	- Add setting variables: $opt_permute, $opt_pass_through.
 
 
-0.19    2014-12-18 (PERLANCAR)
+0.19    2014-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -79,35 +86,35 @@
 	  Windows.
 
 
-0.18    2014-12-18 (PERLANCAR)
+0.18    2014-12-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Make Complete::* modules prereq on Unix only for now.
 
 
-0.17    2014-12-14 (PERLANCAR)
+0.17    2014-12-14  Released-By: PERLANCAR
 
 	- Remove some completion code (will be handed off to shcompgen).
 
 
-0.16    2014-12-13 (PERLANCAR)
+0.16    2014-12-13  Released-By: PERLANCAR
 
 	- Update instruction for activating tab completion (mention
 	  shcompgen).
 
 
-0.15    2014-11-29 (PERLANCAR)
+0.15    2014-11-29  Released-By: PERLANCAR
 
 	- Add completion support for fish and zsh.
 
 
-0.14    2014-11-23 (PERLANCAR)
+0.14    2014-11-23  Released-By: PERLANCAR
 
 	- Add completion support for tcsh.
 
 
-0.13    2014-11-10 (PERLANCAR)
+0.13    2014-11-10  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -116,19 +123,19 @@
         - Mention App::BashCompletionProg.
 
 
-0.12    2014-08-07 (SHARYANTO)
+0.12    2014-08-07  Released-By: SHARYANTO
 
         - [Bugfix] Fix shebang line of script.
 
 
-0.11    2014-08-02 (SHARYANTO)
+0.11    2014-08-02  Released-By: SHARYANTO
 
         - No functional changes.
 
         - POD fixes.
 
 
-0.10    2014-07-27 (SHARYANTO)
+0.10    2014-07-27  Released-By: SHARYANTO
 
         [POTENTIALLY INCOMPATIBLE CHANGES]
 
@@ -136,7 +143,7 @@
           with no_ignore_case, bundling.
 
 
-0.09    2014-07-27 (SHARYANTO)
+0.09    2014-07-27  Released-By: SHARYANTO
 
         - bin/demo-getopt-long-complete: bug fix and add some more short/long
           option aliases.
@@ -146,20 +153,20 @@
           auto_abbrev, permute.
 
 
-0.08    2014-07-27 (SHARYANTO)
+0.08    2014-07-27  Released-By: SHARYANTO
 
         - bin/demo-getopt-long-complete: set sane Getopt::Long configuration
           (bundling + no_ignore_case).
 
 
-0.07    2014-07-27 (SHARYANTO)
+0.07    2014-07-27  Released-By: SHARYANTO
 
         - Support old GetOptionsWithCompletion()'s first argument as hash
           (through Complete::Getopt::Long 0.09). This is undocumented and will
           be removed in the future though.
 
 
-0.06    2014-07-27 (SHARYANTO)
+0.06    2014-07-27  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -171,19 +178,19 @@
           it is being called for. See Complete::Getopt::Long for more details.
 
 
-0.05    2014-07-26 (SHARYANTO)
+0.05    2014-07-26  Released-By: SHARYANTO
 
         - Add demo script: demo-getopt-long-complete.
 
 
-0.04    2014-07-25 (SHARYANTO)
+0.04    2014-07-25  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Adjust to Complete::Bash 0.09.
 
 
-0.03    2014-07-22 (SHARYANTO)
+0.03    2014-07-22  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -192,13 +199,13 @@
         - Add example for completing argument.
 
 
-0.02    2014-07-22 (SHARYANTO)
+0.02    2014-07-22  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Fix POD.
 
 
-0.01    2014-07-22 (SHARYANTO)
+0.01    2014-07-22  Released-By: SHARYANTO
 
         - First release.

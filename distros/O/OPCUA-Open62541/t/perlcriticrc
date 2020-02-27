@@ -1,0 +1,56 @@
+### General settings
+color = 0
+force = 0
+
+# Only apply policies listed in the perlcriticrc
+# only = 1
+
+severity = 3
+
+# Output format
+verbose = %f: [%s - %p] %m at line %l, column %c.\n
+
+### List of Perl::Critic policies to apply
+[Variables::RequireInitializationForLocalVars]
+severity = 2
+[BuiltinFunctions::ProhibitStringyEval]
+[BuiltinFunctions::RequireGlobFunction]
+[ClassHierarchies::ProhibitOneArgBless]
+[ControlStructures::ProhibitDeepNests]
+[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+[ControlStructures::ProhibitMutatingListFunctions]
+[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+[ControlStructures::ProhibitUnreachableCode]
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+[InputOutput::ProhibitBacktickOperators]
+[InputOutput::ProhibitBarewordFileHandles]
+[InputOutput::ProhibitTwoArgOpen]
+[InputOutput::RequireCheckedClose]
+[InputOutput::RequireCheckedOpen]
+[InputOutput::RequireCheckedSyscalls]
+[Modules::ProhibitEvilModules]
+[Modules::RequireExplicitPackage]
+severity = 2
+[Modules::RequireFilenameMatchesPackage]
+[Modules::RequireNoMatchVarsWithUseEnglish]
+[NamingConventions::ProhibitAmbiguousNames]
+[RegularExpressions::ProhibitCaptureWithoutTest]
+[Subroutines::ProhibitExplicitReturnUndef]
+severity = 2
+[Subroutines::ProhibitNestedSubs]
+[Subroutines::RequireArgUnpacking]
+severity = 2
+[Subroutines::ProhibitReturnSort]
+[Subroutines::RequireFinalReturn]
+severity = 2
+[TestingAndDebugging::RequireUseStrict]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+severity = 2
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+severity = 2
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+[Variables::ProhibitConditionalDeclarations]
+
+#[Modules::ProhibitExcessMainComplexity]
+#[Subroutines::ProhibitExcessComplexity]
+#[TestingAndDebugging::RequireUseWarnings]

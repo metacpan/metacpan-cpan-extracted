@@ -1,19 +1,23 @@
 package Complete::TZ;
 
-our $DATE = '2015-11-29'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-02-27'; # DATE
+our $DIST = 'Complete-TZ'; # DIST
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
 
 use Complete::Common qw(:all);
 use Complete::Util qw(hashify_answer);
+use Sah::Schema::date::tz_offset;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
+                       complete_tz_name
+                       complete_tz_offset
                        complete_tz
                 );
 
@@ -24,7 +28,7 @@ $SPEC{':package'} = {
     summary => 'Timezone-related completion routines',
 };
 
-$SPEC{complete_tz} = {
+$SPEC{complete_tz_name} = {
     v => 1.1,
     summary => 'Complete from list of timezone names',
     description => <<'_',
@@ -41,7 +45,7 @@ _
         schema => 'array',
     },
 };
-sub complete_tz {
+sub complete_tz_name {
     require Complete::File;
 
     my %args  = @_;
@@ -62,6 +66,35 @@ sub complete_tz {
     $res;
 }
 
+# old name
+*complete_tz = \&complete_tz_name;
+
+$SPEC{complete_tz_offset} = {
+    v => 1.1,
+    summary => 'Complete from list of existing timezone offsets (in the form of -HH:MM(:SS)? or +HH:MM(:SS)?)',
+    description => <<'_',
+
+_
+    args => {
+        %arg_word,
+    },
+    result_naked => 1,
+    result => {
+        schema => 'array',
+    },
+};
+sub complete_tz_offset {
+    require Complete::Util;
+
+    my %args  = @_;
+    my $word  = $args{word} // "";
+
+    Complete::Util::complete_array_elem(
+        word => $word,
+        array => \@Sah::Schema::date::tz_offset::TZ_STRING_OFFSETS,
+    );
+}
+
 1;
 # ABSTRACT: Timezone-related completion routines
 
@@ -77,14 +110,18 @@ Complete::TZ - Timezone-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.07 of Complete::TZ (from Perl distribution Complete-TZ), released on 2015-11-29.
+This document describes version 0.081 of Complete::TZ (from Perl distribution Complete-TZ), released on 2020-02-27.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 complete_tz(%args) -> array
+=head2 complete_tz_name
+
+Usage:
+
+ complete_tz_name(%args) -> array
 
 Complete from list of timezone names.
 
@@ -101,11 +138,37 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
-=head1 SEE ALSO
+
+
+=head2 complete_tz_offset
+
+Usage:
+
+ complete_tz_offset(%args) -> array
+
+Complete from list of existing timezone offsets (in the form of -HH:MM(:SS)? or +HH:MM(:SS)?).
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<word>* => I<str> (default: "")
+
+Word to complete.
+
+
+=back
+
+Return value:  (array)
+
+=for Pod::Coverage ^(complete_tz)$
 
 =head1 HOMEPAGE
 
@@ -123,13 +186,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

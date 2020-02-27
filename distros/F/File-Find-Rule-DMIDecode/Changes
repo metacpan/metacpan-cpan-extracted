@@ -1,0 +1,11 @@
+0.03 2020-02-27T22:19:24+01:00
+ - Add dmidecode_handle() method.
+
+0.02 2020-02-27T14:04:13+01:00
+ - Fix META.yml.
+ - Fix dependencies. 
+ - LICENSE AND COPYRIGHT section in doc to my standard.
+ - SUBROUTINES section in doc to my standard.
+
+0.01 2020-02-27T12:04:46+01:00
+ - First version.

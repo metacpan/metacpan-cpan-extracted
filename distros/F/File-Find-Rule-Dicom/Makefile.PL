@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Common rules for searching for DICOM things.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
 author_requires 'Test::More' => 0;
@@ -23,13 +22,13 @@ requires 'File::Find::Rule' => 0;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=File-Find-Rule-Dicom';
-resources 'homepage' => 'https://github.com/tupinek/File-Find-Rule-Dicom';
-resources 'repository' => 'git://github.com/tupinek/File-Find-Rule-Dicom';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/File-Find-Rule-Dicom';
+resources 'repository' => 'git://github.com/michal-josef-spacek/File-Find-Rule-Dicom';
 test_requires 'File::Object' => 0.08;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

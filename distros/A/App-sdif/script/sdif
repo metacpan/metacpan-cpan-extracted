@@ -218,6 +218,7 @@ my %colormap = do {
 };
 
 use Getopt::EX::Colormap;
+$Getopt::EX::Colormap::NO_RESET_EL = 1;
 use constant SGR_RESET => "\e[m";
 my $color_handler = Getopt::EX::Colormap
     ->new(HASH => \%colormap)

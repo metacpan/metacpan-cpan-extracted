@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -144,10 +144,11 @@ sub new {
     $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
         'ignore', 1 );
+    $profile->set_value( 'browser.aboutHomeSnippets.updateUrl', q[], 1 );
+    $profile->set_value( 'browser.search.geoip.url',            q[], 1 );
     $profile->set_value( 'startup.homepage_welcome_url', 'about:blank', 1 );
     $profile->set_value( 'startup.homepage_welcome_url.additional',
         'about:blank', 1 );
-    $profile->set_value( 'xpinstall.signatures.require', 'false', 0 );
     $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
         'false', 0 );
     $profile->set_value( 'browser.download.useDownloadDir', 'true', 0 );
@@ -175,11 +176,25 @@ sub new {
     $profile->set_value( 'extensions.blocklist.enabled',   'false', 0 );
     $profile->set_value( 'browser.safebrowsing.downloads.remote.enabled',
         'false', 0 );
-    $profile->set_value( 'extensions.getAddons.cache.enabled', 'false', 0 );
-    $profile->set_value( 'app.normandy.enabled',               'false', 0 );
-    $profile->set_value( 'media.gmp-gmpopenh264.enabled',      'false', 0 );
-    $profile->set_value( 'browser.casting.enabled',            'false', 0 );
-    $profile->set_value( 'xpinstall.signatures.required',      'false', 0 );
+    $profile->set_value( 'extensions.getAddons.cache.enabled',     'false', 0 );
+    $profile->set_value( 'app.normandy.enabled',                   'false', 0 );
+    $profile->set_value( 'media.gmp-gmpopenh264.enabled',          'false', 0 );
+    $profile->set_value( 'browser.casting.enabled',                'false', 0 );
+    $profile->set_value( 'xpinstall.signatures.required',          'false', 0 );
+    $profile->set_value( 'network.captive-portal-service.enabled', 'false', 0 );
+    $profile->set_value( 'profile.enable_profile_migration',       'false', 0 );
+    $profile->set_value( 'bookmarks.initialized.pref',             'true',  0 );
+    $profile->set_value( 'browser.bookmarks.restore_default_bookmarks',
+        'false', 0 );
+    $profile->set_value( 'app.update.disabledForTesting', 'true', 0 );
+    $profile->set_value( 'browser.newtabpage.activity-stream.feeds.snippets',
+        'false', 0 );
+    $profile->set_value(
+        'browser.newtabpage.activity-stream.feeds.section.highlights',
+        'false', 0 );
+    $profile->set_value( 'browser.newtabpage.activity-stream.feeds.topsites',
+        'false', 0 );
+    $profile->set_value( 'browser.search.update', 'false', 0 );
 
     return $profile;
 }
@@ -302,7 +317,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.94
+Version 0.95
 
 =head1 SYNOPSIS
 
